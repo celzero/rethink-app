@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="BottomSheet" parent="@style/Theme.Design.BottomSheetDialog">
+        <item name="android:background">@drawable/bg_bottom_sheet_dialog_fragment</item>
+        <item name="android:windowBackgroundBlurRadius">80dp</item>
+    </style>
+</resources>

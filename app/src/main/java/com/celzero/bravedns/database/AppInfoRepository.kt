@@ -33,16 +33,15 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.insert(appInfo)
     }
 
-    suspend fun updateUid(oldUid: Int, uid: Int, pkg: String): Int {
-        val isExist = appInfoDAO.isUidPkgExist(uid, pkg) != null
+    suspend fun updateUid(oldUid: Int, newUid: Int, pkg: String): Int {
+        val isExist = appInfoDAO.isUidPkgExist(newUid, pkg) != null
         if (isExist) {
             // already app is present with the new uid, so no need to update
             // in that case, old uid with same pkg should be deleted as we intend to update the uid
             appInfoDAO.deletePackage(oldUid, pkg)
             return 0
         }
-
-        return appInfoDAO.updateUid(oldUid, pkg, uid)
+        return appInfoDAO.updateUid(oldUid, pkg, newUid)
     }
 
     suspend fun deleteByPackageName(packageNames: List<String>) {
@@ -57,12 +56,19 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         }
     }
 
-    suspend fun tombstoneApp(uid: Int, packageName: String?, tombstoneTs: Long) {
-        if (packageName == null) {
-            appInfoDAO.tombstoneApp(uid, tombstoneTs)
-            return
+    suspend fun tombstoneApp(oldUid: Int, newUid: Int, packageName: String?, tombstoneTs: Long) {
+        try {
+            if (packageName == null) {
+                appInfoDAO.tombstoneApp(oldUid, newUid, tombstoneTs)
+                return
+            }
+            appInfoDAO.tombstoneApp(oldUid, newUid, packageName, tombstoneTs)
+        } catch (_: Exception) {
+            // tombstoneApp is called when there is a package name change or uid change
+            // in both the cases, we try to update the existing record with new uid or package name
+            // if the record is not present, it throws exception, which we catch here
+            // no need to log this exception
         }
-        appInfoDAO.tombstoneApp(uid, packageName, tombstoneTs)
     }
 
     suspend fun getAppInfo(): List<AppInfo> {

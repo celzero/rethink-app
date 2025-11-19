@@ -27,7 +27,7 @@ class AlertsActivity : AppCompatActivity(R.layout.activity_alerts) {
     private val alerts: Array<AlertRegistry?> = Array(size = 3, init = { null })
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
         init()
     }

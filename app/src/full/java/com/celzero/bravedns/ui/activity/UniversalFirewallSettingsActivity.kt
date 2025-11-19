@@ -42,6 +42,7 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -55,15 +56,17 @@ class UniversalFirewallSettingsActivity :
     private val persistentState by inject<PersistentState>()
     private val connTrackerRepository by inject<ConnectionTrackerRepository>()
 
-    private lateinit var blockedUniversalRules : List<ConnectionTracker>
+    private var blockedUniversalRules : List<ConnectionTracker> = emptyList()
 
     companion object {
         const val RULES_SEARCH_ID = "R:"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -203,7 +206,7 @@ class UniversalFirewallSettingsActivity :
 
         b.firewallDnsBypassRl.setOnClickListener { startActivity(FirewallRuleset.RULE7.id) }
 
-        b.firewallNewAppRl.setOnClickListener { startActivity(FirewallRuleset.RULE8.id) }
+        b.firewallNewAppRl.setOnClickListener { startActivity(FirewallRuleset.RULE1B.id) }
 
         b.firewallMeteredRl.setOnClickListener { startActivity(FirewallRuleset.RULE1F.id) }
 
@@ -308,7 +311,7 @@ class UniversalFirewallSettingsActivity :
     }
 
     private fun showPermissionAlert() {
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.alert_permission_accessibility)
         builder.setMessage(R.string.alert_firewall_accessibility_explanation)
         builder.setPositiveButton(getString(R.string.univ_accessibility_dialog_positive)) { _, _ ->
@@ -353,7 +356,7 @@ class UniversalFirewallSettingsActivity :
             val dnsBypass =
                 blockedUniversalRules.filter { it.blockedByRule.contains(FirewallRuleset.RULE7.id) }
             val newApp =
-                blockedUniversalRules.filter { it.blockedByRule.contains(FirewallRuleset.RULE8.id) }
+                blockedUniversalRules.filter { it.blockedByRule.contains(FirewallRuleset.RULE1B.id) }
             val metered =
                 blockedUniversalRules.filter {
                     it.blockedByRule.contains(FirewallRuleset.RULE1F.id)

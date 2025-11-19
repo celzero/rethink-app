@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import org.koin.android.ext.android.inject
 import kotlin.getValue
 
@@ -61,8 +62,11 @@ class FragmentHostActivity : AppCompatActivity(R.layout.activity_fragment_host) 
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
+
         setContentView(R.layout.activity_fragment_host)
 
         if (savedInstanceState == null) {

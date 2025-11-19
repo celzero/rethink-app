@@ -51,11 +51,11 @@ interface AppInfoDAO {
     @Query("delete from AppInfo where uid = :uid and packageName = :packageName")
     fun deletePackage(uid: Int, packageName: String)
 
-    @Query("update AppInfo set tombstoneTs = :tombstoneTs where uid = :uid and packageName = :packageName")
-    fun tombstoneApp(uid: Int, packageName: String, tombstoneTs: Long)
+    @Query("update AppInfo set uid = :newUid, tombstoneTs = :tombstoneTs where uid = :uid and packageName = :packageName")
+    fun tombstoneApp(newUid: Int, uid: Int, packageName: String, tombstoneTs: Long)
 
-    @Query("update AppInfo set tombstoneTs = :tombstoneTs where uid = :uid")
-    fun tombstoneApp(uid: Int, tombstoneTs: Long)
+    @Query("update AppInfo set uid = :newUid, tombstoneTs = :tombstoneTs where uid = :oldUid")
+    fun tombstoneApp(oldUid: Int, newUid: Int, tombstoneTs: Long)
 
     @Query("select * from AppInfo order by appCategory, uid") fun getAllAppDetails(): List<AppInfo>
 

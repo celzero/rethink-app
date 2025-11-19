@@ -85,10 +85,9 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
      */
     private fun showAddCustomDohDialog() {
         val dialogBinding = DialogSetCustomDohBinding.inflate(layoutInflater)
-        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
         val dialog = builder.create()
-        dialog.show()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT

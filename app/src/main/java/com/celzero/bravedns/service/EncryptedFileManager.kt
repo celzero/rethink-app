@@ -77,7 +77,7 @@ object EncryptedFileManager {
                 ist?.close()
                 bos?.flush()
                 bos?.close()
-            } catch (ignored: Exception) { } // no-op
+            } catch (_: Exception) { } // no-op
         }
 
         return config

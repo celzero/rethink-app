@@ -236,7 +236,7 @@ class DoTEndpointAdapter(private val context: Context, private val appConfig: Ap
                 } else {
                     message
                 }
-            } catch (ignored: Exception) {
+            } catch (_: Exception) {
                 ""
             }
         }

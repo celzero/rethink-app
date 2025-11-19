@@ -33,6 +33,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.Dispatchers
@@ -61,6 +62,11 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
     ): View {
         _binding = BottomSheetFirewallSortFilterBinding.inflate(inflater, container, false)
         return b.root
+    }
+
+    override fun onStart() {
+        super.onStart()
+        dialog?.useTransparentNoDimBackground()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

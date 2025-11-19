@@ -46,18 +46,29 @@ class DataUsageUpdater(context: Context, workerParams: WorkerParameters) :
         val currentTimestamp = System.currentTimeMillis()
         val previousTimestamp = persistentState.prevDataUsageCheck
         val dataUsageList = connTrackRepository.getDataUsage(previousTimestamp, currentTimestamp)
+
+        if (dataUsageList == null) {
+            Logger.w(LOG_TAG_SCHEDULER, "Data usage list is null, skipping update")
+            persistentState.prevDataUsageCheck = currentTimestamp
+            return
+        }
+
         dataUsageList.forEach {
             if (it.uid == Constants.INVALID_UID) return@forEach
 
             try {
-                val currentDataUsage = appInfoRepository.getDataUsageByUid(it.uid) ?: return@forEach
+                val currentDataUsage = appInfoRepository.getDataUsageByUid(it.uid)
+                if (currentDataUsage == null) {
+                    Logger.w(LOG_TAG_SCHEDULER, "No data usage found for uid: ${it.uid}")
+                    return@forEach
+                }
 
                 val upload = currentDataUsage.uploadBytes + it.uploadBytes
                 val download = currentDataUsage.downloadBytes + it.downloadBytes
                 Logger.d(LOG_TAG_SCHEDULER, "Data usage for ${it.uid}, $upload, $download")
                 appInfoRepository.updateDataUsageByUid(it.uid, upload, download)
             } catch (e: Exception) {
-                Logger.e(LOG_TAG_SCHEDULER, "err in data usage updater: ${e.message}", e)
+                Logger.e(LOG_TAG_SCHEDULER, "err in data usage updater: ${e.message}")
             }
         }
 

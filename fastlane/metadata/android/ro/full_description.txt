@@ -1,0 +1,31 @@
+Bucură-te de un Android mai sigur, transparent și securizat.
+
+VPN: Conectează-te la multiple VPN-uri WireGuard, la alegerea ta.
+
+Sigur: Arată activitatea din rețea a aplicațiilor instalate și permite dezactivarea, dezinstalarea sau blocarea lor.
+
+Securizat: Prima linie de apărare împotriva spyware, ransomware și malware care sustrag informații personale și piratează conturi. Protejează împotriva manipulării DNS folosită, de regulă, pentru a cenzura site-urile web, social-media și aplicațiile de mesagerie.
+
+Rapid: Servere DNS amplasate în peste 300 de locații din întreaga lume pentru a te asigura că internetul tău este cât se poate de rapid și disponibil.
+
+Deschis: Open-source și liber de orice  urmărire.
+
+***Caracteristici****
+
+Firewall: Previne conectarea aplicațiilor la internet. Blochează spyware, malware, ransomware și multe altele.
+     
+Un firewall blochează orice aplicație care se conectează la internet prin WiFi sau date mobile. Deoarece majoritatea formelor de supraveghere necesită trimiterea datelor din rețea către un server, protejarea prin firewall atenuează eficient amenințarea (File Managers, Dearest Clock, Calculator sunt câteva exemple de aplicații care nu necesită acces la internet pentru a funcționa). Funcția firewall folosește Serviciul de accesibilitate pentru a detecta și proteja aplicațiile din fundal.
+
+Monitorizare: Ține evidența traficului de internet, atât la ieșire cât și la intrare. 
+
+Dacă este activată, înregistrările de conexiune sunt colectate și analizate. Rapoartele automate semnalează conexiunile necunoscute anterior sau suspecte și dezvăluie amploarea tentativelor de furt de date de către rețelele spyware. În testele noastre, aproximativ 60% din trafic este semnalat și raportat ca fiind inițiat de spyware cunoscut. Jurnalele generate sunt puse la dispoziția utilizatorului, în timp aproape real, pentru propria analiză.
+
+WireGuard: Trafic de internet securizat la ieșire.
+
+Aplicația folosește protocolul WireGuard rapid, modern, ușor și sigur pentru a cripta conexiunile de ieșire către orice furnizor VPN compatibil la alegere.
+
+Anti-cenzură: 
+
+Aplicația criptează conexiunea ta de internet la serverul DNS (Domain Name System) administrat de Rethink, cu prezență în peste 300 de locații din întreaga lume. Serverele DNS sunt agenda internetului: un server DNS oferă adresele exacte de care aveți nevoie pentru a vizita un site web sau a deschide o aplicație.
+
+Monitor date: Contorizează utilizarea datelor de către fiecare aplicație, atât la date mobile cât și la WiFi.

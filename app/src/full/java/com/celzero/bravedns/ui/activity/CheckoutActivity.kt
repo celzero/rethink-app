@@ -43,6 +43,7 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.togb
 import com.celzero.bravedns.util.Utilities.togs
 import com.celzero.bravedns.util.Utilities.tos
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -66,8 +67,10 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)

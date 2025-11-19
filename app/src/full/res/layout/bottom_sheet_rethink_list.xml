@@ -8,7 +8,7 @@
     android:paddingBottom="60dp"
     app:layout_behavior="@string/bottom_sheet_behavior">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="60dp"
         android:layout_height="3dp"
         android:layout_gravity="center"
@@ -17,7 +17,7 @@
         android:background="?attr/border" />
 
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/bsr_heading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -31,7 +31,7 @@
         android:textSize="@dimen/extra_large_font_text_view"
         android:textStyle="bold" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/bsr_configure"
         style="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="match_parent"

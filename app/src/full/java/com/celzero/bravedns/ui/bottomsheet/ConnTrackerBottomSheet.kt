@@ -38,7 +38,6 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
-import com.celzero.bravedns.data.ConnectionRules
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
@@ -48,7 +47,7 @@ import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.FirewallRuleset.Companion.getFirewallRule
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.ProxyManager.isIpnProxy
+import com.celzero.bravedns.service.ProxyManager.isNotLocalAndRpnProxy
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.AppInfoActivity
 import com.celzero.bravedns.util.Constants
@@ -61,6 +60,7 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.collect.HashMultimap
@@ -186,6 +186,11 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        dialog?.useTransparentNoDimBackground()
+    }
+
     private fun updateDnsIfAvailable() {
         val domain = info?.dnsQuery
         val uid = info?.uid
@@ -238,7 +243,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         }
 
         val rule = info!!.blockedByRule
-        val isIpnProxy = isIpnProxy(info?.proxyDetails ?: "")
+        val isIpnProxy = isNotLocalAndRpnProxy(info?.proxyDetails ?: "")
         // TODO: below code is not required, remove it in future (20/03/2023)
         if (rule.contains(FirewallRuleset.RULE2G.id)) {
             b.bsConnTrackAppInfo.text =
@@ -246,17 +251,26 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             return
         } else if (!info?.proxyDetails.isNullOrEmpty() && isIpnProxy) {
             // add the proxy id to the chip text if available
-            b.bsConnTrackAppInfo.text = getString(R.string.two_argument_colon, getFirewallRule(rule)?.title?.let { getString(it) }, info?.proxyDetails)
+            b.bsConnTrackAppInfo.text = getString(R.string.two_argument_colon, getString(FirewallRuleset.RULE12.title), info?.proxyDetails)
         } else {
-            val isRuleAddedAsProxy = getFirewallRule(rule)?.id == FirewallRuleset.RULE12.id
-            // when the conn is marked as proxied with id from flow, but the returned summary
-            // doesn't have the proxy details. change the rule from proxied to none
-            if (isRuleAddedAsProxy && (info?.proxyDetails.isNullOrEmpty() || !isIpnProxy)) {
-                b.bsConnTrackAppInfo.text = getString(getFirewallRule(FirewallRuleset.RULE0.id)?.title ?: R.string.firewall_rule_no_rule)
+            if (isInvalidProxyDetails()) {
+                b.bsConnTrackAppInfo.text = getString(getFirewallRule(FirewallRuleset.RULE18.id)?.title ?: R.string.firewall_rule_no_rule)
             } else {
                 b.bsConnTrackAppInfo.text = getFirewallRule(rule)?.title?.let { getString(it) }
             }
         }
+    }
+
+    private fun isInvalidProxyDetails(): Boolean {
+        val isIpnProxy = isNotLocalAndRpnProxy(info?.proxyDetails ?: "")
+        val rule = info!!.blockedByRule
+        val isRuleAddedAsProxy = getFirewallRule(rule)?.id == FirewallRuleset.RULE12.id
+        if (isRuleAddedAsProxy && (info?.proxyDetails.isNullOrEmpty() || !isIpnProxy)) {
+            // when the conn is marked as proxied with id from flow, but the returned summary
+            // doesn't have the proxy details. change the rule from proxied to error (RULE1C)
+            return true
+        }
+        return false
     }
 
     private fun updateAppDetails() {
@@ -379,7 +393,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                 requireContext(),
                 FirewallRuleset.getRulesIcon(info?.blockedByRule)
             )
-        if (info!!.isBlocked) {
+        if (info!!.isBlocked || isInvalidProxyDetails()) {
             b.bsConnTrackAppInfo.setTextColor(fetchColor(requireContext(), R.attr.chipTextNegative))
             val colorFilter =
                 PorterDuffColorFilter(
@@ -624,7 +638,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         if (blockedRule == null) return
 
         val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
-        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
         val dialog = builder.create()
         dialog.show()
@@ -726,13 +740,6 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun applyIpRule(ipRuleStatus: IpRulesManager.IpRuleStatus) {
-        val proto = Protocol.getProtocolName(info!!.protocol).name
-        val cr = ConnectionRules(info!!.ipAddress, info!!.port, proto)
-
-        Logger.i(
-            LOG_TAG_FIREWALL,
-            "Apply ip rule for ${cr.ipAddress}, ${FirewallRuleset.RULE2.name}"
-        )
         io {
             // no need to apply rule, prev selection and current selection are same
             if (
@@ -744,6 +751,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             val ipPair = IpRulesManager.getIpNetPort(info!!.ipAddress)
             val ip = ipPair.first ?: return@io
             IpRulesManager.addIpRule(info!!.uid, ip, /*wildcard-port*/ 0, ipRuleStatus, proxyId = "", proxyCC = "")
+            Logger.i(LOG_TAG_FIREWALL, "apply ip-rule for ${info!!.uid}, $ip, ${ipRuleStatus.name}")
         }
     }
 

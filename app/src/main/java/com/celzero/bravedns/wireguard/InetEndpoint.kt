@@ -106,7 +106,7 @@ private constructor(val host: String, private val isResolved: Boolean, val port:
                 InetAddresses.parse(uri.host)
                 // Parsing ths host as a numeric address worked, so we don't need to do DNS lookups.
                 InetEndpoint(uri.host, true, uri.port)
-            } catch (ignored: ParseException) {
+            } catch (_: ParseException) {
                 // Failed to parse the host as a numeric address, so it must be a DNS hostname/FQDN.
                 InetEndpoint(uri.host, false, uri.port)
             }

@@ -1,0 +1,1 @@
+Güvenlik duvarı uygulamaları, WireGuard VPN kullanın, ağı izleyin, kötü amaçlı yazılımları engelleyin, DNS'yi değiştirin.

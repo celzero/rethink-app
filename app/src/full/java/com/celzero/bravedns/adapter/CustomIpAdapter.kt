@@ -70,13 +70,15 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
             object : DiffUtil.ItemCallback<CustomIp>() {
 
                 override fun areItemsTheSame(oldConnection: CustomIp, newConnection: CustomIp) =
-                    oldConnection.ipAddress == newConnection.ipAddress &&
-                        oldConnection.status == newConnection.status &&
-                        oldConnection.proxyCC == newConnection.proxyCC &&
-                        oldConnection.proxyId == newConnection.proxyId
+                    oldConnection.uid == newConnection.uid &&
+                            oldConnection.ipAddress == newConnection.ipAddress &&
+                            oldConnection.port == newConnection.port
 
                 override fun areContentsTheSame(oldConnection: CustomIp, newConnection: CustomIp) =
-                    oldConnection == newConnection
+                    oldConnection.status == newConnection.status &&
+                            oldConnection.proxyCC == newConnection.proxyCC &&
+                            oldConnection.proxyId == newConnection.proxyId &&
+                            oldConnection.modifiedDateTime == newConnection.modifiedDateTime
             }
     }
 
@@ -249,6 +251,14 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                 }
             }
 
+            b.customIpCheckbox.setOnClickListener {
+                if (!isSelectionMode) {
+                    isSelectionMode = true
+                }
+                toggleSelection(customIp)
+                notifyDataSetChanged()
+            }
+
             b.customIpSeeMoreChip.setOnClickListener { openAppWiseRulesActivity(customIp.uid) }
 
             b.customIpContainer.setOnLongClickListener {
@@ -412,6 +422,14 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                 }
             }
 
+            b.customIpCheckbox.setOnClickListener {
+                if (!isSelectionMode) {
+                    isSelectionMode = true
+                }
+                toggleSelection(customIp)
+                notifyDataSetChanged()
+            }
+
             b.customIpContainer.setOnLongClickListener {
                 isSelectionMode = true
                 selectedItems.add(customIp)
@@ -508,7 +526,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
     private fun showEditIpDialog(customIp: CustomIp) {
         val dBind =
             DialogAddCustomIpBinding.inflate((context as CustomRulesActivity).layoutInflater)
-        val builder = MaterialAlertDialogBuilder(context).setView(dBind.root)
+        val builder = MaterialAlertDialogBuilder(context, R.style.App_Dialog_NoDim).setView(dBind.root)
         val lp = WindowManager.LayoutParams()
         val dialog = builder.create()
         dialog.show()

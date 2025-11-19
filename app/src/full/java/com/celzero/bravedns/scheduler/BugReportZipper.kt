@@ -26,6 +26,7 @@ import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities
+import com.celzero.firestack.intra.Intra
 import com.google.common.io.Files
 import java.io.File
 import java.io.FileInputStream
@@ -33,6 +34,7 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
+import java.nio.file.NoSuchFileException
 import java.util.Enumeration
 import java.util.zip.ZipEntry
 import java.util.zip.ZipException
@@ -113,12 +115,12 @@ object BugReportZipper {
 
             return ZipFile(file)
         } catch (e: FileNotFoundException) {
-            Logger.w(LOG_TAG_BUG_REPORT, "file not found exception while creating zip file", e)
+            Logger.w(LOG_TAG_BUG_REPORT, "file not found exception while creating zip file; ${e.message}")
         } catch (e: ZipException) {
-            Logger.w(LOG_TAG_BUG_REPORT, "err while creating zip file", e)
+            Logger.w(LOG_TAG_BUG_REPORT, "err while creating zip file; ${e.message}")
             Utilities.deleteRecursive(file) // delete corrupted zip file
         } catch (e: Exception) {
-            Logger.w(LOG_TAG_BUG_REPORT, "err while creating zip file", e)
+            Logger.w(LOG_TAG_BUG_REPORT, "err while creating zip file; ${e.message}")
         }
         return null
     }
@@ -382,7 +384,7 @@ object BugReportZipper {
         file.appendText(prefsDetails.toString())
         val separator = "--------------------------------------------\n"
         file.appendText(separator)
-        val build = VpnController.goBuildVersion(true)
+        val build = Intra.build(true)
         file.appendText(build)
         file.appendText(separator)
     }

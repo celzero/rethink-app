@@ -83,7 +83,7 @@
             android:layout_toEndOf="@id/custom_domain_checkbox"
             android:orientation="vertical">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/custom_domain_label_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -92,7 +92,7 @@
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/custom_domain_status_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -9,9 +9,7 @@
     <string name="orbot_status_arg_2">TCP</string>
     <string name="orbot_status_arg_3">DNS 同 TCP</string>
     <string name="orbot_http_desc">同 Orbot 嘅 HTTP 代理起條隧道。</string>
-    <string name="alert_firewall_accessibility_regrant_explanation">Rethink 嘅無障礙服務停咗或者 hang 咗。如果您要繼續用<i>攔截未使用應用</i>呢個功能，<i><b>請去系統設定度強制停止並再次啓動</b></i> Rethink。
-\n
-\nRethink 用咗無障礙服務嚟追蹤你用緊嘅 app（前景）同唔係用緊嘅 app（背景）。</string>
+    <string name="alert_firewall_accessibility_regrant_explanation">Rethink 嘅無障礙服務停咗或者 hang 咗。<i><b>請去系統設定度強制停止</b></i>並再次啓動 Rethink ，嚟繼續用<i>攔截未使用應用</i>呢個功能。 \n \nRethink 用咗無障礙服務嚟追蹤你用緊嘅 app（前景）同唔係用緊嘅 app（背景）。</string>
     <string name="status_protected_with_http_private_dns">被 HTTP 代理同私人 DNS 保護住</string>
     <string name="notification_action_dns_firewall_mode">DNS + 防火牆</string>
     <string name="settings_socks5_dialog_hint_ip">IP 地址</string>
@@ -396,8 +394,8 @@
     <string name="ctbs_block_other_apps">應用喺 %1$s 嘅規則亦會應用喺其他 %2$s 個應用程式</string>
     <string name="ctbs_dialog_negative_btn">返回</string>
     <string name="dns_log_dialog_positive">刪除日誌</string>
-    <string name="dns_btm_sheet_dialog_message"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>：%2$s 份攔截清單</h3>%3$s。<br/><br/>]]></Data> \u0020</string>
-    <string name="dns_btm_sheet_dialog_ips"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_message"><Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>：%2$s 份攔截清單</h3>%3$s。<br/><br/>]]></Data></string>
+    <string name="dns_btm_sheet_dialog_ips"><Data><![CDATA[ %1$s %2$s <br/>]]></Data></string>
     <string name="dns_btm_sheet_chip">+%1$s 個其他 IP</string>
     <string name="dns_btm_resolved_crypt">%1$s 由 %2$s 自 %3$s <u>匿名</u>解析</string>
     <string name="dns_btm_resolved_doh">%1$s 由 %2$s 解析</string>
@@ -677,16 +675,16 @@
     <string name="fapps_firewall_filter_bypass_universal">繞行咗</string>
     <string name="fapps_firewall_filter_excluded">排除咗</string>
     <string name="fapps_firewall_filter_isolate">隔離咗</string>
-    <string name="firewall_rule_block_app_desc">一條用戶定義嘅防火牆規則攔截咗呢個 <i>App</i>。<br></br><br></br>如果要改，請去<i>所有應用程式</i>選項卡。</string>
-    <string name="firewall_rule_new_app_desc">呢個 App <i>第一次</i>嘗試連線。<br></br><br></br>如果要改，請去<i>全局</i>選項卡。</string>
-    <string name="firewall_rule_block_app_unmetered_desc">一條用戶定義嘅防火牆規則喺呢個 <i>App</i> 嘗試連線去<i>唔收費嘅網絡</i>嘅時候將佢攔截咗。<br></br><br></br>如果要改，請去<i>所有應用程式</i>選項卡。</string>
-    <string name="firewall_rule_block_app_mobile_desc">一條用戶定義嘅防火牆規則喺呢個 <i>App</i> 嘗試連線去<i>收費嘅網絡</i>嘅時候將佢攔截咗。<br></br><br></br>如果要改，請去<i>所有應用程式</i>選項卡。</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc">一條用戶定義嘅全局防火牆規則喺呢個 <i>App</i> 嘗試連線去<i>收費嘅網絡</i>（流動數據）時將佢攔截咗。<br></br><br></br>如果要改，請去<i>全局</i>選項卡。</string>
-    <string name="firewall_rule_isolate_desc">一條用戶定義嘅全局防火牆規則喺呢個 <i>App</i> 嘗試連線去<i>已繞行 IP</i> 以外嘅地址時時將佢攔截咗。<br></br><br></br>如果要改，請去<i>所有應用程式</i>選項卡。</string>
-    <string name="firewall_rule_block_ip_univ_desc">一條用戶定義嘅全局防火牆規則攔截咗呢個<i>目標 IP / 埠</i>。<br></br><br></br>如果要改，請去<i>全局</i>選項卡。</string>
-    <string name="firewall_rule_block_ip_desc">一條用戶定義嘅全局防火牆規則攔截咗呢個<i>目標 IP</i>。<br></br><br></br>如果要改，請去<i>分應用防火牆</i>區。</string>
-    <string name="firewall_rule_trusted_ip_desc">呢個連線因爲呢個<i>目標 IP</i> 設定咗做信任嘅 IP 而被放行。<br></br><br></br>如果要改，請去<i>分應用防火牆</i>區。</string>
-    <string name="firewall_rule_bypass_universal_ip_desc">呢個連線因爲呢個<i>目標 IP</i> 設定咗做繞過所有全局規則而被放行。<br></br><br></br>如果要改，請去<i>全局</i>選項卡。</string>
+    <string name="firewall_rule_block_app_desc">一條用戶定義嘅防火牆規則攔截咗呢個 <i>App</i>。<br/><br/>如果要改，請去<i>所有應用程式</i>選項卡。</string>
+    <string name="firewall_rule_new_app_desc">呢個 App <i>第一次</i>嘗試連線。<br/><br/>如果要改，請去<i>全局</i>選項卡。</string>
+    <string name="firewall_rule_block_app_unmetered_desc">一條用戶定義嘅防火牆規則喺呢個 <i>App</i> 嘗試連線去<i>唔收費嘅網絡</i>嘅時候將佢攔截咗。<br/><br/>如果要改，請去<i>所有應用程式</i>選項卡。</string>
+    <string name="firewall_rule_block_app_mobile_desc">一條用戶定義嘅防火牆規則喺呢個 <i>App</i> 嘗試連線去<i>收費嘅網絡</i>嘅時候將佢攔截咗。<br/><br/>如果要改，請去<i>所有應用程式</i>選項卡。</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc">一條用戶定義嘅全局防火牆規則喺呢個 <i>App</i> 嘗試連線去<i>收費嘅網絡</i>（流動數據）時將佢攔截咗。<br/><br/>如果要改，請去<i>全局</i>選項卡。</string>
+    <string name="firewall_rule_isolate_desc">一條用戶定義嘅全局防火牆規則喺呢個 <i>App</i> 嘗試連線去<i>已繞行 IP</i> 以外嘅地址時時將佢攔截咗。<br/><br/>如果要改，請去<i>所有應用程式</i>選項卡。</string>
+    <string name="firewall_rule_block_ip_univ_desc">一條用戶定義嘅全局防火牆規則攔截咗呢個<i>目標 IP / 埠</i>。<br/><br/>如果要改，請去<i>全局</i>選項卡。</string>
+    <string name="firewall_rule_block_ip_desc">一條用戶定義嘅全局防火牆規則攔截咗呢個<i>目標 IP</i>。<br/><br/>如果要改，請去<i>分應用防火牆</i>區。</string>
+    <string name="firewall_rule_trusted_ip_desc">呢個連線因爲呢個<i>目標 IP</i> 設定咗做信任嘅 IP 而被放行。<br/><br/>如果要改，請去<i>分應用防火牆</i>區。</string>
+    <string name="firewall_rule_bypass_universal_ip_desc">呢個連線因爲呢個<i>目標 IP</i> 設定咗做繞過所有全局規則而被放行。<br/><br/>如果要改，請去<i>全局</i>選項卡。</string>
     <string name="cd_dialog_desc">一個 URL 或者網域，可以帶有通配符，例如 *.test.com 或者 test.com/test</string>
     <string name="cd_blocked_initial">攔</string>
     <string name="ci_bypass_universal_txt">無條件放行</string>
@@ -700,16 +698,16 @@
     <string name="ada_app_bypass_univ">無條件放行</string>
     <string name="notif_download_failure_content">下載失敗。請再試過。</string>
     <string name="brbs_restore_no_uri_toast">恢復失敗；請再試過</string>
-    <string name="firewall_rule_block_udp_ntp_desc">一條用戶定義嘅防火牆規則攔截咗呢個 <i>UDP</i> 連線。<br></br><br></br>如果要改，請去<i>全局</i>選項卡。</string>
+    <string name="firewall_rule_block_udp_ntp_desc">一條用戶定義嘅防火牆規則攔截咗呢個 <i>UDP</i> 連線。<br/><br/>如果要改，請去<i>全局</i>選項卡。</string>
     <string name="firewall_rule_exempt_orbot_setup_desc">呢個連線因爲仲設定緊<i>一鍵 Tor 代理</i>而放行。</string>
-    <string name="firewall_rule_device_lock_desc">呢個連線因爲<i>裝置鎖定咗</i>而被攔截。<br></br><br></br>如果要改呢個行爲，請去<i>全局</i>選項卡。</string>
-    <string name="firewall_rule_foreground_desc">呢個連線因爲來源嘅應用程式<i>唔喺前景</i>而被攔截。<br></br><br></br>如果要改呢個行爲，請去<i>全局</i>選項卡。</string>
-    <string name="firewall_rule_unknown_desc">呢個連線因爲唔知道<i>來源嘅應用程式</i>係乜而被攔截。<br></br><br></br>如果要改呢個行爲，請去<i>全局</i>選項卡。</string>
-    <string name="firewall_rule_block_dns_bypass_desc">呢個連線因爲<i>來源嘅應用程式</i>繞過咗用戶設定嘅 DNS 而被攔截。<br></br><br></br>如果要改呢個行爲，請去<i>全局</i>選項卡。</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc">呢個連線因爲<i>來源嘅應用程式</i>被設定咗做<i>無條件放行</i>而放行。<br></br><br></br>如果要改，請去<i>分應用防火牆</i>區。</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc">呢個 DNS 連線已經被代理咗並轉發去用戶所揀嘅 DNS 端點。<br></br><br></br>如果要改，請去 DNS <i>配置</i>區停用<i>防止 DNS 洩漏</i>。</string>
-    <string name="firewall_rule_block_http_desc">呢個連線因爲疑似用緊<i>唔安全嘅 HTTP</i> 而被攔截。<br></br><br></br>如果要改，請去<i>全局</i>選項卡。</string>
-    <string name="firewall_rule_global_lockdown_desc">呢個連線因爲設定咗全局閉關模式而被攔截。<br></br><br></br>如果要改，請至<i>全局</i>選項卡。</string>
+    <string name="firewall_rule_device_lock_desc">呢個連線因爲<i>裝置鎖定咗</i>而被攔截。<br/><br/>如果要改呢個行爲，請去<i>全局</i>選項卡。</string>
+    <string name="firewall_rule_foreground_desc">呢個連線因爲來源嘅應用程式<i>唔喺前景</i>而被攔截。<br/><br/>如果要改呢個行爲，請去<i>全局</i>選項卡。</string>
+    <string name="firewall_rule_unknown_desc">呢個連線因爲唔知道<i>來源嘅應用程式</i>係乜而被攔截。<br/><br/>如果要改呢個行爲，請去<i>全局</i>選項卡。</string>
+    <string name="firewall_rule_block_dns_bypass_desc">呢個連線因爲<i>來源嘅應用程式</i>繞過咗用戶設定嘅 DNS 而被攔截。<br/><br/>如果要改呢個行爲，請去<i>全局</i>選項卡。</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc">呢個連線因爲<i>來源嘅應用程式</i>被設定咗做<i>無條件放行</i>而放行。<br/><br/>如果要改，請去<i>分應用防火牆</i>區。</string>
+    <string name="firewall_rule_exempt_dns_proxied_desc">呢個 DNS 連線已經被代理咗並轉發去用戶所揀嘅 DNS 端點。<br/><br/>如果要改，請去 DNS <i>配置</i>區停用<i>防止 DNS 洩漏</i>。</string>
+    <string name="firewall_rule_block_http_desc">呢個連線因爲疑似用緊<i>唔安全嘅 HTTP</i> 而被攔截。<br/><br/>如果要改，請去<i>全局</i>選項卡。</string>
+    <string name="firewall_rule_global_lockdown_desc">呢個連線因爲設定咗全局閉關模式而被攔截。<br/><br/>如果要改，請至<i>全局</i>選項卡。</string>
     <string name="ada_firewall_title">呢個 app 嘅防火牆規則</string>
     <string name="rt_filter_desc">顯示緊 <u>%1$s</u> 份攔截清單</string>
     <string name="rt_filter_desc_subgroups">顯示緊 %2$s 分組同埋子分組 %3$s 入面嘅 <u>%1$s</u> 份攔截清單</string>
@@ -789,12 +787,12 @@
     <string name="lbl_wildcard" translatable="true">萬用字元</string>
     <string name="lbl_action_required" translatable="true">要做嘢</string>
     <string name="lbl_domain_rules" translatable="true">網域規則</string>
-    <string name="firewall_rule_block_domain_desc" translatable="true">一條用戶定義嘅全局防火牆規則攔截咗呢個<i>網域</i>。<br></br><br></br>如果要改，請去<i>分應用防火牆</i>區。</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">一條用戶定義嘅全局防火牆規則攔截咗呢個<i>網域</i>。<br/><br/>如果要改，請去<i>分應用防火牆</i>區。</string>
     <string name="cd_no_rules_text" translatable="true">冇網域規則。</string>
     <string name="lbl_ip_rules" translatable="true">IP 規則</string>
     <string name="firewall_rule_trusted_domain" translatable="true">信任網域（應用程式）</string>
     <string name="firewall_rule_block_domain" translatable="true">網域（應用程式）</string>
-    <string name="firewall_rule_trusted_domain_desc" translatable="true">呢個連線因爲呢個<i>網域</i>被設定咗做信任嘅網域而被放行。<br></br><br></br>如果要改，請去<i>分應用防火牆</i>區。</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">呢個連線因爲呢個<i>網域</i>被設定咗做信任嘅網域而被放行。<br/><br/>如果要改，請去<i>分應用防火牆</i>區。</string>
     <string name="bsdl_block_desc" translatable="true">攔截、信任<u>呢個網域</u></string>
     <string name="settings_default_dns_heading" translatable="true">揀後備 DNS</string>
     <string name="settings_default_dns_desc" translatable="true">喺極少數情況下，當確定唔到用戶偏好嘅 DNS 時，將會攞後備 DNS 嚟用。</string>
@@ -832,10 +830,10 @@
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">將會繞過通用 DNS 同防火牆規則</string>
     <string name="dc_refresh_toast" translatable="true">刷新完</string>
     <string name="ada_app_firewall" translatable="true">防火牆</string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">呢個連線因爲<i>網域</i>被通用網域規則信任而被放行。<br></br><br></br>如果要改呢個行爲，請去 <i>DNS 配置</i>選項卡。</string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">呢個連線因爲<i>來源應用程式</i>嘅<i>繞行 DNS 同防火牆</i>規則而被放行。<br></br><br></br>如果要改，請去<i>分應用防火牆</i>區。</string>
-    <string name="firewall_rule_dns_blocked_desc" translatable="true">呢個連線因爲<i>網域</i>被用戶偏好嘅 DNS 攔截咗。<br></br><br></br>如果要改呢個行爲，請去 <i>DNS 配置</i>選項卡。</string>
-    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">呢個連線因爲<i>網域</i>被通用網域規則攔截而攔截咗。<br></br><br></br>如果要改呢個行爲，請去 <i>DNS 配置</i>選項卡。</string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">呢個連線因爲<i>網域</i>被通用網域規則信任而被放行。<br/><br/>如果要改呢個行爲，請去 <i>DNS 配置</i>選項卡。</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">呢個連線因爲<i>來源應用程式</i>嘅<i>繞行 DNS 同防火牆</i>規則而被放行。<br/><br/>如果要改，請去<i>分應用防火牆</i>區。</string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true">呢個連線因爲<i>網域</i>被用戶偏好嘅 DNS 攔截咗。<br/><br/>如果要改呢個行爲，請去 <i>DNS 配置</i>選項卡。</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">呢個連線因爲<i>網域</i>被通用網域規則攔截而攔截咗。<br/><br/>如果要改呢個行爲，請去 <i>DNS 配置</i>選項卡。</string>
     <string name="brbs_backup_restore_desc" translatable="true">冇得跨版本用</string>
     <string name="lbl_maybe_blocked" translatable="true">或已攔截</string>
     <string name="lbl_network" translatable="true">網絡</string>
@@ -909,7 +907,7 @@
     <string name="app_ip_domain_rules_desc" translatable="true">改分應用 IP／網域規則。</string>
     <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">繞過 DNS 同防火牆規則。</string>
     <string name="univ_firewall_heading" translatable="true">全局防火牆規則</string>
-    <string name="firewall_rule_proxied_desc" translatable="true">呢個連線已經代理咗並且轉發咗去用戶所揀嘅代理。<br></br><br></br> 如果要改，請去<i>配置</i>區入面嘅<i>代理</i>區。</string>
+    <string name="firewall_rule_proxied_desc" translatable="true">呢個連線已經代理咗並且轉發咗去用戶所揀嘅代理。<br/><br/> 如果要改，請去<i>配置</i>區入面嘅<i>代理</i>區。</string>
     <string name="cd_deleted_toast" translatable="true">已經剷哂所有網域規則</string>
     <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">攔截最多嘅國家</string>
     <string name="bad_config_reason_invalid_key" translatable="true">冇效嘅鍵</string>
@@ -1014,6 +1012,5 @@
     <string name="lbl_unselected" translatable="true">冇揀嘅</string>
     <string name="lbl_battery_optimization" translatable="true">電池優化</string>
     <string name="battery_optimization_dialog_heading" translatable="true">禁用 %1$s</string>
-    <string name="lbl_background_data" translatable="true">限制背景數據</string>
     <string name="lbl_notification" translatable="true">通知</string>
 </resources>

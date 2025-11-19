@@ -27,6 +27,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ListItemWgPeersBinding
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
+import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities.tos
 import com.celzero.bravedns.wireguard.Peer
@@ -37,7 +38,7 @@ import kotlinx.coroutines.withContext
 
 class WgPeersAdapter(
     val context: Context,
-    private val themeId: Int,
+    private var themeId: Int,
     private val configId: Int,
     private var peers: MutableList<Peer>
 ) : RecyclerView.Adapter<WgPeersAdapter.WgPeersViewHolder>() {
@@ -92,6 +93,9 @@ class WgPeersAdapter(
 
     private fun openEditPeerDialog(wgPeer: Peer) {
         // send 0 as peerId to indicate that it is a new peer
+        if (Themes.isFrostTheme(themeId)) {
+            themeId = R.style.App_Dialog_NoDim
+        }
         val addPeerDialog = WgAddPeerDialog(context as Activity, themeId, configId, wgPeer)
         addPeerDialog.setCanceledOnTouchOutside(false)
         addPeerDialog.show()
@@ -108,7 +112,7 @@ class WgPeersAdapter(
     }
 
     private fun showDeleteInterfaceDialog(wgPeer: Peer) {
-        val builder = MaterialAlertDialogBuilder(context)
+        val builder = MaterialAlertDialogBuilder(context, R.style.App_Dialog_NoDim)
         val delText =
             context.getString(
                 R.string.two_argument_space,

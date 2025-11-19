@@ -379,7 +379,7 @@ object RethinkBlocklistManager : KoinComponent {
             Logger.d(LOG_TAG_VPN, "${type.name} flags: $flags; stamp: $flags2Stamp")
             flags2Stamp
         } catch (e: java.lang.Exception) {
-            Logger.e(LOG_TAG_VPN, "err stamp2tags: ${e.message}, $e")
+            Logger.e(LOG_TAG_VPN, "err stamp2tags for $fileValues of type: ${type.name} ${e.message}, $e")
             ""
         }
     }
@@ -390,7 +390,7 @@ object RethinkBlocklistManager : KoinComponent {
             Logger.d(LOG_TAG_VPN, "${type.name} stamp: $stamp; tags: $tags")
             tags
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "err tags2stamp: ${e.message}, $e")
+            Logger.e(LOG_TAG_VPN, "err tags2stamp for $stamp of type: ${type.name} ${e.message}, $e")
             setOf()
         }
     }

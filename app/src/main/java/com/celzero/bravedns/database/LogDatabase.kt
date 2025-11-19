@@ -16,6 +16,7 @@
 package com.celzero.bravedns.database
 
 import Logger
+import Logger.LOG_TAG_APP_DB
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteException
@@ -31,7 +32,7 @@ import com.celzero.bravedns.util.Utilities
 
 @Database(
     entities = [ConnectionTracker::class, DnsLog::class, RethinkLog::class, IpInfo::class],
-    version = 11,
+    version = 12,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -72,6 +73,7 @@ abstract class LogDatabase : RoomDatabase() {
                 .addMigrations(Migration_8_9)
                 .addMigrations(Migration_9_10)
                 .addMigrations(MIGRATION_10_11)
+                .addMigrations(MIGRATION_11_12)
                 .fallbackToDestructiveMigration() // recreate the database if no migration is found
                 .build()
         }
@@ -133,11 +135,11 @@ abstract class LogDatabase : RoomDatabase() {
                     )
                 }
                 db.enableWriteAheadLogging()
-            } catch (ignored: Exception) {
+            } catch (ex: Exception) {
                 Logger.crash(
                     "MIGRATION",
-                    "error migrating from v1to2 on log db: ${ignored.message}",
-                    ignored
+                    "err migrating from v1to2 on log db: ${ex.message}",
+                    ex
                 )
             }
         }
@@ -306,6 +308,19 @@ abstract class LogDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE DnsLogs ADD COLUMN ttl INTEGER DEFAULT 0 NOT NULL")
                 db.execSQL("CREATE TABLE IF NOT EXISTS IpInfo (ip TEXT PRIMARY KEY NOT NULL, asn TEXT NOT NULL, asName TEXT NOT NULL, asDomain TEXT NOT NULL, countryCode TEXT NOT NULL, country TEXT NOT NULL, continentCode TEXT NOT NULL, continent TEXT NOT NULL, createdTs INTEGER NOT NULL)".trimIndent())
                 db.execSQL("ALTER TABLE DnsLogs ADD COLUMN isCached INTEGER DEFAULT 0 NOT NULL")
+            }
+        }
+
+        private val MIGRATION_11_12: Migration = object : Migration(11, 12) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // add column dnssecOk, dnssecValid to DnsLogs
+                try {
+                    db.execSQL("ALTER TABLE DnsLogs ADD COLUMN dnssecOk INTEGER NOT NULL DEFAULT 0")
+                    db.execSQL("ALTER TABLE DnsLogs ADD COLUMN dnssecValid INTEGER NOT NULL DEFAULT 0")
+                    Logger.i(LOG_TAG_APP_DB, "added dnssecOk & dnssecValid columns")
+                } catch (_: Exception) {
+                    Logger.i(LOG_TAG_APP_DB, "dnssecOk already exists")
+                }
             }
         }
 

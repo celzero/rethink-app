@@ -1,739 +1,721 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/background"
-    android:clipToPadding="false"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    app:layout_scrollFlags="scroll|enterAlways">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <!-- Existing scrollable content -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="60dp"
-        android:orientation="vertical"
-        android:weightSum="1">
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:layout_scrollFlags="scroll|enterAlways">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="60dp"
             android:orientation="vertical"
-            android:padding="15dp">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                style="@style/TextAppearance.Heading.HomeScreen"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:alpha="0.5"
-                android:paddingStart="7dp"
-                android:paddingEnd="7dp"
-                android:text="@string/app_name_small_case" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                style="@style/TextAppearance.SubHeading.HomeScreen"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:alpha="0.5"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:text="@string/about_title_desc" />
-
-        </LinearLayout>
-
-        <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/toggle_group"
-            style="@style/toggleButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:checkedButton="@id/tb_recent_toggle_btn"
-            app:selectionRequired="true"
-            app:singleSelection="true">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/tb_recent_toggle_btn"
-                style="@style/toggleButtonNoStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minWidth="100dp"
-                android:tag="0"
-                android:textAllCaps="false"
-                android:textColor="?attr/defaultToggleBtnTxt"
-                android:textSize="@dimen/default_font_text_view"
-                app:cornerRadius="16dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/tb_daily_toggle_btn"
-                style="@style/toggleButtonNoStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minWidth="100dp"
-                android:tag="1"
-                android:textAllCaps="false"
-                android:textColor="?attr/defaultToggleBtnTxt"
-                android:textSize="@dimen/default_font_text_view"
-                app:cornerRadius="16dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/tb_weekly_toggle_btn"
-                style="@style/toggleButtonNoStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minWidth="100dp"
-                android:tag="2"
-                android:textAllCaps="false"
-                android:textColor="?attr/defaultToggleBtnTxt"
-                android:textSize="@dimen/default_font_text_view"
-                app:cornerRadius="16dp" />
-
-        </com.google.android.material.button.MaterialButtonToggleGroup>
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            app:cardBackgroundColor="?attr/background"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
-            app:cardUseCompatPadding="true"
-            app:strokeColor="?attr/secondaryTextColor"
-            app:strokeWidth="1dp">
+            android:weightSum="1">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
                 android:orientation="vertical"
-                android:padding="10dp">
+                android:padding="15dp">
 
-                <ProgressBar
-                    android:id="@+id/fss_progress_bar"
-                    style="?android:attr/progressBarStyleHorizontal"
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.Heading.HomeScreen"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:max="100"
-                    android:progress="50"
-                    android:secondaryProgress="80" />
+                    android:alpha="0.5"
+                    android:paddingStart="7dp"
+                    android:paddingEnd="7dp"
+                    android:text="@string/app_name_small_case" />
 
-                <RelativeLayout
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.SubHeading.HomeScreen"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:alpha="0.5"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="@string/about_title_desc" />
+
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/toggle_group"
+                style="@style/toggleButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:checkedButton="@id/tb_recent_toggle_btn"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/tb_recent_toggle_btn"
+                    style="@style/toggleButtonNoStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="100dp"
+                    android:tag="0"
+                    android:textAllCaps="false"
+                    android:textColor="?attr/defaultToggleBtnTxt"
+                    android:textSize="@dimen/default_font_text_view"
+                    app:cornerRadius="16dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/tb_daily_toggle_btn"
+                    style="@style/toggleButtonNoStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="100dp"
+                    android:tag="1"
+                    android:textAllCaps="false"
+                    android:textColor="?attr/defaultToggleBtnTxt"
+                    android:textSize="@dimen/default_font_text_view"
+                    app:cornerRadius="16dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/tb_weekly_toggle_btn"
+                    style="@style/toggleButtonNoStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="100dp"
+                    android:tag="2"
+                    android:textAllCaps="false"
+                    android:textColor="?attr/defaultToggleBtnTxt"
+                    android:textSize="@dimen/default_font_text_view"
+                    app:cornerRadius="16dp" />
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:strokeColor="?attr/secondaryTextColor"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <ProgressBar
+                        android:id="@+id/fss_progress_bar"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:max="100"
+                        android:progress="50"
+                        android:secondaryProgress="80" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/fss_unmetered_data_usage"
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_toStartOf="@id/fss_total_data_usage"
+                            android:drawableStart="@drawable/dot_accent"
+                            android:drawablePadding="10dp"
+                            android:padding="5dp"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="@dimen/small_font_subheading_text" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/fss_total_data_usage"
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:padding="5dp"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="@dimen/small_font_subheading_text" />
+                    </RelativeLayout>
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fss_unmetered_data_usage"
+                        android:id="@+id/fss_metered_data_usage"
                         style="@style/TextAppearance.AppCompat.Subhead"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:layout_toStartOf="@id/fss_total_data_usage"
                         android:drawableStart="@drawable/dot_accent"
                         android:drawablePadding="10dp"
                         android:padding="5dp"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/small_font_subheading_text" />
 
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fss_active_apps_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fss_total_data_usage"
                         style="@style/TextAppearance.AppCompat.Subhead"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="20dp"
+                        android:layout_toStartOf="@id/fss_active_apps_chip"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:lineSpacingExtra="5dp"
                         android:padding="5dp"
+                        android:text="@string/top_active_conns"
                         android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/small_font_subheading_text" />
+                        android:textSize="@dimen/extra_large_font_text_view" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/fss_active_apps_chip"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerInParent="true"
+                        android:layout_gravity="end"
+                        android:layout_marginEnd="10dp"
+                        android:text="@string/ssv_see_more"
+                        android:textColor="?attr/chipTextPositive"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:visibility="visible"
+                        app:chipBackgroundColor="?attr/chipBgColorPositive"
+                        app:chipSurfaceColor="@null" />
+
+
                 </RelativeLayout>
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fss_metered_data_usage"
-                    style="@style/TextAppearance.AppCompat.Subhead"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/fss_active_apps_recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/dot_accent"
-                    android:drawablePadding="10dp"
-                    android:padding="5dp"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/small_font_subheading_text" />
+                    android:nestedScrollingEnabled="false" />
 
-            </LinearLayout>
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
-        </com.google.android.material.card.MaterialCardView>
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/fss_active_apps_ll"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    style="@style/TextAppearance.AppCompat.Subhead"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="20dp"
-                    android:layout_toStartOf="@id/fss_active_apps_chip"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:lineSpacingExtra="5dp"
-                    android:padding="5dp"
-                    android:text="@string/top_active_conns"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/extra_large_font_text_view" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/fss_active_apps_chip"
-                    style="@style/ThinnerChip.Action"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="10dp"
-                    android:text="@string/ssv_see_more"
-                    android:textColor="?attr/chipTextPositive"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:visibility="visible"
-                    app:chipBackgroundColor="?attr/chipBgColorPositive"
-                    app:chipSurfaceColor="@null" />
-
-
-            </RelativeLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/fss_active_apps_recycler_view"
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fss_app_allowed_ll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
+                android:orientation="vertical"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp">
 
-        </androidx.appcompat.widget.LinearLayoutCompat>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/fss_app_allowed_ll"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp">
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="20dp"
+                        android:layout_toStartOf="@id/fss_app_info_chip"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:lineSpacingExtra="5dp"
+                        android:padding="5dp"
+                        android:text="@string/ssv_app_network_activity_heading"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/extra_large_font_text_view" />
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    style="@style/TextAppearance.AppCompat.Subhead"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="20dp"
-                    android:layout_toStartOf="@id/fss_app_info_chip"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:lineSpacingExtra="5dp"
-                    android:padding="5dp"
-                    android:text="@string/ssv_app_network_activity_heading"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/extra_large_font_text_view" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/fss_app_info_chip"
-                    style="@style/ThinnerChip.Action"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="10dp"
-                    android:text="@string/ssv_see_more"
-                    android:textColor="?attr/chipTextPositive"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:visibility="visible"
-                    app:chipBackgroundColor="?attr/chipBgColorPositive"
-                    app:chipSurfaceColor="@null" />
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/fss_app_info_chip"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerInParent="true"
+                        android:layout_gravity="end"
+                        android:layout_marginEnd="10dp"
+                        android:text="@string/ssv_see_more"
+                        android:textColor="?attr/chipTextPositive"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:visibility="visible"
+                        app:chipBackgroundColor="?attr/chipBgColorPositive"
+                        app:chipSurfaceColor="@null" />
 
 
-            </RelativeLayout>
+                </RelativeLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/fss_app_network_activity_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/fss_app_blocked_ll"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="25dp"
-            android:paddingBottom="5dp">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    style="@style/TextAppearance.AppCompat.Subhead"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/fss_app_network_activity_recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="20dp"
-                    android:layout_toStartOf="@id/fss_app_info_chip_second"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:lineSpacingExtra="5dp"
-                    android:padding="5dp"
-                    android:text="@string/ssv_app_blocked_heading"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/extra_large_font_text_view" />
+                    android:nestedScrollingEnabled="false" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/fss_app_info_chip_second"
-                    style="@style/ThinnerChip.Action"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="10dp"
-                    android:text="@string/ssv_see_more"
-                    android:textColor="?attr/chipTextPositive"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:visibility="visible"
-                    app:chipBackgroundColor="?attr/chipBgColorPositive"
-                    app:chipSurfaceColor="@null" />
-            </RelativeLayout>
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/fss_app_blocked_recycler_view"
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fss_app_blocked_ll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
+                android:orientation="vertical"
+                android:paddingTop="25dp"
+                android:paddingBottom="5dp">
 
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-        </androidx.appcompat.widget.LinearLayoutCompat>
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="20dp"
+                        android:layout_toStartOf="@id/fss_app_info_chip_second"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:lineSpacingExtra="5dp"
+                        android:padding="5dp"
+                        android:text="@string/ssv_app_blocked_heading"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/extra_large_font_text_view" />
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/fss_asn_allowed_ll"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp">
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/fss_app_info_chip_second"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerInParent="true"
+                        android:layout_gravity="end"
+                        android:layout_marginEnd="10dp"
+                        android:text="@string/ssv_see_more"
+                        android:textColor="?attr/chipTextPositive"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:visibility="visible"
+                        app:chipBackgroundColor="?attr/chipBgColorPositive"
+                        app:chipSurfaceColor="@null" />
+                </RelativeLayout>
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    style="@style/TextAppearance.AppCompat.Subhead"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="20dp"
-                    android:layout_toStartOf="@id/fss_asn_chip"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:lineSpacingExtra="5dp"
-                    android:padding="5dp"
-                    android:text="@string/most_contacted_asn"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/extra_large_font_text_view" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/fss_asn_chip"
-                    style="@style/ThinnerChip.Action"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="10dp"
-                    android:text="@string/ssv_see_more"
-                    android:textColor="?attr/chipTextPositive"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:visibility="visible"
-                    app:chipBackgroundColor="?attr/chipBgColorPositive"
-                    app:chipSurfaceColor="@null" />
-
-            </RelativeLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/fss_asn_allowed_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/fss_asn_blocked_ll"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="25dp"
-            android:paddingBottom="5dp">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    style="@style/TextAppearance.AppCompat.Subhead"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/fss_app_blocked_recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="20dp"
-                    android:layout_toStartOf="@id/fss_asn_chip_second"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:lineSpacingExtra="5dp"
-                    android:padding="5dp"
-                    android:text="@string/most_blocked_asn"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/extra_large_font_text_view" />
+                    android:nestedScrollingEnabled="false" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/fss_asn_chip_second"
-                    style="@style/ThinnerChip.Action"
-                    android:layout_width="wrap_content"
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fss_asn_allowed_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="20dp"
+                        android:layout_toStartOf="@id/fss_asn_chip"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:lineSpacingExtra="5dp"
+                        android:padding="5dp"
+                        android:text="@string/most_contacted_asn"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/extra_large_font_text_view" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/fss_asn_chip"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerInParent="true"
+                        android:layout_gravity="end"
+                        android:layout_marginEnd="10dp"
+                        android:text="@string/ssv_see_more"
+                        android:textColor="?attr/chipTextPositive"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:visibility="visible"
+                        app:chipBackgroundColor="?attr/chipBgColorPositive"
+                        app:chipSurfaceColor="@null" />
+
+                </RelativeLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/fss_asn_allowed_recycler_view"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="10dp"
-                    android:text="@string/ssv_see_more"
-                    android:textColor="?attr/chipTextPositive"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:visibility="visible"
-                    app:chipBackgroundColor="?attr/chipBgColorPositive"
-                    app:chipSurfaceColor="@null" />
-            </RelativeLayout>
+                    android:nestedScrollingEnabled="false" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/fss_asn_blocked_recycler_view"
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fss_asn_blocked_ll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
+                android:orientation="vertical"
+                android:paddingTop="25dp"
+                android:paddingBottom="5dp">
 
-        </androidx.appcompat.widget.LinearLayoutCompat>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:id="@+id/load_more_ll"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:orientation="horizontal">
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="20dp"
+                        android:layout_toStartOf="@id/fss_asn_chip_second"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:lineSpacingExtra="5dp"
+                        android:padding="5dp"
+                        android:text="@string/most_blocked_asn"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/extra_large_font_text_view" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/load_more_tv"
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/fss_asn_chip_second"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerInParent="true"
+                        android:layout_gravity="end"
+                        android:layout_marginEnd="10dp"
+                        android:text="@string/ssv_see_more"
+                        android:textColor="?attr/chipTextPositive"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:visibility="visible"
+                        app:chipBackgroundColor="?attr/chipBgColorPositive"
+                        app:chipSurfaceColor="@null" />
+                </RelativeLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/fss_asn_blocked_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fss_domain_allowed_ll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:gravity="center"
-                android:padding="10dp"
-                android:text="@string/load_more"
-                android:textColor="?attr/secondaryTextColor"
-                android:textSize="@dimen/heading_font_text_view" />
-
-            <ProgressBar
-                android:id="@+id/load_progress_bar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:indeterminate="true"
+                android:orientation="vertical"
                 android:visibility="gone"
-                android:layout_margin="10dp"
-                />
+                android:paddingTop="25dp"
+                android:paddingBottom="5dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_toStartOf="@id/fss_dns_logs_chip"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:lineSpacingExtra="5dp"
+                        android:padding="5dp"
+                        android:text="@string/ssv_most_contacted_domain_heading"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/extra_large_font_text_view" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/fss_dns_logs_chip"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerInParent="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_gravity="end"
+                        android:layout_marginEnd="10dp"
+                        android:text="@string/ssv_see_more"
+                        android:textColor="?attr/chipTextPositive"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:visibility="visible"
+                        app:chipBackgroundColor="?attr/chipBgColorPositive"
+                        app:chipSurfaceColor="@null" />
+
+                </RelativeLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/fss_contacted_domain_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fss_domain_blocked_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:paddingTop="25dp"
+                android:paddingBottom="5dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_toStartOf="@id/fss_dns_logs_chip_second"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:gravity="center_vertical"
+                        android:lineSpacingExtra="5dp"
+                        android:padding="5dp"
+                        android:text="@string/ssv_most_blocked_domain_heading"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/extra_large_font_text_view" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/fss_dns_logs_chip_second"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerInParent="true"
+                        android:layout_gravity="end"
+                        android:layout_marginEnd="10dp"
+                        android:text="@string/ssv_see_more"
+                        android:textColor="?attr/chipTextPositive"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:visibility="visible"
+                        app:chipBackgroundColor="?attr/chipBgColorPositive"
+                        app:chipSurfaceColor="@null" />
+                </RelativeLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/fss_blocked_domain_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fss_countries_allowed_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:paddingTop="25dp"
+                android:paddingBottom="5dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_toStartOf="@id/fss_countries_logs_chip"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:lineSpacingExtra="5dp"
+                        android:padding="5dp"
+                        android:text="@string/ssv_most_contacted_countries_heading"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/extra_large_font_text_view" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/fss_countries_logs_chip"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerInParent="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_gravity="end"
+                        android:layout_marginEnd="10dp"
+                        android:text="@string/ssv_see_more"
+                        android:textColor="?attr/chipTextPositive"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:visibility="visible"
+                        app:chipBackgroundColor="?attr/chipBgColorPositive"
+                        app:chipSurfaceColor="@null" />
+
+                </RelativeLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/fss_contacted_countries_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fss_ip_allowed_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="25dp"
+                android:visibility="gone"
+                android:paddingBottom="5dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="20dp"
+                        android:layout_toStartOf="@id/fss_network_logs_chip"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:gravity="center_vertical"
+                        android:lineSpacingExtra="5dp"
+                        android:padding="5dp"
+                        android:text="@string/ssv_most_contacted_ips_heading"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/extra_large_font_text_view" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/fss_network_logs_chip"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerInParent="true"
+                        android:layout_gravity="end"
+                        android:layout_marginEnd="10dp"
+                        android:text="@string/ssv_see_more"
+                        android:textColor="?attr/chipTextPositive"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:visibility="visible"
+                        app:chipBackgroundColor="?attr/chipBgColorPositive"
+                        app:chipSurfaceColor="@null" />
+                </RelativeLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/fss_contacted_ips_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fss_ip_blocked_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:paddingTop="25dp"
+                android:paddingBottom="5dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="20dp"
+                        android:layout_toStartOf="@id/fss_network_logs_chip_second"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:lineSpacingExtra="5dp"
+                        android:padding="5dp"
+                        android:text="@string/ssv_most_blocked_ips_heading"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/extra_large_font_text_view" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/fss_network_logs_chip_second"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerInParent="true"
+                        android:layout_gravity="end"
+                        android:layout_marginEnd="10dp"
+                        android:text="@string/ssv_see_more"
+                        android:textColor="?attr/chipTextPositive"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:visibility="visible"
+                        app:chipBackgroundColor="?attr/chipBgColorPositive"
+                        app:chipSurfaceColor="@null" />
+                </RelativeLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/fss_blocked_ips_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
         </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/fss_domain_allowed_ll"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone"
-            android:paddingTop="25dp"
-            android:paddingBottom="5dp">
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fssFabLoadMore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_margin="75dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:textAlignment="center"
+        android:textColor="?attr/homeScreenHeaderTextColor"
+        app:backgroundTint="?attr/buttonBackground"
+        android:contentDescription="@string/ssv_see_more"
+        android:text="@string/load_more" />
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    style="@style/TextAppearance.AppCompat.Subhead"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_toStartOf="@id/fss_dns_logs_chip"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:lineSpacingExtra="5dp"
-                    android:padding="5dp"
-                    android:text="@string/ssv_most_contacted_domain_heading"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/extra_large_font_text_view" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/fss_dns_logs_chip"
-                    style="@style/ThinnerChip.Action"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:layout_centerHorizontal="true"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="10dp"
-                    android:text="@string/ssv_see_more"
-                    android:textColor="?attr/chipTextPositive"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:visibility="visible"
-                    app:chipBackgroundColor="?attr/chipBgColorPositive"
-                    app:chipSurfaceColor="@null" />
-
-            </RelativeLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/fss_contacted_domain_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
-
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/fss_domain_blocked_ll"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone"
-            android:paddingTop="25dp"
-            android:paddingBottom="5dp">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    style="@style/TextAppearance.AppCompat.Subhead"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_toStartOf="@id/fss_dns_logs_chip_second"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:gravity="center_vertical"
-                    android:lineSpacingExtra="5dp"
-                    android:padding="5dp"
-                    android:text="@string/ssv_most_blocked_domain_heading"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/extra_large_font_text_view" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/fss_dns_logs_chip_second"
-                    style="@style/ThinnerChip.Action"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="10dp"
-                    android:text="@string/ssv_see_more"
-                    android:textColor="?attr/chipTextPositive"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:visibility="visible"
-                    app:chipBackgroundColor="?attr/chipBgColorPositive"
-                    app:chipSurfaceColor="@null" />
-            </RelativeLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/fss_blocked_domain_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
-
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/fss_countries_allowed_ll"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone"
-            android:paddingTop="25dp"
-            android:paddingBottom="5dp">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    style="@style/TextAppearance.AppCompat.Subhead"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_toStartOf="@id/fss_countries_logs_chip"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:lineSpacingExtra="5dp"
-                    android:padding="5dp"
-                    android:text="@string/ssv_most_contacted_countries_heading"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/extra_large_font_text_view" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/fss_countries_logs_chip"
-                    style="@style/ThinnerChip.Action"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:layout_centerHorizontal="true"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="10dp"
-                    android:text="@string/ssv_see_more"
-                    android:textColor="?attr/chipTextPositive"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:visibility="visible"
-                    app:chipBackgroundColor="?attr/chipBgColorPositive"
-                    app:chipSurfaceColor="@null" />
-
-            </RelativeLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/fss_contacted_countries_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
-
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/fss_ip_allowed_ll"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="25dp"
-            android:visibility="gone"
-            android:paddingBottom="5dp">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    style="@style/TextAppearance.AppCompat.Subhead"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="20dp"
-                    android:layout_toStartOf="@id/fss_network_logs_chip"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:gravity="center_vertical"
-                    android:lineSpacingExtra="5dp"
-                    android:padding="5dp"
-                    android:text="@string/ssv_most_contacted_ips_heading"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/extra_large_font_text_view" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/fss_network_logs_chip"
-                    style="@style/ThinnerChip.Action"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="10dp"
-                    android:text="@string/ssv_see_more"
-                    android:textColor="?attr/chipTextPositive"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:visibility="visible"
-                    app:chipBackgroundColor="?attr/chipBgColorPositive"
-                    app:chipSurfaceColor="@null" />
-            </RelativeLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/fss_contacted_ips_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
-
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/fss_ip_blocked_ll"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone"
-            android:paddingTop="25dp"
-            android:paddingBottom="5dp">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    style="@style/TextAppearance.AppCompat.Subhead"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="20dp"
-                    android:layout_toStartOf="@id/fss_network_logs_chip_second"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:lineSpacingExtra="5dp"
-                    android:padding="5dp"
-                    android:text="@string/ssv_most_blocked_ips_heading"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/extra_large_font_text_view" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/fss_network_logs_chip_second"
-                    style="@style/ThinnerChip.Action"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="10dp"
-                    android:text="@string/ssv_see_more"
-                    android:textColor="?attr/chipTextPositive"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:visibility="visible"
-                    app:chipBackgroundColor="?attr/chipBgColorPositive"
-                    app:chipSurfaceColor="@null" />
-            </RelativeLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/fss_blocked_ips_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
-
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+</FrameLayout>

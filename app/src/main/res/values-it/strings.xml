@@ -276,7 +276,7 @@
     <string name="fav_icon">fav_icon</string>
     <string name="unicode_warning_sign">⚠</string>
     <string name="socks5_proxy_toast_parameter">Proxy SOCKS5</string>
-    <string name="firewall_rule_trusted_ip_desc">Questa connessione è stata consentita perché l\'<i>IP di destinazione</i> è stato autorizzato.<br></br><br></br> Per modificare, vai alla schermata <i>del firewall specifica per l\'app</i>.</string>
+    <string name="firewall_rule_trusted_ip_desc">Questa connessione è stata consentita perché l\'<i>IP di destinazione</i> è stato autorizzato.<br/><br/> Per modificare, vai alla schermata <i>del firewall specifica per l\'app</i>.</string>
     <string name="notif_dialog_pause_dialog_title">App in pausa!</string>
     <string name="notif_channel_desc_proxy_failure">Ti avvisa su errori e anomalie del Proxy</string>
     <string name="notif_channel_desc_vpn_notification">Ti informa quando Rethink è attivo e in esecuzione in background</string>
@@ -578,25 +578,25 @@
     <string name="firewall_rule_block_http">HTTP non sicuro</string>
     <string name="firewall_rule_global_lockdown">Quarantena</string>
     <string name="firewall_rule_no_rule_desc">Nessuna regola del firewall coincide con questa connessione.</string>
-    <string name="firewall_rule_block_app_desc">Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>app</i>.<br></br><br></br> Per modificarla, vai a <i>Tutte le app</i>.</string>
-    <string name="firewall_rule_new_app_desc">Quest\'app si è connessa per la <i>prima</i> volta.<br></br><br></br> Per modificare vai a <i>Regole Universali</i>.</string>
-    <string name="firewall_rule_block_app_unmetered_desc">Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>app</i> dal connettersi alla rete <i>Non a consumo</i>.<br></br><br></br> Per modificarla, vai a <i>Tutte le app</i>.</string>
-    <string name="firewall_rule_block_app_mobile_desc">Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>app</i> dal connettersi alla rete <i>A consumo</i>.<br></br><br></br> Per modificarla, vai a <i>Tutte le app</i>.</string>
-    <string name="firewall_rule_isolate_desc">Una regola del firewall impostata dall\'utente consente a quest\'<i>app</i> di connettersi solo a <i>IP che aggirano il firewall</i>.<br></br><br></br> Per modificarla, vai a <i>Tutte le app</i>.</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc">Una regola universale del firewall impostata dall\'utente ha bloccato quest\'<i>app</i> dal connettersi alla rete <i>A consumo (dati mobili)</i>.<br></br><br></br> Per modificarla, vai a <i>Tutte le app</i>.</string>
-    <string name="firewall_rule_block_ip_univ_desc">Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>IP / Porta di destinazione</i>.<br></br><br></br> Per modificarla, vai a <i>Regole Universali</i>.</string>
-    <string name="firewall_rule_block_ip_desc">Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>IP di destinazione</i>.<br></br><br></br> Per modificarla, vai a alla <i>schermata dell\'app specifica nel Firewall</i>.</string>
+    <string name="firewall_rule_block_app_desc">Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>app</i>.<br/><br/> Per modificarla, vai a <i>Tutte le app</i>.</string>
+    <string name="firewall_rule_new_app_desc">Quest\'app si è connessa per la <i>prima</i> volta.<br/><br/> Per modificare vai a <i>Regole Universali</i>.</string>
+    <string name="firewall_rule_block_app_unmetered_desc">Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>app</i> dal connettersi alla rete <i>Non a consumo</i>.<br/><br/> Per modificarla, vai a <i>Tutte le app</i>.</string>
+    <string name="firewall_rule_block_app_mobile_desc">Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>app</i> dal connettersi alla rete <i>A consumo</i>.<br/><br/> Per modificarla, vai a <i>Tutte le app</i>.</string>
+    <string name="firewall_rule_isolate_desc">Una regola del firewall impostata dall\'utente consente a quest\'<i>app</i> di connettersi solo a <i>IP che aggirano il firewall</i>.<br/><br/> Per modificarla, vai a <i>Tutte le app</i>.</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc">Una regola universale del firewall impostata dall\'utente ha bloccato quest\'<i>app</i> dal connettersi alla rete <i>A consumo (dati mobili)</i>.<br/><br/> Per modificarla, vai a <i>Tutte le app</i>.</string>
+    <string name="firewall_rule_block_ip_univ_desc">Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>IP / Porta di destinazione</i>.<br/><br/> Per modificarla, vai a <i>Regole Universali</i>.</string>
+    <string name="firewall_rule_block_ip_desc">Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>IP di destinazione</i>.<br/><br/> Per modificarla, vai a alla <i>schermata dell\'app specifica nel Firewall</i>.</string>
     <string name="firewall_rule_bypass_universal_ip_desc">Questa connessione è stata consentita perché l\'&lt;i&gt;IP di destinazione&lt;/i&gt; è impostato in modo da aggirare tutte le regole universali del firewall.&lt;br/&gt;&lt;br/&gt; Per modificare, vai a &lt;i&gt;Regole IP&lt;i&gt; dalla scheda &lt;i&gt;Regole Universali&lt;/i&gt;.</string>
-    <string name="firewall_rule_device_lock_desc">Questa connessione è stata bloccata perché <i>il dispositivo era bloccato</i> in quel momento.<br></br><br></br> Per modificare questa impostazione, vai a <i>Regole Universali</i>.</string>
-    <string name="firewall_rule_unknown_desc">Questa connessione è stata bloccata perché non è stato possibile determinarne <i>l\'app d\'origine</i>.<br></br><br></br> Per modificare questa impostazione, vai a <i>Regole Universali</i>.</string>
-    <string name="firewall_rule_foreground_desc">Questa connessione è stata bloccata perché l\'app d\'origine <i>non era in primo piano</i>.<br></br><br></br> Per modificare questa impostazione, vai a <i>Regole Universali</i>.</string>
-    <string name="firewall_rule_block_udp_ntp_desc">Una regola del firewall impostata dall\'utente ha bloccato questa connessione <i>UDP</i>.<br></br><br></br> Per modificarla, vai a <i>Regole Universali</i>.</string>
-    <string name="firewall_rule_block_dns_bypass_desc">Questa connessione è stata bloccata perché <i>l\'app d\'origine</i> ha aggirato il DNS scelto dall\'utente.<br></br><br></br> Per modificare questa impostazione, vai a <i>Regole Universali</i>.</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc">Questa connessione è stata consentita perché l\'<i>app d\'origine</i> è impostata su <i>aggirare le regole universali del firewall</i>.<br></br><br></br> Per modificarla, vai a alla <i>schermata dell\'app specifica nel Firewall</i>.</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc">Questa connessione DNS è stata reindirizzata all\'endpoint DNS scelto dall\'utente.<br></br><br></br> Per modificare, disabilita <i>Previeni aggiramenti del DNS</i> dalla schermata <i>Configura</i> del DNS.</string>
+    <string name="firewall_rule_device_lock_desc">Questa connessione è stata bloccata perché <i>il dispositivo era bloccato</i> in quel momento.<br/><br/> Per modificare questa impostazione, vai a <i>Regole Universali</i>.</string>
+    <string name="firewall_rule_unknown_desc">Questa connessione è stata bloccata perché non è stato possibile determinarne <i>l\'app d\'origine</i>.<br/><br/> Per modificare questa impostazione, vai a <i>Regole Universali</i>.</string>
+    <string name="firewall_rule_foreground_desc">Questa connessione è stata bloccata perché l\'app d\'origine <i>non era in primo piano</i>.<br/><br/> Per modificare questa impostazione, vai a <i>Regole Universali</i>.</string>
+    <string name="firewall_rule_block_udp_ntp_desc">Una regola del firewall impostata dall\'utente ha bloccato questa connessione <i>UDP</i>.<br/><br/> Per modificarla, vai a <i>Regole Universali</i>.</string>
+    <string name="firewall_rule_block_dns_bypass_desc">Questa connessione è stata bloccata perché <i>l\'app d\'origine</i> ha aggirato il DNS scelto dall\'utente.<br/><br/> Per modificare questa impostazione, vai a <i>Regole Universali</i>.</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc">Questa connessione è stata consentita perché l\'<i>app d\'origine</i> è impostata su <i>aggirare le regole universali del firewall</i>.<br/><br/> Per modificarla, vai a alla <i>schermata dell\'app specifica nel Firewall</i>.</string>
+    <string name="firewall_rule_exempt_dns_proxied_desc">Questa connessione DNS è stata reindirizzata all\'endpoint DNS scelto dall\'utente.<br/><br/> Per modificare, disabilita <i>Previeni aggiramenti del DNS</i> dalla schermata <i>Configura</i> del DNS.</string>
     <string name="firewall_rule_exempt_orbot_setup_desc">Questa connessione è stata consentita perché era in corso la configurazione in un click di <i> Tor-come-proxy</i> tramite Orbot.</string>
-    <string name="firewall_rule_block_http_desc">Questa connessione è stata bloccata perché probabilmente utilizzava <i>HTTP non sicuro</i>.<br></br><br></br> Per modificare, vai a <i>Regole Universali</i>.</string>
-    <string name="firewall_rule_global_lockdown_desc">Questa connessione è stata bloccata perché è attivata la quarantena universale.<br></br><br></br> Per modificare, vai a <i>Regole Universali</i>.</string>
+    <string name="firewall_rule_block_http_desc">Questa connessione è stata bloccata perché probabilmente utilizzava <i>HTTP non sicuro</i>.<br/><br/> Per modificare, vai a <i>Regole Universali</i>.</string>
+    <string name="firewall_rule_global_lockdown_desc">Questa connessione è stata bloccata perché è attivata la quarantena universale.<br/><br/> Per modificare, vai a <i>Regole Universali</i>.</string>
     <string name="new_app_bulk_notification_title">Attenzione</string>
     <string name="new_app_bulk_notification_content">Rethink ha bloccato %1$s nuove applicazioni. Tocca per visualizzare o modificare.</string>
     <string name="new_app_notification_content">Rethink ha bloccato l\'app installata di recente, %1$s.</string>
@@ -782,8 +782,8 @@
     <string name="lbl_apply" translatable="true">Applica</string>
     <string name="firewall_rule_trusted_domain" translatable="true">Dominio attendibile (App)</string>
     <string name="firewall_rule_block_domain" translatable="true">Dominio (App)</string>
-    <string name="firewall_rule_block_domain_desc" translatable="true">Una regola del firewall impostata dall\'utente ha bloccato questo <i>dominio</i>.<br></br><br></br> Per modificarla, vai a alla schermata del <i>firewall specifico per le app</i>.</string>
-    <string name="firewall_rule_trusted_domain_desc" translatable="true">Questa connessione è stata consentita perché il <i>dominio</i> è impostato come attendibile.<br></br><br></br> Per modificarlo, accedere alla schermata del <i>firewall specifico per le app</i>.</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">Una regola del firewall impostata dall\'utente ha bloccato questo <i>dominio</i>.<br/><br/> Per modificarla, vai a alla schermata del <i>firewall specifico per le app</i>.</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">Questa connessione è stata consentita perché il <i>dominio</i> è impostato come attendibile.<br/><br/> Per modificarlo, accedere alla schermata del <i>firewall specifico per le app</i>.</string>
     <string name="cd_no_rules_text" translatable="true">Nessuna regola dominio.</string>
     <string name="lbl_dismiss" translatable="true">Chiudi</string>
     <string name="lbl_all" translatable="true">Tutti</string>
@@ -796,7 +796,7 @@
     <string name="lbl_ip_rules" translatable="true">Regole IP</string>
     <string name="lbl_domain_rules" translatable="true">Regole dominio</string>
     <string name="bsdl_block_desc" translatable="true">Blocca, autorizza <u>questo dominio</u></string>
-    <string name="firewall_rule_dns_blocked_desc" translatable="true">Questa connessione è stata bloccata perché il dominio <i></i> è bloccato dal DNS preferito dall\'utente.<br></br><br></br> Per modificare questo comportamento, accedere alla scheda <i>Configura DNS</i>.</string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true">Questa connessione è stata bloccata perché il dominio <i/> è bloccato dal DNS preferito dall\'utente.<br/><br/> Per modificare questo comportamento, accedere alla scheda <i>Configura DNS</i>.</string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">Aggira DNS e firewall</string>
     <string name="lbl_maybe_blocked" translatable="true">Forse bloccato</string>
     <string name="lbl_rules" translatable="true">regole</string>
@@ -837,9 +837,9 @@
     <string name="dc_setting_dns_cache_desc" translatable="true">Accorpare le richieste, memorizzare le risposte nella cache, gestire gli errori in modo resiliente</string>
     <string name="lbl_configure" translatable="true">Configura</string>
     <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Bypassare regole universale di DNS e firewall per le applicazioni <i>elencate</i>\?</string>
-    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Questa connessione è stata bloccata perché il <i>dominio</i> è impostato come bloccato nelle regole del dominio universale.<br></br><br></br> Per modificare questo comportamento, accedere alla scheda <i>Configura DNS</i>.</string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Questa connessione è stata consentita perché il <i>dominio</i> è impostato come attendibile nelle regole del dominio universale.<br></br><br></br> Per modificare questo comportamento, andare alla scheda <i>Configura DNS</i>.</string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Questa connessione è stata consentita perché l\'<i>app d\'origine</i> è impostata su <i>aggira DNS e firewall</i>.<br></br><br></br> Per modificarla, vai a alla schermata <i>Firewall specifico per app</i>.</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Questa connessione è stata bloccata perché il <i>dominio</i> è impostato come bloccato nelle regole del dominio universale.<br/><br/> Per modificare questo comportamento, accedere alla scheda <i>Configura DNS</i>.</string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Questa connessione è stata consentita perché il <i>dominio</i> è impostato come attendibile nelle regole del dominio universale.<br/><br/> Per modificare questo comportamento, andare alla scheda <i>Configura DNS</i>.</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Questa connessione è stata consentita perché l\'<i>app d\'origine</i> è impostata su <i>aggira DNS e firewall</i>.<br/><br/> Per modificarla, vai a alla schermata <i>Firewall specifico per app</i>.</string>
     <string name="brbs_backup_restore_desc" translatable="true">Non funziona per tutte le versioni dell\'app o per tutti i dispositivi</string>
     <string name="bsct_block_domain" translatable="true">Blocca, autorizza <u>domini</u> per <u>questa app</u></string>
     <string name="lbl_import" translatable="true">Importa</string>
@@ -924,13 +924,12 @@
     <string name="univ_firewall_heading" translatable="true">Regole firewall universali</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">Se disattivato, esclude le applicazioni forwarder proxy (SOCKS5, HTTP, DNS) dal tunnel VPN di Rethink.</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Instradamento del traffico di Rethink attraverso il tunnel. A meno che non sappiate cosa state facendo, lasciatelo disattivato.</string>
-    <string name="lbl_background_data" translatable="true">Limita dati in background</string>
     <string name="lbl_battery_optimization" translatable="true">Ottimizzazione batteria</string>
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s è disabilitato perché i proxy sono attivi</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> potrebbe causare una perdita di connettività. Modificare l\'impostazione per consentire a Rethink di utilizzare dati e altre risorse quando è in background.</string>
     <string name="dc_proxy_dns_desc" translatable="true">Non fare mai proxy di DNS su proxy come Always-on WireGuard, SOCKS5, HTTP.</string>
     <string name="lbl_notification" translatable="true">notifiche</string>
-    <string name="firewall_rule_proxied_desc" translatable="true">Questa connessione è stata inoltrata al Proxy preferito dall\'utente.<br></br><br></br> Per cambiare, andare su <i>Proxy</i> dalla schermata <i>Configura</i>.</string>
+    <string name="firewall_rule_proxied_desc" translatable="true">Questa connessione è stata inoltrata al Proxy preferito dall\'utente.<br/><br/> Per cambiare, andare su <i>Proxy</i> dalla schermata <i>Configura</i>.</string>
     <string name="cd_deleted_toast" translatable="true">Cancellate tutte le regole di dominio</string>
     <string name="cd_toast_edit" translatable="true">Modificato</string>
 </resources>

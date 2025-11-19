@@ -53,7 +53,7 @@ class InetNetwork private constructor(val address: InetAddress, val mask: Int) {
                 rawMask =
                     try {
                         maskString.toInt(10)
-                    } catch (ignored: NumberFormatException) {
+                    } catch (_: NumberFormatException) {
                         throw ParseException(Int::class.java, maskString)
                     }
                 rawAddress = network.substring(0, slash)

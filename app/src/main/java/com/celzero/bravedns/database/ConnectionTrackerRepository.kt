@@ -89,7 +89,11 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         connectionTrackerDAO.clearLogsByUid(uid)
     }
 
-    suspend fun getDataUsage(before: Long, current: Long): List<DataUsage> {
+    suspend fun clearLogsByRule(rule: String) {
+        connectionTrackerDAO.clearLogsByRule(rule)
+    }
+
+    suspend fun getDataUsage(before: Long, current: Long): List<DataUsage>? {
         return connectionTrackerDAO.getDataUsage(before, current)
     }
 
@@ -97,11 +101,11 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         return connectionTrackerDAO.getBlockedUniversalRulesCount()
     }
 
-    suspend fun closeConnections( connIds: List<String>) {
-        connectionTrackerDAO.closeConnections(connIds)
+    suspend fun closeConnections( connIds: List<String>, reason: String) {
+        connectionTrackerDAO.closeConnections(connIds, reason)
     }
 
-    suspend fun closeConnectionForUids( uids: List<Int> ) {
-        connectionTrackerDAO.closeConnectionForUids(uids)
+    suspend fun closeConnectionForUids( uids: List<Int>, reason: String) {
+        connectionTrackerDAO.closeConnectionForUids(uids, reason)
     }
 }

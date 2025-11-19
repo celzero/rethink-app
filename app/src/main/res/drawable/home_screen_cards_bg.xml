@@ -9,7 +9,7 @@
                 android:angle="90"
                 android:startColor="?attr/homeScreenBtnGradientStart"
                 android:endColor="?attr/homeScreenBtnGradientEnd" />
-            <corners android:radius="20dp" />
+            <corners android:radius="0dp" />
         </shape>
     </item>
 

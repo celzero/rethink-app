@@ -1,1 +1,1 @@
-Pare-feu puissant, WireGuard, moniteur de réseau, bloquez les logiciels malveillants, changez le DNS.
+Apps pare-feu, utiliser WireGuardVPN, surveiller réseau, bloquer malware, changer DNS.

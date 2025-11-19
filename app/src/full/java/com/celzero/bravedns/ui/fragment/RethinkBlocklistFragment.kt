@@ -49,6 +49,9 @@ import com.celzero.bravedns.download.DownloadConstants.Companion.FILE_TAG
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.RethinkBlocklistManager.RethinkBlocklistType.Companion.getType
+import com.celzero.bravedns.service.RethinkBlocklistManager.getStamp
+import com.celzero.bravedns.service.RethinkBlocklistManager.getTagsFromStamp
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_NAME
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_TYPE
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_URL
@@ -184,7 +187,7 @@ class RethinkBlocklistFragment :
         selectedFileTags.observe(viewLifecycleOwner) {
             if (it == null) return@observe
 
-            io { modifiedStamp = RethinkBlocklistManager.getStamp(it, type) }
+            io { modifiedStamp = getStamp(it, type) }
         }
 
         filters.observe(viewLifecycleOwner) {
@@ -213,7 +216,10 @@ class RethinkBlocklistFragment :
         b.lbBlocklistApplyBtn.text =
             getString(R.string.ct_ip_details, getString(R.string.lbl_apply), typeName)
 
-        updateFileTagList(emptySet())
+        io {
+            val flags = getTagsFromStamp(modifiedStamp, type)
+            updateFileTagList(flags)
+        }
 
         // update ui based on blocklist availability
         hasBlocklist()
@@ -323,8 +329,17 @@ class RethinkBlocklistFragment :
         }
 
         b.lbBlocklistCancelBtn.setOnClickListener {
-            // close the activity associated with the fragment
-            requireActivity().finish()
+            // close the activity associated with the fragment after reverting to old stamp
+            io {
+                val stamp = getStamp()
+                val list = RethinkBlocklistManager.getTagsFromStamp(stamp, type)
+                updateSelectedFileTags(list.toMutableSet())
+                setStamp(stamp)
+                Logger.i(LOG_TAG_UI, "revert to old stamp for blocklist type: ${type.name}, $stamp, $list")
+                uiCtx {
+                    requireActivity().finish()
+                }
+            }
         }
 
         b.lbListToggleGroup.addOnButtonCheckedListener(listViewToggleListener)
@@ -352,6 +367,34 @@ class RethinkBlocklistFragment :
     }
 
     private fun downloadBlocklist(type: RethinkBlocklistManager.RethinkBlocklistType) {
+        // Check if VPN is in lockdown mode and custom download manager is disabled
+        if (VpnController.isVpnLockdown() && !persistentState.useCustomDownloadManager) {
+            showLockdownDownloadDialog(type)
+            return
+        }
+
+        proceedWithBlocklistDownload(type)
+    }
+
+    private fun showLockdownDownloadDialog(type: RethinkBlocklistManager.RethinkBlocklistType) {
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+        builder.setTitle(R.string.lockdown_download_enable_inapp)
+        builder.setMessage(R.string.lockdown_download_message)
+        builder.setCancelable(true)
+        builder.setPositiveButton(R.string.lockdown_download_enable_inapp) { _, _ ->
+            // Enable in-app downloader and proceed with download
+            persistentState.useCustomDownloadManager = true
+            downloadBlocklist(type)
+        }
+        builder.setNegativeButton(R.string.lbl_cancel) { dialog, _ ->
+            dialog.dismiss()
+            // Proceed with Android download manager (useCustomDownloadManager stays false)
+            proceedWithBlocklistDownload(type)
+        }
+        builder.create().show()
+    }
+
+    private fun proceedWithBlocklistDownload(type: RethinkBlocklistManager.RethinkBlocklistType) {
         ui {
             if (type.isLocal()) {
                 var status = AppDownloadManager.DownloadManagerStatus.NOT_STARTED
@@ -415,7 +458,7 @@ class RethinkBlocklistFragment :
     }
 
     private fun showApplyChangesDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(getString(R.string.rt_dialog_title))
         builder.setMessage(getString(R.string.rt_dialog_message))
         builder.setCancelable(true)
@@ -440,7 +483,7 @@ class RethinkBlocklistFragment :
         }
 
         io {
-            val blocklistCount = RethinkBlocklistManager.getTagsFromStamp(stamp, type).size
+            val blocklistCount = getTagsFromStamp(stamp, type).size
             if (type.isLocal()) {
                 persistentState.localBlocklistStamp = stamp
                 persistentState.numberOfLocalBlocklists = blocklistCount
@@ -454,6 +497,7 @@ class RethinkBlocklistFragment :
                     blocklistCount
                 )
                 appConfig.enableRethinkDnsPlus()
+                Logger.i(LOG_TAG_UI, "set stamp for remote blocklist with $stamp, $blocklistCount")
             }
         }
     }
@@ -578,10 +622,12 @@ class RethinkBlocklistFragment :
         }
 
         if (type.isLocal()) {
+            RethinkBlocklistManager.clearTagsSelectionLocal()
             RethinkBlocklistManager.updateFiletagsLocal(selectedTags, 1 /* isSelected: true */)
             val list = RethinkBlocklistManager.getSelectedFileTagsLocal().toSet()
             updateFileTagList(list)
         } else {
+            RethinkBlocklistManager.clearTagsSelectionRemote()
             RethinkBlocklistManager.updateFiletagsRemote(selectedTags, 1 /* isSelected: true */)
             val list = RethinkBlocklistManager.getSelectedFileTagsRemote().toSet()
             updateFileTagList(list)

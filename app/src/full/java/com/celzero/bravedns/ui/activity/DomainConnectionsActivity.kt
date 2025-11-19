@@ -31,6 +31,7 @@ import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.viewmodel.DomainConnectionsViewModel
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -52,17 +53,20 @@ class DomainConnectionsActivity : AppCompatActivity(R.layout.activity_domain_con
         const val INTENT_EXTRA_FLAG = "FLAG"
         const val INTENT_EXTRA_DOMAIN = "DOMAIN"
         const val INTENT_EXTRA_ASN = "ASN"
+        const val INTENT_EXTRA_IP = "IP"
         const val INTENT_EXTRA_IS_BLOCKED = "IS_BLOCKED"
         const val INTENT_EXTRA_TIME_CATEGORY = "TIME_CATEGORY"
     }
 
     enum class InputType(val type: Int) {
-        DOMAIN(0), FLAG(1), ASN(2);
+        DOMAIN(0), FLAG(1), ASN(2), IP(3);
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -89,6 +93,12 @@ class DomainConnectionsActivity : AppCompatActivity(R.layout.activity_domain_con
                 val isBlocked = intent.getBooleanExtra(INTENT_EXTRA_IS_BLOCKED, false)
                 viewModel.setAsn(asn, isBlocked)
                 b.dcTitle.text = asn
+            }
+            InputType.IP -> {
+                val ip = intent.getStringExtra(INTENT_EXTRA_IP) ?: ""
+                val isBlocked = intent.getBooleanExtra(INTENT_EXTRA_IS_BLOCKED, false)
+                viewModel.setIp(ip, isBlocked)
+                b.dcTitle.text = ip
             }
         }
         val tc = intent.getIntExtra(INTENT_EXTRA_TIME_CATEGORY, 0)
@@ -148,6 +158,9 @@ class DomainConnectionsActivity : AppCompatActivity(R.layout.activity_domain_con
             }
             InputType.ASN -> {
                 viewModel.asnConnectionList
+            }
+            InputType.IP -> {
+                viewModel.ipConnectionList
             }
         }
 

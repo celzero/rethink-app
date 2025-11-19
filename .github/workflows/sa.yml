@@ -8,14 +8,62 @@ jobs:
   detekt:
     name: detekt
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
 
     steps:
-      - name: "checkout"
+      - name: 🥏 Checkout
         uses: actions/checkout@v4
-
-      - name: "detekt"
-        uses: natiginfo/action-detekt-all@1.23.8
-        # from: https://github.com/natiginfo/action-detekt-all
+      - name: ☕️ JREv17
+        uses: actions/setup-java@v5
         with:
-          args: --config .github/detekt-config.yml
+          # default: jdk
+          java-package: 'jre'
+          # github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Java-version-file
+          java-version: '17'
+          # github.com/actions/setup-java?tab=readme-ov-file#supported-distributions
+          distribution: 'temurin'
+      - name: 🤺 Detekt
+        run: |
+          set -euo pipefail
+          # from: github.com/natiginfo/action-detekt-all
+          wget -q https://github.com/detekt/detekt/releases/download/v${DETEKT_VER}/detekt-cli-${DETEKT_VER}-all.jar -O detekt-cli-all.jar
 
+          # detekt.github.io/detekt/cli.html#use-the-cli
+          java -jar detekt-cli-all.jar \
+              --build-upon-default-config \
+              --config .github/detekt-config.yml \
+              --fail-on-severity ${SEV} \
+              --analysis-mode full \
+              --api-version ${KOTLIN_VER} \
+              --jvm-target ${JVM_TARGET} \
+              --language-version ${KOTLIN_VER} \
+              --parallel \
+              --report sarif:rethink-app-detekt-${RUNID}.sarif
+        shell: bash
+        env:
+          RUNID: ${{ github.run_id }}
+          # recommended versions: github.com/detekt/detekt?tab=readme-ov-file#executing-detekt
+          DETEKT_VER: "2.0.0-alpha.1"
+          # github.com/celzero/rethink-app/blob/main/app/build.gradle#L199
+          # one of:  [1.6, 1.8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
+          JVM_TARGET: "17"
+          # one of: [Error, Warning, Info, Never]
+          SEV: "Warning"
+          # WARNING: Keep major.minor version (e.g., "2.1") in sync with build.gradle (ext.kotlin_version, line 4)!
+          # Only the major.minor part is required here, not the full version (e.g., "2.1.20").
+          # github.com/celzero/rethink-app/blob/main/build.gradle#L4
+          KOTLIN_VER: "2.1"
+      - name: 📤 Upload
+        if: always()
+        # TODO: docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/configuring-advanced-setup-for-code-scanning
+        # docs.github.com/en/code-security/code-scanning/integrating-with-code-scanning/sarif-support-for-code-scanning
+        # docs.github.com/en/code-security/code-scanning/integrating-with-code-scanning/uploading-a-sarif-file-to-github
+        # github.com/github/codeql-action/blob/v4/upload-sarif/action.yml
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          # Path to SARIF file relative to the root of the repository
+          sarif_file: "rethink-app-detekt-${{ github.run_id }}.sarif"
+          # Optional category for the results
+          # Used to differentiate multiple results for one commit
+          # category: rethink-app

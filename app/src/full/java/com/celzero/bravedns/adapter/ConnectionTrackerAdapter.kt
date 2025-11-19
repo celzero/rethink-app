@@ -43,6 +43,7 @@ import com.celzero.bravedns.ui.bottomsheet.ConnTrackerBottomSheet
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
 import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.Protocol
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.getDurationInHumanReadableFormat
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getDefaultIcon
@@ -120,7 +121,20 @@ class ConnectionTrackerAdapter(private val context: Context) :
             displayProtocolDetails(connTracker.port, connTracker.protocol)
             displayAppDetails(connTracker)
             displaySummaryDetails(connTracker)
-            displayFirewallRulesetHint(connTracker.isBlocked, connTracker.blockedByRule)
+            // case: when the rule is set to RULE12 but no proxy is set, consider this as error
+            // handle this as special case, and display the RULE1C hint
+            // RULE1C is the hint for RULE12 with no proxy set.
+            val blocked = if (connTracker.blockedByRule == FirewallRuleset.RULE12.id) {
+                connTracker.proxyDetails.isEmpty()
+            } else {
+                connTracker.isBlocked
+            }
+            val rule = if (connTracker.blockedByRule == FirewallRuleset.RULE12.id && connTracker.proxyDetails.isEmpty()) {
+                FirewallRuleset.RULE18.id
+            } else {
+                connTracker.blockedByRule
+            }
+            displayFirewallRulesetHint(blocked, rule)
 
             b.connectionParentLayout.setOnClickListener { openBottomSheet(connTracker) }
         }
@@ -220,9 +234,16 @@ class ConnectionTrackerAdapter(private val context: Context) :
                 // hint red when blocked
                 isBlocked -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
-                    b.connectionStatusIndicator.setBackgroundColor(
-                        ContextCompat.getColor(context, R.color.colorRed_A400)
-                    )
+                    val isError = FirewallRuleset.isProxyError(ruleName)
+                    if (isError) {
+                        b.connectionStatusIndicator.setBackgroundColor(
+                            UIUtils.fetchColor(context, R.attr.chipTextNeutral)
+                        )
+                    } else {
+                        b.connectionStatusIndicator.setBackgroundColor(
+                            ContextCompat.getColor(context, R.color.colorRed_A400)
+                        )
+                    }
                 }
                 // hint white when whitelisted
                 (FirewallRuleset.shouldShowHint(ruleName)) -> {
@@ -382,8 +403,10 @@ class ConnectionTrackerAdapter(private val context: Context) :
         private fun isConnectionProxied(ruleName: String?, proxyDetails: String): Boolean {
             if (ruleName == null) return false
             val rule = FirewallRuleset.getFirewallRule(ruleName) ?: return false
-            val proxy = ProxyManager.isIpnProxy(proxyDetails)
-            return FirewallRuleset.isProxied(rule) && proxyDetails.isNotEmpty() && proxy
+            val proxy = ProxyManager.isNotLocalAndRpnProxy(proxyDetails)
+            // show key symbol in case of proxy error too
+            val isProxyError = FirewallRuleset.isProxyError(ruleName)
+            return (FirewallRuleset.isProxied(rule) && proxyDetails.isNotEmpty() && proxy) || isProxyError
         }
 
         private fun isRpnProxy(pid: String): Boolean {

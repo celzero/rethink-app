@@ -491,7 +491,7 @@
     <string name="dns_proxy_dialog_message_no_app">আইপি ঠিকানা: %1$s
 \n
 \nপোর্ট নম্বর: %2$s</string>
-    <string name="firewall_rule_block_app_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i>কে ব্লক করেছে।<br></br><br></br> পরিবর্তন করতে <i>সমস্ত অ্যাপস</i> ট্যাবে যান।</string>
+    <string name="firewall_rule_block_app_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i>কে ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>সমস্ত অ্যাপস</i> ট্যাবে যান।</string>
     <string name="ada_app_unmetered">মিটারবিহীন</string>
     <string name="notif_channel_firewall_alerts">ফায়ারওয়াল সতর্কতা</string>
     <string name="category_name_others">অন্যান্য</string>
@@ -504,7 +504,7 @@
     <string name="firewall_rule_block_app_exception">ত্রুটি</string>
     <string name="firewall_rule_block_ip">আইপি / পোর্ট</string>
     <string name="firewall_rule_block_dns_bypass">DNS বাইপাস</string>
-    <string name="firewall_rule_global_lockdown_desc">এই সংযোগটি অবরুদ্ধ করা হয়েছে কারণ সর্বজনীন লকডাউন সেট করা হয়েছে।<br></br><br></br> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান।</string>
+    <string name="firewall_rule_global_lockdown_desc">এই সংযোগটি অবরুদ্ধ করা হয়েছে কারণ সর্বজনীন লকডাউন সেট করা হয়েছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান।</string>
     <string name="ci_bypass_universal">বাইপাস সার্বজনীন</string>
     <string name="dc_dns_crypt">DNSCrypt</string>
     <string name="dc_dns_proxy">DNS প্রক্সি</string>
@@ -582,10 +582,10 @@
     <string name="system_dns_connection_failure">বর্তমান DNS সার্ভার নির্ধারণ করা যাচ্ছে না</string>
     <string name="other_dns_list_tab3">ডিএনএস প্রক্সি</string>
     <string name="firewall_rule_univ_block_metered">মিটারযুক্ত (সর্বজনীন)</string>
-    <string name="firewall_rule_new_app_desc">এই অ্যাপটি <i>প্রথম</i> বারের জন্য সংযোগ তৈরি করেছে।<br></br><br></br> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান।</string>
+    <string name="firewall_rule_new_app_desc">এই অ্যাপটি <i>প্রথম</i> বারের জন্য সংযোগ তৈরি করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান।</string>
     <string name="firewall_rule_block_app_mobile_desc"><i>Metered</i> নেটওয়ার্কে সংযোগ করার চেষ্টা করার সময় একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i> ব্লক করে।</string>
-    <string name="firewall_rule_isolate_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i>কে <i>বাইপাস করা IPs</i> ব্যতীত অন্যের সাথে সংযোগ ব্লক করেছে।<br></br><br></br> পরিবর্তন করতে <i>সমস্ত অ্যাপস</i> ট্যাবে যান।</string>
-    <string name="firewall_rule_block_http_desc">এই সংযোগটি ব্লক করা হয়েছে কারণ এটি সম্ভবত <i>অনিরাপদ HTTP</i> ব্যবহার করেছে।<br></br><br></br> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান৷</string>
+    <string name="firewall_rule_isolate_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i>কে <i>বাইপাস করা IPs</i> ব্যতীত অন্যের সাথে সংযোগ ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>সমস্ত অ্যাপস</i> ট্যাবে যান।</string>
+    <string name="firewall_rule_block_http_desc">এই সংযোগটি ব্লক করা হয়েছে কারণ এটি সম্ভবত <i>অনিরাপদ HTTP</i> ব্যবহার করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান৷</string>
     <string name="notif_channel_vpn_failure">নিষ্ক্রিয় VPN</string>
     <string name="notif_channel_download">সতর্কতা ডাউনলোড করুন</string>
     <string name="ci_no_rule_initial">এন</string>
@@ -649,7 +649,7 @@
     <string name="settings_local_blocklist_in_use">%1$s ব্লকলিস্ট ব্যবহার করা হচ্ছে</string>
     <string name="firewall_rule_block_unmetered">মিটারবিহীন (ওয়াইফাই)</string>
     <string name="firewall_rule_block_app_univ_mobile_desc"><i>Metered</i> (মোবাইল) নেটওয়ার্কে সংযোগ করার চেষ্টা করার সময় একটি ব্যবহারকারী-সেট ইউনিভার্সাল ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i> ব্লক করে। ট্যাব</string>
-    <string name="firewall_rule_block_udp_ntp_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>UDP</i> সংযোগ ব্লক করেছে।<br></br><br></br> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান।</string>
+    <string name="firewall_rule_block_udp_ntp_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>UDP</i> সংযোগ ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান।</string>
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="ci_delete">মুছে ফেলা</string>
     <string name="ada_noapp_dialog_message">নির্দিষ্ট অ্যাপ্লিকেশনের জন্য অ্যাপ্লিকেশন তথ্য পাওয়া যায় নি.</string>
@@ -686,8 +686,8 @@
     <string name="orbot_toast_parameter">টর-এ-এ-প্রক্সি</string>
     <string name="update_complete_action_snack">আবার শুরু</string>
     <string name="firewall_rule_trusted_ip">বাইপাসড আইপি (অ্যাপ)</string>
-    <string name="firewall_rule_block_ip_univ_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম <i>গন্তব্য আইপি / পোর্ট</i>কে ব্লক করেছে।<br></br><br></br> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান</string>
-    <string name="firewall_rule_trusted_ip_desc">এই সংযোগের অনুমতি দেওয়া হয়েছিল কারণ <i>গন্তব্য IP</i> অ্যাপ-নির্দিষ্ট নিয়মগুলিকে বাইপাস করার জন্য সেট করা হয়েছে।<br></br><br></br> পরিবর্তন করতে <i>অ্যাপ-নির্দিষ্ট ফায়ারওয়াল</i> স্ক্রিনে যান।</string>
+    <string name="firewall_rule_block_ip_univ_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম <i>গন্তব্য আইপি / পোর্ট</i>কে ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান</string>
+    <string name="firewall_rule_trusted_ip_desc">এই সংযোগের অনুমতি দেওয়া হয়েছিল কারণ <i>গন্তব্য IP</i> অ্যাপ-নির্দিষ্ট নিয়মগুলিকে বাইপাস করার জন্য সেট করা হয়েছে।<br/><br/> পরিবর্তন করতে <i>অ্যাপ-নির্দিষ্ট ফায়ারওয়াল</i> স্ক্রিনে যান।</string>
     <string name="notif_channel_desc_vpn_failure">Android বা অন্য VPN অ্যাপ দ্বারা RethinkDNS বন্ধ করা হলে জানান</string>
     <string name="lbbs_heading">185+ ব্লকলিস্ট কনফিগার করুন</string>
     <string name="brbs_restore_complete_toast">পুনরুদ্ধার সম্পন্ন হয়েছে, অ্যাপ পুনরায় চালু হচ্ছে…</string>

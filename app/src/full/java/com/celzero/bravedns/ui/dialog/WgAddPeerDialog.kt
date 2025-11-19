@@ -31,6 +31,7 @@ import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.UIUtils.getDurationInHumanReadableFormat
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.tos
+import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.util.ErrorMessages
 import kotlinx.coroutines.Dispatchers
@@ -63,6 +64,7 @@ class WgAddPeerDialog(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT
         )
+        setupAutoExpand(b.peerAllowedIps)
 
         if (wgPeer != null) {
             isEditing = true
@@ -81,6 +83,32 @@ class WgAddPeerDialog(
                 b.keepAliveHint.text = getDurationInHumanReadableFormat(activity, kas)
             } else {
                 b.keepAliveHint.visibility = View.GONE
+            }
+        }
+        // re-measure after setting text
+        b.root.post {
+            triggerExpandNow()
+        }
+    }
+
+    private fun triggerExpandNow() {
+        listOf(b.peerAllowedIps).forEach { adjustMaxLines(it) }
+    }
+
+    private fun setupAutoExpand(et: com.google.android.material.textfield.TextInputEditText) {
+        et.setHorizontallyScrolling(false)
+        et.maxLines = 4 // initial cap
+        et.doOnTextChanged { _, _, _, _ -> adjustMaxLines(et) }
+    }
+
+    private fun adjustMaxLines(et: com.google.android.material.textfield.TextInputEditText) {
+        // post to ensure lineCount updated after layout
+        et.post {
+            val lines = et.lineCount
+            val threshold = 4
+            val hardCap = 12
+            if (lines > threshold) {
+                et.maxLines = minOf(lines, hardCap)
             }
         }
     }

@@ -64,6 +64,13 @@ internal constructor(
         connTracker.proxyDetails = connTrackerMetaData.proxyDetails
         connTracker.connId = connTrackerMetaData.connId
         connTracker.connType = connTrackerMetaData.connType
+        connTracker.downloadBytes = connTrackerMetaData.downloadBytes
+        connTracker.uploadBytes = connTrackerMetaData.uploadBytes
+        connTracker.rpid = connTrackerMetaData.rpid
+        connTracker.synack = connTrackerMetaData.synack
+        connTracker.duration = connTrackerMetaData.duration
+        connTracker.blockedByRule = connTrackerMetaData.blockedByRule
+        connTracker.message = connTrackerMetaData.message
 
         val serverAddress = convertIpV6ToIpv4IfNeeded(connTrackerMetaData.destIP)
         connTracker.dnsQuery = connTrackerMetaData.query
@@ -90,6 +97,12 @@ internal constructor(
         rlog.proxyDetails = connTrackerMetaData.proxyDetails
         rlog.connId = connTrackerMetaData.connId
         rlog.connType = connTrackerMetaData.connType
+        rlog.downloadBytes = connTrackerMetaData.downloadBytes
+        rlog.uploadBytes = connTrackerMetaData.uploadBytes
+        rlog.rpid = connTrackerMetaData.rpid
+        rlog.synack = connTrackerMetaData.synack
+        rlog.duration = connTrackerMetaData.duration
+        rlog.message = connTrackerMetaData.message
 
         val serverAddress = convertIpV6ToIpv4IfNeeded(connTrackerMetaData.destIP)
         rlog.dnsQuery = connTrackerMetaData.query
@@ -196,7 +209,12 @@ internal constructor(
             val appInfo = Utilities.getApplicationInfo(ctx, packageName) ?: return ""
 
             Logger.i(LOG_TAG_FIREWALL, "app, $appName, not tracked by FirewallManager")
-            appName = ctx.packageManager.getApplicationLabel(appInfo).toString()
+            appName = try {
+                ctx.packageManager.getApplicationLabel(appInfo).toString()
+            } catch (_: Exception) {
+                // fallback if base.apk is not accessible
+                ctx.getString(R.string.network_log_app_name_unnamed, uid.toString())
+            }
         }
         return appName
     }

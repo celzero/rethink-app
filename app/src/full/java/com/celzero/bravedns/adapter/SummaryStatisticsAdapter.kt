@@ -432,10 +432,32 @@ class SummaryStatisticsAdapter(
                         startAppInfoActivity(appConnection)
                     }
                     SummaryStatisticsType.MOST_CONNECTED_APPS -> {
-                        startAppInfoActivity(appConnection)
+                        io {
+                            if (isUnknownApp(appConnection)) {
+                                uiCtx {
+                                    showNetworkLogs(
+                                        appConnection,
+                                        SummaryStatisticsType.MOST_CONNECTED_APPS
+                                    )
+                                }
+                            } else {
+                                uiCtx { startAppInfoActivity(appConnection) }
+                            }
+                        }
                     }
                     SummaryStatisticsType.MOST_BLOCKED_APPS -> {
-                        startAppInfoActivity(appConnection)
+                        io {
+                            if (isUnknownApp(appConnection)) {
+                                uiCtx {
+                                    showNetworkLogs(
+                                        appConnection,
+                                        SummaryStatisticsType.MOST_BLOCKED_APPS
+                                    )
+                                }
+                            } else {
+                                uiCtx { startAppInfoActivity(appConnection) }
+                            }
+                        }
                     }
                     SummaryStatisticsType.MOST_CONNECTED_ASN -> {
                         startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.ASN)
@@ -447,30 +469,13 @@ class SummaryStatisticsAdapter(
                         startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.DOMAIN)
                     }
                     SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
-                        io {
-                            val isDnsBypassed = FirewallManager.isAnyAppBypassesDns()
-                            uiCtx {
-                                if (appConfig.getBraveMode().isDnsMode()) {
-                                    showDnsLogs(appConnection)
-                                }
-                                // if any app bypasses dns, then the decision made in flow() call
-                                // will be to show the network logs. Else, show the dns logs.
-                                if (isDnsBypassed) {
-                                    showNetworkLogs(
-                                        appConnection,
-                                        SummaryStatisticsType.MOST_BLOCKED_DOMAINS
-                                    )
-                                } else {
-                                    showDnsLogs(appConnection)
-                                }
-                            }
-                        }
+                        startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.DOMAIN, true)
                     }
                     SummaryStatisticsType.MOST_CONTACTED_IPS -> {
-                        showNetworkLogs(appConnection, SummaryStatisticsType.MOST_CONTACTED_IPS)
+                        startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.IP)
                     }
                     SummaryStatisticsType.MOST_BLOCKED_IPS -> {
-                        showNetworkLogs(appConnection, SummaryStatisticsType.MOST_BLOCKED_IPS)
+                        startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.IP, true)
                     }
                     SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
                         startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.FLAG)
@@ -479,13 +484,18 @@ class SummaryStatisticsAdapter(
             }
         }
 
+        private suspend fun isUnknownApp(appConnection: AppConnection): Boolean {
+            val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
+            return appInfo == null
+        }
+
         private fun startDomainConnectionsActivity(appConnection: AppConnection, input: DomainConnectionsActivity.InputType, isBlocked: Boolean = false) {
             val intent = Intent(context, DomainConnectionsActivity::class.java)
             intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_TYPE, input.type)
             when (input) {
                 DomainConnectionsActivity.InputType.DOMAIN -> {
                     intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_DOMAIN, appConnection.appOrDnsName)
-                    intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_IS_BLOCKED, false)
+                    intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_IS_BLOCKED, isBlocked)
                 }
                 DomainConnectionsActivity.InputType.ASN -> {
                     intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_ASN, appConnection.appOrDnsName)
@@ -493,6 +503,10 @@ class SummaryStatisticsAdapter(
                 }
                 DomainConnectionsActivity.InputType.FLAG -> {
                     intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_FLAG, appConnection.flag)
+                }
+                DomainConnectionsActivity.InputType.IP -> {
+                    intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_IP, appConnection.ipAddress)
+                    intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_IS_BLOCKED, isBlocked)
                 }
             }
             intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_TIME_CATEGORY, timeCategory.value)
@@ -561,7 +575,7 @@ class SummaryStatisticsAdapter(
                 }
                 else -> {
                     // should never happen, but just in case we'll show all logs
-                    startActivity(NetworkLogsActivity.Tabs.NETWORK_LOGS.screen, "")
+                    startActivity(NetworkLogsActivity.Tabs.NETWORK_LOGS.screen, appConnection.appOrDnsName)
                 }
             }
         }
@@ -624,7 +638,7 @@ class SummaryStatisticsAdapter(
                             }
                         }
                     )
-            } catch (ignored: Exception) {
+            } catch (_: Exception) {
                 Logger.d(LOG_TAG_DNS, "err loading icon, load flag instead")
                 displayDuckduckgoFavIcon(duckDuckGoUrl, duckduckgoDomainURL)
             }
@@ -671,7 +685,7 @@ class SummaryStatisticsAdapter(
                             }
                         }
                     )
-            } catch (ignored: Exception) {
+            } catch (_: Exception) {
                 Logger.d(LOG_TAG_DNS, "err loading icon, load flag instead")
                 showFlag()
                 hideFavIcon()

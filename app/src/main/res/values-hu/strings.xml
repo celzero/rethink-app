@@ -94,11 +94,11 @@
     <string name="settings_locale_heading" translatable="true">Nyelvválasztás</string>
     <string name="settings_biometeric_heading" translatable="true">Alkalmazászár engedélyezése</string>
     <string name="logs_card_duration" translatable="true">%1$s óta</string>
-    <string name="hsf_vpn_dialog_message" translatable="true">A RethinkDNS-nek engedélyre van szüksége egy helyi VPN beállításához, hogy titkosíthassa az eszköz DNS-kérelmeit, hálózati monitorozást hajtson végre, és tűzfalszabályokat érvényesítsen.\n\nA RethinkDNS semmilyen információt nem gyűjt, és semmilyen módon nem kémkedik Ön után.</string>
+    <string name="hsf_vpn_dialog_message" translatable="true">AA Rethink engedélyt kér egy helyi VPN létrehozására, hogy titkosítsa az eszköz DNS-kéréseit, lehetővé tegye a hálózati forgalom megfigyelését, valamint érvényesítse a tűzfalszabályokat.\n\nA Rethink nem gyűjt semmilyen adatot Önnel kapcsolatban, és semmilyen módon nem figyeli vagy követi Önt.</string>
     <string name="show_logs_disabled_network_message" translatable="true">A kapcsolati naplózás le lett tiltva. Ha újra szeretné engedélyezni, lépjen a <i>Beállítások</i> menübe, és kapcsolja be az <i>Eszközön történő naplózás engedélyezése opciót.</i></string>
     <string name="dns_query_clear_logs_title" translatable="true">Törli az összes DNS naplót?</string>
     <string name="bsct_app_info" translatable="true">Alkalmazás információ</string>
-    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Megakadályozza, hogy egy alkalmazás csatlakozzon az internethez.\n <u>#2</u>: Blokkolja bármely alkalmazás csatlakozását egy adott IP-címhez.\n <u>#3</u>: Blokkolja az összes kapcsolatot, ha a készülék le van zárva (univerzális tűzfal).\n <u>#4</u>: Blokkolja a nem használt alkalmazásokat (univerzális tűzfal).\n <u>#5</u>: Blokkolja a kapcsolatokat, ha a forrás alkalmazás ismeretlen (univerzális tűzfal).\n <u>#6</u>: Blokkolja az összes UDP forgalmat a DNS kivételével (egyetemes tűzfal).\n <u>#7</u>: Blokkolja a kapcsolatokat, ha a DNS megkerült (univerzális tűzfal).</string>
+    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Megakadályozza, hogy egy alkalmazás csatlakozzon az internethez.\n<u>#2</u>: Megakadályozza, hogy bármely alkalmazás csatlakozzon egy adott IP-címhez.\n<u>#3</u>: Minden kapcsolatot blokkol, amikor az eszköz zárolva van (Univerzális tűzfal).\n<u>#4</u>: Blokkolja azokat az alkalmazásokat, amelyek nincsenek használatban (Univerzális tűzfal).\n<u>#5</u>: Blokkolja a kapcsolatokat, ha a forrásalkalmazás ismeretlen (Univerzális tűzfal).\n<u>#6</u>: Blokkolja az összes UDP-forgalmat, kivéve a DNS-t (Univerzális tűzfal).\n<u>#7</u>: Blokkolja a kapcsolatokat, ha a DNS megkerülésre kerül (Univerzális tűzfal).</string>
     <string name="download_update_dialog_failure_message" translatable="true">Vagy a szervereink nem elérhetők, vagy a kapcsolat nem jött létre. Kérjük, próbálja meg később.</string>
     <string name="whats_new_version_update" translatable="true"><b>Ne pánikoljon 2</b><b>Új:</b> A hálózati motor hibáinak rögzítése a felhasználói hibajelentésekben.<b>Új:</b> A rendszer DNS használata nem delegált domain nevekhez, <b>ha</b> a „DNS-szivárgás megelőzése” <b>be van kapcsolva</b>.<b>Fejlesztés:</b> Dual-stack (IPv4 + IPv6) WireGuard kapcsolat.<b>Fejlesztés:</b> A felhasználói felület elemei nem blokkolódnak, ha a hálózati motor nem válaszol.<b>Javítás:</b> Kapcsolati időtúllépés, ha az „Advanced DNS filtering” be van kapcsolva.<b>Javítás:</b> A WireGuard partner végpontok, amelyek domain nevet használnak, lefagynak hálózati váltáskor.<a href="https://svc.rethinkdns.com/r/translate">Segítsen az alkalmazás fordításában</a></string>
     <string name="connection_http3" translatable="true">HTTP3</string>
@@ -261,7 +261,7 @@
     <string name="memory_notification_text">A Rethink alacsony memóriát észlel. Előfordulhat, hogy a rendszer műveletei korlátozottak lesznek.</string>
     <string name="slide_2_title" translatable="true">Üdvözöljük</string>
     <string name="slide_2_desc" translatable="true">A Rethink a legkönnyebb módja a hálózati aktivitás figyelésének, az internetes cenzúra megkerülésének és az alkalmazások tűzfalának kezelésére Android eszközön.</string>
-    <string name="slide_1_desc" translatable="true">A Rethink egy nyílt forráskódú szoftver, amelyet a Mozilla Builders MVP programja támogat.</string>
+    <string name="slide_1_desc" translatable="true">A Rethink egy nyílt forráskódú szoftver, amelyet a Mozilla Builders MVP program és a FOSS United Alapítvány támogat.</string>
     <string name="allow" translatable="true">engedélyez</string>
     <string name="block" translatable="true">blokk</string>
     <string name="bypass_universal" translatable="true">univerzális megkerülés(bypass)</string>
@@ -384,7 +384,7 @@
     <string name="settings_pcap_dialog_option_3" translatable="true">Kimenet a Letöltések mappába</string>
     <string name="firewall_status_isolate" translatable="true">elkülönített</string>
     <string name="firewall_status_whitelisted" translatable="true">megkerüli az univerzális tűzfalszabályokat</string>
-    <string name="firewall_status_block_unmetered" translatable="true">blokkolva a nem mért (wifi) hálózatokon</string>
+    <string name="firewall_status_block_unmetered" translatable="true">kapcsolat letiltva, a korlátlan Wi-Fi hálózatokon</string>
     <string name="firewall_status_block_metered" translatable="true">blokkolva a díjköteles (mobil) hálózatokon</string>
     <string name="hs_biometeric_title" translatable="true">Rethink feloldása</string>
     <string name="hs_biometeric_desc" translatable="true">Használja a biometrikus hitelesítést a RethinkDNS feloldásához</string>
@@ -414,7 +414,7 @@
     <string name="info_dialog_url_copy_toast_msg" translatable="true">URL másolva</string>
     <string name="dns_crypt_relay_remove_dialog_message" translatable="true">A DNSCrypt átjáró törlése a mentett konfigurációból.</string>
     <string name="refresh_complete" translatable="true"><!-- use dc_refresh_toast --> Alkalmazáslista újraszinkronizálása befejeződött.</string>
-    <string name="orbot_explanation" translatable="true">Az Orbot egy ingyenes proxyalkalmazás, amely lehetővé teszi más alkalmazások számára, hogy az internetet <u>biztonságosabban</u> használják.\nAz Orbot a <u>Tor</u> segítségével titkosítja az internetes forgalmat, ami segít <u>megkerülni a cenzúrát</u>, és megvédi a személyes szabadságát és magánéletét a <u>hálózati felügyelet</u> különböző formáitól.\n<u>TCP Proxy</u>: A Rethink csak a <i>kiválasztott</i> alkalmazások TCP-kapcsolatait továbbítja az Orbotnak.\n<u>HTTP Proxy</u>: A Rethink <i>HTTP CONNECT alagutat hoz létre</i> az Orbot felé, és csak a <i>kiválasztott</i> alkalmazások TCP-kapcsolatait továbbítja.</string>
+    <string name="orbot_explanation" translatable="true">Orbot egy ingyenes proxy alkalmazás, amely lehetővé teszi más alkalmazások számára, hogy <u>biztonságosabban</u> használják az internetet.\nAz Orbot a <u>Tor</u> hálózatot használja az internetes forgalmad titkosítására, ami segít <u>megkerülni a cenzúrát</u>, és védelmet nyújt a <u>hálózati megfigyelés</u> különböző formái ellen, amelyek veszélyeztetik a személyes szabadságot és a magánéletet.\n<u>TCP proxy</u>: A Rethink csak az <i>kiválasztott</i> alkalmazások TCP kapcsolatait továbbítja az Orbot felé.\n<u>HTTP proxy</u>: A Rethink <i>HTTP CONNECT alagutat hoz létre</i> az Orbot felé, és csak az <i>kiválasztott</i> alkalmazások TCP kapcsolatait továbbítja.</string>
     <string name="hsf_notification_permission_failure" translatable="true">Értesítési engedély engedélyezése a Beállítások képernyőn</string>
     <string name="hsf_start_dialog_header" translatable="true">Indítsa el: %1$s</string>
     <string name="hsf_start_dialog_message" translatable="true">Már csak egy lépés választja el attól, hogy biztonságosan és védetten használja Android készülékét: azonnal megtekintheti a hálózati tevékenységet, letilthatja a weboldalakat, IP-címeket és a nem megfelelően működő alkalmazásokat.</string>
@@ -431,7 +431,6 @@
     <string name="hsf_blocklist_updating_text" translatable="true">Engedélyezés…</string>
     <string name="hsf_chip_appearance" translatable="true">Téma: %1$s</string>
     <string name="hsf_pause_vpn_failure" translatable="true">Nem lehet szüneteltetni: RethinkDNS nem aktív</string>
-    <string name="lbl_background_data" translatable="true">Háttéradat-forgalom korlátozása</string>
     <string name="battery_optimization_dialog_heading" translatable="true">%1$s letiltása</string>
     <string name="restrict_dialog_message" translatable="true">A(z) <i>%1$s</i> kapcsolatvesztést okozhat. Módosítsa a beállítást, hogy a Rethink a háttérben is használhassa az adatforgalmat és egyéb erőforrásokat.</string>
     <string name="dc_block_heading" translatable="true">szabályok</string>
@@ -476,7 +475,7 @@
     <string name="about_settings_notification" translatable="true">Értesítési beállítások</string>
     <string name="about_whats_new" translatable="true">Mi az újdonság a(z) %1$s verzióban</string>
     <string name="about_twitter" translatable="true">Kövessen minket Twitteren</string>
-    <string name="about_mozilla" translatable="true">A Rethink DNS-t a Mozilla Builders, a FOSS United Foundation és az OSOM Products Inc. támogatja.</string>
+    <string name="about_mozilla" translatable="true">A RethinkDNS projektet a Mozilla Builders és a FOSS United Alapítvány támogatja.</string>
     <string name="about_app_update_check" translatable="true">Alkalmazásfrissítések ellenőrzése</string>
     <string name="about_app_contributors" translatable="true">Szerzők</string>
     <string name="about_app_translate" translatable="true">Fordítás</string>
@@ -499,7 +498,74 @@
     <string name="collecting_logs_progress_text" translatable="true">Rögzítés folyamatban…</string>
     <string name="logs_disclaimer" translatable="true">Az első 20 000 karakter megjelenítése</string>
     <string name="contributors_dialog_title" translatable="true">Szerzők</string>
-    <string name="contributors_list" translatable="true">A &lt;i&gt;Rethink Open Source Project&lt;/i&gt; ezeknek az önkénteseknek köszönheti létét, akik számtalan órát áldoznak a fejlesztésére.&lt;br/&gt; &lt;br/&gt; &lt;br/&gt;🛡️ Android alkalmazás &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Network engine &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Resolver &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Közösségi modok &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Geo-IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Fordítások &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Build szerverek &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list" translatable="true"><![CDATA[The <i>A Rethink Open Source Project</i> a létezését azoknak az önkénteseknek köszönheti, akik megszámlálhatatlan órát szentelnek a fejlesztésének.<br/>
+                                              <br/>🛡️ Android alk. <br/>
+                                              <a href="https://github.com/anthonyryan1">Anthony Ryan</a> /
+                                              <a href="https://github.com/BayLee4">BayLee4</a> /
+                                              <a href="https://github.com/Ch4t4r">Ch4t4r</a> /
+                                              <a href="https://github.com/samthesamman">CodingAttack</a> /
+                                              <a href="https://github.com/HrBDev">HrBDev</a> /
+                                              <a href="https://github.com/hussainmohd-a">hussainmohd-a</a> /
+                                              <a href="https://github.com/ignoramous">ignoramous</a> /
+                                              <a href="https://github.com/ironveil">ironveil</a> /
+                                              <a href="https://github.com/markwmuller">markwmuller</a> /
+                                              <a href="https://github.com/mohammaduvez">Mohammaduvez</a> /
+                                              <a href="https://github.com/Mygod">Mygod</a> /
+                                              <a href="https://github.com/Poussinou">Poussinou</a> /
+                                              <a href="https://github.com/pjosingh">pjosingh</a> /
+                                              <a href="https://github.com/RohitSurwase">RohitSurwase</a> /
+                                              <a href="https://github.com/ShantanuVichare">Shantanu</a> /
+                                              <a href="https://github.com/Uldiniad">Uldiniad</a><br/> /
+                                              <a href="https://github.com/yurtpage">yurtpage</a><br/>
+                                              <br/>🚂 - Hálózati vezérlő <br/>
+                                              <a href="https://github.com/alalamav">alalamav</a> /
+                                              <a href="https://github.com/bemasc">bemasc</a> /
+                                              <a href="https://github.com/dmcardle">dmcardle</a> /
+                                              <a href="https://github.com/fortuna">fortuna</a> /
+                                              <a href="https://github.com/ignoramous">ignoramous</a> /
+                                              <a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /
+                                              <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
+                                              <a href="https://github.com/SeanBurford">SeanBurford</a><br/>
+                                              <br/>📚 Feloldó <br/>
+                                              <a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a> /
+                                              <a href="https://github.com/amithm7">amithm7</a> /
+                                              <a href="https://github.com/arfshl">arfshl</a> /
+                                              <a href="https://github.com/badmojr">badmojr</a> /
+                                              <a href="https://github.com/bongochong">bongochong</a> /
+                                              <a href="https://github.com/elliotwutingfeng">elliotwutingfeng</a> /
+                                              <a href="https://github.com/georgyo">georgyo</a> /
+                                              <a href="https://github.com/GiddyGoatGaming">GiddyGoatGaming</a> /
+                                              <a href="https://github.com/Harish-Narayan">Harish-Narayan</a> /
+                                              <a href="https://github.com/ignoramous">ignoramous</a> /
+                                              <a href="https://github.com/JakeChampion">JakeChampion</a> /
+                                              <a href="https://github.com/MasterKia">MasterKia</a> /
+                                              <a href="https://github.com/mtxadmin">mtxadmin</a> /
+                                              <a href="https://github.com/neneeen">neneeen</a> /
+                                              <a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /
+                                              <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
+                                              <a href="https://github.com/shruuub">shruuub</a> /
+                                              <a href="https://github.com/shuvashish76">shuvashish76</a><br/>
+                                              <br/>⚜ Közösség mód <br/>
+                                              <a href="https://t.me/amithm7">amithm7</a> /
+                                              <a href="https://t.me/TronSlayer">Andersen</a> /
+                                              <a href="https://t.me/ppatra">ppatra</a> /
+                                               <a href="https://t.me/InFamous23">InFamous23</a> /
+                                              <a href="https://t.me/TheTr1ckst3r">TheTr1ckst3r</a> /
+                                              <a href="https://t.me/Ch4t4r">Ch4t4r</a> /
+                                              <a href="https://t.me/Billi_ance">Billi_ance</a> /
+                                              <a href="https://t.me/kaliangel">kaliangel</a> /
+                                              <a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>
+                                              <br/>📌 Geo-IP <br/>
+                                              <a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IPinfo Lite</a><br/>
+                                              <br/>❇ Fordítások <br/>
+                                              <a href="https://weblate.org/en/">Weblate</a><br/>
+                                              <br/>🦆 Ikon <br/>
+                                              <a href="https://github.com/celzero/rethink-app/issues/346">Icons</a><br/>
+                                              <br/>📦 Fordító szerver <br/>
+                                              <a href="https://jitpack.io/">JitPack</a> /
+                                              <a href="https://github.com/">GitHub</a> /
+                                              <a href="https://central.sonatype.com/">Sonatype</a><br/>
+                                              ]]></string>
     <string name="cd_dns_crypt_title" translatable="true">feloldók (resolvers)</string>
     <string name="cd_custom_doh_dialog_title" translatable="true">Egyéni kiszolgáló URL</string>
     <string name="cd_custom_doh_url_name_default" translatable="true">DoH</string>
@@ -530,20 +596,20 @@
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">Ne érvényesítse a szerver TLS tanúsítványokat (csak akkor, ha tudja, mit csinál)</string>
     <string name="cd_dnscrypt_relay_heading" translatable="true">Átjátszók</string>
     <string name="cd_dns_alg_heading" translatable="true">Fejlett DNS-szűrés (kísérleti)</string>
-    <string name="cd_dns_alg_desc" translatable="true">Egyedi IP-cím hozzárendelése minden DNS-lekérdezéshez</string>
+    <string name="cd_dns_alg_desc" translatable="true">Egyedi IP-cím hozzárendelése minden DNS-lekérdezéshez.</string>
     <string name="ctbs_app_info_not_available_toast" translatable="true">Az alkalmazás beállításai oldal nem található</string>
     <string name="ctbs_app_other_apps" translatable="true">%1$s + %2$s más alkalmazás(ok)</string>
     <string name="ctbs_block_other_apps" translatable="true">A(z) %1$s-hez alkalmazott szabályok %2$s másik alkalmazásra is érvényesek lesznek</string>
     <string name="ctbs_dialog_negative_btn" translatable="true">Vissza</string>
     <string name="dns_log_dialog_positive" translatable="true">Naplók törlése</string>
-    <string name="dns_btm_sheet_dialog_message" translatable="true"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s tiltólista</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
-    <string name="dns_btm_sheet_dialog_ips" translatable="true"> \u0020<Data> %1$s %2$s &lt;br/&gt;</Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_message" translatable="true"><Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s tiltólista</h3>%3$s.<br/><br/>]]></Data></string>
+    <string name="dns_btm_sheet_dialog_ips" translatable="true"><Data> %1$s %2$s &lt;br/&gt;</Data></string>
     <string name="dns_btm_sheet_chip" translatable="true">+%1$s Egyéb IP-k</string>
     <string name="dns_btm_sheet_chip_no_answer" translatable="true">Nincs válasz</string>
     <string name="dns_btm_resolved_crypt" translatable="true"><u>Anonim módon</u> feloldva: %1$s, %2$s által, %3$s-en keresztül</string>
     <string name="dns_btm_resolved_doh" translatable="true">megoldott %1$s által %2$s</string>
     <string name="dns_btm_resolved_doh_no_server" translatable="true">megoldott %1$s</string>
-    <string name="dns_btm_latency_ms" translatable="true">%1$sMs</string>
+    <string name="dns_btm_latency_ms" translatable="true">%1$s ms</string>
     <string name="dns_btm_record_type" translatable="true">A lekérdezés típusa: %1$s</string>
     <string name="hs_download_positive_default" translatable="true">OK</string>
     <string name="hs_download_positive_play_store" translatable="true">Frissítés befejezése</string>
@@ -595,8 +661,8 @@
     <string name="fapps_firewall_filter_excluded" translatable="true">Kizárt</string>
     <string name="fapps_firewall_filter_isolate" translatable="true">Elszigetelt</string>
     <string name="fapps_info_dialog_message" translatable="true">Blokkolja az alkalmazások internet-hozzáférését. Az internetelérés korlátozása segít megelőzni a felesleges adatforgalmat, és kíméli az akkumulátort is.</string>
-    <string name="fapps_info_unmetered_msg" translatable="true">Engedélyezés / Blokkolás a nem mért (WiFi) hálózaton.</string>
-    <string name="fapps_info_metered_msg" translatable="true">Engedélyezés / Blokkolás mért (mobil) hálózaton.</string>
+    <string name="fapps_info_unmetered_msg" translatable="true">Engedélyezés /Blokkolás, korlátlan WiFi-hálózaton.</string>
+    <string name="fapps_info_metered_msg" translatable="true">Engedélyezés / Blokkolás, forgalmi díjas (mobil) hálózaton.</string>
     <string name="fapps_info_bypass_msg" translatable="true">Az univerzális tűzfalszabályok megkerülése.</string>
     <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">Bypass DNS &amp; tűzfal szabályok.</string>
     <string name="fapps_info_exclude_msg" translatable="true">Kizárás mind a DNS-, mind a tűzfal-szabályok alól.</string>
@@ -607,7 +673,7 @@
     <string name="fapps_unmetered_block_dialog_message" translatable="true">Blokkolja a(z) <i>felsorolt</i> alkalmazások kapcsolatait korlátlan (Wi-Fi) hálózaton?</string>
     <string name="fapps_unmetered_unblock_dialog_message">Engedélyezi a(z) <i>felsorolt</i> alkalmazások kapcsolatait korlátlan (Wi-Fi) hálózaton?</string>
     <string name="fapps_metered_block_dialog_title" translatable="true">Blokkolás korlátozott adatkapcsolaton</string>
-    <string name="fapps_metered_block_dialog_message" translatable="true">A <i>listán szereplő</i> alkalmazások kapcsolatainak blokkolása a mért (mobil) hálózaton?</string>
+    <string name="fapps_metered_block_dialog_message" translatable="true">Kapcsolatok blokkolása forgalmi díjas (mobil) hálózaton a <i>megadott</i> alkalmazásoknál?</string>
     <string name="fapps_metered_unblock_dialog_title" translatable="true">Engedélyezés korlátozott adatkapcsolaton</string>
     <string name="fapps_metered_unblock_dialog_message" translatable="true">Engedélyezi a(z) <i>felsorolt</i> alkalmazások kapcsolatait korlátozott (mobil) adatkapcsolaton?</string>
     <string name="lbl_battery_optimization" translatable="true">Akkumulátor optimalizálása</string>
@@ -622,8 +688,8 @@
     <string name="fapps_isolate_block_dialog_title" translatable="true">Alkalmazások elkülönítése</string>
     <string name="fapps_isolate_block_dialog_message" translatable="true">Elkülöníteni a <i>felsorolt</i> alkalmazásokat?</string>
     <string name="fapps_firewall_filter_hint" translatable="true">Összes alkalmazás megjelenítése</string>
-    <string name="fapps_firewall_filter_desc" translatable="true">A(z) <u>%1$s</u> %2$s alkalmazás megjelenítése</string>
-    <string name="fapps_firewall_filter_desc_category" translatable="true">A(z) <u>%1$s</u> %2$s alkalmazás megjelenítése a következő kategóriákban: %3$s</string>
+    <string name="fapps_firewall_filter_desc" translatable="true"><![CDATA[<u>%1$s</u> %2$s alkalmazás megjelenítése]]></string>
+    <string name="fapps_firewall_filter_desc_category" translatable="true"><![CDATA[<u>%1$s</u> %2$s alkalmazás megjelenítése a következő kategóriákban: %3$s]]></string>
     <string name="rules_load_failure_heading" translatable="true">Megjegyzés</string>
     <string name="rules_load_failure_desc" translatable="true">Tűzfalszabály nem található</string>
     <string name="rules_load_failure_reload" translatable="true">Újratöltés</string>
@@ -651,7 +717,7 @@
     <string name="other_dns_list_tab1" translatable="true">DoH</string>
     <string name="other_dns_list_tab2" translatable="true">Dnscrypt</string>
     <string name="other_dns_list_tab3" translatable="true">Dns proxy</string>
-    <string name="hs_btm_sheet_lock_down" translatable="true">Nem módosítható az üzemmód, amíg a VPN <i>zárolt</i> állapotban van. Koppintson ide a <u>VPN beállításainak szerkesztéséhez</u>.</string>
+    <string name="hs_btm_sheet_lock_down" translatable="true">Nem lehet módot váltani, amíg a VPN <i>zárolt</i> állapotban van. Koppints ide a &lt;u&gt;VPN beállításainak szerkesztéséhez&lt;/u&gt;.</string>
     <string name="firewall_rule_no_rule" translatable="true">Nincs Szabály</string>
     <string name="firewall_rule_block_app" translatable="true">Alkalmazás blokkolva</string>
     <string name="firewall_rule_block_unmetered" translatable="true">Korlátlan (WiFi)</string>
@@ -682,33 +748,33 @@
     <string name="firewall_rule_domain_trusted_univ" translatable="true">Megbízható domain (univerzális)</string>
     <string name="firewall_rule_proxied" translatable="true">Proxyzva</string>
     <string name="firewall_rule_no_rule_desc" translatable="true">Ehhez a kapcsolathoz nem található tűzfalszabály.</string>
-    <string name="firewall_rule_block_app_desc" translatable="true">A felhasználó által beállított tűzfalszabály blokkolta ezt az <i>alkalmazást</i>.<br></br><br></br>A módosításhoz lépjen az <i>Összes alkalmazás</i> fülre.</string>
-    <string name="firewall_rule_new_app_desc" translatable="true">Ez az alkalmazás <i>első alkalommal</i> létesített kapcsolatot.<br></br><br></br>A módosításhoz lépjen az <i>Univerzális</i> fülre.</string>
-    <string name="firewall_rule_block_app_unmetered_desc" translatable="true">Egy felhasználó által beállított tűzfalszabály blokkolta ezt az <i>alkalmazást</i>, amikor <i>korlátlan</i> hálózaton próbált csatlakozni.<br></br><br></br> A módosításhoz lépjen az <i>Összes alkalmazás</i> fülre.</string>
-    <string name="firewall_rule_block_app_mobile_desc" translatable="true">Egy felhasználó által beállított tűzfalszabály blokkolta ezt az <i>alkalmazást</i>, amikor <i>forgalmi díjas</i> hálózaton próbált csatlakozni.<br></br><br></br> A módosításhoz lépjen az <i>Összes alkalmazás</i> fülre.</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true">Egy felhasználó által beállított univerzális tűzfalszabály blokkolta ezt az <i>alkalmazást</i>, amikor <i>forgalmi díjas</i> (mobil) hálózaton próbált csatlakozni.<br></br><br></br> A módosításhoz lépjen az <i>Univerzális</i> fülre.</string>
-    <string name="firewall_rule_isolate_desc" translatable="true">Egy felhasználó által beállított tűzfalszabály blokkolta ezt az <i>alkalmazást</i>, amikor a <i>kivételként megadott IP-ktől</i> eltérő címekhez próbált csatlakozni.<br></br><br></br> A módosításhoz lépjen az <i>Összes alkalmazás</i> fülre.</string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Ez a kapcsolat azért lett engedélyezve, mert a <i>forrás alkalmazás</i> úgy van beállítva, hogy <i>megkerülje a DNS- és tűzfalszabályokat</i>.<br></br><br></br> A módosításhoz lépjen az <i>Alkalmazásspecifikus tűzfal</i> képernyőre.</string>
-    <string name="firewall_rule_block_ip_univ_desc" translatable="true">Egy felhasználó által beállított tűzfalszabály blokkolta a <i>cél IP-címet / portot</i>.<br></br><br></br> A módosításhoz lépjen az <i>Univerzális</i> fülre.</string>
-    <string name="firewall_rule_block_ip_desc" translatable="true">Egy felhasználó által beállított tűzfalszabály blokkolta a <i>cél IP-címet</i>.<br></br><br></br>A módosításhoz lépjen az <i>Alkalmazásspecifikus tűzfal</i> képernyőre.</string>
-    <string name="firewall_rule_trusted_ip_desc" translatable="true">Ez a kapcsolat azért lett engedélyezve, mert a <i>cél IP-cím</i> megbízható IP-ként van beállítva.<br></br><br></br>A módosításhoz lépjen az <i>Alkalmazásspecifikus tűzfal</i> képernyőre.</string>
-    <string name="firewall_rule_bypass_universal_ip_desc" translatable="true">Ez a kapcsolat azért lett engedélyezve, mert a <i>cél IP-cím</i> úgy van beállítva, hogy megkerülje az összes univerzális tűzfalszabályt.<br></br><br></br>A módosításhoz lépjen az <i>IP szabályok</i>hoz az <i>Univerzális</i> fülön.</string>
-    <string name="firewall_rule_device_lock_desc" translatable="true">Ez a kapcsolat tűzfal mögé került, mert a <i>készülék zárolva volt</i> az időpontban.<br></br><br></br>A viselkedés módosításához lépjen az <i>Univerzális</i> fülre.</string>
-    <string name="firewall_rule_foreground_desc" translatable="true">Ez a kapcsolat tűzfal mögé került, mert a forrás alkalmazás <i>nem volt az előtérben</i>.<br></br><br></br>A viselkedés módosításához lépjen az <i>Univerzális</i> fülre.</string>
-    <string name="firewall_rule_unknown_desc" translatable="true">Ez a kapcsolat tűzfal mögé került, mert a <i>forrás alkalmazás</i> nem volt meghatározható.<br></br><br></br>A viselkedés módosításához lépjen az <i>Univerzális</i> fülre.</string>
-    <string name="firewall_rule_block_udp_ntp_desc" translatable="true">Egy felhasználó által beállított tűzfalszabály blokkolta ezt a <i>UDP</i> kapcsolatot.<br></br><br></br>A módosításhoz lépjen az <i>Univerzális</i> fülre.</string>
-    <string name="firewall_rule_block_dns_bypass_desc" translatable="true">Ez a kapcsolat blokkolva lett, mert a <i>forrásalkalmazás</i> megkerülte a felhasználó által beállított DNS-t.<br></br><br></br>Ennek a viselkedésnek a módosításához lépjen az <i>Univerzális</i> fülre.</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true">Ez a kapcsolat azért lett engedélyezve, mert a <i>forrás alkalmazás</i> úgy van beállítva, hogy <i>megkerülje az univerzális</i> tűzfalszabályokat.<br></br><br></br>A módosításhoz lépjen az <i>Alkalmazásspecifikus tűzfal</i> képernyőre.</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true">Ez a DNS kapcsolat proxyzva lett, és továbbítva lett a felhasználó által preferált DNS végpontra.<br></br><br></br>A módosításhoz tiltsa le a <i>DNS szivárgás megelőzése</i> opciót a DNS <i>Beállítás</i> képernyőn.</string>
-    <string name="firewall_rule_exempt_orbot_setup_desc" translatable="true">Ez a kapcsolat azért lett engedélyezve, mert éppen folyamatban volt az <i>egy kattintásos Tor-proxy</i> beállítása Orboton keresztül.</string>
-    <string name="firewall_rule_block_http_desc" translatable="true">Ez a kapcsolat blokkolva lett, mert valószínűleg <i>nem biztonságos HTTP-t</i> használt.<br></br><br></br>A módosításhoz lépjen az <i>Univerzális</i> fülre.</string>
-    <string name="firewall_rule_global_lockdown_desc" translatable="true">Ez a kapcsolat blokkolva lett, mert az univerzális zárolás be van kapcsolva.<br></br><br></br> A módosításhoz lépjen az <i>Univerzális</i> fülre.</string>
-    <string name="firewall_rule_block_domain_desc" translatable="true">Egy felhasználó által beállított tűzfalszabály blokkolta a <i>domaint</i>.<br></br><br></br>A módosításhoz lépjen az <i>Alkalmazásspecifikus tűzfal</i> képernyőre.</string>
-    <string name="firewall_rule_trusted_domain_desc" translatable="true">Ez a kapcsolat azért lett engedélyezve, mert a <i>domain</i> megbízható doménként van beállítva.<br></br><br></br>A módosításhoz lépjen az <i>Alkalmazásspecifikus tűzfal</i> képernyőre.</string>
-    <string name="firewall_rule_dns_blocked_desc" translatable="true">Ez a kapcsolat blokkolva lett, mert a <i>domain</i> a felhasználó által preferált DNS által blokkolva van.<br></br><br></br>A viselkedés módosításához lépjen a <i>DNS beállítása</i> fülre.</string>
-    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Ez a kapcsolat blokkolva lett, mert a <i>domain</i> az univerzális domain szabályokban blokkoltként van beállítva.<br></br><br></br>A viselkedés módosításához lépjen a <i>DNS beállítása</i> fülre.</string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Ez a kapcsolat azért lett engedélyezve, mert a <i>domain</i> az univerzális domain szabályokban megbízhatóként van beállítva.<br></br><br></br>A viselkedés módosításához lépjen a <i>DNS beállítása</i> fülre.</string>
-    <string name="firewall_rule_proxied_desc" translatable="true">Ez a kapcsolat továbbítva lett a felhasználó által preferált proxyhoz.<br></br><br></br>A módosításhoz lépjen a <i>Proxy</i> részhez a <i>Beállítások</i> képernyőn.</string>
+    <string name="firewall_rule_block_app_desc" translatable="true"><![CDATA[Egy felhasználó által beállított tűzfalszabály blokkolta ezt az <i>alkalmazást</i>.<br/><br/> A módosításhoz lépj az <i>Összes alkalmazás</i> fülre.]]></string>
+    <string name="firewall_rule_new_app_desc" translatable="true"><![CDATA[Ez az <i>alkalmazás</i> most létesített kapcsolatot először.<br/><br/> A módosításhoz lépj az <i>Univerzális</i> fülre.]]></string>
+    <string name="firewall_rule_block_app_unmetered_desc" translatable="true"><![CDATA[Egy felhasználó által beállított tűzfalszabály blokkolta ezt az <i>alkalmazást</i>, amikor megpróbált csatlakozni egy <i>korlátlan</i> hálózatra.<br/><br/> A módosításhoz lépj az <i>Összes alkalmazás</i> fülre.]]></string>
+    <string name="firewall_rule_block_app_mobile_desc" translatable="true"><![CDATA[Egy felhasználó által beállított tűzfalszabály blokkolta ezt az <i>alkalmazást</i>, amikor megpróbált csatlakozni egy <i>mért</i> hálózatra.<br/><br/> A módosításhoz lépj az <i>Összes alkalmazás</i> fülre.]]></string>
+    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true"><![CDATA[Egy felhasználó által beállított univerzális tűzfalszabály blokkolta ezt az <i>alkalmazást</i>, amikor megpróbált csatlakozni egy <i>mért</i> (mobil) hálózatra.<br/><br/> A módosításhoz lépj az <i>Univerzális</i> fülre.]]></string>
+    <string name="firewall_rule_isolate_desc" translatable="true"><![CDATA[Egy felhasználó által beállított tűzfalszabály blokkolta ezt az <i>alkalmazást</i>, amikor olyan IP-címhez próbált csatlakozni, amely nem szerepel a <i>kihagyott IP-k</i> listáján.<br/><br/> A módosításhoz lépj az <i>Összes alkalmazás</i> fülre.]]></string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[Ez a kapcsolat engedélyezve lett, mert a <i>forrásalkalmazás</i> be van állítva úgy, hogy <i>megkerülje a DNS- és tűzfalszabályokat</i>.<br/><br/> A módosításhoz lépj az <i>Alkalmazásspecifikus tűzfal</i> képernyőre.]]></string>
+    <string name="firewall_rule_block_ip_univ_desc" translatable="true"><![CDATA[Egy felhasználó által beállított tűzfalszabály blokkolta a <i>cél IP-címet / portot</i>.<br/><br/> A módosításhoz lépj az <i>Univerzális</i> fülre.]]></string>
+    <string name="firewall_rule_block_ip_desc" translatable="true"><![CDATA[Egy felhasználó által beállított tűzfalszabály blokkolta a <i>cél IP-címet</i>.<br/><br/> A módosításhoz lépj az <i>Alkalmazásspecifikus tűzfal</i> képernyőre.]]></string>
+    <string name="firewall_rule_trusted_ip_desc" translatable="true"><![CDATA[Ez a kapcsolat engedélyezve lett, mert a <i>cél IP-cím</i> megbízható IP-ként van beállítva.<br/><br/> A módosításhoz lépj az <i>Alkalmazásspecifikus tűzfal</i> képernyőre.]]></string>
+    <string name="firewall_rule_bypass_universal_ip_desc" translatable="true"><![CDATA[Ez a kapcsolat engedélyezve lett, mert a <i>cél IP-cím</i> úgy van beállítva, hogy megkerülje az összes univerzális tűzfalszabályt.<br/><br/> A módosításhoz lépj az <i>IP-szabályok</i> részhez az <i>Univerzális</i> fülön.]]></string>
+    <string name="firewall_rule_device_lock_desc" translatable="true"><![CDATA[Ez a kapcsolat blokkolva lett, mert az <i>eszköz zárolva volt</i> abban az időben.<br/><br/> A viselkedés módosításához lépj az <i>Univerzális</i> fülre.]]></string>
+    <string name="firewall_rule_foreground_desc" translatable="true"><![CDATA[Ez a kapcsolat blokkolva lett, mert a forrásalkalmazás <i>nem volt az előtérben</i>.<br/><br/> A viselkedés módosításához lépj az <i>Univerzális</i> fülre.]]></string>
+    <string name="firewall_rule_unknown_desc" translatable="true"><![CDATA[Ez a kapcsolat blokkolva lett, mert a <i>forrásalkalmazás</i> nem volt azonosítható.<br/><br/> A viselkedés módosításához lépj az <i>Univerzális</i> fülre.]]></string>
+    <string name="firewall_rule_block_udp_ntp_desc" translatable="true"><![CDATA[Egy felhasználó által beállított tűzfalszabály blokkolta ezt a <i>UDP</i> kapcsolatot.<br/><br/> A módosításhoz lépj az <i>Univerzális</i> fülre.]]></string>
+    <string name="firewall_rule_block_dns_bypass_desc" translatable="true"><![CDATA[Ez a kapcsolat blokkolva lett, mert a <i>forrásalkalmazás</i> megkerülte a felhasználó által preferált DNS-t.<br/><br/> A viselkedés módosításához lépj az <i>Univerzális</i> fülre.]]></string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true"><![CDATA[Ez a kapcsolat engedélyezve lett, mert a <i>forrásalkalmazás</i> úgy van beállítva, hogy <i>megkerülje az univerzális</i> tűzfalszabályokat.<br/><br/> A módosításhoz lépj az <i>Alkalmazásspecifikus tűzfal</i> képernyőre.]]></string>
+    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true"><![CDATA[Ez a DNS-kapcsolat proxy-n keresztül lett továbbítva a felhasználó által preferált DNS végpontra.<br/><br/> A módosításhoz kapcsold ki a <i>DNS-szivárgás megakadályozása</i> beállítást a DNS <i>Konfiguráció</i> képernyőn.]]></string>
+    <string name="firewall_rule_exempt_orbot_setup_desc" translatable="true"><![CDATA[Ez a kapcsolat engedélyezve lett, mert a <i>egy kattintásos Tor proxyként</i> beállítás Orboton keresztül éppen folyamatban volt.]]></string>
+    <string name="firewall_rule_block_http_desc" translatable="true"><![CDATA[Ez a kapcsolat blokkolva lett, mert valószínűleg <i>nem biztonságos HTTP</i> protokollt használt.<br/><br/> A viselkedés módosításához lépj az <i>Univerzális</i> fülre.]]></string>
+    <string name="firewall_rule_global_lockdown_desc" translatable="true"><![CDATA[This connection was blocked because universal lockdown is set.<br/><br/> To change go to <i>Universal</i> tab.]]></string>
+    <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[Egy felhasználó által beállított tűzfalszabály blokkolta a <i>tartományt</i>.<br/><br/> A módosításhoz lépj az <i>Alkalmazásspecifikus tűzfal</i> képernyőre.]]></string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[Ez a kapcsolat engedélyezve lett, mert a <i>tartomány</i> megbízhatóként van beállítva.<br/><br/> A módosításhoz lépj az <i>Alkalmazásspecifikus tűzfal</i> képernyőre.]]></string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[Ez a kapcsolat blokkolva lett, mert a <i>tartomány</i> blokkolva van a felhasználó által preferált DNS által.<br/><br/> A viselkedés módosításához lépj a <i>DNS konfigurálása</i> fülre.]]></string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[Ez a kapcsolat blokkolva lett, mert a <i>tartomány</i> blokkoltként van beállítva az univerzális tartományszabályokban.<br/><br/> A viselkedés módosításához lépj a <i>DNS konfigurálása</i> fülre.]]></string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[Ez a kapcsolat engedélyezve lett, mert a <i>tartomány</i> megbízhatóként van beállítva az univerzális tartományszabályokban.<br/><br/> A viselkedés módosításához lépj a <i>DNS konfigurálása</i> fülre.]]></string>
+    <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[Ez a kapcsolat továbbítva lett a felhasználó által preferált proxyhoz.<br/><br/> A módosításhoz lépj a <i>Proxy</i> részhez a <i>Konfiguráció</i> képernyőn.]]></string>
     <string name="new_app_bulk_notification_title" translatable="true">Figyelem</string>
     <string name="new_app_bulk_notification_content" translatable="true">A Rethink blokkolt %1$s új alkalmazást. Koppintson a megtekintéshez vagy módosításhoz.</string>
     <string name="new_app_notification_content" translatable="true">A RethinkDNS blokkolta a nemrég telepített alkalmazást, %1$s.</string>
@@ -774,10 +840,10 @@
     <string name="ada_noapp_dialog_title" translatable="true">Nincs ilyen alkalmazás</string>
     <string name="ada_noapp_dialog_message" translatable="true">Az alkalmazás információi hiányoznak. Lehetséges, hogy ezt az alkalmazást eltávolították?</string>
     <string name="ada_noapp_dialog_positive" translatable="true">OK</string>
-    <string name="ada_firewall_status" translatable="true">Ez az alkalmazás <b><i>%1$s</i> </b> .</string>
+    <string name="ada_firewall_status" translatable="true"><![CDATA[Ez az alkalmazás: <b><i>%1$s</i></b>.]]></string>
     <string name="ada_ip_connection_count" translatable="true">Csatlakozás a %1$s IP-cím(ek)re</string>
     <string name="ada_ip_connection_count_zero" translatable="true">0 IP-cím</string>
-    <string name="ada_ip_no_connection" translatable="true">Nincs hálózati naplózás ehhez az alkalmazáshoz.</string>
+    <string name="ada_ip_no_connection" translatable="true">Nincs hálózati napló ebben a kategóriában.</string>
     <string name="ada_app_status_allow" translatable="true">engedélyezett</string>
     <string name="ada_app_status_block" translatable="true">blokkolva van</string>
     <string name="ada_app_status_block_wifi" translatable="true">blokkolva van a korlátlan (wifi) hálózatokon</string>
@@ -833,8 +899,8 @@
     <string name="radio_sky_btn" translatable="true">⛅ Ég</string>
     <string name="radio_max_btn" translatable="true">🪂 Max</string>
     <string name="rt_filter_hint" translatable="true"><u>Az összes</u> blokklista megjelenítése</string>
-    <string name="rt_filter_desc" translatable="true">A <u>%1$s</u> blokklisták megjelenítése</string>
-    <string name="rt_filter_desc_subgroups" translatable="true">A <u>%1$s</u> blokklisták megjelenítése a következő csoportban: %2$s és alcsoportban: %3$s</string>
+    <string name="rt_filter_desc" translatable="true"><![CDATA[<u>%1$s</u> tiltólista megjelenítése]]></string>
+    <string name="rt_filter_desc_subgroups" translatable="true"><![CDATA[<u>%1$s</u> tiltólisták megjelenítése a következő csoportban: %2$s, alcsoportban: %3$s]]></string>
     <string name="rethink_sky_desc" translatable="true">280+ helyszín; nagyobb rendelkezésre állás; a stub resolver a cloudflare.com-on fut</string>
     <string name="rethink_max_desc" translatable="true">50+ helyszín; nagyobb adatvédelem; a rekurzív resolver a fly.io-n fut</string>
     <string name="bsrf_sub_group_heading" translatable="true">Alcsoport</string>
@@ -943,7 +1009,7 @@
     <string name="wg_apps_dialog_title_exclude" translatable="true">%1$s db alkalmazás kizárása</string>
     <string name="wireguard_no_config_msg" translatable="true">Nincsenek WireGuard VPN konfigurációk. Adjon hozzá néhányat a kezdéshez.</string>
     <string name="wireguard_connection_error" translatable="true">A WireGuard VPN csatlakozása sikertelen</string>
-    <string name="wireguard_disclaimer" translatable="true">A DNS-forgalom továbbításra kerül a(z) %1$s címre, az ICMP (például: ping) csomagokat pedig az alapértelmezett hálózaton keresztül küldi a rendszer.</string>
+    <string name="wireguard_disclaimer" translatable="true">DNS továbbítva ide: %1$s.</string>
     <string name="wireguard_disable_title" translatable="true">WireGuard leállítása</string>
     <string name="wireguard_disable_message" translatable="true">Szeretné leállítani az összes aktív WireGuard VPN-t?</string>
     <string name="lbl_remaining_apps" translatable="true">Fennmaradó alkalmazások</string>
@@ -967,4 +1033,126 @@
     <string name="crypt_relay_us" translatable="true">Névtelenített DNS átjátszó (relay) az USA-ban, Los Angelesben, a https://cryptostorm.is/ szolgáltató üzemeltetésében.</string>
     <string name="crypt_relay_singapore" translatable="true">Névtelenített DNS átjátszó (relay) Szingapúrban.</string>
     <string name="cd_toast_edit" translatable="true">Szerkesztve</string>
+    <string name="lbl_test" translatable="true">teszt</string>
+    <string name="lbl_protos" translatable="true">protos</string>
+    <string name="lbl_service_providers" translatable="true">Szolgáltatók</string>
+    <string name="wireguard_desc" translatable="true">Titkosítsa az internetes forgalom WireGuard. Válasszon különböző útvonalakat különböző alkalmazásokhoz.</string>
+    <string name="firewall_title" translatable="true">Védje Androidját a Firewall segítségével</string>
+    <string name="firewall_desc" translatable="true">Szabályozza az alkalmazások internet-hozzáférését; korlátozza a kapcsolatokat alkalmazás vagy hálózati aktivitás alapján.</string>
+    <string name="dns_title" translatable="true">Hirdetések és kártevők blokkolása DNS segítségével</string>
+    <string name="dns_desc" translatable="true">Válasszon több mint 190 listából a hirdetések, nyomkövetők és kártevők blokkolásához.</string>
+    <string name="status_no_network" translatable="true">Nincs hálózati kapcsolat</string>
+    <string name="settings_mobile_metered_heading" translatable="true">Fizetős mobilhálózat</string>
+    <string name="settings_mobile_metered_desc" translatable="true">Csak a mobilhálózatokat tekintse adatforgalomhoz kötöttnek, a többi hálózatot korlátlannak.</string>
+    <string name="settings_theme_dialog_themes_5" translatable="true">Alapszintű szűrés ( Light Plus )</string>
+    <string name="settings_theme_dialog_themes_6" translatable="true">Erőteljes szűrés ( Dark Plus )</string>
+    <string name="settings_biometric_dialog_heading" translatable="true">Biometrikus hitelesítés</string>
+    <string name="settings_biometric_dialog_option_1" translatable="true">Közvetlenül</string>
+    <string name="settings_biometric_dialog_option_2" translatable="true">5 perc múlva</string>
+    <string name="settings_biometric_dialog_option_3" translatable="true">15 perc múlva</string>
+    <string name="sponser_dialog_usage_msg" translatable="true">Ön már <b>%1$s napja</b> használja a Rethink alkalmazást, ami <b>%2$s USD</b> használati költséget jelentene. Megfontolná, hogy támogatásával hozzájáruljon a fejlesztés fenntartásához?</string>
+    <string name="dc_use_sys_dns_undelegated_heading" translatable="true">A rendszer DNS használata a nem delegált tartományokhoz</string>
+    <string name="dc_use_sys_dns_undelegated_desc" translatable="true">A rendszer DNS használata a nem delegált tartományokhoz, mint például <i>.lan</i>, <i>.internal</i> stb.</string>
+    <string name="dc_filtering_heading" translatable="true">szűrés</string>
+    <string name="cd_split_dns_heading" translatable="true">Split DNS (kísérleti)</string>
+    <string name="cd_split_dns_desc" translatable="true">A proxyn keresztül irányított alkalmazások DNS-lekérdezéseinek továbbítása a proxy DNS-kiszolgálóihoz.</string>
+    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">A DNS-szabályok kezelése tűzfalszabályként (kísérleti)</string>
+    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">A DNS-blokkolás a feloldás során nem érvényesül; a kapcsolódáskor dől el, hogy engedélyezett-e.</string>
+    <string name="univ_firewall_rule_11" translatable="true">Helyi kapcsolatok blokkolása</string>
+    <string name="univ_delete_domain_dialog_title" translatable="true">Összes tartományszabály törlése?</string>
+    <string name="univ_delete_domain_dialog_message" translatable="true">A szabályok törlésével bármely alkalmazás csatlakozhatna az eddig blokkolt tartományokhoz.</string>
+    <string name="firewall_rule_private_dns" translatable="true">Privát DNS</string>
+    <string name="firewall_rule_bypass_proxy" translatable="true">Proxy megkerülése (Bypass Proxy)</string>
+    <string name="firewall_rule_paused_app" translatable="true">Alkalmazás szüneteltetve</string>
+    <string name="firewall_rule_lockdown_wg" translatable="true">Zárolt proxy</string>
+    <string name="lbl_experimental" translatable="true">(kísérleti)</string>
+    <string name="wireguard_title" translatable="true">Biztonságos internetkapcsolat WireGuarddal</string>
+    <string name="lbl_hop" translatable="true">Átjátszó</string>
+    <string name="lbl_manual" translatable="true">Kézikönyv</string>
+    <string name="lbl_fallback" translatable="true">Tartalék</string>
+    <string name="settings_biometric_dialog_option_0" translatable="true">Egyik sem</string>
+    <string name="ac_title" translatable="true">Cenzúraellenes mód</string>
+    <string name="ac_desc" translatable="true">A cenzúra megkerülésére szolgáló eszközök szabadságot nyújthatnak az interneten, de nem minden hálózati környezetben működnek. Csak olyan kapcsolatokon használhatók, amelyek nem proxy mögött futnak.</string>
+    <string name="ac_never_split_desc" translatable="true">A hálózati csomagok változatlanul maradnak.</string>
+    <string name="ac_split_auto_desc" translatable="true">Csomagmódosítás engedélyezve, ha szükséges.</string>
+    <string name="ac_split_tcp" translatable="true">TCP</string>
+    <string name="ac_split_tcp_desc" translatable="true">TCP csomagok módosítása.</string>
+    <string name="ac_split_tls" translatable="true">TCP/TLS</string>
+    <string name="ac_split_tls_desc" translatable="true">TCP- vagy TLS-csomagok módosítása.</string>
+    <string name="ac_desync" translatable="true">Szinkronhiány</string>
+    <string name="ac_desync_desc" translatable="true">Álcázó csomagok továbbítása, ha indokolt.</string>
+    <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[Ez a kapcsolat egy <i>Privát DNS</i> kiszolgálót keres, amely nem létezik.]]></string>
+    <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[Ez a kapcsolat engedélyezve lett, mert a <i>forrásalkalmazás</i> be van állítva úgy, hogy <i>megkerülje a proxy</i> szabályokat.<br/><br/> A módosításhoz lépjen a <i>Alkalmazásspecifikus tűzfal</i> képernyőre.]]></string>
+    <string name="firewall_rule_paused_app_desc" translatable="true"><![CDATA[Ez a kapcsolat engedélyezve lett, mert az <i>alkalmazás</i> <i>szüneteltetett</i> állapotban van.]]></string>
+    <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[Ez a kapcsolat blokkolva lett, mert a WireGuard <i>zárolt</i> módban van.<br/><br/> A módosításhoz lépjen a <i>WireGuard</i> képernyőre.]]></string>
+    <string name="wireguard_disable_failure_relay" translatable="true"><![CDATA[A „Relay WireGuard” nem kapcsolható ki]]></string>
+    <string name="config_invalid_desc" translatable="true">Érvénytelen WireGuard konfiguráció</string>
+    <string name="console_log_title" translatable="true">Rendszernaplók</string>
+    <string name="console_log_desc" translatable="true">A naplók érzékeny információkat tartalmazhatnak.</string>
+    <string name="do_not_randomize_listen_port_title" translatable="true">Haladó beállítások</string>
+    <string name="do_not_randomize_listen_port_desc" translatable="true">Haladó módban a WireGuard figyelő portjai rögzítve maradnak (nincs véletlenszerűsítés).</string>
+    <string name="endpoint_independent_mapping_title" translatable="true">Végpontfüggetlen leképezés</string>
+    <string name="endpoint_independent_mapping_desc" translatable="true">Ha engedélyezve van, az UDP-aljzatok minden célállomás esetén rögzített címet és portot használnak.</string>
+    <string name="anti_censorship_title" translatable="true">Cenzúraellenesség</string>
+    <string name="anti_censorship_desc" translatable="true">Válasszon a különféle cenzúraellenes technikák közül.</string>
+    <string name="tcp_keep_alive_title" translatable="true">Rövidebb TCP-életben tartás</string>
+    <string name="tcp_keep_alive_desc" translatable="true">TCP-aljzatok gyors bezárása, ha nincs friss aktivitás.</string>
+    <string name="ac_retry_options_title" translatable="true">stratégia</string>
+    <string name="ac_retry_options_desc" translatable="true">Állítsa be, hogyan működjenek az újrapróbálkozások a cenzúrázott kapcsolatok esetén.</string>
+    <string name="ac_retry_options_never_desc" translatable="true">Sikertelenség esetén soha ne próbálkozz újra az anticenzúra technikákkal.</string>
+    <string name="ac_retry_options_with_split_desc" translatable="true">Alkalmazza az anticenzúra technikákat, amikor szükséges.</string>
+    <string name="ac_retry_options_after_split_desc" translatable="true">Mindig alkalmazza az anticenzúra technikákat.</string>
+    <string name="ac_toast_retry_disabled" translatable="true">Válassz bármelyik anticenzúra opciót a stratégia kiválasztásához.</string>
+    <string name="exclude_no_package_err_toast" translatable="true">Az alkalmazások kizárásához csomagnév megadása szükséges.</string>
+    <string name="hop_error_toast_msg_1" translatable="true">Nem lehet továbbítani, már %1$s</string>
+    <string name="hop_error_toast_msg_2" translatable="true">Nincs elérhető WireGuard az átirányításhoz; kérlek, adj hozzá többet.</string>
+    <string name="hop_error_toast_msg_3" translatable="true">A mobilos használat letíltása, hogy átirányításokat vehessen igénybe</string>
+    <string name="mode_change_error_proxy_enabled" translatable="true">Nem lehet módot váltani, amíg proxyk vannak használatban. Koppintson a <u>proxy beállításainak szerkesztéséhez</u>.</string>
+    <string name="blocklist_not_available_toast" translatable="true">A tiltólisták frissítéséhez töltse le az alkalmazás legújabb verzióját.</string>
+    <string name="lbl_ultra_secure" translatable="true">Rendkívül biztonságos</string>
+    <string name="adv_set_dial_timeout_title" translatable="true">Tétlen időkorlát</string>
+    <string name="adv_set_dial_timeout_desc" translatable="true">A tétlen TCP- és UDP-aljzatokat bezárása, az adott időtartam után.</string>
+    <string name="no_stats_available" translatable="true">Nincsenek statisztikák</string>
+    <string name="hop_failure_toast" translatable="true">Átirányítási hiba: %1$s → %2$s</string>
+    <string name="wg_setting_use_on_mobile" translatable="true">Csak mobilos használat</string>
+    <string name="wg_setting_use_on_mobile_desc" translatable="true">Ennek a WireGuard-kapcsolatnak a használata kizárólag mobiladat-hálózaton történjen.</string>
+    <string name="hop_add_remove_title" translatable="true">Közvetítő hozzáadása / eltávolítása</string>
+    <string name="bypasses_network_restrictions" translatable="true">Az elérhetőségi ellenőrzések megkerülik az összes hálózati korlátozást. Az <i>Automatikus</i> módban a Rethink véletlenszerűen használja a korábban csatlakozott IP-címeket és hosztneveket.</string>
+    <string name="most_contacted_asn" translatable="true">Legutóbb elért szolgáltatók</string>
+    <string name="most_blocked_asn" translatable="true">Leggyakrabban blokkolt szolgáltatók</string>
+    <string name="adv_tasker_dialog_msg" translatable="true">Adja meg vesszővel elválasztva azoknak a csomagoknak a nevét, amelyek elindíthatják vagy leállíthatják a Rethink alkalmazást.</string>
+    <string name="adv_tasker_dialog_instructions" translatable="true">Utasítások:\nKötelező extra adatok a broadcast üzenetben:\n• Kulcs: sender\n• Érték: A hívó alkalmazás csomagneve\n\nPélda: key:sender value:com.termux\n\nTámogatott műveletek:\n• VPN indítása– com.celzero.bravedns.intent.action.VPN_START\n• VPN leállítása – com.celzero.bravedns.intent.action.VPN_STOP</string>
+    <string name="adv_tasker_dialog_edit_hint" translatable="true">Adja meg a csomag nevét (például: net.dinglisch.android.taskerm), amely jogosult a Rethink VPN indítására vagy leállítására</string>
+    <string name="download_ip_info_title" translatable="true">Szolgáltató információinak megjelenítése</string>
+    <string name="download_ip_info_desc" translatable="true">Lekéri a weboldalak szolgáltatói adatait a <i>rethinkdns.com</i> oldalról, a következő által működtetve: <i>%1$s</i></string>
+    <string name="adv_taster_desc" translatable="true">Alkalmazások konfigurálása, amelyek elindíthatják vagy leállíthatják a Rethink szolgáltatást.</string>
+    <string name="top_active_conns" translatable="true">Top aktív kapcsolatok</string>
+    <string name="load_more" translatable="true">Összes betöltése</string>
+    <string name="close_conns_dialog_title" translatable="true">Kapcsolatok bezárása</string>
+    <string name="close_conns_dialog_desc" translatable="true">Bezárja az összes kapcsolatot ehhez: %1$s?</string>
+    <string name="local_blocklist_delete_desc" translatable="true">Törli az eszközön tárolt tiltólistákat?</string>
+    <string name="fail_open_network_title" translatable="true">A hálózati kapcsolat elvesztése esetén megállítás</string>
+    <string name="fail_open_network_desc" translatable="true">Ha engedélyezve van, a Rethink minden adatforgalmat leállít, amikor nincs elérhető hálózati kapcsolat, például <i>repülőgép üzemmódban</i>.</string>
+    <string name="about_license" translatable="true">Licencelve Apache-2.0 alatt</string>
+    <string name="smart_dns" translatable="true">Smart DNS</string>
+    <string name="processing_dialog_desc" translatable="true">Kérjük, várjon, amíg feldolgozzuk a kérését.</string>
+    <string name="smart_dns_desc" translatable="true">A <i>Smart DNS</i> véletlenszerűen használja az alábbi DNS feloldók valamelyikét:</string>
+    <string name="wg_mobile_only_hop_err" translatable="true">A „Csak mobil mód” nem támogatott az átjátszók (Relays) esetében</string>
+    <string name="vpn_policy_auto_desc" translatable="true">Reagál a fontos hálózati és kapcsolati változásokra.</string>
+    <string name="vpn_policy_sensitive" translatable="true">Érzékeny</string>
+    <string name="vpn_policy_sensitive_desc" translatable="true">Reagál minden hálózati és kapcsolati változásra.</string>
+    <string name="vpn_policy_relaxed" translatable="true">Relaxált</string>
+    <string name="vpn_policy_relaxed_desc" translatable="true">Reagál az érdekes kapcsolati változásokra.</string>
+    <string name="vpn_policy_title" translatable="true">Kapcsolatváltozási irányelv</string>
+    <string name="use_fallback_dns_to_bypass" translatable="true">Tartalék DNS használata megkerülésként</string>
+    <string name="use_fallback_dns_to_bypass_desc" translatable="true">Ha engedélyezve van, mindig a tartalék DNS-t használja a megkerült alkalmazásokhoz, domainekhez és IP-címekhez.</string>
+    <string name="title_database_dump" translatable="true">Adatbázis állapota</string>
+    <string name="lbl_always" translatable="true">Mindig</string>
+    <string name="about_terms_of_service" translatable="true">Általános szerződési feltételek</string>
+    <string name="adv_taster_title" translatable="true">Automatizáció</string>
+    <string name="close_all" translatable="true">Összes bezárása</string>
+    <string name="processing_dialog_title" translatable="true">Feldolgozás</string>
+    <string name="copied_clipboard" translatable="true">Másolva</string>
+    <string name="conn_track_clear_rule_logs_title" translatable="true">Törli ennek a szabálynak a naplóit?</string>
+    <string name="conn_track_clear_rule_logs_message" translatable="true">Ez csak a jelenleg megtekintett tűzfalszabályhoz tartozó hálózati naplókat törli. Ez a művelet nem visszavonható. Folytatja?</string>
 </resources>

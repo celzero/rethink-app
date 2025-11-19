@@ -13,7 +13,7 @@
         android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/universal_heading"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
@@ -30,11 +30,7 @@
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
-            app:cardUseCompatPadding="true">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -69,7 +65,7 @@
                         android:layout_toEndOf="@id/universal_firewall_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/universal_firewall_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -78,7 +74,7 @@
                             android:text="@string/univ_firewall_heading"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/universal_firewall_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -128,7 +124,7 @@
                         android:layout_toEndOf="@id/custom_ip_domain_universal_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/custom_ip_domain_universal_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -136,7 +132,7 @@
                             android:text="@string/univ_view_blocked_ip"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/custom_ip_domain_universal_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -161,7 +157,7 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/app_wise_heading"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
@@ -177,11 +173,7 @@
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
-            app:cardUseCompatPadding="true">
+            android:layout_height="wrap_content">
 
             <RelativeLayout
                 android:id="@+id/app_wise_ip_domain_rl"
@@ -211,7 +203,7 @@
                     android:layout_toEndOf="@id/app_wise_ip_domain_icon"
                     android:orientation="vertical">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/app_wise_ip_domain_txt"
                         style="@style/TextAppearance.AppCompat.Subhead"
                         android:layout_width="wrap_content"
@@ -219,7 +211,7 @@
                         android:text="@string/app_ip_domain_rules"
                         android:textSize="@dimen/large_font_text_view" />
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/app_wise_ip_domain_desc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -239,6 +231,7 @@
                     android:src="@drawable/ic_right_arrow_white" />
 
             </RelativeLayout>
+
         </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>

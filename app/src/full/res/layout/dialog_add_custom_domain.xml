@@ -6,7 +6,7 @@
     android:background="?attr/background"
     android:padding="10dp">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/dacd_url_title"
         style="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="match_parent"
@@ -16,7 +16,7 @@
         android:textSize="@dimen/large_font_text_view"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/dacd_url_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -113,7 +113,7 @@
 
     </LinearLayout>
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/dacd_failure_text"
         style="@style/TextAppearance.AppCompat.Body1"
         android:layout_width="match_parent"

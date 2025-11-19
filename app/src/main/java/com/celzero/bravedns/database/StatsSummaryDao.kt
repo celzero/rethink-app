@@ -811,10 +811,10 @@ interface StatsSummaryDao {
               appOrDnsName AS appOrDnsName, 
               Sum(uploadbytes) AS uploadBytes, 
               Sum(downloadbytes) AS downloadBytes, 
-              0 AS totalBytes 
+              Sum(uploadBytes + downloadBytes) AS totalBytes 
             FROM 
               (
-                -- From DnsLogs
+                -- From ConnectionTracker
                 SELECT uid, 
                   appName AS appOrDnsName, 
                   COUNT(id) AS count, 
@@ -829,7 +829,7 @@ interface StatsSummaryDao {
                 
                 UNION ALL 
                 
-                -- From ConnectionTracker
+                -- From DnsLogs
                 SELECT uid, 
                   appName AS appOrDnsName, 
                   COUNT(id) AS count, 
@@ -981,4 +981,26 @@ interface StatsSummaryDao {
         """
     )
     fun getAllDomainsByUid(uid: Int, to: Long): PagingSource<Int, AppConnection>
+
+    @Query(
+        """
+            SELECT uid AS uid, 
+              ipAddress AS ipAddress, 
+              0 AS port, 
+              COUNT(id) AS count, 
+              flag AS flag, 
+              isBlocked AS blocked, 
+              appName AS appOrDnsName, 
+              SUM(uploadBytes) AS uploadBytes, 
+              SUM(downloadBytes) AS downloadBytes, 
+              SUM(downloadBytes + uploadBytes) AS totalBytes 
+            FROM ConnectionTracker 
+            WHERE timeStamp > :to 
+              AND ipAddress = :ip 
+              AND isBlocked = :isBlocked
+            GROUP BY uid 
+            ORDER BY count DESC
+        """
+    )
+    fun getIpDetails(ip: String, to: Long, isBlocked: Boolean): PagingSource<Int, AppConnection>
 }

@@ -67,7 +67,13 @@ class FirewallAppListAdapter(
                     oldConnection: AppInfo,
                     newConnection: AppInfo
                 ): Boolean {
-                    return oldConnection == newConnection
+                    return oldConnection.uid == newConnection.uid &&
+                            oldConnection.packageName == newConnection.packageName &&
+                            oldConnection.appName == newConnection.appName
+                            && oldConnection.tombstoneTs == newConnection.tombstoneTs
+                            && oldConnection.isProxyExcluded == newConnection.isProxyExcluded
+                            && oldConnection.firewallStatus == newConnection.firewallStatus
+                            && oldConnection.connectionStatus == newConnection.connectionStatus
                 }
 
                 override fun areContentsTheSame(
@@ -241,8 +247,8 @@ class FirewallAppListAdapter(
                     showWifiUnused()
                 }
                 else -> {
-                    showWifiDisabled()
-                    showMobileDataDisabled()
+                    showWifiEnabled()
+                    showMobileDataEnabled()
                 }
             }
         }
@@ -481,7 +487,18 @@ class FirewallAppListAdapter(
     }
 
     override fun getSectionName(position: Int): String {
+        // Check if position is valid to prevent IndexOutOfBoundsException
+        if (position < 0 || position >= itemCount) {
+            return ""
+        }
+        
         val appInfo = getItem(position) ?: return ""
-        return appInfo.appName.substring(0, 1)
+        
+        // Handle empty app names safely
+        return if (appInfo.appName.isNotEmpty()) {
+            appInfo.appName.substring(0, 1)
+        } else {
+            ""
+        }
     }
 }

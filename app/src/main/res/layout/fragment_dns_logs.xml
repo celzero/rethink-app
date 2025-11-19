@@ -9,13 +9,11 @@
     android:nestedScrollingEnabled="false"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/query_list_card_view_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:elevation="10dp"
         app:cardCornerRadius="16dp">
 
         <LinearLayout
@@ -73,7 +71,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
-                android:paddingTop="5dp"
+                android:paddingTop="10dp"
                 android:paddingBottom="2dp"
                 android:visibility="gone"
                 app:selectionRequired="true"
@@ -81,7 +79,7 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/query_list_logs_disabled_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -99,13 +97,16 @@
         android:layout_height="match_parent"
         android:layout_below="@id/query_list_card_view_top"
         android:layout_marginTop="5dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:nestedScrollingEnabled="true"
+        android:orientation="vertical"
         app:fastScrollAutoHide="true"
         app:fastScrollAutoHideDelay="1500"
-        android:nestedScrollingEnabled="true"
-        app:fastScrollThumbInactiveColor="?attr/chipColorBgNormal"
-        app:fastScrollThumbEnabled="true"
-        app:fastScrollThumbColor="?attr/chipColorBgNormal"
         app:fastScrollEnableThumbInactiveColor="true"
+        app:fastScrollThumbColor="?attr/chipColorBgNormal"
+        app:fastScrollThumbEnabled="true"
+        app:fastScrollThumbInactiveColor="?attr/chipColorBgNormal"
         app:fastScrollTrackColor="?attr/background" />
 
     <androidx.appcompat.widget.AppCompatTextView

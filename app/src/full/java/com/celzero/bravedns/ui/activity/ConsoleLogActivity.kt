@@ -42,6 +42,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ConsoleLogAdapter
 import com.celzero.bravedns.database.ConsoleLogRepository
 import com.celzero.bravedns.databinding.ActivityConsoleLogBinding
+import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
@@ -49,6 +50,9 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.util.disableFrostTemporarily
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.celzero.bravedns.util.restoreFrost
 import com.celzero.bravedns.viewmodel.ConsoleLogViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -83,8 +87,10 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -117,6 +123,8 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
         b.searchView.setQuery("", false)
         b.searchView.clearFocus()
 
+        val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        restoreFrost(themeId)
         val imm = this.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.restartInput(b.searchView)
     }
@@ -239,20 +247,33 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
 
     private fun showFilterDialog() {
         // show dialog with level filter
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(getString(R.string.console_log_title))
-        val items = Logger.LoggerLevel.entries
+        val items = arrayOf(
+            getString(R.string.settings_gologger_dialog_option_0),
+            getString(R.string.settings_gologger_dialog_option_1),
+            getString(R.string.settings_gologger_dialog_option_2),
+            getString(R.string.settings_gologger_dialog_option_3),
+            getString(R.string.settings_gologger_dialog_option_4),
+            getString(R.string.settings_gologger_dialog_option_5),
+            getString(R.string.settings_gologger_dialog_option_6),
+            getString(R.string.settings_gologger_dialog_option_7),
+        )
         val checkedItem = Logger.uiLogLevel.toInt()
         builder.setSingleChoiceItems(
-            items.map { it.name }.toTypedArray(),
+            items.map { it }.toTypedArray(),
             checkedItem
         ) { _, which ->
-            Logger.uiLogLevel = items[which].id
+            Logger.uiLogLevel = which.toLong()
+            GoVpnAdapter.setLogLevel(
+                persistentState.goLoggerLevel.toInt(),
+                Logger.uiLogLevel.toInt()
+            )
             viewModel.setLogLevel(which.toLong())
             if (which < Logger.LoggerLevel.ERROR.id) {
                 consoleLogRepository.setStartTimestamp(System.currentTimeMillis())
             }
-            Logger.i(LOG_TAG_BUG_REPORT, "Log level set to ${items[which].name}")
+            Logger.i(LOG_TAG_BUG_REPORT, "Log level set to ${items[which]}")
         }
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { dialogInterface, _ ->
@@ -324,6 +345,7 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
     }
 
     private fun shareZipFileViaEmail(filePath: String) {
+        disableFrostTemporarily()
         val file = File(filePath)
         // Get the URI of the file using FileProvider
         val uri: Uri = FileProvider.getUriForFile(this, "${this.packageName}.provider", file)
@@ -332,9 +354,10 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
         val intent =
             Intent(Intent.ACTION_SEND).apply {
                 type = "application/zip"
-                putExtra(Intent.EXTRA_SUBJECT, "Log File")
-                putExtra(Intent.EXTRA_TEXT, "Attached is the log file for RethinkDNS.")
+                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_bugreport_subject))
+                putExtra(Intent.EXTRA_TEXT, "Crash/Issue Report (Logs Attached)")
                 putExtra(Intent.EXTRA_STREAM, uri)
+                putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.about_mail_to)))
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
 

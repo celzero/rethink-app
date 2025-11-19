@@ -556,7 +556,6 @@
     <string name="settings_exclude_proxy_apps_heading" translatable="true">העברת תנועה מישומי פרוקסי חזרה דרך המנהרה</string>
     <string name="hsf_blocklist_updating_text" translatable="true">מפעיל…</string>
     <string name="hsf_chip_appearance" translatable="true">נושא: %1$s</string>
-    <string name="lbl_background_data" translatable="true">מגביל נתוני רקע</string>
     <string name="about_mail_bugreport_text" translatable="true">שלח דוא\"ל זה אל: hello@celzero.com</string>
     <string name="about_mail_subject" translatable="true">[Rethink]:</string>
     <string name="about_mail_bugreport_share_title" translatable="true">בחר ספק דוא\"ל</string>
@@ -755,33 +754,33 @@
     <string name="firewall_rule_domain_trusted_univ" translatable="true">דומיין מהימן (אוניברסלי)</string>
     <string name="firewall_rule_proxied" translatable="true">תווך</string>
     <string name="firewall_rule_no_rule_desc" translatable="true">אף כלל חומת אש לא תאם לחיבור הזה.</string>
-    <string name="firewall_rule_block_app_desc" translatable="true">כלל חומת אש שהוגדר על ידי משתמש חסם את <i>האפליקציה </i> הזו.<br></br><br></br> כדי לשנות זאת יש לעבור אל לשונית <i>כל האפליקציות</i>.</string>
-    <string name="firewall_rule_new_app_desc" translatable="true">האפליקציה הזו יצרה חיבור בפעם <i>הראשונה</i>. <br></br><br></br>כדי לשנות זאת יש לעבור אל הלשונית <i>אוניברסלי</i>.</string>
-    <string name="firewall_rule_block_app_unmetered_desc" translatable="true">כלל חומת אש שהוגדר על ידי משתמש חסם את <i>האפליקציה</i> הזו בעת ניסיון להתחבר ברשת <i>לא מדודה</i>.<br></br><br></br> כדי לשנות זאת יש לעבור אל לשונית <i>כל האפליקציות</i>.</string>
-    <string name="firewall_rule_block_app_mobile_desc" translatable="true">כלל חומת אש שהוגדר על ידי משתמש חסם את <i>האפליקציה</i> הזו בעת ניסיון להתחבר ברשת <i>מדודה</i>.<br></br><br></br> כדי לשנות זאת יש לעבור אל לשונית <i>כל האפליקציות</i>.</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true">כלל חומת אש אוניברסלי שהוגדר על ידי משתמש חסם את <i>האפליקציה</i> הזו בעת ניסיון להתחבר ברשת <i>מדודה</i> (נתונים).<br></br><br></br> כדי לשנות זאת יש לעבור אל הלשונית <i>Universal</i>.</string>
-    <string name="firewall_rule_isolate_desc" translatable="true">כלל חומת אש שהוגדר על ידי משתמש חסם את החיבור של <i>אפליקציה</i> זו לכתובות IP אחרות מלבד ה<i>נעקפות</i>.<br></br><br></br> כדי לשנות זאת יש לעבור אל לשונית <i>כל האפליקציות</i>.</string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">חיבור זה הותר מכיוון ש<i>אפליקציית המקור </i> מוגדרת ל-<i>עקוף כללי DNS וחומת אש</i>.<br></br><br></br> כדי לשנות זאת יש לעבור למסך ה<i>חומת אש ספציפית לאפליקציה</i> .</string>
+    <string name="firewall_rule_block_app_desc" translatable="true">כלל חומת אש שהוגדר על ידי משתמש חסם את <i>האפליקציה </i> הזו.<br/><br/> כדי לשנות זאת יש לעבור אל לשונית <i>כל האפליקציות</i>.</string>
+    <string name="firewall_rule_new_app_desc" translatable="true">האפליקציה הזו יצרה חיבור בפעם <i>הראשונה</i>. <br/><br/>כדי לשנות זאת יש לעבור אל הלשונית <i>אוניברסלי</i>.</string>
+    <string name="firewall_rule_block_app_unmetered_desc" translatable="true">כלל חומת אש שהוגדר על ידי משתמש חסם את <i>האפליקציה</i> הזו בעת ניסיון להתחבר ברשת <i>לא מדודה</i>.<br/><br/> כדי לשנות זאת יש לעבור אל לשונית <i>כל האפליקציות</i>.</string>
+    <string name="firewall_rule_block_app_mobile_desc" translatable="true">כלל חומת אש שהוגדר על ידי משתמש חסם את <i>האפליקציה</i> הזו בעת ניסיון להתחבר ברשת <i>מדודה</i>.<br/><br/> כדי לשנות זאת יש לעבור אל לשונית <i>כל האפליקציות</i>.</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true">כלל חומת אש אוניברסלי שהוגדר על ידי משתמש חסם את <i>האפליקציה</i> הזו בעת ניסיון להתחבר ברשת <i>מדודה</i> (נתונים).<br/><br/> כדי לשנות זאת יש לעבור אל הלשונית <i>Universal</i>.</string>
+    <string name="firewall_rule_isolate_desc" translatable="true">כלל חומת אש שהוגדר על ידי משתמש חסם את החיבור של <i>אפליקציה</i> זו לכתובות IP אחרות מלבד ה<i>נעקפות</i>.<br/><br/> כדי לשנות זאת יש לעבור אל לשונית <i>כל האפליקציות</i>.</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">חיבור זה הותר מכיוון ש<i>אפליקציית המקור </i> מוגדרת ל-<i>עקוף כללי DNS וחומת אש</i>.<br/><br/> כדי לשנות זאת יש לעבור למסך ה<i>חומת אש ספציפית לאפליקציה</i> .</string>
     <string name="firewall_rule_exempt_dns_proxied" translatable="true">DNS תווך</string>
-    <string name="firewall_rule_block_ip_univ_desc" translatable="true">כלל חומת אש שהוגדר על ידי משתמש חסם את <i>יעד הIP/היציאה</i>.<br></br><br></br> כדי לשנות זאת יש לעבור אל הלשונית <i>Universal</i>.</string>
-    <string name="firewall_rule_block_ip_desc" translatable="true">כלל חומת אש שהוגדר על ידי משתמש חסם את <i>יעד הIP</i>.<br></br><br></br> כדי לשנות זאת יש לעבור למסך <i>חומת אש ספציפית לאפליקציה</i>.</string>
-    <string name="firewall_rule_trusted_ip_desc" translatable="true">חיבור זה הותר מכיוון ש-<i>IP היעד</i> מוגדר כ-IP מהימן.<br></br><br></br> כדי לשנות זאת יש לעבור למסך <i>חומת אש ספציפית לאפליקציה</i>.</string>
+    <string name="firewall_rule_block_ip_univ_desc" translatable="true">כלל חומת אש שהוגדר על ידי משתמש חסם את <i>יעד הIP/היציאה</i>.<br/><br/> כדי לשנות זאת יש לעבור אל הלשונית <i>Universal</i>.</string>
+    <string name="firewall_rule_block_ip_desc" translatable="true">כלל חומת אש שהוגדר על ידי משתמש חסם את <i>יעד הIP</i>.<br/><br/> כדי לשנות זאת יש לעבור למסך <i>חומת אש ספציפית לאפליקציה</i>.</string>
+    <string name="firewall_rule_trusted_ip_desc" translatable="true">חיבור זה הותר מכיוון ש-<i>IP היעד</i> מוגדר כ-IP מהימן.<br/><br/> כדי לשנות זאת יש לעבור למסך <i>חומת אש ספציפית לאפליקציה</i>.</string>
     <string name="firewall_rule_bypass_universal_ip_desc" translatable="true">חיבור זה הותר מכיוון ש&lt;i&gt;כתובת ה-IP של היעד&lt;/i&gt; מוגדרת לעקוף את כל כללי חומת האש האוניברסליים.&lt;br/&gt;&lt;br/&gt; כדי לשנות זאת יש לעבור אל &lt;i&gt;כללי הIP&lt;i&gt; בלשונית &lt;i&gt;אוניברסלי&lt; /i&gt;.</string>
-    <string name="firewall_rule_device_lock_desc" translatable="true">חיבור זה נחסם חומת אש מכיוון ש<i>המכשיר היה נעול</i> באותו זמן.<br></br><br></br> כדי לשנות את ההתנהגות הזו יש עבור לכרטיסייה <i>Universal</i>.</string>
-    <string name="firewall_rule_foreground_desc" translatable="true">חיבור זה נחסם מכיוון שאפליקציית המקור <i>לא הייתה בחזית</i>.<br></br><br></br> כדי לשנות את ההתנהגות הזו יש לעבור ללשונית <i>Universal</i>.</string>
-    <string name="firewall_rule_unknown_desc" translatable="true">חיבור זה נחסם מכיוון שאפליקציית המקור <i>לא יכלה להיקבע</i>.<br></br><br></br> כדי לשנות את ההתנהגות הזו יש לעבור ללשונית <i>Universal</i>.</string>
-    <string name="firewall_rule_block_udp_ntp_desc" translatable="true">כלל חומת אש שהוגדר על ידי משתמש חסם את <i>חיבור הUDP</i> הזה.<br></br><br></br> כדי לשנות זאת יש לעבור אל הלשונית <i>Universal</i>.</string>
-    <string name="firewall_rule_block_dns_bypass_desc" translatable="true">חיבור זה נחסם משום ש<i>אפליקציית המקור</i> עקפה את הDNS המועדף על ידי המשתמש.<br></br><br></br> כדי לשנות את ההתנהגות הזאת יש לעבור ללשונית <i>Universal</i>.</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true">חיבור זה הותר מכיוון ש <i>אפליקציית המקור</i> מוגדרת <i>לעקוף dns וכללי חומת אש</i>.<br></br><br></br> כדי לשנות זאת יש לעבור אל המסך <i>חומת אש ספציפית לאפליקציה</i> .</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true">חיבור הDNS הזה תווך והועבר לנקודת קצה של DNS המועדפת על ידי המשתמש.<br></br><br></br> כדי לשנות זאת יש להשבית <i>מניעת דליפות DNS</i> ממסך <i>הגדרת</i> הDNS.</string>
-    <string name="firewall_rule_block_http_desc" translatable="true">חיבור זה נחסם מכיוון שהוא כנראה השתמש ב<i>HTTP לא מאובטח</i>.<br></br><br></br> כדי לשנות זאת יש לעבור ללשונית <i>Universal</i>.</string>
-    <string name="firewall_rule_global_lockdown_desc" translatable="true">חיבור זה נחסם מכיוון שהוגדר סגר אוניברסלי.<br></br><br></br> כדי לשנות זאת יש לעבור אל הכרטיסייה <i>Universal</i>.</string>
-    <string name="firewall_rule_block_domain_desc" translatable="true">כלל חומת אש שהוגדר על ידי משתמש חסם את <i>הדומיין</i>.<br></br><br></br> כדי לשנות זאת יש לעבור למסך <i>חומת אש ספציפית לאפליקציה</i>.</string>
-    <string name="firewall_rule_trusted_domain_desc" translatable="true">חיבור זה הותר מכיוון ש<i>הדומיין </i> מוגדר כדומיין מהימן.<br></br><br></br> כדי לשנות זאת יש לעבור למסך <i>חומת אש ספציפית לאפליקציה</i>.</string>
-    <string name="firewall_rule_dns_blocked_desc" translatable="true">חיבור זה נחסם משום ש<i>הדומיין</i> חסום על ידי הDNS המועדף על ידי המשתמש.<br></br><br></br> כדי לשנות את ההתנהגות הזאת יש לעבור ללשונית <i>הגדרת הDNS</i>.</string>
-    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">חיבור זה נחסם משום ש<i>הדומיין</i> נקבע כחסום בכללי הדומיין האוניברסליים.<br></br><br></br> כדי לשנות את ההתנהגות הזאת יש לעבור ללשונית <i>הגדרת הDNS</i>.</string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">חיבור זה הותר משום ש<i>הדומיין</i> נקבע כמהימן בכללי הדומיין האוניברסליים.<br></br><br></br> כדי לשנות את ההתנהגות הזאת יש לעבור ללשונית <i>הגדרת הDNS</i>.</string>
-    <string name="firewall_rule_proxied_desc" translatable="true">חיבור זה תווך לפרוקסי המועדף על ידי המשתמש.<br></br><br></br> כדי לשנות יש לעבור ל<i>פרוקסי</i> ממסך ה<i>הגדרה</i>.</string>
+    <string name="firewall_rule_device_lock_desc" translatable="true">חיבור זה נחסם חומת אש מכיוון ש<i>המכשיר היה נעול</i> באותו זמן.<br/><br/> כדי לשנות את ההתנהגות הזו יש עבור לכרטיסייה <i>Universal</i>.</string>
+    <string name="firewall_rule_foreground_desc" translatable="true">חיבור זה נחסם מכיוון שאפליקציית המקור <i>לא הייתה בחזית</i>.<br/><br/> כדי לשנות את ההתנהגות הזו יש לעבור ללשונית <i>Universal</i>.</string>
+    <string name="firewall_rule_unknown_desc" translatable="true">חיבור זה נחסם מכיוון שאפליקציית המקור <i>לא יכלה להיקבע</i>.<br/><br/> כדי לשנות את ההתנהגות הזו יש לעבור ללשונית <i>Universal</i>.</string>
+    <string name="firewall_rule_block_udp_ntp_desc" translatable="true">כלל חומת אש שהוגדר על ידי משתמש חסם את <i>חיבור הUDP</i> הזה.<br/><br/> כדי לשנות זאת יש לעבור אל הלשונית <i>Universal</i>.</string>
+    <string name="firewall_rule_block_dns_bypass_desc" translatable="true">חיבור זה נחסם משום ש<i>אפליקציית המקור</i> עקפה את הDNS המועדף על ידי המשתמש.<br/><br/> כדי לשנות את ההתנהגות הזאת יש לעבור ללשונית <i>Universal</i>.</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true">חיבור זה הותר מכיוון ש <i>אפליקציית המקור</i> מוגדרת <i>לעקוף dns וכללי חומת אש</i>.<br/><br/> כדי לשנות זאת יש לעבור אל המסך <i>חומת אש ספציפית לאפליקציה</i> .</string>
+    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true">חיבור הDNS הזה תווך והועבר לנקודת קצה של DNS המועדפת על ידי המשתמש.<br/><br/> כדי לשנות זאת יש להשבית <i>מניעת דליפות DNS</i> ממסך <i>הגדרת</i> הDNS.</string>
+    <string name="firewall_rule_block_http_desc" translatable="true">חיבור זה נחסם מכיוון שהוא כנראה השתמש ב<i>HTTP לא מאובטח</i>.<br/><br/> כדי לשנות זאת יש לעבור ללשונית <i>Universal</i>.</string>
+    <string name="firewall_rule_global_lockdown_desc" translatable="true">חיבור זה נחסם מכיוון שהוגדר סגר אוניברסלי.<br/><br/> כדי לשנות זאת יש לעבור אל הכרטיסייה <i>Universal</i>.</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">כלל חומת אש שהוגדר על ידי משתמש חסם את <i>הדומיין</i>.<br/><br/> כדי לשנות זאת יש לעבור למסך <i>חומת אש ספציפית לאפליקציה</i>.</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">חיבור זה הותר מכיוון ש<i>הדומיין </i> מוגדר כדומיין מהימן.<br/><br/> כדי לשנות זאת יש לעבור למסך <i>חומת אש ספציפית לאפליקציה</i>.</string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true">חיבור זה נחסם משום ש<i>הדומיין</i> חסום על ידי הDNS המועדף על ידי המשתמש.<br/><br/> כדי לשנות את ההתנהגות הזאת יש לעבור ללשונית <i>הגדרת הDNS</i>.</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">חיבור זה נחסם משום ש<i>הדומיין</i> נקבע כחסום בכללי הדומיין האוניברסליים.<br/><br/> כדי לשנות את ההתנהגות הזאת יש לעבור ללשונית <i>הגדרת הDNS</i>.</string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">חיבור זה הותר משום ש<i>הדומיין</i> נקבע כמהימן בכללי הדומיין האוניברסליים.<br/><br/> כדי לשנות את ההתנהגות הזאת יש לעבור ללשונית <i>הגדרת הDNS</i>.</string>
+    <string name="firewall_rule_proxied_desc" translatable="true">חיבור זה תווך לפרוקסי המועדף על ידי המשתמש.<br/><br/> כדי לשנות יש לעבור ל<i>פרוקסי</i> ממסך ה<i>הגדרה</i>.</string>
     <string name="new_app_bulk_notification_title" translatable="true">שימו לב</string>
     <string name="new_app_bulk_notification_content" translatable="true">Rethink חסם %1$s אפליקציות חדשות.יש להקיש כדי לצפות או לשנות.</string>
     <string name="new_app_notification_content" translatable="true">Rethink חסם אפליקציה שהותקנה לאחרונה, %1$s.</string>

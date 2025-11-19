@@ -4,7 +4,6 @@
     android:id="@+id/ss_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/background"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -34,7 +33,7 @@
                 android:src="@android:color/transparent"
                 android:visibility="gone" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/ss_flag"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
@@ -62,7 +61,7 @@
             android:orientation="vertical"
             android:padding="5dp">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/ss_data_usage"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
@@ -128,7 +127,7 @@
 
     </RelativeLayout>
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="match_parent"
         android:layout_height="0.75dp"
         android:background="?attr/divider"

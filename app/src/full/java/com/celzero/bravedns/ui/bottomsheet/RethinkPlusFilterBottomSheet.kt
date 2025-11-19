@@ -32,6 +32,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.fragment.RethinkBlocklistFragment
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import org.koin.android.ext.android.inject
@@ -61,6 +62,11 @@ class RethinkPlusFilterBottomSheet(
     ): View {
         _binding = BottomSheetRethinkPlusFilterBinding.inflate(inflater, container, false)
         return b.root
+    }
+
+    override fun onStart() {
+        super.onStart()
+        dialog?.useTransparentNoDimBackground()
     }
 
     private fun isDarkThemeOn(): Boolean {

@@ -80,7 +80,7 @@ class VpnControlReceiver: BroadcastReceiver(), KoinComponent {
             try {
                 Logger.i(LOG_TAG_VPN, "$TAG Attempting to prepare VPN before starting")
                 VpnService.prepare(context)
-            } catch (ignored: NullPointerException) {
+            } catch (_: NullPointerException) {
                 // This shouldn't happen normally as Broadcast Intent sender apps like Tasker
                 // won't come up as early as Always-on VPNs
                 // Context can be null in case of auto-restart VPNs:

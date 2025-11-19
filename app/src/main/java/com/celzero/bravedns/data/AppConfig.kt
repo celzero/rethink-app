@@ -92,6 +92,19 @@ internal constructor(
         // csv is <dns-name,url>, url maybe empty
         val dnsName = persistentState.connectedDnsName.split(",").firstOrNull() ?: ""
         connectedDns.postValue(dnsName)
+
+        // initialize pcapFilePath from persistent state
+        pcapFilePath = persistentState.pcapFilePath
+
+        // validate pcap settings: if mode is EXTERNAL_FILE but path is empty/invalid, reset to NONE
+        if (PcapMode.getPcapType(persistentState.pcapMode) == PcapMode.EXTERNAL_FILE) {
+            if (pcapFilePath.isEmpty() || !java.io.File(pcapFilePath).exists()) {
+                Logger.w(LOG_TAG_VPN, "Pcap file path invalid or missing, resetting pcap mode to NONE")
+                persistentState.pcapMode = PcapMode.NONE.id
+                persistentState.pcapFilePath = ""
+                pcapFilePath = ""
+            }
+        }
     }
 
     data class TunnelOptions(
@@ -380,6 +393,7 @@ internal constructor(
                 }
             }
         persistentState.pcapMode = mode
+        persistentState.pcapFilePath = pcapFilePath
     }
 
     fun getPcapFilePath(): String {
@@ -532,13 +546,14 @@ internal constructor(
                 postConnectedDnsName(endpoint.name, endpoint.resolver)
             }
             DnsType.DNSCRYPT -> {
-                val endpoint = getConnectedDnscryptServer()
+                val endpoint = getConnectedDnscryptServer() ?: return
                 postConnectedDnsName(endpoint.dnsCryptName, endpoint.dnsCryptURL)
             }
             DnsType.DNS_PROXY -> {
                 val endpoint = getDNSProxyServerDetails() ?: return
 
-                val url = endpoint.proxyIP + ":" + endpoint.proxyPort
+                val ip = endpoint.proxyIP?.split(",")?.firstOrNull() ?: ""
+                val url = ip + ":" + endpoint.proxyPort
                 postConnectedDnsName(endpoint.proxyName, url)
             }
             DnsType.RETHINK_REMOTE -> {
@@ -639,7 +654,7 @@ internal constructor(
         return dnsProxyEndpointRepository.getSelectedProxy()
     }
 
-    suspend fun getConnectedDnscryptServer(): DnsCryptEndpoint {
+    suspend fun getConnectedDnscryptServer(): DnsCryptEndpoint? {
         return dnsCryptEndpointRepository.getConnectedDNSCrypt()
     }
 
@@ -758,6 +773,10 @@ internal constructor(
 
     suspend fun getRemoteRethinkEndpoint(): RethinkDnsEndpoint? {
         return rethinkDnsEndpointRepository.getConnectedEndpoint()
+    }
+
+    suspend fun getRethinkDefaultEndpoint(): RethinkDnsEndpoint? {
+        return rethinkDnsEndpointRepository.getDefaultRethinkEndpoint()
     }
 
     suspend fun getBlockFreeRethinkEndpoint(): String {

@@ -108,8 +108,8 @@ object VpnController : KoinComponent {
         try {
             // externalScope?.coroutineContext?.get(Job)?.cancel("VPNController - onVpnDestroyed")
             externalScope?.cancel("VPNController - onVpnDestroyed")
-        } catch (ignored: IllegalStateException) {} catch (
-            ignored: CancellationException) {} catch (ignored: Exception) {}
+        } catch (_: IllegalStateException) {} catch (
+            _: CancellationException) {} catch (_: Exception) {}
     }
 
     fun uptimeMs(): Long {
@@ -235,6 +235,10 @@ object VpnController : KoinComponent {
         return braveVpnService?.getProxyStats(id)
     }
 
+    suspend fun getWireGuardStats(id: String): WireguardManager.WgStats? {
+        return braveVpnService?.getWireGuardStats(id)
+    }
+
     suspend fun getSupportedIpVersion(id: String): Pair<Boolean, Boolean> {
         return braveVpnService?.getSupportedIpVersion(id) ?: Pair(false, false)
     }
@@ -254,7 +258,6 @@ object VpnController : KoinComponent {
     fun protocols(): String {
         val ipv4 = protocol.first
         val ipv6 = protocol.second
-        Logger.d(LOG_TAG_VPN, "protocols => ipv4: $ipv4, ipv6: $ipv6")
         return if (ipv4 && ipv6) {
             "$URL4, $URL6"
         } else if (ipv6) {
@@ -266,7 +269,7 @@ object VpnController : KoinComponent {
             if (!persistentState.stallOnNoNetwork) {
                 "$URL4, $URL6"
             } else {
-                ""
+                "-"
             }
         }
     }
@@ -283,6 +286,10 @@ object VpnController : KoinComponent {
 
     fun mtu(): Int {
         return braveVpnService?.tunMtu() ?: 0
+    }
+
+    fun underlyingSsid(): String? {
+        return braveVpnService?.underlyingNetworks?.activeSsid ?: braveVpnService?.underlyingNetworks?.ipv4Net?.firstOrNull { !it.ssid.isNullOrEmpty() }?.ssid ?: braveVpnService?.underlyingNetworks?.ipv6Net?.firstOrNull { !it.ssid.isNullOrEmpty() }?.ssid ?: ""
     }
 
     fun netType(): String {
@@ -312,20 +319,20 @@ object VpnController : KoinComponent {
         braveVpnService?.removeWireGuardProxy(id)
     }
 
-    suspend fun addWireGuardProxy(id: String) {
-        braveVpnService?.addWireGuardProxy(id)
+    suspend fun addWireGuardProxy(id: String, force: Boolean = false) {
+        braveVpnService?.addWireGuardProxy(id, force)
     }
 
     suspend fun refreshOrPauseOrResumeOrReAddProxies() {
         braveVpnService?.refreshOrPauseOrResumeOrReAddProxies()
     }
 
-    fun closeConnectionsIfNeeded(uid: Int = INVALID_UID) {
-        braveVpnService?.closeConnectionsIfNeeded(uid)
+    fun closeConnectionsIfNeeded(uid: Int = INVALID_UID, reason: String) {
+        braveVpnService?.closeConnectionsIfNeeded(uid, reason)
     }
 
-    fun closeConnectionsByUidDomain(uid: Int, ipAddress: String?) {
-        braveVpnService?.closeConnectionsByUidDomain(uid, ipAddress)
+    fun closeConnectionsByUidDomain(uid: Int, ipAddress: String?, reason: String) {
+        braveVpnService?.closeConnectionsByUidDomain(uid, ipAddress, reason)
     }
 
     suspend fun getDnsStatus(id: String): Long? {
@@ -336,10 +343,6 @@ object VpnController : KoinComponent {
         return braveVpnService?.getRDNS(type)
     }
 
-    fun goBuildVersion(full: Boolean): String {
-        return braveVpnService?.goBuildVersion(full) ?: ""
-    }
-
     fun protectSocket(socket: Socket) {
         braveVpnService?.protectSocket(socket)
     }
@@ -348,8 +351,8 @@ object VpnController : KoinComponent {
         return braveVpnService?.probeIpOrUrl(ip, useAuto)
     }
 
-    suspend fun notifyConnectionMonitor() {
-        braveVpnService?.notifyConnectionMonitor()
+    suspend fun notifyConnectionMonitor(enforcePolicyChange: Boolean = false) {
+        braveVpnService?.notifyConnectionMonitor(enforcePolicyChange)
     }
 
     suspend fun getSystemDns(): String {
@@ -424,15 +427,15 @@ object VpnController : KoinComponent {
         return braveVpnService?.getPlusTransportById(id)
     }
 
-    fun screenLock() {
-        braveVpnService?.screenLock()
-    }
-
     fun isUnderlyingVpnNetworkEmpty(): Boolean {
         return braveVpnService?.isUnderlyingVpnNetworkEmpty() ?: false
     }
 
     fun screenUnlock() {
         braveVpnService?.screenUnlock()
+    }
+
+    suspend fun performFlightRecording() {
+        braveVpnService?.performFlightRecording()
     }
 }

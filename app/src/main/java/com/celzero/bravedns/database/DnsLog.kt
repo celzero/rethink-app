@@ -66,6 +66,8 @@ class DnsLog {
     var upstreamBlock: Boolean = false
     var region: String = ""
     var isCached: Boolean = false
+    var dnssecOk: Boolean = false
+    var dnssecValid: Boolean = false
 
     override fun equals(other: Any?): Boolean {
         if (other !is DnsLog) return false
@@ -95,7 +97,7 @@ class DnsLog {
     }
 
     fun isAnonymized(): Boolean {
-        return this.relayIP.isNotEmpty() || ( this.proxyId.isNotEmpty() && ProxyManager.isIpnProxy(this.proxyId))
+        return this.relayIP.isNotEmpty() || ( this.proxyId.isNotEmpty() && ProxyManager.isNotLocalAndRpnProxy(this.proxyId))
     }
 
     fun isLocallyAnswered(): Boolean {

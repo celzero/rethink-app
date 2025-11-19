@@ -66,7 +66,7 @@
     <string name="dc_block_heading">regras</string>
     <string name="dc_dns_website_heading">Mostrar ícone de sites em registros de DNS (experimental)</string>
     <string name="about_github">Contribuir no GitHub</string>
-    <string name="about_mozilla">Rethink é apoiado por Mozilla Builders, FOSS United Foundation, OSOM Products Inc.</string>
+    <string name="about_mozilla">O Rethink é apoiado pela Mozilla Builders, FOSS United Foundation.</string>
     <string name="about_web">links</string>
     <string name="about_website">Acessar rethinkdns.com</string>
     <string name="about_faq">Perguntas frequentes</string>
@@ -117,13 +117,13 @@
     <string name="firewall_rule_no_rule_desc">Nenhuma regra de firewall correspondeu a esta conexão.</string>
     <string name="firewall_rule_block_dns_bypass">DNS ignorado</string>
     <string name="firewall_rule_global_lockdown">Restrito</string>
-    <string name="firewall_rule_block_app_mobile_desc">Uma regra de firewall definida pelo usuário bloqueou este <i>aplicativo</i> ao tentar se conectar em uma rede <i>móvel</i>.<br></br><br></br> Para alterar, acesse a guia <i>Todos os aplicativos</i>.</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc">Uma regra de firewall universal definida pelo usuário bloqueou este <i>aplicativo</i> ao tentar se conectar em uma rede <i>móvel</i>.<br></br><br></br>Para alterar, acesse a guia <i>Universal</i>.</string>
-    <string name="firewall_rule_trusted_ip_desc">Esta conexão foi permitida porque o <i>IP de destino</i> está configurado como IP confiável.<br></br><br></br> Para alterar, acesse a tela <i>Firewall específico do aplicativo</i>.</string>
-    <string name="firewall_rule_device_lock_desc">Esta conexão foi bloqueada porque o dispositivo <i>estava bloqueado</i> naquele momento.<br></br><br></br> Para mudar este comportamento, acesse a guia <i>Universal</i>.</string>
-    <string name="firewall_rule_block_udp_ntp_desc">Uma regra de firewall definida pelo usuário bloqueou esta conexão <i>UDP</i>.<br></br><br></br> Para alterar, acesse a guia <i>Universal</i>.</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc">Esta conexão foi permitida porque o <i>aplicativo de origem</i> está configurado para <i>ignorar regras universais</i> de firewall.<br></br><br></br> Para alterar, acesse a tela <i>Firewall específico do aplicativo</i>.</string>
-    <string name="firewall_rule_block_http_desc">Esta conexão foi bloqueada porque provavelmente usava <i>HTTP inseguro</i>.<br></br><br></br> Para alterar, acesse a guia <i>Universal</i>.</string>
+    <string name="firewall_rule_block_app_mobile_desc">Uma regra de firewall definida pelo usuário bloqueou este <i>aplicativo</i> ao tentar se conectar em uma rede <i>móvel</i>.<br/><br/> Para alterar, acesse a guia <i>Todos os aplicativos</i>.</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc">Uma regra de firewall universal definida pelo usuário bloqueou este <i>aplicativo</i> ao tentar se conectar em uma rede <i>móvel</i>.<br/><br/>Para alterar, acesse a guia <i>Universal</i>.</string>
+    <string name="firewall_rule_trusted_ip_desc">Esta conexão foi permitida porque o <i>IP de destino</i> está configurado como IP confiável.<br/><br/> Para alterar, acesse a tela <i>Firewall específico do aplicativo</i>.</string>
+    <string name="firewall_rule_device_lock_desc">Esta conexão foi bloqueada porque o dispositivo <i>estava bloqueado</i> naquele momento.<br/><br/> Para mudar este comportamento, acesse a guia <i>Universal</i>.</string>
+    <string name="firewall_rule_block_udp_ntp_desc">Uma regra de firewall definida pelo usuário bloqueou esta conexão <i>UDP</i>.<br/><br/> Para alterar, acesse a guia <i>Universal</i>.</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc">Esta conexão foi permitida porque o <i>aplicativo de origem</i> está configurado para <i>ignorar regras universais</i> de firewall.<br/><br/> Para alterar, acesse a tela <i>Firewall específico do aplicativo</i>.</string>
+    <string name="firewall_rule_block_http_desc">Esta conexão foi bloqueada porque provavelmente usava <i>HTTP inseguro</i>.<br/><br/> Para alterar, acesse a guia <i>Universal</i>.</string>
     <string name="new_app_notification_action_toast_allow">Conexão de rede permitida para este aplicativo</string>
     <string name="notif_channel_firewall_alerts">Alertas de Firewall</string>
     <string name="notif_channel_vpn_failure">VPN inativa</string>
@@ -232,7 +232,7 @@
     <string name="slide_2_title">Bem-vindo</string>
     <string name="slide_2_desc">Rethink é a melhor maneira de monitorar as atividades da rede, ignorar a censura da internet e implementar um firewall para os aplicativos em seu dispositivo Android.</string>
     <string name="slide_1_title">Gratuito e de código aberto</string>
-    <string name="slide_1_desc">Rethink é um de código aberto apoiado pelo programa MVP do Mozilla Builders.</string>
+    <string name="slide_1_desc">Rethink é um software de código aberto apoiado pelo programa Mozilla Builders MVP da FOSS United Foundation.</string>
     <string name="allow">permitir</string>
     <string name="bypass_universal">Ignorar todos</string>
     <string name="exclude">excluir</string>
@@ -550,8 +550,8 @@
     <string name="fapps_metered_block_dialog_message">Bloquear conexões em redes móveis para aplicativos <i>listados</i>\?</string>
     <string name="fapps_metered_unblock_dialog_title">Permitir em redes móveis</string>
     <string name="fapps_metered_unblock_dialog_message">Permitir conexões em redes móveis para aplicativos <i>listados</i>\?</string>
-    <string name="fapps_firewall_filter_desc">Mostrando aplicativos: <u>%1$s</u>, %2$s</string>
-    <string name="fapps_firewall_filter_desc_category">Mostrando aplicativos (<u>%1$s</u>, %2$s) nas categorias: %3$s</string>
+    <string name="fapps_firewall_filter_desc"><![CDATA[Exibindo <u>%1$s</u> %2$s aplicativos]]></string>
+    <string name="fapps_firewall_filter_desc_category"><![CDATA[Exibindo <u>%1$s</u> %2$s aplicativos nas categorias: %3$s]]></string>
     <string name="unicode_warning_sign">⚠</string>
     <string name="unicode_question_sign">❔</string>
     <string name="fav_icon">fav_icon</string>
@@ -585,19 +585,19 @@
     <string name="firewall_rule_foreground">Aplicativo não está em uso</string>
     <string name="firewall_rule_unknown">Fonte desconhecida</string>
     <string name="firewall_rule_block_udp_ntp">UDP bloqueado</string>
-    <string name="firewall_rule_block_app_desc">Uma regra de firewall definida pelo usuário bloqueou este <i>aplicativo</i>.<br></br><br></br> Para alterar, acesse a guia <i>Todos os aplicativos</i>.</string>
-    <string name="firewall_rule_new_app_desc">Este aplicativo fez uma conexão pela <i>primeira</i> vez.<br></br><br></br> Para alterar, acesse a guia <i>Universal</i>.</string>
-    <string name="firewall_rule_block_app_unmetered_desc">Uma regra de firewall definida pelo usuário bloqueou este <i>aplicativo</i> ao tentar se conectar em uma rede <i>Wi-Fi</i>.<br></br><br></br> Para alterar, acesse a guia <i>Todos os aplicativos</i>.</string>
-    <string name="firewall_rule_isolate_desc">Uma regra de firewall definida pelo usuário bloqueou a conexão deste <i>aplicativo</i> com outros <i>IPs ignorados</i>.<br></br><br></br> Para alterar, acesse a guia <i>Todos os aplicativos</i>.</string>
-    <string name="firewall_rule_block_ip_univ_desc">Uma regra de firewall definida pelo usuário bloqueou o <i>IP / Porta de destino</i>.<br></br><br></br> Para alterar, acesse a guia <i>Universal</i>.</string>
-    <string name="firewall_rule_block_ip_desc">Uma regra de firewall definida pelo usuário bloqueou o <i>IP de destino</i>.<br></br><br></br> Para alterar, acesse a tela <i>Firewall específico do aplicativo</i>.</string>
+    <string name="firewall_rule_block_app_desc">Uma regra de firewall definida pelo usuário bloqueou este <i>aplicativo</i>.<br/><br/> Para alterar, acesse a guia <i>Todos os aplicativos</i>.</string>
+    <string name="firewall_rule_new_app_desc">Este aplicativo fez uma conexão pela <i>primeira</i> vez.<br/><br/> Para alterar, acesse a guia <i>Universal</i>.</string>
+    <string name="firewall_rule_block_app_unmetered_desc">Uma regra de firewall definida pelo usuário bloqueou este <i>aplicativo</i> ao tentar se conectar em uma rede <i>Wi-Fi</i>.<br/><br/> Para alterar, acesse a guia <i>Todos os aplicativos</i>.</string>
+    <string name="firewall_rule_isolate_desc">Uma regra de firewall definida pelo usuário bloqueou a conexão deste <i>aplicativo</i> com outros <i>IPs ignorados</i>.<br/><br/> Para alterar, acesse a guia <i>Todos os aplicativos</i>.</string>
+    <string name="firewall_rule_block_ip_univ_desc">Uma regra de firewall definida pelo usuário bloqueou o <i>IP / Porta de destino</i>.<br/><br/> Para alterar, acesse a guia <i>Universal</i>.</string>
+    <string name="firewall_rule_block_ip_desc">Uma regra de firewall definida pelo usuário bloqueou o <i>IP de destino</i>.<br/><br/> Para alterar, acesse a tela <i>Firewall específico do aplicativo</i>.</string>
     <string name="firewall_rule_bypass_universal_ip_desc">Esta conexão foi permitida porque o &lt;i&gt;IP de destino&lt;/i&gt; está configurado para ignorar todas as regras universais de firewall.&lt;br/&gt;&lt;br/&gt; Para alterar, acesse a guia &lt;i&gt;Regras de IP&lt;i&gt; em &lt;i&gt;Universal&lt;/i&gt;.</string>
-    <string name="firewall_rule_foreground_desc">Esta conexão foi protegida por firewall porque o aplicativo de origem <i>não estava em primeiro plano</i>.<br></br><br></br> Para alterar esse comportamento, acesse a guia <i>Universal</i>.</string>
-    <string name="firewall_rule_unknown_desc">Esta conexão foi protegida por firewall porque o <i>aplicativo de origem</i> não podia ser determinado.<br></br><br></br> Para alterar esse comportamento, acesse a guia <i>Universal</i>.</string>
-    <string name="firewall_rule_block_dns_bypass_desc">Esta conexão foi bloqueada porque o <i>aplicativo de origem</i> ignorou o DNS escolhido pelo o usuário.<br></br><br></br> Para alterar esse comportamento, acesse a guia <i>Universal</i>.</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc">Esta conexão de DNS usou proxy e foi encaminhada ao endpoint do DNS escolhido pelo usuário.<br></br><br></br> Para alterar, desative <i>Impedir vazamentos do DNS</i> acessando a tela de <i>Configuração</i> do DNS.</string>
+    <string name="firewall_rule_foreground_desc">Esta conexão foi protegida por firewall porque o aplicativo de origem <i>não estava em primeiro plano</i>.<br/><br/> Para alterar esse comportamento, acesse a guia <i>Universal</i>.</string>
+    <string name="firewall_rule_unknown_desc">Esta conexão foi protegida por firewall porque o <i>aplicativo de origem</i> não podia ser determinado.<br/><br/> Para alterar esse comportamento, acesse a guia <i>Universal</i>.</string>
+    <string name="firewall_rule_block_dns_bypass_desc">Esta conexão foi bloqueada porque o <i>aplicativo de origem</i> ignorou o DNS escolhido pelo o usuário.<br/><br/> Para alterar esse comportamento, acesse a guia <i>Universal</i>.</string>
+    <string name="firewall_rule_exempt_dns_proxied_desc">Esta conexão de DNS usou proxy e foi encaminhada ao endpoint do DNS escolhido pelo usuário.<br/><br/> Para alterar, desative <i>Impedir vazamentos do DNS</i> acessando a tela de <i>Configuração</i> do DNS.</string>
     <string name="firewall_rule_exempt_orbot_setup_desc">Esta conexão foi permitida porque a configuração de <i>Tor-como-proxy em um clique</i> via Orbot estava em andamento.</string>
-    <string name="firewall_rule_global_lockdown_desc">Esta conexão foi bloqueada porque foi definida uma restrição universal.<br></br><br></br> Para alterar, acesse a guia <i>Universal</i>.</string>
+    <string name="firewall_rule_global_lockdown_desc">Esta conexão foi bloqueada porque foi definida uma restrição universal.<br/><br/> Para alterar, acesse a guia <i>Universal</i>.</string>
     <string name="new_app_bulk_notification_title">Atenção</string>
     <string name="new_app_bulk_notification_content">Rethink bloqueou %1$s novos aplicativos. Toque para ver ou modificar.</string>
     <string name="new_app_notification_content">Rethink bloqueou um aplicativo instalado recentemente: %1$s.</string>
@@ -774,7 +774,7 @@
     <string name="fapps_info_bypass_msg" translatable="true">Ignora as regras universais de firewall.</string>
     <string name="fapps_info_metered_msg" translatable="true">Permitir / Bloquear em redes móveis.</string>
     <string name="fapps_info_exclude_msg" translatable="true">Excluir do DNS + Firewall.</string>
-    <string name="cd_dns_alg_desc" translatable="true">Atribuir IP exclusivo por solicitação de DNS</string>
+    <string name="cd_dns_alg_desc" translatable="true">Atribuir IP exclusivo por solicitação de DNS.</string>
     <string name="cd_dns_alg_heading" translatable="true">Filtragem de DNS avançada (experimental)</string>
     <string name="lbl_maybe_blocked" translatable="true">Talvez bloqueado</string>
     <string name="lbl_network" translatable="true">rede</string>
@@ -830,7 +830,7 @@
     <string name="lbl_random" translatable="true">(aleatório)</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">Manter a notificação persistente</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">Notificação persistente</string>
-    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Esta conexão foi bloqueada porque o <i>domínio</i> está configurado como bloqueado nas regras de domínio universais.<br></br><br></br> Para alterar esse comportamento, acesse a guia <i>Configurar DNS</i>.</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Esta conexão foi bloqueada porque o <i>domínio</i> está configurado como bloqueado nas regras de domínio universais.<br/><br/> Para alterar esse comportamento, acesse a guia <i>Configurar DNS</i>.</string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">irá ignorar as regras universais de DNS e firewall</string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">Ignorar DNS + Firewall</string>
     <string name="fapps_isolate_block_dialog_message" translatable="true">Isolar aplicativos <i>listados</i>\?</string>
@@ -898,9 +898,9 @@
     <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Ignorar aplicativos</string>
     <string name="fapps_unblock_dialog_message" translatable="true">Permitir conexões para aplicativos <i>listados</i>\?</string>
     <string name="ci_trust_rule" translatable="true">Confiar</string>
-    <string name="firewall_rule_block_domain_desc" translatable="true">Uma regra de firewall definida pelo usuário bloqueou o <i>domínio</i>.<br></br><br></br> Para alterar, acesse a tela <i>Firewall específico do aplicativo</i>.</string>
-    <string name="firewall_rule_trusted_domain_desc" translatable="true">Esta conexão foi permitida porque o <i>domínio</i> está configurado como Domínio confiável.<br></br><br></br> Para alterar, acesse a tela <i>Firewall específico do aplicativo</i>.</string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Esta conexão foi permitida porque o <i>domínio</i> está configurado como confiável nas regras de domínio universal.<br></br><br></br> Para alterar esse comportamento, acesse a guia <i>Configurar DNS</i>.</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">Uma regra de firewall definida pelo usuário bloqueou o <i>domínio</i>.<br/><br/> Para alterar, acesse a tela <i>Firewall específico do aplicativo</i>.</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">Esta conexão foi permitida porque o <i>domínio</i> está configurado como Domínio confiável.<br/><br/> Para alterar, acesse a tela <i>Firewall específico do aplicativo</i>.</string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Esta conexão foi permitida porque o <i>domínio</i> está configurado como confiável nas regras de domínio universal.<br/><br/> Para alterar esse comportamento, acesse a guia <i>Configurar DNS</i>.</string>
     <string name="bsdl_block_desc" translatable="true">Bloquear, confiar <u>neste domínio</u></string>
     <string name="dc_setting_dns_cache_desc" translatable="true">Agrupar solicitações, respostas de cache, tratamento de erros resiliente</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category" translatable="true">%1$s lista(s) de bloqueio</string>
@@ -932,10 +932,10 @@
     <string name="firewall_rule_trusted_domain" translatable="true">Domínio confiável (Aplicativo)</string>
     <string name="firewall_rule_block_domain" translatable="true">Domínio (Aplicativo)</string>
     <string name="firewall_rule_domain_trusted_univ" translatable="true">Domínio confiável (Univ)</string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Esta conexão foi permitida porque o <i>aplicativo de origem</i> está configurado para <i>ignorar regras de DNS e firewall</i>.<br></br><br></br> Para alterar, acesse a tela <i>Firewall específico do aplicativo </i> .</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Esta conexão foi permitida porque o <i>aplicativo de origem</i> está configurado para <i>ignorar regras de DNS e firewall</i>.<br/><br/> Para alterar, acesse a tela <i>Firewall específico do aplicativo </i> .</string>
     <string name="firewall_rule_proxied" translatable="true">Via proxy</string>
-    <string name="firewall_rule_dns_blocked_desc" translatable="true">Esta conexão foi bloqueada porque o <i>domínio</i> está bloqueado pelo DNS preferido do usuário.<br></br><br></br> Para alterar esse comportamento, acesse a guia <i>Configurar DNS</i>.</string>
-    <string name="firewall_rule_proxied_desc" translatable="true">Esta conexão foi encaminhada para o proxy preferido do usuário.<br></br><br></br> Para alterar, acesse ao <i>Proxy</i> na tela <i>Configurar</i>.</string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true">Esta conexão foi bloqueada porque o <i>domínio</i> está bloqueado pelo DNS preferido do usuário.<br/><br/> Para alterar esse comportamento, acesse a guia <i>Configurar DNS</i>.</string>
+    <string name="firewall_rule_proxied_desc" translatable="true">Esta conexão foi encaminhada para o proxy preferido do usuário.<br/><br/> Para alterar, acesse ao <i>Proxy</i> na tela <i>Configurar</i>.</string>
     <string name="cd_no_rules_text" translatable="true">Sem regras de domínio.</string>
     <string name="ci_trust_initial" translatable="true">T</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen" translatable="true">Bloquear conteúdo adulto e pirateado, jogos e encontros on-line e mídias sociais.</string>
@@ -1007,7 +1007,6 @@
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s está desativado porque os proxies estão ativos</string>
     <string name="lbl_unselected" translatable="true">Não selecionado</string>
     <string name="lbl_battery_optimization" translatable="true">Otimização da Bateria</string>
-    <string name="lbl_background_data" translatable="true">Restringindo dados em segundo plano</string>
     <string name="battery_optimization_dialog_heading" translatable="true">Desativar %1$s</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> pode resultar em perda de conectividade. Altere a configuração para permitir que o Rethink use dados e outros recursos quando estiver em segundo plano.</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Aplicativos de encaminhamento proxy loopback</string>
@@ -1021,4 +1020,40 @@
     <string name="lbl_protos" translatable="true">protos</string>
     <string name="lbl_experimental" translatable="true">(experimental)</string>
     <string name="lbl_service_providers" translatable="true">Provedores de serviços</string>
+    <string name="lbl_hop" translatable="true">Relés</string>
+    <string name="lbl_manual" translatable="true">Manual</string>
+    <string name="lbl_fallback" translatable="true">Fallback</string>
+    <string name="wireguard_title" translatable="true">Internet segura com WireGuard</string>
+    <string name="wireguard_desc" translatable="true">Criptografe seu tráfego de internet com o WireGuard. Escolha rotas diferentes para aplicativos diferentes.</string>
+    <string name="firewall_title" translatable="true">Proteja seu Android com Firewall</string>
+    <string name="firewall_desc" translatable="true">Controle o uso da internet por aplicativos; restrinja conexões com base na atividade do aplicativo ou da rede.</string>
+    <string name="dns_title" translatable="true">Bloqueie anúncios e malware com DNS</string>
+    <string name="dns_desc" translatable="true">Escolha entre mais de 190 listas para bloquear anúncios, rastreadores e malware.</string>
+    <string name="status_no_network" translatable="true">sem rede</string>
+    <string name="conn_track_clear_rule_logs_title" translatable="true">Excluir logs para esta regra?</string>
+    <string name="conn_track_clear_rule_logs_message" translatable="true">Isso excluirá apenas os logs de rede da regra de firewall visualizada no momento. Esta operação não é reversível. Deseja prosseguir?</string>
+    <string name="settings_mobile_metered_heading" translatable="true">Redes móveis de medidores</string>
+    <string name="settings_mobile_metered_desc" translatable="true">Trate apenas as redes móveis como medidas e as demais como não medidas.</string>
+    <string name="settings_biometric_dialog_heading" translatable="true">Autenticação Biométrica</string>
+    <string name="settings_biometric_dialog_option_0" translatable="true">Nenhum</string>
+    <string name="settings_biometric_dialog_option_1" translatable="true">Imediatamente</string>
+    <string name="settings_biometric_dialog_option_2" translatable="true">Após 5 minutos</string>
+    <string name="settings_biometric_dialog_option_3" translatable="true">Depois de 15 minutos</string>
+    <string name="sponser_dialog_usage_msg" translatable="true">Você usa o Rethink há <b>%1$s dias</b>, o que representa um custo de uso de <b>$%2$s</b>. Você consideraria patrocinar para sustentar seu desenvolvimento?</string>
+    <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Use DNS do sistema para domínios não delegados</string>
+    <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Use o DNS do sistema para domínios não controlados, como <i>.lan</i>, <i>.internal</i>, etc.</string>
+    <string name="dc_filtering_heading" translatable="true">filtragem</string>
+    <string name="cd_split_dns_heading" translatable="true">DNS dividido (experimental)</string>
+    <string name="cd_split_dns_desc" translatable="true">Encaminhe consultas DNS de aplicativos proxy para os servidores DNS do proxy.</string>
+    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">Tratar regras de DNS como regras de firewall (experimental)</string>
+    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">O bloqueio de DNS será ignorado durante a resolução; a decisão será tomada no momento da conexão.</string>
+    <string name="univ_firewall_rule_11" translatable="true">Bloquear todas as conexões de host local</string>
+    <string name="univ_delete_domain_dialog_title" translatable="true">Excluir todas as regras de domínio?</string>
+    <string name="univ_delete_domain_dialog_message" translatable="true">A exclusão dessas regras permitirá que qualquer aplicativo se conecte aos domínios atualmente bloqueados.</string>
+    <string name="firewall_rule_private_dns" translatable="true">DNS privado</string>
+    <string name="firewall_rule_bypass_proxy" translatable="true">Ignorar proxy</string>
+    <string name="firewall_rule_paused_app" translatable="true">Aplicativo pausado</string>
+    <string name="firewall_rule_lockdown_wg" translatable="true">Proxy de bloqueio</string>
+    <string name="settings_theme_dialog_themes_5" translatable="true">Luz Plus</string>
+    <string name="settings_theme_dialog_themes_6" translatable="true">Escuro Plus</string>
 </resources>

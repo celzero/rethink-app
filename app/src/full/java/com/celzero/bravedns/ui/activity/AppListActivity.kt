@@ -50,6 +50,7 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.viewmodel.AppInfoViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -196,8 +197,10 @@ class AppListActivity :
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -489,7 +492,7 @@ class AppListActivity :
     private fun showInfoDialog() {
         val li = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val view: View = li.inflate(R.layout.dialog_info_firewall_rules, null)
-        val builder = MaterialAlertDialogBuilder(this).setView(view)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim).setView(view)
         builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { dialog, _ ->
             dialog.dismiss()
         }

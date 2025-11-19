@@ -71,18 +71,14 @@ internal constructor(
     // expected per row size is 100 bytes to 500 bytes, so a batch of 40 rows is around 4KB to 20KB
     private val logBatchSize = 40
     // dispatch buffer to consumer if greater than batch size, for console logs
-    private val consoleLogBatchSize = 512
+    private val consoleLogBatchSize = 1024
 
     // a single thread to run sig and batch co-routines in;
     // to avoid use of mutex/semaphores over shared-state
     // looper is never closed / cancelled and is always active
-    private val looper = Daemons.make("netlog")
+    private val looper = Daemons.make("netl")
 
-    private val consoleLogLooper = Daemons.make("consoleLog")
-
-    companion object {
-        private const val UPDATE_DELAY = 2500L
-    }
+    private val consoleLogLooper = Daemons.make("consl")
 
     suspend fun restart(s: CoroutineScope) {
         this.scope = s
@@ -175,9 +171,6 @@ internal constructor(
                     summary
                 }
 
-            // add a delay to ensure the insert is complete before updating
-            delay(UPDATE_DELAY)
-
             ipBatcher?.update(s)
         }
     }
@@ -192,9 +185,6 @@ internal constructor(
                 } else {
                     summary
                 }
-
-            // add a delay to ensure the insert is complete before updating
-            delay(UPDATE_DELAY)
 
             rrBatcher?.update(s)
         }

@@ -40,12 +40,15 @@ import com.celzero.bravedns.ui.activity.NetworkLogsActivity
 import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
-import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel.TopLevelFilter
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -84,7 +87,7 @@ class ConnectionTrackerFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (arguments != null) {
-            val query = arguments?.getString(Constants.SEARCH_QUERY) ?: return
+            val query = arguments?.getString(Constants.SEARCH_QUERY) ?: ""
             fromUniversalFirewallScreen = query.contains(UniversalFirewallSettingsActivity.RULES_SEARCH_ID)
             fromWireGuardScreen = query.contains(NetworkLogsActivity.RULES_SEARCH_ID_WIREGUARD)
             if (fromUniversalFirewallScreen) {
@@ -101,6 +104,8 @@ class ConnectionTrackerFragment :
                 hideSearchLayout()
             } else {
                 b.connectionSearch.setQuery(query, true)
+                viewModel.setFilter(query, filterCategories, filterType)
+                setQueryFilter()
             }
         }
         initView()
@@ -168,9 +173,15 @@ class ConnectionTrackerFragment :
                     b.connectionCardViewTop.visibility = View.VISIBLE
                 }
                 viewModel.connectionTrackerList.removeObservers(this)
+                b.recyclerConnection.visibility = View.GONE
             } else {
                 b.connectionListLogsDisabledTv.visibility = View.GONE
-                b.connectionCardViewTop.visibility = View.VISIBLE
+                if (!b.recyclerConnection.isVisible) b.recyclerConnection.visibility = View.VISIBLE
+                if (fromUniversalFirewallScreen || fromWireGuardScreen) {
+                    b.connectionCardViewTop.visibility = View.GONE
+                } else {
+                    b.connectionCardViewTop.visibility = View.VISIBLE
+                }
             }
         }
 
@@ -180,7 +191,7 @@ class ConnectionTrackerFragment :
                     recyclerAdapter.stateRestorationPolicy =
                         RecyclerView.Adapter.StateRestorationPolicy.ALLOW
                 }
-            } catch (ignored: Exception) {
+            } catch (_: Exception) {
                 Logger.e(LOG_TAG_UI, "$TAG; err in setting the recycler restoration policy")
             }
         }
@@ -333,37 +344,58 @@ class ConnectionTrackerFragment :
         }
     }
 
-    override fun onQueryTextSubmit(query: String): Boolean {
-        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
-            if (this.isAdded) {
-                this.filterQuery = query
-                viewModel.setFilter(query, filterCategories, filterType)
-            }
+    @OptIn(FlowPreview::class)
+    private fun setQueryFilter() {
+        lifecycleScope.launch {
+            searchQuery
+                .debounce(QUERY_TEXT_DELAY)
+                .distinctUntilChanged()
+                .collect { query ->
+                    filterQuery = query
+                    viewModel.setFilter(query, filterCategories, filterType)
+                }
         }
+    }
+
+    val searchQuery = MutableStateFlow("")
+
+    override fun onQueryTextSubmit(query: String): Boolean {
+        searchQuery.value = query
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
-            if (this.isAdded) {
-                this.filterQuery = query
-                viewModel.setFilter(query, filterCategories, filterType)
-            }
-        }
+        searchQuery.value = query
         return true
     }
 
     private fun showDeleteDialog() {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.conn_track_clear_logs_title)
-            .setMessage(R.string.conn_track_clear_logs_message)
-            .setCancelable(true)
-            .setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
-                io { connectionTrackerRepository.clearAllData() }
-            }
-            .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
-            .create()
-            .show()
+        val rule = filterCategories.firstOrNull()
+        if (fromUniversalFirewallScreen && rule != null) {
+            // Rule-specific deletion for Universal Firewall Settings
+            MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+                .setTitle(R.string.conn_track_clear_rule_logs_title)
+                .setMessage(R.string.conn_track_clear_rule_logs_message)
+                .setCancelable(true)
+                .setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
+                    io { connectionTrackerRepository.clearLogsByRule(rule) }
+                }
+                .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
+                .create()
+                .show()
+        } else {
+            // Default deletion behavior - delete all logs
+            MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+                .setTitle(R.string.conn_track_clear_logs_title)
+                .setMessage(R.string.conn_track_clear_logs_message)
+                .setCancelable(true)
+                .setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
+                    io { connectionTrackerRepository.clearAllData() }
+                }
+                .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
+                .create()
+                .show()
+        }
     }
 
     private fun remakeChildFilterChipsUi(categories: List<FirewallRuleset>) {

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.activity
+/*
 
 import Logger
 import Logger.LOG_TAG_UI
@@ -32,6 +33,7 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import androidx.core.graphics.drawable.toDrawable
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -56,8 +58,10 @@ class RpnCountriesActivity: AppCompatActivity(R.layout.activity_rpn_countries) {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -117,3 +121,4 @@ class RpnCountriesActivity: AppCompatActivity(R.layout.activity_rpn_countries) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 }
+*/

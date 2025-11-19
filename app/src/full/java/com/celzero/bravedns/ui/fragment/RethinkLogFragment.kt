@@ -34,10 +34,13 @@ import com.celzero.bravedns.databinding.FragmentConnectionTrackerBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
-import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.RethinkLogViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -111,10 +114,11 @@ class RethinkLogFragment :
         b.recyclerConnection.layoutAnimation = null
 
         setupRecyclerScrollListener()
-
         b.connectionSearch.setOnQueryTextListener(this)
+        setQueryFilter()
 
         b.connectionDeleteIcon.setOnClickListener { showDeleteDialog() }
+
     }
 
     private fun setupRecyclerScrollListener() {
@@ -150,26 +154,32 @@ class RethinkLogFragment :
         b.recyclerConnection.addOnScrollListener(scrollListener)
     }
 
-    override fun onQueryTextSubmit(query: String): Boolean {
-        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
-            if (this.isAdded) {
-                viewModel.setFilter(query)
-            }
+    @OptIn(FlowPreview::class)
+    private fun setQueryFilter() {
+        lifecycleScope.launch {
+            searchQuery
+                .debounce(QUERY_TEXT_DELAY)
+                .distinctUntilChanged()
+                .collect { query ->
+                    viewModel.setFilter(query)
+                }
         }
+    }
+
+    val searchQuery = MutableStateFlow("")
+
+    override fun onQueryTextSubmit(query: String): Boolean {
+        searchQuery.value = query
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
-            if (this.isAdded) {
-                viewModel.setFilter(query)
-            }
-        }
+        searchQuery.value = query
         return true
     }
 
     private fun showDeleteDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.conn_track_clear_logs_title)
         builder.setMessage(R.string.conn_track_clear_logs_message)
         builder.setCancelable(true)

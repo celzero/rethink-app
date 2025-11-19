@@ -201,7 +201,7 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
         }
 
         private fun showDohMetadataDialog(endpoint: RethinkDnsEndpoint) {
-            val builder = MaterialAlertDialogBuilder(context)
+            val builder = MaterialAlertDialogBuilder(context, R.style.App_Dialog_NoDim)
             builder.setTitle(endpoint.name)
             builder.setMessage(endpoint.url + "\n\n" + endpoint.desc)
             builder.setCancelable(true)

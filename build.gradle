@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '2.1.0'
+    ext.kotlin_version = '2.1.20'
     repositories {
         google()
         // https://jfrog.com/blog/into-the-sunset-bintray-jcenter-gocenter-and-chartcenter/
@@ -9,13 +9,22 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.11.0'
+        classpath 'com.android.tools.build:gradle:8.13.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        // add firebase plugins - will be conditionally applied in app/build.gradle
+        def taskNames = gradle.startParameter.taskNames.join(',').toLowerCase()
+        def isFdroidBuild = taskNames.contains("fdroid")
+        println("gradle-task names: $taskNames")
+        println("is fdroid build? $isFdroidBuild")
+        if (!isFdroidBuild) {
+            classpath 'com.google.gms:google-services:4.4.3'
+            classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.6'
+        }
     }
 }
 
 plugins {
-    id 'com.google.devtools.ksp' version '2.1.0-1.0.28' apply false
+    id 'com.google.devtools.ksp' version '2.1.20-2.0.1' apply false
 }
 
 allprojects {

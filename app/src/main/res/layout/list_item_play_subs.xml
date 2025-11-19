@@ -5,10 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
-    android:focusable="true"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="4dp"
-    app:cardUseCompatPadding="true">
+    android:focusable="true">
 
     <RelativeLayout
         android:id="@+id/subs_parent"

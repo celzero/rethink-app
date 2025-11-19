@@ -1,1 +1,1 @@
-重新思考：DNS + 防火牆 + VPN
+Rethink：重塑 DNS + 防火牆 + VPN

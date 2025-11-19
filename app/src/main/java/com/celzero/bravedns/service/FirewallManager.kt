@@ -19,6 +19,9 @@ import Logger
 import Logger.LOG_TAG_FIREWALL
 import android.app.KeyguardManager
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfo
@@ -268,44 +271,29 @@ object FirewallManager : KoinComponent {
 
     suspend fun getAllApps(): Set<AppInfoTuple> {
         mutex.withLock {
+            // only return apps that are not tombstoned
             return appInfos.values().map { AppInfoTuple(it.uid, it.packageName) }.toSet()
         }
     }
 
-    suspend fun deletePackages(packagesToDelete: Set<AppInfoTuple>) {
+    suspend fun tombstoneApp(uid: Int, packageName: String?, ts: Long = System.currentTimeMillis()) {
+        val newUid = if (uid > 0) -1 * uid else uid // use negative uid to mark the app as tombstone
         mutex.withLock {
-            packagesToDelete.forEach { tuple ->
-                appInfos
-                    .get(tuple.uid)
-                    .filter { tuple.packageName == it.packageName }
-                    .forEach { ai -> appInfos.remove(tuple.uid, ai) }
+            val iter = appInfos.get(uid).iterator()
+            while (iter.hasNext()) {
+                val ai = iter.next()
+                if (ai.packageName == packageName) {
+                    iter.remove() // safe removal while iterating
+                    ai.uid = newUid
+                    ai.tombstoneTs = ts
+                    appInfos.put(newUid, ai)
+                    break
+                }
             }
         }
-        // Delete the uninstalled apps from database
-        packagesToDelete.forEach { tuple -> db.deletePackage(tuple.uid, tuple.packageName) }
-    }
-
-    suspend fun tombstoneApp(uid: Int, packageName: String?) {
-        val currentTime = System.currentTimeMillis()
-        mutex.withLock {
-            appInfos
-                .values()
-                .filter { it.packageName == packageName && it.uid == uid }
-                .forEach { it.tombstoneTs = currentTime }
-        }
-        // delete the uninstalled apps from database
-        db.tombstoneApp(uid, packageName, currentTime)
-    }
-
-    suspend fun resetTombstoneTs(uid: Int, packageName: String?) {
-        mutex.withLock {
-            appInfos
-                .values()
-                .filter { it.packageName == packageName && it.uid == uid }
-                .forEach { it.tombstoneTs = 0 }
-        }
-        // delete the uninstalled apps from database
-        db.tombstoneApp(uid, packageName, 0)
+        db.tombstoneApp(newUid, uid, packageName, ts)
+        Logger.d(LOG_TAG_FIREWALL, "tombstone app: $packageName, uid: $uid, ts: $ts, newUid: $newUid")
+        informObservers()
     }
 
     suspend fun deletePackage(uid: Int, packageName: String?) {
@@ -328,13 +316,22 @@ object FirewallManager : KoinComponent {
     // TODO: Use the package-manager API instead
     suspend fun isOrbotInstalled(): Boolean {
         mutex.withLock {
-            return appInfos.values().any { it.packageName == OrbotHelper.ORBOT_PACKAGE_NAME }
+            return appInfos.values().any { it.packageName == OrbotHelper.ORBOT_PACKAGE_NAME && it.tombstoneTs == 0L }
         }
     }
 
     suspend fun hasUid(uid: Int): Boolean {
         mutex.withLock {
-            return appInfos.containsKey(uid)
+            val appInfo = appInfos.get(uid)
+            return appInfo.isNotEmpty()
+        }
+    }
+
+    suspend fun isTombstone(packageName: String): Boolean {
+        mutex.withLock {
+            return appInfos.values().any {
+                it.packageName == packageName && it.tombstoneTs > 0L
+            }
         }
     }
 
@@ -370,7 +367,7 @@ object FirewallManager : KoinComponent {
         mutex.withLock {
             return appInfos
                 .values()
-                .filter { it.firewallStatus == FirewallStatus.EXCLUDE.id }
+                .filter { it.firewallStatus == FirewallStatus.EXCLUDE.id && it.tombstoneTs == 0L }
                 .map { it.packageName }
                 .toMutableSet()
         }
@@ -380,7 +377,8 @@ object FirewallManager : KoinComponent {
     suspend fun isAnyAppBypassesDns(): Boolean {
         mutex.withLock {
             return appInfos.values().any {
-                it.firewallStatus == FirewallStatus.BYPASS_DNS_FIREWALL.id
+                it.firewallStatus == FirewallStatus.BYPASS_DNS_FIREWALL.id &&
+                it.tombstoneTs == 0L
             }
         }
     }
@@ -405,6 +403,60 @@ object FirewallManager : KoinComponent {
 
     suspend fun getAllAppNames(): List<String> {
         return getAppInfos().map { it.appName }.sortedBy { it.lowercase() }
+    }
+
+    suspend fun getAllAppNamesSortedByVpnPermission(context: Context): List<String> {
+        val appInfos = getAppInfos()
+        val packageManager = context.packageManager
+
+        // separate apps with and without VPN permission
+        val appsWithVpnPermission = mutableListOf<String>()
+        val appsWithoutVpnPermission = mutableListOf<String>()
+
+        appInfos.forEach { appInfo ->
+            // skip the app itself
+            if (appInfo.packageName == RETHINK_PACKAGE) {
+                return@forEach
+            }
+            // skip apps which do not have internet permission
+            if (!appInfo.hasInternetPermission(packageManager)) {
+                return@forEach
+            }
+            // skip tombstoned apps
+            if (appInfo.tombstoneTs > 0L) {
+                return@forEach
+            }
+            val hasVpnPermission = try {
+                val packageInfo = packageManager.getPackageInfo(appInfo.packageName, PackageManager.GET_SERVICES)
+                packageInfo.isVpnRelatedApp(packageManager)
+            } catch (_: Exception) {
+                false
+            }
+
+            if (hasVpnPermission) {
+                appsWithVpnPermission.add(appInfo.appName)
+            } else {
+                appsWithoutVpnPermission.add(appInfo.appName)
+            }
+        }
+
+        // sort each group alphabetically and combine with the list of apps
+        return appsWithVpnPermission.sortedBy { it.lowercase() } +
+               appsWithoutVpnPermission.sortedBy { it.lowercase() }
+    }
+
+    private fun PackageInfo.isVpnRelatedApp(pm: PackageManager): Boolean {
+        val vpnServiceStr = "android.net.VpnService"
+        val hasVpnService = services?.any {
+            it.permission == android.Manifest.permission.BIND_VPN_SERVICE
+        } ?: false
+
+        val hasVpnIntent = pm.queryIntentServices(
+            Intent(vpnServiceStr).apply { `package` = packageName },
+            PackageManager.MATCH_ALL
+        ).isNotEmpty()
+
+        return hasVpnService || hasVpnIntent
     }
 
     suspend fun getAppNameByUid(uid: Int): String? {
@@ -467,35 +519,38 @@ object FirewallManager : KoinComponent {
         connectionStatus: ConnectionStatus
     ) {
         if (firewallStatus == FirewallStatus.ISOLATE) {
-            VpnController.closeConnectionsIfNeeded(uid)
+            VpnController.closeConnectionsIfNeeded(uid, "isolate-manual-close")
         } else if (
             firewallStatus == FirewallStatus.NONE && connectionStatus != ConnectionStatus.ALLOW
         ) {
-            VpnController.closeConnectionsIfNeeded(uid)
+            VpnController.closeConnectionsIfNeeded(uid, "block-manual-close")
         } else {
             // no-op, no need to close existing connections, if the app is not isolated or blocked
         }
     }
 
-    suspend fun updateUid(olduid: Int, uid: Int, pkg: String) {
+    suspend fun updateUidAndResetTombstone(oldUid: Int, newUid: Int, pkg: String) {
         // while updating the package reset the tombstone timestamp
         var cacheok = false
-        // FIXME: review once again
+        val appInfo = getAppInfoByUid(oldUid)
+        Logger.i(LOG_TAG_FIREWALL, "updateUidAndResetTombstone: $oldUid -> $newUid; has? ${appInfo?.packageName} == $pkg")
         mutex.withLock {
-            appInfos.get(olduid).forEach { ai ->
+            val iter = appInfos.get(oldUid).iterator()
+            while (iter.hasNext()) {
+                val ai = iter.next()
                 if (ai.packageName == pkg) {
-                    appInfos.remove(olduid, ai) // remove the old uid entry
-                    ai.uid = uid // update the uid in-place
-                    ai.tombstoneTs = 0 // remove the tombstone timestamp
-                    appInfos.put(uid, ai) // add the updated ai entry
+                    iter.remove() // safe removal while iterating
+                    ai.uid = newUid
+                    ai.tombstoneTs = 0
+                    appInfos.put(newUid, ai)
                     cacheok = true
-                    return@withLock
+                    break
                 }
             }
         }
-        // Delete the uninstalled apps from database
-        val dbok = db.updateUid(olduid, uid, pkg)
-        Logger.d(LOG_TAG_FIREWALL, "update: $pkg; $olduid -> $uid; c? $cacheok; db? $dbok")
+
+        val dbok = db.updateUid(oldUid, newUid, pkg)
+        Logger.d(LOG_TAG_FIREWALL, "update: $pkg; $oldUid -> $newUid; c? $cacheok; db? $dbok")
         informObservers()
     }
 
@@ -543,7 +598,7 @@ object FirewallManager : KoinComponent {
                 }
             }
             val isAppUid = AndroidUidConfig.isUidAppRange(uid)
-            Logger.d(LOG_TAG_FIREWALL, "app in foreground with uid? $isAppUid")
+            Logger.d(LOG_TAG_FIREWALL, "app in foreground; uid($uid)? $isAppUid")
 
             // Only track packages within app uid range.
             if (!isAppUid) return@io
@@ -557,13 +612,13 @@ object FirewallManager : KoinComponent {
         // When the user engages the app and locks the screen, the app is
         // considered to be in background and the connections for those apps
         // should be blocked.
-        val locked = keyguardManager?.isKeyguardLocked == false
-        val isForeground = foregroundUids.contains(uid)
+        val locked = keyguardManager?.isKeyguardLocked == true
+        val inForegroundList = foregroundUids.contains(uid)
         Logger.d(
             LOG_TAG_FIREWALL,
-            "is app $uid foreground? ${locked && isForeground}, isLocked? $locked, is available in foreground list? $isForeground"
+            "is app $uid foreground? ${!locked && inForegroundList}, isLocked? $locked, in foreground list? $inForegroundList"
         )
-        return locked && isForeground
+        return !locked && inForegroundList
     }
 
     suspend fun updateFirewalledApps(uid: Int, connectionStatus: ConnectionStatus) {
@@ -596,10 +651,6 @@ object FirewallManager : KoinComponent {
             }
             return ImmutableList.copyOf(appInfos.values())
         }
-    }
-
-    suspend fun getTotalAppsCount(): Int {
-        return getAppInfos().size
     }
 
     suspend fun isUnknownPackage(uid: Int): Boolean {
@@ -664,6 +715,10 @@ object FirewallManager : KoinComponent {
             db.updateProxyExcluded(uid, isProxyExcluded)
             informObservers()
         }
+    }
+
+    fun getTombstoneApps(): List<AppInfo> {
+        return appInfos.values().filter { it.tombstoneTs > 0L }
     }
 
     fun isAppExcludedFromProxy(uid: Int): Boolean {

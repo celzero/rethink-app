@@ -14,7 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:elevation="5dp"
         app:cardCornerRadius="16dp">
 
         <LinearLayout
@@ -71,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
-                android:paddingTop="5dp"
+                android:paddingTop="10dp"
                 android:paddingBottom="2dp"
                 android:visibility="gone"
                 app:selectionRequired="true"
@@ -133,7 +132,7 @@
         android:textColor="?attr/primaryTextColor"
         android:visibility="gone" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/connection_list_logs_disabled_tv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

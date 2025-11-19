@@ -90,7 +90,7 @@ internal constructor(
             } else {
                 summary.uid.toInt()
             }
-        } catch (ignored: NumberFormatException) {
+        } catch (_: NumberFormatException) {
             Logger.w(LOG_TAG_VPN, "onQuery: invalid uid: ${summary.uid}, using default uid: $uid")
         }
 
@@ -117,6 +117,8 @@ internal constructor(
         transaction.upstreamBlock = summary.upstreamBlocks
         transaction.region = summary.region
         transaction.isCached = summary.cached
+        transaction.dnssecOk = summary.`do`
+        transaction.dnssecValid = summary.ad
         return transaction
     }
 
@@ -140,6 +142,8 @@ internal constructor(
         dnsLog.upstreamBlock = transaction.upstreamBlock
         dnsLog.region = transaction.region
         dnsLog.isCached = transaction.isCached
+        dnsLog.dnssecOk = transaction.dnssecOk
+        dnsLog.dnssecValid = transaction.dnssecValid
         val typeName = ResourceRecordTypes.getTypeName(transaction.type.toInt())
         if (typeName == ResourceRecordTypes.UNKNOWN) {
             dnsLog.typeName = transaction.type.toString()
@@ -152,8 +156,8 @@ internal constructor(
         // mark the query as blocked if the transaction id is Dnsx.BlockAll, no need to check
         // for blocklist as it is already marked as blocked
         if (transaction.id == Backend.BlockAll) {
-            // TODO: rdata should be empty for block all
-            if (transaction.response.isNotEmpty()) {
+            // TODO: rdata should be either empty / 0.0.0.0 / ::0 / -- for block all
+            if (transaction.response.isNotEmpty() && transaction.response != UNSPECIFIED_IP_IPV4 && transaction.response != UNSPECIFIED_IP_IPV6 && transaction.response != EMPTY_RESPONSE) {
                 Logger.w(
                     LOG_TAG_VPN,
                     "id is BlockAll, but rdata is not empty: ${transaction.response} for ${transaction.qName}"

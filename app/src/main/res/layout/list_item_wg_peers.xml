@@ -7,10 +7,7 @@
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="8dp"
-        app:cardUseCompatPadding="true">
+        android:layout_height="wrap_content">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -49,7 +46,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/public_key_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -59,7 +56,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/peer_title" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/public_key_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -70,7 +67,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/public_key_label"
                 tools:text="wOs2eguFEohqIZxlSJ1CAT9584tc6ejj9hfGFsoBVkA=" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/pre_shared_key_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -81,7 +78,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/public_key_text" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/pre_shared_key_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -93,7 +90,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/pre_shared_key_label"
                 tools:text="8VyS8W8XeMcBWfKp1GuG3/fZlnUQFkqMNbrdmZtVQIM=" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/allowed_ips_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -103,7 +100,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/pre_shared_key_text" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/allowed_ips_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -111,7 +108,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/allowed_ips_label"
                 tools:text="0.0.0.0/5, 8.0.0.0/7, 11.0.0.0/8, 12.0.0.0/6, 16.0.0.0/4, 32.0.0.0/3" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/endpoint_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -120,7 +117,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/allowed_ips_text" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/endpoint_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -128,7 +125,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/endpoint_label"
                 tools:text="192.168.0.1:51820" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/persistent_keepalive_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -138,7 +135,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/endpoint_text" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/persistent_keepalive_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

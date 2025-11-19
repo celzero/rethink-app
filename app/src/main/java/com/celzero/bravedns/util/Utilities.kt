@@ -899,6 +899,19 @@ object Utilities {
         return true // versions are equal
     }
 
+    suspend fun writeToFile(file: File, content: ByteArray): Boolean {
+        return try {
+            file.outputStream().use { output ->
+                output.write(content)
+                output.flush()
+            }
+            true
+        } catch (e: IOException) {
+            Logger.e(LOG_TAG_VPN, "err writing to file ${file.path}, ${e.message}", e)
+            false
+        }
+    }
+
 
     /**
      * Converts a nullable [String] to a [Gostr] object for use with the Backend engine.

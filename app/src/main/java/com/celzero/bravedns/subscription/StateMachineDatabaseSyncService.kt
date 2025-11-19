@@ -14,8 +14,17 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.subscription
-
+/*
+import Logger.LOG_IAB
+import com.android.billingclient.api.BillingResult
+import com.celzero.bravedns.database.SubscriptionStateHistory
+import com.celzero.bravedns.database.SubscriptionStateHistoryDao
+import com.celzero.bravedns.database.SubscriptionStatus
+import com.celzero.bravedns.database.SubscriptionStatusRepository
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import com.celzero.bravedns.iab.PurchaseDetail
 
 /**
  * Service for synchronizing state machine states with database
@@ -23,25 +32,25 @@ import org.koin.core.component.KoinComponent
  */
 class StateMachineDatabaseSyncService : KoinComponent {
 
-    /*private val subscriptionRepository by inject<SubscriptionStatusRepository>()
+    private val subscriptionRepository by inject<SubscriptionStatusRepository>()
     private val historyDAO: SubscriptionStateHistoryDao by inject()
 
     companion object {
         private const val TAG = "StateMachineDBSync"
     }
 
-    *//**
+    /**
      * Database state information for state machine initialization
-     *//*
+     */
     data class DatabaseStateInfo(
         val currentSubscription: SubscriptionStatus,
         val recommendedState: SubscriptionStateMachineV2.SubscriptionState,
         val lastTransitionTime: Long
     )
 
-    *//**
+    /**
      * Load current subscription state from database and determine recommended state
-     *//*
+     */
     suspend fun loadStateFromDatabase(): DatabaseStateInfo? {
         return try {
             Logger.d(LOG_IAB, "$TAG Loading state from database")
@@ -67,9 +76,9 @@ class StateMachineDatabaseSyncService : KoinComponent {
         }
     }
 
-    *//**
+    /**
      * Save state transition to database
-     *//*
+     */
     suspend fun saveStateTransition(
         fromState: SubscriptionStateMachineV2.SubscriptionState,
         toState: SubscriptionStateMachineV2.SubscriptionState,
@@ -109,9 +118,9 @@ class StateMachineDatabaseSyncService : KoinComponent {
         }
     }
 
-    *//**
+    /**
      * Save purchase detail to database - ensures single subscription record
-     *//*
+     */
     suspend fun savePurchaseDetail(purchaseDetail: PurchaseDetail): Long {
         return try {
             Logger.d(LOG_IAB, "$TAG Saving purchase detail: ${purchaseDetail.productId}")
@@ -151,9 +160,9 @@ class StateMachineDatabaseSyncService : KoinComponent {
         }
     }
 
-    *//**
+    /**
      * Update subscription expiry information
-     *//*
+     */
     suspend fun updateSubscriptionExpiry(
         subscriptionId: Int,
         billingExpiry: Long,
@@ -172,9 +181,9 @@ class StateMachineDatabaseSyncService : KoinComponent {
         }
     }
 
-    *//**
+    /**
      * Mark subscription as revoked
-     *//*
+     */
     suspend fun markSubscriptionRevoked(subscriptionId: Int) {
         try {
             Logger.w(LOG_IAB, "$TAG Marking subscription as revoked: $subscriptionId")
@@ -232,9 +241,9 @@ class StateMachineDatabaseSyncService : KoinComponent {
         }
     }
 
-    *//**
+    /**
      * Perform system check
-     *//*
+     */
     suspend fun performSystemCheck(): SystemCheckResult? {
         return try {
             Logger.d(TAG, "Performing system check")
@@ -382,14 +391,15 @@ class StateMachineDatabaseSyncService : KoinComponent {
         }
     }
 
-    *//**
+    /**
      * Result of system check operation
-     *//*
+     */
     data class SystemCheckResult(
         val expiredSubscriptionsUpdated: Int,
         val duplicateTokensFound: Int,
         val invalidSubscriptionsFound: Int,
         val currentSubscriptionValid: Boolean,
         val timestamp: Long
-    )*/
+    )
 }
+*/

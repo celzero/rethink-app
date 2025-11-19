@@ -52,11 +52,12 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.VIEW_PAGER_SCREEN_TO_LOAD
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UIUtils.openAndroidAppInfo
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
+import com.celzero.bravedns.util.UIUtils.openAndroidAppInfo
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
@@ -95,9 +96,9 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
-
+        handleFrostEffectIfNeeded(persistentState.theme)
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
             controller.isAppearanceLightNavigationBars = false
@@ -127,7 +128,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         io {
             val appInfo = FirewallManager.getAppInfoByUid(uid)
             // case: app is uninstalled but still available in RethinkDNS database
-            if (appInfo == null || uid == INVALID_UID) {
+            if (appInfo == null || uid == INVALID_UID || appInfo.tombstoneTs > 0) {
                 uiCtx { showNoAppFoundDialog() }
                 return@io
             }
@@ -152,6 +153,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 if (appInfo.packageName == rethinkPkgName) {
                     isRethinkApp = true
                     b.aadFirewallStatus.visibility = View.GONE
+                    b.aadAapFirewallNewCard.visibility = View.GONE
                     hideFirewallStatusUi()
                     hideDomainBlockUi()
                     hideIpBlockUi()
@@ -181,7 +183,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     }
 
     private fun displayProxyStatus() {
-        val proxy = ProxyManager.getProxyIdForApp(appInfo.uid)
+        val proxy = ProxyManager.getProxyIdForApp(uid)
         if (proxy.isEmpty() || proxy == ID_NONE) {
             b.aadProxyDetails.visibility = View.GONE
             return
@@ -221,6 +223,15 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     }
 
     private fun displayDataUsage() {
+        if (!::appInfo.isInitialized) {
+            Logger.w(LOG_TAG_UI, "AppInfo not initialized yet in displayDataUsage")
+            // Set default values when appInfo is not available
+            b.aadDataUsageStatus.text = getString(R.string.two_argument,
+                getString(R.string.symbol_upload, "0 B"),
+                getString(R.string.symbol_download, "0 B"))
+            return
+        }
+
         val u = Utilities.humanReadableByteCount(appInfo.uploadBytes, true)
         val uploadBytes = getString(R.string.symbol_upload, u)
         val d = Utilities.humanReadableByteCount(appInfo.downloadBytes, true)
@@ -273,8 +284,18 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private fun setupClickListeners() {
 
         b.aadAppInfoIcon.setOnClickListener {
+            if (!::appInfo.isInitialized) {
+                Logger.w(LOG_TAG_UI, "AppInfo not initialized yet in aadAppInfoIcon click listener, using uid: $uid")
+                showToastUiCentered(
+                    this,
+                    this.getString(R.string.ctbs_app_info_not_available_toast),
+                    Toast.LENGTH_SHORT
+                )
+                return@setOnClickListener
+            }
+
             io {
-                val appNames = FirewallManager.getAppNamesByUid(appInfo.uid)
+                val appNames = FirewallManager.getAppNamesByUid(uid)
                 uiCtx {
                     if (appNames.count() == 1) {
                         openAndroidAppInfo(this, appInfo.packageName)
@@ -302,96 +323,108 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         TooltipCompat.setTooltipText(b.aadCloseConnsChip, getString(R.string.close_conns_dialog_title))
 
         b.aadAppSettingsBypassDnsFirewall.setOnClickListener {
-            // show the tooltip only once when app is not bypassed (dns + firewall) earlier
-            if (showBypassToolTip && appStatus == FirewallManager.FirewallStatus.NONE) {
-                b.aadAppSettingsBypassDnsFirewall.performLongClick()
-                showBypassToolTip = false
-                return@setOnClickListener
-            }
-
-            if (appStatus == FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL) {
-                updateFirewallStatus(
-                    FirewallManager.FirewallStatus.NONE,
-                    FirewallManager.ConnectionStatus.ALLOW
-                )
-            } else {
-                updateFirewallStatus(
-                    FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL,
-                    FirewallManager.ConnectionStatus.ALLOW
-                )
-            }
-        }
-
-        b.aadAppSettingsBlockWifi.setOnClickListener {
-            toggleWifi(appInfo)
-            updateFirewallStatusUi(appStatus, connStatus)
-        }
-
-        b.aadAppSettingsBlockMd.setOnClickListener {
-            toggleMobileData(appInfo)
-            updateFirewallStatusUi(appStatus, connStatus)
-        }
-
-        b.aadAppSettingsBypassUniv.setOnClickListener {
-            // change the status to allowed if already app is bypassed
-            if (appStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL) {
-                updateFirewallStatus(
-                    FirewallManager.FirewallStatus.NONE,
-                    FirewallManager.ConnectionStatus.ALLOW
-                )
-            } else {
-                updateFirewallStatus(
-                    FirewallManager.FirewallStatus.BYPASS_UNIVERSAL,
-                    FirewallManager.ConnectionStatus.ALLOW
-                )
-            }
-        }
-
-        b.aadAppSettingsExclude.setOnClickListener {
-            if (VpnController.isVpnLockdown()) {
-                showToastUiCentered(this, getString(R.string.hsf_exclude_error), Toast.LENGTH_SHORT)
-                return@setOnClickListener
-            }
-
-            io {
-                if (FirewallManager.isUnknownPackage(uid) && appStatus == FirewallManager.FirewallStatus.EXCLUDE) {
-                    uiCtx {
-                        showToastUiCentered(
-                            this,
-                            getString(R.string.exclude_no_package_err_toast),
-                            Toast.LENGTH_LONG
-                        )
-                    }
-                    return@io
+            guardAppInfoInitialized("aadAppSettingsBypassDnsFirewall") {
+                // show the tooltip only once when app is not bypassed (dns + firewall) earlier
+                if (showBypassToolTip && appStatus == FirewallManager.FirewallStatus.NONE) {
+                    b.aadAppSettingsBypassDnsFirewall.performLongClick()
+                    showBypassToolTip = false
+                    return@setOnClickListener
                 }
 
-                // change the status to allowed if already app is excluded
-                if (appStatus == FirewallManager.FirewallStatus.EXCLUDE) {
+                if (appStatus == FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL) {
                     updateFirewallStatus(
                         FirewallManager.FirewallStatus.NONE,
                         FirewallManager.ConnectionStatus.ALLOW
                     )
                 } else {
                     updateFirewallStatus(
-                        FirewallManager.FirewallStatus.EXCLUDE,
+                        FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL,
                         FirewallManager.ConnectionStatus.ALLOW
                     )
                 }
             }
         }
 
+        b.aadAppSettingsBlockWifi.setOnClickListener {
+            guardAppInfoInitialized("aadAppSettingsBlockWifi") {
+                toggleWifi(appInfo)
+                updateFirewallStatusUi(appStatus, connStatus)
+            }
+        }
+
+        b.aadAppSettingsBlockMd.setOnClickListener {
+            guardAppInfoInitialized("aadAppSettingsBlockMd") {
+                toggleMobileData(appInfo)
+                updateFirewallStatusUi(appStatus, connStatus)
+            }
+        }
+
+        b.aadAppSettingsBypassUniv.setOnClickListener {
+            guardAppInfoInitialized("aadAppSettingsBypassUniv") {
+                // change the status to allowed if already app is bypassed
+                if (appStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL) {
+                    updateFirewallStatus(
+                        FirewallManager.FirewallStatus.NONE,
+                        FirewallManager.ConnectionStatus.ALLOW
+                    )
+                } else {
+                    updateFirewallStatus(
+                        FirewallManager.FirewallStatus.BYPASS_UNIVERSAL,
+                        FirewallManager.ConnectionStatus.ALLOW
+                    )
+                }
+            }
+        }
+
+        b.aadAppSettingsExclude.setOnClickListener {
+            guardAppInfoInitialized("aadAppSettingsExclude") {
+                if (VpnController.isVpnLockdown()) {
+                    showToastUiCentered(this, getString(R.string.hsf_exclude_error), Toast.LENGTH_SHORT)
+                    return@setOnClickListener
+                }
+
+                io {
+                    if (FirewallManager.isUnknownPackage(uid) && appStatus == FirewallManager.FirewallStatus.EXCLUDE) {
+                        uiCtx {
+                            showToastUiCentered(
+                                this,
+                                getString(R.string.exclude_no_package_err_toast),
+                                Toast.LENGTH_LONG
+                            )
+                        }
+                        return@io
+                    }
+
+                    // change the status to allowed if already app is excluded
+                    if (appStatus == FirewallManager.FirewallStatus.EXCLUDE) {
+                        updateFirewallStatus(
+                            FirewallManager.FirewallStatus.NONE,
+                            FirewallManager.ConnectionStatus.ALLOW
+                        )
+                    } else {
+                        updateFirewallStatus(
+                            FirewallManager.FirewallStatus.EXCLUDE,
+                            FirewallManager.ConnectionStatus.ALLOW
+                        )
+                    }
+                }
+            }
+        }
+
         b.aadAppSettingsIsolate.setOnClickListener {
-            // change the status to allowed if already app is isolated
-            if (appStatus == FirewallManager.FirewallStatus.ISOLATE) {
-                updateFirewallStatus(
-                    FirewallManager.FirewallStatus.NONE,
-                    FirewallManager.ConnectionStatus.ALLOW
-                )
-            } else {
-                updateFirewallStatus(
-                    FirewallManager.FirewallStatus.ISOLATE,
-                    FirewallManager.ConnectionStatus.ALLOW
-                )
+            guardAppInfoInitialized("aadAppSettingsIsolate") {
+                // change the status to allowed if already app is isolated
+                if (appStatus == FirewallManager.FirewallStatus.ISOLATE) {
+                    updateFirewallStatus(
+                        FirewallManager.FirewallStatus.NONE,
+                        FirewallManager.ConnectionStatus.ALLOW
+                    )
+                } else {
+                    updateFirewallStatus(
+                        FirewallManager.FirewallStatus.ISOLATE,
+                        FirewallManager.ConnectionStatus.ALLOW
+                    )
+                }
             }
         }
 
@@ -416,13 +449,19 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         }
 
         b.aadCloseConnsChip.setOnClickListener {
+            if (!::appInfo.isInitialized) {
+                Logger.w(LOG_TAG_UI, "AppInfo not initialized yet in aadCloseConnsChip click listener, using uid: $uid")
+                showCloseConnectionDialog(uid, "Unknown App")
+                return@setOnClickListener
+            }
+
             showCloseConnectionDialog(uid, appInfo.appName)
         }
     }
 
     private fun updateExcludeProxyStatus(isExcluded: Boolean) {
         io {
-            FirewallManager.updateIsProxyExcluded(appInfo.uid, isExcluded)
+            FirewallManager.updateIsProxyExcluded(uid, isExcluded)
         }
     }
 
@@ -564,7 +603,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     }
 
     private fun showAppInfoDialog(appNames: List<String>) {
-        val builderSingle = MaterialAlertDialogBuilder(this)
+        val builderSingle = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builderSingle.setTitle(this.getString(R.string.about_settings_app_info))
 
         val arrayAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_activated_1)
@@ -802,7 +841,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     }
 
     private fun showNoAppFoundDialog() {
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(getString(R.string.ada_noapp_dialog_title))
         builder.setMessage(getString(R.string.ada_noapp_dialog_message))
         builder.setCancelable(false)
@@ -823,7 +862,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         prevConnStat: FirewallManager.ConnectionStatus
     ) {
 
-        val builderSingle = MaterialAlertDialogBuilder(this)
+        val builderSingle = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
 
         builderSingle.setIcon(R.drawable.ic_firewall_block_grey)
         val count = packageList.count()
@@ -860,12 +899,12 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             return
         }
         Logger.v(LOG_TAG_UI, "$TAG show close connection dialog for uid: $uid")
-        val dialog = MaterialAlertDialogBuilder(this)
+        val dialog = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
             .setTitle(this.getString(R.string.close_conns_dialog_title))
             .setMessage(getString(R.string.close_conns_dialog_desc, appName))
             .setPositiveButton(R.string.lbl_proceed) { _, _ ->
                 // close the connection
-                VpnController.closeConnectionsIfNeeded(uid)
+                VpnController.closeConnectionsIfNeeded(uid, "app-info-dialog-manual-close")
                 Logger.i(LOG_TAG_UI, "$TAG closed connection for uid: $uid")
                 showToastUiCentered(this, getString(R.string.config_add_success_toast), Toast.LENGTH_LONG)
             }
@@ -883,6 +922,19 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
             Configuration.UI_MODE_NIGHT_YES
+    }
+
+    private inline fun guardAppInfoInitialized(listenerName: String, block: () -> Unit) {
+        if (!::appInfo.isInitialized) {
+            Logger.w(LOG_TAG_UI, "AppInfo not initialized yet in $listenerName click listener, using uid: $uid")
+            showToastUiCentered(
+                this,
+                this.getString(R.string.ctbs_app_info_not_available_toast),
+                Toast.LENGTH_SHORT
+            )
+            return
+        }
+        block()
     }
 
     private fun io(f: suspend () -> Unit): Job {

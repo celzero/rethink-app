@@ -16,6 +16,7 @@
 package com.celzero.bravedns.adapter
 
 import Logger.LOG_TAG_PROXY
+import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.Intent
 import android.text.format.DateUtils
@@ -44,7 +45,6 @@ import com.celzero.bravedns.service.WireguardManager.ERR_CODE_OTHER_WG_ACTIVE
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_ACTIVE
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_FULL
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_WG_INVALID
-import com.celzero.bravedns.service.WireguardManager.WG_HANDSHAKE_TIMEOUT
 import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
@@ -53,6 +53,7 @@ import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.WgHopManager
 import com.celzero.bravedns.wireguard.WgInterface
+import com.celzero.firestack.backend.Backend
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -65,8 +66,8 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
     private var lifecycleOwner: LifecycleOwner? = null
 
     companion object {
-        private const val ONE_SEC_MS = 1500L
-        private const val TAG = "WgConfigAdapter"
+        private const val DELAY_MS = 1500L
+        private const val TAG = "WgCfgAdapter"
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<WgConfigFiles>() {
 
@@ -115,10 +116,13 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
         private var job: Job? = null
 
         fun update(config: WgConfigFiles) {
-            b.interfaceNameText.text = config.name.take(12)
+            b.interfaceNameText.text = config.name
+            b.interfaceNameText.isSelected = true
             b.interfaceIdText.text = context.getString(R.string.single_argument_parenthesis, config.id.toString())
             b.interfaceSwitch.isChecked = config.isActive && VpnController.hasTunnel()
             setupClickListeners(config)
+            val appsCount = ProxyManager.getAppCountForProxy(ID_WG_BASE + config.id)
+            updateUi(config, appsCount)
             updateStatusJob(config)
             updateHopSrcChip(config.id)
             updateAmneziaChip(config)
@@ -140,11 +144,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 b.protocolInfoChipGroup.visibility = View.GONE
                 b.interfaceActiveLayout.visibility = View.GONE
                 b.interfaceStatus.visibility = View.GONE
-                val id = ID_WG_BASE + config.id
-                val appsCount = ProxyManager.getAppCountForProxy(id)
-                updateUi(config, appsCount)
             } else {
-                b.interfaceConfigStatus.visibility = View.GONE
                 b.interfaceAppsCount.visibility = View.GONE
                 b.interfaceActiveLayout.visibility = View.GONE
                 b.interfaceDetailCard.strokeColor = fetchColor(context, R.attr.background)
@@ -166,7 +166,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             return io {
                 while (true) {
                     updateStatus(config)
-                    delay(ONE_SEC_MS)
+                    delay(DELAY_MS)
                 }
             }
         }
@@ -247,7 +247,6 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
 
         private suspend fun updateStatus(config: WgConfigFiles) {
             val id = ID_WG_BASE + config.id
-            val appsCount = ProxyManager.getAppCountForProxy(id)
             val statusId = VpnController.getProxyStatusById(id)
             val pair = VpnController.getSupportedIpVersion(id)
             val c = WireguardManager.getConfigById(config.id)
@@ -277,7 +276,6 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             }
             uiCtx {
                 updateStatusUi(config, statusId, dnsStatusId, stats)
-                updateUi(config, appsCount)
                 updateProtocolChip(pair)
                 updateSplitTunnelChip(isSplitTunnel)
             }
@@ -304,40 +302,51 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                     c.getH4().isPresent || c.getS1().isPresent || c.getS2().isPresent
         }
 
-        private fun updateUi(config: WgConfigFiles, appsCount: Int) {
+        private fun updateUi(mapping: WgConfigFiles, appsCount: Int) {
             b.interfaceAppsCount.visibility = View.VISIBLE
-            if (config.isCatchAll) {
-                b.interfaceConfigStatus.visibility = View.VISIBLE
-                b.interfaceAppsCount.text = context.getString(R.string.routing_remaining_apps)
-                b.interfaceAppsCount.setTextColor(
-                    fetchColor(context, R.attr.primaryLightColorText)
-                )
-                b.interfaceConfigStatus.text = context.getString(R.string.catch_all_wg_dialog_title)
-                return // no need to update the apps count
-            } else if (config.isLockdown) {
-                if (!config.isActive) {
+            b.chipProperties.text = ""
+            if (mapping.isCatchAll) {
+                b.chipProperties.visibility = View.VISIBLE
+                b.chipProperties.text = context.getString(R.string.symbol_lightening)
+            }
+            if (mapping.isLockdown) {
+                if (!mapping.isActive) {
                     b.interfaceDetailCard.strokeWidth = 2
                     b.interfaceDetailCard.strokeColor = fetchColor(context, R.attr.accentBad)
                 }
-                b.interfaceConfigStatus.visibility = View.VISIBLE
-                b.interfaceConfigStatus.text =
-                    context.getString(R.string.firewall_rule_global_lockdown)
-            } else {
-                b.interfaceConfigStatus.visibility = View.GONE
+                b.chipProperties.visibility = View.VISIBLE
+                b.chipProperties.text = context.getString(R.string.two_argument_space, b.chipProperties.text.toString(), context.getString(R.string.symbol_lockdown))
             }
-            if (!config.isActive) {
+            if (mapping.useOnlyOnMetered) {
+                b.chipProperties.visibility = View.VISIBLE
+                b.chipProperties.text = context.getString(R.string.two_argument_space,b.chipProperties.text.toString(), context.getString(R.string.symbol_mobile))
+            }
+            if (mapping.ssidEnabled) {
+                b.chipProperties.visibility = View.VISIBLE
+                b.chipProperties.text = context.getString(
+                    R.string.two_argument_space,
+                    b.chipProperties.text.toString(),
+                    context.getString(R.string.symbol_id)
+                )
+            }
+
+            val visible = if (b.chipProperties.text.isNotEmpty()) View.VISIBLE else View.GONE
+            b.chipProperties.visibility = visible
+
+            if (!mapping.isActive) {
                 // no need to update the apps count if the config is disabled
                 b.interfaceAppsCount.visibility = View.GONE
                 b.interfaceActiveLayout.visibility = View.GONE
-                return
-            }
-
-            b.interfaceAppsCount.text =
-                context.getString(R.string.firewall_card_status_active, appsCount.toString())
-            if (appsCount == 0) {
-                b.interfaceAppsCount.setTextColor(fetchColor(context, R.attr.accentBad))
-            } else {
+            } else if (mapping.isCatchAll) {
+                b.interfaceAppsCount.text = context.getString(R.string.routing_remaining_apps)
                 b.interfaceAppsCount.setTextColor(fetchColor(context, R.attr.primaryLightColorText))
+            } else {
+                b.interfaceAppsCount.text = context.getString(R.string.firewall_card_status_active, appsCount.toString())
+                if (appsCount == 0) {
+                    b.interfaceAppsCount.setTextColor(fetchColor(context, R.attr.accentBad))
+                } else {
+                    b.interfaceAppsCount.setTextColor(fetchColor(context, R.attr.primaryLightColorText))
+                }
             }
         }
 
@@ -346,7 +355,6 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 b.interfaceSwitch.isChecked = true
                 b.interfaceDetailCard.strokeWidth = 2
                 b.interfaceStatus.visibility = View.VISIBLE
-                b.interfaceConfigStatus.visibility = View.VISIBLE
                 b.interfaceActiveLayout.visibility = View.VISIBLE
                 val time = getUpTime(stats)
                 val rxtx = getRxTx(stats)
@@ -365,7 +373,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
 
                 if (dnsStatusId != null) {
                     // check for dns failure cases and update the UI
-                    if (isDnsError(dnsStatusId)) {
+                    if (isDnsError(dnsStatusId) && statusPair.first != Backend.TPU) {
                         b.interfaceDetailCard.strokeColor =
                             fetchColor(context, R.attr.chipTextNegative)
                         val humanReadableLastOk = getHumanReadableLastOk(stats).toString()
@@ -381,6 +389,10 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                                     .replaceFirstChar(Char::titlecase), humanReadableLastOk
                             )
                         }
+                        Logger.d(
+                            LOG_TAG_UI,
+                            "$TAG DNS failing, status updated to failing with stroke color chipTextNegative, lastok:${stats?.lastOK}, since:${stats?.since}, humanReadableLastOk:$humanReadableLastOk"
+                        )
                     } else {
                         // if dns status is not failing, then update the proxy status
                         updateProxyStatusUi(statusPair, stats)
@@ -394,7 +406,6 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 b.interfaceDetailCard.strokeColor = fetchColor(context, R.attr.background)
                 b.interfaceDetailCard.strokeWidth = 0
                 b.interfaceSwitch.isChecked = false
-                b.interfaceConfigStatus.visibility = View.GONE
                 b.interfaceAppsCount.visibility = View.GONE
                 b.interfaceStatus.visibility = View.VISIBLE
                 b.interfaceStatus.text =
@@ -403,10 +414,16 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
         }
 
         private fun getStrokeColorForStatus(status: UIUtils.ProxyStatus?, stats: RouterStats?): Int {
+            val now = System.currentTimeMillis()
+            val lastOk = stats?.lastOK ?: 0L
+            val since = stats?.since ?: 0L
+            val isFailing = now - since > WG_UPTIME_THRESHOLD && lastOk == 0L
             return when (status) {
-                UIUtils.ProxyStatus.TOK -> if (stats?.lastOK == 0L) return R.attr.chipTextNeutral else R.attr.accentGood
-                UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ, UIUtils.ProxyStatus.TPU -> R.attr.chipTextNeutral
-                else -> R.attr.chipTextNegative // TNT, TKO, TEND
+                UIUtils.ProxyStatus.TOK -> if (isFailing) R.attr.chipTextNegative else R.attr.accentGood
+                // treat TNT as neutral, for v055u (until fixed in go), as there is a scenario
+                // where idle is behaving as waiting
+                UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ, UIUtils.ProxyStatus.TNT -> R.attr.chipTextNeutral
+                else -> R.attr.chipTextNegative // TKO, TEND
             }
         }
 
@@ -448,14 +465,6 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             }
         }
 
-        private fun getIdleStatusText(status: UIUtils.ProxyStatus?, stats: RouterStats?): String {
-            if (status != UIUtils.ProxyStatus.TZZ && status != UIUtils.ProxyStatus.TNT) return ""
-            if (stats == null || stats.lastOK == 0L) return ""
-            if (System.currentTimeMillis() - stats.since >= WG_HANDSHAKE_TIMEOUT) return ""
-
-            return context.getString(R.string.dns_connected).replaceFirstChar(Char::titlecase)
-        }
-
         private fun updateProxyStatusUi(statusPair: Pair<Long?, String>, stats: RouterStats?) {
             val status = UIUtils.ProxyStatus.entries.find { it.id == statusPair.first } // Convert to enum
 
@@ -463,15 +472,10 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
 
             val strokeColor = getStrokeColorForStatus(status, stats)
             b.interfaceDetailCard.strokeColor = fetchColor(context, strokeColor)
-            val statusText = getIdleStatusText(status, stats).ifEmpty {
-                getStatusText(
-                    status,
-                    humanReadableLastOk,
-                    stats,
-                    statusPair.second
-                )
-            }
+            val statusText = getStatusText(status, humanReadableLastOk, stats, statusPair.second)
+
             b.interfaceStatus.text = statusText
+            Logger.d(LOG_TAG_UI, "$TAG status updated to $statusText (${status?.id} - ${status?.name}) with stroke color $strokeColor, lastok:${stats?.lastOK}, since:${stats?.since}, humanReadableLastOk:$humanReadableLastOk")
         }
 
         private fun isDnsError(statusId: Long?): Boolean {
