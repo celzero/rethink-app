@@ -323,96 +323,108 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         TooltipCompat.setTooltipText(b.aadCloseConnsChip, getString(R.string.close_conns_dialog_title))
 
         b.aadAppSettingsBypassDnsFirewall.setOnClickListener {
-            // show the tooltip only once when app is not bypassed (dns + firewall) earlier
-            if (showBypassToolTip && appStatus == FirewallManager.FirewallStatus.NONE) {
-                b.aadAppSettingsBypassDnsFirewall.performLongClick()
-                showBypassToolTip = false
-                return@setOnClickListener
-            }
-
-            if (appStatus == FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL) {
-                updateFirewallStatus(
-                    FirewallManager.FirewallStatus.NONE,
-                    FirewallManager.ConnectionStatus.ALLOW
-                )
-            } else {
-                updateFirewallStatus(
-                    FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL,
-                    FirewallManager.ConnectionStatus.ALLOW
-                )
-            }
-        }
-
-        b.aadAppSettingsBlockWifi.setOnClickListener {
-            toggleWifi(appInfo)
-            updateFirewallStatusUi(appStatus, connStatus)
-        }
-
-        b.aadAppSettingsBlockMd.setOnClickListener {
-            toggleMobileData(appInfo)
-            updateFirewallStatusUi(appStatus, connStatus)
-        }
-
-        b.aadAppSettingsBypassUniv.setOnClickListener {
-            // change the status to allowed if already app is bypassed
-            if (appStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL) {
-                updateFirewallStatus(
-                    FirewallManager.FirewallStatus.NONE,
-                    FirewallManager.ConnectionStatus.ALLOW
-                )
-            } else {
-                updateFirewallStatus(
-                    FirewallManager.FirewallStatus.BYPASS_UNIVERSAL,
-                    FirewallManager.ConnectionStatus.ALLOW
-                )
-            }
-        }
-
-        b.aadAppSettingsExclude.setOnClickListener {
-            if (VpnController.isVpnLockdown()) {
-                showToastUiCentered(this, getString(R.string.hsf_exclude_error), Toast.LENGTH_SHORT)
-                return@setOnClickListener
-            }
-
-            io {
-                if (FirewallManager.isUnknownPackage(uid) && appStatus == FirewallManager.FirewallStatus.EXCLUDE) {
-                    uiCtx {
-                        showToastUiCentered(
-                            this,
-                            getString(R.string.exclude_no_package_err_toast),
-                            Toast.LENGTH_LONG
-                        )
-                    }
-                    return@io
+            guardAppInfoInitialized("aadAppSettingsBypassDnsFirewall") {
+                // show the tooltip only once when app is not bypassed (dns + firewall) earlier
+                if (showBypassToolTip && appStatus == FirewallManager.FirewallStatus.NONE) {
+                    b.aadAppSettingsBypassDnsFirewall.performLongClick()
+                    showBypassToolTip = false
+                    return@setOnClickListener
                 }
 
-                // change the status to allowed if already app is excluded
-                if (appStatus == FirewallManager.FirewallStatus.EXCLUDE) {
+                if (appStatus == FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL) {
                     updateFirewallStatus(
                         FirewallManager.FirewallStatus.NONE,
                         FirewallManager.ConnectionStatus.ALLOW
                     )
                 } else {
                     updateFirewallStatus(
-                        FirewallManager.FirewallStatus.EXCLUDE,
+                        FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL,
                         FirewallManager.ConnectionStatus.ALLOW
                     )
                 }
             }
         }
 
+        b.aadAppSettingsBlockWifi.setOnClickListener {
+            guardAppInfoInitialized("aadAppSettingsBlockWifi") {
+                toggleWifi(appInfo)
+                updateFirewallStatusUi(appStatus, connStatus)
+            }
+        }
+
+        b.aadAppSettingsBlockMd.setOnClickListener {
+            guardAppInfoInitialized("aadAppSettingsBlockMd") {
+                toggleMobileData(appInfo)
+                updateFirewallStatusUi(appStatus, connStatus)
+            }
+        }
+
+        b.aadAppSettingsBypassUniv.setOnClickListener {
+            guardAppInfoInitialized("aadAppSettingsBypassUniv") {
+                // change the status to allowed if already app is bypassed
+                if (appStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL) {
+                    updateFirewallStatus(
+                        FirewallManager.FirewallStatus.NONE,
+                        FirewallManager.ConnectionStatus.ALLOW
+                    )
+                } else {
+                    updateFirewallStatus(
+                        FirewallManager.FirewallStatus.BYPASS_UNIVERSAL,
+                        FirewallManager.ConnectionStatus.ALLOW
+                    )
+                }
+            }
+        }
+
+        b.aadAppSettingsExclude.setOnClickListener {
+            guardAppInfoInitialized("aadAppSettingsExclude") {
+                if (VpnController.isVpnLockdown()) {
+                    showToastUiCentered(this, getString(R.string.hsf_exclude_error), Toast.LENGTH_SHORT)
+                    return@setOnClickListener
+                }
+
+                io {
+                    if (FirewallManager.isUnknownPackage(uid) && appStatus == FirewallManager.FirewallStatus.EXCLUDE) {
+                        uiCtx {
+                            showToastUiCentered(
+                                this,
+                                getString(R.string.exclude_no_package_err_toast),
+                                Toast.LENGTH_LONG
+                            )
+                        }
+                        return@io
+                    }
+
+                    // change the status to allowed if already app is excluded
+                    if (appStatus == FirewallManager.FirewallStatus.EXCLUDE) {
+                        updateFirewallStatus(
+                            FirewallManager.FirewallStatus.NONE,
+                            FirewallManager.ConnectionStatus.ALLOW
+                        )
+                    } else {
+                        updateFirewallStatus(
+                            FirewallManager.FirewallStatus.EXCLUDE,
+                            FirewallManager.ConnectionStatus.ALLOW
+                        )
+                    }
+                }
+            }
+        }
+
         b.aadAppSettingsIsolate.setOnClickListener {
-            // change the status to allowed if already app is isolated
-            if (appStatus == FirewallManager.FirewallStatus.ISOLATE) {
-                updateFirewallStatus(
-                    FirewallManager.FirewallStatus.NONE,
-                    FirewallManager.ConnectionStatus.ALLOW
-                )
-            } else {
-                updateFirewallStatus(
-                    FirewallManager.FirewallStatus.ISOLATE,
-                    FirewallManager.ConnectionStatus.ALLOW
-                )
+            guardAppInfoInitialized("aadAppSettingsIsolate") {
+                // change the status to allowed if already app is isolated
+                if (appStatus == FirewallManager.FirewallStatus.ISOLATE) {
+                    updateFirewallStatus(
+                        FirewallManager.FirewallStatus.NONE,
+                        FirewallManager.ConnectionStatus.ALLOW
+                    )
+                } else {
+                    updateFirewallStatus(
+                        FirewallManager.FirewallStatus.ISOLATE,
+                        FirewallManager.ConnectionStatus.ALLOW
+                    )
+                }
             }
         }
 
@@ -910,6 +922,19 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
             Configuration.UI_MODE_NIGHT_YES
+    }
+
+    private inline fun guardAppInfoInitialized(listenerName: String, block: () -> Unit) {
+        if (!::appInfo.isInitialized) {
+            Logger.w(LOG_TAG_UI, "AppInfo not initialized yet in $listenerName click listener, using uid: $uid")
+            showToastUiCentered(
+                this,
+                this.getString(R.string.ctbs_app_info_not_available_toast),
+                Toast.LENGTH_SHORT
+            )
+            return
+        }
+        block()
     }
 
     private fun io(f: suspend () -> Unit): Job {
