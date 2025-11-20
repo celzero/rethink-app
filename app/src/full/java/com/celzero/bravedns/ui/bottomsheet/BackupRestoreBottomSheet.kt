@@ -150,18 +150,37 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun backup() {
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-        // have complete access to the physical location returned as part of result
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.type = INTENT_TYPE_OCTET
-        val sdf = SimpleDateFormat(BACKUP_FILE_NAME_DATETIME, Locale.ROOT)
-        // filename format (Rethink_version_DATA_FORMAT.bk)
-        val version = getVersionName().replace(' ', '_')
-        val zipFileName: String = BACKUP_FILE_NAME + version + sdf.format(Date()) + BACKUP_FILE_EXTN
+        try {
+            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+            // have complete access to the physical location returned as part of result
+            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            intent.type = INTENT_TYPE_OCTET
+            val sdf = SimpleDateFormat(BACKUP_FILE_NAME_DATETIME, Locale.ROOT)
+            // filename format (Rethink_version_DATA_FORMAT.bk)
+            val version = getVersionName().replace(' ', '_')
+            val zipFileName: String = BACKUP_FILE_NAME + version + sdf.format(Date()) + BACKUP_FILE_EXTN
 
-        intent.putExtra(Intent.EXTRA_TITLE, zipFileName)
+            intent.putExtra(Intent.EXTRA_TITLE, zipFileName)
 
-        backupActivityResult.launch(intent)
+            // Check if there's an activity that can handle this intent
+            if (intent.resolveActivity(requireContext().packageManager) != null) {
+                backupActivityResult.launch(intent)
+            } else {
+                Logger.e(LOG_TAG_BACKUP_RESTORE, "No activity found to handle CREATE_DOCUMENT intent")
+                Utilities.showToastUiCentered(
+                    requireContext(),
+                    getString(R.string.brbs_backup_dialog_failure_message),
+                    Toast.LENGTH_LONG
+                )
+            }
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_BACKUP_RESTORE, "err opening file picker for backup: ${e.message}")
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.brbs_backup_dialog_failure_message),
+                Toast.LENGTH_LONG
+            )
+        }
     }
 
     private fun observeBackupWorker() {

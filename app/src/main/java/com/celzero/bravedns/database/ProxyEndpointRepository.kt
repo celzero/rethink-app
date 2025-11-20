@@ -44,15 +44,15 @@ class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
         return proxyEndpointDAO.getCustomSocks5Endpoint()
     }
 
-    suspend fun getHttpProxyDetails(): ProxyEndpoint {
+    suspend fun getHttpProxyDetails(): ProxyEndpoint? {
         return proxyEndpointDAO.getHttpProxyDetails()
     }
 
-    suspend fun getOrbotSocks5Endpoint(): ProxyEndpoint {
+    suspend fun getOrbotSocks5Endpoint(): ProxyEndpoint? {
         return proxyEndpointDAO.getOrbotSocks5Endpoint()
     }
 
-    suspend fun getOrbotHttpEndpoint(): ProxyEndpoint {
+    suspend fun getOrbotHttpEndpoint(): ProxyEndpoint? {
         return proxyEndpointDAO.getOrbotHttpEndpoint()
     }
 
@@ -64,7 +64,7 @@ class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
         return proxyEndpointDAO.getConnectedProxyLiveData()
     }
 
-    suspend fun getConnectedOrbotProxy(): ProxyEndpoint {
+    suspend fun getConnectedOrbotProxy(): ProxyEndpoint? {
         return proxyEndpointDAO.getConnectedOrbotProxy()
     }
 }

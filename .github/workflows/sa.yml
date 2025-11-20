@@ -54,7 +54,8 @@ jobs:
           # Only the major.minor part is required here, not the full version (e.g., "2.1.20").
           # github.com/celzero/rethink-app/blob/main/build.gradle#L4
           KOTLIN_VER: "2.1"
-      - name: 📤 Upload
+
+      - name: 📡 Upload to code-scanning
         if: always()
         # TODO: docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/configuring-advanced-setup-for-code-scanning
         # docs.github.com/en/code-security/code-scanning/integrating-with-code-scanning/sarif-support-for-code-scanning
@@ -67,3 +68,12 @@ jobs:
           # Optional category for the results
           # Used to differentiate multiple results for one commit
           # category: rethink-app
+
+      - name: 🗃️ Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: "rethink-app-detekt-${{ github.run_id }}.sarif"
+          path: "rethink-app-detekt-${{ github.run_id }}.sarif"
+          retention-days: 52
+          if-no-files-found: error # error, warn (default), ignore
+          compression-level: 9 # 0-9; 9 is max
