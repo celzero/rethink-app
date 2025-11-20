@@ -4960,11 +4960,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
         if (appConfig.isCustomHttpProxyEnabled()) {
             val endpoint = appConfig.getHttpProxyDetails()
-            val packageName = FirewallManager.getPackageNameByUid(uid)
-            // do not block the app if the app is set to forward the traffic via http proxy
-            if (endpoint.proxyAppName == packageName) {
-                logd("flow: http proxy enabled for $packageName, handling as spl app")
-                return true
+            if (endpoint == null) {
+                logd("flow: http proxy enabled but endpoint is null")
+            } else {
+                val packageName = FirewallManager.getPackageNameByUid(uid)
+                // do not block the app if the app is set to forward the traffic via http proxy
+                if (endpoint.proxyAppName == packageName) {
+                    logd("flow: http proxy enabled for $packageName, handling as spl app")
+                    return true
+                }
             }
         }
 
@@ -5112,20 +5116,24 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
         if (appConfig.isCustomHttpProxyEnabled()) {
             val endpoint = appConfig.getHttpProxyDetails()
-            val packageName = FirewallManager.getPackageNameByUid(uid)
-            // do not block the app if the app is set to forward the traffic via http proxy
-            if (endpoint.proxyAppName == packageName) {
-                logd("flow/inflow: http exit for $packageName, $connId, $uid")
-                return persistAndConstructFlowResponse(connTracker, Backend.Exit, connId, uid)
-            }
+            if (endpoint == null) {
+                logd("flow/inflow: http proxy enabled but endpoint is null")
+            } else {
+                val packageName = FirewallManager.getPackageNameByUid(uid)
+                // do not block the app if the app is set to forward the traffic via http proxy
+                if (endpoint.proxyAppName == packageName) {
+                    logd("flow/inflow: http exit for $packageName, $connId, $uid")
+                    return persistAndConstructFlowResponse(connTracker, Backend.Exit, connId, uid)
+                }
 
-            logd("flow/inflow: http proxy for $connId, $uid")
-            return persistAndConstructFlowResponse(
-                connTracker,
-                ProxyManager.ID_HTTP_BASE,
-                connId,
-                uid
-            )
+                logd("flow/inflow: http proxy for $connId, $uid")
+                return persistAndConstructFlowResponse(
+                    connTracker,
+                    ProxyManager.ID_HTTP_BASE,
+                    connId,
+                    uid
+                )
+            }
         }
 
         if (appConfig.isDnsProxyActive()) {

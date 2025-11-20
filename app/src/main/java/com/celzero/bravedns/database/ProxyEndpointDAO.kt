@@ -49,24 +49,24 @@ interface ProxyEndpointDAO {
     fun getConnectedProxyLiveData(): LiveData<ProxyEndpoint?>
 
     @Query("select * from ProxyEndpoint where proxyMode = 0") // 0 for Custom SOCKS5
-    fun getCustomSocks5Endpoint(): ProxyEndpoint?
+    suspend fun getCustomSocks5Endpoint(): ProxyEndpoint?
 
     @Query("select * from ProxyEndpoint where isSelected = 1 and proxyMode = 0")
-    fun getConnectedSocks5Proxy(): ProxyEndpoint?
+    suspend fun getConnectedSocks5Proxy(): ProxyEndpoint?
 
     @Query("select * from ProxyEndpoint where proxyMode = 1") // 1 for Custom HTTP
-    fun getHttpProxyDetails(): ProxyEndpoint
+    suspend fun getHttpProxyDetails(): ProxyEndpoint?
 
     @Query("select * from ProxyEndpoint where proxyMode = 1 and isSelected = 1")
-    fun getConnectedHttpProxy(): ProxyEndpoint?
+    suspend fun getConnectedHttpProxy(): ProxyEndpoint?
 
 
     @Query("select * from ProxyEndpoint where isSelected = 1 and (proxyMode = 2 or proxyMode = 3)")
-    fun getConnectedOrbotProxy(): ProxyEndpoint
+    suspend fun getConnectedOrbotProxy(): ProxyEndpoint?
 
     @Query("select * from ProxyEndpoint where proxyMode = 2") // 2 for Orbot SOCKS5
-    fun getOrbotSocks5Endpoint(): ProxyEndpoint
+    suspend fun getOrbotSocks5Endpoint(): ProxyEndpoint?
 
     @Query("select * from ProxyEndpoint where proxyMode = 3") // 3 for Orbot HTTP
-    fun getOrbotHttpEndpoint(): ProxyEndpoint
+    suspend fun getOrbotHttpEndpoint(): ProxyEndpoint?
 }

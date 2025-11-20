@@ -252,6 +252,12 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             }
             io {
                 val endpoint = appConfig.getHttpProxyDetails()
+                if (endpoint == null) {
+                    uiCtx {
+                        showToastUiCentered(this, getString(R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
+                    }
+                    return@io
+                }
                 val packageName = endpoint.proxyAppName
                 val app = FirewallManager.getAppInfoByPackage(packageName)
                 val m = ProxyManager.ProxyMode.get(endpoint.proxyMode)
@@ -388,6 +394,12 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
 
         io {
             val endpoint = appConfig.getHttpProxyDetails()
+            if (endpoint == null) {
+                uiCtx {
+                    showToastUiCentered(this, getString(R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
+                }
+                return@io
+            }
             val m = ProxyManager.ProxyMode.get(endpoint.proxyMode) ?: return@io
 
             // only update below ui if its custom http proxy

@@ -40,7 +40,6 @@ import com.celzero.bravedns.database.ProxyEndpoint.Companion.DEFAULT_PROXY_TYPE
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.Constants.Companion.HTTP_PROXY_PORT
 import com.celzero.bravedns.util.Constants.Companion.SOCKS_DEFAULT_PORT
@@ -370,7 +369,12 @@ class OrbotHelper(
 
     private suspend fun handleOrbotSocks5Update(): Boolean {
         val pMode = ProxyManager.ProxyMode.ORBOT_SOCKS5
-        val id = appConfig.getOrbotSocks5Endpoint().id
+        val endpoint = appConfig.getOrbotSocks5Endpoint()
+        if (endpoint == null) {
+            Logger.w(LOG_TAG_VPN, "Orbot SOCKS5 endpoint not found in database")
+            return false
+        }
+        val id = endpoint.id
         val proxyEndpoint = constructProxy(id, pMode, socks5Ip, socks5Port)
         return if (proxyEndpoint != null) {
             appConfig.updateOrbotProxy(proxyEndpoint)
@@ -395,7 +399,12 @@ class OrbotHelper(
             return false
         }
 
-        val id = appConfig.getOrbotHttpEndpoint().id
+        val endpoint = appConfig.getOrbotHttpEndpoint()
+        if (endpoint == null) {
+            Logger.w(LOG_TAG_VPN, "Orbot HTTP endpoint not found in database")
+            return false
+        }
+        val id = endpoint.id
         val proxyEndpoint = constructProxy(id, pMode, httpAddress, 0)
         return if (proxyEndpoint != null) {
             appConfig.updateOrbotHttpProxy(proxyEndpoint)
