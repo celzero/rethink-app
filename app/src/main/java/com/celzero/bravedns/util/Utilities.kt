@@ -140,7 +140,7 @@ object Utilities {
                 return true
             }
         }
-        Logger.e(
+        Logger.w(
             LOG_TAG_VPN,
             "Accessibility failure, ${context.packageName},  ${service.name}, return size: ${enabledServices.count()}"
         )
@@ -172,7 +172,7 @@ object Utilities {
                 }
             }
         } catch (e: Settings.SettingNotFoundException) {
-            Logger.e(
+            Logger.w(
                 LOG_TAG_VPN,
                 "isAccessibilityServiceEnabled err on isAccessibilityServiceEnabledViaSettingsSecure() ${e.message}",
                 e
@@ -452,7 +452,7 @@ object Utilities {
             val alwaysOn = Settings.Secure.getString(context.contentResolver, "always_on_vpn_app")
             context.packageName == alwaysOn
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "err while retrieving Settings.Secure value ${e.message}", e)
+            Logger.w(LOG_TAG_VPN, "err while retrieving Settings.Secure value ${e.message}", e)
             false
         }
     }
@@ -463,7 +463,7 @@ object Utilities {
             val alwaysOn = Settings.Secure.getString(context.contentResolver, "always_on_vpn_app")
             !TextUtils.isEmpty(alwaysOn) && context.packageName != alwaysOn
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "err while retrieving Settings.Secure value ${e.message}", e)
+            Logger.w(LOG_TAG_VPN, "err while retrieving Settings.Secure value ${e.message}", e)
             false
         }
     }

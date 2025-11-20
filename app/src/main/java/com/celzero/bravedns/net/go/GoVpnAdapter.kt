@@ -991,10 +991,20 @@ class GoVpnAdapter : KoinComponent {
             val endpoint: ProxyEndpoint
             val id =
                 if (tunProxyMode.isTunProxyOrbot()) {
-                    endpoint = appConfig.getOrbotHttpEndpoint()
+                    val orbotEndpoint = appConfig.getOrbotHttpEndpoint()
+                    if (orbotEndpoint == null) {
+                        Logger.e(LOG_TAG_VPN, "$TAG could not fetch Orbot HTTP endpoint for proxyMode: $tunProxyMode")
+                        return
+                    }
+                    endpoint = orbotEndpoint
                     ProxyManager.ID_ORBOT_BASE
                 } else {
-                    endpoint = appConfig.getHttpProxyDetails()
+                    val httpEndpoint = appConfig.getHttpProxyDetails()
+                    if (httpEndpoint == null) {
+                        Logger.e(LOG_TAG_VPN, "$TAG could not fetch http proxy details for proxyMode: $tunProxyMode")
+                        return
+                    }
+                    endpoint = httpEndpoint
                     ProxyManager.ID_HTTP_BASE
                 }
             val httpProxyUrl = endpoint.proxyIP ?: return

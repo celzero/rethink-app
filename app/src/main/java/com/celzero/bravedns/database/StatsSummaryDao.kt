@@ -447,7 +447,10 @@ interface StatsSummaryDao {
               SUM(count) AS count, 
               '' as flag, 
               1 AS blocked, 
-              appOrDnsName 
+              appOrDnsName,
+              0 as downloadBytes,
+              0 as uploadBytes,
+              0 as totalBytes
             FROM 
               (
                 -- From DnsLogs
@@ -487,7 +490,10 @@ interface StatsSummaryDao {
               SUM(count) AS count, 
               '' as flag, 
               1 AS blocked, 
-              appOrDnsName 
+              appOrDnsName,
+              0 as downloadBytes,
+              0 as uploadBytes,
+              0 as totalBytes
             FROM 
               (
                 -- From DnsLogs
@@ -524,7 +530,10 @@ interface StatsSummaryDao {
             SUM(count) AS count, 
             flag, 
             1 AS blocked, 
-            appOrDnsName 
+            appOrDnsName,
+            0 as downloadBytes,
+            0 as uploadBytes,
+            0 as totalBytes
           FROM 
             (
               -- From DnsLogs
@@ -564,7 +573,10 @@ interface StatsSummaryDao {
               SUM(count) AS count, 
               flag, 
               1 AS blocked, 
-              appOrDnsName 
+              appOrDnsName,
+              0 as downloadBytes,
+              0 as uploadBytes,
+              0 as totalBytes
             FROM 
               (
                 -- From DnsLogs
@@ -604,7 +616,10 @@ interface StatsSummaryDao {
                 SUM(count) AS count, 
                 flag, 
                 0 AS blocked, 
-                appOrDnsName
+                appOrDnsName,
+                0 as downloadBytes,
+                0 as uploadBytes,
+                0 as totalBytes
             FROM (
                 -- From DnsLogs
                 SELECT RTRIM(queryStr, '.') AS appOrDnsName, 
@@ -644,7 +659,10 @@ interface StatsSummaryDao {
                 SUM(count) AS count, 
                 flag, 
                 0 AS blocked, 
-                appOrDnsName
+                appOrDnsName,
+                0 as downloadBytes,
+                0 as uploadBytes,
+                0 as totalBytes
             FROM (
                 -- From DnsLogs
                 SELECT RTRIM(queryStr, '.') AS appOrDnsName, 
@@ -683,7 +701,10 @@ interface StatsSummaryDao {
               SUM(count) AS count, 
               flag, 
               0 AS blocked, 
-              '' as appOrDnsName 
+              '' as appOrDnsName,
+              0 as downloadBytes,
+              0 as uploadBytes,
+              0 as totalBytes
             FROM 
               (
                 -- From DnsLogs
@@ -721,7 +742,10 @@ interface StatsSummaryDao {
               SUM(count) AS count, 
               flag, 
               0 AS blocked, 
-              '' as appOrDnsName 
+              '' as appOrDnsName,
+              0 as downloadBytes,
+              0 as uploadBytes,
+              0 as totalBytes
             FROM 
               (
                 -- From DnsLogs

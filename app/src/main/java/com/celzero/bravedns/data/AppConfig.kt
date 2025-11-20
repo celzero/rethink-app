@@ -490,11 +490,11 @@ internal constructor(
         return customSocks5Endpoint!!
     }
 
-    suspend fun getHttpProxyDetails(): ProxyEndpoint {
+    suspend fun getHttpProxyDetails(): ProxyEndpoint? {
         if (customHttpEndpoint == null) {
             customHttpEndpoint = proxyEndpointRepository.getHttpProxyDetails()
         }
-        return customHttpEndpoint!!
+        return customHttpEndpoint
     }
 
     suspend fun getConnectedOrbotProxy(): ProxyEndpoint? {
@@ -504,11 +504,11 @@ internal constructor(
         return orbotEndpoint
     }
 
-    suspend fun getOrbotSocks5Endpoint(): ProxyEndpoint {
+    suspend fun getOrbotSocks5Endpoint(): ProxyEndpoint? {
         return proxyEndpointRepository.getOrbotSocks5Endpoint()
     }
 
-    suspend fun getOrbotHttpEndpoint(): ProxyEndpoint {
+    suspend fun getOrbotHttpEndpoint(): ProxyEndpoint? {
         return proxyEndpointRepository.getOrbotHttpEndpoint()
     }
 
