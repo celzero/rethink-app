@@ -1,1 +1,1 @@
-فایروال برنامه‌های ، استفاده از وایرگارد، نظارت بر شبکه، مسدود کردن بدافزار، تغییر دی ان اس.
+Firewall apps, use WireGuard VPN, monitor network, block malware, change DNS.

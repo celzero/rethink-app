@@ -131,7 +131,7 @@
     <string name="status_no_internet" translatable="true">Fără internet</string>
     <string name="notification_action_dns_mode" translatable="true">DNS</string>
     <string name="dns_mode_info_title" translatable="true">DNS</string>
-    <string name="firewall_mode_info_title" translatable="true">firewall</string>
+    <string name="firewall_mode_info_title" translatable="true">Firewall</string>
     <string name="apps_info_title" translatable="true">Aplicații</string>
     <string name="custom_url_error_invalid_url" translatable="true">URL invalid</string>
     <string name="bsct_app_info" translatable="true">Informații aplicație</string>
@@ -304,9 +304,9 @@
     <string name="settings_allow_bypass_desc" translatable="true">Permite aplicațiilor să acceseze toate rețelele disponibile. La nevoie, aceste aplicații pot ocoli tunelul VPN Rethink. Unele aplicații de audio/video conferință precum Zoom și Meet au nevoie de asta pentru a funcționa corespunzător.</string>
     <string name="settings_lock_down_mode_desc" translatable="true">Anumite opțiuni sunt dezactivate când VPN e în modul lockdown. <u>Vezi setările VPN</u>.</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Nu pot fi setate proxy-uri când VPN rulează în modul DNS-only.</string>
-    <string name="settings_socks5_heading" translatable="true">Setare Proxy SOCKS5</string>
+    <string name="settings_socks5_heading" translatable="true">Setări Proxy SOCKS5</string>
     <string name="settings_socks5_desc" translatable="true">Trimite conexiunile la endpoint-ul SOCKS5.</string>
-    <string name="settings_https_heading" translatable="true">Setează Proxy HTTP(S) CONNECT</string>
+    <string name="settings_https_heading" translatable="true">Setări Proxy HTTP(S) CONNECT</string>
     <string name="settings_https_desc" translatable="true">Transmite conexiunile la endpoint-ul HTTP(S) CONNECT.</string>
     <string name="orbot_socks5" translatable="true">Proxy TCP-only</string>
     <string name="orbot_socks5_desc" translatable="true">Transmite toate conexiunile TCP la Orbot.</string>
@@ -1179,8 +1179,8 @@
     <string name="wg_ssid_delete_confirmation" translatable="true">Ștergi %1$s?</string>
     <string name="settings_firebase_error_reporting_heading" translatable="true">Program stabilitate</string>
     <string name="settings_firebase_error_reporting_desc" translatable="true">Capturează înregistrările erorilor pentru îmbunătățirea stabilității.</string>
-    <string name="tombstone_app_title" translatable="true">Nu uita de aplicațiile dezinstalate</string>
-    <string name="tombstone_app_desc" translatable="true">Odată activate, păstrează regulile pe aplicații timp de 7 zile.</string>
+    <string name="tombstone_app_title" translatable="true">Memorează aplicațiile dezinstalate</string>
+    <string name="tombstone_app_desc" translatable="true">Dacă este activat, păstrează regulile pe aplicații timp de 7 zile.</string>
     <string name="settings_locale_dialog_default" translatable="true">Prestabilit de sistem</string>
     <string name="settings_allow_incoming_wg_packets" translatable="true">WireGuard P2P</string>
     <string name="settings_allow_incoming_wg_packets_desc" translatable="true">Odată activate, permite intrarea conexiunile inițiate de perechile Wireguard.</string>
