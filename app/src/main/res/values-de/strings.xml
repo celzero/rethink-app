@@ -8,23 +8,23 @@
     <string name="pause_title_desc">Pause…</string>
     <string name="txt_home">Startseite</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Warnung: Rethink wurde deaktiviert</string>
-    <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Tippen zum ändern der Schutzeinstellung</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Zum Ändern der Schutzeinstellung tippen</string>
     <string name="universal_firewall_explanation">Firewall-Regeln auf alle Apps anwenden basierend auf der Grundlage von Geräteereignissen, z. B. Firewall, wenn das Gerät gesperrt ist oder wenn eine bestimmte App nicht verwendet wird.</string>
     <string name="accessibility_service_description">Rethink verwendet den Dienst für Barrierefreiheit, um Hintergrund-Apps zu erkennen und per Firewall einzudämmen. Rethink erfasst und verkauft keine Daten.</string>
-    <string name="next">Nächste</string>
+    <string name="next">Weiter</string>
     <string name="skip">Überspringen</string>
     <string name="finish">Fertig</string>
     <string name="slide_2_desc">Rethink ist das einfachste Mittel, um Netzwerkaktivitäten zu überwachen, Internetzensur zu umgehen und Apps auf deinem Android-Gerät mit einer Firewall einzudämmen.</string>
     <string name="slide_1_desc">Rethink ist eine Open-Source-Software, die vom Mozilla Builders MVP-Programm und der FOSS United Foundation unterstützt wird.</string>
     <string name="rdns_plus">RDNS Plus</string>
-    <string name="block">blocken</string>
-    <string name="untracked">nicht verfolgt</string>
+    <string name="block">blockieren</string>
+    <string name="untracked">ungetrackt</string>
     <string name="dns_mode_notification_title">Geschützt! Verbunden mit schnellem und sicherem DNS.</string>
     <string name="firewall_mode_notification_title">Geschützt! Verbunden mit der Firewall.</string>
     <string name="hybrid_mode_notification_title">Geschützt! Verbunden mit DNS + Firewall.</string>
-    <string name="pause_mode_notification_title">Pausiert! Blockierte Apps werden weiterhin mit einer Firewall geschützt.</string>
-    <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">warte</string>
-    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">ausfallend</string>
+    <string name="pause_mode_notification_title">Pausiert! Blockierte Apps werden weiterhin mit einer Firewall geblockt.</string>
+    <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">wartend</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">fehlerhaft</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">geschützt</string>
     <string name="status_protected_with_tor">geschützt mit Tor</string>
     <string name="status_app_error">Anwendungsfehler</string>
@@ -67,7 +67,7 @@
     <string name="bsct_block_ip">Blockieren, <u>dieser IP</u> für <u>diese App</u> vertrauen</string>
     <string name="bsct_block"><u>Diese App</u> blockieren, umgehen, ausschließen, isolieren</string>
     <string name="bsct_conn_block_desc">blockiert %1$s durch %2$s</string>
-    <string name="bsct_conn_desc_blocked">blockiert am %1$s %2$s</string>
+    <string name="bsct_conn_desc_blocked">blockiert bei %1$s %2$s</string>
     <string name="always_on_dialog_positive_btn">Einstellungen öffnen</string>
     <string name="always_on_dialog_stop_heading">Always-On VPN</string>
     <string name="always_on_dialog_stop_message">Always-On VPN ist für Rethink aktiviert. Bist du sicher, dass du Rethink trotzdem beenden möchtest?</string>
@@ -138,8 +138,8 @@
     <string name="download_update_dialog_failure_message">Entweder sind unsere Server ausgefallen oder die Verbindung konnte nicht hergestellt werden. Bitte versuche es nach einiger Zeit erneut.</string>
     <string name="download_update_dialog_trylater_title">Kann im Moment nicht aktualisieren</string>
     <string name="download_update_dialog_trylater_message">Das Update kann im Moment nicht ausgeführt werden, bitte versuche es später noch einmal.</string>
-    <string name="search_firewall_network_log"><font size="12">Suche nach Anwendungen, IPs, Domänen</font></string>
-    <string name="search_firewall_all_apps"><font size="12">Anwendungen suchen</font></string>
+    <string name="search_firewall_network_log"><font size="12">Suche nach Apps, IPs, Domänen</font></string>
+    <string name="search_firewall_all_apps"><font size="12">Apps suchen</font></string>
     <string name="search_dns_logs"><font size="12">Suche nach Domänennamen oder IPs</font></string>
     <string name="search_universal_ips"><font size="12">IPs suchen</font></string>
     <string name="search_custom_domains"><font size="12">Domänennamen suchen</font></string>
@@ -192,7 +192,7 @@
     <string name="orbot_none">Keine (Standard)</string>
     <string name="orbot_install_dialog_positive">Installieren</string>
     <string name="settings_orbot_header">Orbot ❯</string>
-    <string name="bsct_conn_desc_allowed">erlaubt am %1$s %2$s</string>
+    <string name="bsct_conn_desc_allowed">erlaubt bei %1$s %2$s</string>
     <string name="app_mode_dns_low_battery">DNS (energiesparend)</string>
     <string name="orbot_bs_status_2">HTTP-Proxy ist festgelegt.</string>
     <string name="orbot_stop_dialog_title">Manueller Eingriff erforderlich</string>
@@ -243,8 +243,8 @@
     <string name="firewall_rule_block_app">App gesperrt</string>
     <string name="firewall_rule_no_rule">Keine Regel</string>
     <string name="firewall_rule_block_unmetered">Ungezählt (Wlan)</string>
-    <string name="firewall_rule_block_metered">Gemessen (Mobil)</string>
-    <string name="firewall_rule_univ_block_metered">Gemessen (Universell)</string>
+    <string name="firewall_rule_block_metered">Getaktet (Mobil)</string>
+    <string name="firewall_rule_univ_block_metered">Getaktet (Universell)</string>
     <string name="firewall_rule_isolate">Isolieren</string>
     <string name="firewall_rule_block_app_new_install">Neue App</string>
     <string name="firewall_rule_block_app_exception">Fehler</string>
@@ -322,9 +322,9 @@
     <string name="settings_check_update_heading">Nach App-Updates suchen</string>
     <string name="settings_custom_downloader_desc">Wenn deaktiviert, wird der in Android integrierte <i>Download Manager</i> verwendet</string>
     <string name="settings_import_export_heading">Sichern und Wiederherstellen</string>
-    <string name="bypass_universal">Universelle Umgehung</string>
+    <string name="bypass_universal">Pauschale Umgehung</string>
     <string name="alert_firewall_accessibility_exception">Öffnen der Einstellungen für Barrierefreiheit fehlgeschlagen. Versuche es später erneut!</string>
-    <string name="firewall_act_universal_tab">universell</string>
+    <string name="firewall_act_universal_tab">Pauschal</string>
     <string name="new_app_bulk_notification_title">Achtung</string>
     <string name="notif_channel_download">Download Warnung</string>
     <string name="notif_channel_desc_vpn_notification">Informieren, wenn Rethink aktiv ist und im Hintergrund läuft</string>
@@ -432,7 +432,7 @@
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Blockieren Sie Malware, Ransomware (Erpressersoftware), Kryptoware, Phisher und andere Bedrohungen.</string>
     <string name="brbs_restore_desc">Aus Sicherungsdatei wiederherstellen</string>
     <string name="brbs_backup_desc">Sichern von Anwendungseinstellungen, Netzwerk- und DNS-Protokollen</string>
-    <string name="alert_firewall_accessibility_regrant_explanation">Der Rethink Dienst für Barrierefreiheit wurde angehalten oder ist abgestürzt. <i><b>Erzwinge das Beenden von Rethink über die Systemeinstellungen</b></i> und starten Rethink erneut, um die Funktion <i>Sperrung aller nicht genutzten Apps</i> zu verwenden.\n\nRethink verwendet den Dienst für Barrierefreiheit, um zu verfolgen, welche Apps in Gebrauch sind (im Vordergrund) und welche nicht (im Hintergrund).</string>
+    <string name="alert_firewall_accessibility_regrant_explanation">Der Rethink Dienst für Barrierefreiheit wurde angehalten oder ist abgestürzt. <i><b>Erzwinge das Beenden von Rethink über die Systemeinstellungen</b></i> und starte Rethink erneut, um die Funktion <i>Blockieren aller nicht genutzten Apps</i> zu verwenden.\n\nRethink verwendet den Dienst für Barrierefreiheit, um zu verfolgen, welche Apps in Gebrauch sind (im Vordergrund) und welche nicht (im Hintergrund).</string>
     <string name="firewall_status_isolate">isoliert</string>
     <string name="firewall_status_excluded">von DNS und Firewall ausgeschlossen</string>
     <string name="firewall_status_whitelisted">umgeht die universellen Firewall-Regeln</string>
@@ -457,8 +457,8 @@
     <string name="ci_trust_txt">Vertrauenswürdig</string>
     <string name="ada_app_status_block_md">ist in gebührenpflichtigen (mobilen) Netzen gesperrt</string>
     <string name="ada_network_log_title">Netzwerkprotokoll für diese Anwendung</string>
-    <string name="ada_app_metered">Gemessen</string>
-    <string name="ada_app_unmetered">Nicht gemessen</string>
+    <string name="ada_app_metered">Getaktet</string>
+    <string name="ada_app_unmetered">Ungetaktet</string>
     <string name="ada_app_bypass_univ">Universelle Umgehung</string>
     <string name="ada_app_exclude">Ausblenden</string>
     <string name="ada_app_isolate">Isolieren</string>
@@ -868,7 +868,7 @@
     <string name="dc_refresh_toast" translatable="true">Aktualisierung abgeschlossen</string>
     <string name="pcap_failure_toast" translatable="true">Fehler beim Erstellen der pcap-Datei, versuche es erneut!</string>
     <string name="brbs_backup_restore_desc" translatable="true">Funktioniert nicht über verschiedene App-Versionen hinweg</string>
-    <string name="bsct_block_domain" translatable="true">Blockiere, vertraue <u>Domain(s)</u> für <u>diese App</u></string>
+    <string name="bsct_block_domain" translatable="true">Blockieren, <u>Domain(s)</u> für <u>diese App</u> vertrauen</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Proxies können nicht aufgesetzt werden, während das VPN im DNS only - Modus läuft.</string>
     <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Sollen universelle DNS- &amp; Firewall-Regeln für <i>aufgelisteten</i> Apps umgangen werden\?</string>
     <string name="firewall_rule_domain_trusted_univ" translatable="true">Vertrauenswürdige Domäne (Univ)</string>
@@ -883,7 +883,7 @@
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[Diese Verbindung wurde zugelassen, da die <i>Quell-App</i> auf <i>DNS- und Firewall-Regeln umgehen</i> gesetzt ist.<br/><br/> Zum Ändern gehen Sie zum Bildschirm <i>App-spezifische Firewall</i>.]]></string>
     <string name="settings_default_dns_desc" translatable="true">In seltenen Fällen kann das bevorzugte DNS nicht ermittelt bzw. erreicht werden. Dann wird das Ausweich-DNS verwendet.</string>
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[Diese Verbindung wurde zugelassen, da die <i>Domain</i> in den universellen Domain-Regeln als vertrauenswürdig eingestuft ist.<br/><br/> Um dieses Verhalten zu ändern, gehen Sie zum Tab <i>DNS konfigurieren</i>.]]></string>
-    <string name="lbl_maybe_blocked" translatable="true">Vielleicht geblockt</string>
+    <string name="lbl_maybe_blocked" translatable="true">Evtl. blockiert</string>
     <string name="lbl_network" translatable="true">Netzwerk</string>
     <string name="bypass_dns_firewall_tooltip">%1$s funktioniert nur mit Rethink\'s DNS</string>
     <string name="settings_allow_lan_heading" translatable="true">Private IPs nicht umlenken (experimentell)</string>
@@ -983,7 +983,7 @@
     <string name="status_protected_with_wg_private_dns" translatable="true">geschützt mit WireGuard &amp; privatem DNS</string>
     <string name="crypt_adguard_family_desc" translatable="true">Adguard DNS mit sicherer Suche und Blockierung von Inhalten für Erwachsene.</string>
     <string name="bad_config_reason_syntax_error" translatable="true">Syntaxfehler</string>
-    <string name="lbl_listen_port" translatable="true">Port belauschen</string>
+    <string name="lbl_listen_port" translatable="true">Eingehender Port</string>
     <string name="wireguard_connection_error">Wireguard-VPN konnte nicht verbunden werden</string>
     <string name="illegal_filename_error" translatable="true">Ungültiger Dateiname „%s“</string>
     <string name="lbl_status" translatable="true">Status</string>
@@ -993,7 +993,7 @@
     <string name="lbl_notification" translatable="true">Benachrichtigung</string>
     <string name="lbl_private" translatable="true">privat</string>
     <string name="lbl_secure" translatable="true">sicher</string>
-    <string name="lbl_split" translatable="true">Teilen</string>
+    <string name="lbl_split" translatable="true">Aufteilen</string>
     <string name="lbl_idle" translatable="true">Leerlauf</string>
     <string name="lbl_anonymous" translatable="true">anonym</string>
     <string name="lbl_unselected" translatable="true">Nicht ausgewählt</string>
@@ -1003,7 +1003,7 @@
     <string name="failed_using_default" translatable="true">Fehler: Verwende Fallback DNS</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">DoT Endpunkt löschen?</string>
     <string name="memory_notification_text">Rethink hat gerade nur wenig Speicher zur Verfügung. Einige Funktionen könnten eingeschränkt sein.</string>
-    <string name="lbl_persistent_keepalive" translatable="true">Anhaltende Aufrechterhaltung der Verbindung</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Dauerhafte Aufrechterhaltung der Verbindung</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Geschützt! Verbunden mit DNS + Firewall + Proxy.</string>
     <string name="lbl_peer" translatable="true">Peer</string>
     <string name="settings_rinr_heading" translatable="true">Loopback (experimentell)</string>
@@ -1074,7 +1074,7 @@
     <string name="lbl_protos" translatable="true">protos</string>
     <string name="lbl_service_providers" translatable="true">Service Provider</string>
     <string name="firewall_title" translatable="true">Schütze dein Android mit einer Firewall</string>
-    <string name="status_no_network" translatable="true">kein netzwerk</string>
+    <string name="status_no_network" translatable="true">kein Netzwerk</string>
     <string name="settings_theme_dialog_themes_6" translatable="true">Dunkel Plus</string>
     <string name="settings_biometric_dialog_heading" translatable="true">Biometrische Authentifizierung</string>
     <string name="settings_biometric_dialog_option_2" translatable="true">Nach 5 Minuten</string>
@@ -1082,7 +1082,7 @@
     <string name="cd_split_dns_heading" translatable="true">Split DNS (experimentell)</string>
     <string name="cd_treat_dns_rules_firewall_heading" translatable="true">DNS-Regeln als Firewall-Regeln behandeln (experimentell)</string>
     <string name="lbl_experimental" translatable="true">(experimentell)</string>
-    <string name="lbl_manual" translatable="true">Anleitung</string>
+    <string name="lbl_manual" translatable="true">Manuell</string>
     <string name="wireguard_title" translatable="true">Internet mit WireGuard absichern</string>
     <string name="wireguard_desc" translatable="true">Verschlüsselt deinen Internetverkehr mit WireGuard. Für unterschiedliche Apps lassen sich verschiedene Routen auswählen.</string>
     <string name="firewall_desc" translatable="true">Kontrolliere die Internetnutzung pro App und schränke Verbindungen basierend auf der Netzwerkaktivität oder je nach App ein.</string>
