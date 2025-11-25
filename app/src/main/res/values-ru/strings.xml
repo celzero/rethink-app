@@ -1206,4 +1206,12 @@
     <string name="copied_clipboard" translatable="true">Скопировано</string>
     <string name="conn_track_clear_rule_logs_title" translatable="true">Удалить журнал для этого правила?</string>
     <string name="conn_track_clear_rule_logs_message" translatable="true">Это приведет к удалению только сетевых журналов для текущего правила фаервола. Эта операция необратима. Продолжить?</string>
+    <string name="lbl_default" translatable="true">По умолчанию</string>
+    <string name="lbl_action" translatable="true">Действие</string>
+    <string name="lbl_connect" translatable="true">Подключить</string>
+    <string name="lbl_criteria" translatable="true">Критерии</string>
+    <string name="settings_theme_dialog_themes_7" translatable="true">Холод</string>
+    <string name="firewall_rule_proxy_error" translatable="true">Ошибка прокси</string>
+    <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[Подключение былл заблокировано потому чтот <i>прокси</i> не выбрано для этого приложения.<br/><br/> Что-бы изменить идите в <i>Прокси</i> из экрана <i>Конфигурация</i> .]]></string>
+    <string name="vpn_policy_fixed" translatable="true">Консервативное</string>
 </resources>
