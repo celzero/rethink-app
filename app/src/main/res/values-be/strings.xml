@@ -3,54 +3,54 @@
     <string name="title_about" translatable="true">Пра нас</string>
     <string name="title_settings" translatable="true">Налады</string>
     <string name="title_statistics" translatable="true">Статыстыка</string>
-    <string name="pause_title_desc" translatable="true">дрэмлю…</string>
-    <string name="about_title_desc" translatable="true">Выяўляеце ды блакуеце пагрозы бяспецы сеткі</string>
+    <string name="pause_title_desc" translatable="true">драмлю…</string>
+    <string name="about_title_desc" translatable="true">Выяўленне і блакіроўка пагроз сеткавай бяспекі</string>
     <string name="txt_home" translatable="true">Галоўная</string>
     <string name="accessibility_service_description" translatable="true">Rethink выкарыстоўвае службу спецыяльных магчымасцей для выяўлення фонавых праграм і брандмаўэра. Rethink не збірае і не прадае ніякай інфармацыі.</string>
     <string name="next" translatable="true">Далей</string>
     <string name="skip" translatable="true">Прапусціць</string>
-    <string name="finish" translatable="true">Скончыць</string>
-    <string name="lbl_cancel" translatable="true">Адмяніць</string>
-    <string name="lbl_apply" translatable="true">Ужыць</string>
+    <string name="finish" translatable="true">Завяршыць</string>
+    <string name="lbl_cancel" translatable="true">Скасаваць</string>
+    <string name="lbl_apply" translatable="true">Прымяніць</string>
     <string name="lbl_dismiss" translatable="true">Адхіліць</string>
     <string name="lbl_all" translatable="true">Усе</string>
     <string name="lbl_allowed" translatable="true">Дазволеныя</string>
-    <string name="lbl_maybe_blocked" translatable="true">Магчыма заблякаваны</string>
-    <string name="lbl_blocked" translatable="true">Заблякаваны</string>
-    <string name="lbl_disabled" translatable="true">Адключаны</string>
+    <string name="lbl_maybe_blocked" translatable="true">Магчыма заблакіраваныя</string>
+    <string name="lbl_blocked" translatable="true">Заблакіраваныя</string>
+    <string name="lbl_disabled" translatable="true">Адключана</string>
     <string name="lbl_domain" translatable="true">Дамен</string>
     <string name="lbl_wildcard" translatable="true">Падстаноўны знак</string>
     <string name="lbl_rules" translatable="true">правілы</string>
-    <string name="lbl_configure" translatable="true">Наладзіць</string>
+    <string name="lbl_configure" translatable="true">Канфігурацыя</string>
     <string name="lbl_logs" translatable="true">журналы</string>
     <string name="lbl_network" translatable="true">сетка</string>
     <string name="lbl_create" translatable="true">Стварыць</string>
     <string name="lbl_qr_code" translatable="true">QR-код</string>
     <string name="lbl_import" translatable="true">Імпартаваць</string>
     <string name="lbl_wireguard" translatable="true">WireGuard</string>
-    <string name="lbl_public_key" translatable="true">Адкрыты ключ</string>
+    <string name="lbl_public_key" translatable="true">Публічны ключ</string>
     <string name="lbl_addresses" translatable="true">Адрасы</string>
     <string name="lbl_dns_servers" translatable="true">DNS-серверы</string>
-    <string name="lbl_applications" translatable="true">Дадаткі</string>
+    <string name="lbl_applications" translatable="true">Праграмы</string>
     <string name="lbl_ip_rules" translatable="true">Правілы IP-адрасоў</string>
     <string name="lbl_domain_rules" translatable="true">Правілы даменаў</string>
     <string name="lbl_delete" translatable="true">Выдаліць</string>
     <string name="lbl_proceed" translatable="true">Працягнуць</string>
-    <string name="lbl_private_key" translatable="true">Закрыты ключ</string>
-    <string name="lbl_generated" translatable="true">(згенеравана)</string>
+    <string name="lbl_private_key" translatable="true">Прыватны ключ</string>
+    <string name="lbl_generated" translatable="true">(згенерыравана)</string>
     <string name="lbl_random" translatable="true">(выпадковы)</string>
     <string name="lbl_listen_port" translatable="true">Порт праслухоўвання</string>
     <string name="lbl_mtu" translatable="true">MTU</string>
     <string name="lbl_auto" translatable="true">(аўтаматычна)</string>
     <string name="lbl_include" translatable="true">Уключыць</string>
-    <string name="lbl_select_all" translatable="true">выбраць усё</string>
-    <string name="lbl_active" translatable="true">Актыўны</string>
-    <string name="lbl_inactive" translatable="true">Неактыўны</string>
+    <string name="lbl_select_all" translatable="true">выбраць усе</string>
+    <string name="lbl_active" translatable="true">Актыўна</string>
+    <string name="lbl_inactive" translatable="true">Неактыўна</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
     <string name="lbl_http" translatable="true">HTTP</string>
     <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
-    <string name="lbl_fast" translatable="true">хуткі</string>
-    <string name="lbl_slow" translatable="true">павольны</string>
+    <string name="lbl_fast" translatable="true">хутка</string>
+    <string name="lbl_slow" translatable="true">павольна</string>
     <string name="lbl_very" translatable="true">вельмі</string>
     <string name="lbl_add" translatable="true">дадаць</string>
     <string name="lbl_sec" translatable="true">c</string>
