@@ -1,1 +1,1 @@
-Rethink: دی‌ان‌اس + دیوار‌آتش + فیلترشکن
+Rethink: DNS + Firewall + VPN
