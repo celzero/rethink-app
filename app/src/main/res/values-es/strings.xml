@@ -27,7 +27,7 @@
     <string name="cd_dns_proxy_error_text_3">Puerto no válido</string>
     <string name="cd_dns_crypt_dialog_desc">Descripción (opcional)</string>
     <string name="cd_dns_crypt_relay_name">Repetidor DNS %1$s</string>
-    <string name="cd_dnscrypt_relay_heading">Repetidores</string>
+    <string name="cd_dnscrypt_relay_heading">Relés</string>
     <string name="univ_ip_delete_toast_success">Se han borrado todas las reglas IP.</string>
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
     <string name="dns_proxy_dialog_message_no_app">Dirección IP: %1$s
@@ -1067,4 +1067,14 @@
     <string name="settings_mobile_metered_desc" translatable="true">Considera solo las redes móviles como medidas, el resto como no medidas.</string>
     <string name="settings_biometric_dialog_option_0" translatable="true">Ninguna</string>
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Usar el DNS del sistema para dominios no delegados</string>
+    <string name="adv_tasker_dialog_instructions" translatable="true">Instrucciones:\nAl enviar el broadcast es requerido:\n• Key: sender\n• Value: Nombre del paquete de la app.\n\nEjemplo: key:sender value:com.termux\n\nAcciones disponibles:\n\n• Iniciar VPN – com.celzero.bravedns.intent.action.VPN_START\n\n• Detener VPN – com.celzero.bravedns.intent.action.VPN_STOP</string>
+    <string name="adv_tasker_dialog_msg" translatable="true">Introduce los nombres de paquete (separado por comas) se les permite iniciar o detener Rethink.</string>
+    <string name="no_stats_available" translatable="true">Sin estadísticas</string>
+    <string name="adv_set_dial_timeout_title" translatable="true">Tiempo de espera inactivo</string>
+    <string name="lbl_protos" translatable="true">protos</string>
+    <string name="lbl_default" translatable="true">Por defecto</string>
+    <string name="lbl_action" translatable="true">Acción</string>
+    <string name="lbl_connect" translatable="true">Conectar</string>
+    <string name="lbl_criteria" translatable="true">Parámetro</string>
+    <string name="lbl_fallback" translatable="true">Alternativa</string>
 </resources>
