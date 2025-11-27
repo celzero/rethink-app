@@ -97,9 +97,33 @@ class WgIncludeAppsAdapter(
         RecyclerView.ViewHolder(b.root) {
 
         fun update(mapping: ProxyApplicationMapping) {
+            // capture item identity before async operations to prevent incorrect UI updates
+            // when ViewHolder is recycled for a different item during fast scrolling
+            val itemUid = mapping.uid
+            val itemPackageName = mapping.packageName
+            val itemAppName = mapping.appName
+            val itemProxyId = mapping.proxyId
+            val itemProxyName = mapping.proxyName
+
             io {
-                val isProxyExcluded = FirewallManager.isAppExcludedFromProxy(mapping.uid)
+                val isProxyExcluded = FirewallManager.isAppExcludedFromProxy(itemUid)
+                val hasInternetPerm = mapping.hasInternetPermission(packageManager)
+                val iconDrawable = getIcon(context, itemPackageName, itemAppName)
+
                 uiCtx {
+                    // is still valid and bound to the same item
+                    if (bindingAdapterPosition == RecyclerView.NO_POSITION) {
+                        Logger.w(LOG_TAG_PROXY, "ViewHolder recycled, skipping UI update for uid: $itemUid")
+                        return@uiCtx
+                    }
+
+                    // double-check
+                    val currentItem = getItem(bindingAdapterPosition)
+                    if (currentItem?.uid != itemUid) {
+                        Logger.w(LOG_TAG_PROXY, "ViewHolder rebound to different item, skipping update for uid: $itemUid")
+                        return@uiCtx
+                    }
+
                     if (isProxyExcluded) {
                         b.wgIncludeAppListContainer.isEnabled = false
                         b.wgIncludeAppListCheckbox.isChecked = false
@@ -119,19 +143,19 @@ class WgIncludeAppsAdapter(
                         b.wgIncludeAppListCheckbox.isFocusable = true
                     }
 
-                    b.wgIncludeAppListApkLabelTv.text = mapping.appName
+                    b.wgIncludeAppListApkLabelTv.text = itemAppName
 
-                    if (mapping.proxyId == "") {
+                    if (itemProxyId == "") {
                         b.wgIncludeAppAppDescTv.text = ""
                         b.wgIncludeAppAppDescTv.visibility = View.GONE
                         b.wgIncludeAppListCheckbox.isChecked = false
                         setCardBackground(false)
-                    } else if (mapping.proxyId != proxyId) {
+                    } else if (itemProxyId != proxyId) {
                         if (!isProxyExcluded) {
                             b.wgIncludeAppAppDescTv.text =
                                 context.getString(
                                     R.string.wireguard_apps_proxy_map_desc,
-                                    mapping.proxyName
+                                    itemProxyName
                                 )
                         } else {
                             b.wgIncludeAppAppDescTv.text =
@@ -142,14 +166,14 @@ class WgIncludeAppsAdapter(
                         setCardBackground(false)
                     } else {
                         b.wgIncludeAppListCheckbox.isChecked =
-                            mapping.proxyId == proxyId && !isProxyExcluded
-                        setCardBackground(mapping.proxyId == proxyId && !isProxyExcluded)
+                            itemProxyId == proxyId && !isProxyExcluded
+                        setCardBackground(itemProxyId == proxyId && !isProxyExcluded)
                     }
 
-                    val isIncluded = mapping.proxyId == proxyId && mapping.proxyId != ""
-                    displayIcon(getIcon(context, mapping.packageName, mapping.appName))
+                    val isIncluded = itemProxyId == proxyId && itemProxyId != ""
+                    displayIcon(iconDrawable)
                     // set the alpha based on internet permission
-                    if (mapping.hasInternetPermission(packageManager)) {
+                    if (hasInternetPerm) {
                         b.wgIncludeAppListApkLabelTv.alpha = 1f
                         b.wgIncludeAppListApkIconIv.alpha = 1f
                     } else {
