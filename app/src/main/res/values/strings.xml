@@ -1370,7 +1370,7 @@
     <string name="ada_app_status_block_md" translatable="true">is blocked on metered (mobile) networks</string>
     <string name="ada_app_status_whitelist" translatable="true">will bypass universal firewall rules</string>
     <string name="ada_app_status_exclude" translatable="true">is excluded from dns and firewall</string>
-    <string name="ada_app_status_isolate" translatable="true">is isolated; only trusted IPs allowed</string>
+    <string name="ada_app_status_isolate" translatable="true">is isolated; only trusted IPs and domains allowed</string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">will bypass universal dns &amp; firewall rules</string>
     <string name="ada_app_status_unknown" translatable="true">is unknown</string>
 
@@ -1890,8 +1890,8 @@
     <!--[Pause / Connect] this WireGuard VPN when active Wi-Fi Identifier (SSID) [exactly / partially]. -->
     <string name="wg_ssid_dialog_description" translatable="true">%1$s this WireGuard VPN when <i>active</i> Wi-Fi Identifier (%2$s) %3$s.</string>
     <string name="wg_ssid_input_hint" translatable="true">Enter Wi-Fi identifier (%1$s)</string>
-    <string name="wg_ssid_type_exact" translatable="true">Exactly</string>
-    <string name="wg_ssid_type_wildcard" translatable="true">Partially</string>
+    <string name="wg_ssid_type_exact" translatable="true">Matches exactly</string>
+    <string name="wg_ssid_type_wildcard" translatable="true">Matches partially</string>
     <string name="wg_ssid_invalid_error" translatable="true">Wi-Fi identifiers (%1$s) must be 32 characters or less.</string>
     <string name="wg_ssid_delete_confirmation" translatable="true">Delete "%1$s"?</string>
 

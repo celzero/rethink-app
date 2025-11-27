@@ -164,7 +164,6 @@ class GoVpnAdapter : KoinComponent {
         undelegatedDomains()
         setExperimentalSettings()
         setAutoDialsParallel()
-        setHappyEyeballs()
         // added for testing, use if needed
         if (DEBUG) panicAtRandom(persistentState.panicRandom) else panicAtRandom(false)
         Logger.v(LOG_TAG_VPN, "$TAG initResolverProxiesPcap done")
@@ -2116,25 +2115,12 @@ class GoVpnAdapter : KoinComponent {
             return
         }
         try {
-            Intra.experimental(value)
+            Intra.experimentalWireGuard(value)
             // refresh proxies on experimental settings change (required for wireguard)
             //refreshOrReAddProxies()
             Logger.i(LOG_TAG_VPN, "$TAG set experimental settings: $value")
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG err set experimental settings: ${e.message}", e)
-        }
-    }
-
-    suspend fun setHappyEyeballs(value: Boolean = InternetProtocol.isAlwaysV46(persistentState.internetProtocolType)) {
-        if (!tunnel.isConnected) {
-            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip happy eyeballs setting")
-            return
-        }
-        try {
-            Intra.happyEyeballs(value)
-            Logger.i(LOG_TAG_VPN, "$TAG set happy eyeballs as $value")
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "$TAG err; happy eyeballs: ${e.message}", e)
         }
     }
 

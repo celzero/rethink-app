@@ -21,7 +21,6 @@ import Logger.LOG_TAG_UI
 import Logger.LOG_TAG_VPN
 import Logger.updateConfigLevel
 import android.Manifest
-import android.R.attr.theme
 import android.app.LocaleManager
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -89,12 +88,10 @@ import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.google.android.gms.common.wrappers.Wrappers.packageManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
-import org.koin.java.KoinJavaComponent.inject
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.File

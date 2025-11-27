@@ -185,7 +185,8 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             }
 
             if (config.isActive && !VpnController.hasTunnel()) {
-                disableInterface()
+                // Fix: disableInterface() modifies UI, must run on main thread
+                uiCtx { disableInterface() }
                 return
             }
 

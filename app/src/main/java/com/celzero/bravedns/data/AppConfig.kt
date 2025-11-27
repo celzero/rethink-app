@@ -483,11 +483,11 @@ internal constructor(
         return oDoHEndpointRepository.getConnectedODoH()
     }
 
-    suspend fun getSocks5ProxyDetails(): ProxyEndpoint {
+    suspend fun getSocks5ProxyDetails(): ProxyEndpoint? {
         if (customSocks5Endpoint == null) {
             customSocks5Endpoint = proxyEndpointRepository.getCustomSocks5Endpoint()
         }
-        return customSocks5Endpoint!!
+        return customSocks5Endpoint
     }
 
     suspend fun getHttpProxyDetails(): ProxyEndpoint? {
