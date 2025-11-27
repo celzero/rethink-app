@@ -43,7 +43,6 @@ import com.celzero.bravedns.service.FirewallManager.deletePackage
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.NotificationHandlerActivity
@@ -59,13 +58,13 @@ import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isNonApp
 import com.celzero.bravedns.wireguard.WgHopManager
-import java.util.concurrent.TimeUnit
-import kotlin.random.Random
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 
 class RefreshDatabase
 internal constructor(
