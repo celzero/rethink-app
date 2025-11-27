@@ -55,6 +55,10 @@ import com.celzero.bravedns.viewmodel.AppInfoViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -83,7 +87,7 @@ class AppListActivity :
         private const val ANIMATION_END_DEGREE = 360.0f
 
         private const val REFRESH_TIMEOUT: Long = 4000
-        private const val QUERY_TEXT_TIMEOUT: Long = 1000
+        private const val QUERY_TEXT_DELAY: Long = 1000
     }
 
     // enum class for bulk ui update
@@ -258,19 +262,29 @@ class AppListActivity :
         super.onPause()
     }
 
+    val searchQuery = MutableStateFlow("")
+
     override fun onQueryTextSubmit(query: String): Boolean {
-        addQueryToFilters(query)
+        searchQuery.value = query
         b.ffaSearch.clearFocus()
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        Utilities.delay(QUERY_TEXT_TIMEOUT, lifecycleScope) {
-            if (!this.isFinishing) {
-                addQueryToFilters(query)
-            }
-        }
+        searchQuery.value = query
         return true
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun setQueryFilter() {
+        lifecycleScope.launch {
+            searchQuery
+                .debounce(QUERY_TEXT_DELAY)
+                .distinctUntilChanged()
+                .collect { query ->
+                    addQueryToFilters(query)
+                }
+        }
     }
 
     private fun addQueryToFilters(query: String) {
@@ -790,6 +804,7 @@ class AppListActivity :
         }
 
         b.ffaAppList.adapter = recyclerAdapter
+        setQueryFilter()
     }
 
     private fun openFilterBottomSheet() {

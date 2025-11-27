@@ -139,7 +139,15 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
     fun clearSelection() {
         selectedItems.clear()
         isSelectionMode = false
-        notifyDataSetChanged()
+        // Fix: Use notifyItemRangeChanged instead of notifyDataSetChanged for PagingDataAdapter
+        // to avoid IndexOutOfBoundsException from adapter inconsistency
+        try {
+            if (itemCount > 0) {
+                notifyItemRangeChanged(0, itemCount)
+            }
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "$TAG error clearing selection: ${e.message}", e)
+        }
     }
 
     private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
@@ -256,7 +264,11 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                     isSelectionMode = true
                 }
                 toggleSelection(customIp)
-                notifyDataSetChanged()
+                // Fix: Use notifyItemChanged for single item instead of notifyDataSetChanged
+                val position = absoluteAdapterPosition
+                if (position != RecyclerView.NO_POSITION && position < itemCount) {
+                    notifyItemChanged(position)
+                }
             }
 
             b.customIpSeeMoreChip.setOnClickListener { openAppWiseRulesActivity(customIp.uid) }
@@ -264,7 +276,14 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
             b.customIpContainer.setOnLongClickListener {
                 isSelectionMode = true
                 selectedItems.add(customIp)
-                notifyDataSetChanged()
+                // Fix: Use notifyItemRangeChanged instead of notifyDataSetChanged
+                try {
+                    if (itemCount > 0) {
+                        notifyItemRangeChanged(0, itemCount)
+                    }
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_UI, "$TAG error in long click: ${e.message}", e)
+                }
                 true
             }
         }
@@ -427,13 +446,24 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                     isSelectionMode = true
                 }
                 toggleSelection(customIp)
-                notifyDataSetChanged()
+                // Fix: Use notifyItemChanged for single item instead of notifyDataSetChanged
+                val position = absoluteAdapterPosition
+                if (position != RecyclerView.NO_POSITION && position < itemCount) {
+                    notifyItemChanged(position)
+                }
             }
 
             b.customIpContainer.setOnLongClickListener {
                 isSelectionMode = true
                 selectedItems.add(customIp)
-                notifyDataSetChanged()
+                // Fix: Use notifyItemRangeChanged instead of notifyDataSetChanged
+                try {
+                    if (itemCount > 0) {
+                        notifyItemRangeChanged(0, itemCount)
+                    }
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_UI, "$TAG error in long click: ${e.message}", e)
+                }
                 true
             }
         }

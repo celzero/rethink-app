@@ -125,7 +125,15 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
                 beautifyDomainString(conn.appOrDnsName ?: "")
             )
             bottomSheetFragment.arguments = bundle
-            bottomSheetFragment.dismissListener(adapter, absoluteAdapterPosition)
+            // Fix: Validate position before passing to avoid IndexOutOfBoundsException
+            val currentPosition = absoluteAdapterPosition
+            if (currentPosition != RecyclerView.NO_POSITION) {
+                bottomSheetFragment.dismissListener(adapter, currentPosition)
+            } else {
+                // Position is invalid, pass -1 to indicate refresh should be used
+                Logger.w(LOG_TAG_UI, "$TAG invalid adapter position when opening bottom sheet")
+                bottomSheetFragment.dismissListener(adapter, RecyclerView.NO_POSITION)
+            }
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
 
@@ -201,6 +209,20 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
     }
 
     override fun notifyDataset(position: Int) {
-        this.notifyItemChanged(position)
+        // Fix: IndexOutOfBoundsException - validate position before notifying
+        // PagingDataAdapter manages its own data, so we need to be careful with manual notifications
+        try {
+            if (position >= 0 && position < itemCount) {
+                notifyItemChanged(position)
+            } else {
+                // Position is invalid, refresh the entire dataset instead
+                Logger.w(LOG_TAG_UI, "$TAG invalid position: $position, itemCount: $itemCount, refreshing adapter")
+                refresh()
+            }
+        } catch (e: Exception) {
+            // If notification fails, refresh the adapter to ensure consistency
+            Logger.e(LOG_TAG_UI, "$TAG error notifying position $position: ${e.message}", e)
+            refresh()
+        }
     }
 }
