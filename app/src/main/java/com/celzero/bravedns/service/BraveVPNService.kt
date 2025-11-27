@@ -101,10 +101,10 @@ import com.celzero.bravedns.util.Constants.Companion.PRIMARY_USER
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.CrashReporter
 import com.celzero.bravedns.util.Daemons
-import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.IPUtil
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.KnownPorts
+import com.celzero.bravedns.util.MemoryUtils
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Protocol
@@ -314,7 +314,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     // used to store the conn-ids that need to be closed when device is locked,
     // this is used to close the connections when the device is locked
     // list will exclude bypassed apps, domains and ip rules
-    private var trackedCidsToClose = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
+    private var activeClosableCids = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
     // data class to store the connection summary
     data class CidKey(val cid: String, val uid: Int)
@@ -2442,16 +2442,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // or onNetworkDisconnected. onNetworkConnected may call restartVpn
             notifyConnectionMonitor()
         }
-        // with alwaysV4V6, builder will have both v4 and v6 addresses, so apps need to do
-        // perform connectivity checks to decide which protocol to use. To aid that,
-        // set happy eyeballs to true
-        if (InternetProtocol.isAlwaysV46(persistentState.internetProtocolType)) {
-            // set happy eyeballs in case of always v4v6
-            vpnAdapter?.setHappyEyeballs(true)
-        } else {
-            // false in all other cases, including Auto
-            vpnAdapter?.setHappyEyeballs(false)
-        }
         val reason = "ipProto: ${persistentState.internetProtocolType}"
         vpnRestartTrigger.value = reason
     }
@@ -4531,20 +4521,24 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             if (s.uid == Backend.UidSelf || s.uid == rethinkUid.toString()) {
                 // update rethink summary
                 val key = CidKey(connectionSummary.connId, rethinkUid)
-                activeCids.remove(key)
+                synchronized(activeCids) {
+                    activeCids.remove(key)
+                }
                 netLogTracker.updateRethinkSummary(connectionSummary)
-                synchronized(trackedCidsToClose) {
-                    trackedCidsToClose.remove(connectionSummary.connId)
+                synchronized(activeClosableCids) {
+                    activeClosableCids.remove(connectionSummary.connId)
                 }
             } else {
                 // other apps summary
                 // convert the uid to app id
                 val uid = FirewallManager.appId(s.uid.toInt(), isPrimaryUser())
                 val key = CidKey(connectionSummary.connId, uid)
-                activeCids.remove(key)
+                synchronized(activeCids) {
+                    activeCids.remove(key)
+                }
                 netLogTracker.updateIpSummary(connectionSummary)
-                synchronized(trackedCidsToClose) {
-                    trackedCidsToClose.remove(connectionSummary.connId)
+                synchronized(activeClosableCids) {
+                    activeClosableCids.remove(connectionSummary.connId)
                 }
             }
             io("dlIpInfo") {
@@ -4767,7 +4761,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     // add to trackedCids, so that the connection can be removed from the list when the
                     // connection is closed (onSocketClosed), use: ui to show the active connections
                     val key = CidKey(cm.connId, uid)
-                    activeCids.add(key)
+                    synchronized(activeCids) {
+                        activeCids.add(key)
+                    }
                     Backend.Exit
                 }
 
@@ -4794,7 +4790,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // add to trackedCids, so that the connection can be removed from the list when the
         // connection is closed (onSocketClosed), use: ui to show the active connections
         val key = CidKey(cm.connId, uid)
-        activeCids.add(key)
+        synchronized(activeCids) {
+            activeCids.add(key)
+        }
 
         return@go2kt determineProxyDetails(cm, doubleLoopback)
     }
@@ -4857,7 +4855,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // add to trackedCids, so that the connection can be removed from the list when the
             // connection is closed (onSocketClosed), use: ui to show the active connections
             val key = CidKey(cm.connId, uid)
-            activeCids.add(key)
+            synchronized(activeCids) {
+                activeCids.add(key)
+            }
 
             logd("inflow: determine proxy and other dtls for $connId, $uid")
 
@@ -4950,9 +4950,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
         if (appConfig.isCustomSocks5Enabled()) {
             val endpoint = appConfig.getSocks5ProxyDetails()
+            if (endpoint == null) {
+                Logger.e(LOG_TAG_VPN, "flow: socks5 proxy enabled but endpoint is null")
+            }
             val packageName = FirewallManager.getPackageNameByUid(uid)
+            logd("flow/inflow: socks5 proxy is enabled, $packageName, ${endpoint?.proxyAppName}")
             // do not block the app if the app is set to forward the traffic via socks5 proxy
-            if (endpoint.proxyAppName == packageName) {
+            if (endpoint?.proxyAppName == packageName) {
                 logd("flow: socks5 enabled for $packageName, handling as spl app")
                 return true
             }
@@ -4961,14 +4965,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         if (appConfig.isCustomHttpProxyEnabled()) {
             val endpoint = appConfig.getHttpProxyDetails()
             if (endpoint == null) {
-                logd("flow: http proxy enabled but endpoint is null")
-            } else {
-                val packageName = FirewallManager.getPackageNameByUid(uid)
-                // do not block the app if the app is set to forward the traffic via http proxy
-                if (endpoint.proxyAppName == packageName) {
-                    logd("flow: http proxy enabled for $packageName, handling as spl app")
-                    return true
-                }
+                Logger.e(LOG_TAG_VPN, "flow: http proxy enabled but endpoint is null")
+            }
+            val packageName = FirewallManager.getPackageNameByUid(uid)
+            // do not block the app if the app is set to forward the traffic via http proxy
+            if (endpoint?.proxyAppName == packageName) {
+                logd("flow/inflow: http exit for $packageName, $uid")
+                return true
             }
         }
 
@@ -5098,9 +5101,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         if (appConfig.isCustomSocks5Enabled()) {
             val endpoint = appConfig.getSocks5ProxyDetails()
             val packageName = FirewallManager.getPackageNameByUid(uid)
-            logd("flow/inflow: socks5 proxy is enabled, $packageName, ${endpoint.proxyAppName}")
+            if (endpoint == null) {
+                Logger.e(LOG_TAG_VPN, "flow: socks5 proxy enabled but endpoint is null")
+            }
+            logd("flow/inflow: socks5 proxy is enabled, $packageName, ${endpoint?.proxyAppName}")
             // do not block the app if the app is set to forward the traffic via socks5 proxy
-            if (endpoint.proxyAppName == packageName) {
+            if (endpoint?.proxyAppName == packageName) {
                 logd("flow/inflow: socks5 exit for $packageName, $connId, $uid")
                 return persistAndConstructFlowResponse(connTracker, Backend.Exit, connId, uid)
             }
@@ -5117,23 +5123,21 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         if (appConfig.isCustomHttpProxyEnabled()) {
             val endpoint = appConfig.getHttpProxyDetails()
             if (endpoint == null) {
-                logd("flow/inflow: http proxy enabled but endpoint is null")
-            } else {
-                val packageName = FirewallManager.getPackageNameByUid(uid)
-                // do not block the app if the app is set to forward the traffic via http proxy
-                if (endpoint.proxyAppName == packageName) {
-                    logd("flow/inflow: http exit for $packageName, $connId, $uid")
-                    return persistAndConstructFlowResponse(connTracker, Backend.Exit, connId, uid)
-                }
-
-                logd("flow/inflow: http proxy for $connId, $uid")
-                return persistAndConstructFlowResponse(
-                    connTracker,
-                    ProxyManager.ID_HTTP_BASE,
-                    connId,
-                    uid
-                )
+                Logger.e(LOG_TAG_VPN, "flow: http proxy enabled but endpoint is null")
             }
+            val packageName = FirewallManager.getPackageNameByUid(uid)
+            // do not block the app if the app is set to forward the traffic via http proxy
+            if (endpoint?.proxyAppName == packageName) {
+                logd("flow/inflow: http exit for $packageName, $connId, $uid")
+                return persistAndConstructFlowResponse(connTracker, Backend.Exit, connId, uid)
+            }
+            logd("flow/inflow: http proxy for $connId, $uid")
+            return persistAndConstructFlowResponse(
+                connTracker,
+                ProxyManager.ID_HTTP_BASE,
+                connId,
+                uid
+            )
         }
 
         if (appConfig.isDnsProxyActive()) {
@@ -5154,7 +5158,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // get app id from uid
         val uid0 = FirewallManager.appId(uid, isPrimaryUser())
         val key = CidKey(connId, uid0)
-        return activeCids.contains(key)
+        synchronized(activeCids) {
+            return activeCids.contains(key)
+        }
     }
 
     suspend fun removeWireGuardProxy(id: Int) {
@@ -5342,19 +5348,19 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         }
 
         Logger.v(LOG_TAG_VPN, "firewall-rule $rule, adding to trackedCids to close, $cid")
-        synchronized(trackedCidsToClose) {
-            trackedCidsToClose.add(cid)
+        synchronized(activeClosableCids) {
+            activeClosableCids.add(cid)
         }
     }
 
     // this method is called when the device is locked, so no need to check for device lock here
     private fun closeTrackedConnsOnDeviceLock() {
         io("devLockCloseConns") {
-            val cidsToClose: List<String> = synchronized(trackedCidsToClose) {
-                if (!trackedCidsToClose.isEmpty()) emptyList<String>()
+            val cidsToClose: List<String> = synchronized(activeClosableCids) {
+                if (!activeClosableCids.isEmpty()) emptyList<String>()
 
-                val snapshot = trackedCidsToClose.toList()
-                trackedCidsToClose.clear()
+                val snapshot = activeClosableCids.toList()
+                activeClosableCids.clear()
                 snapshot
             }
             if (cidsToClose.isNotEmpty()) {
@@ -5540,6 +5546,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         stats.append("DomainRules:\n${domainRulesStats()}\n")
         stats.append("Proxy:\n${proxyStats()}\n")
         stats.append("WireGuard:\n${wireguardStats()}\n")
+        stats.append("Memory: \n${MemoryUtils.getMemoryStats(this)}\n")
         return stats.toString()
     }
 

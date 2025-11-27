@@ -49,7 +49,7 @@ object DomainRulesManager : KoinComponent {
     private var trie: RadixTree = Backend.newRadixTree()
     // fixme: find a better way to handle trusted domains without using two data structures
     // map to store the trusted domains with set of uids
-    private val trustedMap: MutableMap<String, Set<Int>> = ConcurrentHashMap()
+    private val trustedMap = ConcurrentHashMap<String, Set<Int>>()
     // even though we have trustedMap, we need to keep the trie for wildcard matching
     private var trustedTrie: RadixTree = Backend.newRadixTree()
 
@@ -164,11 +164,15 @@ object DomainRulesManager : KoinComponent {
     }
 
     private fun maybeAddToTrustedMap(cd: CustomDomain) {
-        if (cd.status == Status.TRUST.id) {
-            val domain = cd.domain.lowercase(Locale.ROOT)
-            val key = mkTrieKeyForTrustedMap(domain)
-            trustedTrie.set(key, cd.status.toString().togs())
-            trustedMap[cd.domain] = trustedMap.getOrDefault(domain, emptySet()).plus(cd.uid)
+        if (cd.status != Status.TRUST.id) return
+
+        val domain = cd.domain.lowercase(Locale.ROOT)
+        val key = mkTrieKeyForTrustedMap(domain)
+
+        trustedTrie.set(key, cd.status.toString().togs())
+
+        trustedMap.compute(domain) { _, old ->
+            (old ?: emptySet()) + cd.uid
         }
     }
 
@@ -318,16 +322,22 @@ object DomainRulesManager : KoinComponent {
 
     private fun maybeUpdateTrustedMap(uid: Int, domain: String, status: Status) {
         val d = domain.lowercase(Locale.ROOT)
-        if (status == Status.TRUST) {
-            trustedMap[d] = trustedMap.getOrDefault(d, emptySet()).plus(uid)
-        } else {
-            trustedMap[d] = trustedMap.getOrDefault(d, emptySet()).minus(uid)
+
+        val result = trustedMap.compute(d) { _, old ->
+            val updated = if (status == Status.TRUST) {
+                (old ?: emptySet()) + uid
+            } else {
+                (old ?: emptySet()) - uid
+            }
+
+            updated.ifEmpty { null }
         }
-        if (trustedMap[d] == null) {
-            val key = mkTrieKeyForTrustedMap(d)
+
+        val key = mkTrieKeyForTrustedMap(d)
+
+        if (result == null) {
             trustedTrie.del(key)
         } else {
-            val key = mkTrieKeyForTrustedMap(d)
             trustedTrie.set(key, status.id.toString().togs())
         }
     }
@@ -366,25 +376,28 @@ object DomainRulesManager : KoinComponent {
 
     private fun removeIfInTrustedMap(uid: Int, domain: String) {
         val d = domain.lowercase(Locale.ROOT)
-        val trustedUids = trustedMap.getOrDefault(d, emptySet()).minus(uid)
-        if (trustedUids.isEmpty()) {
-            trustedMap.remove(d)
-            val key = mkTrieKeyForTrustedMap(d)
+        val result = trustedMap.compute(d) { _, old ->
+            val updated = (old ?: emptySet()) - uid
+            updated.ifEmpty { null }
+        }
+        val key = mkTrieKeyForTrustedMap(d)
+
+        if (result == null) {
             trustedTrie.del(key)
-        } else {
-            trustedMap[d] = trustedUids
         }
     }
 
     private fun clearTrustedMap(uid: Int) {
-        trustedMap.forEach { (domain, uids) ->
-            val newUids = uids.minus(uid)
-            if (newUids.isEmpty()) {
-                trustedMap.remove(domain)
-                val key = mkTrieKeyForTrustedMap(domain)
+        trustedMap.keys.forEach { domain ->
+            val result = trustedMap.compute(domain) { _, old ->
+                val updated = (old ?: emptySet()) - uid
+                updated.ifEmpty { null }
+            }
+
+            val key = mkTrieKeyForTrustedMap(domain)
+
+            if (result == null) {
                 trustedTrie.del(key)
-            } else {
-                trustedMap[domain] = newUids
             }
         }
     }
