@@ -313,13 +313,13 @@ dependencies {
     implementation 'com.google.android.material:material:1.13.0'
     fullImplementation 'androidx.viewpager2:viewpager2:1.1.0'
 
-    fullImplementation 'com.squareup.okhttp3:okhttp:5.2.1'
-    fullImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:5.2.1'
+    fullImplementation 'com.squareup.okhttp3:okhttp:5.3.2'
+    fullImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:5.3.2'
 
     fullImplementation 'com.squareup.retrofit2:retrofit:3.0.0'
     fullImplementation 'com.squareup.retrofit2:converter-gson:3.0.0'
 
-    implementation 'com.squareup.okio:okio-jvm:3.16.2'
+    implementation 'com.squareup.okio:okio-jvm:3.16.4'
     // Glide
     fullImplementation('com.github.bumptech.glide:glide:5.0.5') {
         exclude group: 'glide-parent'
