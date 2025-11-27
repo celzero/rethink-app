@@ -370,30 +370,22 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             if (isAtleastS()) {
                 // Check if transportInfo is actually WifiInfo before casting
                 val transportInfo = cap.transportInfo
-                if (transportInfo is WifiInfo) {
-                    val ssid = transportInfo.ssid
-                    if (ssid == UNKNOWN_SSID) {
-                        Logger.v(
-                            LOG_TAG_CONNECTION,
-                            "getNetworkSSID: SSID is unknown for network ${network.networkHandle}, falling back to WifiManager"
-                        )
-                        showNotificationIfNeeded()
-                        return null
-                    }
-                    if (!ssid.isNullOrEmpty()) {
-                        val cleanSSID = ssid.removeSurrounding("\"")
+                val isTransportInfoWifi = transportInfo is WifiInfo
+                var ssid: String? = null
+                if (isTransportInfoWifi) {
+                    ssid = transportInfo.ssid
+                    extractCleanSsid(ssid)?.let { clean ->
                         Logger.i(
                             LOG_TAG_CONNECTION,
-                            "getNetworkSSID: SSID for network ${network.networkHandle} is: $cleanSSID"
+                            "getNetworkSSID(S): $clean (${network.networkHandle})"
                         )
-                        return cleanSSID
+                        return clean
                     }
-                } else {
-                    Logger.d(
-                        LOG_TAG_CONNECTION,
-                        "getNetworkSSID: transportInfo is not WifiInfo (${transportInfo?.javaClass?.simpleName}), falling back to WifiManager"
-                    )
                 }
+                Logger.v(
+                    LOG_TAG_CONNECTION,
+                    "isWifiInfo? $isTransportInfoWifi, (${transportInfo?.javaClass?.simpleName}), ssid: $ssid , falling back to WifiManager"
+                )
             }
 
             val wifiInfo: WifiInfo? = wm.connectionInfo
@@ -402,32 +394,20 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 return null
             }
 
-            val ssid = wifiInfo.ssid
-            if (ssid.isNullOrEmpty()) {
-                Logger.v(
+            extractCleanSsid(wifiInfo.ssid)?.let { clean ->
+                Logger.i(
                     LOG_TAG_CONNECTION,
-                    "getNetworkSSID: SSID is empty for network ${network.networkHandle}, ssid: $ssid, wifiInfo: $wifiInfo"
+                    "getNetworkSSID(WM): $clean (${network.networkHandle})"
                 )
-                return null
+                return clean
             }
 
-            if (ssid == UNKNOWN_SSID) {
-                Logger.v(
-                    LOG_TAG_CONNECTION,
-                    "getNetworkSSID: SSID is unknown for network ${network.networkHandle}"
-                )
-                showNotificationIfNeeded()
-                return null
-            }
-
-            // Remove quotes from SSID if present
-            val cleanSSID = ssid.removeSurrounding("\"")
-
-            Logger.i(
+            Logger.w(
                 LOG_TAG_CONNECTION,
-                "getNetworkSSID: SSID for network ${network.networkHandle} is: $cleanSSID"
+                "getNetworkSSID: SSID is null or unknown for network ${network.networkHandle}"
             )
-            return cleanSSID
+            showNotificationIfNeeded()
+            return null
 
         } catch (e: SecurityException) {
             Logger.w(LOG_TAG_CONNECTION, "getNetworkSSID: SecurityException accessing WiFi info", e)
@@ -440,6 +420,11 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             )
             return null
         }
+    }
+
+    private fun extractCleanSsid(ssid: String?): String? {
+        if (ssid.isNullOrEmpty() || ssid == UNKNOWN_SSID) return null
+        return ssid.removeSurrounding("\"")
     }
 
     private fun showNotificationIfNeeded() {
