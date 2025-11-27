@@ -6,12 +6,22 @@
     android:fillViewport="true"
     android:orientation="vertical">
 
-    <LinearLayout
+    <!-- Wrap content in ConstraintLayout with maxWidth for foldables/tablets -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="70dp"
-        android:orientation="vertical"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_gravity="center_horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="70dp"
+            android:orientation="vertical"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_max="700dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -144,15 +154,17 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/fs_firewall_tv"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
+                    android:layout_toStartOf="@id/fs_firewall_iv"
                     android:layout_toEndOf="@id/fs_firewall_icon"
                     android:text="@string/firewall_mode_info_title"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="16sp" />
 
                 <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/fs_firewall_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
@@ -184,15 +196,17 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/fs_proxy_tv"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
+                    android:layout_toStartOf="@id/fs_proxy_iv"
                     android:layout_toEndOf="@id/fs_proxy_icon"
                     android:text="@string/cd_custom_dns_proxy_name_default"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="16sp" />
 
                 <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/fs_proxy_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
@@ -224,15 +238,17 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/fs_network_tv"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
+                    android:layout_toStartOf="@id/fs_network_iv"
                     android:layout_toEndOf="@id/fs_network_icon"
                     android:text="@string/lbl_network"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="16sp" />
 
                 <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/fs_network_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
@@ -264,15 +280,17 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/fs_others_tv"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
+                    android:layout_toStartOf="@id/fs_others_iv"
                     android:layout_toEndOf="@id/fs_others_icon"
                     android:text="@string/title_settings"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="16sp" />
 
                 <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/fs_others_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
@@ -405,5 +423,6 @@
                     android:src="@drawable/ic_right_arrow_white" />
             </RelativeLayout>
         </com.google.android.material.card.MaterialCardView>
-    </LinearLayout>
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>
