@@ -146,9 +146,16 @@ class WgSsidDialog(
         b.ssidEditText.addTextChangedListener { text ->
             val isNotEmpty = !text.isNullOrBlank()
 
-            // Enable or disable button based on text
+            // Enable or disable add button based on text
             b.addSsidBtn.isEnabled = isNotEmpty
             b.addSsidBtn.isClickable = isNotEmpty
+
+            // Enable or disable radio buttons based on text
+            // User should only be able to change settings when there's an SSID to apply them to
+            b.radioEqual.isEnabled = isNotEmpty
+            b.radioNotEqual.isEnabled = isNotEmpty
+            b.radioExact.isEnabled = isNotEmpty
+            b.radioWildcard.isEnabled = isNotEmpty
 
             // Change button background color based on state
             val context = b.addSsidBtn.context
