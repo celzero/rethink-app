@@ -22,6 +22,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" tools:targetApi="29" />
     
     <!-- Android 11 introduces changes related to package visibility. These changes affect
     apps only if they target Android 11.
