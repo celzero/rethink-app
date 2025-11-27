@@ -163,10 +163,19 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
             intent.putExtra(Intent.EXTRA_TITLE, zipFileName)
 
             // Check if there's an activity that can handle this intent
-            if (intent.resolveActivity(requireContext().packageManager) != null) {
-                backupActivityResult.launch(intent)
-            } else {
-                Logger.e(LOG_TAG_BACKUP_RESTORE, "No activity found to handle CREATE_DOCUMENT intent")
+            try {
+                if (intent.resolveActivity(requireContext().packageManager) != null) {
+                    backupActivityResult.launch(intent)
+                } else {
+                    Logger.e(LOG_TAG_BACKUP_RESTORE, "No activity found to handle CREATE_DOCUMENT intent")
+                    Utilities.showToastUiCentered(
+                        requireContext(),
+                        getString(R.string.brbs_backup_dialog_failure_message),
+                        Toast.LENGTH_LONG
+                    )
+                }
+            } catch (e: android.content.ActivityNotFoundException) {
+                Logger.e(LOG_TAG_BACKUP_RESTORE, "Activity not found for CREATE_DOCUMENT: ${e.message}")
                 Utilities.showToastUiCentered(
                     requireContext(),
                     getString(R.string.brbs_backup_dialog_failure_message),
