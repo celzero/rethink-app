@@ -5357,7 +5357,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     private fun closeTrackedConnsOnDeviceLock() {
         io("devLockCloseConns") {
             val cidsToClose: List<String> = synchronized(activeClosableCids) {
-                if (!activeClosableCids.isEmpty()) emptyList<String>()
+                if (activeClosableCids.isEmpty()) emptyList<String>()
 
                 val snapshot = activeClosableCids.toList()
                 activeClosableCids.clear()
