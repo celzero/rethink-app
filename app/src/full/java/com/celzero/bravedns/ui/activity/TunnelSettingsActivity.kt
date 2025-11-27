@@ -82,12 +82,6 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     override fun onResume() {
         super.onResume()
         handleLockdownModeIfNeeded()
-        showNewBadgeIfNeeded()
-    }
-
-    private fun showNewBadgeIfNeeded() {
-        val allowIncomingWg = NewSettingsManager.shouldShowBadge(NewSettingsManager.ALLOW_INCOMING_WG_PACKETS)
-        b.dvWgAllowIncomingTxt.setBadgeDotVisible(this, allowIncomingWg)
     }
 
     private fun initView() {
@@ -397,12 +391,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.dvEimfRl.setOnClickListener { b.dvEimfSwitch.isChecked = !b.dvEimfSwitch.isChecked }
 
         b.dvWgAllowIncomingSwitch.setOnCheckedChangeListener { _, isChecked ->
-            NewSettingsManager.markSettingSeen(NewSettingsManager.ALLOW_INCOMING_WG_PACKETS)
             persistentState.nwEngExperimentalFeatures = isChecked
         }
 
         b.dvWgAllowIncomingRl.setOnClickListener {
-            NewSettingsManager.markSettingSeen(NewSettingsManager.ALLOW_INCOMING_WG_PACKETS)
             b.dvWgAllowIncomingSwitch.isChecked = !b.dvWgAllowIncomingSwitch.isChecked
         }
 

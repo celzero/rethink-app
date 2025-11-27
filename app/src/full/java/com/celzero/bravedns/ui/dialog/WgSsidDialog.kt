@@ -81,6 +81,7 @@ class WgSsidDialog(
         b.addSsidBtn.isEnabled = false
         b.addSsidBtn.isClickable = false
         b.addSsidBtn.setTextColor(UIUtils.fetchColor(context, R.attr.primaryLightColorText))
+        disableOrEnableRadioButtons(false)
 
         // listeners to update description text when radio buttons change
         b.ssidConditionRadioGroup.setOnCheckedChangeListener { _, _ ->
@@ -152,10 +153,7 @@ class WgSsidDialog(
 
             // Enable or disable radio buttons based on text
             // User should only be able to change settings when there's an SSID to apply them to
-            b.radioEqual.isEnabled = isNotEmpty
-            b.radioNotEqual.isEnabled = isNotEmpty
-            b.radioExact.isEnabled = isNotEmpty
-            b.radioWildcard.isEnabled = isNotEmpty
+            disableOrEnableRadioButtons(isNotEmpty)
 
             // Change button background color based on state
             val context = b.addSsidBtn.context
@@ -172,6 +170,17 @@ class WgSsidDialog(
         b.saveBtn.setOnClickListener {
             saveSsids()
         }
+    }
+
+    private fun disableOrEnableRadioButtons(enable: Boolean) {
+        b.radioEqual.isEnabled = enable
+        b.radioEqual.isClickable = enable
+        b.radioNotEqual.isEnabled = enable
+        b.radioNotEqual.isClickable = enable
+        b.radioExact.isEnabled = enable
+        b.radioExact.isClickable = enable
+        b.radioWildcard.isEnabled = enable
+        b.radioWildcard.isClickable = enable
     }
 
     private fun addSsid() {

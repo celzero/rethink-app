@@ -742,23 +742,19 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
         // Firebase error reporting toggle
         b.settingsFirebaseErrorReportingRl.setOnClickListener {
-            NewSettingsManager.markSettingSeen(NewSettingsManager.ERROR_REPORTING)
             b.settingsFirebaseErrorReportingSwitch.isChecked =
                 !b.settingsFirebaseErrorReportingSwitch.isChecked
         }
 
         b.settingsFirebaseErrorReportingSwitch.setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
-            NewSettingsManager.markSettingSeen(NewSettingsManager.ERROR_REPORTING)
             handleFirebaseErrorReportingToggle(isChecked)
         }
 
         b.tombstoneAppRl.setOnClickListener {
-            NewSettingsManager.markSettingSeen(NewSettingsManager.TOMBSTONE_APP_SETTING)
             b.tombstoneAppSwitch.isChecked = !b.tombstoneAppSwitch.isChecked
         }
 
         b.tombstoneAppSwitch.setOnCheckedChangeListener { _, isChecked ->
-            NewSettingsManager.markSettingSeen(NewSettingsManager.TOMBSTONE_APP_SETTING)
             persistentState.tombstoneApps = isChecked
             io { rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE) }
         }
@@ -1261,14 +1257,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         // app notification permission android 13
         showEnableNotificationSettingIfNeeded()
         checkMicCamAccessRule()
-        showNewBadgeIfNeeded()
-    }
-
-    private fun showNewBadgeIfNeeded() {
-        val errorReporting = NewSettingsManager.shouldShowBadge(NewSettingsManager.ERROR_REPORTING)
-        b.genSettingsFirebaseErrorReportingTxt.setBadgeDotVisible(this, errorReporting)
-        val tombstoneSetting = NewSettingsManager.shouldShowBadge(NewSettingsManager.TOMBSTONE_APP_SETTING)
-        b.tombstoneAppTxt.setBadgeDotVisible(this, tombstoneSetting)
     }
 
     private fun registerForActivityResult() {
