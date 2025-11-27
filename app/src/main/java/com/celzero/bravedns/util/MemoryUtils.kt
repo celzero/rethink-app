@@ -151,7 +151,7 @@ object MemoryUtils {
     private fun formatBytes(bytes: Long): String {
         if (bytes <= 0) return "0 B"
         val units = arrayOf("B", "KB", "MB", "GB", "TB")
-        val digitGroups = (log10(bytes.toDouble()) / log10(1024.0)).toInt()
+        val digitGroups = kotlin.math.min((log10(bytes.toDouble()) / log10(1024.0)).toInt(), units.size - 1)
         return DecimalFormat("#,##0.#").format(bytes / 1024.0.pow(digitGroups.toDouble())) + " " + units[digitGroups]
     }
 }
