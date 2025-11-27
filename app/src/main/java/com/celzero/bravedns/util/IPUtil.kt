@@ -19,7 +19,6 @@ import Logger
 import Logger.LOG_TAG_VPN
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import inet.ipaddr.IPAddress
-import inet.ipaddr.IPAddressString
 import java.net.InetAddress
 import java.net.UnknownHostException
 import kotlin.math.floor

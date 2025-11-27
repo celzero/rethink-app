@@ -34,8 +34,8 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isOsVersionAbove412
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import org.koin.android.ext.android.inject
 import com.celzero.firestack.settings.Settings
+import org.koin.android.ext.android.inject
 
 class AntiCensorshipActivity : AppCompatActivity(R.layout.activity_anti_censorship) {
     val b by viewBinding(ActivityAntiCensorshipBinding::bind)

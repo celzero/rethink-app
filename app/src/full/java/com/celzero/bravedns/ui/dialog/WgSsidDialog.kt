@@ -34,7 +34,6 @@ import com.celzero.bravedns.databinding.DialogWgSsidBinding
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlin.text.replaceFirstChar
 
 class WgSsidDialog(
     private val activity: Activity,

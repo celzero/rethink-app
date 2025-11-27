@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.util
 
+import Logger
 import Logger.LOG_TAG_UI
 import com.celzero.bravedns.service.PersistentState
 import org.koin.core.component.KoinComponent

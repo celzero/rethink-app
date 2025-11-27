@@ -61,11 +61,11 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import org.koin.android.ext.android.inject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
-import org.koin.android.ext.android.inject
 
 class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
     private var _binding: ActivityBackupRestoreBinding? = null

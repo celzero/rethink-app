@@ -45,6 +45,9 @@ import com.celzero.bravedns.util.Utilities.blocklistDownloadBasePath
 import com.celzero.bravedns.util.Utilities.calculateMd5
 import com.celzero.bravedns.util.Utilities.getTagValueFromJson
 import com.celzero.bravedns.util.Utilities.tempDownloadBasePath
+import okhttp3.ResponseBody
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -54,9 +57,6 @@ import java.io.OutputStream
 import java.util.concurrent.CancellationException
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
-import okhttp3.ResponseBody
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams), KoinComponent {

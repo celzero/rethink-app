@@ -15,24 +15,8 @@
  */
 package com.celzero.bravedns.util
 
-import Logger.LOG_TAG_UI
-import android.app.Dialog
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
-import android.os.Build
-import android.view.View
-import android.view.WindowManager
-import androidx.annotation.ColorInt
-import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDialog
-import androidx.appcompat.content.res.AppCompatResources
 import com.celzero.bravedns.R
-import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isAtleastS
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import java.util.function.Consumer
-import androidx.core.graphics.drawable.toDrawable
 
 // Application themes enum
 enum class Themes(val id: Int) {

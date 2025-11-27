@@ -21,7 +21,6 @@ import Logger.LOG_TAG_FIREWALL
 import android.content.Context
 import android.util.Patterns
 import androidx.lifecycle.LiveData
-import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.CustomDomain
@@ -29,11 +28,9 @@ import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities.togs
 import com.celzero.bravedns.util.Utilities.tos
+import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.Gostr
 import com.celzero.firestack.backend.RadixTree
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.net.MalformedURLException

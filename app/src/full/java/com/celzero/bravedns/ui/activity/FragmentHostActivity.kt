@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger
 import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.Intent
@@ -28,7 +29,6 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import org.koin.android.ext.android.inject
-import kotlin.getValue
 
 class FragmentHostActivity : AppCompatActivity(R.layout.activity_fragment_host) {
     private val persistentState by inject<PersistentState>()
