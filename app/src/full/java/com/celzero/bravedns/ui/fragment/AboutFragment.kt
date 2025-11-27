@@ -49,8 +49,6 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.battery.BatteryStatsProvider
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.databinding.DialogViewLogsBinding
@@ -157,7 +155,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutAppTranslate.setOnClickListener(this)
         b.aboutStats.setOnClickListener(this)
         b.aboutDbStats.setOnClickListener(this)
-        b.aboutBatteryStats.setOnClickListener(this)
         b.tokenTextView.setOnClickListener(this)
 
         val gestureDetector = GestureDetector(
@@ -373,9 +370,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
             b.aboutDbStats -> {
                 openDatabaseDumpDialog()
-            }
-            b.aboutBatteryStats -> {
-                openBatteryStatsDialog()
             }
             b.tokenTextView -> {
                 // click is handled in gesture detector
@@ -942,46 +936,5 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) { f() }
-    }
-
-    private fun openBatteryStatsDialog() {
-        val ctx = requireContext()
-        val textView = android.widget.TextView(ctx)
-        val pad = resources.getDimensionPixelSize(R.dimen.dots_margin_bottom)
-        textView.setPadding(pad, pad, pad, pad)
-        textView.typeface = android.graphics.Typeface.MONOSPACE
-        textView.setTextIsSelectable(true)
-        textView.text = "Loading battery stats…"
-
-        val scroll = android.widget.ScrollView(ctx)
-        scroll.addView(textView)
-
-        val dialog = MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
-            .setTitle("Battery stats")
-            .setView(scroll)
-            .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
-            .setNeutralButton(R.string.dns_info_neutral) { _, _ ->
-                copyToClipboard("battery_stats", textView.text.toString())
-                showToastUiCentered(ctx, getString(R.string.copied_clipboard), Toast.LENGTH_SHORT)
-            }
-            .create()
-        dialog.show()
-
-        // load metrics async to avoid any UI jank
-        io {
-            val stats = BatteryStatsProvider.formattedStats()
-            uiCtx {
-                if (!isAdded) return@uiCtx
-                if (stats.isEmpty()) {
-                    textView.text = "No battery stats available"
-                    return@uiCtx
-                }
-                textView.text = stats
-            }
-        }
-        if (!DEBUG) return
-        io {
-            VpnController.performFlightRecording()
-        }
     }
 }

@@ -61,12 +61,6 @@ class RethinkDnsApplicationPlay : Application() {
         // Initialize global exception handler
         GlobalExceptionHandler.initialize(this)
         FirebaseErrorReporting.initialize()
-        // initialize battery stats provider (facebook battery-metrics)
-        try {
-            BatteryStatsLogger.start(this)
-        } catch (e: Exception) {
-            Logger.w(LOG_TAG_SCHEDULER, "battery-stats-init-failed: ${e.message}", e)
-        }
 
         CoroutineScope(SupervisorJob()).launch {
             scheduleJobs()
