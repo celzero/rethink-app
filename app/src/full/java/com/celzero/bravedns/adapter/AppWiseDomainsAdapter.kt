@@ -224,7 +224,15 @@ class AppWiseDomainsAdapter(
             bundle.putInt(AppDomainRulesBottomSheet.UID, uid)
             bundle.putString(AppDomainRulesBottomSheet.DOMAIN, appConn.appOrDnsName)
             bottomSheetFragment.arguments = bundle
-            bottomSheetFragment.dismissListener(adapter, absoluteAdapterPosition)
+            // Fix: Validate position before passing to avoid IndexOutOfBoundsException
+            val currentPosition = absoluteAdapterPosition
+            if (currentPosition != RecyclerView.NO_POSITION) {
+                bottomSheetFragment.dismissListener(adapter, currentPosition)
+            } else {
+                // Position is invalid, pass -1 to indicate refresh should be used
+                Logger.w(LOG_TAG_UI, "$TAG invalid adapter position when opening bottom sheet")
+                bottomSheetFragment.dismissListener(adapter, RecyclerView.NO_POSITION)
+            }
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
 
@@ -273,6 +281,19 @@ class AppWiseDomainsAdapter(
     }
 
     override fun notifyDataset(position: Int) {
-        this.notifyItemChanged(position)
+        // Fix: IndexOutOfBoundsException - validate position before notifying
+        try {
+            if (position >= 0 && position < itemCount) {
+                notifyItemChanged(position)
+            } else {
+                // Position is invalid, refresh the entire dataset instead
+                Logger.w(LOG_TAG_UI, "$TAG invalid position: $position, itemCount: $itemCount, refreshing adapter")
+                refresh()
+            }
+        } catch (e: Exception) {
+            // If notification fails, refresh the adapter to ensure consistency
+            Logger.e(LOG_TAG_UI, "$TAG error notifying position $position: ${e.message}", e)
+            refresh()
+        }
     }
 }

@@ -18,12 +18,15 @@
  */
 package com.celzero.bravedns.wireguard
 
-import com.celzero.bravedns.wireguard.BadConfigException.*
+import com.celzero.bravedns.wireguard.BadConfigException.Location
+import com.celzero.bravedns.wireguard.BadConfigException.Reason
+import com.celzero.bravedns.wireguard.BadConfigException.Section
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.util.*
+import java.util.Collections
+import java.util.Objects
 
 /**
  * Represents the contents of a wg-quick configuration file, made up of one or more "Interface"

@@ -15,7 +15,6 @@
  */
 package com.celzero.bravedns.data
 
-import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import java.io.Serializable
 
 // do not use it as key in the map or set, as it is mutable

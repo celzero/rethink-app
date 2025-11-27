@@ -328,7 +328,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 if (showBypassToolTip && appStatus == FirewallManager.FirewallStatus.NONE) {
                     b.aadAppSettingsBypassDnsFirewall.performLongClick()
                     showBypassToolTip = false
-                    return@setOnClickListener
+                    return@guardAppInfoInitialized
                 }
 
                 if (appStatus == FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL) {
@@ -380,7 +380,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             guardAppInfoInitialized("aadAppSettingsExclude") {
                 if (VpnController.isVpnLockdown()) {
                     showToastUiCentered(this, getString(R.string.hsf_exclude_error), Toast.LENGTH_SHORT)
-                    return@setOnClickListener
+                    return@guardAppInfoInitialized
                 }
 
                 io {
@@ -924,7 +924,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             Configuration.UI_MODE_NIGHT_YES
     }
 
-    private inline fun guardAppInfoInitialized(listenerName: String, block: () -> Unit) {
+    private fun guardAppInfoInitialized(listenerName: String, block: () -> Unit) {
         if (!::appInfo.isInitialized) {
             Logger.w(LOG_TAG_UI, "AppInfo not initialized yet in $listenerName click listener, using uid: $uid")
             showToastUiCentered(

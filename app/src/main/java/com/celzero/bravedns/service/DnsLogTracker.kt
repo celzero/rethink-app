@@ -20,7 +20,6 @@ import Logger
 import Logger.LOG_TAG_VPN
 import android.content.Context
 import android.os.SystemClock
-import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
@@ -36,6 +35,7 @@ import com.celzero.bravedns.util.Utilities.getCountryCode
 import com.celzero.bravedns.util.Utilities.getFlag
 import com.celzero.bravedns.util.Utilities.makeAddressPair
 import com.celzero.bravedns.util.Utilities.normalizeIp
+import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.DNSSummary
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

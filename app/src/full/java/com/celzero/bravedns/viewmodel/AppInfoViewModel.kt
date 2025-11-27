@@ -15,6 +15,9 @@ import com.celzero.bravedns.database.AppInfoDAO
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.util.Constants
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
@@ -30,6 +33,21 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
     val appInfo = filter.switchMap { input: String -> getAppInfo(input) }
 
+    private fun setFilterWithDebounce(searchString: String) {
+        viewModelScope.launch {
+            debounceFilter(searchString)
+        }
+    }
+
+    private var debounceJob: Job? = null
+    private fun debounceFilter(searchString: String) {
+        debounceJob?.cancel()
+        debounceJob = viewModelScope.launch {
+            delay(300) // 300ms debounce delay
+            filter.value = searchString
+        }
+    }
+
     fun setFilter(filters: AppListActivity.Filters) {
         this.category.clear()
         this.category.addAll(filters.categoryFilters)
@@ -38,7 +56,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         this.topLevelFilter = filters.topLevelFilter
 
         this.search = filters.searchString
-        this.filter.value = filters.searchString
+        setFilterWithDebounce(filters.searchString)
     }
 
     private fun getAppInfo(searchString: String): LiveData<PagingData<AppInfo>> {

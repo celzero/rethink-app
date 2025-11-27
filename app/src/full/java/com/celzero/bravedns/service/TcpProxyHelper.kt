@@ -10,7 +10,6 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.customdownloader.ITcpProxy
 import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.data.AppConfig
@@ -18,6 +17,7 @@ import com.celzero.bravedns.database.TcpProxyEndpoint
 import com.celzero.bravedns.database.TcpProxyRepository
 import com.celzero.bravedns.scheduler.PaymentWorker
 import com.celzero.bravedns.util.Utilities.togs
+import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.IpTree
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

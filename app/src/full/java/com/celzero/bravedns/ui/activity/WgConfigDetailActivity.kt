@@ -55,13 +55,11 @@ import com.celzero.bravedns.ui.dialog.WgHopDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
 import com.celzero.bravedns.ui.dialog.WgSsidDialog
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.SsidPermissionManager
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.openAndroidAppInfo
-import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.tos
@@ -163,7 +161,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         super.onResume()
         init()
         setupClickListeners()
-        showNewBadgeIfNeeded()
     }
 
     override fun onRequestPermissionsResult(
@@ -180,11 +177,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             grantResults,
             ssidPermissionCallback
         )
-    }
-
-    private fun showNewBadgeIfNeeded() {
-        val ssid = NewSettingsManager.shouldShowBadge(NewSettingsManager.WG_SSID_SETTING)
-        b.ssidTitleTv.setBadgeDotVisible(this, ssid)
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -916,8 +908,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         updateErrorLayouts(hasPermissions, isLocationEnabled, permissionErrorLayout, locationErrorLayout)
 
         sw.setOnCheckedChangeListener { _, isChecked ->
-            NewSettingsManager.markSettingSeen(NewSettingsManager.WG_SSID_SETTING)
-
             // Check current permissions and location status dynamically
             val currentHasPermissions = SsidPermissionManager.hasRequiredPermissions(this)
             val currentLocationEnabled = SsidPermissionManager.isLocationEnabled(this)

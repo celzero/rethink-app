@@ -52,7 +52,6 @@ import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.DomainConnectionsActivity
-import com.celzero.bravedns.ui.activity.DomainConnectionsActivity.Companion.INTENT_EXTRA_IS_BLOCKED
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.ResourceRecordTypes
 import com.celzero.bravedns.util.Themes

@@ -39,7 +39,6 @@ import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.DialogWgAppsBinding
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder

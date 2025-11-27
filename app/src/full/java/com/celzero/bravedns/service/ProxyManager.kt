@@ -17,14 +17,13 @@ package com.celzero.bravedns.service
 
 import Logger
 import Logger.LOG_TAG_PROXY
-import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ProxyAppMappingRepository
 import com.celzero.bravedns.database.ProxyApplicationMapping
+import com.celzero.firestack.backend.Backend
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.concurrent.CopyOnWriteArraySet
-import kotlin.collections.removeAll
 
 object ProxyManager : KoinComponent {
 

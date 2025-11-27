@@ -16,10 +16,10 @@
 
 package com.celzero.bravedns.service
 
+import Logger
 import Logger.LOG_BATCH_LOGGER
 import android.content.Context
 import android.util.Log
-import com.celzero.firestack.backend.DNSSummary
 import com.celzero.bravedns.data.ConnTrackerMetaData
 import com.celzero.bravedns.data.ConnectionSummary
 import com.celzero.bravedns.database.ConnectionTracker
@@ -32,18 +32,17 @@ import com.celzero.bravedns.database.RethinkLog
 import com.celzero.bravedns.database.RethinkLogRepository
 import com.celzero.bravedns.util.Daemons
 import com.celzero.bravedns.util.NetLogBatcher
-import java.util.Calendar
+import com.celzero.firestack.backend.DNSSummary
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import java.util.Calendar
 
 class NetLogTracker
 internal constructor(

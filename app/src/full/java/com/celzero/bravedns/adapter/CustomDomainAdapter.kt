@@ -136,7 +136,15 @@ class CustomDomainAdapter(
     fun clearSelection() {
         selectedItems.clear()
         isSelectionMode = false
-        notifyDataSetChanged()
+        // Fix: Use notifyItemRangeChanged instead of notifyDataSetChanged for PagingDataAdapter
+        // to avoid IndexOutOfBoundsException from adapter inconsistency
+        try {
+            if (itemCount > 0) {
+                notifyItemRangeChanged(0, itemCount)
+            }
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "$TAG error clearing selection: ${e.message}", e)
+        }
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -409,7 +417,14 @@ class CustomDomainAdapter(
                     b.customDomainContainer.setOnLongClickListener {
                         isSelectionMode = true
                         selectedItems.add(cd)
-                        notifyDataSetChanged()
+                        // Fix: Use notifyItemRangeChanged instead of notifyDataSetChanged
+                        try {
+                            if (itemCount > 0) {
+                                notifyItemRangeChanged(0, itemCount)
+                            }
+                        } catch (e: Exception) {
+                            Logger.e(LOG_TAG_UI, "$TAG error in long click: ${e.message}", e)
+                        }
                         true
                     }
                 }
@@ -548,7 +563,14 @@ class CustomDomainAdapter(
             b.customDomainContainer.setOnLongClickListener {
                 isSelectionMode = true
                 selectedItems.add(cd)
-                notifyDataSetChanged()
+                // Fix: Use notifyItemRangeChanged instead of notifyDataSetChanged
+                try {
+                    if (itemCount > 0) {
+                        notifyItemRangeChanged(0, itemCount)
+                    }
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_UI, "$TAG error in long click: ${e.message}", e)
+                }
                 true
             }
         }

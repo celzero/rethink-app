@@ -70,6 +70,7 @@ jobs:
           # category: rethink-app
 
       - name: 🗃️ Artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: "rethink-app-detekt-${{ github.run_id }}.sarif"

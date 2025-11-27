@@ -18,10 +18,15 @@
  */
 package com.celzero.bravedns.wireguard
 
+import com.celzero.bravedns.wireguard.BadConfigException.Location
+import com.celzero.bravedns.wireguard.BadConfigException.Reason
+import com.celzero.bravedns.wireguard.BadConfigException.Section
 import com.celzero.firestack.backend.Backend
-import com.celzero.bravedns.wireguard.BadConfigException.*
 import java.net.InetAddress
-import java.util.*
+import java.util.Collections
+import java.util.Locale
+import java.util.Objects
+import java.util.Optional
 import java.util.stream.Collectors
 
 /**

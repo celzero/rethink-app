@@ -25,17 +25,15 @@ import android.os.SystemClock
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.celzero.firestack.backend.RDNS
-import com.celzero.firestack.backend.RouterStats
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConsoleLog
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.backend.DNSTransport
 import com.celzero.firestack.backend.NetStat
+import com.celzero.firestack.backend.RDNS
+import com.celzero.firestack.backend.RouterStats
 import com.celzero.firestack.intra.Controller
-import java.net.Socket
-import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -44,6 +42,8 @@ import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.net.Socket
+import kotlin.coroutines.cancellation.CancellationException
 
 object VpnController : KoinComponent {
 

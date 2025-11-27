@@ -17,13 +17,9 @@ package com.celzero.bravedns
 
 import Logger
 import Logger.LOG_TAG_SCHEDULER
-import android.app.Activity
 import android.app.Application
 import android.content.pm.ApplicationInfo
-import android.os.Bundle
 import android.os.StrictMode
-import com.celzero.bravedns.battery.BatteryStatsLogger
-import com.celzero.bravedns.battery.BatteryStatsProvider.logMetrics
 import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.util.FirebaseErrorReporting
@@ -36,7 +32,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 
-class RethinkDnsApplication : Application(), Application.ActivityLifecycleCallbacks {
+class RethinkDnsApplication : Application() {
     companion object {
         var DEBUG: Boolean = false
     }
@@ -57,20 +53,11 @@ class RethinkDnsApplication : Application(), Application.ActivityLifecycleCallba
         GlobalExceptionHandler.initialize(this)
         FirebaseErrorReporting.initialize()
 
-        // initialize battery stats provider (facebook battery-metrics)
-        try {
-            BatteryStatsLogger.start(this)
-        } catch (e: Exception) {
-            Logger.w(LOG_TAG_SCHEDULER, "battery-stats-init-failed: ${e.message}", e)
-        }
-
         turnOnStrictMode()
 
         CoroutineScope(SupervisorJob()).launch {
             scheduleJobs()
         }
-
-        registerActivityLifecycleCallbacks(this)
     }
 
     private suspend fun scheduleJobs() {
@@ -104,22 +91,4 @@ class RethinkDnsApplication : Application(), Application.ActivityLifecycleCallba
                 .build()
         )
     }
-
-    override fun onActivityCreated(p0: Activity, p1: Bundle?) {}
-
-    override fun onActivityDestroyed(p0: Activity) {}
-
-    override fun onActivityPaused(p0: Activity) {
-        logMetrics("foreground")
-    }
-
-    override fun onActivityResumed(p0: Activity) {
-        logMetrics("background")
-    }
-
-    override fun onActivitySaveInstanceState(p0: Activity, p1: Bundle) {}
-
-    override fun onActivityStarted(p0: Activity) {}
-
-    override fun onActivityStopped(p0: Activity) {}
 }

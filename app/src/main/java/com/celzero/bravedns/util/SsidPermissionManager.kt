@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.util
 
+import Logger
 import Logger.LOG_TAG_UI
 import android.Manifest
 import android.app.Activity
@@ -22,7 +23,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
-import android.net.wifi.WifiManager
 import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat

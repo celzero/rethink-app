@@ -9,14 +9,22 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.13.0'
+        classpath 'com.android.tools.build:gradle:8.13.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // add firebase plugins - will be conditionally applied in app/build.gradle
         def taskNames = gradle.startParameter.taskNames.join(',').toLowerCase()
-        def isFdroidBuild = taskNames.contains("fdroid")
-        println("gradle-task names: $taskNames")
-        println("is fdroid build? $isFdroidBuild")
-        if (!isFdroidBuild) {
+        def apkBuild = taskNames.contains("full")
+        def fdroidBuild = taskNames.contains("fdroid")
+
+        // check for fdroidserver value is set in system env
+        def fdroidBuildServer = System.getenv("fdroidserver")
+        def isFdroidBuildServer = fdroidBuildServer != null && !fdroidBuildServer.isEmpty() && fdroidBuildServer != "null"
+        def deGoogled = !apkBuild || fdroidBuild || isFdroidBuildServer
+
+        println("app-task names: '$taskNames'")
+        println("app; deGoogled? $deGoogled (fdroidBuild: $fdroidBuild, fdroidBuildServer: $isFdroidBuildServer, apkBuild: $apkBuild)")
+
+        if (!deGoogled) {
             classpath 'com.google.gms:google-services:4.4.3'
             classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.6'
         }

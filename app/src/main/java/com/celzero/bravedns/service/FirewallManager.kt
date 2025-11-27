@@ -717,12 +717,14 @@ object FirewallManager : KoinComponent {
         }
     }
 
-    fun getTombstoneApps(): List<AppInfo> {
-        return appInfos.values().filter { it.tombstoneTs > 0L }
+    suspend fun getTombstoneApps(): List<AppInfo> {
+        mutex.withLock {
+            return appInfos.values().filter { it.tombstoneTs > 0L }
+        }
     }
 
-    fun isAppExcludedFromProxy(uid: Int): Boolean {
-        return appInfos.get(uid).firstOrNull()?.isProxyExcluded ?: false
+    suspend fun isAppExcludedFromProxy(uid: Int): Boolean {
+        return getAppInfoByUid(uid)?.isProxyExcluded ?: false
     }
 
     fun stats(): String {

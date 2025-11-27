@@ -17,12 +17,9 @@ package com.celzero.bravedns.subscription
 
 import Logger
 import Logger.LOG_IAB
-import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 
 /**
  * Generic State Machine Framework inspired by:

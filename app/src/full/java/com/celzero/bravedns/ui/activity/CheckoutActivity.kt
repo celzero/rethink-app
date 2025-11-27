@@ -30,7 +30,6 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.celzero.firestack.backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityCheckoutProxyBinding
@@ -44,6 +43,7 @@ import com.celzero.bravedns.util.Utilities.togb
 import com.celzero.bravedns.util.Utilities.togs
 import com.celzero.bravedns.util.Utilities.tos
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.celzero.firestack.backend.Backend
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

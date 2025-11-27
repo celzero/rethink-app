@@ -18,10 +18,14 @@
  */
 package com.celzero.bravedns.wireguard
 
-import java.net.*
+import java.net.Inet4Address
+import java.net.InetAddress
+import java.net.URI
+import java.net.URISyntaxException
+import java.net.UnknownHostException
 import java.time.Duration
 import java.time.Instant
-import java.util.*
+import java.util.Optional
 import java.util.regex.Pattern
 
 /**

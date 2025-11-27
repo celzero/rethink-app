@@ -23,7 +23,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.sqlite.db.SimpleSQLiteQuery
-import com.celzero.bravedns.util.Constants
 
 @Dao
 interface ConsoleLogDAO {

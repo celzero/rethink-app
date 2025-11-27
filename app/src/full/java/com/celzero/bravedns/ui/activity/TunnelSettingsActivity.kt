@@ -40,10 +40,8 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.dialog.NetworkReachabilityDialog
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.InternetProtocol
-import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
@@ -82,12 +80,6 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     override fun onResume() {
         super.onResume()
         handleLockdownModeIfNeeded()
-        showNewBadgeIfNeeded()
-    }
-
-    private fun showNewBadgeIfNeeded() {
-        val allowIncomingWg = NewSettingsManager.shouldShowBadge(NewSettingsManager.ALLOW_INCOMING_WG_PACKETS)
-        b.dvWgAllowIncomingTxt.setBadgeDotVisible(this, allowIncomingWg)
     }
 
     private fun initView() {
@@ -397,12 +389,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.dvEimfRl.setOnClickListener { b.dvEimfSwitch.isChecked = !b.dvEimfSwitch.isChecked }
 
         b.dvWgAllowIncomingSwitch.setOnCheckedChangeListener { _, isChecked ->
-            NewSettingsManager.markSettingSeen(NewSettingsManager.ALLOW_INCOMING_WG_PACKETS)
             persistentState.nwEngExperimentalFeatures = isChecked
         }
 
         b.dvWgAllowIncomingRl.setOnClickListener {
-            NewSettingsManager.markSettingSeen(NewSettingsManager.ALLOW_INCOMING_WG_PACKETS)
             b.dvWgAllowIncomingSwitch.isChecked = !b.dvWgAllowIncomingSwitch.isChecked
         }
 

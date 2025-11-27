@@ -252,7 +252,13 @@ class AppWiseDomainLogsActivity :
         b.awlRecyclerConnection.layoutManager = layoutManager
         val recyclerAdapter = AppWiseDomainsAdapter(this, this, uid, isRethink, true)
         networkLogsViewModel.activeConnections.observe(this) {
-            recyclerAdapter.submitData(this.lifecycle, it)
+            // Fix: Stop layout before submitting data to prevent IndexOutOfBoundsException
+            try {
+                b.awlRecyclerConnection.stopScroll()
+                recyclerAdapter.submitData(this.lifecycle, it)
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_UI, "Error submitting active connections data: ${e.message}", e)
+            }
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
 
@@ -282,7 +288,13 @@ class AppWiseDomainLogsActivity :
         b.awlRecyclerConnection.layoutManager = layoutManager
         val recyclerAdapter = AppWiseDomainsAdapter(this, this, uid, isRethink)
         networkLogsViewModel.appDomainLogs.observe(this) {
-            recyclerAdapter.submitData(this.lifecycle, it)
+            // Fix: Stop layout before submitting data to prevent IndexOutOfBoundsException
+            try {
+                b.awlRecyclerConnection.stopScroll()
+                recyclerAdapter.submitData(this.lifecycle, it)
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_UI, "Error submitting domain logs data: ${e.message}", e)
+            }
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
 
@@ -312,7 +324,13 @@ class AppWiseDomainLogsActivity :
         b.awlRecyclerConnection.layoutManager = layoutManager
         val recyclerAdapter = AppWiseDomainsAdapter(this, this, uid, isRethink)
         networkLogsViewModel.rinrDomainLogs.observe(this) {
-            recyclerAdapter.submitData(this.lifecycle, it)
+            // Fix: Stop layout before submitting data to prevent IndexOutOfBoundsException
+            try {
+                b.awlRecyclerConnection.stopScroll()
+                recyclerAdapter.submitData(this.lifecycle, it)
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_UI, "Error submitting rethink domain logs data: ${e.message}", e)
+            }
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
 

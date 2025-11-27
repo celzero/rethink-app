@@ -34,7 +34,6 @@ import com.celzero.bravedns.databinding.DialogWgSsidBinding
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlin.text.replaceFirstChar
 
 class WgSsidDialog(
     private val activity: Activity,
@@ -81,6 +80,7 @@ class WgSsidDialog(
         b.addSsidBtn.isEnabled = false
         b.addSsidBtn.isClickable = false
         b.addSsidBtn.setTextColor(UIUtils.fetchColor(context, R.attr.primaryLightColorText))
+        disableOrEnableRadioButtons(false)
 
         // listeners to update description text when radio buttons change
         b.ssidConditionRadioGroup.setOnCheckedChangeListener { _, _ ->
@@ -146,9 +146,13 @@ class WgSsidDialog(
         b.ssidEditText.addTextChangedListener { text ->
             val isNotEmpty = !text.isNullOrBlank()
 
-            // Enable or disable button based on text
+            // Enable or disable add button based on text
             b.addSsidBtn.isEnabled = isNotEmpty
             b.addSsidBtn.isClickable = isNotEmpty
+
+            // Enable or disable radio buttons based on text
+            // User should only be able to change settings when there's an SSID to apply them to
+            disableOrEnableRadioButtons(isNotEmpty)
 
             // Change button background color based on state
             val context = b.addSsidBtn.context
@@ -165,6 +169,17 @@ class WgSsidDialog(
         b.saveBtn.setOnClickListener {
             saveSsids()
         }
+    }
+
+    private fun disableOrEnableRadioButtons(enable: Boolean) {
+        b.radioEqual.isEnabled = enable
+        b.radioEqual.isClickable = enable
+        b.radioNotEqual.isEnabled = enable
+        b.radioNotEqual.isClickable = enable
+        b.radioExact.isEnabled = enable
+        b.radioExact.isClickable = enable
+        b.radioWildcard.isEnabled = enable
+        b.radioWildcard.isClickable = enable
     }
 
     private fun addSsid() {

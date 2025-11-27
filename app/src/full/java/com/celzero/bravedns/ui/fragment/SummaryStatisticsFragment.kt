@@ -19,9 +19,9 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.SummaryStatisticsAdapter
@@ -41,7 +41,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 
 class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics) {
     private val b by viewBinding(FragmentSummaryStatisticsBinding::bind)

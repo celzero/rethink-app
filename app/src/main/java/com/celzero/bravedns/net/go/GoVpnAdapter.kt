@@ -29,7 +29,6 @@ import android.net.VpnService.NOTIFICATION_SERVICE
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
@@ -59,7 +58,6 @@ import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL_MAX
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL_SKY
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
-import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.UIUtils.getAccentColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.blocklistDir
@@ -74,6 +72,7 @@ import com.celzero.bravedns.util.Utilities.togs
 import com.celzero.bravedns.util.Utilities.tos
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.WgHopManager
+import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.DNSResolver
 import com.celzero.firestack.backend.DNSTransport
 import com.celzero.firestack.backend.NetStat
@@ -84,17 +83,16 @@ import com.celzero.firestack.intra.Controller
 import com.celzero.firestack.intra.DefaultDNS
 import com.celzero.firestack.intra.Intra
 import com.celzero.firestack.intra.Tunnel
+import com.celzero.firestack.settings.Settings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import com.celzero.firestack.settings.Settings
-import kotlinx.coroutines.delay
 import java.io.File
 import java.net.URI
 import java.net.URLEncoder
-import kotlin.text.substring
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -164,7 +162,6 @@ class GoVpnAdapter : KoinComponent {
         undelegatedDomains()
         setExperimentalSettings()
         setAutoDialsParallel()
-        setHappyEyeballs()
         // added for testing, use if needed
         if (DEBUG) panicAtRandom(persistentState.panicRandom) else panicAtRandom(false)
         Logger.v(LOG_TAG_VPN, "$TAG initResolverProxiesPcap done")
@@ -2116,25 +2113,12 @@ class GoVpnAdapter : KoinComponent {
             return
         }
         try {
-            Intra.experimental(value)
+            Intra.experimentalWireGuard(value)
             // refresh proxies on experimental settings change (required for wireguard)
             //refreshOrReAddProxies()
             Logger.i(LOG_TAG_VPN, "$TAG set experimental settings: $value")
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG err set experimental settings: ${e.message}", e)
-        }
-    }
-
-    suspend fun setHappyEyeballs(value: Boolean = InternetProtocol.isAlwaysV46(persistentState.internetProtocolType)) {
-        if (!tunnel.isConnected) {
-            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip happy eyeballs setting")
-            return
-        }
-        try {
-            Intra.happyEyeballs(value)
-            Logger.i(LOG_TAG_VPN, "$TAG set happy eyeballs as $value")
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "$TAG err; happy eyeballs: ${e.message}", e)
         }
     }
 

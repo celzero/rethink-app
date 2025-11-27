@@ -23,13 +23,13 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.celzero.bravedns.database.ConsoleLogDAO
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import java.io.BufferedOutputStream
 
 class LogExportWorker(context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams), KoinComponent {

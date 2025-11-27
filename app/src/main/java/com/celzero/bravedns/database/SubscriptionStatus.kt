@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.database
 
+import Logger
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 

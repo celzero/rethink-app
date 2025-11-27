@@ -31,7 +31,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.celzero.firestack.backend.Backend
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
@@ -51,6 +50,7 @@ import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.getIcon
+import com.celzero.firestack.backend.Backend
 import com.google.gson.Gson
 
 class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethinkDns: Boolean) :

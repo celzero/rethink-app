@@ -21,7 +21,6 @@ import Logger.LOG_TAG_UI
 import Logger.LOG_TAG_VPN
 import Logger.updateConfigLevel
 import android.Manifest
-import android.R.attr.theme
 import android.app.LocaleManager
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -73,13 +72,11 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_REGENERATION_PERIOD_DAYS
-import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils.openUrl
-import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.getRandomString
@@ -89,12 +86,10 @@ import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.google.android.gms.common.wrappers.Wrappers.packageManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
-import org.koin.java.KoinJavaComponent.inject
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.File
@@ -745,23 +740,19 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
         // Firebase error reporting toggle
         b.settingsFirebaseErrorReportingRl.setOnClickListener {
-            NewSettingsManager.markSettingSeen(NewSettingsManager.ERROR_REPORTING)
             b.settingsFirebaseErrorReportingSwitch.isChecked =
                 !b.settingsFirebaseErrorReportingSwitch.isChecked
         }
 
         b.settingsFirebaseErrorReportingSwitch.setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
-            NewSettingsManager.markSettingSeen(NewSettingsManager.ERROR_REPORTING)
             handleFirebaseErrorReportingToggle(isChecked)
         }
 
         b.tombstoneAppRl.setOnClickListener {
-            NewSettingsManager.markSettingSeen(NewSettingsManager.TOMBSTONE_APP_SETTING)
             b.tombstoneAppSwitch.isChecked = !b.tombstoneAppSwitch.isChecked
         }
 
         b.tombstoneAppSwitch.setOnCheckedChangeListener { _, isChecked ->
-            NewSettingsManager.markSettingSeen(NewSettingsManager.TOMBSTONE_APP_SETTING)
             persistentState.tombstoneApps = isChecked
             io { rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE) }
         }
@@ -1264,14 +1255,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         // app notification permission android 13
         showEnableNotificationSettingIfNeeded()
         checkMicCamAccessRule()
-        showNewBadgeIfNeeded()
-    }
-
-    private fun showNewBadgeIfNeeded() {
-        val errorReporting = NewSettingsManager.shouldShowBadge(NewSettingsManager.ERROR_REPORTING)
-        b.genSettingsFirebaseErrorReportingTxt.setBadgeDotVisible(this, errorReporting)
-        val tombstoneSetting = NewSettingsManager.shouldShowBadge(NewSettingsManager.TOMBSTONE_APP_SETTING)
-        b.tombstoneAppTxt.setBadgeDotVisible(this, tombstoneSetting)
     }
 
     private fun registerForActivityResult() {

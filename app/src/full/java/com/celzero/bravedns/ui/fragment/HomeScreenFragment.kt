@@ -1835,15 +1835,26 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun isAnotherVpnActive(): Boolean {
-        val connectivityManager =
-            requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork = connectivityManager.activeNetwork ?: return false
-        val capabilities =
-            connectivityManager.getNetworkCapabilities(activeNetwork)
-                ?: // It's not clear when this can happen, but it has occurred for at least one
-                // user.
-                return false
-        return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+        return try {
+            val connectivityManager =
+                requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val activeNetwork = connectivityManager.activeNetwork ?: return false
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(activeNetwork)
+                    ?: // It's not clear when this can happen, but it has occurred for at least one
+                    // user.
+                    return false
+            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+        } catch (e: SecurityException) {
+            // Fix: Handle SecurityException that can occur when calling getNetworkCapabilities()
+            // on certain devices/Android versions or when app lacks proper permissions
+            Logger.e(LOG_TAG_VPN, "SecurityException checking VPN status: ${e.message}", e)
+            false
+        } catch (e: Exception) {
+            // Catch any other unexpected exceptions
+            Logger.e(LOG_TAG_VPN, "err checking VPN status: ${e.message}", e)
+            false
+        }
     }
 
     private fun fetchTextColor(attr: Int): Int {

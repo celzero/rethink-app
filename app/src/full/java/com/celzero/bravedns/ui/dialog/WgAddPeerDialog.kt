@@ -31,7 +31,6 @@ import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.UIUtils.getDurationInHumanReadableFormat
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.tos
-import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.util.ErrorMessages
 import kotlinx.coroutines.Dispatchers

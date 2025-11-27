@@ -196,6 +196,12 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             }
             io {
                 val endpoint = appConfig.getSocks5ProxyDetails()
+                if (endpoint == null) {
+                    uiCtx {
+                        showToastUiCentered(this, getString(R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
+                    }
+                    return@io
+                }
                 val packageName = endpoint.proxyAppName
                 val app = FirewallManager.getAppInfoByPackage(packageName)?.appName ?: ""
                 val m = ProxyManager.ProxyMode.get(endpoint.proxyMode)
@@ -251,7 +257,12 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 return@setOnCheckedChangeListener
             }
             io {
-                val endpoint = appConfig.getHttpProxyDetails()
+                val endpoint = try {
+                    appConfig.getHttpProxyDetails()
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_PROXY, "err fetching HTTP proxy details: ${e.message}", e)
+                    null
+                }
                 if (endpoint == null) {
                     uiCtx {
                         showToastUiCentered(this, getString(R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
@@ -393,7 +404,12 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         if (!appConfig.isCustomHttpProxyEnabled()) return
 
         io {
-            val endpoint = appConfig.getHttpProxyDetails()
+            val endpoint = try {
+                appConfig.getHttpProxyDetails()
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_PROXY, "Error fetching HTTP proxy details in displayHttpProxyUi: ${e.message}", e)
+                null
+            }
             if (endpoint == null) {
                 uiCtx {
                     showToastUiCentered(this, getString(R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
@@ -525,7 +541,17 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         }
 
         io {
-            val endpoint: ProxyEndpoint = appConfig.getSocks5ProxyDetails()
+            val endpoint: ProxyEndpoint? = appConfig.getSocks5ProxyDetails()
+            if (endpoint == null) {
+                uiCtx {
+                    showToastUiCentered(
+                        this,
+                        getString(R.string.blocklist_update_check_failure),
+                        Toast.LENGTH_SHORT
+                    )
+                }
+                return@io
+            }
             val m = ProxyManager.ProxyMode.get(endpoint.proxyMode) ?: return@io
 
             // only update below ui if its custom http proxy
