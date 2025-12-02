@@ -1,19 +1,10 @@
 # Detekt configuration file
 # Excludes test files from code scanning
 # Exclude test files from analysis
-test-pattern:
-  - '**/src/test/**'
-  - '**/src/androidTest/**'
-  - '**/src/testDebug/**'
-  - '**/src/testRelease/**'
-  - '**/src/androidTestDebug/**'
-  - '**/src/androidTestRelease/**'
-  - '**/*Test.kt'
-  - '**/*Tests.kt'
-  - '**/*Spec.kt'
+excludes: '**/src/test/**,**/src/androidTest/**,**/src/testDebug/**,**/src/testRelease/**,**/src/androidTestDebug/**,**/src/androidTestRelease/**,**/*Test.kt,**/*Tests.kt,**/*Spec.kt'
 
 style:
- MaxLineLength:
+  MaxLineLength:
     active: true
     maxLineLength: 1400
     excludePackageStatements: true
