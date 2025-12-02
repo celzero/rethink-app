@@ -1,3 +1,5 @@
+# Detekt configuration file
+# Excludes test files from code scanning
 style:
  MaxLineLength:
     active: true
@@ -6,4 +8,27 @@ style:
     excludeImportStatements: true
     excludeCommentStatements: false
     excludeRawStrings: true
+
+build:
+  # Exclude test source sets from analysis
+  excludes:
+    - '**/src/test/**'
+    - '**/src/androidTest/**'
+    - '**/src/testDebug/**'
+    - '**/src/testRelease/**'
+    - '**/src/androidTestDebug/**'
+    - '**/src/androidTestRelease/**'
+    - '**/*Test.kt'
+    - '**/*Tests.kt'
+    - '**/*Spec.kt'
+
+# Optional: You can also add specific test-related patterns
+input:
+  excludes:
+    - '**/test/**'
+    - '**/androidTest/**'
+    - '**/commonTest/**'
+    - '**/jvmTest/**'
+    - '**/jsTest/**'
+    - '**/iosTest/**'
 
