@@ -33,6 +33,7 @@ jobs:
           java -jar detekt-cli-all.jar \
               --build-upon-default-config \
               --config .github/detekt-config.yml \
+              --excludes '**/src/test/**,**/src/androidTest/**,**/src/testDebug/**,**/src/testRelease/**,**/src/androidTestDebug/**,**/src/androidTestRelease/**,**/*Test.kt,**/*Tests.kt,**/*Spec.kt' \
               --fail-on-severity ${SEV} \
               --analysis-mode full \
               --api-version ${KOTLIN_VER} \
