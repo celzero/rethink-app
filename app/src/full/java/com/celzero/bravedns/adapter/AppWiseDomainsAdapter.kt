@@ -45,7 +45,6 @@ class AppWiseDomainsAdapter(
     val context: Context,
     val lifecycleOwner: LifecycleOwner,
     val uid: Int,
-    val isRethink: Boolean,
     val isActiveConn: Boolean = false
 ) :
     PagingDataAdapter<AppConnection, AppWiseDomainsAdapter.ConnectionDetailsViewHolder>(
@@ -170,10 +169,10 @@ class AppWiseDomainsAdapter(
                 return
             }
 
-            if (isRethink) {
+            /*if (isRethink) {
                 Logger.i(LOG_TAG_UI, "$TAG rethink connection - no close connection dialog")
                 return
-            }
+            }*/
             Logger.v(LOG_TAG_UI, "$TAG show close connection dialog for uid: $uid")
             val dialog = MaterialAlertDialogBuilder(context, R.style.App_Dialog_NoDim)
                 .setTitle(context.getString(R.string.close_conns_dialog_title))
@@ -204,10 +203,10 @@ class AppWiseDomainsAdapter(
                 return
             }
 
-            if (isRethink) {
+            /*if (isRethink) {
                 Logger.i(LOG_TAG_UI, "$TAG rethink connection - no bottom sheet")
                 return
-            }
+            }*/
 
             if (isActiveConn) {
                 Logger.i(LOG_TAG_UI, "$TAG active connection - no bottom sheet")

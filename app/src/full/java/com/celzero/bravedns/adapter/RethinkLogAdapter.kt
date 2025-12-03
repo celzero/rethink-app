@@ -118,7 +118,7 @@ class RethinkLogAdapter(private val context: Context) :
                 return
             }
 
-            val bottomSheetFragment = RethinkLogBottomSheet()
+            val bottomSheetFragment = ConnTrackerBottomSheet()
             // see AppIpRulesAdapter.kt#openBottomSheet()
             val bundle = Bundle()
             bundle.putString(ConnTrackerBottomSheet.INSTANCE_STATE_IPDETAILS, Gson().toJson(log))

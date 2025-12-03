@@ -65,7 +65,6 @@ class AppWiseIpLogsActivity :
     private var uid: Int = INVALID_UID
     private var layoutManager: RecyclerView.LayoutManager? = null
     private lateinit var appInfo: AppInfo
-    private var isRethink = false
     private var isAsn = false
 
     companion object {
@@ -93,13 +92,10 @@ class AppWiseIpLogsActivity :
         if (uid == INVALID_UID) {
             finish()
         }
+        init()
         if (Utilities.getApplicationInfo(this, this.packageName)?.uid == uid) {
-            isRethink = true
-            init()
             setRethinkAdapter()
-            b.toggleGroup.addOnButtonCheckedListener(listViewToggleListener)
         } else {
-            init()
             if (isAsn) {
                 // ASN view
                 // disable search view for ASN view, visibility should be there as the icon is used
@@ -109,8 +105,8 @@ class AppWiseIpLogsActivity :
             } else {
                 setAdapter()
             }
-            setClickListener()
         }
+        setClickListener()
     }
 
     override fun onResume() {
@@ -219,7 +215,7 @@ class AppWiseIpLogsActivity :
         b.awlRecyclerConnection.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(this)
         b.awlRecyclerConnection.layoutManager = layoutManager
-        val recyclerAdapter = AppWiseIpsAdapter(this, this, uid, isRethink)
+        val recyclerAdapter = AppWiseIpsAdapter(this, this, uid)
         networkLogsViewModel.appIpLogs.observe(this) {
             recyclerAdapter.submitData(this.lifecycle, it)
         }
@@ -245,12 +241,11 @@ class AppWiseIpLogsActivity :
     }
 
     private fun setAsnAdapter() {
-        Logger.v(LOG_TAG_UI, "setAsnAdapter: uid: $uid, isRethink: $isRethink")
         networkLogsViewModel.setUid(uid)
         b.awlRecyclerConnection.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(this)
         b.awlRecyclerConnection.layoutManager = layoutManager
-        val recyclerAdapter = AppWiseIpsAdapter(this, this, uid, isRethink, isAsn = true)
+        val recyclerAdapter = AppWiseIpsAdapter(this, this, uid, isAsn = true)
         networkLogsViewModel.asnLogs.observe(this) {
             recyclerAdapter.submitData(this.lifecycle, it)
         }
@@ -280,7 +275,7 @@ class AppWiseIpLogsActivity :
         b.awlRecyclerConnection.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(this)
         b.awlRecyclerConnection.layoutManager = layoutManager
-        val recyclerAdapter = AppWiseIpsAdapter(this, this, uid, isRethink)
+        val recyclerAdapter = AppWiseIpsAdapter(this, this, uid)
         networkLogsViewModel.rinrIpLogs.observe(this) {
             recyclerAdapter.submitData(this.lifecycle, it)
         }

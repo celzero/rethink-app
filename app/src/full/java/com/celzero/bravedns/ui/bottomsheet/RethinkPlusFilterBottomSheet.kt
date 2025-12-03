@@ -54,7 +54,7 @@ class RethinkPlusFilterBottomSheet : BottomSheetDialogFragment() {
 
     companion object {
         private const val ARG_FILE_TAGS = "file_tags"
-
+        
         // Factory method to create instance with parameters
         fun newInstance(
             activity: RethinkBlocklistFragment?,

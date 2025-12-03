@@ -32,7 +32,7 @@ import com.celzero.bravedns.util.Utilities
 
 @Database(
     entities = [ConnectionTracker::class, DnsLog::class, RethinkLog::class, IpInfo::class],
-    version = 12,
+    version = 13,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -74,6 +74,7 @@ abstract class LogDatabase : RoomDatabase() {
                 .addMigrations(Migration_9_10)
                 .addMigrations(MIGRATION_10_11)
                 .addMigrations(MIGRATION_11_12)
+                .addMigrations(MIGRATION_12_13)
                 .fallbackToDestructiveMigration() // recreate the database if no migration is found
                 .build()
         }
@@ -320,6 +321,20 @@ abstract class LogDatabase : RoomDatabase() {
                     Logger.i(LOG_TAG_APP_DB, "added dnssecOk & dnssecValid columns")
                 } catch (_: Exception) {
                     Logger.i(LOG_TAG_APP_DB, "dnssecOk already exists")
+                }
+            }
+        }
+
+        private val MIGRATION_12_13: Migration = object : Migration(12, 13) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // add missing columns to RethinkLog to align with ConnectionTracker
+                try {
+                    db.execSQL("ALTER TABLE RethinkLog ADD COLUMN usrId INTEGER NOT NULL DEFAULT 0")
+                    db.execSQL("ALTER TABLE RethinkLog ADD COLUMN blockedByRule TEXT NOT NULL DEFAULT ''")
+                    db.execSQL("ALTER TABLE RethinkLog ADD COLUMN blocklists TEXT NOT NULL DEFAULT ''")
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_12_13: added usrId, blockedByRule, blocklists columns to RethinkLog")
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_APP_DB, "MIGRATION_12_13: columns may already exist: ${e.message}")
                 }
             }
         }

@@ -226,6 +226,20 @@ class AppConnectionsViewModel(
             .cachedIn(viewModelScope)
     }
 
+    fun getRethinkActiveConnsLimited(uptime: Long): LiveData<PagingData<AppConnection>> {
+        val to = System.currentTimeMillis() - uptime
+        return Pager(pagingConfig) { statsDao.getRethinkTopActiveConns(to) }
+            .liveData
+            .cachedIn(viewModelScope)
+    }
+
+    fun getRethinkAllActiveConns(uptime: Long): LiveData<PagingData<AppConnection>> {
+        val to = System.currentTimeMillis() - uptime
+        return Pager(pagingConfig) { statsDao.getRethinkAllActiveConns(to) }
+            .liveData
+            .cachedIn(viewModelScope)
+    }
+
     fun getRethinkDomainLogsLimited(): LiveData<PagingData<AppConnection>> {
         val to = System.currentTimeMillis() - ONE_WEEK_MILLIS
         return Pager(pagingConfig) { rinrDao.getDomainLogsLimited(to) }

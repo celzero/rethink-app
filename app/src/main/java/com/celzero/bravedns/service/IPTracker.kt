@@ -46,10 +46,6 @@ internal constructor(
     private val ctx: Context
 ) : KoinComponent {
 
-    companion object {
-        private const val PER_USER_RANGE = 100000
-    }
-
     suspend fun makeConnectionTracker(connTrackerMetaData: ConnTrackerMetaData): ConnectionTracker {
         val connTracker = ConnectionTracker()
         connTracker.ipAddress = connTrackerMetaData.destIP
@@ -91,6 +87,7 @@ internal constructor(
         rlog.ipAddress = connTrackerMetaData.destIP
         rlog.isBlocked = connTrackerMetaData.isBlocked
         rlog.uid = connTrackerMetaData.uid
+        rlog.usrId = connTrackerMetaData.usrId
         rlog.port = connTrackerMetaData.destPort
         rlog.protocol = connTrackerMetaData.protocol
         rlog.timeStamp = connTrackerMetaData.timestamp
@@ -176,11 +173,9 @@ internal constructor(
 
         val cachedPkgs = FirewallManager.getPackageNamesByUid(uid)
 
-        val pkgs = if (cachedPkgs.isEmpty()) {
+        val pkgs = cachedPkgs.ifEmpty {
             // query the package manager for the package name
             getPackageInfoForUid(ctx, uid)?.toList() ?: emptyList()
-        } else {
-            cachedPkgs
         }
 
         val appName: String =

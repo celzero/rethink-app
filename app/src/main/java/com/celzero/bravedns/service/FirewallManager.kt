@@ -503,8 +503,6 @@ object FirewallManager : KoinComponent {
     ) {
         mutex.withLock {
             appInfos.get(uid).forEach {
-                if (it.packageName == RETHINK_PACKAGE) return@forEach
-
                 it.firewallStatus = firewallStatus.id
                 it.connectionStatus = connectionStatus.id
             }
