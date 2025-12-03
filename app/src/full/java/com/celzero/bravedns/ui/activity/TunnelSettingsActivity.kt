@@ -40,8 +40,10 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.dialog.NetworkReachabilityDialog
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.InternetProtocol
+import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
@@ -80,6 +82,13 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     override fun onResume() {
         super.onResume()
         handleLockdownModeIfNeeded()
+        showNewBadgeIfNeeded()
+    }
+
+    private fun showNewBadgeIfNeeded() {
+        val showBadge =
+            NewSettingsManager.shouldShowBadge(NewSettingsManager.WG_GLOBAL_LOCKDOWN_MODE_SETTING)
+        b.dvWgLockdownTxt.setBadgeDotVisible(this, showBadge)
     }
 
     private fun initView() {
@@ -112,6 +121,8 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.settingsStallNoNwSwitch.isChecked = persistentState.stallOnNoNetwork
 
         b.dvWgListenPortSwitch.isChecked = !persistentState.randomizeListenPort
+
+        b.dvWgLockdownSwitch.isChecked = persistentState.wgGlobalLockdown
 
         // endpoint independent mapping (eim) / endpoint independent filtering (eif)
         b.dvEimfSwitch.isChecked = persistentState.endpointIndependence
@@ -394,6 +405,15 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         b.dvWgAllowIncomingRl.setOnClickListener {
             b.dvWgAllowIncomingSwitch.isChecked = !b.dvWgAllowIncomingSwitch.isChecked
+        }
+
+        b.dvWgLockdownSwitch.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.wgGlobalLockdown = isChecked
+        }
+
+        b.dvWgLockdownRl.setOnClickListener {
+            NewSettingsManager.markSettingSeen(NewSettingsManager.WG_GLOBAL_LOCKDOWN_MODE_SETTING)
+            b.dvWgLockdownSwitch.isChecked = !b.dvWgLockdownSwitch.isChecked
         }
 
         b.dvTcpKeepAliveSwitch.setOnCheckedChangeListener { _, isChecked ->

@@ -53,7 +53,7 @@ import com.celzero.bravedns.util.Constants
         SubscriptionStatus::class,
         SubscriptionStateHistory::class
     ],
-    version = 26,
+    version = 27,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -100,6 +100,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_23_24)
                 .addMigrations(MIGRATION_24_25)
                 .addMigrations(MIGRATION_25_26)
+                .addMigrations(MIGRATION_26_27)
                 .build()
 
         private val roomCallback: Callback =
@@ -918,7 +919,7 @@ abstract class AppDatabase : RoomDatabase() {
                             )
                         }
                         Logger.i(LOG_TAG_APP_DB, "MIGRATION_21_22: added isLockdown column")
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         Logger.i(LOG_TAG_APP_DB, "isLockdown column already exists, ignore")
                     }
                     try {
@@ -928,7 +929,7 @@ abstract class AppDatabase : RoomDatabase() {
                             )
                         }
                         Logger.i(LOG_TAG_APP_DB, "MIGRATION_21_22: added isCatchAll column")
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         Logger.i(LOG_TAG_APP_DB, "isCatchAll column already exists, ignore")
                     }
                     try {
@@ -938,7 +939,7 @@ abstract class AppDatabase : RoomDatabase() {
                             )
                         }
                         Logger.i(LOG_TAG_APP_DB, "MIGRATION_21_22: added oneWireGuard column")
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         Logger.i(LOG_TAG_APP_DB, "oneWireGuard column already exists, ignore")
                     }
                 }
@@ -1063,15 +1064,29 @@ abstract class AppDatabase : RoomDatabase() {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     try {
                         db.execSQL("ALTER TABLE WgConfigFiles ADD COLUMN ssidEnabled INTEGER NOT NULL DEFAULT 0")
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         Logger.i(LOG_TAG_APP_DB, "MIGRATION_25_26: ssidEnabled already exists")
                     }
                     try {
                         db.execSQL("ALTER TABLE WgConfigFiles ADD COLUMN ssids TEXT NOT NULL DEFAULT ''")
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         Logger.i(LOG_TAG_APP_DB, "MIGRATION_25_26: ssids already exists")
                     }
                     Logger.i(LOG_TAG_APP_DB, "MIGRATION_25_26: added ssidEnabled & ssids columns")
+                }
+            }
+
+        private val MIGRATION_26_27: Migration =
+            object : Migration(26, 27) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    // delete the column isLockdown from WgConfigFiles
+                    db.execSQL("CREATE TABLE 'WgConfigFiles_new' ('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'configPath' TEXT NOT NULL, 'serverResponse' TEXT NOT NULL, 'isActive' INTEGER NOT NULL, 'isDeletable' INTEGER NOT NULL, 'isCatchAll' INTEGER NOT NULL, 'oneWireGuard' INTEGER NOT NULL, 'useOnlyOnMetered' INTEGER NOT NULL, 'ssidEnabled' INTEGER NOT NULL, 'ssids' TEXT NOT NULL, PRIMARY KEY (id))")
+                    db.execSQL("INSERT INTO WgConfigFiles_new SELECT id, name, configPath, serverResponse, isActive, isDeletable, isCatchAll, oneWireGuard, useOnlyOnMetered, ssidEnabled, ssids FROM WgConfigFiles")
+                    db.execSQL("DROP TABLE WgConfigFiles")
+                    db.execSQL("ALTER TABLE WgConfigFiles_new RENAME TO WgConfigFiles")
+                    // insert new columns with default values (modifiedTs)
+                    db.execSQL("ALTER TABLE WgConfigFiles ADD COLUMN modifiedTs INTEGER NOT NULL DEFAULT 0")
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_26_27: removed isLockdown column")
                 }
             }
 
@@ -1085,7 +1100,7 @@ abstract class AppDatabase : RoomDatabase() {
             try {
                 db.query("SELECT * FROM $tableName LIMIT 0", emptyArray())
                     .use { cursor -> return cursor.getColumnIndex(columnToCheck) != -1 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 return false
             }
         }

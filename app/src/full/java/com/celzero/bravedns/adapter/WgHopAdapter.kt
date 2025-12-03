@@ -157,7 +157,7 @@ class WgHopAdapter(
 
         private fun updatePropertiesChip(config: Config) {
             val mapping = WireguardManager.getConfigFilesById(config.getId()) ?: return
-            if (!mapping.isCatchAll && !mapping.isLockdown && !mapping.useOnlyOnMetered && !mapping.ssidEnabled) {
+            if (!mapping.isCatchAll && !mapping.useOnlyOnMetered && !mapping.ssidEnabled) {
                 b.chipProperties.visibility = View.GONE
                 return
             }
@@ -165,14 +165,6 @@ class WgHopAdapter(
             if (mapping.isCatchAll) {
                 b.chipProperties.visibility = View.VISIBLE
                 b.chipProperties.text = context.getString(R.string.symbol_lightening)
-            }
-            if (mapping.isLockdown) {
-                b.chipProperties.visibility = View.VISIBLE
-                b.chipProperties.text = context.getString(
-                    R.string.two_argument_space,
-                    b.chipProperties.text.toString(),
-                    context.getString(R.string.symbol_lockdown)
-                )
             }
             if (mapping.useOnlyOnMetered) {
                 b.chipProperties.visibility = View.VISIBLE

@@ -48,6 +48,7 @@ object WireguardManager : KoinComponent {
     private val db: WgConfigFilesRepository by inject()
     private val applicationContext: Context by inject()
     private val appConfig: AppConfig by inject()
+    private val persistentState: PersistentState by inject()
 
     // 120 sec + 5 sec buffer
     const val WG_HANDSHAKE_TIMEOUT = 125 * DateUtils.SECOND_IN_MILLIS
@@ -228,7 +229,6 @@ object WireguardManager : KoinComponent {
                 map.serverResponse,
                 true,
                 map.isCatchAll,
-                map.isLockdown,
                 map.oneWireGuard,
                 map.useOnlyOnMetered,
                 map.isDeletable,
@@ -324,7 +324,6 @@ object WireguardManager : KoinComponent {
                 m.serverResponse,
                 false, // confirms with db.disableConfig query
                 m.isCatchAll,
-                m.isLockdown,
                 false, // confirms with db.disableConfig query
                 m.useOnlyOnMetered,
                 m.isDeletable,
@@ -346,7 +345,8 @@ object WireguardManager : KoinComponent {
     }
 
     // pair - first: proxyId, second - can proceed for next check
-    private suspend fun canUseConfig(idStr: String, type: String, usesMtrdNw: Boolean, ssid: String): Pair<String, Boolean> {
+    private fun canUseConfig(idStr: String, type: String, usesMtrdNw: Boolean, ssid: String): Pair<String, Boolean> {
+        val lockdown = persistentState.wgGlobalLockdown
         val block = Backend.Block
         if (idStr.isEmpty()) {
             return Pair("", true)
@@ -359,14 +359,14 @@ object WireguardManager : KoinComponent {
             return Pair("", true)
         }
 
-        if (config.isLockdown && (checkEligibilityBasedOnNw(id, usesMtrdNw) && checkEligibilityBasedOnSsid(id, ssid))) {
+        if (lockdown && (checkEligibilityBasedOnNw(id, usesMtrdNw) && checkEligibilityBasedOnSsid(id, ssid))) {
             Logger.d(LOG_TAG_PROXY, "lockdown wg for $type => return $idStr")
             return Pair(idStr, false) // no need to proceed further for lockdown
         }
 
         // in case of lockdown and not metered network, we need to return block as the
         // lockdown should not leak the connections via WiFi
-        if (config.isLockdown) {
+        if (lockdown) {
             // add IpnBlock instead of the config id, let the connection be blocked in WiFi
             // regardless of config is active or not
             Logger.d(LOG_TAG_PROXY, "lockdown wg for $type => return $block")
@@ -388,14 +388,15 @@ object WireguardManager : KoinComponent {
     }
 
     // no need to check for app excluded from proxy here, expected to call this fn after that
-    suspend fun getAllPossibleConfigIdsForApp(uid: Int, ip: String, port: Int, domain: String, usesMobileNw: Boolean, ssid: String, default: String): List<String> {
+    fun getAllPossibleConfigIdsForApp(uid: Int, ip: String, port: Int, domain: String, usesMobileNw: Boolean, ssid: String, default: String): List<String> {
+        val lockdown = persistentState.wgGlobalLockdown
         val block = Backend.Block
         val proxyIds: MutableList<String> = mutableListOf()
         if (oneWireGuardEnabled()) {
             val id = getOneWireGuardProxyId()
             if (id == null || id == INVALID_CONF_ID) {
                 Logger.e(LOG_TAG_PROXY, "canAdd: one-wg not found, id: $id, return empty")
-                return emptyList<String>()
+                return emptyList()
             }
 
             // commenting this as the one-wg is enabled for all networks no need to check for
@@ -530,16 +531,10 @@ object WireguardManager : KoinComponent {
             Logger.i(LOG_TAG_PROXY, "no proxy ids found for $uid, $ip, $port, $domain; returning $default")
             return listOf(default)
         }
-        // see if any id is part of lockdown, if so, then return the list, cac's can have lockdown
-        val isAnyIdLockdown = proxyIds.any { id ->
-            val confId = convertStringIdToId(id)
-            val conf = mappings.find { it.id == confId }
-            conf?.isLockdown ?: false
-        }
 
         // add the default proxy to the end, will not be true for lockdown but lockdown is handled
         // above, so no need to check here
-        if (default.isNotEmpty() && !isAnyIdLockdown) proxyIds.add(default)
+        if (default.isNotEmpty() && !lockdown) proxyIds.add(default)
 
         // the proxyIds list will contain the ip-app specific, domain-app specific, app specific,
         // universal ip, universal domain, catch-all and default configs in the order of priority
@@ -810,39 +805,6 @@ object WireguardManager : KoinComponent {
         }
     }
 
-    suspend fun updateLockdownConfig(id: Int, isLockdown: Boolean) {
-        val config = configs.find { it.getId() == id }
-        val map = mappings.find { it.id == id }
-        if (config == null) {
-            Logger.e(LOG_TAG_PROXY, "updateLockdownConfig: wg not found, id: $id, ${configs.size}")
-            return
-        }
-        Logger.i(LOG_TAG_PROXY, "updating lockdown for config: $id, ${config.getPeers()}")
-        db.updateLockdownConfig(id, isLockdown)
-        val m = mappings.find { it.id == id } ?: return
-        mappings.remove(m)
-        mappings.add(
-            WgConfigFilesImmutable(
-                id,
-                config.getName(),
-                m.configPath,
-                m.serverResponse,
-                m.isActive,
-                m.isCatchAll,
-                isLockdown, // just updating lockdown field
-                m.oneWireGuard,
-                m.useOnlyOnMetered,
-                m.isDeletable,
-                m.ssidEnabled,
-                m.ssids
-            )
-        )
-        if (map?.isActive == true) {
-            VpnController.addWireGuardProxy(id = ID_WG_BASE + config.getId())
-            VpnController.notifyConnectionMonitor()
-        }
-    }
-
     suspend fun updateCatchAllConfig(id: Int, isEnabled: Boolean) {
         val config = configs.find { it.getId() == id }
         if (config == null) {
@@ -861,7 +823,6 @@ object WireguardManager : KoinComponent {
                 m.serverResponse,
                 m.isActive,
                 isEnabled, // just updating catch all field
-                m.isLockdown,
                 m.oneWireGuard,
                 m.useOnlyOnMetered,
                 m.isDeletable,
@@ -891,7 +852,6 @@ object WireguardManager : KoinComponent {
                 m.serverResponse,
                 m.isActive,
                 m.isCatchAll,
-                m.isLockdown,
                 owg, // updating just one wireguard field
                 m.useOnlyOnMetered,
                 m.isDeletable,
@@ -919,7 +879,6 @@ object WireguardManager : KoinComponent {
                 m.serverResponse,
                 m.isActive,
                 m.isCatchAll,
-                m.isLockdown,
                 m.oneWireGuard,
                 useMobileNw, // just updating useMobileNw
                 m.isDeletable,
@@ -958,7 +917,6 @@ object WireguardManager : KoinComponent {
                 m.serverResponse,
                 m.isActive,
                 m.isCatchAll,
-                m.isLockdown,
                 m.oneWireGuard,
                 m.useOnlyOnMetered,
                 m.isDeletable,
@@ -994,7 +952,6 @@ object WireguardManager : KoinComponent {
                 m.serverResponse,
                 m.isActive,
                 m.isCatchAll,
-                m.isLockdown,
                 m.oneWireGuard,
                 m.useOnlyOnMetered,
                 m.isDeletable,
@@ -1089,7 +1046,6 @@ object WireguardManager : KoinComponent {
                     serverResponse,
                     isActive = false,
                     isCatchAll = false,
-                    isLockdown = false,
                     oneWireGuard = false,
                     useOnlyOnMetered = false,
                     isDeletable = true,
@@ -1126,7 +1082,6 @@ object WireguardManager : KoinComponent {
                     serverResponse,
                     isActive = false,
                     isCatchAll = false,
-                    isLockdown = false,
                     oneWireGuard = false,
                     isDeletable = true,
                     useOnlyOnMetered = false,
@@ -1163,7 +1118,8 @@ object WireguardManager : KoinComponent {
             sb.append("   lastOk: ${getRelativeTimeSpan(routerStats?.lastOK)}\n")
             sb.append("   since: ${getRelativeTimeSpan(routerStats?.since)}\n")
             sb.append("   errRx: ${routerStats?.errRx}\n")
-            sb.append("   errTx: ${routerStats?.errTx}\n\n")
+            sb.append("   errTx: ${routerStats?.errTx}\n")
+            sb.append("   extra: ${routerStats?.extra}\n\n")
         }
         if (sb.isEmpty()) {
             sb.append("   N/A")

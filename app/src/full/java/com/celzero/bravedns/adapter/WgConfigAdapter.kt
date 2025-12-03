@@ -140,27 +140,20 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
         }
 
         private fun disableInactiveConfig(config: WgConfigFiles) {
-            // if lockdown is enabled, then show the lockdown card even if config is disabled
-            if (config.isLockdown) {
-                b.protocolInfoChipGroup.visibility = View.GONE
-                b.interfaceActiveLayout.visibility = View.GONE
-                b.interfaceStatus.visibility = View.GONE
-            } else {
-                b.interfaceAppsCount.visibility = View.GONE
-                b.interfaceActiveLayout.visibility = View.GONE
-                b.interfaceDetailCard.strokeColor = fetchColor(context, R.attr.background)
-                b.interfaceDetailCard.strokeWidth = 0
-                b.interfaceSwitch.isChecked = false
-                b.protocolInfoChipGroup.visibility = View.GONE
-                b.interfaceStatus.visibility = View.VISIBLE
-                b.interfaceStatus.text =
-                    context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
-                updateProtocolChip(Pair(false, false))
-                updateSplitTunnelChip(false)
-                updateHopSrcChip(config.id)
-                updateAmneziaChip(config)
-                updateHoppingChip(config.id)
-            }
+            b.interfaceAppsCount.visibility = View.GONE
+            b.interfaceActiveLayout.visibility = View.GONE
+            b.interfaceDetailCard.strokeColor = fetchColor(context, R.attr.background)
+            b.interfaceDetailCard.strokeWidth = 0
+            b.interfaceSwitch.isChecked = false
+            b.protocolInfoChipGroup.visibility = View.GONE
+            b.interfaceStatus.visibility = View.VISIBLE
+            b.interfaceStatus.text =
+                context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
+            updateProtocolChip(Pair(false, false))
+            updateSplitTunnelChip(false)
+            updateHopSrcChip(config.id)
+            updateAmneziaChip(config)
+            updateHoppingChip(config.id)
         }
 
         private fun updateProxyStatusContinuously(config: WgConfigFiles): Job? {
@@ -309,14 +302,6 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             if (mapping.isCatchAll) {
                 b.chipProperties.visibility = View.VISIBLE
                 b.chipProperties.text = context.getString(R.string.symbol_lightening)
-            }
-            if (mapping.isLockdown) {
-                if (!mapping.isActive) {
-                    b.interfaceDetailCard.strokeWidth = 2
-                    b.interfaceDetailCard.strokeColor = fetchColor(context, R.attr.accentBad)
-                }
-                b.chipProperties.visibility = View.VISIBLE
-                b.chipProperties.text = context.getString(R.string.two_argument_space, b.chipProperties.text.toString(), context.getString(R.string.symbol_lockdown))
             }
             if (mapping.useOnlyOnMetered) {
                 b.chipProperties.visibility = View.VISIBLE
