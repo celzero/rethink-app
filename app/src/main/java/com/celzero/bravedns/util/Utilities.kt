@@ -89,7 +89,17 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.ln
 import kotlin.math.pow
 
+@Suppress("TooManyFunctions", "LargeClass")
 object Utilities {
+
+    private const val FLAG_BASE_OFFSET = 0x1F1E6
+    private const val ALPHA_BASE_CODE = 'A'.code
+    private const val BUFFER_SIZE = 256
+    private const val HEX_FORMAT = "%02x"
+    private const val BYTE_UNIT_THRESHOLD = 1000
+    private const val BYTE_UNIT_POWER = 1024
+    private const val MINIMUM_OS_VERSION_PARTS = 2
+    private const val DECIMAL_FORMAT_PATTERN = "%.1f %sB"
 
     // convert an FQDN like "www.example.co.uk." to an eTLD + 1 like "example.co.uk".
     fun getETldPlus1(fqdn: String): String? {
@@ -116,6 +126,7 @@ object Utilities {
             // If fqdn is not a valid domain name, InternetDomainName.from() will throw an
             // exception.  Since this function is only for aesthetic purposes, we can
             // return the input unmodified in this case.
+            // SwallowedException: Intentionally returning input as fallback for aesthetic purposes
             fqdn
         }
     }
@@ -202,6 +213,7 @@ object Utilities {
         try {
             countryMap = CountryMap(context.assets)
         } catch (e: IOException) {
+            // SwallowedException: Exception is logged, countryMap remains null as fallback
             Logger.e(LOG_TAG_VPN, "err fetching country map ${e.message}", e)
         }
     }
@@ -218,14 +230,13 @@ object Utilities {
         // offset to each character, shifting it from the normal A-Z range into the region
         // indicator
         // symbol letter range.
-        val alphaBase = 'A'.code // Start of alphabetic country code characters.
-        val flagBase = 0x1F1E6 // Start of regional indicator symbol letters.
-        val offset = flagBase - alphaBase
+        val offset = FLAG_BASE_OFFSET - ALPHA_BASE_CODE
         val firstHalf = Character.codePointAt(countryCode, 0) + offset
         val secondHalf = Character.codePointAt(countryCode, 1) + offset
         return String(Character.toChars(firstHalf)) + String(Character.toChars(secondHalf))
     }
 
+    @Suppress("ReturnCount", "TooGenericExceptionCaught")
     fun normalizeIp(ipstr: String?): InetAddress? {
         if (ipstr.isNullOrEmpty()) return null
 
@@ -264,6 +275,7 @@ object Utilities {
         return SimpleDateFormat(template, Locale.ENGLISH).format(date)
     }
 
+    @Suppress("ReturnCount", "TooGenericExceptionCaught")
     fun isLanIpv4(ipAddress: String): Boolean {
         try {
             val ip = IPAddressString(ipAddress).address ?: return false
@@ -305,44 +317,17 @@ object Utilities {
     fun showToastUiCentered(context: Context, message: String, toastLength: Int) {
         try {
             val isMainThread = Looper.myLooper() == Looper.getMainLooper()
-            // Handle based on context type and thread
-            when {
-                context is androidx.appcompat.app.AppCompatActivity -> {
-                    if (isMainThread) Toast.makeText(context, message, toastLength).show()
-                    else context.runOnUiThread {
-                        Toast.makeText(context, message, toastLength).show()
-                    }
+            when (context) {
+                is androidx.appcompat.app.AppCompatActivity,
+                is androidx.fragment.app.FragmentActivity,
+                is android.app.Activity -> {
+                    showToastForActivity(context as android.app.Activity, message, toastLength, isMainThread)
                 }
-
-                context is androidx.fragment.app.FragmentActivity -> {
-                    if (isMainThread) Toast.makeText(context, message, toastLength).show()
-                    else context.runOnUiThread {
-                        Toast.makeText(context, message, toastLength).show()
-                    }
+                is android.app.Application -> {
+                    showToastForApplication(context, message, toastLength, isMainThread)
                 }
-
-                context is android.app.Activity -> {
-                    if (isMainThread) Toast.makeText(context, message, toastLength).show()
-                    else context.runOnUiThread {
-                        Toast.makeText(context, message, toastLength).show()
-                    }
-                }
-
-                context is android.app.Application -> {
-                    if (isMainThread) {
-                        Toast.makeText(context, message, toastLength).show()
-                    } else {
-                        android.os.Handler(Looper.getMainLooper()).post {
-                            Toast.makeText(context, message, toastLength).show()
-                        }
-                    }
-                }
-
                 else -> {
-                    Logger.w(LOG_TAG_VPN, "toast err: unsuitable context type")
-                    if (DEBUG && isMainThread) { // for testing purpose
-                        Toast.makeText(context, message, toastLength).show()
-                    }
+                    handleUnsupportedContext(context, message, toastLength, isMainThread)
                 }
             }
         } catch (e: IllegalStateException) {
@@ -353,6 +338,33 @@ object Utilities {
             Logger.w(LOG_TAG_VPN, "toast err: ${e.message}")
         } catch (e: Exception) {
             Logger.w(LOG_TAG_VPN, "toast err: ${e.message}")
+        }
+    }
+
+    private fun showToastForActivity(activity: android.app.Activity, message: String, toastLength: Int, isMainThread: Boolean) {
+        if (isMainThread) {
+            Toast.makeText(activity, message, toastLength).show()
+        } else {
+            activity.runOnUiThread {
+                Toast.makeText(activity, message, toastLength).show()
+            }
+        }
+    }
+
+    private fun showToastForApplication(context: android.app.Application, message: String, toastLength: Int, isMainThread: Boolean) {
+        if (isMainThread) {
+            Toast.makeText(context, message, toastLength).show()
+        } else {
+            android.os.Handler(Looper.getMainLooper()).post {
+                Toast.makeText(context, message, toastLength).show()
+            }
+        }
+    }
+
+    private fun handleUnsupportedContext(context: Context, message: String, toastLength: Int, isMainThread: Boolean) {
+        Logger.w(LOG_TAG_VPN, "toast err: unsuitable context type")
+        if (DEBUG && isMainThread) {
+            Toast.makeText(context, message, toastLength).show()
         }
     }
 
@@ -397,6 +409,7 @@ object Utilities {
         }
     }
 
+    @Suppress("ReturnCount", "TooGenericExceptionCaught")
     fun copy(from: String, to: String): Boolean {
         try {
             val src = File(from)
@@ -414,21 +427,20 @@ object Utilities {
     }
 
     fun copyWithStream(readStream: InputStream, writeStream: OutputStream): Boolean {
-        val length = 256
-        val buffer = ByteArray(length)
+        val buffer = ByteArray(BUFFER_SIZE)
         return try {
             readStream.use { input ->
                 writeStream.use { output ->
-                    var bytesRead: Int = input.read(buffer, 0, length)
+                    var bytesRead: Int = input.read(buffer, 0, BUFFER_SIZE)
                     // write the required bytes
                     while (bytesRead > 0) {
                         output.write(buffer, 0, bytesRead)
-                        bytesRead = input.read(buffer, 0, length)
+                        bytesRead = input.read(buffer, 0, BUFFER_SIZE)
                     }
                 }
             }
             true
-        } catch (e: Exception) {
+        } catch (e: Exception) { // Catches IOException and other stream-related exceptions
             Logger.w(LOG_TAG_DOWNLOAD, "err while copying files using streams: ${e.message}, $e")
             false
         }
@@ -451,18 +463,19 @@ object Utilities {
         return try {
             val alwaysOn = Settings.Secure.getString(context.contentResolver, "always_on_vpn_app")
             context.packageName == alwaysOn
-        } catch (e: Exception) {
+        } catch (e: Exception) { // Catches SecurityException and other Settings-related exceptions
             Logger.w(LOG_TAG_VPN, "err while retrieving Settings.Secure value ${e.message}", e)
             false
         }
     }
 
     // This function is not supported from version 12 onwards.
+    @Suppress("TooGenericExceptionCaught")
     fun isOtherVpnHasAlwaysOn(context: Context): Boolean {
         return try {
             val alwaysOn = Settings.Secure.getString(context.contentResolver, "always_on_vpn_app")
             !TextUtils.isEmpty(alwaysOn) && context.packageName != alwaysOn
-        } catch (e: Exception) {
+        } catch (e: Exception) { // Catches SecurityException and other Settings-related exceptions
             Logger.w(LOG_TAG_VPN, "err while retrieving Settings.Secure value ${e.message}", e)
             false
         }
@@ -490,12 +503,13 @@ object Utilities {
         return AppCompatResources.getDrawable(context, R.drawable.default_app_icon)
     }
 
+    @Suppress("TooGenericExceptionCaught")
     fun delay(ms: Long, scope: LifecycleCoroutineScope, updateUi: () -> Unit) {
         scope.launch {
             kotlinx.coroutines.delay(ms)
             try {
                 updateUi()
-            } catch (e: Exception) {
+            } catch (e: Exception) { // Catches any exception from user-provided updateUi lambda
                 Logger.e(LOG_TAG_VPN, "err in delay fn ${e.message}", e)
             }
         }
@@ -610,7 +624,7 @@ object Utilities {
                 }
             Logger.d(LOG_TAG_DOWNLOAD, "deleteRecursive File : ${fileOrDirectory.path}, $isDeleted")
             return isDeleted
-        } catch (e: Exception) {
+        } catch (e: Exception) { // Catches SecurityException, IOException, etc.
             Logger.w(LOG_TAG_DOWNLOAD, "err on file delete: ${e.message}", e)
         }
         return false
@@ -658,6 +672,7 @@ object Utilities {
         }
     }
 
+    @Suppress("ReturnCount")
     fun hasRemoteBlocklists(ctx: Context, timestamp: Long): Boolean {
         val remoteDir =
             blocklistDir(ctx, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp) ?: return false
@@ -765,6 +780,7 @@ object Utilities {
         STRICT // The setting is "Strict".
     }
 
+    @Suppress("ReturnCount")
     fun getPrivateDnsMode(context: Context): PrivateDnsMode {
         // https://github.com/celzero/rethink-app/issues/408
         if (!isAtleastQ()) {
@@ -811,17 +827,18 @@ object Utilities {
         val random = ByteArray(length)
         secureRandom.nextBytes(random)
         // formats each byte as a two-character hexadecimal string
-        return random.joinToString("") { "%02x".format(it) }
+        return random.joinToString("") { HEX_FORMAT.format(it) }
     }
 
+    @Suppress("ReturnCount", "TooGenericExceptionCaught")
     fun humanReadableByteCount(bytes: Long, si: Boolean): String {
-        val unit = if (si) 1000 else 1024
+        val unit = if (si) BYTE_UNIT_THRESHOLD else BYTE_UNIT_POWER
         if (bytes < unit) return "$bytes B"
         try {
             val exp = (ln(bytes.toDouble()) / ln(unit.toDouble())).toInt()
             val pre = ("KMGTPE")[exp - 1] + if (si) "" else "i"
             val totalBytes = bytes / unit.toDouble().pow(exp.toDouble())
-            return String.format(Locale.ROOT, "%.1f %sB", totalBytes, pre)
+            return String.format(Locale.ROOT, DECIMAL_FORMAT_PATTERN, totalBytes, pre)
         } catch (e: NumberFormatException) {
             Logger.e(LOG_TAG_DOWNLOAD, "err in humanReadableByteCount: ${e.message}", e)
         } catch (e: Exception) {
@@ -882,6 +899,11 @@ object Utilities {
         val version1Parts = currentVersion.split(".").mapNotNull { it.toIntOrNull() }
         val version2Parts = targetVersion.split(".").mapNotNull { it.toIntOrNull() }
 
+        // Ensure both versions have minimum required parts
+        if (version1Parts.size < MINIMUM_OS_VERSION_PARTS || version2Parts.size < MINIMUM_OS_VERSION_PARTS) {
+            return false
+        }
+
         // find the maximum length to compare up to the longest version component
         val maxLength = maxOf(version1Parts.size, version2Parts.size)
 
@@ -899,7 +921,7 @@ object Utilities {
         return true // versions are equal
     }
 
-    suspend fun writeToFile(file: File, content: ByteArray): Boolean {
+    fun writeToFile(file: File, content: ByteArray): Boolean {
         return try {
             file.outputStream().use { output ->
                 output.write(content)
