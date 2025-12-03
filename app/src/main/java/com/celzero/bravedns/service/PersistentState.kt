@@ -420,6 +420,12 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // debug settings, panic random
     var panicRandom by booleanPref("panic_random").withDefault<Boolean>(false)
 
+    // universal rule, block all non A & AAAA dns responses
+    private var _blockOtherDnsRecordTypes by booleanPref("block_non_ip_dns_responses").withDefault<Boolean>(false)
+
+    // global lockdown for wireguard proxy
+    var wgGlobalLockdown by booleanPref("wg_global_lockdown").withDefault<Boolean>(false)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
     var universalRulesCount: MutableLiveData<Int> = MutableLiveData()
@@ -461,7 +467,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
                 _udpBlocked,
                 _blockUnknownConnections,
                 _blockAppWhenBackground,
-                _blockWhenDeviceLocked
+                _blockWhenDeviceLocked,
+                _blockOtherDnsRecordTypes
             )
         universalRulesCount.postValue(list.count { it })
     }
@@ -550,6 +557,15 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     fun getBlockWhenDeviceLocked(): Boolean {
         return _blockWhenDeviceLocked
+    }
+
+    fun getBlockOtherDnsRecordTypes(): Boolean {
+        return _blockOtherDnsRecordTypes
+    }
+
+    fun setBlockOtherDnsRecordTypes(b: Boolean) {
+        _blockOtherDnsRecordTypes = b
+        setUniversalRulesCount()
     }
 
     fun getProxyStatus(): MutableLiveData<Int> {
