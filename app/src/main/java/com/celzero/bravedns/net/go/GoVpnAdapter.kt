@@ -118,8 +118,6 @@ class GoVpnAdapter : KoinComponent {
         this.context = context
         this.externalScope = externalScope
         val defaultDns = newDefaultTransport(appConfig.getDefaultDns())
-        // no need to connect tunnel if already connected, just reset the tunnel with new
-        // parameters
         val prev = Settings.dupTunFd(FIRESTACK_MUST_DUP_TUNFD)
         Logger.i(LOG_TAG_VPN, "$TAG connect tunnel with new params")
         tunnel =
@@ -849,7 +847,7 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    fun hopStatus(src: String, hop: String): Pair<Long?, String> {
+    suspend fun hopStatus(src: String, hop: String): Pair<Long?, String> {
         return try {
             val status = tunnel.proxies.getProxy(src.togs()).router().via().status()
             Logger.v(LOG_TAG_VPN, "$TAG hop $src -> $hop; status: $status")
@@ -860,7 +858,7 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    fun removeHop(src: String): Pair<Boolean, String> {
+    suspend fun removeHop(src: String): Pair<Boolean, String> {
         var err = ""
         try {
             tunnel.proxies.hop("".togs(), src.togs())
@@ -873,7 +871,7 @@ class GoVpnAdapter : KoinComponent {
         return Pair(false, err)
     }
 
-    fun testHop(src: String, hop: String): Pair<Boolean, String?> {
+    suspend fun testHop(src: String, hop: String): Pair<Boolean, String?> {
         // returns empty on success, err msg on failure
         val s = tunnel.proxies.testHop(hop.togs(), src.togs()).tos()
         val res = s.isNullOrEmpty()
@@ -1543,6 +1541,7 @@ class GoVpnAdapter : KoinComponent {
     suspend fun updateLinkAndRoutes(
         tunFd: Long,
         mtu: Int,
+        nwMtu: Int,
         proto: Long
     ): Boolean {
         if (!tunnel.isConnected) {
@@ -1550,9 +1549,9 @@ class GoVpnAdapter : KoinComponent {
             return false
         }
 
-        Logger.i(LOG_TAG_VPN, "$TAG updateLink with fd(${tunFd}) mtu: $mtu")
+        Logger.i(LOG_TAG_VPN, "$TAG updateLink with fd(${tunFd}) mtu: $mtu, nwMtu: $nwMtu, proto: $proto")
         return try {
-            tunnel.setLinkAndRoutes(tunFd, mtu.toLong(), proto)
+            tunnel.setLinkAndRoutes2(tunFd, mtu.toLong(), nwMtu.toLong(), proto)
             true
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG err update tun: ${e.message}", e)
@@ -1573,6 +1572,22 @@ class GoVpnAdapter : KoinComponent {
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG error restarting tunnel: ${e.message}", e)
             return false
+        }
+    }
+
+    suspend fun setLinkMtu(nwMtu: Int): Boolean {
+        if (!tunnel.isConnected) {
+            Logger.e(LOG_TAG_VPN, "$TAG setLinkMtu: tunnel is not connected, returning")
+            return false
+        }
+
+        Logger.i(LOG_TAG_VPN, "$TAG setting link mtu: $nwMtu")
+        return try {
+            tunnel.setLinkMtu(nwMtu.toLong())
+            true
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "$TAG error setting link mtu: ${e.message}", e)
+            false
         }
     }
 
