@@ -27,7 +27,13 @@ object NewSettingsManager: KoinComponent {
 
     private const val EXPIRY_DAYS = 7
 
-    private val newSettingsList = emptyList<String>()
+    const val UNIV_BLOCK_NON_A_AAAA_SETTING = "UNIV_BLOCK_NON_A_AAAA_SETTING"
+    const val WG_GLOBAL_LOCKDOWN_MODE_SETTING = "WG_GLOBAL_LOCKDOWN_MODE_SETTING"
+
+    private val newSettingsList = listOf (
+        UNIV_BLOCK_NON_A_AAAA_SETTING,
+        WG_GLOBAL_LOCKDOWN_MODE_SETTING,
+    )
 
     init {
         handleNewSettings()
