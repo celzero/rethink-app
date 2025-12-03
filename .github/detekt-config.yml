@@ -10,3 +10,11 @@ style:
     excludeCommentStatements: false
     excludeRawStrings: true
 
+exceptions:
+  TooGenericExceptionCaught:
+    active: true
+    exceptionNames:
+      - Throwable
+      - RuntimeException
+    allowedExceptionNames:
+      - Exception
