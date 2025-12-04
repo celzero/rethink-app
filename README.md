@@ -34,19 +34,17 @@ Currently, per-app connection mapping is implemented by capturing `udp` and `tcp
 A network monitor is a per-app report-card of sorts on when connections were made, how many were made, and to where. Tracking UDP / TCP (and DNS on Android 12+) is straight-forward. DNS are trickier to track on Android 11 and below, and so a rough heuristic is used for now, which may not hold good in all cases.
 
 ### DNS over HTTPS client
-Almost all of the network related code (`firestack`), including DNS over HTTPS split-tunnel, is a hard fork of [Jigsaw-Code/outline-go-tun2socks](https://github.com/Jigsaw-Code/outline-go-tun2socks) written in golang. The UI is vastly different but borrows minimally from [Jigsaw-Code/Intra](https://github.com/Jigsaw-Code/Intra/). A split-tunnel traps requests sent to the VPN's DNS endpoint and relays it to a DNS-over-HTTPS / DNS-over-TLS / DNSCrypt endpoint of the user's choosing, logging the end-to-end latency, time of request, the DNS request query itself, and its answer.
+Almost all of the network related code (`firestack`), including DNS over HTTPS split-tunnel, is a hard fork of [Jigsaw-Code/outline-go-tun2socks](https://github.com/Jigsaw-Code/outline-go-tun2socks) written in golang. The UI is vastly different but borrows minimally from [Jigsaw-Code/Intra](https://github.com/Jigsaw-Code/Intra/). A split-tunnel traps requests sent to the VPN's DNS endpoint and relays it to a DNS-over-HTTPS / DNS-over-TLS / DNSCrypt / Oblivious DNS-over-HTTPS endpoint of the user's choosing, logging the end-to-end latency, time of request, the DNS request query itself, and its answer.
 
 ### The Rethink DNS Resolver
 A malware and ad-blocking DNS over HTTPS resolver at `https://sky.rethinkdns.com/rs` (deployed to 300+ locations world-wide via Cloudflare Workers) is the default DNS endpoint on the app, though the user is free to change that. A configurable DNS resolver that lets users add or remove denylists and allowlists, add rewrites, analyse DNS requests is launching late 2026. Right now, a free-to-use DNS over HTTPS endpoint with custom blocklists can be setup here: [rethinkdns.com/configure](https://rethinkdns.com/configure).
 
-The resolver, sponsored by [FLOSS/fund](https://floss.fund/), is deployed to [Fly.io](https://fly.io/) at `max.rethinkdns.com`, and [Deno Deploy](https://deno.com/deploy) at `rdns.deno.dev` too, apart from the default deployment on [Cloudflare Workers](https://workers.dev).
-
-The resolver is open source software: [serverless-dns](https://github.com/serverless-dns/serverless-dns).
+The resolver, sponsored by [FLOSS/fund](https://floss.fund/), is deployed to [Fly.io](https://fly.io/) at `max.rethinkdns.com`, and [Deno Deploy](https://deno.com/deploy) at `rdns.deno.dev` too, apart from the default deployment on [Cloudflare Workers](https://workers.dev). The resolver is open source software: [serverless-dns](https://github.com/serverless-dns/serverless-dns).
 
 ### The Rethink Proxy Network
 RPN is a multi-party relay, with connections hopping over serverless proxy (hosted on Cloudflare Workers) exiting through Windscribe. Users would be able to self-host the first hop or use the ones run by us. At launch in Dec 2025, this service would cost $3/month for unlimited bandwidth.
 
-The serverless proxy is open source software: [serverless-proxy](https://github.com/serverless-proxy/serverless-proxy).
+The proxy is open source software: [serverless-proxy](https://github.com/serverless-proxy/serverless-proxy).
 
 ### Community
 [<img src="https://img.shields.io/github/sponsors/serverless-dns"
@@ -58,7 +56,7 @@ The serverless proxy is open source software: [serverless-proxy](https://github.
 - We're also kind of active on the bird and toot apps, mostly nerd-sniping other engs or shit-posting about our tech stack: [twitter/rethinkdns](https://twitter.com/rethinkdns), [mastodon/rdns](https://mastodon.social/@rdns).
 
 ### Translation
-Help [translate Rethink DNS + Firewall + VPN](https://hosted.weblate.org/engage/rethink-dns-firewall) on [Weblate](https://weblate.org/):<br>
+Help [translate Rethink DNS + Firewall + VPN](https://hosted.weblate.org/engage/rethink-dns-firewall) on [Weblate](https://weblate.org/):<br><br>
 [![](https://hosted.weblate.org/widgets/rethink-dns-firewall/-/287x66-black.png)](https://hosted.weblate.org/engage/rethink-dns-firewall)
 
 ### What Rethink DNS + Firewall + VPN is not
@@ -74,7 +72,7 @@ To turn Android devices into user-agents: Something that users can control as th
 To deliver the promise of open-internet for all: With the inevitable ECH (encrypted client hello) standardization and the imminent adoption of DNS-over-HTTPS and DNS-over-TLS across operating systems and browsers, we're that much closer to an open internet. Of course, *Deep Packet Inspection* remains a credible threat that can't be mitigated with just encrypted DNS, but it is one example of delivering maximum impact (circumvent internet censorship in most countries) with minimal effort (not requiring use of a VPN or access via IPFS, for example). Rethink would continue to make these technologies accessible in the simplest way possible, especially the ones that get 90% of the way there with 10% effort.
 
 ## Development
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/celzero/rethink-app/badge)](https://securityscorecards.dev/viewer/?uri=github.com/celzero/rethink-app) [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/celzero/rethink-app)
+[![Release](https://img.shields.io/github/v/release/celzero/rethink-app?include_prereleases)](https://github.com/celzero/rethink-app/releases) &nbsp; [![CI](https://github.com/celzero/rethink-app/actions/workflows/android.yml/badge.svg?branch=main)](https://github.com/celzero/rethink-app/actions/workflows/android.yml) &nbsp; [![License: Apache-2.0](https://img.shields.io/badge/License-Apache-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) &nbsp; [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/celzero/rethink-app/badge)](https://securityscorecards.dev/viewer/?uri=github.com/celzero/rethink-app) &nbsp; [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/celzero/rethink-app)
 
 1. Feel free to fork and send a pull request for any reproducible bug fixes.
   1. The codebase is raw and is lacking documentation and comprehensive tests. If you need help, feel free to create a Wikipage to highlight the pain with building, testing, writing, committing code. [DeepWiki](https://deepwiki.com/celzero/rethink-app) and [Copilot](https://github.com/copilot?prompt=https://github.com/celzero/rethink-app) may also help, but they do hallucinate.
