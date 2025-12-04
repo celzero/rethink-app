@@ -135,10 +135,20 @@ object VpnController : KoinComponent {
         connectionStatus.postValue(state)
     }
 
-    fun start(context: Context) {
+    fun start(context: Context, reboot: Boolean = false) {
         // if the tunnel has the go-adapter then there's nothing to do
         if (hasTunnel()) {
             Logger.w(LOG_TAG_VPN, "braveVPNService is already on, resending vpn enabled state")
+            return
+        }
+        // below check is to avoid multiple calls to start the vpn when always-on is enabled
+        // case: after a device reboot, vpn?.isAlwaysOnEnabled() may return false even though
+        // always-on is actually enabled; this causes the VPN to start twice and fails doing so.
+        // one approach is to store the always-on state in persistent state and check it here.
+        // another is to check whether the vpn is already running.
+        // todo: see whether changing the persistent state is really necessary.
+        if (braveVpnService != null && reboot) {
+            Logger.i(LOG_TAG_VPN, "vpn service already running, no need to start")
             return
         }
         try {
