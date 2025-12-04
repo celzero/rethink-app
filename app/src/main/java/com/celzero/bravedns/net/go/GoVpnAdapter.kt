@@ -114,6 +114,7 @@ class GoVpnAdapter : KoinComponent {
         tunFd: Long,
         ifaceAddresses: String,
         mtu: Int,
+        nwMtu: Int,
         opts: TunnelOptions) {
         this.context = context
         this.externalScope = externalScope
@@ -123,6 +124,7 @@ class GoVpnAdapter : KoinComponent {
         tunnel =
             Intra.connect(
                 tunFd,
+                nwMtu.toLong(),
                 mtu.toLong(),
                 ifaceAddresses,
                 opts.fakeDns,
