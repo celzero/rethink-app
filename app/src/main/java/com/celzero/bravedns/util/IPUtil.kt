@@ -28,6 +28,22 @@ import kotlin.math.pow
 class IPUtil {
 
     companion object {
+        // IPv6 address byte positions for embedded IPv4 addresses
+        private const val IPV6_EMBEDDED_IPV4_BYTE_POSITION_12 = 12
+        private const val IPV6_TEREDO_IPV4_BYTE_POSITION_4 = 4
+
+        // IPv6 prefix-64 segment value (hex 64 = decimal 100)
+        private const val IPV6_PREFIX_64_SEGMENT_VALUE = 100
+
+        // IPv4 address constants
+        private const val IPV4_ADDRESS_BITS = 32
+        private const val IPV4_ADDRESS_BYTE_COUNT = 4
+        private const val IPV4_BYTE_MASK = 0xFF
+        private const val IPV4_ADDRESS_MASK = 0xFFFFFFFFL
+
+        // Bit shift constants
+        private const val BITS_PER_BYTE = 8
+
         fun isIpV6(ip: IPAddress): Boolean {
             return ip.isIPv6
         }
@@ -43,7 +59,7 @@ class IPUtil {
 
             if (isIpv6Prefix64(ip)) {
                 // get the last 4 bytes from the segment and convert into IPv4 address
-                return ip.toIPv6().getEmbeddedIPv4Address(12)
+                return ip.toIPv6().getEmbeddedIPv4Address(IPV6_EMBEDDED_IPV4_BYTE_POSITION_12)
             }
 
             if (isIpTeredo(ip)) {
@@ -51,7 +67,7 @@ class IPUtil {
                 // teredo tunnelling will contain the IPv4 address in segment 3 and 4.
                 // 2001::/32 (segment 0 should match 2001, segment 1 should be zero)
                 // sample: 2001:0000:4136:e378:8000:63bf:3fff:fdd2 -> 65.54.227.120
-                return ip.toIPv6().getEmbeddedIPv4Address(4)
+                return ip.toIPv6().getEmbeddedIPv4Address(IPV6_TEREDO_IPV4_BYTE_POSITION_4)
             }
 
             // as of now, support for Routing between 6to4 and native IPv6 (protocol type 41) is
@@ -80,7 +96,7 @@ class IPUtil {
             // get the first segment from ipv6 address
             val segment = ipv6.getSegment(0)
             // Decimal value for the 64(hexa) is 100
-            return segment.segmentValue == 100
+            return segment.segmentValue == IPV6_PREFIX_64_SEGMENT_VALUE
         }
 
 
@@ -94,16 +110,16 @@ class IPUtil {
             var from: Long = inet2long(start)
             val to: Long = inet2long(end)
             while (to >= from) {
-                var prefix: Byte = 32
+                var prefix: Byte = IPV4_ADDRESS_BITS.toByte()
                 while (prefix > 0) {
                     val mask: Long = prefix2mask(prefix - 1)
                     if (from and mask != from) break
                     prefix--
                 }
-                val max = (32 - floor(ln((to - from + 1).toDouble()) / ln(2.0))).toInt().toByte()
+                val max = (IPV4_ADDRESS_BITS - floor(ln((to - from + 1).toDouble()) / ln(2.0))).toInt().toByte()
                 if (prefix < max) prefix = max
                 listResult.add(CIDR(long2inet(from)?.hostAddress, prefix.toInt()))
-                from += 2.0.pow((32 - prefix).toDouble()).toLong()
+                from += 2.0.pow((IPV4_ADDRESS_BITS - prefix).toDouble()).toLong()
             }
             if (DEBUG) {
                 for (cidr in listResult) Logger.d(LOG_TAG_VPN, cidr.toString())
@@ -112,23 +128,23 @@ class IPUtil {
         }
 
         private fun prefix2mask(bits: Int): Long {
-            return -0x100000000L shr bits and 0xFFFFFFFFL
+            return -0x100000000L shr bits and IPV4_ADDRESS_MASK
         }
 
         private fun inet2long(address: InetAddress?): Long {
             var result: Long = 0
             if (address != null)
-                for (b in address.address) result = result shl 8 or (b.toInt() and 0xFF).toLong()
+                for (b in address.address) result = result shl BITS_PER_BYTE or (b.toInt() and IPV4_BYTE_MASK).toLong()
             return result
         }
 
         private fun long2inet(a: Long): InetAddress? {
             var addr = a
             return try {
-                val b = ByteArray(4)
+                val b = ByteArray(IPV4_ADDRESS_BYTE_COUNT)
                 for (i in b.indices.reversed()) {
-                    b[i] = (addr and 0xFFL).toByte()
-                    addr = addr shr 8
+                    b[i] = (addr and IPV4_BYTE_MASK.toLong()).toByte()
+                    addr = addr shr BITS_PER_BYTE
                 }
                 InetAddress.getByAddress(b)
             } catch (ignore: UnknownHostException) {
@@ -168,7 +184,7 @@ class IPUtil {
 
         val end: InetAddress?
             get() =
-                long2inet((inet2long(address) and prefix2mask(prefix)) + (1L shl 32 - prefix) - 1)
+                long2inet((inet2long(address) and prefix2mask(prefix)) + (1L shl IPV4_ADDRESS_BITS - prefix) - 1)
 
         override fun toString(): String {
             return address?.hostAddress +
