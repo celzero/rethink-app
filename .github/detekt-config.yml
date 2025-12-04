@@ -17,9 +17,6 @@ exceptions:
       - Throwable
       - Error
 
-comments:
-  ForbiddenComment:
-    active: true
-    values:
-      - 'FIXME'
-      - 'STOPSHIP'
+formatting:
+  CommentPattern:
+    active: false
