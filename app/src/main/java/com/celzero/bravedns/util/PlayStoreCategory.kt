@@ -15,6 +15,8 @@ limitations under the License.
 */
 package com.celzero.bravedns.util
 
+// Hash codes of Play Store category names used for efficient lookups, not magic numbers
+@Suppress("MagicNumber")
 enum class PlayStoreCategory(val rawValue: Int) {
     OTHER(0),
     ART_AND_DESIGN(1798113474),
