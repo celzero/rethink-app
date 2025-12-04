@@ -213,8 +213,8 @@ class SummaryStatisticsAdapter(
                             loadAppIcon(
                                 Utilities.getIcon(
                                     context,
-                                    appInfo?.packageName ?: "",
-                                    appInfo?.appName ?: ""
+                                    appInfo?.packageName.orEmpty(),
+                                    appInfo?.appName.orEmpty()
                                 )
                             )
                         }
@@ -229,8 +229,8 @@ class SummaryStatisticsAdapter(
                             loadAppIcon(
                                 Utilities.getIcon(
                                     context,
-                                    appInfo?.packageName ?: "",
-                                    appInfo?.appName ?: ""
+                                    appInfo?.packageName.orEmpty(),
+                                    appInfo?.appName.orEmpty()
                                 )
                             )
                         }
@@ -613,7 +613,7 @@ class SummaryStatisticsAdapter(
         private fun startActivity(screenToLoad: Int, searchParam: String?) {
             val intent = Intent(context, NetworkLogsActivity::class.java)
             intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, screenToLoad)
-            intent.putExtra(Constants.SEARCH_QUERY, searchParam ?: "")
+            intent.putExtra(Constants.SEARCH_QUERY, searchParam.orEmpty())
             context.startActivity(intent)
         }
 
