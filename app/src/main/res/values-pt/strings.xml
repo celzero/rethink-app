@@ -904,7 +904,6 @@
     <string name="parse_error_integer" translatable="true">número</string>
     <string name="bad_config_explanation_positive_number" translatable="true">: Deve ser positivo</string>
     <string name="no_configs_error" translatable="true">Nenhuma configuração encontrada</string>
-    <string name="wg_lockdown_dialog_title" translatable="true">Bloqueio</string>
     <string name="one_wg_dialog_desc" translatable="true">Todas as ligações de todas as aplicações, incluindo DNS, serão encaminhadas para uma única VPN WireGuard ativa. Outras VPNs WireGuard ativas, se existirem, serão interrompidas.</string>
     <string name="lbl_anonymous" translatable="true">anónimo</string>
     <string name="settings_go_log_heading" translatable="true">Nível de registo</string>
@@ -929,7 +928,6 @@
     <string name="wireguard_description" translatable="true">WireGuard como proxy.</string>
     <string name="setup_wireguard" translatable="true">Configurar WireGuard</string>
     <string name="one_wg_apps_added" translatable="true">Encaminhar todas as aplicações</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">As aplicações selecionadas apenas serão encaminhadas através desta VPN WireGuard, independentemente de estar ou não ligada.</string>
     <string name="catch_all_wg_dialog_title" translatable="true">Sempre ligada</string>
     <string name="routing_remaining_apps" translatable="true">Encaminhamento das restantes aplicações</string>
     <string name="exclude_all_app_wg_dialog_title" translatable="true">Excluir todas as aplicações</string>

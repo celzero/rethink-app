@@ -865,7 +865,6 @@
     <string name="brbs_backup_dialog_message" translatable="true">Salvează setările de la aplicații, rețea și jurnale DNS intr-un fișier. Această acțiune va reporni VPN.</string>
     <string name="parse_error_integer" translatable="true">număr</string>
     <string name="one_wg_apps_added" translatable="true">Se direcționează toate aplicațiile</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">Aplicațiile selectate vor fi direcționate numai prin această VPN WireGuard, indiferent dacă este activă sau dezactivată.</string>
     <string name="catch_all_wg_dialog_title" translatable="true">Permanent</string>
     <string name="unknown_error" translatable="true">Eroare necunoscută</string>
     <string name="invalid_file_error" translatable="true">fișierul nu e valid</string>
@@ -1012,7 +1011,6 @@
     <string name="new_warp_config_desc" translatable="true">Obține configurația WARP de la server</string>
     <string name="new_warp_error_toast" translatable="true">Nu se poate obține configurația WARP</string>
     <string name="new_warp_invalid_config_toast" translatable="true">Configurația WARP nu e validă</string>
-    <string name="wg_lockdown_dialog_title" translatable="true">Blocare</string>
     <string name="one_wg_dialog_desc" translatable="true">Toate conexiunile, de la toate aplicațiile, inclusiv DNS, vor fi direcționate la o singură VPN WireGuard activă. Dacă există alte VPN WireGuard active, vor fi oprite.</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">Toate conexiunile și aplicațiile nedirecționate prin alte VPN WireGuard vor fi direcționate prin aceasta.</string>
     <string name="one_wg_error_toast" translatable="true">Pentru a comuta la Avansate, oprește WireGuard în modul Simplu</string>

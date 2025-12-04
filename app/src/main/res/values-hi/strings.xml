@@ -859,7 +859,6 @@
     <string name="lbl_private" translatable="true">निजी</string>
     <string name="lbl_remove" translatable="true">हटाएँ</string>
     <string name="lbl_cache" translatable="true">कैशे</string>
-    <string name="wg_lockdown_dialog_title" translatable="true">लॉकडाउन</string>
     <string name="lbl_last" translatable="true">अंतिम</string>
     <string name="lbl_starting" translatable="true">शुरुआत</string>
     <string name="lbl_overall" translatable="true">समस्त/कुल मिलाकर</string>
@@ -991,6 +990,5 @@
     <string name="wg_apps_dialog_title_include" translatable="true">%1$s ऐप्स शामिल करें</string>
     <string name="wireguard_disable_failure" translatable="true">\"Always-on WireGuard\" को बंद नहीं किया जा सकता</string>
     <string name="wireguard_apps_proxy_map_desc" translatable="true">%1$s का हिस्सा</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">चयनित ऐप्स केवल इस वायरगार्ड वीपीएन के माध्यम से मार्गनिर्देशित होंगे, चाहे वह असफल हो या जुड़ा हो।।</string>
     <string name="lbl_on_device" translatable="true">ऑन-डिवाइस</string>
 </resources>

@@ -971,7 +971,6 @@
     <string name="settings_connectivity_checks" translatable="true">Wykonaj sprawdzenie połączenia</string>
     <string name="wireguard_disable_title" translatable="true">Zatrzymaj WireGuard</string>
     <string name="lbl_unselected" translatable="true">Niewybrane</string>
-    <string name="wg_lockdown_dialog_title" translatable="true">Blokada</string>
     <string name="wg_apps_dialog_title_exclude" translatable="true">Wyklucz %1$s aplikacji</string>
     <string name="lbl_battery_optimization" translatable="true">Optymalizacja baterii</string>
     <string name="battery_optimization_dialog_heading" translatable="true">Wyłącz %1$s</string>

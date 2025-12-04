@@ -902,7 +902,6 @@
     <string name="bad_config_reason_invalid_key" translatable="true">مفتاح غير صالح</string>
     <string name="bad_config_reason_invalid_number" translatable="true">رقم غير صالح</string>
     <string name="one_wg_apps_added" translatable="true">توجيه جميع التطبيقات</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">سيتم توجيه التطبيقات المحددة فقط من خلال WireGuard VPN، بغض النظر عما إذا كانت شبكة VPN معطلة أو متصلة.</string>
     <string name="catch_all_wg_dialog_title" translatable="true">دائمًا متصل</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">سيتم توجيه جميع الاتصالات والتطبيقات التي لم يتم توجيهها بواسطة شبكات WireGuard VPN الأخرى بواسطة هذه الشبكة.</string>
     <string name="routing_remaining_apps" translatable="true">توجيه التطبيقات المتبقية</string>
