@@ -234,7 +234,7 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
         b.brbsSelectAllText.text = if (isChecked) {
             getString(R.string.bug_report_deselect_all)
         } else {
-            getString(R.string.bug_report_select_all)
+            getString(R.string.lbl_select_all).replaceFirstChar(Char::titlecase)
         }
     }
 
@@ -445,7 +445,7 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
             b.brbsSelectAllText.text = if (allSelected) {
                 getString(R.string.bug_report_deselect_all)
             } else {
-                getString(R.string.bug_report_select_all)
+                getString(R.string.lbl_select_all).replaceFirstChar(Char::titlecase)
             }
         }
     }
@@ -466,7 +466,7 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
 
-            startActivity(Intent.createChooser(intent, getString(R.string.bug_report_view_file)))
+            startActivity(Intent.createChooser(intent, getString(R.string.about_bug_report)))
         } catch (e: Exception) {
             Logger.e(LOG_TAG_UI, "err opening file: ${e.message}", e)
             showToastUiCentered(

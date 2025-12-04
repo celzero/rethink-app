@@ -50,14 +50,14 @@
             android:textSize="@dimen/small_font_text_view" />
 
     </LinearLayout>
-    
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/item_file_view_btn"
         style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
-        android:contentDescription="@string/bug_report_view_file"
+        android:contentDescription="@string/about_bug_report"
         app:icon="@drawable/ic_visibility"
         app:iconGravity="textStart"
         android:padding="5dp"

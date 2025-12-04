@@ -22,7 +22,7 @@
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
         android:padding="10dp"
-        android:text="@string/dns_record_types_heading"
+        android:text="@string/cd_allowed_dns_record_types_heading"
         android:textColor="?attr/primaryLightColorText"
         android:textSize="@dimen/extra_large_font_text_view" />
 
@@ -35,7 +35,7 @@
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
         android:paddingBottom="10dp"
-        android:text="@string/dns_record_types_desc"
+        android:text="@string/cd_allowed_dns_record_types_desc"
         android:textColor="?attr/primaryLightColorText"
         android:textSize="@dimen/default_font_text_view" />
 

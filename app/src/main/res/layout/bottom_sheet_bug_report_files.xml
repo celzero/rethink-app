@@ -23,7 +23,7 @@
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
         android:padding="10dp"
-        android:text="@string/bug_report_files_heading"
+        android:text="@string/about_bug_report"
         android:textColor="?attr/primaryLightColorText"
         android:textSize="@dimen/extra_large_font_text_view"
         android:textStyle="bold" />
@@ -66,7 +66,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
-            android:text="@string/bug_report_select_all"
+            android:text="@string/lbl_select_all"
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/default_font_text_view"
             android:textStyle="bold" />
@@ -120,7 +120,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="@string/bug_report_preparing"
+            android:text="@string/collecting_logs_progress_text"
             android:textColor="?attr/secondaryTextColor"
             android:textSize="@dimen/default_font_text_view" />
 
@@ -144,7 +144,7 @@
         android:layout_marginBottom="10dp"
         android:padding="10dp"
         android:minHeight="48dp"
-        android:text="@string/bug_report_send"
+        android:text="@string/about_bug_no_log_dialog_positive_btn"
         android:textColor="?attr/primaryTextColor"
         android:textAllCaps="false"
         app:cornerRadius="8dp"
