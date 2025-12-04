@@ -46,6 +46,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
@@ -138,6 +139,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.titleStats.text = getString(R.string.title_statistics).lowercase()
         b.aboutStats.text = getString(R.string.settings_general_header).replaceFirstChar(Char::titlecase)
 
+        if (DEBUG) {
+            b.aboutFlightRecord.visibility = View.VISIBLE
+        } else {
+            b.aboutFlightRecord.visibility = View.GONE
+        }
+
         b.aboutSponsor.setOnClickListener(this)
         b.aboutWebsite.setOnClickListener(this)
         b.aboutTwitter.setOnClickListener(this)
@@ -166,6 +173,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutStats.setOnClickListener(this)
         b.aboutDbStats.setOnClickListener(this)
         b.tokenTextView.setOnClickListener(this)
+        b.aboutFlightRecord.setOnClickListener(this)
 
         val gestureDetector = GestureDetector(
             requireContext(),
@@ -388,7 +396,15 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.tokenTextView -> {
                 // click is handled in gesture detector
             }
+            b.aboutFlightRecord -> {
+                initiateFlightRecord()
+            }
         }
+    }
+
+    private fun initiateFlightRecord() {
+        io { VpnController.performFlightRecording() }
+        Toast.makeText(requireContext(), "Flight recording started", Toast.LENGTH_SHORT).show()
     }
 
     private fun generateNewToken(): String {

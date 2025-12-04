@@ -2376,6 +2376,11 @@ class GoVpnAdapter : KoinComponent {
             Logger.i(LOG_TAG_VPN, "$TAG started flight recorder")
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG err start flight recorder: ${e.message}")
+            try {
+                Intra.flightRecorder(false)
+            } catch (_: Exception) {
+                // ignore
+            }
         }
     }
 
