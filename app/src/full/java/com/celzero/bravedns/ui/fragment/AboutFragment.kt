@@ -99,6 +99,20 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
     companion object {
         private const val SCHEME_PACKAGE = "package"
+
+        // Version string constants
+        private const val VERSION_SLICE_END_INDEX = 6
+
+        // Time calculation constants (same as HomeScreenFragment for consistency)
+        private const val MILLISECONDS_PER_SECOND = 1000L
+        private const val SECONDS_PER_MINUTE = 60L
+        private const val MINUTES_PER_HOUR = 60L
+        private const val HOURS_PER_DAY = 24L
+        private const val DAYS_PER_MONTH = 30.0
+
+        // Sponsorship calculation constants
+        private const val BASE_AMOUNT_PER_MONTH = 0.60
+        private const val ADDITIONAL_AMOUNT_PER_MONTH = 0.20
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -198,7 +212,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             val version = getVersionName()
             // take first 7 characters of the version name, as the version has build number
             // appended to it, which is not required for the user to see.
-            val slicedVersion = version.slice(0..6)
+            val slicedVersion = version.slice(0..VERSION_SLICE_END_INDEX)
             b.aboutWhatsNew.text = getString(R.string.about_whats_new, slicedVersion)
 
             // complete version name along with the source of installation
@@ -258,9 +272,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             0
         ).firstInstallTime
         val timeDiff = System.currentTimeMillis() - installTime
-        val days = (timeDiff / (1000 * 60 * 60 * 24)).toDouble()
-        val month = days / 30
-        val amount = month * (0.60 + 0.20)
+        val days = (timeDiff / (MILLISECONDS_PER_SECOND * SECONDS_PER_MINUTE * MINUTES_PER_HOUR * HOURS_PER_DAY)).toDouble()
+        val month = days / DAYS_PER_MONTH
+        val amount = month * (BASE_AMOUNT_PER_MONTH + ADDITIONAL_AMOUNT_PER_MONTH)
         val msg = getString(
             R.string.sponser_dialog_usage_msg,
             days.toInt().toString(),

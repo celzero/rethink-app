@@ -77,6 +77,11 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
 
     private var dismissListener: OnBottomSheetDialogFragmentDismiss? = null
 
+    companion object {
+        // Alpha values for button states
+        private const val BUTTON_ALPHA_DISABLED = 0.5f
+    }
+
     override fun getTheme(): Int =
         getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
@@ -462,9 +467,9 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         b.lbbsCopy.isEnabled = false
         b.lbbsSearch.isEnabled = false
 
-        b.lbbsConfigure.alpha = 0.5f
-        b.lbbsCopy.alpha = 0.5f
-        b.lbbsSearch.alpha = 0.5f
+        b.lbbsConfigure.alpha = BUTTON_ALPHA_DISABLED
+        b.lbbsCopy.alpha = BUTTON_ALPHA_DISABLED
+        b.lbbsSearch.alpha = BUTTON_ALPHA_DISABLED
     }
 
     private fun initializeClickListeners() {

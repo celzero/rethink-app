@@ -75,6 +75,19 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
     private val orbotHelper by inject<OrbotHelper>()
     private val mappingViewModel: ProxyAppsMappingViewModel by viewModel()
 
+    companion object {
+        // Animation constants
+        private const val ROTATION_START_DEGREES = 0.0f
+        private const val ROTATION_END_DEGREES = 360.0f
+        private const val ROTATION_MULTIPLIER = 4f
+        private const val ROTATION_Z_DEPTH = 20f
+        private const val ANIMATION_DURATION_SECONDS = 2L
+        private const val ANIMATION_DURATION_MS_MULTIPLIER = 1000L
+
+        // UI dimension constants
+        private const val ORBOT_ICON_WIDTH_DIP = 40f
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -440,10 +453,10 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
         if (width == 0) {
             width = getCalculatedWidth()
         }
-        val rotation = Rotate3dAnimation(0.0f, 360.0f * 4f, width / 2f, width / 2f, 20f, true)
+        val rotation = Rotate3dAnimation(ROTATION_START_DEGREES, ROTATION_END_DEGREES * ROTATION_MULTIPLIER, width / 2f, width / 2f, ROTATION_Z_DEPTH, true)
         rotation.fillAfter = true
         rotation.interpolator = AccelerateInterpolator()
-        rotation.duration = 2.toLong() * 1000
+        rotation.duration = ANIMATION_DURATION_SECONDS * ANIMATION_DURATION_MS_MULTIPLIER
         rotation.repeatCount = Animation.INFINITE
         b.orbotIcon.startAnimation(rotation)
     }
@@ -452,9 +465,8 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
     // Calculate the width of the icon manually.
     // Invoke this method when the width of the Orbot icon is returned as 0 by viewBinder.
     private fun getCalculatedWidth(): Int {
-        val dip = 40f
         val r: Resources = resources
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, r.displayMetrics).toInt()
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, ORBOT_ICON_WIDTH_DIP, r.displayMetrics).toInt()
     }
 
     private fun disableLoading() {

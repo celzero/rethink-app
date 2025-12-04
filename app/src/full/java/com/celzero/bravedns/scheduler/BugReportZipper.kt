@@ -52,6 +52,19 @@ object BugReportZipper {
     // secure sharing of files associated with an app, used in share bugreport file feature
     const val FILE_PROVIDER_NAME = BuildConfig.APPLICATION_ID + ".provider"
 
+    // ZIP file validation constants
+    private const val ZIP_HEADER_SIZE = 4
+
+    // File size limits (10MB in bytes)
+    private const val MAX_ZIP_SIZE_BYTES = 10L * 1024L * 1024L // 10MB
+
+    // Buffer size for ZIP operations
+    private const val ZIP_BUFFER_SIZE = 8192
+
+    // Entry retention constants
+    private const val MAX_RECENT_ENTRIES_LARGE_ZIP = 10
+    private const val MAX_RECENT_ENTRIES_CLEANUP = 5
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun prepare(dir: File): String {
         val filePath = dir.canonicalPath + File.separator + BUG_REPORT_DIR_NAME
@@ -95,9 +108,9 @@ object BugReportZipper {
         // check for ZIP magic bytes (PK\x03\x04)
         try {
             FileInputStream(file).use { fis ->
-                val header = ByteArray(4)
+                val header = ByteArray(ZIP_HEADER_SIZE)
                 val bytesRead = fis.read(header)
-                if (bytesRead < 4 ||
+                if (bytesRead < ZIP_HEADER_SIZE ||
                     header[0] != 'P'.code.toByte() ||
                     header[1] != 'K'.code.toByte()
                 ) {
@@ -177,13 +190,12 @@ object BugReportZipper {
                         curZip.use { czf ->
                             // Check total size before adding files
                             val currentSize = zipFile.length()
-                            val maxZipSize = 10 * 1024 * 1024L // 10MB limit
 
-                            if (currentSize > maxZipSize) {
+                            if (currentSize > MAX_ZIP_SIZE_BYTES) {
                                 // If zip is too large, keep only recent entries
                                 val recentEntries = czf.entries().toList()
                                     .sortedByDescending { it.lastModifiedTime.toMillis() }
-                                    .take(10) // Keep 10 most recent entries
+                                    .take(MAX_RECENT_ENTRIES_LARGE_ZIP)
                                     .map { it.name }
 
                                 czf.entries().toList().forEach { entry ->
@@ -265,11 +277,10 @@ object BugReportZipper {
         }
 
         // skip empty files or files that exceed reasonable size
-        val maxSizeBytes = 10 * 1024 * 1024L // 10MB limit
         if (file.length() == 0L) {
             Logger.w(LOG_TAG_BUG_REPORT, "empty file skipped: ${file.name}")
             return
-        } else if (file.length() > maxSizeBytes) {
+        } else if (file.length() > MAX_ZIP_SIZE_BYTES) {
             Logger.w(LOG_TAG_BUG_REPORT, "file too large (${file.length()} bytes): ${file.name}")
             return
         }
@@ -278,7 +289,7 @@ object BugReportZipper {
             val entry = ZipEntry(file.name)
             zo.putNextEntry(entry)
             FileInputStream(file).use { input ->
-                val buffer = ByteArray(8192)
+                val buffer = ByteArray(ZIP_BUFFER_SIZE)
                 var bytesRead: Int
                 while (input.read(buffer).also { bytesRead = it } != -1) {
                     zo.write(buffer, 0, bytesRead)
@@ -300,17 +311,16 @@ object BugReportZipper {
         // get file size by checking the actual file (more reliable than internal zip size)
         val zipFilePath = zipFile.name
         val zipFileSize = File(zipFilePath).length()
-        val maxZipSize = 10 * 1024 * 1024L // 10MB limit
 
         // if zip file is more than 10 MB, only keep recent entries
-        if (zipFileSize > maxZipSize) {
+        if (zipFileSize > MAX_ZIP_SIZE_BYTES) {
             Logger.i(LOG_TAG_BUG_REPORT, "Zip file size exceeds 10MB, keeping only recent entries")
 
             val entryList = zipFile.entries().toList().sortedByDescending {
                 it.lastModifiedTime.toMillis()
             }
             // keep only the last 5 entries or less if there are not enough entries
-            val keepEntries = entryList.take(5).map { it.name }
+            val keepEntries = entryList.take(MAX_RECENT_ENTRIES_CLEANUP).map { it.name }
 
             entryList.forEach { entry ->
                 if (entry.name in keepEntries && entry.name != ignoreFileName) {

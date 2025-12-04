@@ -81,6 +81,19 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         private const val DOWNLOAD_NOTIFICATION_TAG = "DOWNLOAD_ALERTS"
         private const val DOWNLOAD_NOTIFICATION_ID = 110
         private const val MAX_RETRY_COUNT = 3
+
+        // Buffer sizes for file download
+        private const val BUFFERED_INPUT_STREAM_SIZE = 8192 // 8KB
+        private const val BYTE_BUFFER_SIZE = 4096 // 4KB
+
+        // Progress update intervals
+        private const val PROGRESS_UPDATE_INTERVAL_MS = 1000 // 1 second
+
+        // Byte conversion constants
+        private const val BYTES_PER_MB = 1048576.0 // 1024 * 1024
+
+        // Notification progress constants
+        private const val NOTIFICATION_PROGRESS_MAX = 100
     }
 
     override suspend fun doWork(): Result {
@@ -89,8 +102,8 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
             val startTime = inputData.getLong("workerStartTime", 0)
             val timestamp = inputData.getLong("blocklistTimestamp", 0)
 
-            if (runAttemptCount > 3) {
-                Logger.w(LOG_TAG_DOWNLOAD, "Local blocklist download failed after 3 attempts")
+            if (runAttemptCount > MAX_RETRY_COUNT) {
+                Logger.w(LOG_TAG_DOWNLOAD, "Local blocklist download failed after $MAX_RETRY_COUNT attempts")
                 return Result.failure()
             }
 
@@ -295,23 +308,23 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
             // file size and download percentage
             var bytesRead: Int
             val contentLength = body.contentLength()
-            val expectedMB: Double = contentLength / 1048576.0
+            val expectedMB: Double = contentLength / BYTES_PER_MB
             var downloadedMB = 0.0
-            input = BufferedInputStream(body.byteStream(), 8192) // 8KB
+            input = BufferedInputStream(body.byteStream(), BUFFERED_INPUT_STREAM_SIZE)
             val startMs = SystemClock.elapsedRealtime()
-            var progressJumpsMs = 1000
-            val buf = ByteArray(4096) // 4KB
+            var progressJumpsMs = PROGRESS_UPDATE_INTERVAL_MS
+            val buf = ByteArray(BYTE_BUFFER_SIZE)
             while (input.read(buf).also { bytesRead = it } != -1) {
                 val elapsedMs = SystemClock.elapsedRealtime() - startMs
                 downloadedMB += bytesToMB(bytesRead)
                 val progress =
                     if (contentLength == Long.MAX_VALUE || expectedMB == 0.0) 0
-                    else (downloadedMB * 100 / expectedMB).toInt()
+                    else (downloadedMB * NOTIFICATION_PROGRESS_MAX / expectedMB).toInt()
                 if (elapsedMs >= progressJumpsMs) {
                     updateProgress(context, progress)
                     // increase the next update duration linearly by another sec; ie,
                     // update in the intervals of once every [1, 2, 3, 4, ...] secs
-                    progressJumpsMs += 1000
+                    progressJumpsMs += PROGRESS_UPDATE_INTERVAL_MS
                 }
                 output.write(buf, 0, bytesRead)
             }
@@ -328,7 +341,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
     }
 
     private fun bytesToMB(sz: Int): Double {
-        return sz.toDouble() / 1048576.0
+        return sz.toDouble() / BYTES_PER_MB
     }
 
     private fun isDownloadComplete(dir: File): Boolean {
@@ -452,7 +465,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
                 .setContentTitle(contentTitle)
                 .setContentIntent(getPendingIntent(context))
                 .setContentText(contentText)
-            builder.setProgress(100, 0, false)
+            builder.setProgress(NOTIFICATION_PROGRESS_MAX, 0, false)
             builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
             builder.color =
                 ContextCompat.getColor(context, UIUtils.getAccentColor(persistentState.theme))
@@ -497,7 +510,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
     private fun updateProgress(context: Context, progress: Int) {
         val builder = getBuilder(context)
         val cur = if (progress <= 0) 0 else progress
-        val max = if (cur <= 0) 0 else 100
+        val max = if (cur <= 0) 0 else NOTIFICATION_PROGRESS_MAX
         val forever = cur <= 0
         builder.setProgress(max, cur, forever)
         getNotificationManager(context)

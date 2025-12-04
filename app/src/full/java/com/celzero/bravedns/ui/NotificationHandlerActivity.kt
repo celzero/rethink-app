@@ -44,6 +44,15 @@ import org.koin.android.ext.android.inject
 class NotificationHandlerActivity: AppCompatActivity() {
 
     private val persistentState by inject<PersistentState>()
+
+    companion object {
+        private const val SCHEME_PACKAGE = "package"
+
+        // Biometric authentication timeout durations (in milliseconds)
+        private const val BIOMETRIC_TIMEOUT_FIVE_MIN_MS = 5L * 60L * 1000L
+        private const val BIOMETRIC_TIMEOUT_FIFTEEN_MIN_MS = 15L * 60L * 1000L
+    }
+
     enum class TrampolineType {
         ACCESSIBILITY_SERVICE_FAILURE_DIALOG,
         NEW_APP_INSTALL_DIALOG,
@@ -64,10 +73,6 @@ class NotificationHandlerActivity: AppCompatActivity() {
             window.isNavigationBarContrastEnforced = false
         }
         handleNotificationIntent(intent)
-    }
-
-    companion object {
-        private const val SCHEME_PACKAGE = "package"
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -138,9 +143,9 @@ class NotificationHandlerActivity: AppCompatActivity() {
 
         val lastAuthTime = persistentState.biometricAuthTime
         if (BioMetricType.FIVE_MIN.action == authType) {
-            if (System.currentTimeMillis() - lastAuthTime < 5 * 60 * 1000) return false
+            if (System.currentTimeMillis() - lastAuthTime < BIOMETRIC_TIMEOUT_FIVE_MIN_MS) return false
         } else if (BioMetricType.FIFTEEN_MIN.action == authType) {
-            if (System.currentTimeMillis() - lastAuthTime < 15 * 60 * 1000) return false
+            if (System.currentTimeMillis() - lastAuthTime < BIOMETRIC_TIMEOUT_FIFTEEN_MIN_MS) return false
         }
 
         return true
