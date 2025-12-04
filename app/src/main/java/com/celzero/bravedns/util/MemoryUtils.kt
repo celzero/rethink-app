@@ -24,6 +24,11 @@ import kotlin.math.pow
 
 object MemoryUtils {
 
+    // Constants for memory calculations
+    private const val BYTES_TO_KB = 1024L
+    private const val PERCENTAGE_MULTIPLIER = 100.0
+    private const val MEMORY_UNIT_BASE = 1024.0
+
     data class MemoryStats(
         val availMem: String, // Available memory in the system
         val threshold: String, // Threshold for low memory warning
@@ -67,8 +72,8 @@ object MemoryUtils {
         val availMemBytes = systemMemInfo.availMem
         val thresholdBytes = systemMemInfo.threshold
         val usedMemBytes = totalMemBytes - availMemBytes
-        val usedMemPercent = (usedMemBytes.toDouble() / totalMemBytes.toDouble()) * 100.0
-        val thresholdPercent = (thresholdBytes.toDouble() / totalMemBytes.toDouble()) * 100.0
+        val usedMemPercent = (usedMemBytes.toDouble() / totalMemBytes.toDouble()) * PERCENTAGE_MULTIPLIER
+        val thresholdPercent = (thresholdBytes.toDouble() / totalMemBytes.toDouble()) * PERCENTAGE_MULTIPLIER
         val largeMemoryClassMB = activityManager.largeMemoryClass
         val memoryClassMB = activityManager.memoryClass
 
@@ -76,14 +81,14 @@ object MemoryUtils {
         val debugMemInfo = Debug.MemoryInfo()
         Debug.getMemoryInfo(debugMemInfo)
 
-        val totalPssBytes = debugMemInfo.totalPss * 1024L
+        val totalPssBytes = debugMemInfo.totalPss * BYTES_TO_KB
 
         // "summary.native-heap" etc return values in KB
-        val nativePssBytes = (debugMemInfo.getMemoryStat("summary.native-heap")?.toLongOrNull() ?: 0L) * 1024
-        val graphicsPssBytes = (debugMemInfo.getMemoryStat("summary.graphics")?.toLongOrNull() ?: 0L) * 1024
-        val codePssBytes = (debugMemInfo.getMemoryStat("summary.code")?.toLongOrNull() ?: 0L) * 1024
-        val stackPssBytes = (debugMemInfo.getMemoryStat("summary.stack")?.toLongOrNull() ?: 0L) * 1024
-        val unknownPssBytes = (debugMemInfo.getMemoryStat("summary.private-other")?.toLongOrNull() ?: 0L) * 1024
+        val nativePssBytes = (debugMemInfo.getMemoryStat("summary.native-heap")?.toLongOrNull() ?: 0L) * BYTES_TO_KB
+        val graphicsPssBytes = (debugMemInfo.getMemoryStat("summary.graphics")?.toLongOrNull() ?: 0L) * BYTES_TO_KB
+        val codePssBytes = (debugMemInfo.getMemoryStat("summary.code")?.toLongOrNull() ?: 0L) * BYTES_TO_KB
+        val stackPssBytes = (debugMemInfo.getMemoryStat("summary.stack")?.toLongOrNull() ?: 0L) * BYTES_TO_KB
+        val unknownPssBytes = (debugMemInfo.getMemoryStat("summary.private-other")?.toLongOrNull() ?: 0L) * BYTES_TO_KB
 
         // 3. App-specific Java Heap
         val runtime = Runtime.getRuntime()
@@ -151,7 +156,7 @@ object MemoryUtils {
     private fun formatBytes(bytes: Long): String {
         if (bytes <= 0) return "0 B"
         val units = arrayOf("B", "KB", "MB", "GB", "TB")
-        val digitGroups = kotlin.math.min((log10(bytes.toDouble()) / log10(1024.0)).toInt(), units.size - 1)
-        return DecimalFormat("#,##0.#").format(bytes / 1024.0.pow(digitGroups.toDouble())) + " " + units[digitGroups]
+        val digitGroups = kotlin.math.min((log10(bytes.toDouble()) / log10(MEMORY_UNIT_BASE)).toInt(), units.size - 1)
+        return DecimalFormat("#,##0.#").format(bytes / MEMORY_UNIT_BASE.pow(digitGroups.toDouble())) + " " + units[digitGroups]
     }
 }
