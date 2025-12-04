@@ -25,7 +25,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.os.SystemClock
 import android.provider.Settings
@@ -40,7 +39,6 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -52,7 +50,7 @@ import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentAboutBinding
-import com.celzero.bravedns.scheduler.BugReportZipper.FILE_PROVIDER_NAME
+import com.celzero.bravedns.scheduler.BugReportZipper
 import com.celzero.bravedns.scheduler.BugReportZipper.getZipFileName
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.scheduler.WorkScheduler
@@ -60,6 +58,7 @@ import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.bottomsheet.BugReportFilesBottomSheet
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_4
@@ -296,7 +295,11 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 if (isAtleastO()) {
                     handleShowAppExitInfo()
                 } else {
-                    showNoLogDialog()
+                    if (hasAnyLogsAvailable()) {
+                        promptCrashLogAction()
+                    } else {
+                        showNoLogDialog()
+                    }
                 }
             }
             b.aboutMail -> {
@@ -595,6 +598,44 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         }
     }
 
+    /**
+     * Checks if any bug report logs are available (bug report zip or tombstone files).
+     * @return true if at least one log file exists, false otherwise
+     */
+    private fun hasAnyLogsAvailable(): Boolean {
+        val dir = requireContext().filesDir
+
+        val bugReportZip = File(getZipFileName(dir))
+        if (bugReportZip.exists() && bugReportZip.length() > 0) {
+            return true
+        }
+
+        if (isAtleastO()) {
+            val tombstoneZip = EnhancedBugReport.getTombstoneZipFile(requireContext())
+            if (tombstoneZip != null && tombstoneZip.exists() && tombstoneZip.length() > 0) {
+                return true
+            }
+
+            val tombstoneDir = File(dir, EnhancedBugReport.TOMBSTONE_DIR_NAME)
+            if (tombstoneDir.exists() && tombstoneDir.isDirectory) {
+                val tombstoneFiles = tombstoneDir.listFiles()
+                if (tombstoneFiles != null && tombstoneFiles.any { it.isFile && it.length() > 0 }) {
+                    return true
+                }
+            }
+        }
+
+        val bugReportDir = File(dir, BugReportZipper.BUG_REPORT_DIR_NAME)
+        if (bugReportDir.exists() && bugReportDir.isDirectory) {
+            val bugReportFiles = bugReportDir.listFiles()
+            if (bugReportFiles != null && bugReportFiles.any { it.isFile && it.length() > 0 }) {
+                return true
+            }
+        }
+
+        return false
+    }
+
     private fun showNoLogDialog() {
         val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.about_bug_no_log_dialog_title)
@@ -649,78 +690,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             .setCancelable(true)
             .create()
             .show()
-    }
-
-    // ref: https://developer.android.com/guide/components/intents-filters
-    private fun emailBugReport() {
-        try {
-            // get the rethink.tombstone file
-            val tombstoneFile: File? = EnhancedBugReport.getTombstoneZipFile(requireContext())
-
-            // get the bug_report.zip file
-            val dir = requireContext().filesDir
-            val file = File(getZipFileName(dir))
-            val uri = getFileUri(file) ?: throw Exception("file uri is null")
-
-            // create an intent for sending email with or without multiple attachments
-            val emailIntent = if (tombstoneFile != null) {
-                Intent(Intent.ACTION_SEND_MULTIPLE)
-            } else {
-                Intent(Intent.ACTION_SEND)
-            }
-            emailIntent.type = "text/plain"
-            emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.about_mail_to)))
-            emailIntent.putExtra(
-                Intent.EXTRA_SUBJECT,
-                getString(R.string.about_mail_bugreport_subject)
-            )
-
-            // attach extra files (either as a list or single file based on availability)
-            if (tombstoneFile != null) {
-                val tombstoneUri =
-                    getFileUri(tombstoneFile) ?: throw Exception("tombstoneUri is null")
-                val uriList = arrayListOf<Uri>(uri, tombstoneUri)
-                // send multiple attachments
-                emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uriList)
-            } else {
-                // ensure EXTRA_TEXT is passed correctly as an ArrayList<CharSequence>
-                val bugReportText = getString(R.string.about_mail_bugreport_text)
-                val bugReportTextList = arrayListOf<CharSequence>(bugReportText)
-                emailIntent.putCharSequenceArrayListExtra(Intent.EXTRA_TEXT, bugReportTextList)
-                emailIntent.putExtra(Intent.EXTRA_STREAM, uri)
-            }
-            Logger.i(LOG_TAG_UI, "email with attachment: $uri, ${tombstoneFile?.path}")
-            emailIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-            emailIntent.flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-            startActivity(
-                Intent.createChooser(
-                    emailIntent,
-                    getString(R.string.about_mail_bugreport_share_title)
-                )
-            )
-        } catch (e: Exception) {
-            showToastUiCentered(
-                requireContext(),
-                getString(R.string.error_loading_log_file),
-                Toast.LENGTH_SHORT
-            )
-            Logger.e(LOG_TAG_UI, "error sending email: ${e.message}", e)
-        }
-    }
-
-    private fun getFileUri(file: File): Uri? {
-        if (isFileAvailable(file)) {
-            return FileProvider.getUriForFile(
-                requireContext().applicationContext,
-                FILE_PROVIDER_NAME,
-                file
-            )
-        }
-        return null
-    }
-
-    private fun isFileAvailable(file: File): Boolean {
-        return file.isFile && file.exists()
     }
 
     private fun showContributors() {
@@ -785,7 +754,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         }
 
         // show btmsht with file list
-        val bottomSheet = com.celzero.bravedns.ui.bottomsheet.BugReportFilesBottomSheet()
+        val bottomSheet = BugReportFilesBottomSheet()
         bottomSheet.show(parentFragmentManager, "BugReportFilesBottomSheet")
     }
 
