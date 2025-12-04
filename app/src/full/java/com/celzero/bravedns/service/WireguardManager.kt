@@ -1104,7 +1104,7 @@ object WireguardManager : KoinComponent {
             val stats = VpnController.getWireGuardStats(id)
             val routerStats = stats?.routerStats
             sb.append("   id: ${it.id}, name: ${it.name}\n")
-            sb.append("   addr: ${routerStats?.addr}").append("\n")
+            sb.append("   addr: ${routerStats?.addrs}").append("\n")
             sb.append("   mtu: ${stats?.mtu}\n")
             sb.append("   status: ${stats?.status}\n")
             sb.append("   ip4: ${stats?.ip4}\n")
@@ -1122,7 +1122,7 @@ object WireguardManager : KoinComponent {
             sb.append("   extra: ${routerStats?.extra}\n\n")
         }
         if (sb.isEmpty()) {
-            sb.append("   N/A")
+            sb.append("   N/A\n\n")
         }
         return sb.toString()
     }
