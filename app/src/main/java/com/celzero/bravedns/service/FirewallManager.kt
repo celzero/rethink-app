@@ -87,6 +87,12 @@ object FirewallManager : KoinComponent {
         BYPASS_DNS_FIREWALL(7);
 
         companion object {
+            // UI label index constants for getStatusByLabel mapping
+            private const val LABEL_INDEX_ISOLATE = 4
+            private const val LABEL_INDEX_BYPASS_DNS_FIREWALL = 5
+            private const val LABEL_INDEX_BYPASS_UNIVERSAL = 6
+            private const val LABEL_INDEX_EXCLUDE = 7
+
 
             fun getStatus(id: Int): FirewallStatus {
                 return when (id) {
@@ -110,33 +116,11 @@ object FirewallManager : KoinComponent {
 
             fun getStatusByLabel(id: Int): FirewallStatus {
                 return when (id) {
-                    0 -> {
-                        NONE
-                    }
-                    1 -> {
-                        NONE
-                    }
-                    2 -> {
-                        NONE
-                    }
-                    3 -> {
-                        NONE
-                    }
-                    4 -> {
-                        ISOLATE
-                    }
-                    5 -> {
-                        BYPASS_DNS_FIREWALL
-                    }
-                    6 -> {
-                        BYPASS_UNIVERSAL
-                    }
-                    7 -> {
-                        EXCLUDE
-                    }
-                    else -> {
-                        NONE
-                    }
+                    LABEL_INDEX_ISOLATE -> ISOLATE
+                    LABEL_INDEX_BYPASS_DNS_FIREWALL -> BYPASS_DNS_FIREWALL
+                    LABEL_INDEX_BYPASS_UNIVERSAL -> BYPASS_UNIVERSAL
+                    LABEL_INDEX_EXCLUDE -> EXCLUDE
+                    else -> NONE
                 }
             }
         }
@@ -186,6 +170,12 @@ object FirewallManager : KoinComponent {
         }
 
         companion object {
+            // UI label index constants for getStatusByLabel mapping
+            private const val LABEL_INDEX_UNMETERED = 2
+            private const val LABEL_INDEX_METERED = 3
+            private const val LABEL_INDEX_ALLOW_START = 4
+            private const val LABEL_INDEX_ALLOW_END = 5
+
             fun getStatus(id: Int): ConnectionStatus {
                 return when (id) {
                     BOTH.id -> {
@@ -208,27 +198,11 @@ object FirewallManager : KoinComponent {
 
             fun getStatusByLabel(id: Int): ConnectionStatus {
                 return when (id) {
-                    0 -> {
-                        ALLOW
-                    }
-                    1 -> {
-                        BOTH
-                    }
-                    2 -> {
-                        UNMETERED
-                    }
-                    3 -> {
-                        METERED
-                    }
-                    4 -> {
-                        ALLOW
-                    }
-                    5 -> {
-                        ALLOW
-                    }
-                    else -> {
-                        ALLOW
-                    }
+                    BOTH.id -> BOTH
+                    LABEL_INDEX_UNMETERED -> UNMETERED
+                    LABEL_INDEX_METERED -> METERED
+                    LABEL_INDEX_ALLOW_START, LABEL_INDEX_ALLOW_END -> ALLOW
+                    else -> ALLOW
                 }
             }
         }
