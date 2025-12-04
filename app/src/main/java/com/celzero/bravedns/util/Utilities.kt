@@ -101,6 +101,8 @@ object Utilities {
     private const val MINIMUM_OS_VERSION_PARTS = 2
     private const val DECIMAL_FORMAT_PATTERN = "%.1f %sB"
 
+    private var countryMap: CountryMap? = null
+
     // convert an FQDN like "www.example.co.uk." to an eTLD + 1 like "example.co.uk".
     fun getETldPlus1(fqdn: String): String? {
         return try {
@@ -131,6 +133,7 @@ object Utilities {
         }
     }
 
+    @Suppress("ReturnCount")
     fun isAccessibilityServiceEnabled(
         context: Context,
         service: Class<out AccessibilityService?>
@@ -158,6 +161,7 @@ object Utilities {
         return false
     }
 
+    @Suppress("ReturnCount")
     fun isAccessibilityServiceEnabledViaSettingsSecure(
         context: Context,
         accessibilityService: Class<out AccessibilityService?>
@@ -192,8 +196,6 @@ object Utilities {
         Logger.w(LOG_TAG_VPN, "accessibility service not enabled via Settings Secure")
         return isAccessibilityServiceEnabled(context, accessibilityService)
     }
-
-    private var countryMap: CountryMap? = null
 
     // Return a two-letter ISO country code, or null if that fails.
     fun getCountryCode(address: InetAddress?, context: Context): String? {
@@ -321,7 +323,7 @@ object Utilities {
                 is androidx.appcompat.app.AppCompatActivity,
                 is androidx.fragment.app.FragmentActivity,
                 is android.app.Activity -> {
-                    showToastForActivity(context as android.app.Activity, message, toastLength, isMainThread)
+                    showToastForActivity(context, message, toastLength, isMainThread)
                 }
                 is android.app.Application -> {
                     showToastForApplication(context, message, toastLength, isMainThread)
@@ -888,6 +890,7 @@ object Utilities {
 
     // used to check if the current os version is above 4.12 for anti-censorship feature
     // desync requires os version above 4.12
+    @Suppress("ReturnCount")
     fun isOsVersionAbove412(targetVersion: String): Boolean {
         // get the os version from system properties
         val osVersion = System.getProperty("os.version") ?: return false
