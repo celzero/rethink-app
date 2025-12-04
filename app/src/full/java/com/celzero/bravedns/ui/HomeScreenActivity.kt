@@ -362,8 +362,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             persistentState.defaultDnsUrl = Constants.DEFAULT_DNS_LIST[2].url
         }
         moveRemoteBlocklistFileFromAsset()
-        // set the rethink app in firewall mode as allowed by default
-        io { appInfoDb.resetRethinkAppFirewallMode() }
         // if biometric auth is enabled, then set the biometric auth type to 3 (15 minutes)
         if (persistentState.biometricAuth) {
             persistentState.biometricAuthType =

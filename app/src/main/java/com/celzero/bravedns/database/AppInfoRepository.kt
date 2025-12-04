@@ -112,10 +112,6 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         appInfoDAO.updateProxyExcluded(uid, isProxyExcluded)
     }
 
-    suspend fun resetRethinkAppFirewallMode() {
-        appInfoDAO.resetRethinkAppFirewallMode()
-    }
-
     suspend fun getAppInfoUidForPackageName(packageName: String): Int {
         return appInfoDAO.getAppInfoUidForPackageName(packageName)
     }
