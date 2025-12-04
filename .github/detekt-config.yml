@@ -9,6 +9,8 @@ style:
     excludeImportStatements: true
     excludeCommentStatements: false
     excludeRawStrings: true
+  ForbiddenComment:
+    active: false
 
 exceptions:
   TooGenericExceptionCaught:
@@ -16,7 +18,3 @@ exceptions:
     exceptionNames:
       - Throwable
       - Error
-
-formatting:
-  CommentPattern:
-    active: false
