@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    android:orientation="vertical"
+    android:paddingBottom="20dp">
+
+    <!-- Drag handle -->
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="60dp"
+        android:layout_height="3dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
+        android:background="?attr/border" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/brbs_heading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:padding="10dp"
+        android:text="@string/bug_report_files_heading"
+        android:textColor="?attr/primaryLightColorText"
+        android:textSize="@dimen/extra_large_font_text_view"
+        android:textStyle="bold" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/brbs_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="10dp"
+        android:text="@string/bug_report_files_desc"
+        android:textColor="?attr/primaryLightColorText"
+        android:textSize="@dimen/default_font_text_view" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/brbs_select_all_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="?attr/accentGood"
+            android:foregroundTint="?attr/accentGood"
+            android:checked="true" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/brbs_select_all_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="@string/bug_report_select_all"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/default_font_text_view"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/brbs_total_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text=""
+            android:textColor="?attr/secondaryTextColor"
+            android:textSize="@dimen/small_font_text_view" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:background="?attr/border" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/brbs_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:maxHeight="400dp"
+        android:nestedScrollingEnabled="true" />
+
+    <LinearLayout
+        android:id="@+id/brbs_progress_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/brbs_progress_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/bug_report_preparing"
+            android:textColor="?attr/secondaryTextColor"
+            android:textSize="@dimen/default_font_text_view" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="10dp"
+        android:background="?attr/border" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/brbs_send_button"
+        style="@style/toggleButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="10dp"
+        android:padding="10dp"
+        android:minHeight="48dp"
+        android:text="@string/bug_report_send"
+        android:textColor="?attr/primaryTextColor"
+        android:textAllCaps="false"
+        app:cornerRadius="8dp"
+        app:icon="@drawable/ic_mail"
+        app:iconPadding="10dp"
+        app:iconTint="?attr/primaryTextColor"
+        app:iconGravity="textStart" />
+
+</LinearLayout>
+

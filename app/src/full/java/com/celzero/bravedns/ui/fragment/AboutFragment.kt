@@ -38,7 +38,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.FileProvider
@@ -51,7 +50,6 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
-import com.celzero.bravedns.databinding.DialogViewLogsBinding
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentAboutBinding
 import com.celzero.bravedns.scheduler.BugReportZipper.FILE_PROVIDER_NAME
@@ -91,7 +89,6 @@ import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 import java.io.File
 import java.util.concurrent.TimeUnit
-import java.util.zip.ZipFile
 
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, KoinComponent {
     private val b by viewBinding(FragmentAboutBinding::bind)
@@ -762,21 +759,23 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun promptCrashLogAction() {
-        val binding =
-            DialogViewLogsBinding.inflate(LayoutInflater.from(requireContext()), null, false)
-        val builder = AlertDialog.Builder(requireContext()).setView(binding.root)
-        builder.setTitle(getString(R.string.about_bug_report))
+        // ensure tombstone logs are added to zip if available
+        if (isAtleastO()) {
+            io {
+                try {
+                    EnhancedBugReport.addLogsToZipFile(requireContext())
+                } catch (e: Exception) {
+                    Logger.w(LOG_TAG_UI, "err adding tombstone to zip: ${e.message}", e)
+                }
+            }
+        }
 
+        // see if bug report files exist
         val dir = requireContext().filesDir
         val zipPath = getZipFileName(dir)
-        val zipFile =
-            try {
-                ZipFile(zipPath)
-            } catch (_: Exception) { // FileNotFound, ZipException
-                null
-            }
+        val zipFile = File(zipPath)
 
-        if (zipFile == null || zipFile.size() <= 0) {
+        if (!zipFile.exists() || zipFile.length() <= 0) {
             showToastUiCentered(
                 requireContext(),
                 getString(R.string.log_file_not_available),
@@ -785,84 +784,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             return
         }
 
-        io {
-            // load only 20k characters to avoid ANR
-            val maxLength = 20000
-            try {
-                val inputString = StringBuilder(maxLength)
-                val entries = zipFile.entries()
-                val buffer = CharArray(4096) // Read in smaller chunks
-                var shouldBreak = false
-                while (entries.hasMoreElements() && !shouldBreak) {
-                    val entry = entries.nextElement()
-                    zipFile.getInputStream(entry).use { inputStream ->
-                        val reader = inputStream.bufferedReader()
-                        var charsRead: Int
-                        while (reader.read(buffer).also { charsRead = it } > 0 && !shouldBreak) {
-                            if (charsRead + inputString.length > maxLength) {
-                                // add only what we need to reach maxLength
-                                inputString.append(buffer, 0, maxLength - inputString.length)
-                                shouldBreak = true
-                                break
-                            } else {
-                                inputString.append(buffer, 0, charsRead)
-                            }
-                        }
-                    }
-                    if (inputString.length >= maxLength) {
-                        break
-                    }
-                }
-                Logger.d(
-                    LOG_TAG_UI,
-                    "bug report content size: ${inputString.length}, $zipPath, ${zipFile.size()}"
-                )
-                uiCtx {
-                    if (!isAdded) return@uiCtx
-                    binding.info.visibility = View.VISIBLE
-                    if (inputString.isEmpty()) {
-                        binding.logs.text = getString(R.string.error_loading_log_file)
-                        return@uiCtx
-                    }
-                    if (inputString.length > maxLength) {
-                        binding.logs.text = inputString.slice(0 until maxLength)
-                    } else {
-                        binding.logs.text = inputString
-                    }
-                }
-                if (isAtleastO()) {
-                    EnhancedBugReport.addLogsToZipFile(requireContext())
-                }
-            } catch (e: Exception) {
-                Logger.w(LOG_TAG_UI, "err loading log files to textview: ${e.message}", e)
-                uiCtx {
-                    if (!isAdded) return@uiCtx
-                    binding.info.visibility = View.GONE
-                    binding.logs.text = getString(R.string.error_loading_log_file)
-                }
-            } finally {
-                zipFile.close()
-            }
-
-            uiCtx {
-                if (!isAdded) return@uiCtx
-
-                binding.progressLayout.visibility = View.GONE
-            }
-        }
-
-        val width = (resources.displayMetrics.widthPixels * 0.75).toInt()
-        val height = (resources.displayMetrics.heightPixels * 0.75).toInt()
-
-        builder.setPositiveButton(getString(R.string.about_bug_report_dialog_positive_btn)) { _, _
-            ->
-            emailBugReport()
-        }
-        builder.setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ -> dialog.dismiss() }
-
-        val alert: AlertDialog = builder.create()
-        alert.window?.setLayout(width, height)
-        alert.show()
+        // show btmsht with file list
+        val bottomSheet = com.celzero.bravedns.ui.bottomsheet.BugReportFilesBottomSheet()
+        bottomSheet.show(parentFragmentManager, "BugReportFilesBottomSheet")
     }
 
     private fun handleShowAppExitInfo() {
