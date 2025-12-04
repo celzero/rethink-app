@@ -29,6 +29,7 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.PcapMode
+import com.celzero.bravedns.util.ResourceRecordTypes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import hu.autsoft.krate.SimpleKrate
@@ -467,8 +468,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
                 _udpBlocked,
                 _blockUnknownConnections,
                 _blockAppWhenBackground,
-                _blockWhenDeviceLocked,
-                _blockOtherDnsRecordTypes
+                _blockWhenDeviceLocked
             )
         universalRulesCount.postValue(list.count { it })
     }
@@ -559,15 +559,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         return _blockWhenDeviceLocked
     }
 
-    fun getBlockOtherDnsRecordTypes(): Boolean {
-        return _blockOtherDnsRecordTypes
-    }
-
-    fun setBlockOtherDnsRecordTypes(b: Boolean) {
-        _blockOtherDnsRecordTypes = b
-        setUniversalRulesCount()
-    }
-
     fun getProxyStatus(): MutableLiveData<Int> {
         return updateProxyStatus()
     }
@@ -625,5 +616,53 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         }
 
         return
+    }
+
+    // Allowed DNS record types (stored as comma-separated enum names)
+    // Default: A, AAAA, CNAME, HTTPS, SVCB
+    internal var allowedDnsRecordTypesString by stringPref("allowed_dns_record_types")
+        .withDefault(setOf(
+            ResourceRecordTypes.A.name,
+            ResourceRecordTypes.AAAA.name,
+            ResourceRecordTypes.CNAME.name,
+            ResourceRecordTypes.HTTPS.name,
+            ResourceRecordTypes.SVCB.name,
+            ResourceRecordTypes.IPSECKEY.name
+        ).joinToString(","))
+
+    // Auto mode for DNS record types - when enabled, all record types are allowed
+    // Default: true (Auto mode ON)
+    var dnsRecordTypesAutoMode by booleanPref("dns_record_types_auto_mode")
+        .withDefault(true)
+
+    fun getAllowedDnsRecordTypes(): Set<String> {
+        // If Auto mode is enabled, return all record types
+        if (dnsRecordTypesAutoMode) {
+            return ResourceRecordTypes.entries
+                .filter { it != ResourceRecordTypes.UNKNOWN }
+                .map { it.name }
+                .toSet()
+        }
+
+        val value = allowedDnsRecordTypesString
+        return if (value.isEmpty()) {
+            emptySet()
+        } else {
+            value.split(",").filter { it.isNotEmpty() }.toSet()
+        }
+    }
+
+    fun setAllowedDnsRecordTypes(types: Set<String>) {
+        allowedDnsRecordTypesString = types.joinToString(",")
+    }
+
+    fun getAllowedDnsRecordTypesAsEnum(): Set<ResourceRecordTypes> {
+        return getAllowedDnsRecordTypes().mapNotNull { name ->
+            try {
+                ResourceRecordTypes.valueOf(name)
+            } catch (e: IllegalArgumentException) {
+                null
+            }
+        }.toSet()
     }
 }

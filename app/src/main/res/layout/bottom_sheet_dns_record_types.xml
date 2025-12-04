@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    android:orientation="vertical"
+    android:paddingBottom="40dp">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="60dp"
+        android:layout_height="3dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
+        android:background="?attr/border" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/drbs_heading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:padding="10dp"
+        android:text="@string/dns_record_types_heading"
+        android:textColor="?attr/primaryLightColorText"
+        android:textSize="@dimen/extra_large_font_text_view" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/drbs_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="10dp"
+        android:text="@string/dns_record_types_desc"
+        android:textColor="?attr/primaryLightColorText"
+        android:textSize="@dimen/default_font_text_view" />
+
+    <!-- Mode Selection Toggle -->
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/drbs_mode_toggle_group"
+        style="@style/toggleButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="15dp"
+        app:checkedButton="@id/drbs_auto_mode_btn"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/drbs_auto_mode_btn"
+            style="@style/toggleButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minWidth="125dp"
+            android:tag="auto"
+            android:text="@string/settings_ip_text_ipv46"
+            android:textColor="?attr/defaultToggleBtnTxt"
+            app:cornerRadius="16dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/drbs_manual_mode_btn"
+            style="@style/toggleButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minWidth="125dp"
+            android:tag="manual"
+            android:text="@string/lbl_manual"
+            android:textColor="?attr/defaultToggleBtnTxt"
+            app:cornerRadius="16dp" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <!-- Manual Selection Section -->
+    <LinearLayout
+        android:id="@+id/drbs_manual_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/drbs_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="15dp"
+            android:maxHeight="400dp"
+            android:nestedScrollingEnabled="true" />
+
+    </LinearLayout>
+
+</LinearLayout>
+

@@ -44,9 +44,12 @@ import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
 import com.celzero.bravedns.ui.activity.DnsListActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
+import com.celzero.bravedns.ui.bottomsheet.DnsRecordTypesBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.LocalBlocklistsBottomSheet
+import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
@@ -94,7 +97,19 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         updateSelectedDns()
         // update local blocklist ui
         updateLocalBlocklistUi()
+        // update allowed record types ui
+        updateAllowedRecordTypesUi()
+        showNewBadgeIfNeeded()
     }
+
+
+    private fun showNewBadgeIfNeeded() {
+        val showBadge = NewSettingsManager.shouldShowBadge(NewSettingsManager.BLOCK_DNS_QTYPE_SETTING)
+        if (!showBadge) return
+
+        b.dcAllowedRecordTypesHeading.setBadgeDotVisible(requireContext(), true)
+    }
+
 
     private fun initView() {
         // init animation
@@ -118,6 +133,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.connectedStatusTitle.text = getConnectedDnsType()
         b.dcUseFallbackToBypassSwitch.isChecked = persistentState.useFallbackDnsToBypass
         showSplitDnsUi()
+        updateAllowedRecordTypesUi()
     }
 
     private fun updateLocalBlocklistUi() {
@@ -141,6 +157,19 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
 
         b.dcLocalBlocklistCount.setTextColor(fetchColor(requireContext(), R.attr.accentBad))
         b.dcLocalBlocklistCount.text = getString(R.string.lbl_disabled)
+    }
+
+    private fun updateAllowedRecordTypesUi() {
+        val selectedTxt = if (persistentState.dnsRecordTypesAutoMode) {
+            // Auto mode is enabled - show "Auto (All types)"
+            getString(R.string.dns_record_types_auto_mode_status)
+        } else {
+            // Manual mode - show count
+            val selectedCount = persistentState.getAllowedDnsRecordTypes().size
+            getString(R.string.two_argument_space, selectedCount.toString(), getString(R.string.rt_filter_parent_selected).lowercase())
+        }
+        val txt = getString(R.string.two_argument_space, getString(R.string.cd_allowed_dns_record_types_desc), selectedTxt)
+        b.dcAllowedRecordTypesDesc.text = txt
     }
 
     private fun initObservers() {
@@ -573,6 +602,19 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.dcUseFallbackToBypassHeading.setOnClickListener {
             b.dcUseFallbackToBypassSwitch.isChecked = !b.dcUseFallbackToBypassSwitch.isChecked
         }
+
+        b.dcAllowedRecordTypesRl.setOnClickListener {
+            showDnsRecordTypesBottomSheet()
+        }
+    }
+
+    private fun showDnsRecordTypesBottomSheet() {
+        val bottomSheet = DnsRecordTypesBottomSheet()
+        // Update UI when bottom sheet is dismissed
+        parentFragmentManager.setFragmentResultListener("dns_record_types_updated", viewLifecycleOwner) { _, _ ->
+            updateAllowedRecordTypesUi()
+        }
+        bottomSheet.show(parentFragmentManager, bottomSheet.tag)
     }
 
     private fun showSmartDnsInfoDialog() {

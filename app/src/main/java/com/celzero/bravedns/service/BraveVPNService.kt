@@ -2706,10 +2706,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     // create a new vpn adapter
                     val ifaceAddresses = getAddresses()
                     Logger.i(LOG_TAG_VPN, "vpn-adapter doesn't exists, create one, fd: $fd, lockdown: $lockdown, protos: $protos, ifaddr: $ifaceAddresses, opts: $opts, mtu: $mtu, nwMtu: $nwMtu")
-                    vpnAdapter = GoVpnAdapter(ctx, vpnScope, fd, ifaceAddresses, mtu, opts) // may throw
+                    vpnAdapter = GoVpnAdapter(ctx, vpnScope, fd, ifaceAddresses, mtu, nwMtu, opts) // may throw
                     GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel.toInt())
                     vpnAdapter?.initResolverProxiesPcap(opts)
-                    vpnAdapter?.setLinkMtu(nwMtu)
                     //checkForPlusSubscription()
                     return@withContext ok
                 } else {
@@ -3836,13 +3835,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         if (appMode.isDnsMode()) {
             result = getTransportIdForDnsMode(uid, fqdn, rinr)
             logd("onQuery (Dns):$fqdn, dnsx: $result")
-            return@go2kt shouldBlockNonEssentialDnsRecords(result, uid, fqdn, qtype, rinr = rinr)
+            return@go2kt checkUserAllowedDnsQtypes(result, uid, fqdn, qtype, rinr = rinr)
         }
 
         if (appMode.isDnsFirewallMode()) {
             result = getTransportIdForDnsFirewallMode(uid, fqdn, rinr = rinr)
             logd("onQuery (Dns+Firewall):$fqdn, dnsx: $result")
-            return@go2kt shouldBlockNonEssentialDnsRecords(result, uid, fqdn, qtype, rinr = rinr)
+            return@go2kt checkUserAllowedDnsQtypes(result, uid, fqdn, qtype, rinr = rinr)
         }
 
         // all other dns are added with id as Preferred, but SmartDns is added with Plus
@@ -3855,15 +3854,16 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         result = makeNsOpts(uid, Pair(tid, ""), fqdn, rinr = rinr) // should not reach here
         Logger.e(LOG_TAG_VPN, "onQuery: unknown mode ${appMode}, $fqdn, returning $result")
         // log the time taken for the query; result should not be null in any case
-        return@go2kt shouldBlockNonEssentialDnsRecords(result, uid, fqdn, qtype, rinr = rinr)
+        return@go2kt checkUserAllowedDnsQtypes(result, uid, fqdn, qtype, rinr = rinr)
     }
 
-    private suspend fun shouldBlockNonEssentialDnsRecords(result: DNSOpts, uid: Int, fqdn: String, qtype: Long, rinr: Boolean): DNSOpts {
+    private suspend fun checkUserAllowedDnsQtypes(result: DNSOpts, uid: Int, fqdn: String, qtype: Long, rinr: Boolean): DNSOpts {
         if (result.tidcsv.contains(Backend.BlockAll)) {
             // already blocked, no need to check further
             return result
         }
-        if (persistentState.getBlockOtherDnsRecordTypes() && !ResourceRecordTypes.mayContainIP(qtype.toInt())) {
+        val allowedTypes = persistentState.getAllowedDnsRecordTypesAsEnum()
+        if (!ResourceRecordTypes.isQtypeAllowed(qtype.toInt(), allowedTypes)) {
             // block dns responses which may not contain IPs
             val r = makeNsOpts(uid, Pair(Backend.BlockAll, ""), fqdn, false, rinr = rinr)
             logd("onQuery: blocking unknown dns responses for $fqdn, qtype: $qtype, returning $r")

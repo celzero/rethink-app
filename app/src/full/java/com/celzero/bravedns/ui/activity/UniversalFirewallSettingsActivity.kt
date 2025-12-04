@@ -98,7 +98,6 @@ class UniversalFirewallSettingsActivity :
         // includeView.firewallCheckIpv4Check.isChecked = persistentState.filterIpv4inIpv6
         b.firewallBlockHttpCheck.isChecked = persistentState.getBlockHttpConnections()
         b.firewallUnivLockdownCheck.isChecked = persistentState.getUniversalLockdown()
-        b.firewallUnknownDnsCheck.isChecked = persistentState.getBlockOtherDnsRecordTypes()
 
         setupClickListeners()
         updateStats()
@@ -198,15 +197,6 @@ class UniversalFirewallSettingsActivity :
             b.firewallUnivLockdownCheck.isChecked = !b.firewallUnivLockdownCheck.isChecked
         }
 
-        b.firewallUnknownDnsTxt.setOnClickListener {
-            b.firewallUnknownDnsCheck.isChecked = !b.firewallUnknownDnsCheck.isChecked
-        }
-
-        b.firewallUnknownDnsCheck.setOnCheckedChangeListener { _, b ->
-            NewSettingsManager.markSettingSeen(NewSettingsManager.UNIV_BLOCK_NON_A_AAAA_SETTING)
-            persistentState.setBlockOtherDnsRecordTypes(b)
-        }
-
         // click listener for the stats
         b.firewallDeviceLockedRl.setOnClickListener { startActivity(FirewallRuleset.RULE3.id) }
 
@@ -225,8 +215,6 @@ class UniversalFirewallSettingsActivity :
         b.firewallHttpRl.setOnClickListener { startActivity(FirewallRuleset.RULE10.id) }
 
         b.firewallLockdownRl.setOnClickListener { startActivity(FirewallRuleset.RULE11.id) }
-
-        b.firewallUnknownRl.setOnClickListener { startActivity(FirewallRuleset.RULE12.id) }
     }
 
     private fun recheckFirewallBackgroundMode(isChecked: Boolean) {
@@ -263,14 +251,6 @@ class UniversalFirewallSettingsActivity :
     override fun onResume() {
         super.onResume()
         updateUniversalFirewallPreferences()
-        showNewBadgeIfNeeded()
-    }
-
-    private fun showNewBadgeIfNeeded() {
-        val showBadge = NewSettingsManager.shouldShowBadge(NewSettingsManager.UNIV_BLOCK_NON_A_AAAA_SETTING)
-        if (!showBadge) return
-
-        b.firewallUnknownDnsTxt.setBadgeDotVisible(this, true)
     }
 
     private fun updateUniversalFirewallPreferences() {
@@ -391,10 +371,6 @@ class UniversalFirewallSettingsActivity :
                 blockedUniversalRules.filter {
                     it.blockedByRule.contains(FirewallRuleset.RULE11.id)
                 }
-            val unknownDns =
-                blockedUniversalRules.filter {
-                    it.blockedByRule.contains(FirewallRuleset.RULE12.id)
-                }
 
             val blockedCountList =
                 listOf(
@@ -406,8 +382,7 @@ class UniversalFirewallSettingsActivity :
                     newApp.size,
                     metered.size,
                     http.size,
-                    universalLockdown.size,
-                    unknownDns.size
+                    universalLockdown.size
                 )
 
             maxValue = blockedCountList.maxOrNull()?.toDouble() ?: 0.0
@@ -437,8 +412,6 @@ class UniversalFirewallSettingsActivity :
                             calculatePercentage(blockedCountList[7].toDouble())
                         b.lockdownProgress.progress =
                             calculatePercentage(blockedCountList[8].toDouble())
-                        b.unknownDnsProgress.progress =
-                            calculatePercentage(blockedCountList[9].toDouble())
 
                         b.firewallDeviceLockedStats.text = deviceLocked.size.toString()
                         b.firewallNotInUseStats.text = backgroundMode.size.toString()
@@ -449,7 +422,6 @@ class UniversalFirewallSettingsActivity :
                         b.firewallMeteredStats.text = metered.size.toString()
                         b.firewallHttpStats.text = http.size.toString()
                         b.firewallLockdownStats.text = universalLockdown.size.toString()
-                        b.firewallUnknownDnsStats.text = unknownDns.size.toString()
                     },
                     500
                 )
@@ -481,7 +453,6 @@ class UniversalFirewallSettingsActivity :
         b.firewallMeteredShimmerLayout.stopShimmer()
         b.firewallHttpShimmerLayout.stopShimmer()
         b.firewallLockdownShimmerLayout.stopShimmer()
-        b.firewallUnknownDnsShimmerLayout.stopShimmer()
     }
 
     private fun hideShimmer() {
@@ -496,7 +467,6 @@ class UniversalFirewallSettingsActivity :
         b.firewallMeteredShimmerLayout.visibility = View.GONE
         b.firewallHttpShimmerLayout.visibility = View.GONE
         b.firewallLockdownShimmerLayout.visibility = View.GONE
-        b.firewallUnknownDnsShimmerLayout.visibility = View.GONE
     }
 
     private fun startActivity(rule: String?) {

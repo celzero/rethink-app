@@ -129,5 +129,10 @@ enum class ResourceRecordTypes(val value: Int, val desc: String) {
                 }
             return list.map { it.desc }.toSet()
         }
+
+        fun isQtypeAllowed(qtype: Int, allowedTypes: Set<ResourceRecordTypes>): Boolean {
+            val type = getTypeName(qtype)
+            return allowedTypes.contains(type)
+        }
     }
 }

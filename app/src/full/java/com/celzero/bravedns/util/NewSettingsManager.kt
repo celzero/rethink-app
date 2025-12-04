@@ -27,11 +27,11 @@ object NewSettingsManager: KoinComponent {
 
     private const val EXPIRY_DAYS = 7
 
-    const val UNIV_BLOCK_NON_A_AAAA_SETTING = "UNIV_BLOCK_NON_A_AAAA_SETTING"
+    const val BLOCK_DNS_QTYPE_SETTING = "BLOCK_DNS_QTYPE_SETTING"
     const val WG_GLOBAL_LOCKDOWN_MODE_SETTING = "WG_GLOBAL_LOCKDOWN_MODE_SETTING"
 
     private val newSettingsList = listOf (
-        UNIV_BLOCK_NON_A_AAAA_SETTING,
+        BLOCK_DNS_QTYPE_SETTING,
         WG_GLOBAL_LOCKDOWN_MODE_SETTING,
     )
 
