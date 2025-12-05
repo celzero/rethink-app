@@ -32,9 +32,11 @@ import org.koin.android.ext.android.inject
 
 class FragmentHostActivity : AppCompatActivity(R.layout.activity_fragment_host) {
     private val persistentState by inject<PersistentState>()
+
     companion object {
         private const val EXTRA_FRAGMENT_CLASS_NAME = "extra_fragment_class_name"
         private const val EXTRA_FRAGMENT_ARGUMENTS = "extra_fragment_arguments"
+        private const val STATE_FRAGMENT_CLASS_NAME = "state_fragment_class_name"
 
         /**
          * Helper function to create an intent to show any fragment
@@ -56,6 +58,8 @@ class FragmentHostActivity : AppCompatActivity(R.layout.activity_fragment_host) 
         }
     }
 
+    private var fragmentClassName: String? = null
+
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
                 UI_MODE_NIGHT_YES
@@ -69,24 +73,48 @@ class FragmentHostActivity : AppCompatActivity(R.layout.activity_fragment_host) 
 
         setContentView(R.layout.activity_fragment_host)
 
-        if (savedInstanceState == null) {
-            val fragmentClassName = intent.getStringExtra(EXTRA_FRAGMENT_CLASS_NAME)
-                ?: throw IllegalArgumentException("Fragment class name must be provided")
+        // Retrieve fragment class name from savedInstanceState or intent
+        fragmentClassName = savedInstanceState?.getString(STATE_FRAGMENT_CLASS_NAME)
+            ?: intent.getStringExtra(EXTRA_FRAGMENT_CLASS_NAME)
 
+        if (fragmentClassName == null) {
+            Logger.e(LOG_TAG_UI, "Fragment class name not provided, finishing activity")
+            finish()
+            return
+        }
+
+        if (savedInstanceState == null) {
+            // Only create fragment on first launch, not on recreation
             val arguments = intent.getBundleExtra(EXTRA_FRAGMENT_ARGUMENTS)
 
-            // Instantiate fragment from class name
-            val fragment = supportFragmentManager.fragmentFactory.instantiate(
-                classLoader,
-                fragmentClassName
-            ).apply {
-                if (arguments != null) this.arguments = arguments
-                Logger.i(LOG_TAG_UI, "Loading fragment: $fragmentClassName with arguments: $arguments")
-            }
+            try {
+                // Instantiate fragment from class name
+                val fragment = supportFragmentManager.fragmentFactory.instantiate(
+                    classLoader,
+                    fragmentClassName!!
+                ).apply {
+                    if (arguments != null) this.arguments = arguments
+                    Logger.i(LOG_TAG_UI, "Loading fragment: $fragmentClassName with arguments: $arguments")
+                }
 
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, fragment)
-                .commit()
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .commit()
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_UI, "Error instantiating fragment: $fragmentClassName", e)
+                finish()
+            }
+        } else {
+            // Fragment will be automatically restored by FragmentManager
+            Logger.i(LOG_TAG_UI, "Restoring fragment: $fragmentClassName from savedInstanceState")
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        // Save fragment class name to restore after process death
+        fragmentClassName?.let {
+            outState.putString(STATE_FRAGMENT_CLASS_NAME, it)
         }
     }
 }
