@@ -288,7 +288,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
         }
 
         private fun showBtmSheet() {
-            val bottomSheet = CustomIpRulesBtmSheet(customIp)
+            val bottomSheet = CustomIpRulesBtmSheet.newInstance(customIp)
             bottomSheet.show((context as CustomRulesActivity).supportFragmentManager, bottomSheet.tag)
         }
 
@@ -468,7 +468,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
         }
 
         private fun showBtmSheet() {
-            val bottomSheet = CustomIpRulesBtmSheet(customIp)
+            val bottomSheet = CustomIpRulesBtmSheet.newInstance(customIp)
             bottomSheet.show((context as CustomRulesActivity).supportFragmentManager, bottomSheet.tag)
         }
 

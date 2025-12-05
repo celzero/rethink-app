@@ -41,7 +41,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class CustomIpRulesBtmSheet(private var ci: CustomIp) :
+class CustomIpRulesBtmSheet() :
     BottomSheetDialogFragment(), ProxyCountriesBtmSheet.CountriesDismissListener, WireguardListBtmSheet.WireguardDismissListener {
     private var _binding: BottomSheetCustomIpsBinding? = null
 
@@ -51,6 +51,8 @@ class CustomIpRulesBtmSheet(private var ci: CustomIp) :
 
     private val persistentState by inject<PersistentState>()
 
+    private lateinit var ci: CustomIp
+
     private fun isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
                 Configuration.UI_MODE_NIGHT_YES
@@ -58,6 +60,15 @@ class CustomIpRulesBtmSheet(private var ci: CustomIp) :
 
     companion object {
         private const val TAG = "CIRBtmSht"
+        private const val ARG_CUSTOM_IP = "custom_ip"
+
+        fun newInstance(customIp: CustomIp): CustomIpRulesBtmSheet {
+            val fragment = CustomIpRulesBtmSheet()
+            val args = Bundle()
+            args.putSerializable(ARG_CUSTOM_IP, customIp)
+            fragment.arguments = args
+            return fragment
+        }
     }
 
     override fun getTheme(): Int =
@@ -84,6 +95,19 @@ class CustomIpRulesBtmSheet(private var ci: CustomIp) :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Retrieve CustomIp from arguments
+        ci = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getSerializable(ARG_CUSTOM_IP, CustomIp::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            arguments?.getSerializable(ARG_CUSTOM_IP) as? CustomIp
+        } ?: run {
+            Logger.e(LOG_TAG_UI, "$TAG: CustomIp not found in arguments, dismissing")
+            dismiss()
+            return
+        }
+
         dialog?.window?.let { window ->
             if (isAtleastQ()) {
                 val controller = WindowInsetsControllerCompat(window, window.decorView)
