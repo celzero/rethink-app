@@ -88,6 +88,13 @@ object FirewallManager : KoinComponent {
 
         companion object {
             // UI label index constants for getStatusByLabel mapping
+            // Positions 0-3: NONE status with different ConnectionStatus values
+            private const val LABEL_INDEX_NONE_ALLOW = 0      // Allow all
+            private const val LABEL_INDEX_NONE_BLOCK = 1      // Block all
+            private const val LABEL_INDEX_NONE_WIFI_BLOCK = 2 // Block WiFi only
+            private const val LABEL_INDEX_NONE_DATA_BLOCK = 3 // Block Mobile data only
+
+            // Positions 4-7: Special firewall statuses
             private const val LABEL_INDEX_ISOLATE = 4
             private const val LABEL_INDEX_BYPASS_DNS_FIREWALL = 5
             private const val LABEL_INDEX_BYPASS_UNIVERSAL = 6
@@ -116,6 +123,10 @@ object FirewallManager : KoinComponent {
 
             fun getStatusByLabel(id: Int): FirewallStatus {
                 return when (id) {
+                    LABEL_INDEX_NONE_ALLOW -> NONE
+                    LABEL_INDEX_NONE_BLOCK -> NONE
+                    LABEL_INDEX_NONE_WIFI_BLOCK -> NONE
+                    LABEL_INDEX_NONE_DATA_BLOCK -> NONE
                     LABEL_INDEX_ISOLATE -> ISOLATE
                     LABEL_INDEX_BYPASS_DNS_FIREWALL -> BYPASS_DNS_FIREWALL
                     LABEL_INDEX_BYPASS_UNIVERSAL -> BYPASS_UNIVERSAL
@@ -171,10 +182,12 @@ object FirewallManager : KoinComponent {
 
         companion object {
             // UI label index constants for getStatusByLabel mapping
-            private const val LABEL_INDEX_UNMETERED = 2
-            private const val LABEL_INDEX_METERED = 3
-            private const val LABEL_INDEX_ALLOW_START = 4
-            private const val LABEL_INDEX_ALLOW_END = 5
+            private const val LABEL_INDEX_ALLOW = 0      // Allow all (position 0)
+            private const val LABEL_INDEX_BOTH = 1       // Block all (position 1)
+            private const val LABEL_INDEX_UNMETERED = 2  // Block WiFi only
+            private const val LABEL_INDEX_METERED = 3    // Block Mobile data only
+            private const val LABEL_INDEX_ALLOW_START = 4  // Allow for higher positions
+            private const val LABEL_INDEX_ALLOW_END = 5    // Allow for higher positions
 
             fun getStatus(id: Int): ConnectionStatus {
                 return when (id) {
@@ -198,10 +211,12 @@ object FirewallManager : KoinComponent {
 
             fun getStatusByLabel(id: Int): ConnectionStatus {
                 return when (id) {
-                    BOTH.id -> BOTH
+                    LABEL_INDEX_ALLOW -> ALLOW
+                    LABEL_INDEX_BOTH -> BOTH
                     LABEL_INDEX_UNMETERED -> UNMETERED
                     LABEL_INDEX_METERED -> METERED
-                    LABEL_INDEX_ALLOW_START, LABEL_INDEX_ALLOW_END -> ALLOW
+                    LABEL_INDEX_ALLOW_START -> ALLOW
+                    LABEL_INDEX_ALLOW_END -> ALLOW
                     else -> ALLOW
                 }
             }
