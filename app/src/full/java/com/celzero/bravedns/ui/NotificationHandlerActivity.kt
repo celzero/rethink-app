@@ -20,6 +20,8 @@ import Logger.LOG_TAG_UI
 import Logger.LOG_TAG_VPN
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
@@ -36,6 +38,8 @@ import com.celzero.bravedns.ui.activity.MiscSettingsActivity.BioMetricType
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.activity.WgMainActivity
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -62,10 +66,21 @@ class NotificationHandlerActivity: AppCompatActivity() {
         NONE
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private fun Context.isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+                UI_MODE_NIGHT_YES
+    }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        // Apply theme before super.onCreate to ensure proper dialog inflation
+        theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
+        super.onCreate(savedInstanceState)
         handleFrostEffectIfNeeded(persistentState.theme)
+        
+        // Set a transparent content view so dialogs can inflate properly
+        // This is a trampoline activity that shows dialogs but no actual UI
+        setContentView(android.R.layout.activity_list_item)
+        window.decorView.alpha = 0f // Make it invisible
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
