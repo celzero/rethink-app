@@ -134,9 +134,20 @@ class WgSsidDialog(
             addSsid()
         }
 
-        b.ssidEditText.setOnEditorActionListener { _, actionId, _ ->
+        b.ssidEditText.setOnEditorActionListener { view, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                addSsid()
+                // Hide keyboard first
+                val imm = context.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+                imm.hideSoftInputFromWindow(view.windowToken, 0)
+
+                // Post the addSsid call to ensure it happens after keyboard is hidden
+                // This prevents focus search issues
+                view.post {
+                    view.clearFocus()
+                    addSsid()
+                }
+
+                // Return true to indicate we handled the action
                 true
             } else {
                 false
