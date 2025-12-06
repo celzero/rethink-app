@@ -64,5 +64,18 @@
         app:iconSize="20dp"
         app:iconTint="?attr/primaryTextColor" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/item_file_delete_btn"
+        style="@style/Widget.Material3.Button.IconButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="4dp"
+        android:contentDescription="@string/lbl_delete"
+        app:icon="@drawable/ic_delete"
+        app:iconGravity="textStart"
+        android:padding="5dp"
+        app:iconSize="20dp"
+        app:iconTint="?attr/accentBad" />
+
 </LinearLayout>
 
