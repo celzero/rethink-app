@@ -57,6 +57,28 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
 
+    companion object {
+        // Time conversion constants
+        private const val SECONDS_PER_MINUTE = 60
+        private const val SECONDS_PER_HOUR = 3600
+
+        // Network policy indices
+        private const val POLICY_AUTO = 0
+        private const val POLICY_SENSITIVE = 1
+        private const val POLICY_RELAXED = 2
+        private const val POLICY_FIXED = 3
+
+        // IP protocol dialog positions
+        private const val IP_DIALOG_POS_IPV4 = 0
+        private const val IP_DIALOG_POS_IPV6 = 1
+        private const val IP_DIALOG_POS_ALWAYS_V46 = 2
+        private const val IP_DIALOG_POS_V46 = 3
+
+        // Alpha values for UI elements
+        private const val ALPHA_ENABLED = 1f
+        private const val ALPHA_DISABLED = 0.5f
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         //setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
@@ -135,7 +157,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         }
 
         b.dvTcpKeepAliveSwitch.isChecked = persistentState.tcpKeepAlive
-        b.dvTimeoutSeekbar.progress = persistentState.dialTimeoutSec / 60
+        b.dvTimeoutSeekbar.progress = persistentState.dialTimeoutSec / SECONDS_PER_MINUTE
 
         b.settingsUseMaxMtuSwitch.isChecked = persistentState.useMaxMtu
 
@@ -152,7 +174,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         showNwPolicyDescription(persistentState.vpnBuilderPolicy)
         
         // If Fixed policy is selected, disable jumbo packets and IP version settings
-        if (persistentState.vpnBuilderPolicy == 3) {
+        if (persistentState.vpnBuilderPolicy == POLICY_FIXED) {
             b.settingsUseMaxMtuRl.isEnabled = false
             b.settingsUseMaxMtuSwitch.isEnabled = false
             b.settingsActivityIpRl.isEnabled = false
@@ -166,9 +188,9 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     }
 
     private fun formatTimeShort(totalSeconds: Int): String {
-        val hours = totalSeconds / 3600
-        val minutes = (totalSeconds % 3600) / 60
-        val seconds = totalSeconds % 60
+        val hours = totalSeconds / SECONDS_PER_HOUR
+        val minutes = (totalSeconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE
+        val seconds = totalSeconds % SECONDS_PER_MINUTE
 
         val parts = mutableListOf<String>()
 
@@ -180,7 +202,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     }
 
     private fun updateDialerTimeOut(valueMin: Int) {
-        val inSec = valueMin * 60
+        val inSec = valueMin * SECONDS_PER_MINUTE
         persistentState.dialTimeoutSec = inSec
         displayDialerTimeOutUi(inSec)
     }
@@ -314,7 +336,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.settingsActivityVpnLockdownDesc.setOnClickListener { UIUtils.openVpnProfile(this) }
 
         b.settingsActivityIpRl.setOnClickListener {
-            if (persistentState.vpnBuilderPolicy == 3) return@setOnClickListener
+            if (persistentState.vpnBuilderPolicy == POLICY_FIXED) return@setOnClickListener
 
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.settingsActivityIpRl)
             showIpDialog()
@@ -523,7 +545,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             .setTitle(getString(R.string.vpn_policy_title))
             .setAdapter(adapter) { _, which ->
                 currentSelection = which
-                if (currentSelection == 3) {
+                if (currentSelection == POLICY_FIXED) {
                     // enable experimental settings prompt
                     persistentState.enableStabilityDependentSettings(this)
                 }
@@ -540,7 +562,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         showNwPolicyDescription(which)
 
         // If Fixed policy is selected (index 3), enable jumbo packets and set IPv4 & IPv6
-        if (which == 3) {
+        if (which == POLICY_FIXED) {
             // Enable jumbo packets
             persistentState.useMaxMtu = true
             b.settingsUseMaxMtuSwitch.isChecked = true
@@ -565,10 +587,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
     private fun showNwPolicyDescription(which: Int) {
         when (which) {
-            0 -> { b.settingsVpnNwPolicyDesc.text = getString(R.string.settings_ip_text_ipv46) }
-            1 -> { b.settingsVpnNwPolicyDesc.text = getString(R.string.vpn_policy_sensitive) }
-            2 -> { b.settingsVpnNwPolicyDesc.text = getString(R.string.vpn_policy_relaxed) }
-            3 -> { b.settingsVpnNwPolicyDesc.text = getString(R.string.vpn_policy_fixed) }
+            POLICY_AUTO -> { b.settingsVpnNwPolicyDesc.text = getString(R.string.settings_ip_text_ipv46) }
+            POLICY_SENSITIVE -> { b.settingsVpnNwPolicyDesc.text = getString(R.string.vpn_policy_sensitive) }
+            POLICY_RELAXED -> { b.settingsVpnNwPolicyDesc.text = getString(R.string.vpn_policy_relaxed) }
+            POLICY_FIXED -> { b.settingsVpnNwPolicyDesc.text = getString(R.string.vpn_policy_fixed) }
         }
     }
 
@@ -654,13 +676,13 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     }
 
     private fun disableBandwidthBoosterUi() {
-        b.settingsUseMaxMtuRl.alpha = 0.5f
+        b.settingsUseMaxMtuRl.alpha = ALPHA_DISABLED
         b.settingsUseMaxMtuSwitch.isEnabled = false
         b.settingsUseMaxMtuRl.isEnabled = false
     }
 
     private fun enableBandwidthBoosterUi() {
-        b.settingsUseMaxMtuRl.alpha = 1f
+        b.settingsUseMaxMtuRl.alpha = ALPHA_ENABLED
         b.settingsUseMaxMtuSwitch.isEnabled = true
         b.settingsUseMaxMtuRl.isEnabled = true
     }
@@ -679,26 +701,26 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         val chosenProtocol = persistentState.internetProtocolType
         val checkedItem = when (chosenProtocol) {
             InternetProtocol.ALWAYSv46.id -> {
-                2 // alwaysV46 is at pos 2
+                IP_DIALOG_POS_ALWAYS_V46 // alwaysV46 is at pos 2
             }
             InternetProtocol.IPv46.id -> {
-                3 // ipv46 is at pos 3
+                IP_DIALOG_POS_V46 // ipv46 is at pos 3
             }
             else -> {
                 when (chosenProtocol) {
-                    InternetProtocol.IPv4.id -> 0
-                    InternetProtocol.IPv6.id -> 1
-                    else -> 0
+                    InternetProtocol.IPv4.id -> IP_DIALOG_POS_IPV4
+                    InternetProtocol.IPv6.id -> IP_DIALOG_POS_IPV6
+                    else -> IP_DIALOG_POS_IPV4
                 }
             }
         }
         alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
             dialog.dismiss()
             val selectedItem = when (which) {
-                3 -> {
+                IP_DIALOG_POS_V46 -> {
                     InternetProtocol.IPv46.id // ipv46 is at pos 3
                 }
-                2 -> {
+                IP_DIALOG_POS_ALWAYS_V46 -> {
                     InternetProtocol.ALWAYSv46.id // alwaysV46 is at pos 2
                 }
                 else -> {
@@ -774,12 +796,12 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         val isLockdown = VpnController.isVpnLockdown()
         if (isLockdown) {
             b.settingsActivityVpnLockdownDesc.visibility = View.VISIBLE
-            b.settingsActivityAllowBypassRl.alpha = 0.5f
-            b.settingsActivityExcludeProxyAppsRl.alpha = 0.5f
+            b.settingsActivityAllowBypassRl.alpha = ALPHA_DISABLED
+            b.settingsActivityExcludeProxyAppsRl.alpha = ALPHA_DISABLED
         } else {
             b.settingsActivityVpnLockdownDesc.visibility = View.GONE
-            b.settingsActivityAllowBypassRl.alpha = 1f
-            b.settingsActivityExcludeProxyAppsRl.alpha = 1f
+            b.settingsActivityAllowBypassRl.alpha = ALPHA_ENABLED
+            b.settingsActivityExcludeProxyAppsRl.alpha = ALPHA_ENABLED
         }
         b.settingsActivityAllowBypassSwitch.isEnabled = !isLockdown
         b.settingsActivityAllowBypassRl.isEnabled = !isLockdown
