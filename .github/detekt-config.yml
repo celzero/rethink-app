@@ -18,6 +18,16 @@ exceptions:
     exceptionNames:
       - Throwable
       - Error
+
 coroutines:
   RedundantSuspendModifier:
     active: false
+
+complexity:
+  TooManyFunctions:
+    active: true
+    thresholdInClasses: 25
+    thresholdInInterfaces: 25
+    thresholdInObjects: 25
+    thresholdInEnums: 30
+
