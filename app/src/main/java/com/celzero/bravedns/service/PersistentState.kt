@@ -619,7 +619,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     }
 
     // Allowed DNS record types (stored as comma-separated enum names)
-    // Default: A, AAAA, CNAME, HTTPS, SVCB
+    // Default: A, AAAA, CNAME, HTTPS, SVCB, IPSECKEY
     internal var allowedDnsRecordTypesString by stringPref("allowed_dns_record_types")
         .withDefault(setOf(
             ResourceRecordTypes.A.name,
@@ -660,7 +660,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         return getAllowedDnsRecordTypes().mapNotNull { name ->
             try {
                 ResourceRecordTypes.valueOf(name)
-            } catch (e: IllegalArgumentException) {
+            } catch (_: IllegalArgumentException) {
                 null
             }
         }.toSet()

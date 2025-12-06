@@ -72,12 +72,11 @@ class NotificationHandlerActivity: AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Apply theme before super.onCreate to ensure proper dialog inflation
+        // apply theme before super.onCreate to ensure proper dialog inflation
         theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
         handleFrostEffectIfNeeded(persistentState.theme)
-        
-        // Set a transparent content view so dialogs can inflate properly
+
         // This is a trampoline activity that shows dialogs but no actual UI
         setContentView(android.R.layout.activity_list_item)
         window.decorView.alpha = 0f // Make it invisible
