@@ -64,6 +64,14 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
     private val bugReportFiles = mutableListOf<BugReportFile>()
     private lateinit var adapter: BugReportFilesAdapter
 
+    companion object {
+        private const val ALPHA_ENABLED = 1.0f
+        private const val ALPHA_DISABLED = 0.5f
+        private const val BYTES_IN_KB = 1024L
+        private const val BYTES_IN_MB = 1024L * 1024L
+        private const val MB_DIVISOR = 1024.0 * 1024.0
+    }
+
     override fun getTheme(): Int =
         Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
@@ -246,7 +254,7 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
     private fun updateSendButtonState() {
         val hasSelection = bugReportFiles.any { it.isSelected }
         b.brbsSendButton.isEnabled = hasSelection
-        b.brbsSendButton.alpha = if (hasSelection) 1.0f else 0.5f
+        b.brbsSendButton.alpha = if (hasSelection) ALPHA_ENABLED else ALPHA_DISABLED
     }
 
     private fun sendBugReport() {
@@ -319,6 +327,8 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
         val zipFile = File(tempDir, "rethinkdns_bugreport_$timestamp.zip")
 
         try {
+            val addedEntries = mutableSetOf<String>() // Track added entry names to skip duplicates
+            
             ZipOutputStream(FileOutputStream(zipFile)).use { zos ->
                 files.forEach { file ->
                     if (file.extension == "zip") {
@@ -327,7 +337,10 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
                             val entries = zf.entries()
                             while (entries.hasMoreElements()) {
                                 val entry = entries.nextElement()
-                                if (!entry.isDirectory) {
+                                if (!entry.isDirectory && !addedEntries.contains(entry.name)) {
+                                    // Only add if not already present
+                                    addedEntries.add(entry.name)
+                                    
                                     val newEntry = ZipEntry(entry.name)
                                     zos.putNextEntry(newEntry)
                                     zf.getInputStream(entry).use { input ->
@@ -338,13 +351,17 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
                             }
                         }
                     } else {
-                        // regular file
-                        val entry = ZipEntry(file.name)
-                        zos.putNextEntry(entry)
-                        FileInputStream(file).use { input ->
-                            input.copyTo(zos)
+                        // regular file - skip if already added
+                        if (!addedEntries.contains(file.name)) {
+                            addedEntries.add(file.name)
+                            
+                            val entry = ZipEntry(file.name)
+                            zos.putNextEntry(entry)
+                            FileInputStream(file).use { input ->
+                                input.copyTo(zos)
+                            }
+                            zos.closeEntry()
                         }
-                        zos.closeEntry()
                     }
                 }
             }
@@ -356,6 +373,7 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
             return null
         }
     }
+
 
     private fun getFileUri(file: File): android.net.Uri? {
         return try {
@@ -372,9 +390,9 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
 
     private fun formatFileSize(size: Long): String {
         return when {
-            size < 1024 -> "$size B"
-            size < 1024 * 1024 -> "${size / 1024} KB"
-            else -> String.format(Locale.US, "%.1f MB", size / (1024.0 * 1024.0))
+            size < BYTES_IN_KB -> "$size B"
+            size < BYTES_IN_MB -> "${size / BYTES_IN_KB} KB"
+            else -> String.format(Locale.US, "%.1f MB", size / MB_DIVISOR)
         }
     }
 
@@ -415,6 +433,10 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
                 itemBinding.itemFileViewBtn.setOnClickListener {
                     openFile(fileItem.file)
                 }
+
+                itemBinding.itemFileDeleteBtn.setOnClickListener {
+                    showDeleteConfirmationDialog(fileItem)
+                }
             }
         }
 
@@ -446,6 +468,67 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
                 getString(R.string.bug_report_deselect_all)
             } else {
                 getString(R.string.lbl_select_all).replaceFirstChar(Char::titlecase)
+            }
+        }
+    }
+
+    private fun showDeleteConfirmationDialog(fileItem: BugReportFile) {
+        val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.lbl_delete))
+            .setMessage(getString(R.string.bug_report_delete_confirmation, fileItem.name))
+            .setPositiveButton(getString(R.string.lbl_delete)) { _, _ ->
+                deleteFile(fileItem)
+            }
+            .setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+
+        dialog.show()
+    }
+
+    private fun deleteFile(fileItem: BugReportFile) {
+        lifecycleScope.launch {
+            try {
+                val deleted = withContext(Dispatchers.IO) {
+                    fileItem.file.delete()
+                }
+
+                if (deleted) {
+                    bugReportFiles.remove(fileItem)
+                    adapter.notifyDataSetChanged()
+                    updateTotalSize()
+                    updateSendButtonState()
+
+                    showToastUiCentered(
+                        requireContext(),
+                        getString(R.string.bug_report_file_deleted, fileItem.name),
+                        Toast.LENGTH_SHORT
+                    )
+
+                    // If no files left, dismiss the bottom sheet
+                    if (bugReportFiles.isEmpty()) {
+                        showToastUiCentered(
+                            requireContext(),
+                            getString(R.string.bug_report_no_files_available),
+                            Toast.LENGTH_SHORT
+                        )
+                        dismiss()
+                    }
+                } else {
+                    showToastUiCentered(
+                        requireContext(),
+                        getString(R.string.bug_report_delete_failed, fileItem.name),
+                        Toast.LENGTH_SHORT
+                    )
+                }
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_UI, "err deleting file: ${e.message}", e)
+                showToastUiCentered(
+                    requireContext(),
+                    getString(R.string.bug_report_delete_failed, fileItem.name),
+                    Toast.LENGTH_SHORT
+                )
             }
         }
     }
