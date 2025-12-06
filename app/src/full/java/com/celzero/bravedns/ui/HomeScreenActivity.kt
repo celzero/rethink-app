@@ -52,6 +52,7 @@ import androidx.work.WorkRequest
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
@@ -350,8 +351,10 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         // to fail due to the "Block connections without VPN" option.
         persistentState.allowBypass = false
 
-        // reset stall on no networks to false, for v055p
-        persistentState.stallOnNoNetwork = false
+        io {
+            appInfoDb.setRethinkToBypassDnsAndFirewall()
+            appInfoDb.setRethinkToBypassProxy(true)
+        }
 
         // change the persistent state for defaultDnsUrl, if its google.com (only for v055d)
         // TODO: remove this post v054.
@@ -369,12 +372,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             // reset the bio metric auth time, as now the value is changed from System.currentTimeMillis
             // to SystemClock.elapsedRealtime
             persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
-        }
-
-        // remove this after v055r
-        io {
-            rdb.cleanupTombstone()
-            rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE)
         }
 
         // reset the local blocklist download from android download manager to custom in v055o
