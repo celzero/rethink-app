@@ -478,7 +478,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
         contactedAsnAdapter?.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (contactedAsnAdapter!!.itemCount < 1) {
+                if ((contactedAsnAdapter?.itemCount ?: 0) < 1) {
                     b.fssAsnAllowedLl.visibility = View.GONE
                 } else {
                     b.fssAsnAllowedLl.visibility = View.VISIBLE
@@ -515,7 +515,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
         blockedAsnAdapter?.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (blockedAsnAdapter!!.itemCount < 1) {
+                if ((blockedAsnAdapter?.itemCount ?: 0) < 1) {
                     b.fssAsnBlockedLl.visibility = View.GONE
                 } else {
                     b.fssAsnBlockedLl.visibility = View.VISIBLE
@@ -559,7 +559,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
         contactedDomainsAdapter?.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (contactedDomainsAdapter!!.itemCount < 1) {
+                if ((contactedDomainsAdapter?.itemCount ?: 0) < 1) {
                     b.fssDomainAllowedLl.visibility = View.GONE
                 } else {
                     b.fssDomainAllowedLl.visibility = View.VISIBLE
@@ -601,7 +601,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
         blockedDomainsAdapter?.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (blockedDomainsAdapter!!.itemCount < 1) {
+                if ((blockedDomainsAdapter?.itemCount ?: 0) < 1) {
                     b.fssDomainBlockedLl.visibility = View.GONE
                 } else {
                     b.fssDomainBlockedLl.visibility = View.VISIBLE
@@ -643,7 +643,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
         contactedIpsAdapter?.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (contactedIpsAdapter!!.itemCount < 1) {
+                if ((contactedIpsAdapter?.itemCount ?: 0) < 1) {
                     b.fssIpAllowedLl.visibility = View.GONE
                 } else {
                     b.fssIpAllowedLl.visibility = View.VISIBLE
@@ -685,7 +685,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
         blockedIpsAdapter?.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (blockedIpsAdapter!!.itemCount < 1) {
+                if ((blockedIpsAdapter?.itemCount ?: 0) < 1) {
                     b.fssIpBlockedLl.visibility = View.GONE
                 } else {
                     b.fssIpBlockedLl.visibility = View.VISIBLE
@@ -728,7 +728,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
         contactedCountriesAdapter?.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (contactedCountriesAdapter!!.itemCount < 1) {
+                if ((contactedCountriesAdapter?.itemCount ?: 0) < 1) {
                     b.fssCountriesAllowedLl.visibility = View.GONE
                 } else {
                     b.fssCountriesAllowedLl.visibility = View.VISIBLE
