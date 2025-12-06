@@ -28,6 +28,4 @@ complexity:
     active: false
   LargeClass:
     active: false
-  ReturnCount:
-    active: false
 
