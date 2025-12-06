@@ -372,6 +372,14 @@ object ProxyManager : KoinComponent {
             !ipnProxyId.endsWith(Backend.RPN)
     }
 
+    fun isAnyUserSetProxy(proxyId: String): Boolean {
+        return proxyId.startsWith(ID_WG_BASE) ||
+            proxyId.startsWith(ID_ORBOT_BASE) ||
+            proxyId.startsWith(ID_S5_BASE) ||
+            proxyId.startsWith(ID_HTTP_BASE) ||
+            proxyId.endsWith(Backend.RPN)
+    }
+
     fun isRpnProxy(ipnProxyId: String): Boolean {
         if (ipnProxyId.isEmpty()) return false
         // check if the proxy id is not the base, block, exit, auto or ingress
