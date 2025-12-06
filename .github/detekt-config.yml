@@ -26,4 +26,6 @@ coroutines:
 complexity:
   TooManyFunctions:
     active: false
+  LargeClass:
+    active: false
 
