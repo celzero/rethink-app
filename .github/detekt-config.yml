@@ -26,8 +26,5 @@ coroutines:
 complexity:
   TooManyFunctions:
     active: true
-    thresholdInClasses: 25
-    thresholdInInterfaces: 25
-    thresholdInObjects: 25
-    thresholdInEnums: 30
+    functionThreshold: 25
 
