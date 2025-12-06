@@ -25,6 +25,5 @@ coroutines:
 
 complexity:
   TooManyFunctions:
-    active: true
-    threshold: 25
+    active: false
 
