@@ -646,9 +646,23 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.settingsRInRSwitch.isChecked = persistentState.routeRethinkInRethink
         if (persistentState.routeRethinkInRethink) {
             b.genRInRDesc.text = getString(R.string.settings_rinr_desc_enabled)
+            disableBandwidthBoosterUi()
         } else {
             b.genRInRDesc.text = getString(R.string.settings_rinr_desc_disabled)
+            enableBandwidthBoosterUi()
         }
+    }
+
+    private fun disableBandwidthBoosterUi() {
+        b.settingsUseMaxMtuRl.alpha = 0.5f
+        b.settingsUseMaxMtuSwitch.isEnabled = false
+        b.settingsUseMaxMtuRl.isEnabled = false
+    }
+
+    private fun enableBandwidthBoosterUi() {
+        b.settingsUseMaxMtuRl.alpha = 1f
+        b.settingsUseMaxMtuSwitch.isEnabled = true
+        b.settingsUseMaxMtuRl.isEnabled = true
     }
 
     private fun showIpDialog() {
