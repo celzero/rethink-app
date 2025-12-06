@@ -1561,15 +1561,15 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    suspend fun restartTunnel(tunFd: Long, mtu: Int, proto: Long): Boolean {
+    suspend fun restartTunnel(tunFd: Long, mtu: Int, nwMtu: Int, proto: Long): Boolean {
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_VPN, "$TAG restartTunnel: tunnel is not connected, returning")
             return false
         }
 
-        Logger.i(LOG_TAG_VPN, "$TAG restarting tunnel")
+        Logger.i(LOG_TAG_VPN, "$TAG restarting tunnel with fd(${tunFd}) mtu: $mtu, nwMtu: $nwMtu, proto: $proto")
         try {
-            tunnel.restart(tunFd, mtu.toLong(), proto)
+            tunnel.restart(tunFd, nwMtu.toLong(), mtu.toLong(), proto)
             return true
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG error restarting tunnel: ${e.message}", e)
