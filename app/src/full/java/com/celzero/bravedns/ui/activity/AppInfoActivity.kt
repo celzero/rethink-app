@@ -23,6 +23,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.text.format.DateUtils
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.ImageView
@@ -224,11 +225,26 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         firewallStatus: FirewallManager.FirewallStatus,
         connectionStatus: FirewallManager.ConnectionStatus
     ) {
+        val statusText = getFirewallText(firewallStatus, connectionStatus)
+        val statusWithTime = if (::appInfo.isInitialized && appInfo.modifiedTs > 0) {
+            val now = System.currentTimeMillis()
+            val uptime = now - appInfo.modifiedTs
+            val relativeTime = DateUtils.getRelativeTimeSpanString(
+                now - uptime,
+                now,
+                DateUtils.MINUTE_IN_MILLIS,
+                DateUtils.FORMAT_ABBREV_RELATIVE
+            )
+            "$statusText $relativeTime"
+        } else {
+            statusText
+        }
+
         b.aadFirewallStatus.text =
             htmlToSpannedText(
                 getString(
                     R.string.ada_firewall_status,
-                    getFirewallText(firewallStatus, connectionStatus)
+                    statusWithTime
                 )
             )
 

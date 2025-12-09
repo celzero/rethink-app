@@ -53,7 +53,7 @@ import com.celzero.bravedns.util.Constants
         SubscriptionStatus::class,
         SubscriptionStateHistory::class
     ],
-    version = 27,
+    version = 28,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -101,6 +101,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_24_25)
                 .addMigrations(MIGRATION_25_26)
                 .addMigrations(MIGRATION_26_27)
+                .addMigrations(MIGRATION_27_28)
                 .build()
 
         private val roomCallback: Callback =
@@ -1087,6 +1088,20 @@ abstract class AppDatabase : RoomDatabase() {
                     // insert new columns with default values (modifiedTs)
                     db.execSQL("ALTER TABLE WgConfigFiles ADD COLUMN modifiedTs INTEGER NOT NULL DEFAULT 0")
                     Logger.i(LOG_TAG_APP_DB, "MIGRATION_26_27: removed isLockdown column")
+                }
+            }
+
+        private val MIGRATION_27_28: Migration =
+            object : Migration(27, 28) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    // Add modifiedTs column to AppInfo table to track when firewall/proxy rules change
+                    try {
+                        db.execSQL("ALTER TABLE AppInfo ADD COLUMN modifiedTs INTEGER NOT NULL DEFAULT 0")
+                        // Backfill all existing rows with 0 (already done by DEFAULT 0)
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_27_28: added modifiedTs column to AppInfo")
+                    } catch (e: Exception) {
+                        Logger.e(LOG_TAG_APP_DB, "MIGRATION_27_28: modifiedTs column already exists, ignore", e)
+                    }
                 }
             }
 

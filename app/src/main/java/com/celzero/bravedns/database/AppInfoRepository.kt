@@ -30,6 +30,7 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
     }
 
     suspend fun insert(appInfo: AppInfo): Long {
+        appInfo.modifiedTs = System.currentTimeMillis()
         return appInfoDAO.insert(appInfo)
     }
 
@@ -41,7 +42,8 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
             appInfoDAO.deletePackage(oldUid, pkg)
             return 0
         }
-        return appInfoDAO.updateUid(oldUid, pkg, newUid)
+        val modifiedTs = System.currentTimeMillis()
+        return appInfoDAO.updateUid(oldUid, pkg, newUid, modifiedTs)
     }
 
     suspend fun deleteByPackageName(packageNames: List<String>) {
@@ -57,12 +59,13 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
     }
 
     suspend fun tombstoneApp(oldUid: Int, newUid: Int, packageName: String?, tombstoneTs: Long) {
+        val modifiedTs = System.currentTimeMillis()
         try {
             if (packageName == null) {
-                appInfoDAO.tombstoneApp(oldUid, newUid, tombstoneTs)
+                appInfoDAO.tombstoneApp(oldUid, newUid, tombstoneTs, modifiedTs)
                 return
             }
-            appInfoDAO.tombstoneApp(oldUid, newUid, packageName, tombstoneTs)
+            appInfoDAO.tombstoneApp(oldUid, newUid, packageName, tombstoneTs, modifiedTs)
         } catch (_: Exception) {
             // tombstoneApp is called when there is a package name change or uid change
             // in both the cases, we try to update the existing record with new uid or package name
@@ -76,19 +79,22 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
     }
 
     suspend fun updateFirewallStatusByUid(uid: Int, firewallStatus: Int, connectionStatus: Int) {
-        appInfoDAO.updateFirewallStatusByUid(uid, firewallStatus, connectionStatus)
+        appInfoDAO.updateFirewallStatusByUid(uid, firewallStatus, connectionStatus, System.currentTimeMillis())
     }
 
     fun cpUpdate(appInfo: AppInfo): Int {
+        appInfo.modifiedTs = System.currentTimeMillis()
         return appInfoDAO.update(appInfo)
     }
 
     fun cpUpdate(appInfo: AppInfo, clause: String): Int {
         // update only firewall and metered
+        // Note: This method updates via raw query so modifiedTs must be included in clause if needed
         return appInfoDAO.cpUpdate(appInfo.firewallStatus, appInfo.connectionStatus, clause)
     }
 
     fun cpInsert(appInfo: AppInfo): Long {
+        appInfo.modifiedTs = System.currentTimeMillis()
         return appInfoDAO.insert(appInfo)
     }
 
@@ -109,7 +115,7 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
     }
 
     suspend fun updateProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
-        appInfoDAO.updateProxyExcluded(uid, isProxyExcluded)
+        appInfoDAO.updateProxyExcluded(uid, isProxyExcluded, System.currentTimeMillis())
     }
 
     suspend fun getAppInfoUidForPackageName(packageName: String): Int {

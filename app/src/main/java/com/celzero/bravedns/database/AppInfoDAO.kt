@@ -31,14 +31,14 @@ interface AppInfoDAO {
     @Update fun update(appInfo: AppInfo): Int
 
     @Query(
-        "update AppInfo set firewallStatus = :firewallStatus, connectionStatus = :connectionStatus where uid = :uid"
+        "update AppInfo set firewallStatus = :firewallStatus, connectionStatus = :connectionStatus, modifiedTs = :modifiedTs where uid = :uid"
     )
-    fun updateFirewallStatusByUid(uid: Int, firewallStatus: Int, connectionStatus: Int)
+    fun updateFirewallStatusByUid(uid: Int, firewallStatus: Int, connectionStatus: Int, modifiedTs: Long)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(appInfo: AppInfo): Long
 
-    @Query("update AppInfo set uid = :newUid, tombstoneTs = 0 where uid = :oldUid and packageName = :pkg")
-    fun updateUid(oldUid: Int, pkg: String, newUid: Int): Int
+    @Query("update AppInfo set uid = :newUid, tombstoneTs = 0, modifiedTs = :modifiedTs where uid = :oldUid and packageName = :pkg")
+    fun updateUid(oldUid: Int, pkg: String, newUid: Int, modifiedTs: Long): Int
 
     @Query("select * from AppInfo where uid = :uid and packageName = :pkg")
     fun isUidPkgExist(uid: Int, pkg: String): AppInfo?
@@ -51,11 +51,11 @@ interface AppInfoDAO {
     @Query("delete from AppInfo where uid = :uid and packageName = :packageName")
     fun deletePackage(uid: Int, packageName: String)
 
-    @Query("update AppInfo set uid = :newUid, tombstoneTs = :tombstoneTs where uid = :uid and packageName = :packageName")
-    fun tombstoneApp(newUid: Int, uid: Int, packageName: String, tombstoneTs: Long)
+    @Query("update AppInfo set uid = :newUid, tombstoneTs = :tombstoneTs, modifiedTs = :modifiedTs where uid = :uid and packageName = :packageName")
+    fun tombstoneApp(newUid: Int, uid: Int, packageName: String, tombstoneTs: Long, modifiedTs: Long)
 
-    @Query("update AppInfo set uid = :newUid, tombstoneTs = :tombstoneTs where uid = :oldUid")
-    fun tombstoneApp(oldUid: Int, newUid: Int, tombstoneTs: Long)
+    @Query("update AppInfo set uid = :newUid, tombstoneTs = :tombstoneTs, modifiedTs = :modifiedTs where uid = :oldUid")
+    fun tombstoneApp(oldUid: Int, newUid: Int, tombstoneTs: Long, modifiedTs: Long)
 
     @Query("select * from AppInfo order by appCategory, uid") fun getAllAppDetails(): List<AppInfo>
 
@@ -162,8 +162,8 @@ interface AppInfoDAO {
     )
     fun updateDataUsageByUid(uid: Int, uploadBytes: Long, downloadBytes: Long)
 
-    @Query("update AppInfo set isProxyExcluded = :isProxyExcluded where uid = :uid")
-    fun updateProxyExcluded(uid: Int, isProxyExcluded: Boolean)
+    @Query("update AppInfo set isProxyExcluded = :isProxyExcluded, modifiedTs = :modifiedTs where uid = :uid")
+    fun updateProxyExcluded(uid: Int, isProxyExcluded: Boolean, modifiedTs: Long)
 
     @Query("select uid from AppInfo where packageName = :packageName")
     fun getAppInfoUidForPackageName(packageName: String): Int

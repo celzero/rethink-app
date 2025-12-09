@@ -326,6 +326,7 @@ object FirewallManager : KoinComponent {
                     iter.remove() // safe removal while iterating
                     ai.uid = newUid
                     ai.tombstoneTs = ts
+                    ai.modifiedTs = ts
                     appInfos.put(newUid, ai)
                     break
                 }
@@ -541,10 +542,12 @@ object FirewallManager : KoinComponent {
         firewallStatus: FirewallStatus,
         connectionStatus: ConnectionStatus
     ) {
+        val now = System.currentTimeMillis()
         mutex.withLock {
             appInfos.get(uid).forEach {
                 it.firewallStatus = firewallStatus.id
                 it.connectionStatus = connectionStatus.id
+                it.modifiedTs = now
             }
         }
         informObservers()
@@ -572,6 +575,7 @@ object FirewallManager : KoinComponent {
         var cacheok = false
         val appInfo = getAppInfoByUid(oldUid)
         Logger.i(LOG_TAG_FIREWALL, "updateUidAndResetTombstone: $oldUid -> $newUid; has? ${appInfo?.packageName} == $pkg")
+        val now = System.currentTimeMillis()
         mutex.withLock {
             val iter = appInfos.get(oldUid).iterator()
             while (iter.hasNext()) {
@@ -580,6 +584,7 @@ object FirewallManager : KoinComponent {
                     iter.remove() // safe removal while iterating
                     ai.uid = newUid
                     ai.tombstoneTs = 0
+                    ai.modifiedTs = now
                     appInfos.put(newUid, ai)
                     cacheok = true
                     break
@@ -745,9 +750,11 @@ object FirewallManager : KoinComponent {
 
     fun updateIsProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
         io {
+            val now = System.currentTimeMillis()
             mutex.withLock {
                 appInfos.get(uid).forEach {
                     it.isProxyExcluded = isProxyExcluded
+                    it.modifiedTs = now
                 }
             }
             db.updateProxyExcluded(uid, isProxyExcluded)
