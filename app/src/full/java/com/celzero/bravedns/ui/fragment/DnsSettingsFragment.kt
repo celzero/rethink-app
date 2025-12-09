@@ -33,10 +33,14 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConfig.Companion.DOH_INDEX
 import com.celzero.bravedns.data.AppConfig.Companion.DOT_INDEX
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.FragmentDnsConfigureBinding
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.scheduler.WorkScheduler.Companion.BLOCKLIST_UPDATE_CHECK_JOB_TAG
 import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
@@ -69,6 +73,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
+    private val eventLogger by inject<EventLogger>()
 
     private lateinit var animation: Animation
 
@@ -442,6 +447,10 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
                 WorkManager.getInstance(requireContext().applicationContext)
                     .cancelAllWorkByTag(BLOCKLIST_UPDATE_CHECK_JOB_TAG)
             }
+            logEvent(
+                "blocklist update? $enabled",
+                "User changed periodic blocklist update check to $enabled"
+            )
         }
 
         b.dcAlgSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
@@ -452,6 +461,10 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
                 requireContext().let { persistentState.enableStabilityDependentSettings(it) }
             }
             updateSpiltDns()
+            logEvent(
+                "dns alg setting? $enabled",
+                "User changed dns alg setting to $enabled"
+            )
         }
 
         b.dcAlgRl.setOnClickListener { b.dcAlgSwitch.isChecked = !b.dcAlgSwitch.isChecked }
@@ -467,6 +480,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
                 // Enable experimental-dependent settings when experimental features are enabled
                 requireContext().let { persistentState.enableStabilityDependentSettings(it) }
             }
+            logEvent("fav icon? $enabled", "User changed fav icon setting to $enabled")
         }
 
         b.dcPreventDnsLeaksRl.setOnClickListener {
@@ -477,6 +491,10 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             ->
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcPreventDnsLeaksSwitch)
             persistentState.preventDnsLeaks = enabled
+            logEvent(
+                "prevent dns leaks? $enabled",
+                "User changed prevent dns leaks setting to $enabled"
+            )
         }
 
         b.rethinkPlusDnsRb.setOnCheckedChangeListener(null)
@@ -515,6 +533,10 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
 
         b.dcDownloaderSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             persistentState.useCustomDownloadManager = b
+            logEvent(
+                "custom download manager? $b",
+                "User changed custom dns download manager setting to $b"
+            )
         }
 
         b.dcEnableCacheRl.setOnClickListener {
@@ -523,12 +545,20 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
 
         b.dcEnableCacheSwitch.setOnCheckedChangeListener { _, b ->
             persistentState.enableDnsCache = b
+            logEvent(
+                "dns cache? $b",
+                "User changed dns cache in tunnel setting to $b"
+            )
         }
 
         b.dcProxyDnsSwitch.setOnCheckedChangeListener { _, b -> persistentState.proxyDns = !b }
 
         b.dcProxyDnsRl.setOnClickListener {
             b.dcProxyDnsSwitch.isChecked = !b.dcProxyDnsSwitch.isChecked
+            logEvent(
+                "proxy dns? ${!b.dcProxyDnsSwitch.isChecked}",
+                "User changed proxy dns in tunnel setting to ${!b.dcProxyDnsSwitch.isChecked}"
+            )
         }
 
         b.dcRefresh.setOnClickListener {
@@ -547,6 +577,10 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
                     )
                 }
             }
+            logEvent(
+                "dns refresh triggered",
+                "User triggered dns refresh from dns settings screen"
+            )
         }
 
         b.dvBypassDnsBlockSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -557,6 +591,10 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
                 // Enable experimental-dependent settings when experimental features are enabled
                 requireContext().let { persistentState.enableStabilityDependentSettings(it) }
             }
+            logEvent(
+                "bypass dns block? $isChecked",
+                "User changed bypass dns block setting to $isChecked"
+            )
         }
 
         b.dvBypassDnsBlockRl.setOnClickListener {
@@ -570,6 +608,10 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
                 requireContext().let { persistentState.enableStabilityDependentSettings(it) }
             }
             updateConnectedStatus(persistentState.connectedDnsName)
+            logEvent(
+                "split dns? $isChecked",
+                "User changed split dns setting to $isChecked"
+            )
         }
 
         b.dcSplitDnsRl.setOnClickListener {
@@ -593,10 +635,18 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
 
         b.dcUndelegatedDomainsSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.useSystemDnsForUndelegatedDomains = isChecked
+            logEvent(
+                "undelegated domains? $isChecked",
+                "User changed use system dns for undelegated domains setting to $isChecked"
+            )
         }
 
         b.dcUseFallbackToBypassSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.useFallbackDnsToBypass = isChecked
+            logEvent(
+                "use fallback to bypass? $isChecked",
+                "User changed use fallback dns to bypass setting to $isChecked"
+            )
         }
 
         b.dcUseFallbackToBypassHeading.setOnClickListener {
@@ -747,6 +797,10 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
 
             for (v in views) v.isEnabled = true
         }
+    }
+
+    private fun logEvent(msg: String, details: String) {
+        eventLogger.log(EventType.UI_SETTING_CHANGED, Severity.LOW, msg, EventSource.UI, false, details)
     }
 
     private fun io(f: suspend () -> Unit) {

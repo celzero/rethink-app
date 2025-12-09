@@ -89,6 +89,7 @@ import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 import java.io.File
 import java.util.concurrent.TimeUnit
+import kotlin.jvm.java
 
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, KoinComponent {
     private val b by viewBinding(FragmentAboutBinding::bind)
@@ -174,6 +175,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutDbStats.setOnClickListener(this)
         b.tokenTextView.setOnClickListener(this)
         b.aboutFlightRecord.setOnClickListener(this)
+        b.aboutEventLogs.setOnClickListener(this)
 
         val gestureDetector = GestureDetector(
             requireContext(),
@@ -399,12 +401,20 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.aboutFlightRecord -> {
                 initiateFlightRecord()
             }
+            b.aboutEventLogs -> {
+                openEventLogs()
+            }
         }
     }
 
     private fun initiateFlightRecord() {
         io { VpnController.performFlightRecording() }
         Toast.makeText(requireContext(), "Flight recording started", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun openEventLogs() {
+        val intent = Intent(requireContext(), com.celzero.bravedns.ui.activity.EventsActivity::class.java)
+        startActivity(intent)
     }
 
     private fun generateNewToken(): String {

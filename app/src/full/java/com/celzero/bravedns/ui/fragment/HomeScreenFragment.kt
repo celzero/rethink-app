@@ -19,6 +19,7 @@ import Logger
 import Logger.LOG_TAG_UI
 import Logger.LOG_TAG_VPN
 import android.Manifest
+import android.R.attr.type
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.ActivityNotFoundException
@@ -36,6 +37,7 @@ import android.os.Bundle
 import android.os.SystemClock
 import android.provider.Settings
 import android.text.format.DateUtils
+import android.util.StatsLog.logEvent
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -52,12 +54,16 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.FragmentHomeScreenBinding
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.DnsLogTracker
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
@@ -116,6 +122,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
     private val workScheduler by inject<WorkScheduler>()
+    private val eventLogger by inject<EventLogger>()
 
     private var isVpnActivated: Boolean = false
 
@@ -227,16 +234,31 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsCardFirewallLl.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on firewall card")
             startFirewallActivity(FirewallActivity.Tabs.UNIVERSAL.screen)
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: Firewall card clicked",
+                "Navigating to FirewallActivity from HomeScreenFragment"
+            )
         }
 
         b.fhsCardAppsCv.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on apps card")
             startAppsActivity()
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: Apps card clicked",
+                "Navigating to AppListActivity from HomeScreenFragment"
+            )
         }
 
         b.fhsCardDnsLl.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on dns card")
             startDnsActivity(DnsDetailActivity.Tabs.CONFIGURE.screen)
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: DNS card clicked",
+                "Navigating to DnsDetailActivity from HomeScreenFragment"
+            )
         }
 
         b.homeFragmentBottomSheetIcon.setOnClickListener {
@@ -246,11 +268,21 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             delay(TimeUnit.MILLISECONDS.toMillis(UI_DELAY_MS), lifecycleScope) {
                 b.homeFragmentBottomSheetIcon.isEnabled = true
             }
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: Bottom sheet icon clicked",
+                "Opening HomeScreen settings bottom sheet from HomeScreenFragment"
+            )
         }
 
         b.homeFragmentPauseIcon.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on pause icon")
             handlePause()
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: Pause icon clicked",
+                "Opening PauseActivity from HomeScreenFragment"
+            )
         }
 
         b.fhsDnsOnOffBtn.setOnClickListener {
@@ -261,6 +293,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     b.homeFragmentBottomSheetIcon.isEnabled = true
                 }
             }
+            logEvent(
+                EventType.UI_TOGGLE,
+                "HomeScreen: Main DNS On/Off button clicked",
+                "Toggling VPN state from HomeScreenFragment"
+            )
         }
 
         appConfig.getBraveModeObservable().observe(viewLifecycleOwner) {
@@ -272,6 +309,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsCardLogsLl.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on logs card")
             startActivity(ScreenType.LOGS, NetworkLogsActivity.Tabs.NETWORK_LOGS.screen)
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: Logs card clicked",
+                "Navigating to NetworkLogsActivity from HomeScreenFragment"
+            )
         }
 
         b.fhsCardProxyLl.setOnClickListener {
@@ -281,6 +323,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             } else {
                 startActivity(ScreenType.PROXY)
             }
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: Proxy card clicked",
+                "Navigating to wg: ${appConfig.isWireGuardEnabled()}  from HomeScreenFragment"
+            )
         }
 
         b.fhsSponsor.setOnClickListener {
@@ -290,6 +337,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 return@setOnClickListener
             }*/
             promptForAppSponsorship()
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: Sponsor card clicked",
+                "Opening sponsorship dialog from HomeScreenFragment"
+            )
         }
 
         b.fhsSponsorBottom.setOnClickListener {
@@ -299,6 +351,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 return@setOnClickListener
             }*/
             promptForAppSponsorship()
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: Sponsor card clicked",
+                "Opening sponsorship dialog from HomeScreenFragment"
+            )
         }
 
         b.fhsTitleRethink.setOnClickListener {
@@ -308,10 +365,21 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 return@setOnClickListener
             }*/
             promptForAppSponsorship()
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: Sponsor card clicked",
+                "Opening sponsorship dialog from HomeScreenFragment"
+            )
         }
 
         // comment out the below code to disable the alerts card (v0.5.5b)
         // b.fhsCardAlertsLl.setOnClickListener { startActivity(ScreenType.ALERTS) }
+    }
+
+    private fun logEvent(type: EventType, msg: String, details: String) {
+        io {
+            eventLogger.log(type, Severity.LOW, msg, EventSource.UI, true, details)
+        }
     }
 
     private fun promptForAppSponsorship() {

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/events_list_rl"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
+    android:background="?attr/colorSurface">
+
+    <!-- Search and Filter Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/events_card_view_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        app:cardCornerRadius="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:id="@+id/events_search_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.SearchView
+                    android:id="@+id/events_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_toStartOf="@id/events_filter_icon"
+                    android:fontFamily="sans-serif"
+                    app:iconifiedByDefault="false"
+                    app:queryHint="@string/search_event_logs" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/events_filter_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toStartOf="@id/events_refresh_icon"
+                    android:padding="7dp"
+                    android:src="@drawable/ic_filter"
+                    android:visibility="visible" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/events_refresh_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toStartOf="@id/events_delete_icon"
+                    android:padding="7dp"
+                    android:src="@drawable/ic_refresh_white"
+                    android:visibility="visible" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/events_delete_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:padding="7dp"
+                    android:src="@drawable/ic_delete"
+                    android:visibility="visible" />
+
+            </RelativeLayout>
+
+            <!-- Severity Filter Chips -->
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/filter_chip_severity_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="2dp"
+                android:visibility="gone"
+                app:selectionRequired="true"
+                app:singleSelection="true" />
+
+            <!-- Source Filter Chips -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:scrollbars="none">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/filter_chip_source_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:elevation="5dp"
+                    android:paddingBottom="5dp"
+                    android:visibility="gone"
+                    app:singleLine="true"
+                    app:singleSelection="false" />
+            </HorizontalScrollView>
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- RecyclerView -->
+    <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+        android:id="@+id/events_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/events_card_view_top"
+        android:layout_marginTop="5dp"
+        android:clipToPadding="false"
+        android:paddingBottom="10dp"
+        android:scrollbars="vertical"
+        app:fastScrollThumbColor="?attr/homeScreenHeaderTextColor"
+        tools:listitem="@layout/item_event" />
+
+    <!-- Empty State -->
+    <LinearLayout
+        android:id="@+id/empty_state_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/events_card_view_top"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:alpha="0.5"
+            android:src="@drawable/ic_event_note"
+            app:tint="?attr/homeScreenHeaderTextColor" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/no_events_recorded"
+            android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
+            android:textColor="?attr/primaryTextColor" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/no_events_desc"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="?attr/primaryTextColor" />
+
+    </LinearLayout>
+
+    <!-- Scroll Header -->
+    <TextView
+        android:id="@+id/events_list_scroll_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/events_card_view_top"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:paddingStart="15dp"
+        android:paddingTop="5dp"
+        android:paddingEnd="15dp"
+        android:paddingBottom="5dp"
+        android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+        android:textColor="?attr/primaryTextColor"
+        android:textStyle="bold"
+        android:visibility="gone"
+        tools:text="Today" />
+
+</RelativeLayout>
+

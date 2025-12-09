@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/event_card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="12dp"
+    android:layout_marginTop="6dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginBottom="6dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
+
+        <!-- Severity Indicator -->
+        <View
+            android:id="@+id/severity_indicator"
+            android:layout_width="2dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:background="#4CAF50" />
+
+        <!-- Severity Icon -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/severity_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="12dp"
+            app:layout_constraintBottom_toBottomOf="@id/event_type_chip"
+            app:layout_constraintStart_toEndOf="@id/severity_indicator"
+            app:layout_constraintTop_toTopOf="@id/event_type_chip"
+            app:tint="?attr/svgStrokeColor"
+            tools:src="@drawable/ic_info" />
+
+        <!-- Event Type Badge -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/event_type_chip"
+            style="@style/Widget.Material3.Chip.Assist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+            app:chipCornerRadius="16dp"
+            app:chipMinHeight="24dp"
+            app:layout_constraintStart_toEndOf="@id/severity_icon"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="VPN_START" />
+
+        <!-- Severity Badge -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/severity_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/rectangle_border_background"
+            android:paddingStart="10dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="4dp"
+            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/event_type_chip"
+            app:layout_constraintStart_toEndOf="@id/event_type_chip"
+            app:layout_constraintTop_toTopOf="@id/event_type_chip"
+            tools:background="#FF5722"
+            tools:text="CRITICAL" />
+
+        <!-- Expand/Collapse Icon -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/expand_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_arrow_down"
+            app:layout_constraintBottom_toBottomOf="@id/event_type_chip"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/event_type_chip"
+            app:tint="?attr/svgStrokeColor" />
+
+        <!-- Timestamp -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/timestamp_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+            android:textColor="?attr/primaryTextColor"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/severity_indicator"
+            app:layout_constraintTop_toBottomOf="@id/event_type_chip"
+            tools:text="2025-12-08 14:30:45" />
+
+        <!-- Source -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/source_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"
+            android:drawablePadding="4dp"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+            android:textColor="?attr/primaryTextColor"
+            app:drawableTint="?attr/svgStrokeColor"
+            app:layout_constraintStart_toEndOf="@id/severity_indicator"
+            app:layout_constraintTop_toBottomOf="@id/timestamp_text"
+            tools:text="VPN" />
+
+        <!-- User Action Indicator -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/user_action_icon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="18dp"
+            android:src="@drawable/ic_person"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/source_text"
+            app:layout_constraintStart_toEndOf="@id/source_text"
+            app:layout_constraintTop_toTopOf="@id/source_text"
+            app:tint="?attr/accentGood"
+            tools:visibility="visible" />
+
+        <!-- Message -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/message_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="?attr/primaryLightColorText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/severity_indicator"
+            app:layout_constraintTop_toBottomOf="@id/source_text"
+            tools:text="VPN service started successfully" />
+
+        <!-- Details Section (Expandable) -->
+        <LinearLayout
+            android:id="@+id/details_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/severity_indicator"
+            app:layout_constraintTop_toBottomOf="@id/message_text"
+            tools:visibility="visible">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/details_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/event_details"
+                android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                android:textColor="?attr/primaryLightColorText"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/details_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                android:textColor="?attr/primaryLightColorText"
+                android:textIsSelectable="true"
+                tools:text="Interface: tun0\nMTU: 1500\nDNS: 1.1.1.1" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>
+

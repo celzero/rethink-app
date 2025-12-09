@@ -34,7 +34,11 @@ import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.ActivityTunnelSettingsBinding
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.dialog.NetworkReachabilityDialog
@@ -56,6 +60,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     private val b by viewBinding(ActivityTunnelSettingsBinding::bind)
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
+    private val eventLogger by inject<EventLogger>()
 
     companion object {
         // Time conversion constants
@@ -242,10 +247,18 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                 persistentState.routeRethinkInRethink = false
                 displayRethinkInRethinkUi()
             }
+            logEvent(
+                "use all networks",
+                "Use all networks for VPN: $b"
+            )
         }
 
         b.settingsActivityExcludeProxyAppsSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.excludeAppsInProxy = !isChecked
+            logEvent(
+                "exclude apps in proxy",
+                "Exclude apps in proxy: ${!isChecked}"
+            )
         }
 
         b.settingsActivityExcludeProxyAppsRl.setOnClickListener {
@@ -276,10 +289,18 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                     persistentState.useMultipleNetworks = true
                     persistentState.routeRethinkInRethink = true
                     displayRethinkInRethinkUi()
+                    logEvent(
+                        "use all networks",
+                        "Use all networks for VPN: true"
+                    )
                 }
                 alertBuilder.setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ ->
                     dialog.dismiss()
                     b.settingsRInRSwitch.isChecked = false
+                    logEvent(
+                        "rinr disabled",
+                        "Rethink in Rethink disabled by user"
+                    )
                 }
                 val dialog = alertBuilder.create()
                 dialog.show()
@@ -288,6 +309,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                 if (isChecked) {
                     persistentState.enableStabilityDependentSettings(this)
                 }
+                logEvent(
+                    "rinr toggled",
+                    "Rethink in Rethink set to: $isChecked"
+                )
                 displayRethinkInRethinkUi()
             }
         }
@@ -312,6 +337,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                 b.settingsActivityAllowBypassProgress.visibility = View.GONE
                 b.settingsActivityAllowBypassSwitch.visibility = View.VISIBLE
             }
+            logEvent(
+                "allow bypass",
+                "Allow bypass VPN: $checked"
+            )
         }
 
         b.settingsActivityLanTrafficRl.setOnClickListener {
@@ -331,6 +360,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             Utilities.delay(TimeUnit.SECONDS.toMillis(1L), lifecycleScope) {
                 b.settingsActivityLanTrafficSwitch.isEnabled = true
             }
+            logEvent(
+                "route lan traffic",
+                "Route LAN traffic: $checked"
+            )
         }
 
         b.settingsActivityVpnLockdownDesc.setOnClickListener { UIUtils.openVpnProfile(this) }
@@ -357,6 +390,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                     Toast.LENGTH_SHORT
                 )
             }
+            logEvent(
+                "protocol translation",
+                "Protocol translation set to: $isSelected"
+            )
         }
 
         b.settingsActivityDefaultDnsRl.setOnClickListener { showDefaultDnsDialog() }
@@ -385,6 +422,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         b.settingsActivityMobileMeteredSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.treatOnlyMobileNetworkAsMetered = isChecked
+            logEvent(
+                "treat mobile network as metered",
+                "Treat only mobile network as metered: $isChecked"
+            )
         }
 
         b.settingsActivityMobileMeteredRl.setOnClickListener {
@@ -394,6 +435,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         b.settingsStallNoNwSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.stallOnNoNetwork = isChecked
+            logEvent(
+                "stall on no network",
+                "Stall on no network: $isChecked"
+            )
         }
 
         b.settingsStallNoNwRl.setOnClickListener {
@@ -402,6 +447,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         b.dvWgListenPortSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.randomizeListenPort = !isChecked
+            logEvent(
+                "wireguard listen port",
+                "WireGuard listen port randomize: ${!isChecked}"
+            )
         }
 
         b.dvWgListenPortRl.setOnClickListener {
@@ -417,12 +466,20 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                 b.dvWgAllowIncomingRl.visibility = View.GONE
                 persistentState.nwEngExperimentalFeatures = false
             }
+            logEvent(
+                "endpoint independence",
+                "Endpoint independence (EIM/EIF) set to: $isChecked"
+            )
         }
 
         b.dvEimfRl.setOnClickListener { b.dvEimfSwitch.isChecked = !b.dvEimfSwitch.isChecked }
 
         b.dvWgAllowIncomingSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.nwEngExperimentalFeatures = isChecked
+            logEvent(
+                "wg allow incoming packets",
+                "WireGuard allow incoming packets set to: $isChecked"
+            )
         }
 
         b.dvWgAllowIncomingRl.setOnClickListener {
@@ -431,6 +488,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         b.dvWgLockdownSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.wgGlobalLockdown = isChecked
+            logEvent(
+                "wg global lockdown",
+                "WireGuard global lockdown mode set to: $isChecked"
+            )
         }
 
         b.dvWgLockdownRl.setOnClickListener {
@@ -440,6 +501,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         b.dvTcpKeepAliveSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.tcpKeepAlive = isChecked
+            logEvent(
+                "tcp keep alive",
+                "TCP keep alive set to: $isChecked"
+            )
         }
 
         b.dvTcpKeepAliveRl.setOnClickListener {
@@ -452,6 +517,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         b.settingsUseMaxMtuSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.useMaxMtu = isChecked
+            logEvent(
+                "use jumbo packets",
+                "Use jumbo packets set to: $isChecked"
+            )
         }
 
         b.settingsActivityTunnelMeteredRl.setOnClickListener {
@@ -462,6 +531,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.settingsActivityTunnelMeteredSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (!isAtleastQ()) return@setOnCheckedChangeListener
             persistentState.setVpnBuilderToMetered = isChecked
+            logEvent(
+                "set vpn metered",
+                "Set VPN builder to metered: $isChecked"
+            )
         }
 
         b.dvTimeoutSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -508,6 +581,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             dialog.dismiss()
             // update the default dns url
             persistentState.defaultDnsUrl = Constants.DEFAULT_DNS_LIST[pos].url
+            logEvent(
+                "default dns changed",
+                "Default DNS changed to: ${Constants.DEFAULT_DNS_LIST[pos].name}"
+            )
         }
         val dialog = alertBuilder.create()
         dialog.show()
@@ -583,6 +660,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             b.settingsUseMaxMtuSwitch.isEnabled = true
             b.settingsActivityIpRl.isEnabled = true
         }
+        logEvent(
+            "vpn builder network policy changed",
+            "VPN builder network policy changed to index: $which"
+        )
     }
 
     private fun showNwPolicyDescription(which: Int) {
@@ -743,6 +824,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             }
 
             displayInternetProtocolUi()
+            logEvent(
+                "internet protocol changed",
+                "Internet protocol changed to: ${protocolType.name}"
+            )
         }
         alertBuilder.create().show()
     }
@@ -788,6 +873,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                     b.settingsActivityPingIpsBtn.visibility = View.VISIBLE
                 }
             }
+            logEvent(
+                "connectivity checks changed",
+                "Connectivity checks changed to option index: $which"
+            )
         }
         alertBuilder.create().show()
     }
@@ -808,6 +897,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.settingsActivityLanTrafficRl.isEnabled = !isLockdown
         b.settingsActivityExcludeProxyAppsSwitch.isEnabled = !isLockdown
         b.settingsActivityExcludeProxyAppsRl.isEnabled = !isLockdown
+    }
+
+    private fun logEvent(msg: String, details: String) {
+        eventLogger.log(EventType.TUN_ESTABLISHED, Severity.LOW, msg, EventSource.UI, false, details)
     }
 
     private fun enableAfterDelay(ms: Long, vararg views: View) {

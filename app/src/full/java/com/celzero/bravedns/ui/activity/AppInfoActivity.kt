@@ -41,7 +41,11 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppWiseDomainsAdapter
 import com.celzero.bravedns.adapter.AppWiseIpsAdapter
 import com.celzero.bravedns.database.AppInfo
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.ActivityAppDetailsBinding
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
 import com.celzero.bravedns.service.PersistentState
@@ -74,6 +78,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private val b by viewBinding(ActivityAppDetailsBinding::bind)
 
     private val persistentState by inject<PersistentState>()
+    private val eventLogger by inject<EventLogger>()
 
     private val ipRulesViewModel: CustomIpViewModel by viewModel()
     private val domainRulesViewModel: CustomDomainViewModel by viewModel()
@@ -312,10 +317,18 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                         FirewallManager.FirewallStatus.NONE,
                         FirewallManager.ConnectionStatus.ALLOW
                     )
+                    logEvent(
+                        "firewall rule change",
+                        "DNS + Firewall bypass disabled for ${appInfo.appName} (${appInfo.uid})"
+                    )
                 } else {
                     updateFirewallStatus(
                         FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL,
                         FirewallManager.ConnectionStatus.ALLOW
+                    )
+                    logEvent(
+                        "firewall rule change",
+                        "DNS + Firewall bypass enabled for ${appInfo.appName} (${appInfo.uid})"
                     )
                 }
             }
@@ -343,10 +356,18 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                         FirewallManager.FirewallStatus.NONE,
                         FirewallManager.ConnectionStatus.ALLOW
                     )
+                    logEvent(
+                        "firewall rule change",
+                        "Universal bypass disabled for ${appInfo.appName} (${appInfo.uid})"
+                    )
                 } else {
                     updateFirewallStatus(
                         FirewallManager.FirewallStatus.BYPASS_UNIVERSAL,
                         FirewallManager.ConnectionStatus.ALLOW
+                    )
+                    logEvent(
+                        "firewall rule change",
+                        "Universal bypass enabled for ${appInfo.appName} (${appInfo.uid})"
                     )
                 }
             }
@@ -377,10 +398,18 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                             FirewallManager.FirewallStatus.NONE,
                             FirewallManager.ConnectionStatus.ALLOW
                         )
+                        logEvent(
+                            "firewall rule change",
+                            "App exclusion disabled for ${appInfo.appName} (${appInfo.uid})"
+                        )
                     } else {
                         updateFirewallStatus(
                             FirewallManager.FirewallStatus.EXCLUDE,
                             FirewallManager.ConnectionStatus.ALLOW
+                        )
+                        logEvent(
+                            "firewall rule change",
+                            "App exclusion enabled for ${appInfo.appName} (${appInfo.uid})"
                         )
                     }
                 }
@@ -395,10 +424,18 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                         FirewallManager.FirewallStatus.NONE,
                         FirewallManager.ConnectionStatus.ALLOW
                     )
+                    logEvent(
+                        "firewall rule change",
+                        "App isolation disabled for ${appInfo.appName} (${appInfo.uid})"
+                    )
                 } else {
                     updateFirewallStatus(
                         FirewallManager.FirewallStatus.ISOLATE,
                         FirewallManager.ConnectionStatus.ALLOW
+                    )
+                    logEvent(
+                        "firewall rule change",
+                        "App isolation enabled for ${appInfo.appName} (${appInfo.uid})"
                     )
                 }
             }
@@ -438,6 +475,10 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private fun updateExcludeProxyStatus(isExcluded: Boolean) {
         io {
             FirewallManager.updateIsProxyExcluded(uid, isExcluded)
+            logEvent(
+                "proxy exclude change",
+                "Proxy exclude status changed for ${appInfo.appName} (${appInfo.uid}), new status: $isExcluded"
+            )
         }
     }
 
@@ -671,6 +712,10 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                     }
 
                 updateFirewallStatus(FirewallManager.FirewallStatus.NONE, cStat, connStatus)
+                logEvent(
+                    "firewall rule change",
+                    "Toggled WIFI for ${appInfo.appName} (${appInfo.uid}), new conn status: $cStat"
+                )
             }
         }
     }
@@ -701,6 +746,10 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         connStatus = cStat
         io { updateFirewallStatus(appInfo.uid, aStat, cStat) }
         updateFirewallStatusUi(aStat, cStat)
+        logEvent(
+            "firewall rule change",
+            "Firewall status changed for ${appInfo.appName} (${appInfo.uid}), new status: $aStat, conn status: $cStat"
+        )
     }
 
     private fun enableAppBypassedUi() {
@@ -913,6 +962,10 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             return
         }
         block()
+    }
+
+    private fun logEvent(msg: String, details: String) {
+        eventLogger.log(EventType.FW_RULE_MODIFIED, Severity.LOW, msg, EventSource.UI, false, details)
     }
 
     private fun io(f: suspend () -> Unit): Job {

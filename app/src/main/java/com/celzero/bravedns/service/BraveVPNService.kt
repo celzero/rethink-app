@@ -74,7 +74,10 @@ import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.ConsoleLog
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.RefreshDatabase
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.receiver.NotificationActionReceiver
@@ -182,6 +185,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     private var connectionMonitor: ConnectionMonitor = ConnectionMonitor(this, this, serializer, vpnScope)
     private val connTrackRepository by inject<ConnectionTrackerRepository>()
+    private val eventLogger by inject<EventLogger>()
 
     private var userPresentReceiver: UserPresentReceiver = UserPresentReceiver()
 
@@ -1726,12 +1730,23 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             Logger.i(LOG_TAG_VPN, "start restart manager flow")
             // if the string is same, it will not restart the vpn, so adding ts whereever same
             // value requires a restart
+            var reasonForEvent = ""
             vpnRestartTrigger
                 .debounce(3000)
                 .collect { reason ->
                     Logger.v(LOG_TAG_VPN, "RESTART; new restart request: $reason")
                     restartVpnWithNewAppConfig(reason)
+                    reasonForEvent = reason
                 }
+            io("eventLogger") {
+                eventLogger.logHigh(
+                    EventType.VPN_RESTART,
+                    "stopped vpn restart manager flow",
+                    EventSource.VPN,
+                    userAction = false,
+                    details = "reason: $reasonForEvent"
+                )
+            }
         }
     }
 
@@ -1805,6 +1820,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     // it indicates that something is out of whack (as in, connection monitor
                     // exists, vpn service exists, but the underlying adapter doesn't...
                     updateTun(opts)
+                    eventLogger.logLow(EventType.VPN_START, "restart existing vpn from onStartCommand",
+                        EventSource.VPN, userAction = false, details = "opts: $opts")
                 }
             } else {
                 io("startVpn") {
@@ -1817,6 +1834,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                         observeVpnRestartRequests()
                         // call this *after* a new vpn is created #512
                         uiCtx("observers") { observeChanges() }
+                        eventLogger.logLow(EventType.VPN_START, "start new vpn from onStartCommand",
+                            EventSource.VPN, userAction = false, details = "opts: $opts")
                     }
                 }
             }
@@ -2528,6 +2547,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     fun signalStopService(reason: String, userInitiated: Boolean = true) {
         if (!userInitiated) notifyUserOnVpnFailure()
         io(reason) { stopVpnAdapter() }
+        eventLogger.logHigh(EventType.VPN_STOP, "vpn service destroyed",
+                    EventSource.SERVICE, userAction = userInitiated, details = "vpn destroyed")
         stopSelf()
         Logger.i(LOG_TAG_VPN, "stopped vpn adapter & service: $reason, $userInitiated")
     }
@@ -2792,6 +2813,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
         val reason = "nwDisconnect"
         vpnRestartTrigger.value = reason
+        eventLogger.logMedium(EventType.SYSTEM_EVENT, "network disconnected, restart vpn",
+            EventSource.SERVICE, userAction = false, details = "networks: ${networks.ipv4Net.size + networks.ipv6Net.size}")
         // pause mobile-only wgs on no network
         pauseMobileOnlyWireGuardOnNoNw()
         pauseSsidEnabledWireGuardOnNoNw()
@@ -2957,6 +2980,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // WireGuard may fail to connect to the server when the network changes.
             Logger.i(LOG_TAG_VPN, "$TAG ssid/bound-nws changed, refresh wg if needed")
             refreshOrPauseOrResumeOrReAddProxies() // takes care of adding the proxies if missing in tun
+            eventLogger.logLow(EventType.PROXY_REFRESH, "refresh/pause/resume/readd proxies",
+                EventSource.SERVICE, userAction = false, "nwChange, $isBoundNetworksChanged, $isSsidChanged, ssid: ${networks.activeSsid}, refresh/pause/resume/readd proxies")
         }
 
         underlyingNetworks?.ipv4Net?.forEach {

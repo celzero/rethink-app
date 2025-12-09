@@ -140,6 +140,8 @@
             android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.ConsoleLogActivity"
             android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.activity.EventsActivity"
+            android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.NotificationHandlerActivity"
             android:excludeFromRecents="true"
