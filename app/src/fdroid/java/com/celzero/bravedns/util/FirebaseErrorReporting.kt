@@ -37,7 +37,7 @@ object FirebaseErrorReporting : KoinComponent {
     /**
      * Enable or disable Firebase Crashlytics data collection - no-op for fdroid variant
      */
-    fun setEnabled(_: Boolean) {
+    fun setEnabled(enabled: Boolean) {
         Logger.i(LOG_FIREBASE, "crashlytics not available in fdroid variant")
     }
 
@@ -51,28 +51,28 @@ object FirebaseErrorReporting : KoinComponent {
     /**
      * Log a custom message - no-op for fdroid variant
      */
-    fun log(_: String) {
+    fun log(message: String) {
         // no-op: firebase not available in fdroid variant
     }
 
     /**
      * Record a non-fatal exception - no-op for fdroid variant
      */
-    fun recordException(_: Throwable) {
+    fun recordException(throwable: Throwable) {
         // no-op: firebase not available in fdroid variant
     }
 
     /**
      * Set user ID - no-op for fdroid variant
      */
-    fun setUserId(_: String) {
+    fun setUserId(userId: String) {
         // no-op: firebase not available in fdroid variant
     }
 
     /**
      * Set custom key-value pairs - no-op for fdroid variant
      */
-    fun setCustomKey(_: String, _: String) {
+    fun setCustomKey(key: String, value: String) {
         // no-op: firebase not available in fdroid variant
     }
 }
