@@ -6,16 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:descendantFocusability="beforeDescendants"
-    android:focusableInTouchMode="true"
-    android:background="?attr/colorSurface">
+    android:focusableInTouchMode="true">
 
     <!-- Search and Filter Card -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/events_card_view_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        app:cardCornerRadius="16dp">
+        android:layout_margin="5dp">
 
         <LinearLayout
             android:layout_width="match_parent"

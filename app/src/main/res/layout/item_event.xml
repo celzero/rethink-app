@@ -28,8 +28,7 @@
             android:layout_marginEnd="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:background="#4CAF50" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Severity Icon -->
         <androidx.appcompat.widget.AppCompatImageView
@@ -54,8 +53,7 @@
             app:chipCornerRadius="16dp"
             app:chipMinHeight="24dp"
             app:layout_constraintStart_toEndOf="@id/severity_icon"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="VPN_START" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Severity Badge -->
         <androidx.appcompat.widget.AppCompatTextView
@@ -73,9 +71,7 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/event_type_chip"
             app:layout_constraintStart_toEndOf="@id/event_type_chip"
-            app:layout_constraintTop_toTopOf="@id/event_type_chip"
-            tools:background="#FF5722"
-            tools:text="CRITICAL" />
+            app:layout_constraintTop_toTopOf="@id/event_type_chip" />
 
         <!-- Expand/Collapse Icon -->
         <androidx.appcompat.widget.AppCompatImageView

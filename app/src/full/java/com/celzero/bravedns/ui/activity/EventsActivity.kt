@@ -77,6 +77,7 @@ class EventsActivity : AppCompatActivity(R.layout.activity_events), SearchView.O
         private const val CHIP_TAG_MEDIUM = "MEDIUM"
         private const val CHIP_TAG_HIGH = "HIGH"
         private const val CHIP_TAG_CRITICAL = "CRITICAL"
+        private const val CHIP_TAG_SOURCE = "SOURCE"
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -116,6 +117,7 @@ class EventsActivity : AppCompatActivity(R.layout.activity_events), SearchView.O
         setupRecyclerView()
         setupClickListeners()
         remakeSeverityFilterChipsUi()
+        remakeSourceFilterChipsUi()
         setQueryFilter()
     }
 
@@ -256,25 +258,35 @@ class EventsActivity : AppCompatActivity(R.layout.activity_events), SearchView.O
         val medium = makeSeverityChip(CHIP_TAG_MEDIUM, CHIP_TAG_MEDIUM, false)
         val high = makeSeverityChip(CHIP_TAG_HIGH, CHIP_TAG_HIGH, false)
         val critical = makeSeverityChip(CHIP_TAG_CRITICAL, CHIP_TAG_CRITICAL, false)
+        val source = makeSeverityChip(CHIP_TAG_SOURCE, "Source", false)
 
         b.filterChipSeverityGroup.addView(all)
         b.filterChipSeverityGroup.addView(low)
         b.filterChipSeverityGroup.addView(medium)
         b.filterChipSeverityGroup.addView(high)
         b.filterChipSeverityGroup.addView(critical)
+        b.filterChipSeverityGroup.addView(source)
     }
 
     private fun makeSeverityChip(tag: String, label: String, checked: Boolean): Chip {
         val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
         chip.tag = tag
-        chip.text = label
+        chip.text = label.lowercase().replaceFirstChar(Char::titlecase)
         chip.isChecked = checked
 
         chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
             if (isSelected) {
                 applySeverityFilter(button.tag)
             } else {
-                unselectSeverityChipsUi(button.tag)
+                // Only auto-select "ALL" if this chip was unchecked without another chip being selected
+                // This prevents the issue where switching from one severity to another triggers both
+                // the uncheck of the old chip and the check of the new chip
+                val hasAnyChecked = (0 until b.filterChipSeverityGroup.childCount).any { i ->
+                    (b.filterChipSeverityGroup.getChildAt(i) as? Chip)?.isChecked == true
+                }
+                if (!hasAnyChecked) {
+                    unselectSeverityChipsUi(button.tag)
+                }
             }
         }
 
@@ -283,8 +295,18 @@ class EventsActivity : AppCompatActivity(R.layout.activity_events), SearchView.O
 
     private fun makeSourceChip(source: EventSource): Chip {
         val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
-        chip.text = source.name
-        chip.isCheckedIconVisible = false
+        // Format source name for better readability
+        chip.text = when (source) {
+            EventSource.UI -> "UI"
+            EventSource.VPN -> "VPN"
+            EventSource.DNS -> "DNS"
+            EventSource.FIREWALL -> "Firewall"
+            EventSource.SYSTEM -> "System"
+            EventSource.SERVICE -> "Service"
+            EventSource.WORKER -> "Worker"
+            EventSource.MANAGER -> "Manager"
+        }
+        chip.isCheckedIconVisible = true
         chip.tag = source
 
         chip.setOnCheckedChangeListener { compoundButton: CompoundButton, isSelected: Boolean ->
@@ -301,6 +323,16 @@ class EventsActivity : AppCompatActivity(R.layout.activity_events), SearchView.O
             filterType = TopLevelFilter.ALL
             viewModel.setFilter(filterQuery, emptySet(), null)
             hideSourceChipsUi()
+        } else if (tagString == CHIP_TAG_SOURCE) {
+            filterSeverity = null
+            filterType = TopLevelFilter.SOURCE
+            showSourceChipsUi()
+            // Don't clear sources or update filter yet - let user select sources first
+            if (filterSources.isEmpty()) {
+                viewModel.setFilter(filterQuery, emptySet(), null)
+            } else {
+                viewModel.setFilter(filterQuery, filterSources, null)
+            }
         } else {
             filterSeverity = when (tagString) {
                 CHIP_TAG_LOW -> Severity.LOW

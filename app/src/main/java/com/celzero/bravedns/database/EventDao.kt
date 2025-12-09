@@ -121,7 +121,7 @@ interface EventDao {
     /**
      * Retrieves events filtered by search query with pagination.
      */
-    @Query("SELECT * FROM Events WHERE message LIKE :searchQuery OR details LIKE :searchQuery ORDER BY timestamp DESC")
+    @Query("SELECT * FROM Events WHERE LOWER(message) LIKE LOWER(:searchQuery) OR LOWER(details) LIKE LOWER(:searchQuery) OR LOWER(eventType) LIKE LOWER(:searchQuery) OR LOWER(source) LIKE LOWER(:searchQuery) ORDER BY timestamp DESC")
     fun getEventsBySearchPaged(searchQuery: String): androidx.paging.PagingSource<Int, Event>
 
     /**
@@ -133,7 +133,7 @@ interface EventDao {
     /**
      * Retrieves events filtered by severity and search query with pagination.
      */
-    @Query("SELECT * FROM Events WHERE severity = :severity AND (message LIKE :searchQuery OR details LIKE :searchQuery) ORDER BY timestamp DESC")
+    @Query("SELECT * FROM Events WHERE severity = :severity AND (LOWER(message) LIKE LOWER(:searchQuery) OR LOWER(details) LIKE LOWER(:searchQuery) OR LOWER(eventType) LIKE LOWER(:searchQuery) OR LOWER(source) LIKE LOWER(:searchQuery)) ORDER BY timestamp DESC")
     fun getEventsBySeverityAndSearchPaged(severity: Severity, searchQuery: String): androidx.paging.PagingSource<Int, Event>
 
     /**
@@ -145,7 +145,7 @@ interface EventDao {
     /**
      * Retrieves events filtered by sources and search query with pagination.
      */
-    @Query("SELECT * FROM Events WHERE source IN (:sources) AND (message LIKE :searchQuery OR details LIKE :searchQuery) ORDER BY timestamp DESC")
+    @Query("SELECT * FROM Events WHERE source IN (:sources) AND (LOWER(message) LIKE LOWER(:searchQuery) OR LOWER(details) LIKE LOWER(:searchQuery) OR LOWER(eventType) LIKE LOWER(:searchQuery) OR LOWER(source) LIKE LOWER(:searchQuery)) ORDER BY timestamp DESC")
     fun getEventsBySourcesAndSearchPaged(sources: List<EventSource>, searchQuery: String): androidx.paging.PagingSource<Int, Event>
 }
 

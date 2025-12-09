@@ -103,9 +103,9 @@ class EventsViewModel(private val eventDao: EventDao) : ViewModel() {
     }
 
     fun setFilter(query: String, sources: Set<EventSource>, severity: Severity?) {
-        filteredQuery.value = query
         filteredSources.value = sources
         filteredSeverity.value = severity
+        filteredQuery.value = "%$query%"
     }
 
     fun setFilterType(type: TopLevelFilter) {
