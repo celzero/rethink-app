@@ -51,7 +51,7 @@ object FirebaseErrorReporting : KoinComponent {
     /**
      * Log a custom message - no-op for fdroid variant
      */
-    fun log(message: String) {
+    fun log(msg: String) {
         // no-op: firebase not available in fdroid variant
     }
 
@@ -65,14 +65,14 @@ object FirebaseErrorReporting : KoinComponent {
     /**
      * Set user ID - no-op for fdroid variant
      */
-    fun setUserId(userId: String) {
+    fun setUserId(uid: String) {
         // no-op: firebase not available in fdroid variant
     }
 
     /**
      * Set custom key-value pairs - no-op for fdroid variant
      */
-    fun setCustomKey(key: String, value: String) {
+    fun setCustomKey(k: String, v: String) {
         // no-op: firebase not available in fdroid variant
     }
 }
