@@ -39,9 +39,13 @@ import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
 import com.celzero.bravedns.database.ConnectionTracker
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.FirewallRuleset.Companion.getFirewallRule
@@ -106,6 +110,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     private val persistentState by inject<PersistentState>()
+    private val eventLogger by inject<EventLogger>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -425,6 +430,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                 "Unknown app, universal firewall settings(block unknown app): ${b.bsConnUnknownAppCheck.isChecked} "
             )
             persistentState.setBlockUnknownConnections(b.bsConnUnknownAppCheck.isChecked)
+            logEvent("Universal firewall setting changed", "Block unknown apps: ${b.bsConnUnknownAppCheck.isChecked}")
         }
 
         b.bsConnTrackAppInfo.setOnClickListener { showFirewallRulesDialog(info?.blockedByRule) }
@@ -729,7 +735,10 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     ) {
         val uid = info?.uid ?: return
         uiCtx {
-            io { FirewallManager.updateFirewallStatus(uid, firewallStatus, connStatus) }
+            io {
+                FirewallManager.updateFirewallStatus(uid, firewallStatus, connStatus)
+                logEvent("Firewall rule changed", "UID: $uid, FirewallStatus: ${firewallStatus.name}, ConnectionStatus: ${connStatus.name}")
+            }
             updateFirewallRulesUi(firewallStatus, connStatus)
         }
     }
@@ -748,6 +757,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             val ip = ipPair.first ?: return@io
             IpRulesManager.addIpRule(currentInfo.uid, ip, /*wildcard-port*/ 0, ipRuleStatus, proxyId = "", proxyCC = "")
             Logger.i(LOG_TAG_FIREWALL, "apply ip-rule for ${currentInfo.uid}, $ip, ${ipRuleStatus.name}")
+            logEvent("IP rule changed", "UID: ${currentInfo.uid}, IP: $ip, IpRuleStatus: ${ipRuleStatus.name}")
         }
     }
 
@@ -765,7 +775,12 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                 DomainRulesManager.DomainType.DOMAIN,
                 currentInfo.uid,
             )
+            logEvent("Domain rule changed", "Domain: $dnsQuery, UID: ${currentInfo.uid}, DomainRuleStatus: ${domainRuleStatus.name}")
         }
+    }
+
+    private fun logEvent(msg: String, details: String) {
+        eventLogger.log(EventType.FW_RULE_MODIFIED, Severity.LOW, msg, EventSource.UI, false, details)
     }
 
     private fun io(f: suspend () -> Unit) = lifecycleScope.launch(Dispatchers.IO) { f() }

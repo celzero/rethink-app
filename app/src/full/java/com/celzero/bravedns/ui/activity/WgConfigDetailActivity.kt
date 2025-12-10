@@ -36,9 +36,13 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.adapter.WgPeersAdapter
 import com.celzero.bravedns.data.SsidItem
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.databinding.ActivityWgDetailBinding
 import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.VpnController
@@ -76,10 +80,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.getValue
 
 class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     private val b by viewBinding(ActivityWgDetailBinding::bind)
     private val persistentState by inject<PersistentState>()
+    private val eventLogger by inject<EventLogger>()
 
     private val mappingViewModel: ProxyAppsMappingViewModel by viewModel()
 
@@ -642,6 +648,10 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
     private fun updateUseOnMobileNetwork(enabled: Boolean) {
         io { WireguardManager.updateUseOnMobileNetworkConfig(configId, enabled) }
+        logEvent(
+            "WireGuard Use on Mobile Networks",
+            "User ${if (enabled) "enabled" else "disabled"} use on mobile networks for WireGuard config with id $configId"
+        )
     }
 
     private fun updateCatchAll(enabled: Boolean) {
@@ -709,6 +719,10 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             }
 
             WireguardManager.updateCatchAllConfig(configId, enabled)
+            logEvent(
+                "WireGuard Catch All apps",
+                "User ${if (enabled) "enabled" else "disabled"} catch all apps for WireGuard config with id $configId"
+            )
             uiCtx {
                 b.applicationsBtn.isEnabled = !enabled
                 if (enabled) {
@@ -775,6 +789,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                     )
                     finish()
                 }
+                logEvent("Delete WireGuard config", "User deleted WireGuard config with id $configId")
             }
         }
 
@@ -910,6 +925,10 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
             // If we reach here, either we're disabling or we have all required permissions
             io { WireguardManager.updateSsidEnabled(configId, isChecked) }
+            logEvent(
+                "SSID feature toggled",
+                "ConfigId: $configId, Enabled: $isChecked"
+            )
 
             if (isChecked && currentHasPermissions && currentLocationEnabled) {
                 // Enable experimental-dependent settings when experimental features are enabled
@@ -1015,6 +1034,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             // Reset the SSID switch since location is required
             b.ssidCheck.isChecked = false
             io { WireguardManager.updateSsidEnabled(configId, false) }
+            logEvent("SSID location denied", "User denied enabling location services for configId: $configId")
         }
         val dialog = builder.create()
         dialog.show()
@@ -1034,6 +1054,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             // Reset the SSID switch since permissions are required
             b.ssidCheck.isChecked = false
             io { WireguardManager.updateSsidEnabled(configId, false) }
+            logEvent("SSID permission denied", "User denied SSID permissions for configId: $configId")
         }
         val dialog = builder.create()
         dialog.show()
@@ -1092,8 +1113,13 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             // Reset the SSID switch since permissions are required
             b.ssidCheck.isChecked = false
             io { WireguardManager.updateSsidEnabled(configId, false) }
+            logEvent("SSID permission denied", "User denied SSID permissions for configId: $configId")
         }
         val dialog = builder.create()
         dialog.show()
+    }
+
+    private fun logEvent(msg: String, details: String) {
+        eventLogger.log(EventType.PROXY_SWITCH, Severity.LOW, msg, EventSource.UI, false, details)
     }
 }

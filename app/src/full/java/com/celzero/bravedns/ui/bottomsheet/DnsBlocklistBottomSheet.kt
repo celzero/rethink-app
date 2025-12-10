@@ -44,11 +44,15 @@ import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
 import com.celzero.bravedns.database.DnsLog
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.databinding.DialogIpDetailsLayoutBinding
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.DomainConnectionsActivity
@@ -84,6 +88,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     private var log: DnsLog? = null
 
     private val persistentState by inject<PersistentState>()
+    private val eventLogger by inject<EventLogger>()
 
     override fun getTheme(): Int =
         Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
@@ -304,6 +309,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
                 DomainRulesManager.DomainType.DOMAIN,
                 status
             )
+            logEvent("DNS domain rule change", "${currentLog.queryStr} to ${status.name}")
         }
     }
 
@@ -723,6 +729,10 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
             b.dnsBlockFavIcon.visibility = View.GONE
         }
+    }
+
+    private fun logEvent(msg: String, details: String) {
+        eventLogger.log(EventType.FW_RULE_MODIFIED, Severity.LOW, msg, EventSource.UI, false, details)
     }
 
     private fun io(f: suspend () -> Unit) {
