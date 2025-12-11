@@ -385,6 +385,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         try {
             input = ObjectInputStream(FileInputStream(prefsBackupFile))
 
+            @Suppress("UNCHECKED_CAST")
             val pref: Map<String, *> = input.readObject() as Map<String, *>
 
             for (e in pref.entries) {
@@ -452,6 +453,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             input = ObjectInputStream(FileInputStream(prefsBackupFile))
             val prefsEditor = currentSharedPreferences.edit()
             prefsEditor.clear()
+            @Suppress("UNCHECKED_CAST")
             val pref: Map<String, *> = input.readObject() as Map<String, *>
 
             for (e in pref.entries) {

@@ -25,6 +25,7 @@ class ConsoleLogManager(private val repository: ConsoleLogRepository) {
     }
 
     suspend fun insertBatch(logs: List<*>) {
+        @Suppress("UNCHECKED_CAST")
         val l = logs as? List<ConsoleLog> ?: return
 
         repository.insertBatch(l)

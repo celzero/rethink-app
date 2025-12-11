@@ -53,6 +53,7 @@ abstract class LogDatabase : RoomDatabase() {
         // The actual value will be TRUNCATE when the it is a low-RAM device.
         // Otherwise, WRITE_AHEAD_LOGGING will be used.
         // https://developer.android.com/reference/android/arch/persistence/room/RoomDatabase.JournalMode#automatic
+        @Suppress("DEPRECATION")
         fun buildDatabase(context: Context): LogDatabase {
             rethinkDnsDbPath = context.getDatabasePath(AppDatabase.DATABASE_NAME).toString()
             isFreshInstall = Utilities.isFreshInstall(context)

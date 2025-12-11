@@ -725,6 +725,7 @@ internal constructor(
         if (!persistentState.getBlockNewlyInstalledApp()) return
 
         // no need to notify if the vpn is not on
+        @Suppress("DEPRECATION")
         if (!VpnController.isOn()) return
 
         var pkgName = app.packageName

@@ -387,6 +387,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 )
             }
 
+            @Suppress("DEPRECATION")
             val wifiInfo: WifiInfo? = wm.connectionInfo
             if (wifiInfo == null) {
                 Logger.v(LOG_TAG_CONNECTION, "getNetworkSSID: WifiInfo is null")
@@ -836,6 +837,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             return
         }
         // TODO: process after a delay to avoid processing multiple network changes in short bursts
+        @Suppress("OPT_IN_USAGE")
         if (DEBUG) Logger.v(LOG_TAG_CONNECTION, "sendNetworkChanges, channel closed? ${channel.isClosedForSend} msg: ${msg.msgType}, test: ${msg.testReachability}, stall: ${msg.stallOnNoNetwork}, useAutoChecks: ${msg.useAutoConnectivityChecks}, networks: ${msg.networkSet.size}")
         try {
             channel.send(msg)
@@ -1753,6 +1755,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             val networks =
                 if (networkSet.isEmpty()) {
                     Logger.d(LOG_TAG_CONNECTION, "networkSet is empty")
+                    @Suppress("DEPRECATION")
                     cm.allNetworks
                 } else {
                     Logger.d(LOG_TAG_CONNECTION, "networkSet size: ${networkSet.size}")

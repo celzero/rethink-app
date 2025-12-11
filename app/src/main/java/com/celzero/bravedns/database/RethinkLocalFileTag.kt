@@ -90,6 +90,7 @@ class RethinkLocalFileTag {
                     if (it.value as Any? is String) {
                         url = listOf(it.value as String)
                     } else if (it.value as Any? is List<*>) {
+                        @Suppress("UNCHECKED_CAST")
                         url = it.value as List<String>
                     }
                 }
@@ -99,6 +100,7 @@ class RethinkLocalFileTag {
                     if (it.value as Any? is String) {
                         pack = listOf(it.value as String)
                     } else if (it.value as Any? is List<*>) {
+                        @Suppress("UNCHECKED_CAST")
                         pack = it.value as List<String>
                     }
                 }
