@@ -320,6 +320,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         return (version != 0 && version != versionStored)
     }
 
+    @Suppress("DEPRECATION")
     private fun getLatestVersion(): Int {
         val pInfo: PackageInfo? =
             Utilities.getPackageMetadata(context.packageManager, context.packageName)

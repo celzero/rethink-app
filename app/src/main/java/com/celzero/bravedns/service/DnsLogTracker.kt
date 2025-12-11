@@ -259,6 +259,7 @@ internal constructor(
     }
 
     suspend fun insertBatch(logs: List<*>) {
+        @Suppress("UNCHECKED_CAST")
         val dnsLogs = (logs as? List<DnsLog>) ?: return
         dnsLogRepository.insertBatch(dnsLogs)
     }

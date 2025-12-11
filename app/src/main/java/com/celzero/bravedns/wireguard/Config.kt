@@ -54,6 +54,7 @@ class Config private constructor(builder: Builder) {
         peers = Collections.unmodifiableList(ArrayList(builder.peers))
     }
 
+    @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
     override fun equals(obj: Any?): Boolean {
         if (obj !is Config) return false
 

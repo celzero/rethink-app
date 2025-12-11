@@ -72,7 +72,7 @@ object FirebaseErrorReporting : KoinComponent {
     /**
      * Set custom key-value pairs - no-op for fdroid variant
      */
-    fun setCustomKey(k: String, v: String) {
+    fun setCustomKey(key: String, value: String) {
         // no-op: firebase not available in fdroid variant
     }
 }

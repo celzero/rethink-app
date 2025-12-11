@@ -124,21 +124,25 @@ internal constructor(
     }
 
     suspend fun insertBatch(logs: List<*>) {
+        @Suppress("UNCHECKED_CAST")
         val conns = logs as? List<ConnectionTracker> ?: return
         connectionTrackerRepository.insertBatch(conns)
     }
 
     suspend fun insertRethinkBatch(logs: List<*>) {
+        @Suppress("UNCHECKED_CAST")
         val conns = logs as? List<RethinkLog> ?: return
         rethinkLogRepository.insertBatch(conns)
     }
 
     suspend fun updateBatch(logs: List<*>) {
+        @Suppress("UNCHECKED_CAST")
         val smms = logs as? List<ConnectionSummary> ?: return
         connectionTrackerRepository.updateBatch(smms)
     }
 
     suspend fun updateRethinkBatch(logs: List<*>) {
+        @Suppress("UNCHECKED_CAST")
         val smms = logs as? List<ConnectionSummary> ?: return
         rethinkLogRepository.updateBatch(smms)
     }

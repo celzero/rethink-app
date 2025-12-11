@@ -365,6 +365,7 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
         // see:
         // https://stackoverflow.com/questions/40433449/how-can-i-programmatically-start-and-stop-an-accessibilityservice
         // no need ot handle the events when the vpn is not running
+        @Suppress("DEPRECATION")
         if (!VpnController.isOn()) return
 
         if (!persistentState.getBlockAppWhenBackground() && !persistentState.micCamAccess) return

@@ -119,6 +119,7 @@ class WgInterface private constructor(builder: Builder) {
         h4 = builder.h4
     }
 
+    @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
     override fun equals(obj: Any?): Boolean {
         if (obj !is WgInterface) return false
         return addresses == obj.addresses &&

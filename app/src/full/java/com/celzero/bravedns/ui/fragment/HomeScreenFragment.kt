@@ -965,6 +965,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 preferredId
             }
 
+        @Suppress("DEPRECATION")
         if (VpnController.isOn()) {
             io {
                 var failing = false
@@ -1446,6 +1447,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * state. If persistence state has vpn enabled and the VPN is not connected then the start will
      * be initiated.
      */
+    @Suppress("DEPRECATION")
     private fun maybeAutoStartVpn() {
         if (isVpnActivated && !VpnController.isOn()) {
             // this case will happen when the app is updated or crashed

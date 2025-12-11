@@ -448,6 +448,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun getLatestVersion(): Int {
         val pInfo: PackageInfo? = getPackageMetadata(this.packageManager, this.packageName)
         // TODO: modify this to use the latest version code api
+        @Suppress("DEPRECATION")
         val v = pInfo?.versionCode ?: 0
         // latest version has apk variant (baseAbiVersionCode * 10000000 + variant.versionCode)
         // so we need to mod the version code by 10000000 to get the actual version code

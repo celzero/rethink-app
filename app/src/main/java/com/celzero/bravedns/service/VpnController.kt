@@ -112,6 +112,7 @@ object VpnController : KoinComponent {
             _: CancellationException) {} catch (_: Exception) {}
     }
 
+    @Suppress("DEPRECATION")
     fun uptimeMs(): Long {
         val t = SystemClock.elapsedRealtime() - vpnStartElapsedTime
 
@@ -175,6 +176,7 @@ object VpnController : KoinComponent {
         braveVpnService?.signalStopService(reason, userInitiated = true)
     }
 
+    @Suppress("DEPRECATION")
     fun state(): VpnState {
         val requested: Boolean = persistentState.getVpnEnabled()
         val on = isOn()

@@ -429,7 +429,7 @@
     <string name="dns_connected_rethink_plus" translatable="true">இணைக்கப்பட்டுள்ளது. %1$s பிளாக்லிச்ட்கள் பயன்பாட்டில்</string>
     <string name="dns_connected" translatable="true">இணைக்கப்பட்டுள்ளது</string>
     <string name="univ_accessibility_crash_dialog_positive" translatable="true">கோட்டோ அமைப்புகள்</string>
-    <string name="fapps_firewall_filter_desc_category" translatable="true">&lt;!</string>
+    <string name="fapps_firewall_filter_desc_category" translatable="true"><![CDATA[வகைகளில் <u>%1$s</u> %2$s பயன்பாடுகள் காட்டப்படுகின்றன: %3$s]]></string>
     <string name="firewall_rule_block_app_exception" translatable="true">பிழை</string>
     <string name="new_app_notification_content" translatable="true">ரீதிங்க் அண்மைக் காலத்தில் நிறுவப்பட்ட பயன்பாடு, %1$s.</string>
     <string name="ada_app_status_allow" translatable="true">அனுமதிக்கப்படுகிறது</string>
