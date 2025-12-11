@@ -1288,12 +1288,13 @@ class GoVpnAdapter : KoinComponent {
                     // close the connections for all the uids in the diff
                     val uids = diff.mapNotNull { it.toIntOrNull() }
                     connTrackerDb.closeConnectionForUids(uids, reason)
+                    // event for closed conns is not needed, as bulk update triggers unnecessary events
                     Logger.i(LOG_TAG_VPN, "$TAG closeConns: $connIds, res: $res, uids: $uids, reason: $reason")
                 } else {
                     connTrackerDb.closeConnections(diff, reason)
+                    logEvent(Severity.LOW, "close conns", "close all connections, res: ${closedConns.size}")
                     Logger.i(LOG_TAG_VPN, "$TAG closeConns: $connIds, res: $res, ids: $diff, reason: $reason")
                 }
-                logEvent(Severity.LOW, "close conns", "close all connections, res: ${closedConns.size}")
             } catch (e: Exception) {
                 Logger.i(LOG_TAG_VPN, "$TAG err closing connections: ${e.message}")
                 logEvent(Severity.MEDIUM, "close conns error", "err closing connections for diff: $diff, reason: ${e.message}")

@@ -33,8 +33,12 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.CustomIpAdapter
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.DialogAddCustomIpBinding
 import com.celzero.bravedns.databinding.FragmentCustomIpBinding
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
@@ -48,13 +52,17 @@ import inet.ipaddr.IPAddress
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQueryTextListener {
 
     private var layoutManager: RecyclerView.LayoutManager? = null
     private val b by viewBinding(FragmentCustomIpBinding::bind)
     private val viewModel: CustomIpViewModel by viewModel()
+    private val eventLogger by inject<EventLogger>()
     private var uid = UID_EVERYBODY
     private var rules = CustomRulesActivity.RULES.APP_SPECIFIC_RULES
     private lateinit var adapter: CustomIpAdapter
@@ -187,7 +195,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
 
     private fun setupAdapterForApp() {
         observeAppSpecificRules()
-        adapter = CustomIpAdapter(requireContext(), CustomRulesActivity.RULES.APP_SPECIFIC_RULES)
+        adapter = CustomIpAdapter(requireContext(), CustomRulesActivity.RULES.APP_SPECIFIC_RULES, eventLogger)
         viewModel.setUid(uid)
         viewModel.customIpDetails.observe(viewLifecycleOwner) {
             adapter.submitData(this.lifecycle, it)
@@ -197,7 +205,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
 
     private fun setupAdapterForAllApps() {
         observeAllAppsRules()
-        adapter = CustomIpAdapter(requireContext(), CustomRulesActivity.RULES.ALL_RULES)
+        adapter = CustomIpAdapter(requireContext(), CustomRulesActivity.RULES.ALL_RULES, eventLogger)
         viewModel.allIpRules.observe(viewLifecycleOwner) { adapter.submitData(this.lifecycle, it) }
         b.cipRecycler.adapter = adapter
     }
@@ -320,6 +328,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
             getString(R.string.ci_dialog_added_success),
             Toast.LENGTH_SHORT
         )
+        logEvent("Added IP rule: $ip, Port: $port, Status: $status, UID: $uid")
     }
 
     private fun showIpRulesDeleteDialog() {
@@ -332,11 +341,14 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
                 if (selectedItems.isNotEmpty()) {
                     IpRulesManager.deleteRules(selectedItems)
                     uiCtx { adapter.clearSelection() }
+                    logEvent("Deleted IP rules: $selectedItems")
                 } else {
                     if (rules == CustomRulesActivity.RULES.APP_SPECIFIC_RULES) {
                         IpRulesManager.deleteRulesByUid(uid)
+                        logEvent("Deleted all IP rules for UID: $uid")
                     } else {
                         IpRulesManager.deleteAllAppsRules()
+                        logEvent("Deleted all IP rules for all apps")
                     }
                 }
             }
@@ -353,6 +365,10 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
 
         builder.setCancelable(true)
         builder.create().show()
+    }
+
+    private fun logEvent(details: String) {
+        eventLogger.log(EventType.FW_RULE_MODIFIED, Severity.LOW, "Custom IP", EventSource.UI, false, details)
     }
 
     private suspend fun ioCtx(f: suspend () -> Unit) {

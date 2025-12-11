@@ -950,6 +950,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 VpnController.closeConnectionsIfNeeded(uid, "app-info-dialog-manual-close")
                 Logger.i(LOG_TAG_UI, "$TAG closed connection for uid: $uid")
                 showToastUiCentered(this, getString(R.string.config_add_success_toast), Toast.LENGTH_LONG)
+                logEvent("close connections",
+                    "Closed active connections for $appName ($uid) from AppInfoActivity")
             }
             .setNegativeButton(R.string.lbl_cancel, null)
             .create()

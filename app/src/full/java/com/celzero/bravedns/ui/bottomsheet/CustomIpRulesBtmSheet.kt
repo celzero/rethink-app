@@ -19,8 +19,12 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CustomIp
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.databinding.BottomSheetCustomIpsBinding
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.IpRulesManager.IpRuleStatus
@@ -50,7 +54,7 @@ class CustomIpRulesBtmSheet() :
         get() = _binding!!
 
     private val persistentState by inject<PersistentState>()
-
+    private val eventLogger by inject<EventLogger>()
     private lateinit var ci: CustomIp
 
     private fun isDarkThemeOn(): Boolean {
@@ -295,7 +299,7 @@ class CustomIpRulesBtmSheet() :
         }
     }
 
-    private fun updateStatusUi(status: IpRulesManager.IpRuleStatus, modifiedTs: Long) {
+    private fun updateStatusUi(status: IpRuleStatus, modifiedTs: Long) {
         val now = System.currentTimeMillis()
         val uptime = System.currentTimeMillis() - modifiedTs
         // returns a string describing 'time' as a time relative to 'now'
@@ -307,7 +311,7 @@ class CustomIpRulesBtmSheet() :
                 DateUtils.FORMAT_ABBREV_RELATIVE
             )
         when (status) {
-            IpRulesManager.IpRuleStatus.TRUST -> {
+            IpRuleStatus.TRUST -> {
                 b.customIpLastUpdated.text =
                     requireContext().getString(
                         R.string.ci_desc,
@@ -316,7 +320,7 @@ class CustomIpRulesBtmSheet() :
                     )
             }
 
-            IpRulesManager.IpRuleStatus.BLOCK -> {
+            IpRuleStatus.BLOCK -> {
                 b.customIpLastUpdated.text =
                     requireContext().getString(
                         R.string.ci_desc,
@@ -325,7 +329,7 @@ class CustomIpRulesBtmSheet() :
                     )
             }
 
-            IpRulesManager.IpRuleStatus.NONE -> {
+            IpRuleStatus.NONE -> {
                 b.customIpLastUpdated.text =
                     requireContext().getString(
                         R.string.ci_desc,
@@ -333,7 +337,7 @@ class CustomIpRulesBtmSheet() :
                         time
                     )
             }
-            IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
+            IpRuleStatus.BYPASS_UNIVERSAL -> {
                 b.customIpLastUpdated.text =
                     requireContext().getString(
                         R.string.ci_desc,
@@ -366,6 +370,7 @@ class CustomIpRulesBtmSheet() :
         val copy = orig.deepCopy()
         // status and modified time will be set in updateRule
         IpRulesManager.updateBypass(copy)
+        logEvent("Set IP ${copy.ipAddress} to bypass universal")
         return copy
     }
 
@@ -373,6 +378,7 @@ class CustomIpRulesBtmSheet() :
         Logger.i(LOG_TAG_UI, "$TAG: set ${orig.ipAddress} to bypass app")
         val copy = orig.deepCopy()
         IpRulesManager.updateTrust(copy)
+        logEvent("Set IP ${copy.ipAddress} to trust")
         return copy
     }
 
@@ -380,6 +386,7 @@ class CustomIpRulesBtmSheet() :
         Logger.i(LOG_TAG_UI, "$TAG: block ${orig.ipAddress}")
         val copy = orig.deepCopy()
         IpRulesManager.updateBlock(copy)
+        logEvent("Blocked IP ${copy.ipAddress}")
         return copy
     }
 
@@ -387,6 +394,7 @@ class CustomIpRulesBtmSheet() :
         Logger.i(LOG_TAG_UI, "$TAG: no rule for ${orig.ipAddress}")
         val copy = orig.deepCopy()
         IpRulesManager.updateNoRule(copy)
+        logEvent("Set no rule for IP ${copy.ipAddress}")
         return copy
     }
 
@@ -514,6 +522,7 @@ class CustomIpRulesBtmSheet() :
                 Toast.LENGTH_SHORT
             )
             dismiss()
+            logEvent("Deleted custom IP rule for ${ci.ipAddress}")
         }
 
         builder.setNegativeButton(requireContext().getString(R.string.lbl_cancel)) { _, _ ->
@@ -553,6 +562,10 @@ class CustomIpRulesBtmSheet() :
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         Logger.v(LOG_TAG_UI, "$TAG: onDismiss; ip: ${ci.ipAddress}")
+    }
+
+    private fun logEvent(details: String) {
+        eventLogger.log(EventType.FW_RULE_MODIFIED, Severity.LOW, "Custom IP", EventSource.UI, false, details)
     }
 
     private fun io(f: suspend () -> Unit) {
