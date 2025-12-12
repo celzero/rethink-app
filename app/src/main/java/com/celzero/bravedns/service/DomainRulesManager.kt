@@ -51,9 +51,10 @@ object DomainRulesManager : KoinComponent {
     private var trustedTrie: RadixTree = Backend.newRadixTree()
 
     // regex to check if url is valid wildcard domain
-    // valid wildcard domain: *.example.com, *.example.co.in, *.do-main.com
+    // valid wildcard domain: *.eu, *.com, *.example.com, *.example.co.in, *.do-main.com
     // RFC 1035: https://tools.ietf.org/html/rfc1035#section-2.3.4
-    private val wcRegex = Pattern.compile("^(\\*\\.)?([a-zA-Z0-9-]+\\.)+[a-zA-Z0-9-]+$")
+    // Updated to support top-level domain wildcards (*.eu, *.ru, etc.)
+    private val wcRegex = Pattern.compile("^(\\*\\.)?([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9-]+$")
 
     private val selectedCCs: MutableSet<String> = mutableSetOf()
 
