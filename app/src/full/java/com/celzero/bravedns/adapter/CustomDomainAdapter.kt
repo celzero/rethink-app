@@ -313,37 +313,8 @@ class CustomDomainAdapter(
 
     // fixme: same as extractHost in CustomDomainFragment, should be moved to a common place
     private fun extractHost(input: String): String? {
-        val trimmedInput = input.trim()
-
-        return when {
-            // case: valid wildcard input without schema, eg., *.example.com
-            trimmedInput.startsWith("*.") && !trimmedInput.contains("://") -> {
-                trimmedInput
-            }
-
-            // case: invalid wildcard with schema, eg., https://*.example.com
-            trimmedInput.contains("://") && trimmedInput.contains("*") -> {
-                null // Invalid: Wildcards shouldn't appear in URLs
-            }
-
-            // case: standard URL input, eg., https://www.example.com
-            trimmedInput.contains("://") -> {
-                try {
-                    // return the host part of the URL
-                    // only www. is the common prefix you'd want to strip for cosmetic or
-                    // standardization reasons (like www.google.com → google.com). Other subdomains
-                    // (e.g., mail., api., m.) are actually part of the valid hostname and
-                    // should not be removed
-                    val uri = URI(trimmedInput)
-                    uri.host?.removePrefix("www.") // remove 'www.' prefix if present
-                } catch (e: Exception) {
-                    null
-                }
-            }
-
-            // case: plain domain (no schema, no wildcard), eg., example.com
-            else -> trimmedInput
-        }
+        // Use centralized domain extraction logic from DomainRulesManager
+        return DomainRulesManager.extractHost(input)
     }
 
     private suspend fun insertDomain(

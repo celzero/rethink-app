@@ -520,6 +520,55 @@ object DomainRulesManager : KoinComponent {
         return wcRegex.matcher(url).matches()
     }
 
+    /**
+     * Extracts and validates the host from various input formats
+     * Handles wildcards, URLs with schemas, and plain domains
+     *
+     * @param input The domain input string (e.g., "*.example.com", "https://example.com", "example.com")
+     * @return The extracted host string, or null if invalid
+     *
+     * Supported formats:
+     * - Wildcard domains: *.example.com, *.eu
+     * - URLs with schema: https://www.example.com → example.com
+     * - Plain domains: example.com
+     *
+     * Invalid formats:
+     * - Wildcards with schema: https:// *.example.com
+     */
+    fun extractHost(input: String): String? {
+        val trimmedInput = input.trim()
+
+        return when {
+            // case: valid wildcard input without schema, eg., *.example.com, *.eu
+            trimmedInput.startsWith("*.") && !trimmedInput.contains("://") -> {
+                trimmedInput
+            }
+
+            // case: invalid wildcard with schema, eg., https://*.example.com
+            trimmedInput.contains("://") && trimmedInput.contains("*") -> {
+                null // Invalid: Wildcards shouldn't appear in URLs
+            }
+
+            // case: standard URL input, eg., https://www.example.com
+            trimmedInput.contains("://") -> {
+                try {
+                    // return the host part of the URL
+                    // only www. is the common prefix you'd want to strip for cosmetic or
+                    // standardization reasons (like www.google.com → google.com). Other subdomains
+                    // (e.g., mail., api., m.) are actually part of the valid hostname and
+                    // should not be removed
+                    val uri = java.net.URI(trimmedInput)
+                    uri.host?.removePrefix("www.") // remove 'www.' prefix if present
+                } catch (e: Exception) {
+                    null
+                }
+            }
+
+            // case: plain domain (no schema, no wildcard), eg., example.com
+            else -> trimmedInput
+        }
+    }
+
     // this is to create a custom domain entry where user want to add proxy without any
     // rules set, this is created for the new ui, should be made generic
     fun makeCustomDomain(uid: Int, domain: String): CustomDomain {
