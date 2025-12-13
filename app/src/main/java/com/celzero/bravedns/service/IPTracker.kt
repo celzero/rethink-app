@@ -86,6 +86,7 @@ internal constructor(
         val rlog = RethinkLog()
         rlog.ipAddress = connTrackerMetaData.destIP
         rlog.isBlocked = connTrackerMetaData.isBlocked
+        rlog.blockedByRule = connTrackerMetaData.blockedByRule
         rlog.uid = connTrackerMetaData.uid
         rlog.usrId = connTrackerMetaData.usrId
         rlog.port = connTrackerMetaData.destPort

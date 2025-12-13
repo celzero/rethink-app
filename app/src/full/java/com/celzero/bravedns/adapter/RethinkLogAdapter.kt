@@ -37,13 +37,14 @@ import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.RethinkLog
 import com.celzero.bravedns.databinding.ListItemConnTrackBinding
 import com.celzero.bravedns.service.FirewallManager
+import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.bottomsheet.ConnTrackerBottomSheet
-import com.celzero.bravedns.ui.bottomsheet.RethinkLogBottomSheet
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
 import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.Protocol
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.getDurationInHumanReadableFormat
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
@@ -102,7 +103,20 @@ class RethinkLogAdapter(private val context: Context) :
             displayProtocolDetails(log.port, log.protocol)
             displayAppDetails(log)
             displaySummaryDetails(log)
-            displayFirewallRulesetHint(log.isBlocked)
+            // case: when the rule is set to RULE12 but no proxy is set, consider this as error
+            // handle this as special case, and display the RULE1C hint
+            // RULE1C is the hint for RULE12 with no proxy set.
+            val blocked = if (log.blockedByRule == FirewallRuleset.RULE12.id) {
+                log.proxyDetails.isEmpty()
+            } else {
+                log.isBlocked
+            }
+            val rule = if (log.blockedByRule == FirewallRuleset.RULE12.id && log.proxyDetails.isEmpty()) {
+                FirewallRuleset.RULE18.id
+            } else {
+                log.blockedByRule
+            }
+            displayFirewallRulesetHint(log.isBlocked, rule)
 
             b.connectionParentLayout.setOnClickListener { openBottomSheet(log) }
         }
@@ -117,7 +131,7 @@ class RethinkLogAdapter(private val context: Context) :
                 Logger.w(LOG_TAG_UI, "err opening the connection tracker bottomsheet")
                 return
             }
-
+            // ToDo: get rid of rethink btm sht if not required
             val bottomSheetFragment = ConnTrackerBottomSheet()
             // see AppIpRulesAdapter.kt#openBottomSheet()
             val bundle = Bundle()
@@ -192,13 +206,27 @@ class RethinkLogAdapter(private val context: Context) :
                 }
         }
 
-        private fun displayFirewallRulesetHint(isBlocked: Boolean) {
+        private fun displayFirewallRulesetHint(isBlocked: Boolean, ruleName: String) {
             when {
                 // hint red when blocked
                 isBlocked -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
+                    val isError = FirewallRuleset.isProxyError(ruleName)
+                    if (isError) {
+                        b.connectionStatusIndicator.setBackgroundColor(
+                            UIUtils.fetchColor(context, R.attr.chipTextNeutral)
+                        )
+                    } else {
+                        b.connectionStatusIndicator.setBackgroundColor(
+                            ContextCompat.getColor(context, R.color.colorRed_A400)
+                        )
+                    }
+                }
+                // hint white when whitelisted
+                (FirewallRuleset.shouldShowHint(ruleName)) -> {
+                    b.connectionStatusIndicator.visibility = View.VISIBLE
                     b.connectionStatusIndicator.setBackgroundColor(
-                        ContextCompat.getColor(context, R.color.colorRed_A400)
+                        ContextCompat.getColor(context, R.color.primaryLightColorText)
                     )
                 }
                 // no hints, otherwise
@@ -210,11 +238,13 @@ class RethinkLogAdapter(private val context: Context) :
 
         private fun displaySummaryDetails(log: RethinkLog) {
             val connType = ConnectionTracker.ConnType.get(log.connType)
+            b.connectionDataUsage.text = ""
+            b.connectionDelay.text = ""
             if (
                 log.duration == 0 &&
-                    log.downloadBytes == 0L &&
-                    log.uploadBytes == 0L &&
-                    log.message.isEmpty()
+                log.downloadBytes == 0L &&
+                log.uploadBytes == 0L &&
+                log.message.isEmpty()
             ) {
                 var hasMinSummary = false
                 if (VpnController.hasCid(log.connId, log.uid)) {
@@ -223,12 +253,26 @@ class RethinkLogAdapter(private val context: Context) :
                     b.connectionDuration.text = context.getString(R.string.symbol_green_circle)
                     b.connectionDelay.text = ""
                     hasMinSummary = true
+                } else {
+                    b.connectionDataUsage.text = ""
+                    b.connectionDuration.text =""
                 }
                 if (connType.isMetered()) {
                     b.connectionDelay.text = context.getString(R.string.symbol_currency)
+                    hasMinSummary = true
+                } else {
+                    b.connectionDelay.text = ""
                 }
 
-                if (isConnectionProxied(log.proxyDetails)) {
+                if (isRpnProxy(log.rpid)) {
+                    b.connectionSummaryLl.visibility = View.VISIBLE
+                    b.connectionDelay.text =
+                        context.getString(
+                            R.string.ci_desc,
+                            b.connectionDelay.text,
+                            context.getString(R.string.symbol_sparkle)
+                        )
+                } else if (isConnectionProxied(log.blockedByRule, log.proxyDetails)) {
                     b.connectionSummaryLl.visibility = View.VISIBLE
                     b.connectionDelay.text =
                         context.getString(
@@ -284,7 +328,24 @@ class RethinkLogAdapter(private val context: Context) :
                         context.getString(R.string.symbol_turtle)
                     )
             }
-            if (isConnectionProxied(log.proxyDetails)) {
+            // bunny in case rpid as present, key in case of proxy
+            // bunny and key indicate conn is proxied, so its enough to show one of them
+            if (isRpnProxy(log.rpid)) {
+                b.connectionSummaryLl.visibility = View.VISIBLE
+                b.connectionDelay.text =
+                    context.getString(
+                        R.string.ci_desc,
+                        b.connectionDelay.text,
+                        context.getString(R.string.symbol_sparkle)
+                    )
+            } else if (containsRelayProxy(log.rpid)) {
+                b.connectionDelay.text =
+                    context.getString(
+                        R.string.ci_desc,
+                        b.connectionDelay.text,
+                        context.getString(R.string.symbol_bunny)
+                    )
+            } else if (isConnectionProxied(log.blockedByRule, log.proxyDetails)) {
                 b.connectionDelay.text =
                     context.getString(
                         R.string.ci_desc,
@@ -292,22 +353,50 @@ class RethinkLogAdapter(private val context: Context) :
                         context.getString(R.string.symbol_key)
                     )
             }
+
+            // rtt -> show rocket if less than 20ms, treat it as rtt
+            if (isRoundTripShorter(log.synack, log.isBlocked)) {
+                b.connectionDelay.text =
+                    context.getString(
+                        R.string.ci_desc,
+                        b.connectionDelay.text,
+                        context.getString(R.string.symbol_rocket)
+                    )
+            }
+
             if (b.connectionDelay.text.isEmpty() && b.connectionDataUsage.text.isEmpty()) {
                 b.connectionSummaryLl.visibility = View.GONE
             }
         }
 
-        private fun isConnectionProxied(proxyDetails: String): Boolean {
-            return ProxyManager.isNotLocalAndRpnProxy(proxyDetails)
+        private fun isRoundTripShorter(rtt: Long, blocked: Boolean): Boolean {
+            return rtt in 1..20 && !blocked
         }
 
-        private fun isConnectionHeavier(ct: RethinkLog): Boolean {
-            return ct.downloadBytes + ct.uploadBytes > MAX_BYTES
+        private fun containsRelayProxy(rpid: String): Boolean {
+            return rpid.isNotEmpty()
         }
 
-        private fun isConnectionSlower(ct: RethinkLog): Boolean {
-            return (ct.protocol == Protocol.UDP.protocolType && ct.duration > MAX_TIME_UDP) ||
-                (ct.protocol == Protocol.TCP.protocolType && ct.duration > MAX_TIME_TCP)
+        private fun isConnectionProxied(ruleName: String?, proxyDetails: String): Boolean {
+            if (ruleName == null) return false
+            val rule = FirewallRuleset.getFirewallRule(ruleName) ?: return false
+            val proxy = ProxyManager.isNotLocalAndRpnProxy(proxyDetails)
+            // show key symbol in case of proxy error too
+            val isProxyError = FirewallRuleset.isProxyError(ruleName)
+            return (FirewallRuleset.isProxied(rule) && proxyDetails.isNotEmpty() && proxy) || isProxyError
+        }
+
+        private fun isRpnProxy(pid: String): Boolean {
+            return pid.isNotEmpty() && ProxyManager.isRpnProxy(pid)
+        }
+
+        private fun isConnectionHeavier(log: RethinkLog): Boolean {
+            return log.downloadBytes + log.uploadBytes > MAX_BYTES
+        }
+
+        private fun isConnectionSlower(log: RethinkLog): Boolean {
+            return (log.protocol == Protocol.UDP.protocolType && log.duration > MAX_TIME_UDP) ||
+                    (log.protocol == Protocol.TCP.protocolType && log.duration > MAX_TIME_TCP)
         }
 
         private fun loadAppIcon(drawable: Drawable?) {
