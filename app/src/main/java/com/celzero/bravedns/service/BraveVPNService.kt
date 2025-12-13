@@ -114,6 +114,7 @@ import com.celzero.bravedns.util.UIUtils.getAccentColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.celzero.bravedns.util.Utilities.isAtleastU
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
@@ -397,7 +398,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val isRethinkBypassedFromProxy = FirewallManager.getAppInfoByUid(rethinkUid)?.isProxyExcluded ?: false
             if (!isRethinkBypassedFromProxy) {
                 // let user set proxy proceed to protect & bind, as rethink is not bypassing proxies
-                if (!ProxyManager.isAnyUserSetProxy(who) || who != Backend.Exit) {
+                if (!ProxyManager.isAnyUserSetProxy(who) && who != Backend.Exit) {
                     // do not proceed if rethink is bypassed and proxyId(who) is not user-set proxy
                     // or Exit, this includes Base or any other go related proxies
                     Logger.vv(LOG_TAG_VPN, "bind: rinr, bypassed rethink, who: $who, fd: $fid, addr: $addrPort")
@@ -597,17 +598,19 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     /** Checks if incoming connection is blocked by any user-set firewall rule */
     private suspend fun firewall(
         connInfo: ConnTrackerMetaData,
+        domains: String?,
         anyRealIpBlocked: Boolean = false,
         isSplApp: Boolean,
         rinr: Boolean
     ): FirewallRuleset {
+        val connId = connInfo.connId
         try {
             if (connInfo.uid == rethinkUid && !rinr) {
-                logd("firewall: rethink uid, $rethinkUid, not processing firewall rules")
+                logd("firewall($connId): rethink uid, $rethinkUid, not processing firewall rules")
                 return FirewallRuleset.RULE0
             }
 
-            logd("firewall: $connInfo")
+            logd("firewall($connId): $connInfo")
             val uid = connInfo.uid
             val appStatus = FirewallManager.appStatus(uid)
             val connectionStatus = FirewallManager.connectionStatus(uid)
@@ -617,7 +620,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             }
 
             if (unknownAppBlocked(uid)) {
-                logd("firewall: unknown app blocked, $uid")
+                logd("firewall($connId): unknown app blocked, $uid")
                 return FirewallRuleset.RULE5
             }
 
@@ -625,7 +628,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             if (appStatus.isUntracked() && uid != INVALID_UID) {
                 io("addNewApp") { rdb.addNewApp(uid) }
                 if (newAppBlocked(uid)) {
-                    logd("firewall: new app blocked, $uid")
+                    logd("firewall($connId): new app blocked, $uid")
                     return FirewallRuleset.RULE1B
                 }
             }
@@ -633,23 +636,29 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // check for app rules (unmetered, metered connections)
             val appRuleset = appBlocked(connInfo, connectionStatus)
             if (appRuleset != null) {
-                logd("firewall: app blocked, $uid")
+                logd("firewall($connId): app blocked, $uid")
                 return appRuleset
             }
 
             if (isLockdown() && isAppPaused()) {
-                logd("firewall: lockdown, app paused, $uid")
+                logd("firewall($connId): lockdown, app paused, $uid")
                 return FirewallRuleset.RULE16
             }
 
-            when (getDomainRule(connInfo.query, uid)) {
+            // returns a pair of domain rule and matched domain
+            val dp = getDomainRule(domains, uid)
+            // assign the query only if we have a matched domain
+            if (!dp.second.isNullOrEmpty()) {
+                connInfo.query = dp.second
+            }
+            when (dp.first) {
                 DomainRulesManager.Status.BLOCK -> {
-                    logd("firewall: domain blocked, $uid")
+                    logd("firewall($connId): domain blocked, $uid")
                     return FirewallRuleset.RULE2E
                 }
 
                 DomainRulesManager.Status.TRUST -> {
-                    logd("firewall: domain trusted, $uid")
+                    logd("firewall($connId): domain trusted, $uid")
                     return FirewallRuleset.RULE2F
                 }
 
@@ -661,12 +670,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // IP rules
             when (uidIpStatus(uid, connInfo.destIP, connInfo.destPort)) {
                 IpRulesManager.IpRuleStatus.BLOCK -> {
-                    logd("firewall: ip blocked, $uid")
+                    logd("firewall($connId): ip blocked, $uid")
                     return FirewallRuleset.RULE2
                 }
 
                 IpRulesManager.IpRuleStatus.TRUST -> {
-                    logd("firewall: ip trusted, $uid")
+                    logd("firewall($connId): ip trusted, $uid")
                     return FirewallRuleset.RULE2B
                 }
 
@@ -682,32 +691,37 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
             // by-pass dns firewall, go-through app specific ip and domain rules before applying
             if (appStatus.bypassDnsFirewall()) {
-                logd("firewall: bypass dns firewall, $uid")
+                logd("firewall($connId): bypass dns firewall, $uid")
                 return FirewallRuleset.RULE1H
             }
 
             // isolate mode
             if (appStatus.isolate()) {
-                logd("firewall: isolate mode, $uid")
+                logd("firewall($connId): isolate mode, $uid")
                 return FirewallRuleset.RULE1G
             }
 
-            val globalDomainRule = getDomainRule(connInfo.query, UID_EVERYBODY)
+            // returns a pair of domain rule and matched domain
+            val globalDomainPair = getDomainRule(domains, UID_EVERYBODY)
+            val globalDomainRule = globalDomainPair.first
+            if (!globalDomainPair.second.isNullOrEmpty()) {
+                connInfo.query = globalDomainPair.second
+            }
 
             // should firewall rules by-pass universal firewall rules (previously whitelist)
             if (appStatus.bypassUniversal()) {
                 // bypass universal should block the domains that are blocked by dns (local/remote)
                 // unless the domain is trusted by the user
                 if (anyRealIpBlocked && globalDomainRule != DomainRulesManager.Status.TRUST) {
-                    logd("firewall: bypass universal, dns blocked, $uid, ${connInfo.query}")
+                    logd("firewall($connId): bypass universal, dns blocked, $uid, ${connInfo.query}")
                     return FirewallRuleset.RULE2G
                 }
 
                 return if (dnsProxied(connInfo.destPort)) {
-                    logd("firewall: bypass universal, dns proxied, $uid")
+                    logd("firewall($connId): bypass universal, dns proxied, $uid")
                     FirewallRuleset.RULE9
                 } else {
-                    logd("firewall: bypass universal, $uid")
+                    logd("firewall($connId): bypass universal, $uid")
                     FirewallRuleset.RULE8
                 }
             }
@@ -715,12 +729,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // check for global domain allow/block domains
             when (globalDomainRule) {
                 DomainRulesManager.Status.TRUST -> {
-                    logd("firewall: global domain trusted, $uid, ${connInfo.query}")
+                    logd("firewall($connId): global domain trusted, $uid, ${connInfo.query}")
                     return FirewallRuleset.RULE2I
                 }
 
                 DomainRulesManager.Status.BLOCK -> {
-                    logd("firewall: global domain blocked, $uid, ${connInfo.query}")
+                    logd("firewall($connId): global domain blocked, $uid, ${connInfo.query}")
                     return FirewallRuleset.RULE2H
                 }
 
@@ -732,12 +746,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // should ip rules by-pass or block universal firewall rules
             when (globalIpRule(connInfo.destIP, connInfo.destPort)) {
                 IpRulesManager.IpRuleStatus.BLOCK -> {
-                    logd("firewall: global ip blocked, $uid, ${connInfo.destIP}")
+                    logd("firewall($connId): global ip blocked, $uid, ${connInfo.destIP}")
                     return FirewallRuleset.RULE2D
                 }
 
                 IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
-                    logd("firewall: global ip bypass universal, $uid, ${connInfo.destIP}")
+                    logd("firewall($connId): global ip bypass universal, $uid, ${connInfo.destIP}")
                     return FirewallRuleset.RULE2C
                 }
 
@@ -753,7 +767,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // if any of the real ip is blocked then allow only if it is trusted,
             // otherwise no need to check further
             if (anyRealIpBlocked) {
-                logd("firewall: dns blocked, $uid, ${connInfo.query}")
+                logd("firewall($connId): dns blocked, $uid, ${connInfo.query}")
                 return FirewallRuleset.RULE2G
             } else {
                 // no-op; pass-through
@@ -762,7 +776,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // apps which are used to forward dns proxy, socks5 or https proxy are handled as spl
             // no need to handle universal firewall rules for these apps
             if (isSplApp) {
-                logd("firewall: special app, $uid, ${connInfo.query}")
+                logd("firewall($connId): special app, $uid, ${connInfo.query}")
                 // placeholder rule (RULE0) for special app rules
                 return FirewallRuleset.RULE0
             }
@@ -770,64 +784,84 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val isMetered = isConnectionMetered(connInfo.destIP)
             // block all metered connections (Universal firewall setting)
             if (persistentState.getBlockMeteredConnections() && isMetered) {
-                logd("firewall: metered blocked, $uid")
+                logd("firewall($connId): metered blocked, $uid")
                 return FirewallRuleset.RULE1F
             }
 
             // block apps when universal lockdown is enabled
             if (universalLockdown()) {
-                logd("firewall: universal lockdown, $uid")
+                logd("firewall($connId): universal lockdown, $uid")
                 return FirewallRuleset.RULE11
             }
 
             if (httpBlocked(connInfo.destPort)) {
-                logd("firewall: http blocked, $uid")
+                logd("firewall($connId): http blocked, $uid")
                 return FirewallRuleset.RULE10
             }
 
             if (deviceLocked()) {
                 closeTrackedConnsOnDeviceLock()
-                logd("firewall: device locked, $uid")
+                logd("firewall($connId): device locked, $uid")
                 return FirewallRuleset.RULE3
             }
 
             if (udpBlocked(uid, connInfo.protocol, connInfo.destPort)) {
-                logd("firewall: udp blocked, $uid")
+                logd("firewall($connId): udp blocked, $uid")
                 return FirewallRuleset.RULE6
             }
 
             if (blockBackgroundData(uid)) {
-                logd("firewall: background data blocked, $uid")
+                logd("firewall($connId): background data blocked, $uid")
                 return FirewallRuleset.RULE4
             }
 
             // if all packets on port 53 needs to be trapped
             if (dnsProxied(connInfo.destPort)) {
-                logd("firewall: dns proxied, $uid")
+                logd("firewall($connId): dns proxied, $uid")
                 return FirewallRuleset.RULE9
             }
 
             // if connInfo.query is empty, then it is not resolved by user set dns
             if (dnsBypassed(connInfo.query)) {
-                logd("firewall: dns bypassed, $uid")
+                logd("firewall($connId): dns bypassed, $uid")
                 return FirewallRuleset.RULE7
             }
         } catch (iex: Exception) {
             // TODO: show alerts to user on such exceptions, in a separate ui?
-            Logger.crash(LOG_TAG_VPN, "unexpected err in firewall(), block anyway", iex)
+            Logger.crash(LOG_TAG_VPN, "unexpected err in firewall()($connId), block anyway", iex)
             return FirewallRuleset.RULE1C
         }
 
-        logd("no firewall rule, uid=${connInfo.uid}")
+        logd("no firewall rule($connId), uid=${connInfo.uid}")
         return FirewallRuleset.RULE0
     }
 
-    private fun getDomainRule(domain: String?, uid: Int): DomainRulesManager.Status {
+    private fun getDomainRule(domain: String?, uid: Int): Pair<DomainRulesManager.Status, String?> {
         if (domain.isNullOrEmpty()) {
-            return DomainRulesManager.Status.NONE
+            return Pair(DomainRulesManager.Status.NONE, "")
         }
 
-        return DomainRulesManager.status(domain, uid)
+        val domains = if (isAtleastR()) {
+            // on Android R and above, go will give the first domain as accurate domain so
+            // no need to check further domains
+            val d = domain.lowercase(Locale.getDefault()).split(",").firstOrNull()
+            if (d.isNullOrEmpty()) return Pair(DomainRulesManager.Status.NONE, "")
+            listOf(d)
+        } else {
+            domain.lowercase(Locale.getDefault()).split(",")
+        }
+
+        if (domains.isEmpty()) {
+            return Pair(DomainRulesManager.Status.NONE, "")
+        }
+        for (d in domains) {
+            val status = DomainRulesManager.status(d, uid)
+            if (status != DomainRulesManager.Status.NONE) {
+                return Pair(status, d)
+            }
+        }
+
+        return Pair(DomainRulesManager.Status.NONE, domains.firstOrNull())
     }
 
     private fun universalLockdown(): Boolean {
@@ -3990,7 +4024,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 // set isBlockFree as true so that the decision is made by in flow() function
                 Logger.vv(LOG_TAG_VPN, "$TAG; onQuery: no uid, univ domain trusted $fqdn")
                 makeNsOpts(uid, transportIdsAlg(tid, splitDns), fqdn, true, rinr = rinr)
-            } else if (getDomainRule(fqdn, UID_EVERYBODY) == DomainRulesManager.Status.BLOCK) {
+            } else if (getDomainRule(fqdn, UID_EVERYBODY).first == DomainRulesManager.Status.BLOCK) {
                 // if the domain is blocked by global rule then set as block all (overriding the tid)
                 // app-wise trust is already checked above
                 Logger.vv(LOG_TAG_VPN, "$TAG; onQuery: no uid, univ domain blocked $fqdn")
@@ -4024,7 +4058,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 return makeNsOpts(uid, getTransportIdToBypass(tid), fqdn, true, rinr = rinr)
             }
 
-            val appDomainRule =  getDomainRule(fqdn, uid)
+            // returns the app specific domain rule in pair(first: status, second: domain)
+            val appDomainRule =  getDomainRule(fqdn, uid).first
             when (appDomainRule) {
                 DomainRulesManager.Status.TRUST -> {
                     Logger.vv(LOG_TAG_VPN, "$TAG onQuery, $uid, domain trusted: $fqdn")
@@ -4039,7 +4074,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 }
             }
 
-            val globalDomainRule = getDomainRule(fqdn, UID_EVERYBODY)
+            // returns the global domain rule in pair(first: status, second: domain)
+            val globalDomainRule = getDomainRule(fqdn, UID_EVERYBODY).first
             when (globalDomainRule) {
                 DomainRulesManager.Status.TRUST -> {
                     Logger.vv(LOG_TAG_VPN, "$TAG onQuery, $uid, univ domain trusted: $fqdn")
@@ -4687,7 +4723,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         possibleDomains: Gostr?,
         blocklists: Gostr?
     ): Mark = go2kt(flowDispatcher) {
-        logd("flow: $_uid, $src, $dst, $realIps, $d, $blocklists, $possibleDomains")
+        logd("flow: $_uid, $src, $dst, $realIps, $d, $blocklists, $d")
         handleVpnLockdownStateAsync()
 
         // in case of double loopback, all traffic will be part of rinr instead of just rethink's
@@ -4764,7 +4800,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
         // always block, since the vpn tunnel doesn't serve dns-over-tls
         if (trapVpnPrivateDns) {
-            logd("flow: dns-over-tls, returning Ipn.Block, $uid, $possibleDomains")
+            logd("flow: dns-over-tls, returning Ipn.Block, $uid, $domains")
             cm.isBlocked = true
             cm.blockedByRule = FirewallRuleset.RULE14.id
             return@go2kt persistAndConstructFlowResponse(cm, Backend.Block, connId, uid)
@@ -4776,7 +4812,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         if (isRethink && !rinr) {
             // case when uid is rethink, return Ipn.Base
             logd(
-                "flow: Ipn.Exit for rethink, $uid, $packageName, $srcIp, $srcPort, $realDestIp, $dstPort, $possibleDomains"
+                "flow: Ipn.Exit for rethink, $uid, $packageName, $srcIp, $srcPort, $realDestIp, $dstPort, $domains, $possibleDomains"
             )
             if (cm.query.isNullOrEmpty()) {
                 // possible domains only used for logging purposes, it may be available if
@@ -4823,14 +4859,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 uid = INVALID_UID
             }
             // android R+, uid will be there for dns request as well
-            logd("flow: dns-request, returning ${Backend.Base}, $uid, $connId, $possibleDomains")
+            logd("flow: dns-request, returning ${Backend.Base}, $uid, $connId, $domains")
             return@go2kt persistAndConstructFlowResponse(null, Backend.Base, connId, uid)
         }
-        processFirewallRequest(cm, anyRealIpBlocked, blocklists.tos() ?: "", isSplApp, rinr)
+        processFirewallRequest(cm, d.tos(), anyRealIpBlocked, blocklists.tos() ?: "", isSplApp, rinr)
 
         if (cm.isBlocked) {
             // return Ipn.Block, no need to check for other rules
-            logd("flow: received rule: block, returning Ipn.Block, $connId, $uid, $possibleDomains")
+            logd("flow: received rule: block, returning Ipn.Block, $connId, $uid, $domains")
             return@go2kt persistAndConstructFlowResponse(cm, Backend.Block, connId, uid)
         }
 
@@ -4893,7 +4929,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     connType
                 )
 
-            processFirewallRequest(cm, false, "", rinr = rinr)
+            processFirewallRequest(cm, "",false, "", rinr = rinr)
 
             if (cm.isBlocked) {
                 // return Ipn.Block, no need to check for other rules
@@ -4992,7 +5028,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val endpoint = appConfig.getConnectedOrbotProxy()
             val packageName = FirewallManager.getPackageNameByUid(uid)
             if (endpoint?.proxyAppName == packageName) {
-                logd("flow: orbot enabled for $packageName, handling as spl app")
+                logd("flow/inflow: orbot enabled for $packageName, handling as spl app")
                 return true
             }
         }
@@ -5006,7 +5042,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             logd("flow/inflow: socks5 proxy is enabled, $packageName, ${endpoint?.proxyAppName}")
             // do not block the app if the app is set to forward the traffic via socks5 proxy
             if (endpoint?.proxyAppName == packageName) {
-                logd("flow: socks5 enabled for $packageName, handling as spl app")
+                logd("flow/inflow: socks5 enabled for $packageName, handling as spl app")
                 return true
             }
         }
@@ -5029,7 +5065,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val packageName = FirewallManager.getPackageNameByUid(uid) ?: return false
             // do not block the app if the app is set to forward the traffic via dns proxy
             if (endpoint.proxyAppName == packageName) {
-                logd("flow: dns proxy enabled for $packageName, handling as spl app")
+                logd("flow/inflow: dns proxy enabled for $packageName, handling as spl app")
                 return true
             }
         }
@@ -5350,12 +5386,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     private suspend fun processFirewallRequest(
         metadata: ConnTrackerMetaData,
+        domains: String?,
         anyRealIpBlocked: Boolean = false,
         blocklists: String = "",
         isSplApp: Boolean = false,
         rinr: Boolean
     ) {
-        val rule = firewall(metadata, anyRealIpBlocked, isSplApp, rinr)
+        val rule = firewall(metadata, domains, anyRealIpBlocked, isSplApp, rinr)
 
         metadata.blockedByRule = rule.id
         metadata.blocklists = blocklists
@@ -5365,7 +5402,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
         addCidToTrackedCidsToCloseIfNeeded(metadata.connId, rule)
 
-        logd("firewall-rule $rule on conn $metadata")
+        logd("firewall-rule $rule on conn: ${metadata.connId}; $metadata")
         return
     }
 
