@@ -68,7 +68,6 @@ import com.celzero.bravedns.ui.LauncherSwitcher
 import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.APP_LOCK_ALIAS
 import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.HOME_ALIAS
 import com.celzero.bravedns.ui.bottomsheet.BackupRestoreBottomSheet
-import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
@@ -174,8 +173,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt()).name.lowercase()
                 .replaceFirstChar(Char::titlecase).replace("_", " ")
 
-        // camera and microphone access
-        b.settingsMicCamAccessSwitch.isChecked = persistentState.micCamAccess
 
         // for app locale (default system/user selected locale)
         if (isAtleastT()) {
@@ -585,23 +582,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             showBiometricDialog()
         }
 
-
-        b.settingsMicCamAccessRl.setOnClickListener {
-            b.settingsMicCamAccessSwitch.isChecked = !b.settingsMicCamAccessSwitch.isChecked
-        }
-
-        b.settingsMicCamAccessSwitch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean
-            ->
-            if (!checked) {
-                b.settingsMicCamAccessSwitch.isChecked = false
-                persistentState.micCamAccess = false
-                return@setOnCheckedChangeListener
-            }
-
-            // check for the permission and enable the switch
-            handleAccessibilityPermission()
-        }
-
         b.settingsConsoleLogRl.setOnClickListener { openConsoleLogActivity() }
 
         b.settingsActivityAutoStartRl.setOnClickListener {
@@ -768,98 +748,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             }
         }
         alertBuilder.create().show()
-    }
-
-    private fun handleAccessibilityPermission() {
-        try {
-            val isAccessibilityServiceRunning =
-                Utilities.isAccessibilityServiceEnabled(
-                    this,
-                    BackgroundAccessibilityService::class.java
-                )
-            val isAccessibilityServiceEnabled =
-                Utilities.isAccessibilityServiceEnabledViaSettingsSecure(
-                    this,
-                    BackgroundAccessibilityService::class.java
-                )
-            val isAccessibilityServiceFunctional =
-                isAccessibilityServiceRunning && isAccessibilityServiceEnabled
-
-            if (isAccessibilityServiceFunctional) {
-                persistentState.micCamAccess = true
-                b.settingsMicCamAccessSwitch.isChecked = true
-                return
-            }
-
-            showPermissionAlert()
-            b.settingsMicCamAccessSwitch.isChecked = false
-            persistentState.micCamAccess = false
-        } catch (e: PackageManager.NameNotFoundException) {
-            Logger.e(LOG_TAG_APP_OPS, "error checking usage stats permission ${e.message}", e)
-            return
-        }
-    }
-
-    private fun checkMicCamAccessRule() {
-        if (!persistentState.micCamAccess) return
-
-        val running =
-            Utilities.isAccessibilityServiceEnabled(
-                this,
-                BackgroundAccessibilityService::class.java
-            )
-        val enabled =
-            Utilities.isAccessibilityServiceEnabledViaSettingsSecure(
-                this,
-                BackgroundAccessibilityService::class.java
-            )
-
-        Logger.d(LOG_TAG_APP_OPS, "cam/mic access - running: $running, enabled: $enabled")
-
-        val isAccessibilityServiceFunctional = running && enabled
-
-        if (!isAccessibilityServiceFunctional) {
-            persistentState.micCamAccess = false
-            b.settingsMicCamAccessSwitch.isChecked = false
-            showToastUiCentered(
-                this,
-                getString(R.string.accessibility_failure_toast),
-                Toast.LENGTH_SHORT
-            )
-            return
-        }
-
-        if (running) {
-            b.settingsMicCamAccessSwitch.isChecked = persistentState.micCamAccess
-            return
-        }
-    }
-
-    private fun showPermissionAlert() {
-        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
-        builder.setTitle(R.string.alert_permission_accessibility)
-        builder.setMessage(R.string.alert_firewall_accessibility_explanation)
-        builder.setPositiveButton(getString(R.string.univ_accessibility_dialog_positive)) { _, _ ->
-            openAccessibilitySettings()
-        }
-        builder.setNegativeButton(getString(R.string.univ_accessibility_dialog_negative)) { _, _ ->
-        }
-        builder.setCancelable(false)
-        builder.create().show()
-    }
-
-    private fun openAccessibilitySettings() {
-        try {
-            val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-            startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            showToastUiCentered(
-                this,
-                getString(R.string.alert_firewall_accessibility_exception),
-                Toast.LENGTH_SHORT
-            )
-            Logger.e(LOG_TAG_APP_OPS, "Failure accessing accessibility settings: ${e.message}", e)
-        }
     }
 
     private fun invokeChangeLocaleDialog() {
@@ -1159,7 +1047,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         super.onResume()
         // app notification permission android 13
         showEnableNotificationSettingIfNeeded()
-        checkMicCamAccessRule()
     }
 
     private fun registerForActivityResult() {

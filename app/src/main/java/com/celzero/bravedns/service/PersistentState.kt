@@ -323,8 +323,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     var pingv6Url by stringPref("ping_ipv6_url").withDefault<String>(Constants.urlV6probes.joinToString(","))
 
-    // camera and mic access
-    var micCamAccess by booleanPref("mic_camera_access").withDefault<Boolean>(false)
 
     // anti-censorship type (auto, split_tls, split_tcp, desync)
     var dialStrategy by intPref("dial_strategy").withDefault<Int>(AntiCensorshipActivity.DialStrategies.SPLIT_AUTO.mode)
