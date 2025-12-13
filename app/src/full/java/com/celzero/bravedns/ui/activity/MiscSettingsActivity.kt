@@ -27,10 +27,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.os.LocaleList
 import android.provider.Settings
 import android.text.InputType
@@ -49,7 +47,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.biometric.BiometricManager
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
@@ -85,7 +82,6 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.getRandomString
 import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
@@ -132,7 +128,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
     companion object {
         private const val SCHEME_PACKAGE = "package"
-        private const val STORAGE_PERMISSION_CODE = 23
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -303,20 +298,22 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     private fun makePcapFile(): File? {
         return try {
             val sdf = SimpleDateFormat(BackupHelper.BACKUP_FILE_NAME_DATETIME, Locale.ROOT)
-            // create folder in DOWNLOADS
-            val dir =
-                if (isAtleastR()) {
-                    val downloadsDir =
-                        Environment.getExternalStoragePublicDirectory(
-                            Environment.DIRECTORY_DOWNLOADS
-                        )
-                    // create folder in DOWNLOADS/Rethink
-                    File(downloadsDir, Constants.PCAP_FOLDER_NAME)
-                } else {
-                    val downloadsDir = Environment.getExternalStorageDirectory()
-                    // create folder in DOWNLOADS/Rethink
-                    File(downloadsDir, Constants.PCAP_FOLDER_NAME)
-                }
+
+            // Use app-specific external storage (no permissions required)
+            val baseDir = getExternalFilesDir(null)
+            if (baseDir == null) {
+                Logger.e(LOG_TAG_VPN, "External storage not available for PCAP file")
+                return null
+            }
+
+            // Check if external storage is mounted and writable
+            val state = android.os.Environment.getExternalStorageState(baseDir)
+            if (state != android.os.Environment.MEDIA_MOUNTED) {
+                Logger.e(LOG_TAG_VPN, "External storage not mounted, state: $state")
+                return null
+            }
+
+            val dir = File(baseDir, Constants.PCAP_FOLDER_NAME)
 
             // ensure directory exists
             if (!dir.exists()) {
@@ -356,15 +353,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun createAndSetPcapFile() {
-        // check for storage permissions
-        if (!checkStoragePermissions()) {
-            // request for storage permissions
-            Logger.i(LOG_TAG_VPN, "requesting for storage permissions")
-            requestForStoragePermissions()
-            return
-        }
-
-        Logger.i(LOG_TAG_VPN, "storage permission granted, creating pcap file")
+        // No storage permissions needed for app-specific external storage
+        Logger.i(LOG_TAG_VPN, "creating pcap file in app-specific storage")
         try {
             val file = makePcapFile()
             if (file == null) {
@@ -387,110 +377,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "error in createAndSetPcapFile: ${e.message}", e)
             showFileCreationErrorToast()
-        }
-    }
-
-    private val storageActivityResultLauncher: ActivityResultLauncher<Intent> =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (isAtleastR()) {
-                // version 11 (R) or above
-                if (Environment.isExternalStorageManager()) {
-                    createAndSetPcapFile()
-                } else {
-                    showFileCreationErrorToast()
-                }
-            } else {
-                // below ver 11 (R), the permission is handled via onRequestPermissionsResult
-            }
-        }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray,
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == STORAGE_PERMISSION_CODE) {
-            if (grantResults.isNotEmpty()) {
-                val write = grantResults[0] == PackageManager.PERMISSION_GRANTED
-                val read = grantResults[1] == PackageManager.PERMISSION_GRANTED
-                if (read && write) {
-                    createAndSetPcapFile()
-                } else {
-                    showFileCreationErrorToast()
-                }
-            }
-        }
-    }
-
-    private fun requestForStoragePermissions() {
-        // version 11 (R) or above
-        if (isAtleastR()) {
-            try {
-                val intent = Intent()
-                intent.action = Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
-                val uri = Uri.fromParts(SCHEME_PACKAGE, this.packageName, null)
-                intent.data = uri
-
-                // Check if there's an activity that can handle this intent
-                if (intent.resolveActivity(packageManager) != null) {
-                    storageActivityResultLauncher.launch(intent)
-                } else {
-                    // Fallback to general settings
-                    throw ActivityNotFoundException("No activity found for app-specific storage settings")
-                }
-            } catch (e: Exception) {
-                Logger.e(LOG_TAG_VPN, "Error launching app-specific storage settings: ${e.message}")
-                try {
-                    val intent = Intent()
-                    intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
-
-                    // Check if there's an activity that can handle the fallback intent
-                    if (intent.resolveActivity(packageManager) != null) {
-                        storageActivityResultLauncher.launch(intent)
-                    } else {
-                        // No activity available to handle storage permission
-                        Logger.e(LOG_TAG_VPN, "No activity found to handle storage permission request")
-                        showToastUiCentered(
-                            this,
-                            getString(R.string.pcap_failure_toast),
-                            Toast.LENGTH_LONG
-                        )
-                    }
-                } catch (fallbackException: Exception) {
-                    Logger.e(LOG_TAG_VPN, "Error launching storage settings: ${fallbackException.message}", fallbackException)
-                    showToastUiCentered(
-                        this,
-                        getString(R.string.pcap_failure_toast),
-                        Toast.LENGTH_LONG
-                    )
-                }
-            }
-        } else {
-            // below version 11
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                ),
-                STORAGE_PERMISSION_CODE,
-            )
-        }
-    }
-
-
-    private fun checkStoragePermissions(): Boolean {
-        return if (isAtleastR()) {
-            // version 11 (R) or above
-            Environment.isExternalStorageManager()
-        } else {
-            // below version 11
-            val write =
-                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            val read =
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-            read == PackageManager.PERMISSION_GRANTED && write == PackageManager.PERMISSION_GRANTED
         }
     }
 
