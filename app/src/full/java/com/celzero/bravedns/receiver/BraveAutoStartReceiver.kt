@@ -72,7 +72,7 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
 
             if (prepareVpnIntent == null) {
                 Logger.i(LOG_TAG_VPN, "vpn auto-start, event: $eventType")
-                VpnController.start(context, reboot = true)
+                VpnController.start(context, autoAttempt = true)
                 return
             }
         }
