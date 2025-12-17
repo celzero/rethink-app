@@ -148,11 +148,18 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
             return
         }
 
+        // Setup basic UI immediately (lightweight operations)
         b.bsdlDomainRuleDesc.text = htmlToSpannedText(getString(R.string.bsdl_block_desc))
         b.dnsBlockUrl.text = "${log?.queryStr.orEmpty()}      ❯"
         b.dnsBlockIpAddress.text = getResponseIp()
         b.dnsBlockConnectionFlag.text = log?.flag.orEmpty()
         b.dnsBlockIpLatency.text = getString(R.string.dns_btm_latency_ms, log?.ttl?.toString().orEmpty())
+        if (log?.blockedTarget?.isEmpty() == true) {
+            b.dnsBlockedTarget.visibility = View.GONE
+        } else {
+            b.dnsBlockedTarget.text = log?.blockedTarget
+            b.dnsBlockedTarget.visibility = View.VISIBLE
+        }
         if (Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt())
                 .isLessThan(Logger.LoggerLevel.DEBUG)
         ) {
@@ -161,19 +168,32 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
             b.dnsMessage.text = log?.msg.orEmpty()
         }
 
-        displayFavIcon()
-        displayDnsTransactionDetails()
-        displayRecordTypeChip()
-        setupClickListeners()
-        updateAppDetails(log)
-        updateRulesUi(log?.queryStr.orEmpty())
-
         val region = log?.region.orEmpty()
         if (region.isNotEmpty()) {
             b.dnsRegion.visibility = View.VISIBLE
             b.dnsRegion.text = region
         } else {
             b.dnsRegion.visibility = View.GONE
+        }
+
+        // Setup click listeners immediately (no heavy work)
+        setupClickListeners()
+
+        // Update app details (already uses background thread)
+        updateAppDetails(log)
+
+        // Defer heavy operations to prevent ANR
+        // This allows the UI to render immediately while heavy operations run after first frame
+        view.post {
+            displayRecordTypeChip()
+            displayDnsTransactionDetails()
+            updateRulesUi(log?.queryStr.orEmpty())
+        }
+
+        // Defer favicon loading even more (lowest priority, can be slow)
+        lifecycleScope.launch {
+            kotlinx.coroutines.delay(150) // Let basic UI settle first
+            displayFavIcon()
         }
     }
 
@@ -640,6 +660,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
                 .load(url)
                 .onlyRetrieveFromCache(true)
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                .timeout(2000) // Prevent hanging - fail fast if cache lookup is slow
                 .error(lookupForImageDuckduckgo(duckduckgoUrl, duckduckgoDomainURL))
                 .transition(DrawableTransitionOptions.withCrossFade(factory))
                 .into(
@@ -688,10 +709,12 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
                 .load(url)
                 .onlyRetrieveFromCache(true)
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                .timeout(2000) // Prevent hanging - fail fast if cache lookup is slow
                 .error(
                     Glide.with(requireContext().applicationContext)
                         .load(domainUrl)
                         .onlyRetrieveFromCache(true)
+                        .timeout(2000)
                 )
                 .transition(DrawableTransitionOptions.withCrossFade(factory))
                 .into(
