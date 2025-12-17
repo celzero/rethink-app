@@ -250,6 +250,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             b.dcSplitDnsRl.visibility = View.VISIBLE
             b.dcSplitDnsSwitch.isChecked = persistentState.splitDns
             updateConnectedStatus(persistentState.connectedDnsName)
+            showSplitDnsUi()
             return
         }
 
