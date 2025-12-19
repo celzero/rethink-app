@@ -126,7 +126,7 @@
 \nRethinkDNS sử dụng dịch vụ trợ năng để theo dõi xem những nào ứng dụng đang được sử dụng trực tiếp (foreground) và những ứng dụng nào đang không được sử dụng trực tiếp/chạy ngầm (background).</string>
     <string name="bsct_conn_desc_allowed" translatable="true">đã được cho phép trên %1$s %2$s</string>
     <string name="always_on_dialog_lockdown_stop_message" translatable="true">Rethink đang chạy VPN ở chế độ <i>Lockdown</i>. Nếu dừng nó sẽ dẫn đến mất kết nối Internet trên hồ sơ người dùng này. Bạn có muốn tiếp tục không?</string>
-    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Chặn ứng dụng kết nối với Internet. \n <u>#2</u>: Chặn bất kỳ ứng dụng nào kết nối với một IP cụ thể. \n <u>#3</u>: Chặn tất cả các kết nối khi thiết bị đang khóa màn (Tường lửa chung). \n <u>#4</u>: Chặn bất kỳ ứng dụng nào không được sử dụng (Tường lửa chung). \n <u>#5</u>: Chặn kết nối khi ứng dụng có nguồn gốc không được xác định (Tường lửa chung). \n <u>#6</u>: Chặn tất cả lưu lượng UDP ngoại trừ DNS (Tường lửa chung). \n <u>#7</u>: Chặn kết nối khi DNS bị bỏ qua (Tường lửa chung).</string>
+    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Chặn ứng dụng kết nối với Internet. \n <u>#2</u>: Chặn bất kỳ ứng dụng nào kết nối với một IP cụ thể. \n <u>#3</u>: Chặn tất cả các kết nối khi thiết bị đang khóa màn hình (Tường lửa chung). \n <u>#4</u>: Chặn bất kỳ ứng dụng nào không được sử dụng (Tường lửa chung). \n <u>#5</u>: Chặn kết nối khi ứng dụng có nguồn gốc không được xác định (Tường lửa chung). \n <u>#6</u>: Chặn tất cả lưu lượng UDP ngoại trừ DNS (Tường lửa chung). \n <u>#7</u>: Chặn kết nối khi DNS bị bỏ qua (Tường lửa chung).</string>
     <string name="dns_crypt_relay_remove_success" translatable="true">Đã xóa Chuyển tiếp DNSCrypt.</string>
     <string name="doh_custom_url_remove_dialog_title" translatable="true">Xóa điểm cuối DoH?</string>
     <string name="dns_crypt_relay_remove_dialog_message" translatable="true">Xóa chuyển tiếp DNSCrypt khỏi cấu hình đã lưu.</string>
@@ -734,4 +734,96 @@
     <string name="firewall_rule_block_metered" translatable="true">Giới hạn (Dữ liệu di động)</string>
     <string name="firewall_rule_univ_block_metered" translatable="true">Giới hạn (Chung)</string>
     <string name="firewall_rule_isolate" translatable="true">Cách ly</string>
+    <string name="lbl_action" translatable="true">Hành động</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Duy trì kết nối</string>
+    <string name="lbl_protos" translatable="true">Giao thức</string>
+    <string name="lbl_hop" translatable="true">Rơ le</string>
+    <string name="lbl_default" translatable="true">Mặc định</string>
+    <string name="lbl_connect" translatable="true">Kết nối</string>
+    <string name="lbl_criteria" translatable="true">Tiêu chí</string>
+    <string name="settings_mobile_metered_heading" translatable="true">Đo lường mạng di động</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">Các ứng dụng chuyển tiếp Proxy Vòng lặp ngược</string>
+    <string name="settings_theme_dialog_themes_7" translatable="true">Đóng băng</string>
+    <string name="dc_filtering_heading" translatable="true">Lọc</string>
+    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">Bỏ qua chặn DNS khi phân giải tên miền; quy tắc chặn sẽ được áp dụng khi bắt đầu kết nối.</string>
+    <string name="firewall_rule_bypass_dns_firewall" translatable="true">Ứng dụng được bỏ qua</string>
+    <string name="firewall_rule_block_app_new_install" translatable="true">Ứng dụng mới</string>
+    <string name="firewall_rule_block_app_exception" translatable="true">Lỗi</string>
+    <string name="firewall_rule_block_ip" translatable="true">IP / Cổng (Ứng dụng)</string>
+    <string name="firewall_rule_block_univ_ip" translatable="true">IP / Cổng (Chung)</string>
+    <string name="firewall_rule_trusted_ip" translatable="true">IP được tin tưởng</string>
+    <string name="firewall_rule_bypass_universal_ip" translatable="true">IP được bỏ qua</string>
+    <string name="firewall_rule_device_lock" translatable="true">Thiết bị đã khóa</string>
+    <string name="firewall_rule_foreground" translatable="true">Ứng dụng không được sử dụng</string>
+    <string name="firewall_rule_block_dns_bypass" translatable="true">DNS được bỏ qua</string>
+    <string name="firewall_rule_exempt_dns_proxied" translatable="true">DNS được định tuyến</string>
+    <string name="firewall_rule_block_http" translatable="true">HTTP không bảo mật</string>
+    <string name="firewall_rule_global_lockdown" translatable="true">Khóa chặt</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">Miền được tin tưởng (Ứng dụng)</string>
+    <string name="firewall_rule_proxied" translatable="true">Được định tuyến</string>
+    <string name="firewall_rule_private_dns" translatable="true">DNS riêng tư</string>
+    <string name="firewall_rule_bypass_proxy" translatable="true">Bỏ qua proxy</string>
+    <string name="firewall_rule_paused_app" translatable="true">Ứng dụng được tạm ngừng</string>
+    <string name="firewall_rule_no_rule_desc" translatable="true">Không có quy tắc tường lửa nào khớp với kết nối này</string>
+    <string name="notif_channel_vpn_notification" translatable="true">VPN đang hoạt động</string>
+    <string name="notif_channel_vpn_failure" translatable="true">VPN đang tắt</string>
+    <string name="notif_channel_firewall_alerts" translatable="true">Các cảnh báo tường lửa</string>
+    <string name="notif_channel_proxy_failure" translatable="true">Các cảnh báo proxy</string>
+    <string name="notif_channel_download" translatable="true">Các cảnh báo tải xuống</string>
+    <string name="notif_channel_desc_vpn_notification" translatable="true">"Hiện thông báo khi Rethink đang bật và chạy  dưới nền"</string>
+    <string name="no_stats_available" translatable="true">Không có thống kê</string>
+    <string name="new_app_notification_action_deny" translatable="true">Tiếp tục chặn</string>
+    <string name="new_app_notification_action_toast_allow" translatable="true">Ứng dụng được phép kết nối mạng</string>
+    <string name="new_app_notification_action_toast_deny" translatable="true">Ứng dụng này bị từ chối kết nối mạng</string>
+    <string name="notif_dialog_pause_dialog_title" translatable="true">Ứng dụng tạm ngừng!</string>
+    <string name="notif_dialog_pause_dialog_message" translatable="true">Ứng dụng đang tạm ngừng,</string>
+    <string name="notif_dialog_pause_dialog_negative" translatable="true">Loại bỏ</string>
+    <string name="notif_channel_desc_vpn_failure" translatable="true">Hiện thông báo khi Rethink bị dừng bởi hệ thống hoặc ứng dụng VPN khác</string>
+    <string name="notif_channel_desc_firewall_alerts" translatable="true">Cảnh báo lỗi và bất thường của tường lửa</string>
+    <string name="notif_channel_desc_proxy_failure" translatable="true">Cảnh báo lỗi và bất thường của Proxy</string>
+    <string name="notif_channed_desc_download" translatable="true">Hiện tiến độ tải xuống các bộ lọc trên thiết bị</string>
+    <string name="category_name_sys_components" translatable="true">Thành phần hệ thống</string>
+    <string name="category_name_sys_apps" translatable="true">Ứng dụng hệ thống</string>
+    <string name="category_name_others" translatable="true">Khác</string>
+    <string name="category_name_non_app_sys" translatable="true">Dịch vụ hệ thống</string>
+    <string name="category_name_installed" translatable="true">Ứng dụng đã cài đặt</string>
+    <string name="build__flavor_website" translatable="true">trang web</string>
+    <string name="build__flavor_fdroid" translatable="true">fdroid</string>
+    <string name="cd_toast_deleted" translatable="true">Miền bị loại bỏ từ danh sách tùy chỉnh</string>
+    <string name="cd_toast_added" translatable="true">Tên miền được thêm vào thành công</string>
+    <string name="cd_remove_dialog_title" translatable="true">Xóa tên miền ?</string>
+    <string name="hop_error_toast_msg_2" translatable="true">Không có WireGuard có sẵn cho rơ le; vui lòng bổ sung</string>
+    <string name="exclude_no_package_err_toast" translatable="true">Loại trừ ứng dụng yêu cầu tên gói</string>
+    <string name="ac_toast_retry_disabled" translatable="true">Chọn bất kỳ phương thức chống kiểm duyệt nào để chọn chiến lược</string>
+    <string name="ac_retry_options_after_split_desc" translatable="true">Luôn luôn áp dụng các kỹ thuật chống kiểm duyệt.</string>
+    <string name="lbl_always" translatable="true">Luôn luôn</string>
+    <string name="ac_retry_options_with_split_desc" translatable="true">Áp dụng biện pháp kỹ thuật chống kiểm duyệt khi cần thiết.</string>
+    <string name="ac_retry_options_never_desc" translatable="true">Khi thất bại, không bao giờ thử lại các biện pháp kỹ thuật chống kiểm duyệt.</string>
+    <string name="ac_retry_options_desc" translatable="true">Đặt số lượt thử lại cho các kết nối bị kiểm duyệt</string>
+    <string name="ac_retry_options_title" translatable="true">chiến lược</string>
+    <string name="ac_desync_desc" translatable="true">Gửi các gói tin mồi nhử khi cần thiết</string>
+    <string name="ac_desync" translatable="true">Không đồng bộ</string>
+    <string name="ac_split_tls_desc" translatable="true">Thay đổi các gói tin TCP hoặc TLS</string>
+    <string name="ac_split_tls" translatable="true">TCP/TLS</string>
+    <string name="ac_split_tcp_desc" translatable="true">Thay đổi các gói tin TCP</string>
+    <string name="ac_split_tcp" translatable="true">TCP</string>
+    <string name="ac_split_auto_desc" translatable="true">Thay đổi các gói tin khi cần thiết</string>
+    <string name="ac_never_split_desc" translatable="true">Không thay đổi gói tin.</string>
+    <string name="ac_desc" translatable="true">Các công cụ chống kiểm duyệt cung cấp tự do Internet, nhưng chúng không hoạt động ở mọi nơi. Chỉ được thử trên kết nối không proxy</string>
+    <string name="ac_title" translatable="true">chống kiểm duyệt</string>
+    <string name="tcp_keep_alive_desc" translatable="true">Nhanh chóng đóng cổng TCP khi không có hoạt động gần đây.</string>
+    <string name="tcp_keep_alive_title" translatable="true">Rút ngắn thời gian duy trì kết nối (TCP)</string>
+    <string name="anti_censorship_desc" translatable="true">Chọn từ nhiều biện pháp kỹ thuật chống kiểm duyệt.</string>
+    <string name="anti_censorship_title" translatable="true">chống kiểm duyệt</string>
+    <string name="console_log_desc" translatable="true">Nhật ký có thể chứa thông tin nhạy cảm.</string>
+    <string name="console_log_title" translatable="true">Các nhật ký ứng dụng</string>
+    <string name="network_dns" translatable="true">DNS hệ thống</string>
+    <string name="notif_download_content_text" translatable="true">Quá trình tải xuống đang diễn ra…</string>
+    <string name="notif_download_failure_content" translatable="true">Tải xuống thất bại. Vui lòng thử lại</string>
+    <string name="notif_download_cancel_content" translatable="true">Quá trình tải xuống bị ngắt.</string>
+    <string name="notif_download_success_content" translatable="true">Tải xuống thành công.</string>
+    <string name="rbl_parental_control" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">Kiểm soát cha mẹ</string>
+    <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen" translatable="true">Chặn nội dung người dùng v&amp; vi phạm bản quyền; cờ bạc trực tuyến &amp; hẹn hò, và mạng xã hội.</string>
+    <string name="rbl_privacy" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">Riêng tư</string>
+    <string name="rbl_security" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">Bảo mật</string>
 </resources>

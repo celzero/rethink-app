@@ -1,0 +1,26 @@
+Chào đón một trải nghiệm Android an toàn, minh bạch và bảo mật hơn.
+
+VPN: Kết nối tới nhiều VPN ( mạng riêng ảo ) sử dụng giao thức WireGuard tùy theo lựa chọn của bạn.
+
+An toàn: Hiển thị chi tiết hoạt động mạng của các ứng dụng đã cài đặt, cho phép bạn vô hiệu hóa, gỡ cài đặt hoặc thiết lập tường lửa để chặn chúng.
+
+Bảo mật: Lớp phòng thủ đầu tiên chống lại phần mềm gián điệp, mã độc tống tiền và phần mềm độc hại chuyên đánh cắp thông tin cá nhân và chiếm đoạt tài khoản. Bảo vệ người dùng khỏi các hành vi thao túng DNS thường được sử dụng để kiểm duyệt các trang web, mạng xã hội và các ứng dụng nhắn tin.
+
+Nhanh: Các máy chủ DNS được triển khai tại hơn 300 địa điểm trên toàn cầu, đảm bảo kết nối Internet của bạn đạt tốc độ tối đa và sự sẵn sàng cao nhất có thể.
+
+Mở: Mã nguồn mở và hoàn toàn không chứa bất kỳ trình theo dõi (trackers) nào.
+
+***Các Tính Năng***
+Tường lửa: Ngăn chặn ứng dụng kết nối Internet. Chặn đứng phần mềm gián điệp, mã độc, mã độc tống tiền và hơn thế nữa. Tường lửa sẽ chặn bất kỳ ứng dụng nào cố gắng kết nối Internet qua WiFi hoặc Dữ liệu di động. Vì hầu hết các hình thức giám sát đều yêu cầu gửi dữ liệu qua mạng về máy chủ đích, việc cô lập chúng bằng tường lửa sẽ giảm thiểu mối đe dọa một cách hiệu quả (Trình quản lý tệp, Đồng hồ báo thức, Máy tính là một vài ví dụ điển hình về các ứng dụng không cần truy cập Internet để hoạt động). Tính năng tường lửa sử dụng Dịch vụ Trợ năng của Android để phát hiện và ngăn chặn các ứng dụng chạy nền.
+
+Giám sát: Theo dõi lưu lượng Internet chiều vào và chiều ra.
+
+Nếu được kích hoạt, các nhật ký kết nối sẽ được thu thập và phân tích. Các báo cáo tự động sẽ gắn cờ những kết nối đáng ngờ hoặc chưa từng biết đến, đồng thời phơi bày quy mô của các nỗ lực đánh cắp dữ liệu từ các mạng lưới gián điệp. Trong các thử nghiệm của chúng tôi, khoảng 60% lưu lượng truy cập được gắn cờ và báo cáo là do các phần mềm gián điệp đã biết khởi tạo. Nhật ký được tạo ra và cung cấp cho người dùng gần như theo thời gian thực để phục vụ việc tự phân tích.
+
+WireGuard: Bảo mật lưu lượng Internet chiều ra.
+
+Ứng dụng sử dụng giao thức WireGuard hiện đại, nhanh chóng, gọn nhẹ và bảo mật để mã hóa các kết nối đi ra tới bất kỳ nhà cung cấp VPN tương thích nào mà bạn lựa chọn.
+
+Chống kiểm duyệt: Ứng dụng mã hóa kết nối Internet của bạn đến máy chủ Hệ thống Tên miền (DNS) do Rethink vận hành với sự hiện diện tại hơn 300 địa điểm trên toàn thế giới. Máy chủ DNS được ví như cuốn danh bạ của Internet: Một máy chủ DNS cung cấp các địa chỉ chính xác cần thiết để bạn truy cập một trang web hoặc mở một ứng dụng.
+
+Giám sát dữ liệu: Theo dõi mức sử dụng dữ liệu Di động hoặc WiFi trên từng ứng dụng và từng kết nối cụ thể.
