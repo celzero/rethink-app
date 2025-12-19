@@ -1235,4 +1235,12 @@
     <string name="tombstone_app_desc" translatable="true">Если включено, сохраняет правила приложений ещё 7 дней.</string>
     <string name="settings_locale_dialog_default" translatable="true">Как в системе</string>
     <string name="settings_allow_incoming_wg_packets" translatable="true">WireGuard P2P (напрямую между участниками)</string>
+    <string name="settings_allow_incoming_wg_packets_desc" translatable="true">При активации пропускает входящие подключения от клиентов Wireguard</string>
+    <string name="lockdown_download_message" translatable="true">Встроенный в Android <i>Менеджер Загрузок</i> может не работать, если VPN настроен в режиме <i>Блокировки</i>. Использовать собственный менеджер загрузок Rethink?</string>
+    <string name="lockdown_download_enable_inapp" translatable="true">Включить Менеджер Загрузок</string>
+    <string name="settings_jumbo_packets" translatable="true">Расширение пропускной способности</string>
+    <string name="settings_jumbo_packets_desc" translatable="true">Использовать <i>jumbo-фреймы</i> внутри VPN-туннеля Rethink.</string>
+    <string name="settings_tunnel_metered" translatable="true">Всегда лимитированное</string>
+    <string name="stability_program_toast" translatable="true">Теперь вы участник <i>программы тестирования</i><i> экспериментальных функций</i>.</string>
+    <string name="settings_tunnel_metered_desc" translatable="true">Обозначать VPN-туннель Rethink как лимитированное подключение, чтобы сократить трафик от приложений. Внимание: может привести к проблемам с загрузкой больших файлов, таких как резервные копии.</string>
 </resources>
