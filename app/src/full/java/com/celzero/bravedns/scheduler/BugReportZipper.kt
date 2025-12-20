@@ -230,7 +230,7 @@ object BugReportZipper {
                 }
             }
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_BUG_REPORT, "err while updating zip file", e)
+            Logger.w(LOG_TAG_BUG_REPORT, "err while updating zip file ${e.message}")
         } finally {
             // Clean up temp file if it exists
             if (tempFile.exists()) {
@@ -366,21 +366,25 @@ object BugReportZipper {
 
     @RequiresApi(Build.VERSION_CODES.R)
     fun dumpAppExit(aei: ApplicationExitInfo, file: File) {
-        val reportDetails =
-            "${aei.packageUid}, reason: ${aei.reason}, desc: ${aei.description}, imp: ${aei.importance}, pss: ${aei.pss}, rss: ${aei.rss},${
-            Utilities.convertLongToTime(aei.timestamp, Constants.TIME_FORMAT_3)
-        }\n"
-        file.appendText(reportDetails)
+        try {
+            val reportDetails =
+                "${aei.packageUid}, reason: ${aei.reason}, desc: ${aei.description}, imp: ${aei.importance}, pss: ${aei.pss}, rss: ${aei.rss},${
+                    Utilities.convertLongToTime(aei.timestamp, Constants.TIME_FORMAT_3)
+                }\n"
+            file.appendText(reportDetails)
 
-        if (Utilities.isAtleastS()) {
-            // above API 31, we can get the traceInputStream for native crashes
-            if (aei.reason == ApplicationExitInfo.REASON_CRASH_NATIVE) {
+            if (Utilities.isAtleastS()) {
+                // above API 31, we can get the traceInputStream for native crashes
+                if (aei.reason == ApplicationExitInfo.REASON_CRASH_NATIVE) {
+                    aei.traceInputStream.use { ins -> fileWrite(ins, file) }
+                }
+            }
+            // capture traces for ANR exit-infos
+            if (aei.reason == ApplicationExitInfo.REASON_ANR) {
                 aei.traceInputStream.use { ins -> fileWrite(ins, file) }
             }
-        }
-        // capture traces for ANR exit-infos
-        if (aei.reason == ApplicationExitInfo.REASON_ANR) {
-            aei.traceInputStream.use { ins -> fileWrite(ins, file) }
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_BUG_REPORT, "err while dumping app exit info, ${e.message}")
         }
     }
 
