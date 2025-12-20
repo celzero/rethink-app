@@ -2,9 +2,9 @@
 <resources>
     <string name="app_name">RethinkDNS</string>
     <string name="settings_title_desc">DNS и Firewall с много възможности за персонализиране</string>
-    <string name="accessibility_service_description">Rethink използва услугата за достъпност при засичането и блокирането на приложенията на заден план. Rethink не събира или продава никаква информация.</string>
-    <string name="slide_2_desc">Rethink е най-лесният начин да наблюдавате мрежовата активност, да заобиколите интернет цензурата и приложенията за защитна стена на вашето устройство с Android.</string>
-    <string name="slide_1_desc">Rethink е софтуер с отворен код, поддържан от програмата Mozilla Builders MVP.</string>
+    <string name="accessibility_service_description">Rethink използва услуга за достъпност, за да открива и защитава фонови приложения. Rethink не събира и не продава никаква информация.</string>
+    <string name="slide_2_desc">Rethink е най-лесният начин да наблюдавате мрежовата активност, да заобикаляте интернет цензурата и приложенията за защитна стена на вашето устройство с Android.</string>
+    <string name="slide_1_desc">Rethink е софтуер с отворен код, подкрепен от програмата Mozilla Builders MVP, FOSS United Foundation.</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Натисни за промяна на настройките за защита</string>
     <string name="pause_mode_notification_title">На пауза! Блокираните приложения ще продължат да бъдат защитени със защитна стена.</string>
     <string name="dns_mode_notification_title">Защитен! Свързан към Бърз и Сигурен DNS.</string>
@@ -29,7 +29,7 @@
     <string name="title_settings">Настройки</string>
     <string name="title_statistics">Статистики</string>
     <string name="pause_title_desc">на пауза…</string>
-    <string name="about_title_desc">Засичай и блокирай мрежови заплахи</string>
+    <string name="about_title_desc">Откриване и блокиране на заплахи за мрежовата сигурност</string>
     <string name="txt_home">Начало</string>
     <string name="next">Следващ</string>
     <string name="skip">Пропускане</string>
@@ -184,7 +184,7 @@
     <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Услугата за достъпност RethinkDNS е спряна или се е сринала. <i><b>Влезте в Настройки и Насилствено спрете</b></i> RethinkDNS и го стартирайте отново, за да използвате <i>Блокирайте всяко приложение, което не се използва</i> функция.
 \n
 \nRethinkDNS използва услугата за достъпност, за да следи кои приложения се използват (на преден план) спрямо тези, които не се използват (на заден план).</string>
-    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Блокира дадено приложение да се свързва с интернет. \n <u>#2</u>: Блокира всяко приложение да се свързва с определен IP адрес. \n <u>#3</u>: Блокира всички връзки, когато устройството е заключено (универсална защитна стена). \n <u>#4</u>: Блокира всяко приложение, което не се използва (универсална защитна стена). \n <u>#5</u>: Блокира връзките, когато източникът на приложението е неизвестен (Universal Firewall). \n <u>#6</u>: Блокира целия UDP трафик с изключение на DNS (универсална защитна стена). \n <u>#7</u>: Блокиране на връзки, когато DNS е заобиколен (Universal Firewall).</string>
+    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Блокира свързването на приложение с интернет. \n <u>#2</u>: Блокира всяко приложение да се свързва с определен IP адрес. \n <u>#3</u>: Блокира всички връзки, когато устройството е заключено (Universal Firewall). \n <u>#4</u>: Блокира всяко приложение, което не се използва (Universal Firewall). \n <u>#5</u>: Блокира връзките, когато изходното приложение е неизвестно (Universal Firewall). \n <u>#6</u>: Блокира целия UDP трафик с изключение на DNS (Universal Firewall). \n <u>#7</u>: Блокиране на връзки, когато DNS е заобиколен (Universal Firewall).</string>
     <string name="connection_http3" translatable="true">HTTP3</string>
     <string name="settings_allow_bypass_desc" translatable="true">Позволете на заявяващите приложения да заобикалят защитната стена на RethinkDNS при поискване. Някои приложения за аудио/видеоконференции, като Zoom и WhatsApp, може да изискват заобикаляне при поискване, за да функционират правилно.</string>
     <string name="info_dialog_copy_toast_msg" translatable="true">Копиран IP адрес.</string>
@@ -206,7 +206,7 @@
     <string name="settings_ptrans_desc" translatable="true">Преобразувайте изходящия IPv6 трафик в IPv4 на устройството. Разрешете, ако сте свързани към мрежа, която използва само IPv4.</string>
     <string name="orbot_status_arg_3" translatable="true">DNS и TCP</string>
     <string name="settings_allow_bypass_heading" translatable="true">Активирайте видимостта на мрежата</string>
-    <string name="settings_lock_down_proxy_desc" translatable="true">Не може да се настроят проксита, когато VPN работи в режим само DNS или в режим на блокиране. <u>Отидете в настройките на VPN</u></string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">Не могат да се настройват прокси сървъри, когато VPN работи в режим само на DNS.</string>
     <string name="whats_new_version_update" translatable="true">&lt;b&gt;RA Fisher!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Нова функция&lt;/i&gt;: &lt;br/&gt; 2. &lt;i&gt;Нова функция&lt;/i&gt;: Изцяло нов екран \"Статистика\": Защитете това приложение с помощта на заключване на екрана.&lt;br/&gt; 3. &lt;i&gt;Нова функция&lt;/i&gt;: Изберете предпочитания от вас език от настройките на приложението.&lt;br/&gt; 4. &lt;i&gt;Нова функция&lt;/i&gt;: RDNS+ &lt;i&gt;Прост&lt;/i&gt; изглед показва само добре подбрани списъци.&lt;br/&gt; 5. преименуване: &lt;i&gt;Режимът на заключване на приложението&lt;/i&gt; вече е &lt;i&gt;Изолиран&lt;/i&gt; режим.&lt;br/&gt; 6. преименуване: &lt;i&gt;Правилата за заобикаляне на приложенията&lt;/i&gt; вече се нарича &lt;i&gt;Доверен&lt;/i&gt; IP.&lt;br/&gt; 7. Поправяне на срив, когато Rethink е инсталиран в работен профил.&lt;br/&gt; 8. сега се изтриват специфичните за приложението правила, когато приложението е деинсталирано.&lt;br/&gt; 9. и други дребни промени в потребителския интерфейс и поправки на грешки.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Помощ за превод на това приложение&lt;/a&gt;</string>
     <string name="orbot_socks5_desc" translatable="true">Препраща всички TCP връзки към Orbot.</string>
     <string name="orbot_app_issue" translatable="true">Не може да стартира Orbot. Инсталиран ли е?</string>
@@ -224,7 +224,7 @@
     <string name="download_update_dialog_message_ok_title" translatable="true">В крак с времето!</string>
     <string name="download_update_dialog_message_ok" translatable="true">Вече сте с най-новата версия.</string>
     <string name="download_update_dialog_message_success" translatable="true">Изтеглянето на блоковия списък е успешно.</string>
-    <string name="download_update_dialog_failure_title" translatable="true">Нещо се обърка</string>
+    <string name="download_update_dialog_failure_title" translatable="true">Нещо се обърка!</string>
     <string name="download_update_dialog_trylater_message" translatable="true">Актуализацията не може да бъде изпълнена в момента, моля, опитайте отново по-късно.</string>
     <string name="search_firewall_all_apps" translatable="true"><font size="12">Търсене на приложения по uid, име</font></string>
     <string name="search_dns_logs" translatable="true"><font size="12">Търсене на имена на домейни или IP адреси</font></string>
@@ -250,7 +250,7 @@
     <string name="relative_time_yesterday" translatable="true">Вчера</string>
     <string name="settings_allow_lan_heading" translatable="true">Не маршрутизирайте частни IP адреси (експериментално)</string>
     <string name="orbot_stop_dialog_message" translatable="true">RethinkDNS е спрял да препраща връзки към Orbot, но Orbot може да работи във фонов режим.</string>
-    <string name="refresh_complete" translatable="true">Повторната синхронизация на списъка с приложения е завършена.</string>
+    <string name="refresh_complete" translatable="true"><!-- use dc_refresh_toast --> Повторното синхронизиране на списъка с приложения е завършено.</string>
     <string name="configure_dns_connected_doh_status" translatable="true">DNS през HTTPS</string>
     <string name="download_update_dialog_message" translatable="true">Новата версия на приложението е достъпна за изтегляне от уебсайта. Искате ли да продължите?</string>
     <string name="status_protected_with_wg_private_dns" translatable="true">защитен с wireguard и частен dns</string>
