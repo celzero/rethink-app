@@ -832,4 +832,46 @@ href="https://central.sonatype.com/">Sonatype</a><br/> ]]></string>
     <string name="dns_crypt_connection_failure" translatable="true">خطا در اتصال به سرور DNSCrypt.</string>
     <string name="update_complete_snack_message" translatable="true">نسخه جدید دانلود شد.</string>
     <string name="accessibility_failure_toast" translatable="true">Rethink سرویس دسترسی دوباره متوقف شده یا از کار افتاده است. دیگر برنامه‌های پس‌زمینه را مسدود نمی‌کند.</string>
+    <string name="fapps_isolate_block_dialog_message" translatable="true">برنامه‌های <i>فهرست‌شده</i> ایزوله شوند؟</string>
+    <string name="fapps_firewall_filter_desc" translatable="true"><![CDATA[نمایش <u>%1$s</u> %2$s برنامه]]></string>
+    <string name="fapps_firewall_filter_desc_category" translatable="true"><![CDATA[نمایش <u>%1$s</u> %2$s برنامه در دسته‌بندی‌ها: %3$s]]></string>
+    <string name="rules_load_failure_desc" translatable="true">هیچ قانون فایروالی پیدا نشد</string>
+    <string name="rules_load_failure_reload" translatable="true">بارگذاری</string>
+    <string name="network_log_app_name_unknown" translatable="true">ناشناخته</string>
+    <string name="network_log_app_name_unnamed" translatable="true">بی نام (%1$s)</string>
+    <string name="dns_proxy_connection_failure" translatable="true">خطا در اتصال به سرور پروکسی DNS</string>
+    <string name="dns_proxy_connection_failure_lockdown" translatable="true">مستثنی کردن %1$s برای %2$s در حالت قفل، میتواند مشکلاتی در اتصال اینترنت ایجاد کند.</string>
+    <string name="socks5_proxy_toast_parameter" translatable="true">پروکسی SOCKS5</string>
+    <string name="orbot_toast_parameter" translatable="true">Tor به عنوان پروکسی</string>
+    <string name="system_dns_connection_failure" translatable="true">نمیتوان سرور DNS فعلی را مشخص کرد</string>
+    <string name="copy_clipboard_label" translatable="true">پیوند</string>
+    <string name="update_complete_action_snack" translatable="true">راه‌اندازی مجدد</string>
+    <string name="settings_local_blocklist_in_use" translatable="true">%1$s بلاک‌لیست استفاده میشوند</string>
+    <string name="settings_local_blocklist_dialog_positive" translatable="true">دانلود</string>
+    <string name="settings_local_blocklist_version" translatable="true">نسخه: %1$s</string>
+    <string name="accessibility_notification_content" translatable="true">سرویس دسترسی‌پذیری Rethink متوقف شد یا کرش کرد. دیگر نمیتوان برنامه های پس زمینه را مسدود کرد. برای فعالسازی دوباره، ضربه بزنید.</string>
+    <string name="toast_allow_bypass_disabled" translatable="true">%1$s غیر فعال است زیرا پروکسی‌ها فعال هستند</string>
+    <string name="firewall_rule_no_rule" translatable="true">قانونی وجود ندارد</string>
+    <string name="firewall_rule_block_app" translatable="true">برنامه مسدود شد</string>
+    <string name="firewall_rule_block_unmetered" translatable="true">نامحدود (وای‌فای)</string>
+    <string name="firewall_rule_block_metered" translatable="true">محدود (موبایل)</string>
+    <string name="firewall_rule_univ_block_metered" translatable="true">محدود (کلی)</string>
+    <string name="firewall_rule_isolate" translatable="true">ایزوله کردن</string>
+    <string name="firewall_rule_bypass_dns_firewall" translatable="true">برنامه دور‌زده شده</string>
+    <string name="firewall_rule_block_app_new_install" translatable="true">برنامه جدید</string>
+    <string name="firewall_rule_block_app_exception" translatable="true">خطا</string>
+    <string name="firewall_rule_block_ip" translatable="true">IP / پورت (برنامه)</string>
+    <string name="firewall_rule_block_univ_ip" translatable="true">IP / پورت (کلی)</string>
+    <string name="firewall_rule_trusted_ip" translatable="true">IPهای معتمد</string>
+    <string name="firewall_rule_bypass_universal_ip" translatable="true">IPهای دور‌زده شده</string>
+    <string name="firewall_rule_device_lock" translatable="true">دستگاه قفل شد</string>
+    <string name="firewall_rule_foreground" translatable="true">برنامه درحال استفاده‌شدن نیست</string>
+    <string name="firewall_rule_unknown" translatable="true">منبع نامشخص</string>
+    <string name="firewall_rule_block_udp_ntp" translatable="true">UDP مسدود شد</string>
+    <string name="firewall_rule_block_dns_bypass" translatable="true">DNS دور‌زده شد</string>
+    <string name="firewall_rule_exempt_app_bypass_univ" translatable="true">برنامه دور‌زده شد</string>
+    <string name="firewall_rule_exempt_dns_proxied" translatable="true">DNS پروکسی شد</string>
+    <string name="firewall_rule_exempt_orbot_setup" translatable="true">راه‌اندازی Orbot</string>
+    <string name="firewall_rule_block_http" translatable="true">HTTP نا‌امن</string>
+    <string name="firewall_rule_global_lockdown" translatable="true">قفل</string>
 </resources>
