@@ -119,6 +119,7 @@ internal constructor(
         transaction.isCached = summary.cached
         transaction.dnssecOk = summary.`do`
         transaction.dnssecValid = summary.ad
+        transaction.blockedTarget = summary.blockedTarget
         return transaction
     }
 
@@ -144,6 +145,7 @@ internal constructor(
         dnsLog.isCached = transaction.isCached
         dnsLog.dnssecOk = transaction.dnssecOk
         dnsLog.dnssecValid = transaction.dnssecValid
+        dnsLog.blockedTarget = transaction.blockedTarget
         val typeName = ResourceRecordTypes.getTypeName(transaction.type.toInt())
         if (typeName == ResourceRecordTypes.UNKNOWN) {
             dnsLog.typeName = transaction.type.toString()

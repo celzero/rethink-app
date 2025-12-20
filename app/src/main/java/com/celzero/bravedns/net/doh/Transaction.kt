@@ -44,6 +44,7 @@ class Transaction {
     var isCached: Boolean = false
     var dnssecOk: Boolean = false
     var dnssecValid: Boolean = false
+    var blockedTarget: String = ""
 
     enum class Status(val id: Long) {
         START(Backend.Start),
