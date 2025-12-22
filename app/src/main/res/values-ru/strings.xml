@@ -1087,13 +1087,13 @@
     <string name="lbl_test" translatable="true">тест</string>
     <string name="lbl_protos" translatable="true">протос</string>
     <string name="lbl_experimental" translatable="true">(эксперементально)</string>
-    <string name="lbl_hop" translatable="true">Узлы</string>
+    <string name="lbl_hop" translatable="true">Релеи</string>
     <string name="lbl_manual" translatable="true">Вручную</string>
     <string name="wireguard_title" translatable="true">Безопасный Интернет с WireGuard</string>
     <string name="wireguard_desc" translatable="true">Зашифруйте свой интернет-трафик с WireGuard. Выберите различные маршруты для различных приложений.</string>
     <string name="firewall_title" translatable="true">Защитите свой Android с помощью Firewall</string>
-    <string name="firewall_desc" translatable="true">Контролируйте использование интернет-трафика ваших приложений; ограничивайте соединения на основе приложений или сетевой активности.</string>
-    <string name="dns_title" translatable="true">Блокируйте рекламу и вредоносное ПО с помощью DNS</string>
+    <string name="firewall_desc" translatable="true">Контролируйте использование интернета вашими приложениями; ограничивайте соединения по приложению или сетевой активности.</string>
+    <string name="dns_title" translatable="true">Блокируйте рекламу и вредоносы с помощью DNS</string>
     <string name="dns_desc" translatable="true">Выбирайте из 190+ списков, чтобы остановить рекламу, трекеры и вредоносное ПО.</string>
     <string name="status_no_network" translatable="true">нет подключения к сети</string>
     <string name="settings_mobile_metered_heading" translatable="true">измерить мобильные сети</string>
@@ -1190,7 +1190,7 @@
     <string name="smart_dns_desc" translatable="true"><i>Smart DNS</i> случайным образом использует любой из этих DNS-преобразователей:</string>
     <string name="lbl_service_providers" translatable="true">Поставщик услуг</string>
     <string name="hop_error_toast_msg_3" translatable="true">Отключить \"Только мобильный\" или SSID, чтобы использовать релеи</string>
-    <string name="wg_mobile_only_hop_err" translatable="true">Режим «Только мобильный» не поддерживается для relays</string>
+    <string name="wg_mobile_only_hop_err" translatable="true">Режим «Только мобильный» не поддерживается для релеев</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">Удалить все Правила домена?</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">Удаление этих правил позволит любому приложению подключиться к заблокированным доменам.</string>
     <string name="vpn_policy_auto_desc" translatable="true">Реагирует на важные изменения сети и подключения.</string>
@@ -1235,7 +1235,7 @@
     <string name="tombstone_app_desc" translatable="true">Если включено, сохраняет правила приложений ещё 7 дней.</string>
     <string name="settings_locale_dialog_default" translatable="true">Как в системе</string>
     <string name="settings_allow_incoming_wg_packets" translatable="true">WireGuard P2P (напрямую между участниками)</string>
-    <string name="settings_allow_incoming_wg_packets_desc" translatable="true">При активации пропускает входящие подключения от клиентов Wireguard</string>
+    <string name="settings_allow_incoming_wg_packets_desc" translatable="true">Если включено, пропускает входящие подключения от клиентов Wireguard.</string>
     <string name="lockdown_download_message" translatable="true">Встроенный в Android <i>Менеджер Загрузок</i> может не работать, если VPN настроен в режиме <i>Блокировки</i>. Использовать собственный менеджер загрузок Rethink?</string>
     <string name="lockdown_download_enable_inapp" translatable="true">Включить Менеджер Загрузок</string>
     <string name="settings_jumbo_packets" translatable="true">Расширение пропускной способности</string>
