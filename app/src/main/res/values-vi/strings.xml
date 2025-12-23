@@ -826,4 +826,51 @@
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen" translatable="true">Chặn nội dung người dùng v&amp; vi phạm bản quyền; cờ bạc trực tuyến &amp; hẹn hò, và mạng xã hội.</string>
     <string name="rbl_privacy" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">Riêng tư</string>
     <string name="rbl_security" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">Bảo mật</string>
+    <string name="lbbs_copy" translatable="true">Sao chép như RDNS + URL</string>
+    <string name="lbbs_search" translatable="true">Tìm kiếm tên miền trong danh sách chặn</string>
+    <string name="lbbs_update_check" translatable="true">Kiểm tra bản cập nhật</string>
+    <string name="lbbs_redownload" translatable="true">Tải lại các danh sách chặn</string>
+    <string name="lbbs_download" translatable="true">Cập nhật các danh sách chặn</string>
+    <string name="lbbs_heading" translatable="true">Tinh chỉnh hơn 195 danh sách chặn</string>
+    <string name="brbs_title" translatable="true">Sao lưu và khôi phục</string>
+    <string name="brbs_backup_title" translatable="true">Sao lưu</string>
+    <string name="brbs_backup_desc" translatable="true">Sao lưu các cài đặt ứng dụng, cài đặt mạng và nhật ký dns</string>
+    <string name="brbs_restore_title" translatable="true">Khôi phục</string>
+    <string name="brbs_restore_desc" translatable="true">Khôi phục từ một tập tin sao lưu</string>
+    <string name="brbs_backup_restore_desc" translatable="true">Không tương thích giữa các phiên bản ứng dụng</string>
+    <string name="brbs_backup_dialog_message" translatable="true">Sao lưu các cài đặt ứng dụng, cài đặt mạng và nhật ký dns sang một tập tin. Việc này sẽ khởi động lại VPN</string>
+    <string name="brbs_backup_dialog_positive" translatable="true">Sao lưu</string>
+    <string name="brbs_restore_dialog_title" translatable="true">Khôi phục bản sao lưu</string>
+    <string name="key_length_explanation_base64" translatable="true">Khóa WireGuard ( mã hóa base64 ) phải dài 44 ký tự ( 32 bytes )</string>
+    <string name="bad_config_reason_unknown_attribute" translatable="true">Thuộc tính không rõ</string>
+    <string name="bad_config_reason_syntax_error" translatable="true">Lỗi cú pháp</string>
+    <string name="bad_config_reason_invalid_value" translatable="true">Giá trị không hợp lệ</string>
+    <string name="bad_config_reason_invalid_key" translatable="true">Khóa không hợp lệ</string>
+    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Khởi động Rethink để tiếp tục</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">các quốc gia bị chặn nhiều nhất</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">Các IP bị chặn nhiều nhất</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">Các IP được liên hệ nhiều nhất</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">Các tên miền bị chặn nhiều nhất</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">Các quốc gia được liên hệ nhiều nhất</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">Các tên miền được liên hệ nhiều nhất</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">Các ứng dụng bị chặn nhiều nhất</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">Các ứng dụng được cho phép nhiều nhất</string>
+    <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category" translatable="true">%1$s danh sách chặn</string>
+    <string name="brbs_restore_no_uri_toast" translatable="true">Khôi phục thất bại; vui lòng thử lại</string>
+    <string name="brbs_backup_complete_toast" translatable="true">Sao lưu hoàn thành</string>
+    <string name="brbs_restore_complete_toast" translatable="true">Khôi phục hoàn tất, đang khởi động lại ứng dụng…</string>
+    <string name="brbs_restore_dialog_failure_positive" translatable="true">Thử lại việc khôi phục</string>
+    <string name="brbs_restore_dialog_failure_message" translatable="true">Không thể khôi phục. Thử lại chứ ?</string>
+    <string name="brbs_restore_dialog_failure_title" translatable="true">Khôi phục thất bại</string>
+    <string name="brbs_backup_dialog_failure_positive" translatable="true">Thử lại việc sao lưu</string>
+    <string name="brbs_backup_dialog_failure_message" translatable="true">Không thể sao lưu. Thử lại chứ ?</string>
+    <string name="brbs_backup_dialog_failure_title" translatable="true">Sao lưu thất bại</string>
+    <string name="brbs_restore_dialog_positive" translatable="true">Khôi phục</string>
+    <string name="brbs_restore_dialog_message" translatable="true">Khôi phục các cài đặt ứng dụng, cài đặt mạng và nhật ký dns từ một tệp tin sao lưu. Việc này sẽ khởi động lại ứng dụng</string>
+    <string name="lbbs_configure" translatable="true">Tinh chỉnh</string>
+    <string name="lbbs_enabled" translatable="true">Cho phép</string>
+    <string name="dc_refresh_toast" translatable="true">Làm mới hoàn tất</string>
+    <string name="rethink_max_desc" translatable="true">Có hơn 50 vị trí, tính riêng tư cao hơn, và trình phân giải đệ quy chạy trên fly.io</string>
+    <string name="rethink_sky_desc" translatable="true">Có hơn 280 vị trí, độ ổn định/uptime cao hơn, và trình phân giải stub đang chạy trên cloudflare.com</string>
+    <string name="rt_dialog_title" translatable="true">Lưu các thay đổi</string>
 </resources>
