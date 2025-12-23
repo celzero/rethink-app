@@ -244,16 +244,20 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             b.catchAllRl.visibility = View.VISIBLE
             b.oneWgInfoTv.visibility = View.GONE
             b.hopBtn.visibility = View.VISIBLE
+            b.hopBtnX.visibility = View.VISIBLE
             b.mobileSsidSettingsCard.visibility = View.VISIBLE
         } else if (wgType.isOneWg()) {
             b.wgHeaderTv.text =
                 getString(R.string.rt_list_simple_btn_txt).replaceFirstChar(Char::titlecase)
             b.catchAllRl.visibility = View.GONE
             b.hopBtn.visibility = View.GONE
+            b.hopBtnX.visibility = View.GONE
             b.oneWgInfoTv.visibility = View.VISIBLE
             b.applicationsBtn.isEnabled = false
+            b.applicationsBtnX.isEnabled = false
             b.mobileSsidSettingsCard.visibility = View.GONE
             b.applicationsBtn.text = getString(R.string.one_wg_apps_added)
+            b.appsLabel.text = "All apps"
         } else {
             // invalid wireguard type, finish the activity
             finish()
@@ -503,6 +507,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 b.applicationsBtn.setTextColor(fetchColor(this, R.attr.accentGood))
             }
             b.applicationsBtn.text = getString(R.string.add_remove_apps, it.toString())
+            b.appsLabel.text = "Apps ($it)"
         }
     }
 
