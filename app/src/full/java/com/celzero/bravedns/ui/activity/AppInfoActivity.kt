@@ -146,6 +146,12 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 b.aadAppDetailName.text = appName(packages.count())
                 b.aadPkgName.text = appInfo.packageName
                 b.excludeProxySwitch.isChecked = appInfo.isProxyExcluded
+                
+                // Set temporary allow toggle state
+                val isTempAllowed = FirewallManager.isTempAllowed(appInfo.uid)
+                b.tempAllowSwitch.isChecked = isTempAllowed
+                updateTempAllowDescription(isTempAllowed, appInfo.tempAllowExpiryTime)
+                
                 displayDataUsage()
                 displayProxyStatus()
                 displayIcon(
@@ -477,6 +483,14 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             b.excludeProxySwitch.isChecked = !b.excludeProxySwitch.isChecked
         }
 
+        b.tempAllowSwitch.setOnCheckedChangeListener { _, isChecked ->
+            updateTempAllowStatus(isChecked)
+        }
+
+        b.tempAllowRl.setOnClickListener {
+            b.tempAllowSwitch.isChecked = !b.tempAllowSwitch.isChecked
+        }
+
         b.aadCloseConnsChip.setOnClickListener {
             if (!::appInfo.isInitialized) {
                 Logger.w(LOG_TAG_UI, "AppInfo not initialized yet in aadCloseConnsChip click listener, using uid: $uid")
@@ -495,6 +509,46 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 "proxy exclude change",
                 "Proxy exclude status changed for ${appInfo.appName} (${appInfo.uid}), new status: $isExcluded"
             )
+        }
+    }
+
+    private fun updateTempAllowStatus(isAllowed: Boolean) {
+        io {
+            if (isAllowed) {
+                FirewallManager.updateTempAllow(uid, true)
+                val expiryTime = System.currentTimeMillis() + (15 * 60 * 1000L)
+                uiCtx {
+                    updateTempAllowDescription(true, expiryTime)
+                }
+            } else {
+                FirewallManager.updateTempAllow(uid, false)
+                uiCtx {
+                    updateTempAllowDescription(false, 0)
+                }
+            }
+            logEvent(
+                "temp allow change",
+                "Temporary allow status changed for ${appInfo.appName} (${appInfo.uid}), new status: $isAllowed"
+            )
+        }
+    }
+
+    private fun updateTempAllowDescription(isAllowed: Boolean, expiryTime: Long) {
+        if (isAllowed && expiryTime > 0) {
+            val now = System.currentTimeMillis()
+            if (expiryTime > now) {
+                val relativeTime = DateUtils.getRelativeTimeSpanString(
+                    expiryTime,
+                    now,
+                    DateUtils.MINUTE_IN_MILLIS,
+                    DateUtils.FORMAT_ABBREV_RELATIVE
+                )
+                b.tempAllowDesc.text = getString(R.string.temp_allow_active, relativeTime)
+            } else {
+                b.tempAllowDesc.text = getString(R.string.temp_allow_desc)
+            }
+        } else {
+            b.tempAllowDesc.text = getString(R.string.temp_allow_desc)
         }
     }
 

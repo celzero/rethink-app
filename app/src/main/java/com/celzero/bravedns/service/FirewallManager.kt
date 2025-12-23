@@ -291,10 +291,14 @@ object FirewallManager : KoinComponent {
         @Volatile var foregroundUids: HashSet<Int> = HashSet()
 
         var appInfosLiveData: MutableLiveData<Collection<AppInfo>> = MutableLiveData()
+
+        // Temporary allow list with expiry times
+        @Volatile var tempAllowedUids: MutableMap<Int, Long> = mutableMapOf()
     }
 
     init {
         io { load() }
+        startTempAllowScheduler()
     }
 
     data class AppInfoTuple(val uid: Int, val packageName: String)
@@ -685,6 +689,89 @@ object FirewallManager : KoinComponent {
 
         invalidateFirewallStatus(uid, firewallStatus, connectionStatus)
         db.updateFirewallStatusByUid(uid, firewallStatus.id, connectionStatus.id)
+    }
+
+    suspend fun updateTempAllowStatus(uid: Int, durationMinutes: Int = 15) {
+        Logger.i(LOG_TAG_FIREWALL, "Apply temporary allow for uid: $uid for $durationMinutes minutes")
+
+        val expiryTime = System.currentTimeMillis() + (durationMinutes * 60 * 1000L)
+
+        // Store the previous firewall state in cache before applying temp allow
+        mutex.withLock {
+            GlobalVariable.tempAllowedUids[uid] = expiryTime
+        }
+
+        // Update database
+        db.updateTempAllowByUid(uid, true, expiryTime)
+
+        Logger.i(LOG_TAG_FIREWALL, "Temporary allow applied for uid: $uid, expires at: $expiryTime")
+    }
+
+    private suspend fun revertTempAllow(uid: Int) {
+        Logger.i(LOG_TAG_FIREWALL, "Reverting temporary allow for uid: $uid")
+
+        mutex.withLock {
+            GlobalVariable.tempAllowedUids.remove(uid)
+        }
+
+        // Clear temp allow from database
+        db.clearTempAllowByUid(uid)
+
+        Logger.i(LOG_TAG_FIREWALL, "Temporary allow reverted for uid: $uid, app is now blocked")
+    }
+
+    private fun startTempAllowScheduler() {
+        // Start a coroutine that checks every minute for expired temp allows
+        CoroutineScope(Dispatchers.IO).launch {
+            while (true) {
+                try {
+                    checkAndRevertExpiredTempAllows()
+                    kotlinx.coroutines.delay(60_000) // Check every minute
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_FIREWALL, "Error in temp allow scheduler: ${e.message}", e)
+                }
+            }
+        }
+    }
+
+    private suspend fun checkAndRevertExpiredTempAllows() {
+        val currentTime = System.currentTimeMillis()
+        val expiredUids = mutableListOf<Int>()
+
+        mutex.withLock {
+            GlobalVariable.tempAllowedUids.forEach { (uid, expiryTime) ->
+                if (currentTime >= expiryTime) {
+                    expiredUids.add(uid)
+                }
+            }
+        }
+
+        expiredUids.forEach { uid ->
+            revertTempAllow(uid)
+        }
+
+        if (expiredUids.isNotEmpty()) {
+            Logger.i(LOG_TAG_FIREWALL, "Reverted ${expiredUids.size} expired temporary allows")
+        }
+    }
+
+    suspend fun isTempAllowed(uid: Int): Boolean {
+        mutex.withLock {
+            val expiryTime = GlobalVariable.tempAllowedUids[uid]
+            if (expiryTime != null) {
+                return System.currentTimeMillis() < expiryTime
+            }
+        }
+        return false
+    }
+
+    suspend fun updateTempAllow(uid: Int, enabled: Boolean) {
+        if (enabled) {
+            updateTempAllowStatus(uid, 15) // 15 minutes default
+        } else {
+            // Clear temp allow
+            revertTempAllow(uid)
+        }
     }
 
     private suspend fun getAppInfos(): Collection<AppInfo> {

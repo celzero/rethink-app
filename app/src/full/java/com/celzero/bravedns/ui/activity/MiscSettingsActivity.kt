@@ -16,7 +16,6 @@
 package com.celzero.bravedns.ui.activity
 
 import Logger
-import Logger.LOG_TAG_APP_OPS
 import Logger.LOG_TAG_UI
 import Logger.LOG_TAG_VPN
 import Logger.updateConfigLevel
@@ -72,6 +71,7 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_REGENERATION_PERIOD_DAYS
+import com.celzero.bravedns.util.BubbleHelper
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Themes
@@ -107,6 +107,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     private val eventLogger by inject<EventLogger>()
 
     private lateinit var notificationPermissionResult: ActivityResultLauncher<String>
+    private lateinit var bubbleSettingsResult: ActivityResultLauncher<Intent>
 
     enum class BioMetricType(val action: Int, val mins: Long) {
         OFF(0, -1L),
@@ -242,11 +243,19 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             b.settingsBiometricRl.visibility = View.GONE
         }
 
+        if (isAtleastQ()) {
+            b.settingsFirewallBubbleRl.visibility = View.VISIBLE
+        } else {
+            b.settingsFirewallBubbleRl.visibility = View.GONE
+        }
+
         // Auto start app after reboot
         b.settingsActivityAutoStartSwitch.isChecked = persistentState.prefAutoStartBootUp
         b.dvIpInfoSwitch.isChecked = persistentState.downloadIpInfo
 
         b.tombstoneAppSwitch.isChecked = persistentState.tombstoneApps
+
+        b.settingsFirewallBubbleSwitch.isChecked = persistentState.firewallBubbleEnabled
 
         displayPcapUi()
         displayAppThemeUi()
@@ -635,6 +644,16 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             logEvent("Tombstone apps set to $isChecked")
         }
 
+        b.settingsFirewallBubbleRl.setOnClickListener {
+            b.settingsFirewallBubbleSwitch.isChecked = !b.settingsFirewallBubbleSwitch.isChecked
+        }
+
+        b.settingsFirewallBubbleSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isAtleastQ()) {
+                handleFirewallBubbleToggle(isChecked)
+            }
+        }
+
     }
 
     private fun handleFirebaseErrorReportingToggle(isChecked: Boolean) {
@@ -651,6 +670,49 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             persistentState.firebaseErrorReportingEnabled = false
         }
         logEvent("Firebase error reporting enabled set to $isChecked")
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun handleFirewallBubbleToggle(isChecked: Boolean) {
+        if (isChecked) {
+            // Enable bubble
+            persistentState.firewallBubbleEnabled = true
+
+            // Ensure channel/shortcut exist.
+            BubbleHelper.createBubbleNotificationChannel(this)
+            BubbleHelper.createBubbleShortcut(this)
+
+            // If not eligible, take user to the *channel* settings page where the
+            // "Allow bubbles" toggle is present. This avoids launching generic notification pages.
+            if (!BubbleHelper.isBubbleEligible(this)) {
+                try {
+                    val intent = Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS).apply {
+                        putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+                        putExtra(Settings.EXTRA_CHANNEL_ID, "firewall_bubble_channel_v2")
+                    }
+                    bubbleSettingsResult.launch(intent)
+                } catch (e: Exception) {
+                    Logger.w(LOG_TAG_UI, "err launching bubble channel settings: ${e.message}")
+                    // Last resort: open app notification settings
+                    invokeAndroidNotificationSetting()
+                }
+                logEvent("Firewall bubble enabled (needs user to allow bubbles)")
+                return
+            }
+
+            // Eligible: request bubble now.
+            BubbleHelper.showBubble(this)
+            logEvent("Firewall bubble enabled")
+        } else {
+            // Disable bubble - reset all bubble state for clean re-initialization
+            persistentState.firewallBubbleEnabled = false
+
+            // Reset bubble state (removes notification, channel, and shortcut)
+            // This ensures next time user enables it, permissions and setup are checked fresh
+            BubbleHelper.resetBubbleState(this)
+
+            logEvent("Firewall bubble disabled")
+        }
     }
 
     private fun showGoLoggerDialog() {
@@ -1047,12 +1109,19 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         super.onResume()
         // app notification permission android 13
         showEnableNotificationSettingIfNeeded()
+
+        // If user enabled bubble toggle, re-check eligibility after coming back from Settings.
+        if (isAtleastQ() && persistentState.firewallBubbleEnabled) {
+            try {
+                if (BubbleHelper.isBubbleEligible(this)) {
+                    BubbleHelper.showBubble(this)
+                }
+            } catch (_: Exception) {
+            }
+        }
     }
 
     private fun registerForActivityResult() {
-        // app notification permission android 13
-        if (!isAtleastT()) return
-
         // Sets up permissions request launcher.
         notificationPermissionResult =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) {
@@ -1068,6 +1137,23 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                     invokeAndroidNotificationSetting()
                 }
                 logEvent("Notification permission granted: $it")
+            }
+
+        // Launcher for bubble channel settings.
+        bubbleSettingsResult =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                // User may have toggled "Allow bubbles". Re-check and request bubble if eligible.
+                if (!isAtleastQ()) return@registerForActivityResult
+
+                if (!persistentState.firewallBubbleEnabled) return@registerForActivityResult
+
+                try {
+                    if (BubbleHelper.isBubbleEligible(this)) {
+                        BubbleHelper.showBubble(this)
+                    }
+                } catch (e: Exception) {
+                    Logger.w(LOG_TAG_UI, "err after bubble settings return: ${e.message}")
+                }
             }
     }
 

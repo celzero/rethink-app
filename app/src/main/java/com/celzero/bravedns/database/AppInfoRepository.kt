@@ -78,8 +78,33 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.getAllAppDetails()
     }
 
+    suspend fun getAppInfoByUid(uid: Int): AppInfo? {
+        return appInfoDAO.getAppInfoByUid(uid)
+    }
+
     suspend fun updateFirewallStatusByUid(uid: Int, firewallStatus: Int, connectionStatus: Int) {
         appInfoDAO.updateFirewallStatusByUid(uid, firewallStatus, connectionStatus, System.currentTimeMillis())
+    }
+
+    suspend fun updateTempAllowByUid(uid: Int, enabled: Boolean, expiryTime: Long) {
+        appInfoDAO.updateTempAllowByUid(uid, enabled, expiryTime, System.currentTimeMillis())
+    }
+
+    suspend fun getTempAllowedApps(): List<AppInfo> {
+        return appInfoDAO.getTempAllowedApps()
+    }
+
+    suspend fun getAllTempAllowedApps(now: Long): List<AppInfo> {
+        // Filter apps where tempAllowExpiryTime is greater than current time
+        return appInfoDAO.getTempAllowedApps().filter { it.tempAllowExpiryTime > now }
+    }
+
+    fun getAllTempAllowedAppsPaged(now: Long): androidx.paging.PagingSource<Int, AppInfo> {
+        return appInfoDAO.getTempAllowedAppsPaged(now)
+    }
+
+    suspend fun clearTempAllowByUid(uid: Int) {
+        appInfoDAO.clearTempAllowByUid(uid, System.currentTimeMillis())
     }
 
     fun cpUpdate(appInfo: AppInfo): Int {

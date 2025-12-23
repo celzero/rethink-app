@@ -35,6 +35,9 @@ interface AppInfoDAO {
     )
     fun updateFirewallStatusByUid(uid: Int, firewallStatus: Int, connectionStatus: Int, modifiedTs: Long)
 
+    @Query("update AppInfo set tempAllowEnabled = :enabled, tempAllowExpiryTime = :expiryTime, modifiedTs = :modifiedTs where uid = :uid")
+    fun updateTempAllowByUid(uid: Int, enabled: Boolean, expiryTime: Long, modifiedTs: Long)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(appInfo: AppInfo): Long
 
     @Query("update AppInfo set uid = :newUid, tombstoneTs = 0, modifiedTs = :modifiedTs where uid = :oldUid and packageName = :pkg")
@@ -42,6 +45,9 @@ interface AppInfoDAO {
 
     @Query("select * from AppInfo where uid = :uid and packageName = :pkg")
     fun isUidPkgExist(uid: Int, pkg: String): AppInfo?
+
+    @Query("select * from AppInfo where uid = :uid limit 1")
+    suspend fun getAppInfoByUid(uid: Int): AppInfo?
 
     @Delete fun delete(appInfo: AppInfo)
 
@@ -173,4 +179,13 @@ interface AppInfoDAO {
 
     @Query("update AppInfo set firewallStatus = 7 and connectionStatus = 3 where packageName = 'com.celzero.bravedns'")
     fun setRethinkToBypassDnsAndFirewall()
+
+    @Query("select * from AppInfo where tempAllowEnabled = 1 and tempAllowExpiryTime > 0")
+    suspend fun getTempAllowedApps(): List<AppInfo>
+
+    @Query("select * from AppInfo where tempAllowEnabled = 1 and tempAllowExpiryTime > :now ORDER BY tempAllowExpiryTime DESC")
+    fun getTempAllowedAppsPaged(now: Long): PagingSource<Int, AppInfo>
+
+    @Query("update AppInfo set tempAllowEnabled = 0, tempAllowExpiryTime = 0, modifiedTs = :modifiedTs where uid = :uid")
+    fun clearTempAllowByUid(uid: Int, modifiedTs: Long)
 }

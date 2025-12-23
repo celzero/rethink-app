@@ -221,4 +221,30 @@ interface ConnectionTrackerDAO {
 
     @Query("update ConnectionTracker set message = :reason, duration = 0 where uid in (:uids) and message = '' and uploadBytes = 0 and downloadBytes = 0 and synack = 0")
     fun closeConnectionForUids( uids: List<Int>, reason: String)
+
+    @Query(
+        "SELECT uid, MAX(timeStamp) AS lastBlocked, COUNT(*) AS count FROM ConnectionTracker WHERE isBlocked = 1 and timeStamp > :time GROUP BY uid ORDER BY lastBlocked DESC LIMIT 10"
+    )
+    suspend fun getRecentlyBlockedApps(time: Long): List<BlockedAppResult>
+
+    @Query(
+        "SELECT uid, MAX(timeStamp) AS lastBlocked, COUNT(*) AS count FROM ConnectionTracker WHERE isBlocked = 1 and timeStamp > :time GROUP BY uid ORDER BY lastBlocked DESC"
+    )
+    fun getRecentlyBlockedAppsPaged(time: Long): PagingSource<Int, BlockedAppResult>
+
+    @Query(
+        "SELECT * FROM ConnectionTracker WHERE isBlocked = 1 AND timeStamp >= :since ORDER BY timeStamp DESC"
+    )
+    suspend fun getBlockedConnectionsSince(since: Long): List<ConnectionTracker>
+
+    @Query(
+        "SELECT COUNT(*) FROM ConnectionTracker WHERE isBlocked = 1 AND timeStamp >= :since"
+    )
+    fun getBlockedConnectionsCountLiveData(since: Long): LiveData<Int>
 }
+
+data class BlockedAppResult(
+    val uid: Int,
+    val lastBlocked: Long,
+    val count: Int
+)

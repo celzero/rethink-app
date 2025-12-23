@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardUseCompatPadding="true"
+    app:strokeWidth="0.5dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="14dp">
+
+        <ImageView
+            android:id="@+id/allowed_app_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            tools:src="@drawable/ic_launcher_foreground"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <TextView
+            android:id="@+id/allowed_app_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textStyle="bold"
+            android:textColor="?attr/primaryTextColor"
+            tools:text="Chrome Browser"
+            app:layout_constraintStart_toEndOf="@id/allowed_app_icon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/allowed_remove_btn" />
+
+        <TextView
+            android:id="@+id/allowed_time_remaining"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginTop="2dp"
+            android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+            android:textColor="?attr/primaryLightColorText"
+            tools:text="12 mins remaining"
+            app:layout_constraintStart_toEndOf="@id/allowed_app_icon"
+            app:layout_constraintTop_toBottomOf="@id/allowed_app_name"
+            app:layout_constraintEnd_toStartOf="@id/allowed_remove_btn" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/allowed_remove_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="Remove"
+            android:textAllCaps="false"
+            android:textSize="12sp"
+            app:cornerRadius="18dp"
+            app:iconTint="?attr/accentGood"
+            android:textColor="?attr/accentGood"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>
