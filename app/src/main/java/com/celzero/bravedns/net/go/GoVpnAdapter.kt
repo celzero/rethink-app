@@ -52,6 +52,7 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.ui.activity.AntiCensorshipActivity
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
@@ -172,6 +173,8 @@ class GoVpnAdapter : KoinComponent {
         undelegatedDomains()
         setExperimentalSettings()
         setAutoDialsParallel()
+        setAutoMode()
+        registerSeProxyIfNeeded()
         // added for testing, use if needed
         if (DEBUG) panicAtRandom(persistentState.panicRandom) else panicAtRandom(false)
         Logger.v(LOG_TAG_VPN, "$TAG initResolverProxiesPcap done")
@@ -2452,6 +2455,55 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
+    suspend fun registerSeProxyIfNeeded() {
+        if (!persistentState.autoProxyEnabled) return
+
+        if (!tunnel.isConnected) {
+            Logger.e(LOG_TAG_PROXY, "$TAG no tunnel, skip register se proxy")
+            return
+        }
+        try {
+            val seProxy = tunnel.proxies.rpn().se()
+            if (seProxy != null) {
+                Logger.i(LOG_TAG_PROXY, "$TAG se proxy already registered")
+                return
+            }
+        } catch (_: Exception) {
+            Logger.i(LOG_TAG_PROXY, "$TAG se proxy not registered, fall through")
+        }
+        try {
+            Logger.i(LOG_TAG_PROXY, "$TAG start se proxy registration")
+            tunnel.proxies.rpn().registerSE().also {
+                Logger.i(LOG_TAG_PROXY, "$TAG se proxy registered: $it")
+            }
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG err register se proxy: ${e.message}", e)
+        }
+    }
+
+    suspend fun unregisterSeProxyIfNeeded() {
+        if (!tunnel.isConnected) {
+            Logger.e(LOG_TAG_PROXY, "$TAG no tunnel, skip unregister se proxy")
+            return
+        }
+        try {
+            val seProxy = tunnel.proxies.rpn().se()
+            if (seProxy == null) {
+                Logger.i(LOG_TAG_PROXY, "$TAG se proxy not registered, skip unregister")
+                return
+            }
+        } catch (_: Exception) {
+            Logger.i(LOG_TAG_PROXY, "$TAG se proxy not registered, skip unregister")
+            return
+        }
+        try {
+            val res = tunnel.proxies.rpn().unregisterSE()
+            Logger.i(LOG_TAG_PROXY, "$TAG unregister se proxy: $res")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG err unregister se proxy: ${e.message}", e)
+        }
+    }
+
     suspend fun setExperimentalSettings(value: Boolean = persistentState.nwEngExperimentalFeatures) {
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip set experimental settings")
@@ -2506,6 +2558,54 @@ class GoVpnAdapter : KoinComponent {
                 Severity.HIGH,
                 "Set auto dials parallel failed",
                 "Failed to set auto dials parallel to $value: ${e.message}"
+            )
+        }
+    }
+
+    suspend fun setAutoMode() {
+        if (!tunnel.isConnected) {
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip set auto mode")
+            logEvent(
+                Severity.CRITICAL,
+                "Set auto mode failed",
+                "Failed to set auto mode: no tunnel"
+            )
+            return
+        }
+        try {
+            val retryStrategy = AntiCensorshipActivity.RetryStrategies.fromInt(persistentState.retryStrategy)
+            if (retryStrategy == null) {
+                Logger.w(LOG_TAG_VPN, "$TAG invalid retry strategy: ${persistentState.retryStrategy}, no-op set auto mode")
+                return
+            }
+            val dialStrategy = AntiCensorshipActivity.DialStrategies.fromInt(persistentState.dialStrategy)
+
+            // proxy + none -> remote
+            // proxy + other retry -> hybrid
+            // all other dial strategies -> local
+            val mode = if (dialStrategy == AntiCensorshipActivity.DialStrategies.TCP_PROXY) {
+                if (retryStrategy == AntiCensorshipActivity.RetryStrategies.RETRY_NEVER) {
+                    Settings.AutoModeRemote
+                } else {
+                    Settings.AutoModeLocal
+                }
+            } else {
+                Settings.AutoModeLocal
+            }
+
+            Settings.setAutoMode(mode)
+            Logger.i(LOG_TAG_VPN, "$TAG set auto mode: $mode")
+            logEvent(
+                Severity.LOW,
+                "Set auto mode",
+                "Set auto mode to $mode"
+            )
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "$TAG err set auto mode: ${e.message}", e)
+            logEvent(
+                Severity.HIGH,
+                "Set auto mode failed",
+                "Failed to set auto mode: ${e.message}"
             )
         }
     }
