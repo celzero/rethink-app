@@ -82,6 +82,14 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val USE_MAX_MTU = "use_max_mtu"
         const val SET_VPN_BUILDER_TO_METERED = "set_vpn_builder_to_metered"
         const val PANIC_RANDOM = "panic_random"
+
+        // SE Proxy for Anti-Censorship
+        const val AUTO_PROXY_ENABLED = "auto_proxy_enabled"
+
+        // Custom LAN IP settings for VPN tunnel
+        const val CUSTOM_LAN_MODE_IPS_CHANGED = "custom_lan_mode_ip_changed"
+
+        const val FIREWALL_BUBBLE = "pref_firewall_bubble_enabled"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -298,6 +306,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // go logger level, default 3 -> info
     var goLoggerLevel by longPref("go_logger_level").withDefault<Long>(3)
+
+    // firewall bubble feature toggle
+    var firewallBubbleEnabled by booleanPref("pref_firewall_bubble_enabled").withDefault<Boolean>(false)
 
     // previous data usage check timestamp
     var prevDataUsageCheck by longPref("prev_data_usage_check").withDefault<Long>(INIT_TIME_MS)
@@ -663,4 +674,23 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
             }
         }.toSet()
     }
+
+    // SE Proxy for Anti-Censorship
+    var autoProxyEnabled by booleanPref(AUTO_PROXY_ENABLED).withDefault<Boolean>(false)
+
+    // Custom LAN IP configuration mode: 0 = AUTO (default), 1 = MANUAL
+    var customLanIpMode by booleanPref("custom_lan_ip_mode").withDefault<Boolean>(false)
+
+    // Custom LAN IPs. Store IP and prefix together as a single value (e.g., "10.111.222.1/24").
+    // Empty string means: use defaults.
+    var customLanGatewayIpv4 by stringPref("custom_lan_gateway_ipv4").withDefault<String>("10.111.222.1/24")
+    var customLanGatewayIpv6 by stringPref("custom_lan_gateway_ipv6").withDefault<String>("fd66:f83a:c650::1/120")
+
+    var customLanRouterIpv4 by stringPref("custom_lan_router_ipv4").withDefault<String>("10.111.222.2/32")
+    var customLanRouterIpv6 by stringPref("custom_lan_router_ipv6").withDefault<String>("fd66:f83a:c650::2/128")
+
+    var customLanDnsIpv4 by stringPref("custom_lan_dns_ipv4").withDefault<String>("10.111.222.3/32")
+    var customLanDnsIpv6 by stringPref("custom_lan_dns_ipv6").withDefault<String>("fd66:f83a:c650::3/128")
+
+    var customModeOrIpChanged by booleanPref("custom_lan_mode_ip_changed").withDefault<Boolean>(false)
 }
