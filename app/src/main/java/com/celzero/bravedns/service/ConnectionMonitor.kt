@@ -932,7 +932,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
         private val maxReachabilityCount = 3L
 
         companion object {
-            private const val DEFAULT_MTU = 1280 // same as BraveVpnService#VPN_INTERFACE_MTU
+            private const val DEFAULT_MTU = 1500 // same as BraveVpnService#VPN_INTERFACE_MTU
             private const val MIN_MTU = 1280
         }
 
@@ -1296,6 +1296,8 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             var minMtu6: Int = -1
             if (!isAtleastQ()) {
                 // If not at least Q, return MIN_MTU for safety
+                // on Q and below, the OS cannot reliably report or handle correct MTU values for
+                // VPN interfaces, and using a dynamic or larger MTU causes real packet breakage.
                 return MIN_MTU
             }
             if (useActiveNetwork) {
@@ -1329,11 +1331,11 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             }
             // If both are -1, return MIN_MTU explicitly
             if (minMtu4 <= 0 && minMtu6 <= 0) {
-                Logger.i(LOG_TAG_CONNECTION, "Both MTUs are invalid, using MIN_MTU: $MIN_MTU")
-                return MIN_MTU
+                Logger.i(LOG_TAG_CONNECTION, "Both MTUs are invalid, using MIN_MTU: $DEFAULT_MTU")
+                return DEFAULT_MTU
             }
             // set mtu to MIN_MTU (1280) if mtu4/mtu6 are less than MIN_MTU
-            val mtu = max(min(minMtu4.takeIf { it > 0 } ?: Int.MAX_VALUE, minMtu6.takeIf { it > 0 } ?: Int.MAX_VALUE), MIN_MTU)
+            val mtu = max(min(minMtu4.takeIf { it > 0 } ?: DEFAULT_MTU, minMtu6.takeIf { it > 0 } ?: DEFAULT_MTU), MIN_MTU)
             Logger.i(LOG_TAG_CONNECTION, "mtu4: $minMtu4, mtu6: $minMtu6; final mtu: $mtu")
             return mtu
         }
@@ -1364,8 +1366,8 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 if (mtu2 <= 0) mtu1 else min(mtu1, mtu2)
             } else {
                 if (mtu2 <= 0) {
-                    // both m1 and m2 are invalid, return MIN_MTU
-                    MIN_MTU
+                    // both m1 and m2 are invalid, return DEFAULT_MTU
+                    DEFAULT_MTU
                 } else {
                     // m1 is invalid, return m2
                     mtu2
