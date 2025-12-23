@@ -557,6 +557,35 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             }
         })
 
+        // Custom LAN IPs for VPN
+        b.settingsCustomLanIpHeading.text = getString(R.string.custom_lan_ip_title)
+        b.settingsCustomLanIpDesc.text = getString(R.string.custom_lan_ip_desc)
+        b.settingsCustomLanIpRl.setOnClickListener {
+            openCustomLanIpDialog()
+        }
+    }
+
+    private fun openCustomLanIpDialog() {
+        try {
+            var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
+            if (Themes.isFrostTheme(themeId)) {
+                themeId = R.style.App_Dialog_NoDim
+            }
+            val dialog = com.celzero.bravedns.ui.dialog.CustomLanIpDialog(
+                this,
+                persistentState,
+                themeId
+            )
+            dialog.setCanceledOnTouchOutside(true)
+            dialog.show()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "err opening CustomLanIpDialog: ${e.message}", e)
+            showToastUiCentered(
+                this,
+                getString(R.string.custom_lan_ip_open_error),
+                Toast.LENGTH_LONG
+            )
+        }
     }
 
     private fun showDefaultDnsDialog() {
