@@ -77,7 +77,6 @@ import com.celzero.bravedns.database.ConsoleLog
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.RefreshDatabase
-import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.receiver.NotificationActionReceiver
@@ -91,6 +90,7 @@ import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.ui.activity.MiscSettingsActivity
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.BackgroundAccessibilityService
+import com.celzero.bravedns.util.BubbleHelper
 import com.celzero.bravedns.util.CoFactory
 import com.celzero.bravedns.util.ConnectivityCheckHelper
 import com.celzero.bravedns.util.Constants
@@ -201,6 +201,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     private val dnsQueryDispatcher by lazy { Daemons.ioDispatcher("onQuery", DNSOpts(), vpnScope) }
     private val bind4Dispatcher by lazy { Daemons.ioDispatcher("bind4", Unit, vpnScope) }
     private val bind6Dispatcher by lazy { Daemons.ioDispatcher("bind6", Unit, vpnScope) }
+    private val protectDispatcher by lazy { Daemons.ioDispatcher("protect", Unit, vpnScope) }
     private val proxyAddedDispatcher by lazy { Daemons.ioDispatcher("proxyAdded", Unit, vpnScope) }
 
     // TODO: remove volatile
@@ -243,7 +244,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         private const val IPV6_TEMPLATE: String = "fd66:f83a:c650::%d"
         private const val IPV6_PREFIX_LENGTH: Int = 120
 
-        const val VPN_INTERFACE_MTU: Int = 1280
+        const val VPN_INTERFACE_MTU: Int = 1500
         // TODO: should be different for IPv4 and IPv6, but for now it is same
         // IPv4: 576, IPv6: 1280
         const val MIN_MTU: Int = 1280
@@ -298,6 +299,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     private lateinit var appInfoObserver: Observer<Collection<AppInfo>>
     private lateinit var orbotStartStatusObserver: Observer<Boolean>
     private lateinit var dnscryptRelayObserver: Observer<PersistentState.DnsCryptRelayDetails>
+    private lateinit var blockedConnsObserver: Observer<Int>
 
     private var rethinkUid: Int = INVALID_UID
 
@@ -566,12 +568,29 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         Logger.v(LOG_TAG_VPN, "socket protected")
     }
 
-    override fun protect(who: String?, fd: Long) {
+    override fun protect(who: String?, fd: Long) = go2kt(protectDispatcher) {
+        if (who == null) {
+            Logger.w(LOG_TAG_VPN, "protect: who is null, fd: $fd")
+            return@go2kt
+        }
+
         val rinr = persistentState.routeRethinkInRethink
         logd("protect: $who, fd: $fd, rinr? $rinr")
-        if (who != Backend.Exit && rinr) {
-            // when in rinr mode, only protect "Exit" as others must be looped back into the tunnel
-            return
+        if (rinr) {
+            val isRethinkBypassedFromProxy = FirewallManager.getAppInfoByUid(rethinkUid)?.isProxyExcluded ?: false
+            if (!isRethinkBypassedFromProxy) {
+                // let user set proxy proceed to protect & bind, as rethink is not bypassing proxies
+                if (!ProxyManager.isAnyUserSetProxy(who) && who != Backend.Exit) {
+                    // do not proceed if rethink is bypassed and proxyId(who) is not user-set proxy
+                    // or Exit, this includes Base or any other go related proxies
+                    Logger.vv(LOG_TAG_VPN, "protect: rinr, bypassed rethink, who: $who, fd: $fd")
+                    return@go2kt
+                }
+            } else if (who != Backend.Exit) {
+                // do not proceed if rethink within rethink is enabled and proxyId(who) is not exit
+                Logger.vv(LOG_TAG_VPN, "protect: rinr, within rethink, who: $who, fd: $fd")
+                return@go2kt
+            }
         }
         this.protect(fd.toInt())
     }
@@ -614,6 +633,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val uid = connInfo.uid
             val appStatus = FirewallManager.appStatus(uid)
             val connectionStatus = FirewallManager.connectionStatus(uid)
+            val isTempAllowed = FirewallManager.isTempAllowed(uid)
 
             if (allowOrbot(uid)) {
                 return FirewallRuleset.RULE9B
@@ -631,6 +651,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     logd("firewall($connId): new app blocked, $uid")
                     return FirewallRuleset.RULE1B
                 }
+            }
+
+            if (isTempAllowed) {
+                logd("firewall($connId): temp allowed, $uid")
+                return FirewallRuleset.RULE19
             }
 
             // check for app rules (unmetered, metered connections)
@@ -994,27 +1019,58 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     }
 
     private fun isVpnDns(ip: String): Boolean {
-        val fakeDnsIpv4: String = LanIp.DNS.make(IPV4_TEMPLATE)
-        val fakeDnsIpv6: String = LanIp.DNS.make(IPV6_TEMPLATE)
-        return when (persistentState.internetProtocolType) {
-            InternetProtocol.IPv4.id -> {
-                ip == fakeDnsIpv4
-            }
+        val isCustomLanIp = persistentState.customLanIpMode
+        if (isCustomLanIp) {
+            val customDnsIp4 = persistentState.customLanDnsIpv4
+            val customDnsIp6 = persistentState.customLanDnsIpv6
+            val ipv4Parts = customDnsIp4.split("/").firstOrNull() ?: ""
+            val ipv6Parts = customDnsIp6.split("/").firstOrNull() ?: ""
+            val ipv4 = HostName(ipv4Parts).toString()
+            val ipv6 = HostName(ipv6Parts).toString()
+            return when (persistentState.internetProtocolType) {
+                InternetProtocol.IPv4.id -> {
+                    ip == ipv4
+                }
 
-            InternetProtocol.IPv6.id -> {
-                ip == fakeDnsIpv6
-            }
+                InternetProtocol.IPv6.id -> {
+                    false
+                }
 
-            InternetProtocol.IPv46.id -> {
-                ip == fakeDnsIpv4 || ip == fakeDnsIpv6
-            }
+                InternetProtocol.IPv46.id -> {
+                    ip == ipv4 || ip == ipv6
+                }
 
-            InternetProtocol.ALWAYSv46.id -> {
-                ip == fakeDnsIpv4 || ip == fakeDnsIpv6
-            }
+                InternetProtocol.ALWAYSv46.id -> {
+                    ip == ipv4 || ip == ipv6
+                }
 
-            else -> {
-                ip == fakeDnsIpv4
+                else -> {
+                    ip == ipv4
+                }
+            }
+        } else {
+            val fakeDnsIpv4: String = LanIp.DNS.make(IPV4_TEMPLATE)
+            val fakeDnsIpv6: String = LanIp.DNS.make(IPV6_TEMPLATE)
+            return when (persistentState.internetProtocolType) {
+                InternetProtocol.IPv4.id -> {
+                    ip == fakeDnsIpv4
+                }
+
+                InternetProtocol.IPv6.id -> {
+                    ip == fakeDnsIpv6
+                }
+
+                InternetProtocol.IPv46.id -> {
+                    ip == fakeDnsIpv4 || ip == fakeDnsIpv6
+                }
+
+                InternetProtocol.ALWAYSv46.id -> {
+                    ip == fakeDnsIpv4 || ip == fakeDnsIpv6
+                }
+
+                else -> {
+                    ip == fakeDnsIpv4
+                }
             }
         }
     }
@@ -1468,6 +1524,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         connTracer = ConnectionTracer(this)
         VpnController.onVpnCreated(this)
 
+        // Temp-allow expiry scheduling is only relevant when VPN is active.
+        FirewallManager.initTempAllowScheduler(this)
+
         io("nlt") {
             Log.d(LOG_BATCH_LOGGER, "vpn: restart $vpnScope")
             netLogTracker.restart(vpnScope)
@@ -1484,7 +1543,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             registerAccessibilityServiceState()
         }
         registerUserPresentReceiver()
+        if (isAtleastQ()) {
+            handleFirewallBubbleIfNeeded()
+        }
     }
+
 
     private fun registerUserPresentReceiver() {
         val filter = IntentFilter().apply {
@@ -1503,7 +1566,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         }
     }
 
-    private fun observeChanges() {
+    private suspend fun observeChanges() {
         appInfoObserver = makeAppInfoObserver()
         FirewallManager.getApplistObserver().observeForever(appInfoObserver)
         persistentState.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
@@ -2417,6 +2480,31 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     }
                 }
             }
+            PersistentState.AUTO_PROXY_ENABLED -> {
+                io("seProxyEnabled") {
+                    if (persistentState.autoProxyEnabled) {
+                        vpnAdapter?.registerSeProxyIfNeeded()
+                    } else {
+                        vpnAdapter?.unregisterSeProxyIfNeeded()
+                    }
+                }
+            }
+            PersistentState.CUSTOM_LAN_MODE_IPS_CHANGED -> {
+                if (persistentState.customModeOrIpChanged) {
+                    io("customIpsChanged") {
+                        val reason = "customIpsChanged: ${System.currentTimeMillis()}"
+                        vpnRestartTrigger.value = reason
+                    }
+                } else {
+                    // no-op
+                }
+            }
+
+            PersistentState.FIREWALL_BUBBLE -> {
+                if (isAtleastQ()) {
+                    handleFirewallBubbleIfNeeded()
+                }
+            }
         }
     }
 
@@ -2436,6 +2524,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             "set dial strategy: ${persistentState.dialStrategy}, retry: ${persistentState.retryStrategy}, tcpKeepAlive: ${persistentState.tcpKeepAlive}, timeout: ${persistentState.dialTimeoutSec}"
         )
         vpnAdapter?.setDialStrategy()
+        vpnAdapter?.setAutoMode()
     }
 
     private suspend fun setAutoDialsParallel() {
@@ -3322,6 +3411,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     }
 
     override fun onDestroy() {
+        if (persistentState.firewallBubbleEnabled) {
+            BubbleHelper.dismissBubble(this)
+        }
+
         try {
             unregisterAccessibilityServiceState()
             orbotHelper.unregisterReceiver()
@@ -3775,9 +3868,30 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             } catch (ex: UnknownHostException) {
                 Logger.e(LOG_TAG_VPN, "addRoute4: ${ex.message}", ex)
             }
-            b.addRoute(LanIp.GATEWAY.make(IPV4_TEMPLATE), 32)
-            b.addRoute(LanIp.DNS.make(IPV4_TEMPLATE), 32)
-            b.addRoute(LanIp.ROUTER.make(IPV4_TEMPLATE), 32)
+            if (persistentState.customLanIpMode) {
+                // gateway
+                val gatewayIp4 = persistentState.customLanGatewayIpv4
+                val ipParts = gatewayIp4.split("/")
+                val gwIp4 = ipParts[0]
+                val prefixGwIp4 = ipParts[1].toIntOrNull() ?: 32
+                b.addRoute(HostName(gwIp4).toString(), prefixGwIp4)
+                // dns
+                val customDns4 = persistentState.customLanDnsIpv4
+                val dnsIpParts = customDns4.split("/")
+                val dnsIp4 = dnsIpParts[0]
+                val prefixDnsIp4 = dnsIpParts[1].toIntOrNull() ?: 32
+                b.addRoute(HostName(dnsIp4).toString(), prefixDnsIp4)
+                // router
+                val router4 = persistentState.customLanRouterIpv4
+                val routerIpParts = router4.split("/")
+                val routerIp4 = routerIpParts[0]
+                val prefixRouterIp4 = routerIpParts[1].toIntOrNull() ?: 32
+                b.addRoute(HostName(routerIp4).toString(), prefixRouterIp4)
+            } else {
+                b.addRoute(LanIp.GATEWAY.make(IPV4_TEMPLATE), 32)
+                b.addRoute(LanIp.DNS.make(IPV4_TEMPLATE), 32)
+                b.addRoute(LanIp.ROUTER.make(IPV4_TEMPLATE), 32)
+            }
         } else {
             Logger.i(LOG_TAG_VPN, "addRoute4: privateIps is false, adding default route")
             // no need to exclude LAN traffic, add default route which is 0.0.0.0/0
@@ -3788,42 +3902,117 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     }
 
     private fun addIfAddress4(b: Builder): Builder {
-        b.addAddress(LanIp.GATEWAY.make(IPV4_TEMPLATE), IPV4_PREFIX_LENGTH)
+        val isCustomGateway = persistentState.customLanIpMode
+        if (isCustomGateway) {
+            val customIp = persistentState.customLanGatewayIpv4
+            Logger.i(LOG_TAG_VPN, "addIfAddress4: using custom gateway ip: $customIp")
+            // split the address and prefix length "$ip/$prefix"
+            val ip4Parts = customIp.split("/")
+            val ip4 = HostName(ip4Parts[0]).toString()
+            b.addAddress(ip4, ip4Parts[1].toIntOrNull() ?: IPV4_PREFIX_LENGTH)
+        } else {
+            b.addAddress(LanIp.GATEWAY.make(IPV4_TEMPLATE), IPV4_PREFIX_LENGTH)
+        }
         return b
     }
 
     private fun addIfAddress6(b: Builder): Builder {
-        b.addAddress(LanIp.GATEWAY.make(IPV6_TEMPLATE), IPV6_PREFIX_LENGTH)
+        val isCustomGateway = persistentState.customLanIpMode
+        if (isCustomGateway) {
+            val customIp = persistentState.customLanGatewayIpv6
+            Logger.i(LOG_TAG_VPN, "addIfAddress6: using custom gateway ip: $customIp")
+            // split the address and prefix length "$ip/$prefix"
+            val ipParts = customIp.split("/")
+            val ip6 = HostName(ipParts[0]).toString()
+            b.addAddress(ip6, ipParts[1].toIntOrNull() ?: IPV6_PREFIX_LENGTH)
+        } else {
+            b.addAddress(LanIp.GATEWAY.make(IPV6_TEMPLATE), IPV6_PREFIX_LENGTH)
+        }
         return b
     }
 
     private fun addDnsServer4(b: Builder): Builder {
-        b.addDnsServer(LanIp.DNS.make(IPV4_TEMPLATE))
+        val isCustomLanDns = persistentState.customLanIpMode
+        if (isCustomLanDns) {
+            val customDns = persistentState.customLanDnsIpv4
+            Logger.i(LOG_TAG_VPN, "addDnsServer4: using custom dns ip: $customDns")
+            val dnsIp = customDns.split("/")
+            val dns = HostName(dnsIp[0]).toString()
+            b.addDnsServer(dns)
+        } else {
+            b.addDnsServer(LanIp.DNS.make(IPV4_TEMPLATE))
+        }
         return b
     }
 
     private fun addDnsServer6(b: Builder): Builder {
-        b.addDnsServer(LanIp.DNS.make(IPV6_TEMPLATE))
+        val isCustomLanDns = persistentState.customLanIpMode
+        if (isCustomLanDns) {
+            val customDns = persistentState.customLanDnsIpv6
+            Logger.i(LOG_TAG_VPN, "addDnsServer6: using custom dns ip: $customDns")
+            val dnsIp = customDns.split("/")
+            val dns = HostName(dnsIp[0]).toString()
+            b.addDnsServer(dns)
+        } else {
+            b.addDnsServer(LanIp.DNS.make(IPV6_TEMPLATE))
+        }
         return b
     }
 
     private fun addDnsRoute4(b: Builder): Builder {
-        b.addRoute(LanIp.DNS.make(IPV4_TEMPLATE), 32)
+        val isCustomLanDns = persistentState.customLanIpMode
+        if (isCustomLanDns) {
+            val customDns = persistentState.customLanDnsIpv4
+            Logger.i(LOG_TAG_VPN, "addDnsRoute4: using custom dns ip: $customDns")
+            val ipParts = customDns.split("/")
+            val ip = HostName(ipParts[0]).toString()
+            b.addRoute(ip, ipParts[1].toIntOrNull() ?: 32)
+        } else {
+            b.addRoute(LanIp.DNS.make(IPV4_TEMPLATE), 32)
+        }
         return b
     }
 
     // builder.addRoute() when the app is in DNS only mode
     private fun addDnsRoute6(b: Builder): Builder {
-        b.addRoute(LanIp.DNS.make(IPV6_TEMPLATE), 128)
+        val isCustomLanDns = persistentState.customLanIpMode
+        if (isCustomLanDns) {
+            val customDns = persistentState.customLanDnsIpv6
+            Logger.i(LOG_TAG_VPN, "addDnsRoute6: using custom dns ip: $customDns")
+            val ipParts = customDns.split("/")
+            val ip = HostName(ipParts[0]).toString()
+            b.addRoute(ip, ipParts[1].toIntOrNull() ?: 128)
+        } else {
+            b.addRoute(LanIp.DNS.make(IPV6_TEMPLATE), 128)
+        }
         return b
     }
 
     private fun getFakeDns(): String {
-        val ipv4 = LanIp.DNS.make(IPV4_TEMPLATE, KnownPorts.DNS_PORT)
-        val ipv6 = LanIp.DNS.make(IPV6_TEMPLATE, KnownPorts.DNS_PORT)
-        // now fakedns will be only set during first time vpn is started, so set both ipv4 and ipv6
-        // addresses, so that if the network changes doesn't affect
-        return "$ipv4,$ipv6"
+        val isCustomLanDns = persistentState.customLanIpMode
+        if (isCustomLanDns) {
+            val customDnsV4 = persistentState.customLanDnsIpv4
+            val customDnsV6 = persistentState.customLanDnsIpv6
+            Logger.i(
+                LOG_TAG_VPN,
+                "getFakeDns: using custom dns ips: v4: $customDnsV4, v6: $customDnsV6"
+            )
+            val ipv4 = customDnsV4.split(",") .joinToString(",") {
+                val ipParts = it.split("/")
+                HostName(IPAddressString(ipParts[0]).address, KnownPorts.DNS_PORT).toString()
+            }
+            val ipv6 = customDnsV6.split(",") .joinToString(",") {
+                val ipParts = it.split("/")
+                HostName(IPAddressString(ipParts[0]).address, KnownPorts.DNS_PORT).toString()
+            }
+            return "$ipv4,$ipv6"
+        } else {
+            val ipv4 = LanIp.DNS.make(IPV4_TEMPLATE, KnownPorts.DNS_PORT)
+            val ipv6 = LanIp.DNS.make(IPV6_TEMPLATE, KnownPorts.DNS_PORT)
+            // now fakedns will be only set during first time vpn is started, so set both ipv4 and ipv6
+            // addresses, so that if the network changes doesn't affect
+            return "$ipv4,$ipv6"
+        }
         /*return if (route4() && route6()) {
             "$ipv4,$ipv6"
         } else if (route6()) {
@@ -3834,9 +4023,26 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     }
 
     private fun getAddresses(): String {
-        val ipv4 = IPAddressString("${LanIp.GATEWAY.make(IPV4_TEMPLATE)}/$IPV4_PREFIX_LENGTH")
-        val ipv6 = IPAddressString("${LanIp.GATEWAY.make(IPV6_TEMPLATE)}/$IPV6_PREFIX_LENGTH")
-        return "${ipv4.address.toNormalizedString()},${ipv6.address.toNormalizedString()}"
+        val isCustomLanIp = persistentState.customLanIpMode
+        if (isCustomLanIp) {
+            val customGatewayV4 = persistentState.customLanGatewayIpv4
+            val customGatewayV6 = persistentState.customLanGatewayIpv6
+            Logger.i(
+                LOG_TAG_VPN,
+                "getAddresses: using custom gateway ips: v4: $customGatewayV4, v6: $customGatewayV6"
+            )
+            val ip4Parts = customGatewayV4.split("/")
+            val prefix4 = ip4Parts[1].toIntOrNull() ?: IPV4_PREFIX_LENGTH
+            val ipv4 = IPAddressString("${ip4Parts[0]}/$prefix4").address.toNormalizedString()
+            val ip6Parts = customGatewayV6.split("/")
+            val prefix6 = ip6Parts[1].toIntOrNull() ?: IPV6_PREFIX_LENGTH
+            val ipv6 = IPAddressString("${ip6Parts[0]}/$prefix6").address.toNormalizedString()
+            return "$ipv4,$ipv6"
+        } else {
+            val ipv4 = IPAddressString("${LanIp.GATEWAY.make(IPV4_TEMPLATE)}/$IPV4_PREFIX_LENGTH")
+            val ipv6 = IPAddressString("${LanIp.GATEWAY.make(IPV6_TEMPLATE)}/$IPV6_PREFIX_LENGTH")
+            return "${ipv4.address.toNormalizedString()},${ipv6.address.toNormalizedString()}"
+        }
     }
 
     private fun <T> go2kt(co: CoFactory<T>, f: suspend() -> T): T = runBlocking {
@@ -4723,7 +4929,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         possibleDomains: Gostr?,
         blocklists: Gostr?
     ): Mark = go2kt(flowDispatcher) {
-        logd("flow: $_uid, $src, $dst, $realIps, $d, $blocklists, $d")
+        logd("flow: $_uid, $src, $dst, $realIps, $d, $blocklists")
         handleVpnLockdownStateAsync()
 
         // in case of double loopback, all traffic will be part of rinr instead of just rethink's
@@ -4847,7 +5053,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     synchronized(activeCids) {
                         activeCids.add(key)
                     }
-                    Backend.Exit
+                    if (persistentState.autoProxyEnabled) {
+                        Backend.Auto
+                    } else {
+                        Backend.Exit
+                    }
                 }
 
             return@go2kt persistAndConstructFlowResponse(cm, proxy, connId, uid)
@@ -5086,14 +5296,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 // marked with Backend.Base will be handled (proxied) by vpnAdapter's dns-transport
                 Backend.Base
             } else {
-                Backend.Exit
+                if (persistentState.autoProxyEnabled) Backend.Auto else Backend.Exit
             }
 
         // override baseOrExit to Exit if rinr is true and the app is rethink because using
         // base will cause rethink's traffic to be reroute to vpn again
         // treat it as special case, also remove if this is handled in go side
         baseOrExit = if (rinr && connTracker.uid == rethinkUid) {
-            Backend.Exit
+            if (persistentState.autoProxyEnabled) Backend.Auto else Backend.Exit
         } else {
             baseOrExit
         }
@@ -5101,8 +5311,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val uid = connTracker.uid
 
         if (connTracker.uid == rethinkUid && !rinr) {
-            logd("flow/inflow: Ipn.Exit for rethink, $uid, $connId")
-            return persistAndConstructFlowResponse(connTracker, Backend.Exit, connId, uid)
+            val pid = if (persistentState.autoProxyEnabled) Backend.Auto else Backend.Exit
+            logd("flow/inflow: $pid for rethink, $uid, $connId")
+            return persistAndConstructFlowResponse(connTracker, pid, connId, uid)
         }
 
         if (FirewallManager.isAppExcludedFromProxy(uid)) {
@@ -5147,8 +5358,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val endpoint = appConfig.getConnectedOrbotProxy()
             val packageName = FirewallManager.getPackageNameByUid(uid)
             if (endpoint?.proxyAppName == packageName) {
-                logd("flow/inflow: orbot exit for $packageName, $connId, $uid")
-                return persistAndConstructFlowResponse(connTracker, Backend.Exit, connId, uid)
+                val pid = if (persistentState.autoProxyEnabled) Backend.Auto else Backend.Exit
+                logd("flow/inflow: orbot $pid for $packageName, $connId, $uid")
+                return persistAndConstructFlowResponse(connTracker, pid, connId, uid)
             }
 
             val activeId = ProxyManager.getProxyIdForApp(uid)
@@ -5176,8 +5388,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             logd("flow/inflow: socks5 proxy is enabled, $packageName, ${endpoint?.proxyAppName}")
             // do not block the app if the app is set to forward the traffic via socks5 proxy
             if (endpoint?.proxyAppName == packageName) {
-                logd("flow/inflow: socks5 exit for $packageName, $connId, $uid")
-                return persistAndConstructFlowResponse(connTracker, Backend.Exit, connId, uid)
+                val pid = if (persistentState.autoProxyEnabled) Backend.Auto else Backend.Exit
+                logd("flow/inflow: socks5 $pid for $packageName, $connId, $uid")
+                return persistAndConstructFlowResponse(connTracker, pid, connId, uid)
             }
 
             logd("flow/inflow: socks5 proxy for $connId, $uid")
@@ -5197,8 +5410,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val packageName = FirewallManager.getPackageNameByUid(uid)
             // do not block the app if the app is set to forward the traffic via http proxy
             if (endpoint?.proxyAppName == packageName) {
-                logd("flow/inflow: http exit for $packageName, $connId, $uid")
-                return persistAndConstructFlowResponse(connTracker, Backend.Exit, connId, uid)
+                val pid = if (persistentState.autoProxyEnabled) Backend.Auto else Backend.Exit
+                logd("flow/inflow: http $pid for $packageName, $connId, $uid")
+                return persistAndConstructFlowResponse(connTracker, pid, connId, uid)
             }
             logd("flow/inflow: http proxy for $connId, $uid")
             return persistAndConstructFlowResponse(
@@ -5214,8 +5428,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val packageName = FirewallManager.getPackageNameByUid(uid)
             // do not block the app if the app is set to forward the traffic via dns proxy
             if (endpoint?.proxyAppName == packageName) {
-                logd("flow/inflow: dns proxy enabled for $packageName, return exit, $connId, $uid")
-                return persistAndConstructFlowResponse(connTracker, Backend.Exit, connId, uid)
+                val pid = if (persistentState.autoProxyEnabled) Backend.Auto else Backend.Exit
+                logd("flow/inflow: dns proxy enabled for $packageName, return $pid, $connId, $uid")
+                return persistAndConstructFlowResponse(connTracker, pid, connId, uid)
             }
         }
 
@@ -5759,4 +5974,88 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         stopVpnAdapter()
         return super.onUnbind(intent)
     }*/
+
+    @RequiresApi(VERSION_CODES.Q)
+    private fun handleFirewallBubbleIfNeeded() {
+        if (!persistentState.firewallBubbleEnabled) {
+            Logger.w(TAG, "Bubble disabled by user")
+            unobserveBubbleBlockedConns()
+            BubbleHelper.dismissBubble(this)
+            return
+        }
+
+        initializeBubble()
+    }
+
+    private fun unobserveBubbleBlockedConns() {
+        if (this::blockedConnsObserver.isInitialized) {
+            connTrackRepository.getBlockedConnectionsCountLiveData().removeObserver(blockedConnsObserver)
+        }
+        lastBlockedCount = -1
+        Logger.i(TAG, "Bubble observer removed")
+    }
+
+    @RequiresApi(VERSION_CODES.Q)
+    private fun initializeBubble() {
+        try {
+            // Request bubble. Bubbles are always backed by a notification, but we suppress the
+            // shade entry via BubbleMetadata#setSuppressNotification(true).
+            val eligible = BubbleHelper.showBubble(this, persistentState)
+            Logger.i(TAG, "Bubble notification posted (eligible=$eligible)")
+
+            // If not eligible, do not install observers / update loops.
+            // Do not post any fallback notification (bubble-only UX).
+            if (!eligible) {
+                unobserveBubbleBlockedConns()
+                return
+            }
+
+            blockedConnsObserver = makeFirewallBlockedConnsObserver()
+            connTrackRepository.getBlockedConnectionsCountLiveData().observeForever(blockedConnsObserver)
+        } catch (e: Exception) {
+            Logger.e(TAG, "Bubble init failed: ${e.message}", e)
+            stopSelf()
+        }
+    }
+    private var lastBlockedCount = -1
+    @RequiresApi(VERSION_CODES.Q)
+    private fun makeFirewallBlockedConnsObserver(): Observer<Int> {
+        return Observer { t ->
+            // If user disabled bubble (or it was auto-disabled), stop observing.
+            if (!persistentState.firewallBubbleEnabled) {
+                try {
+                    BubbleHelper.dismissBubble(this)
+                    removeBubbleObserver()
+                } catch (e: Exception) {
+                    Logger.w(TAG, "err stopping bubble observer: ${e.message}")
+                }
+                return@Observer
+            }
+
+            if (t != lastBlockedCount) {
+                // Pass persistentState so it can be disabled if bubbles are not allowed
+                BubbleHelper.updateBubble(this, t, persistentState)
+                lastBlockedCount = t
+                Logger.d(TAG, "Bubble updated: $t blocked")
+
+                // updateBubble can flip the toggle off (permission revoked). If that happened,
+                // stop observing and clean up.
+                if (!persistentState.firewallBubbleEnabled) {
+                    BubbleHelper.dismissBubble(this)
+                    removeBubbleObserver()
+                }
+            }
+        }
+    }
+
+    @RequiresApi(VERSION_CODES.Q)
+    private fun removeBubbleObserver() {
+        if (this::blockedConnsObserver.isInitialized) {
+            connTrackRepository.getBlockedConnectionsCountLiveData().removeObserver(blockedConnsObserver)
+        }
+        lastBlockedCount = -1
+        Logger.i(TAG, "Bubble observer removed")
+    }
+
+
 }
