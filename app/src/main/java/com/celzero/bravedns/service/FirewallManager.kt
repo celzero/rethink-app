@@ -26,34 +26,43 @@ import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoRepository
-import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
 import com.celzero.bravedns.service.FirewallManager.GlobalVariable.appInfos
 import com.celzero.bravedns.service.FirewallManager.GlobalVariable.appInfosLiveData
 import com.celzero.bravedns.service.FirewallManager.GlobalVariable.foregroundUids
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_PACKAGE
 import com.celzero.bravedns.util.OrbotHelper
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
+import com.google.common.cache.RemovalCause
+import com.google.common.cache.RemovalListener
 import com.google.common.collect.HashMultimap
-import com.google.common.collect.ImmutableList
 import com.google.common.collect.Multimap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 object FirewallManager : KoinComponent {
 
     private val db by inject<AppInfoRepository>()
     private val persistentState by inject<PersistentState>()
+
     private val mutex = Mutex()
 
     const val NOTIF_CHANNEL_ID_FIREWALL_ALERTS = "Firewall_Alerts"
 
     // max time to keep the tombstone entry in the database
     const val TOMBSTONE_EXPIRY_TIME_MS = 7 * 24 * 60 * 60 * 1000L // 7 days
+
+    const val TEMP_ALLOW_DEFAULT_MINUTES = 15 // 15 minutes
 
     // androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/android/os/UserHandle.java
     private const val PER_USER_RANGE = 100000
@@ -88,20 +97,34 @@ object FirewallManager : KoinComponent {
 
         companion object {
 
+            private const val LABEL_INDEX_NONE_0 = 0
+            private const val LABEL_INDEX_NONE_1 = 1
+            private const val LABEL_INDEX_NONE_2 = 2
+            private const val LABEL_INDEX_NONE_3 = 3
+            private const val LABEL_INDEX_ISOLATE = 4
+            private const val LABEL_INDEX_BYPASS_DNS_FIREWALL = 5
+            private const val LABEL_INDEX_BYPASS_UNIVERSAL = 6
+            private const val LABEL_INDEX_EXCLUDE = 7
+
+
             fun getStatus(id: Int): FirewallStatus {
                 return when (id) {
                     BYPASS_UNIVERSAL.id -> {
                         BYPASS_UNIVERSAL
                     }
+
                     EXCLUDE.id -> {
                         EXCLUDE
                     }
+
                     ISOLATE.id -> {
                         ISOLATE
                     }
+
                     BYPASS_DNS_FIREWALL.id -> {
                         BYPASS_DNS_FIREWALL
                     }
+
                     else -> {
                         NONE
                     }
@@ -110,30 +133,38 @@ object FirewallManager : KoinComponent {
 
             fun getStatusByLabel(id: Int): FirewallStatus {
                 return when (id) {
-                    0 -> {
+                    LABEL_INDEX_NONE_0 -> {
                         NONE
                     }
-                    1 -> {
+
+                    LABEL_INDEX_NONE_1 -> {
                         NONE
                     }
-                    2 -> {
+
+                    LABEL_INDEX_NONE_2 -> {
                         NONE
                     }
-                    3 -> {
+
+                    LABEL_INDEX_NONE_3 -> {
                         NONE
                     }
-                    4 -> {
+
+                    LABEL_INDEX_ISOLATE -> {
                         ISOLATE
                     }
-                    5 -> {
+
+                    LABEL_INDEX_BYPASS_DNS_FIREWALL -> {
                         BYPASS_DNS_FIREWALL
                     }
-                    6 -> {
+
+                    LABEL_INDEX_BYPASS_UNIVERSAL -> {
                         BYPASS_UNIVERSAL
                     }
-                    7 -> {
+
+                    LABEL_INDEX_EXCLUDE -> {
                         EXCLUDE
                     }
+
                     else -> {
                         NONE
                     }
@@ -186,20 +217,32 @@ object FirewallManager : KoinComponent {
         }
 
         companion object {
+
+            private const val LABEL_INDEX_ALLOW = 0
+            private const val LABEL_INDEX_BOTH = 1
+            private const val LABEL_INDEX_UNMETERED = 2
+            private const val LABEL_INDEX_METERED = 3
+            private const val LABEL_INDEX_ALLOW_4 = 4
+            private const val LABEL_INDEX_ALLOW_5 = 5
+
             fun getStatus(id: Int): ConnectionStatus {
                 return when (id) {
                     BOTH.id -> {
                         BOTH
                     }
+
                     UNMETERED.id -> {
                         UNMETERED
                     }
+
                     METERED.id -> {
                         METERED
                     }
+
                     ALLOW.id -> {
                         ALLOW
                     }
+
                     else -> {
                         ALLOW
                     }
@@ -208,24 +251,30 @@ object FirewallManager : KoinComponent {
 
             fun getStatusByLabel(id: Int): ConnectionStatus {
                 return when (id) {
-                    0 -> {
+                    LABEL_INDEX_ALLOW -> {
                         ALLOW
                     }
-                    1 -> {
+
+                    LABEL_INDEX_BOTH -> {
                         BOTH
                     }
-                    2 -> {
+
+                    LABEL_INDEX_UNMETERED -> {
                         UNMETERED
                     }
-                    3 -> {
+
+                    LABEL_INDEX_METERED -> {
                         METERED
                     }
-                    4 -> {
+
+                    LABEL_INDEX_ALLOW_4 -> {
                         ALLOW
                     }
-                    5 -> {
+
+                    LABEL_INDEX_ALLOW_5 -> {
                         ALLOW
                     }
+
                     else -> {
                         ALLOW
                     }
@@ -251,13 +300,99 @@ object FirewallManager : KoinComponent {
         @Volatile var foregroundUids: HashSet<Int> = HashSet()
 
         var appInfosLiveData: MutableLiveData<Collection<AppInfo>> = MutableLiveData()
+
+        // TEMP ALLOW: keep the source-of-truth in DB; in-memory cache is only for fast checks.
+        // Note: Do not use this map anymore. Kept for backward binary compatibility; may be removed later.
+        @Deprecated("Use tempAllowCache")
+        @Suppress("unused")
+        @Volatile var tempAllowedUids: MutableMap<Int, Long> = mutableMapOf()
     }
+
+    // ---- Temp Allow (15 min) cache + DB (source of truth) ----
+
+    private val tempAllowDbExecutor: Executor = Executors.newSingleThreadExecutor { r ->
+        Thread(r, "fw-temp-allow-db").apply { isDaemon = true }
+    }
+
+    /**
+     * Cache(uid -> expiryEpochMs).
+     * Note: Guava's variable-expiry API isn't available here; we use a fixed max TTL and treat
+     * the stored value as the real expiry.
+     */
+    private val tempAllowCache: Cache<Int, Long> = CacheBuilder.newBuilder()
+        .maximumSize(10_000)
+        // Hard upper bound; real expiry is based on stored expiryEpochMs.
+        .expireAfterWrite(60, TimeUnit.MINUTES)
+        .removalListener(
+            RemovalListener<Int, Long> { notification ->
+                val uid = notification.key ?: return@RemovalListener
+                val expiry = notification.value ?: return@RemovalListener
+
+                if (notification.cause == RemovalCause.EXPIRED) {
+                    tempAllowDbExecutor.execute {
+                        runCatching {
+                            db.clearTempAllowByUidIfExpiryBlocking(uid, expiry)
+                        }.onFailure { t ->
+                            Logger.e(LOG_TAG_FIREWALL, "err clearing expired temp allow: ${t.message}", t as? Exception)
+                        }
+                    }
+                }
+            }
+        )
+        .build()
 
     init {
         io { load() }
+        io { hydrateTempAllowCacheFromDb() }
     }
 
-    data class AppInfoTuple(val uid: Int, val packageName: String)
+    private var appContext: Context? = null
+
+    /** Called from Application / Service once to enable WorkManager scheduling. */
+    fun initTempAllowScheduler(context: Context) {
+        appContext = context.applicationContext
+        // best-effort: ensure any pending expiry work is scheduled based on DB state
+        TempAllowExpiryWorker.scheduleNext(context.applicationContext)
+    }
+
+    private fun scheduleTempAllowExpiryIfPossible() {
+        val ctx = appContext ?: return
+        TempAllowExpiryWorker.scheduleNext(ctx)
+    }
+
+    private fun cancelTempAllowExpiryIfPossible() {
+        val ctx = appContext ?: return
+        TempAllowExpiryWorker.cancel(ctx)
+    }
+
+    private suspend fun hydrateTempAllowCacheFromDb() {
+        val now = System.currentTimeMillis()
+        val apps = try {
+            db.getTempAllowedApps()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_FIREWALL, "err hydrate temp allows: ${e.message}", e)
+            emptyList()
+        }
+
+        var hasAny = false
+        apps.forEach { ai ->
+            if (!ai.tempAllowEnabled) return@forEach
+            val expiry = ai.tempAllowExpiryTime
+            if (expiry <= now) {
+                try {
+                    db.clearTempAllowByUidIfExpiry(ai.uid, expiry)
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_FIREWALL, "err clearing stale temp allow: ${e.message}", e)
+                }
+                return@forEach
+            }
+            hasAny = true
+            tempAllowCache.put(ai.uid, expiry)
+        }
+
+        // schedule/cancel based on presence
+        if (hasAny) scheduleTempAllowExpiryIfPossible() else cancelTempAllowExpiryIfPossible()
+    }
 
     suspend fun isUidFirewalled(uid: Int): Boolean {
         return connectionStatus(uid) != ConnectionStatus.ALLOW
@@ -286,6 +421,7 @@ object FirewallManager : KoinComponent {
                     iter.remove() // safe removal while iterating
                     ai.uid = newUid
                     ai.tombstoneTs = ts
+                    ai.modifiedTs = ts
                     appInfos.put(newUid, ai)
                     break
                 }
@@ -501,12 +637,12 @@ object FirewallManager : KoinComponent {
         firewallStatus: FirewallStatus,
         connectionStatus: ConnectionStatus
     ) {
+        val now = System.currentTimeMillis()
         mutex.withLock {
             appInfos.get(uid).forEach {
-                if (it.packageName == RETHINK_PACKAGE) return@forEach
-
                 it.firewallStatus = firewallStatus.id
                 it.connectionStatus = connectionStatus.id
+                it.modifiedTs = now
             }
         }
         informObservers()
@@ -534,6 +670,7 @@ object FirewallManager : KoinComponent {
         var cacheok = false
         val appInfo = getAppInfoByUid(oldUid)
         Logger.i(LOG_TAG_FIREWALL, "updateUidAndResetTombstone: $oldUid -> $newUid; has? ${appInfo?.packageName} == $pkg")
+        val now = System.currentTimeMillis()
         mutex.withLock {
             val iter = appInfos.get(oldUid).iterator()
             while (iter.hasNext()) {
@@ -542,6 +679,7 @@ object FirewallManager : KoinComponent {
                     iter.remove() // safe removal while iterating
                     ai.uid = newUid
                     ai.tombstoneTs = 0
+                    ai.modifiedTs = now
                     appInfos.put(newUid, ai)
                     cacheok = true
                     break
@@ -644,22 +782,77 @@ object FirewallManager : KoinComponent {
         db.updateFirewallStatusByUid(uid, firewallStatus.id, connectionStatus.id)
     }
 
-    private suspend fun getAppInfos(): Collection<AppInfo> {
-        mutex.withLock {
-            if (appInfos.isEmpty) {
-                return emptyList()
-            }
-            return ImmutableList.copyOf(appInfos.values())
+    suspend fun updateTempAllowStatus(uid: Int, durationMinutes: Int = TEMP_ALLOW_DEFAULT_MINUTES) {
+        Logger.i(LOG_TAG_FIREWALL, "Apply temporary allow for uid: $uid for $durationMinutes minutes")
+
+        val expiryTime = System.currentTimeMillis() + (durationMinutes * 60 * 1000L)
+
+        db.updateTempAllowByUid(uid, true, expiryTime)
+        tempAllowCache.put(uid, expiryTime)
+
+        scheduleTempAllowExpiryIfPossible()
+
+        Logger.i(LOG_TAG_FIREWALL, "Temporary allow applied for uid: $uid, expires at: $expiryTime")
+    }
+
+    private suspend fun revertTempAllow(uid: Int) {
+        Logger.i(LOG_TAG_FIREWALL, "Reverting temporary allow for uid: $uid")
+
+        tempAllowCache.invalidate(uid)
+        db.clearTempAllowByUid(uid)
+
+        // schedule/cancel based on remaining entries (DB is source of truth)
+        scheduleTempAllowExpiryIfPossible()
+
+        Logger.i(LOG_TAG_FIREWALL, "Temporary allow reverted for uid: $uid")
+    }
+
+    suspend fun isTempAllowed(uid: Int): Boolean {
+        val now = System.currentTimeMillis()
+
+        val cachedExpiry = tempAllowCache.getIfPresent(uid)
+        if (cachedExpiry != null) {
+            return now < cachedExpiry
+        }
+
+        // Cache miss: consult DB (source of truth) and warm cache if still valid.
+        val ai = try {
+            db.getAppInfoByUid(uid)
+        } catch (_: Exception) {
+            null
+        }
+
+        if (ai?.tempAllowEnabled == true && ai.tempAllowExpiryTime > now) {
+            tempAllowCache.put(uid, ai.tempAllowExpiryTime)
+            return true
+        }
+
+        // If DB says expired/disabled, ensure cache doesn't keep it.
+        tempAllowCache.invalidate(uid)
+        return false
+    }
+
+    suspend fun updateTempAllow(uid: Int, enabled: Boolean) {
+        if (enabled) {
+            updateTempAllowStatus(uid, TEMP_ALLOW_DEFAULT_MINUTES)
+        } else {
+            revertTempAllow(uid)
         }
     }
 
-    suspend fun isUnknownPackage(uid: Int): Boolean {
-        return getAppInfoByUid(uid)?.packageName?.startsWith(NO_PACKAGE_PREFIX) ?: false
+    private fun ioScope(): CoroutineScope {
+        return CoroutineScope(SupervisorJob() + Dispatchers.IO)
     }
 
-    private suspend fun informObservers() {
-        val v = getAppInfos()
-        v.let { appInfosLiveData.postValue(v) }
+    private fun io(f: suspend () -> Unit) {
+        ioScope().launch(Dispatchers.IO) { f() }
+    }
+
+    private suspend fun getAppInfos(): Collection<AppInfo> {
+        mutex.withLock {
+            if (appInfos.isEmpty()) return emptyList()
+            return appInfos.values().toList()
+        }
     }
 
     // labels for spinner / toggle ui
@@ -707,9 +900,11 @@ object FirewallManager : KoinComponent {
 
     fun updateIsProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
         io {
+            val now = System.currentTimeMillis()
             mutex.withLock {
                 appInfos.get(uid).forEach {
                     it.isProxyExcluded = isProxyExcluded
+                    it.modifiedTs = now
                 }
             }
             db.updateProxyExcluded(uid, isProxyExcluded)
@@ -717,12 +912,14 @@ object FirewallManager : KoinComponent {
         }
     }
 
-    fun getTombstoneApps(): List<AppInfo> {
-        return appInfos.values().filter { it.tombstoneTs > 0L }
+    suspend fun getTombstoneApps(): List<AppInfo> {
+        mutex.withLock {
+            return appInfos.values().filter { it.tombstoneTs > 0L }
+        }
     }
 
-    fun isAppExcludedFromProxy(uid: Int): Boolean {
-        return appInfos.get(uid).firstOrNull()?.isProxyExcluded ?: false
+    suspend fun isAppExcludedFromProxy(uid: Int): Boolean {
+        return getAppInfoByUid(uid)?.isProxyExcluded ?: false
     }
 
     fun stats(): String {
@@ -751,7 +948,17 @@ object FirewallManager : KoinComponent {
         return sb.toString()
     }
 
-    private fun io(f: suspend () -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch { f() }
+    data class AppInfoTuple(val uid: Int, val packageName: String)
+
+    private fun informObservers() {
+        // existing code expects this to broadcast appInfos snapshot.
+        // Use a snapshot to avoid exposing internal live collections.
+        appInfosLiveData.postValue(appInfos.values().toList())
+    }
+
+    fun isUnknownPackage(uid: Int): Boolean {
+        // Unknown uids are marked with a synthetic package prefix.
+        val pkgs = runCatching { appInfos.get(uid).map { it.packageName } }.getOrDefault(emptyList())
+        return pkgs.any { it.startsWith(AppInfoRepository.NO_PACKAGE_PREFIX) }
     }
 }

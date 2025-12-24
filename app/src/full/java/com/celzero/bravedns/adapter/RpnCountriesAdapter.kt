@@ -26,7 +26,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ListItemRpnCountriesBinding
 import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.Utilities.getFlag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

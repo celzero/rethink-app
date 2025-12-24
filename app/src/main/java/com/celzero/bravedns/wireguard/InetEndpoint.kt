@@ -18,10 +18,14 @@
  */
 package com.celzero.bravedns.wireguard
 
-import java.net.*
+import java.net.Inet4Address
+import java.net.InetAddress
+import java.net.URI
+import java.net.URISyntaxException
+import java.net.UnknownHostException
 import java.time.Duration
 import java.time.Instant
-import java.util.*
+import java.util.Optional
 import java.util.regex.Pattern
 
 /**
@@ -35,6 +39,7 @@ private constructor(val host: String, private val isResolved: Boolean, val port:
     private var lastResolution = Instant.EPOCH
     private var resolved: InetEndpoint? = null
 
+    @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
     override fun equals(obj: Any?): Boolean {
         if (obj !is InetEndpoint) return false
         return host == obj.host && port == obj.port
@@ -63,7 +68,7 @@ private constructor(val host: String, private val isResolved: Boolean, val port:
                             break
                         }
                     }
-                    resolved = InetEndpoint(address.hostAddress, true, port)
+                    resolved = InetEndpoint(address.hostAddress ?: "", true, port)
                     lastResolution = Instant.now()
                 } catch (e: UnknownHostException) {
                     resolved = null

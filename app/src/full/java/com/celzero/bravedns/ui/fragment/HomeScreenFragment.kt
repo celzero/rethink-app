@@ -19,6 +19,7 @@ import Logger
 import Logger.LOG_TAG_UI
 import Logger.LOG_TAG_VPN
 import android.Manifest
+import android.R.attr.type
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.ActivityNotFoundException
@@ -36,6 +37,7 @@ import android.os.Bundle
 import android.os.SystemClock
 import android.provider.Settings
 import android.text.format.DateUtils
+import android.util.StatsLog.logEvent
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -52,12 +54,16 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.FragmentHomeScreenBinding
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.DnsLogTracker
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
@@ -116,6 +122,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
     private val workScheduler by inject<WorkScheduler>()
+    private val eventLogger by inject<EventLogger>()
 
     private var isVpnActivated: Boolean = false
 
@@ -128,6 +135,51 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     companion object {
         private const val TAG = "HSFragment"
         private const val GRACE_DIALOG_REMIND_AFTER_DAYS = 1 // days to remind again
+
+        // UI interaction delays (milliseconds)
+        private const val UI_DELAY_MS = 500L
+
+        // Time calculation constants
+        private const val MILLISECONDS_PER_SECOND = 1000L
+        private const val SECONDS_PER_MINUTE = 60L
+        private const val MINUTES_PER_HOUR = 60L
+        private const val HOURS_PER_DAY = 24L
+        private const val DAYS_PER_MONTH = 30.0
+
+        // Sponsorship calculation constants
+        private const val BASE_AMOUNT_PER_MONTH = 0.60
+        private const val ADDITIONAL_AMOUNT_PER_MONTH = 0.20
+
+        // DNS latency thresholds (milliseconds)
+        private const val LATENCY_VERY_FAST_MAX = 19L
+        private const val LATENCY_FAST_MIN = 20L
+        private const val LATENCY_FAST_MAX = 50L
+        private const val LATENCY_SLOW_MIN = 50L
+        private const val LATENCY_SLOW_MAX = 100L
+
+        // Traffic display rotation
+        private const val TRAFFIC_DISPLAY_CYCLE_MODULO = 3
+        private const val TRAFFIC_DISPLAY_STATS_RATE = 0
+        private const val TRAFFIC_DISPLAY_BANDWIDTH = 1
+        private const val TRAFFIC_DISPLAY_DELAY_MS = 2500L
+
+        // Byte conversion constants (KB, MB, GB, TB)
+        private const val BYTES_PER_KB = 1024.0
+        private const val BYTES_PER_MB = 1024.0 * 1024.0
+        private const val BYTES_PER_GB = 1024.0 * 1024.0 * 1024.0
+        private const val BYTES_PER_TB = 1024.0 * 1024.0 * 1024.0 * 1024.0
+
+        // Byte conversion thresholds (Long)
+        private const val KB_THRESHOLD = 1024L
+        private const val MB_THRESHOLD = 1024L * 1024L
+        private const val GB_THRESHOLD = 1024L * 1024L * 1024L
+        private const val TB_THRESHOLD = 1024L * 1024L * 1024L * 1024L
+
+        // Shimmer animation constants
+        private const val SHIMMER_DURATION_MS = 2000L
+        private const val SHIMMER_BASE_ALPHA = 0.85f
+        private const val SHIMMER_DROPOFF = 1f
+        private const val SHIMMER_HIGHLIGHT_ALPHA = 0.35f
     }
 
     enum class ScreenType {
@@ -182,40 +234,70 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsCardFirewallLl.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on firewall card")
             startFirewallActivity(FirewallActivity.Tabs.UNIVERSAL.screen)
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: Firewall card clicked",
+                "Navigating to FirewallActivity from HomeScreenFragment"
+            )
         }
 
         b.fhsCardAppsCv.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on apps card")
             startAppsActivity()
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: Apps card clicked",
+                "Navigating to AppListActivity from HomeScreenFragment"
+            )
         }
 
         b.fhsCardDnsLl.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on dns card")
             startDnsActivity(DnsDetailActivity.Tabs.CONFIGURE.screen)
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: DNS card clicked",
+                "Navigating to DnsDetailActivity from HomeScreenFragment"
+            )
         }
 
         b.homeFragmentBottomSheetIcon.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on bottom sheet icon")
             b.homeFragmentBottomSheetIcon.isEnabled = false
             openBottomSheet()
-            delay(TimeUnit.MILLISECONDS.toMillis(500), lifecycleScope) {
+            delay(TimeUnit.MILLISECONDS.toMillis(UI_DELAY_MS), lifecycleScope) {
                 b.homeFragmentBottomSheetIcon.isEnabled = true
             }
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: Bottom sheet icon clicked",
+                "Opening HomeScreen settings bottom sheet from HomeScreenFragment"
+            )
         }
 
         b.homeFragmentPauseIcon.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on pause icon")
             handlePause()
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: Pause icon clicked",
+                "Opening PauseActivity from HomeScreenFragment"
+            )
         }
 
         b.fhsDnsOnOffBtn.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on main button")
             handleMainScreenBtnClickEvent()
-            delay(TimeUnit.MILLISECONDS.toMillis(500), lifecycleScope) {
+            delay(TimeUnit.MILLISECONDS.toMillis(UI_DELAY_MS), lifecycleScope) {
                 if (isAdded) {
                     b.homeFragmentBottomSheetIcon.isEnabled = true
                 }
             }
+            logEvent(
+                EventType.UI_TOGGLE,
+                "HomeScreen: Main DNS On/Off button clicked",
+                "Toggling VPN state from HomeScreenFragment"
+            )
         }
 
         appConfig.getBraveModeObservable().observe(viewLifecycleOwner) {
@@ -227,6 +309,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsCardLogsLl.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on logs card")
             startActivity(ScreenType.LOGS, NetworkLogsActivity.Tabs.NETWORK_LOGS.screen)
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: Logs card clicked",
+                "Navigating to NetworkLogsActivity from HomeScreenFragment"
+            )
         }
 
         b.fhsCardProxyLl.setOnClickListener {
@@ -236,6 +323,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             } else {
                 startActivity(ScreenType.PROXY)
             }
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: Proxy card clicked",
+                "Navigating to wg: ${appConfig.isWireGuardEnabled()}  from HomeScreenFragment"
+            )
         }
 
         b.fhsSponsor.setOnClickListener {
@@ -245,6 +337,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 return@setOnClickListener
             }*/
             promptForAppSponsorship()
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: Sponsor card clicked",
+                "Opening sponsorship dialog from HomeScreenFragment"
+            )
         }
 
         b.fhsSponsorBottom.setOnClickListener {
@@ -254,6 +351,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 return@setOnClickListener
             }*/
             promptForAppSponsorship()
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: Sponsor card clicked",
+                "Opening sponsorship dialog from HomeScreenFragment"
+            )
         }
 
         b.fhsTitleRethink.setOnClickListener {
@@ -263,10 +365,21 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 return@setOnClickListener
             }*/
             promptForAppSponsorship()
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: Sponsor card clicked",
+                "Opening sponsorship dialog from HomeScreenFragment"
+            )
         }
 
         // comment out the below code to disable the alerts card (v0.5.5b)
         // b.fhsCardAlertsLl.setOnClickListener { startActivity(ScreenType.ALERTS) }
+    }
+
+    private fun logEvent(type: EventType, msg: String, details: String) {
+        io {
+            eventLogger.log(type, Severity.LOW, msg, EventSource.UI, true, details)
+        }
     }
 
     private fun promptForAppSponsorship() {
@@ -276,10 +389,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         ).firstInstallTime
         val timeDiff = System.currentTimeMillis() - installTime
         // convert it to month
-        val days = (timeDiff / (1000 * 60 * 60 * 24)).toDouble()
-        val month = days / 30
+        val days = (timeDiff / (MILLISECONDS_PER_SECOND * SECONDS_PER_MINUTE * MINUTES_PER_HOUR * HOURS_PER_DAY)).toDouble()
+        val month = days / DAYS_PER_MONTH
         // multiply the month with 0.60$ + 0.20$ for every month
-        val amount = month * (0.60 + 0.20)
+        val amount = month * (BASE_AMOUNT_PER_MONTH + ADDITIONAL_AMOUNT_PER_MONTH)
         Logger.d(LOG_TAG_UI, "Sponsor: $installTime, days/month: $days/$month, amount: $amount")
         val alertBuilder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         val inflater = LayoutInflater.from(requireContext())
@@ -777,7 +890,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             uiCtx {
                 if (!isVisible || !isAdded) return@uiCtx
                 when (p50) {
-                    in 0L..19L -> {
+                    in 0L..LATENCY_VERY_FAST_MAX -> {
                         val string =
                             getString(
                                 R.string.ci_desc,
@@ -788,12 +901,12 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         b.fhsCardDnsLatency.text = string
                     }
 
-                    in 20L..50L -> {
+                    in LATENCY_FAST_MIN..LATENCY_FAST_MAX -> {
                         b.fhsCardDnsLatency.text =
                             getString(R.string.lbl_fast).replaceFirstChar(Char::titlecase)
                     }
 
-                    in 50L..100L -> {
+                    in LATENCY_SLOW_MIN..LATENCY_SLOW_MAX -> {
                         b.fhsCardDnsLatency.text =
                             getString(R.string.lbl_slow).replaceFirstChar(Char::titlecase)
                     }
@@ -852,6 +965,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 preferredId
             }
 
+        @Suppress("DEPRECATION")
         if (VpnController.isOn()) {
             io {
                 var failing = false
@@ -1038,7 +1152,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun handleMainScreenBtnClickEvent() {
         b.fhsDnsOnOffBtn.isEnabled = false
-        delay(TimeUnit.MILLISECONDS.toMillis(500), lifecycleScope) {
+        delay(TimeUnit.MILLISECONDS.toMillis(UI_DELAY_MS), lifecycleScope) {
             if (isAdded) {
                 b.fhsDnsOnOffBtn.isEnabled = true
             }
@@ -1200,15 +1314,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     // make it as 3 options and add the protos
                     if (!isAdded) return@ui
 
-                    if (counter % 3 == 0) {
+                    if (counter % TRAFFIC_DISPLAY_CYCLE_MODULO == TRAFFIC_DISPLAY_STATS_RATE) {
                         displayTrafficStatsRate()
-                    } else if (counter % 3 == 1) {
+                    } else if (counter % TRAFFIC_DISPLAY_CYCLE_MODULO == TRAFFIC_DISPLAY_BANDWIDTH) {
                         displayTrafficStatsBW()
                     } else {
                         displayProtos()
                     }
                     // show protos
-                    kotlinx.coroutines.delay(2500L)
+                    kotlinx.coroutines.delay(TRAFFIC_DISPLAY_DELAY_MS)
                     counter++
                 }
             }
@@ -1301,10 +1415,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun getCommonUnit(bytes1: Long, bytes2: Long): String {
         val maxBytes = maxOf(bytes1, bytes2)
         return when {
-            maxBytes >= 1024L * 1024L * 1024L * 1024L -> "TB"
-            maxBytes >= 1024L * 1024L * 1024L -> "GB"
-            maxBytes >= 1024L * 1024L -> "MB"
-            maxBytes >= 1024L -> "KB"
+            maxBytes >= TB_THRESHOLD -> "TB"
+            maxBytes >= GB_THRESHOLD -> "GB"
+            maxBytes >= MB_THRESHOLD -> "MB"
+            maxBytes >= KB_THRESHOLD -> "KB"
             else -> "B"
         }
     }
@@ -1321,10 +1435,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         return Pair(String.format(Locale.ROOT, "%.2f", v.first), String.format(Locale.ROOT, "%.2f", v.second))
     }
 
-    private fun bytesToKB(bytes: Long): Double = bytes / 1024.0
-    private fun bytesToMB(bytes: Long): Double = bytes / (1024.0 * 1024.0)
-    private fun bytesToGB(bytes: Long): Double = bytes / (1024.0 * 1024.0 * 1024.0)
-    private fun bytesToTB(bytes: Long): Double = bytes / (1024.0 * 1024.0 * 1024.0 * 1024.0)
+    private fun bytesToKB(bytes: Long): Double = bytes / BYTES_PER_KB
+    private fun bytesToMB(bytes: Long): Double = bytes / BYTES_PER_MB
+    private fun bytesToGB(bytes: Long): Double = bytes / BYTES_PER_GB
+    private fun bytesToTB(bytes: Long): Double = bytes / BYTES_PER_TB
 
     /**
      * Issue fix - https://github.com/celzero/rethink-app/issues/57 When the application
@@ -1333,6 +1447,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * state. If persistence state has vpn enabled and the VPN is not connected then the start will
      * be initiated.
      */
+    @Suppress("DEPRECATION")
     private fun maybeAutoStartVpn() {
         if (isVpnActivated && !VpnController.isOn()) {
             // this case will happen when the app is updated or crashed
@@ -1471,10 +1586,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun startShimmer() {
         val builder = Shimmer.AlphaHighlightBuilder()
-        builder.setDuration(2000)
-        builder.setBaseAlpha(0.85f)
-        builder.setDropoff(1f)
-        builder.setHighlightAlpha(0.35f)
+        builder.setDuration(SHIMMER_DURATION_MS)
+        builder.setBaseAlpha(SHIMMER_BASE_ALPHA)
+        builder.setDropoff(SHIMMER_DROPOFF)
+        builder.setHighlightAlpha(SHIMMER_HIGHLIGHT_ALPHA)
         b.shimmerViewContainer1.setShimmer(builder.build())
         b.shimmerViewContainer1.startShimmer()
     }
@@ -1486,7 +1601,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun startVpnService() {
         // runtime permission for notification (Android 13)
         getNotificationPermissionIfNeeded()
-        VpnController.start(requireContext())
+        VpnController.start(requireContext(), true)
     }
 
     private fun getNotificationPermissionIfNeeded() {
@@ -1835,15 +1950,26 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun isAnotherVpnActive(): Boolean {
-        val connectivityManager =
-            requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork = connectivityManager.activeNetwork ?: return false
-        val capabilities =
-            connectivityManager.getNetworkCapabilities(activeNetwork)
-                ?: // It's not clear when this can happen, but it has occurred for at least one
-                // user.
-                return false
-        return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+        return try {
+            val connectivityManager =
+                requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val activeNetwork = connectivityManager.activeNetwork ?: return false
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(activeNetwork)
+                    ?: // It's not clear when this can happen, but it has occurred for at least one
+                    // user.
+                    return false
+            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+        } catch (e: SecurityException) {
+            // Fix: Handle SecurityException that can occur when calling getNetworkCapabilities()
+            // on certain devices/Android versions or when app lacks proper permissions
+            Logger.e(LOG_TAG_VPN, "SecurityException checking VPN status: ${e.message}", e)
+            false
+        } catch (e: Exception) {
+            // Catch any other unexpected exceptions
+            Logger.e(LOG_TAG_VPN, "err checking VPN status: ${e.message}", e)
+            false
+        }
     }
 
     private fun fetchTextColor(attr: Int): Int {

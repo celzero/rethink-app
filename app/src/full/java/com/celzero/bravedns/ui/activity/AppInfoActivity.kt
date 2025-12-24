@@ -23,6 +23,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.text.format.DateUtils
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.ImageView
@@ -41,7 +42,11 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppWiseDomainsAdapter
 import com.celzero.bravedns.adapter.AppWiseIpsAdapter
 import com.celzero.bravedns.database.AppInfo
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.ActivityAppDetailsBinding
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
 import com.celzero.bravedns.service.PersistentState
@@ -50,6 +55,7 @@ import com.celzero.bravedns.service.ProxyManager.ID_NONE
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
+import com.celzero.bravedns.util.Constants.Companion.RETHINK_PACKAGE
 import com.celzero.bravedns.util.Constants.Companion.VIEW_PAGER_SCREEN_TO_LOAD
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
@@ -73,6 +79,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private val b by viewBinding(ActivityAppDetailsBinding::bind)
 
     private val persistentState by inject<PersistentState>()
+    private val eventLogger by inject<EventLogger>()
 
     private val ipRulesViewModel: CustomIpViewModel by viewModel()
     private val domainRulesViewModel: CustomDomainViewModel by viewModel()
@@ -85,8 +92,6 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private var connStatus = FirewallManager.ConnectionStatus.ALLOW
 
     private var showBypassToolTip: Boolean = true
-
-    private var isRethinkApp: Boolean = false
 
     companion object {
         const val INTENT_UID = "UID"
@@ -124,7 +129,6 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     }
 
     private fun init() {
-        val rethinkPkgName = this.packageName
         io {
             val appInfo = FirewallManager.getAppInfoByUid(uid)
             // case: app is uninstalled but still available in RethinkDNS database
@@ -142,6 +146,12 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 b.aadAppDetailName.text = appName(packages.count())
                 b.aadPkgName.text = appInfo.packageName
                 b.excludeProxySwitch.isChecked = appInfo.isProxyExcluded
+                
+                // Set temporary allow toggle state
+                val isTempAllowed = FirewallManager.isTempAllowed(appInfo.uid)
+                b.tempAllowSwitch.isChecked = isTempAllowed
+                updateTempAllowDescription(isTempAllowed, appInfo.tempAllowExpiryTime)
+                
                 displayDataUsage()
                 displayProxyStatus()
                 displayIcon(
@@ -149,20 +159,14 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                     b.aadAppDetailIcon
                 )
 
-                // do not show the firewall status if the app is Rethink
-                if (appInfo.packageName == rethinkPkgName) {
-                    isRethinkApp = true
-                    b.aadFirewallStatus.visibility = View.GONE
-                    b.aadAapFirewallNewCard.visibility = View.GONE
-                    hideFirewallStatusUi()
-                    hideDomainBlockUi()
-                    hideIpBlockUi()
-                    hideBypassProxyUi()
+                if (appInfo.packageName == RETHINK_PACKAGE) {
+                    updateFirewallStatusUi(appStatus, connStatus)
+                    setActiveConnsAdapter(true)
                     setRethinkDomainLogsAdapter()
                     setRethinkIpLogsAdapter()
                 } else {
                     updateFirewallStatusUi(appStatus, connStatus)
-                    setActiveConnsAdapter()
+                    setActiveConnsAdapter(false)
                     if (persistentState.downloadIpInfo) {
                         setASNAdapter()
                     }
@@ -190,22 +194,6 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         }
         b.aadProxyDetails.visibility = View.VISIBLE
         b.aadProxyDetails.text = getString(R.string.wireguard_apps_proxy_map_desc, proxy)
-    }
-
-    private fun hideFirewallStatusUi() {
-        b.aadAppSettingsCard.visibility = View.GONE
-    }
-
-    private fun hideBypassProxyUi() {
-        b.excludeProxyRl.visibility = View.GONE
-    }
-
-    private fun hideDomainBlockUi() {
-        b.aadDomainBlockCard.visibility = View.GONE
-    }
-
-    private fun hideIpBlockUi() {
-        b.aadIpBlockCard.visibility = View.GONE
     }
 
     private fun openCustomIpScreen() {
@@ -243,11 +231,26 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         firewallStatus: FirewallManager.FirewallStatus,
         connectionStatus: FirewallManager.ConnectionStatus
     ) {
+        val statusText = getFirewallText(firewallStatus, connectionStatus)
+        val statusWithTime = if (::appInfo.isInitialized && appInfo.modifiedTs > 0) {
+            val now = System.currentTimeMillis()
+            val uptime = now - appInfo.modifiedTs
+            val relativeTime = DateUtils.getRelativeTimeSpanString(
+                now - uptime,
+                now,
+                DateUtils.MINUTE_IN_MILLIS,
+                DateUtils.FORMAT_ABBREV_RELATIVE
+            )
+            "$statusText $relativeTime"
+        } else {
+            statusText
+        }
+
         b.aadFirewallStatus.text =
             htmlToSpannedText(
                 getString(
                     R.string.ada_firewall_status,
-                    getFirewallText(firewallStatus, connectionStatus)
+                    statusWithTime
                 )
             )
 
@@ -328,7 +331,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 if (showBypassToolTip && appStatus == FirewallManager.FirewallStatus.NONE) {
                     b.aadAppSettingsBypassDnsFirewall.performLongClick()
                     showBypassToolTip = false
-                    return@setOnClickListener
+                    return@guardAppInfoInitialized
                 }
 
                 if (appStatus == FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL) {
@@ -336,10 +339,18 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                         FirewallManager.FirewallStatus.NONE,
                         FirewallManager.ConnectionStatus.ALLOW
                     )
+                    logEvent(
+                        "firewall rule change",
+                        "DNS + Firewall bypass disabled for ${appInfo.appName} (${appInfo.uid})"
+                    )
                 } else {
                     updateFirewallStatus(
                         FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL,
                         FirewallManager.ConnectionStatus.ALLOW
+                    )
+                    logEvent(
+                        "firewall rule change",
+                        "DNS + Firewall bypass enabled for ${appInfo.appName} (${appInfo.uid})"
                     )
                 }
             }
@@ -367,10 +378,18 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                         FirewallManager.FirewallStatus.NONE,
                         FirewallManager.ConnectionStatus.ALLOW
                     )
+                    logEvent(
+                        "firewall rule change",
+                        "Universal bypass disabled for ${appInfo.appName} (${appInfo.uid})"
+                    )
                 } else {
                     updateFirewallStatus(
                         FirewallManager.FirewallStatus.BYPASS_UNIVERSAL,
                         FirewallManager.ConnectionStatus.ALLOW
+                    )
+                    logEvent(
+                        "firewall rule change",
+                        "Universal bypass enabled for ${appInfo.appName} (${appInfo.uid})"
                     )
                 }
             }
@@ -380,7 +399,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             guardAppInfoInitialized("aadAppSettingsExclude") {
                 if (VpnController.isVpnLockdown()) {
                     showToastUiCentered(this, getString(R.string.hsf_exclude_error), Toast.LENGTH_SHORT)
-                    return@setOnClickListener
+                    return@guardAppInfoInitialized
                 }
 
                 io {
@@ -401,10 +420,18 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                             FirewallManager.FirewallStatus.NONE,
                             FirewallManager.ConnectionStatus.ALLOW
                         )
+                        logEvent(
+                            "firewall rule change",
+                            "App exclusion disabled for ${appInfo.appName} (${appInfo.uid})"
+                        )
                     } else {
                         updateFirewallStatus(
                             FirewallManager.FirewallStatus.EXCLUDE,
                             FirewallManager.ConnectionStatus.ALLOW
+                        )
+                        logEvent(
+                            "firewall rule change",
+                            "App exclusion enabled for ${appInfo.appName} (${appInfo.uid})"
                         )
                     }
                 }
@@ -419,10 +446,18 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                         FirewallManager.FirewallStatus.NONE,
                         FirewallManager.ConnectionStatus.ALLOW
                     )
+                    logEvent(
+                        "firewall rule change",
+                        "App isolation disabled for ${appInfo.appName} (${appInfo.uid})"
+                    )
                 } else {
                     updateFirewallStatus(
                         FirewallManager.FirewallStatus.ISOLATE,
                         FirewallManager.ConnectionStatus.ALLOW
+                    )
+                    logEvent(
+                        "firewall rule change",
+                        "App isolation enabled for ${appInfo.appName} (${appInfo.uid})"
                     )
                 }
             }
@@ -448,6 +483,14 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             b.excludeProxySwitch.isChecked = !b.excludeProxySwitch.isChecked
         }
 
+        b.tempAllowSwitch.setOnCheckedChangeListener { _, isChecked ->
+            updateTempAllowStatus(isChecked)
+        }
+
+        b.tempAllowRl.setOnClickListener {
+            b.tempAllowSwitch.isChecked = !b.tempAllowSwitch.isChecked
+        }
+
         b.aadCloseConnsChip.setOnClickListener {
             if (!::appInfo.isInitialized) {
                 Logger.w(LOG_TAG_UI, "AppInfo not initialized yet in aadCloseConnsChip click listener, using uid: $uid")
@@ -462,6 +505,50 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private fun updateExcludeProxyStatus(isExcluded: Boolean) {
         io {
             FirewallManager.updateIsProxyExcluded(uid, isExcluded)
+            logEvent(
+                "proxy exclude change",
+                "Proxy exclude status changed for ${appInfo.appName} (${appInfo.uid}), new status: $isExcluded"
+            )
+        }
+    }
+
+    private fun updateTempAllowStatus(isAllowed: Boolean) {
+        io {
+            if (isAllowed) {
+                FirewallManager.updateTempAllow(uid, true)
+                val expiryTime = System.currentTimeMillis() + (15 * 60 * 1000L)
+                uiCtx {
+                    updateTempAllowDescription(true, expiryTime)
+                }
+            } else {
+                FirewallManager.updateTempAllow(uid, false)
+                uiCtx {
+                    updateTempAllowDescription(false, 0)
+                }
+            }
+            logEvent(
+                "temp allow change",
+                "Temporary allow status changed for ${appInfo.appName} (${appInfo.uid}), new status: $isAllowed"
+            )
+        }
+    }
+
+    private fun updateTempAllowDescription(isAllowed: Boolean, expiryTime: Long) {
+        if (isAllowed && expiryTime > 0) {
+            val now = System.currentTimeMillis()
+            if (expiryTime > now) {
+                val relativeTime = DateUtils.getRelativeTimeSpanString(
+                    expiryTime,
+                    now,
+                    DateUtils.MINUTE_IN_MILLIS,
+                    DateUtils.FORMAT_ABBREV_RELATIVE
+                )
+                b.tempAllowDesc.text = getString(R.string.temp_allow_active, relativeTime)
+            } else {
+                b.tempAllowDesc.text = getString(R.string.temp_allow_desc)
+            }
+        } else {
+            b.tempAllowDesc.text = getString(R.string.temp_allow_desc)
         }
     }
 
@@ -479,14 +566,20 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         startActivity(intent)
     }
 
-    private fun setActiveConnsAdapter() {
+    private fun setActiveConnsAdapter(isRethink: Boolean) {
         val layoutManager = LinearLayoutManager(this)
         b.aadActiveConnsRv.layoutManager = layoutManager
-        val adapter = AppWiseDomainsAdapter(this, this, uid, isRethinkApp, isActiveConn = true)
+        val adapter = AppWiseDomainsAdapter(this, this, uid, isActiveConn = true)
         val uptime = VpnController.uptimeMs()
         Logger.i(LOG_TAG_UI, "app-info-act, active conns, uptime: $uptime ms")
-        networkLogsViewModel.fetchTopActiveConnections(uid, uptime).observe(this) {
-            adapter.submitData(this.lifecycle, it)
+        if (isRethink) {
+            networkLogsViewModel.getRethinkActiveConnsLimited(uptime).observe(this) {
+                adapter.submitData(this.lifecycle, it)
+            }
+        } else {
+            networkLogsViewModel.fetchTopActiveConnections(uid, uptime).observe(this) {
+                adapter.submitData(this.lifecycle, it)
+            }
         }
         b.aadActiveConnsRv.adapter = adapter
 
@@ -504,7 +597,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private fun setASNAdapter() {
         val layoutManager = LinearLayoutManager(this)
         b.aadAsnRv.layoutManager = layoutManager
-        val adapter = AppWiseIpsAdapter(this, this, uid, isRethinkApp, isAsn = true)
+        val adapter = AppWiseIpsAdapter(this, this, uid,  isAsn = true)
         networkLogsViewModel.getAsnLogsLimited(uid).observe(this) {
             adapter.submitData(this.lifecycle, it)
         }
@@ -524,7 +617,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private fun setDomainsAdapter() {
         val layoutManager = LinearLayoutManager(this)
         b.aadMostContactedDomainRv.layoutManager = layoutManager
-        val adapter = AppWiseDomainsAdapter(this, this, uid, isRethinkApp)
+        val adapter = AppWiseDomainsAdapter(this, this, uid)
         networkLogsViewModel.getDomainLogsLimited(uid).observe(this) {
             adapter.submitData(this.lifecycle, it)
         }
@@ -544,7 +637,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private fun setRethinkDomainLogsAdapter() {
         val layoutManager = LinearLayoutManager(this)
         b.aadMostContactedDomainRv.layoutManager = layoutManager
-        val adapter = AppWiseDomainsAdapter(this, this, uid, isRethinkApp)
+        val adapter = AppWiseDomainsAdapter(this, this, uid)
         networkLogsViewModel.getRethinkDomainLogsLimited().observe(this) {
             adapter.submitData(this.lifecycle, it)
         }
@@ -564,7 +657,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private fun setRethinkIpLogsAdapter() {
         val layoutManager = LinearLayoutManager(this)
         b.aadMostContactedIpsRv.layoutManager = layoutManager
-        val adapter = AppWiseIpsAdapter(this, this, uid, isRethinkApp)
+        val adapter = AppWiseIpsAdapter(this, this, uid)
         networkLogsViewModel.getRethinkIpLogsLimited().observe(this) {
             adapter.submitData(this.lifecycle, it)
         }
@@ -585,7 +678,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         b.aadMostContactedIpsRv.setHasFixedSize(true)
         val layoutManager = LinearLayoutManager(this)
         b.aadMostContactedIpsRv.layoutManager = layoutManager
-        val adapter = AppWiseIpsAdapter(this, this, uid, isRethinkApp)
+        val adapter = AppWiseIpsAdapter(this, this, uid)
         networkLogsViewModel.getIpLogsLimited(uid).observe(this) {
             adapter.submitData(this.lifecycle, it)
         }
@@ -689,6 +782,10 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                     }
 
                 updateFirewallStatus(FirewallManager.FirewallStatus.NONE, cStat, connStatus)
+                logEvent(
+                    "firewall rule change",
+                    "Toggled WIFI for ${appInfo.appName} (${appInfo.uid}), new conn status: $cStat"
+                )
             }
         }
     }
@@ -719,6 +816,10 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         connStatus = cStat
         io { updateFirewallStatus(appInfo.uid, aStat, cStat) }
         updateFirewallStatusUi(aStat, cStat)
+        logEvent(
+            "firewall rule change",
+            "Firewall status changed for ${appInfo.appName} (${appInfo.uid}), new status: $aStat, conn status: $cStat"
+        )
     }
 
     private fun enableAppBypassedUi() {
@@ -894,10 +995,6 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     }
 
     private fun showCloseConnectionDialog(uid: Int, appName: String) {
-        if (isRethinkApp) {
-            Logger.i(LOG_TAG_UI, "$TAG rethink connection - no close connection dialog")
-            return
-        }
         Logger.v(LOG_TAG_UI, "$TAG show close connection dialog for uid: $uid")
         val dialog = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
             .setTitle(this.getString(R.string.close_conns_dialog_title))
@@ -907,6 +1004,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 VpnController.closeConnectionsIfNeeded(uid, "app-info-dialog-manual-close")
                 Logger.i(LOG_TAG_UI, "$TAG closed connection for uid: $uid")
                 showToastUiCentered(this, getString(R.string.config_add_success_toast), Toast.LENGTH_LONG)
+                logEvent("close connections",
+                    "Closed active connections for $appName ($uid) from AppInfoActivity")
             }
             .setNegativeButton(R.string.lbl_cancel, null)
             .create()
@@ -924,7 +1023,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             Configuration.UI_MODE_NIGHT_YES
     }
 
-    private inline fun guardAppInfoInitialized(listenerName: String, block: () -> Unit) {
+    private fun guardAppInfoInitialized(listenerName: String, block: () -> Unit) {
         if (!::appInfo.isInitialized) {
             Logger.w(LOG_TAG_UI, "AppInfo not initialized yet in $listenerName click listener, using uid: $uid")
             showToastUiCentered(
@@ -935,6 +1034,10 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             return
         }
         block()
+    }
+
+    private fun logEvent(msg: String, details: String) {
+        eventLogger.log(EventType.FW_RULE_MODIFIED, Severity.LOW, msg, EventSource.UI, false, details)
     }
 
     private fun io(f: suspend () -> Unit): Job {

@@ -1037,8 +1037,6 @@
     <string name="cd_toast_edit" translatable="true">已編輯</string>
     <string name="settings_rinr_heading" translatable="true">回送（實驗性）</string>
     <string name="one_wg_apps_added" translatable="true">正在路由所有應用程式</string>
-    <string name="wg_lockdown_dialog_title" translatable="true">閉關</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">所選應用程式將僅由此 WireGuard VPN 路由，無論是否成功連線此 VPN 。</string>
     <string name="wireguard_apps_proxy_map_desc" translatable="true">%1$s 的一部分</string>
     <string name="settings_rinr_desc_enabled" translatable="true">將 Rethink 自身的流量路由入隧道。若您不瞭解您在做什麼，請不要啟用。</string>
     <string name="settings_rinr_desc_disabled" translatable="true">將如下載攔截清單、連線檢查與 DNS 連線等的 Rethink 自身流量路由回隧道。</string>

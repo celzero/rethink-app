@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.SystemClock
+import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
@@ -55,7 +56,6 @@ import java.io.ObjectOutputStream
 import java.io.OutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
-import androidx.core.net.toUri
 
 // ref:
 // https://gavingt.medium.com/refactoring-my-backup-and-restore-feature-to-comply-with-scoped-storage-e2b6c792c3b

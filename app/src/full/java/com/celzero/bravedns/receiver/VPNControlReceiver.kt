@@ -71,6 +71,7 @@ class VpnControlReceiver: BroadcastReceiver(), KoinComponent {
         }
     }
 
+    @Suppress("DEPRECATION")
     private fun handleVpnStart(context: Context) {
         if (VpnController.isOn()) {
             Logger.i(LOG_TAG_VPN, "$TAG VPN is already running, ignoring start intent")
@@ -95,6 +96,7 @@ class VpnControlReceiver: BroadcastReceiver(), KoinComponent {
         }
     }
 
+    @Suppress("DEPRECATION")
     private fun handleVpnStop(context: Context) {
         if (!VpnController.isOn()) {
             Logger.i(LOG_TAG_VPN, "$TAG VPN is not running, ignoring stop intent")
@@ -181,6 +183,7 @@ class VpnControlReceiver: BroadcastReceiver(), KoinComponent {
         }
 
         for (key in extras.keySet()) {
+            @Suppress("DEPRECATION")
             sb.append("  $key -> ${extras.get(key)}\n")
         }
 

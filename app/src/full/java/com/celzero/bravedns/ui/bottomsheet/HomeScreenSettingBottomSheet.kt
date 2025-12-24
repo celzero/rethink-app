@@ -38,8 +38,8 @@ import com.celzero.bravedns.ui.activity.WgMainActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.SsidPermissionManager
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
-import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
+import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment

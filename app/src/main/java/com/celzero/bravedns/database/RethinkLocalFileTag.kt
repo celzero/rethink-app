@@ -29,8 +29,8 @@ class RethinkLocalFileTag {
     var url: List<String> = arrayListOf()
     var show: Int = 0
     var entries: Int = 0
-    var pack: List<String>? = arrayListOf()
-    var level: List<Int>? = arrayListOf()
+    var pack: List<String>? = null
+    var level: List<Int>? = null
     var simpleTagId: Int = INVALID_SIMPLE_TAG_ID
     var isSelected: Boolean = false
 
@@ -90,6 +90,7 @@ class RethinkLocalFileTag {
                     if (it.value as Any? is String) {
                         url = listOf(it.value as String)
                     } else if (it.value as Any? is List<*>) {
+                        @Suppress("UNCHECKED_CAST")
                         url = it.value as List<String>
                     }
                 }
@@ -99,6 +100,7 @@ class RethinkLocalFileTag {
                     if (it.value as Any? is String) {
                         pack = listOf(it.value as String)
                     } else if (it.value as Any? is List<*>) {
+                        @Suppress("UNCHECKED_CAST")
                         pack = it.value as List<String>
                     }
                 }

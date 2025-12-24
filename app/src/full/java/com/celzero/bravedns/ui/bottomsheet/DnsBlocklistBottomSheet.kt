@@ -44,15 +44,18 @@ import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
 import com.celzero.bravedns.database.DnsLog
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.databinding.DialogIpDetailsLayoutBinding
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.DomainConnectionsActivity
-import com.celzero.bravedns.ui.activity.DomainConnectionsActivity.Companion.INTENT_EXTRA_IS_BLOCKED
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.ResourceRecordTypes
 import com.celzero.bravedns.util.Themes
@@ -85,6 +88,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     private var log: DnsLog? = null
 
     private val persistentState by inject<PersistentState>()
+    private val eventLogger by inject<EventLogger>()
 
     override fun getTheme(): Int =
         Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
@@ -144,31 +148,52 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
             return
         }
 
+        // Setup basic UI immediately (lightweight operations)
         b.bsdlDomainRuleDesc.text = htmlToSpannedText(getString(R.string.bsdl_block_desc))
-        b.dnsBlockUrl.text = log!!.queryStr + "      ❯"
+        b.dnsBlockUrl.text = "${log?.queryStr.orEmpty()}      ❯"
         b.dnsBlockIpAddress.text = getResponseIp()
-        b.dnsBlockConnectionFlag.text = log!!.flag
-        b.dnsBlockIpLatency.text = getString(R.string.dns_btm_latency_ms, log!!.ttl.toString())
+        b.dnsBlockConnectionFlag.text = log?.flag.orEmpty()
+        b.dnsBlockIpLatency.text = getString(R.string.dns_btm_latency_ms, log?.ttl?.toString().orEmpty())
+        if (log?.blockedTarget?.isEmpty() == true) {
+            b.dnsBlockedTarget.visibility = View.GONE
+        } else {
+            b.dnsBlockedTarget.text = log?.blockedTarget
+            b.dnsBlockedTarget.visibility = View.VISIBLE
+        }
         if (Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt())
                 .isLessThan(Logger.LoggerLevel.DEBUG)
         ) {
             b.dnsMessage.text = "${log?.msg}; ${log?.proxyId}; ${log?.relayIP}"
         } else {
-            b.dnsMessage.text = log!!.msg
+            b.dnsMessage.text = log?.msg.orEmpty()
         }
 
-        displayFavIcon()
-        displayDnsTransactionDetails()
-        displayRecordTypeChip()
-        setupClickListeners()
-        updateAppDetails(log)
-        updateRulesUi(log!!.queryStr)
-
-        if (log!!.region.isNotEmpty()) {
+        val region = log?.region.orEmpty()
+        if (region.isNotEmpty()) {
             b.dnsRegion.visibility = View.VISIBLE
-            b.dnsRegion.text = log!!.region
+            b.dnsRegion.text = region
         } else {
             b.dnsRegion.visibility = View.GONE
+        }
+
+        // Setup click listeners immediately (no heavy work)
+        setupClickListeners()
+
+        // Update app details (already uses background thread)
+        updateAppDetails(log)
+
+        // Defer heavy operations to prevent ANR
+        // This allows the UI to render immediately while heavy operations run after first frame
+        view.post {
+            displayRecordTypeChip()
+            displayDnsTransactionDetails()
+            updateRulesUi(log?.queryStr.orEmpty())
+        }
+
+        // Defer favicon loading even more (lowest priority, can be slow)
+        lifecycleScope.launch {
+            kotlinx.coroutines.delay(150) // Let basic UI settle first
+            displayFavIcon()
         }
     }
 
@@ -222,8 +247,8 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun getResponseIp(): String {
-        val ips = log!!.response.split(",")
-        return ips[0]
+        val ips = log?.response?.split(",") ?: return ""
+        return ips.firstOrNull() ?: ""
     }
 
     private fun updateRulesUi(domain: String) {
@@ -238,23 +263,23 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
             return
         }
 
-        if (log!!.typeName.isEmpty()) {
+        if (log?.typeName.orEmpty().isEmpty()) {
             b.dnsRecordTypeChip.visibility = View.GONE
             return
         }
 
         b.dnsRecordTypeChip.visibility = View.VISIBLE
-        b.dnsRecordTypeChip.text = getString(R.string.dns_btm_record_type, log!!.typeName)
+        b.dnsRecordTypeChip.text = getString(R.string.dns_btm_record_type, log?.typeName.orEmpty())
     }
 
     private fun setupClickListeners() {
 
         b.dnsBlockHeaderContainer.setOnClickListener {
-            startDomainConnectionsActivity(log!!.queryStr)
+            log?.queryStr?.let { query -> startDomainConnectionsActivity(query) }
         }
 
         b.dnsBlockUrl.setOnClickListener {
-            startDomainConnectionsActivity(log!!.queryStr)
+            log?.queryStr?.let { query -> startDomainConnectionsActivity(query) }
         }
 
         b.bsdlDomainRuleSpinner.adapter =
@@ -275,8 +300,9 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
                     val status = DomainRulesManager.Status.getStatus(position)
 
                     // no need to apply rule, if prev selection and current selection are same
+                    val queryStr = log?.queryStr ?: return
                     if (
-                        DomainRulesManager.getDomainRule(log!!.queryStr, Constants.UID_EVERYBODY) ==
+                        DomainRulesManager.getDomainRule(queryStr, Constants.UID_EVERYBODY) ==
                             status
                     ) {
                         return
@@ -290,30 +316,33 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun applyDnsRule(status: DomainRulesManager.Status) {
-        if (log == null) {
+        val currentLog = log
+        if (currentLog == null) {
             Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to apply dns rules")
             return
         }
         io {
             DomainRulesManager.changeStatus(
-                log!!.queryStr,
+                currentLog.queryStr,
                 Constants.UID_EVERYBODY,
-                log!!.responseIps,
+                currentLog.responseIps,
                 DomainRulesManager.DomainType.DOMAIN,
                 status
             )
+            logEvent("DNS domain rule change", "${currentLog.queryStr} to ${status.name}")
         }
     }
 
     private fun displayDnsTransactionDetails() {
-        if (log == null) {
+        val currentLog = log
+        if (currentLog == null) {
             Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to update ui")
             return
         }
 
         displayDescription()
 
-        if (log!!.groundedQuery() || log!!.hasBlocklists() || log!!.upstreamBlock) {
+        if (currentLog.groundedQuery() || currentLog.hasBlocklists() || currentLog.upstreamBlock) {
             handleBlocklistChip()
             b.dnsBlockIpsChip.visibility = View.GONE
             return
@@ -323,15 +352,16 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun handleResponseIpsChip() {
+        val currentLog = log ?: return
         b.dnsBlockIpsChip.visibility = View.VISIBLE
         lightenUpChip(b.dnsBlockIpsChip, BlockType.ALLOWED)
-        if (ResourceRecordTypes.mayContainIp(log!!.typeName) && log!!.responseIps == "") {
+        if (ResourceRecordTypes.mayContainIp(currentLog.typeName) && currentLog.responseIps == "") {
             b.dnsBlockIpsChip.text = getString(R.string.dns_btm_sheet_chip_no_answer)
             return
         }
 
         try {
-            val ips = log!!.responseIps.split(",")
+            val ips = currentLog.responseIps.split(",")
             val ipCount = ips.count()
 
             if (ipCount == 1) {
@@ -350,14 +380,15 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun handleBlocklistChip() {
-        if (log == null) {
+        val currentLog = log
+        if (currentLog == null) {
             Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to update chips")
             return
         }
 
         b.dnsBlockBlocklistChip.visibility = View.VISIBLE
 
-        if (log!!.isBlocked) {
+        if (currentLog.isBlocked) {
             lightenUpChip(b.dnsBlockBlocklistChip, BlockType.BLOCKED)
         } else if (determineMaybeBlocked()) {
             lightenUpChip(b.dnsBlockBlocklistChip, BlockType.MAYBE_BLOCKED)
@@ -366,13 +397,13 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         }
 
         // show blocklist chip
-        if (log!!.hasBlocklists()) {
+        if (currentLog.hasBlocklists()) {
             showBlocklistChip()
             return
         }
 
         // show no-answer chip
-        if (log!!.unansweredQuery()) {
+        if (currentLog.unansweredQuery()) {
             b.dnsBlockBlocklistChip.text = getString(R.string.dns_btm_sheet_chip_no_answer)
             return
         }
@@ -383,18 +414,19 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun determineMaybeBlocked(): Boolean {
-        if (log == null) {
+        val currentLog = log
+        if (currentLog == null) {
             Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to update chips")
             return false
         }
 
-        return log!!.upstreamBlock || log!!.blockLists.isNotEmpty()
+        return currentLog.upstreamBlock || currentLog.blockLists.isNotEmpty()
     }
 
     private fun showBlocklistChip() {
         val group: Multimap<String, String> = HashMultimap.create()
 
-        log!!.getBlocklists().forEach {
+        log?.getBlocklists()?.forEach {
             val items = it.split(":")
             if (items.count() <= 1) return@forEach
 
@@ -444,7 +476,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_TYPE, DomainConnectionsActivity.InputType.DOMAIN.type)
         intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_DOMAIN, domain)
         intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_TIME_CATEGORY, DomainConnectionsViewModel.TimeCategory.SEVEN_DAYS.value)
-        intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_IS_BLOCKED, log!!.isBlocked)
+        intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_IS_BLOCKED, log?.isBlocked ?: false)
         requireContext().startActivity(intent)
         this.dismiss()
     }
@@ -462,7 +494,8 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun showIpsDialog() {
-        if (log == null) {
+        val currentLog = log
+        if (currentLog == null) {
             Logger.w(LOG_TAG_DNS, "Transaction detail missing, not showing dialog")
             return
         }
@@ -484,8 +517,8 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
             dialogBinding.ipDetailsFavIcon.setImageDrawable(b.dnsBlockFavIcon.drawable)
         else dialogBinding.ipDetailsFavIcon.visibility = View.GONE
 
-        dialogBinding.ipDetailsFqdnTxt.text = log!!.queryStr
-        dialogBinding.ipDetailsIpDetailsTxt.text = formatIps(log!!.responseIps)
+        dialogBinding.ipDetailsFqdnTxt.text = currentLog.queryStr
+        dialogBinding.ipDetailsIpDetailsTxt.text = formatIps(currentLog.responseIps)
 
         dialogBinding.infoRulesDialogCancelImg.setOnClickListener { dialog.dismiss() }
         dialog.show()
@@ -522,20 +555,21 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun displayDescription() {
-        if (log == null) {
+        val currentLog = log
+        if (currentLog == null) {
             Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to update ui")
             return
         }
 
         val uptime =
             DateUtils.getRelativeTimeSpanString(
-                    log!!.time,
+                    currentLog.time,
                     System.currentTimeMillis(),
                     DateUtils.MINUTE_IN_MILLIS,
                     DateUtils.FORMAT_ABBREV_RELATIVE
                 )
                 .toString()
-        if (log!!.isBlocked) {
+        if (currentLog.isBlocked) {
             showBlockedState(uptime)
         } else {
             showResolvedState(uptime)
@@ -543,59 +577,62 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun showResolvedState(uptime: String) {
-        if (log == null) {
+        val currentLog = log
+        if (currentLog == null) {
             Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to update ui")
             return
         }
 
-        if (log!!.isCached) {
-            val txt = if (log!!.serverIP.isEmpty()) {
+        if (currentLog.isCached) {
+            val txt = if (currentLog.serverIP.isEmpty()) {
                 getString(R.string.dns_btm_resolved_doh, uptime, getString(R.string.lbl_cache))
             } else {
-                val concat = "${getString(R.string.lbl_cache)} (${log!!.resolverId}:${log!!.serverIP})"
+                val concat = "${getString(R.string.lbl_cache)} (${currentLog.resolverId}:${currentLog.serverIP})"
                 getString(R.string.dns_btm_resolved_doh, uptime, concat)
             }
             b.dnsBlockBlockedDesc.text = txt
             return
         }
 
-        if (log!!.isAnonymized()) { // anonymized queries answered by dns-crypt / proxies
-            val p = log!!.relayIP.ifEmpty {
-                log!!.proxyId
+        if (currentLog.isAnonymized()) { // anonymized queries answered by dns-crypt / proxies
+            val p = currentLog.relayIP.ifEmpty {
+                currentLog.proxyId
             }
-            val text = getString(R.string.dns_btm_resolved_crypt, uptime, log!!.serverIP, p)
+            val text = getString(R.string.dns_btm_resolved_crypt, uptime, currentLog.serverIP, p)
             b.dnsBlockBlockedDesc.text = htmlToSpannedText(text)
-        } else if (log!!.isLocallyAnswered()) { // usually happens when there is a network failure
+        } else if (currentLog.isLocallyAnswered()) { // usually happens when there is a network failure
             b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh_no_server, uptime)
         } else {
             b.dnsBlockBlockedDesc.text =
-                getString(R.string.dns_btm_resolved_doh, uptime, log!!.serverIP)
+                getString(R.string.dns_btm_resolved_doh, uptime, currentLog.serverIP)
         }
     }
 
     private fun showBlockedState(uptime: String) {
-        if (log == null) {
+        val currentLog = log
+        if (currentLog == null) {
             Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to update ui")
             return
         }
 
-        if (log!!.isLocallyAnswered()) { // usually true when query blocked by on-device blocklists
+        if (currentLog.isLocallyAnswered()) { // usually true when query blocked by on-device blocklists
             b.dnsBlockBlockedDesc.text = getString(R.string.bsct_conn_block_desc_device, uptime)
         } else {
             b.dnsBlockBlockedDesc.text =
-                getString(R.string.bsct_conn_block_desc, uptime, log!!.serverIP)
+                getString(R.string.bsct_conn_block_desc, uptime, currentLog.serverIP)
         }
     }
 
     private fun displayFavIcon() {
-        if (log == null) {
+        val currentLog = log
+        if (currentLog == null) {
             Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to update ui")
             return
         }
 
-        if (!persistentState.fetchFavIcon || log!!.groundedQuery()) return
+        if (!persistentState.fetchFavIcon || currentLog.groundedQuery()) return
 
-        val trim = log!!.queryStr.dropLastWhile { it == '.' }
+        val trim = currentLog.queryStr.dropLastWhile { it == '.' }
 
         // no need to check in glide cache if the value is available in failed cache
         if (FavIconDownloader.isUrlAvailableInFailedCache(trim) != null) {
@@ -623,6 +660,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
                 .load(url)
                 .onlyRetrieveFromCache(true)
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                .timeout(2000) // Prevent hanging - fail fast if cache lookup is slow
                 .error(lookupForImageDuckduckgo(duckduckgoUrl, duckduckgoDomainURL))
                 .transition(DrawableTransitionOptions.withCrossFade(factory))
                 .into(
@@ -671,10 +709,12 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
                 .load(url)
                 .onlyRetrieveFromCache(true)
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                .timeout(2000) // Prevent hanging - fail fast if cache lookup is slow
                 .error(
                     Glide.with(requireContext().applicationContext)
                         .load(domainUrl)
                         .onlyRetrieveFromCache(true)
+                        .timeout(2000)
                 )
                 .transition(DrawableTransitionOptions.withCrossFade(factory))
                 .into(
@@ -712,6 +752,10 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
             b.dnsBlockFavIcon.visibility = View.GONE
         }
+    }
+
+    private fun logEvent(msg: String, details: String) {
+        eventLogger.log(EventType.FW_RULE_MODIFIED, Severity.LOW, msg, EventSource.UI, false, details)
     }
 
     private fun io(f: suspend () -> Unit) {

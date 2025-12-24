@@ -36,6 +36,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.FirewallManager.TOMBSTONE_EXPIRY_TIME_MS
@@ -43,7 +44,6 @@ import com.celzero.bravedns.service.FirewallManager.deletePackage
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.NotificationHandlerActivity
@@ -59,13 +59,14 @@ import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isNonApp
 import com.celzero.bravedns.wireguard.WgHopManager
-import java.util.concurrent.TimeUnit
-import kotlin.random.Random
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
+import kotlin.math.log
+import kotlin.random.Random
 
 class RefreshDatabase
 internal constructor(
@@ -73,7 +74,8 @@ internal constructor(
     private val connTrackerRepository: ConnectionTrackerRepository,
     private val dnsLogRepository: DnsLogRepository,
     private val rethinkLogRepository: RethinkLogRepository,
-    private val persistentState: PersistentState
+    private val persistentState: PersistentState,
+    private val eventLogger: EventLogger
 ) {
 
     companion object {
@@ -150,12 +152,12 @@ internal constructor(
             val pxm = ProxyManager.load()
             val wgm = WireguardManager.load(forceRefresh = false)
             val hm = WgHopManager.load(forceRefresh = false)
-            val tm = TcpProxyHelper.load()
+            // val tm = TcpProxyHelper.load() // no need to load tcp-proxy mapping now (055v)
             //val rm = RpnProxyManager.load()
 
             Logger.i(
                 LOG_TAG_APP_DB,
-                "reload: fm: $fm; ip: $ipm; dom: $dm; px: $pxm; wg: $wgm; hm: $hm t: $tm"
+                "reload: fm: $fm; ip: $ipm; dom: $dm; px: $pxm; wg: $wgm; hm: $hm"
             )
 
             val canTombstone = persistentState.tombstoneApps
@@ -176,6 +178,9 @@ internal constructor(
                 if (appInfo != null) {
                     installedApps.add(FirewallManager.AppInfoTuple(appInfo.uid, it.packageName))
                 }
+            }
+            if (trackedApps.size != installedApps.size) {
+                logEvent(Severity.LOW, "app refresh", "installed apps: ${installedApps.size}, tracked apps: ${trackedApps.size}, restore? ${action == ACTION_REFRESH_RESTORE}")
             }
             Logger.i(
                 LOG_TAG_APP_DB,
@@ -199,6 +204,7 @@ internal constructor(
             printAll(packagesToDelete, "packagesToDelete")
             printAll(packagesToUpdate, "packagesToUpdate")
 
+            logEvent(Severity.LOW, "app refresh details", "sizes: rmv: ${packagesToDelete.size}; add: ${packagesToAdd.size}; update: ${packagesToUpdate.size}, tombstone: ${packagesToTombstone.size}, action: $action, tombstoneEnabled? $canTombstone")
             Logger.i(
                 LOG_TAG_APP_DB,
                 "sizes: rmv: ${packagesToDelete.size}; add: ${packagesToAdd.size}; update: ${packagesToUpdate.size}, tombstone: ${packagesToTombstone.size}, action: $action, tombstoneEnabled? $canTombstone"
@@ -457,6 +463,7 @@ internal constructor(
                     oldUid
                 }
                 FirewallManager.updateUidAndResetTombstone(oldUid, newUid, pkg)
+                logEvent(Severity.MEDIUM, "tombstone app", "reset tombstone for non-app $pkg, uid: $newUid")
                 Logger.i(LOG_TAG_APP_DB, "insertApp: $uid is tombstoned, but app info is null (non-app)")
                 return
             }
@@ -472,8 +479,10 @@ internal constructor(
         if (ai != null) {
             // uid may be different from the one in ai, if the app is installed in a different user
             insertApp(ai)
+            logEvent(Severity.LOW, "new app installed", "inserted app ${ai.packageName}, uid: ${ai.uid}")
         } else {
             insertUnknownApp(uid)
+            logEvent(Severity.MEDIUM, "new unknown app installed", "inserted unknown app, uid: $uid")
         }
         showNewAppNotificationIfNeeded(FirewallManager.AppInfoTuple(uid, pkg))
     }
@@ -716,6 +725,7 @@ internal constructor(
         if (!persistentState.getBlockNewlyInstalledApp()) return
 
         // no need to notify if the vpn is not on
+        @Suppress("DEPRECATION")
         if (!VpnController.isOn()) return
 
         var pkgName = app.packageName
@@ -967,6 +977,10 @@ internal constructor(
         dnsLogRepository.purgeDnsLogsByDate(date)
         connTrackerRepository.purgeLogsByDate(date)
         rethinkLogRepository.purgeLogsByDate(date)
+    }
+
+    private suspend fun logEvent(severity: Severity, msg: String, details: String) {
+        eventLogger.log(EventType.APP_REFRESH, severity, msg, EventSource.MANAGER, false, details)
     }
 
     private fun printAll(c: Collection<FirewallManager.AppInfoTuple>, tag: String) {

@@ -35,8 +35,12 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.animation.Rotate3dAnimation
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.BottomSheetOrbotBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
@@ -73,7 +77,21 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
     private val orbotHelper by inject<OrbotHelper>()
+    private val eventLogger by inject<EventLogger>()
     private val mappingViewModel: ProxyAppsMappingViewModel by viewModel()
+
+    companion object {
+        // Animation constants
+        private const val ROTATION_START_DEGREES = 0.0f
+        private const val ROTATION_END_DEGREES = 360.0f
+        private const val ROTATION_MULTIPLIER = 4f
+        private const val ROTATION_Z_DEPTH = 20f
+        private const val ANIMATION_DURATION_SECONDS = 2L
+        private const val ANIMATION_DURATION_MS_MULTIPLIER = 1000L
+
+        // UI dimension constants
+        private const val ORBOT_ICON_WIDTH_DIP = 40f
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -323,6 +341,10 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
         io {
             val isOrbotDns = appConfig.isOrbotDns()
             uiCtx { showStopOrbotDialog(isOrbotDns) }
+            logEvent(
+                "Orbot Stopped",
+                "User stopped Orbot from Orbot Bottom Sheet"
+            )
         }
     }
 
@@ -440,10 +462,10 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
         if (width == 0) {
             width = getCalculatedWidth()
         }
-        val rotation = Rotate3dAnimation(0.0f, 360.0f * 4f, width / 2f, width / 2f, 20f, true)
+        val rotation = Rotate3dAnimation(ROTATION_START_DEGREES, ROTATION_END_DEGREES * ROTATION_MULTIPLIER, width / 2f, width / 2f, ROTATION_Z_DEPTH, true)
         rotation.fillAfter = true
         rotation.interpolator = AccelerateInterpolator()
-        rotation.duration = 2.toLong() * 1000
+        rotation.duration = ANIMATION_DURATION_SECONDS * ANIMATION_DURATION_MS_MULTIPLIER
         rotation.repeatCount = Animation.INFINITE
         b.orbotIcon.startAnimation(rotation)
     }
@@ -452,9 +474,8 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
     // Calculate the width of the icon manually.
     // Invoke this method when the width of the Orbot icon is returned as 0 by viewBinder.
     private fun getCalculatedWidth(): Int {
-        val dip = 40f
         val r: Resources = resources
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, r.displayMetrics).toInt()
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, ORBOT_ICON_WIDTH_DIP, r.displayMetrics).toInt()
     }
 
     private fun disableLoading() {
@@ -516,6 +537,10 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
 
                 if (VpnController.hasTunnel()) {
                     orbotHelper.startOrbot(type)
+                    logEvent(
+                        "Orbot Started with type: $type",
+                        "User started Orbot from Orbot Bottom Sheet with type: $type"
+                    )
                 } else {
                     Utilities.showToastUiCentered(
                         requireContext(),
@@ -598,6 +623,10 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
 
         okBtn.setOnClickListener { dialog.dismiss() }
         dialog.show()
+    }
+
+    private fun logEvent(msg: String, details: String) {
+        eventLogger.log(EventType.PROXY_SWITCH, Severity.LOW, msg, EventSource.UI, false, details)
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {

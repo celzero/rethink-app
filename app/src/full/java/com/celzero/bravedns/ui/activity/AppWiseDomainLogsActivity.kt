@@ -39,6 +39,7 @@ import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.databinding.ActivityAppWiseDomainLogsBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
@@ -65,7 +66,6 @@ class AppWiseDomainLogsActivity :
     private var uid: Int = INVALID_UID
     private var layoutManager: RecyclerView.LayoutManager? = null
     private lateinit var appInfo: AppInfo
-    private var isRethink = false
     private var isActiveConns = false
 
     companion object {
@@ -94,20 +94,18 @@ class AppWiseDomainLogsActivity :
         if (uid == INVALID_UID) {
             finish()
         }
-        if (Utilities.getApplicationInfo(this, this.packageName)?.uid == uid) {
-            isRethink = true
-            init()
-            setRethinkAdapter()
-            b.toggleGroup.addOnButtonCheckedListener(listViewToggleListener)
+        val isRethink = Utilities.getApplicationInfo(this, this.packageName)?.uid == uid
+        init()
+        if (isActiveConns) {
+            setActiveConnsAdapter(isRethink)
         } else {
-            init()
-            if (isActiveConns) {
-                setActiveConnsAdapter()
+            if (isRethink) {
+                setRethinkAdapter()
             } else {
                 setAdapter()
             }
-            setClickListener()
         }
+        setClickListener()
     }
 
     override fun onResume() {
@@ -244,15 +242,38 @@ class AppWiseDomainLogsActivity :
         Glide.with(this).load(drawable).error(Utilities.getDefaultIcon(this)).into(mIconImageView)
     }
 
-    private fun setActiveConnsAdapter() {
+    private fun setActiveConnsAdapter(isRethink: Boolean) {
         Logger.v(LOG_TAG_UI, "setActiveConnsAdapter: uid: $uid, isRethink: $isRethink")
-        networkLogsViewModel.setUid(uid)
+        if (!isRethink) networkLogsViewModel.setUid(uid)
         b.awlRecyclerConnection.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(this)
         b.awlRecyclerConnection.layoutManager = layoutManager
-        val recyclerAdapter = AppWiseDomainsAdapter(this, this, uid, isRethink, true)
-        networkLogsViewModel.activeConnections.observe(this) {
-            recyclerAdapter.submitData(this.lifecycle, it)
+        val recyclerAdapter = AppWiseDomainsAdapter(this, this, uid, true)
+        if (isRethink) {
+            val uptime = VpnController.uptimeMs()
+            networkLogsViewModel.getRethinkAllActiveConns(uptime).observe(this) {
+                // Fix: Stop layout before submitting data to prevent IndexOutOfBoundsException
+                try {
+                    b.awlRecyclerConnection.stopScroll()
+                    recyclerAdapter.submitData(this.lifecycle, it)
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_UI, "Error submitting rethink active connections data: ${e.message}", e)
+                }
+            }
+        } else {
+            networkLogsViewModel.activeConnections.observe(this) {
+                // Fix: Stop layout before submitting data to prevent IndexOutOfBoundsException
+                try {
+                    b.awlRecyclerConnection.stopScroll()
+                    recyclerAdapter.submitData(this.lifecycle, it)
+                } catch (e: Exception) {
+                    Logger.e(
+                        LOG_TAG_UI,
+                        "Error submitting active connections data: ${e.message}",
+                        e
+                    )
+                }
+            }
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
 
@@ -280,9 +301,15 @@ class AppWiseDomainLogsActivity :
         b.awlRecyclerConnection.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(this)
         b.awlRecyclerConnection.layoutManager = layoutManager
-        val recyclerAdapter = AppWiseDomainsAdapter(this, this, uid, isRethink)
+        val recyclerAdapter = AppWiseDomainsAdapter(this, this, uid)
         networkLogsViewModel.appDomainLogs.observe(this) {
-            recyclerAdapter.submitData(this.lifecycle, it)
+            // Fix: Stop layout before submitting data to prevent IndexOutOfBoundsException
+            try {
+                b.awlRecyclerConnection.stopScroll()
+                recyclerAdapter.submitData(this.lifecycle, it)
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_UI, "Error submitting domain logs data: ${e.message}", e)
+            }
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
 
@@ -310,9 +337,15 @@ class AppWiseDomainLogsActivity :
         b.awlRecyclerConnection.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(this)
         b.awlRecyclerConnection.layoutManager = layoutManager
-        val recyclerAdapter = AppWiseDomainsAdapter(this, this, uid, isRethink)
+        val recyclerAdapter = AppWiseDomainsAdapter(this, this, uid)
         networkLogsViewModel.rinrDomainLogs.observe(this) {
-            recyclerAdapter.submitData(this.lifecycle, it)
+            // Fix: Stop layout before submitting data to prevent IndexOutOfBoundsException
+            try {
+                b.awlRecyclerConnection.stopScroll()
+                recyclerAdapter.submitData(this.lifecycle, it)
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_UI, "Error submitting rethink domain logs data: ${e.message}", e)
+            }
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
 

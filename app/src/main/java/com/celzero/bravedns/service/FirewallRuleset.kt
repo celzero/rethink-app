@@ -227,8 +227,14 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
     RULE18(
         "Proxy Error",
         R.string.firewall_rule_proxy_error,
-        R.string.firewall_rule_proxy_error,
+        R.string.firewall_rule_proxy_error_desc,
         R.integer.stall
+    ),
+    RULE19(
+        "Temp Allow",
+        R.string.firewall_rule_temp_allow,
+        R.string.firewall_rule_temp_allow_desc ,
+        R.integer.allow
     );
 
     companion object {
@@ -269,6 +275,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE16.id -> RULE16
                 RULE17.id -> RULE17
                 RULE18.id -> RULE18
+                RULE19.id -> RULE19
                 else -> null
             }
         }
@@ -358,6 +365,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE9.id -> true
                 RULE9B.id -> true
                 RULE15.id -> true
+                RULE19.id -> true
                 else -> false
             }
         }

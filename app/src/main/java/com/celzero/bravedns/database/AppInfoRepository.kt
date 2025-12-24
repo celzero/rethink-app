@@ -30,6 +30,7 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
     }
 
     suspend fun insert(appInfo: AppInfo): Long {
+        appInfo.modifiedTs = System.currentTimeMillis()
         return appInfoDAO.insert(appInfo)
     }
 
@@ -41,7 +42,8 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
             appInfoDAO.deletePackage(oldUid, pkg)
             return 0
         }
-        return appInfoDAO.updateUid(oldUid, pkg, newUid)
+        val modifiedTs = System.currentTimeMillis()
+        return appInfoDAO.updateUid(oldUid, pkg, newUid, modifiedTs)
     }
 
     suspend fun deleteByPackageName(packageNames: List<String>) {
@@ -57,12 +59,13 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
     }
 
     suspend fun tombstoneApp(oldUid: Int, newUid: Int, packageName: String?, tombstoneTs: Long) {
+        val modifiedTs = System.currentTimeMillis()
         try {
             if (packageName == null) {
-                appInfoDAO.tombstoneApp(oldUid, newUid, tombstoneTs)
+                appInfoDAO.tombstoneApp(oldUid, newUid, tombstoneTs, modifiedTs)
                 return
             }
-            appInfoDAO.tombstoneApp(oldUid, newUid, packageName, tombstoneTs)
+            appInfoDAO.tombstoneApp(oldUid, newUid, packageName, tombstoneTs, modifiedTs)
         } catch (_: Exception) {
             // tombstoneApp is called when there is a package name change or uid change
             // in both the cases, we try to update the existing record with new uid or package name
@@ -75,20 +78,52 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.getAllAppDetails()
     }
 
+    suspend fun getAppInfoByUid(uid: Int): AppInfo? {
+        return appInfoDAO.getAppInfoByUid(uid)
+    }
+
     suspend fun updateFirewallStatusByUid(uid: Int, firewallStatus: Int, connectionStatus: Int) {
-        appInfoDAO.updateFirewallStatusByUid(uid, firewallStatus, connectionStatus)
+        appInfoDAO.updateFirewallStatusByUid(uid, firewallStatus, connectionStatus, System.currentTimeMillis())
+    }
+
+    suspend fun updateTempAllowByUid(uid: Int, enabled: Boolean, expiryTime: Long) {
+        appInfoDAO.updateTempAllowByUid(uid, enabled, expiryTime, System.currentTimeMillis())
+    }
+
+    suspend fun getTempAllowedApps(): List<AppInfo> {
+        return appInfoDAO.getTempAllowedApps()
+    }
+
+    suspend fun getAllTempAllowedApps(now: Long): List<AppInfo> {
+        // Filter apps where tempAllowExpiryTime is greater than current time
+        return appInfoDAO.getTempAllowedApps().filter { it.tempAllowExpiryTime > now }
+    }
+
+    fun getAllTempAllowedAppsPaged(now: Long): androidx.paging.PagingSource<Int, AppInfo> {
+        return appInfoDAO.getTempAllowedAppsPaged(now)
+    }
+
+    suspend fun clearTempAllowByUid(uid: Int) {
+        appInfoDAO.clearTempAllowByUid(uid, System.currentTimeMillis())
+    }
+
+    suspend fun clearTempAllowByUidIfExpiry(uid: Int, expectedExpiry: Long): Int {
+        return appInfoDAO.clearTempAllowByUidIfExpiry(uid, expectedExpiry, System.currentTimeMillis())
     }
 
     fun cpUpdate(appInfo: AppInfo): Int {
+        appInfo.modifiedTs = System.currentTimeMillis()
         return appInfoDAO.update(appInfo)
     }
 
     fun cpUpdate(appInfo: AppInfo, clause: String): Int {
         // update only firewall and metered
+        // Note: This method updates via raw query so modifiedTs must be included in clause if needed
         return appInfoDAO.cpUpdate(appInfo.firewallStatus, appInfo.connectionStatus, clause)
     }
 
     fun cpInsert(appInfo: AppInfo): Long {
+        appInfo.modifiedTs = System.currentTimeMillis()
         return appInfoDAO.insert(appInfo)
     }
 
@@ -109,14 +144,43 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
     }
 
     suspend fun updateProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
-        appInfoDAO.updateProxyExcluded(uid, isProxyExcluded)
-    }
-
-    suspend fun resetRethinkAppFirewallMode() {
-        appInfoDAO.resetRethinkAppFirewallMode()
+        appInfoDAO.updateProxyExcluded(uid, isProxyExcluded, System.currentTimeMillis())
     }
 
     suspend fun getAppInfoUidForPackageName(packageName: String): Int {
         return appInfoDAO.getAppInfoUidForPackageName(packageName)
+    }
+
+    suspend fun setRethinkToBypassProxy(bypass: Boolean) {
+        appInfoDAO.setRethinkToBypassProxy(bypass)
+    }
+
+    suspend fun setRethinkToBypassDnsAndFirewall() {
+        appInfoDAO.setRethinkToBypassDnsAndFirewall()
+    }
+
+    /**
+     * Blocking variant for use from non-coroutine contexts (eg: Guava cache removal listeners).
+     */
+    fun clearTempAllowByUidBlocking(uid: Int) {
+        appInfoDAO.clearTempAllowByUid(uid, System.currentTimeMillis())
+    }
+
+    /**
+     * Blocking variant for use from non-coroutine contexts (eg: Guava cache removal listeners).
+     */
+    fun clearTempAllowByUidIfExpiryBlocking(uid: Int, expectedExpiry: Long): Int {
+        return appInfoDAO.clearTempAllowByUidIfExpiry(uid, expectedExpiry, System.currentTimeMillis())
+    }
+
+    fun getNearestTempAllowExpiryBlocking(now: Long): Long? {
+        return appInfoDAO.getNearestTempAllowExpiry(now)
+    }
+
+    /** Clears all expired temp-allow entries in a single statement; returns rows updated. */
+    fun clearAllExpiredTempAllowsBlocking(now: Long): Int {
+        // Clear any temp allow rows whose expiry has passed.
+        // (Requires a DAO query; if not present, keep this as best-effort per-uid in worker.)
+        return appInfoDAO.clearAllExpiredTempAllows(now, System.currentTimeMillis())
     }
 }

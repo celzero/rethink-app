@@ -38,23 +38,23 @@
                         android:id="@+id/config_title_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
                         android:baselineAligned="false"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent">
+                        android:orientation="horizontal"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/config_name_text"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:paddingTop="5dp"
-                            android:textAppearance="?attr/textAppearanceHeadline6"
-                            android:textColor="?attr/primaryTextColor"
                             android:ellipsize="none"
-                            android:singleLine="false"
+                            android:inputType="textMultiLine"
+                            android:paddingTop="5dp"
                             android:scrollHorizontally="false"
-                            android:inputType="textMultiLine" />
+                            android:singleLine="false"
+                            android:textAppearance="?attr/textAppearanceHeadline6"
+                            android:textColor="?attr/primaryTextColor" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/config_id_text"
@@ -64,8 +64,8 @@
                             android:layout_marginStart="2dp"
                             android:layout_marginEnd="3dp"
                             android:alpha="0.7"
-                            android:maxEms="5"
                             android:ellipsize="end"
+                            android:maxEms="5"
                             android:singleLine="true" />
 
                     </LinearLayout>
@@ -325,11 +325,150 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/actions_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/interface_detail_card"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:letterSpacing="0.03"
+                        android:text="Actions"
+                        android:textAppearance="?attr/textAppearanceSubtitle1"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textStyle="bold" />
+
+                    <!-- Premium Horizontal Actions -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:weightSum="3">
+
+                        <LinearLayout
+                            android:id="@+id/applications_btn_x"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/rectangle_border_background"
+                            android:foreground="?attr/selectableItemBackground"
+                            android:gravity="center"
+                            android:minHeight="64dp"
+                            android:orientation="vertical"
+                            android:paddingStart="12dp"
+                            android:paddingTop="10dp"
+                            android:paddingEnd="12dp"
+                            android:paddingBottom="10dp">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginBottom="4dp"
+                                android:src="@drawable/ic_app_info_accent"
+                                app:tint="?attr/primaryTextColor" />
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/apps_label"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Apps(0)"
+                                android:textAllCaps="false"
+                                android:textColor="?attr/secondaryTextColor"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/hop_btn_x"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:layout_marginEnd="4dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/rectangle_border_background"
+                            android:foreground="?attr/selectableItemBackground"
+                            android:gravity="center"
+                            android:minHeight="64dp"
+                            android:orientation="vertical"
+                            android:paddingStart="12dp"
+                            android:paddingTop="10dp"
+                            android:paddingEnd="12dp"
+                            android:paddingBottom="10dp">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginBottom="4dp"
+                                android:src="@drawable/ic_network_tunnel"
+                                app:tint="?attr/primaryTextColor" />
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Relay"
+                                android:textAllCaps="false"
+                                android:textColor="?attr/secondaryTextColor"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/logs_btn_x"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/rectangle_border_background"
+                            android:foreground="?attr/selectableItemBackground"
+                            android:gravity="center"
+                            android:minHeight="64dp"
+                            android:orientation="vertical"
+                            android:paddingStart="12dp"
+                            android:paddingTop="10dp"
+                            android:paddingEnd="12dp"
+                            android:paddingBottom="10dp">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginBottom="4dp"
+                                android:src="@drawable/ic_logs"
+                                app:tint="?attr/primaryTextColor" />
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Logs"
+                                android:textAllCaps="false"
+                                android:textColor="?attr/secondaryTextColor"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/other_settings_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/interface_detail_card">
+                app:layout_constraintTop_toBottomOf="@id/actions_card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -346,51 +485,6 @@
                         android:paddingTop="15dp"
                         android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textColor="?attr/primaryTextColor" />
-
-                    <RelativeLayout
-                        android:id="@+id/lockdown_rl"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="15dp"
-                        android:layout_marginEnd="15dp"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentStart="true"
-                            android:layout_centerVertical="true"
-                            android:layout_toStartOf="@id/lockdown_check"
-                            android:orientation="vertical">
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/global_lockdown_title_tv"
-                                style="@style/TextAppearance.AppCompat.Subhead"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/firewall_rule_global_lockdown"
-                                android:textSize="@dimen/large_font_text_view" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:paddingTop="5dp"
-                                android:text="@string/wg_lockdown_dialog_desc"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="@dimen/default_font_text_view" />
-                        </LinearLayout>
-
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/lockdown_check"
-                            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true" />
-
-                    </RelativeLayout>
 
                     <RelativeLayout
                         android:id="@+id/catch_all_rl"

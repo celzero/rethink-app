@@ -957,8 +957,6 @@
     <string name="cd_dialog_edit_title" translatable="true">Алишьадара даҟәылара аҿыцреи arra</string>
     <string name="cd_toast_edit" translatable="true">Адаптиракьыра</string>
     <string name="one_wg_apps_added" translatable="true">Апхылаққәа зегьы р маршрутизациа</string>
-    <string name="wg_lockdown_dialog_title" translatable="true">Лакра, анцәахатә режим</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">Архьатқәа рыҧшра ашәахьала уи WireGuard VPN аҟны инагоуп, VPN активла акәымкәа, мамзаракә аус зумкәа.</string>
     <string name="one_wg_dialog_desc" translatable="true">Амшынлара зегь, зегьыла апликациақәа рҟынтә, DNS егьалҟьаз, еиртаҟәааны иҟоу еицырҧшәаны WireGuard VPN-и иаишьҭырҧшәаны. Егьырҧшәаны иҟоу WireGuard VPN-қәа, егьырҧшәаны иҟам-иҟома, ашьҭыжьра аҿаҧра аҭышәы ҟаҵалоит.</string>
     <string name="catch_all_wg_dialog_title" translatable="true">Аҧшәыла-имҩасуа</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">АлаӠкыларақәа рымҩаԥгара, егьырҭоуп WireGuard VPN-қәа рымҩаԥгарала ишызмырҩасуа апрограммақәеи рнапылақәеи, ашәырҟәышә ашәырҟәышә ацынхәалагала аҟаҵаҟа.</string>

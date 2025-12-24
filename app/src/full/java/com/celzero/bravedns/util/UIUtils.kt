@@ -37,12 +37,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
-import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.DnsLogTracker
+import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.NetStat
 import com.google.android.material.radiobutton.MaterialRadioButton
 import java.util.Calendar

@@ -4,7 +4,6 @@
     <string name="title_settings" translatable="true">ตั้งค่า</string>
     <string name="title_statistics" translatable="true">สถานะ</string>
     <string name="pause_title_desc" translatable="true">งีบหลับสักพัก…</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">แอปที่เลือกจะถูกกำหนดเส้นทางผ่าน WireGuard VPN นี้เท่านั้น โดยไม่คำนึงว่า VPN นั้นจะเปิดใช้งานหรือปิดใช้งานอยู่</string>
     <string name="lbl_idle" translatable="true">ว่างงาน</string>
     <string name="lbl_private" translatable="true">ส่วนตัว</string>
     <string name="lbl_secure" translatable="true">ปลอดภัย</string>
@@ -881,7 +880,6 @@
     <string name="new_warp_invalid_config_toast" translatable="true">การกำหนดค่า WARP ไม่ถูกต้อง</string>
     <string name="parse_error_inet_network" translatable="true">เครือข่ายไอพี</string>
     <string name="parse_error_integer" translatable="true">ตัวเลข</string>
-    <string name="wg_lockdown_dialog_title" translatable="true">การปิดพื้นที่</string>
     <string name="one_wg_dialog_desc" translatable="true">การเชื่อมต่อทั้งหมดจากแอปทั้งหมด รวมถึง DNS จะถูกส่งต่อไปยัง WireGuard VPN ที่ใช้งานอยู่เพียงตัวเดียว หากมี WireGuard VPN ที่ใช้งานอยู่ตัวอื่นก็จะหยุดทำงาน</string>
     <string name="include_all_app_wg_dialog_desc" translatable="true">ใช้ WireGuard VPN นี้สำหรับแอปทั้งหมดหรือไม่?</string>
     <string name="wireguard_disable_message" translatable="true">หยุด WireGuard VPN ที่ใช้งานอยู่ทั้งหมดหรือไม่?</string>

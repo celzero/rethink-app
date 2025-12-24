@@ -455,4 +455,10 @@
     <color name="defaultToggleBtnTxtBG">#FDFDFD</color>
     <color name="defaultToggleBtnBgBG">#1e1e1e</color>
 
+    <!-- Event Severity Colors -->
+    <color name="severity_low">#4CAF50</color>        <!-- Green -->
+    <color name="severity_medium">#FFC107</color>     <!-- Yellow/Amber -->
+    <color name="severity_high">#FF9800</color>       <!-- Orange -->
+    <color name="severity_critical">#F44336</color>   <!-- Red -->
+
 </resources>

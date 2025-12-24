@@ -47,6 +47,7 @@ object ViewModelModule {
         viewModel { ConsoleLogViewModel(get()) }
         viewModel { DomainConnectionsViewModel(get()) }
         viewModel { WgNwActivityViewModel(get()) }
+        viewModel { EventsViewModel(get()) }
     }
 
     val modules = listOf(viewModelModule)

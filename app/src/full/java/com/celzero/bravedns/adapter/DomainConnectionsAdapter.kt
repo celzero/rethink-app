@@ -34,11 +34,8 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.activity.AppInfoActivity
 import com.celzero.bravedns.ui.activity.DomainConnectionsActivity
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity
-import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment.SummaryStatisticsType
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.getFlag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

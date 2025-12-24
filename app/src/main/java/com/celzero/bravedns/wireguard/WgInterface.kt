@@ -18,10 +18,15 @@
  */
 package com.celzero.bravedns.wireguard
 
+import com.celzero.bravedns.wireguard.BadConfigException.Location
+import com.celzero.bravedns.wireguard.BadConfigException.Reason
+import com.celzero.bravedns.wireguard.BadConfigException.Section
 import com.celzero.firestack.backend.Backend
-import com.celzero.bravedns.wireguard.BadConfigException.*
 import java.net.InetAddress
-import java.util.*
+import java.util.Collections
+import java.util.Locale
+import java.util.Objects
+import java.util.Optional
 import java.util.stream.Collectors
 
 /**
@@ -114,6 +119,7 @@ class WgInterface private constructor(builder: Builder) {
         h4 = builder.h4
     }
 
+    @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
     override fun equals(obj: Any?): Boolean {
         if (obj !is WgInterface) return false
         return addresses == obj.addresses &&

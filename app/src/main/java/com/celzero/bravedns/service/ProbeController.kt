@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.service
 
+import Logger
 import Logger.LOG_TAG_CONNECTION
 import android.net.Network
 import com.celzero.firestack.intra.Controller

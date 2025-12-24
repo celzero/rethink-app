@@ -149,7 +149,6 @@ class WireguardManagerTest : KoinTest {
         configPath: String = "/test/path",
         isActive: Boolean = false,
         isCatchAll: Boolean = false,
-        isLockdown: Boolean = false,
         oneWireGuard: Boolean = false,
         useOnlyOnMetered: Boolean = false,
         isDeletable: Boolean = true,
@@ -163,7 +162,6 @@ class WireguardManagerTest : KoinTest {
             serverResponse = "test-response",
             isActive = isActive,
             isCatchAll = isCatchAll,
-            isLockdown = isLockdown,
             oneWireGuard = oneWireGuard,
             useOnlyOnMetered = useOnlyOnMetered,
             isDeletable = isDeletable,
@@ -1276,7 +1274,7 @@ class WireguardManagerTest : KoinTest {
         println("🧪 Testing canDisableConfig() - lockdown config")
 
         // Setup
-        val lockdownConfig = createMockWgConfigFilesImmutable(1, isLockdown = true, isCatchAll = false)
+        val lockdownConfig = createMockWgConfigFilesImmutable(1, isCatchAll = false)
 
         // Execute
         val result = WireguardManager.canDisableConfig(lockdownConfig)
@@ -1292,7 +1290,7 @@ class WireguardManagerTest : KoinTest {
 
         // Setup
         val catchAllLockdownConfig = createMockWgConfigFilesImmutable(
-            1, isCatchAll = true, isLockdown = true
+            1, isCatchAll = true
         )
 
         // Execute
@@ -1318,7 +1316,7 @@ class WireguardManagerTest : KoinTest {
             setupMockConfig(2)
         )
         addConfigToManager(
-            createMockWgConfigFilesImmutable(3, isActive = true, isLockdown = true),
+            createMockWgConfigFilesImmutable(3, isActive = true),
             setupMockConfig(3)
         )
 

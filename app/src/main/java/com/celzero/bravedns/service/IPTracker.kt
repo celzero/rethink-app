@@ -46,10 +46,6 @@ internal constructor(
     private val ctx: Context
 ) : KoinComponent {
 
-    companion object {
-        private const val PER_USER_RANGE = 100000
-    }
-
     suspend fun makeConnectionTracker(connTrackerMetaData: ConnTrackerMetaData): ConnectionTracker {
         val connTracker = ConnectionTracker()
         connTracker.ipAddress = connTrackerMetaData.destIP
@@ -90,7 +86,9 @@ internal constructor(
         val rlog = RethinkLog()
         rlog.ipAddress = connTrackerMetaData.destIP
         rlog.isBlocked = connTrackerMetaData.isBlocked
+        rlog.blockedByRule = connTrackerMetaData.blockedByRule
         rlog.uid = connTrackerMetaData.uid
+        rlog.usrId = connTrackerMetaData.usrId
         rlog.port = connTrackerMetaData.destPort
         rlog.protocol = connTrackerMetaData.protocol
         rlog.timeStamp = connTrackerMetaData.timestamp
@@ -127,21 +125,25 @@ internal constructor(
     }
 
     suspend fun insertBatch(logs: List<*>) {
+        @Suppress("UNCHECKED_CAST")
         val conns = logs as? List<ConnectionTracker> ?: return
         connectionTrackerRepository.insertBatch(conns)
     }
 
     suspend fun insertRethinkBatch(logs: List<*>) {
+        @Suppress("UNCHECKED_CAST")
         val conns = logs as? List<RethinkLog> ?: return
         rethinkLogRepository.insertBatch(conns)
     }
 
     suspend fun updateBatch(logs: List<*>) {
+        @Suppress("UNCHECKED_CAST")
         val smms = logs as? List<ConnectionSummary> ?: return
         connectionTrackerRepository.updateBatch(smms)
     }
 
     suspend fun updateRethinkBatch(logs: List<*>) {
+        @Suppress("UNCHECKED_CAST")
         val smms = logs as? List<ConnectionSummary> ?: return
         rethinkLogRepository.updateBatch(smms)
     }
@@ -176,11 +178,9 @@ internal constructor(
 
         val cachedPkgs = FirewallManager.getPackageNamesByUid(uid)
 
-        val pkgs = if (cachedPkgs.isEmpty()) {
+        val pkgs = cachedPkgs.ifEmpty {
             // query the package manager for the package name
             getPackageInfoForUid(ctx, uid)?.toList() ?: emptyList()
-        } else {
-            cachedPkgs
         }
 
         val appName: String =

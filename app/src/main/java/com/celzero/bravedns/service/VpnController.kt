@@ -25,8 +25,6 @@ import android.os.SystemClock
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.celzero.firestack.backend.RDNS
-import com.celzero.firestack.backend.RouterStats
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConsoleLog
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
@@ -34,9 +32,9 @@ import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.backend.DNSTransport
 import com.celzero.firestack.backend.NetStat
+import com.celzero.firestack.backend.RDNS
+import com.celzero.firestack.backend.RouterStats
 import com.celzero.firestack.intra.Controller
-import java.net.Socket
-import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -45,6 +43,8 @@ import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.net.Socket
+import kotlin.coroutines.cancellation.CancellationException
 
 object VpnController : KoinComponent {
 
@@ -113,6 +113,7 @@ object VpnController : KoinComponent {
             _: CancellationException) {} catch (_: Exception) {}
     }
 
+    @Suppress("DEPRECATION")
     fun uptimeMs(): Long {
         val t = SystemClock.elapsedRealtime() - vpnStartElapsedTime
 
@@ -136,10 +137,21 @@ object VpnController : KoinComponent {
         connectionStatus.postValue(state)
     }
 
-    fun start(context: Context) {
+    fun start(context: Context, autoAttempt: Boolean = false) {
         // if the tunnel has the go-adapter then there's nothing to do
         if (hasTunnel()) {
             Logger.w(LOG_TAG_VPN, "braveVPNService is already on, resending vpn enabled state")
+            return
+        }
+        Logger.d("TEST", "vpn start: ${braveVpnService != null}, reboot: $autoAttempt")
+        // below check is to avoid multiple calls to start the vpn when always-on is enabled
+        // case: after a device reboot, vpn?.isAlwaysOnEnabled() may return false even though
+        // always-on is actually enabled; this causes the VPN to start twice and fails doing so.
+        // one approach is to store the always-on state in persistent state and check it here.
+        // another is to check whether the vpn is already running.
+        // todo: see whether changing the persistent state is really necessary.
+        if (braveVpnService != null && autoAttempt) {
+            Logger.i(LOG_TAG_VPN, "vpn service already running, no need to start")
             return
         }
         try {
@@ -166,6 +178,7 @@ object VpnController : KoinComponent {
         braveVpnService?.signalStopService(reason, userInitiated = true)
     }
 
+    @Suppress("DEPRECATION")
     fun state(): VpnState {
         val requested: Boolean = persistentState.getVpnEnabled()
         val on = isOn()

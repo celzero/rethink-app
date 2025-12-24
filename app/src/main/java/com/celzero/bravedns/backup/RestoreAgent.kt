@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageInfo
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -37,7 +38,11 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.LogDatabase
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.RethinkBlocklistManager
+import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.deleteRecursive
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
@@ -45,11 +50,6 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.ObjectInputStream
-import androidx.core.net.toUri
-import com.celzero.bravedns.service.RethinkBlocklistManager
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.RemoteFileTagUtil
-import com.celzero.bravedns.util.Utilities.deleteRecursive
 
 class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams), KoinComponent {
@@ -320,6 +320,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         return (version != 0 && version != versionStored)
     }
 
+    @Suppress("DEPRECATION")
     private fun getLatestVersion(): Int {
         val pInfo: PackageInfo? =
             Utilities.getPackageMetadata(context.packageManager, context.packageName)
@@ -384,6 +385,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         try {
             input = ObjectInputStream(FileInputStream(prefsBackupFile))
 
+            @Suppress("UNCHECKED_CAST")
             val pref: Map<String, *> = input.readObject() as Map<String, *>
 
             for (e in pref.entries) {
@@ -451,6 +453,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             input = ObjectInputStream(FileInputStream(prefsBackupFile))
             val prefsEditor = currentSharedPreferences.edit()
             prefsEditor.clear()
+            @Suppress("UNCHECKED_CAST")
             val pref: Map<String, *> = input.readObject() as Map<String, *>
 
             for (e in pref.entries) {

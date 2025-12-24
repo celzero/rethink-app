@@ -20,7 +20,6 @@ import Logger
 import Logger.LOG_TAG_VPN
 import android.content.Context
 import android.os.SystemClock
-import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
@@ -36,6 +35,7 @@ import com.celzero.bravedns.util.Utilities.getCountryCode
 import com.celzero.bravedns.util.Utilities.getFlag
 import com.celzero.bravedns.util.Utilities.makeAddressPair
 import com.celzero.bravedns.util.Utilities.normalizeIp
+import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.DNSSummary
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -119,6 +119,7 @@ internal constructor(
         transaction.isCached = summary.cached
         transaction.dnssecOk = summary.`do`
         transaction.dnssecValid = summary.ad
+        transaction.blockedTarget = summary.blockedTarget
         return transaction
     }
 
@@ -144,6 +145,7 @@ internal constructor(
         dnsLog.isCached = transaction.isCached
         dnsLog.dnssecOk = transaction.dnssecOk
         dnsLog.dnssecValid = transaction.dnssecValid
+        dnsLog.blockedTarget = transaction.blockedTarget
         val typeName = ResourceRecordTypes.getTypeName(transaction.type.toInt())
         if (typeName == ResourceRecordTypes.UNKNOWN) {
             dnsLog.typeName = transaction.type.toString()
@@ -259,6 +261,7 @@ internal constructor(
     }
 
     suspend fun insertBatch(logs: List<*>) {
+        @Suppress("UNCHECKED_CAST")
         val dnsLogs = (logs as? List<DnsLog>) ?: return
         dnsLogRepository.insertBatch(dnsLogs)
     }

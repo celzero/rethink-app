@@ -46,7 +46,6 @@ object IpInfoDownloader: KoinComponent {
 
     suspend fun fetchIpInfoIfRequired(ipToLookup: String) {
         if (!persistentState.downloadIpInfo) {
-            Logger.vv(LOG_TAG_DOWNLOAD, "$TAG; download is disabled")
             return
         }
 

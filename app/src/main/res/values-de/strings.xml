@@ -1027,7 +1027,6 @@
     <string name="dc_proxy_dns_desc" translatable="true">DNS nicht über Always-on WireGuard, SOCKS5, HTTP-Proxies leiten.</string>
     <string name="firewall_rule_proxied" translatable="true">via Proxy</string>
     <string name="one_wg_apps_added" translatable="true">Weiterleitung aller Anwendungen</string>
-    <string name="wg_lockdown_dialog_title" translatable="true">Lockdown</string>
     <string name="import_error" translatable="true">Tunnel kann nicht importiert werden: %s</string>
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s ist deaktiviert, wenn Proxies aktiv sind</string>
     <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[Diese Verbindung wurde an den vom Benutzer bevorzugten Proxy weitergeleitet.<br/><br/> Um dies zu ändern, gehe auf dem Bildschirm <i>Konfigurieren</i> zu <i>Proxy</i>.]]></string>
@@ -1038,7 +1037,6 @@
     <string name="exclude_apps_from_proxy_failure_toast">Diese App umgeht Proxies</string>
     <string name="key_length_explanation_base64" translatable="true">: WireGuard base64 Schlüssel müssen aus 44 Zeichen (32 Byte) bestehen</string>
     <string name="bad_config_context" translatable="true">%1$s\'s %2$s</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">Ausgewählte Apps werden ausschließlich über WireGuard VPN geleitet, unabhängig davon, ob das VPN aktiv ist oder nicht.</string>
     <string name="wg_apps_dialog_title_exclude" translatable="true">%1$s Apps ausschließen</string>
     <string name="wireguard_disable_title" translatable="true">Stoppe WireGuard</string>
     <string name="wireguard_disclaimer" translatable="true">DNS wird an %1$s weitergeleitet.</string>
