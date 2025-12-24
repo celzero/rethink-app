@@ -188,4 +188,19 @@ interface AppInfoDAO {
 
     @Query("update AppInfo set tempAllowEnabled = 0, tempAllowExpiryTime = 0, modifiedTs = :modifiedTs where uid = :uid")
     fun clearTempAllowByUid(uid: Int, modifiedTs: Long)
+
+    @Query(
+        "update AppInfo set tempAllowEnabled = 0, tempAllowExpiryTime = 0, modifiedTs = :modifiedTs " +
+            "where uid = :uid and tempAllowEnabled = 1 and tempAllowExpiryTime = :expectedExpiry"
+    )
+    fun clearTempAllowByUidIfExpiry(uid: Int, expectedExpiry: Long, modifiedTs: Long): Int
+
+    @Query("select MIN(tempAllowExpiryTime) from AppInfo where tempAllowEnabled = 1 and tempAllowExpiryTime > :now")
+    fun getNearestTempAllowExpiry(now: Long): Long?
+
+    @Query(
+        "update AppInfo set tempAllowEnabled = 0, tempAllowExpiryTime = 0, modifiedTs = :modifiedTs " +
+            "where tempAllowEnabled = 1 and tempAllowExpiryTime > 0 and tempAllowExpiryTime <= :now"
+    )
+    fun clearAllExpiredTempAllows(now: Long, modifiedTs: Long): Int
 }
