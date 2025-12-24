@@ -682,18 +682,12 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             BubbleHelper.createBubbleNotificationChannel(this)
             BubbleHelper.createBubbleShortcut(this)
 
-            // If not eligible, take user to the *channel* settings page where the
-            // "Allow bubbles" toggle is present. This avoids launching generic notification pages.
+            // If not eligible, take user to bubble settings page.
             if (!BubbleHelper.isBubbleEligible(this)) {
                 try {
-                    val intent = Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS).apply {
-                        putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
-                        putExtra(Settings.EXTRA_CHANNEL_ID, "firewall_bubble_channel_v2")
-                    }
-                    bubbleSettingsResult.launch(intent)
+                    bubbleSettingsResult.launch(BubbleHelper.buildEnableBubblesIntent(this))
                 } catch (e: Exception) {
-                    Logger.w(LOG_TAG_UI, "err launching bubble channel settings: ${e.message}")
-                    // Last resort: open app notification settings
+                    Logger.w(LOG_TAG_UI, "err launching bubble settings: ${e.message}")
                     invokeAndroidNotificationSetting()
                 }
                 logEvent("Firewall bubble enabled (needs user to allow bubbles)")
@@ -707,8 +701,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             // Disable bubble - reset all bubble state for clean re-initialization
             persistentState.firewallBubbleEnabled = false
 
-            // Reset bubble state (removes notification, channel, and shortcut)
-            // This ensures next time user enables it, permissions and setup are checked fresh
             BubbleHelper.resetBubbleState(this)
 
             logEvent("Firewall bubble disabled")

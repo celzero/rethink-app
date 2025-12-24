@@ -107,6 +107,10 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         appInfoDAO.clearTempAllowByUid(uid, System.currentTimeMillis())
     }
 
+    suspend fun clearTempAllowByUidIfExpiry(uid: Int, expectedExpiry: Long): Int {
+        return appInfoDAO.clearTempAllowByUidIfExpiry(uid, expectedExpiry, System.currentTimeMillis())
+    }
+
     fun cpUpdate(appInfo: AppInfo): Int {
         appInfo.modifiedTs = System.currentTimeMillis()
         return appInfoDAO.update(appInfo)
@@ -153,5 +157,30 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
 
     suspend fun setRethinkToBypassDnsAndFirewall() {
         appInfoDAO.setRethinkToBypassDnsAndFirewall()
+    }
+
+    /**
+     * Blocking variant for use from non-coroutine contexts (eg: Guava cache removal listeners).
+     */
+    fun clearTempAllowByUidBlocking(uid: Int) {
+        appInfoDAO.clearTempAllowByUid(uid, System.currentTimeMillis())
+    }
+
+    /**
+     * Blocking variant for use from non-coroutine contexts (eg: Guava cache removal listeners).
+     */
+    fun clearTempAllowByUidIfExpiryBlocking(uid: Int, expectedExpiry: Long): Int {
+        return appInfoDAO.clearTempAllowByUidIfExpiry(uid, expectedExpiry, System.currentTimeMillis())
+    }
+
+    fun getNearestTempAllowExpiryBlocking(now: Long): Long? {
+        return appInfoDAO.getNearestTempAllowExpiry(now)
+    }
+
+    /** Clears all expired temp-allow entries in a single statement; returns rows updated. */
+    fun clearAllExpiredTempAllowsBlocking(now: Long): Int {
+        // Clear any temp allow rows whose expiry has passed.
+        // (Requires a DAO query; if not present, keep this as best-effort per-uid in worker.)
+        return appInfoDAO.clearAllExpiredTempAllows(now, System.currentTimeMillis())
     }
 }

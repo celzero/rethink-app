@@ -495,6 +495,19 @@ object BubbleHelper {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun buildBubbleSettingsIntent(context: Context): Intent {
+        // Prefer the system's dedicated bubble settings surface when available.
+        // On Android 12+ this takes the user to: App notifications -> Bubbles.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val bubbleIntent = Intent(Settings.ACTION_APP_NOTIFICATION_BUBBLE_SETTINGS).apply {
+                putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            if (bubbleIntent.resolveActivity(context.packageManager) != null) {
+                return bubbleIntent
+            }
+        }
+
+        // Android 10/11: best available is channel settings; bubble toggle lives there.
         return Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS).apply {
             putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
             putExtra(Settings.EXTRA_CHANNEL_ID, BUBBLE_CHANNEL_ID)
@@ -518,6 +531,16 @@ object BubbleHelper {
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+    }
+
+    /**
+     * Intent to open the best available system UI to enable bubbles.
+     * - Android 12+: App notification bubble settings (global per-app bubble toggle)
+     * - Android 10/11: Channel notification settings (channel-level "Allow bubbles")
+     */
+    @RequiresApi(Build.VERSION_CODES.Q)
+    fun buildEnableBubblesIntent(context: Context): Intent {
+        return buildBubbleSettingsIntent(context)
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)

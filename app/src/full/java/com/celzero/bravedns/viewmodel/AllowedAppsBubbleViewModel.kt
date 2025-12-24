@@ -28,7 +28,8 @@ import com.celzero.bravedns.database.AppInfoRepository
  */
 class AllowedAppsBubbleViewModel(
     private val appInfoRepository: AppInfoRepository,
-    private val now: Long
+    private val now: Long,
+    private val context: android.content.Context
 ) : PagingSource<Int, AllowedAppInfo>() {
 
     companion object {
@@ -43,9 +44,10 @@ class AllowedAppsBubbleViewModel(
             // Convert to AllowedAppInfo
             val allowedApps = tempAllowedApps.mapNotNull { appInfo ->
                 try {
+                    val displayName = decorateNameIfSharedUid(appInfo.appName, appInfo.uid)
                     AllowedAppInfo(
                         packageName = appInfo.packageName,
-                        appName = appInfo.appName,
+                        appName = displayName,
                         uid = appInfo.uid,
                         allowedAt = appInfo.tempAllowExpiryTime - (15 * 60 * 1000) // Calculate when it was allowed
                     )
@@ -68,5 +70,15 @@ class AllowedAppsBubbleViewModel(
 
     override fun getRefreshKey(state: PagingState<Int, AllowedAppInfo>): Int? {
         return null
+    }
+
+    private fun decorateNameIfSharedUid(appName: String, uid: Int): String {
+        return try {
+            val pkgs = context.packageManager.getPackagesForUid(uid)
+            val otherCount = (pkgs?.size ?: 0) - 1
+            if (otherCount > 0) "$appName + $otherCount other apps" else appName
+        } catch (_: Exception) {
+            appName
+        }
     }
 }

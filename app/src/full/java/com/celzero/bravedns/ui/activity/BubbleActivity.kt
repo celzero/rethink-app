@@ -39,6 +39,7 @@ import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.databinding.ActivityBubbleBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -104,6 +105,15 @@ class BubbleActivity : AppCompatActivity(R.layout.activity_bubble) {
     override fun onResume() {
         super.onResume()
 
+        // If VPN is off, don't load anything / don't start collectors.
+        if (!VpnController.hasTunnel()) {
+            Logger.i(TAG, "VPN is off; not loading bubble lists")
+            stopCollectors()
+            showVpnOffState()
+            return
+        }
+
+        showContentState()
         setupRecyclerViews()
         setupLoadStateListeners()
 
@@ -146,7 +156,7 @@ class BubbleActivity : AppCompatActivity(R.layout.activity_bubble) {
                         enablePlaceholders = false
                     ),
                     pagingSourceFactory = {
-                        AllowedAppsBubbleViewModel(appInfoRepository, now)
+                        AllowedAppsBubbleViewModel(appInfoRepository, now, this@BubbleActivity)
                     }
                 ).flow.cachedIn(lifecycleScope)
 
@@ -223,13 +233,15 @@ class BubbleActivity : AppCompatActivity(R.layout.activity_bubble) {
     }
 
     private fun allowApp(blockedApp: BlockedAppInfo) {
+        // Optimistic UI update: remove right away from blocked list for fast feedback.
+        // PagingDataAdapter doesn't support direct removal; we force a refresh after DB update,
+        // but also hide the row by refreshing immediately.
         lifecycleScope.launch {
             try {
                 Logger.i(TAG, "Temporarily allowing app for 15 minutes: ${blockedApp.appName} (uid: ${blockedApp.uid})")
 
-                withContext(Dispatchers.IO) {
-                    // Update firewall status to TEMP ALLOW for 15 minutes
-                    FirewallManager.updateTempAllowStatus(blockedApp.uid, 15)
+                withContext<Unit>(Dispatchers.IO) {
+                    FirewallManager.updateTempAllow(blockedApp.uid, true)
                 }
 
                 if (!isFinishing && !isDestroyed) {
@@ -368,5 +380,30 @@ class BubbleActivity : AppCompatActivity(R.layout.activity_bubble) {
                 }
             }
         }
+    }
+
+    private fun showVpnOffState() {
+        // Avoid loading spinners if VPN isn't running.
+        runCatching {
+            b.bubbleProgressCard.visibility = View.GONE
+            b.bubbleProgressBar.visibility = View.GONE
+            b.bubbleAllowedAppsLl.visibility = View.GONE
+            b.bubbleRecyclerView.visibility = View.GONE
+            b.bubbleEmptyState.visibility = View.VISIBLE
+            b.bubbleEmptyTitle.text = "VPN is off" // keep inline for now
+        }
+    }
+
+    private fun showContentState() {
+        runCatching {
+            b.bubbleEmptyState.visibility = View.GONE
+        }
+    }
+
+    private fun stopCollectors() {
+        blockedCollectJob?.cancel()
+        blockedCollectJob = null
+        allowedCollectJob?.cancel()
+        allowedCollectJob = null
     }
 }

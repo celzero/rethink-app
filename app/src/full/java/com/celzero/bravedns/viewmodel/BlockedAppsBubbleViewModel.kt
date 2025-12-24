@@ -42,31 +42,29 @@ class BlockedAppsBubbleViewModel(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, BlockedAppInfo> {
         return try {
-            // Always compute fresh temp-allowed uids so the blocked list updates immediately
-            // after user taps "Allow" from the bubble.
             val now = System.currentTimeMillis()
             val liveTempAllowedUids = try {
                 appInfoRepository.getAllTempAllowedApps(now).map { it.uid }.toSet()
             } catch (_: Exception) {
-                // fallback to constructor provided set if repo query fails
                 tempAllowedUids
             }
 
-            // Get blocked app results from database
+            // Use the paged query so refresh()/invalidate() works well with Room + Paging.
             val blockedResults = connectionTrackerDAO.getRecentlyBlockedApps(sinceTime)
 
-            // Filter out temp allowed apps and convert to BlockedAppInfo
             val blockedApps = blockedResults
                 .filter { !liveTempAllowedUids.contains(it.uid) }
                 .mapNotNull { result ->
                     try {
                         val appInfo = appInfoRepository.getAppInfoByUid(result.uid)
                         val packageName = appInfo?.packageName ?: "Unknown"
-                        val appName = appInfo?.appName ?: getAppNameFromUid(result.uid)
+
+                        val baseName = appInfo?.appName ?: getAppNameFromUid(result.uid)
+                        val displayName = decorateNameIfSharedUid(baseName, result.uid)
 
                         BlockedAppInfo(
                             packageName = packageName,
-                            appName = appName,
+                            appName = displayName,
                             uid = result.uid,
                             count = result.count,
                             lastBlocked = result.lastBlocked
@@ -79,8 +77,8 @@ class BlockedAppsBubbleViewModel(
 
             LoadResult.Page(
                 data = blockedApps,
-                prevKey = null, // Only one page for now
-                nextKey = null  // Only one page for now
+                prevKey = null,
+                nextKey = null
             )
         } catch (e: Exception) {
             Logger.e(TAG, "Error loading blocked apps: ${e.message}", e)
@@ -105,6 +103,16 @@ class BlockedAppsBubbleViewModel(
         } catch (e: Exception) {
             Logger.e(TAG, "err getting app name for uid $uid: ${e.message}", e)
             "UID: $uid"
+        }
+    }
+
+    private fun decorateNameIfSharedUid(appName: String, uid: Int): String {
+        return try {
+            val pkgs = context.packageManager.getPackagesForUid(uid)
+            val otherCount = (pkgs?.size ?: 0) - 1
+            if (otherCount > 0) "$appName + $otherCount other apps" else appName
+        } catch (_: Exception) {
+            appName
         }
     }
 }
