@@ -1244,6 +1244,7 @@
     <string name="firewall_rule_paused_app" translatable="true">App Paused</string>
     <string name="firewall_rule_lockdown_wg" translatable="true">Lockdown Proxy</string>
     <string name="firewall_rule_proxy_error" translatable="true">Proxy Error</string>
+    <string name="firewall_rule_temp_allow" translatable="false">Temporary Allow</string>
 
     <string name="firewall_rule_no_rule_desc" translatable="true">No firewall rules matched this connection.</string>
     <string name="firewall_rule_block_app_desc" translatable="true"><![CDATA[A user-set firewall rule blocked this <i>app</i>.<br/><br/> To change go to <i>All Apps</i> tab.]]></string>
@@ -1278,7 +1279,7 @@
     <string name="firewall_rule_paused_app_desc" translatable="true"><![CDATA[This connection was allowed because the <i>app</i> is in <i>paused</i> state.]]></string>
     <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[This connection was blocked because WireGuard is in <i>lockdown</i> mode.<br/><br/> To change go to <i>WireGuard</i> screen.]]></string>
     <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[This connection was blocked because the <i>proxy</i> selected for the app is not chosen.<br/><br/> To change go to <i>Proxy</i> from <i>Configure</i> screen.]]></string>
-
+    <string name="firewall_rule_temp_allow_desc" translatable="false"><![CDATA[This connection was allowed temporarily for the app.<br/><br/> To change go to <i>App Info</i> screen.]]></string>
     <!-- New app install Notification -->
     <string name="new_app_bulk_notification_title" translatable="true">Attention</string>
     <string name="new_app_bulk_notification_content" translatable="true">Rethink blocked %1$s new apps. Tap to view or modify.</string>
@@ -1414,6 +1415,12 @@
 
     <string name="exclude_apps_from_proxy">Bypass app from all proxies</string>
     <string name="exclude_apps_from_proxy_failure_toast">This app bypasses proxies</string>
+
+    <!-- Temporary Allow Feature -->
+    <string name="temp_allow_label" translatable="false">Allow for 15 minutes</string>
+    <string name="temp_allow_desc" translatable="false">Temporarily allow this app. Auto-reverts after 15 minutes.</string>
+    <string name="temp_allow_desc_with_time" translatable="false">Last allowed: %1$s</string>
+    <string name="temp_allow_active" translatable="false">Active until %1$s</string>
 
     <!-- app info bottom sheet -->
     <string name="bsac_title_desc" translatable="true">Rules apply to this app only.</string>
@@ -1692,6 +1699,9 @@
     <string name="ac_desync" translatable="true">Desync</string>
     <string name="ac_desync_desc" translatable="true">Send decoy packets as necessary.</string>
 
+    <string name="ac_tcp_proxy" translatable="false">Hybrid</string>
+    <string name="ac_tcp_proxy_desc" translatable="false">Also uses proxy as necessary.</string>
+
     <string name="ac_retry_options_title" translatable="true">strategy</string>
     <string name="ac_retry_options_desc" translatable="true">Set how retries work for censored connections.</string>
 
@@ -1917,6 +1927,24 @@
     <string name="tombstone_app_title" translatable="true">Remember uninstalled apps</string>
     <string name="tombstone_app_desc" translatable="true">When enabled, keep app rules for 7 days.</string>
 
+    <string name="firewall_bubble_title" translatable="false">Firewall Bubble</string>
+    <string name="firewall_bubble_desc" translatable="false">Show a floating bubble with recently blocked apps.</string>
+    <string name="firewall_bubble" translatable="false">Firewall Bubble</string>
+    <string name="firewall_bubble_channel_name" translatable="false">Firewall Bubble Notifications</string>
+    <string name="firewall_bubble_channel_desc" translatable="false">Shows bubble notification for blocked apps</string>
+    <string name="firewall_bubble_text" translatable="false">Tap to see recently blocked apps</string>
+    <string name="firewall_bubble_permission_granted_toast" translatable="false">Firewall Bubble enabled</string>
+    <string name="firewall_bubble_permission_denied_toast" translatable="false">Permission denied. Firewall Bubble disabled.</string>
+
+    <string name="bubble_activity_title" translatable="false">Recently Blocked Apps</string>
+    <string name="bubble_empty_state_title" translatable="false">No Blocked Apps</string>
+    <string name="bubble_empty_state_desc" translatable="false">Apps blocked by the firewall will appear here</string>
+    <string name="bubble_allow_btn" translatable="false">Allow (15 min)</string>
+    <string name="bubble_blocked_count" translatable="false">%d blocked</string>
+    <string name="bubble_time_just_now" translatable="false">Just now</string>
+    <string name="bubble_time_minutes_ago" translatable="false">%d min ago</string>
+    <string name="bubble_time_hours_ago" translatable="false">%d hr ago</string>
+
     <string name="settings_locale_dialog_default" translatable="true">System default</string>
 
     <string name="settings_allow_incoming_wg_packets" translatable="true">WireGuard P2P</string>
@@ -1933,17 +1961,33 @@
 
     <string name="stability_program_toast" translatable="true">Enrolled to the <i>stability program</i> for <i>experimental features</i>.</string>
 
-    <string name="settings_wireguard_lockdown_mode" translatable="true">WireGuard Lockdown</string>
-    <string name="settings_wireguard_lockdown_mode_desc" translatable="true">When enabled, all traffic is forced through WireGuard VPN.</string>
+    <string name="settings_wireguard_lockdown_mode" translatable="false">WireGuard Lockdown</string>
+    <string name="settings_wireguard_lockdown_mode_desc" translatable="false">When enabled, all traffic is forced through WireGuard VPN.</string>
 
     <!-- Event Logs -->
-    <string name="event_logs_title" translatable="true">Event Logs</string>
-    <string name="event_logs_subtitle" translatable="true">View internal system &amp; debug events</string>
-    <string name="event_details" translatable="true">Details</string>
-    <string name="no_events_recorded" translatable="true">No events recorded yet</string>
-    <string name="no_events_desc" translatable="true">Event logs will appear here once the app starts recording system activities</string>
-    <string name="total_events_count" translatable="true">Total Events: %1$d</string>
-    <string name="delete_all_events" translatable="true">Delete All Events</string>
-    <string name="delete_all_events_confirmation" translatable="true">Are you sure you want to delete all event logs? This action cannot be undone.</string>
+    <string name="event_logs_title" translatable="false">Event Logs</string>
+    <string name="event_logs_subtitle" translatable="false">View internal system &amp; debug events</string>
+    <string name="event_details" translatable="false">Details</string>
+    <string name="no_events_recorded" translatable="false">No events recorded yet</string>
+    <string name="no_events_desc" translatable="false">Event logs will appear here once the app starts recording system activities</string>
+    <string name="total_events_count" translatable="false">Total Events: %1$d</string>
+    <string name="delete_all_events" translatable="false">Delete All Events</string>
+    <string name="delete_all_events_confirmation" translatable="false">Are you sure you want to delete all event logs? This action cannot be undone.</string>
 
+    <!-- Custom LAN IPs -->
+    <string name="custom_lan_ip_title" translatable="false">Custom LAN IPs for VPN</string>
+    <string name="custom_lan_ip_desc" translatable="false">Override default VPN LAN gateway, router, and DNS addresses.</string>
+    <string name="custom_lan_ip_auto_desc" translatable="false">Use automatically assigned VPN LAN IPs.</string>
+    <string name="custom_lan_ip_manual_desc" translatable="false">Manually configure LAN IPs for gateway, router, and DNS.</string>
+    <string name="custom_lan_ip_mode_auto" translatable="false">AUTO</string>
+    <string name="custom_lan_ip_mode_manual" translatable="false">MANUAL</string>
+    <string name="custom_lan_ip_gateway" translatable="false">Gateway</string>
+    <string name="custom_lan_ip_router" translatable="false">Router</string>
+    <string name="lbl_reset" translatable="false">Reset</string>
+    <string name="lbl_prefix" translatable="false">Prefix</string>
+    <string name="custom_lan_ip_saved_auto" translatable="false">Using automatic LAN IP configuration</string>
+    <string name="custom_lan_ip_saved_manual" translatable="false">Custom LAN IPs saved</string>
+    <string name="custom_lan_ip_save_error" translatable="false">Could not save custom LAN IPs</string>
+    <string name="custom_lan_ip_open_error" translatable="false">Could not open Custom LAN IPs dialog</string>
+    <string name="custom_lan_ip_validation_error" translatable="false">Invalid IP addresses. Ensure:\n• IPv4 must be private (10.x.x.x, 172.16-31.x.x, or 192.168.x.x)\n• IPv6 must be unique local (fc00::/7)\n• Both IP and prefix must be provided together</string>
 </resources>
