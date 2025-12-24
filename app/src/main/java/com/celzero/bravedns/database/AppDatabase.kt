@@ -53,7 +53,7 @@ import com.celzero.bravedns.util.Constants
         SubscriptionStatus::class,
         SubscriptionStateHistory::class
     ],
-    version = 28,
+    version = 29,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -102,6 +102,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_25_26)
                 .addMigrations(MIGRATION_26_27)
                 .addMigrations(MIGRATION_27_28)
+                .addMigrations(MIGRATION_28_29)
                 .build()
 
         private val roomCallback: Callback =
@@ -1101,6 +1102,20 @@ abstract class AppDatabase : RoomDatabase() {
                         Logger.i(LOG_TAG_APP_DB, "MIGRATION_27_28: added modifiedTs column to AppInfo")
                     } catch (e: Exception) {
                         Logger.e(LOG_TAG_APP_DB, "MIGRATION_27_28: modifiedTs column already exists, ignore", e)
+                    }
+                }
+            }
+
+        private val MIGRATION_28_29: Migration =
+            object : Migration(28, 29) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    // Add tempAllowEnabled and tempAllowExpiryTime columns to AppInfo table for temporary allow feature
+                    try {
+                        db.execSQL("ALTER TABLE AppInfo ADD COLUMN tempAllowEnabled INTEGER NOT NULL DEFAULT 0")
+                        db.execSQL("ALTER TABLE AppInfo ADD COLUMN tempAllowExpiryTime INTEGER NOT NULL DEFAULT 0")
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_28_29: added tempAllowEnabled and tempAllowExpiryTime columns to AppInfo")
+                    } catch (e: Exception) {
+                        Logger.e(LOG_TAG_APP_DB, "MIGRATION_28_29: temp allow columns already exist, ignore", e)
                     }
                 }
             }
