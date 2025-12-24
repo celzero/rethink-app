@@ -495,7 +495,7 @@
     <string name="about_faq">Просмотреть часто задаваемые вопросы</string>
     <string name="about_email">Отправьте нам электронное письмо</string>
     <string name="about_settings_notification">Параметры уведомлений</string>
-    <string name="about_mozilla">Rethink поддерживается благодаря Mozilla Builders, FOSS United Foundation.</string>
+    <string name="about_mozilla">Rethink поддерживается благодаря Mozilla Builders, FOSS United Foundation, FLOSS/fund.</string>
     <string name="about_dialog_positive_button">Поехали</string>
     <string name="about_app_update_check">Проверить наличие обновлений</string>
     <string name="about_mail_bugreport_subject">[Rethink]: Отчет об ошибке</string>
@@ -1087,13 +1087,13 @@
     <string name="lbl_test" translatable="true">тест</string>
     <string name="lbl_protos" translatable="true">протос</string>
     <string name="lbl_experimental" translatable="true">(эксперементально)</string>
-    <string name="lbl_hop" translatable="true">Узлы</string>
+    <string name="lbl_hop" translatable="true">Релеи</string>
     <string name="lbl_manual" translatable="true">Вручную</string>
     <string name="wireguard_title" translatable="true">Безопасный Интернет с WireGuard</string>
     <string name="wireguard_desc" translatable="true">Зашифруйте свой интернет-трафик с WireGuard. Выберите различные маршруты для различных приложений.</string>
     <string name="firewall_title" translatable="true">Защитите свой Android с помощью Firewall</string>
-    <string name="firewall_desc" translatable="true">Контролируйте использование интернет-трафика ваших приложений; ограничивайте соединения на основе приложений или сетевой активности.</string>
-    <string name="dns_title" translatable="true">Блокируйте рекламу и вредоносное ПО с помощью DNS</string>
+    <string name="firewall_desc" translatable="true">Контролируйте использование интернета вашими приложениями; ограничивайте соединения по приложению или сетевой активности.</string>
+    <string name="dns_title" translatable="true">Блокируйте рекламу и вредоносы с помощью DNS</string>
     <string name="dns_desc" translatable="true">Выбирайте из 190+ списков, чтобы остановить рекламу, трекеры и вредоносное ПО.</string>
     <string name="status_no_network" translatable="true">нет подключения к сети</string>
     <string name="settings_mobile_metered_heading" translatable="true">измерить мобильные сети</string>
@@ -1162,7 +1162,7 @@
     <string name="no_stats_available" translatable="true">Нет статистики</string>
     <string name="hop_failure_toast" translatable="true">ошибка relay: %1$s -&gt; %2$s</string>
     <string name="wg_setting_use_on_mobile" translatable="true">только мобильный</string>
-    <string name="wg_setting_use_on_mobile_desc" translatable="true">Используйте этот WireGuard исключительно для передачи мобильных данных.</string>
+    <string name="wg_setting_use_on_mobile_desc" translatable="true">Использовать этот VPN WireGuard только при передаче по мобильной связи.</string>
     <string name="hop_add_remove_title" translatable="true">Добавить / Удалить relay</string>
     <string name="about_terms_of_service" translatable="true">Условия использования</string>
     <string name="bypasses_network_restrictions" translatable="true">Проверки доступности обходят все сетевые ограничения. В режиме <i>Авто</i> Rethink случайным образом использует ранее подключенные IP-адреса и имена хостов.</string>
@@ -1189,8 +1189,8 @@
     <string name="processing_dialog_desc" translatable="true">Пожалуйста, подождите, пока мы обработаем ваш запрос.</string>
     <string name="smart_dns_desc" translatable="true"><i>Smart DNS</i> случайным образом использует любой из этих DNS-преобразователей:</string>
     <string name="lbl_service_providers" translatable="true">Поставщик услуг</string>
-    <string name="hop_error_toast_msg_3" translatable="true">Отключить только мобильный, чтобы использовать relays</string>
-    <string name="wg_mobile_only_hop_err" translatable="true">Режим «Только мобильный» не поддерживается для relays</string>
+    <string name="hop_error_toast_msg_3" translatable="true">Отключить \"Только мобильный\" или SSID, чтобы использовать релеи</string>
+    <string name="wg_mobile_only_hop_err" translatable="true">Режим «Только мобильный» не поддерживается для релеев</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">Удалить все Правила домена?</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">Удаление этих правил позволит любому приложению подключиться к заблокированным доменам.</string>
     <string name="vpn_policy_auto_desc" translatable="true">Реагирует на важные изменения сети и подключения.</string>
@@ -1202,7 +1202,7 @@
     <string name="use_fallback_dns_to_bypass_desc" translatable="true">При включении, всегда используется запасной DNS для обходных приложений, доменов и IP-адресов.</string>
     <string name="lbl_fallback" translatable="true">Запасной</string>
     <string name="vpn_policy_relaxed" translatable="true">Расслабленный</string>
-    <string name="title_database_dump" translatable="true">Состояние базы данных</string>
+    <string name="title_database_dump" translatable="true">База данных</string>
     <string name="copied_clipboard" translatable="true">Скопировано</string>
     <string name="conn_track_clear_rule_logs_title" translatable="true">Удалить журнал для этого правила?</string>
     <string name="conn_track_clear_rule_logs_message" translatable="true">Это приведет к удалению только сетевых журналов для текущего правила фаервола. Эта операция необратима. Продолжить?</string>
@@ -1214,4 +1214,33 @@
     <string name="firewall_rule_proxy_error" translatable="true">Ошибка прокси</string>
     <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[Подключение былл заблокировано потому чтот <i>прокси</i> не выбрано для этого приложения.<br/><br/> Что-бы изменить идите в <i>Прокси</i> из экрана <i>Конфигурация</i> .]]></string>
     <string name="vpn_policy_fixed" translatable="true">Консервативное</string>
+    <string name="vpn_policy_fixed_desc" translatable="true">Наименее зависит от изменений сети.</string>
+    <string name="wg_setting_ssid_title" translatable="true">Только Wi‑Fi</string>
+    <string name="wg_setting_ssid_desc" translatable="true">Использовать этот VPN WireGuard только при подключении к Wi-Fi или указанным сетям Wi-Fi (%1$s).</string>
+    <string name="ssid_permission_explanation" translatable="true">Для Rethink нужно разрешение местоположения чтобы видеть названия Wi-Fi сетей (%1$s).</string>
+    <string name="location_enable_explanation" translatable="true">Чтобы узнать названия Wi-Fi сетей (%1$s), включите службу определения местоположения.</string>
+    <string name="ssid_location_error" translatable="true">Включить службу определения местоположения</string>
+    <string name="ssid_permission_error_action" translatable="true">Позволить</string>
+    <string name="ssid_location_error_action" translatable="true">Включить определение местоположения</string>
+    <string name="wg_ssid_and_mobile_err" translatable="true">Нельзя использовать сразу оба %1$s и %2$s</string>
+    <string name="wg_ssid_dialog_description" translatable="true"><i>Включено</i> когда сеть Wi-Fi (%2$s) равен %3$s, тогда этот VPN WireGuard %1$s.</string>
+    <string name="wg_ssid_input_hint" translatable="true">Введите название сети Wi-Fi (%1$s)</string>
+    <string name="wg_ssid_type_exact" translatable="true">Точно</string>
+    <string name="wg_ssid_type_wildcard" translatable="true">Частично</string>
+    <string name="wg_ssid_invalid_error" translatable="true">Идентификаторы Wi-Fi (%1$s) должны быть до 32 символов.</string>
+    <string name="wg_ssid_delete_confirmation" translatable="true">Удалить %1$s?</string>
+    <string name="settings_firebase_error_reporting_heading" translatable="true">Программа стабилизации</string>
+    <string name="settings_firebase_error_reporting_desc" translatable="true">Отправлять журнал ошибок чтобы помочь улучшить стабильность приложения.</string>
+    <string name="tombstone_app_title" translatable="true">Запоминать удалённые программы</string>
+    <string name="tombstone_app_desc" translatable="true">Если включено, сохраняет правила приложений ещё 7 дней.</string>
+    <string name="settings_locale_dialog_default" translatable="true">Как в системе</string>
+    <string name="settings_allow_incoming_wg_packets" translatable="true">WireGuard P2P (напрямую между участниками)</string>
+    <string name="settings_allow_incoming_wg_packets_desc" translatable="true">Если включено, пропускает входящие подключения от клиентов Wireguard.</string>
+    <string name="lockdown_download_message" translatable="true">Встроенный в Android <i>Менеджер Загрузок</i> может не работать, если VPN настроен в режиме <i>Блокировки</i>. Использовать собственный менеджер загрузок Rethink?</string>
+    <string name="lockdown_download_enable_inapp" translatable="true">Включить Менеджер Загрузок</string>
+    <string name="settings_jumbo_packets" translatable="true">Расширение пропускной способности</string>
+    <string name="settings_jumbo_packets_desc" translatable="true">Использовать <i>jumbo-фреймы</i> внутри VPN-туннеля Rethink.</string>
+    <string name="settings_tunnel_metered" translatable="true">Всегда лимитированное</string>
+    <string name="stability_program_toast" translatable="true">Теперь вы участник <i>программы тестирования</i><i> экспериментальных функций</i>.</string>
+    <string name="settings_tunnel_metered_desc" translatable="true">Обозначать VPN-туннель Rethink как лимитированное подключение, чтобы сократить трафик от приложений. Внимание: может привести к проблемам с загрузкой больших файлов, таких как резервные копии.</string>
 </resources>

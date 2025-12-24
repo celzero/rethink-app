@@ -1000,7 +1000,7 @@
     <string name="lbl_on_device" translatable="true">auf dem Gerät</string>
     <string name="lbl_cache" translatable="true">Cache</string>
     <string name="lbl_starting" translatable="true">Wird gestartet</string>
-    <string name="failed_using_default" translatable="true">Fehler: Verwende Fallback DNS</string>
+    <string name="failed_using_default" translatable="true">Fehlgeschlagen: Verwendung von Fallback-DNS</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">DoT Endpunkt löschen?</string>
     <string name="memory_notification_text">Rethink hat gerade nur wenig Speicher zur Verfügung. Einige Funktionen könnten eingeschränkt sein.</string>
     <string name="lbl_persistent_keepalive" translatable="true">Dauerhafte Aufrechterhaltung der Verbindung</string>
