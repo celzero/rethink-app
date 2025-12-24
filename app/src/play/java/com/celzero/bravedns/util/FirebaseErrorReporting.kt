@@ -15,7 +15,7 @@
  */
 package com.celzero.bravedns.util
 
-import android.content.Context
+import Logger
 import Logger.LOG_FIREBASE
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Utilities.getRandomString

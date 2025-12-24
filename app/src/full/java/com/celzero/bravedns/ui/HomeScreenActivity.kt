@@ -52,6 +52,7 @@ import androidx.work.WorkRequest
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
@@ -350,8 +351,10 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         // to fail due to the "Block connections without VPN" option.
         persistentState.allowBypass = false
 
-        // reset stall on no networks to false, for v055p
-        persistentState.stallOnNoNetwork = false
+        io {
+            appInfoDb.setRethinkToBypassDnsAndFirewall()
+            appInfoDb.setRethinkToBypassProxy(true)
+        }
 
         // change the persistent state for defaultDnsUrl, if its google.com (only for v055d)
         // TODO: remove this post v054.
@@ -362,8 +365,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             persistentState.defaultDnsUrl = Constants.DEFAULT_DNS_LIST[2].url
         }
         moveRemoteBlocklistFileFromAsset()
-        // set the rethink app in firewall mode as allowed by default
-        io { appInfoDb.resetRethinkAppFirewallMode() }
         // if biometric auth is enabled, then set the biometric auth type to 3 (15 minutes)
         if (persistentState.biometricAuth) {
             persistentState.biometricAuthType =
@@ -371,12 +372,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             // reset the bio metric auth time, as now the value is changed from System.currentTimeMillis
             // to SystemClock.elapsedRealtime
             persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
-        }
-
-        // remove this after v055r
-        io {
-            rdb.cleanupTombstone()
-            rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE)
         }
 
         // reset the local blocklist download from android download manager to custom in v055o
@@ -453,6 +448,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun getLatestVersion(): Int {
         val pInfo: PackageInfo? = getPackageMetadata(this.packageManager, this.packageName)
         // TODO: modify this to use the latest version code api
+        @Suppress("DEPRECATION")
         val v = pInfo?.versionCode ?: 0
         // latest version has apk variant (baseAbiVersionCode * 10000000 + variant.versionCode)
         // so we need to mod the version code by 10000000 to get the actual version code

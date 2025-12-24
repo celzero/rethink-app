@@ -16,8 +16,8 @@
  */
 package com.celzero.bravedns.net.doh
 
-import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
+import com.celzero.firestack.backend.Backend
 import java.util.Calendar
 
 class Transaction {
@@ -44,6 +44,7 @@ class Transaction {
     var isCached: Boolean = false
     var dnssecOk: Boolean = false
     var dnssecValid: Boolean = false
+    var blockedTarget: String = ""
 
     enum class Status(val id: Long) {
         START(Backend.Start),

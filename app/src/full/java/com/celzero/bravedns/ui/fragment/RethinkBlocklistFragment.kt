@@ -786,7 +786,7 @@ class RethinkBlocklistFragment :
 
     private fun openFilterBottomSheet() {
         io {
-            val bottomSheetFragment = RethinkPlusFilterBottomSheet(this, getAllList())
+            val bottomSheetFragment = RethinkPlusFilterBottomSheet.newInstance(this, getAllList())
             uiCtx { bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag) }
         }
     }

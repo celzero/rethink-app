@@ -23,7 +23,6 @@ import android.view.WindowManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.databinding.DialogDnscryptRelaysBinding
-import com.celzero.bravedns.util.useTransparentNoDimBackground
 
 class DnsCryptRelaysDialog(
     private var activity: Activity,

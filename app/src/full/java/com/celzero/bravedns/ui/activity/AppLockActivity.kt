@@ -161,11 +161,9 @@ class AppLockActivity : AppCompatActivity(R.layout.activity_app_lock) {
 
     private fun startHomeActivity() {
         Logger.v(LOG_TAG_UI, "$TAG starting home activity")
-        val intent = Intent(this, HomeScreenActivity::class.java)
-        // Use a specific combination of flags that will maintain the proper back stack
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        intent.setPackage(this.packageName)
-        intent.putExtras(this.intent)
+        val intent = Intent(this, HomeScreenActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }
         startActivity(intent)
         finish()
     }

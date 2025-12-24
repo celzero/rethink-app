@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggle_group"
+            style="@style/toggleButtonStyle"
+            app:checkedButton="@id/tb_recent_toggle_btn"
+            app:selectionRequired="true"
+            app:singleSelection="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/auto_toggle_btn"
+                style="@style/toggleButtonNoStyle"
+                app:cornerRadius="16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="100dp"
+                android:tag="0"
+                android:text="@string/settings_ip_text_ipv46"
+                android:textAllCaps="false"
+                android:textColor="?attr/defaultToggleBtnTxt"
+                android:textSize="@dimen/extra_large_font_text_view" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/manual_toggle_btn"
+                style="@style/toggleButtonNoStyle"
+                app:cornerRadius="16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="100dp"
+                android:tag="2"
+                android:text="@string/lbl_manual"
+                android:textAllCaps="false"
+                android:textColor="?attr/defaultToggleBtnTxt"
+                android:textSize="@dimen/extra_large_font_text_view" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/mode_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:text="@string/custom_lan_ip_auto_desc"
+            android:padding="5dp" />
+
+        <!-- Gateway -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/custom_lan_ip_gateway"
+            android:padding="5dp"
+            android:layout_marginTop="10dp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/gateway_ipv4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:inputType="text"
+                android:background="@drawable/edittext_default"
+                android:hint="@string/settings_ip_text_ipv4" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/gateway_ipv4_prefix"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:inputType="number"
+                android:background="@drawable/edittext_default"
+                android:hint="@string/lbl_prefix"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/gateway_ipv6"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:inputType="text"
+                android:background="@drawable/edittext_default"
+                android:hint="@string/settings_ip_text_ipv6"/>
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/gateway_ipv6_prefix"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:inputType="number"
+                android:background="@drawable/edittext_default"
+                android:hint="@string/lbl_prefix"/>
+        </LinearLayout>
+
+        <!-- Router -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/custom_lan_ip_router"
+            android:padding="5dp"
+            android:layout_marginTop="16dp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/router_ipv4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:inputType="text"
+                android:background="@drawable/edittext_default"
+                android:hint="@string/settings_ip_text_ipv4" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/router_ipv4_prefix"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:inputType="number"
+                android:background="@drawable/edittext_default"
+                android:hint="@string/lbl_prefix"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/router_ipv6"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:inputType="text"
+                android:background="@drawable/edittext_default"
+                android:hint="@string/settings_ip_text_ipv6" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/router_ipv6_prefix"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/edittext_default"
+                android:layout_marginStart="4dp"
+                android:inputType="number"
+                android:hint="@string/lbl_prefix"/>
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/dns_mode_info_title"
+            android:padding="5dp"
+            android:layout_marginTop="10dp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/dns_ipv4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:inputType="text"
+                android:background="@drawable/edittext_default"
+                android:hint="@string/settings_ip_text_ipv4" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/dns_ipv4_prefix"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:inputType="number"
+                android:background="@drawable/edittext_default"
+                android:hint="@string/lbl_prefix"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/dns_ipv6"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:inputType="text"
+                android:background="@drawable/edittext_default"
+                android:hint="@string/settings_ip_text_ipv6" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/dns_ipv6_prefix"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:inputType="number"
+                android:background="@drawable/edittext_default"
+                android:hint="@string/lbl_prefix"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="30dp"
+            android:paddingTop="16dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/reset_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                android:background="@drawable/rectangle_border_background"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center"
+                android:padding="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:text="@string/lbl_reset" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/save_button"
+                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/rectangle_border_background"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="@string/lbl_save" />
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/error_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:padding="8dp"
+            android:textColor="?attr/accentBad"
+            android:textSize="@dimen/default_font_text_view"
+            android:visibility="gone" />
+
+    </LinearLayout>
+</ScrollView>
+

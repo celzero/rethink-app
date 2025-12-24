@@ -3,4 +3,7 @@
     <files-path
         name="file_path"
         path="." />
+    <cache-path
+        name="cache_path"
+        path="." />
 </paths>

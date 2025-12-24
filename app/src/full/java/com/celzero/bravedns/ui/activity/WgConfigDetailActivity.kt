@@ -36,9 +36,13 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.adapter.WgPeersAdapter
 import com.celzero.bravedns.data.SsidItem
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.databinding.ActivityWgDetailBinding
 import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.VpnController
@@ -55,13 +59,11 @@ import com.celzero.bravedns.ui.dialog.WgHopDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
 import com.celzero.bravedns.ui.dialog.WgSsidDialog
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.SsidPermissionManager
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.openAndroidAppInfo
-import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.tos
@@ -78,10 +80,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.getValue
 
 class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     private val b by viewBinding(ActivityWgDetailBinding::bind)
     private val persistentState by inject<PersistentState>()
+    private val eventLogger by inject<EventLogger>()
 
     private val mappingViewModel: ProxyAppsMappingViewModel by viewModel()
 
@@ -163,7 +167,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         super.onResume()
         init()
         setupClickListeners()
-        showNewBadgeIfNeeded()
     }
 
     override fun onRequestPermissionsResult(
@@ -180,11 +183,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             grantResults,
             ssidPermissionCallback
         )
-    }
-
-    private fun showNewBadgeIfNeeded() {
-        val ssid = NewSettingsManager.shouldShowBadge(NewSettingsManager.WG_SSID_SETTING)
-        b.ssidTitleTv.setBadgeDotVisible(this, ssid)
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -213,12 +211,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         b.editBtn.text = getString(R.string.rt_edit_dialog_positive).uppercase()
         b.deleteBtn.text = getString(R.string.lbl_delete).uppercase()
 
-        b.globalLockdownTitleTv.text =
-            getString(
-                R.string.two_argument_space,
-                getString(R.string.firewall_rule_global_lockdown),
-                getString(R.string.symbol_lockdown)
-            )
         b.catchAllTitleTv.text =
             getString(
                 R.string.two_argument_space,
@@ -249,21 +241,23 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         )
         if (wgType.isDefault()) {
             b.wgHeaderTv.text = getString(R.string.lbl_advanced).replaceFirstChar(Char::titlecase)
-            b.lockdownRl.visibility = View.VISIBLE
             b.catchAllRl.visibility = View.VISIBLE
             b.oneWgInfoTv.visibility = View.GONE
             b.hopBtn.visibility = View.VISIBLE
+            b.hopBtnX.visibility = View.VISIBLE
             b.mobileSsidSettingsCard.visibility = View.VISIBLE
         } else if (wgType.isOneWg()) {
             b.wgHeaderTv.text =
                 getString(R.string.rt_list_simple_btn_txt).replaceFirstChar(Char::titlecase)
-            b.lockdownRl.visibility = View.GONE
             b.catchAllRl.visibility = View.GONE
             b.hopBtn.visibility = View.GONE
+            b.hopBtnX.visibility = View.GONE
             b.oneWgInfoTv.visibility = View.VISIBLE
             b.applicationsBtn.isEnabled = false
+            b.applicationsBtnX.isEnabled = false
             b.mobileSsidSettingsCard.visibility = View.GONE
             b.applicationsBtn.text = getString(R.string.one_wg_apps_added)
+            b.appsLabel.text = "All apps"
         } else {
             // invalid wireguard type, finish the activity
             finish()
@@ -284,7 +278,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 b.applicationsBtn.isEnabled = false
                 b.applicationsBtn.text = getString(R.string.routing_remaining_apps)
             }
-            b.lockdownCheck.isChecked = mapping.isLockdown
             b.useMobileCheck.isChecked = mapping.useOnlyOnMetered
         }
 
@@ -514,6 +507,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 b.applicationsBtn.setTextColor(fetchColor(this, R.attr.accentGood))
             }
             b.applicationsBtn.text = getString(R.string.add_remove_apps, it.toString())
+            b.appsLabel.text = "Apps ($it)"
         }
     }
 
@@ -557,13 +551,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             )
         }
 
-        b.lockdownRl.setOnClickListener {
-            b.lockdownCheck.isChecked = !b.lockdownCheck.isChecked
-            updateLockdown(b.lockdownCheck.isChecked)
-        }
-
-        b.lockdownCheck.setOnClickListener { updateLockdown(b.lockdownCheck.isChecked) }
-
         b.catchAllRl.setOnClickListener {
             b.catchAllCheck.isChecked = !b.catchAllCheck.isChecked
             updateCatchAll(b.catchAllCheck.isChecked)
@@ -604,7 +591,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 return@setOnClickListener
             }
 
-            if (mapping.isActive || mapping.isLockdown || mapping.isCatchAll) {
+            if (mapping.isActive || mapping.isCatchAll) {
                 io {
                     val sid = ID_WG_BASE + configId
                     val isVia = WgHopManager.isAlreadyHop(sid)
@@ -664,12 +651,12 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         startActivity(intent)
     }
 
-    private fun updateLockdown(enabled: Boolean) {
-        io { WireguardManager.updateLockdownConfig(configId, enabled) }
-    }
-
     private fun updateUseOnMobileNetwork(enabled: Boolean) {
         io { WireguardManager.updateUseOnMobileNetworkConfig(configId, enabled) }
+        logEvent(
+            "WireGuard Use on Mobile Networks",
+            "User ${if (enabled) "enabled" else "disabled"} use on mobile networks for WireGuard config with id $configId"
+        )
     }
 
     private fun updateCatchAll(enabled: Boolean) {
@@ -737,6 +724,10 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             }
 
             WireguardManager.updateCatchAllConfig(configId, enabled)
+            logEvent(
+                "WireGuard Catch All apps",
+                "User ${if (enabled) "enabled" else "disabled"} catch all apps for WireGuard config with id $configId"
+            )
             uiCtx {
                 b.applicationsBtn.isEnabled = !enabled
                 if (enabled) {
@@ -803,6 +794,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                     )
                     finish()
                 }
+                logEvent("Delete WireGuard config", "User deleted WireGuard config with id $configId")
             }
         }
 
@@ -916,8 +908,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         updateErrorLayouts(hasPermissions, isLocationEnabled, permissionErrorLayout, locationErrorLayout)
 
         sw.setOnCheckedChangeListener { _, isChecked ->
-            NewSettingsManager.markSettingSeen(NewSettingsManager.WG_SSID_SETTING)
-
             // Check current permissions and location status dynamically
             val currentHasPermissions = SsidPermissionManager.hasRequiredPermissions(this)
             val currentLocationEnabled = SsidPermissionManager.isLocationEnabled(this)
@@ -940,6 +930,10 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
             // If we reach here, either we're disabling or we have all required permissions
             io { WireguardManager.updateSsidEnabled(configId, isChecked) }
+            logEvent(
+                "SSID feature toggled",
+                "ConfigId: $configId, Enabled: $isChecked"
+            )
 
             if (isChecked && currentHasPermissions && currentLocationEnabled) {
                 // Enable experimental-dependent settings when experimental features are enabled
@@ -1045,6 +1039,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             // Reset the SSID switch since location is required
             b.ssidCheck.isChecked = false
             io { WireguardManager.updateSsidEnabled(configId, false) }
+            logEvent("SSID location denied", "User denied enabling location services for configId: $configId")
         }
         val dialog = builder.create()
         dialog.show()
@@ -1064,6 +1059,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             // Reset the SSID switch since permissions are required
             b.ssidCheck.isChecked = false
             io { WireguardManager.updateSsidEnabled(configId, false) }
+            logEvent("SSID permission denied", "User denied SSID permissions for configId: $configId")
         }
         val dialog = builder.create()
         dialog.show()
@@ -1122,8 +1118,13 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             // Reset the SSID switch since permissions are required
             b.ssidCheck.isChecked = false
             io { WireguardManager.updateSsidEnabled(configId, false) }
+            logEvent("SSID permission denied", "User denied SSID permissions for configId: $configId")
         }
         val dialog = builder.create()
         dialog.show()
+    }
+
+    private fun logEvent(msg: String, details: String) {
+        eventLogger.log(EventType.PROXY_SWITCH, Severity.LOW, msg, EventSource.UI, false, details)
     }
 }

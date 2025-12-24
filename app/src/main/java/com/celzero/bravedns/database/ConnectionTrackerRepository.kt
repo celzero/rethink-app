@@ -108,4 +108,11 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
     suspend fun closeConnectionForUids( uids: List<Int>, reason: String) {
         connectionTrackerDAO.closeConnectionForUids(uids, reason)
     }
+
+    private val BLOCKED_WINDOW_MS = 5 * 60 * 1000L // 5 minutes
+    fun getBlockedConnectionsCountLiveData(): LiveData<Int> {
+        val since = System.currentTimeMillis() - BLOCKED_WINDOW_MS
+
+        return connectionTrackerDAO.getBlockedConnectionsCountLiveData(since)
+    }
 }

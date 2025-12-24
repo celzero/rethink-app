@@ -36,20 +36,22 @@ class DataUsageUpdater(context: Context, workerParams: WorkerParameters) :
     private val persistentState by inject<PersistentState>()
 
     override suspend fun doWork(): Result {
-        updateDataUsage()
+        val curr = System.currentTimeMillis()
+        val prev = persistentState.prevDataUsageCheck
+        updateDataUsage(prev, curr)
+        updateRethinkDataUsage(prev, curr)
         return Result.success()
     }
 
-    private suspend fun updateDataUsage() {
+    private suspend fun updateDataUsage(prev: Long, curr: Long) {
         // fetch the data usage from connection tracker and update the app info database
         // with the data usage.
-        val currentTimestamp = System.currentTimeMillis()
-        val previousTimestamp = persistentState.prevDataUsageCheck
-        val dataUsageList = connTrackRepository.getDataUsage(previousTimestamp, currentTimestamp)
+
+        val dataUsageList = connTrackRepository.getDataUsage(prev, curr)
 
         if (dataUsageList == null) {
             Logger.w(LOG_TAG_SCHEDULER, "Data usage list is null, skipping update")
-            persistentState.prevDataUsageCheck = currentTimestamp
+            persistentState.prevDataUsageCheck = curr
             return
         }
 
@@ -72,10 +74,8 @@ class DataUsageUpdater(context: Context, workerParams: WorkerParameters) :
             }
         }
 
-        updateRethinkDataUsage(previousTimestamp, currentTimestamp)
-
-        persistentState.prevDataUsageCheck = currentTimestamp
-        Logger.i(LOG_TAG_SCHEDULER, "Data usage updated for all apps at $currentTimestamp")
+        persistentState.prevDataUsageCheck = curr
+        Logger.i(LOG_TAG_SCHEDULER, "Data usage updated for all apps at $curr")
     }
 
     private suspend fun updateRethinkDataUsage(prev: Long, curr: Long) {
@@ -84,8 +84,8 @@ class DataUsageUpdater(context: Context, workerParams: WorkerParameters) :
             val uid =
                 appInfoRepository.getAppInfoUidForPackageName(Constants.RETHINK_PACKAGE)
 
-            val prevDataUsage = rethinkDb.getDataUsage(prev, curr) ?: return
-            val currDataUsage = appInfoRepository.getDataUsageByUid(uid) ?: return
+            val currDataUsage = rethinkDb.getDataUsage(prev, curr) ?: return
+            val prevDataUsage = appInfoRepository.getDataUsageByUid(uid) ?: return
 
             if (currDataUsage.uploadBytes == 0L && currDataUsage.downloadBytes == 0L) {
                 // if the data usage is 0, then no need to update the database

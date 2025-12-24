@@ -31,8 +31,8 @@ import com.celzero.bravedns.util.Constants.Companion.EMPTY_PACKAGE_NAME
 import com.celzero.bravedns.util.Utilities
 
 @Database(
-    entities = [ConnectionTracker::class, DnsLog::class, RethinkLog::class, IpInfo::class],
-    version = 12,
+    entities = [ConnectionTracker::class, DnsLog::class, RethinkLog::class, IpInfo::class, Event::class],
+    version = 15,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -53,6 +53,7 @@ abstract class LogDatabase : RoomDatabase() {
         // The actual value will be TRUNCATE when the it is a low-RAM device.
         // Otherwise, WRITE_AHEAD_LOGGING will be used.
         // https://developer.android.com/reference/android/arch/persistence/room/RoomDatabase.JournalMode#automatic
+        @Suppress("DEPRECATION")
         fun buildDatabase(context: Context): LogDatabase {
             rethinkDnsDbPath = context.getDatabasePath(AppDatabase.DATABASE_NAME).toString()
             isFreshInstall = Utilities.isFreshInstall(context)
@@ -74,6 +75,9 @@ abstract class LogDatabase : RoomDatabase() {
                 .addMigrations(Migration_9_10)
                 .addMigrations(MIGRATION_10_11)
                 .addMigrations(MIGRATION_11_12)
+                .addMigrations(MIGRATION_12_13)
+                .addMigrations(MIGRATION_13_14)
+                .addMigrations(MIGRATION_14_15)
                 .fallbackToDestructiveMigration() // recreate the database if no migration is found
                 .build()
         }
@@ -324,6 +328,63 @@ abstract class LogDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_12_13: Migration = object : Migration(12, 13) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // add missing columns to RethinkLog to align with ConnectionTracker
+                try {
+                    db.execSQL("ALTER TABLE RethinkLog ADD COLUMN usrId INTEGER NOT NULL DEFAULT 0")
+                    db.execSQL("ALTER TABLE RethinkLog ADD COLUMN blockedByRule TEXT NOT NULL DEFAULT ''")
+                    db.execSQL("ALTER TABLE RethinkLog ADD COLUMN blocklists TEXT NOT NULL DEFAULT ''")
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_12_13: added usrId, blockedByRule, blocklists columns to RethinkLog")
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_APP_DB, "MIGRATION_12_13: columns may already exist: ${e.message}")
+                }
+            }
+        }
+
+        private val MIGRATION_13_14: Migration = object : Migration(13, 14) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                try {
+                    // Create Events table with all required columns
+                    db.execSQL(
+                        """CREATE TABLE IF NOT EXISTS Events (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                            timestamp INTEGER NOT NULL,
+                            eventType TEXT NOT NULL,
+                            severity TEXT NOT NULL,
+                            message TEXT NOT NULL,
+                            details TEXT,
+                            source TEXT NOT NULL,
+                            userAction INTEGER NOT NULL DEFAULT 0
+                        )""".trimIndent()
+                    )
+
+                    // Create indices for efficient querying
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_Events_timestamp ON Events(timestamp)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_Events_eventType ON Events(eventType)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_Events_severity ON Events(severity)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_Events_source ON Events(source)")
+                    db.execSQL("ALTER TABLE DnsLogs ADD COLUMN blockedTarget TEXT NOT NULL DEFAULT ''")
+
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_13_14: created Events table with indices")
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_APP_DB, "MIGRATION_13_14: error creating Events table: ${e.message}")
+                }
+            }
+        }
+
+        private val MIGRATION_14_15: Migration = object : Migration(14, 15) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                try {
+                    // Add blockedTarget column to DnsLogs table
+                    db.execSQL("ALTER TABLE DnsLogs ADD COLUMN blockedTarget TEXT NOT NULL DEFAULT ''")
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_14_15: added blockedTarget column to DnsLogs")
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_APP_DB, "MIGRATION_14_15: blockedTarget column already exists or error: ${e.message}", e)
+                }
+            }
+        }
+
     }
 
     fun checkPoint() {
@@ -342,6 +403,8 @@ abstract class LogDatabase : RoomDatabase() {
     abstract fun statsSummaryDAO(): StatsSummaryDao
 
     abstract fun ipInfoDao(): IpInfoDAO
+
+    abstract fun eventDao(): EventDao
 
     fun connectionTrackerRepository() = ConnectionTrackerRepository(connectionTrackerDAO())
 

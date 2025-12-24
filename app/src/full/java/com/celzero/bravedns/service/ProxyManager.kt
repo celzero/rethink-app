@@ -17,14 +17,13 @@ package com.celzero.bravedns.service
 
 import Logger
 import Logger.LOG_TAG_PROXY
-import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ProxyAppMappingRepository
 import com.celzero.bravedns.database.ProxyApplicationMapping
+import com.celzero.firestack.backend.Backend
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.concurrent.CopyOnWriteArraySet
-import kotlin.collections.removeAll
 
 object ProxyManager : KoinComponent {
 
@@ -371,6 +370,14 @@ object ProxyManager : KoinComponent {
             ipnProxyId != Backend.Auto &&
             ipnProxyId != Backend.Ingress &&
             !ipnProxyId.endsWith(Backend.RPN)
+    }
+
+    fun isAnyUserSetProxy(proxyId: String): Boolean {
+        return proxyId.startsWith(ID_WG_BASE) ||
+            proxyId.startsWith(ID_ORBOT_BASE) ||
+            proxyId.startsWith(ID_S5_BASE) ||
+            proxyId.startsWith(ID_HTTP_BASE) ||
+            proxyId.endsWith(Backend.RPN)
     }
 
     fun isRpnProxy(ipnProxyId: String): Boolean {

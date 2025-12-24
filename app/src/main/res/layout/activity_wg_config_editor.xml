@@ -5,20 +5,12 @@
     android:layout_height="match_parent"
     android:background="?attr/background">
 
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="8dp"
-        android:focusableInTouchMode="true"
-        app:cardBackgroundColor="?attr/background"
-        app:cardCornerRadius="16dp">
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:paddingStart="5dp"
-            android:paddingEnd="5dp">
+            android:padding="16dp"
+            android:layout_margin="16dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/wg_config_layout"
@@ -244,13 +236,6 @@
                 android:layout_below="@id/wg_config_layout"
                 android:textColor="?attr/primaryLightColorText"/>
 
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_above="@id/lb_action_container"
-                android:background="?attr/border" />
-
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/lb_action_container"
                 android:layout_width="match_parent"
@@ -258,7 +243,7 @@
                 android:layout_alignParentBottom="true"
                 android:orientation="horizontal">
 
-                <com.google.android.material.button.MaterialButton
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/dismiss_btn"
                     style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
                     android:layout_width="0dp"
@@ -267,24 +252,29 @@
                     android:text="@string/lbl_dismiss"
                     android:textColor="?attr/accentGood"
                     android:textSize="@dimen/large_font_text_view"
+                    android:layout_marginEnd="5dp"
+                    android:background="@drawable/rectangle_border_background"
+                    android:foreground="?android:attr/selectableItemBackground"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toLeftOf="@+id/guideline"
                     app:layout_constraintTop_toBottomOf="@+id/save_tunnel" />
 
-                <com.google.android.material.button.MaterialButton
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/save_tunnel"
                     style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
+                    android:layout_marginStart="5dp"
                     android:text="@string/lbl_save"
                     android:textColor="?attr/accentGood"
                     android:textSize="@dimen/large_font_text_view"
+                    android:background="@drawable/rectangle_border_background"
+                    android:foreground="?android:attr/selectableItemBackground"
                     app:layout_constraintLeft_toRightOf="@+id/guideline"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/save_tunnel" />
             </androidx.appcompat.widget.LinearLayoutCompat>
 
         </RelativeLayout>
-    </com.google.android.material.card.MaterialCardView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

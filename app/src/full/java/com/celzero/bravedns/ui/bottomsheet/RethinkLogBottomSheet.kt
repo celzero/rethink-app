@@ -119,24 +119,26 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun initView() {
-        if (info == null) {
+        val logInfo = info
+        if (logInfo == null) {
             Logger.w(LOG_TAG_FIREWALL, "ip-details missing: initView called before onViewCreated?")
             this.dismiss()
             return
         }
 
-        if (info!!.ipAddress == DNS_IP_TEMPLATE_V4 || info!!.ipAddress == DNS_IP_TEMPLATE_V6) {
+        val ipAddress = logInfo.ipAddress
+        if (ipAddress == DNS_IP_TEMPLATE_V4 || ipAddress == DNS_IP_TEMPLATE_V6) {
             val dnsTxt =
                 getString(
                     R.string.about_version_install_source,
                     getString(R.string.dns_mode_info_title),
-                    info!!.ipAddress
+                    ipAddress
                 )
             b.bsConnConnectionTypeHeading.text = dnsTxt
         } else {
-            b.bsConnConnectionTypeHeading.text = info!!.ipAddress
+            b.bsConnConnectionTypeHeading.text = ipAddress
         }
-        b.bsConnConnectionFlag.text = info!!.flag
+        b.bsConnConnectionFlag.text = logInfo.flag
 
         b.bsConnBlockAppTxt.text = htmlToSpannedText(getString(R.string.bsct_block))
         b.bsConnBlockConnAllTxt.text = htmlToSpannedText(getString(R.string.bsct_block_ip))
@@ -170,8 +172,9 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun handleRethinkApp() {
+        val logInfo = info ?: return
         io {
-            val pkgName = FirewallManager.getPackageNameByUid(info!!.uid)
+            val pkgName = FirewallManager.getPackageNameByUid(logInfo.uid)
             uiCtx {
                 if (pkgName == requireContext().packageName) {
                     b.bsConnBlockedRule1HeaderLl.visibility = View.GONE
@@ -204,21 +207,22 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun updateConnDetailsChip() {
-        if (info == null) {
+        val logInfo = info
+        if (logInfo == null) {
             Logger.w(LOG_TAG_FIREWALL, "ip-details missing: not updating the chip details")
             return
         }
 
-        val protocol = Protocol.getProtocolName(info!!.protocol).name
+        val protocol = Protocol.getProtocolName(logInfo.protocol).name
         val time =
             DateUtils.getRelativeTimeSpanString(
-                info!!.timeStamp,
+                logInfo.timeStamp,
                 System.currentTimeMillis(),
                 DateUtils.MINUTE_IN_MILLIS,
                 DateUtils.FORMAT_ABBREV_RELATIVE
             )
-        val protocolDetails = "$protocol/${info!!.port}"
-        if (info!!.isBlocked) {
+        val protocolDetails = "$protocol/${logInfo.port}"
+        if (logInfo.isBlocked) {
             b.bsConnTrackPortDetailChip.text =
                 getString(R.string.bsct_conn_desc_blocked, protocolDetails, time)
             return
@@ -229,16 +233,17 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun updateBlockedRulesChip() {
-        if (!info!!.isBlocked) {
+        val logInfo = info ?: return
+        if (!logInfo.isBlocked) {
             b.bsConnTrackAppInfo.text = getString(R.string.firewall_rule_no_rule)
             return
         }
     }
 
     private fun updateAppDetails() {
-        if (info == null) return
+        val logInfo = info ?: return
         io {
-            val appNames = FirewallManager.getAppNamesByUid(info!!.uid)
+            val appNames = FirewallManager.getAppNamesByUid(logInfo.uid)
             val pkgName = FirewallManager.getPackageNameByAppName(appNames[0])
             uiCtx {
                 val appCount = appNames.count()
@@ -268,10 +273,24 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun displaySummaryDetails() {
-        b.bsConnConnTypeSecondary.visibility = View.GONE
-        b.connectionMessage.text = info?.message
+        val logInfo = info ?: return
 
-        if (VpnController.hasCid(info!!.connId, info!!.uid)) {
+        b.bsConnConnTypeSecondary.visibility = View.GONE
+        b.connectionMessage.text = logInfo.message
+
+        updateConnectionStatus(logInfo)
+        updateConnectionType(logInfo)
+
+        if (hasNoSummaryData(logInfo)) {
+            showMinimalSummary()
+            return
+        }
+
+        showFullSummary(logInfo)
+    }
+
+    private fun updateConnectionStatus(logInfo: RethinkLog) {
+        if (VpnController.hasCid(logInfo.connId, logInfo.uid)) {
             b.connectionMessageLl.visibility = View.VISIBLE
             b.bsConnConnDuration.text =
                 getString(
@@ -287,8 +306,10 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                     getString(R.string.symbol_clock)
                 )
         }
+    }
 
-        val connType = ConnectionTracker.ConnType.get(info?.connType)
+    private fun updateConnectionType(logInfo: RethinkLog) {
+        val connType = ConnectionTracker.ConnType.get(logInfo.connType)
         if (connType.isMetered()) {
             b.bsConnConnType.text =
                 getString(
@@ -304,44 +325,49 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                     getString(R.string.symbol_global)
                 )
         }
+    }
 
-        if (
-            info?.message?.isEmpty() == true &&
-                info?.duration == 0 &&
-                info?.downloadBytes == 0L &&
-                info?.uploadBytes == 0L
-        ) {
-            b.connectionMessageLl.visibility = View.GONE
-            b.bsConnSummaryDetailLl.visibility = View.GONE
-            b.bsConnConnTypeSecondary.visibility = View.VISIBLE
-            b.bsConnConnTypeSecondary.text = b.bsConnConnType.text
-            return
-        }
+    private fun hasNoSummaryData(logInfo: RethinkLog): Boolean {
+        val hasNoMessage = logInfo.message.isEmpty()
+        val hasNoDuration = logInfo.duration == 0
+        val hasNoDownload = logInfo.downloadBytes == 0L
+        val hasNoUpload = logInfo.uploadBytes == 0L
+        return hasNoMessage && hasNoDuration && hasNoDownload && hasNoUpload
+    }
 
+    private fun showMinimalSummary() {
+        b.connectionMessageLl.visibility = View.GONE
+        b.bsConnSummaryDetailLl.visibility = View.GONE
+        b.bsConnConnTypeSecondary.visibility = View.VISIBLE
+        b.bsConnConnTypeSecondary.text = b.bsConnConnType.text
+    }
+
+    private fun showFullSummary(logInfo: RethinkLog) {
         b.connectionMessageLl.visibility = View.VISIBLE
         val downloadBytes =
             getString(
                 R.string.symbol_download,
-                Utilities.humanReadableByteCount(info?.downloadBytes ?: 0L, true)
+                Utilities.humanReadableByteCount(logInfo.downloadBytes, true)
             )
         val uploadBytes =
             getString(
                 R.string.symbol_upload,
-                Utilities.humanReadableByteCount(info?.uploadBytes ?: 0L, true)
+                Utilities.humanReadableByteCount(logInfo.uploadBytes, true)
             )
 
         b.bsConnConnUpload.text = uploadBytes
         b.bsConnConnDownload.text = downloadBytes
-        val duration = UIUtils.getDurationInHumanReadableFormat(requireContext(), info!!.duration)
+        val duration = UIUtils.getDurationInHumanReadableFormat(requireContext(), logInfo.duration)
         b.bsConnConnDuration.text =
             getString(R.string.two_argument_space, duration, getString(R.string.symbol_clock))
     }
 
     private fun lightenUpChip() {
+        val logInfo = info ?: return
         // Load icons for the firewall rules if available
         b.bsConnTrackAppInfo.chipIcon =
             ContextCompat.getDrawable(requireContext(), R.drawable.ic_whats_new)
-        if (info!!.isBlocked) {
+        if (logInfo.isBlocked) {
             b.bsConnTrackAppInfo.setTextColor(fetchColor(requireContext(), R.attr.chipTextNegative))
             val colorFilter =
                 PorterDuffColorFilter(
@@ -365,22 +391,23 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun handleNonApp() {
+        val logInfo = info ?: return
         // show universal setting layout
         b.bsConnBlockedRule2HeaderLl.visibility = View.VISIBLE
         // hide the app firewall layout
         b.bsConnBlockedRule1HeaderLl.visibility = View.GONE
         b.bsConnUnknownAppCheck.isChecked = persistentState.getBlockUnknownConnections()
-        b.bsConnTrackAppName.text = info!!.appName
+        b.bsConnTrackAppName.text = logInfo.appName
     }
 
     private fun setupClickListeners() {
-
         b.bsConnTrackAppNameHeader.setOnClickListener {
+            val logInfo = info ?: return@setOnClickListener
             io {
-                val ai = FirewallManager.getAppInfoByUid(info!!.uid)
+                val ai = FirewallManager.getAppInfoByUid(logInfo.uid)
                 uiCtx {
                     // case: app is uninstalled but still available in RethinkDNS database
-                    if (ai == null || info?.uid == Constants.INVALID_UID) {
+                    if (ai == null || logInfo.uid == Constants.INVALID_UID) {
                         showToastUiCentered(
                             requireContext(),
                             getString(R.string.ct_bs_app_info_error),
@@ -388,7 +415,7 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                         )
                         return@uiCtx
                     }
-                    openAppDetailActivity(info!!.uid)
+                    openAppDetailActivity(logInfo.uid)
                 }
             }
         }

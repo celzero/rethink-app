@@ -21,7 +21,6 @@ import Logger.LOG_TAG_FIREWALL
 import android.content.Context
 import android.util.Patterns
 import androidx.lifecycle.LiveData
-import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.CustomDomain
@@ -29,11 +28,9 @@ import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities.togs
 import com.celzero.bravedns.util.Utilities.tos
+import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.Gostr
 import com.celzero.firestack.backend.RadixTree
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.net.MalformedURLException
@@ -49,14 +46,15 @@ object DomainRulesManager : KoinComponent {
     private var trie: RadixTree = Backend.newRadixTree()
     // fixme: find a better way to handle trusted domains without using two data structures
     // map to store the trusted domains with set of uids
-    private val trustedMap: MutableMap<String, Set<Int>> = ConcurrentHashMap()
+    private val trustedMap = ConcurrentHashMap<String, Set<Int>>()
     // even though we have trustedMap, we need to keep the trie for wildcard matching
     private var trustedTrie: RadixTree = Backend.newRadixTree()
 
     // regex to check if url is valid wildcard domain
-    // valid wildcard domain: *.example.com, *.example.co.in, *.do-main.com
+    // valid wildcard domain: *.eu, *.com, *.example.com, *.example.co.in, *.do-main.com
     // RFC 1035: https://tools.ietf.org/html/rfc1035#section-2.3.4
-    private val wcRegex = Pattern.compile("^(\\*\\.)?([a-zA-Z0-9-]+\\.)+[a-zA-Z0-9-]+$")
+    // Updated to support top-level domain wildcards (*.eu, *.ru, etc.)
+    private val wcRegex = Pattern.compile("^(\\*\\.)?([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9-]+$")
 
     private val selectedCCs: MutableSet<String> = mutableSetOf()
 
@@ -164,11 +162,15 @@ object DomainRulesManager : KoinComponent {
     }
 
     private fun maybeAddToTrustedMap(cd: CustomDomain) {
-        if (cd.status == Status.TRUST.id) {
-            val domain = cd.domain.lowercase(Locale.ROOT)
-            val key = mkTrieKeyForTrustedMap(domain)
-            trustedTrie.set(key, cd.status.toString().togs())
-            trustedMap[cd.domain] = trustedMap.getOrDefault(domain, emptySet()).plus(cd.uid)
+        if (cd.status != Status.TRUST.id) return
+
+        val domain = cd.domain.lowercase(Locale.ROOT)
+        val key = mkTrieKeyForTrustedMap(domain)
+
+        trustedTrie.set(key, cd.status.toString().togs())
+
+        trustedMap.compute(domain) { _, old ->
+            (old ?: emptySet()) + cd.uid
         }
     }
 
@@ -318,16 +320,22 @@ object DomainRulesManager : KoinComponent {
 
     private fun maybeUpdateTrustedMap(uid: Int, domain: String, status: Status) {
         val d = domain.lowercase(Locale.ROOT)
-        if (status == Status.TRUST) {
-            trustedMap[d] = trustedMap.getOrDefault(d, emptySet()).plus(uid)
-        } else {
-            trustedMap[d] = trustedMap.getOrDefault(d, emptySet()).minus(uid)
+
+        val result = trustedMap.compute(d) { _, old ->
+            val updated = if (status == Status.TRUST) {
+                (old ?: emptySet()) + uid
+            } else {
+                (old ?: emptySet()) - uid
+            }
+
+            updated.ifEmpty { null }
         }
-        if (trustedMap[d] == null) {
-            val key = mkTrieKeyForTrustedMap(d)
+
+        val key = mkTrieKeyForTrustedMap(d)
+
+        if (result == null) {
             trustedTrie.del(key)
         } else {
-            val key = mkTrieKeyForTrustedMap(d)
             trustedTrie.set(key, status.id.toString().togs())
         }
     }
@@ -366,25 +374,28 @@ object DomainRulesManager : KoinComponent {
 
     private fun removeIfInTrustedMap(uid: Int, domain: String) {
         val d = domain.lowercase(Locale.ROOT)
-        val trustedUids = trustedMap.getOrDefault(d, emptySet()).minus(uid)
-        if (trustedUids.isEmpty()) {
-            trustedMap.remove(d)
-            val key = mkTrieKeyForTrustedMap(d)
+        val result = trustedMap.compute(d) { _, old ->
+            val updated = (old ?: emptySet()) - uid
+            updated.ifEmpty { null }
+        }
+        val key = mkTrieKeyForTrustedMap(d)
+
+        if (result == null) {
             trustedTrie.del(key)
-        } else {
-            trustedMap[d] = trustedUids
         }
     }
 
     private fun clearTrustedMap(uid: Int) {
-        trustedMap.forEach { (domain, uids) ->
-            val newUids = uids.minus(uid)
-            if (newUids.isEmpty()) {
-                trustedMap.remove(domain)
-                val key = mkTrieKeyForTrustedMap(domain)
+        trustedMap.keys.forEach { domain ->
+            val result = trustedMap.compute(domain) { _, old ->
+                val updated = (old ?: emptySet()) - uid
+                updated.ifEmpty { null }
+            }
+
+            val key = mkTrieKeyForTrustedMap(domain)
+
+            if (result == null) {
                 trustedTrie.del(key)
-            } else {
-                trustedMap[domain] = newUids
             }
         }
     }
@@ -507,6 +518,55 @@ object DomainRulesManager : KoinComponent {
 
     fun isWildCardEntry(url: String): Boolean {
         return wcRegex.matcher(url).matches()
+    }
+
+    /**
+     * Extracts and validates the host from various input formats
+     * Handles wildcards, URLs with schemas, and plain domains
+     *
+     * @param input The domain input string (e.g., "*.example.com", "https://example.com", "example.com")
+     * @return The extracted host string, or null if invalid
+     *
+     * Supported formats:
+     * - Wildcard domains: *.example.com, *.eu
+     * - URLs with schema: https://www.example.com → example.com
+     * - Plain domains: example.com
+     *
+     * Invalid formats:
+     * - Wildcards with schema: https:// *.example.com
+     */
+    fun extractHost(input: String): String? {
+        val trimmedInput = input.trim()
+
+        return when {
+            // case: valid wildcard input without schema, eg., *.example.com, *.eu
+            trimmedInput.startsWith("*.") && !trimmedInput.contains("://") -> {
+                trimmedInput
+            }
+
+            // case: invalid wildcard with schema, eg., https://*.example.com
+            trimmedInput.contains("://") && trimmedInput.contains("*") -> {
+                null // Invalid: Wildcards shouldn't appear in URLs
+            }
+
+            // case: standard URL input, eg., https://www.example.com
+            trimmedInput.contains("://") -> {
+                try {
+                    // return the host part of the URL
+                    // only www. is the common prefix you'd want to strip for cosmetic or
+                    // standardization reasons (like www.google.com → google.com). Other subdomains
+                    // (e.g., mail., api., m.) are actually part of the valid hostname and
+                    // should not be removed
+                    val uri = java.net.URI(trimmedInput)
+                    uri.host?.removePrefix("www.") // remove 'www.' prefix if present
+                } catch (e: Exception) {
+                    null
+                }
+            }
+
+            // case: plain domain (no schema, no wildcard), eg., example.com
+            else -> trimmedInput
+        }
     }
 
     // this is to create a custom domain entry where user want to add proxy without any

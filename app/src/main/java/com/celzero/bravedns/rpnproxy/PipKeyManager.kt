@@ -26,7 +26,6 @@ import com.celzero.bravedns.util.Utilities.togb
 import com.celzero.bravedns.util.Utilities.togs
 import com.celzero.bravedns.util.Utilities.tos
 import com.celzero.firestack.backend.Backend
-import com.celzero.firestack.backend.PipKey
 import com.celzero.firestack.backend.PipMsg
 import com.google.gson.Gson
 import kotlinx.serialization.SerializationException

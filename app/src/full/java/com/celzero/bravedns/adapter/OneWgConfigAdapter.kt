@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.adapter
 
+import Logger
 import Logger.LOG_TAG_PROXY
-import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.Intent
 import android.text.format.DateUtils
@@ -31,11 +31,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.celzero.firestack.backend.RouterStats
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.databinding.ListItemWgOneInterfaceBinding
 import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
@@ -50,13 +53,14 @@ import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
+import com.celzero.firestack.backend.RouterStats
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class OneWgConfigAdapter(private val context: Context, private val listener: DnsStatusListener) :
+class OneWgConfigAdapter(private val context: Context, private val listener: DnsStatusListener, private val eventLogger: EventLogger) :
     PagingDataAdapter<WgConfigFiles, OneWgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
 
     private var lifecycleOwner: LifecycleOwner? = null
@@ -185,7 +189,8 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             }
 
             if (config.isActive && !VpnController.hasTunnel()) {
-                disableInterface()
+                // Fix: disableInterface() modifies UI, must run on main thread
+                uiCtx { disableInterface() }
                 return
             }
 
@@ -453,6 +458,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             config.oneWireGuard = true
             WireguardManager.enableConfig(config.toImmutable())
             uiCtx { listener.onDnsStatusChanged() }
+            logEvent("One-WireGuard enabled", "WG ID: ${config.id}")
         }
 
         private suspend fun disableWgIfPossible(config: WgConfigFiles) {
@@ -476,6 +482,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             config.oneWireGuard = false
             WireguardManager.disableConfig(config.toImmutable())
             uiCtx { listener.onDnsStatusChanged() }
+            logEvent("One-WireGuard disabled", "WG ID: ${config.id}")
         }
 
         private fun launchConfigDetail(id: Int) {
@@ -493,6 +500,10 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             intent.putExtra(INTENT_EXTRA_WG_TYPE, WgConfigDetailActivity.WgType.ONE_WG.value)
             context.startActivity(intent)
         }
+    }
+
+    private fun logEvent(msg: String, details: String) {
+        eventLogger.log(EventType.PROXY_SWITCH, Severity.LOW, msg, EventSource.UI, false, details)
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {

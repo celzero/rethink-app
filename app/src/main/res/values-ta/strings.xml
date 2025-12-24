@@ -429,7 +429,7 @@
     <string name="dns_connected_rethink_plus" translatable="true">இணைக்கப்பட்டுள்ளது. %1$s பிளாக்லிச்ட்கள் பயன்பாட்டில்</string>
     <string name="dns_connected" translatable="true">இணைக்கப்பட்டுள்ளது</string>
     <string name="univ_accessibility_crash_dialog_positive" translatable="true">கோட்டோ அமைப்புகள்</string>
-    <string name="fapps_firewall_filter_desc_category" translatable="true">&lt;!</string>
+    <string name="fapps_firewall_filter_desc_category" translatable="true"><![CDATA[வகைகளில் <u>%1$s</u> %2$s பயன்பாடுகள் காட்டப்படுகின்றன: %3$s]]></string>
     <string name="firewall_rule_block_app_exception" translatable="true">பிழை</string>
     <string name="new_app_notification_content" translatable="true">ரீதிங்க் அண்மைக் காலத்தில் நிறுவப்பட்ட பயன்பாடு, %1$s.</string>
     <string name="ada_app_status_allow" translatable="true">அனுமதிக்கப்படுகிறது</string>
@@ -924,8 +924,6 @@
     <string name="parse_error_integer" translatable="true">எண்</string>
     <string name="generic_error" translatable="true">தெரியாத “%s” பிழை</string>
     <string name="parse_error_generic" translatable="true">சரம்</string>
-    <string name="wg_lockdown_dialog_title" translatable="true">முடக்குதல்</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">VPN செயலில் உள்ளதா அல்லது முடக்கப்பட்டுள்ளதா என்பதைப் பொருட்படுத்தாமல், தேர்ந்தெடுக்கப்பட்ட பயன்பாடுகள் இந்த வயர்கார்ட் VPN மூலம் மட்டுமே அனுப்பப்படும்.</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">மற்ற வயர்கார்ட் VPN களால் வழிநடத்தப்படாத அனைத்து இணைப்புகள் மற்றும் பயன்பாடுகள் இதன் மூலம் வழிநடத்தப்படும்.</string>
     <string name="one_wg_error_toast" translatable="true">மேம்பட்ட இடத்திற்கு மாற, எளிய பயன்முறையில் வயர் கார்டை நிறுத்துங்கள்</string>
     <string name="routing_remaining_apps" translatable="true">மீதமுள்ள பயன்பாடுகளை வழிநடத்துதல்</string>

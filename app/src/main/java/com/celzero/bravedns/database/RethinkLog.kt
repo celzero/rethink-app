@@ -34,10 +34,13 @@ class RethinkLog {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
     var appName: String = ""
     var uid: Int = 0
+    var usrId: Int = 0
     var ipAddress: String = ""
     var port: Int = 0
     var protocol: Int = 0
     var isBlocked: Boolean = false
+    var blockedByRule: String = ""
+    var blocklists: String = ""
     var proxyDetails: String = ""
     var flag: String = ""
     var dnsQuery: String? = null

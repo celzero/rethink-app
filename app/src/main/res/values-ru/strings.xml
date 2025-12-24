@@ -1055,9 +1055,7 @@
     <string name="settings_rinr_dialog_title" translatable="true">Loopback (экспериментальный)</string>
     <string name="cd_dialog_edit_title" translatable="true">Изменить правило домена</string>
     <string name="one_wg_apps_added" translatable="true">Маршрутизация всех приложений</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">Выбранные приложения будут проходить только через этот WireGuard VPN, независимо от того, активен он или отключён.</string>
     <string name="cd_toast_edit" translatable="true">Отредактировано</string>
-    <string name="wg_lockdown_dialog_title" translatable="true">Блокировка</string>
     <string name="dc_proxy_dns_desc" translatable="true">Не проксировать DNS поверх Всегда-Включённый WireGuard, SOCKS5, HTTP прокси.</string>
     <string name="dc_proxy_dns_heading" translatable="true">Новее прокси DNS</string>
     <string name="one_wg_dialog_desc" translatable="true">Все соединения из всех приложений, включая DNS, будут направлены на единственный, активный WireGuard VPN. Другие активные WireGuard VPN, если таковые имеются, будут остановлены.</string>

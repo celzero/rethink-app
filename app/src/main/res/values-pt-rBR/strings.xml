@@ -965,7 +965,6 @@
     <string name="settings_rinr_desc_enabled" translatable="true">Encaminhando o próprio tráfego do Rethink através do túnel. A menos que você saiba o que está fazendo, desligue-o.</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Encaminhar o próprio tráfego do Rethink, como downloads de listas de bloqueio, verificações de conectividade, conexões DNS, de volta ao túnel.</string>
     <string name="cd_toast_edit" translatable="true">Editado</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">Os aplicativos selecionados serão encaminhados apenas por meio desta VPN WireGuard, independentemente de a VPN estar ativa ou desativada.</string>
     <string name="one_wg_dialog_desc" translatable="true">Todas as conexões de todos os aplicativos, incluindo DNS, serão encaminhadas para uma única VPN WireGuard ativa. Outras VPNs WireGuard ativas, se houver, serão interrompidas.</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">Todas as conexões e aplicativos não encaminhadas por outras VPNs WireGuard serão encaminhadas por esta.</string>
     <string name="one_wg_error_toast" translatable="true">Ao mudar para o modo \"Avançado\", desative o WireGuard no modo \"Simples\"</string>
@@ -994,7 +993,6 @@
     <string name="wg_apps_dialog_title_exclude" translatable="true">Excluir %1$s aplicativo(s)</string>
     <string name="catch_all_wg_dialog_title" translatable="true">Sempre Ativa</string>
     <string name="wireguard_disable_failure" translatable="true">\"WireGuard Sempre Ativa\" não pode ser desativado</string>
-    <string name="wg_lockdown_dialog_title" translatable="true">Restrito</string>
     <string name="wireguard_disable_title" translatable="true">Desativar WireGuard</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Protegido! Conectado ao DNS + Firewall + Proxy.</string>
     <string name="settings_connectivity_checks" translatable="true">Executar verificações de conectividade</string>

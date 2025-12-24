@@ -42,11 +42,15 @@ import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.database.ProxyEndpoint.Companion.DEFAULT_PROXY_TYPE
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.DialogSetProxyBinding
 import com.celzero.bravedns.databinding.FragmentProxyConfigureBinding
 import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
@@ -81,7 +85,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
     private val orbotHelper by inject<OrbotHelper>()
-
+    private val eventLogger by inject<EventLogger>()
     private lateinit var animation: Animation
 
     companion object {
@@ -175,6 +179,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 appConfig.removeProxy(AppConfig.ProxyType.SOCKS5, AppConfig.ProxyProvider.CUSTOM)
                 b.settingsActivitySocks5Desc.text =
                     getString(R.string.settings_socks_forwarding_default_desc)
+                logEvent("Custom SOCKS5 Proxy disabled", "disabled custom SOCKS5 proxy")
                 return@setOnCheckedChangeListener
             }
 
@@ -196,6 +201,12 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             }
             io {
                 val endpoint = appConfig.getSocks5ProxyDetails()
+                if (endpoint == null) {
+                    uiCtx {
+                        showToastUiCentered(this, getString(R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
+                    }
+                    return@io
+                }
                 val packageName = endpoint.proxyAppName
                 val app = FirewallManager.getAppInfoByPackage(packageName)?.appName ?: ""
                 val m = ProxyManager.ProxyMode.get(endpoint.proxyMode)
@@ -251,7 +262,12 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 return@setOnCheckedChangeListener
             }
             io {
-                val endpoint = appConfig.getHttpProxyDetails()
+                val endpoint = try {
+                    appConfig.getHttpProxyDetails()
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_PROXY, "err fetching HTTP proxy details: ${e.message}", e)
+                    null
+                }
                 if (endpoint == null) {
                     uiCtx {
                         showToastUiCentered(this, getString(R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
@@ -393,7 +409,12 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         if (!appConfig.isCustomHttpProxyEnabled()) return
 
         io {
-            val endpoint = appConfig.getHttpProxyDetails()
+            val endpoint = try {
+                appConfig.getHttpProxyDetails()
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_PROXY, "Error fetching HTTP proxy details in displayHttpProxyUi: ${e.message}", e)
+                null
+            }
             if (endpoint == null) {
                 uiCtx {
                     showToastUiCentered(this, getString(R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
@@ -525,7 +546,17 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         }
 
         io {
-            val endpoint: ProxyEndpoint = appConfig.getSocks5ProxyDetails()
+            val endpoint: ProxyEndpoint? = appConfig.getSocks5ProxyDetails()
+            if (endpoint == null) {
+                uiCtx {
+                    showToastUiCentered(
+                        this,
+                        getString(R.string.blocklist_update_check_failure),
+                        Toast.LENGTH_SHORT
+                    )
+                }
+                return@io
+            }
             val m = ProxyManager.ProxyMode.get(endpoint.proxyMode) ?: return@io
 
             // only update below ui if its custom http proxy
@@ -712,10 +743,18 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
 
         excludeAppLayout.setOnClickListener {
             excludeAppCheckBox.isChecked = !excludeAppCheckBox.isChecked
+            logEvent(
+                "loopback proxy forwarder apps SOCKS5 Proxy toggled",
+                "loopback proxy forwarder apps in SOCKS5 proxy: ${excludeAppCheckBox.isChecked}"
+            )
         }
 
         udpBlockLayout.setOnClickListener {
             udpBlockCheckBox.isChecked = !udpBlockCheckBox.isChecked
+            logEvent(
+                "UDP Block in SOCKS5 Proxy toggled",
+                "UDP block in SOCKS5 proxy: ${udpBlockCheckBox.isChecked}"
+            )
         }
 
         applyURLBtn.setOnClickListener {
@@ -771,6 +810,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                     b.settingsActivitySocks5Desc.text =
                         getString(R.string.settings_socks_forwarding_desc, ip, port.toString(), app)
                 }
+                logEvent("Custom SOCKS5 Proxy set", "custom SOCKS5 proxy to $ip:$port, app: $app")
                 dialog.dismiss()
             } else {
                 // no-op
@@ -879,6 +919,10 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
 
         excludeAppLayout.setOnClickListener {
             excludeAppCheckBox.isChecked = !excludeAppCheckBox.isChecked
+            logEvent(
+                "loopback proxy forwarder apps in HTTP Proxy toggled",
+                "loopback proxy forwarder apps in HTTP proxy: ${excludeAppCheckBox.isChecked}"
+            )
         }
 
         val proxySpinnerAdapter =
@@ -932,6 +976,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                     b.settingsActivityHttpProxyDesc.text =
                         getString(R.string.settings_http_proxy_desc, host)
                 }
+                logEvent("Custom HTTP Proxy set", "custom HTTP proxy to $host, app: ${appNameSpinner.selectedItem}" )
             }
         }
         cancelURLBtn.setOnClickListener {
@@ -1061,6 +1106,10 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             modifiedDataTime = 0L,
             latency = 0
         )
+    }
+
+    private fun logEvent(msg: String, details: String) {
+        eventLogger.log(EventType.PROXY_SWITCH, Severity.LOW, msg, EventSource.UI, false, details)
     }
 
     private fun io(f: suspend () -> Unit) {

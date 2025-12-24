@@ -21,6 +21,7 @@ import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
+import java.io.Serializable
 
 /**
  * The CustomIp table will contain the firewall rules based on IP address, port and protocol.
@@ -30,7 +31,7 @@ import inet.ipaddr.IPAddressString
  * combination of ipaddress, port, protocol will be applied for all the available apps.
  */
 @Entity(primaryKeys = ["uid", "ipAddress", "port", "protocol"], tableName = "CustomIp")
-class CustomIp {
+class CustomIp : Serializable {
     var uid: Int = UID_EVERYBODY
     var ipAddress: String = ""
     var port: Int = UNSPECIFIED_PORT

@@ -39,6 +39,9 @@ class AppInfo {
     var downloadBytes: Long = 0
     var isProxyExcluded: Boolean = false
     var tombstoneTs: Long = 0
+    var modifiedTs: Long = 0
+    var tempAllowEnabled: Boolean = false
+    var tempAllowExpiryTime: Long = 0
 
     override fun equals(other: Any?): Boolean {
         if (other !is AppInfo) return false
@@ -74,6 +77,9 @@ class AppInfo {
                 "downloadBytes" -> downloadBytes = it.value as Long
                 "isProxyExcluded" -> isProxyExcluded = (it.value as Int == 1)
                 "tombstoneTs" -> tombstoneTs = it.value as Long
+                "modifiedTs" -> modifiedTs = it.value as Long
+                "tempAllowEnabled" -> tempAllowEnabled = (it.value as Int == 1)
+                "tempAllowExpiryTime" -> tempAllowExpiryTime = it.value as Long
                 else -> {
                     // ignore
                 }

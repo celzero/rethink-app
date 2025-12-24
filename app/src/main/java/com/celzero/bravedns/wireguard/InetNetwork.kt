@@ -28,6 +28,7 @@ import java.net.InetAddress
  */
 class InetNetwork private constructor(val address: InetAddress, val mask: Int) {
 
+    @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
     override fun equals(obj: Any?): Boolean {
         if (obj !is InetNetwork) return false
         return address == obj.address && mask == obj.mask
@@ -38,7 +39,7 @@ class InetNetwork private constructor(val address: InetAddress, val mask: Int) {
     }
 
     override fun toString(): String {
-        return address.hostAddress + '/' + mask
+        return (address.hostAddress ?: "") + '/' + mask
     }
 
     companion object {

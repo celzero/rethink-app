@@ -967,7 +967,6 @@
     <string name="settings_rinr_desc_enabled" translatable="true">Enrutar el propio tráfico de Rethink a través del túnel. A menos que sepas lo que haces, desactívalo.</string>
     <string name="cd_dialog_edit_title" translatable="true">Editar la regla del dominio</string>
     <string name="cd_toast_edit" translatable="true">Editado</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">Las aplicaciones seleccionadas solo se enrutarán a través de esta VPN WireGuard, independientemente de si la VPN está activa o deshabilitada.</string>
     <string name="one_wg_dialog_desc" translatable="true">Todas las conexiones de todas las aplicaciones, incluyendo DNS, serán enrutadas a una única VPN WireGuard activa. Las demás VPN de WireGuard activas, si las hay, se detendrán.</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">Todas las conexiones y aplicaciones no enrutadas por otras VPN de WireGuard serán enrutadas por esta.</string>
     <string name="one_wg_error_toast" translatable="true">Para cambiar a Avanzado, detenga WireGuard en modo Simple</string>
@@ -986,7 +985,6 @@
     <string name="lbl_cache" translatable="true">Cache</string>
     <string name="failed_using_default" translatable="true">Falló: usando DNS alternativas</string>
     <string name="one_wg_apps_added" translatable="true">Enrutar todas las aplicaciones</string>
-    <string name="wg_lockdown_dialog_title" translatable="true">Bloqueo</string>
     <string name="catch_all_wg_dialog_title" translatable="true">Siempre activo</string>
     <string name="routing_remaining_apps" translatable="true">Enrutamiento de las aplicaciones restantes</string>
     <string name="settings_rinr_dialog_title" translatable="true">Bucle invertido (experimental)</string>

@@ -21,6 +21,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.celzero.bravedns.database.RefreshDatabase
+import com.celzero.bravedns.service.EventLogger
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.Calendar
@@ -29,9 +30,11 @@ class PurgeConnectionLogs(val context: Context, workerParameters: WorkerParamete
     CoroutineWorker(context, workerParameters), KoinComponent {
 
     private val refreshDatabase by inject<RefreshDatabase>()
+    private val eventLogger by inject<EventLogger>()
 
     companion object {
         const val NUMBER_OF_DAYS_TO_PURGE = -7
+        const val NUMBER_OF_DAYS_TO_PURGE_EVENTS = 4
     }
 
     override suspend fun doWork(): Result {
@@ -47,6 +50,12 @@ class PurgeConnectionLogs(val context: Context, workerParameters: WorkerParamete
          * ConnectionTracker and DNSLogs.
          */
         refreshDatabase.purgeConnectionLogs(date)
+        /**
+         * purge event logs older than 4 days, can be changed based on user configuration in later
+         * versions.
+         */
+         eventLogger.scheduleAutoPurge(NUMBER_OF_DAYS_TO_PURGE_EVENTS)
+
         return Result.success()
     }
 }

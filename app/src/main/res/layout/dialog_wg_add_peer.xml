@@ -5,19 +5,16 @@
     android:layout_height="match_parent"
     android:background="?attr/background">
 
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="8dp"
-        android:focusableInTouchMode="true"
-        app:cardBackgroundColor="?attr/background"
-        app:cardCornerRadius="16dp">
-
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:layout_constraintTop_toTopOf="parent"
+            android:focusableInTouchMode="true"
+            android:padding="8dp">
 
             <LinearLayout
+                android:id="@+id/peer_input_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -182,49 +179,46 @@
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_above="@id/lb_action_container"
-                android:background="?attr/border" />
-
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/lb_action_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
+                android:layout_marginTop="30dp"
+                android:layout_below="@id/peer_input_container"
                 android:orientation="horizontal">
 
-                <com.google.android.material.button.MaterialButton
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/custom_dialog_dismiss_button"
                     style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
                     android:text="@string/lbl_dismiss"
+                    android:layout_marginEnd="5dp"
                     android:textColor="?attr/accentGood"
                     android:textSize="@dimen/large_font_text_view"
-                    android:background="?attr/colorPrimary"
+                    android:background="@drawable/rectangle_border_background"
+                    android:foreground="?android:attr/selectableItemBackground"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toLeftOf="@+id/guideline"
                     app:layout_constraintTop_toBottomOf="@+id/custom_dialog_ok_button" />
 
-                <com.google.android.material.button.MaterialButton
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/custom_dialog_ok_button"
                     style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
                     android:text="@string/lbl_save"
+                    android:layout_marginStart="5dp"
                     android:textColor="?attr/accentGood"
                     android:textSize="@dimen/large_font_text_view"
-                    android:background="?attr/colorPrimary"
+                    android:background="@drawable/rectangle_border_background"
+                    android:foreground="?android:attr/selectableItemBackground"
                     app:layout_constraintLeft_toRightOf="@+id/guideline"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/save_tunnel" />
             </androidx.appcompat.widget.LinearLayoutCompat>
         </RelativeLayout>
-
-    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

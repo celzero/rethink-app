@@ -42,8 +42,12 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallAppListAdapter
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.RefreshDatabase
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.ActivityAppListBinding
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.bottomsheet.FirewallAppFilterBottomSheet
 import com.celzero.bravedns.util.Themes
@@ -55,6 +59,10 @@ import com.celzero.bravedns.viewmodel.AppInfoViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -62,6 +70,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class AppListActivity :
     AppCompatActivity(R.layout.activity_app_list), SearchView.OnQueryTextListener {
     private val persistentState by inject<PersistentState>()
+    private val eventLogger by inject<EventLogger>()
     private val b by viewBinding(ActivityAppListBinding::bind)
 
     private val appInfoViewModel: AppInfoViewModel by viewModel()
@@ -83,7 +92,7 @@ class AppListActivity :
         private const val ANIMATION_END_DEGREE = 360.0f
 
         private const val REFRESH_TIMEOUT: Long = 4000
-        private const val QUERY_TEXT_TIMEOUT: Long = 1000
+        private const val QUERY_TEXT_DELAY: Long = 1000
     }
 
     // enum class for bulk ui update
@@ -118,6 +127,7 @@ class AppListActivity :
         }
     }
 
+    @Suppress("MagicNumber")
     enum class FirewallFilter(val id: Int) {
         ALL(0),
         ALLOWED(1),
@@ -258,19 +268,29 @@ class AppListActivity :
         super.onPause()
     }
 
+    val searchQuery = MutableStateFlow("")
+
     override fun onQueryTextSubmit(query: String): Boolean {
-        addQueryToFilters(query)
+        searchQuery.value = query
         b.ffaSearch.clearFocus()
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        Utilities.delay(QUERY_TEXT_TIMEOUT, lifecycleScope) {
-            if (!this.isFinishing) {
-                addQueryToFilters(query)
-            }
-        }
+        searchQuery.value = query
         return true
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun setQueryFilter() {
+        lifecycleScope.launch {
+            searchQuery
+                .debounce(QUERY_TEXT_DELAY)
+                .distinctUntilChanged()
+                .collect { query ->
+                    addQueryToFilters(query)
+                }
+        }
     }
 
     private fun addQueryToFilters(query: String) {
@@ -651,7 +671,8 @@ class AppListActivity :
     }
 
     private fun updateMeteredBulk() {
-        if (isInitTag(b.ffaToggleAllMobileData)) {
+        val metered = isInitTag(b.ffaToggleAllMobileData)
+        if (metered) {
             b.ffaToggleAllMobileData.tag = 1
             b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_off)
             io { appInfoViewModel.updateMeteredStatus(true) }
@@ -661,10 +682,12 @@ class AppListActivity :
             io { appInfoViewModel.updateMeteredStatus(false) }
         }
         resetFirewallIcons(BlockType.METER)
+        logEvent("Bulk metered rule update performed, isMetered: $metered")
     }
 
     private fun updateUnmeteredBulk() {
-        if (isInitTag(b.ffaToggleAllWifi)) {
+        val unmeter = isInitTag(b.ffaToggleAllWifi)
+        if (unmeter) {
             b.ffaToggleAllWifi.tag = 1
             b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_off)
             io { appInfoViewModel.updateUnmeteredStatus(true) }
@@ -674,10 +697,12 @@ class AppListActivity :
             io { appInfoViewModel.updateUnmeteredStatus(false) }
         }
         resetFirewallIcons(BlockType.UNMETER)
+        logEvent("Bulk unmetered rule update performed, isUnmetered: $unmeter")
     }
 
     private fun updateBypassBulk() {
-        if (isInitTag(b.ffaToggleAllBypass)) {
+        val bypass = isInitTag(b.ffaToggleAllBypass)
+        if (bypass) {
             b.ffaToggleAllBypass.tag = 1
             b.ffaToggleAllBypass.setImageResource(R.drawable.ic_firewall_bypass_on)
             io { appInfoViewModel.updateBypassStatus(true) }
@@ -687,10 +712,12 @@ class AppListActivity :
             io { appInfoViewModel.updateBypassStatus(false) }
         }
         resetFirewallIcons(BlockType.BYPASS)
+        logEvent("Bulk bypass rule update performed, isBypass: $bypass")
     }
 
     private fun updateBypassDnsFirewallBulk() {
-        if (isInitTag(b.ffaToggleAllBypassDnsFirewall)) {
+        val bypassDnsFirewall = isInitTag(b.ffaToggleAllBypassDnsFirewall)
+        if (bypassDnsFirewall) {
             b.ffaToggleAllBypassDnsFirewall.tag = 1
             b.ffaToggleAllBypassDnsFirewall.setImageResource(R.drawable.ic_bypass_dns_firewall_on)
             io { appInfoViewModel.updateBypassDnsFirewall(true) }
@@ -700,10 +727,12 @@ class AppListActivity :
             io { appInfoViewModel.updateBypassDnsFirewall(false) }
         }
         resetFirewallIcons(BlockType.BYPASS_DNS_FIREWALL)
+        logEvent("Bulk bypass DNS firewall rule update performed, isBypassDnsFirewall: $bypassDnsFirewall")
     }
 
     private fun updateExcludedBulk() {
-        if (isInitTag(b.ffaToggleAllExclude)) {
+        val exclude = isInitTag(b.ffaToggleAllExclude)
+        if (exclude) {
             b.ffaToggleAllExclude.tag = 1
             b.ffaToggleAllExclude.setImageResource(R.drawable.ic_firewall_exclude_on)
             io { appInfoViewModel.updateExcludeStatus(true) }
@@ -713,10 +742,12 @@ class AppListActivity :
             io { appInfoViewModel.updateExcludeStatus(false) }
         }
         resetFirewallIcons(BlockType.EXCLUDE)
+        logEvent("Bulk exclude rule update performed, isExclude: $exclude")
     }
 
     private fun updateLockdownBulk() {
-        if (isInitTag(b.ffaToggleAllLockdown)) {
+        val lockdown = isInitTag(b.ffaToggleAllLockdown)
+        if (lockdown) {
             b.ffaToggleAllLockdown.tag = 1
             b.ffaToggleAllLockdown.setImageResource(R.drawable.ic_firewall_lockdown_on)
             io { appInfoViewModel.updateLockdownStatus(true) }
@@ -726,6 +757,7 @@ class AppListActivity :
             io { appInfoViewModel.updateLockdownStatus(false) }
         }
         resetFirewallIcons(BlockType.LOCKDOWN)
+        logEvent("Bulk lockdown rule update performed, isLockdown: $lockdown")
     }
 
     private fun isInitTag(view: View): Boolean {
@@ -778,7 +810,7 @@ class AppListActivity :
     }
 
     private fun initListAdapter() {
-        val recyclerAdapter = FirewallAppListAdapter(this, this)
+        val recyclerAdapter = FirewallAppListAdapter(this, this, eventLogger)
         b.ffaAppList.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(this)
         b.ffaAppList.layoutManager = layoutManager
@@ -790,6 +822,7 @@ class AppListActivity :
         }
 
         b.ffaAppList.adapter = recyclerAdapter
+        setQueryFilter()
     }
 
     private fun openFilterBottomSheet() {
@@ -812,6 +845,10 @@ class AppListActivity :
 
     private fun refreshDatabase() {
         io { refreshDatabase.refresh(RefreshDatabase.ACTION_REFRESH_INTERACTIVE) }
+    }
+
+    private fun logEvent(details: String) {
+        eventLogger.log(EventType.FW_RULE_MODIFIED, Severity.LOW, "App list, bulk change", EventSource.UI, false, details)
     }
 
     private fun io(f: suspend () -> Unit) {

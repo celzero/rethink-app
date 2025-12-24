@@ -985,8 +985,6 @@
     <string name="new_warp_config_desc" translatable="true">Fetch WARP konfiguráció a szerverről</string>
     <string name="new_warp_error_toast" translatable="true">Nem sikerült lekérni a WARP konfigurációt</string>
     <string name="one_wg_apps_added" translatable="true">Minden alkalmazás átirányítása</string>
-    <string name="wg_lockdown_dialog_title" translatable="true">Zárolás</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">A kiválasztott alkalmazások forgalma csak ezen a WireGuard VPN-en keresztül lesz irányítva, függetlenül attól, hogy a VPN aktív vagy le van tiltva.</string>
     <string name="one_wg_dialog_desc" translatable="true">Minden alkalmazás összes kapcsolata, beleértve a DNS-forgalmat is, egyetlen aktív WireGuard VPN-re lesz átirányítva. Más aktív WireGuard VPN-ek (ha vannak) leállnak.</string>
     <string name="catch_all_wg_dialog_title" translatable="true">Mindig bekapcsolva</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">Minden olyan kapcsolat és alkalmazás, amit más WireGuard VPN-ek nem irányítanak, ezen a VPN-en keresztül lesz továbbítva.</string>

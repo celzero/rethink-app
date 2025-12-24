@@ -996,8 +996,6 @@
     <string name="cd_dialog_edit_title" translatable="true">改網域規則</string>
     <string name="cd_toast_edit" translatable="true">改咗</string>
     <string name="one_wg_apps_added" translatable="true">路由緊所有應用程式</string>
-    <string name="wg_lockdown_dialog_title" translatable="true">閉關</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">揀咗嘅應用程式將淨係用呢個 WireGuard VPN 嚟路由，無論呢個 VPN 係咪已經啓用。</string>
     <string name="one_wg_dialog_desc" translatable="true">包括 DNS 在內嘅來自所有應用程式嘅流量將被單個活躍嘅 WireGuard VPN 路由。其他活躍嘅 WireGuard VPN 將被停止。</string>
     <string name="catch_all_wg_dialog_title" translatable="true">永遠着住</string>
     <string name="wireguard_disable_title" translatable="true">停止 WireGuard</string>

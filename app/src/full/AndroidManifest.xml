@@ -3,17 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission
-        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage" />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32"
-        tools:ignore="ScopedStorage" />
 
     <application
         android:name=".RethinkDnsApplication"
-        android:requestLegacyExternalStorage="true"
         android:theme="@style/AppThemeInitial">
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
@@ -140,6 +132,8 @@
             android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.ConsoleLogActivity"
             android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.activity.EventsActivity"
+            android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.NotificationHandlerActivity"
             android:excludeFromRecents="true"
@@ -176,6 +170,14 @@
             android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.RpnWinProxyDetailsActivity"
             android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.BubbleActivity"
+            android:allowEmbedded="true"
+            android:resizeableActivity="true"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:launchMode="standard"/>
        <!-- <activity android:name=".ui.location.LocationSelectorActivity"
             android:finishOnTaskLaunch="true" />-->
 
@@ -187,7 +189,6 @@
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter android:priority="999">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
                 <action android:name="android.intent.action.REBOOT" />
                 <action android:name="android.intent.action.USER_UNLOCKED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
@@ -212,6 +213,9 @@
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:name=".receiver.BubbleDismissReceiver"
+            android:exported="false" />
 
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"

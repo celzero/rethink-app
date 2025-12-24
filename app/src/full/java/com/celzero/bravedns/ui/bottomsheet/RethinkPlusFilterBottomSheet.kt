@@ -37,10 +37,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import org.koin.android.ext.android.inject
 
-class RethinkPlusFilterBottomSheet(
-    val activity: RethinkBlocklistFragment?,
-    private val fileTags: List<FileTag>
-) : BottomSheetDialogFragment() {
+class RethinkPlusFilterBottomSheet : BottomSheetDialogFragment() {
 
     private var _binding: BottomSheetRethinkPlusFilterBinding? = null
 
@@ -51,6 +48,26 @@ class RethinkPlusFilterBottomSheet(
     private val persistentState by inject<PersistentState>()
 
     private var filters: RethinkBlocklistFragment.Filters? = null
+
+    // Store activity reference (not in constructor to allow no-arg constructor)
+    private var fragmentActivity: RethinkBlocklistFragment? = null
+
+    companion object {
+        private const val ARG_FILE_TAGS = "file_tags"
+        
+        // Factory method to create instance with parameters
+        fun newInstance(
+            activity: RethinkBlocklistFragment?,
+            fileTags: List<FileTag>
+        ): RethinkPlusFilterBottomSheet {
+            val fragment = RethinkPlusFilterBottomSheet()
+            fragment.fragmentActivity = activity
+            val args = Bundle()
+            args.putSerializable(ARG_FILE_TAGS, ArrayList(fileTags))
+            fragment.arguments = args
+            return fragment
+        }
+    }
 
     override fun getTheme(): Int =
         Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
@@ -88,7 +105,9 @@ class RethinkPlusFilterBottomSheet(
     }
 
     private fun initView() {
-        filters = activity?.filterObserver()?.value
+        filters = fragmentActivity?.filterObserver()?.value
+        @Suppress("UNCHECKED_CAST", "DEPRECATION")
+        val fileTags = (arguments?.getSerializable(ARG_FILE_TAGS) as? ArrayList<FileTag>) ?: emptyList()
         makeChipSubGroup(fileTags)
     }
 
@@ -108,11 +127,11 @@ class RethinkPlusFilterBottomSheet(
             this.dismiss()
             if (filters == null) return@setOnClickListener
 
-            activity?.filterObserver()?.postValue(filters)
+            fragmentActivity?.filterObserver()?.postValue(filters)
         }
 
         b.rpfClear.setOnClickListener {
-            activity?.filterObserver()?.postValue(RethinkBlocklistFragment.Filters())
+            fragmentActivity?.filterObserver()?.postValue(RethinkBlocklistFragment.Filters())
             this.dismiss()
         }
     }

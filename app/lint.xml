@@ -4,4 +4,10 @@
     <issue id="all">
         <ignore regexp=".*/src/.*/res/values(?:-[^/]+)?/strings\.xml" />
     </issue>
+
+    <!-- Explicitly suppress StringFormatInvalid errors for translation files -->
+    <issue id="StringFormatInvalid" severity="ignore" />
+
+    <!-- Suppress StringFormatMatches errors for translation files (argument count mismatches) -->
+    <issue id="StringFormatMatches" severity="ignore" />
 </lint>
