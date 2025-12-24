@@ -956,7 +956,7 @@ object FirewallManager : KoinComponent {
         appInfosLiveData.postValue(appInfos.values().toList())
     }
 
-    private fun isUnknownPackage(uid: Int): Boolean {
+    fun isUnknownPackage(uid: Int): Boolean {
         // Unknown uids are marked with a synthetic package prefix.
         val pkgs = runCatching { appInfos.get(uid).map { it.packageName } }.getOrDefault(emptyList())
         return pkgs.any { it.startsWith(AppInfoRepository.NO_PACKAGE_PREFIX) }
