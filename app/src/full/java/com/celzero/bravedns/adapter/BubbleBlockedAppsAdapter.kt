@@ -71,6 +71,9 @@ class BubbleBlockedAppsAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(app: BlockedAppInfo) {
+            // Enable marquee reliably (focus is usually held by other views like buttons).
+            binding.blockedAppName.isSelected = true
+
             binding.blockedAppName.text = app.appName
             binding.blockedAppPackage.text = app.packageName
             binding.blockedAppCount.text = itemView.context.getString(
@@ -125,4 +128,3 @@ class BubbleBlockedAppsAdapter(
         }
     }
 }
-

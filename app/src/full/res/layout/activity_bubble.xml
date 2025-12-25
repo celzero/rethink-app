@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="10dp"
     android:background="?attr/background">
 
     <androidx.core.widget.NestedScrollView
@@ -16,8 +17,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="12dp"
-            android:paddingBottom="16dp">
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp">
 
             <!-- Header: keep it compact and consistent with other Rethink screens (no toolbar) -->
             <LinearLayout
@@ -30,7 +31,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Firewall Bubble"
+                    android:text="@string/firewall_bubble_title"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title"
                     android:textColor="?attr/primaryTextColor"
                     android:textStyle="bold" />
@@ -39,9 +40,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Review blocked apps and allow them temporarily."
+                    android:text="@string/firewall_bubble_subtitle"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                    android:textColor="?attr/secondaryTextColor" />
+                    android:textColor="?attr/primaryLightColorText" />
             </LinearLayout>
 
             <!-- Temporarily allowed apps (15 min) -->
@@ -49,10 +50,9 @@
                 android:id="@+id/bubble_allowed_apps_ll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="12dp"
                 android:layout_marginBottom="12dp"
                 android:orientation="vertical"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -66,9 +66,10 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Temporarily Allowed"
+                        android:layout_marginStart="16dp"
+                        android:text="@string/bubble_allowed_title"
                         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-                        android:textColor="?attr/primaryTextColor"
+                        android:textColor="?attr/primaryLightColorText"
                         android:textStyle="bold" />
 
                     <TextView
@@ -80,7 +81,6 @@
                         android:paddingEnd="8dp"
                         android:paddingTop="2dp"
                         android:paddingBottom="2dp"
-                        android:text="0"
                         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
                         android:textColor="?attr/colorPrimary" />
                 </LinearLayout>
@@ -104,20 +104,12 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:contentDescription=""
-                    android:src="@drawable/ic_firewall_shield"
-                    app:tint="?attr/colorError" />
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="Recently Blocked"
+                    android:text="@string/bubble_activity_title"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-                    android:textColor="?attr/primaryTextColor"
+                    android:textColor="?attr/primaryLightColorText"
                     android:textStyle="bold" />
 
             </LinearLayout>
@@ -143,9 +135,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:text="Loading…"
+                    android:text="@string/bubble_loading"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                    android:textColor="?attr/secondaryTextColor" />
+                    android:textColor="?attr/primaryLightColorText" />
 
             </LinearLayout>
 
@@ -155,8 +147,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipToPadding="false"
-                android:paddingTop="4dp"
-                android:paddingBottom="6dp"
                 tools:listitem="@layout/item_blocked_app" />
 
             <!-- Empty state -->
@@ -169,7 +159,7 @@
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="24dp"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="44dp"
@@ -195,17 +185,7 @@
                     android:lineSpacingExtra="2dp"
                     android:text="@string/bubble_empty_state_desc"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                    android:textColor="?attr/secondaryTextColor" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/bubble_empty_action_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="View Firewall Settings"
-                    android:visibility="gone"
-                    app:cornerRadius="12dp"
-                    app:icon="@drawable/ic_firewall_shield" />
+                    android:textColor="?attr/primaryLightColorText" />
 
             </LinearLayout>
 

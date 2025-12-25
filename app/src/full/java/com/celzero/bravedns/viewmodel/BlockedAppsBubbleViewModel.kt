@@ -16,22 +16,30 @@
 package com.celzero.bravedns.viewmodel
 
 import Logger
-import android.content.Context
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.celzero.bravedns.data.BlockedAppInfo
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.ConnectionTrackerDAO
-
+import com.celzero.bravedns.database.DnsLogDAO
+import com.celzero.bravedns.service.FirewallManager
 
 /**
- * Custom PagingSource that wraps ConnectionTrackerDAO's blocked apps query
- * and converts BlockedAppResult to BlockedAppInfo with app metadata
+ * PagingSource for the Bubble blocked-apps list.
+ *
+ * Consolidates blocked apps from:
+ * - ConnectionTracker (firewall / IP connections)
+ * - DnsLogs (DNS blocks)
+ *
+ * De-duplicates by uid, sums counts, and uses the latest blocked timestamp.
+ *
+ * IMPORTANT: Do not use PackageManager here; use FirewallManager (in-memory appInfos) as the
+ * canonical source for app labels and uid->package aggregation.
  */
 class BlockedAppsBubbleViewModel(
     private val connectionTrackerDAO: ConnectionTrackerDAO,
+    private val dnsLogDAO: DnsLogDAO,
     private val appInfoRepository: AppInfoRepository,
-    private val context: Context,
     private val sinceTime: Long,
     private val tempAllowedUids: Set<Int>
 ) : PagingSource<Int, BlockedAppInfo>() {
@@ -49,30 +57,49 @@ class BlockedAppsBubbleViewModel(
                 tempAllowedUids
             }
 
-            // Use the paged query so refresh()/invalidate() works well with Room + Paging.
-            val blockedResults = connectionTrackerDAO.getRecentlyBlockedApps(sinceTime)
+            // Fetch recent blocked from both sources.
+            val connBlocked = connectionTrackerDAO.getRecentlyBlockedApps(sinceTime)
+            val dnsBlocked = runCatching { dnsLogDAO.getRecentlyBlockedDnsApps(sinceTime) }
+                .getOrElse {
+                    Logger.w(TAG, "dns blocked query failed: ${it.message}")
+                    emptyList()
+                }
 
-            val blockedApps = blockedResults
-                .filter { !liveTempAllowedUids.contains(it.uid) }
-                .mapNotNull { result ->
-                    try {
-                        val appInfo = appInfoRepository.getAppInfoByUid(result.uid)
-                        val packageName = appInfo?.packageName ?: "Unknown"
+            // Merge by UID. Sum counts, take max(lastBlocked).
+            val merged = LinkedHashMap<Int, Pair<Long, Int>>()
+            fun merge(uid: Int, last: Long, count: Int) {
+                val prev = merged[uid]
+                if (prev == null) {
+                    merged[uid] = last to count
+                } else {
+                    merged[uid] = maxOf(prev.first, last) to (prev.second + count)
+                }
+            }
 
-                        val baseName = appInfo?.appName ?: getAppNameFromUid(result.uid)
-                        val displayName = decorateNameIfSharedUid(baseName, result.uid)
+            connBlocked.forEach { merge(it.uid, it.lastBlocked, it.count) }
+            dnsBlocked.forEach { merge(it.uid, it.lastBlocked, it.count) }
 
-                        BlockedAppInfo(
-                            packageName = packageName,
-                            appName = displayName,
-                            uid = result.uid,
-                            count = result.count,
-                            lastBlocked = result.lastBlocked
-                        )
-                    } catch (e: Exception) {
-                        Logger.e(TAG, "Error getting app info for uid ${result.uid}: ${e.message}", e)
-                        null
-                    }
+            val blockedApps = merged
+                .entries
+                .sortedByDescending { it.value.first }
+                .take(10)
+                .filter { !liveTempAllowedUids.contains(it.key) }
+                .map { (uid, meta) ->
+                    val (lastBlocked, count) = meta
+                    val packageNames = FirewallManager.getPackageNamesByUid(uid)
+                    val appNames = FirewallManager.getAppNamesByUid(uid)
+
+                    val otherCount = (packageNames.size - 1).coerceAtLeast(0)
+                    val baseName = appNames.firstOrNull() ?: "Unknown"
+                    val appName = if (otherCount > 0) "$baseName + $otherCount other apps" else baseName
+
+                    BlockedAppInfo(
+                        packageName = packageNames.firstOrNull() ?: "Unknown" ,
+                        appName = appName,
+                        uid = uid,
+                        count = count,
+                        lastBlocked = lastBlocked
+                    )
                 }
 
             LoadResult.Page(
@@ -86,33 +113,5 @@ class BlockedAppsBubbleViewModel(
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, BlockedAppInfo>): Int? {
-        return null
-    }
-
-    private fun getAppNameFromUid(uid: Int): String {
-        return try {
-            val packages = context.packageManager.getPackagesForUid(uid)
-            if (!packages.isNullOrEmpty()) {
-                val packageName = packages[0]
-                val appInfo = context.packageManager.getApplicationInfo(packageName, 0)
-                context.packageManager.getApplicationLabel(appInfo).toString()
-            } else {
-                "UID: $uid"
-            }
-        } catch (e: Exception) {
-            Logger.e(TAG, "err getting app name for uid $uid: ${e.message}", e)
-            "UID: $uid"
-        }
-    }
-
-    private fun decorateNameIfSharedUid(appName: String, uid: Int): String {
-        return try {
-            val pkgs = context.packageManager.getPackagesForUid(uid)
-            val otherCount = (pkgs?.size ?: 0) - 1
-            if (otherCount > 0) "$appName + $otherCount other apps" else appName
-        } catch (_: Exception) {
-            appName
-        }
-    }
+    override fun getRefreshKey(state: PagingState<Int, BlockedAppInfo>): Int? = null
 }

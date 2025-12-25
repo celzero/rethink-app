@@ -28,39 +28,45 @@ import com.celzero.bravedns.database.AppInfoRepository
  */
 class AllowedAppsBubbleViewModel(
     private val appInfoRepository: AppInfoRepository,
-    private val now: Long,
-    private val context: android.content.Context
+    private val now: Long
 ) : PagingSource<Int, AllowedAppInfo>() {
 
     companion object {
         private const val TAG = "AllowedAppsPagingSource"
+        private const val TEMP_ALLOW_MS = 15 * 60 * 1000L
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, AllowedAppInfo> {
         return try {
-            // Get temp allowed apps from database
+            // DB returns one row per package; collapse to one row per UID.
             val tempAllowedApps = appInfoRepository.getAllTempAllowedApps(now)
 
-            // Convert to AllowedAppInfo
-            val allowedApps = tempAllowedApps.mapNotNull { appInfo ->
-                try {
-                    val displayName = decorateNameIfSharedUid(appInfo.appName, appInfo.uid)
-                    AllowedAppInfo(
-                        packageName = appInfo.packageName,
-                        appName = displayName,
-                        uid = appInfo.uid,
-                        allowedAt = appInfo.tempAllowExpiryTime - (15 * 60 * 1000) // Calculate when it was allowed
-                    )
-                } catch (e: Exception) {
-                    Logger.e(TAG, "Error mapping app info: ${e.message}", e)
-                    null
-                }
-            }
+            val byUid = tempAllowedApps.groupBy { it.uid }
+
+            val allowedApps = byUid.values.mapNotNull { appsForUid ->
+                val primary = appsForUid.firstOrNull() ?: return@mapNotNull null
+
+                // If multiple packages share this UID, show "App + N other apps".
+                val otherCount = (appsForUid.size - 1).coerceAtLeast(0)
+                val displayName =
+                    if (otherCount > 0) "${primary.appName} + $otherCount other apps" else primary.appName
+
+                // tempAllowExpiryTime is stored per row; for UID aggregation, take the max.
+                val expiry = appsForUid.maxOfOrNull { it.tempAllowExpiryTime } ?: primary.tempAllowExpiryTime
+
+                AllowedAppInfo(
+                    packageName = primary.packageName,
+                    appName = displayName,
+                    uid = primary.uid,
+                    allowedAt = expiry - TEMP_ALLOW_MS,
+                    otherAppsCount = otherCount
+                )
+            }.sortedByDescending { it.allowedAt }
 
             LoadResult.Page(
                 data = allowedApps,
-                prevKey = null, // Only one page for now
-                nextKey = null  // Only one page for now
+                prevKey = null,
+                nextKey = null
             )
         } catch (e: Exception) {
             Logger.e(TAG, "Error loading allowed apps: ${e.message}", e)
@@ -68,17 +74,5 @@ class AllowedAppsBubbleViewModel(
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, AllowedAppInfo>): Int? {
-        return null
-    }
-
-    private fun decorateNameIfSharedUid(appName: String, uid: Int): String {
-        return try {
-            val pkgs = context.packageManager.getPackagesForUid(uid)
-            val otherCount = (pkgs?.size ?: 0) - 1
-            if (otherCount > 0) "$appName + $otherCount other apps" else appName
-        } catch (_: Exception) {
-            appName
-        }
-    }
+    override fun getRefreshKey(state: PagingState<Int, AllowedAppInfo>): Int? = null
 }

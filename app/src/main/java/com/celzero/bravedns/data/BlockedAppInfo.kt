@@ -27,6 +27,6 @@ data class AllowedAppInfo(
     val packageName: String,
     val appName: String,
     val uid: Int,
-    val allowedAt: Long // Timestamp when temp allow was set
+    val allowedAt: Long, // Timestamp when temp allow was set
+    val otherAppsCount: Int = 0
 )
-
