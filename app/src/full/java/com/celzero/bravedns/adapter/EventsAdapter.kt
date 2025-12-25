@@ -24,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Toast
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
@@ -35,7 +36,7 @@ import java.util.Date
 import java.util.Locale
 
 class EventsAdapter(private val context: Context) :
-    androidx.paging.PagingDataAdapter<Event, EventsAdapter.EventViewHolder>(EventDiffCallback()) {
+    PagingDataAdapter<Event, EventsAdapter.EventViewHolder>(EventDiffCallback()) {
 
     companion object {
         private const val ANIMATION_DURATION = 300L

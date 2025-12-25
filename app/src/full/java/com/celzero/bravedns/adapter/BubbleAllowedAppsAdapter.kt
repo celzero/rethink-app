@@ -43,6 +43,7 @@ class BubbleAllowedAppsAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(app: AllowedAppInfo) {
+            // appName is already decorated ("App + N other apps") by paging source.
             binding.allowedAppName.text = app.appName
 
             // Calculate time remaining
@@ -87,4 +88,3 @@ class BubbleAllowedAppsAdapter(
         }
     }
 }
-
