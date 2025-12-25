@@ -1876,12 +1876,16 @@ class GoVpnAdapter : KoinComponent {
 
         Logger.i(LOG_TAG_VPN, "$TAG setting link mtu: $nwMtu")
         return try {
-            tunnel.setLinkMtu(nwMtu.toLong())
-            logEvent(
-                Severity.LOW,
-                "set link mtu",
-                "Link MTU set to: $nwMtu"
-            )
+            if (tunMtu() != nwMtu) {
+                tunnel.setLinkMtu(nwMtu.toLong())
+                logEvent(
+                    Severity.LOW,
+                    "set link mtu",
+                    "Link MTU set to: $nwMtu"
+                )
+            } else {
+                Logger.vv(LOG_TAG_VPN, "$TAG link mtu is already set to $nwMtu, no-op")
+            }
             true
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG error setting link mtu: ${e.message}", e)
