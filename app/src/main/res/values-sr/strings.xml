@@ -704,7 +704,6 @@
     <string name="new_warp_config_desc" translatable="true">Добави WARP конфигурацију са сервера</string>
     <string name="new_warp_invalid_config_toast" translatable="true">Неисправна WARP конфигурација</string>
     <string name="one_wg_apps_added" translatable="true">Рутирање свих апликација</string>
-    <string name="wg_lockdown_dialog_title" translatable="true">Закључавање</string>
     <string name="bad_config_context" translatable="true">%1$s-ов %2$s</string>
     <string name="one_wg_dialog_desc" translatable="true">Све конекције из ове апликације, укључујучи DNS, биће рутиране на један, активан WireGuard VPN. Остали активни WireGuard VPN-ови, ако постоје, биће заустављени.</string>
     <string name="catch_all_wg_dialog_title" translatable="true">Увек укључен</string>
@@ -951,7 +950,6 @@
     <string name="unknown_error" translatable="true">Непозната грешка</string>
     <string name="setup_wireguard" translatable="true">Подеси WireGuard</string>
     <string name="new_warp_error_toast" translatable="true">Није могуће добавити WARP конфигурацију</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">Изабране апликације ће једино бити рутиране кроз овај WireGuard VPN, без обзира да ли је VPN активан или онемогућен.</string>
     <string name="one_wg_error_toast" translatable="true">Да пређете на Напредни, зауставите WireGuard у једоставном моду</string>
     <string name="config_add_success_toast" translatable="true">Завршено</string>
     <string name="wireguard_enabled_failure" translatable="true">Заустави остале активне проксије да би омогућио WireGuard</string>

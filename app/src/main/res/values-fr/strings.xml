@@ -687,7 +687,7 @@
     <string name="ci_dialog_edittext_hint">Adresse IP, sous-réseau ou port</string>
     <string name="ci_no_rule">Aucune règle</string>
     <string name="ada_app_status_allow">est autorisée</string>
-    <string name="ada_app_status_isolate">est confinée ; seules les IP de confiance sont autorisées</string>
+    <string name="ada_app_status_isolate">est confinée ; seules les IP de confiance sont autorisées</string>
     <string name="rt_dialog_neutral">Continuer</string>
     <string name="lbbs_search">Recherche de domaines dans les listes de blocage</string>
     <string name="lbbs_update_check">Vérifier MàJ</string>
@@ -987,8 +987,6 @@
     <string name="lbl_starting" translatable="true">Démarrage</string>
     <string name="lbl_anonymous" translatable="true">Anonyme</string>
     <string name="lbl_overall" translatable="true">Vue d\'ensemble</string>
-    <string name="wg_lockdown_dialog_title" translatable="true">Confinement</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">Les applications sélectionnées seront uniquement acheminées via ce VPN WireGuard, que le VPN soit activé ou désactivé.</string>
     <string name="catch_all_wg_dialog_title" translatable="true">Toujours en marche</string>
     <string name="routing_remaining_apps" translatable="true">Routage des applications restantes</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Routage du trafic propre à Rethink à travers le tunnel. À moins que vous sachiez ce que vous faites, désactivez cette fonction.</string>

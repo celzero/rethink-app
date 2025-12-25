@@ -33,12 +33,16 @@ import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.database.DoHEndpointRepository
 import com.celzero.bravedns.database.DoTEndpoint
 import com.celzero.bravedns.database.DoTEndpointRepository
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.ODoHEndpoint
 import com.celzero.bravedns.database.ODoHEndpointRepository
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.database.ProxyEndpointRepository
 import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.database.RethinkDnsEndpointRepository
+import com.celzero.bravedns.database.Severity
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.util.Constants
@@ -64,7 +68,8 @@ internal constructor(
     private val proxyEndpointRepository: ProxyEndpointRepository,
     private val persistentState: PersistentState,
     private val networkLogs: ConnectionTrackerRepository,
-    private val dnsLogs: DnsLogRepository
+    private val dnsLogs: DnsLogRepository,
+    private val eventLogger: EventLogger
 ) {
     private var braveModeObserver: MutableLiveData<Int> = MutableLiveData()
     private var pcapFilePath: String = ""
@@ -483,11 +488,11 @@ internal constructor(
         return oDoHEndpointRepository.getConnectedODoH()
     }
 
-    suspend fun getSocks5ProxyDetails(): ProxyEndpoint {
+    suspend fun getSocks5ProxyDetails(): ProxyEndpoint? {
         if (customSocks5Endpoint == null) {
             customSocks5Endpoint = proxyEndpointRepository.getCustomSocks5Endpoint()
         }
-        return customSocks5Endpoint!!
+        return customSocks5Endpoint
     }
 
     suspend fun getHttpProxyDetails(): ProxyEndpoint? {
@@ -596,6 +601,11 @@ internal constructor(
         if (isRethinkDnsConnected()) {
             onDnsChange(DnsType.RETHINK_REMOTE)
         }
+        logEvent(
+            EventType.DNS_SERVER_CHANGE,
+            "RethinkDNS switched to MAX",
+            "RethinkDNS endpoint switched to MAX, prev: ${persistentState.connectedDnsName}"
+        )
     }
 
     suspend fun switchRethinkDnsToSky() {
@@ -603,6 +613,11 @@ internal constructor(
         if (isRethinkDnsConnected()) {
             onDnsChange(DnsType.RETHINK_REMOTE)
         }
+        logEvent(
+            EventType.DNS_SERVER_CHANGE,
+            "RethinkDNS switched to SKY",
+            "RethinkDNS endpoint switched to SKY, prev: ${persistentState.connectedDnsName}"
+        )
     }
 
     fun changeBraveMode(braveMode: Int) {
@@ -694,6 +709,15 @@ internal constructor(
 
         doHEndpointRepository.update(doHEndpoint)
         onDnsChange(DnsType.DOH)
+        logEvent(
+            EventType.DNS_SERVER_CHANGE,
+            "DoH endpoint changed",
+            "DoH endpoint changed to ${doHEndpoint.dohName}, prev: ${persistentState.connectedDnsName}"
+        )
+    }
+
+    private suspend fun logEvent(type: EventType, msg: String, details: String) {
+        eventLogger.log(type, Severity.LOW, msg, EventSource.UI, true, details)
     }
 
     suspend fun handleDoTChanges(doTEndpoint: DoTEndpoint) {
@@ -702,8 +726,14 @@ internal constructor(
             removeConnectionStatus()
         }
 
+        val prev = persistentState.connectedDnsName
         doTEndpointRepository.update(doTEndpoint)
         onDnsChange(DnsType.DOT)
+        logEvent(
+            EventType.DNS_SERVER_CHANGE,
+            "DoT endpoint changed",
+            "DoT endpoint changed to ${doTEndpoint.name}, prev: $prev"
+        )
     }
 
     suspend fun handleODoHChanges(oDoHEndpoint: ODoHEndpoint) {
@@ -712,8 +742,14 @@ internal constructor(
             removeConnectionStatus()
         }
 
+        val prev = persistentState.connectedDnsName
         oDoHEndpointRepository.update(oDoHEndpoint)
         onDnsChange(DnsType.ODOH)
+        logEvent(
+            EventType.DNS_SERVER_CHANGE,
+            "ODoH endpoint changed",
+            "ODoH endpoint changed to ${oDoHEndpoint.name}, prev: $prev"
+        )
     }
 
     suspend fun handleRethinkChanges(rethinkDnsEndpoint: RethinkDnsEndpoint) {
@@ -722,8 +758,14 @@ internal constructor(
             removeConnectionStatus()
         }
 
+        val prev = persistentState.connectedDnsName
         rethinkDnsEndpointRepository.update(rethinkDnsEndpoint)
         onDnsChange(DnsType.RETHINK_REMOTE)
+        logEvent(
+            EventType.DNS_SERVER_CHANGE,
+            "RethinkDNS endpoint changed",
+            "RethinkDNS endpoint changed to ${rethinkDnsEndpoint.name}, prev: $prev"
+        )
     }
 
     suspend fun handleDnsProxyChanges(dnsProxyEndpoint: DnsProxyEndpoint) {
@@ -732,8 +774,14 @@ internal constructor(
             removeConnectionStatus()
         }
 
+        val prev = persistentState.connectedDnsName
         dnsProxyEndpointRepository.update(dnsProxyEndpoint)
         onDnsChange(DnsType.DNS_PROXY)
+        logEvent(
+            EventType.DNS_SERVER_CHANGE,
+            "DNS Proxy endpoint changed",
+            "DNS Proxy endpoint changed to ${dnsProxyEndpoint.proxyName}, prev: $prev"
+        )
     }
 
     suspend fun isOrbotDns(): Boolean {
@@ -748,8 +796,14 @@ internal constructor(
             removeConnectionStatus()
         }
 
+        val prev = persistentState.connectedDnsName
         dnsCryptEndpointRepository.update(dnsCryptEndpoint)
         onDnsChange(DnsType.DNSCRYPT)
+        logEvent(
+            EventType.DNS_SERVER_CHANGE,
+            "DNSCrypt endpoint changed",
+            "DNSCrypt endpoint changed to ${dnsCryptEndpoint.dnsCryptName}, prev: $prev"
+        )
     }
 
     suspend fun getOrbotDnsProxyEndpoint(): DnsProxyEndpoint? {
@@ -760,6 +814,12 @@ internal constructor(
         dnsCryptRelayEndpointRepository.update(endpoint)
         persistentState.dnsCryptRelays.postValue(
             PersistentState.DnsCryptRelayDetails(endpoint, endpoint.isSelected)
+        )
+
+        logEvent(
+            EventType.DNS_SERVER_CHANGE,
+            "DNSCrypt Relay endpoint changed",
+            "DNSCrypt Relay endpoint changed to ${endpoint.dnsCryptRelayURL}, isSelected: ${endpoint.isSelected}"
         )
     }
 
@@ -797,8 +857,14 @@ internal constructor(
             removeConnectionStatus()
         }
 
+        val prev = persistentState.connectedDnsName
         rethinkDnsEndpointRepository.setRethinkPlus()
         onDnsChange(DnsType.RETHINK_REMOTE)
+        logEvent(
+            EventType.DNS_SERVER_CHANGE,
+            "RethinkDNS Plus enabled",
+            "RethinkDNS Plus enabled, prev: $prev"
+        )
     }
 
     fun isRethinkDnsConnected(): Boolean {
@@ -810,7 +876,13 @@ internal constructor(
             removeConnectionStatus()
         }
 
+        val prev = persistentState.connectedDnsName
         onDnsChange(DnsType.SYSTEM_DNS)
+        logEvent(
+            EventType.DNS_SERVER_CHANGE,
+            "System DNS enabled",
+            "System DNS enabled, prev: $prev"
+        )
     }
 
     suspend fun enableSmartDns() {
@@ -818,7 +890,13 @@ internal constructor(
             removeConnectionStatus()
         }
 
+        val prev = persistentState.connectedDnsName
         onDnsChange(DnsType.SMART_DNS)
+        logEvent(
+            EventType.DNS_SERVER_CHANGE,
+            "Smart DNS enabled",
+            "Smart DNS enabled, prev: $prev"
+        )
     }
 
     fun isSystemDns(): Boolean {

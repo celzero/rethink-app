@@ -180,6 +180,7 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
         finish()
     }
 
+    @Suppress("DEPRECATION")
     private fun changeStatusBarColor() {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.statusBarColor = Color.TRANSPARENT

@@ -103,6 +103,7 @@ class GlobalExceptionHandler private constructor(
     private fun logExceptionContext(thread: Thread, exception: Throwable) {
         try {
             val stackTrace = exception.stackTraceToString()
+            @Suppress("DEPRECATION")
             val threadInfo = "Thread: ${thread.name} (ID: ${thread.id}, State: ${thread.state})"
 
             val stringBuilder = StringBuilder()

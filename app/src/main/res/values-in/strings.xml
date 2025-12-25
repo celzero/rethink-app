@@ -1048,7 +1048,6 @@
     <string name="one_wg_apps_added" translatable="true">Merutekan semua aplikasi</string>
     <string name="lbl_status" translatable="true">Status</string>
     <string name="lbl_starting" translatable="true">Memulai</string>
-    <string name="wg_lockdown_dialog_title" translatable="true">Penguncian Penuh</string>
     <string name="routing_remaining_apps" translatable="true">Rutekan aplikasi yang tersisa</string>
     <string name="remaining_apps_dialog_title" translatable="true">Sertakan aplikasi yang tersisa</string>
     <string name="remaining_apps_dialog_desc" translatable="true">Sertakan semua aplikasi yang tersisa yang tidak dirutekan oleh Proxy lain</string>
@@ -1056,7 +1055,6 @@
     <string name="one_wg_dialog_desc" translatable="true">Seluruh sambungan dari semua aplikasi, termasuk DNS, akan dirutekan dengan lajur tunggal, yaitu VPN WireGuard yang aktif. WireGuard VPN lain yang aktif, jika ada, akan dihentikan.</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">Semua sambungan dan aplikasi yang tidak dirutekan oleh VPN WireGuard lain akan dirutekan oleh VPN ini.</string>
     <string name="catch_all_wg_dialog_title" translatable="true">Selalu-Menyala</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">Aplikasi yang dipilih hanya akan dirutekan melalui jalur VPN WireGuard, terlepas apakah VPN aktif atau dimatikan.</string>
     <string name="one_wg_error_toast" translatable="true">Untuk beralih ke mode Lanjutan, hentikan WireGuard dalam mode Sederhana</string>
     <string name="wireguard_disable_failure" translatable="true">\"WireGuard Selalu-Menyala\" tidak dapat dimatikan</string>
     <string name="wg_apps_dialog_title_exclude" translatable="true">Kecualikan aplikasi %1$s</string>

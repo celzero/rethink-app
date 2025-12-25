@@ -53,6 +53,7 @@ object DatabaseModule {
         single { get<LogDatabase>().rethinkConnectionLogDAO() }
         single { get<LogDatabase>().statsSummaryDAO() }
         single { get<LogDatabase>().ipInfoDao() }
+        single { get<LogDatabase>().eventDao() }
 
         single { get<ConsoleLogDatabase>().consoleLogDAO() }
 

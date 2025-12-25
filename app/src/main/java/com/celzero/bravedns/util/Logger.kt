@@ -78,16 +78,16 @@ object Logger : KoinComponent {
 
         companion object {
             fun fromId(id: Int): LoggerLevel {
-                return when (id) {
-                    0 -> VERY_VERBOSE
-                    1 -> VERBOSE
-                    2 -> DEBUG
-                    3 -> INFO
-                    4 -> WARN
-                    5 -> ERROR
-                    6 -> STACKTRACE
-                    7 -> USR
-                    8 -> NONE
+                return when (id.toLong()) {
+                    VERY_VERBOSE.id -> VERY_VERBOSE
+                    VERBOSE.id -> VERBOSE
+                    DEBUG.id -> DEBUG
+                    INFO.id -> INFO
+                    WARN.id -> WARN
+                    ERROR.id -> ERROR
+                    STACKTRACE.id -> STACKTRACE
+                    USR.id -> USR
+                    NONE.id -> NONE
                     else -> NONE
                 }
             }

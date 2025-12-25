@@ -55,7 +55,7 @@ object InetAddresses {
      * @return whether or not maybeHostname is a valid DNS hostname
      */
     fun isHostname(maybeHostname: CharSequence?): Boolean {
-        return VALID_HOSTNAME.matcher(maybeHostname).matches()
+        return VALID_HOSTNAME.matcher(maybeHostname ?: "").matches()
     }
 
     /**

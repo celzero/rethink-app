@@ -39,9 +39,13 @@ import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
 import com.celzero.bravedns.database.ConnectionTracker
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.FirewallRuleset.Companion.getFirewallRule
@@ -85,6 +89,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
     companion object {
         const val INSTANCE_STATE_IPDETAILS = "IPDETAILS"
+        const val INSTANCE_OBJ_RETHINKLOG = "RETHINKLOG"
     }
 
     override fun onCreateView(
@@ -105,6 +110,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     private val persistentState by inject<PersistentState>()
+    private val eventLogger by inject<EventLogger>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -134,8 +140,8 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             return
         }
 
-        b.bsConnConnectionTypeHeading.text = info!!.ipAddress
-        b.bsConnConnectionFlag.text = info!!.flag
+        b.bsConnConnectionTypeHeading.text = info?.ipAddress.orEmpty()
+        b.bsConnConnectionFlag.text = info?.flag.orEmpty()
 
         b.bsConnBlockAppTxt.text = htmlToSpannedText(getString(R.string.bsct_block))
         b.bsConnBlockConnAllTxt.text = htmlToSpannedText(getString(R.string.bsct_block_ip))
@@ -153,20 +159,8 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         displaySummaryDetails()
         // setup click and item selected listeners
         setupClickListeners()
-
-        val rethinkUid =
-            Utilities.getApplicationInfo(requireContext(), requireContext().packageName)?.uid
-                ?: Constants.INVALID_UID
-        if (info!!.uid == rethinkUid) {
-            // do not show rules for RethinkDNS app
-            b.bsConnBlockedRule1HeaderLl.visibility = View.GONE
-            b.bsConnBlockedRule2HeaderLl.visibility = View.GONE
-            b.bsConnBlockedRule3HeaderLl.visibility = View.GONE
-            b.bsConnDomainRuleLl.visibility = View.GONE
-            return
-        }
         // updates the ip rules button
-        updateIpRulesUi(info!!.uid, info!!.ipAddress)
+        info?.let { updateIpRulesUi(it.uid, it.ipAddress) }
         // updates the value from dns request cache if available
         updateDnsIfAvailable()
     }
@@ -179,9 +173,10 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             return
         }
         // updates the app firewall's button
+        val uid = info?.uid ?: return
         io {
-            val appStatus = FirewallManager.appStatus(info!!.uid)
-            val connStatus = FirewallManager.connectionStatus(info!!.uid)
+            val appStatus = FirewallManager.appStatus(uid)
+            val connStatus = FirewallManager.connectionStatus(uid)
             uiCtx { updateFirewallRulesUi(appStatus, connStatus) }
         }
     }
@@ -212,21 +207,22 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun updateConnDetailsChip() {
-        if (info == null) {
+        val currentInfo = info
+        if (currentInfo == null) {
             Logger.w(LOG_TAG_FIREWALL, "ip-details missing: not updating the chip details")
             return
         }
 
-        val protocol = Protocol.getProtocolName(info!!.protocol).name
+        val protocol = Protocol.getProtocolName(currentInfo.protocol).name
         val time =
             DateUtils.getRelativeTimeSpanString(
-                info!!.timeStamp,
+                currentInfo.timeStamp,
                 System.currentTimeMillis(),
                 DateUtils.MINUTE_IN_MILLIS,
                 DateUtils.FORMAT_ABBREV_RELATIVE
             )
-        val protocolDetails = "$protocol/${info!!.port}"
-        if (info!!.isBlocked) {
+        val protocolDetails = "$protocol/${currentInfo.port}"
+        if (currentInfo.isBlocked) {
             b.bsConnTrackPortDetailChip.text =
                 getString(R.string.bsct_conn_desc_blocked, protocolDetails, time)
             return
@@ -237,12 +233,12 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun updateBlockedRulesChip() {
-        if (info!!.blockedByRule.isBlank()) {
+        if (info?.blockedByRule.isNullOrBlank()) {
             b.bsConnTrackAppInfo.text = getString(R.string.firewall_rule_no_rule)
             return
         }
 
-        val rule = info!!.blockedByRule
+        val rule = info?.blockedByRule ?: return
         val isIpnProxy = isNotLocalAndRpnProxy(info?.proxyDetails ?: "")
         // TODO: below code is not required, remove it in future (20/03/2023)
         if (rule.contains(FirewallRuleset.RULE2G.id)) {
@@ -263,7 +259,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
     private fun isInvalidProxyDetails(): Boolean {
         val isIpnProxy = isNotLocalAndRpnProxy(info?.proxyDetails ?: "")
-        val rule = info!!.blockedByRule
+        val rule = info?.blockedByRule ?: return false
         val isRuleAddedAsProxy = getFirewallRule(rule)?.id == FirewallRuleset.RULE12.id
         if (isRuleAddedAsProxy && (info?.proxyDetails.isNullOrEmpty() || !isIpnProxy)) {
             // when the conn is marked as proxied with id from flow, but the returned summary
@@ -274,10 +270,10 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun updateAppDetails() {
-        if (info == null) return
+        val currentInfo = info ?: return
 
         io {
-            val appNames = FirewallManager.getAppNamesByUid(info!!.uid)
+            val appNames = FirewallManager.getAppNamesByUid(currentInfo.uid)
             if (appNames.isEmpty()) {
                 uiCtx { handleNonApp() }
                 return@io
@@ -322,7 +318,8 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             b.connectionMessage.text = info?.message
         }
 
-        if (VpnController.hasCid(info!!.connId, info!!.uid)) {
+        val currentInfo = info
+        if (currentInfo != null && VpnController.hasCid(currentInfo.connId, currentInfo.uid)) {
             b.bsConnConnDuration.text =
                 getString(
                     R.string.two_argument_space,
@@ -381,7 +378,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
         b.bsConnConnUpload.text = uploadBytes
         b.bsConnConnDownload.text = downloadBytes
-        val duration = UIUtils.getDurationInHumanReadableFormat(requireContext(), info!!.duration)
+        val duration = UIUtils.getDurationInHumanReadableFormat(requireContext(), info?.duration ?: 0)
         b.bsConnConnDuration.text =
             getString(R.string.two_argument_space, duration, getString(R.string.symbol_clock))
     }
@@ -393,7 +390,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                 requireContext(),
                 FirewallRuleset.getRulesIcon(info?.blockedByRule)
             )
-        if (info!!.isBlocked || isInvalidProxyDetails()) {
+        if (info?.isBlocked == true || isInvalidProxyDetails()) {
             b.bsConnTrackAppInfo.setTextColor(fetchColor(requireContext(), R.attr.chipTextNegative))
             val colorFilter =
                 PorterDuffColorFilter(
@@ -422,7 +419,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         // hide the app firewall layout
         b.bsConnBlockedRule1HeaderLl.visibility = View.GONE
         b.bsConnUnknownAppCheck.isChecked = persistentState.getBlockUnknownConnections()
-        b.bsConnTrackAppName.text = info!!.appName
+        b.bsConnTrackAppName.text = info?.appName.orEmpty()
     }
 
     private fun setupClickListeners() {
@@ -433,16 +430,18 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                 "Unknown app, universal firewall settings(block unknown app): ${b.bsConnUnknownAppCheck.isChecked} "
             )
             persistentState.setBlockUnknownConnections(b.bsConnUnknownAppCheck.isChecked)
+            logEvent("Universal firewall setting changed", "Block unknown apps: ${b.bsConnUnknownAppCheck.isChecked}")
         }
 
-        b.bsConnTrackAppInfo.setOnClickListener { showFirewallRulesDialog(info!!.blockedByRule) }
+        b.bsConnTrackAppInfo.setOnClickListener { showFirewallRulesDialog(info?.blockedByRule) }
 
         b.bsConnTrackAppNameHeader.setOnClickListener {
+            val uid = info?.uid ?: return@setOnClickListener
             io {
-                val ai = FirewallManager.getAppInfoByUid(info!!.uid)
+                val ai = FirewallManager.getAppInfoByUid(uid)
                 uiCtx {
                     // case: app is uninstalled but still available in RethinkDNS database
-                    if (ai == null || info?.uid == Constants.INVALID_UID) {
+                    if (ai == null || uid == Constants.INVALID_UID) {
                         showToastUiCentered(
                             requireContext(),
                             getString(R.string.ct_bs_app_info_error),
@@ -450,7 +449,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                         )
                         return@uiCtx
                     }
-                    openAppDetailActivity(info!!.uid)
+                    openAppDetailActivity(uid)
                 }
             }
         }
@@ -475,9 +474,10 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                     val connStatus = FirewallManager.ConnectionStatus.getStatusByLabel(position)
 
                     // no change, prev selection and current selection are same
+                    val uid = info?.uid ?: return
                     io {
-                        val a = FirewallManager.appStatus(info!!.uid)
-                        val c = FirewallManager.connectionStatus(info!!.uid)
+                        val a = FirewallManager.appStatus(uid)
+                        val c = FirewallManager.connectionStatus(uid)
 
                         if (a == fStatus && c == connStatus) return@io
 
@@ -495,7 +495,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                         }
 
                         // TODO: instead disable/remove exclude from the view if pkg is unknown?
-                        if (FirewallManager.isUnknownPackage(info!!.uid) && fStatus.isExclude()) {
+                        if (FirewallManager.isUnknownPackage(uid) && fStatus.isExclude()) {
                             uiCtx {
                                 // reset the spinner to previous selection
                                 updateFirewallRulesUi(a, c)
@@ -555,7 +555,9 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                     position: Int,
                     id: Long
                 ) {
-                    if (info!!.dnsQuery == null) {
+                    val dnsQuery = info?.dnsQuery
+                    val uid = info?.uid
+                    if (dnsQuery == null) {
                         Logger.w(LOG_TAG_FIREWALL, "DNS query is null, cannot apply domain rule")
                         return
                     }
@@ -565,11 +567,9 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                     val fid = DomainRulesManager.Status.getStatus(position)
 
                     // no need to apply rule, prev selection and current selection are same
-                    if (
-                        info!!.dnsQuery?.let { DomainRulesManager.getDomainRule(it, info!!.uid) } ==
-                            fid
-                    )
+                    if (uid != null && DomainRulesManager.getDomainRule(dnsQuery, uid) == fid) {
                         return
+                    }
 
                     applyDomainRule(fid)
                 }
@@ -733,41 +733,54 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         firewallStatus: FirewallManager.FirewallStatus,
         connStatus: FirewallManager.ConnectionStatus
     ) {
+        val uid = info?.uid ?: return
         uiCtx {
-            io { FirewallManager.updateFirewallStatus(info!!.uid, firewallStatus, connStatus) }
+            io {
+                FirewallManager.updateFirewallStatus(uid, firewallStatus, connStatus)
+                logEvent("Firewall rule changed", "UID: $uid, FirewallStatus: ${firewallStatus.name}, ConnectionStatus: ${connStatus.name}")
+            }
             updateFirewallRulesUi(firewallStatus, connStatus)
         }
     }
 
     private fun applyIpRule(ipRuleStatus: IpRulesManager.IpRuleStatus) {
+        val currentInfo = info ?: return
         io {
             // no need to apply rule, prev selection and current selection are same
             if (
-                IpRulesManager.getMostSpecificRuleMatch(info!!.uid, info!!.ipAddress) ==
+                IpRulesManager.getMostSpecificRuleMatch(currentInfo.uid, currentInfo.ipAddress) ==
                     ipRuleStatus
             )
                 return@io
 
-            val ipPair = IpRulesManager.getIpNetPort(info!!.ipAddress)
+            val ipPair = IpRulesManager.getIpNetPort(currentInfo.ipAddress)
             val ip = ipPair.first ?: return@io
-            IpRulesManager.addIpRule(info!!.uid, ip, /*wildcard-port*/ 0, ipRuleStatus, proxyId = "", proxyCC = "")
-            Logger.i(LOG_TAG_FIREWALL, "apply ip-rule for ${info!!.uid}, $ip, ${ipRuleStatus.name}")
+            IpRulesManager.addIpRule(currentInfo.uid, ip, /*wildcard-port*/ 0, ipRuleStatus, proxyId = "", proxyCC = "")
+            Logger.i(LOG_TAG_FIREWALL, "apply ip-rule for ${currentInfo.uid}, $ip, ${ipRuleStatus.name}")
+            logEvent("IP rule changed", "UID: ${currentInfo.uid}, IP: $ip, IpRuleStatus: ${ipRuleStatus.name}")
         }
     }
 
     private fun applyDomainRule(domainRuleStatus: DomainRulesManager.Status) {
+        val currentInfo = info ?: return
+        val dnsQuery = currentInfo.dnsQuery ?: return
         Logger.i(
             LOG_TAG_FIREWALL,
-            "Apply domain rule for ${info!!.dnsQuery}, ${domainRuleStatus.name}"
+            "Apply domain rule for $dnsQuery, ${domainRuleStatus.name}"
         )
         io {
             DomainRulesManager.addDomainRule(
-                info!!.dnsQuery!!,
+                dnsQuery,
                 domainRuleStatus,
                 DomainRulesManager.DomainType.DOMAIN,
-                info!!.uid,
+                currentInfo.uid,
             )
+            logEvent("Domain rule changed", "Domain: $dnsQuery, UID: ${currentInfo.uid}, DomainRuleStatus: ${domainRuleStatus.name}")
         }
+    }
+
+    private fun logEvent(msg: String, details: String) {
+        eventLogger.log(EventType.FW_RULE_MODIFIED, Severity.LOW, msg, EventSource.UI, false, details)
     }
 
     private fun io(f: suspend () -> Unit) = lifecycleScope.launch(Dispatchers.IO) { f() }

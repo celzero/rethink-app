@@ -32,8 +32,12 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppWiseIpsAdapter
 import com.celzero.bravedns.adapter.DomainRulesBtmSheetAdapter
 import com.celzero.bravedns.database.CustomIp
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.databinding.BottomSheetAppConnectionsBinding
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
@@ -59,6 +63,7 @@ class AppIpRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmSheet
         get() = _binding!!
 
     private val persistentState by inject<PersistentState>()
+    private val eventLogger by inject<EventLogger>()
 
     // listener to inform dataset change to the adapter
     private var dismissListener: OnBottomSheetDialogFragmentDismiss? = null
@@ -310,6 +315,7 @@ class AppIpRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmSheet
 
         // set port number as null for all the rules applied from this screen
         io { IpRulesManager.addIpRule(uid, ip, null, status, proxyId = "", proxyCC = "") }
+        logEvent("IP Rule set to ${status.name} for IP: $ipAddress, UID: $uid")
     }
 
     override fun onDismiss(dialog: DialogInterface) {
@@ -342,6 +348,10 @@ class AppIpRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmSheet
         b.blockIcon.setImageDrawable(
             ContextCompat.getDrawable(requireContext(), R.drawable.ic_block)
         )
+    }
+
+    private fun logEvent(details: String) {
+        eventLogger.log(EventType.FW_RULE_MODIFIED, Severity.LOW, "App IP rule", EventSource.UI, false, details)
     }
 
     private fun io(f: suspend () -> Unit) {

@@ -724,7 +724,6 @@
     <string name="parse_error_reason" translatable="true">Nelze analyzovat %1$s „%2$s“</string>
     <string name="unknown_error" translatable="true">Neznámá chyba</string>
     <string name="invalid_file_error" translatable="true">neplatný soubor</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">Vybrané aplikace budou směrovány pouze přes tento WireGuard VPN bez ohledu na to, zda je VPN aktivní či nikoli.</string>
     <string name="catch_all_wg_dialog_title" translatable="true">Always-on</string>
     <string name="routing_remaining_apps" translatable="true">Směruji zbývající aplikace</string>
     <string name="config_add_success_toast" translatable="true">Hotovo</string>
@@ -912,7 +911,6 @@
     <string name="new_warp_error_toast" translatable="true">Nelze načíst WARP konfiguraci</string>
     <string name="new_warp_invalid_config_toast" translatable="true">Neplatná WARP konfigurace</string>
     <string name="one_wg_apps_added" translatable="true">Směruji všechny aplikace</string>
-    <string name="wg_lockdown_dialog_title" translatable="true">Lockdown</string>
     <string name="one_wg_dialog_desc" translatable="true">Veškeré připojení pro všechny aplikace, včetně DNS, bude směrováno do jediné aktivní WireGuard VPN. Ostatní aktivní WireGuard VPN budou zastaveny.</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">Všechna připojení a aplikace, které nejsou směrovány jinými WireGuard VPN, budou směrovány touto VPN.</string>
     <string name="one_wg_error_toast" translatable="true">Pro přepnutí na Pokročilé režimy zastavte WireGuard v režimu Jednoduché</string>

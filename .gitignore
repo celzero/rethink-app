@@ -28,3 +28,6 @@ app/src/headless/assets
 /tools
 /.kotlin/sessions
 app/google-services.json
+app/fdroidFull/release
+app/playFull/release
+app/websiteFull/release

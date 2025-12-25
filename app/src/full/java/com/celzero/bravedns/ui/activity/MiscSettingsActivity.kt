@@ -16,22 +16,18 @@
 package com.celzero.bravedns.ui.activity
 
 import Logger
-import Logger.LOG_TAG_APP_OPS
 import Logger.LOG_TAG_UI
 import Logger.LOG_TAG_VPN
 import Logger.updateConfigLevel
 import android.Manifest
-import android.R.attr.theme
 import android.app.LocaleManager
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.os.LocaleList
 import android.provider.Settings
 import android.text.InputType
@@ -51,7 +47,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.biometric.BiometricManager
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
@@ -61,31 +56,32 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.RefreshDatabase
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.ActivityMiscSettingsBinding
 import com.celzero.bravedns.net.go.GoVpnAdapter
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.LauncherSwitcher
 import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.APP_LOCK_ALIAS
 import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.HOME_ALIAS
 import com.celzero.bravedns.ui.bottomsheet.BackupRestoreBottomSheet
-import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_REGENERATION_PERIOD_DAYS
-import com.celzero.bravedns.util.NewSettingsManager
+import com.celzero.bravedns.util.BubbleHelper
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils.openUrl
-import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.getRandomString
 import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
@@ -94,7 +90,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
-import org.koin.java.KoinJavaComponent.inject
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.File
@@ -104,16 +99,17 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-
 class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) {
     private val b by viewBinding(ActivityMiscSettingsBinding::bind)
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
     private val rdb by inject<RefreshDatabase>()
+    private val eventLogger by inject<EventLogger>()
 
     private var isThemeChanged: Boolean = false
     private lateinit var notificationPermissionResult: ActivityResultLauncher<String>
+    private lateinit var bubbleSettingsResult: ActivityResultLauncher<Intent>
 
     enum class BioMetricType(val action: Int, val mins: Long) {
         OFF(0, -1L),
@@ -134,9 +130,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
     companion object {
         private const val SCHEME_PACKAGE = "package"
-        private const val STORAGE_PERMISSION_CODE = 23
-        const val THEME_CHANGED_RESULT = 24
-        private const val KEY_THEME_CHANGE = "key_theme_change"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -205,8 +198,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt()).name.lowercase()
                 .replaceFirstChar(Char::titlecase).replace("_", " ")
 
-        // camera and microphone access
-        b.settingsMicCamAccessSwitch.isChecked = persistentState.micCamAccess
 
         // for app locale (default system/user selected locale)
         if (isAtleastT()) {
@@ -276,11 +267,19 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             b.settingsBiometricRl.visibility = View.GONE
         }
 
+        if (isAtleastQ()) {
+            b.settingsFirewallBubbleRl.visibility = View.VISIBLE
+        } else {
+            b.settingsFirewallBubbleRl.visibility = View.GONE
+        }
+
         // Auto start app after reboot
         b.settingsActivityAutoStartSwitch.isChecked = persistentState.prefAutoStartBootUp
         b.dvIpInfoSwitch.isChecked = persistentState.downloadIpInfo
 
         b.tombstoneAppSwitch.isChecked = persistentState.tombstoneApps
+
+        b.settingsFirewallBubbleSwitch.isChecked = persistentState.firewallBubbleEnabled
 
         displayPcapUi()
         displayAppThemeUi()
@@ -329,20 +328,22 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     private fun makePcapFile(): File? {
         return try {
             val sdf = SimpleDateFormat(BackupHelper.BACKUP_FILE_NAME_DATETIME, Locale.ROOT)
-            // create folder in DOWNLOADS
-            val dir =
-                if (isAtleastR()) {
-                    val downloadsDir =
-                        Environment.getExternalStoragePublicDirectory(
-                            Environment.DIRECTORY_DOWNLOADS
-                        )
-                    // create folder in DOWNLOADS/Rethink
-                    File(downloadsDir, Constants.PCAP_FOLDER_NAME)
-                } else {
-                    val downloadsDir = Environment.getExternalStorageDirectory()
-                    // create folder in DOWNLOADS/Rethink
-                    File(downloadsDir, Constants.PCAP_FOLDER_NAME)
-                }
+
+            // Use app-specific external storage (no permissions required)
+            val baseDir = getExternalFilesDir(null)
+            if (baseDir == null) {
+                Logger.e(LOG_TAG_VPN, "External storage not available for PCAP file")
+                return null
+            }
+
+            // Check if external storage is mounted and writable
+            val state = android.os.Environment.getExternalStorageState(baseDir)
+            if (state != android.os.Environment.MEDIA_MOUNTED) {
+                Logger.e(LOG_TAG_VPN, "External storage not mounted, state: $state")
+                return null
+            }
+
+            val dir = File(baseDir, Constants.PCAP_FOLDER_NAME)
 
             // ensure directory exists
             if (!dir.exists()) {
@@ -382,15 +383,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun createAndSetPcapFile() {
-        // check for storage permissions
-        if (!checkStoragePermissions()) {
-            // request for storage permissions
-            Logger.i(LOG_TAG_VPN, "requesting for storage permissions")
-            requestForStoragePermissions()
-            return
-        }
-
-        Logger.i(LOG_TAG_VPN, "storage permission granted, creating pcap file")
+        // No storage permissions needed for app-specific external storage
+        Logger.i(LOG_TAG_VPN, "creating pcap file in app-specific storage")
         try {
             val file = makePcapFile()
             if (file == null) {
@@ -413,110 +407,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "error in createAndSetPcapFile: ${e.message}", e)
             showFileCreationErrorToast()
-        }
-    }
-
-    private val storageActivityResultLauncher: ActivityResultLauncher<Intent> =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (isAtleastR()) {
-                // version 11 (R) or above
-                if (Environment.isExternalStorageManager()) {
-                    createAndSetPcapFile()
-                } else {
-                    showFileCreationErrorToast()
-                }
-            } else {
-                // below ver 11 (R), the permission is handled via onRequestPermissionsResult
-            }
-        }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray,
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == STORAGE_PERMISSION_CODE) {
-            if (grantResults.isNotEmpty()) {
-                val write = grantResults[0] == PackageManager.PERMISSION_GRANTED
-                val read = grantResults[1] == PackageManager.PERMISSION_GRANTED
-                if (read && write) {
-                    createAndSetPcapFile()
-                } else {
-                    showFileCreationErrorToast()
-                }
-            }
-        }
-    }
-
-    private fun requestForStoragePermissions() {
-        // version 11 (R) or above
-        if (isAtleastR()) {
-            try {
-                val intent = Intent()
-                intent.action = Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
-                val uri = Uri.fromParts(SCHEME_PACKAGE, this.packageName, null)
-                intent.data = uri
-
-                // Check if there's an activity that can handle this intent
-                if (intent.resolveActivity(packageManager) != null) {
-                    storageActivityResultLauncher.launch(intent)
-                } else {
-                    // Fallback to general settings
-                    throw ActivityNotFoundException("No activity found for app-specific storage settings")
-                }
-            } catch (e: Exception) {
-                Logger.e(LOG_TAG_VPN, "Error launching app-specific storage settings: ${e.message}")
-                try {
-                    val intent = Intent()
-                    intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
-
-                    // Check if there's an activity that can handle the fallback intent
-                    if (intent.resolveActivity(packageManager) != null) {
-                        storageActivityResultLauncher.launch(intent)
-                    } else {
-                        // No activity available to handle storage permission
-                        Logger.e(LOG_TAG_VPN, "No activity found to handle storage permission request")
-                        showToastUiCentered(
-                            this,
-                            getString(R.string.pcap_failure_toast),
-                            Toast.LENGTH_LONG
-                        )
-                    }
-                } catch (fallbackException: Exception) {
-                    Logger.e(LOG_TAG_VPN, "Error launching storage settings: ${fallbackException.message}", fallbackException)
-                    showToastUiCentered(
-                        this,
-                        getString(R.string.pcap_failure_toast),
-                        Toast.LENGTH_LONG
-                    )
-                }
-            }
-        } else {
-            // below version 11
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                ),
-                STORAGE_PERMISSION_CODE,
-            )
-        }
-    }
-
-
-    private fun checkStoragePermissions(): Boolean {
-        return if (isAtleastR()) {
-            // version 11 (R) or above
-            Environment.isExternalStorageManager()
-        } else {
-            // below version 11
-            val write =
-                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            val read =
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-            read == PackageManager.PERMISSION_GRANTED && write == PackageManager.PERMISSION_GRANTED
         }
     }
 
@@ -555,6 +445,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                     createAndSetPcapFile()
                 }
             }
+            logEvent("PCAP mode set to ${PcapMode.getPcapType(which)}")
         }
         alertBuilder.create().show()
     }
@@ -654,6 +545,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         b.settingsActivityEnableLogsSwitch.setOnCheckedChangeListener { _: CompoundButton,
                                                                         b: Boolean ->
             persistentState.logsEnabled = b
+            logEvent("Logs enabled set to $b")
         }
 
         b.settingsActivityCheckUpdateRl.setOnClickListener {
@@ -664,6 +556,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         b.settingsActivityCheckUpdateSwitch.setOnCheckedChangeListener { _: CompoundButton,
                                                                          b: Boolean ->
             persistentState.checkForAppUpdate = b
+            logEvent("Check for app update set to $b")
         }
 
 
@@ -701,6 +594,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         b.settingsActivityAppNotificationPersistentSwitch.setOnCheckedChangeListener { _: CompoundButton,
                                                                                        b: Boolean ->
             persistentState.persistentNotification = b
+            logEvent("Persistent notification set to $b")
         }
 
         b.settingsActivityImportExportRl.setOnClickListener { invokeImportExport() }
@@ -721,23 +615,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             showBiometricDialog()
         }
 
-
-        b.settingsMicCamAccessRl.setOnClickListener {
-            b.settingsMicCamAccessSwitch.isChecked = !b.settingsMicCamAccessSwitch.isChecked
-        }
-
-        b.settingsMicCamAccessSwitch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean
-            ->
-            if (!checked) {
-                b.settingsMicCamAccessSwitch.isChecked = false
-                persistentState.micCamAccess = false
-                return@setOnCheckedChangeListener
-            }
-
-            // check for the permission and enable the switch
-            handleAccessibilityPermission()
-        }
-
         b.settingsConsoleLogRl.setOnClickListener { openConsoleLogActivity() }
 
         b.settingsActivityAutoStartRl.setOnClickListener {
@@ -752,11 +629,13 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 // Enable experimental-dependent settings when experimental features are enabled
                 persistentState.enableStabilityDependentSettings(this)
             }
+            logEvent("Auto start on boot set to $b")
         }
 
         b.settingsTaskerRl.setOnClickListener {
             showAppTriggerPackageDialog(this , onPackageSet = { packageName ->
                 persistentState.appTriggerPackages = packageName
+                logEvent("App trigger package set to $packageName")
             })
         }
 
@@ -766,29 +645,37 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
         b.dvIpInfoSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.downloadIpInfo = isChecked
+            logEvent("Download ipinfo inc set to $isChecked")
         }
 
         // Firebase error reporting toggle
         b.settingsFirebaseErrorReportingRl.setOnClickListener {
-            NewSettingsManager.markSettingSeen(NewSettingsManager.ERROR_REPORTING)
             b.settingsFirebaseErrorReportingSwitch.isChecked =
                 !b.settingsFirebaseErrorReportingSwitch.isChecked
         }
 
         b.settingsFirebaseErrorReportingSwitch.setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
-            NewSettingsManager.markSettingSeen(NewSettingsManager.ERROR_REPORTING)
             handleFirebaseErrorReportingToggle(isChecked)
         }
 
         b.tombstoneAppRl.setOnClickListener {
-            NewSettingsManager.markSettingSeen(NewSettingsManager.TOMBSTONE_APP_SETTING)
             b.tombstoneAppSwitch.isChecked = !b.tombstoneAppSwitch.isChecked
         }
 
         b.tombstoneAppSwitch.setOnCheckedChangeListener { _, isChecked ->
-            NewSettingsManager.markSettingSeen(NewSettingsManager.TOMBSTONE_APP_SETTING)
             persistentState.tombstoneApps = isChecked
             io { rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE) }
+            logEvent("Tombstone apps set to $isChecked")
+        }
+
+        b.settingsFirewallBubbleRl.setOnClickListener {
+            b.settingsFirewallBubbleSwitch.isChecked = !b.settingsFirewallBubbleSwitch.isChecked
+        }
+
+        b.settingsFirewallBubbleSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isAtleastQ()) {
+                handleFirewallBubbleToggle(isChecked)
+            }
         }
 
     }
@@ -805,6 +692,42 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             FirebaseErrorReporting.setEnabled(false)
             b.settingsFirebaseErrorReportingSwitch.isChecked = false
             persistentState.firebaseErrorReportingEnabled = false
+        }
+        logEvent("Firebase error reporting enabled set to $isChecked")
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun handleFirewallBubbleToggle(isChecked: Boolean) {
+        if (isChecked) {
+            // Enable bubble
+            persistentState.firewallBubbleEnabled = true
+
+            // Ensure channel/shortcut exist.
+            BubbleHelper.createBubbleNotificationChannel(this)
+            BubbleHelper.createBubbleShortcut(this)
+
+            // If not eligible, take user to bubble settings page.
+            if (!BubbleHelper.isBubbleEligible(this)) {
+                try {
+                    bubbleSettingsResult.launch(BubbleHelper.buildEnableBubblesIntent(this))
+                } catch (e: Exception) {
+                    Logger.w(LOG_TAG_UI, "err launching bubble settings: ${e.message}")
+                    invokeAndroidNotificationSetting()
+                }
+                logEvent("Firewall bubble enabled (needs user to allow bubbles)")
+                return
+            }
+
+            // Eligible: request bubble now.
+            BubbleHelper.showBubble(this)
+            logEvent("Firewall bubble enabled")
+        } else {
+            // Disable bubble - reset all bubble state for clean re-initialization
+            persistentState.firewallBubbleEnabled = false
+
+            BubbleHelper.resetBubbleState(this)
+
+            logEvent("Firewall bubble disabled")
         }
     }
 
@@ -836,6 +759,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             val logLevel = if (persistentState.goLoggerLevel.toInt() == 7) 8 else persistentState.goLoggerLevel.toInt()
             b.genSettingsGoLogDesc.text = Logger.LoggerLevel.fromId(logLevel).name.lowercase()
                     .replaceFirstChar(Char::titlecase).replace("_", " ")
+            logEvent("Go log level set to ${Logger.LoggerLevel.fromId(logLevel).name}")
         }
         alertBuilder.create().show()
     }
@@ -894,104 +818,14 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             if (bioMetricType.enabled()) {
                 Logger.i(LOG_TAG_UI, "biometric auth enabled, switching to app lock alias")
                 LauncherSwitcher.switchLauncherAlias(applicationContext, APP_LOCK_ALIAS, HOME_ALIAS)
+                logEvent("biometric auth enabled with type: $bioMetricType")
             } else {
                 Logger.i(LOG_TAG_UI, "biometric auth disabled, switching to home alias")
                 LauncherSwitcher.switchLauncherAlias(applicationContext, HOME_ALIAS, APP_LOCK_ALIAS)
+                logEvent("biometric auth disabled")
             }
         }
         alertBuilder.create().show()
-    }
-
-    private fun handleAccessibilityPermission() {
-        try {
-            val isAccessibilityServiceRunning =
-                Utilities.isAccessibilityServiceEnabled(
-                    this,
-                    BackgroundAccessibilityService::class.java
-                )
-            val isAccessibilityServiceEnabled =
-                Utilities.isAccessibilityServiceEnabledViaSettingsSecure(
-                    this,
-                    BackgroundAccessibilityService::class.java
-                )
-            val isAccessibilityServiceFunctional =
-                isAccessibilityServiceRunning && isAccessibilityServiceEnabled
-
-            if (isAccessibilityServiceFunctional) {
-                persistentState.micCamAccess = true
-                b.settingsMicCamAccessSwitch.isChecked = true
-                return
-            }
-
-            showPermissionAlert()
-            b.settingsMicCamAccessSwitch.isChecked = false
-            persistentState.micCamAccess = false
-        } catch (e: PackageManager.NameNotFoundException) {
-            Logger.e(LOG_TAG_APP_OPS, "error checking usage stats permission ${e.message}", e)
-            return
-        }
-    }
-
-    private fun checkMicCamAccessRule() {
-        if (!persistentState.micCamAccess) return
-
-        val running =
-            Utilities.isAccessibilityServiceEnabled(
-                this,
-                BackgroundAccessibilityService::class.java
-            )
-        val enabled =
-            Utilities.isAccessibilityServiceEnabledViaSettingsSecure(
-                this,
-                BackgroundAccessibilityService::class.java
-            )
-
-        Logger.d(LOG_TAG_APP_OPS, "cam/mic access - running: $running, enabled: $enabled")
-
-        val isAccessibilityServiceFunctional = running && enabled
-
-        if (!isAccessibilityServiceFunctional) {
-            persistentState.micCamAccess = false
-            b.settingsMicCamAccessSwitch.isChecked = false
-            showToastUiCentered(
-                this,
-                getString(R.string.accessibility_failure_toast),
-                Toast.LENGTH_SHORT
-            )
-            return
-        }
-
-        if (running) {
-            b.settingsMicCamAccessSwitch.isChecked = persistentState.micCamAccess
-            return
-        }
-    }
-
-    private fun showPermissionAlert() {
-        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
-        builder.setTitle(R.string.alert_permission_accessibility)
-        builder.setMessage(R.string.alert_firewall_accessibility_explanation)
-        builder.setPositiveButton(getString(R.string.univ_accessibility_dialog_positive)) { _, _ ->
-            openAccessibilitySettings()
-        }
-        builder.setNegativeButton(getString(R.string.univ_accessibility_dialog_negative)) { _, _ ->
-        }
-        builder.setCancelable(false)
-        builder.create().show()
-    }
-
-    private fun openAccessibilitySettings() {
-        try {
-            val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-            startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            showToastUiCentered(
-                this,
-                getString(R.string.alert_firewall_accessibility_exception),
-                Toast.LENGTH_SHORT
-            )
-            Logger.e(LOG_TAG_APP_OPS, "Failure accessing accessibility settings: ${e.message}", e)
-        }
     }
 
     private fun invokeChangeLocaleDialog() {
@@ -1020,6 +854,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 val locale = Locale.forLanguageTag(languages.getOrDefault(item, "en-US"))
                 AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(locale))
             }
+            logEvent("App locale changed to $tag")
         }
         alertBuilder.setNeutralButton(getString(R.string.settings_locale_dialog_neutral)) { dialog, _ ->
             dialog.dismiss()
@@ -1178,6 +1013,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
             persistentState.theme = which
             isThemeChanged = true
+            logEvent("App theme changed, theme id: $theme")
             when (which) {
                 Themes.SYSTEM_DEFAULT.id -> {
                     if (isDarkThemeOn()) {
@@ -1260,6 +1096,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                     persistentState.notificationActionType = NotificationActionType.NONE.action
                 }
             }
+            logEvent("Notification action type set to ${NotificationActionType.getNotificationActionType(which)}")
         }
         alertBuilder.create().show()
     }
@@ -1289,21 +1126,19 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         super.onResume()
         // app notification permission android 13
         showEnableNotificationSettingIfNeeded()
-        checkMicCamAccessRule()
-        showNewBadgeIfNeeded()
-    }
 
-    private fun showNewBadgeIfNeeded() {
-        val errorReporting = NewSettingsManager.shouldShowBadge(NewSettingsManager.ERROR_REPORTING)
-        b.genSettingsFirebaseErrorReportingTxt.setBadgeDotVisible(this, errorReporting)
-        val tombstoneSetting = NewSettingsManager.shouldShowBadge(NewSettingsManager.TOMBSTONE_APP_SETTING)
-        b.tombstoneAppTxt.setBadgeDotVisible(this, tombstoneSetting)
+        // If user enabled bubble toggle, re-check eligibility after coming back from Settings.
+        if (isAtleastQ() && persistentState.firewallBubbleEnabled) {
+            try {
+                if (BubbleHelper.isBubbleEligible(this)) {
+                    BubbleHelper.showBubble(this)
+                }
+            } catch (_: Exception) {
+            }
+        }
     }
 
     private fun registerForActivityResult() {
-        // app notification permission android 13
-        if (!isAtleastT()) return
-
         // Sets up permissions request launcher.
         notificationPermissionResult =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) {
@@ -1317,6 +1152,24 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                     b.settingsActivityAppNotificationRl.visibility = View.VISIBLE
                     b.settingsActivityAppNotificationSwitch.isChecked = false
                     invokeAndroidNotificationSetting()
+                }
+                logEvent("Notification permission granted: $it")
+            }
+
+        // Launcher for bubble channel settings.
+        bubbleSettingsResult =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                // User may have toggled "Allow bubbles". Re-check and request bubble if eligible.
+                if (!isAtleastQ()) return@registerForActivityResult
+
+                if (!persistentState.firewallBubbleEnabled) return@registerForActivityResult
+
+                try {
+                    if (BubbleHelper.isBubbleEligible(this)) {
+                        BubbleHelper.showBubble(this)
+                    }
+                } catch (e: Exception) {
+                    Logger.w(LOG_TAG_UI, "err after bubble settings return: ${e.message}")
                 }
             }
     }
@@ -1351,7 +1204,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         } catch (e: Exception) {
             Logger.e(
                 LOG_TAG_VPN,
-                "Exception while requesting notification permission: ${e.message}",
+                "err while requesting notification permission: ${e.message}",
                 e
             )
             showToastUiCentered(
@@ -1421,6 +1274,10 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         for (v in views) v.isEnabled = false
 
         delay(ms, lifecycleScope) { for (v in views) v.isEnabled = true }
+    }
+
+    private fun logEvent(details: String) {
+        eventLogger.log(EventType.UI_TOGGLE, Severity.LOW, "Misc settings", EventSource.UI, false, details)
     }
 
     private fun io(f: suspend () -> Unit) = lifecycleScope.launch(Dispatchers.IO) { f() }

@@ -31,9 +31,13 @@ import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppWiseDomainsAdapter
 import com.celzero.bravedns.database.CustomDomain
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.databinding.BottomSheetAppConnectionsBinding
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
@@ -57,6 +61,7 @@ class AppDomainRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmS
         get() = _binding!!
 
     private val persistentState by inject<PersistentState>()
+    private val eventLogger by inject<EventLogger>()
 
     // listener to inform dataset change to the adapter
     private var dismissListener: OnBottomSheetDialogFragmentDismiss? = null
@@ -294,6 +299,7 @@ class AppDomainRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmS
                 status
             )
         }
+        logEvent("Domain rule applied: $domain, $uid, ${status.name}")
     }
 
     override fun onDismiss(dialog: DialogInterface) {
@@ -326,6 +332,10 @@ class AppDomainRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmS
         b.blockIcon.setImageDrawable(
             ContextCompat.getDrawable(requireContext(), R.drawable.ic_block)
         )
+    }
+
+    private fun logEvent(details: String) {
+        eventLogger.log(EventType.FW_RULE_MODIFIED, Severity.LOW, "App domain rule", EventSource.UI, false, details)
     }
 
     private fun io(f: suspend () -> Unit) {

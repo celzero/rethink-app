@@ -6,404 +6,422 @@
     android:fillViewport="true"
     android:orientation="vertical">
 
-    <LinearLayout
+    <!-- Wrap content in ConstraintLayout with maxWidth for foldables/tablets -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="70dp"
-        android:orientation="vertical"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_marginBottom="70dp">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingStart="15dp"
-            android:paddingTop="15dp"
-            android:paddingEnd="15dp"
-            android:paddingBottom="15dp">
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_max="700dp">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/fhs_title_rethink"
-                style="@style/TextAppearance.Heading.HomeScreen"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:alpha="0.5"
-                android:paddingStart="7dp"
-                android:paddingEnd="7dp"
-                android:text="@string/app_name_small_case" />
+                android:orientation="vertical"
+                android:paddingStart="15dp"
+                android:paddingTop="15dp"
+                android:paddingEnd="15dp"
+                android:paddingBottom="15dp">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/fhs_title_rethink_desc"
-                style="@style/TextAppearance.SubHeading.HomeScreen"
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fhs_title_rethink"
+                    style="@style/TextAppearance.Heading.HomeScreen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.5"
+                    android:paddingStart="7dp"
+                    android:paddingEnd="7dp"
+                    android:text="@string/app_name_small_case" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fhs_title_rethink_desc"
+                    style="@style/TextAppearance.SubHeading.HomeScreen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.5"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="@string/settings_title_desc" />
+
+            </LinearLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/fs_apps_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="20dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/fs_apps_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/ic_app_info_accent" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/fs_apps_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_toStartOf="@id/fs_apps_iv"
+                        android:layout_toEndOf="@id/fs_apps_icon"
+                        android:text="@string/apps_info_title"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="16sp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/fs_apps_iv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/ic_right_arrow_white" />
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/fs_dns_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="20dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/fs_dns_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/dns_home_screen" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/fs_dns_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_toStartOf="@id/fs_dns_iv"
+                        android:layout_toEndOf="@id/fs_dns_icon"
+                        android:text="@string/dns_mode_info_title"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="16sp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/fs_dns_iv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/ic_right_arrow_white" />
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/fs_firewall_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/fs_firewall_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/firewall_home_screen" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/fs_firewall_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_toStartOf="@id/fs_firewall_iv"
+                        android:layout_toEndOf="@id/fs_firewall_icon"
+                        android:text="@string/firewall_mode_info_title"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="16sp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/fs_firewall_iv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_right_arrow_white" />
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/fs_proxy_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:alpha="0.5"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:text="@string/settings_title_desc" />
+                android:clipToPadding="true">
 
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/fs_proxy_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/ic_proxy" />
+
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/fs_proxy_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_toStartOf="@id/fs_proxy_iv"
+                        android:layout_toEndOf="@id/fs_proxy_icon"
+                        android:text="@string/cd_custom_dns_proxy_name_default"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="16sp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/fs_proxy_iv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_right_arrow_white" />
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/fs_network_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="true">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/fs_network_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/ic_network_tunnel" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/fs_network_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_toStartOf="@id/fs_network_iv"
+                        android:layout_toEndOf="@id/fs_network_icon"
+                        android:text="@string/lbl_network"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="16sp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/fs_network_iv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_right_arrow_white" />
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/fs_others_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="true">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/fs_others_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/ic_other_settings" />
+
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/fs_others_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_toStartOf="@id/fs_others_iv"
+                        android:layout_toEndOf="@id/fs_others_icon"
+                        android:text="@string/title_settings"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="16sp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/fs_others_iv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_right_arrow_white" />
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/fs_logs_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="20dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/fs_logs_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/ic_logs_accent" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/fs_logs_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_toStartOf="@id/fs_logs_iv"
+                        android:layout_toEndOf="@id/fs_logs_icon"
+                        android:text="@string/lbl_logs"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="16sp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/fs_logs_iv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/ic_right_arrow_white" />
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/fs_anti_censorship_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="20dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/fs_anti_censorship_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerInParent="true"
+                        android:alpha="0.8"
+                        android:src="@drawable/ic_anti_dpi"
+                        android:tint="?attr/accentGood" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/fs_anti_censorship_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="15dp"
+                        android:layout_toStartOf="@id/fs_anti_censorship_iv"
+                        android:layout_toEndOf="@id/fs_anti_censorship_icon"
+                        android:gravity="start|center"
+                        android:text="@string/anti_censorship_title"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="16sp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/fs_anti_censorship_iv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/ic_right_arrow_white" />
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/fs_advanced_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="20dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/fs_advanced_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerInParent="true"
+                        android:alpha="0.8"
+                        android:src="@drawable/ic_advanced_settings"
+                        android:tint="?attr/accentGood" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/fs_advanced_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="15dp"
+                        android:layout_toStartOf="@id/fs_advanced_iv"
+                        android:layout_toEndOf="@id/fs_advanced_icon"
+                        android:gravity="start|center"
+                        android:text="@string/lbl_advanced"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="16sp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/fs_advanced_iv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/ic_right_arrow_white" />
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/fs_apps_card"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="20dp">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/fs_apps_icon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/ic_app_info_accent" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fs_apps_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:layout_toStartOf="@id/fs_apps_iv"
-                    android:layout_toEndOf="@id/fs_apps_icon"
-                    android:text="@string/apps_info_title"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="16sp" />
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/fs_apps_iv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/ic_right_arrow_white" />
-            </RelativeLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/fs_dns_card"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="20dp">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/fs_dns_icon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/dns_home_screen" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fs_dns_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:layout_toStartOf="@id/fs_dns_iv"
-                    android:layout_toEndOf="@id/fs_dns_icon"
-                    android:text="@string/dns_mode_info_title"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="16sp" />
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/fs_dns_iv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/ic_right_arrow_white" />
-            </RelativeLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/fs_firewall_card"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/fs_firewall_icon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/firewall_home_screen" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fs_firewall_tv"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:layout_toEndOf="@id/fs_firewall_icon"
-                    android:text="@string/firewall_mode_info_title"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="16sp" />
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/ic_right_arrow_white" />
-            </RelativeLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/fs_proxy_card"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="true">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/fs_proxy_icon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/ic_proxy" />
-
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fs_proxy_tv"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:layout_toEndOf="@id/fs_proxy_icon"
-                    android:text="@string/cd_custom_dns_proxy_name_default"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="16sp" />
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/ic_right_arrow_white" />
-            </RelativeLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/fs_network_card"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="true">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
-
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/fs_network_icon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/ic_network_tunnel" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fs_network_tv"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:layout_toEndOf="@id/fs_network_icon"
-                    android:text="@string/lbl_network"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="16sp" />
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/ic_right_arrow_white" />
-            </RelativeLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/fs_others_card"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="true">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/fs_others_icon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/ic_other_settings" />
-
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fs_others_tv"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:layout_toEndOf="@id/fs_others_icon"
-                    android:text="@string/title_settings"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="16sp" />
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/ic_right_arrow_white" />
-            </RelativeLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/fs_logs_card"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="20dp">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/fs_logs_icon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/ic_logs_accent" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fs_logs_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:layout_toStartOf="@id/fs_logs_iv"
-                    android:layout_toEndOf="@id/fs_logs_icon"
-                    android:text="@string/lbl_logs"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="16sp" />
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/fs_logs_iv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/ic_right_arrow_white" />
-            </RelativeLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/fs_anti_censorship_card"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="20dp">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/fs_anti_censorship_icon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerInParent="true"
-                    android:alpha="0.8"
-                    android:src="@drawable/ic_anti_dpi"
-                    android:tint="?attr/accentGood" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fs_anti_censorship_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="15dp"
-                    android:layout_toEndOf="@id/fs_anti_censorship_icon"
-                    android:layout_toStartOf="@id/fs_anti_censorship_iv"
-                    android:gravity="start|center"
-                    android:text="@string/anti_censorship_title"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="16sp" />
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/fs_anti_censorship_iv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/ic_right_arrow_white" />
-            </RelativeLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/fs_advanced_card"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="20dp">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/fs_advanced_icon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerInParent="true"
-                    android:alpha="0.8"
-                    android:src="@drawable/ic_advanced_settings"
-                    android:tint="?attr/accentGood" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fs_advanced_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="15dp"
-                    android:layout_toEndOf="@id/fs_advanced_icon"
-                    android:layout_toStartOf="@id/fs_advanced_iv"
-                    android:gravity="start|center"
-                    android:text="@string/lbl_advanced"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="16sp" />
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/fs_advanced_iv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/ic_right_arrow_white" />
-            </RelativeLayout>
-        </com.google.android.material.card.MaterialCardView>
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

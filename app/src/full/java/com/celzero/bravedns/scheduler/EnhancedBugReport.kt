@@ -35,8 +35,7 @@ object EnhancedBugReport {
 
     const val TOMBSTONE_DIR_NAME = "tombstone"
     private const val TOMBSTONE_FILE_NAME = "tombstone_"
-    private const val MAX_TOMBSTONE_FILES = 5 // maximum files allowed as part of tombstone zip file
-    private const val MAX_FILE_SIZE = 1024 * 1024 // 1MB
+    private const val MAX_TOMBSTONE_FILES = 20 // maximum files allowed as part of tombstone dir
     private const val FILE_EXTENSION = ".txt"
     const val TOMBSTONE_ZIP_FILE_NAME = "rethinkdns.tombstone.zip"
 
@@ -81,66 +80,53 @@ object EnhancedBugReport {
         Log.i(LOG_TAG_BUG_REPORT, "logs added to zip file")
     }
 
+    @Synchronized
     fun writeLogsToFile(context: Context?, token: String, logs: String) {
         if (context == null) {
             Log.e(LOG_TAG_BUG_REPORT, "context is null, cannot write logs to file")
             return
         }
         try {
-            val file = getFileToWrite(context)
+            // Always create a new file for each tombstone write
+            val file = createNewTombstoneFile(context)
             if (file == null) {
-                Log.e(LOG_TAG_BUG_REPORT, "file name is null, cannot write logs to file")
+                Log.e(LOG_TAG_BUG_REPORT, "failed to create new tombstone file")
                 return
             }
+
             val time = Utilities.convertLongToTime(System.currentTimeMillis(), Constants.TIME_FORMAT_3)
-            val l = "\n$time \nToken: $token\n$logs"
-            file.appendText(l, Charset.defaultCharset())
-            Log.v(LOG_TAG_BUG_REPORT, "logs written to file: ${file.absolutePath}")
+            val content = "$time\nToken: $token\n$logs\n"
+
+            // Write to the new file atomically
+            file.writeText(content, Charset.defaultCharset())
+            Log.i(LOG_TAG_BUG_REPORT, "logs written to new file: ${file.name}, size: ${file.length()} bytes")
+
+            // Perform rotation to maintain file limit
+            performRotation(context)
         } catch (e: Exception) {
             Log.e(LOG_TAG_BUG_REPORT, "err writing logs to file: ${e.message}", e)
         }
     }
 
-    private fun getFileToWrite(context: Context): File? {
-        val file = getTombstoneFile(context)
-        Log.d(LOG_TAG_BUG_REPORT, "file to write logs: ${file?.name}")
-        return file
-    }
-
-    private fun getTombstoneFile(context: Context): File? {
+    /**
+     * Creates a new tombstone file with current timestamp.
+     * Each write operation creates a fresh file to ensure data isolation.
+     */
+    private fun createNewTombstoneFile(context: Context): File? {
         try {
             val folderPath = getFolderPath(context.filesDir)
             if (folderPath == null) {
-                Log.e(LOG_TAG_BUG_REPORT, "folder path is null, cannot get tombstone file")
+                Log.e(LOG_TAG_BUG_REPORT, "folder path is null, cannot create tombstone file")
                 return null
             }
-            val folder = File(folderPath)
-            val files = folder.listFiles()
-            if (files.isNullOrEmpty()) {
-                Log.d(LOG_TAG_BUG_REPORT, "no files found in the tombstone folder")
-                return createTombstoneFile(folderPath)
-            } else {
-                Log.d(LOG_TAG_BUG_REPORT, "files found in the tombstone folder")
-                return getLatestFile(files) ?: createTombstoneFile(folderPath)
-            }
+            return createTombstoneFile(folderPath)
         } catch (e: Exception) {
-            Log.e(LOG_TAG_BUG_REPORT, "err getting tombstone file: ${e.message}", e)
+            Log.e(LOG_TAG_BUG_REPORT, "err creating new tombstone file: ${e.message}", e)
             return null
         }
     }
 
-    private fun findLatestFile(files: Array<File>): File? {
-        if (files.isEmpty()) {
-            return null
-        }
 
-        return files.maxByOrNull { it.lastModified() }?.also {
-            Log.v(LOG_TAG_BUG_REPORT, "latest file: ${it.name}, timestamp: ${it.lastModified()}")
-        } ?: run {
-            Log.w(LOG_TAG_BUG_REPORT, "no files found to determine latest file")
-            null
-        }
-    }
 
     fun getTombstoneZipFile(context: Context): File? {
         try {
@@ -156,39 +142,49 @@ object EnhancedBugReport {
         return null
     }
 
-    private fun getLatestFile(files: Array<File>): File? {
+    /**
+     * Performs rotation to maintain the maximum file limit.
+     * Deletes oldest files when count exceeds MAX_TOMBSTONE_FILES (20).
+     */
+    private fun performRotation(context: Context) {
         try {
+            val folderPath = getFolderPath(context.filesDir) ?: return
+            val folder = File(folderPath)
+            val files = folder.listFiles() ?: return
+
             if (files.isEmpty()) {
-                Log.w(LOG_TAG_BUG_REPORT, "no files found in the tombstone folder")
-                return null
+                Log.d(LOG_TAG_BUG_REPORT, "no files to rotate")
+                return
             }
 
-            // if the file count is more than MAX_TOMBSTONE_FILES, delete the oldest file
-            val totalSize = files.sumOf { it.length() }
-            val maxDirSize = MAX_FILE_SIZE * MAX_TOMBSTONE_FILES
-            if (totalSize > maxDirSize) {
-                files.sortedByDescending { it.lastModified() }
-                    .drop(MAX_TOMBSTONE_FILES)
+            val fileCount = files.size
+            Log.d(LOG_TAG_BUG_REPORT, "current tombstone file count: $fileCount")
+
+            // If file count exceeds MAX_TOMBSTONE_FILES, delete the oldest files
+            if (fileCount > MAX_TOMBSTONE_FILES) {
+                val filesToDelete = fileCount - MAX_TOMBSTONE_FILES
+                Log.i(LOG_TAG_BUG_REPORT, "file count ($fileCount) exceeds limit ($MAX_TOMBSTONE_FILES), deleting $filesToDelete oldest file(s)")
+
+                // Sort by last modified time (ascending), oldest first
+                files.sortedBy { it.lastModified() }
+                    .take(filesToDelete)
                     .forEach { file ->
-                        if (!file.delete()) {
-                            Log.w(LOG_TAG_BUG_REPORT, "failed to delete file: ${file.name}")
+                        val deleted = file.delete()
+                        if (deleted) {
+                            Log.i(LOG_TAG_BUG_REPORT, "deleted old tombstone file: ${file.name}")
                         } else {
-                            Log.i(LOG_TAG_BUG_REPORT, "deleted old file: ${file.name}")
+                            Log.w(LOG_TAG_BUG_REPORT, "failed to delete tombstone file: ${file.name}")
                         }
                     }
+
+                val remainingCount = folder.listFiles()?.size ?: 0
+                Log.i(LOG_TAG_BUG_REPORT, "rotation complete, remaining files: $remainingCount")
+            } else {
+                Log.d(LOG_TAG_BUG_REPORT, "file count within limit, no rotation needed")
             }
-            val latestFile = findLatestFile(files) ?: return null
-            if (latestFile.length() > MAX_FILE_SIZE) {
-                Log.d(LOG_TAG_BUG_REPORT, "file size is more than 1MB, ${latestFile.name}")
-                // create a new file
-                val parent = latestFile.parent ?: return null
-                return createTombstoneFile(parent)
-            }
-            return latestFile
         } catch (e: Exception) {
-            Log.e(LOG_TAG_BUG_REPORT, "err getting latest file: ${e.message}", e)
+            Log.e(LOG_TAG_BUG_REPORT, "err performing rotation: ${e.message}", e)
         }
-        return null
     }
 
     private fun createTombstoneFile(folderPath: String): File? {

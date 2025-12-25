@@ -74,6 +74,9 @@ class AppDownloadManager(
 
     companion object {
         private const val INVALID_DOWNLOAD_ID = -1L
+
+        // WorkManager delay constant
+        private const val WORK_INITIAL_DELAY_SECONDS = 10L
     }
 
     suspend fun isDownloadRequired(type: DownloadType) {
@@ -369,7 +372,7 @@ class AppDownloadManager(
                     TimeUnit.MILLISECONDS
                 )
                 .addTag(DOWNLOAD_TAG)
-                .setInitialDelay(10, TimeUnit.SECONDS)
+                .setInitialDelay(WORK_INITIAL_DELAY_SECONDS, TimeUnit.SECONDS)
                 .build()
 
         val timestampWorkerData = workDataOf("blocklistDownloadInitiatedTime" to timestamp)

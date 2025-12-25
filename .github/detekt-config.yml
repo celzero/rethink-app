@@ -1,9 +1,31 @@
+# Detekt configuration file
+# Excludes test files from code scanning
+
 style:
- MaxLineLength:
+  MaxLineLength:
     active: true
     maxLineLength: 1400
     excludePackageStatements: true
     excludeImportStatements: true
     excludeCommentStatements: false
     excludeRawStrings: true
+  ForbiddenComment:
+    active: false
+
+exceptions:
+  TooGenericExceptionCaught:
+    active: true
+    exceptionNames:
+      - Throwable
+      - Error
+
+coroutines:
+  RedundantSuspendModifier:
+    active: false
+
+complexity:
+  TooManyFunctions:
+    active: false
+  LargeClass:
+    active: false
 

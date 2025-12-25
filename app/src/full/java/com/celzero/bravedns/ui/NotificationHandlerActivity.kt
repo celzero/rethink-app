@@ -20,6 +20,8 @@ import Logger.LOG_TAG_UI
 import Logger.LOG_TAG_VPN
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
@@ -36,6 +38,8 @@ import com.celzero.bravedns.ui.activity.MiscSettingsActivity.BioMetricType
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.activity.WgMainActivity
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -44,6 +48,15 @@ import org.koin.android.ext.android.inject
 class NotificationHandlerActivity: AppCompatActivity() {
 
     private val persistentState by inject<PersistentState>()
+
+    companion object {
+        private const val SCHEME_PACKAGE = "package"
+
+        // Biometric authentication timeout durations (in milliseconds)
+        private const val BIOMETRIC_TIMEOUT_FIVE_MIN_MS = 5L * 60L * 1000L
+        private const val BIOMETRIC_TIMEOUT_FIFTEEN_MIN_MS = 15L * 60L * 1000L
+    }
+
     enum class TrampolineType {
         ACCESSIBILITY_SERVICE_FAILURE_DIALOG,
         NEW_APP_INSTALL_DIALOG,
@@ -53,10 +66,20 @@ class NotificationHandlerActivity: AppCompatActivity() {
         NONE
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private fun Context.isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+                UI_MODE_NIGHT_YES
+    }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        // apply theme before super.onCreate to ensure proper dialog inflation
+        theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
+        super.onCreate(savedInstanceState)
         handleFrostEffectIfNeeded(persistentState.theme)
+
+        // This is a trampoline activity that shows dialogs but no actual UI
+        setContentView(android.R.layout.activity_list_item)
+        window.decorView.alpha = 0f // Make it invisible
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -66,10 +89,6 @@ class NotificationHandlerActivity: AppCompatActivity() {
         handleNotificationIntent(intent)
     }
 
-    companion object {
-        private const val SCHEME_PACKAGE = "package"
-    }
-
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleNotificationIntent(intent)
@@ -77,6 +96,7 @@ class NotificationHandlerActivity: AppCompatActivity() {
 
     // In two-cases (accessibility failure/new app install action), the app directly launches
     // firewall activity from notification action. Need to handle the pause state for those cases
+    @Suppress("DEPRECATION")
     private fun handleNotificationIntent(intent: Intent) {
         // app not started launch home screen
         if (!VpnController.isOn()) {
@@ -138,9 +158,9 @@ class NotificationHandlerActivity: AppCompatActivity() {
 
         val lastAuthTime = persistentState.biometricAuthTime
         if (BioMetricType.FIVE_MIN.action == authType) {
-            if (System.currentTimeMillis() - lastAuthTime < 5 * 60 * 1000) return false
+            if (System.currentTimeMillis() - lastAuthTime < BIOMETRIC_TIMEOUT_FIVE_MIN_MS) return false
         } else if (BioMetricType.FIFTEEN_MIN.action == authType) {
-            if (System.currentTimeMillis() - lastAuthTime < 15 * 60 * 1000) return false
+            if (System.currentTimeMillis() - lastAuthTime < BIOMETRIC_TIMEOUT_FIFTEEN_MIN_MS) return false
         }
 
         return true

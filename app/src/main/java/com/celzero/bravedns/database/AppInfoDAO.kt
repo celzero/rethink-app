@@ -31,17 +31,23 @@ interface AppInfoDAO {
     @Update fun update(appInfo: AppInfo): Int
 
     @Query(
-        "update AppInfo set firewallStatus = :firewallStatus, connectionStatus = :connectionStatus where uid = :uid and packageName != 'com.celzero.bravedns'"
+        "update AppInfo set firewallStatus = :firewallStatus, connectionStatus = :connectionStatus, modifiedTs = :modifiedTs where uid = :uid"
     )
-    fun updateFirewallStatusByUid(uid: Int, firewallStatus: Int, connectionStatus: Int)
+    fun updateFirewallStatusByUid(uid: Int, firewallStatus: Int, connectionStatus: Int, modifiedTs: Long)
+
+    @Query("update AppInfo set tempAllowEnabled = :enabled, tempAllowExpiryTime = :expiryTime, modifiedTs = :modifiedTs where uid = :uid")
+    fun updateTempAllowByUid(uid: Int, enabled: Boolean, expiryTime: Long, modifiedTs: Long)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(appInfo: AppInfo): Long
 
-    @Query("update AppInfo set uid = :newUid, tombstoneTs = 0 where uid = :oldUid and packageName = :pkg")
-    fun updateUid(oldUid: Int, pkg: String, newUid: Int): Int
+    @Query("update AppInfo set uid = :newUid, tombstoneTs = 0, modifiedTs = :modifiedTs where uid = :oldUid and packageName = :pkg")
+    fun updateUid(oldUid: Int, pkg: String, newUid: Int, modifiedTs: Long): Int
 
     @Query("select * from AppInfo where uid = :uid and packageName = :pkg")
     fun isUidPkgExist(uid: Int, pkg: String): AppInfo?
+
+    @Query("select * from AppInfo where uid = :uid limit 1")
+    suspend fun getAppInfoByUid(uid: Int): AppInfo?
 
     @Delete fun delete(appInfo: AppInfo)
 
@@ -51,11 +57,11 @@ interface AppInfoDAO {
     @Query("delete from AppInfo where uid = :uid and packageName = :packageName")
     fun deletePackage(uid: Int, packageName: String)
 
-    @Query("update AppInfo set uid = :newUid, tombstoneTs = :tombstoneTs where uid = :uid and packageName = :packageName")
-    fun tombstoneApp(newUid: Int, uid: Int, packageName: String, tombstoneTs: Long)
+    @Query("update AppInfo set uid = :newUid, tombstoneTs = :tombstoneTs, modifiedTs = :modifiedTs where uid = :uid and packageName = :packageName")
+    fun tombstoneApp(newUid: Int, uid: Int, packageName: String, tombstoneTs: Long, modifiedTs: Long)
 
-    @Query("update AppInfo set uid = :newUid, tombstoneTs = :tombstoneTs where uid = :oldUid")
-    fun tombstoneApp(oldUid: Int, newUid: Int, tombstoneTs: Long)
+    @Query("update AppInfo set uid = :newUid, tombstoneTs = :tombstoneTs, modifiedTs = :modifiedTs where uid = :oldUid")
+    fun tombstoneApp(oldUid: Int, newUid: Int, tombstoneTs: Long, modifiedTs: Long)
 
     @Query("select * from AppInfo order by appCategory, uid") fun getAllAppDetails(): List<AppInfo>
 
@@ -162,12 +168,39 @@ interface AppInfoDAO {
     )
     fun updateDataUsageByUid(uid: Int, uploadBytes: Long, downloadBytes: Long)
 
-    @Query("update AppInfo set isProxyExcluded = :isProxyExcluded where uid = :uid")
-    fun updateProxyExcluded(uid: Int, isProxyExcluded: Boolean)
-
-    @Query("update AppInfo set firewallStatus = 5, connectionStatus = 3 where packageName = 'com.celzero.bravedns'")
-    fun resetRethinkAppFirewallMode()
+    @Query("update AppInfo set isProxyExcluded = :isProxyExcluded, modifiedTs = :modifiedTs where uid = :uid")
+    fun updateProxyExcluded(uid: Int, isProxyExcluded: Boolean, modifiedTs: Long)
 
     @Query("select uid from AppInfo where packageName = :packageName")
     fun getAppInfoUidForPackageName(packageName: String): Int
+
+    @Query("update AppInfo set isProxyExcluded = :bypass where packageName = 'com.celzero.bravedns'")
+    fun setRethinkToBypassProxy(bypass: Boolean)
+
+    @Query("update AppInfo set firewallStatus = 7 and connectionStatus = 3 where packageName = 'com.celzero.bravedns'")
+    fun setRethinkToBypassDnsAndFirewall()
+
+    @Query("select * from AppInfo where tempAllowEnabled = 1 and tempAllowExpiryTime > 0")
+    suspend fun getTempAllowedApps(): List<AppInfo>
+
+    @Query("select * from AppInfo where tempAllowEnabled = 1 and tempAllowExpiryTime > :now ORDER BY tempAllowExpiryTime DESC")
+    fun getTempAllowedAppsPaged(now: Long): PagingSource<Int, AppInfo>
+
+    @Query("update AppInfo set tempAllowEnabled = 0, tempAllowExpiryTime = 0, modifiedTs = :modifiedTs where uid = :uid")
+    fun clearTempAllowByUid(uid: Int, modifiedTs: Long)
+
+    @Query(
+        "update AppInfo set tempAllowEnabled = 0, tempAllowExpiryTime = 0, modifiedTs = :modifiedTs " +
+            "where uid = :uid and tempAllowEnabled = 1 and tempAllowExpiryTime = :expectedExpiry"
+    )
+    fun clearTempAllowByUidIfExpiry(uid: Int, expectedExpiry: Long, modifiedTs: Long): Int
+
+    @Query("select MIN(tempAllowExpiryTime) from AppInfo where tempAllowEnabled = 1 and tempAllowExpiryTime > :now")
+    fun getNearestTempAllowExpiry(now: Long): Long?
+
+    @Query(
+        "update AppInfo set tempAllowEnabled = 0, tempAllowExpiryTime = 0, modifiedTs = :modifiedTs " +
+            "where tempAllowEnabled = 1 and tempAllowExpiryTime > 0 and tempAllowExpiryTime <= :now"
+    )
+    fun clearAllExpiredTempAllows(now: Long, modifiedTs: Long): Int
 }

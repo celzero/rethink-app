@@ -49,4 +49,47 @@ class Converters {
 
         return Gson().toJson(set)
     }
+
+    // Event logging type converters
+    @TypeConverter
+    fun fromEventType(value: EventType): String {
+        return value.name
+    }
+
+    @TypeConverter
+    fun toEventType(value: String): EventType {
+        return try {
+            EventType.valueOf(value)
+        } catch (e: IllegalArgumentException) {
+            EventType.SYSTEM_EVENT // Default fallback
+        }
+    }
+
+    @TypeConverter
+    fun fromSeverity(value: Severity): String {
+        return value.name
+    }
+
+    @TypeConverter
+    fun toSeverity(value: String): Severity {
+        return try {
+            Severity.valueOf(value)
+        } catch (e: IllegalArgumentException) {
+            Severity.LOW // Default fallback
+        }
+    }
+
+    @TypeConverter
+    fun fromEventSource(value: EventSource): String {
+        return value.name
+    }
+
+    @TypeConverter
+    fun toEventSource(value: String): EventSource {
+        return try {
+            EventSource.valueOf(value)
+        } catch (e: IllegalArgumentException) {
+            EventSource.SYSTEM // Default fallback
+        }
+    }
 }

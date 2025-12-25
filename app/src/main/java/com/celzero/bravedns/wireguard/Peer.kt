@@ -18,12 +18,17 @@
  */
 package com.celzero.bravedns.wireguard
 
+import com.celzero.bravedns.RethinkDnsApplication
+import com.celzero.bravedns.wireguard.BadConfigException.Location
+import com.celzero.bravedns.wireguard.BadConfigException.Reason
+import com.celzero.bravedns.wireguard.BadConfigException.Section
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.WgKey
-import com.celzero.bravedns.RethinkDnsApplication
-import com.celzero.bravedns.wireguard.BadConfigException.*
 import inet.ipaddr.IPAddressString
-import java.util.*
+import java.util.Collections
+import java.util.Locale
+import java.util.Objects
+import java.util.Optional
 import java.util.function.Consumer
 
 /**
@@ -49,6 +54,7 @@ class Peer private constructor(builder: Builder) {
 
     init {
         // Defensively copy to ensure immutability even if the Builder is reused.
+        @Suppress("UNCHECKED_CAST")
         allowedIps =
             Collections.unmodifiableSet(LinkedHashSet<Any?>(builder.allowedIps)) as Set<InetNetwork>
         endpoint = builder.endpoint
@@ -58,6 +64,7 @@ class Peer private constructor(builder: Builder) {
         publicKey = Objects.requireNonNull(builder.publicKey, "Peers must have a public key")!!
     }
 
+    @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
     override fun equals(obj: Any?): Boolean {
         if (obj !is Peer) return false
         return allowedIps == obj.allowedIps &&

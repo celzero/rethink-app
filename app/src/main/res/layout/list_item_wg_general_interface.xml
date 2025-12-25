@@ -34,37 +34,32 @@
                 android:layout_toStartOf="@id/interface_switch"
                 android:orientation="vertical">
 
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/interface_name_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="3dp"
-                        android:ellipsize="marquee"
-                        android:marqueeRepeatLimit="marquee_forever"
-                        android:singleLine="true"
-                        android:scrollHorizontally="true"
-                        android:focusable="true"
-                        android:focusableInTouchMode="true"
-                        android:ems="10"
-                        android:padding="5dp"
-                        android:textAppearance="?attr/textAppearanceHeadline6" />
+                    android:paddingHorizontal="3dp">
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/interface_id_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginEnd="3dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
                         android:alpha="0.7"
-                        android:maxLength="5" />
+                        android:maxLength="5"
+                        android:padding="5dp" />
 
-                </LinearLayout>
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/interface_name_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_toStartOf="@id/interface_id_text"
+                        android:layout_centerVertical="true"
+                        android:ellipsize="end"
+                        android:singleLine="true"
+                        android:padding="5dp"
+                        android:textAppearance="?attr/textAppearanceHeadline6" />
+                </RelativeLayout>
 
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/protocol_info_chip_group"

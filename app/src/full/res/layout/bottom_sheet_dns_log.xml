@@ -112,6 +112,21 @@
                 android:textSize="@dimen/heading_font_text_view" />
         </LinearLayout>
 
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/dns_blocked_target"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:layout_below="@id/dns_block_header_container"
+            android:layout_centerHorizontal="true"
+            android:foregroundGravity="center"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/large_font_text_view" />
+
         <RelativeLayout
             android:id="@+id/dns_app_name_header"
             android:layout_width="match_parent"
@@ -119,7 +134,7 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:layout_marginBottom="10dp"
-            android:layout_below="@id/dns_block_header_container"
+            android:layout_below="@id/dns_blocked_target"
             android:orientation="horizontal"
             android:paddingStart="20dp"
             android:paddingEnd="20dp">

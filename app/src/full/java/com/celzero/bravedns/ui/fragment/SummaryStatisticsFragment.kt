@@ -19,9 +19,9 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.SummaryStatisticsAdapter
@@ -41,7 +41,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 
 class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics) {
     private val b by viewBinding(FragmentSummaryStatisticsBinding::bind)
@@ -79,20 +78,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
         companion object {
             fun getType(t: Int): SummaryStatisticsType {
-                return when (t) {
-                    MOST_CONNECTED_APPS.tid -> MOST_CONNECTED_APPS
-                    MOST_BLOCKED_APPS.tid -> MOST_BLOCKED_APPS
-                    MOST_CONNECTED_ASN.tid -> MOST_CONNECTED_ASN
-                    MOST_BLOCKED_ASN.tid -> MOST_BLOCKED_ASN
-                    MOST_CONTACTED_DOMAINS.tid -> MOST_CONTACTED_DOMAINS
-                    MOST_BLOCKED_DOMAINS.tid -> MOST_BLOCKED_DOMAINS
-                    MOST_CONTACTED_COUNTRIES.tid -> MOST_CONTACTED_COUNTRIES
-                    MOST_CONTACTED_IPS.tid -> MOST_CONTACTED_IPS
-                    MOST_BLOCKED_IPS.tid -> MOST_BLOCKED_IPS
-                    TOP_ACTIVE_CONNS.tid -> TOP_ACTIVE_CONNS
-                    // make most contacted apps as default
-                    else -> MOST_CONNECTED_APPS
-                }
+                return entries.find { it.tid == t } ?: MOST_CONNECTED_APPS
             }
         }
     }
@@ -178,9 +164,8 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         )
 
         // set the alpha for the drawable
-        val alphaValue = 128 // half-transparent
         val drawable = b.fssMeteredDataUsage.compoundDrawables[0] // drawableLeft
-        drawable?.mutate()?.alpha = alphaValue
+        drawable?.mutate()?.alpha = ALPHA_HALF_TRANSPARENT
 
         // set the progress bar
         val ump = calculatePercentage(unmeteredUsage, totalUsage) // unmetered percentage
@@ -195,7 +180,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     private fun calculatePercentage(value: Long, maxValue: Long): Int {
         if (maxValue == 0L) return 0
 
-        return (value * 100 / maxValue).toInt()
+        return (value * PERCENTAGE_MULTIPLIER / maxValue).toInt()
     }
 
     private fun highlightToggleBtn() {
@@ -306,8 +291,8 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             // create or reuse progress drawable
             if (progressDrawable == null) {
                 progressDrawable = CircularProgressDrawable(requireContext()).apply {
-                    strokeWidth = 5f
-                    centerRadius = 18f
+                    strokeWidth = PROGRESS_STROKE_WIDTH
+                    centerRadius = PROGRESS_CENTER_RADIUS
                     setStyle(CircularProgressDrawable.LARGE)
                 }
             }
@@ -351,8 +336,18 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     companion object {
         fun newInstance() = SummaryStatisticsFragment()
 
+        // Recycler view height constants
         private const val RECYCLER_ITEM_VIEW_HEIGHT = 480
+        private const val RECYCLER_HEIGHT_OFFSET = 80
+
+        // UI constants
         private const val LOAD_MORE_TIMEOUT: Long = 1000
+        private const val ALPHA_HALF_TRANSPARENT = 128
+        private const val PERCENTAGE_MULTIPLIER = 100
+
+        // Progress drawable constants
+        private const val PROGRESS_STROKE_WIDTH = 5f
+        private const val PROGRESS_CENTER_RADIUS = 18f
     }
 
     private fun showTopActiveApps() {
@@ -385,7 +380,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
 
         val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 80) * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - RECYCLER_HEIGHT_OFFSET) * scale + 0.5f)
         b.fssActiveAppsRecyclerView.minimumHeight = pixels.toInt()
         b.fssActiveAppsRecyclerView.adapter = recyclerAdapter
     }
@@ -455,7 +450,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
 
         val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 80) * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - RECYCLER_HEIGHT_OFFSET) * scale + 0.5f)
         b.fssAppBlockedRecyclerView.minimumHeight = pixels.toInt()
         b.fssAppBlockedRecyclerView.adapter = recyclerAdapter
     }
@@ -483,7 +478,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
         contactedAsnAdapter?.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (contactedAsnAdapter!!.itemCount < 1) {
+                if ((contactedAsnAdapter?.itemCount ?: 0) < 1) {
                     b.fssAsnAllowedLl.visibility = View.GONE
                 } else {
                     b.fssAsnAllowedLl.visibility = View.VISIBLE
@@ -493,7 +488,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 80) * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - RECYCLER_HEIGHT_OFFSET) * scale + 0.5f)
         b.fssAsnAllowedRecyclerView.minimumHeight = pixels.toInt()
         b.fssAsnAllowedRecyclerView.adapter = contactedAsnAdapter
     }
@@ -520,7 +515,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
         blockedAsnAdapter?.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (blockedAsnAdapter!!.itemCount < 1) {
+                if ((blockedAsnAdapter?.itemCount ?: 0) < 1) {
                     b.fssAsnBlockedLl.visibility = View.GONE
                 } else {
                     b.fssAsnBlockedLl.visibility = View.VISIBLE
@@ -530,7 +525,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 80) * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - RECYCLER_HEIGHT_OFFSET) * scale + 0.5f)
         b.fssAsnBlockedRecyclerView.minimumHeight = pixels.toInt()
         b.fssAsnBlockedRecyclerView.adapter = blockedAsnAdapter
     }
@@ -564,7 +559,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
         contactedDomainsAdapter?.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (contactedDomainsAdapter!!.itemCount < 1) {
+                if ((contactedDomainsAdapter?.itemCount ?: 0) < 1) {
                     b.fssDomainAllowedLl.visibility = View.GONE
                 } else {
                     b.fssDomainAllowedLl.visibility = View.VISIBLE
@@ -574,7 +569,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 80) * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - RECYCLER_HEIGHT_OFFSET) * scale + 0.5f)
         b.fssContactedDomainRecyclerView.minimumHeight = pixels.toInt()
         b.fssContactedDomainRecyclerView.adapter = contactedDomainsAdapter
     }
@@ -606,7 +601,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
         blockedDomainsAdapter?.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (blockedDomainsAdapter!!.itemCount < 1) {
+                if ((blockedDomainsAdapter?.itemCount ?: 0) < 1) {
                     b.fssDomainBlockedLl.visibility = View.GONE
                 } else {
                     b.fssDomainBlockedLl.visibility = View.VISIBLE
@@ -616,7 +611,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 80) * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - RECYCLER_HEIGHT_OFFSET) * scale + 0.5f)
         b.fssBlockedDomainRecyclerView.minimumHeight = pixels.toInt()
         b.fssBlockedDomainRecyclerView.adapter = blockedDomainsAdapter
     }
@@ -648,7 +643,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
         contactedIpsAdapter?.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (contactedIpsAdapter!!.itemCount < 1) {
+                if ((contactedIpsAdapter?.itemCount ?: 0) < 1) {
                     b.fssIpAllowedLl.visibility = View.GONE
                 } else {
                     b.fssIpAllowedLl.visibility = View.VISIBLE
@@ -658,7 +653,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 80) * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - RECYCLER_HEIGHT_OFFSET) * scale + 0.5f)
         b.fssContactedIpsRecyclerView.minimumHeight = pixels.toInt()
         b.fssContactedIpsRecyclerView.adapter = contactedIpsAdapter
     }
@@ -690,7 +685,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
         blockedIpsAdapter?.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (blockedIpsAdapter!!.itemCount < 1) {
+                if ((blockedIpsAdapter?.itemCount ?: 0) < 1) {
                     b.fssIpBlockedLl.visibility = View.GONE
                 } else {
                     b.fssIpBlockedLl.visibility = View.VISIBLE
@@ -700,7 +695,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 80) * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - RECYCLER_HEIGHT_OFFSET) * scale + 0.5f)
         b.fssBlockedIpsRecyclerView.minimumHeight = pixels.toInt()
         b.fssBlockedIpsRecyclerView.adapter = blockedIpsAdapter
     }
@@ -733,7 +728,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
         contactedCountriesAdapter?.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (contactedCountriesAdapter!!.itemCount < 1) {
+                if ((contactedCountriesAdapter?.itemCount ?: 0) < 1) {
                     b.fssCountriesAllowedLl.visibility = View.GONE
                 } else {
                     b.fssCountriesAllowedLl.visibility = View.VISIBLE
@@ -743,7 +738,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 80) * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - RECYCLER_HEIGHT_OFFSET) * scale + 0.5f)
         b.fssContactedCountriesRecyclerView.minimumHeight = pixels.toInt()
         b.fssContactedCountriesRecyclerView.adapter = contactedCountriesAdapter
     }

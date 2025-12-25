@@ -628,7 +628,6 @@
     <string name="cd_dnscrypt_relay_heading" translatable="true">Ретранслятор</string>
     <string name="invalid_file_error" translatable="true">пошкоджений файл</string>
     <string name="parse_error_generic" translatable="true">рядок</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">Вибрані застосунки спрямовуватимуться лише через цю WireGuard VPN, незалежно від того, активна чи вимкнена VPN.</string>
     <string name="catch_all_wg_dialog_title" translatable="true">Завжди ввімкнено</string>
     <string name="crypt_cleanbrowsing_family_desc" translatable="true">Блокує доступ до всіх дорослих, порнографічних та відвертих сайтів. Він також блокує проксі-сервери та VPN-домени, які використовуються для обходу фільтрів. Також блокуються сайти зі змішаним контентом (наприклад, Reddit). Google, Bing та Youtube налоштуйте на безпечний режим.</string>
     <string name="cleanbrowsing_family_dns_desc" translatable="true">Сімейний фільтр блокує доступ до усіх дорослих, порнографічних та відвертих сайтів. Він також блокує проксі-сервери та VPN-домени, які можуть бути використані для обходу наших фільтрів. Сайти змішаного контенту (наприклад, Reddit) також блокуються. Google, Bing та Youtube налаштуйте на безпечний режим.</string>
@@ -778,7 +777,6 @@
     <string name="no_configs_error" translatable="true">Конфігурацій не знайдені</string>
     <string name="illegal_filename_error" translatable="true">Неправильна назва файлу “%s”</string>
     <string name="import_error" translatable="true">Не вдалося імпортувати тунель: %s</string>
-    <string name="wg_lockdown_dialog_title" translatable="true">Закриття</string>
     <string name="one_wg_apps_added" translatable="true">Маршрутизація усіх застосунків</string>
     <string name="new_warp_invalid_config_toast" translatable="true">Конфігурація WARP є некоректною</string>
     <string name="new_warp_error_toast" translatable="true">Не вдалося отримати конфігурацію WARP</string>

@@ -42,13 +42,13 @@ class Attribute private constructor(val key: String, val value: String) {
         }
 
         fun parse(line: CharSequence?): Optional<Attribute> {
-            val matcher = LINE_PATTERN.matcher(line)
+            val matcher = LINE_PATTERN.matcher(line ?: "")
             return if (!matcher.matches()) Optional.empty()
-            else Optional.of(Attribute(matcher.group(1), matcher.group(2)))
+            else Optional.of(Attribute(matcher.group(1) ?: "", matcher.group(2) ?: ""))
         }
 
         fun split(value: CharSequence?): Array<String> {
-            return LIST_SEPARATOR.split(value)
+            return LIST_SEPARATOR.split(value ?: "")
         }
     }
 }

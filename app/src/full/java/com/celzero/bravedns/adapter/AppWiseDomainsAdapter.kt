@@ -45,7 +45,6 @@ class AppWiseDomainsAdapter(
     val context: Context,
     val lifecycleOwner: LifecycleOwner,
     val uid: Int,
-    val isRethink: Boolean,
     val isActiveConn: Boolean = false
 ) :
     PagingDataAdapter<AppConnection, AppWiseDomainsAdapter.ConnectionDetailsViewHolder>(
@@ -170,10 +169,10 @@ class AppWiseDomainsAdapter(
                 return
             }
 
-            if (isRethink) {
+            /*if (isRethink) {
                 Logger.i(LOG_TAG_UI, "$TAG rethink connection - no close connection dialog")
                 return
-            }
+            }*/
             Logger.v(LOG_TAG_UI, "$TAG show close connection dialog for uid: $uid")
             val dialog = MaterialAlertDialogBuilder(context, R.style.App_Dialog_NoDim)
                 .setTitle(context.getString(R.string.close_conns_dialog_title))
@@ -204,10 +203,10 @@ class AppWiseDomainsAdapter(
                 return
             }
 
-            if (isRethink) {
+            /*if (isRethink) {
                 Logger.i(LOG_TAG_UI, "$TAG rethink connection - no bottom sheet")
                 return
-            }
+            }*/
 
             if (isActiveConn) {
                 Logger.i(LOG_TAG_UI, "$TAG active connection - no bottom sheet")
@@ -224,7 +223,15 @@ class AppWiseDomainsAdapter(
             bundle.putInt(AppDomainRulesBottomSheet.UID, uid)
             bundle.putString(AppDomainRulesBottomSheet.DOMAIN, appConn.appOrDnsName)
             bottomSheetFragment.arguments = bundle
-            bottomSheetFragment.dismissListener(adapter, absoluteAdapterPosition)
+            // Fix: Validate position before passing to avoid IndexOutOfBoundsException
+            val currentPosition = absoluteAdapterPosition
+            if (currentPosition != RecyclerView.NO_POSITION) {
+                bottomSheetFragment.dismissListener(adapter, currentPosition)
+            } else {
+                // Position is invalid, pass -1 to indicate refresh should be used
+                Logger.w(LOG_TAG_UI, "$TAG invalid adapter position when opening bottom sheet")
+                bottomSheetFragment.dismissListener(adapter, RecyclerView.NO_POSITION)
+            }
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
 
@@ -273,6 +280,19 @@ class AppWiseDomainsAdapter(
     }
 
     override fun notifyDataset(position: Int) {
-        this.notifyItemChanged(position)
+        // Fix: IndexOutOfBoundsException - validate position before notifying
+        try {
+            if (position >= 0 && position < itemCount) {
+                notifyItemChanged(position)
+            } else {
+                // Position is invalid, refresh the entire dataset instead
+                Logger.w(LOG_TAG_UI, "$TAG invalid position: $position, itemCount: $itemCount, refreshing adapter")
+                refresh()
+            }
+        } catch (e: Exception) {
+            // If notification fails, refresh the adapter to ensure consistency
+            Logger.e(LOG_TAG_UI, "$TAG error notifying position $position: ${e.message}", e)
+            refresh()
+        }
     }
 }

@@ -1036,8 +1036,6 @@
     <string name="settings_rinr_desc_disabled" translatable="true">将如下载屏蔽名单、连接检查与 DNS 连接等的 Rethink 自身流量路由回隧道。</string>
     <string name="settings_rinr_dialog_desc" translatable="true">这会同时启用“<!--settings_network_all_networks--> %1$s”设置。您是否想要继续？</string>
     <string name="one_wg_apps_added" translatable="true">正在路由所有应用</string>
-    <string name="wg_lockdown_dialog_title" translatable="true">闭关</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">所选应用将仅由此 WireGuard VPN 路由，无论是否成功连接此 VPN 。</string>
     <string name="one_wg_dialog_desc" translatable="true">包括 DNS 在内的来自所有应用的流量将被单个活跃的 WireGuard VPN 路由。其他活跃的 WireGuard VPN 将被停止。</string>
     <string name="catch_all_wg_dialog_title" translatable="true">永久连接</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">所有未被其他 WireGuard VPN 路由的应用的连接将经此 VPN 路由。</string>

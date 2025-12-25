@@ -28,8 +28,8 @@ class RethinkRemoteFileTag {
     var url: List<String> = arrayListOf()
     var show: Int = 0
     var entries: Int = 0
-    var pack: List<String>? = arrayListOf()
-    var level: List<Int>? = arrayListOf()
+    var pack: List<String>? = null
+    var level: List<Int>? = null
     var simpleTagId: Int = INVALID_SIMPLE_TAG_ID
     var isSelected: Boolean = false
 

@@ -4,17 +4,35 @@ plugins {
     id 'kotlin-android'
 }
 
+// ensure consistent JVM version for Java and Kotlin compilation
+// kotl.in/gradle/jvm/toolchain
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
 // apply Google Services and Firebase Crashlytics plugins conditionally
 // strategy: For command-line builds, check task names. For IDE, always apply plugins
 // but they'll only process play/website variants (Firebase deps are scoped to those variants)
 def taskNames = gradle.startParameter.taskNames.join(',').toLowerCase()
-def isFdroidBuild = taskNames.contains("fdroid")
+def apkBuild = taskNames.contains("full")
+def fdroidBuild = taskNames.contains("fdroid")
+
+// check for fdroidserver value is set in system env
+def fdroidBuildServer = System.getenv("fdroidserver")
+def isFdroidBuildServer = fdroidBuildServer != null && !fdroidBuildServer.isEmpty() && fdroidBuildServer != "null"
+def deGoogled = !apkBuild || fdroidBuild || isFdroidBuildServer
 
 println("app-task names: '$taskNames'")
-println("app; is fdroid build? $isFdroidBuild")
+println("gradle deGoogled? $deGoogled (fdroidBuild: $fdroidBuild, fdroidBuildServer: $isFdroidBuildServer, apkBuild: $apkBuild)")
 
 // don't apply firebase plugins for fdroid CLI builds
-if (!isFdroidBuild) {
+if (!deGoogled) {
     apply plugin: 'com.google.gms.google-services'
     apply plugin: 'com.google.firebase.crashlytics'
     println("app firebase plugins applied")
@@ -145,7 +163,7 @@ android {
                 // This reduces the total symbol data Crashlytics needs to process
                 abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'
             }
-            if (!isFdroidBuild) {
+            if (!deGoogled) {
                 firebaseCrashlytics {
                     // Enable processing and uploading of native symbols to Firebase servers.
                     nativeSymbolUploadEnabled true
@@ -168,7 +186,7 @@ android {
 
     // fix: injectCrashlyticsBuildIds task has a buffer overflow bug
     // apply crashlytics configuration to firebase builds only
-    if (!isFdroidBuild) {
+    if (!deGoogled) {
         // workaround for crashlytics gradle plugin bug with large native symbols
         afterEvaluate {
             tasks.configureEach { task ->
@@ -186,6 +204,12 @@ android {
                 }
             }
         }
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+        freeCompilerArgs += [
+            '-Xsuppress-warning=SENSELESS_COMPARISON'
+        ]
     }
 
     buildFeatures {
@@ -292,13 +316,13 @@ dependencies {
     implementation 'com.google.android.material:material:1.13.0'
     fullImplementation 'androidx.viewpager2:viewpager2:1.1.0'
 
-    fullImplementation 'com.squareup.okhttp3:okhttp:5.2.1'
-    fullImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:5.2.1'
+    fullImplementation 'com.squareup.okhttp3:okhttp:5.3.2'
+    fullImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:5.3.2'
 
     fullImplementation 'com.squareup.retrofit2:retrofit:3.0.0'
     fullImplementation 'com.squareup.retrofit2:converter-gson:3.0.0'
 
-    implementation 'com.squareup.okio:okio-jvm:3.16.2'
+    implementation 'com.squareup.okio:okio-jvm:3.16.4'
     // Glide
     fullImplementation('com.github.bumptech.glide:glide:5.0.5') {
         exclude group: 'glide-parent'
@@ -397,17 +421,12 @@ dependencies {
     // battery optimization permission helper
     implementation 'com.waseemsabir:betterypermissionhelper:1.0.3'
 
-    // Facebook battery metrics
-    implementation 'com.facebook.battery:metrics:1.0.0'
-    implementation 'com.facebook.battery:reporters:1.0.0'
-    implementation 'com.facebook.battery:serializers:1.0.0'
-
     // Firebase dependencies for error reporting (website and play variants only)
-    websiteImplementation platform('com.google.firebase:firebase-bom:34.4.0')
+    websiteImplementation platform('com.google.firebase:firebase-bom:34.6.0')
     websiteImplementation 'com.google.firebase:firebase-crashlytics'
     websiteImplementation 'com.google.firebase:firebase-crashlytics-ndk'
 
-    playImplementation platform('com.google.firebase:firebase-bom:34.4.0')
+    playImplementation platform('com.google.firebase:firebase-bom:34.6.0')
     playImplementation 'com.google.firebase:firebase-crashlytics'
     playImplementation 'com.google.firebase:firebase-crashlytics-ndk'
 }

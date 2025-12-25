@@ -43,7 +43,6 @@ import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_AL
 import com.celzero.bravedns.service.VpnBuilderPolicy.Companion.getNetworkBehaviourDuration
 import com.celzero.bravedns.service.WireguardManager.NOTIF_CHANNEL_ID_WIREGUARD_ALERTS
 import com.celzero.bravedns.ui.NotificationHandlerActivity
-import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.ConnectivityCheckHelper
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_WG_PERMISSION_NAME
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_WG_PERMISSION_VALUE
@@ -370,64 +369,45 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             if (isAtleastS()) {
                 // Check if transportInfo is actually WifiInfo before casting
                 val transportInfo = cap.transportInfo
-                if (transportInfo is WifiInfo) {
-                    val ssid = transportInfo.ssid
-                    if (ssid == UNKNOWN_SSID) {
-                        Logger.v(
-                            LOG_TAG_CONNECTION,
-                            "getNetworkSSID: SSID is unknown for network ${network.networkHandle}, falling back to WifiManager"
-                        )
-                        showNotificationIfNeeded()
-                        return null
-                    }
-                    if (!ssid.isNullOrEmpty()) {
-                        val cleanSSID = ssid.removeSurrounding("\"")
+                val isTransportInfoWifi = transportInfo is WifiInfo
+                var ssid: String? = null
+                if (isTransportInfoWifi) {
+                    ssid = transportInfo.ssid
+                    extractCleanSsid(ssid)?.let { clean ->
                         Logger.i(
                             LOG_TAG_CONNECTION,
-                            "getNetworkSSID: SSID for network ${network.networkHandle} is: $cleanSSID"
+                            "getNetworkSSID(S): $clean (${network.networkHandle})"
                         )
-                        return cleanSSID
+                        return clean
                     }
-                } else {
-                    Logger.d(
-                        LOG_TAG_CONNECTION,
-                        "getNetworkSSID: transportInfo is not WifiInfo (${transportInfo?.javaClass?.simpleName}), falling back to WifiManager"
-                    )
                 }
+                Logger.v(
+                    LOG_TAG_CONNECTION,
+                    "isWifiInfo? $isTransportInfoWifi, (${transportInfo?.javaClass?.simpleName}), ssid: $ssid , falling back to WifiManager"
+                )
             }
 
+            @Suppress("DEPRECATION")
             val wifiInfo: WifiInfo? = wm.connectionInfo
             if (wifiInfo == null) {
                 Logger.v(LOG_TAG_CONNECTION, "getNetworkSSID: WifiInfo is null")
                 return null
             }
 
-            val ssid = wifiInfo.ssid
-            if (ssid.isNullOrEmpty()) {
-                Logger.v(
+            extractCleanSsid(wifiInfo.ssid)?.let { clean ->
+                Logger.i(
                     LOG_TAG_CONNECTION,
-                    "getNetworkSSID: SSID is empty for network ${network.networkHandle}, ssid: $ssid, wifiInfo: $wifiInfo"
+                    "getNetworkSSID(WM): $clean (${network.networkHandle})"
                 )
-                return null
+                return clean
             }
 
-            if (ssid == UNKNOWN_SSID) {
-                Logger.v(
-                    LOG_TAG_CONNECTION,
-                    "getNetworkSSID: SSID is unknown for network ${network.networkHandle}"
-                )
-                showNotificationIfNeeded()
-                return null
-            }
-
-            // Remove quotes from SSID if present
-            val cleanSSID = ssid.removeSurrounding("\"")
-
-            Logger.i(
+            Logger.w(
                 LOG_TAG_CONNECTION,
-                "getNetworkSSID: SSID for network ${network.networkHandle} is: $cleanSSID"
+                "getNetworkSSID: SSID is null or unknown for network ${network.networkHandle}"
             )
-            return cleanSSID
+            showNotificationIfNeeded()
+            return null
 
         } catch (e: SecurityException) {
             Logger.w(LOG_TAG_CONNECTION, "getNetworkSSID: SecurityException accessing WiFi info", e)
@@ -440,6 +420,11 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             )
             return null
         }
+    }
+
+    private fun extractCleanSsid(ssid: String?): String? {
+        if (ssid.isNullOrEmpty() || ssid == UNKNOWN_SSID) return null
+        return ssid.removeSurrounding("\"")
     }
 
     private fun showNotificationIfNeeded() {
@@ -852,6 +837,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             return
         }
         // TODO: process after a delay to avoid processing multiple network changes in short bursts
+        @Suppress("OPT_IN_USAGE")
         if (DEBUG) Logger.v(LOG_TAG_CONNECTION, "sendNetworkChanges, channel closed? ${channel.isClosedForSend} msg: ${msg.msgType}, test: ${msg.testReachability}, stall: ${msg.stallOnNoNetwork}, useAutoChecks: ${msg.useAutoConnectivityChecks}, networks: ${msg.networkSet.size}")
         try {
             channel.send(msg)
@@ -946,7 +932,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
         private val maxReachabilityCount = 3L
 
         companion object {
-            private const val DEFAULT_MTU = 1280 // same as BraveVpnService#VPN_INTERFACE_MTU
+            private const val DEFAULT_MTU = 1500 // same as BraveVpnService#VPN_INTERFACE_MTU
             private const val MIN_MTU = 1280
         }
 
@@ -1310,6 +1296,8 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             var minMtu6: Int = -1
             if (!isAtleastQ()) {
                 // If not at least Q, return MIN_MTU for safety
+                // on Q and below, the OS cannot reliably report or handle correct MTU values for
+                // VPN interfaces, and using a dynamic or larger MTU causes real packet breakage.
                 return MIN_MTU
             }
             if (useActiveNetwork) {
@@ -1343,11 +1331,11 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             }
             // If both are -1, return MIN_MTU explicitly
             if (minMtu4 <= 0 && minMtu6 <= 0) {
-                Logger.i(LOG_TAG_CONNECTION, "Both MTUs are invalid, using MIN_MTU: $MIN_MTU")
-                return MIN_MTU
+                Logger.i(LOG_TAG_CONNECTION, "Both MTUs are invalid, using MIN_MTU: $DEFAULT_MTU")
+                return DEFAULT_MTU
             }
             // set mtu to MIN_MTU (1280) if mtu4/mtu6 are less than MIN_MTU
-            val mtu = max(min(minMtu4.takeIf { it > 0 } ?: Int.MAX_VALUE, minMtu6.takeIf { it > 0 } ?: Int.MAX_VALUE), MIN_MTU)
+            val mtu = max(min(minMtu4.takeIf { it > 0 } ?: DEFAULT_MTU, minMtu6.takeIf { it > 0 } ?: DEFAULT_MTU), MIN_MTU)
             Logger.i(LOG_TAG_CONNECTION, "mtu4: $minMtu4, mtu6: $minMtu6; final mtu: $mtu")
             return mtu
         }
@@ -1378,8 +1366,8 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 if (mtu2 <= 0) mtu1 else min(mtu1, mtu2)
             } else {
                 if (mtu2 <= 0) {
-                    // both m1 and m2 are invalid, return MIN_MTU
-                    MIN_MTU
+                    // both m1 and m2 are invalid, return DEFAULT_MTU
+                    DEFAULT_MTU
                 } else {
                     // m1 is invalid, return m2
                     mtu2
@@ -1769,6 +1757,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             val networks =
                 if (networkSet.isEmpty()) {
                     Logger.d(LOG_TAG_CONNECTION, "networkSet is empty")
+                    @Suppress("DEPRECATION")
                     cm.allNetworks
                 } else {
                     Logger.d(LOG_TAG_CONNECTION, "networkSet size: ${networkSet.size}")

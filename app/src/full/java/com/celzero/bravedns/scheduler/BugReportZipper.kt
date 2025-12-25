@@ -23,7 +23,6 @@ import android.content.SharedPreferences
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.celzero.bravedns.BuildConfig
-import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.intra.Intra
@@ -34,13 +33,11 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
-import java.nio.file.NoSuchFileException
 import java.util.Enumeration
 import java.util.zip.ZipEntry
 import java.util.zip.ZipException
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
-import kotlin.compareTo
 
 object BugReportZipper {
 
@@ -54,6 +51,19 @@ object BugReportZipper {
 
     // secure sharing of files associated with an app, used in share bugreport file feature
     const val FILE_PROVIDER_NAME = BuildConfig.APPLICATION_ID + ".provider"
+
+    // ZIP file validation constants
+    private const val ZIP_HEADER_SIZE = 4
+
+    // File size limits (10MB in bytes)
+    private const val MAX_ZIP_SIZE_BYTES = 10L * 1024L * 1024L // 10MB
+
+    // Buffer size for ZIP operations
+    private const val ZIP_BUFFER_SIZE = 8192
+
+    // Entry retention constants
+    private const val MAX_RECENT_ENTRIES_LARGE_ZIP = 10
+    private const val MAX_RECENT_ENTRIES_CLEANUP = 5
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun prepare(dir: File): String {
@@ -98,9 +108,9 @@ object BugReportZipper {
         // check for ZIP magic bytes (PK\x03\x04)
         try {
             FileInputStream(file).use { fis ->
-                val header = ByteArray(4)
+                val header = ByteArray(ZIP_HEADER_SIZE)
                 val bytesRead = fis.read(header)
-                if (bytesRead < 4 ||
+                if (bytesRead < ZIP_HEADER_SIZE ||
                     header[0] != 'P'.code.toByte() ||
                     header[1] != 'K'.code.toByte()
                 ) {
@@ -180,13 +190,12 @@ object BugReportZipper {
                         curZip.use { czf ->
                             // Check total size before adding files
                             val currentSize = zipFile.length()
-                            val maxZipSize = 10 * 1024 * 1024L // 10MB limit
 
-                            if (currentSize > maxZipSize) {
+                            if (currentSize > MAX_ZIP_SIZE_BYTES) {
                                 // If zip is too large, keep only recent entries
                                 val recentEntries = czf.entries().toList()
                                     .sortedByDescending { it.lastModifiedTime.toMillis() }
-                                    .take(10) // Keep 10 most recent entries
+                                    .take(MAX_RECENT_ENTRIES_LARGE_ZIP)
                                     .map { it.name }
 
                                 czf.entries().toList().forEach { entry ->
@@ -221,7 +230,7 @@ object BugReportZipper {
                 }
             }
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_BUG_REPORT, "err while updating zip file", e)
+            Logger.w(LOG_TAG_BUG_REPORT, "err while updating zip file ${e.message}")
         } finally {
             // Clean up temp file if it exists
             if (tempFile.exists()) {
@@ -268,11 +277,10 @@ object BugReportZipper {
         }
 
         // skip empty files or files that exceed reasonable size
-        val maxSizeBytes = 10 * 1024 * 1024L // 10MB limit
         if (file.length() == 0L) {
             Logger.w(LOG_TAG_BUG_REPORT, "empty file skipped: ${file.name}")
             return
-        } else if (file.length() > maxSizeBytes) {
+        } else if (file.length() > MAX_ZIP_SIZE_BYTES) {
             Logger.w(LOG_TAG_BUG_REPORT, "file too large (${file.length()} bytes): ${file.name}")
             return
         }
@@ -281,7 +289,7 @@ object BugReportZipper {
             val entry = ZipEntry(file.name)
             zo.putNextEntry(entry)
             FileInputStream(file).use { input ->
-                val buffer = ByteArray(8192)
+                val buffer = ByteArray(ZIP_BUFFER_SIZE)
                 var bytesRead: Int
                 while (input.read(buffer).also { bytesRead = it } != -1) {
                     zo.write(buffer, 0, bytesRead)
@@ -303,17 +311,16 @@ object BugReportZipper {
         // get file size by checking the actual file (more reliable than internal zip size)
         val zipFilePath = zipFile.name
         val zipFileSize = File(zipFilePath).length()
-        val maxZipSize = 10 * 1024 * 1024L // 10MB limit
 
         // if zip file is more than 10 MB, only keep recent entries
-        if (zipFileSize > maxZipSize) {
+        if (zipFileSize > MAX_ZIP_SIZE_BYTES) {
             Logger.i(LOG_TAG_BUG_REPORT, "Zip file size exceeds 10MB, keeping only recent entries")
 
             val entryList = zipFile.entries().toList().sortedByDescending {
                 it.lastModifiedTime.toMillis()
             }
             // keep only the last 5 entries or less if there are not enough entries
-            val keepEntries = entryList.take(5).map { it.name }
+            val keepEntries = entryList.take(MAX_RECENT_ENTRIES_CLEANUP).map { it.name }
 
             entryList.forEach { entry ->
                 if (entry.name in keepEntries && entry.name != ignoreFileName) {
@@ -359,21 +366,25 @@ object BugReportZipper {
 
     @RequiresApi(Build.VERSION_CODES.R)
     fun dumpAppExit(aei: ApplicationExitInfo, file: File) {
-        val reportDetails =
-            "${aei.packageUid}, reason: ${aei.reason}, desc: ${aei.description}, imp: ${aei.importance}, pss: ${aei.pss}, rss: ${aei.rss},${
-            Utilities.convertLongToTime(aei.timestamp, Constants.TIME_FORMAT_3)
-        }\n"
-        file.appendText(reportDetails)
+        try {
+            val reportDetails =
+                "${aei.packageUid}, reason: ${aei.reason}, desc: ${aei.description}, imp: ${aei.importance}, pss: ${aei.pss}, rss: ${aei.rss},${
+                    Utilities.convertLongToTime(aei.timestamp, Constants.TIME_FORMAT_3)
+                }\n"
+            file.appendText(reportDetails)
 
-        if (Utilities.isAtleastS()) {
-            // above API 31, we can get the traceInputStream for native crashes
-            if (aei.reason == ApplicationExitInfo.REASON_CRASH_NATIVE) {
+            if (Utilities.isAtleastS()) {
+                // above API 31, we can get the traceInputStream for native crashes
+                if (aei.reason == ApplicationExitInfo.REASON_CRASH_NATIVE) {
+                    aei.traceInputStream.use { ins -> fileWrite(ins, file) }
+                }
+            }
+            // capture traces for ANR exit-infos
+            if (aei.reason == ApplicationExitInfo.REASON_ANR) {
                 aei.traceInputStream.use { ins -> fileWrite(ins, file) }
             }
-        }
-        // capture traces for ANR exit-infos
-        if (aei.reason == ApplicationExitInfo.REASON_ANR) {
-            aei.traceInputStream.use { ins -> fileWrite(ins, file) }
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_BUG_REPORT, "err while dumping app exit info, ${e.message}")
         }
     }
 

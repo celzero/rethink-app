@@ -76,12 +76,25 @@ class SummaryStatisticsAdapter(
     companion object {
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<AppConnection>() {
+                // Fix: Compare by unique identifiers instead of object equality
+                // to prevent RecyclerView position inconsistencies
                 override fun areItemsTheSame(old: AppConnection, new: AppConnection): Boolean {
-                    return (old == new)
+                    return old.uid == new.uid &&
+                            old.ipAddress == new.ipAddress &&
+                            old.port == new.port
                 }
 
                 override fun areContentsTheSame(old: AppConnection, new: AppConnection): Boolean {
-                    return (old == new)
+                    return old.uid == new.uid &&
+                            old.ipAddress == new.ipAddress &&
+                            old.port == new.port &&
+                            old.count == new.count &&
+                            old.flag == new.flag &&
+                            old.blocked == new.blocked &&
+                            old.appOrDnsName == new.appOrDnsName &&
+                            old.downloadBytes == new.downloadBytes &&
+                            old.uploadBytes == new.uploadBytes &&
+                            old.totalBytes == new.totalBytes
                 }
             }
     }
@@ -100,6 +113,11 @@ class SummaryStatisticsAdapter(
     }
 
     override fun onBindViewHolder(holder: AppNetworkActivityViewHolder, position: Int) {
+        // Fix: Validate position to prevent IndexOutOfBoundsException
+        if (position < 0 || position >= itemCount) {
+            Logger.w(LOG_TAG_DNS, "Invalid position $position, itemCount: $itemCount")
+            return
+        }
         val conn = getItem(position) ?: return
         holder.bind(conn)
     }
@@ -195,8 +213,8 @@ class SummaryStatisticsAdapter(
                             loadAppIcon(
                                 Utilities.getIcon(
                                     context,
-                                    appInfo?.packageName ?: "",
-                                    appInfo?.appName ?: ""
+                                    appInfo?.packageName.orEmpty(),
+                                    appInfo?.appName.orEmpty()
                                 )
                             )
                         }
@@ -211,8 +229,8 @@ class SummaryStatisticsAdapter(
                             loadAppIcon(
                                 Utilities.getIcon(
                                     context,
-                                    appInfo?.packageName ?: "",
-                                    appInfo?.appName ?: ""
+                                    appInfo?.packageName.orEmpty(),
+                                    appInfo?.appName.orEmpty()
                                 )
                             )
                         }
@@ -595,7 +613,7 @@ class SummaryStatisticsAdapter(
         private fun startActivity(screenToLoad: Int, searchParam: String?) {
             val intent = Intent(context, NetworkLogsActivity::class.java)
             intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, screenToLoad)
-            intent.putExtra(Constants.SEARCH_QUERY, searchParam ?: "")
+            intent.putExtra(Constants.SEARCH_QUERY, searchParam.orEmpty())
             context.startActivity(intent)
         }
 

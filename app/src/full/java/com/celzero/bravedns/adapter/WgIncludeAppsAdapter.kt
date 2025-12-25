@@ -96,59 +96,92 @@ class WgIncludeAppsAdapter(
         RecyclerView.ViewHolder(b.root) {
 
         fun update(mapping: ProxyApplicationMapping) {
-            val isProxyExcluded = FirewallManager.isAppExcludedFromProxy(mapping.uid)
-            if (isProxyExcluded) {
-                b.wgIncludeAppListContainer.isEnabled = false
-                b.wgIncludeAppListCheckbox.isChecked = false
-                // do not allow to click on the card
-                b.wgIncludeCard.isClickable = false
-                b.wgIncludeCard.isFocusable = false
-                b.wgIncludeAppListCheckbox.isClickable = false
-                b.wgIncludeAppListCheckbox.isFocusable = false
-                b.wgIncludeAppAppDescTv.visibility = View.VISIBLE
-                b.wgIncludeAppAppDescTv.text = context.getString(R.string.exclude_apps_from_proxy)
-            } else {
-                b.wgIncludeAppListContainer.isEnabled = true
-                b.wgIncludeCard.isClickable = true
-                b.wgIncludeCard.isFocusable = true
-                b.wgIncludeAppListCheckbox.isClickable = true
-                b.wgIncludeAppListCheckbox.isFocusable = true
-            }
+            // capture item identity before async operations to prevent incorrect UI updates
+            // when ViewHolder is recycled for a different item during fast scrolling
+            val itemUid = mapping.uid
+            val itemPackageName = mapping.packageName
+            val itemAppName = mapping.appName
+            val itemProxyId = mapping.proxyId
+            val itemProxyName = mapping.proxyName
 
-            b.wgIncludeAppListApkLabelTv.text = mapping.appName
+            io {
+                val isProxyExcluded = FirewallManager.isAppExcludedFromProxy(itemUid)
+                val hasInternetPerm = mapping.hasInternetPermission(packageManager)
+                val iconDrawable = getIcon(context, itemPackageName, itemAppName)
 
-            if (mapping.proxyId == "") {
-                b.wgIncludeAppAppDescTv.text = ""
-                b.wgIncludeAppAppDescTv.visibility = View.GONE
-                b.wgIncludeAppListCheckbox.isChecked = false
-                setCardBackground(false)
-            } else if (mapping.proxyId != proxyId) {
-                if (!isProxyExcluded) {
-                    b.wgIncludeAppAppDescTv.text =
-                        context.getString(R.string.wireguard_apps_proxy_map_desc, mapping.proxyName)
-                } else {
-                    b.wgIncludeAppAppDescTv.text = context.getString(R.string.exclude_apps_from_proxy)
+                uiCtx {
+                    // is still valid and bound to the same item
+                    if (bindingAdapterPosition == RecyclerView.NO_POSITION) {
+                        Logger.w(LOG_TAG_PROXY, "ViewHolder recycled, skipping UI update for uid: $itemUid")
+                        return@uiCtx
+                    }
+
+                    // double-check
+                    val currentItem = getItem(bindingAdapterPosition)
+                    if (currentItem?.uid != itemUid) {
+                        Logger.w(LOG_TAG_PROXY, "ViewHolder rebound to different item, skipping update for uid: $itemUid")
+                        return@uiCtx
+                    }
+
+                    if (isProxyExcluded) {
+                        b.wgIncludeAppListContainer.isEnabled = false
+                        b.wgIncludeAppListCheckbox.isChecked = false
+                        // do not allow to click on the card
+                        b.wgIncludeCard.isClickable = false
+                        b.wgIncludeCard.isFocusable = false
+                        b.wgIncludeAppListCheckbox.isClickable = false
+                        b.wgIncludeAppListCheckbox.isFocusable = false
+                        b.wgIncludeAppAppDescTv.visibility = View.VISIBLE
+                        b.wgIncludeAppAppDescTv.text =
+                            context.getString(R.string.exclude_apps_from_proxy)
+                    } else {
+                        b.wgIncludeAppListContainer.isEnabled = true
+                        b.wgIncludeCard.isClickable = true
+                        b.wgIncludeCard.isFocusable = true
+                        b.wgIncludeAppListCheckbox.isClickable = true
+                        b.wgIncludeAppListCheckbox.isFocusable = true
+                    }
+
+                    b.wgIncludeAppListApkLabelTv.text = itemAppName
+
+                    if (itemProxyId == "") {
+                        b.wgIncludeAppAppDescTv.text = ""
+                        b.wgIncludeAppAppDescTv.visibility = View.GONE
+                        b.wgIncludeAppListCheckbox.isChecked = false
+                        setCardBackground(false)
+                    } else if (itemProxyId != proxyId) {
+                        if (!isProxyExcluded) {
+                            b.wgIncludeAppAppDescTv.text =
+                                context.getString(
+                                    R.string.wireguard_apps_proxy_map_desc,
+                                    itemProxyName
+                                )
+                        } else {
+                            b.wgIncludeAppAppDescTv.text =
+                                context.getString(R.string.exclude_apps_from_proxy)
+                        }
+                        b.wgIncludeAppAppDescTv.visibility = View.VISIBLE
+                        b.wgIncludeAppListCheckbox.isChecked = false
+                        setCardBackground(false)
+                    } else {
+                        b.wgIncludeAppListCheckbox.isChecked =
+                            itemProxyId == proxyId && !isProxyExcluded
+                        setCardBackground(itemProxyId == proxyId && !isProxyExcluded)
+                    }
+
+                    val isIncluded = itemProxyId == proxyId && itemProxyId != ""
+                    displayIcon(iconDrawable)
+                    // set the alpha based on internet permission
+                    if (hasInternetPerm) {
+                        b.wgIncludeAppListApkLabelTv.alpha = 1f
+                        b.wgIncludeAppListApkIconIv.alpha = 1f
+                    } else {
+                        b.wgIncludeAppListApkLabelTv.alpha = 0.4f
+                        b.wgIncludeAppListApkIconIv.alpha = 0.4f
+                    }
+                    setupClickListeners(mapping, isIncluded)
                 }
-                b.wgIncludeAppAppDescTv.visibility = View.VISIBLE
-                b.wgIncludeAppListCheckbox.isChecked = false
-                setCardBackground(false)
-            } else {
-                b.wgIncludeAppListCheckbox.isChecked =
-                    mapping.proxyId == proxyId && !isProxyExcluded
-                setCardBackground(mapping.proxyId == proxyId && !isProxyExcluded)
             }
-
-            val isIncluded = mapping.proxyId == proxyId && mapping.proxyId != ""
-            ui { displayIcon(getIcon(context, mapping.packageName, mapping.appName)) }
-            // set the alpha based on internet permission
-            if (mapping.hasInternetPermission(packageManager)) {
-                b.wgIncludeAppListApkLabelTv.alpha = 1f
-                b.wgIncludeAppListApkIconIv.alpha = 1f
-            } else {
-                b.wgIncludeAppListApkLabelTv.alpha = 0.4f
-                b.wgIncludeAppListApkIconIv.alpha = 0.4f
-            }
-            setupClickListeners(mapping, isIncluded)
         }
 
         private fun setupClickListeners(mapping: ProxyApplicationMapping, isIncluded: Boolean) {

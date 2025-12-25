@@ -27,7 +27,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.LifecycleOwner
@@ -38,9 +37,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CustomIp
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.DialogAddCustomIpBinding
 import com.celzero.bravedns.databinding.ListItemCustomAllIpBinding
 import com.celzero.bravedns.databinding.ListItemCustomIpBinding
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
@@ -58,7 +61,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class CustomIpAdapter(private val context: Context, private val type: CustomRulesActivity.RULES) :
+class CustomIpAdapter(private val context: Context, private val type: CustomRulesActivity.RULES, private val eventLogger: EventLogger) :
     PagingDataAdapter<CustomIp, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
 
     private val selectedItems = mutableSetOf<CustomIp>()
@@ -139,7 +142,15 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
     fun clearSelection() {
         selectedItems.clear()
         isSelectionMode = false
-        notifyDataSetChanged()
+        // Fix: Use notifyItemRangeChanged instead of notifyDataSetChanged for PagingDataAdapter
+        // to avoid IndexOutOfBoundsException from adapter inconsistency
+        try {
+            if (itemCount > 0) {
+                notifyItemRangeChanged(0, itemCount)
+            }
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "$TAG error clearing selection: ${e.message}", e)
+        }
     }
 
     private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
@@ -256,7 +267,11 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                     isSelectionMode = true
                 }
                 toggleSelection(customIp)
-                notifyDataSetChanged()
+                // Fix: Use notifyItemChanged for single item instead of notifyDataSetChanged
+                val position = absoluteAdapterPosition
+                if (position != RecyclerView.NO_POSITION && position < itemCount) {
+                    notifyItemChanged(position)
+                }
             }
 
             b.customIpSeeMoreChip.setOnClickListener { openAppWiseRulesActivity(customIp.uid) }
@@ -264,13 +279,20 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
             b.customIpContainer.setOnLongClickListener {
                 isSelectionMode = true
                 selectedItems.add(customIp)
-                notifyDataSetChanged()
+                // Fix: Use notifyItemRangeChanged instead of notifyDataSetChanged
+                try {
+                    if (itemCount > 0) {
+                        notifyItemRangeChanged(0, itemCount)
+                    }
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_UI, "$TAG error in long click: ${e.message}", e)
+                }
                 true
             }
         }
 
         private fun showBtmSheet() {
-            val bottomSheet = CustomIpRulesBtmSheet(customIp)
+            val bottomSheet = CustomIpRulesBtmSheet.newInstance(customIp)
             bottomSheet.show((context as CustomRulesActivity).supportFragmentManager, bottomSheet.tag)
         }
 
@@ -427,19 +449,30 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                     isSelectionMode = true
                 }
                 toggleSelection(customIp)
-                notifyDataSetChanged()
+                // Fix: Use notifyItemChanged for single item instead of notifyDataSetChanged
+                val position = absoluteAdapterPosition
+                if (position != RecyclerView.NO_POSITION && position < itemCount) {
+                    notifyItemChanged(position)
+                }
             }
 
             b.customIpContainer.setOnLongClickListener {
                 isSelectionMode = true
                 selectedItems.add(customIp)
-                notifyDataSetChanged()
+                // Fix: Use notifyItemRangeChanged instead of notifyDataSetChanged
+                try {
+                    if (itemCount > 0) {
+                        notifyItemRangeChanged(0, itemCount)
+                    }
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_UI, "$TAG error in long click: ${e.message}", e)
+                }
                 true
             }
         }
 
         private fun showBtmSheet() {
-            val bottomSheet = CustomIpRulesBtmSheet(customIp)
+            val bottomSheet = CustomIpRulesBtmSheet.newInstance(customIp)
             bottomSheet.show((context as CustomRulesActivity).supportFragmentManager, bottomSheet.tag)
         }
 
@@ -611,6 +644,11 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
         if (ipString == null) return // invalid ip (ui error shown already)
 
         io { IpRulesManager.replaceIpRule(prev, ipString, port, status, "", "") }
+        logEvent("Updated Custom IP rule: Prev[$prev], New[IP: $ipString, Port: ${port ?: "0"}, Status: $status]")
+    }
+
+    private fun logEvent(details: String) {
+        eventLogger.log(EventType.FW_RULE_MODIFIED, Severity.LOW, "Custom IP", EventSource.UI, false, details)
     }
 
     private suspend fun ioCtx(f: suspend () -> Unit) {
