@@ -786,6 +786,9 @@ object WireguardManager : KoinComponent {
             io {
                 db.deleteConfig(id)
                 mappings.remove(mappings.find { it.id == id })
+                val proxyId = ID_WG_BASE + id
+                ProxyManager.removeProxyId(proxyId)
+                WgHopManager.handleWgDelete(id)
             }
             return
         }
