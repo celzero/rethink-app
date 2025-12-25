@@ -130,6 +130,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
     companion object {
         private const val SCHEME_PACKAGE = "package"
+        const val THEME_CHANGED_RESULT = 24
+        private const val KEY_THEME_CHANGE = "key_theme_change"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
