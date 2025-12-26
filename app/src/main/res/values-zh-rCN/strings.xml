@@ -94,7 +94,7 @@
     <string name="new_app_bulk_notification_title">注意</string>
     <string name="ci_no_rules_text">无 IP 或端口规则。</string>
     <string name="ada_ip_no_connection">此分类无网络日志。</string>
-    <string name="ada_app_status_isolate">正处隔离模式中；仅放行信任 IP</string>
+    <string name="ada_app_status_isolate">隔离模式中；仅放行信任 IP 和域</string>
     <string name="rt_edit_dialog_positive">編辑</string>
     <string name="brbs_backup_title">备份</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">失败</string>
