@@ -145,6 +145,10 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
             }
         }
         b.searchView.setOnQueryTextListener(this)
+        val logLevel = Logger.uiLogLevel.toInt()
+        if (logLevel <= Logger.LoggerLevel.ERROR.id) {
+            showFilterDialog()
+        }
     }
 
     var recyclerAdapter: ConsoleLogAdapter? = null
