@@ -1171,9 +1171,32 @@ object WireguardManager : KoinComponent {
             // read the contents of the file and write it to the EncryptedFileManager
             val bytes = file.readBytes()
             val encryptFile = File(c.configPath)
-            if (!encryptFile.exists()) {
-                encryptFile.parentFile?.mkdirs()
-                encryptFile.createNewFile()
+            val parentDir = encryptFile.parentFile
+            if (parentDir == null) {
+                Logger.e(LOG_TAG_PROXY, "wg restore failed, invalid path: ${c.configPath}")
+                db.deleteConfig(c.id)
+                return@forEach
+            }
+            if (!parentDir.exists() && !parentDir.mkdirs()) {
+                Logger.e(LOG_TAG_PROXY, "wg restore failed, unable to create dir: ${parentDir.absolutePath}")
+                db.deleteConfig(c.id)
+                return@forEach
+            }
+            val created = runCatching {
+                if (!encryptFile.exists()) {
+                    encryptFile.createNewFile()
+                } else {
+                    true
+                }
+            }.getOrElse { ex ->
+                Logger.w(LOG_TAG_PROXY, "wg restore failed, unable to create file: ${encryptFile.absolutePath}, err: ${ex.message}")
+                db.deleteConfig(c.id)
+                return@forEach
+            }
+            if (!created) {
+                Logger.e(LOG_TAG_PROXY, "wg restore failed, createNewFile returned false: ${encryptFile.absolutePath}")
+                db.deleteConfig(c.id)
+                return@forEach
             }
             val res = EncryptedFileManager.write(applicationContext, bytes, encryptFile)
             if (res) {
