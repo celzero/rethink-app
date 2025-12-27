@@ -37,4 +37,5 @@
     <string name="lbl_ip_rules" translatable="true">قوانین IP</string>
     <string name="lbl_domain_rules" translatable="true">قوانین دامنه</string>
     <string name="lbl_delete" translatable="true">حذف</string>
+    <string name="lbl_proceed" translatable="true">سلام خوبی</string>
 </resources>

@@ -874,4 +874,5 @@ href="https://central.sonatype.com/">Sonatype</a><br/> ]]></string>
     <string name="firewall_rule_exempt_orbot_setup" translatable="true">راه‌اندازی Orbot</string>
     <string name="firewall_rule_block_http" translatable="true">HTTP نا‌امن</string>
     <string name="firewall_rule_global_lockdown" translatable="true">قفل</string>
+    <string name="rules_load_failure_heading" translatable="true">­تنظیمات سیو شود</string>
 </resources>

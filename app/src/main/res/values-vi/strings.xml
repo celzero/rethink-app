@@ -483,10 +483,10 @@
     <string name="settings_pcap_dialog_option_2" translatable="true">Xuất ra Logcat</string>
     <string name="firewall_status_bypass_dns_firewall" translatable="true">bỏ qua các quy tắc DNS và tường lửa</string>
     <string name="firewall_status_block_metered" translatable="true">bị chặn trên các mạng có đồng hồ đo (di động)</string>
-    <string name="settings_ptrans_desc" translatable="true">Chuyển đổi lưu lượng gửi từ IPv6 sang IPv4 trên thiết bị. Tắt nếu kết nối của bạn chỉ hỗ trợ IPv4.</string>
+    <string name="settings_ptrans_desc" translatable="true">Dịch lưu lượng IPv6 gửi đi sang IPv4 trên thiết bị. Bật nếu bạn được kết nối với mạng chỉ có IPv4.</string>
     <string name="hsf_exclude_error" translatable="true">Không thể loại trừ ở chế độ khóa VPN</string>
     <string name="settings_ptrans_heading" translatable="true">Bắt buộc đầu ra IPv4</string>
-    <string name="settings_allow_lan_desc" translatable="true">Loại trừ LAN, lặp lại, phát đa hướng, các tuyến liên kết cục bộ từ đường hầm VPN của Rethink.</string>
+    <string name="settings_allow_lan_desc" translatable="true">Loại trừ các tuyến LAN, loopback, link-local khỏi đường hầm VPN của Rethink.</string>
     <string name="settings_lock_down_mode_desc" translatable="true">Một số tùy chọn bị tắt khi VPN ở chế độ khóa.<u>Xem cài đặt VPN</u></string>
     <string name="settings_dns_proxy_dialog_app_desc" translatable="true">Ứng dụng đã chọn sẽ bị loại trừ khỏi VPN để cho phép ứng dụng đó thay mặt bạn kết nối proxy.</string>
     <string name="settings_theme_dialog_themes_4" translatable="true">Đen Thật</string>
@@ -873,4 +873,23 @@
     <string name="rethink_max_desc" translatable="true">Có hơn 50 vị trí, tính riêng tư cao hơn, và trình phân giải đệ quy chạy trên fly.io</string>
     <string name="rethink_sky_desc" translatable="true">Có hơn 280 vị trí, độ ổn định/uptime cao hơn, và trình phân giải stub đang chạy trên cloudflare.com</string>
     <string name="rt_dialog_title" translatable="true">Lưu các thay đổi</string>
+    <string name="ada_noapp_dialog_title" translatable="true">Không có ứng dụng</string>
+    <string name="ci_delete" translatable="true">xóa</string>
+    <string name="ci_trust_rule" translatable="true">Tin tưởng</string>
+    <string name="ci_dialog_desc" translatable="true">Cho phép ( bỏ qua ) hoặc chặn địa chỉ IP, dải IP hoặc cổng. Ví dụ: 10.10.10.10, 10.1.1.*, 10.2.2.0/24, ffff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
+    <string name="ci_dialog_title" translatable="true">Thêm quy tắc IP/ cổng</string>
+    <string name="cd_no_rule_txt" translatable="true">không có quy tắc</string>
+    <string name="cd_no_rule_initial" translatable="true">N</string>
+    <string name="cd_blocked_initial" translatable="true">B</string>
+    <string name="cd_dialog_error_invalid_wildcard" translatable="true">Ký tự đại diện URL hoặc tên miền không hợp lệ</string>
+    <string name="cd_dialog_error_invalid_domain" translatable="true">Tên miền hoặc URL không hợp lệ</string>
+    <string name="cd_dialog_edittext_hint" translatable="true">Nhập %1$s</string>
+    <string name="cd_dialog_desc" translatable="true">URL hoặc tên miền với ký tự đại diện tùy ý: *.test.com, test.com/test</string>
+    <string name="cd_dialog_title" translatable="true">Thêm quy tắc tên miền</string>
+    <string name="cd_toast_edit" translatable="true">Đã chỉnh sửa</string>
+    <string name="cd_dialog_edit_title" translatable="true">Chỉnh sửa quy tắc tên miền</string>
+    <string name="cd_no_rules_text" translatable="true">Không có quy tắc tên miền.</string>
+    <string name="cd_deleted_toast" translatable="true">Xóa tất cả quy tắc tên miền</string>
+    <string name="firewall_rule_domain_trusted_univ" translatable="true">Tên miền được tin tưởng ( chung )</string>
+    <string name="firewall_rule_domain_blocked_univ" translatable="true">Tên miền ( chung )</string>
 </resources>

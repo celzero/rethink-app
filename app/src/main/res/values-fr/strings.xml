@@ -687,7 +687,7 @@
     <string name="ci_dialog_edittext_hint">Adresse IP, sous-réseau ou port</string>
     <string name="ci_no_rule">Aucune règle</string>
     <string name="ada_app_status_allow">est autorisée</string>
-    <string name="ada_app_status_isolate">est confinée ; seules les IP de confiance sont autorisées</string>
+    <string name="ada_app_status_isolate">est confinée ; seules les IP de confiance sont autorisées</string>
     <string name="rt_dialog_neutral">Continuer</string>
     <string name="lbbs_search">Recherche de domaines dans les listes de blocage</string>
     <string name="lbbs_update_check">Vérifier MàJ</string>

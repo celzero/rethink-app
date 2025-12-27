@@ -37,6 +37,7 @@ import android.widget.CompoundButton
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -106,6 +107,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     private val rdb by inject<RefreshDatabase>()
     private val eventLogger by inject<EventLogger>()
 
+    private var isThemeChanged: Boolean = false
     private lateinit var notificationPermissionResult: ActivityResultLauncher<String>
     private lateinit var bubbleSettingsResult: ActivityResultLauncher<Intent>
 
@@ -128,11 +130,16 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
     companion object {
         private const val SCHEME_PACKAGE = "package"
+        const val THEME_CHANGED_RESULT = 24
+        private const val KEY_THEME_CHANGE = "key_theme_change"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        if (savedInstanceState != null) {
+            isThemeChanged = savedInstanceState.getBoolean(KEY_THEME_CHANGE, false)
+        }
 
         handleFrostEffectIfNeeded(persistentState.theme)
 
@@ -145,6 +152,25 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         registerForActivityResult()
         initView()
         setupClickListeners()
+        setupOnBackPressed()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(KEY_THEME_CHANGE, isThemeChanged)
+    }
+
+    private fun setupOnBackPressed() {
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (isThemeChanged) {
+                    setResult(THEME_CHANGED_RESULT)
+                }
+                isEnabled = false
+                onBackPressedDispatcher.onBackPressed()
+            }
+        }
+        onBackPressedDispatcher.addCallback(this, callback)
     }
 
     private fun initView() {
@@ -988,6 +1014,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             }
 
             persistentState.theme = which
+            isThemeChanged = true
             logEvent("App theme changed, theme id: $theme")
             when (which) {
                 Themes.SYSTEM_DEFAULT.id -> {

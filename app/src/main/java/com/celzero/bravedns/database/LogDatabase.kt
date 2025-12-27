@@ -32,7 +32,7 @@ import com.celzero.bravedns.util.Utilities
 
 @Database(
     entities = [ConnectionTracker::class, DnsLog::class, RethinkLog::class, IpInfo::class, Event::class],
-    version = 15,
+    version = 13,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -76,8 +76,6 @@ abstract class LogDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_10_11)
                 .addMigrations(MIGRATION_11_12)
                 .addMigrations(MIGRATION_12_13)
-                .addMigrations(MIGRATION_13_14)
-                .addMigrations(MIGRATION_14_15)
                 .fallbackToDestructiveMigration() // recreate the database if no migration is found
                 .build()
         }
@@ -339,11 +337,6 @@ abstract class LogDatabase : RoomDatabase() {
                 } catch (e: Exception) {
                     Logger.e(LOG_TAG_APP_DB, "MIGRATION_12_13: columns may already exist: ${e.message}")
                 }
-            }
-        }
-
-        private val MIGRATION_13_14: Migration = object : Migration(13, 14) {
-            override fun migrate(db: SupportSQLiteDatabase) {
                 try {
                     // Create Events table with all required columns
                     db.execSQL(
@@ -370,11 +363,6 @@ abstract class LogDatabase : RoomDatabase() {
                 } catch (e: Exception) {
                     Logger.e(LOG_TAG_APP_DB, "MIGRATION_13_14: error creating Events table: ${e.message}")
                 }
-            }
-        }
-
-        private val MIGRATION_14_15: Migration = object : Migration(14, 15) {
-            override fun migrate(db: SupportSQLiteDatabase) {
                 try {
                     // Add blockedTarget column to DnsLogs table
                     db.execSQL("ALTER TABLE DnsLogs ADD COLUMN blockedTarget TEXT NOT NULL DEFAULT ''")

@@ -18,6 +18,7 @@ package com.celzero.bravedns.ui.fragment
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -36,6 +37,13 @@ import com.celzero.bravedns.ui.activity.TunnelSettingsActivity
 class ConfigureFragment : Fragment(R.layout.fragment_configure) {
 
     private val b by viewBinding(FragmentConfigureBinding::bind)
+
+    private val miscSettingsResultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == MiscSettingsActivity.THEME_CHANGED_RESULT) {
+                requireActivity().recreate()
+            }
+        }
 
     enum class ScreenType {
         APPS,
@@ -128,6 +136,11 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
                 ScreenType.ANTI_CENSORSHIP -> Intent(requireContext(), AntiCensorshipActivity::class.java)
                 ScreenType.ADVANCED -> Intent(requireContext(), AdvancedSettingActivity::class.java)
             }
-        startActivity(intent)
+
+        if (type == ScreenType.OTHERS) {
+            miscSettingsResultLauncher.launch(intent)
+        } else {
+            startActivity(intent)
+        }
     }
 }
