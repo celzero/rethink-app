@@ -423,7 +423,7 @@
     <string name="ada_app_status_block_md">блокируется в (мобильных) сетях с тарификацией</string>
     <string name="ada_ip_no_connection">В этой категории нет журналов сети.</string>
     <string name="ada_app_status_exclude">исключен из dns и брандмауэра</string>
-    <string name="ada_app_status_isolate">изолирован; разрешено только доверенным IP</string>
+    <string name="ada_app_status_isolate">изолировано; разрешено только доверенным IP и доменам</string>
     <string name="network_dns">Системный DNS</string>
     <string name="notif_download_failure_content">Загрузка не удалась. Попробуйте еще раз.</string>
     <string name="notif_download_content_title">Загрузка списка блокировки</string>
@@ -1223,8 +1223,8 @@
     <string name="wg_ssid_and_mobile_err" translatable="true">Нельзя использовать сразу оба %1$s и %2$s</string>
     <string name="wg_ssid_dialog_description" translatable="true"><i>Включено</i> когда сеть Wi-Fi (%2$s) равен %3$s, тогда этот VPN WireGuard %1$s.</string>
     <string name="wg_ssid_input_hint" translatable="true">Введите название сети Wi-Fi (%1$s)</string>
-    <string name="wg_ssid_type_exact" translatable="true">Точно</string>
-    <string name="wg_ssid_type_wildcard" translatable="true">Частично</string>
+    <string name="wg_ssid_type_exact" translatable="true">Совпадает точно</string>
+    <string name="wg_ssid_type_wildcard" translatable="true">Совпадает частично</string>
     <string name="wg_ssid_invalid_error" translatable="true">Идентификаторы Wi-Fi (%1$s) должны быть до 32 символов.</string>
     <string name="wg_ssid_delete_confirmation" translatable="true">Удалить %1$s?</string>
     <string name="settings_firebase_error_reporting_heading" translatable="true">Программа стабилизации</string>
@@ -1241,4 +1241,18 @@
     <string name="settings_tunnel_metered" translatable="true">Всегда лимитированное</string>
     <string name="stability_program_toast" translatable="true">Теперь вы участник <i>программы тестирования</i><i> экспериментальных функций</i>.</string>
     <string name="settings_tunnel_metered_desc" translatable="true">Обозначать VPN-туннель Rethink как лимитированное подключение, чтобы сократить трафик от приложений. Внимание: может привести к проблемам с загрузкой больших файлов, таких как резервные копии.</string>
+    <string name="search_event_logs" translatable="true"><font size="12">Искать по событиям и сообщениям</font></string>
+    <string name="bug_report_files_desc" translatable="true">Выберите файлы, которые вы хотите включить в отчёт об ошибках</string>
+    <string name="bug_report_deselect_all" translatable="true">Снять выделение</string>
+    <string name="bug_report_no_files_selected" translatable="true">Пожалуйста, выберите хотя бы один файл</string>
+    <string name="bug_report_creating_zip" translatable="true">Создание архива…</string>
+    <string name="bug_report_file_not_found" translatable="true">Файл не найден</string>
+    <string name="bug_report_error_opening_file" translatable="true">Невозможно открыть этот тип файла</string>
+    <string name="bug_report_delete_confirmation" translatable="true">Вы уверены что хотите удалить \"%1$s\"?</string>
+    <string name="bug_report_file_deleted" translatable="true">Файл «%1$s» удалён</string>
+    <string name="bug_report_delete_failed" translatable="true">Не удалось удалить «%1$s»</string>
+    <string name="bug_report_no_files_available" translatable="true">Нету файлов отчетёв об ошибках</string>
+    <string name="cd_allowed_dns_record_types_heading" translatable="true">Разрешённые типы записей DNS</string>
+    <string name="cd_allowed_dns_record_types_desc" translatable="true">Выберите, какие типы записей ресурсов DNS разрешить.</string>
+    <string name="dns_record_types_auto_mode_status" translatable="true">Авто (Все типы)</string>
 </resources>

@@ -1,1 +1,1 @@
-Firewall, VPN Wireguard, monitor de rede, bloqueio de malware e alteração de DNS.
+Firewall, VPN Wireguard, monitor de rede, bloqueio de malware, alteração de DNS.
