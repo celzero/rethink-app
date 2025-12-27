@@ -94,4 +94,19 @@ interface DnsLogDAO {
     @Query("select time from DNSLogs where id = (select min(id) from DNSLogs)")
     fun getLeastLoggedTime(): Long
 
+    @Query(
+        "SELECT uid AS uid, MAX(time) AS lastBlocked, COUNT(*) AS count FROM DNSLogs WHERE isBlocked = 1 AND time > :time GROUP BY uid ORDER BY lastBlocked DESC LIMIT 10"
+    )
+    suspend fun getRecentlyBlockedDnsApps(time: Long): List<BlockedDnsAppResult>
+
+    @Query(
+        "SELECT uid AS uid, MAX(time) AS lastBlocked, COUNT(*) AS count FROM DNSLogs WHERE isBlocked = 1 AND time > :time GROUP BY uid ORDER BY lastBlocked DESC"
+    )
+    fun getRecentlyBlockedDnsAppsPaged(time: Long): PagingSource<Int, BlockedDnsAppResult>
 }
+
+data class BlockedDnsAppResult(
+    val uid: Int,
+    val lastBlocked: Long,
+    val count: Int
+)

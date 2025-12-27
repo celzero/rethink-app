@@ -781,14 +781,6 @@ object WireguardManager : KoinComponent {
             disableConfig(cf)
         }
 
-        if (config == null) {
-            Logger.e(LOG_TAG_PROXY, "deleteConfig: wg not found, id: $id, ${configs.size}")
-            io {
-                db.deleteConfig(id)
-                mappings.remove(mappings.find { it.id == id })
-            }
-            return
-        }
         io {
             val fileName = getConfigFileName(id)
             val file = File(getConfigFilePath(), fileName)
@@ -800,7 +792,7 @@ object WireguardManager : KoinComponent {
             val proxyId = ID_WG_BASE + id
             ProxyManager.removeProxyId(proxyId)
             mappings.remove(mappings.find { it.id == id })
-            configs.remove(config)
+            if (config != null) configs.remove(config)
             WgHopManager.handleWgDelete(id)
         }
     }

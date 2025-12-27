@@ -36,6 +36,7 @@ import com.celzero.bravedns.data.BlockedAppInfo
 import com.celzero.bravedns.viewmodel.BlockedAppsBubbleViewModel
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.ConnectionTrackerDAO
+import com.celzero.bravedns.database.DnsLogDAO
 import com.celzero.bravedns.databinding.ActivityBubbleBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
@@ -71,12 +72,15 @@ class BubbleActivity : AppCompatActivity(R.layout.activity_bubble) {
     private val persistentState by inject<PersistentState>()
     private val connectionTrackerDAO by inject<ConnectionTrackerDAO>()
     private val appInfoRepository by inject<AppInfoRepository>()
+    private val dnsLogDAO by inject<DnsLogDAO>()
 
     private lateinit var blockedAdapter: BubbleBlockedAppsAdapter
     private lateinit var allowedAdapter: BubbleAllowedAppsAdapter
 
     private var blockedCollectJob: kotlinx.coroutines.Job? = null
     private var allowedCollectJob: kotlinx.coroutines.Job? = null
+
+    private var recyclerDecorationsAdded: Boolean = false
 
     companion object {
         private const val TAG = "BubbleActivity"
@@ -156,7 +160,7 @@ class BubbleActivity : AppCompatActivity(R.layout.activity_bubble) {
                         enablePlaceholders = false
                     ),
                     pagingSourceFactory = {
-                        AllowedAppsBubbleViewModel(appInfoRepository, now, this@BubbleActivity)
+                        AllowedAppsBubbleViewModel(appInfoRepository, now)
                     }
                 ).flow.cachedIn(lifecycleScope)
 
@@ -196,8 +200,8 @@ class BubbleActivity : AppCompatActivity(R.layout.activity_bubble) {
                     pagingSourceFactory = {
                         BlockedAppsBubbleViewModel(
                             connectionTrackerDAO,
+                            dnsLogDAO,
                             appInfoRepository,
-                            this@BubbleActivity,
                             last15Mins,
                             tempAllowedUids
                         )
@@ -222,14 +226,6 @@ class BubbleActivity : AppCompatActivity(R.layout.activity_bubble) {
                 }
             }
         }
-    }
-
-    private fun loadAllowedApps() {
-        startAllowedCollector()
-    }
-
-    private fun loadBlockedApps() {
-        startBlockedCollector()
     }
 
     private fun allowApp(blockedApp: BlockedAppInfo) {
@@ -288,17 +284,19 @@ class BubbleActivity : AppCompatActivity(R.layout.activity_bubble) {
         b.bubbleRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@BubbleActivity)
             adapter = blockedAdapter
-            // Add item spacing for premium look
-            addItemDecoration(object : androidx.recyclerview.widget.RecyclerView.ItemDecoration() {
-                override fun getItemOffsets(
-                    outRect: android.graphics.Rect,
-                    view: View,
-                    parent: androidx.recyclerview.widget.RecyclerView,
-                    state: androidx.recyclerview.widget.RecyclerView.State
-                ) {
-                    outRect.bottom = 16 // 16dp spacing
-                }
-            })
+            if (!recyclerDecorationsAdded) {
+                // Smaller spacing; item XML already has margins.
+                addItemDecoration(object : androidx.recyclerview.widget.RecyclerView.ItemDecoration() {
+                    override fun getItemOffsets(
+                        outRect: android.graphics.Rect,
+                        view: View,
+                        parent: androidx.recyclerview.widget.RecyclerView,
+                        state: androidx.recyclerview.widget.RecyclerView.State
+                    ) {
+                        outRect.bottom = 4 // 4dp
+                    }
+                })
+            }
         }
 
         // Setup allowed apps RecyclerView
@@ -308,16 +306,19 @@ class BubbleActivity : AppCompatActivity(R.layout.activity_bubble) {
         b.bubbleAllowedRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@BubbleActivity)
             adapter = allowedAdapter
-            addItemDecoration(object : androidx.recyclerview.widget.RecyclerView.ItemDecoration() {
-                override fun getItemOffsets(
-                    outRect: android.graphics.Rect,
-                    view: View,
-                    parent: androidx.recyclerview.widget.RecyclerView,
-                    state: androidx.recyclerview.widget.RecyclerView.State
-                ) {
-                    outRect.bottom = 16 // 16dp spacing
-                }
-            })
+            if (!recyclerDecorationsAdded) {
+                addItemDecoration(object : androidx.recyclerview.widget.RecyclerView.ItemDecoration() {
+                    override fun getItemOffsets(
+                        outRect: android.graphics.Rect,
+                        view: View,
+                        parent: androidx.recyclerview.widget.RecyclerView,
+                        state: androidx.recyclerview.widget.RecyclerView.State
+                    ) {
+                        outRect.bottom = 4 // 4dp
+                    }
+                })
+                recyclerDecorationsAdded = true
+            }
         }
     }
 
@@ -390,7 +391,7 @@ class BubbleActivity : AppCompatActivity(R.layout.activity_bubble) {
             b.bubbleAllowedAppsLl.visibility = View.GONE
             b.bubbleRecyclerView.visibility = View.GONE
             b.bubbleEmptyState.visibility = View.VISIBLE
-            b.bubbleEmptyTitle.text = "VPN is off" // keep inline for now
+            b.bubbleEmptyTitle.setText(R.string.bubble_empty_state_title)
         }
     }
 

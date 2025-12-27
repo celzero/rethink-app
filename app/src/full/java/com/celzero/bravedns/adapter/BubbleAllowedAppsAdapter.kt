@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.adapter
 
+import android.R
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
@@ -43,6 +44,10 @@ class BubbleAllowedAppsAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(app: AllowedAppInfo) {
+            // Enable marquee reliably.
+            binding.allowedAppName.isSelected = true
+
+            // appName is already decorated ("App + N other apps") by paging source.
             binding.allowedAppName.text = app.appName
 
             // Calculate time remaining
@@ -62,7 +67,7 @@ class BubbleAllowedAppsAdapter(
                 val icon = packageManager.getApplicationIcon(app.packageName)
                 binding.allowedAppIcon.setImageDrawable(icon)
             } catch (_: Exception) {
-                binding.allowedAppIcon.setImageResource(android.R.drawable.sym_def_app_icon)
+                binding.allowedAppIcon.setImageResource(R.drawable.sym_def_app_icon)
             }
 
             binding.allowedRemoveBtn.setOnClickListener {
@@ -87,4 +92,3 @@ class BubbleAllowedAppsAdapter(
         }
     }
 }
-

@@ -53,7 +53,7 @@ import com.celzero.bravedns.util.Constants
         SubscriptionStatus::class,
         SubscriptionStateHistory::class
     ],
-    version = 29,
+    version = 27,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -101,8 +101,6 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_24_25)
                 .addMigrations(MIGRATION_25_26)
                 .addMigrations(MIGRATION_26_27)
-                .addMigrations(MIGRATION_27_28)
-                .addMigrations(MIGRATION_28_29)
                 .build()
 
         private val roomCallback: Callback =
@@ -1089,37 +1087,24 @@ abstract class AppDatabase : RoomDatabase() {
                     // insert new columns with default values (modifiedTs)
                     db.execSQL("ALTER TABLE WgConfigFiles ADD COLUMN modifiedTs INTEGER NOT NULL DEFAULT 0")
                     Logger.i(LOG_TAG_APP_DB, "MIGRATION_26_27: removed isLockdown column")
-                }
-            }
-
-        private val MIGRATION_27_28: Migration =
-            object : Migration(27, 28) {
-                override fun migrate(db: SupportSQLiteDatabase) {
                     // Add modifiedTs column to AppInfo table to track when firewall/proxy rules change
                     try {
                         db.execSQL("ALTER TABLE AppInfo ADD COLUMN modifiedTs INTEGER NOT NULL DEFAULT 0")
                         // Backfill all existing rows with 0 (already done by DEFAULT 0)
-                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_27_28: added modifiedTs column to AppInfo")
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_26_27: added modifiedTs column to AppInfo")
                     } catch (e: Exception) {
-                        Logger.e(LOG_TAG_APP_DB, "MIGRATION_27_28: modifiedTs column already exists, ignore", e)
+                        Logger.e(LOG_TAG_APP_DB, "MIGRATION_26_27: modifiedTs column already exists, ignore", e)
                     }
-                }
-            }
-
-        private val MIGRATION_28_29: Migration =
-            object : Migration(28, 29) {
-                override fun migrate(db: SupportSQLiteDatabase) {
                     // Add tempAllowEnabled and tempAllowExpiryTime columns to AppInfo table for temporary allow feature
                     try {
                         db.execSQL("ALTER TABLE AppInfo ADD COLUMN tempAllowEnabled INTEGER NOT NULL DEFAULT 0")
                         db.execSQL("ALTER TABLE AppInfo ADD COLUMN tempAllowExpiryTime INTEGER NOT NULL DEFAULT 0")
-                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_28_29: added tempAllowEnabled and tempAllowExpiryTime columns to AppInfo")
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_26_27: added tempAllowEnabled and tempAllowExpiryTime columns to AppInfo")
                     } catch (e: Exception) {
-                        Logger.e(LOG_TAG_APP_DB, "MIGRATION_28_29: temp allow columns already exist, ignore", e)
+                        Logger.e(LOG_TAG_APP_DB, "MIGRATION_26_27: temp allow columns already exist, ignore", e)
                     }
                 }
             }
-
 
         // ref: stackoverflow.com/a/57204285
         private fun doesColumnExistInTable(

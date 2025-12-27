@@ -4249,6 +4249,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 isUidPresentInAnyDnsRequest = true
                 Logger.v(LOG_TAG_VPN, "$TAG; onQuery: uid present in dns request")
             }
+            val isTempAllowed = FirewallManager.isTempAllowed(uid)
+            if (isTempAllowed) {
+                // if the app is temp allowed, bypass local blocklists
+                Logger.vv(LOG_TAG_VPN, "$TAG onQuery, $uid is temp allowed, $fqdn")
+                return makeNsOpts(uid, getTransportIdToBypass(tid), fqdn, true, rinr = rinr)
+            }
             val connectionStatus = FirewallManager.connectionStatus(uid)
             if (connectionStatus.blocked()) {
                 // if the app is blocked by both wifi and mobile data, then the block the request
