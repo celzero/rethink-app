@@ -521,12 +521,12 @@
     <style name="App.Dialog.NoDim" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:backgroundDimEnabled">false</item>
-        <item name="android:background">?attr/colorPrimary</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="buttonBarPositiveButtonStyle">@style/App.AlertDialog.PositiveButton</item>
         <item name="buttonBarNegativeButtonStyle">@style/App.AlertDialog.NegativeButton</item>
         <item name="buttonBarNeutralButtonStyle">@style/App.AlertDialog.NeutralButton</item>
     </style>
+
 
     <style name="App.AlertDialog.PositiveButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">?attr/secondaryTextColor</item>
