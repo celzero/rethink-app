@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="10dp"
-    android:orientation="vertical"
     android:paddingBottom="20dp">
 
     <!-- Drag handle -->
@@ -22,7 +21,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/brbs_heading"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
@@ -37,7 +36,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/brbs_desc"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
@@ -115,29 +114,28 @@
         android:layout_marginEnd="10dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
-        android:layout_weight="1"
         android:clipToPadding="false"
         android:nestedScrollingEnabled="true"
         android:overScrollMode="always"
         android:paddingBottom="12dp"
         app:layout_constraintTop_toBottomOf="@id/brbs_divider_top"
-        app:layout_constraintBottom_toTopOf="@id/brbs_progress_layout"
+        app:layout_constraintBottom_toTopOf="@id/brbs_divider_bottom"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <LinearLayout
         android:id="@+id/brbs_progress_layout"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:gravity="center"
         android:orientation="vertical"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/brbs_recycler"
-        app:layout_constraintBottom_toTopOf="@id/brbs_divider_bottom"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="@id/brbs_recycler"
+        app:layout_constraintBottom_toBottomOf="@id/brbs_recycler"
+        app:layout_constraintStart_toStartOf="@id/brbs_recycler"
+        app:layout_constraintEnd_toEndOf="@id/brbs_recycler">
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:layout_width="wrap_content"
@@ -163,7 +161,6 @@
         android:layout_marginEnd="15dp"
         android:layout_marginBottom="10dp"
         android:background="?attr/border"
-        app:layout_constraintTop_toBottomOf="@id/brbs_progress_layout"
         app:layout_constraintBottom_toTopOf="@id/brbs_send_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -185,7 +182,6 @@
         app:iconPadding="10dp"
         app:iconTint="?attr/primaryTextColor"
         app:iconGravity="textStart"
-        app:layout_constraintTop_toBottomOf="@id/brbs_divider_bottom"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
