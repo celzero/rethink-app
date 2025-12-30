@@ -101,12 +101,8 @@ class CustomDomainRulesBtmSheet :
         super.onViewCreated(view, savedInstanceState)
 
         // Retrieve CustomDomain from arguments
-        cd = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getSerializable(ARG_CUSTOM_DOMAIN, CustomDomain::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            arguments?.getSerializable(ARG_CUSTOM_DOMAIN) as? CustomDomain
-        } ?: run {
+        @Suppress("DEPRECATION")
+        cd = arguments?.getSerializable(ARG_CUSTOM_DOMAIN) as? CustomDomain ?: run {
             Logger.e(LOG_TAG_UI, "$TAG CustomDomain not found in arguments, dismissing")
             dismiss()
             return

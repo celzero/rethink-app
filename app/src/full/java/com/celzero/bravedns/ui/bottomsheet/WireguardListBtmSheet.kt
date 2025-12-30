@@ -132,24 +132,11 @@ class WireguardListBtmSheet :
             return
         }
 
-        obj = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            when (type) {
-                InputType.DOMAIN -> arguments?.getSerializable(ARG_OBJECT, CustomDomain::class.java as Class<java.io.Serializable>) as? CustomDomain
-                InputType.IP -> arguments?.getSerializable(ARG_OBJECT, CustomIp::class.java as Class<java.io.Serializable>) as? CustomIp
-                InputType.APP -> arguments?.getSerializable(ARG_OBJECT, AppInfo::class.java as Class<java.io.Serializable>) as? AppInfo
-            }
-        } else {
-            @Suppress("DEPRECATION")
-            arguments?.getSerializable(ARG_OBJECT)
-        }
+        @Suppress("DEPRECATION")
+        obj = arguments?.getSerializable(ARG_OBJECT)
 
-        @Suppress("UNCHECKED_CAST")
-        confs = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getSerializable(ARG_CONFS, ArrayList::class.java) as? ArrayList<WgConfigFilesImmutable?> ?: emptyList()
-        } else {
-            @Suppress("DEPRECATION")
-            arguments?.getSerializable(ARG_CONFS) as? ArrayList<WgConfigFilesImmutable?> ?: emptyList()
-        }
+        @Suppress("DEPRECATION", "UNCHECKED_CAST")
+        confs = arguments?.getSerializable(ARG_CONFS) as? ArrayList<WgConfigFilesImmutable?> ?: emptyList()
 
         dialog?.window?.let { window ->
             if (isAtleastQ()) {
