@@ -15,12 +15,12 @@
  */
 package com.celzero.bravedns.adapter
 
-import android.R
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AllowedAppInfo
 import com.celzero.bravedns.databinding.ItemAllowedAppBinding
 
@@ -67,7 +67,7 @@ class BubbleAllowedAppsAdapter(
                 val icon = packageManager.getApplicationIcon(app.packageName)
                 binding.allowedAppIcon.setImageDrawable(icon)
             } catch (_: Exception) {
-                binding.allowedAppIcon.setImageResource(R.drawable.sym_def_app_icon)
+                binding.allowedAppIcon.setImageResource(R.drawable.default_app_icon)
             }
 
             binding.allowedRemoveBtn.setOnClickListener {

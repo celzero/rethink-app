@@ -28,6 +28,7 @@
                 android:id="@+id/blocked_app_icon"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
+                android:src="@drawable/default_app_icon"
                 android:layout_gravity="center" />
 
         </androidx.cardview.widget.CardView>
