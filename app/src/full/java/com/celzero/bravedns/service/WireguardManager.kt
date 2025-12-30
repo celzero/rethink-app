@@ -25,6 +25,7 @@ import com.celzero.bravedns.data.SsidItem
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.database.WgConfigFilesRepository
+import com.celzero.bravedns.service.EncryptionException
 import com.celzero.bravedns.service.ProxyManager.ID_NONE
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
@@ -97,8 +98,13 @@ object WireguardManager : KoinComponent {
         mappings = CopyOnWriteArraySet(m)
         mappings.forEach {
             val path = it.configPath
-            val config =
+            val config = try {
                 EncryptedFileManager.readWireguardConfig(applicationContext, path)
+            } catch (e: EncryptionException) {
+                // Critical encryption failure - config is unreadable
+                Logger.e(LOG_TAG_PROXY, "Critical encryption failure for wg config: $path, deleting config", e)
+                return@forEach
+            }
             if (config == null) {
                 Logger.e(LOG_TAG_PROXY, "err loading wg config: $path, invalid config")
                 // TODO: delete the warp config from the wireguard directory, now part of rpn proxy
@@ -1025,7 +1031,13 @@ object WireguardManager : KoinComponent {
         // write the contents to the encrypted file
         val parsedCfg = cfg.toWgQuickString()
         val fileName = getConfigFileName(cfg.getId())
-        EncryptedFileManager.writeWireguardConfig(applicationContext, parsedCfg, fileName)
+        try {
+            EncryptedFileManager.writeWireguardConfig(applicationContext, parsedCfg, fileName)
+        } catch (e: EncryptionException) {
+            // Critical encryption failure - cannot save config
+            Logger.e(LOG_TAG_PROXY, "Critical encryption failure writing wg config: ${cfg.getId()}", e)
+            throw e // Bubble up to caller
+        }
         val path = getConfigFilePath() + fileName
         Logger.i(LOG_TAG_PROXY, "writing wg config to file: $path")
         val file = db.isConfigAdded(cfg.getId())
@@ -1198,13 +1210,11 @@ object WireguardManager : KoinComponent {
                 db.deleteConfig(c.id)
                 return@forEach
             }
-            val res = EncryptedFileManager.write(applicationContext, bytes, encryptFile)
-            if (res) {
+            try {
+                EncryptedFileManager.write(applicationContext, bytes, encryptFile)
                 Logger.i(LOG_TAG_PROXY, "restored wg config: ${c.id}, ${c.name}")
-            } else {
-                Logger.e(LOG_TAG_PROXY, "err restoring wg config: ${c.id}, ${c.name}")
-                // in case of error, delete the entry from the database
-                db.deleteConfig(c.id)
+            } catch (e: EncryptionException) {
+                Logger.e(LOG_TAG_PROXY, "Critical encryption failure restoring wg config: ${c.id}, ${c.name}", e)
             }
         }
 
