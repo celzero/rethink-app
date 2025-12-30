@@ -638,7 +638,7 @@ class CustomDomainAdapter(
     }
 
     private fun showButtonsBottomSheet(customDomain: CustomDomain) {
-        val bottomSheetFragment = CustomDomainRulesBtmSheet(customDomain)
+        val bottomSheetFragment = CustomDomainRulesBtmSheet.newInstance(customDomain)
         bottomSheetFragment.show(fragment.parentFragmentManager, bottomSheetFragment.tag)
     }
 
@@ -654,4 +654,3 @@ class CustomDomainAdapter(
         withContext(Dispatchers.Main) { f() }
     }
 }
-

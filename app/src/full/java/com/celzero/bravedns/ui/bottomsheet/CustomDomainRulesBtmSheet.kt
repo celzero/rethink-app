@@ -44,7 +44,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
+class CustomDomainRulesBtmSheet :
     BottomSheetDialogFragment(), ProxyCountriesBtmSheet.CountriesDismissListener, WireguardListBtmSheet.WireguardDismissListener {
     private var _binding: BottomSheetCustomDomainsBinding? = null
 
@@ -54,6 +54,8 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
 
     private val persistentState by inject<PersistentState>()
     private val eventLogger by inject<EventLogger>()
+
+    private lateinit var cd: CustomDomain
 
     override fun getTheme(): Int =
         getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
@@ -65,6 +67,15 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
 
     companion object {
         private const val TAG = "CDRBtmSht"
+        private const val ARG_CUSTOM_DOMAIN = "custom_domain"
+
+        fun newInstance(customDomain: CustomDomain): CustomDomainRulesBtmSheet {
+            val fragment = CustomDomainRulesBtmSheet()
+            val args = Bundle()
+            args.putSerializable(ARG_CUSTOM_DOMAIN, customDomain)
+            fragment.arguments = args
+            return fragment
+        }
     }
 
     override fun onCreateView(
@@ -88,6 +99,19 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Retrieve CustomDomain from arguments
+        cd = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getSerializable(ARG_CUSTOM_DOMAIN, CustomDomain::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            arguments?.getSerializable(ARG_CUSTOM_DOMAIN) as? CustomDomain
+        } ?: run {
+            Logger.e(LOG_TAG_UI, "$TAG CustomDomain not found in arguments, dismissing")
+            dismiss()
+            return
+        }
+
         dialog?.window?.let { window ->
             if (isAtleastQ()) {
                 val controller = WindowInsetsControllerCompat(window, window.decorView)
