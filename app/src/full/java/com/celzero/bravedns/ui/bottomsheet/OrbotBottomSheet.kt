@@ -352,6 +352,9 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
         when (OrbotHelper.selectedProxyType) {
             AppConfig.ProxyType.SOCKS5.name -> {
                 b.bsOrbotRadioSocks5.isChecked = true
+                b.bsOrbotRadioNone.isChecked = false
+                b.bsOrbotRadioHttp.isChecked = false
+                b.bsOrbotRadioBoth.isChecked = false
                 b.orbotIcon.setImageResource(R.drawable.orbot_enabled)
                 if (isOrbotDns) {
                     b.orbotStatus.text =
@@ -369,11 +372,17 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
             }
             AppConfig.ProxyType.HTTP.name -> {
                 b.bsOrbotRadioHttp.isChecked = true
+                b.bsOrbotRadioSocks5.isChecked = false
+                b.bsOrbotRadioNone.isChecked = false
+                b.bsOrbotRadioBoth.isChecked = false
                 b.orbotIcon.setImageResource(R.drawable.orbot_enabled)
                 b.orbotStatus.text = getString(R.string.orbot_bs_status_2)
             }
             AppConfig.ProxyType.HTTP_SOCKS5.name -> {
                 b.bsOrbotRadioBoth.isChecked = true
+                b.bsOrbotRadioSocks5.isChecked = false
+                b.bsOrbotRadioHttp.isChecked = false
+                b.bsOrbotRadioNone.isChecked = false
                 b.orbotIcon.setImageResource(R.drawable.orbot_enabled)
                 b.orbotStatus.text = getString(R.string.orbot_bs_status_3)
                 if (isOrbotDns) {
