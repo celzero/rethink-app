@@ -26,7 +26,6 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.util.Collections
-import java.util.Objects
 
 /**
  * Represents the contents of a wg-quick configuration file, made up of one or more "Interface"
@@ -48,8 +47,16 @@ class Config private constructor(builder: Builder) {
     init {
         id = builder.id
         name = builder.name
-        wgInterface =
-            Objects.requireNonNull(builder.wgInterface, "An [Interface] section is required")
+        // Validate that interface is not null
+        if (builder.wgInterface == null) {
+            throw BadConfigException(
+                Section.CONFIG,
+                Location.TOP_LEVEL,
+                Reason.MISSING_SECTION,
+                "[Interface]"
+            )
+        }
+        wgInterface = builder.wgInterface
         // Defensively copy to ensure immutability even if the Builder is reused.
         peers = Collections.unmodifiableList(ArrayList(builder.peers))
     }
@@ -161,7 +168,14 @@ class Config private constructor(builder: Builder) {
         }
 
         fun build(): Config {
-            requireNotNull(wgInterface) { "An [Interface] section is required" }
+            if (wgInterface == null) {
+                throw BadConfigException(
+                    Section.CONFIG,
+                    Location.TOP_LEVEL,
+                    Reason.MISSING_SECTION,
+                    "[Interface]"
+                )
+            }
             return Config(this)
         }
 
@@ -215,10 +229,10 @@ class Config private constructor(builder: Builder) {
             var line: String?
             while (reader.readLine().also { line = it } != null) {
                 val commentIndex = line!!.indexOf('#')
-                if (commentIndex != -1) line = line!!.substring(0, commentIndex)
-                line = line!!.trim { it <= ' ' }
-                if (line!!.isEmpty()) continue
-                if (line!!.startsWith("[")) {
+                if (commentIndex != -1) line = line.take(commentIndex)
+                line = line.trim { it <= ' ' }
+                if (line.isEmpty()) continue
+                if (line.startsWith("[")) {
                     // Consume all [Peer] lines read so far.
                     if (inPeerSection) {
                         builder.parsePeer(peerLines)
