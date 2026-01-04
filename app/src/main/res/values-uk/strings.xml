@@ -197,7 +197,7 @@
     <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true"><![CDATA[This connection was allowed because the <i>Для програми-джерела</i> налаштовано <i>обхід універсальних</i> правил брандмауера.<br/><br/> Щоб змінити, перейдіть на екран <i>Брандмауер для конкретної програми</i>.]]></string>
     <string name="category_name_non_app_sys" translatable="true">Системні служби</string>
     <string name="category_name_installed" translatable="true">Встановлені застосунки</string>
-    <string name="ada_app_status_isolate" translatable="true">ізольовано; допускаються лише довірені IP-адреси</string>
+    <string name="ada_app_status_isolate" translatable="true">ізольований; дозволені лише довірені IP-адреси та домени</string>
     <string name="ada_app_bypass_univ" translatable="true">Обхід Універсальний</string>
     <string name="firewall_mode_info_explanation_new" translatable="true">Відстежуйте мережеву активність і брандмауер будь-якого застосунку або IP-адреси.</string>
     <string name="apps_info_title" translatable="true">Застосунки</string>
@@ -1193,8 +1193,8 @@
     <string name="wg_ssid_and_mobile_err" translatable="true">Не можна використовувати одночасно %1$s та %2$s</string>
     <string name="wg_ssid_dialog_description" translatable="true">%1$s ця VPN-мережа WireGuard, коли <i>активна</i>. Ідентифікатор Wi-Fi (%2$s) %3$s.</string>
     <string name="wg_ssid_input_hint" translatable="true">Введіть ідентифікатор Wi-Fi (%1$s)</string>
-    <string name="wg_ssid_type_exact" translatable="true">Точно</string>
-    <string name="wg_ssid_type_wildcard" translatable="true">Частково</string>
+    <string name="wg_ssid_type_exact" translatable="true">Точно відповідає</string>
+    <string name="wg_ssid_type_wildcard" translatable="true">Частково збігається</string>
     <string name="wg_ssid_invalid_error" translatable="true">Ідентифікатори Wi-Fi (%1$s) повинні містити 32 символи або менше.</string>
     <string name="wg_ssid_delete_confirmation" translatable="true">Видалити %1$s?</string>
     <string name="settings_firebase_error_reporting_heading" translatable="true">Програма стабільності</string>
@@ -1211,4 +1211,18 @@
     <string name="settings_tunnel_metered" translatable="true">Завжди з обліком</string>
     <string name="settings_tunnel_metered_desc" translatable="true">Позначте VPN-тунель Rethink як лімітований, щоб програми споживали менше даних. Увага: це може призвести до того, що програми призупинять великі завантаження та вивантаження, такі як резервні копії.</string>
     <string name="stability_program_toast" translatable="true">Зареєстровано в <i>програмі стабільності</i> для <i>експериментальних функцій</i>.</string>
+    <string name="search_event_logs" translatable="true"><font size="12">Пошук подій, повідомлень</font></string>
+    <string name="bug_report_files_desc" translatable="true">Виберіть файли, які потрібно включити до електронного листа зі звітом про помилку</string>
+    <string name="bug_report_deselect_all" translatable="true">Зняти вибір усіх</string>
+    <string name="bug_report_no_files_selected" translatable="true">Будь ласка, виберіть принаймні один файл</string>
+    <string name="bug_report_creating_zip" translatable="true">Створення архіву…</string>
+    <string name="bug_report_file_not_found" translatable="true">Файл не знайдено</string>
+    <string name="bug_report_error_opening_file" translatable="true">Не вдається відкрити цей тип файлу</string>
+    <string name="bug_report_delete_confirmation" translatable="true">Ви впевнені, що хочете видалити \"%1$s\"?</string>
+    <string name="bug_report_file_deleted" translatable="true">Файл \"%1$s\" видалено</string>
+    <string name="bug_report_delete_failed" translatable="true">Не вдалося видалити \"%1$s\"</string>
+    <string name="bug_report_no_files_available" translatable="true">Немає файлів звітів про помилки</string>
+    <string name="cd_allowed_dns_record_types_heading" translatable="true">Дозволені типи DNS-записів</string>
+    <string name="cd_allowed_dns_record_types_desc" translatable="true">Виберіть, які типи записів ресурсів DNS дозволити.</string>
+    <string name="dns_record_types_auto_mode_status" translatable="true">Автоматичний (усі типи)</string>
 </resources>
