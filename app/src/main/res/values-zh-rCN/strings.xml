@@ -1123,4 +1123,35 @@
     <string name="univ_delete_domain_dialog_message" translatable="true">删除这些规则后会允许任何应用连接这些当前被拦截的域名。</string>
     <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[此连接正在寻找一个不存在的<i>私人 DNS</i> 服务器。]]></string>
     <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[此连接因<i>应用</i>设为<i>绕过代理</i>规则而被放行。<br/><br/>若需更改，请移步<i>分应用防火墙</i>屏。]]></string>
+    <string name="lbl_default" translatable="true">默认</string>
+    <string name="lbl_action" translatable="true">操作</string>
+    <string name="lbl_connect" translatable="true">连接</string>
+    <string name="dns_record_types_auto_mode_status" translatable="true">自动（所有类型）</string>
+    <string name="firewall_rule_proxy_error" translatable="true">代理错误</string>
+    <string name="config_invalid_desc" translatable="true">无效的 WireGuard 配置</string>
+    <string name="console_log_title" translatable="true">应用日志</string>
+    <string name="console_log_desc" translatable="true">日志可能包含敏感信息。</string>
+    <string name="do_not_randomize_listen_port_title" translatable="true">不要随机化 WireGuard 监听端口</string>
+    <string name="do_not_randomize_listen_port_desc" translatable="true">在高级模式下保持 WireGuard 监听端口固定（不随机化）。</string>
+    <string name="anti_censorship_title" translatable="true">反审查</string>
+    <string name="anti_censorship_desc" translatable="true">从多种反审查技术中进行选择。</string>
+    <string name="ac_title" translatable="true">反审查</string>
+    <string name="ac_desc" translatable="true">反审查工具可以保障互联网自由，但并非在所有地区有效。仅适用于非代理连接。</string>
+    <string name="ac_split_tcp" translatable="true">TCP</string>
+    <string name="ac_split_tls" translatable="true">TCP/TLS</string>
+    <string name="lbl_always" translatable="true">始终</string>
+    <string name="copied_clipboard" translatable="true">已复制</string>
+    <string name="adv_set_dial_timeout_title" translatable="true">空闲超时</string>
+    <string name="load_more" translatable="true">全部加载</string>
+    <string name="close_conns_dialog_title" translatable="true">关闭连接</string>
+    <string name="close_all" translatable="true">全部关闭</string>
+    <string name="wg_setting_ssid_title" translatable="true">仅 Wi‑Fi</string>
+    <string name="wg_setting_use_on_mobile" translatable="true">仅移动网络</string>
+    <string name="ssid_permission_error_action" translatable="true">授予权限</string>
+    <string name="wg_ssid_delete_confirmation" translatable="true">删除 %1$s？</string>
+    <string name="settings_locale_dialog_default" translatable="true">系统默认</string>
+    <string name="settings_allow_incoming_wg_packets" translatable="true">WireGuard P2P</string>
+    <string name="about_terms_of_service" translatable="true">服务条款</string>
+    <string name="wg_ssid_type_exact" translatable="true">完全匹配</string>
+    <string name="wg_ssid_type_wildcard" translatable="true">部分匹配</string>
 </resources>
