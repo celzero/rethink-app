@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_about" translatable="true">හැඳින්වීම</string>
+    <string name="title_settings" translatable="true">සැකසුම්</string>
+    <string name="title_statistics" translatable="true">සංඛ්‍යාලේඛන</string>
+    <string name="pause_title_desc" translatable="true">Nap එකක් ගන්නවා…</string>
+    <string name="settings_title_desc" translatable="true">ඉහළ ලෙස විවිධාංගීකරණය කළ හැකි DNS හා Firewall</string>
+    <string name="about_title_desc" translatable="true">Network වල ආරක්ෂිත බවට ඇති තර්ජන හඳුනාගැනීම හා අවහිර කිරීම</string>
+    <string name="txt_home" translatable="true">හෝම්</string>
+    <string name="next" translatable="true">ඊළග</string>
+    <string name="skip" translatable="true">මගහරින්න</string>
+    <string name="finish" translatable="true">අවසන් කරන්න</string>
+    <string name="lbl_cancel" translatable="true">අවලංගු කරන්න</string>
+    <string name="lbl_apply" translatable="true">අයදුම් කරන්න</string>
+    <string name="lbl_all" translatable="true">සියලු</string>
+    <string name="lbl_allowed" translatable="true">අවසර ඇති</string>
+    <string name="lbl_maybe_blocked" translatable="true">අවහිරව පැවතිය හැක</string>
+    <string name="lbl_blocked" translatable="true">අවහිරවී ඇත</string>
+    <string name="lbl_disabled" translatable="true">අවලංගු වි ඇත</string>
+    <string name="lbl_domain" translatable="true">වසම</string>
+    <string name="lbl_wildcard" translatable="true">Wildcard</string>
+    <string name="lbl_action_required" translatable="true">ක්‍රියාවක් අත්‍යවශ්‍යයි</string>
+    <string name="lbl_rules" translatable="true">නීති</string>
+    <string name="lbl_configure" translatable="true">සකසන්න</string>
+    <string name="lbl_logs" translatable="true">ලොග්</string>
+    <string name="lbl_network" translatable="true">ජාල</string>
+    <string name="lbl_create" translatable="true">නිර්මාණය කරන්න</string>
+    <string name="lbl_qr_code" translatable="true">QR කේතය</string>
+    <string name="lbl_import" translatable="true">ආනයනය</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="lbl_public_key" translatable="true">පොදු කේතය</string>
+    <string name="lbl_addresses" translatable="true">ලිපිනයන්</string>
+    <string name="lbl_dns_servers" translatable="true">DNS Servers</string>
+    <string name="lbl_applications" translatable="true">යෙදුම්</string>
+    <string name="lbl_ip_rules" translatable="true">IR නිතින්</string>
+    <string name="lbl_domain_rules" translatable="true">Domain නීතීන්</string>
+    <string name="lbl_delete" translatable="true">මකන්න</string>
+    <string name="lbl_proceed" translatable="true">ඉදිරියට යන්න</string>
+    <string name="lbl_private_key" translatable="true">පෞද්ගලික කේතය</string>
+    <string name="lbl_generated" translatable="true">(ජෙනරෙටඩ්)</string>
+    <string name="lbl_random" translatable="true">(අහඹු)</string>
+    <string name="lbl_listen_port" translatable="true">ඇසීමේ port</string>
+    <string name="lbl_mtu" translatable="true">MTU</string>
+    <string name="lbl_auto" translatable="true">(ස්වයං)</string>
+    <string name="lbl_include" translatable="true">අඩංගු</string>
+    <string name="lbl_select_all" translatable="true">සියල්ල තෝරන්න</string>
+    <string name="lbl_active" translatable="true">සක්‍රීය</string>
+    <string name="lbl_inactive" translatable="true">නිෂ්ක්‍රීය</string>
+    <string name="lbl_fast" translatable="true">ඉක්මන්</string>
+    <string name="lbl_slow" translatable="true">සෙමෙන්</string>
+    <string name="lbl_very" translatable="true">ඉතා</string>
+    <string name="lbl_add" translatable="true">එකතු කරන්න</string>
+    <string name="lbl_app_wise" translatable="true">බැගින් යෙදුමකට</string>
+    <string name="lbl_sec" translatable="true">තප්</string>
+    <string name="lbl_min" translatable="true">මිනිත්තු</string>
+    <string name="lbl_hour" translatable="true">පැ</string>
+    <string name="lbl_day" translatable="true">දවස</string>
+    <string name="lbl_preshared_key" translatable="true">පෙර-හුවමාරු කේතය</string>
+    <string name="lbl_insecure" translatable="true">(අනාරක්ෂිත)</string>
+    <string name="lbl_socks5" translatable="true">SOCKS5</string>
+    <string name="lbl_http" translatable="true">HTTP</string>
+    <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
+    <string name="accessibility_service_description" translatable="true">පසුබිම් (Background) යෙදුම් හඳුනා ගැනීමට සහ firewall කිරීමට Rethink, accessibility සේවාව භාවිතා කරයි. Rethink කිසිදු තොරතුරක් රැස් කරන්නේ හෝ විකුණන්නේ නැත.</string>
+    <string name="lbl_dismiss" translatable="true">නොසලකන්න</string>
+    <string name="lbl_save" translatable="true">සුරකින්න</string>
+    <string name="lbl_cache" translatable="true">කෑෂ් (Cache)</string>
+    <string name="lbl_status" translatable="true">තත්වය</string>
+    <string name="lbl_remove" translatable="true">ඉවත්කරන්න</string>
+    <string name="lbl_last" translatable="true">අවසාන</string>
+    <string name="lbl_starting" translatable="true">පටන්ගන්නා</string>
+    <string name="lbl_overall" translatable="true">සමස්තය</string>
+    <string name="lbl_stopped" translatable="true">නැවතුනා</string>
+    <string name="lbl_idle" translatable="true">අයිඩල්</string>
+    <string name="lbl_private" translatable="true">පෞද්ගලික</string>
+    <string name="lbl_secure" translatable="true">සුරක්ෂිත</string>
+    <string name="lbl_anonymous" translatable="true">නිර්නාමික</string>
+    <string name="lbl_peer" translatable="true">පියර්</string>
+    <string name="lbl_split" translatable="true">බෙදන්න</string>
+    <string name="lbl_on_device" translatable="true">උපාංගයේ ඇති</string>
+    <string name="lbl_unselected" translatable="true">තොරානොගත්</string>
+    <string name="lbl_notification" translatable="true">දැනුම්දීම</string>
+    <string name="lbl_test" translatable="true">පරීක්ෂනය</string>
+    <string name="lbl_protos" translatable="true">protos</string>
+    <string name="lbl_experimental" translatable="true">(අත්හදා බැලීම)</string>
+    <string name="lbl_service_providers" translatable="true">සේවා සපයන්නෝ</string>
+    <string name="lbl_hop" translatable="true">රිලේස් (relays)</string>
+    <string name="lbl_manual" translatable="true">මැනුවල්</string>
+    <string name="lbl_fallback" translatable="true">පසුපසට යන්න</string>
+    <string name="lbl_default" translatable="true">පෙරනිමි</string>
+    <string name="lbl_action" translatable="true">ක්‍රියාව</string>
+    <string name="lbl_connect" translatable="true">සම්බන්ධ</string>
+    <string name="lbl_criteria" translatable="true">නිර්ණායක</string>
+    <string name="memory_notification_text">Rethink විසින් අඩු memory තත්ත්වයක් experience කරමින් ඇති නිසා පද්ධති ක්‍රියාවන් සීමිත විය හැක.</string>
+    <string name="slide_2_title" translatable="true">ආයුබෝවන්</string>
+    <string name="slide_2_desc" translatable="true">ඔබගේ Android උපාංගයේ apps firewall කිරීමට, අන්තර්ජාල වාරණ bypass කිරීමට හා network ක්‍රියාකාරකම් ලේසියෙන්ම බලාගැනීමට ඇති ක්‍රමය වන්නේ Rethink යෙදුමයි.</string>
+    <string name="slide_1_title" translatable="true">නිදහස් හා විවෘත මූලාශ්‍ර (FOSS)</string>
+    <string name="slide_1_desc" translatable="true">Rethink යනු Mozilla Builders MVP program හා FOSS United Foundation හි සහාය ඇති විවෘත මූලාශ්‍ර මෘදුකාංගයකි.</string>
+    <string name="wireguard_title" translatable="true">WireGuard හරහා සුරක්ෂිත අන්තර්ජාලය</string>
+    <string name="wireguard_desc" translatable="true">WireGuard ඔස්සේ ඔබගේ අන්තර්ජාල traffic encrypt කරගන්න. විවිධ යෙදුම් සදහා විවිධ මාර්ග යොදාගන්න.</string>
+    <string name="firewall_title" translatable="true">Firewall හරහා ඔබගේ Android උපාංගය ආරක්ෂා කරගන්න</string>
+    <string name="firewall_desc" translatable="true">යෙදුම් වල අන්තර්ජාල භාවිතය පාලනය; යෙදුම හෝ ජාලය වල ක්‍රියාකාරකම් මත සබඳතා අවහිර කළ හැක.</string>
+    <string name="dns_title" translatable="true">Ads හා Malware DNS මගින් අවහිරය</string>
+    <string name="dns_desc" translatable="true">Malware, trackers හා ads පාලනයට ඇති 190+ ලිස්ට් ප්‍රමාණයකින් ඔබට කැමති ආකාරයක් තෝරාගත හැක.</string>
+    <string name="allow" translatable="true">අවසර දෙන්න</string>
+    <string name="block" translatable="true">අවහිරය</string>
+    <string name="bypass_universal" translatable="true">සාර්වත්‍ර bypass</string>
+    <string name="exclude" translatable="true">අයින් කරන්න</string>
+    <string name="isolate" translatable="true">හුදකලා කරන්න</string>
+    <string name="untracked" translatable="true">Track නොවූ</string>
+    <string name="bypass_dns_firewall" translatable="true">DNS හා Firewall bypass</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">අනතුරු ඇගවීම: Rethink අක්‍රිය කර ඇත</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">ආරක්ෂක සැකසුම් වෙනස් කිරීමට ටැප් කරන්න</string>
+    <string name="dns_mode_notification_title" translatable="true">ආරක්ෂිතයි! ඉක්මන් හා සුරක්ෂිත DNS එකකට සම්බන්ධ වි ඇත.</string>
+    <string name="firewall_mode_notification_title" translatable="true">ආරක්ෂිතයි! Firewall එකකට සම්බන්ධ වී ඇත.</string>
+    <string name="hybrid_mode_notification_title" translatable="true">ආරක්ෂිතයි! DNS + Firewall එකකට සම්බන්ධ වි ඇත.</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">ආරක්ෂිතයි! DNS + Firewall + Proxy වලට සම්බන්ධ වි ඇත.</string>
+    <string name="pause_mode_notification_title" translatable="true">විරාම කර ඇත! අවහිර කරන ලද යෙදුම් දිගටම firewall වේ.</string>
+    <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">බලාසිටීම</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">අසමත් වෙමින් ඇත</string>
+    <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">ආරක්ෂිතයි</string>
+    <string name="failed_using_default" translatable="true">අසමත්: ආපස්සට DNS භාවිතා කරයි</string>
+    <string name="status_app_error" translatable="true">යෙදුමේ දෝෂයකි</string>
+    <string name="status_dns_error" translatable="true">DNS දෝෂය</string>
+    <string name="status_dns_server_down" translatable="true">DNS server එක down වි ඇත</string>
+    <string name="status_no_internet" translatable="true">අන්තර්ජාලය නැත</string>
+    <string name="status_no_network" translatable="true">ජාලයක් නැත</string>
+    <string name="status_protected_with_tor" translatable="true">Tor මගින් ආරක්ෂිත වි ඇත</string>
+    <string name="status_protected_with_private_dns" translatable="true">පුද්ගලික DNS මගින් ආරක්ෂිත වි ඇත</string>
+    <string name="status_protected_with_tor_private_dns" translatable="true">පුද්ගලික DNS හා Tor හරහා ආරක්ෂිත වි ඇත</string>
+    <string name="status_protected_with_proxy_private_dns" translatable="true">පුද්ගලික DNS හා proxy මගින් ආරක්ෂිතයි</string>
+    <string name="status_protected_with_socks5_private_dns" translatable="true">පුද්ගලික DNS හා SOCKS5 හරහා ආරක්ෂිතයි</string>
+    <string name="status_protected_with_http_private_dns" translatable="true">පුද්ගලික DNS හා HTTP Proxy හරහා ආරක්ෂිතයි</string>
+    <string name="status_protected_with_socks5" translatable="true">SOCKS proxy මගින් ආරක්ෂිත වි ඇත</string>
+    <string name="status_protected_with_http" translatable="true">HTTP Proxy මගින් ආරක්ෂිතයි</string>
+    <string name="status_protected_with_proxy" translatable="true">Proxy මගින් ආරක්ෂිතයි</string>
+    <string name="status_protected_with_wg" translatable="true">WireGuard මගින් ආරක්ෂිතයි</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">Private DNS &amp; WireGuard හරහා ආරක්ෂිතයි</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">පුද්ගලික DNS enable කර ඇත</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">ආරක්ෂිත නැත</string>
+    <string name="dns_explanation_dns_connected" translatable="true">RethinkDNS මගින් ආරක්ෂිතයි</string>
+    <string name="dns_explanation_firewall_connected" translatable="true">Firewall එකකට සම්බන්ධ වි ඇත</string>
+</resources>
