@@ -181,7 +181,7 @@
         app:cornerRadius="8dp"
         app:icon="@drawable/ic_mail"
         app:iconPadding="10dp"
-        app:iconTint="?attr/primaryTextColor"
+        app:iconTint="?attr/secondaryTextColor"
         app:iconGravity="textStart"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
