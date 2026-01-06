@@ -687,7 +687,7 @@
     <string name="ci_dialog_edittext_hint">Adresse IP, sous-réseau ou port</string>
     <string name="ci_no_rule">Aucune règle</string>
     <string name="ada_app_status_allow">est autorisée</string>
-    <string name="ada_app_status_isolate">est confinée ; seules les IP de confiance sont autorisées</string>
+    <string name="ada_app_status_isolate">est confinée ; seules les IP et les domaines de confiance sont autorisées</string>
     <string name="rt_dialog_neutral">Continuer</string>
     <string name="lbbs_search">Recherche de domaines dans les listes de blocage</string>
     <string name="lbbs_update_check">Vérifier MàJ</string>
@@ -1166,8 +1166,8 @@
     <string name="wg_ssid_and_mobile_err" translatable="true">Impossible d\'utiliser simultanément %1$s et %2$s</string>
     <string name="wg_ssid_dialog_description" translatable="true">%1$s ce VPN WireGuard lorsque <i>actif</i> Identifiant Wi-Fi (%2$s) %3$s.</string>
     <string name="wg_ssid_input_hint" translatable="true">Saisir l\'identifiant Wi-Fi (%1$s)</string>
-    <string name="wg_ssid_type_exact" translatable="true">Exactement</string>
-    <string name="wg_ssid_type_wildcard" translatable="true">Partiellement</string>
+    <string name="wg_ssid_type_exact" translatable="true">Correspond exactement</string>
+    <string name="wg_ssid_type_wildcard" translatable="true">Correspond partiellement</string>
     <string name="wg_ssid_invalid_error" translatable="true">Les identifiants Wi-Fi (%1$s) doivent comporter 32 caractères ou moins.</string>
     <string name="wg_ssid_delete_confirmation" translatable="true">Supprimer %1$s ?</string>
     <string name="settings_firebase_error_reporting_heading" translatable="true">Programme de stabilité</string>
@@ -1183,4 +1183,5 @@
     <string name="settings_theme_dialog_themes_5" translatable="true">Light Plus</string>
     <string name="settings_theme_dialog_themes_6" translatable="true">Dark Plus</string>
     <string name="settings_theme_dialog_themes_7" translatable="true">Frost</string>
+    <string name="dns_record_types_auto_mode_status" translatable="true">Auto (Tous types)</string>
 </resources>

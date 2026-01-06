@@ -1,0 +1,1 @@
+Firewall, WireGuard VPN ඇතුළුව network නිරීක්ෂණය, malware අවහිරය, DNS හැසිරවීම.
