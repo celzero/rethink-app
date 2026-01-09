@@ -76,6 +76,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
         private const val MAX_TIME_TCP = 135 // seconds
         private const val MAX_TIME_UDP = 135 // seconds
         private const val NO_USER_ID = 0
+        private const val RTT_SHORT_THRESHOLD_MS = 20 // milliseconds
         private const val TAG = "ConnTrackAdapter"
     }
 
@@ -393,7 +394,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
         }
 
         private fun isRoundTripShorter(rtt: Long, blocked: Boolean): Boolean {
-            return rtt in 1..20 && !blocked
+            return rtt in 1..RTT_SHORT_THRESHOLD_MS && !blocked
         }
 
         private fun containsRelayProxy(rpid: String): Boolean {
