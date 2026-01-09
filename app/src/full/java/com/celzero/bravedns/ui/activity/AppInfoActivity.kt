@@ -98,6 +98,12 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         const val INTENT_ACTIVE_CONNS = "ACTIVE_CONNS"
         const val INTENT_ASN = "ASN"
         private const val TAG = "AppInfoActivity"
+
+        // Temp allow duration constants
+        private const val TEMP_ALLOW_DURATION_MINUTES = 15
+        private const val MILLIS_PER_MINUTE = 60
+        private const val MILLIS_PER_SECOND = 1000L
+        private const val ALPHA_DISABLED = 0.5f
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -176,7 +182,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
                 // disable exclude app option for apps with no package name
                 if (FirewallManager.isUnknownPackage(uid)) {
-                    b.aadAppSettingsExclude.alpha = 0.5f
+                    b.aadAppSettingsExclude.alpha = ALPHA_DISABLED
                     b.aadAppSettingsExclude.isEnabled = false
                 } else {
                     b.aadAppSettingsExclude.alpha = 1.0f
@@ -516,7 +522,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         io {
             if (isAllowed) {
                 FirewallManager.updateTempAllow(uid, true)
-                val expiryTime = System.currentTimeMillis() + (15 * 60 * 1000L)
+                val expiryTime = System.currentTimeMillis() + (TEMP_ALLOW_DURATION_MINUTES * MILLIS_PER_MINUTE * MILLIS_PER_SECOND)
                 uiCtx {
                     updateTempAllowDescription(true, expiryTime)
                 }

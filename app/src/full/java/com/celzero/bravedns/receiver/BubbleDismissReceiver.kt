@@ -5,6 +5,7 @@ import Logger.LOG_TAG_FIREWALL
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.annotation.RequiresApi
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.BubbleHelper
@@ -27,7 +28,7 @@ class BubbleDismissReceiver : BroadcastReceiver(), KoinComponent {
         const val ACTION_BUBBLE_DISABLE = "com.celzero.bravedns.action.BUBBLE_DISABLE"
     }
 
-    @RequiresApi(29)
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onReceive(context: Context, intent: Intent?) {
         val action = intent?.action ?: return
 

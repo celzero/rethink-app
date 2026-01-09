@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -43,8 +42,6 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -88,6 +85,10 @@ class BubbleActivity : AppCompatActivity(R.layout.activity_bubble) {
     companion object {
         private const val TAG = "BubbleActivity"
         private const val PAGE_SIZE = 20
+        private const val TEMP_ALLOW_DURATION_MINUTES = 15
+        private const val MILLIS_PER_MINUTE = 60
+        private const val MILLIS_PER_SECOND = 1000
+        private const val ITEM_SPACING_DP = 4
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -188,7 +189,7 @@ class BubbleActivity : AppCompatActivity(R.layout.activity_bubble) {
         blockedCollectJob = lifecycleScope.launch {
             try {
                 val now = System.currentTimeMillis()
-                val last15Mins = now - (15 * 60 * 1000)
+                val last15Mins = now - (TEMP_ALLOW_DURATION_MINUTES * MILLIS_PER_MINUTE * MILLIS_PER_SECOND)
 
                 val tempAllowedApps = withContext(Dispatchers.IO) {
                     appInfoRepository.getAllTempAllowedApps(now)
@@ -288,15 +289,15 @@ class BubbleActivity : AppCompatActivity(R.layout.activity_bubble) {
             layoutManager = LinearLayoutManager(this@BubbleActivity)
             adapter = blockedAdapter
             if (!recyclerDecorationsAdded) {
-                // Smaller spacing; item XML already has margins.
-                addItemDecoration(object : androidx.recyclerview.widget.RecyclerView.ItemDecoration() {
+                addItemDecoration(object :
+                    androidx.recyclerview.widget.RecyclerView.ItemDecoration() {
                     override fun getItemOffsets(
                         outRect: android.graphics.Rect,
                         view: View,
                         parent: androidx.recyclerview.widget.RecyclerView,
                         state: androidx.recyclerview.widget.RecyclerView.State
                     ) {
-                        outRect.bottom = 4 // 4dp
+                        outRect.bottom = ITEM_SPACING_DP // 4dp
                     }
                 })
             }
@@ -310,14 +311,15 @@ class BubbleActivity : AppCompatActivity(R.layout.activity_bubble) {
             layoutManager = LinearLayoutManager(this@BubbleActivity)
             adapter = allowedAdapter
             if (!recyclerDecorationsAdded) {
-                addItemDecoration(object : androidx.recyclerview.widget.RecyclerView.ItemDecoration() {
+                addItemDecoration(object :
+                    androidx.recyclerview.widget.RecyclerView.ItemDecoration() {
                     override fun getItemOffsets(
                         outRect: android.graphics.Rect,
                         view: View,
                         parent: androidx.recyclerview.widget.RecyclerView,
                         state: androidx.recyclerview.widget.RecyclerView.State
                     ) {
-                        outRect.bottom = 4 // 4dp
+                        outRect.bottom = ITEM_SPACING_DP // 4dp
                     }
                 })
                 recyclerDecorationsAdded = true

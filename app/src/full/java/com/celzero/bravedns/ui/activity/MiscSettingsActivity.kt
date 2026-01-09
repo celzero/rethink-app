@@ -112,10 +112,10 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     private lateinit var bubbleSettingsResult: ActivityResultLauncher<Intent>
 
     enum class BioMetricType(val action: Int, val mins: Long) {
-        OFF(0, -1L),
-        IMMEDIATE(1, 0L),
-        FIVE_MIN(2, 5L),
-        FIFTEEN_MIN(3, 15L);
+        OFF(BIOMETRIC_ACTION_OFF, BIOMETRIC_MINS_OFF),
+        IMMEDIATE(BIOMETRIC_ACTION_IMMEDIATE, BIOMETRIC_MINS_IMMEDIATE),
+        FIVE_MIN(BIOMETRIC_ACTION_FIVE_MIN, BIOMETRIC_MINS_FIVE),
+        FIFTEEN_MIN(BIOMETRIC_ACTION_FIFTEEN_MIN, BIOMETRIC_MINS_FIFTEEN);
 
         companion object {
             fun fromValue(action: Int): BioMetricType {
@@ -132,6 +132,20 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         private const val SCHEME_PACKAGE = "package"
         const val THEME_CHANGED_RESULT = 24
         private const val KEY_THEME_CHANGE = "key_theme_change"
+        private const val CLICK_DELAY_SHORT_MS = 500L
+        private const val CLICK_DELAY_LONG_MS = 1000L
+        private const val GO_LOG_LEVEL_EXTREME = 7
+        private const val GO_LOG_LEVEL_EXTREME_DISPLAY = 8
+
+        // Biometric type constants
+        private val BIOMETRIC_ACTION_OFF = 0
+        private val BIOMETRIC_ACTION_IMMEDIATE = 1
+        private val BIOMETRIC_ACTION_FIVE_MIN = 2
+        private val BIOMETRIC_ACTION_FIFTEEN_MIN = 3
+        private val BIOMETRIC_MINS_OFF = -1L
+        private val BIOMETRIC_MINS_IMMEDIATE = 0L
+        private val BIOMETRIC_MINS_FIVE = 5L
+        private val BIOMETRIC_MINS_FIFTEEN = 15L
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -563,7 +577,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
 
         b.settingsGoLogRl.setOnClickListener {
-            enableAfterDelay(500, b.settingsGoLogRl)
+            enableAfterDelay(CLICK_DELAY_SHORT_MS, b.settingsGoLogRl)
             showGoLoggerDialog()
         }
 
@@ -575,7 +589,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
 
         b.settingsActivityThemeRl.setOnClickListener {
-            enableAfterDelay(500, b.settingsActivityThemeRl)
+            enableAfterDelay(CLICK_DELAY_SHORT_MS, b.settingsActivityThemeRl)
             showThemeDialog()
         }
 
@@ -758,7 +772,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             persistentState.goLoggerLevel = which.toLong()
             GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel.toInt())
             updateConfigLevel(persistentState.goLoggerLevel)
-            val logLevel = if (persistentState.goLoggerLevel.toInt() == 7) 8 else persistentState.goLoggerLevel.toInt()
+            val logLevel = if (persistentState.goLoggerLevel.toInt() == GO_LOG_LEVEL_EXTREME) GO_LOG_LEVEL_EXTREME_DISPLAY else persistentState.goLoggerLevel.toInt()
             b.genSettingsGoLogDesc.text = Logger.LoggerLevel.fromId(logLevel).name.lowercase()
                     .replaceFirstChar(Char::titlecase).replace("_", " ")
             logEvent("Go log level set to ${Logger.LoggerLevel.fromId(logLevel).name}")
