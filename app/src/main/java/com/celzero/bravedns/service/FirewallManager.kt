@@ -709,8 +709,8 @@ object FirewallManager : KoinComponent {
         mutex.withLock {
             appInfos.clear()
             apps.forEach { appInfos.put(it.uid, it) }
+            informObservers()
         }
-        informObservers()
         return apps.size
     }
 
@@ -727,7 +727,7 @@ object FirewallManager : KoinComponent {
             mutex.withLock {
                 val appInfo = appInfos[uid]
 
-                if (appInfo.isNullOrEmpty()) {
+                if (appInfo.isEmpty()) {
                     Logger.i(
                         LOG_TAG_FIREWALL,
                         "No such app $uid to update 'dis/allow' firewall rule"
@@ -850,7 +850,7 @@ object FirewallManager : KoinComponent {
 
     private suspend fun getAppInfos(): Collection<AppInfo> {
         mutex.withLock {
-            if (appInfos.isEmpty()) return emptyList()
+            if (appInfos.isEmpty) return emptyList()
             return appInfos.values().toList()
         }
     }

@@ -11,7 +11,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
+        android:paddingStart="8dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="16dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -23,27 +26,73 @@
                 android:id="@+id/card_doh"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_margin="10dp"
+                android:layout_margin="8dp"
                 android:clickable="true"
                 android:focusable="true"
+                app:cardElevation="2dp"
                 app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_vertical_row1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <RelativeLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="16dp">
+                    android:padding="12dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/initial_doh"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:paddingTop="8dp"
+                        android:text="@string/cd_custom_doh_url_name_default"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="14sp"
+                        app:autoSizeMaxTextSize="18sp"
+                        app:autoSizeStepGranularity="1sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/abbr_doh"
+                        app:layout_constraintVertical_chainStyle="packed" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/abbr_doh"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:maxLines="2"
+                        android:text="@string/dc_doh"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="16sp"
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="12sp"
+                        app:autoSizeMaxTextSize="16sp"
+                        app:autoSizeStepGranularity="1sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/initial_doh"
+                        app:layout_constraintBottom_toTopOf="@id/icon_container_doh" />
 
                     <LinearLayout
                         android:id="@+id/icon_container_doh"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="4dp"
                         android:importantForAccessibility="noHideDescendants"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/abbr_doh">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
@@ -59,57 +108,80 @@
 
                     </LinearLayout>
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/initial_doh"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_above="@id/abbr_doh"
-                        android:gravity="center"
-                        android:padding="10dp"
-                        android:text="@string/cd_custom_doh_url_name_default"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/rethink_header_text" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/abbr_doh"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_above="@id/icon_container_doh"
-                        android:layout_marginBottom="8dp"
-                        android:ellipsize="end"
-                        android:gravity="center"
-                        android:maxLines="2"
-                        android:text="@string/dc_doh"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/extra_large_font_text_view" />
-
-                </RelativeLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_dot"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_margin="10dp"
+                android:layout_margin="8dp"
                 android:clickable="true"
                 android:focusable="true"
+                app:cardElevation="2dp"
                 app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/guideline_vertical_row1"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <RelativeLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="16dp">
+                    android:padding="12dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/initial_dot"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:paddingTop="8dp"
+                        android:text="@string/lbl_dot"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="14sp"
+                        app:autoSizeMaxTextSize="18sp"
+                        app:autoSizeStepGranularity="1sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/abbr_dot"
+                        app:layout_constraintVertical_chainStyle="packed" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/abbr_dot"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:maxLines="2"
+                        android:text="@string/lbl_dot_abbr"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="16sp"
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="12sp"
+                        app:autoSizeMaxTextSize="16sp"
+                        app:autoSizeStepGranularity="1sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/initial_dot"
+                        app:layout_constraintBottom_toTopOf="@id/icon_container_dot" />
 
                     <LinearLayout
                         android:id="@+id/icon_container_dot"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="4dp"
                         android:importantForAccessibility="noHideDescendants"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/abbr_dot">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
@@ -125,31 +197,7 @@
 
                     </LinearLayout>
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/initial_dot"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_above="@id/abbr_dot"
-                        android:gravity="center"
-                        android:padding="10dp"
-                        android:text="@string/lbl_dot"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/rethink_header_text" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/abbr_dot"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_above="@id/icon_container_dot"
-                        android:layout_marginBottom="8dp"
-                        android:ellipsize="end"
-                        android:gravity="center"
-                        android:maxLines="2"
-                        android:text="@string/lbl_dot_abbr"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/extra_large_font_text_view" />
-
-                </RelativeLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Vertical Guideline (for spacing) -->
@@ -170,28 +218,73 @@
                 android:id="@+id/card_dnscrypt"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_margin="10dp"
+                android:layout_margin="8dp"
                 android:clickable="true"
                 android:focusable="true"
+                app:cardElevation="2dp"
                 app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_vertical_row2"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <RelativeLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:padding="16dp">
+                    android:padding="12dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/initial_dnscrypt"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:paddingTop="8dp"
+                        android:text="@string/lbl_dc"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="14sp"
+                        app:autoSizeMaxTextSize="18sp"
+                        app:autoSizeStepGranularity="1sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/abbr_dnscrypt"
+                        app:layout_constraintVertical_chainStyle="packed" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/abbr_dnscrypt"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:maxLines="2"
+                        android:text="@string/lbl_dc_abbr"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="16sp"
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="12sp"
+                        app:autoSizeMaxTextSize="16sp"
+                        app:autoSizeStepGranularity="1sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/initial_dnscrypt"
+                        app:layout_constraintBottom_toTopOf="@id/icon_container_dnscrypt" />
 
                     <LinearLayout
                         android:id="@+id/icon_container_dnscrypt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="4dp"
                         android:importantForAccessibility="noHideDescendants"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/abbr_dnscrypt">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
@@ -213,57 +306,80 @@
 
                     </LinearLayout>
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/initial_dnscrypt"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_above="@id/abbr_dnscrypt"
-                        android:gravity="center"
-                        android:padding="10dp"
-                        android:text="@string/lbl_dc"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/rethink_header_text" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/abbr_dnscrypt"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_above="@id/icon_container_dnscrypt"
-                        android:layout_marginBottom="8dp"
-                        android:ellipsize="end"
-                        android:gravity="center"
-                        android:maxLines="2"
-                        android:text="@string/lbl_dc_abbr"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/extra_large_font_text_view" />
-
-                </RelativeLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_dnsproxy"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_margin="10dp"
+                android:layout_margin="8dp"
                 android:clickable="true"
                 android:focusable="true"
+                app:cardElevation="2dp"
                 app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/guideline_vertical_row2"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <RelativeLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="16dp">
+                    android:padding="12dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/initial_dnsproxy"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:paddingTop="8dp"
+                        android:text="@string/lbl_dp"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="14sp"
+                        app:autoSizeMaxTextSize="18sp"
+                        app:autoSizeStepGranularity="1sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/abbr_dnsproxy"
+                        app:layout_constraintVertical_chainStyle="packed" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/abbr_dnsproxy"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:maxLines="2"
+                        android:text="@string/lbl_dp_abbr"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="16sp"
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="12sp"
+                        app:autoSizeMaxTextSize="16sp"
+                        app:autoSizeStepGranularity="1sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/initial_dnsproxy"
+                        app:layout_constraintBottom_toTopOf="@id/icon_container_dnsproxy" />
 
                     <LinearLayout
                         android:id="@+id/icon_container_dnsproxy"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="4dp"
                         android:importantForAccessibility="noHideDescendants"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/abbr_dnsproxy">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
@@ -273,31 +389,7 @@
 
                     </LinearLayout>
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/initial_dnsproxy"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_above="@id/abbr_dnsproxy"
-                        android:gravity="center"
-                        android:padding="10dp"
-                        android:text="@string/lbl_dp"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/rethink_header_text" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/abbr_dnsproxy"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_above="@id/icon_container_dnsproxy"
-                        android:layout_marginBottom="8dp"
-                        android:ellipsize="end"
-                        android:gravity="center"
-                        android:maxLines="2"
-                        android:text="@string/lbl_dp_abbr"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/extra_large_font_text_view" />
-
-                </RelativeLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <androidx.constraintlayout.widget.Guideline
@@ -317,27 +409,73 @@
                 android:id="@+id/card_odoh"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_margin="10dp"
+                android:layout_margin="8dp"
                 android:clickable="true"
                 android:focusable="true"
+                app:cardElevation="2dp"
                 app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_vertical"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <RelativeLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="16dp">
+                    android:padding="12dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/initial_odoh"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:paddingTop="8dp"
+                        android:text="@string/lbl_odoh"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="14sp"
+                        app:autoSizeMaxTextSize="18sp"
+                        app:autoSizeStepGranularity="1sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/abbr_odoh"
+                        app:layout_constraintVertical_chainStyle="packed" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/abbr_odoh"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:maxLines="2"
+                        android:text="@string/lbl_odoh_abbr"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="16sp"
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="12sp"
+                        app:autoSizeMaxTextSize="16sp"
+                        app:autoSizeStepGranularity="1sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/initial_odoh"
+                        app:layout_constraintBottom_toTopOf="@id/icon_container_odoh" />
 
                     <LinearLayout
                         android:id="@+id/icon_container_odoh"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="4dp"
                         android:importantForAccessibility="noHideDescendants"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/abbr_odoh">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
@@ -359,30 +497,7 @@
 
                     </LinearLayout>
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/initial_odoh"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_above="@id/abbr_odoh"
-                        android:gravity="center"
-                        android:padding="10dp"
-                        android:text="@string/lbl_odoh"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/rethink_header_text" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/abbr_odoh"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_above="@id/icon_container_odoh"
-                        android:layout_marginBottom="8dp"
-                        android:ellipsize="end"
-                        android:gravity="center"
-                        android:maxLines="2"
-                        android:text="@string/lbl_odoh_abbr"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/extra_large_font_text_view" />
-                </RelativeLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <androidx.constraintlayout.widget.Guideline
@@ -396,26 +511,73 @@
                 android:id="@+id/card_rethink_dns"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_margin="10dp"
+                android:layout_margin="8dp"
                 android:clickable="true"
                 android:focusable="true"
+                app:cardElevation="2dp"
                 app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/guideline_vertical"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <RelativeLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="16dp">
+                    android:padding="12dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/initial_rethink_dns"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:paddingTop="8dp"
+                        android:text="@string/lbl_rdns"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="14sp"
+                        app:autoSizeMaxTextSize="18sp"
+                        app:autoSizeStepGranularity="1sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/abbr_rethink_dns"
+                        app:layout_constraintVertical_chainStyle="packed" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/abbr_rethink_dns"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:maxLines="2"
+                        android:text="@string/dc_rethink_dns_radio"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="16sp"
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="12sp"
+                        app:autoSizeMaxTextSize="16sp"
+                        app:autoSizeStepGranularity="1sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/initial_rethink_dns"
+                        app:layout_constraintBottom_toTopOf="@id/icon_container_rethink_dns" />
 
                     <LinearLayout
                         android:id="@+id/icon_container_rethink_dns"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="4dp"
                         android:importantForAccessibility="noHideDescendants"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/abbr_rethink_dns">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
@@ -434,33 +596,10 @@
                             android:layout_height="wrap_content"
                             android:layout_margin="2dp"
                             android:src="@drawable/dot_green" />
+
                     </LinearLayout>
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/initial_rethink_dns"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_above="@id/abbr_rethink_dns"
-                        android:gravity="center"
-                        android:padding="10dp"
-                        android:text="@string/lbl_rdns"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/rethink_header_text" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/abbr_rethink_dns"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_above="@id/icon_container_rethink_dns"
-                        android:layout_marginBottom="8dp"
-                        android:ellipsize="end"
-                        android:gravity="center"
-                        android:maxLines="2"
-                        android:text="@string/dc_rethink_dns_radio"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/extra_large_font_text_view" />
-
-                </RelativeLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
         </androidx.constraintlayout.widget.ConstraintLayout>
 

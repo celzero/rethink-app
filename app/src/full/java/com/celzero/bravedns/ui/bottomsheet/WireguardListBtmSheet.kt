@@ -35,7 +35,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class WireguardListBtmSheet(val type: InputType, val obj: Any?, val confs: List<WgConfigFilesImmutable?>, val listener: WireguardDismissListener) :
+class WireguardListBtmSheet :
     BottomSheetDialogFragment() {
     private var _binding: BottomSheetProxiesListBinding? = null
 
@@ -45,16 +45,39 @@ class WireguardListBtmSheet(val type: InputType, val obj: Any?, val confs: List<
 
     private val persistentState by inject<PersistentState>()
 
-    private val cd: CustomDomain? = if (type == InputType.DOMAIN) obj as CustomDomain else null
-    private val ci: CustomIp? = if (type == InputType.IP) obj as CustomIp else null
-    private val ai: AppInfo? = if (type == InputType.APP) obj as AppInfo else null
+    private lateinit var type: InputType
+    private var obj: Any? = null
+    private lateinit var confs: List<WgConfigFilesImmutable?>
+    private var listener: WireguardDismissListener? = null
+
+    private val cd: CustomDomain?
+        get() = if (type == InputType.DOMAIN) obj as? CustomDomain else null
+    private val ci: CustomIp?
+        get() = if (type == InputType.IP) obj as? CustomIp else null
+    private val ai: AppInfo?
+        get() = if (type == InputType.APP) obj as? AppInfo else null
 
     companion object {
-        fun newInstance(input: InputType, obj: Any?, data: List<WgConfigFilesImmutable?>, listener: WireguardDismissListener): WireguardListBtmSheet {
-            return WireguardListBtmSheet(input, obj, data, listener)
-        }
-
         private const val TAG = "WglBtmSht"
+        private const val ARG_INPUT_TYPE = "input_type"
+        private const val ARG_OBJECT = "object"
+        private const val ARG_CONFS = "confs"
+
+        fun newInstance(input: InputType, obj: Any?, data: List<WgConfigFilesImmutable?>, listener: WireguardDismissListener): WireguardListBtmSheet {
+            val fragment = WireguardListBtmSheet()
+            fragment.listener = listener
+            val args = Bundle()
+            args.putInt(ARG_INPUT_TYPE, input.id)
+            when (obj) {
+                is CustomDomain -> args.putSerializable(ARG_OBJECT, obj as java.io.Serializable)
+                is CustomIp -> args.putSerializable(ARG_OBJECT, obj as java.io.Serializable)
+                is AppInfo -> args.putSerializable(ARG_OBJECT, obj as java.io.Serializable)
+            }
+            // Store the list as Serializable (ArrayList is Serializable)
+            args.putSerializable(ARG_CONFS, ArrayList(data))
+            fragment.arguments = args
+            return fragment
+        }
     }
 
     interface WireguardDismissListener {
@@ -96,6 +119,25 @@ class WireguardListBtmSheet(val type: InputType, val obj: Any?, val confs: List<
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Retrieve arguments
+        val typeId = arguments?.getInt(ARG_INPUT_TYPE) ?: run {
+            Logger.e(LOG_TAG_UI, "$TAG InputType not found in arguments, dismissing")
+            dismiss()
+            return
+        }
+        type = InputType.entries.firstOrNull { it.id == typeId } ?: run {
+            Logger.e(LOG_TAG_UI, "$TAG Invalid InputType: $typeId, dismissing")
+            dismiss()
+            return
+        }
+
+        @Suppress("DEPRECATION")
+        obj = arguments?.getSerializable(ARG_OBJECT)
+
+        @Suppress("DEPRECATION", "UNCHECKED_CAST")
+        confs = arguments?.getSerializable(ARG_CONFS) as? ArrayList<WgConfigFilesImmutable?> ?: emptyList()
+
         dialog?.window?.let { window ->
             if (isAtleastQ()) {
                 val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -145,20 +187,21 @@ class WireguardListBtmSheet(val type: InputType, val obj: Any?, val confs: List<
 
     private fun processDomain(conf: WgConfigFilesImmutable?) {
         io {
-            if (cd == null) {
+            val domain = cd
+            if (domain == null) {
                 Logger.w(LOG_TAG_UI, "$TAG: Custom domain is null")
                 return@io
             }
             if (conf == null) {
-                DomainRulesManager.setProxyId(cd, "")
-                cd.proxyId = ""
+                DomainRulesManager.setProxyId(domain, "")
+                domain.proxyId = ""
             } else {
                 val id = ID_WG_BASE + conf.id
-                DomainRulesManager.setProxyId(cd, id)
-                cd.proxyId = id
+                DomainRulesManager.setProxyId(domain, id)
+                domain.proxyId = id
             }
             val name = conf?.name ?: getString(R.string.settings_app_list_default_app)
-            Logger.v(LOG_TAG_UI, "$TAG: wg-endpoint set to $name for ${cd.domain}")
+            Logger.v(LOG_TAG_UI, "$TAG: wg-endpoint set to $name for ${domain.domain}")
             uiCtx {
                 Utilities.showToastUiCentered(
                     requireContext(),
@@ -171,20 +214,21 @@ class WireguardListBtmSheet(val type: InputType, val obj: Any?, val confs: List<
 
     private fun processIp(conf: WgConfigFilesImmutable?) {
         io {
-            if (ci == null) {
+            val ip = ci
+            if (ip == null) {
                 Logger.w(LOG_TAG_UI, "$TAG: Custom IP is null")
                 return@io
             }
             if (conf == null) {
-                IpRulesManager.updateProxyId(ci, "")
-                ci.proxyId = ""
+                IpRulesManager.updateProxyId(ip, "")
+                ip.proxyId = ""
             } else {
                 val id = ID_WG_BASE + conf.id
-                IpRulesManager.updateProxyId(ci, id)
-                ci.proxyId = id
+                IpRulesManager.updateProxyId(ip, id)
+                ip.proxyId = id
             }
             val name = conf?.name ?: getString(R.string.settings_app_list_default_app)
-            Logger.v(LOG_TAG_UI, "$TAG: wg-endpoint set to $name for ${ci.ipAddress}")
+            Logger.v(LOG_TAG_UI, "$TAG: wg-endpoint set to $name for ${ip.ipAddress}")
             uiCtx {
                 Utilities.showToastUiCentered(
                     requireContext(),
@@ -275,15 +319,17 @@ class WireguardListBtmSheet(val type: InputType, val obj: Any?, val confs: List<
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         Logger.v(LOG_TAG_UI, "$TAG: Dismissed, input: ${type.name}")
-        when (type) {
-            InputType.DOMAIN -> {
-                listener.onDismissWg(cd)
-            }
-            InputType.IP -> {
-                listener.onDismissWg(ci)
-            }
-            InputType.APP -> {
-                listener.onDismissWg(ai)
+        listener?.let { l ->
+            when (type) {
+                InputType.DOMAIN -> {
+                    l.onDismissWg(cd)
+                }
+                InputType.IP -> {
+                    l.onDismissWg(ci)
+                }
+                InputType.APP -> {
+                    l.onDismissWg(ai)
+                }
             }
         }
     }

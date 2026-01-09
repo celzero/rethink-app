@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_margin="10dp"
-    android:orientation="vertical"
     android:paddingBottom="20dp">
 
     <!-- Drag handle -->
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/brbs_handle"
         android:layout_width="60dp"
         android:layout_height="3dp"
-        android:layout_gravity="center"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="20dp"
-        android:background="?attr/border" />
+        android:background="?attr/border"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/brbs_heading"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
@@ -26,11 +29,14 @@
         android:text="@string/about_bug_report"
         android:textColor="?attr/primaryLightColorText"
         android:textSize="@dimen/extra_large_font_text_view"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/brbs_handle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/brbs_desc"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
@@ -39,10 +45,14 @@
         android:paddingBottom="10dp"
         android:text="@string/bug_report_files_desc"
         android:textColor="?attr/primaryLightColorText"
-        android:textSize="@dimen/default_font_text_view" />
+        android:textSize="@dimen/default_font_text_view"
+        app:layout_constraintTop_toBottomOf="@id/brbs_heading"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/brbs_select_all_layout"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
@@ -50,7 +60,10 @@
         android:layout_marginBottom="10dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="10dp">
+        android:padding="10dp"
+        app:layout_constraintTop_toBottomOf="@id/brbs_desc"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" >
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/brbs_select_all_checkbox"
@@ -83,32 +96,46 @@
     </LinearLayout>
 
     <View
-        android:layout_width="match_parent"
+        android:id="@+id/brbs_divider_top"
+        android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
-        android:background="?attr/border" />
+        android:background="?attr/border"
+        app:layout_constraintTop_toBottomOf="@id/brbs_select_all_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/brbs_recycler"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
-        android:maxHeight="400dp"
-        android:nestedScrollingEnabled="true" />
+        android:clipToPadding="false"
+        android:nestedScrollingEnabled="true"
+        android:overScrollMode="always"
+        android:paddingBottom="12dp"
+        app:layout_constraintTop_toBottomOf="@id/brbs_divider_top"
+        app:layout_constraintBottom_toTopOf="@id/brbs_divider_bottom"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <LinearLayout
         android:id="@+id/brbs_progress_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:gravity="center"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/brbs_recycler"
+        app:layout_constraintBottom_toBottomOf="@id/brbs_recycler"
+        app:layout_constraintStart_toStartOf="@id/brbs_recycler"
+        app:layout_constraintEnd_toEndOf="@id/brbs_recycler">
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:layout_width="wrap_content"
@@ -127,17 +154,21 @@
     </LinearLayout>
 
     <View
-        android:layout_width="match_parent"
+        android:id="@+id/brbs_divider_bottom"
+        android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
         android:layout_marginBottom="10dp"
-        android:background="?attr/border" />
+        android:background="?attr/border"
+        app:layout_constraintBottom_toTopOf="@id/brbs_send_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/brbs_send_button"
         style="@style/toggleButtonStyle"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="25dp"
         android:layout_marginEnd="25dp"
@@ -150,8 +181,10 @@
         app:cornerRadius="8dp"
         app:icon="@drawable/ic_mail"
         app:iconPadding="10dp"
-        app:iconTint="?attr/primaryTextColor"
-        app:iconGravity="textStart" />
+        app:iconTint="?attr/secondaryTextColor"
+        app:iconGravity="textStart"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-</LinearLayout>
-
+</androidx.constraintlayout.widget.ConstraintLayout>

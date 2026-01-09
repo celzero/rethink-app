@@ -158,4 +158,4 @@ data class WgConfigFilesImmutable(
     val isDeletable: Boolean,
     val ssidEnabled: Boolean,
     val ssids: String
-)
+) : java.io.Serializable

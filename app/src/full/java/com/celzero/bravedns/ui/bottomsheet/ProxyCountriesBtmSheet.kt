@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class ProxyCountriesBtmSheet(val type: InputType, val obj: Any?, val confs: List<String>, val listener: CountriesDismissListener) :
+class ProxyCountriesBtmSheet :
     BottomSheetDialogFragment() {
     private var _binding: BottomSheetProxiesListBinding? = null
 
@@ -43,9 +43,17 @@ class ProxyCountriesBtmSheet(val type: InputType, val obj: Any?, val confs: List
 
     private val persistentState by inject<PersistentState>()
 
-    private val cd: CustomDomain? = if (type == InputType.DOMAIN) obj as CustomDomain else null
-    private val ci: CustomIp? = if (type == InputType.IP) obj as CustomIp else null
-    private val ai: AppInfo? = if (type == InputType.APP) obj as AppInfo else null
+    private lateinit var type: InputType
+    private var obj: Any? = null
+    private lateinit var confs: List<String>
+    private var listener: CountriesDismissListener? = null
+
+    private val cd: CustomDomain?
+        get() = if (type == InputType.DOMAIN) obj as? CustomDomain else null
+    private val ci: CustomIp?
+        get() = if (type == InputType.IP) obj as? CustomIp else null
+    private val ai: AppInfo?
+        get() = if (type == InputType.APP) obj as? AppInfo else null
 
     enum class InputType(val id: Int) {
         DOMAIN (0),
@@ -54,11 +62,25 @@ class ProxyCountriesBtmSheet(val type: InputType, val obj: Any?, val confs: List
     }
 
     companion object {
-        fun newInstance(input: InputType, obj: Any?, data: List<String>, listener: CountriesDismissListener): ProxyCountriesBtmSheet {
-            return ProxyCountriesBtmSheet(input, obj, data, listener)
-        }
-
         private const val TAG = "PCCBtmSheet"
+        private const val ARG_INPUT_TYPE = "input_type"
+        private const val ARG_OBJECT = "object"
+        private const val ARG_CONFS = "confs"
+
+        fun newInstance(input: InputType, obj: Any?, data: List<String>, listener: CountriesDismissListener): ProxyCountriesBtmSheet {
+            val fragment = ProxyCountriesBtmSheet()
+            fragment.listener = listener
+            val args = Bundle()
+            args.putInt(ARG_INPUT_TYPE, input.id)
+            when (obj) {
+                is CustomDomain -> args.putSerializable(ARG_OBJECT, obj)
+                is CustomIp -> args.putSerializable(ARG_OBJECT, obj)
+                is AppInfo -> args.putSerializable(ARG_OBJECT, obj)
+            }
+            args.putStringArrayList(ARG_CONFS, ArrayList(data))
+            fragment.arguments = args
+            return fragment
+        }
     }
 
     interface CountriesDismissListener {
@@ -94,6 +116,32 @@ class ProxyCountriesBtmSheet(val type: InputType, val obj: Any?, val confs: List
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Retrieve arguments
+        val typeId = arguments?.getInt(ARG_INPUT_TYPE) ?: run {
+            Logger.e(LOG_TAG_UI, "$TAG InputType not found in arguments, dismissing")
+            dismiss()
+            return
+        }
+        type = InputType.entries.firstOrNull { it.id == typeId } ?: run {
+            Logger.e(LOG_TAG_UI, "$TAG Invalid InputType: $typeId, dismissing")
+            dismiss()
+            return
+        }
+
+        obj = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            when (type) {
+                InputType.DOMAIN -> arguments?.getSerializable(ARG_OBJECT, CustomDomain::class.java)
+                InputType.IP -> arguments?.getSerializable(ARG_OBJECT, CustomIp::class.java)
+                InputType.APP -> arguments?.getSerializable(ARG_OBJECT, AppInfo::class.java)
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            arguments?.getSerializable(ARG_OBJECT)
+        }
+
+        confs = arguments?.getStringArrayList(ARG_CONFS) ?: emptyList()
+
         dialog?.window?.let { window ->
             if (isAtleastQ()) {
                 val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -161,32 +209,34 @@ class ProxyCountriesBtmSheet(val type: InputType, val obj: Any?, val confs: List
     }
 
     private suspend fun processDomain(conf: String) {
-        if (cd == null) {
+        val domain = cd
+        if (domain == null) {
             Logger.w(LOG_TAG_UI, "$TAG: custom domain is null")
             return
         }
-        DomainRulesManager.setCC(cd, conf)
-        cd.proxyCC = conf
+        DomainRulesManager.setCC(domain, conf)
+        domain.proxyCC = conf
         uiCtx {
             Utilities.showToastUiCentered(
                 requireContext(),
-                "Country code updated for ${cd.domain}",
+                "Country code updated for ${domain.domain}",
                 Toast.LENGTH_SHORT
             )
         }
     }
 
     private suspend fun processIp(conf: String) {
-        if (ci == null) {
+        val ip = ci
+        if (ip == null) {
             Logger.w(LOG_TAG_UI, "$TAG: custom ip is null")
             return
         }
-        IpRulesManager.updateProxyCC(ci, conf)
-        ci.proxyCC = conf
+        IpRulesManager.updateProxyCC(ip, conf)
+        ip.proxyCC = conf
         uiCtx {
             Utilities.showToastUiCentered(
                 requireContext(),
-                "Country code updated for ${ci.ipAddress}",
+                "Country code updated for ${ip.ipAddress}",
                 Toast.LENGTH_SHORT
             )
         }
@@ -249,15 +299,17 @@ class ProxyCountriesBtmSheet(val type: InputType, val obj: Any?, val confs: List
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        when (type) {
-            InputType.DOMAIN -> {
-                listener.onDismissCC(cd)
-            }
-            InputType.IP -> {
-                listener.onDismissCC(ci)
-            }
-            InputType.APP -> {
-                listener.onDismissCC(ai)
+        listener?.let { l ->
+            when (type) {
+                InputType.DOMAIN -> {
+                    l.onDismissCC(cd)
+                }
+                InputType.IP -> {
+                    l.onDismissCC(ci)
+                }
+                InputType.APP -> {
+                    l.onDismissCC(ai)
+                }
             }
         }
     }

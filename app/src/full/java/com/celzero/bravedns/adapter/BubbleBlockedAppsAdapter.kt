@@ -96,11 +96,11 @@ class BubbleBlockedAppsAdapter(
                 if (packageName != "Unknown") {
                     itemView.context.packageManager.getApplicationIcon(packageName)
                 } else {
-                    ContextCompat.getDrawable(itemView.context, R.drawable.ic_launcher_foreground)!!
+                    ContextCompat.getDrawable(itemView.context, R.drawable.default_app_icon)!!
                 }
             } catch (_: PackageManager.NameNotFoundException) {
                 Logger.e(TAG, "App icon not found for $packageName")
-                ContextCompat.getDrawable(itemView.context, R.drawable.ic_launcher_foreground)!!
+                ContextCompat.getDrawable(itemView.context, R.drawable.default_app_icon)!!
             }
         }
 

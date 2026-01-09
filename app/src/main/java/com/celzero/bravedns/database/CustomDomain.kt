@@ -20,9 +20,10 @@ import android.os.SystemClock
 import androidx.room.Entity
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.util.Constants
+import java.io.Serializable
 
 @Entity(primaryKeys = ["domain", "uid"], tableName = "CustomDomain")
-class CustomDomain {
+class CustomDomain : Serializable {
     var domain: String = ""
     var uid: Int = Constants.UID_EVERYBODY
     var ips: String = ""

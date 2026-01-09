@@ -21,9 +21,10 @@ import android.content.pm.PackageManager
 import androidx.room.Entity
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
 import com.celzero.bravedns.service.FirewallManager
+import java.io.Serializable
 
 @Entity(primaryKeys = ["uid", "packageName"], tableName = "AppInfo")
-class AppInfo {
+class AppInfo : Serializable {
     var packageName: String = ""
     var appName: String = ""
     var uid: Int = 0
