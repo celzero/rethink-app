@@ -174,4 +174,9 @@ class RethinkPlusFilterBottomSheet : BottomSheetDialogFragment() {
     private fun removeSubgroupFilter(tag: String) {
         filters?.subGroups?.remove(tag)
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
