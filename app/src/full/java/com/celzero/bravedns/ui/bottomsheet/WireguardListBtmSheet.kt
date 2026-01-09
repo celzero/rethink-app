@@ -40,8 +40,8 @@ class WireguardListBtmSheet :
     private var _binding: BottomSheetProxiesListBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
-    private val b
-        get() = _binding!!
+    private val b: BottomSheetProxiesListBinding
+        get() = _binding ?: throw IllegalStateException("Binding is only valid between onCreateView and onDestroyView")
 
     private val persistentState by inject<PersistentState>()
 
