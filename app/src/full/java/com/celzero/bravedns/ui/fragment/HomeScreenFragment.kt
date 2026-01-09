@@ -601,21 +601,30 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     proxyStateListenerJob = null
                 }
                 proxyStateListenerJob = ui("proxyStates") {
-                    while (isVisible && isAdded) {
+                    while (isVisible && isAdded && view != null) {
                         updateUiWithProxyStates(it)
                         kotlinx.coroutines.delay(1500L)
                     }
                     proxyStateListenerJob?.cancel()
                 }
             } else {
-                b.fhsCardProxyCount.text = getString(R.string.lbl_inactive)
-                b.fhsCardOtherProxyCount.visibility = View.VISIBLE
-                b.fhsCardOtherProxyCount.text = getString(R.string.lbl_disabled)
+                // Check if view is available before accessing binding
+                if (view != null && isAdded) {
+                    b.fhsCardProxyCount.text = getString(R.string.lbl_inactive)
+                    b.fhsCardOtherProxyCount.visibility = View.VISIBLE
+                    b.fhsCardOtherProxyCount.text = getString(R.string.lbl_disabled)
+                }
             }
         }
     }
 
     private fun updateUiWithProxyStates(resId: Int) {
+        // Check if view is available before accessing binding
+        if (view == null || !isAdded) {
+            proxyStateListenerJob?.cancel()
+            return
+        }
+
         if (
             !viewLifecycleOwner
                 .lifecycle
@@ -646,7 +655,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 // If no proxies are configured but WireGuard is enabled, show appropriate message
                 if (proxies.isEmpty()) {
                     uiCtx {
-                        if (!isVisible || !isAdded) return@uiCtx
+                        if (!isVisible || !isAdded || view == null) return@uiCtx
                         b.fhsCardOtherProxyCount.visibility = View.VISIBLE
                         b.fhsCardProxyCount.text = getString(R.string.lbl_inactive)
                         b.fhsCardOtherProxyCount.text = getString(resId)
@@ -748,7 +757,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     }
                 }
                 uiCtx {
-                    if (!isVisible || !isAdded) return@uiCtx
+                    if (!isVisible || !isAdded || view == null) return@uiCtx
                     b.fhsCardOtherProxyCount.visibility = View.VISIBLE
                     var text = ""
                     // show as 3 active 1 failing 1 idle, prioritize showing something if any proxy exists
@@ -798,12 +807,18 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         } else {
             // For non-WireGuard proxies, show active if any proxy is enabled
+            if (view == null || !isAdded) return
+
             if (appConfig.isProxyEnabled()) {
                 b.fhsCardProxyCount.text = getString(R.string.lbl_active)
             } else {
                 b.fhsCardProxyCount.text = getString(R.string.lbl_inactive)
             }
         }
+
+        // Final check before accessing binding
+        if (view == null || !isAdded) return
+
         b.fhsCardOtherProxyCount.visibility = View.VISIBLE
         b.fhsCardOtherProxyCount.text = getString(resId)
     }
@@ -829,6 +844,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun disableLogsCard() {
+        if (view == null || !isAdded) return
+
         b.fhsCardNetworkLogsCount.text = getString(R.string.firewall_card_text_inactive)
         b.fhsCardDnsLogsCount.text = getString(R.string.lbl_disabled)
         b.fhsCardLogsDuration.visibility = View.GONE
@@ -836,12 +853,16 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun disableProxyCard() {
         proxyStateListenerJob?.cancel()
+        if (view == null || !isAdded) return
+
         b.fhsCardProxyCount.text = getString(R.string.lbl_inactive)
         b.fhsCardOtherProxyCount.visibility = View.VISIBLE
         b.fhsCardOtherProxyCount.text = getString(R.string.lbl_disabled)
     }
 
     private fun disableFirewallCard() {
+        if (view == null || !isAdded) return
+
         b.fhsCardFirewallUnivRules.visibility = View.VISIBLE
         b.fhsCardFirewallUnivRules.text = getString(R.string.lbl_disabled)
         b.fhsCardFirewallUnivRulesCount.visibility = View.VISIBLE
@@ -851,12 +872,16 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun disabledDnsCard() {
+        if (view == null || !isAdded) return
+
         b.fhsCardDnsLatency.text = getString(R.string.dns_card_latency_inactive)
         b.fhsCardDnsConnectedDns.text = getString(R.string.lbl_disabled)
         b.fhsCardDnsConnectedDns.isSelected = true
     }
 
     private fun disableAppsCard() {
+        if (view == null || !isAdded) return
+
         b.fhsCardAppsStatusRl.visibility = View.GONE
         b.fhsCardApps.visibility = View.VISIBLE
         b.fhsCardApps.text = getString(R.string.firewall_card_text_inactive)
@@ -888,7 +913,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
             val p50 = VpnController.p50(dnsId)
             uiCtx {
-                if (!isVisible || !isAdded) return@uiCtx
+                if (!isVisible || !isAdded || view == null) return@uiCtx
                 when (p50) {
                     in 0L..LATENCY_VERY_FAST_MAX -> {
                         val string =
@@ -939,6 +964,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun updateUiWithDnsStates(dnsName: String) {
+        // Check if view is available before accessing binding
+        if (view == null || !isAdded) return
+
         var dns = dnsName
         val preferredId = if (appConfig.isSystemDns()) {
             Backend.System
@@ -974,7 +1002,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     if (status != null) {
                         failing = false
                         uiCtx {
-                            if (isAdded) {
+                            if (isAdded && view != null) {
                                 b.fhsCardDnsLatency.visibility = View.VISIBLE
                                 b.fhsCardDnsFailure.visibility = View.INVISIBLE
                             }
@@ -986,7 +1014,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     failing = true
                 }
                 uiCtx {
-                    if (failing && isAdded) {
+                    if (failing && isAdded && view != null) {
                         b.fhsCardDnsLatency.visibility = View.INVISIBLE
                         b.fhsCardDnsFailure.visibility = View.VISIBLE
                         b.fhsCardDnsFailure.text = getString(R.string.failed_using_default)
@@ -994,6 +1022,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 }
             }
         }
+
+        // Final check before accessing binding
+        if (view == null || !isAdded) return
+
         b.fhsCardDnsConnectedDns.text = dns
         b.fhsCardDnsConnectedDns.isSelected = true
     }
@@ -1491,6 +1523,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         stopShimmer()
         stopTrafficStats()
         proxyStateListenerJob?.cancel()
+    }
+
+    override fun onDestroyView() {
+        // Cancel any running jobs before the view is destroyed
+        proxyStateListenerJob?.cancel()
+        proxyStateListenerJob = null
+        super.onDestroyView()
     }
 
     private fun startDnsActivity(screenToLoad: Int) {
