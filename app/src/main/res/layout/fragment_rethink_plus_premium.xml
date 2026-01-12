@@ -24,7 +24,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/hero_banner"
                 android:layout_width="0dp"
-                android:layout_height="220dp"
+                android:layout_height="140dp"
                 android:layout_margin="16dp"
                 app:cardCornerRadius="24dp"
                 app:cardElevation="8dp"
@@ -38,15 +38,6 @@
                     android:background="@drawable/home_screen_cards_bg"
                     android:padding="24dp">
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/premium_icon"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@drawable/ic_rethink_plus_sparkle"
-                        app:tint="@android:color/white"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
-
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/hero_title"
                         android:layout_width="0dp"
@@ -55,10 +46,24 @@
                         android:textColor="@android:color/white"
                         android:textSize="28sp"
                         android:textStyle="bold"
-                        android:layout_marginTop="16dp"
-                        app:layout_constraintTop_toBottomOf="@id/premium_icon"
+                        android:includeFontPadding="false"
+                        app:layout_constraintStart_toEndOf="@id/premium_icon"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintVertical_bias="0.0" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/premium_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_rethink_plus_sparkle"
+                        app:tint="@android:color/white"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent" />
+                        app:layout_constraintEnd_toStartOf="@id/hero_title"
+                        app:layout_constraintTop_toTopOf="@id/hero_title"
+                        app:layout_constraintBottom_toBottomOf="@id/hero_title"
+                        android:layout_marginEnd="8dp" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/hero_subtitle"
@@ -85,7 +90,7 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="24dp"
                 app:layout_constraintTop_toBottomOf="@id/hero_banner"
                 app:layout_constraintStart_toStartOf="parent"
@@ -105,6 +110,58 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/product_type_toggle_card"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="24dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="?attr/chipBgColorPositive"
+                app:layout_constraintTop_toBottomOf="@id/plans_subtitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="4dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_subscription"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="@string/subscription_label"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textAllCaps="false"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        app:cornerRadius="12dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_one_time"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="@string/one_time_label"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textAllCaps="false"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        app:cornerRadius="12dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/subscription_plans"
                 android:layout_width="0dp"
@@ -116,12 +173,31 @@
                 android:clipToPadding="false"
                 android:nestedScrollingEnabled="false"
                 android:overScrollMode="never"
-                app:layout_constraintTop_toBottomOf="@id/plans_subtitle"
+                app:layout_constraintTop_toBottomOf="@id/product_type_toggle_card"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                tools:listitem="@layout/item_premium_feature"
+                tools:listitem="@layout/list_item_play_subs"
                 tools:itemCount="3" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/terms_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp"
+                android:text="@string/rethink_terms"
+                android:textAlignment="center"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/subscription_plans" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -133,17 +209,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:layout_marginBottom="60dp"
+        android:background="@android:color/transparent"
+        android:backgroundTint="@android:color/transparent"
         app:cardCornerRadius="0dp"
         app:cardElevation="16dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="20dp"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:paddingBottom="32dp"
-            android:background="?attr/background">
+            app:cornerRadius="30dp"
+            android:background="@android:color/transparent">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/subscribe_button"
@@ -164,25 +240,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- Terms and Test Button -->
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/terms_text"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                android:text="@string/rethink_terms"
-                android:textAlignment="center"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="12sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/subscribe_button" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

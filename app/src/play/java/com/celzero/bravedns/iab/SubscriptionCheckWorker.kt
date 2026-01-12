@@ -39,12 +39,12 @@ class SubscriptionCheckWorker(
     private fun initiateAndFetchPurchases() {
         if (InAppBillingHandler.isBillingClientSetup() && isListenerRegistered(listener)) {
             Logger.i(LOG_IAB, "$TAG; initBilling: billing client already setup")
-            InAppBillingHandler.fetchPurchases(listOf(ProductType.SUBS))
+            InAppBillingHandler.fetchPurchases(listOf(ProductType.SUBS, ProductType.INAPP))
             return
         }
         if (InAppBillingHandler.isBillingClientSetup() && !isListenerRegistered(listener)) {
             InAppBillingHandler.registerListener(listener)
-            InAppBillingHandler.fetchPurchases(listOf(ProductType.SUBS))
+            InAppBillingHandler.fetchPurchases(listOf(ProductType.SUBS, ProductType.INAPP))
             Logger.i(LOG_IAB, "$TAG; initBilling: billing listener registered")
             return
         }
@@ -70,7 +70,7 @@ class SubscriptionCheckWorker(
                 return
             }
             // check for the subscription status after the connection is established
-            val productType = listOf(ProductType.SUBS)
+            val productType = listOf(ProductType.SUBS, ProductType.INAPP)
             InAppBillingHandler.fetchPurchases(productType)
         }
 

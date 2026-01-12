@@ -47,10 +47,11 @@ interface ITcpProxy {
     suspend fun isRethinkPlusAvailable(refId: String): Boolean
 
 
-    @GET("/g/{refId}/{purchaseToken}")
+    @GET("/g/{refId}/{purchaseToken}/{appVersion}")
     suspend fun checkForPaymentAcknowledgement(
         @Path("refId") refId: String,
-        @Path("purchaseToken") purchaseToken: String
+        @Path("purchaseToken") purchaseToken: String,
+        @Path("appVersion") appVersion: String
     ): Response<JsonObject?>?
 
     /*
@@ -61,8 +62,9 @@ interface ITcpProxy {
       * response: {"message":"canceled subscription","purchaseId":"c078ba1a42e042f3745e195aa52c952b3c99751f3de9880e6c754682698d5133"}
       * {"error":"cannot revoke, subscription canceled or expired","expired":false,"canceled":true,"cancelCtx":{"userInitiatedCancellation":{"cancelSurveyResult":null,"cancelTime":"2025-07-10T13:21:24.743Z"},"systemInitiatedCancellation":null,"developerInitiatedCancellation":null,"replacementCancellation":null},"purchaseId":"c078ba1a42e042f3745e195aa52c952b3c99751f3de9880e6c754682698d5133"}
      */
-     @POST("/g/stop")
+     @POST("/g/stop/{appVersion}")
     suspend fun cancelSubscription(
+        @Path("appVersion") appVersion: String,
         @Query("cid") accountId: String,
         @Query("purchaseToken") purchaseToken: String,
         @Query("test") test: Boolean = false
@@ -77,18 +79,29 @@ interface ITcpProxy {
       * response: {"message":"canceled subscription","purchaseId":"c078ba1a42e042f3745e195aa52c952b3c99751f3de9880e6c754682698d5133"}
       * {"error":"cannot revoke, subscription canceled or expired","expired":false,"canceled":true,"cancelCtx":{"userInitiatedCancellation":{"cancelSurveyResult":null,"cancelTime":"2025-07-10T13:21:24.743Z"},"systemInitiatedCancellation":null,"developerInitiatedCancellation":null,"replacementCancellation":null},"purchaseId":"c078ba1a42e042f3745e195aa52c952b3c99751f3de9880e6c754682698d5133"}
      */
-     @POST("/g/refund")
+     @POST("/g/refund/{appVersion}")
     suspend fun revokeSubscription(
+        @Path("appVersion") appVersion: String,
         @Query("cid") accountId: String,
         @Query("purchaseToken") purchaseToken: String,
         @Query("test") test: Boolean = false
     ): Response<JsonObject?>?
 
 
-    @GET("/g/ent")
+    @GET("/g/ent/{appVersion}")
     suspend fun queryEntitlement(
+        @Path("appVersion") appVersion: String,
         @Query("cid") accountId: String,
         @Query("test") test: Boolean = false
+    ): Response<JsonObject?>?
+
+
+    @POST("/g/ack/{appVersion}")
+    suspend fun acknowledgePurchase(
+        @Path("appVersion") appVersion: String,
+        @Query("cid") accountId: String,
+        @Query("purchaseToken") purchaseToken: String,
+        @Query("force") force: Boolean = false
     ): Response<JsonObject?>?
 
     /*@GET("/warp/renew")

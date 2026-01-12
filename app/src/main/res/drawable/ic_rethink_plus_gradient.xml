@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="32"
+    android:viewportHeight="32">
+    
+    <!-- Sparkle with gradient -->
+    <path
+        android:pathData="m16.505,5.616 l0.704,2.393c0.96,3.26 3.509,5.809 6.769,6.769l2.392,0.704c0.478,0.141 0.478,0.818 0,0.959l-2.392,0.704c-3.26,0.96 -5.809,3.509 -6.769,6.769l-0.704,2.393c-0.141,0.478 -0.818,0.478 -0.959,0l-0.704,-2.393c-0.96,-3.26 -3.509,-5.809 -6.769,-6.769l-2.393,-0.704c-0.478,-0.141 -0.478,-0.818 0,-0.959l2.393,-0.704c3.26,-0.96 5.809,-3.509 6.769,-6.769l0.704,-2.393c0.141,-0.478 0.818,-0.478 0.959,0z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="16"
+                android:startY="5"
+                android:endX="16"
+                android:endY="27"
+                android:startColor="#4CAF50"
+                android:centerColor="#2196F3"
+                android:endColor="#9C27B0"/>
+        </aapt:attr>
+    </path>
+    
+    <!-- Rounded square border with gradient -->
+    <path
+        android:pathData="m6,1c-2.761,0 -5,2.239 -5,5v20c0,2.761 2.239,5 5,5h20c2.761,0 5,-2.239 5,-5v-20c0,-2.761 -2.239,-5 -5,-5zM3,6c0,-1.657 1.343,-3 3,-3h20c1.657,0 3,1.343 3,3v20c0,1.657 -1.343,3 -3,3h-20c-1.657,0 -3,-1.343 -3,-3z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="16"
+                android:startY="1"
+                android:endX="16"
+                android:endY="31"
+                android:startColor="#4CAF50"
+                android:centerColor="#2196F3"
+                android:endColor="#9C27B0"/>
+        </aapt:attr>
+    </path>
+</vector>
+

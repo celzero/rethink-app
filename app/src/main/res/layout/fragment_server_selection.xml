@@ -5,13 +5,15 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/background">
+    android:background="?attr/background"
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_vpn_header_gradient"
+        android:fitsSystemWindows="true"
         app:elevation="8dp">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
@@ -49,7 +51,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
-                    android:layout_marginTop="80dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="4dp"
                     android:translationZ="2dp"
                     app:cardCornerRadius="20dp"
                     app:cardElevation="4dp"
@@ -71,8 +74,8 @@
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:background="@drawable/bg_vpn_status_chip"
-                            android:paddingStart="12dp"
-                            android:paddingEnd="12dp"
+                            android:paddingStart="4dp"
+                            android:paddingEnd="4dp"
                             android:paddingTop="6dp"
                             android:paddingBottom="6dp"
                             android:gravity="center_vertical">
@@ -225,10 +228,10 @@
                 android:id="@+id/search_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="4dp"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="4dp"
                 app:strokeWidth="0dp">
@@ -281,10 +284,10 @@
                 android:id="@+id/selected_servers_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp"
                 android:visibility="gone">
 
                 <LinearLayout
@@ -340,14 +343,77 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Error State -->
+            <LinearLayout
+                android:id="@+id/error_state_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="40dp"
+                android:paddingStart="32dp"
+                android:paddingEnd="32dp"
+                android:gravity="center"
+                android:visibility="gone">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/error_illustration"
+                    android:layout_width="160dp"
+                    android:layout_height="160dp"
+                    android:src="@drawable/ic_cloud_error"
+                    android:tint="?attr/primaryLightColorText"
+                    android:alpha="0.4"
+                    android:layout_marginBottom="24dp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/error_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/server_selection_error_title"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="?attr/primaryTextColor"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/error_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/server_selection_error_message"
+                    android:textSize="@dimen/default_font_text_view"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:layout_marginBottom="32dp"
+                    android:gravity="center"
+                    android:lineSpacingExtra="4dp"
+                    android:maxWidth="320dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/error_retry_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="56dp"
+                    android:text="@string/server_selection_retry"
+                    android:textSize="@dimen/large_font_text_view"
+                    android:textStyle="bold"
+                    android:paddingStart="32dp"
+                    android:paddingEnd="32dp"
+                    app:cornerRadius="28dp"
+                    app:elevation="4dp"
+                    app:icon="@drawable/ic_refresh"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp"
+                    style="@style/Widget.Material3.Button.ElevatedButton" />
+
+            </LinearLayout>
+
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/empty_selection_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="8dp">
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -388,10 +454,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                android:paddingTop="16dp"
-                android:paddingBottom="8dp"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="4dp"
                 android:gravity="center_vertical">
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -419,12 +485,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="16dp"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:paddingTop="0dp"
+                android:paddingBottom="12dp"
                 android:clipToPadding="false"
-                tools:listitem="@layout/list_item_vpn_server" />
+                tools:listitem="@layout/list_item_country_card" />
 
             <LinearLayout
                 android:id="@+id/empty_state_layout"
@@ -466,4 +532,3 @@
     </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
-

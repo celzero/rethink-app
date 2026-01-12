@@ -55,6 +55,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.CopyOnWriteArrayList
 import com.celzero.bravedns.customdownloader.ITcpProxy
+import com.celzero.bravedns.service.TcpProxyHelper
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -74,6 +75,7 @@ object InAppBillingHandler : KoinComponent {
     const val LINK = "https://play.google.com/store/account/subscriptions?sku=$1&package=$2"
 
     const val STD_PRODUCT_ID = "standard.tier"
+    const val ONE_TIME_PRODUCT_ID = "test_product"
 
     private lateinit var queryUtils: QueryUtils
     private val productDetails: CopyOnWriteArrayList<ProductDetail> = CopyOnWriteArrayList()
@@ -166,7 +168,7 @@ object InAppBillingHandler : KoinComponent {
             if (isSuccess) {
                 logd(mname, "Billing connected successfully, fetching initial state")
                 // Billing connected - fetch purchases to sync state
-                val prodTypes = listOf(ProductType.SUBS)
+                val prodTypes = listOf(ProductType.SUBS, ProductType.INAPP)
                 fetchPurchases(prodTypes)
             } else {
                 loge(mname, "Billing connection failed: $message")
@@ -207,7 +209,7 @@ object InAppBillingHandler : KoinComponent {
                 logd(mname, "enableInAppMessaging: no action needed")
             } else {
                 logd(TAG, "enableInAppMessaging: subs status update, fetching purchases")
-                fetchPurchases(listOf(ProductType.SUBS))
+                fetchPurchases(listOf(ProductType.SUBS, ProductType.INAPP))
             }
         }
     }
@@ -279,7 +281,7 @@ object InAppBillingHandler : KoinComponent {
                                 logd(mname, "Billing connected successfully")
                                 queryUtils = QueryUtils(billingClient)
                                 queryBillingConfig()
-                                fetchPurchases(listOf(ProductType.SUBS))
+                                fetchPurchases(listOf(ProductType.SUBS, ProductType.INAPP))
                             } else {
                                 loge(mname, "Billing connection failed: ${billingResult.responseCode}, ${billingResult.debugMessage}")
                             }
@@ -549,7 +551,10 @@ object InAppBillingHandler : KoinComponent {
                 planTitle = offerDetails?.let { queryUtils.getPlanTitle(it) } ?: "",
                 state = purchase.purchaseState,
                 purchaseToken = purchase.purchaseToken,
-                productType = ProductType.SUBS,
+                productType = purchase.products.firstOrNull()?.let {
+                    productDetails?.productDetail?.productType
+                        ?: ProductType.SUBS
+                } ?: ProductType.SUBS,
                 purchaseTime = purchase.purchaseTime.toFormattedDate(),
                 purchaseTimeMillis = purchase.purchaseTime,
                 isAutoRenewing = purchase.isAutoRenewing,
@@ -619,7 +624,9 @@ object InAppBillingHandler : KoinComponent {
     }
 
     private fun isPurchaseStateCompleted(purchase: Purchase?): Boolean {
+        val mname = this::isPurchaseStateCompleted.name
         if (purchase?.purchaseState == null) {
+            loge(mname, "purchase or purchase state is null, $purchase")
             return false
         }
 
@@ -628,12 +635,29 @@ object InAppBillingHandler : KoinComponent {
 
         // For subscriptions, check auto-renewal; for one-time purchases, don't require auto-renewal
         // treat empty product as subscription
-        val isSubs = purchase.products.any { if (productDetails.isEmpty()) { true } else productDetails.find { pd -> pd.productId == it }?.productType == ProductType.SUBS }
-        Logger.i(Logger.LOG_IAB, "$TAG isPurchaseStateCompleted: isSubs=$isSubs, isPurchased=$isPurchased, isAcknowledged=$isAcknowledged, isAutoRenewing=${purchase.isAutoRenewing}")
+        purchase.products.forEach {
+            logv(mname, "Product in purchase: $it")
+        }
+        val isSubs = getPurchaseType(purchase) == ProductType.SUBS
+        val isOneTime = getPurchaseType(purchase) == ProductType.INAPP
+        //isSubs = purchase.products.any { if (productDetails.isEmpty()) { true } else productDetails.find { pd -> pd.productId == it }?.productType == ProductType.SUBS }
+        log(mname, "isPurchaseStateCompleted: isSubs?$isSubs, isOneTime?$isOneTime, isPurchased?$isPurchased, isAcknowledged?$isAcknowledged, isAutoRenewing?${purchase.isAutoRenewing}")
         return if (isSubs) {
             isPurchased && purchase.isAutoRenewing && isAcknowledged
-        } else {
+        } else if (isOneTime) {
             isPurchased && isAcknowledged
+        } else {
+            false
+        }
+    }
+
+    fun getPurchaseType(purchase: Purchase): String {
+        val pId = purchase.products.firstOrNull() ?: return "UNKNOWN"
+
+        return when {
+            STD_PRODUCT_ID.contains(pId) -> ProductType.SUBS
+            ONE_TIME_PRODUCT_ID.contains(pId) -> ProductType.INAPP
+            else -> "UNKNOWN"
         }
     }
 
@@ -724,8 +748,8 @@ object InAppBillingHandler : KoinComponent {
         productDetails.clear()
         val productListParams = listOf(
             QueryProductDetailsParams.Product.newBuilder()
-                .setProductId(STD_PRODUCT_ID)
-                .setProductType(ProductType.SUBS)
+                .setProductId(ONE_TIME_PRODUCT_ID)
+                .setProductType(ProductType.INAPP)
                 .build()
         )
         logd(mname, "query product params, size: ${productListParams.size}")
@@ -744,7 +768,39 @@ object InAppBillingHandler : KoinComponent {
                 billingListener?.productResult(false, emptyList())
             }
         }
+
+        // query SUBS product details
+        querySubsProductDetails()
     }
+
+    private fun querySubsProductDetails() {
+        val mname = this::querySubsProductDetails.name
+
+        val subsParams = listOf(
+            QueryProductDetailsParams.Product.newBuilder()
+                .setProductId(STD_PRODUCT_ID)
+                .setProductType(ProductType.SUBS)
+                .build()
+        )
+
+        logd(mname, "query product params, size: ${subsParams.size}")
+        val params = QueryProductDetailsParams.newBuilder()
+            .setProductList(subsParams)
+            .build()
+
+        billingClient.queryProductDetailsAsync(params) { br, result ->
+            if (br.responseCode == BillingClient.BillingResponseCode.OK) {
+                processProductList(result.productDetailsList)
+            } else {
+                loge(mname, "SUBS query failed: ${br.responseCode}, ${br.debugMessage}")
+            }
+
+            // Final callback after all products are processed
+            productDetailsLiveData.postValue(productDetails)
+            billingListener?.productResult(productDetails.isNotEmpty(), productDetails)
+        }
+    }
+
 
     private fun processProductList(productDetailsList: List<ProductDetails>) {
         val mname = this::processProductList.name
@@ -755,28 +811,40 @@ object InAppBillingHandler : KoinComponent {
 
             when (pd.productType) {
                 ProductType.INAPP -> {
-                    val pricingPhase = PricingPhase(
-                        planTitle = "",
-                        recurringMode = RecurringMode.ORIGINAL,
-                        price = pd.oneTimePurchaseOfferDetails?.formattedPrice.toString()
-                            .removeSuffix(".00"),
-                        currencyCode = pd.oneTimePurchaseOfferDetails?.priceCurrencyCode.toString(),
-                        billingCycleCount = 0,
-                        billingPeriod = "",
-                        priceAmountMicros = pd.oneTimePurchaseOfferDetails?.priceAmountMicros
-                            ?: 0L,
-                        freeTrialPeriod = 0
-                    )
+                    val offers = pd.oneTimePurchaseOfferDetailsList.orEmpty()
+                    if (offers.isEmpty()) {
+                        loge(mname, "INAPP product has no one-time offers: ${pd.productId}")
+                        return@forEach
+                    }
 
-                    val productDetail = ProductDetail(
-                        productId = pd.productId,
-                        planId = "",
-                        productTitle = pd.title,
-                        productType = ProductType.INAPP,
-                        pricingDetails = listOf(pricingPhase)
-                    )
-                    this.productDetails.add(productDetail)
-                    queryProductDetail.add(QueryProductDetail(productDetail, pd, null))
+                    offers.forEachIndexed { index, offer ->
+
+                        val billingPeriod = getOneTimeProductBillingPeriod(offer)
+                        val planTitle = QueryUtils.getPlanTitle(billingPeriod)
+                        val planId = offer.purchaseOptionId ?: offer.offerId
+                        ?: "one_time_${pd.productId}_$index"
+
+                        val pricingPhase = PricingPhase(
+                            planTitle = planTitle,
+                            recurringMode = RecurringMode.ORIGINAL,
+                            price = offer.formattedPrice.removeSuffix(".00"),
+                            currencyCode = offer.priceCurrencyCode,
+                            billingCycleCount = 0,
+                            billingPeriod = billingPeriod,
+                            priceAmountMicros = offer.priceAmountMicros,
+                            freeTrialPeriod = 0
+                        )
+
+                        val productDetail = ProductDetail(
+                            productId = pd.productId,
+                            planId = planId,
+                            productTitle = planTitle,
+                            productType = ProductType.INAPP,
+                            pricingDetails = listOf(pricingPhase)
+                        )
+                        this.productDetails.add(productDetail)
+                        queryProductDetail.add(QueryProductDetail(productDetail, pd, null, offer))
+                    }
                 }
 
                 ProductType.SUBS -> {
@@ -847,7 +915,7 @@ object InAppBillingHandler : KoinComponent {
                                 this.productDetails.add(productDetail)
                             }
                             if (!isExistInStore) {
-                                queryProductDetail.add(QueryProductDetail(productDetail, pd, offer))
+                                queryProductDetail.add(QueryProductDetail(productDetail, pd, offer, null))
                             }
                             logd(
                                 mname,
@@ -861,6 +929,14 @@ object InAppBillingHandler : KoinComponent {
 
         storeProductDetails.addAll(queryProductDetail)
         log(mname, "Processed product details list: ${storeProductDetails.size} items")
+
+        storeProductDetails.forEach {
+            log(mname, "storeProductDetails item: ${it.productDetail.productId}, ${it.productDetail.planId}, ${it.productDetail.pricingDetails}" )
+        }
+
+        productDetails.forEach {
+            log(mname, "productDetails item: ${it.productId}, ${it.planId}, ${it.pricingDetails}" )
+        }
 
         // remove duplicates from storeProductDetails and productDetails
         val s = storeProductDetails.distinctBy { it.productDetail.planId }
@@ -889,6 +965,17 @@ object InAppBillingHandler : KoinComponent {
         } else {
             log(mname, "product details found: $productDetails")
             billingListener?.productResult(true, productDetails)
+        }
+    }
+
+    private fun getOneTimeProductBillingPeriod(offer: ProductDetails.OneTimePurchaseOfferDetails): String {
+        // One-time purchases do not have a billing period like subscriptions
+        if (offer.purchaseOptionId == "legacy-base") {
+            return "P2Y"
+        } else if (offer.purchaseOptionId == "legacy-max") {
+            return "P5Y"
+        } else {
+            return "P2Y" // Default to 2 years if unknown
         }
     }
 
@@ -959,6 +1046,43 @@ object InAppBillingHandler : KoinComponent {
         }
     }
 
+    suspend fun purchaseOneTime(activity: Activity, productId: String, planId: String) {
+        val mname = this::purchaseOneTime.name
+
+        log(mname, "Looking for one-time product: $productId, plan: $planId")
+
+        // Find the INAPP (one-time) product in your cached list
+        val queryProductDetail = storeProductDetails.find {
+            it.productDetail.productId == productId &&
+                    it.productDetail.productType == ProductType.INAPP
+        }
+
+        if (queryProductDetail == null) {
+            val errorMsg = "No one-time product details found for productId: $productId, planId: $planId"
+            loge(mname, errorMsg)
+
+            // No subscription state machine here – just notify listener
+            billingListener?.purchasesResult(false, emptyList())
+            return
+        }
+
+        try {
+            val offerToken = queryProductDetail.oneTimeOfferDetails?.offerToken
+
+            launchFlow(
+                activity = activity,
+                pds = queryProductDetail.productDetails,
+                offerToken = offerToken
+            )
+            logv(mname, "One-time purchase flow launched for productId: $productId, plan: $planId, offerToken: $offerToken")
+        } catch (e: Exception) {
+            val errorMsg = "Failed to launch one-time purchase flow: ${e.message}"
+            loge(mname, errorMsg, e)
+
+            billingListener?.purchasesResult(false, emptyList())
+        }
+    }
+
     private suspend fun launchFlow(
         activity: Activity,
         pds: ProductDetails?,
@@ -977,7 +1101,7 @@ object InAppBillingHandler : KoinComponent {
             return
         }
 
-        logd(mname, "Launching purchase flow for: ${pds.title}")
+        logd(mname, "Launching purchase flow for: ${pds.title}, ${pds.productId}, offerToken: $offerToken, ${pds.productType}, ${pds.oneTimePurchaseOfferDetailsList}")
 
         val paramsList = when (offerToken.isNullOrEmpty()) {
             true -> listOf(
@@ -1014,6 +1138,7 @@ object InAppBillingHandler : KoinComponent {
 
     // Query user's billing configuration using BillingClient v7+ API
     fun queryBillingConfig() {
+        val mname = this::queryBillingConfig.name
         val getBillingConfigParams = GetBillingConfigParams.newBuilder().build()
         billingClient.getBillingConfigAsync(getBillingConfigParams) { billingResult, billingConfig ->
             if (billingResult.responseCode == BillingResponseCode.OK
@@ -1021,10 +1146,10 @@ object InAppBillingHandler : KoinComponent {
             ) {
                 val countryCode = billingConfig.countryCode
                 // TODO: Handle country code, see if we need to use it
-                Logger.i(LOG_IAB, "BillingConfig country code: $countryCode")
+                log(mname, "BillingConfig country code: $countryCode")
             } else {
                 // TODO: Handle errors
-                Logger.i(LOG_IAB, "err in billing config: ${billingResult.debugMessage}")
+                log(mname, "err in billing config: ${billingResult.debugMessage}")
             }
         }
     }
@@ -1163,7 +1288,7 @@ object InAppBillingHandler : KoinComponent {
                         .build()
                     val retrofitInterface = retrofit.create(ITcpProxy::class.java)
 
-                    val response = retrofitInterface.cancelSubscription(accountId, purchaseToken, DEBUG)
+                    val response = retrofitInterface.cancelSubscription(persistentState.appVersion.toString(), accountId, purchaseToken, DEBUG)
 
                     // 2. Validate response
                     if (response == null) {
@@ -1213,7 +1338,7 @@ object InAppBillingHandler : KoinComponent {
                         .build()
                     val retrofitInterface = retrofit.create(ITcpProxy::class.java)
 
-                    val response = retrofitInterface.revokeSubscription(accountId, purchaseToken, DEBUG)
+                    val response = retrofitInterface.revokeSubscription(persistentState.appVersion.toString(), accountId, purchaseToken, DEBUG)
 
                     // 2. Validate response
                     if (response == null) {
@@ -1264,7 +1389,7 @@ object InAppBillingHandler : KoinComponent {
             .build()
         val retrofitInterface = retrofit.create(ITcpProxy::class.java)
         try {
-            val response = retrofitInterface.queryEntitlement(accountId, DEBUG)
+            val response = retrofitInterface.queryEntitlement(persistentState.appVersion.toString(), accountId, DEBUG)
             logd(mname, "query entitlement response: ${response?.headers()}, ${response?.message()}, ${response?.raw()?.request?.url}")
             if (response == null) {
                 loge(mname, "response is null, failed to query entitlement")
@@ -1307,7 +1432,7 @@ object InAppBillingHandler : KoinComponent {
                     .build()
             val retrofitInterface = retrofit.create(ITcpProxy::class.java)
             val pt = URLEncoder.encode(purchaseToken, "UTF-8")
-            val response = retrofitInterface.acknowledgePurchase(accountId, pt, true)
+            val response = retrofitInterface.acknowledgePurchase(persistentState.appVersion.toString(), accountId, pt, true)
 
             // 2. Validate response
             if (response == null) {

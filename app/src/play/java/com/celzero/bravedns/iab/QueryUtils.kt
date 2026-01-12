@@ -44,6 +44,8 @@ internal class QueryUtils(private val billingClient: BillingClient) {
             "P6M" -> "6 months"
             "P8M" -> "8 months"
             "P1Y" -> "Yearly"
+            "P2Y" -> "2 years"
+            "P5Y" -> "5 years"
             else -> ""
         }
 
@@ -57,6 +59,8 @@ internal class QueryUtils(private val billingClient: BillingClient) {
             "P6M" -> 180
             "P8M" -> 240
             "P1Y" -> 365
+            "P2Y" -> 730
+            "P5Y" -> 1825
             else -> 0
         }
     }

@@ -405,7 +405,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
                     val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
                     val proxyId = id.toString()
                     val proxyName = "Win-US"
-                    val appsAdapter = WgIncludeAppsAdapter(requireContext(), proxyId, proxyName)
+                    val appsAdapter = WgIncludeAppsAdapter(requireContext(), this, proxyId, proxyName)
                     mappingViewModel.apps.observe(viewLifecycleOwner) {
                         appsAdapter.submitData(
                             lifecycle,

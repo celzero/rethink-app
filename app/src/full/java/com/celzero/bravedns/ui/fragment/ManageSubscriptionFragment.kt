@@ -180,7 +180,7 @@ class ManageSubscriptionFragment : Fragment(R.layout.fragment_manage_subscriptio
         val linkWithSubs = link.replace("$1", productId)
         val linkWithSubsAndPackage = linkWithSubs.replace("$2", requireContext().packageName)
         openUrl(requireContext(), linkWithSubsAndPackage)
-        InAppBillingHandler.fetchPurchases(listOf(BillingClient.ProductType.SUBS))
+        InAppBillingHandler.fetchPurchases(listOf(BillingClient.ProductType.SUBS, BillingClient.ProductType.INAPP))
     }
 
     private fun showDialogConfirmCancelOrRevoke(isCancel: Boolean) {
@@ -300,7 +300,7 @@ class ManageSubscriptionFragment : Fragment(R.layout.fragment_manage_subscriptio
                 initView()
             }
             Logger.i(LOG_TAG_UI, "$TAG cancel subscription request sent, success? ${res.first}, msg: ${res.second}")
-            InAppBillingHandler.fetchPurchases(listOf(BillingClient.ProductType.SUBS))
+            InAppBillingHandler.fetchPurchases(listOf(BillingClient.ProductType.SUBS, BillingClient.ProductType.INAPP))
             checkForGracePeriod()
         }
     }
@@ -397,7 +397,7 @@ class ManageSubscriptionFragment : Fragment(R.layout.fragment_manage_subscriptio
                 initView()
             }
             Logger.i(LOG_TAG_UI, "$TAG revoke subscription request sent, success: ${res.first}, msg: ${res.second}")
-            InAppBillingHandler.fetchPurchases(listOf(BillingClient.ProductType.SUBS))
+            InAppBillingHandler.fetchPurchases(listOf(BillingClient.ProductType.SUBS, BillingClient.ProductType.INAPP))
         }
     }
 

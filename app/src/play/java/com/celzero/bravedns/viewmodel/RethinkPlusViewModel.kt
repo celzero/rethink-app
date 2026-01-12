@@ -58,6 +58,17 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
     private val _products = MutableStateFlow<List<ProductDetail>>(emptyList())
     val products: StateFlow<List<ProductDetail>> = _products.asStateFlow()
 
+    // All products (unfiltered)
+    private var allProducts: List<ProductDetail> = emptyList()
+
+    // Product type selection
+    private val _selectedProductType = MutableStateFlow(ProductTypeFilter.SUBSCRIPTION)
+    val selectedProductType: StateFlow<ProductTypeFilter> = _selectedProductType.asStateFlow()
+
+    // Filtered products based on type
+    private val _filteredProducts = MutableStateFlow<List<ProductDetail>>(emptyList())
+    val filteredProducts: StateFlow<List<ProductDetail>> = _filteredProducts.asStateFlow()
+
     // Polling job for pending purchases
     private var pollingJob: Job? = null
     private var pollingStartTime = 0L
@@ -66,6 +77,11 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
         private const val TAG = "RethinkPlusVM"
         private const val POLLING_INTERVAL_MS = 1500L
         private const val POLLING_TIMEOUT_MS = 30000L
+    }
+
+    enum class ProductTypeFilter {
+        SUBSCRIPTION,
+        ONE_TIME
     }
 
     init {
@@ -138,10 +154,10 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
      * Set product details from billing handler
      */
     fun setProducts(productList: List<ProductDetail>) {
-        val subsProducts = productList.filter { it.productType == ProductType.SUBS }
-        _products.value = subsProducts
+        allProducts = productList
+        _products.value = productList
 
-        if (subsProducts.isEmpty()) {
+        if (productList.isEmpty()) {
             _uiState.value = SubscriptionUiState.Error(
                 title = "No Products Available",
                 message = "Unable to load subscription plans",
@@ -150,9 +166,8 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
             return
         }
 
-        // Auto-select first product
-        val first = subsProducts.first()
-        _selectedProduct.value = Pair(first.productId, first.planId)
+        // Filter by current selection
+        filterProductsByType(_selectedProductType.value)
 
         // Check if can make purchase
         val currentState = subscriptionStateMachine.getCurrentState()
@@ -161,7 +176,47 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
             return
         }
 
-        _uiState.value = SubscriptionUiState.Ready(subsProducts)
+        _uiState.value = SubscriptionUiState.Ready(_filteredProducts.value)
+    }
+
+    /**
+     * Filter products by type
+     */
+    private fun filterProductsByType(type: ProductTypeFilter) {
+        val filtered = when (type) {
+            ProductTypeFilter.SUBSCRIPTION -> allProducts.filter { it.productType == ProductType.SUBS }
+            ProductTypeFilter.ONE_TIME -> allProducts.filter { it.productType == ProductType.INAPP }
+        }
+        
+        _filteredProducts.value = filtered
+        Logger.d(LOG_IAB, "$TAG: Filtered products by $type: ${filtered.size} items")
+
+        // Auto-select first product if available
+        if (filtered.isNotEmpty()) {
+            val first = filtered.first()
+            _selectedProduct.value = Pair(first.productId, first.planId)
+        }
+    }
+
+    /**
+     * Switch product type filter
+     */
+    fun selectProductType(type: ProductTypeFilter) {
+        if (_selectedProductType.value == type) return
+        
+        _selectedProductType.value = type
+        filterProductsByType(type)
+        
+        // Update UI state with filtered products
+        if (_filteredProducts.value.isNotEmpty()) {
+            _uiState.value = SubscriptionUiState.Ready(_filteredProducts.value)
+        } else {
+            _uiState.value = SubscriptionUiState.Error(
+                title = "No Products",
+                message = "No ${type.name.lowercase()} products available",
+                isRetryable = false
+            )
+        }
     }
 
     /**
@@ -248,7 +303,7 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
                 }
 
                 Logger.d(LOG_IAB, "$TAG: Polling pending purchase, elapsed: $elapsedTime ms")
-                InAppBillingHandler.fetchPurchases(listOf(ProductType.SUBS))
+                InAppBillingHandler.fetchPurchases(listOf(ProductType.SUBS, ProductType.INAPP))
 
                 // Query entitlement from server once
                 if (counter == 0) {
@@ -295,7 +350,7 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
         } else {
             // Fetch purchases after connection
             viewModelScope.launch(Dispatchers.IO) {
-                InAppBillingHandler.fetchPurchases(listOf(ProductType.SUBS))
+                InAppBillingHandler.fetchPurchases(listOf(ProductType.SUBS, ProductType.INAPP))
             }
         }
     }

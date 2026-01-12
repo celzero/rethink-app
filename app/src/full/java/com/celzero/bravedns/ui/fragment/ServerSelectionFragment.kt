@@ -17,25 +17,25 @@ package com.celzero.bravedns.ui.fragment
 
 import Logger
 import Logger.LOG_TAG_UI
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.database.RpnWinServer
+import com.celzero.bravedns.database.CountryConfig
 import com.celzero.bravedns.databinding.FragmentServerSelectionBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.ui.adapter.CountryServerAdapter
 import com.celzero.bravedns.ui.adapter.VpnServerAdapter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -54,23 +54,28 @@ import kotlin.math.abs
  * - Material Design 3 UI with dark/light mode support
  */
 class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
-    VpnServerAdapter.ServerSelectionListener {
+    VpnServerAdapter.ServerSelectionListener,
+    CountryServerAdapter.CitySelectionListener {
 
     private val b by viewBinding(FragmentServerSelectionBinding::bind)
-    private lateinit var serverAdapter: VpnServerAdapter
+    private lateinit var serverAdapter: CountryServerAdapter
     private lateinit var selectedAdapter: VpnServerAdapter
-    private val allServers = mutableListOf<RpnWinServer>()
-    private val unselectedServers = mutableListOf<RpnWinServer>()
-    private val selectedServers = mutableListOf<RpnWinServer>()
+    private val allServers = mutableListOf<CountryConfig>()
+    private val unselectedServers = mutableListOf<CountryConfig>()
+    private val selectedServers = mutableListOf<CountryConfig>()
     private var selectedServerIds = mutableSetOf<String>()
 
     private val fragmentScope = CoroutineScope(Dispatchers.Main + Job())
     private var statusUpdateJob: Job? = null
+    private var isWinRegistered = false
+    private var autoServer: CountryConfig? = null
 
     companion object {
         private const val MAX_SELECTIONS = 5
         const val EXTRA_SELECTED_SERVERS = "selected_servers"
         private const val TAG = "ServerSelectionFragment"
+        private const val AUTO_SERVER_ID = "AUTO"
+        private const val AUTO_COUNTRY_CODE = "AUTO"
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -83,8 +88,13 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
         // load servers asynchronously from RpnProxyManager
         fragmentScope.launch(Dispatchers.IO) {
+            // Check if WIN is registered
+            isWinRegistered = VpnController.isWinRegistered()
+            Logger.v(LOG_TAG_UI, "$TAG; WIN registered: $isWinRegistered")
+
             val servers = RpnProxyManager.getWinServers()
             Logger.v(LOG_TAG_UI, "$TAG; fetched ${servers.size} servers from RPN")
+
             withContext(Dispatchers.Main) {
                 if (isAdded) {
                     initServers(servers)
@@ -95,23 +105,90 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         animateHeaderEntry()
     }
 
-    private fun initServers(servers: List<RpnWinServer>) {
-        Logger.v(LOG_TAG_UI, "$TAG.initServers: received ${servers.size} servers")
+    override fun onResume() {
+        super.onResume()
+        // Refresh servers from API to ensure we have the latest list
+        // This will also detect and notify about removed selected servers
+        fragmentScope.launch(Dispatchers.IO) {
+            val (refreshedServers, removedServers) = RpnProxyManager.refreshWinServers()
+
+            if (removedServers.isNotEmpty()) {
+                Logger.w(LOG_TAG_UI, "$TAG.onResume: ${removedServers.size} selected servers were removed from the list")
+
+                withContext(Dispatchers.Main) {
+                    if (isAdded && !requireActivity().isFinishing) {
+                        // Show premium notification bottom sheet
+                        val removedNames = removedServers.joinToString(", ") { it.countryName }
+                        Logger.i(LOG_TAG_UI, "$TAG.onResume: showing premium notification for removed servers: $removedNames")
+
+                        try {
+                            val bottomSheet = com.celzero.bravedns.ui.bottomsheet.ServerRemovalNotificationBottomSheet.newInstance(removedServers)
+                            bottomSheet.setOnDismissCallback {
+                                // Update the UI with refreshed server list after user acknowledges
+                                if (isAdded && refreshedServers.isNotEmpty()) {
+                                    initServers(refreshedServers)
+                                }
+                            }
+                            bottomSheet.show(parentFragmentManager, "ServerRemovalNotification")
+                        } catch (e: Exception) {
+                            Logger.e(LOG_TAG_UI, "$TAG.onResume: error showing bottom sheet: ${e.message}", e)
+                            // Fallback: update UI directly if bottom sheet fails
+                            if (refreshedServers.isNotEmpty()) {
+                                initServers(refreshedServers)
+                            }
+                        }
+                    }
+                }
+            } else if (refreshedServers.isNotEmpty()) {
+                // Even if no servers were removed, update the cache with latest data
+                Logger.v(LOG_TAG_UI, "$TAG.onResume: refreshed ${refreshedServers.size} servers, no selected servers removed")
+            }
+        }
+    }
+
+    private fun initServers(servers: List<CountryConfig>) {
+        Logger.v(LOG_TAG_UI, "$TAG.initServers: received ${servers.size} servers, WIN registered: $isWinRegistered")
         allServers.clear()
         allServers.addAll(servers)
 
-        // initial split based on isSelected
+        // Check if there are no servers available
+        if (servers.isEmpty()) {
+            showErrorState()
+            Logger.w(LOG_TAG_UI, "$TAG.initServers: no servers available to display")
+            return
+        }
+
+        // Hide error state if it was showing
+        hideErrorState()
+
+        // Create AUTO server if WIN is registered
+        if (isWinRegistered) {
+            autoServer = createAutoServer()
+        }
+
+        // initial split based on isActive
         selectedServers.clear()
-        selectedServers.addAll(allServers.filter { it.isSelected })
-        selectedServerIds = selectedServers.mapTo(mutableSetOf()) { it.id }
+
+        // If WIN is registered and no servers are selected, AUTO is active
+        if (isWinRegistered && allServers.none { it.isActive }) {
+            autoServer?.let {
+                it.isActive = true
+                selectedServers.add(it)
+                selectedServerIds = mutableSetOf(AUTO_SERVER_ID)
+            }
+        } else {
+            // Add manually selected servers
+            selectedServers.addAll(allServers.filter { it.isActive })
+            selectedServerIds = selectedServers.mapTo(mutableSetOf()) { it.id }
+        }
 
         unselectedServers.clear()
-        unselectedServers.addAll(allServers.filter { !it.isSelected })
+        unselectedServers.addAll(allServers.filter { !it.isActive })
 
-        Logger.v(LOG_TAG_UI, "$TAG.initServers: selected=${selectedServers.size}, unselected=${unselectedServers.size}")
+        Logger.v(LOG_TAG_UI, "$TAG.initServers: selected=${selectedServers.size}, unselected=${unselectedServers.size}, AUTO active=${autoServer?.isActive}")
 
         selectedAdapter.updateServers(selectedServers)
-        serverAdapter.updateServers(unselectedServers)
+        serverAdapter.updateCountries(buildCountries(unselectedServers))
 
         updateSelectedSectionVisibility()
         updateSelectionCount()
@@ -129,7 +206,122 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         Logger.v(LOG_TAG_UI, "$TAG.initServers: completed")
     }
 
+    private fun showErrorState() {
+        if (!isAdded) return
+
+        // Hide all normal UI elements
+        b.rvServers.isVisible = false
+        b.searchCard.isVisible = false
+        b.selectedServersCard.isVisible = false
+        b.emptySelectionCard.isVisible = false
+
+        // Show error state with animation
+        b.errorStateContainer.visibility = View.VISIBLE
+        b.errorStateContainer.alpha = 0f
+        b.errorStateContainer.translationY = 40f
+
+        b.errorStateContainer.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .setDuration(500)
+            .setInterpolator(AccelerateDecelerateInterpolator())
+            .start()
+
+        // Animate illustration
+        b.errorIllustration.alpha = 0f
+        b.errorIllustration.scaleX = 0.8f
+        b.errorIllustration.scaleY = 0.8f
+        b.errorIllustration.animate()
+            .alpha(0.4f)
+            .scaleX(1f)
+            .scaleY(1f)
+            .setStartDelay(200)
+            .setDuration(600)
+            .setInterpolator(AccelerateDecelerateInterpolator())
+            .start()
+
+        // Setup retry button
+        b.errorRetryBtn.setOnClickListener {
+            retryLoadingServers()
+        }
+
+        Logger.e(LOG_TAG_UI, "$TAG.showErrorState: No servers available, showing premium error UI")
+    }
+
+    private fun hideErrorState() {
+        if (!isAdded) return
+
+        // Animate out error state
+        if (b.errorStateContainer.isVisible) {
+            b.errorStateContainer.animate()
+                .alpha(0f)
+                .translationY(-40f)
+                .setDuration(300)
+                .setInterpolator(AccelerateDecelerateInterpolator())
+                .withEndAction {
+                    if (isAdded) {
+                        b.errorStateContainer.visibility = View.GONE
+                    }
+                }
+                .start()
+        }
+
+        // Show normal UI
+        b.rvServers.isVisible = true
+        b.searchCard.isVisible = true
+    }
+
+    private fun retryLoadingServers() {
+        if (!isAdded) return
+
+        Logger.v(LOG_TAG_UI, "$TAG.retryLoadingServers: user requested retry")
+
+        // Show loading state on button
+        b.errorRetryBtn.isEnabled = false
+        b.errorRetryBtn.text = getString(R.string.loading)
+
+        // Reload servers
+        fragmentScope.launch(Dispatchers.IO) {
+            delay(500) // Brief delay for better UX
+
+            isWinRegistered = VpnController.isWinRegistered()
+            val servers = RpnProxyManager.getWinServers()
+            Logger.v(LOG_TAG_UI, "$TAG.retryLoadingServers: fetched ${servers.size} servers")
+
+            withContext(Dispatchers.Main) {
+                if (isAdded) {
+                    b.errorRetryBtn.isEnabled = true
+                    b.errorRetryBtn.text = getString(R.string.server_selection_retry)
+                    initServers(servers)
+                }
+            }
+        }
+    }
+
+    private fun createAutoServer(): CountryConfig {
+        return CountryConfig(
+            id = AUTO_SERVER_ID,
+            cc = AUTO_COUNTRY_CODE,
+            name = "AUTO",
+            address = "",
+            city = "Automatic",
+            key = "auto",
+            load = 0,
+            link = 0,
+            count = 1,
+            isActive = true
+        )
+    }
+
     private fun setupToolbar() {
+        val activity = requireActivity() as AppCompatActivity
+        activity.setSupportActionBar(b.toolbar)
+
+        activity.supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowTitleEnabled(false)
+        }
+
         b.toolbar.setNavigationOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
@@ -178,18 +370,36 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         // Get current server info from selected servers
         if (selectedServers.isNotEmpty()) {
             val currentServer = selectedServers.first()
-            updateCurrentLocation(
-                countryFlag = currentServer.flagEmoji,
-                countryName = currentServer.countryName,
-                locationName = currentServer.serverLocation
-            )
+            // Check if it's AUTO server
+            if (currentServer.id == AUTO_SERVER_ID) {
+                updateCurrentLocation(
+                    countryFlag = "🌐",
+                    countryName = "AUTO",
+                    locationName = "Automatic server selection"
+                )
+            } else {
+                updateCurrentLocation(
+                    countryFlag = currentServer.flagEmoji,
+                    countryName = currentServer.countryName,
+                    locationName = currentServer.serverLocation
+                )
+            }
         } else {
             // Default fallback when no server is selected
-            updateCurrentLocation(
-                countryFlag = "🌐",
-                countryName = "Not Connected",
-                locationName = "Select a server to connect"
-            )
+            if (isWinRegistered) {
+                // If WIN is registered, show AUTO as active
+                updateCurrentLocation(
+                    countryFlag = "🌐",
+                    countryName = "AUTO",
+                    locationName = "Automatic server selection"
+                )
+            } else {
+                updateCurrentLocation(
+                    countryFlag = "🌐",
+                    countryName = "Not Connected",
+                    locationName = "Select a server to connect"
+                )
+            }
         }
     }
 
@@ -268,7 +478,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         Logger.v(LOG_TAG_UI, "$TAG.setupRecyclerViews: initializing adapters")
 
         b.rvServers.layoutManager = LinearLayoutManager(requireContext())
-        serverAdapter = VpnServerAdapter(unselectedServers, this)
+        // main list grouped by country, expanding into city rows
+        serverAdapter = CountryServerAdapter(buildCountries(unselectedServers), this)
         b.rvServers.adapter = serverAdapter
         Logger.v(LOG_TAG_UI, "$TAG.setupRecyclerViews: serverAdapter created and set, itemCount=${serverAdapter.itemCount}")
 
@@ -359,137 +570,150 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         }
     }
 
-    private fun filterServers(query: String) {
-        if (query.isEmpty()) {
-            animateSearchClearButton(false)
-            serverAdapter.updateServers(unselectedServers)
-        } else {
-            animateSearchClearButton(true)
-            val filtered = unselectedServers.filter { server ->
-                server.countryName.contains(query, ignoreCase = true) ||
-                server.countryCode.contains(query, ignoreCase = true) ||
-                server.serverLocation.contains(query, ignoreCase = true)
-            }
-            serverAdapter.updateServers(filtered)
-        }
-    }
-
-    override fun onServerSelected(server: RpnWinServer, isSelected: Boolean) {
-        if (!isAdded) return
-
-        b.root.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
-
-        if (isSelected) {
-            if (selectedServerIds.size >= MAX_SELECTIONS) {
-                b.root.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.server_selection_max_reached, MAX_SELECTIONS),
-                    Toast.LENGTH_SHORT
-                ).show()
-                // Revert
-                server.isSelected = false
-                refreshLists()
-                return
-            }
-            if (!selectedServerIds.contains(server.id)) {
-                selectedServerIds.add(server.id)
-                server.isSelected = true
-                unselectedServers.remove(server)
-                selectedServers.add(server)
-                animateServerSelection()
-                b.root.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
-            }
-        } else {
-            if (selectedServerIds.contains(server.id)) {
-                selectedServerIds.remove(server.id)
-                server.isSelected = false
-                selectedServers.remove(server)
-                unselectedServers.add(server)
-            }
-        }
-        refreshLists()
-        updateVpnStatus()
-    }
-
-    private fun animateServerSelection() {
-        // Subtle pulse animation on status card to indicate selection
-        val scaleUp = ObjectAnimator.ofFloat(b.statusCard, "scaleX", 1f, 1.02f).apply {
-            duration = 100
-        }
-        val scaleDown = ObjectAnimator.ofFloat(b.statusCard, "scaleX", 1.02f, 1f).apply {
-            duration = 100
-        }
-        scaleUp.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                scaleDown.start()
-            }
-        })
-        scaleUp.start()
-    }
-
-    private val serverComparator = Comparator<RpnWinServer> { a, b ->
-        val c = a.countryName.compareTo(b.countryName, ignoreCase = true)
-        if (c != 0) c else a.serverLocation.compareTo(b.serverLocation, ignoreCase = true)
-    }
-
-    private fun refreshLists() {
-        selectedServers.sortWith(serverComparator)
-        unselectedServers.sortWith(serverComparator)
-        selectedAdapter.updateServers(selectedServers)
-
-        val query = b.searchBar.text?.toString().orEmpty()
-        if (query.isNotEmpty()) {
-            val filtered = unselectedServers.filter { server ->
-                server.countryName.contains(query, ignoreCase = true) ||
-                server.countryCode.contains(query, ignoreCase = true) ||
-                server.serverLocation.contains(query, ignoreCase = true)
-            }
-            serverAdapter.updateServers(filtered)
-        } else {
-            serverAdapter.updateServers(unselectedServers)
-        }
-        updateSelectionCount()
-        updateSelectedSectionVisibility()
-    }
-
     private fun updateSelectedSectionVisibility() {
-        if (selectedServers.isNotEmpty()) {
-            b.selectedServersCard.visibility = View.VISIBLE
-            b.emptySelectionCard.visibility = View.GONE
-        } else {
-            b.selectedServersCard.visibility = View.GONE
-            b.emptySelectionCard.visibility = View.VISIBLE
-        }
+        if (!isAdded) return
+        val hasSelection = selectedServers.isNotEmpty()
+        b.selectedServersCard.isVisible = hasSelection
+        b.rvSelectedServers.isVisible = hasSelection
+        b.emptySelectionCard.isVisible = !hasSelection
     }
 
     private fun updateSelectionCount() {
-        val count = selectedServerIds.size
-        Logger.v(LOG_TAG_UI, "$TAG.updateSelectionCount: selectedCount=$count, unselectedCount=${unselectedServers.size}")
+        if (!isAdded) return
+        val total = selectedServers.size
+        b.tvSelectedCount.text =
+            if (total == 0) getString(R.string.server_selection_none_selected)
+            else getString(
+                R.string.server_selection_selected_count,
+                resources.getQuantityString(R.plurals.server_selection_count, total, total),
+                resources.getQuantityString(R.plurals.server_count, MAX_SELECTIONS, MAX_SELECTIONS)
+            )
+    }
 
-        b.tvSelectedCount.text = resources.getQuantityString(
-            R.plurals.server_selection_count,
-            count,
-            count
-        )
+    private fun buildCountries(servers: List<CountryConfig>): List<CountryServerAdapter.CountryItem> {
+        if (servers.isEmpty()) return emptyList()
 
-        b.tvServerCount.text = resources.getQuantityString(
-            R.plurals.server_count,
-            unselectedServers.size,
-            unselectedServers.size
-        )
+        val grouped = servers.groupBy { it.cc }
+        return grouped.map { (cc, serverList) ->
+            val sample = serverList.first()
+            CountryServerAdapter.CountryItem(
+                countryCode = cc,
+                countryName = sample.countryName,
+                flagEmoji = sample.flagEmoji,
+                cities = serverList.map { CountryServerAdapter.CityItem(it) }
+            )
+        }.sortedBy { it.countryName.lowercase() }
+    }
 
-        // empty state for main list
-        if (unselectedServers.isEmpty()) {
-            Logger.v(LOG_TAG_UI, "$TAG.updateSelectionCount: unselectedServers is empty, hiding rvServers")
-            b.rvServers.visibility = View.GONE
-            b.emptyStateLayout.visibility = View.VISIBLE
+    private fun filterServers(query: String) {
+        val searchText = query.trim().lowercase()
+        Logger.v(LOG_TAG_UI, "$TAG.filterServers: query='$searchText'")
+
+        if (searchText.isEmpty()) {
+            serverAdapter.updateCountries(buildCountries(unselectedServers))
+            animateSearchClearButton(false)
+            return
+        }
+
+        val filtered = unselectedServers.filter { server ->
+            server.countryName.lowercase().contains(searchText) ||
+                server.serverLocation.lowercase().contains(searchText) ||
+                server.cc.lowercase().contains(searchText)
+        }
+        serverAdapter.updateCountries(buildCountries(filtered))
+        animateSearchClearButton(true)
+    }
+
+    override fun onServerSelected(server: CountryConfig, isSelected: Boolean) {
+        Logger.v(LOG_TAG_UI, "$TAG.onServerSelected: server=${server.countryName}, city=${server.serverLocation}, isSelected=$isSelected")
+        if (isSelected) {
+            if (selectedServers.size >= MAX_SELECTIONS) {
+                // Fallback simple message since server_selection_limit_reached does not exist
+                Toast.makeText(
+                    requireContext(),
+                    "You can select up to $MAX_SELECTIONS servers.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return
+            }
+            if (selectedServerIds.contains(server.id)) {
+                Toast.makeText(
+                    requireContext(),
+                    "Already selected ${server.countryName}",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return
+            }
+            io {
+                val key = server.key
+                Logger.v(LOG_TAG_UI, "$TAG add rpn${server.countryName}, key=$key")
+                val res = RpnProxyManager.enableWinServer(key)
+                uiCtx {
+                    if (!res.first) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Failed to add ${server.countryName}: ${res.second}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@uiCtx
+                    }
+                    server.isActive = true
+                    selectedServers.add(server)
+                    selectedServerIds.add(server.id)
+                    unselectedServers.removeAll { it.id == server.id }
+                    selectedAdapter.updateServers(selectedServers)
+                    serverAdapter.updateCountries(buildCountries(unselectedServers))
+
+                    updateSelectedSectionVisibility()
+                    updateSelectionCount()
+                }
+            }
         } else {
-            Logger.v(LOG_TAG_UI, "$TAG.updateSelectionCount: unselectedServers has ${unselectedServers.size} items, showing rvServers")
-            b.rvServers.visibility = View.VISIBLE
-            b.emptyStateLayout.visibility = View.GONE
+            server.isActive = false
+            selectedServers.removeAll { it.id == server.id }
+            selectedServerIds.remove(server.id)
+            if (unselectedServers.any { it.id == server.id }) {
+                Toast.makeText(
+                    requireContext(),
+                    "${server.countryName} is already unselected",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return
+            }
+            io {
+                val key = server.key
+                Logger.v(LOG_TAG_UI, "$TAG.onServerSelected: removing WireGuard proxy for server=${server.countryName}, key=$key")
+                val res = RpnProxyManager.disableWinServer(key)
+                uiCtx {
+                    if (!res.first) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Failed to remove ${server.countryName}: ${res.second}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@uiCtx
+                    }
+                    unselectedServers.add(server)
+                    selectedAdapter.updateServers(selectedServers)
+                    serverAdapter.updateCountries(buildCountries(unselectedServers))
+
+                    updateSelectedSectionVisibility()
+                    updateSelectionCount()
+                }
+            }
         }
     }
 
-}
+    // delegate from country/city adapter to existing selection logic
+    override fun onCitySelected(server: CountryConfig, isSelected: Boolean) {
+        onServerSelected(server, isSelected)
+    }
 
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch(Dispatchers.IO) { f() }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
+    }
+}

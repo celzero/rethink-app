@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
@@ -28,23 +29,31 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ServerWgPeersAdapter
+import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.databinding.ActivityServerWgDetailBinding
 import com.celzero.bravedns.database.CountryConfig
 import com.celzero.bravedns.service.CountryConfigManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.ProxyManager
+import com.celzero.bravedns.service.ProxyManager.ID_RPN_WIN
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.Utilities.tos
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.celzero.bravedns.wireguard.Config
-import com.celzero.bravedns.wireguard.Peer
-import com.celzero.bravedns.wireguard.WgInterface
+import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
+import com.celzero.firestack.backend.Proxy
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.getValue
+import kotlin.math.abs
 
 /**
  * Activity for viewing and editing server-provided WireGuard configurations
@@ -54,17 +63,42 @@ import org.koin.android.ext.android.inject
 class ServerWgConfigDetailActivity : AppCompatActivity(R.layout.activity_server_wg_detail) {
     private val b by viewBinding(ActivityServerWgDetailBinding::bind)
     private val persistentState by inject<PersistentState>()
+    private val mappingViewModel: ProxyAppsMappingViewModel by viewModel()
 
     private var serverWgPeersAdapter: ServerWgPeersAdapter? = null
     private var layoutManager: LinearLayoutManager? = null
 
     private var configId: Int = WireguardManager.INVALID_CONF_ID
-    private var wgInterface: WgInterface? = null
-    private val peers: MutableList<Peer> = mutableListOf()
-    private var countryCode: String? = null
+    private var countryCode: String = ""
+    private var proxy: Proxy? = null
+    private var countryConfig: CountryConfig? = null
 
     // Available listen ports
     private val availableListenPorts = listOf(80, 443, 8080, 9110)
+
+    // SSID permission callback for country configs
+    private val ssidPermissionCallback = object : com.celzero.bravedns.util.SsidPermissionManager.PermissionCallback {
+        override fun onPermissionsGranted() {
+            Logger.vv(LOG_TAG_UI, "ssid-callback permissions granted for country: $countryCode")
+            lifecycleScope.launch {
+                refreshSsidSection()
+            }
+        }
+
+        override fun onPermissionsDenied() {
+            Logger.vv(LOG_TAG_UI, "ssid-callback permissions denied for country: $countryCode")
+            lifecycleScope.launch {
+                // Reset the switch since permissions are required
+                b.ssidCheck.isChecked = false
+                refreshSsidSection()
+            }
+        }
+
+        override fun onPermissionsRationale() {
+            Logger.vv(LOG_TAG_UI, "ssid-callback permissions rationale for country: $countryCode")
+            showSsidPermissionExplanationDialog()
+        }
+    }
 
     companion object {
         const val INTENT_EXTRA_SERVER_ID = "SERVER_WG_CONFIG_ID"
@@ -90,7 +124,7 @@ class ServerWgConfigDetailActivity : AppCompatActivity(R.layout.activity_server_
         }
 
         configId = intent.getIntExtra(INTENT_EXTRA_SERVER_ID, WireguardManager.INVALID_CONF_ID)
-        countryCode = intent.getStringExtra(INTENT_EXTRA_COUNTRY_CODE)
+        countryCode = intent.getStringExtra(INTENT_EXTRA_COUNTRY_CODE) ?: ""
 
         // Setup toolbar
         setSupportActionBar(b.toolbar)
@@ -104,6 +138,9 @@ class ServerWgConfigDetailActivity : AppCompatActivity(R.layout.activity_server_
         b.toolbar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
+
+        // Setup smooth collapsing animation for hero content
+        setupCollapsingAnimation()
     }
 
     override fun onResume() {
@@ -122,15 +159,19 @@ class ServerWgConfigDetailActivity : AppCompatActivity(R.layout.activity_server_
         )
 
         // Load config if ID is valid
-        val config = WireguardManager.getConfigById(configId)
-
-        if (config == null) {
-            showInvalidConfigDialog()
-            return
+        io {
+            proxy = VpnController.getWinByKey(countryCode)
+            val appCount = ProxyManager.getAppsCountForProxy(proxy?.id().tos() ?: "")
+            uiCtx {
+                if (countryCode.isEmpty() || proxy == null) {
+                    showInvalidConfigDialog()
+                    return@uiCtx
+                }
+                b.appsLabel.text = "Apps($appCount)"
+                prefillConfig(proxy)
+                setupListenPortSpinner()
+            }
         }
-
-        prefillConfig(config)
-        setupListenPortSpinner()
     }
 
     private fun showInvalidConfigDialog() {
@@ -145,37 +186,31 @@ class ServerWgConfigDetailActivity : AppCompatActivity(R.layout.activity_server_
         dialog.show()
     }
 
-    private fun prefillConfig(config: Config) {
-        wgInterface = config.getInterface()
-        peers.clear()
-        peers.addAll(config.getPeers() ?: emptyList())
-
-        if (wgInterface == null) {
-            return
-        }
+    private fun prefillConfig(proxy: Proxy?) {
+        if (proxy == null) return
 
         b.configNameText.visibility = View.VISIBLE
-        b.configNameText.text = config.getName()
+        b.configNameText.text = proxy.addr.tos()
         b.configIdText.text =
-            getString(R.string.single_argument_parenthesis, config.getId().toString())
+            getString(R.string.single_argument_parenthesis, proxy.id().toString())
 
         b.statusText.text = getString(R.string.lbl_server_config_readonly)
 
+        val router = proxy.router()
+
         // Pre-fill MTU (read-only)
-        if (wgInterface?.mtu?.isPresent == true) {
-            b.mtuText.text = wgInterface?.mtu?.get().toString()
-            b.mtuText.visibility = View.VISIBLE
-        }
+        b.mtuText.text = router.mtu().toString()
+        b.mtuText.visibility = View.VISIBLE
 
         // Load switch states
         loadConfigSettings()
 
-        setPeersAdapter()
+        // setPeersAdapter()
     }
 
     private fun loadConfigSettings() {
         val cc = countryCode
-        if (cc == null) {
+        if (cc.isEmpty()) {
             // Hide settings cards if no country code
             b.otherSettingsCard.visibility = View.GONE
             b.mobileSsidSettingsCard.visibility = View.GONE
@@ -187,7 +222,6 @@ class ServerWgConfigDetailActivity : AppCompatActivity(R.layout.activity_server_
             val config = CountryConfigManager.getConfig(cc)
             withContext(Dispatchers.Main) {
                 if (config != null) {
-                    b.lockdownCheck.isChecked = config.lockdown
                     b.catchAllCheck.isChecked = config.catchAll
                     b.useMobileCheck.isChecked = config.mobileOnly
                     b.ssidCheck.isChecked = config.ssidBased
@@ -195,10 +229,24 @@ class ServerWgConfigDetailActivity : AppCompatActivity(R.layout.activity_server_
                     b.mobileSsidSettingsCard.visibility = View.VISIBLE
                 } else {
                     // Create default config if it doesn't exist
+                    // should not happen normally
                     CountryConfigManager.upsertConfig(
                         CountryConfig(
+                            id = cc,                 // or "WIN-$cc" if you prefer
                             cc = cc,
-                            enabled = true,
+                            name = cc,               // you can replace with a nicer label later
+                            address = "",
+                            city = "",
+                            key = cc,                // can be adjusted once you have a proper key
+                            load = 0,
+                            link = 0,
+                            count = 0,
+                            isActive = true,
+                            catchAll = false,
+                            lockdown = false,
+                            mobileOnly = false,
+                            ssidBased = false,
+                            priority = 0,
                             lastModified = System.currentTimeMillis()
                         )
                     )
@@ -219,13 +267,13 @@ class ServerWgConfigDetailActivity : AppCompatActivity(R.layout.activity_server_
         b.listenPortSpinner.adapter = adapter
 
         // Set current listen port if present
-        if (wgInterface?.listenPort?.isPresent == true) {
+        /*if (wgInterface?.listenPort?.isPresent == true) {
             val currentPort = wgInterface?.listenPort?.get()
             val position = availableListenPorts.indexOf(currentPort)
             if (position >= 0) {
                 b.listenPortSpinner.setSelection(position)
             }
-        }
+        }*/
 
         // Make read-only for server configs
         b.listenPortSpinner.isEnabled = false
@@ -234,7 +282,7 @@ class ServerWgConfigDetailActivity : AppCompatActivity(R.layout.activity_server_
     private fun setupClickListeners() {
         // Applications button
         b.applicationsBtn.setOnClickListener {
-            openApplicationsDialog()
+            openAppsDialog()
         }
 
         // Hop button
@@ -253,20 +301,6 @@ class ServerWgConfigDetailActivity : AppCompatActivity(R.layout.activity_server_
             b.otherSettingsCard.visibility = View.GONE
             b.mobileSsidSettingsCard.visibility = View.GONE
             return
-        }
-
-        // Lockdown mode toggle - uses CountryConfigManager
-        b.lockdownCheck.setOnCheckedChangeListener { _, isChecked ->
-            lifecycleScope.launch(Dispatchers.IO) {
-                CountryConfigManager.updateLockdown(cc, isChecked)
-                withContext(Dispatchers.Main) {
-                    Utilities.showToastUiCentered(
-                        this@ServerWgConfigDetailActivity,
-                        if (isChecked) "Lockdown mode enabled" else "Lockdown mode disabled",
-                        Toast.LENGTH_SHORT
-                    )
-                }
-            }
         }
 
         // Catch all mode toggle - uses CountryConfigManager
@@ -297,45 +331,23 @@ class ServerWgConfigDetailActivity : AppCompatActivity(R.layout.activity_server_
             }
         }
 
-        // SSID filter toggle - uses CountryConfigManager
-        b.ssidCheck.setOnCheckedChangeListener { _, isChecked ->
-            lifecycleScope.launch(Dispatchers.IO) {
-                CountryConfigManager.updateSsidBased(cc, isChecked)
-                withContext(Dispatchers.Main) {
-                    Utilities.showToastUiCentered(
-                        this@ServerWgConfigDetailActivity,
-                        if (isChecked) "SSID filter enabled" else "SSID filter disabled",
-                        Toast.LENGTH_SHORT
-                    )
-                }
-            }
-        }
+        // Setup SSID section with premium dialog and permission handling
+        setupSsidSection(cc)
 
         // Layout click listeners for better UX
-        b.lockdownRl.setOnClickListener { b.lockdownCheck.performClick() }
         b.catchAllRl.setOnClickListener { b.catchAllCheck.performClick() }
         b.useMobileRl.setOnClickListener { b.useMobileCheck.performClick() }
         b.ssidFilterRl.setOnClickListener { b.ssidCheck.performClick() }
     }
 
-    private fun setPeersAdapter() {
+    /*private fun setPeersAdapter() {
         layoutManager = LinearLayoutManager(this)
         b.peersList.layoutManager = layoutManager
         serverWgPeersAdapter = ServerWgPeersAdapter(this, peers) { position, isExpanded ->
             // Handle peer expansion if needed
         }
         b.peersList.adapter = serverWgPeersAdapter
-    }
-
-    private fun openApplicationsDialog() {
-        Utilities.showToastUiCentered(
-            this,
-            "Add/Remove Apps - Coming Soon",
-            Toast.LENGTH_SHORT
-        )
-        // TODO: Implement ProxyAppMappingActivity navigation
-        // Similar to WgConfigDetailActivity implementation
-    }
+    }*/
 
     private fun openHopDialog() {
         Utilities.showToastUiCentered(
@@ -355,6 +367,232 @@ class ServerWgConfigDetailActivity : AppCompatActivity(R.layout.activity_server_
         )
         // TODO: Implement WgLogActivity navigation
         // Similar to WgConfigDetailActivity implementation
+    }
+
+    private fun openAppsDialog() {
+        if (countryCode.isEmpty() || proxy == null) {
+            Logger.e(LOG_TAG_UI, "win-openAppsDialog: countryCode is null")
+            return
+        }
+
+        val proxyId = proxy?.id().tos() ?: (ID_RPN_WIN + countryCode)
+        val proxyName = countryCode
+        val appsAdapter = WgIncludeAppsAdapter(this, this, proxyId, proxyName)
+        mappingViewModel.apps.observe(this) { appsAdapter.submitData(lifecycle, it) }
+        var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        if (Themes.isFrostTheme(themeId)) {
+            themeId = R.style.App_Dialog_NoDim
+        }
+        val includeAppsDialog =
+            WgIncludeAppsDialog(this, appsAdapter, mappingViewModel, themeId, proxyId, proxyName)
+        includeAppsDialog.setCanceledOnTouchOutside(false)
+        includeAppsDialog.show()
+    }
+
+    private fun setupCollapsingAnimation() {
+        b.appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+            val totalScrollRange = appBarLayout.totalScrollRange
+            val percentage = abs(verticalOffset).toFloat() / totalScrollRange.toFloat()
+
+            // Fade out hero content as toolbar collapses
+            b.configNameText.alpha = 1f - percentage
+            b.statusText.alpha = 1f - percentage
+            b.configIdText.alpha = 1f - percentage
+
+            // Scale down hero content slightly for premium effect
+            val scale = 1f - (percentage * 0.1f) // Scale from 1.0 to 0.9
+            b.configNameText.scaleX = scale
+            b.configNameText.scaleY = scale
+        }
+    }
+
+    // ===== SSID Section Implementation =====
+
+    private fun setupSsidSection(cc: String) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            countryConfig = com.celzero.bravedns.rpnproxy.RpnProxyManager.getCountryConfig(cc)
+            withContext(Dispatchers.Main) {
+                setupSsidSectionUI(countryConfig)
+            }
+        }
+    }
+
+    private fun setupSsidSectionUI(config: CountryConfig?) {
+        val sw = b.ssidCheck
+
+        if (config == null) {
+            sw.isEnabled = false
+            Logger.w(LOG_TAG_UI, "setupSsidSection: config is null for $countryCode")
+            return
+        }
+
+        // Check if device supports required features
+        if (!com.celzero.bravedns.util.SsidPermissionManager.isDeviceSupported(this)) {
+            sw.isEnabled = false
+            b.ssidFilterRl.visibility = View.GONE
+            Logger.w(LOG_TAG_UI, "setupSsidSection: device not supported for SSID feature")
+            return
+        }
+
+        // Always keep the switch enabled
+        sw.isEnabled = true
+        b.ssidFilterRl.visibility = View.VISIBLE
+
+        // Check permissions and location services
+        val hasPermissions = com.celzero.bravedns.util.SsidPermissionManager.hasRequiredPermissions(this)
+        val isLocationEnabled = com.celzero.bravedns.util.SsidPermissionManager.isLocationEnabled(this)
+
+        val enabled = config.ssidBased
+        val ssidItems = com.celzero.bravedns.data.SsidItem.parseStorageList(config.ssids)
+        sw.isChecked = enabled
+
+        Logger.d(LOG_TAG_UI, "SSID for $countryCode - permissions: $hasPermissions, location: $isLocationEnabled, ssidBased: $enabled, items: ${ssidItems.size}")
+
+        sw.setOnCheckedChangeListener { _, isChecked ->
+            // Check current permissions and location status dynamically
+            val currentHasPermissions = com.celzero.bravedns.util.SsidPermissionManager.hasRequiredPermissions(this)
+            val currentLocationEnabled = com.celzero.bravedns.util.SsidPermissionManager.isLocationEnabled(this)
+
+            // Check permissions before enabling SSID feature
+            if (isChecked && !currentHasPermissions) {
+                com.celzero.bravedns.util.SsidPermissionManager.checkAndRequestPermissions(this, ssidPermissionCallback)
+                Logger.d(LOG_TAG_UI, "SSID permissions not granted, requesting...")
+                return@setOnCheckedChangeListener
+            }
+
+            // Check if location services are enabled
+            if (isChecked && !currentLocationEnabled) {
+                showLocationEnableDialog()
+                Logger.d(LOG_TAG_UI, "Location services not enabled, prompting user...")
+                return@setOnCheckedChangeListener
+            }
+
+            // If we reach here, either we're disabling or we have all required permissions
+            lifecycleScope.launch(Dispatchers.IO) {
+                com.celzero.bravedns.rpnproxy.RpnProxyManager.updateSsidBased(countryCode, isChecked)
+                withContext(Dispatchers.Main) {
+                    if (isChecked) {
+                        openSsidDialog()
+                    }
+                }
+            }
+
+            Logger.i(LOG_TAG_UI, "SSID feature ${if (isChecked) "enabled" else "disabled"} for country: $countryCode")
+        }
+    }
+
+    private fun refreshSsidSection() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            countryConfig = com.celzero.bravedns.rpnproxy.RpnProxyManager.getCountryConfig(countryCode)
+            withContext(Dispatchers.Main) {
+                setupSsidSectionUI(countryConfig)
+            }
+        }
+    }
+
+    private fun openSsidDialog() {
+        if (countryCode.isEmpty() || countryConfig == null) {
+            Logger.e(LOG_TAG_UI, "openSsidDialog: countryCode or config is null")
+            return
+        }
+
+        val currentSsids = countryConfig?.ssids ?: ""
+        val countryName = countryConfig?.countryName ?: countryCode
+
+        var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        if (Themes.isFrostTheme(themeId)) {
+            themeId = R.style.App_Dialog_NoDim
+        }
+
+        val ssidDialog = com.celzero.bravedns.ui.dialog.CountrySsidDialog(
+            this,
+            themeId,
+            countryCode,
+            countryName,
+            currentSsids
+        ) { newSsids ->
+            // Save callback - update the SSID configuration
+            lifecycleScope.launch(Dispatchers.IO) {
+                com.celzero.bravedns.rpnproxy.RpnProxyManager.updateSsids(countryCode, newSsids)
+                withContext(Dispatchers.Main) {
+                    refreshSsidSection()
+                    Utilities.showToastUiCentered(
+                        this@ServerWgConfigDetailActivity,
+                        "SSID settings saved for $countryName",
+                        Toast.LENGTH_SHORT
+                    )
+                }
+            }
+        }
+
+        ssidDialog.setCanceledOnTouchOutside(false)
+        ssidDialog.show()
+        ssidDialog.setOnDismissListener {
+            // Refresh SSID section after dialog dismisses
+            refreshSsidSection()
+        }
+    }
+
+    private fun showLocationEnableDialog() {
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+        builder.setTitle(getString(R.string.ssid_location_error))
+        builder.setMessage(getString(R.string.location_enable_explanation, getString(R.string.lbl_ssids)))
+        builder.setCancelable(true)
+        builder.setPositiveButton(getString(R.string.ssid_location_error_action)) { dialog, _ ->
+            com.celzero.bravedns.util.SsidPermissionManager.requestLocationEnable(this)
+            dialog.dismiss()
+            Logger.vv(LOG_TAG_UI, "Prompted user to enable location services for country: $countryCode")
+        }
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
+            // Reset the SSID switch since location is required
+            b.ssidCheck.isChecked = false
+            lifecycleScope.launch(Dispatchers.IO) {
+                com.celzero.bravedns.rpnproxy.RpnProxyManager.updateSsidBased(countryCode, false)
+            }
+        }
+        builder.create().show()
+    }
+
+    private fun showSsidPermissionExplanationDialog() {
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+        builder.setTitle(getString(R.string.ssid_permission_error_action))
+        builder.setMessage(getString(R.string.ssid_permission_explanation, getString(R.string.lbl_ssids)))
+        builder.setCancelable(true)
+        builder.setPositiveButton(getString(R.string.ssid_permission_error_action)) { dialog, _ ->
+            com.celzero.bravedns.util.SsidPermissionManager.requestSsidPermissions(this)
+            dialog.dismiss()
+            Logger.vv(LOG_TAG_UI, "Showing SSID permission rationale dialog for country: $countryCode")
+        }
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
+            // Reset the SSID switch since permissions are required
+            b.ssidCheck.isChecked = false
+            lifecycleScope.launch(Dispatchers.IO) {
+                com.celzero.bravedns.rpnproxy.RpnProxyManager.updateSsidBased(countryCode, false)
+            }
+        }
+        builder.create().show()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        com.celzero.bravedns.util.SsidPermissionManager.handlePermissionResult(
+            requestCode,
+            permissions,
+            grantResults,
+            ssidPermissionCallback
+        )
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch(Dispatchers.IO) { f() }
+    }
+
+    private suspend fun uiCtx(f: () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 }
 

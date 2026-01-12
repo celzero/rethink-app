@@ -44,6 +44,7 @@ import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.ProductDetail
 import com.celzero.bravedns.iab.PurchaseDetail
 import com.celzero.bravedns.ui.bottomsheet.PurchaseProcessingBottomSheet
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.RethinkPlusViewModel
 import com.celzero.bravedns.viewmodel.SubscriptionUiState
@@ -55,14 +56,19 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     GooglePlaySubsAdapter.SubscriptionChangeListener,
     BillingListener {
 
-    private val binding by viewBinding(FragmentRethinkPlusPremiumBinding::bind)
+    private val b by viewBinding(FragmentRethinkPlusPremiumBinding::bind)
     private val viewModel: RethinkPlusViewModel by viewModels()
 
     private var adapter: GooglePlaySubsAdapter? = null
     private var processingBottomSheet: PurchaseProcessingBottomSheet? = null
 
+    // timeout job to avoid keeping the processing bottom sheet forever
+    private var processingTimeoutJob: kotlinx.coroutines.Job? = null
+    private var shouldRecheckOnResume: Boolean = false
+
     companion object {
         private const val TAG = "R+Ui"
+        private const val PROCESSING_TIMEOUT_MS = 60_000L
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -77,21 +83,97 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     private fun setupUI() {
         setupRecyclerView()
         setupTermsAndPolicy()
+        setupProductTypeToggle()
     }
 
     private fun setupRecyclerView() {
-        binding.subscriptionPlans.apply {
+        b.subscriptionPlans.apply {
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
         }
     }
 
     private fun setupTermsAndPolicy() {
-        binding.termsText.apply {
+        b.termsText.apply {
             text = updateHtmlEncodedText(getString(R.string.rethink_terms))
             movementMethod = LinkMovementMethod.getInstance()
             highlightColor = Color.TRANSPARENT
         }
+    }
+
+    private fun setupProductTypeToggle() {
+        // Set initial state
+        updateToggleState(RethinkPlusViewModel.ProductTypeFilter.SUBSCRIPTION)
+
+        b.btnSubscription.setOnClickListener {
+            animateButtonPress(it)
+            viewModel.selectProductType(RethinkPlusViewModel.ProductTypeFilter.SUBSCRIPTION)
+        }
+
+        b.btnOneTime.setOnClickListener {
+            animateButtonPress(it)
+            viewModel.selectProductType(RethinkPlusViewModel.ProductTypeFilter.ONE_TIME)
+        }
+    }
+
+    private fun updateToggleState(selectedType: RethinkPlusViewModel.ProductTypeFilter) {
+        when (selectedType) {
+            RethinkPlusViewModel.ProductTypeFilter.SUBSCRIPTION -> {
+                b.btnSubscription.apply {
+                    setBackgroundColor(UIUtils.fetchColor(requireContext(), R.attr.accentGood))
+                    setTextColor(UIUtils.fetchColor(requireContext(), android.R.attr.textColorPrimaryInverse))
+                }
+                b.btnOneTime.apply {
+                    setBackgroundColor(Color.TRANSPARENT)
+                    setTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor))
+                }
+            }
+            RethinkPlusViewModel.ProductTypeFilter.ONE_TIME -> {
+                b.btnOneTime.apply {
+                    setBackgroundColor(UIUtils.fetchColor(requireContext(), R.attr.accentGood))
+                    setTextColor(UIUtils.fetchColor(requireContext(), android.R.attr.textColorPrimaryInverse))
+                }
+                b.btnSubscription.apply {
+                    setBackgroundColor(Color.TRANSPARENT)
+                    setTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor))
+                }
+            }
+        }
+
+        // Update subscribe button text based on product type and resubscribe state
+        val isResubscribe = checkIfResubscribe()
+        updateSubscribeButtonText(selectedType, isResubscribe)
+    }
+
+    /**
+     * Update subscribe button text based on product type and resubscribe state
+     */
+    private fun updateSubscribeButtonText(
+        productType: RethinkPlusViewModel.ProductTypeFilter,
+        isResubscribe: Boolean = false
+    ) {
+        b.subscribeButton.text = when (productType) {
+            RethinkPlusViewModel.ProductTypeFilter.SUBSCRIPTION -> {
+                if (isResubscribe) {
+                    getString(R.string.resubscribe_title)
+                } else {
+                    getString(R.string.subscribe_now)
+                }
+            }
+            RethinkPlusViewModel.ProductTypeFilter.ONE_TIME -> {
+                getString(R.string.purchase_now)
+            }
+        }
+    }
+
+    // Track resubscribe state
+    private var isResubscribeState: Boolean = false
+
+    /**
+     * Check if user needs to resubscribe (e.g., cancelled subscription)
+     */
+    private fun checkIfResubscribe(): Boolean {
+        return isResubscribeState
     }
 
     private fun setupObservers() {
@@ -111,6 +193,16 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
                     selection?.let {
                         Logger.d(Logger.LOG_IAB, "$TAG: Selected product: ${it.first}, plan: ${it.second}")
                     }
+                }
+            }
+        }
+
+        // observe product type filter changes
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.selectedProductType.collect { productType ->
+                    Logger.d(Logger.LOG_IAB, "$TAG: Product type changed to: ${productType.name}")
+                    updateToggleState(productType)
                 }
             }
         }
@@ -167,7 +259,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
      */
     private fun showLoading() {
         hideAllContainers()
-        binding.loadingContainer.isVisible = true
+        b.loadingContainer.isVisible = true
         startShimmer()
     }
 
@@ -178,21 +270,20 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         hideAllContainers()
         stopShimmer()
 
-        binding.scrollView.isVisible = true
-        binding.subscribeButtonContainer.isVisible = true
+        b.scrollView.isVisible = true
+        b.subscribeButtonContainer.isVisible = true
 
-        // update button text
-        binding.subscribeButton.text = if (isResubscribe) {
-            getString(R.string.resubscribe_title)
-        } else {
-            getString(R.string.subscribe_title)
-        }
+        // Store resubscribe state
+        isResubscribeState = isResubscribe
+
+        // update button text based on product type and resubscribe state
+        updateSubscribeButtonText(viewModel.selectedProductType.value, isResubscribe)
 
         // set adapter data
         if (adapter == null) {
             // create adapter with products and showShimmer = false
             adapter = GooglePlaySubsAdapter(this, requireContext(), products, 0, false)
-            binding.subscriptionPlans.adapter = adapter
+            b.subscriptionPlans.adapter = adapter
         } else {
             adapter?.setData(products)
         }
@@ -209,6 +300,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             PurchaseProcessingBottomSheet.ProcessingState.Processing,
             message
         )
+        startProcessingTimeout()
     }
 
     /**
@@ -219,16 +311,29 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             PurchaseProcessingBottomSheet.ProcessingState.PendingVerification,
             null
         )
+        startProcessingTimeout()
     }
 
     /**
      * Show success state
      */
     private fun showSuccess(productId: String) {
+        // cancel any timeout since we have a result
+        cancelProcessingTimeout()
+
+        // show success state in bottom sheet
         showProcessingBottomSheet(
             PurchaseProcessingBottomSheet.ProcessingState.Success,
             getString(R.string.subscription_activated)
         )
+
+        // show subscription animation dialog immediately on successful purchase
+        try {
+            com.celzero.bravedns.ui.dialog.SubscriptionAnimDialog()
+                .show(childFragmentManager, "SubscriptionAnimDialog")
+        } catch (e: Exception) {
+            Logger.w(Logger.LOG_IAB, "$TAG: err showing subscription anim dialog: ${e.message}")
+        }
 
         // Navigate after delay
         viewLifecycleOwner.lifecycleScope.launch {
@@ -241,16 +346,17 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
      * Show error state
      */
     private fun showError(title: String, message: String, isRetryable: Boolean) {
-        // dismiss any processing bottom sheet
+        // dismiss any processing bottom sheet and cancel timeout
+        cancelProcessingTimeout()
         dismissProcessingBottomSheet()
 
         hideAllContainers()
         stopShimmer()
 
-        binding.errorContainer.isVisible = true
-        binding.errorTitle.text = title
-        binding.errorMessage.text = message
-        binding.retryButton.isVisible = isRetryable
+        b.errorContainer.isVisible = true
+        b.errorTitle.text = title
+        b.errorMessage.text = message
+        b.retryButton.isVisible = isRetryable
     }
 
     /**
@@ -288,8 +394,8 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
      * Dismiss processing bottom sheet
      */
     private fun dismissProcessingBottomSheet() {
+        cancelProcessingTimeout()
         try {
-            // use dismissAllowingStateLoss to avoid IllegalStateException
             processingBottomSheet?.dismissAllowingStateLoss()
         } catch (e: Exception) {
             Logger.w(Logger.LOG_IAB, "$TAG: err dismissing btmsht: ${e.message}")
@@ -298,26 +404,45 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         }
     }
 
+    private fun startProcessingTimeout() {
+        cancelProcessingTimeout()
+        processingTimeoutJob = viewLifecycleOwner.lifecycleScope.launch {
+            delay(PROCESSING_TIMEOUT_MS)
+            // if still showing processing, dismiss and notify user
+            if (isAdded && processingBottomSheet?.isAdded == true) {
+                Logger.w(Logger.LOG_IAB, "$TAG: processing timeout reached, dismissing bottom sheet")
+                dismissProcessingBottomSheet()
+                shouldRecheckOnResume = true
+                showTransactionError(getString(R.string.subscription_processing_timeout))
+            }
+        }
+    }
+
+    private fun cancelProcessingTimeout() {
+        processingTimeoutJob?.cancel()
+        processingTimeoutJob = null
+    }
+
     /**
      * Hide all container views
      */
     private fun hideAllContainers() {
-        binding.loadingContainer.isVisible = false
-        binding.scrollView.isVisible = false
-        binding.subscribeButtonContainer.isVisible = false
-        binding.errorContainer.isVisible = false
+        b.loadingContainer.isVisible = false
+        b.scrollView.isVisible = false
+        b.subscribeButtonContainer.isVisible = false
+        b.errorContainer.isVisible = false
     }
 
     /**
      * Setup click listeners
      */
     private fun setupClickListeners() {
-        binding.subscribeButton.setOnClickListener {
+        b.subscribeButton.setOnClickListener {
             animateButtonPress(it)
             purchaseSubscription()
         }
 
-        binding.retryButton.setOnClickListener {
+        b.retryButton.setOnClickListener {
             animateButtonPress(it)
             viewModel.retry()
         }
@@ -334,7 +459,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     }
 
     /**
-     * Purchase subscription
+     * Purchase subscription or one-time product based on current selection
      */
     private fun purchaseSubscription() {
         val selection = viewModel.selectedProduct.value
@@ -348,8 +473,17 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         }
 
         val (productId, planId) = selection
+        val productType = viewModel.selectedProductType.value
+
         lifecycleScope.launch {
-            InAppBillingHandler.purchaseSubs(requireActivity(), productId, planId)
+            when (productType) {
+                RethinkPlusViewModel.ProductTypeFilter.SUBSCRIPTION -> {
+                    InAppBillingHandler.purchaseSubs(requireActivity(), productId, planId)
+                }
+                RethinkPlusViewModel.ProductTypeFilter.ONE_TIME -> {
+                    InAppBillingHandler.purchaseOneTime(requireActivity(), productId, planId)
+                }
+            }
         }
     }
 
@@ -371,21 +505,21 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
      * Shimmer animations
      */
     private fun startShimmer() {
-        if (!binding.shimmerContainer.isShimmerStarted) {
+        if (!b.shimmerContainer.isShimmerStarted) {
             val shimmer = Shimmer.AlphaHighlightBuilder()
                 .setDuration(2000)
                 .setBaseAlpha(0.85f)
                 .setDropoff(1f)
                 .setHighlightAlpha(0.35f)
                 .build()
-            binding.shimmerContainer.setShimmer(shimmer)
-            binding.shimmerContainer.startShimmer()
+            b.shimmerContainer.setShimmer(shimmer)
+            b.shimmerContainer.startShimmer()
         }
     }
 
     private fun stopShimmer() {
-        if (binding.shimmerContainer.isShimmerStarted) {
-            binding.shimmerContainer.stopShimmer()
+        if (b.shimmerContainer.isShimmerStarted) {
+            b.shimmerContainer.stopShimmer()
         }
     }
 
@@ -393,8 +527,8 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
      * Animate content entrance
      */
     private fun animateContentEntrance() {
-        binding.scrollView.alpha = 0f
-        binding.scrollView.animate()
+        b.scrollView.alpha = 0f
+        b.scrollView.animate()
             .alpha(1f)
             .setDuration(300)
             .start()
@@ -447,8 +581,13 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
 
     override fun onResume() {
         super.onResume()
-        if (binding.loadingContainer.isVisible) {
+        if (b.loadingContainer.isVisible) {
             startShimmer()
+        }
+        // if a timeout occurred earlier, trigger a fresh billing re-check on resume
+        if (shouldRecheckOnResume) {
+            shouldRecheckOnResume = false
+            viewModel.initializeBilling()
         }
     }
 
@@ -459,6 +598,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
 
     override fun onDestroyView() {
         super.onDestroyView()
+        cancelProcessingTimeout()
         dismissProcessingBottomSheet()
         adapter = null
     }

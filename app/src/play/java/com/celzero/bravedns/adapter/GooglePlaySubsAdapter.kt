@@ -23,8 +23,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.android.billingclient.api.BillingClient.ProductType
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ItemPremiumFeatureBinding
 import com.celzero.bravedns.databinding.ListItemPlaySubsBinding
 import com.celzero.bravedns.databinding.ListItemShimmerCardBinding
 import com.celzero.bravedns.iab.InAppBillingHandler
@@ -39,17 +39,14 @@ class GooglePlaySubsAdapter(val listener: SubscriptionChangeListener, val contex
         private const val SHIMMER_ITEM_COUNT = 2
         private const val VIEW_TYPE_SHIMMER = 0
         private const val VIEW_TYPE_REAL = 1
-        private const val VIEW_TYPE_OTHER = 2
         private const val RETHINK_TITLE = " (Rethink: DNS + Firewall + VPN)"
     }
 
     override fun getItemViewType(position: Int): Int {
         return if (showShimmer) {
             VIEW_TYPE_SHIMMER
-        } else if (position == 0) {
-            VIEW_TYPE_REAL
         } else {
-            VIEW_TYPE_OTHER
+            VIEW_TYPE_REAL
         }
     }
 
@@ -64,11 +61,8 @@ class GooglePlaySubsAdapter(val listener: SubscriptionChangeListener, val contex
         return if (viewType == VIEW_TYPE_SHIMMER) {
             val binding = ListItemShimmerCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             ShimmerViewHolder(binding)
-        } else if (viewType == VIEW_TYPE_OTHER) {
-            val binding = ListItemPlaySubsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            SubscriptionPlansViewHolderS(binding)
         } else {
-            val binding = ItemPremiumFeatureBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            val binding = ListItemPlaySubsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             SubscriptionPlansViewHolder(binding)
         }
     }
@@ -90,11 +84,6 @@ class GooglePlaySubsAdapter(val listener: SubscriptionChangeListener, val contex
                 holder.shimmerLayout.startShimmer()
             }
             is SubscriptionPlansViewHolder -> {
-                // First item with premium layout
-                holder.bind(pds[position], position)
-            }
-            is SubscriptionPlansViewHolderS -> {
-                // Other items with old layout
                 holder.bind(pds[position], position)
             }
         }
@@ -118,78 +107,7 @@ class GooglePlaySubsAdapter(val listener: SubscriptionChangeListener, val contex
         val shimmerLayout: ShimmerFrameLayout = binding.shimmerViewContainer
     }
 
-    inner class SubscriptionPlansViewHolderS(private val binding: ListItemPlaySubsBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        fun bind(prod: ProductDetail, pos: Int) {
-            // remove (Rethink: DNS + Firewall + VPN) from the title
-            val pricing = prod.pricingDetails.firstOrNull() ?: return
-            val title = pricing.planTitle.replace(RETHINK_TITLE, "")
-            var offerPrice = ""
-            var originalPrice = ""
-
-            prod.pricingDetails.forEach {
-                if (it.freeTrialPeriod > 0) {
-                    offerPrice = "Trial period: ${it.freeTrialPeriod} days"
-                } else if (it.recurringMode == InAppBillingHandler.RecurringMode.DISCOUNTED && it.price.isNotEmpty()) {
-                    offerPrice = it.price
-                } else if (it.recurringMode == InAppBillingHandler.RecurringMode.ORIGINAL && it.price.isNotEmpty()) {
-                    originalPrice = it.price
-                }
-            }
-
-            if (offerPrice.isEmpty()) {
-                binding.originalPrice.visibility = View.GONE
-                binding.offerPrice.text = originalPrice
-            } else {
-                binding.offerPrice.text = offerPrice
-                binding.originalPrice.visibility = View.VISIBLE
-                binding.originalPrice.paintFlags =
-                    binding.offerPrice.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                binding.originalPrice.text = originalPrice
-            }
-
-            binding.productName.text = title
-
-            setCardStroke(selectedPos == pos)
-            Logger.d(
-                LOG_TAG_UI,
-                "Product Title: $title (${selectedPos == pos}), Price: $originalPrice, Offer: $offerPrice"
-            )
-            setupClickListeners(prod, pos)
-        }
-
-        private fun setupClickListeners(prod: ProductDetail, pos: Int) {
-            binding.subsCard.setOnClickListener {
-                // update the selected item
-                selectedPos = pos
-                // inform the activity about the selected item
-                listener.onSubscriptionSelected(prod.productId, prod.planId)
-                Logger.d(LOG_IAB, "Selected Subscription: ${prod.productId}, ${prod.planId}")
-                notifyDataSetChanged()
-            }
-        }
-
-        private fun setCardStroke(checked: Boolean) {
-            if (checked) {
-                binding.subsCard.strokeWidth = 2
-            } else {
-                binding.subsCard.strokeWidth = 0
-            }
-            binding.subsCard.strokeColor = getStrokeColorForStatus(checked)
-        }
-
-        private fun getStrokeColorForStatus(isActive: Boolean): Int {
-            return if (isActive) {
-                fetchColor(context, R.attr.accentGood)
-            } else {
-                fetchColor(context, R.attr.chipBgColorNeutral)
-
-            }
-        }
-    }
-
-    inner class SubscriptionPlansViewHolder(private val binding: ItemPremiumFeatureBinding) :
+    inner class SubscriptionPlansViewHolder(private val binding: ListItemPlaySubsBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(prod: ProductDetail, pos: Int) {
@@ -203,7 +121,7 @@ class GooglePlaySubsAdapter(val listener: SubscriptionChangeListener, val contex
              * Pricing Phase: ORIGINAL, Price: ₹210, Currency: INR, Plan Title: Monthly, Billing Period: P1M, Price Amount Micros: 210000000, Free Trial Period: 0, cycleCount: 0
              */
             // Extract plan title and clean it
-            val planTitle = pricing.planTitle.replace(" ", "")
+            val planTitle = pricing.planTitle
 
             // Variables for pricing logic
             var currentPrice = ""
@@ -262,11 +180,7 @@ class GooglePlaySubsAdapter(val listener: SubscriptionChangeListener, val contex
             }
 
             // 6. Billing Info
-            val billingText = if (isYearly) {
-                "Billed annually • Cancel anytime"
-            } else {
-                "Billed monthly • Cancel anytime"
-            }
+            val billingText = getBillingText(prod.productType, pricing.billingPeriod)
             binding.billingInfo.text = billingText
 
             // 7. Free Trial Container
@@ -340,6 +254,39 @@ class GooglePlaySubsAdapter(val listener: SubscriptionChangeListener, val contex
             } else {
                 binding.planCard.strokeWidth = 0
                 binding.planCard.strokeColor = fetchColor(context, R.attr.chipBgColorNeutral)
+            }
+        }
+
+        /**
+         * Get billing text based on product type and billing period
+         * Supports: Monthly (P1M), Yearly (P1Y), 2 Years (P2Y), 5 Years (P5Y)
+         * For one-time purchases (INAPP), shows "One-time payment"
+         */
+        private fun getBillingText(productType: String, billingPeriod: String): String {
+            // Check if it's a one-time purchase (INAPP)
+            if (productType == ProductType.INAPP) {
+                return "One-time payment • No recurring charges"
+            }
+
+            // Parse billing period for subscriptions
+            // as of now, only monthly and yearly plans are available
+            return when {
+                billingPeriod.contains("P1M", ignoreCase = true) -> {
+                    "Billed monthly • Cancel anytime"
+                }
+                billingPeriod.contains("P1Y", ignoreCase = true) -> {
+                    "Billed annually • Cancel anytime"
+                }
+                billingPeriod.contains("P2Y", ignoreCase = true) -> {
+                    "Billed every 2 years • Cancel anytime"
+                }
+                billingPeriod.contains("P5Y", ignoreCase = true) -> {
+                    "Billed every 5 years • Cancel anytime"
+                }
+                else -> {
+                    // Fallback for unknown billing periods
+                    "Subscription • Cancel anytime"
+                }
             }
         }
     }
