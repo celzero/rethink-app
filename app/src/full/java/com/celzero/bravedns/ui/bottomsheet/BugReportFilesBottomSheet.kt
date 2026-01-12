@@ -38,8 +38,11 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastO
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.useTransparentNoDimBackground
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -91,7 +94,22 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
 
     override fun onStart() {
         super.onStart()
-        dialog?.useTransparentNoDimBackground()
+        dialog?.window?.let { window ->
+            if (isAtleastQ()) {
+                val controller = WindowInsetsControllerCompat(window, window.decorView)
+                controller.isAppearanceLightNavigationBars = false
+                window.isNavigationBarContrastEnforced = false
+            }
+        }
+        dialog?.let {
+            val bottomSheet = it.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+            bottomSheet?.layoutParams?.height = ViewGroup.LayoutParams.MATCH_PARENT
+        }
+        (dialog as? BottomSheetDialog)?.behavior?.apply {
+            skipCollapsed = true
+            state = BottomSheetBehavior.STATE_EXPANDED
+            isDraggable = true
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -572,4 +590,3 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
         TEXT
     }
 }
-

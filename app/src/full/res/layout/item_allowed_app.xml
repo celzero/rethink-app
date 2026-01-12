@@ -31,7 +31,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:layout_gravity="center"
-                tools:src="@drawable/ic_launcher_foreground" />
+                tools:src="@drawable/default_app_icon" />
 
         </androidx.cardview.widget.CardView>
 

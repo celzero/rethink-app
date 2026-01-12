@@ -27,7 +27,6 @@ import java.util.Collections
 import java.util.Locale
 import java.util.Objects
 import java.util.Optional
-import java.util.stream.Collectors
 
 /**
  * Represents the configuration for a WireGuard interface (an [WgInterface] block). Interfaces must
@@ -39,35 +38,37 @@ import java.util.stream.Collectors
 class WgInterface private constructor(builder: Builder) {
 
 
-    private val addresses: Set<InetNetwork> // The collection is already immutable.
+    // Defensively copy to ensure immutability even if the Builder is reused.
+    private val addresses: Set<InetNetwork> =
+        Collections.unmodifiableSet(LinkedHashSet(builder.addresses)) // The collection is already immutable.
 
     /**
      * Returns the set of DNS servers associated with the interface.
      *
      * @return a set of [InetAddress]es
      */
-    val dnsServers: Set<InetAddress>
+    val dnsServers: Set<InetAddress> = Collections.unmodifiableSet(LinkedHashSet(builder.dnsServers))
 
     /**
      * Returns the set of DNS search domains associated with the interface.
      *
      * @return a set of strings
      */
-    val dnsSearchDomains: Set<String>
+    val dnsSearchDomains: Set<String> = Collections.unmodifiableSet(LinkedHashSet(builder.dnsSearchDomains))
 
     /**
      * Returns the set of applications excluded from using the interface.
      *
      * @return a set of package names
      */
-    val excludedApplications: Set<String>
+    val excludedApplications: Set<String> = Collections.unmodifiableSet(LinkedHashSet(builder.excludedApplications))
 
     /**
      * Returns the set of applications included exclusively for using the interface.
      *
      * @return a set of package names
      */
-    val includedApplications: Set<String>
+    val includedApplications: Set<String> = Collections.unmodifiableSet(LinkedHashSet(builder.includedApplications))
     private val keyPair: KeyPair
 
     /**
@@ -96,14 +97,6 @@ class WgInterface private constructor(builder: Builder) {
     val mtu: Optional<Int>
 
     init {
-        // Defensively copy to ensure immutability even if the Builder is reused.
-        addresses = Collections.unmodifiableSet(LinkedHashSet(builder.addresses))
-        dnsServers = Collections.unmodifiableSet(LinkedHashSet(builder.dnsServers))
-        dnsSearchDomains = Collections.unmodifiableSet(LinkedHashSet(builder.dnsSearchDomains))
-        excludedApplications =
-            Collections.unmodifiableSet(LinkedHashSet(builder.excludedApplications))
-        includedApplications =
-            Collections.unmodifiableSet(LinkedHashSet(builder.includedApplications))
         keyPair = Objects.requireNonNull(builder.keyPair, "Interfaces must have a private key")!!
         listenPort = builder.listenPort
         mtu = builder.mtu
@@ -247,9 +240,8 @@ class WgInterface private constructor(builder: Builder) {
         if (dnsServers.isNotEmpty()) {
             val dnsServerStrings =
                 dnsServers
-                    .stream()
-                    .map { obj: InetAddress -> obj.hostAddress }
-                    .collect(Collectors.toList())
+                    .mapNotNull { it.hostAddress }
+                    .toMutableList()
             dnsServerStrings.addAll(dnsSearchDomains)
             sb.append("DNS = ").append(Attribute.join(dnsServerStrings)).append('\n')
         }
@@ -326,9 +318,8 @@ class WgInterface private constructor(builder: Builder) {
     fun toWgUserspaceString(skipListenPort: Boolean): String {
         val dnsServerStrings =
             dnsServers
-                .stream()
-                .map { obj: InetAddress -> obj.hostAddress }
-                .collect(Collectors.toList())
+                .mapNotNull { it.hostAddress }
+                .toMutableList()
         dnsServerStrings.addAll(dnsSearchDomains)
 
         val sb = StringBuilder()
@@ -541,7 +532,7 @@ class WgInterface private constructor(builder: Builder) {
         }
 
         fun excludeApplications(applications: Collection<String>?): Builder {
-            excludedApplications.addAll(applications!!)
+            applications?.let { excludedApplications.addAll(it) }
             return this
         }
 
@@ -551,7 +542,7 @@ class WgInterface private constructor(builder: Builder) {
         }
 
         fun includeApplications(applications: Collection<String>?): Builder {
-            includedApplications.addAll(applications!!)
+            applications?.let { includedApplications.addAll(it) }
             return this
         }
 
@@ -586,12 +577,33 @@ class WgInterface private constructor(builder: Builder) {
             }
         }
 
+        @Throws(BadConfigException::class)
         fun parseExcludedApplications(apps: CharSequence?): Builder {
-            return excludeApplications(null)
+            return try {
+                if (apps == null) return this
+                for (app in Attribute.split(apps)) {
+                    if (app.isNotEmpty()) {
+                        excludeApplication(app)
+                    }
+                }
+                this
+            } catch (e: Exception) {
+                throw BadConfigException(Section.INTERFACE, Location.EXCLUDED_APPLICATIONS, e)
+            }
         }
 
         fun parseIncludedApplications(apps: CharSequence?): Builder {
-            return includeApplications(null)
+            return try {
+                if (apps == null) return this
+                for (app in Attribute.split(apps)) {
+                    if (app.isNotEmpty()) {
+                        includeApplication(app)
+                    }
+                }
+                this
+            } catch (e: Exception) {
+                throw BadConfigException(Section.INTERFACE, Location.INCLUDED_APPLICATIONS, e)
+            }
         }
 
         @Throws(BadConfigException::class)

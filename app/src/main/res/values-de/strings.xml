@@ -368,7 +368,7 @@
     <string name="ada_ip_no_connection">Keine Netzwerkprotokolle für diese Kategorie.</string>
     <string name="ada_app_status_block">ist blockiert</string>
     <string name="ada_app_status_block_wifi">wird in nicht gebührenpflichtigen Netzwerken (Wlan) blockiert</string>
-    <string name="ada_app_status_isolate">ist isoliert; nur vertrauenswürdige IPs erlaubt</string>
+    <string name="ada_app_status_isolate">ist isoliert; nur vertrauenswürdige IPs und Domains erlaubt</string>
     <string name="ada_app_status_unknown">ist unbekannt</string>
     <string name="ada_app_status_whitelist">umgeht die universellen Firewall-Regeln</string>
     <string name="rbl_parental_control" description="The text appears as part of the blocklist setup screen as categories or headlines">Elterliche Kontrolle</string>
@@ -1207,8 +1207,8 @@
     <string name="ssid_location_error_action" translatable="true">Standort aktivieren</string>
     <string name="wg_ssid_and_mobile_err" translatable="true">%1$s und %2$s können nicht gleichzeitig verwendet werden</string>
     <string name="wg_ssid_input_hint" translatable="true">WLAN-Kennung eingeben (%1$s)</string>
-    <string name="wg_ssid_type_exact" translatable="true">Genau</string>
-    <string name="wg_ssid_type_wildcard" translatable="true">Teilweise</string>
+    <string name="wg_ssid_type_exact" translatable="true">Exakte Übereinstimmung</string>
+    <string name="wg_ssid_type_wildcard" translatable="true">Teilweise Übereinstimmung</string>
     <string name="wg_ssid_invalid_error" translatable="true">Wi-Fi-Kennungen (%1$s) dürfen maximal 32 Zeichen lang sein.</string>
     <string name="wg_ssid_delete_confirmation" translatable="true">%1$s löschen?</string>
     <string name="settings_firebase_error_reporting_heading" translatable="true">Stabilitätsprogramm</string>
@@ -1226,4 +1226,5 @@
     <string name="settings_tunnel_metered" translatable="true">Immer getaktet</string>
     <string name="settings_tunnel_metered_desc" translatable="true">Markiere den VPN-Tunnel als getaktet, um Apps anzuweisen, weniger Daten zu verbrauchen. Achtung: Dies kann dazu führen, dass Apps große Uploads und Downloads, wie z. B. Backups, unterbrechen.</string>
     <string name="stability_program_toast" translatable="true">Für das <i>Stabilitätsprogramm</i> für <i>experimentelle Funktionen</i> angemeldet.</string>
+    <string name="dns_record_types_auto_mode_status" translatable="true">Automaisch (Alle Arten)</string>
 </resources>

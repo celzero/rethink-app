@@ -42,8 +42,8 @@ class RethinkListBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetRethinkListBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
-    private val b
-        get() = _binding!!
+    private val b: BottomSheetRethinkListBinding
+        get() = _binding ?: throw IllegalStateException("Binding is only valid between onCreateView and onDestroyView")
 
     private val persistentState by inject<PersistentState>()
 
@@ -51,7 +51,7 @@ class RethinkListBottomSheet : BottomSheetDialogFragment() {
     private var recyclerAdapter: RethinkEndpointAdapter? = null
     private val viewModel: RethinkEndpointViewModel by viewModel()
 
-    private var filter: Int = 1
+    private val filter: Int = 1
 
     override fun getTheme(): Int =
         Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
@@ -95,7 +95,7 @@ class RethinkListBottomSheet : BottomSheetDialogFragment() {
         recyclerAdapter = RethinkEndpointAdapter(requireContext(), get())
         viewModel.setFilter(filter)
         viewModel.rethinkEndpointList.observe(viewLifecycleOwner) {
-            recyclerAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
+            recyclerAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
         }
         b.bsrRethinkListRecycler.adapter = recyclerAdapter
     }
@@ -111,5 +111,10 @@ class RethinkListBottomSheet : BottomSheetDialogFragment() {
             ConfigureRethinkBasicActivity.FragmentLoader.REMOTE.ordinal
         )
         startActivity(intent)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

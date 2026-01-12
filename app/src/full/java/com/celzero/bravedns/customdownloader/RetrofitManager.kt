@@ -28,6 +28,10 @@ import java.util.concurrent.TimeUnit
 class RetrofitManager {
 
     companion object {
+        private const val CONNECT_TIMEOUT_MINUTES = 1L
+        private const val READ_TIMEOUT_MINUTES = 20L
+        private const val WRITE_TIMEOUT_MINUTES = 5L
+
         enum class OkHttpDnsType {
             DEFAULT,
             CLOUDFLARE,
@@ -56,9 +60,9 @@ class RetrofitManager {
 
         fun okHttpClient(isRinRActive: Boolean): OkHttpClient {
             val b = OkHttpClient.Builder()
-            b.connectTimeout(1, TimeUnit.MINUTES)
-            b.readTimeout(20, TimeUnit.MINUTES)
-            b.writeTimeout(5, TimeUnit.MINUTES)
+            b.connectTimeout(CONNECT_TIMEOUT_MINUTES, TimeUnit.MINUTES)
+            b.readTimeout(READ_TIMEOUT_MINUTES, TimeUnit.MINUTES)
+            b.writeTimeout(WRITE_TIMEOUT_MINUTES, TimeUnit.MINUTES)
             b.retryOnConnectionFailure(true)
             // If unset, the system-wide default DNS will be used.
             // no need to add custom dns if rinr is not active, as the connections will be routed

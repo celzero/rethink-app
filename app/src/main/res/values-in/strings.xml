@@ -815,7 +815,7 @@
     <string name="settings_locale_desc">Pilih bahasa pilihan Anda</string>
     <string name="fapps_info_bypass_msg">Mengabaikan (Bypass) aturan firewall universal.</string>
     <string name="fapps_firewall_filter_isolate">Diisolasi</string>
-    <string name="ada_app_status_isolate">sudah diisolasi; hanya IP terpercaya yang diizinkan</string>
+    <string name="ada_app_status_isolate">terisolasi; hanya IP dan domain tepercaya yang diizinkan</string>
     <string name="settings_locale_dialog_title">Pilih bahasa pilihan Anda</string>
     <string name="settings_locale_dialog_neutral">Bantu kami terjemahkan aplikasi ini</string>
     <string name="hs_biometeric_feature_not_supported">Otentikasi biometrik tidak didukung atau dinonaktifkan pada perangkat ini</string>
@@ -1222,8 +1222,8 @@
     <string name="wg_ssid_and_mobile_err" translatable="true">Tidak dapat menggunakan keduanya, %1$s dan %2$s</string>
     <string name="wg_ssid_dialog_description" translatable="true">%1$s VPN WireGuard ini saat <i>aktif</i> Identifikasi Wi-Fi (%2$s) %3$s.</string>
     <string name="wg_ssid_input_hint" translatable="true">Masukkan identifikasi Wi-Fi (%1$s)</string>
-    <string name="wg_ssid_type_exact" translatable="true">Tepat</string>
-    <string name="wg_ssid_type_wildcard" translatable="true">Sebagian</string>
+    <string name="wg_ssid_type_exact" translatable="true">Cocok sepenuhnya</string>
+    <string name="wg_ssid_type_wildcard" translatable="true">Cocok sebagian</string>
     <string name="wg_ssid_invalid_error" translatable="true">Identifier Wi-Fi (%1$s) harus terdiri dari 32 karakter atau kurang.</string>
     <string name="wg_ssid_delete_confirmation" translatable="true">Hapus %1$s?</string>
     <string name="settings_firebase_error_reporting_heading" translatable="true">Program Stabilitas</string>
@@ -1240,4 +1240,18 @@
     <string name="settings_tunnel_metered" translatable="true">Selalu diukur</string>
     <string name="settings_tunnel_metered_desc" translatable="true">Atur tunnel VPN Mark Rethink sebagai tunnel bermeteran untuk menginstruksikan aplikasi agar menggunakan data lebih sedikit. Perhatian: Hal ini dapat menyebabkan aplikasi menghentikan sementara unggahan dan unduhan besar, seperti cadangan data.</string>
     <string name="stability_program_toast" translatable="true">Daftar ke <i>program stabilitas</i> untuk <i>fitur eksperimental</i>.</string>
+    <string name="search_event_logs" translatable="true"><font size="12">Cari acara, pesan</font></string>
+    <string name="bug_report_files_desc" translatable="true">Pilih file yang ingin Anda sertakan dalam email laporan bug</string>
+    <string name="bug_report_deselect_all" translatable="true">Batalkan semua pilihan</string>
+    <string name="bug_report_no_files_selected" translatable="true">Silakan pilih setidaknya satu file</string>
+    <string name="bug_report_creating_zip" translatable="true">Membuat arsip…</string>
+    <string name="bug_report_file_not_found" translatable="true">File tidak ditemukan</string>
+    <string name="bug_report_error_opening_file" translatable="true">Tidak dapat membuka jenis file ini</string>
+    <string name="bug_report_delete_confirmation" translatable="true">Apakah Anda yakin ingin menghapus \"%1$s\"?</string>
+    <string name="bug_report_file_deleted" translatable="true">File \"%1$s\" telah dihapus</string>
+    <string name="bug_report_delete_failed" translatable="true">Gagal menghapus \"%1$s\"</string>
+    <string name="bug_report_no_files_available" translatable="true">Tidak ada file laporan bug yang tersedia</string>
+    <string name="cd_allowed_dns_record_types_heading" translatable="true">Jenis catatan DNS yang diizinkan</string>
+    <string name="cd_allowed_dns_record_types_desc" translatable="true">Pilih jenis catatan sumber daya DNS yang diizinkan.</string>
+    <string name="dns_record_types_auto_mode_status" translatable="true">Otomatis (Semua jenis)</string>
 </resources>

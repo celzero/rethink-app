@@ -60,7 +60,14 @@ object TunnelImporter : KoinComponent {
                     }
                 }
                 if (name.isEmpty()) {
-                    name = Uri.decode(uri.lastPathSegment)
+                    val lastPathSegment = uri.lastPathSegment
+                    if (lastPathSegment.isNullOrEmpty()) {
+                        throw IllegalArgumentException(context.getString(R.string.illegal_filename_error, uri.toString()))
+                    }
+                    name = Uri.decode(lastPathSegment)
+                }
+                if (name.isEmpty()) {
+                    throw IllegalArgumentException(context.getString(R.string.illegal_filename_error, uri.toString()))
                 }
                 var idx = name.lastIndexOf('/')
                 if (idx >= 0) {
@@ -71,13 +78,17 @@ object TunnelImporter : KoinComponent {
                 }
                 val isZip = name.lowercase().endsWith(".zip")
                 if (name.lowercase().endsWith(".conf")) {
-                    name = name.substring(0, name.length - ".conf".length)
+                    name = name.dropLast(".conf".length)
                 } else {
                     require(isZip) { context.getString(R.string.bad_extension_error) }
                 }
 
                 if (isZip) {
-                    ZipInputStream(contentResolver.openInputStream(uri)).use { zip ->
+                    val inputStream =
+                        contentResolver.openInputStream(uri) ?: throw IllegalArgumentException(
+                            context.getString(R.string.import_error, "Cannot open file: $name")
+                        )
+                    ZipInputStream(inputStream).use { zip ->
                         val reader = BufferedReader(InputStreamReader(zip, StandardCharsets.UTF_8))
                         var entry: ZipEntry?
                         while (true) {
@@ -91,7 +102,7 @@ object TunnelImporter : KoinComponent {
                                 name = name.substring(name.lastIndexOf('/') + 1)
                             }
                             if (name.lowercase().endsWith(".conf")) {
-                                name = name.substring(0, name.length - ".conf".length)
+                                name = name.dropLast(".conf".length)
                             } else {
                                 continue
                             }
@@ -108,7 +119,11 @@ object TunnelImporter : KoinComponent {
                         }
                     }
                 } else {
-                    config = Config.parse(contentResolver.openInputStream(uri)!!)
+                    val inputStream =
+                        contentResolver.openInputStream(uri) ?: throw IllegalArgumentException(
+                            context.getString(R.string.import_error, "Cannot open file: $name")
+                        )
+                    config = Config.parse(inputStream)
                     WireguardManager.addConfig(config, name)
                 }
 

@@ -79,6 +79,24 @@ object ErrorMessages {
                 val explanation = getBadConfigExceptionExplanation(context, rootCause)
                 context.getString(R.string.bad_config_error, reason, ctx) + explanation
             }
+            rootCause is NullPointerException -> {
+                // Provide specific error for NPE instead of generic error
+                val message = rootCause.message
+                if (message != null && message.isNotEmpty()) {
+                    context.getString(R.string.import_error, "Invalid configuration: $message")
+                } else {
+                    context.getString(R.string.import_error, "Configuration file contains missing or invalid required fields")
+                }
+            }
+            rootCause is IllegalArgumentException -> {
+                // Handle illegal argument exceptions with their message
+                val message = rootCause.message
+                if (message != null && message.isNotEmpty()) {
+                    message
+                } else {
+                    context.getString(R.string.import_error, "Invalid configuration format")
+                }
+            }
             rootCause.localizedMessage != null -> {
                 rootCause.localizedMessage!!
             }

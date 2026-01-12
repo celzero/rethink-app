@@ -63,17 +63,26 @@ class AppDownloadManager(
 
     // various download status used as part of Work manager.
     enum class DownloadManagerStatus(val id: Int) {
-        NOT_AVAILABLE(-5),
-        NOT_STARTED(-4),
-        FAILURE(-3),
-        NOT_REQUIRED(-2),
-        IN_PROGRESS(-1),
-        STARTED(0),
-        SUCCESS(1)
+        NOT_AVAILABLE(STATUS_NOT_AVAILABLE),
+        NOT_STARTED(STATUS_NOT_STARTED),
+        FAILURE(STATUS_FAILURE),
+        NOT_REQUIRED(STATUS_NOT_REQUIRED),
+        IN_PROGRESS(STATUS_IN_PROGRESS),
+        STARTED(STATUS_STARTED),
+        SUCCESS(STATUS_SUCCESS)
     }
 
     companion object {
         private const val INVALID_DOWNLOAD_ID = -1L
+
+        // Download status constants
+        private const val STATUS_NOT_AVAILABLE = -5
+        private const val STATUS_NOT_STARTED = -4
+        private const val STATUS_FAILURE = -3
+        private const val STATUS_NOT_REQUIRED = -2
+        private const val STATUS_IN_PROGRESS = -1
+        private const val STATUS_STARTED = 0
+        private const val STATUS_SUCCESS = 1
 
         // WorkManager delay constant
         private const val WORK_INITIAL_DELAY_SECONDS = 10L
