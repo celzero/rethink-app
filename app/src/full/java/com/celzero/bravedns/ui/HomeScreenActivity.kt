@@ -20,6 +20,7 @@ import Logger.LOG_TAG_APP_UPDATE
 import Logger.LOG_TAG_BACKUP_RESTORE
 import Logger.LOG_TAG_DOWNLOAD
 import Logger.LOG_TAG_UI
+import android.app.ActivityManager
 import android.app.UiModeManager
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -146,6 +147,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         updateNewVersion()
 
         setupNavigationItemSelectedListener()
+
 
         // handle intent receiver for backup/restore
         handleIntent()
@@ -756,25 +758,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         )
     }
 
-    private fun updateRethinkPlusHighlight() {
-        val btmNavView = findViewById<BottomNavigationView>(R.id.nav_view) ?: run {
-            Logger.w(LOG_TAG_UI, "BottomNavigationView (R.id.nav_view) not found")
-            return
-        }
-
-        val menu = btmNavView.menu
-        val rethinkPlusItem = menu.findItem(R.id.rethinkPlus)
-        if (rethinkPlusItem != null) {
-            try {
-                rethinkPlusItem.setIcon(R.drawable.ic_rethink_plus_sparkle)
-                btmNavView.removeBadge(R.id.rethinkPlus)
-            } catch (e: Exception) {
-                Logger.e(LOG_TAG_UI, "Failed to update rethinkPlus icon/badge: ${e.message}", e)
-            }
-        } else {
-            Logger.w(LOG_TAG_UI, "Menu item R.id.rethinkPlus not present in BottomNavigationView")
-        }
-    }
 
     private fun setupNavigationItemSelectedListener() {
         val btmNavView = findViewById<BottomNavigationView>(R.id.nav_view) ?: run {
@@ -831,11 +814,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                     }
                 }
             }
-        }
-
-        // Sync highlight with nav changes, guard call to update method
-        navController?.addOnDestinationChangedListener { _, _, _ ->
-            updateRethinkPlusHighlight()
         }
     }
 
