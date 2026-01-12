@@ -82,4 +82,20 @@ class ProxyAppMappingRepository(
             // catch the exception to avoid crash
         }
     }
+
+    suspend fun getProxiesForApp(uid: Int, packageName: String): List<ProxyApplicationMapping> {
+        return proxyApplicationMappingDAO.getProxiesForApp(uid, packageName)
+    }
+
+    suspend fun getProxyIdsForApp(uid: Int, packageName: String): List<String> {
+        return proxyApplicationMappingDAO.getProxyIdsForApp(uid, packageName)
+    }
+
+    suspend fun getAppsForProxy(proxyId: String): List<ProxyApplicationMapping> {
+        return proxyApplicationMappingDAO.getAppsForProxy(proxyId)
+    }
+
+    suspend fun deleteMapping(uid: Int, packageName: String, proxyId: String) {
+        proxyApplicationMappingDAO.deleteMapping(uid, packageName, proxyId)
+    }
 }
