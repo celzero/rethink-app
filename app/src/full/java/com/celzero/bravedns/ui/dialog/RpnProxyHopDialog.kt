@@ -17,60 +17,50 @@ package com.celzero.bravedns.ui.dialog
 
 import android.app.Activity
 import com.celzero.bravedns.adapter.HopItem
-import com.celzero.bravedns.service.WireguardManager
-import android.app.Dialog
-import android.os.Bundle
-import android.view.Window
-import android.view.WindowManager
-import android.view.animation.Animation
-import android.view.animation.RotateAnimation
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.celzero.bravedns.adapter.WgHopAdapter
-import com.celzero.bravedns.databinding.DialogWgHopBinding
-import com.celzero.bravedns.wireguard.Config
+import com.celzero.bravedns.database.CountryConfig
 
 /**
- * Dialog for WireGuard configuration hopping
- * Now extends GenericHopDialog to reuse common hop logic
+ * Dialog for RPN proxy country-based hopping
+ * Extends GenericHopDialog to reuse common hop logic
  */
-class WgHopDialog(
+class RpnProxyHopDialog(
     activity: Activity,
     themeID: Int,
-    srcId: Int,
-    configs: List<Config>,
-    selectedId: Int,
+    srcCountryCode: String,
+    availableCountries: List<CountryConfig>,
+    selectedCountryCode: String?,
     onHopChanged: ((Int) -> Unit)? = null
 ) : GenericHopDialog(
     activity,
     themeID,
-    srcId,
-    configs.map { config ->
-        val mapping = WireguardManager.getConfigFilesById(config.getId())
-        HopItem.WireGuardHop(config, mapping?.isActive ?: false)
+    srcCountryCode.hashCode(),
+    availableCountries.map { countryConfig ->
+        HopItem.RpnProxyHop(countryConfig, countryConfig.isActive)
     },
-    selectedId,
+    selectedCountryCode?.hashCode() ?: -1,
     onHopChanged
 ) {
     companion object {
         /**
-         * Create WireGuard hop dialog
+         * Create RPN proxy hop dialog
          */
         fun create(
             activity: Activity,
             themeID: Int,
-            srcConfigId: Int,
-            availableConfigs: List<Config>,
-            currentlySelectedConfigId: Int = -1,
+            srcCountryCode: String,
+            availableCountries: List<CountryConfig>,
+            currentlySelectedCountryCode: String? = null,
             onHopChanged: ((Int) -> Unit)? = null
-        ): WgHopDialog {
-            return WgHopDialog(
+        ): RpnProxyHopDialog {
+            return RpnProxyHopDialog(
                 activity,
                 themeID,
-                srcConfigId,
-                availableConfigs,
-                currentlySelectedConfigId,
+                srcCountryCode,
+                availableCountries,
+                currentlySelectedCountryCode,
                 onHopChanged
             )
         }
     }
 }
+

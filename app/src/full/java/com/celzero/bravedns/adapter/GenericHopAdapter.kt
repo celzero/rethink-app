@@ -27,13 +27,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ListItemWgHopBinding
-import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
+import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.WgHopManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -41,22 +40,20 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * Adapter for WireGuard configuration hopping
- * 
- * NOTE: For new implementations, consider using GenericHopAdapter which supports
- * both WireGuard configs and RPN proxies through the HopItem sealed interface.
- * This adapter is kept for backwards compatibility.
+ * Generic adapter for hopping between different proxy types
+ * Supports both WireGuard configs and RPN proxies through HopItem sealed class
  */
-class WgHopAdapter(
+class GenericHopAdapter(
     private val context: Context,
+    private val lifecycleOwner: LifecycleOwner,
     private val srcId: Int,
-    private val hopables: List<Config>,
-    private var selectedId: Int
-) : RecyclerView.Adapter<WgHopAdapter.HopViewHolder>() {
+    private val hopItems: List<HopItem>,
+    private var selectedId: Int,
+    private val onHopChanged: ((Int) -> Unit)? = null
+) : RecyclerView.Adapter<GenericHopAdapter.HopViewHolder>() {
 
     companion object {
-        private const val TAG = "HopAdapter"
-        private const val HOP_TEST_DELAY_MS = 2000L // 2 seconds
+        private const val TAG = "GenericHopAdapter"
     }
 
     private var isAttached = false
@@ -67,16 +64,14 @@ class WgHopAdapter(
         return HopViewHolder(itemBinding)
     }
 
-    override fun getItemCount(): Int {
-        return hopables.size
-    }
+    override fun getItemCount(): Int = hopItems.size
 
     override fun onBindViewHolder(holder: HopViewHolder, position: Int) {
         if (position < 0 || position >= itemCount) {
             Logger.w(LOG_TAG_UI, "$TAG; Invalid position $position for itemCount $itemCount")
             return
         }
-        holder.update(hopables[position])
+        holder.update(hopItems[position])
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -92,72 +87,49 @@ class WgHopAdapter(
     inner class HopViewHolder(private val b: ListItemWgHopBinding) :
         RecyclerView.ViewHolder(b.root) {
 
-        fun update(config: Config) {
-            val mapping = WireguardManager.getConfigFilesById(config.getId()) ?: return
-            b.wgHopListNameTv.text = config.getName() + " (" + config.getId() + ")"
-            b.wgHopListCheckbox.isChecked = config.getId() == selectedId
-            setCardStroke(config.getId() == selectedId, mapping.isActive)
-            showChips(config)
-            updateStatusUi(config)
-            setupClickListeners(config, mapping.isActive)
-        }
-
-        private fun updateStatusUi(config: Config) {
-            io {
-                val map = WireguardManager.getConfigFilesById(config.getId())
-                if (map == null) {
-                    uiCtx {
-                        b.wgHopListDescTv.text = context.getString(R.string.config_invalid_desc)
-                    }
-                    return@io
-                }
-                if (selectedId == config.getId()) {
-                    val srcConfig = WireguardManager.getConfigById(srcId)
-                    if (srcConfig == null) {
-                        Logger.i(LOG_TAG_UI, "$TAG; source config($srcId) not found to hop")
-                        uiCtx {
-                            b.wgHopListDescTv.text = context.getString(R.string.lbl_inactive)
-                        }
-                        return@io
-                    }
-                    val src = ID_WG_BASE + srcConfig.getId()
-                    val hop = ID_WG_BASE + config.getId()
-                    val statusPair = VpnController.hopStatus(src, hop)
-                    uiCtx {
-                        val id = statusPair.first
-                        if (statusPair.first != null) {
-                            val txt = UIUtils.getProxyStatusStringRes(id)
-                            b.wgHopListDescTv.text = context.getString(txt)
-                        } else {
-                            b.wgHopListDescTv.text = statusPair.second
-                        }
-                    }
-                    return@io
-                }
-                if (map.isActive) {
-                    uiCtx {
-                        b.wgHopListDescTv.text = context.getString(R.string.lbl_active)
-                    }
-                    return@io
-                } else {
-                    uiCtx {
-                        b.wgHopListDescTv.text = context.getString(R.string.lbl_inactive)
-                    }
-                }
+        fun update(item: HopItem) {
+            when (item) {
+                is HopItem.WireGuardHop -> updateWireGuardHop(item)
+                is HopItem.RpnProxyHop -> updateRpnProxyHop(item)
             }
         }
 
-        private fun showChips(config: Config) {
+        private fun updateWireGuardHop(item: HopItem.WireGuardHop) {
+            val config = item.config
+            // Verify config exists in manager
+            if (WireguardManager.getConfigFilesById(config.getId()) == null) return
+
+            b.wgHopListNameTv.text = "${config.getName()} (${config.getId()})"
+            b.wgHopListCheckbox.isChecked = config.getId() == selectedId
+            setCardStroke(config.getId() == selectedId, item.active)
+            showWgChips(item)
+            updateWgStatusUi(item)
+            setupWgClickListeners(item)
+        }
+
+        private fun updateRpnProxyHop(item: HopItem.RpnProxyHop) {
+            val countryConfig = item.countryConfig
+
+            b.wgHopListNameTv.text = countryConfig.cc
+            b.wgHopListCheckbox.isChecked = countryConfig.cc.hashCode() == selectedId
+            setCardStroke(countryConfig.cc.hashCode() == selectedId, item.active)
+            showRpnChips(item)
+            updateRpnStatusUi(item)
+            setupRpnClickListeners(item)
+        }
+
+        private fun showWgChips(item: HopItem.WireGuardHop) {
             io {
-                val id = ID_WG_BASE + config.getId()
+                val config = item.config
+                val id = ProxyManager.ID_WG_BASE + config.getId()
                 val pair = VpnController.getSupportedIpVersion(id)
                 val isSplitTunnel = if (config.getPeers()?.isNotEmpty() == true) {
-                        VpnController.isSplitTunnelProxy(id, pair)
-                    } else {
-                        false
-                    }
+                    VpnController.isSplitTunnelProxy(id, pair)
+                } else {
+                    false
+                }
                 uiCtx {
-                    updatePropertiesChip(config)
+                    updateWgPropertiesChip(config)
                     updateAmzChip(config)
                     updateProtocolChip(pair)
                     updateSplitTunnelChip(isSplitTunnel)
@@ -167,7 +139,23 @@ class WgHopAdapter(
             }
         }
 
-        private fun updatePropertiesChip(config: Config) {
+        private fun showRpnChips(item: HopItem.RpnProxyHop) {
+            io {
+                val countryConfig = item.countryConfig
+                uiCtx {
+                    updateRpnPropertiesChip(countryConfig)
+                    // Hide WG-specific chips
+                    b.chipAmnezia.visibility = View.GONE
+                    b.chipIpv4.visibility = View.GONE
+                    b.chipIpv6.visibility = View.GONE
+                    b.chipSplitTunnel.visibility = View.GONE
+                    b.chipHopSrc.visibility = View.GONE
+                    b.chipHopping.visibility = View.GONE
+                }
+            }
+        }
+
+        private fun updateWgPropertiesChip(config: com.celzero.bravedns.wireguard.Config) {
             val mapping = WireguardManager.getConfigFilesById(config.getId()) ?: return
             if (!mapping.isCatchAll && !mapping.useOnlyOnMetered && !mapping.ssidEnabled) {
                 b.chipProperties.visibility = View.GONE
@@ -199,7 +187,47 @@ class WgHopAdapter(
             b.chipProperties.visibility = visible
         }
 
-        private fun updateAmzChip(config: Config) {
+        private fun updateRpnPropertiesChip(countryConfig: com.celzero.bravedns.database.CountryConfig) {
+            // Use the countryConfig directly since it already has all the properties
+            if (!countryConfig.catchAll && !countryConfig.lockdown && !countryConfig.mobileOnly && !countryConfig.ssidBased) {
+                b.chipProperties.visibility = View.GONE
+                return
+            }
+            b.chipProperties.text = ""
+            if (countryConfig.catchAll) {
+                b.chipProperties.visibility = View.VISIBLE
+                b.chipProperties.text = context.getString(R.string.symbol_lightening)
+            }
+            if (countryConfig.lockdown) {
+                b.chipProperties.visibility = View.VISIBLE
+                b.chipProperties.text = context.getString(
+                    R.string.two_argument_space,
+                    b.chipProperties.text.toString(),
+                    context.getString(R.string.symbol_lockdown)
+                )
+            }
+            if (countryConfig.mobileOnly) {
+                b.chipProperties.visibility = View.VISIBLE
+                b.chipProperties.text = context.getString(
+                    R.string.two_argument_space,
+                    b.chipProperties.text.toString(),
+                    context.getString(R.string.symbol_mobile)
+                )
+            }
+            if (countryConfig.ssidBased) {
+                b.chipProperties.visibility = View.VISIBLE
+                b.chipProperties.text = context.getString(
+                    R.string.two_argument_space,
+                    b.chipProperties.text.toString(),
+                    context.getString(R.string.symbol_id)
+                )
+            }
+
+            val visible = if (b.chipProperties.text.isNotEmpty()) View.VISIBLE else View.GONE
+            b.chipProperties.visibility = visible
+        }
+
+        private fun updateAmzChip(config: com.celzero.bravedns.wireguard.Config) {
             config.getInterface()?.let {
                 if (it.isAmnezia()) {
                     b.chipGroup.visibility = View.VISIBLE
@@ -244,8 +272,8 @@ class WgHopAdapter(
             }
         }
 
-        private fun updateHopSrcChip(config: Config) {
-            val id = ID_WG_BASE + config.getId()
+        private fun updateHopSrcChip(config: com.celzero.bravedns.wireguard.Config) {
+            val id = ProxyManager.ID_WG_BASE + config.getId()
             val hop = WgHopManager.getMapBySrc(id)
             if (hop.isNotEmpty()) {
                 b.chipGroup.visibility = View.VISIBLE
@@ -255,8 +283,8 @@ class WgHopAdapter(
             }
         }
 
-        private fun updateHoppingChip(config: Config) {
-            val id = ID_WG_BASE + config.getId()
+        private fun updateHoppingChip(config: com.celzero.bravedns.wireguard.Config) {
+            val id = ProxyManager.ID_WG_BASE + config.getId()
             val hop = WgHopManager.isAlreadyHop(id)
             if (hop) {
                 b.chipGroup.visibility = View.VISIBLE
@@ -266,17 +294,86 @@ class WgHopAdapter(
             }
         }
 
-        private fun setupClickListeners(config: Config, isActive: Boolean) {
-            b.wgHopListCard.setOnClickListener {
-                io { handleHop(config, !b.wgHopListCheckbox.isChecked, isActive) }
-            }
-
-            b.wgHopListCheckbox.setOnClickListener {
-                io { handleHop(config, b.wgHopListCheckbox.isChecked, isActive) }
+        private fun updateWgStatusUi(item: HopItem.WireGuardHop) {
+            io {
+                val config = item.config
+                val map = WireguardManager.getConfigFilesById(config.getId())
+                if (map == null) {
+                    uiCtx {
+                        b.wgHopListDescTv.text = context.getString(R.string.config_invalid_desc)
+                    }
+                    return@io
+                }
+                if (selectedId == config.getId()) {
+                    val srcConfig = WireguardManager.getConfigById(srcId)
+                    if (srcConfig == null) {
+                        Logger.i(LOG_TAG_UI, "$TAG; source config($srcId) not found to hop")
+                        uiCtx {
+                            b.wgHopListDescTv.text = context.getString(R.string.lbl_inactive)
+                        }
+                        return@io
+                    }
+                    val src = ProxyManager.ID_WG_BASE + srcConfig.getId()
+                    val hop = ProxyManager.ID_WG_BASE + config.getId()
+                    val statusPair = VpnController.hopStatus(src, hop)
+                    uiCtx {
+                        val id = statusPair.first
+                        if (statusPair.first != null) {
+                            val txt = UIUtils.getProxyStatusStringRes(id)
+                            b.wgHopListDescTv.text = context.getString(txt)
+                        } else {
+                            b.wgHopListDescTv.text = statusPair.second
+                        }
+                    }
+                    return@io
+                }
+                if (map.isActive) {
+                    uiCtx {
+                        b.wgHopListDescTv.text = context.getString(R.string.lbl_active)
+                    }
+                    return@io
+                } else {
+                    uiCtx {
+                        b.wgHopListDescTv.text = context.getString(R.string.lbl_inactive)
+                    }
+                }
             }
         }
 
-        private suspend fun handleHop(config: Config, isChecked: Boolean, isActive: Boolean) {
+        private fun updateRpnStatusUi(item: HopItem.RpnProxyHop) {
+            io {
+                uiCtx {
+                    if (item.active) {
+                        b.wgHopListDescTv.text = context.getString(R.string.lbl_active)
+                    } else {
+                        b.wgHopListDescTv.text = context.getString(R.string.lbl_inactive)
+                    }
+                }
+            }
+        }
+
+        private fun setupWgClickListeners(item: HopItem.WireGuardHop) {
+            b.wgHopListCard.setOnClickListener {
+                io { handleWgHop(item, !b.wgHopListCheckbox.isChecked) }
+            }
+
+            b.wgHopListCheckbox.setOnClickListener {
+                io { handleWgHop(item, b.wgHopListCheckbox.isChecked) }
+            }
+        }
+
+        private fun setupRpnClickListeners(item: HopItem.RpnProxyHop) {
+            b.wgHopListCard.setOnClickListener {
+                io { handleRpnHop(item, !b.wgHopListCheckbox.isChecked) }
+            }
+
+            b.wgHopListCheckbox.setOnClickListener {
+                io { handleRpnHop(item, b.wgHopListCheckbox.isChecked) }
+            }
+        }
+
+        private suspend fun handleWgHop(item: HopItem.WireGuardHop, isChecked: Boolean) {
+            val config = item.config
             val srcConfig = WireguardManager.getConfigById(srcId)
             val mapping = WireguardManager.getConfigFilesById(config.getId())
             if (srcConfig == null || mapping == null) {
@@ -303,14 +400,14 @@ class WgHopAdapter(
                 showProgressIndicator()
             }
             Logger.d(LOG_TAG_UI, "$TAG; init, hop: ${srcConfig.getId()} -> ${config.getId()}, isChecked? $isChecked")
-            val src = ID_WG_BASE + srcConfig.getId()
-            val hop = ID_WG_BASE + config.getId()
+            val src = ProxyManager.ID_WG_BASE + srcConfig.getId()
+            val hop = ProxyManager.ID_WG_BASE + config.getId()
             val currMap = WgHopManager.getMapBySrc(src)
             if (currMap.isNotEmpty()) {
                 var res = false
                 currMap.forEach {
                     if (it.hop != hop && it.hop.isNotEmpty()) {
-                        val id = it.hop.substring(ID_WG_BASE.length).toIntOrNull() ?: return@forEach
+                        val id = it.hop.substring(ProxyManager.ID_WG_BASE.length).toIntOrNull() ?: return@forEach
                         res = WgHopManager.removeHop(srcConfig.getId(), id).first
                     }
                 }
@@ -322,7 +419,7 @@ class WgHopAdapter(
                     }
                 }
             }
-            delay(HOP_TEST_DELAY_MS)
+            delay(2000)
             if (isChecked) {
                 val hopTestRes = VpnController.testHop(src, hop)
                 if (!hopTestRes.first) {
@@ -358,9 +455,33 @@ class WgHopAdapter(
                     setCardStroke(isSelected = false, isActive = false)
                 } else {
                     b.wgHopListCheckbox.isChecked = true
-                    setCardStroke(isSelected = true, isActive)
+                    setCardStroke(isSelected = true, item.active)
+                    onHopChanged?.invoke(config.getId())
                 }
                 notifyDataSetChanged()
+            }
+        }
+
+        private suspend fun handleRpnHop(item: HopItem.RpnProxyHop, isChecked: Boolean) {
+            val countryConfig = item.countryConfig
+            uiCtx {
+                showProgressIndicator()
+            }
+            Logger.d(LOG_TAG_UI, "$TAG; RPN hop: ${countryConfig.cc}, isChecked? $isChecked")
+
+            // TODO: Implement RPN hop logic when hop manager is ready
+            delay(1000)
+
+            uiCtx {
+                if (!isAttached) return@uiCtx
+
+                dismissProgressIndicator()
+                Utilities.showToastUiCentered(
+                    context,
+                    "RPN hopping not yet implemented",
+                    Toast.LENGTH_SHORT
+                )
+                b.wgHopListCheckbox.isChecked = false
             }
         }
 
@@ -377,6 +498,7 @@ class WgHopAdapter(
 
             b.wgHopListCheckbox.isEnabled = true
             b.wgHopListProgress.visibility = View.GONE
+            b.wgHopListCard.isEnabled = true
         }
 
         private fun setCardStroke(isSelected: Boolean, isActive: Boolean) {
@@ -392,13 +514,14 @@ class WgHopAdapter(
             }
             b.wgHopListCard.strokeColor = strokeColor
         }
-    }
 
-    private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
-    }
+        private fun io(f: suspend () -> Unit) {
+            lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) { f() }
+        }
 
-    private fun io(f: suspend () -> Unit) {
-        (context as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        private suspend fun uiCtx(f: suspend () -> Unit) {
+            withContext(Dispatchers.Main) { f() }
+        }
     }
 }
+
