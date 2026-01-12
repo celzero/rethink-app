@@ -163,7 +163,7 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
     private fun openAppsDialog() {
         val proxyId = ProxyManager.ID_TCP_BASE
         val proxyName = ProxyManager.TCP_PROXY_NAME
-        val appsAdapter = WgIncludeAppsAdapter(this, proxyId, proxyName)
+        val appsAdapter = WgIncludeAppsAdapter(this, this, proxyId, proxyName)
         mappingViewModel.apps.observe(this) { appsAdapter.submitData(lifecycle, it) }
         var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         if (Themes.isFrostTheme(themeId)) {
