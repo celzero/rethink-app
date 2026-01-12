@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginBottom="1dp"
+    android:paddingBottom="30dp"
     android:background="?attr/background"
     android:fillViewport="true">
 
@@ -347,7 +348,7 @@
                         android:layout_marginBottom="16dp"
                         android:letterSpacing="0.03"
                         android:text="Actions"
-                        android:textAppearance="?attr/textAppearanceSubtitle1"
+                        android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textColor="?attr/primaryTextColor"
                         android:textStyle="bold" />
 
@@ -379,6 +380,7 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_marginBottom="4dp"
+                                android:alpha="0.5"
                                 android:src="@drawable/ic_app_info_accent"
                                 app:tint="?attr/primaryTextColor" />
 
@@ -388,7 +390,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="Apps(0)"
                                 android:textAllCaps="false"
-                                android:textColor="?attr/secondaryTextColor"
+                                android:textColor="?attr/primaryTextColor"
                                 android:textSize="12sp" />
                         </LinearLayout>
 
@@ -413,6 +415,7 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_marginBottom="4dp"
+                                android:alpha="0.5"
                                 android:src="@drawable/ic_network_tunnel"
                                 app:tint="?attr/primaryTextColor" />
 
@@ -421,7 +424,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="Relay"
                                 android:textAllCaps="false"
-                                android:textColor="?attr/secondaryTextColor"
+                                android:textColor="?attr/primaryTextColor"
                                 android:textSize="12sp" />
                         </LinearLayout>
 
@@ -453,7 +456,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="Logs"
                                 android:textAllCaps="false"
-                                android:textColor="?attr/secondaryTextColor"
+                                android:textColor="?attr/primaryTextColor"
                                 android:textSize="12sp" />
                         </LinearLayout>
 
