@@ -44,6 +44,14 @@ object TcpProxyHelper : KoinComponent {
     private const val MAX_RETRY_COUNT = 3
     const val PAYMENT_WORKER_TAG = "payment_worker_tag"
 
+    // Payment status values
+    private const val PAYMENT_NOT_PAID = 0
+    private const val PAYMENT_INITIATED = 1
+    private const val PAYMENT_PAID = 2
+    private const val PAYMENT_EXPIRED = 3
+    private const val PAYMENT_FAILED = 4
+    private const val PAYMENT_INVALID = 5
+
     private const val JSON_MIN_VERSION_CODE = "minvcode"
     private const val JSON_STATUS = "status"
     private const val JSON_PUB_KEY = "pubkey"
@@ -81,12 +89,12 @@ object TcpProxyHelper : KoinComponent {
         )
 
     enum class PaymentStatus(val value: Int) {
-        NOT_PAID(0),
-        INITIATED(1),
-        PAID(2),
-        EXPIRED(3),
-        FAILED(4),
-        INVALID(5);
+        NOT_PAID(PAYMENT_NOT_PAID),
+        INITIATED(PAYMENT_INITIATED),
+        PAID(PAYMENT_PAID),
+        EXPIRED(PAYMENT_EXPIRED),
+        FAILED(PAYMENT_FAILED),
+        INVALID(PAYMENT_INVALID);
 
         fun isPaid() = this == PAID
 

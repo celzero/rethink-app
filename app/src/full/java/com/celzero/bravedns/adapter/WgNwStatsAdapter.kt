@@ -47,6 +47,7 @@ class WgNwStatsAdapter(private val context: Context) :
     private var maxValue: Int = 0
     companion object {
         private val TAG = WgNwStatsAdapter::class.simpleName
+        private const val PERCENTAGE_MULTIPLIER = 100
 
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<AppConnection>() {
@@ -72,7 +73,7 @@ class WgNwStatsAdapter(private val context: Context) :
     }
 
     private fun calculatePercentage(c: Double): Int {
-        val value = (log2(c) * 100).toInt()
+        val value = (log2(c) * PERCENTAGE_MULTIPLIER).toInt()
         // maxValue will be based on the count returned by the database query (order by count desc)
         if (value > maxValue) {
             maxValue = value
@@ -80,7 +81,7 @@ class WgNwStatsAdapter(private val context: Context) :
         return if (maxValue == 0) {
             0
         } else {
-            (value * 100 / maxValue)
+            (value * PERCENTAGE_MULTIPLIER / maxValue)
         }
     }
 

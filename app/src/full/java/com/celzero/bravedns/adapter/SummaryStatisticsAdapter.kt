@@ -74,6 +74,8 @@ class SummaryStatisticsAdapter(
     private var timeCategory = SummaryStatisticsViewModel.TimeCategory.ONE_HOUR
 
     companion object {
+        private const val PERCENTAGE_MULTIPLIER = 100
+
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<AppConnection>() {
                 // Fix: Compare by unique identifiers instead of object equality
@@ -123,7 +125,7 @@ class SummaryStatisticsAdapter(
     }
 
     private fun calculatePercentage(c: Double): Int {
-        val value = (log2(c) * 100).toInt()
+        val value = (log2(c) * PERCENTAGE_MULTIPLIER).toInt()
         // maxValue will be based on the count returned by the database query (order by count desc)
         if (value > maxValue) {
             maxValue = value
@@ -131,7 +133,7 @@ class SummaryStatisticsAdapter(
         return if (maxValue == 0) {
             0
         } else {
-            (value * 100 / maxValue)
+            (value * PERCENTAGE_MULTIPLIER / maxValue)
         }
     }
 

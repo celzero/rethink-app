@@ -73,6 +73,7 @@ class RethinkLogAdapter(private val context: Context) :
         private const val MAX_BYTES = 500000 // 500 KB
         private const val MAX_TIME_TCP = 135 // seconds
         private const val MAX_TIME_UDP = 135 // seconds
+        private const val RTT_SHORT_THRESHOLD_MS = 20 // milliseconds
 
         const val DNS_IP_TEMPLATE_V4 = "10.111.222.3"
         const val DNS_IP_TEMPLATE_V6 = "fd66:f83a:c650::3"
@@ -370,7 +371,7 @@ class RethinkLogAdapter(private val context: Context) :
         }
 
         private fun isRoundTripShorter(rtt: Long, blocked: Boolean): Boolean {
-            return rtt in 1..20 && !blocked
+            return rtt in 1..RTT_SHORT_THRESHOLD_MS && !blocked
         }
 
         private fun containsRelayProxy(rpid: String): Boolean {

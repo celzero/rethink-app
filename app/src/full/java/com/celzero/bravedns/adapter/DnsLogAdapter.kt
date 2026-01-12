@@ -58,6 +58,8 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
 
     companion object {
         private const val TAG = "DnsLogAdapter"
+        private const val RTT_SHORT_THRESHOLD_MS = 10 // milliseconds
+
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<DnsLog>() {
 
@@ -266,7 +268,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
         }
 
         private fun isRoundTripShorter(rtt: Long, blocked: Boolean): Boolean {
-            return rtt in 1..10 && !blocked
+            return rtt in 1..RTT_SHORT_THRESHOLD_MS && !blocked
         }
 
         private fun containsRelayProxy(rpid: String): Boolean {

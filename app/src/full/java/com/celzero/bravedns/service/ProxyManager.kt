@@ -44,12 +44,18 @@ object ProxyManager : KoinComponent {
     // and hash method implementation is overridden and cannot be used for the pamSet
     data class ProxyAppMapTuple(val uid: Int, val packageName: String, val proxyId: String)
 
+    // Proxy mode values
+    private const val PROXY_MODE_SOCKS5 = 0
+    private const val PROXY_MODE_HTTP = 1
+    private const val PROXY_MODE_ORBOT_SOCKS5 = 2
+    private const val PROXY_MODE_ORBOT_HTTP = 3
+
     // TODO: consider adding other proxy modes (e.g, Wireguard, Rethink, etc.)
     enum class ProxyMode(val value: Int) {
-        SOCKS5(0),
-        HTTP(1),
-        ORBOT_SOCKS5(2),
-        ORBOT_HTTP(3);
+        SOCKS5(PROXY_MODE_SOCKS5),
+        HTTP(PROXY_MODE_HTTP),
+        ORBOT_SOCKS5(PROXY_MODE_ORBOT_SOCKS5),
+        ORBOT_HTTP(PROXY_MODE_ORBOT_HTTP);
 
         companion object {
             fun get(v: Int?): ProxyMode? {

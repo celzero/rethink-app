@@ -38,6 +38,12 @@ class BubbleAllowedAppsAdapter(
                 return oldItem == newItem
             }
         }
+
+        // Time constants for allowed app duration calculation
+        private const val ALLOWED_DURATION_MINUTES = 15
+        private const val MILLIS_PER_MINUTE = 60
+        private const val MILLIS_PER_SECOND = 1000
+        private const val SINGLE_MINUTE = 1L
     }
 
     inner class ViewHolder(private val binding: ItemAllowedAppBinding) :
@@ -52,11 +58,11 @@ class BubbleAllowedAppsAdapter(
 
             // Calculate time remaining
             val now = System.currentTimeMillis()
-            val expiresAt = app.allowedAt + (15 * 60 * 1000) // 15 minutes
-            val remaining = (expiresAt - now) / 1000 / 60 // minutes
+            val expiresAt = app.allowedAt + (ALLOWED_DURATION_MINUTES * MILLIS_PER_MINUTE * MILLIS_PER_SECOND) // 15 minutes
+            val remaining = (expiresAt - now) / MILLIS_PER_SECOND / MILLIS_PER_MINUTE // minutes
 
             binding.allowedTimeRemaining.text = if (remaining > 0) {
-                "$remaining min${if (remaining != 1L) "s" else ""} remaining"
+                "$remaining min${if (remaining != SINGLE_MINUTE) "s" else ""} remaining"
             } else {
                 "Expired"
             }

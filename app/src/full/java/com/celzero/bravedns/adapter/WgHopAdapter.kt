@@ -49,6 +49,7 @@ class WgHopAdapter(
 
     companion object {
         private const val TAG = "HopAdapter"
+        private const val HOP_TEST_DELAY_MS = 2000L // 2 seconds
     }
 
     private var isAttached = false
@@ -310,7 +311,7 @@ class WgHopAdapter(
                     }
                 }
             }
-            delay(2000)
+            delay(HOP_TEST_DELAY_MS)
             if (isChecked) {
                 val hopTestRes = VpnController.testHop(src, hop)
                 if (!hopTestRes.first) {

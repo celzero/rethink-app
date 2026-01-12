@@ -42,8 +42,8 @@ class RethinkPlusFilterBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetRethinkPlusFilterBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
-    private val b
-        get() = _binding!!
+    private val b: BottomSheetRethinkPlusFilterBinding
+        get() = _binding ?: throw IllegalStateException("Binding is only valid between onCreateView and onDestroyView")
 
     private val persistentState by inject<PersistentState>()
 
@@ -168,14 +168,15 @@ class RethinkPlusFilterBottomSheet : BottomSheetDialogFragment() {
         if (filters == null) {
             filters = RethinkBlocklistFragment.Filters()
         }
-        // asserting the filters object with above check
-        filters!!.subGroups.add(tag)
+        filters?.subGroups?.add(tag)
     }
 
     private fun removeSubgroupFilter(tag: String) {
-        if (filters == null) return
+        filters?.subGroups?.remove(tag)
+    }
 
-        // asserting the filters object with above check
-        filters!!.subGroups.remove(tag)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

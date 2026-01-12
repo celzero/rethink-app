@@ -58,6 +58,8 @@ class WgIncludeAppsAdapter(
     private val packageManager: PackageManager = context.packageManager
 
     companion object {
+        private const val ALPHA_FULL = 1f
+        private const val ALPHA_DISABLED = 0.4f
 
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<ProxyApplicationMapping>() {
@@ -173,11 +175,11 @@ class WgIncludeAppsAdapter(
                     displayIcon(iconDrawable)
                     // set the alpha based on internet permission
                     if (hasInternetPerm) {
-                        b.wgIncludeAppListApkLabelTv.alpha = 1f
-                        b.wgIncludeAppListApkIconIv.alpha = 1f
+                        b.wgIncludeAppListApkLabelTv.alpha = ALPHA_FULL
+                        b.wgIncludeAppListApkIconIv.alpha = ALPHA_FULL
                     } else {
-                        b.wgIncludeAppListApkLabelTv.alpha = 0.4f
-                        b.wgIncludeAppListApkIconIv.alpha = 0.4f
+                        b.wgIncludeAppListApkLabelTv.alpha = ALPHA_DISABLED
+                        b.wgIncludeAppListApkIconIv.alpha = ALPHA_DISABLED
                     }
                     setupClickListeners(mapping, isIncluded)
                 }

@@ -42,7 +42,7 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
     AppIpRulesBottomSheet.OnBottomSheetDialogFragmentDismiss {
 
     private var maxValue: Int = 0
-    private var minPercentage: Int = 100
+    private var minPercentage: Int = INITIAL_MIN_PERCENTAGE
 
     companion object {
         private val DIFF_CALLBACK =
@@ -52,6 +52,8 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
                 override fun areContentsTheSame(old: AppConnection, new: AppConnection) = old == new
             }
         private const val TAG = "AppWiseIpsAdapter"
+        private const val INITIAL_MIN_PERCENTAGE = 100
+        private const val PERCENTAGE_MULTIPLIER = 100
     }
 
     private lateinit var adapter: AppWiseIpsAdapter
@@ -70,7 +72,7 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
     }
 
     private fun calculatePercentage(c: Double): Int {
-        val value = (log2(c) * 100).toInt()
+        val value = (log2(c) * PERCENTAGE_MULTIPLIER).toInt()
         // maxValue will be based on the count returned by db query (order by count desc)
         if (value > maxValue) {
             maxValue = value
@@ -78,7 +80,7 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
         return if (maxValue == 0) {
             0
         } else {
-            val percentage = (value * 100 / maxValue)
+            val percentage = (value * PERCENTAGE_MULTIPLIER / maxValue)
             // minPercentage is used to show the progress bar when the percentage is 0
             if (percentage < minPercentage && percentage != 0) {
                 minPercentage = percentage

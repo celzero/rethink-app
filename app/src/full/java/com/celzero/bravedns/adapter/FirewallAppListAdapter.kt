@@ -66,6 +66,9 @@ class FirewallAppListAdapter(
     // private val userAppColor: Int by lazy { UIUtils.fetchColor(context, R.attr.primaryTextColor) }
 
     companion object {
+        private const val ALPHA_FULL = 1f
+        private const val ALPHA_DISABLED = 0.4f
+
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<AppInfo>() {
                 override fun areItemsTheSame(
@@ -128,11 +131,11 @@ class FirewallAppListAdapter(
                         getIcon(context, appInfo.packageName, appInfo.appName), b.firewallAppIconIv)
                     // set the alpha based on internet permission
                     if (appInfo.hasInternetPermission(packageManager)) {
-                        b.firewallAppLabelTv.alpha = 1f
-                        b.firewallAppIconIv.alpha = 1f
+                        b.firewallAppLabelTv.alpha = ALPHA_FULL
+                        b.firewallAppIconIv.alpha = ALPHA_FULL
                     } else {
-                        b.firewallAppLabelTv.alpha = 0.4f
-                        b.firewallAppIconIv.alpha = 0.4f
+                        b.firewallAppLabelTv.alpha = ALPHA_DISABLED
+                        b.firewallAppIconIv.alpha = ALPHA_DISABLED
                     }
                     if (appInfo.packageName == context.packageName) {
                         b.firewallAppToggleWifi.visibility = View.GONE
@@ -147,8 +150,8 @@ class FirewallAppListAdapter(
                     // strike through the app name if the app is tombstoned
                     if (appInfo.tombstoneTs > 0) {
                         b.firewallAppLabelTv.paint.isStrikeThruText = true
-                        b.firewallAppLabelTv.alpha = 0.4f
-                        b.firewallAppIconIv.alpha = 0.4f
+                        b.firewallAppLabelTv.alpha = ALPHA_DISABLED
+                        b.firewallAppIconIv.alpha = ALPHA_DISABLED
                     } else {
                         b.firewallAppLabelTv.paint.isStrikeThruText = false
                     }
@@ -496,7 +499,7 @@ class FirewallAppListAdapter(
 
     override fun getSectionName(position: Int): String {
         // Check if position is valid to prevent IndexOutOfBoundsException
-        if (position < 0 || position >= itemCount) {
+        if (position !in 0..<itemCount) {
             return ""
         }
         

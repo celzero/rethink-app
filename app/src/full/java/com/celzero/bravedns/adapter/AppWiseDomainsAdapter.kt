@@ -53,7 +53,7 @@ class AppWiseDomainsAdapter(
     AppDomainRulesBottomSheet.OnBottomSheetDialogFragmentDismiss {
 
     private var maxValue: Int = 0
-    private var minPercentage: Int = 100
+    private var minPercentage: Int = INITIAL_MIN_PERCENTAGE
 
     companion object {
         private val DIFF_CALLBACK =
@@ -71,6 +71,8 @@ class AppWiseDomainsAdapter(
             }
 
         private const val TAG = "AppWiseDomainsAdapter"
+        private const val INITIAL_MIN_PERCENTAGE = 100
+        private const val PERCENTAGE_MULTIPLIER = 100
     }
 
     private lateinit var adapter: AppWiseDomainsAdapter
@@ -99,7 +101,7 @@ class AppWiseDomainsAdapter(
     }
 
     private fun calculatePercentage(c: Double): Int {
-        val value = (log2(c) * 100).toInt()
+        val value = (log2(c) * PERCENTAGE_MULTIPLIER).toInt()
         // maxValue will be based on the count returned by db query (order by count desc)
         if (value > maxValue) {
             maxValue = value
@@ -107,7 +109,7 @@ class AppWiseDomainsAdapter(
         return if (maxValue == 0) {
             0
         } else {
-            val percentage = (value * 100 / maxValue)
+            val percentage = (value * PERCENTAGE_MULTIPLIER / maxValue)
             // minPercentage is used to show the progress bar when the percentage is 0
             if (percentage < minPercentage && percentage != 0) {
                 minPercentage = percentage
@@ -282,7 +284,7 @@ class AppWiseDomainsAdapter(
     override fun notifyDataset(position: Int) {
         // Fix: IndexOutOfBoundsException - validate position before notifying
         try {
-            if (position >= 0 && position < itemCount) {
+            if (position in 0..<itemCount) {
                 notifyItemChanged(position)
             } else {
                 // Position is invalid, refresh the entire dataset instead
