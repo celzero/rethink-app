@@ -34,6 +34,7 @@ import com.celzero.firestack.backend.DNSTransport
 import com.celzero.firestack.backend.NetStat
 import com.celzero.firestack.backend.RDNS
 import com.celzero.firestack.backend.RouterStats
+import com.celzero.firestack.backend.Proxy
 import com.celzero.firestack.intra.Controller
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -389,6 +390,10 @@ object VpnController : KoinComponent {
         return braveVpnService?.registerAndFetchWinIfNeeded(prevBytes)
     }
 
+    suspend fun isWinRegistered(): Boolean {
+        return braveVpnService?.isWinRegistered() ?: false
+    }
+
     suspend fun createWgHop(origin: String, hop: String): Pair<Boolean, String> {
         return (braveVpnService?.createWgHop(origin, hop) ?: Pair(false, "vpn service not available"))
     }
@@ -411,6 +416,14 @@ object VpnController : KoinComponent {
 
     suspend fun getRpnProps(type: RpnProxyManager.RpnType): Pair<RpnProxyManager.RpnProps?, String?> {
         return braveVpnService?.getRpnProps(type) ?: Pair(null, null)
+    }
+
+    suspend fun addNewWinServer(key: String): Pair<Boolean, String> {
+        return braveVpnService?.addNewWinServer(key) ?: Pair(false, "vpn service not available")
+    }
+
+    suspend fun removeWinServer(key: String): Pair<Boolean, String> {
+        return braveVpnService?.removeWinServer(key) ?: Pair(false, "vpn service not available")
     }
 
     suspend fun vpnStats(): String? {
@@ -451,5 +464,9 @@ object VpnController : KoinComponent {
 
     suspend fun performFlightRecording() {
         braveVpnService?.performFlightRecording()
+    }
+
+    suspend fun getWinByKey(key: String): Proxy? {
+        return braveVpnService?.getWinByKey(key)
     }
 }

@@ -36,7 +36,7 @@ import com.celzero.bravedns.data.AppConfig.Companion.DOH_INDEX
 import com.celzero.bravedns.data.AppConfig.Companion.DOT_INDEX
 import com.celzero.bravedns.data.AppConfig.Companion.FALLBACK_DNS_IF_NET_DNS_EMPTY
 import com.celzero.bravedns.data.AppConfig.TunnelOptions
-import com.celzero.bravedns.database.RpnWinServerEntity
+import com.celzero.bravedns.database.CountryConfig
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsCryptRelayEndpoint
 import com.celzero.bravedns.database.EventSource
@@ -84,6 +84,7 @@ import com.celzero.firestack.backend.DNSResolver
 import com.celzero.firestack.backend.DNSTransport
 import com.celzero.firestack.backend.NetStat
 import com.celzero.firestack.backend.Proxies
+import com.celzero.firestack.backend.Proxy
 import com.celzero.firestack.backend.RDNS
 import com.celzero.firestack.backend.RouterStats
 import com.celzero.firestack.backend.RpnProxy
@@ -94,6 +95,7 @@ import com.celzero.firestack.intra.Tunnel
 import com.celzero.firestack.settings.Settings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -175,7 +177,6 @@ class GoVpnAdapter : KoinComponent {
         undelegatedDomains()
         setExperimentalWireGuardSettings()
         setAutoDialsParallel()
-        setHappyEyeballs()
         setAutoMode()
         registerSeProxyIfNeeded()
         // added for testing, use if needed
@@ -2352,6 +2353,21 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
+    suspend fun getWinByKey(key: String): Proxy? {
+        if (!tunnel.isConnected) {
+            Logger.i(LOG_TAG_PROXY, "$TAG no tunnel, skip get win(rpn) by key")
+            return null
+        }
+        return try {
+            val win = tunnel.proxies.rpn().win().get(key.togs())
+            Logger.i(LOG_TAG_PROXY, "$TAG no win(rpn) found by key: $key")
+            win
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG err get win(rpn) by key: ${e.message}", e)
+            null
+        }
+    }
+
     suspend fun updateWin(): ByteArray? {
         if (!tunnel.isConnected) {
             Logger.i(LOG_TAG_PROXY, "$TAG no tunnel, skip update win(rpn)")
@@ -2367,12 +2383,12 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    suspend fun addNewWinServer(server: RpnWinServerEntity): Pair<Boolean, String> {
+    suspend fun addNewWinServer(key: String): Pair<Boolean, String> {
         if (!tunnel.isConnected) {
             Logger.i(LOG_TAG_PROXY, "$TAG no tunnel, skip add new win(rpn) server")
             return Pair(false, "No tunnel connected")
         }
-        if (server.countryCode.isEmpty()) {
+        if (key.isEmpty()) {
             Logger.w(LOG_TAG_PROXY, "$TAG empty country code for new win(rpn) server")
             return Pair(false, "Empty country code for server")
         }
@@ -2384,13 +2400,34 @@ class GoVpnAdapter : KoinComponent {
                 Logger.w(LOG_TAG_PROXY, "$TAG max win servers reached: $prevServerCount, skipping add")
                 return Pair(false, "Max servers reached: $prevServerCount, skipping add")
             }
-            val name = server.countryCode.togs()
+            val name = key.togs()
             val res = win.fork(name)
             Logger.i(LOG_TAG_PROXY, "$TAG add new win(rpn) server: $res")
             return Pair(true, "Added new server: $name")
         } catch (e: Exception) {
             Logger.e(LOG_TAG_PROXY, "$TAG err add new win(rpn) server: ${e.message}", e)
             Pair(false, e.message ?: "Error adding new server")
+        }
+    }
+
+    suspend fun removeWinServer(key: String): Pair<Boolean, String> {
+        if (!tunnel.isConnected) {
+            Logger.i(LOG_TAG_PROXY, "$TAG no tunnel, skip remove win(rpn) server")
+            return Pair(false, "No tunnel connected")
+        }
+        if (key.isEmpty()) {
+            Logger.w(LOG_TAG_PROXY, "$TAG empty country code for remove win(rpn) server")
+            return Pair(false, "Empty country code for server")
+        }
+        return try {
+            val win = tunnel.proxies.rpn().win()
+            val name = key.togs()
+            val res = win.purge(name)
+            Logger.i(LOG_TAG_PROXY, "$TAG remove win(rpn) server: $res")
+            return Pair(true, "Removed server: $name")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG err remove win(rpn) server: ${e.message}", e)
+            Pair(false, e.message ?: "Error removing server")
         }
     }
 
@@ -2529,19 +2566,6 @@ class GoVpnAdapter : KoinComponent {
                 "Set experimental settings failed",
                 "Failed to set experimental settings to $value: ${e.message}"
             )
-        }
-    }
-
-    suspend fun setHappyEyeballs(value: Boolean = InternetProtocol.isAlwaysV46(persistentState.internetProtocolType)) {
-        if (!tunnel.isConnected) {
-            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip happy eyeballs setting")
-            return
-        }
-        try {
-            Intra.happyEyeballs(value)
-            Logger.i(LOG_TAG_VPN, "$TAG set happy eyeballs as $value")
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "$TAG err; happy eyeballs: ${e.message}", e)
         }
     }
 
@@ -2878,9 +2902,7 @@ class GoVpnAdapter : KoinComponent {
             Logger.e(LOG_TAG_VPN, "$TAG err start flight recorder: ${e.message}")
             try {
                 Intra.flightRecorder(false)
-            } catch (_: Exception) {
-                // ignore
-            }
+            } catch (_: Exception) { }
         }
     }
 
