@@ -65,6 +65,7 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_4
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
+import com.celzero.bravedns.util.KernelProc
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
@@ -173,6 +174,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutAppContributors.setOnClickListener(this)
         b.aboutAppTranslate.setOnClickListener(this)
         b.aboutStats.setOnClickListener(this)
+        b.aboutProc.setOnClickListener(this)
         b.aboutDbStats.setOnClickListener(this)
         b.tokenTextView.setOnClickListener(this)
         b.aboutFlightRecord.setOnClickListener(this)
@@ -393,6 +395,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.aboutStats -> {
                 openStatsDialog()
             }
+            b.aboutProc -> {
+                openProcDialog()
+            }
             b.aboutDbStats -> {
                 openDatabaseDumpDialog()
             }
@@ -465,8 +470,86 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         }
     }
 
+    private fun openProcDialog() {
+        fun gatherProcDump(force: Boolean): String {
+            val stat = KernelProc.getStats(force)
+            val status = KernelProc.getStatus(force)
+            val mem = KernelProc.getMem(force)
+            val maps = KernelProc.getMaps(force)
+            val smaps = KernelProc.getSmaps(force)
+            val net = KernelProc.getNet(force)
+            val ns = KernelProc.getNs(force)
+            val sched = KernelProc.getSched(force)
+            val task = KernelProc.getTask(force)
+            return buildString {
+                append(stat)
+                append("\n\n")
+                append(status)
+                append("\n\n")
+                append(mem)
+                append("\n\n")
+                append(maps)
+                append("\n\n")
+                append(smaps)
+                append("\n\n")
+                append(net)
+                append("\n\n")
+                append(ns)
+                append("\n\n")
+                append(sched)
+                append("\n\n")
+                append(task)
+            }
+        }
+
+        io {
+            val initial = gatherProcDump(force = false)
+            uiCtx {
+                if (!isAdded) return@uiCtx
+                val tv = android.widget.TextView(requireContext())
+                val pad = resources.getDimensionPixelSize(R.dimen.dots_margin_bottom)
+                tv.setPadding(pad, pad, pad, pad)
+                tv.text = initial.ifEmpty { "No Proc stats" }
+                tv.setTextIsSelectable(true)
+                tv.typeface = android.graphics.Typeface.MONOSPACE
+                val scroll = android.widget.ScrollView(requireContext())
+                scroll.addView(tv)
+
+                val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+                    .setTitle(getString(R.string.title_proc))
+                    .setView(scroll)
+                    .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
+                    .setNegativeButton(R.string.dns_info_neutral) { _, _ ->
+                        copyToClipboard("proc_dump", tv.text.toString())
+                        showToastUiCentered(
+                            requireContext(),
+                            getString(R.string.copied_clipboard),
+                            Toast.LENGTH_SHORT
+                        )
+                    }
+                    .setNeutralButton("Refresh", null)
+                    .create()
+
+                dialog.setOnShowListener {
+                    dialog.getButton(android.app.AlertDialog.BUTTON_NEUTRAL)?.setOnClickListener {
+                        io {
+                            val refreshed = gatherProcDump(force = true)
+                            uiCtx {
+                                if (isAdded) tv.text = refreshed
+                                showToastUiCentered(requireContext(), getString(R.string.config_add_success_toast),
+                                    Toast.LENGTH_SHORT)
+                            }
+                        }
+                    }
+                }
+
+                dialog.show()
+            }
+        }
+    }
+
     private fun copyToClipboard(label: String, text: String): ClipboardManager? {
-        val cb = ContextCompat.getSystemService(requireContext(), ClipboardManager::class.java)
+        val cb = getSystemService(requireContext(), ClipboardManager::class.java)
         cb?.setPrimaryClip(ClipData.newPlainText(label, text))
         return cb
     }

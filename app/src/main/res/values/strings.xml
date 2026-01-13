@@ -4,6 +4,7 @@
     <string name="title_about" translatable="true">About</string>
     <string name="title_settings" translatable="true">Settings</string>
     <string name="title_statistics" translatable="true">Stats</string>
+    <string name="title_proc" translatable="false">Proc</string>
     <string name="pause_title_desc" translatable="true">taking a nap…</string>
     <string name="settings_title_desc" translatable="true">A highly customizable DNS and Firewall</string>
     <string name="about_title_desc" translatable="true">Detect and block network security threats</string>
