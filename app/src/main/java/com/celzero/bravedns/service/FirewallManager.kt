@@ -709,8 +709,8 @@ object FirewallManager : KoinComponent {
         mutex.withLock {
             appInfos.clear()
             apps.forEach { appInfos.put(it.uid, it) }
-            informObservers()
         }
+        informObservers()
         return apps.size
     }
 
@@ -925,7 +925,8 @@ object FirewallManager : KoinComponent {
     fun stats(): String {
         // add count of apps in each firewall status
         val statusCount = HashMap<FirewallStatus, Int>()
-        appInfos.values().forEach {
+        // snapshot under lock to avoid iterator faults from concurrent writes
+        runBlockingWithMutex { appInfos.values().toList() }.forEach {
             val status = FirewallStatus.getStatus(it.firewallStatus)
             statusCount[status] = (statusCount[status] ?: 0) + 1
         }
@@ -950,10 +951,25 @@ object FirewallManager : KoinComponent {
 
     data class AppInfoTuple(val uid: Int, val packageName: String)
 
+    private fun snapshotAppInfos(): List<AppInfo> {
+        // take a stable snapshot under lock to avoid concurrent modification during LiveData post
+        return try {
+            runBlockingWithMutex { appInfos.values().toList() }
+        } catch (e: NoSuchElementException) {
+            // Guava's CompactHashSet iterator can throw if mutated mid-iteration; retry on a fresh view
+            Logger.w(LOG_TAG_FIREWALL, "snapshot retry after iterator fault: ${e.message}", e)
+            runBlockingWithMutex { appInfos.asMap().values.flatten() }
+        }
+    }
+
+    private fun <T> runBlockingWithMutex(block: suspend () -> T): T {
+        return kotlinx.coroutines.runBlocking { mutex.withLock { block() } }
+    }
+
     private fun informObservers() {
         // existing code expects this to broadcast appInfos snapshot.
         // Use a snapshot to avoid exposing internal live collections.
-        appInfosLiveData.postValue(appInfos.values().toList())
+        appInfosLiveData.postValue(snapshotAppInfos())
     }
 
     fun isUnknownPackage(uid: Int): Boolean {
