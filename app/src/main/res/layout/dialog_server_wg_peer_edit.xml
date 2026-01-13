@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/background"
+    android:paddingStart="20dp"
+    android:paddingTop="20dp"
+    android:paddingEnd="20dp"
+    android:paddingBottom="20dp">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/wg_peer_edit_keepalive_title"
+        android:textAppearance="?attr/textAppearanceHeadline6"
+        android:textColor="?attr/primaryTextColor"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/dialog_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/wg_peer_edit_keepalive_desc"
+        android:textColor="?attr/primaryLightColorText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_title" />
+
+    <!-- Persistent Keepalive -->
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/persistent_keepalive_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:labelFor="@+id/persistent_keepalive_edit_text"
+        android:text="@string/lbl_persistent_keepalive"
+        android:textColor="?attr/primaryTextColor"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_desc" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/persistent_keepalive_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/edittext_default"
+        android:hint="@string/lbl_persistent_keepalive_hint"
+        android:imeOptions="actionDone"
+        android:inputType="number"
+        android:padding="10dp"
+        android:textColor="?attr/primaryTextColor"
+        android:textColorHint="?attr/primaryLightColorText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/persistent_keepalive_label" />
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:id="@+id/button_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:orientation="horizontal"
+        android:weightSum="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/persistent_keepalive_edit_text">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/dialog_cancel_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="0.5"
+            android:background="@drawable/rectangle_border_background"
+            android:text="@string/lbl_cancel"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/heading_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/dialog_save_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_weight="0.5"
+            android:background="@drawable/rectangle_border_background"
+            android:text="@string/lbl_save"
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/heading_font_text_view" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

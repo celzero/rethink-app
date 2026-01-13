@@ -92,7 +92,7 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
                     .build()
             val retrofitInterface = retrofit.create(ITcpProxy::class.java)
             // TODO: get refId from EncryptedFile
-            val response = retrofitInterface.checkForPaymentAcknowledgement(referenceId, purchaseToken)
+            val response = retrofitInterface.checkForPaymentAcknowledgement(referenceId, purchaseToken, persistentState.appVersion.toString())
             Logger.d(
                 Logger.LOG_IAB,
                 "getPaymentStatusFromServer: ${response?.headers()}, ${response?.message()}, ${response?.raw()?.request?.url}"

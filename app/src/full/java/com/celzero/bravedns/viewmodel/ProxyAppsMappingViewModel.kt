@@ -25,6 +25,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.liveData
 import com.celzero.bravedns.database.ProxyApplicationMappingDAO
+import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
@@ -44,18 +45,23 @@ class ProxyAppsMappingViewModel(private val mappingDAO: ProxyApplicationMappingD
     var apps =
         filteredList.switchMap { searchTxt ->
             Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    when (filterType) {
-                        WgIncludeAppsDialog.TopLevelFilter.ALL_APPS ->
-                            mappingDAO.getAllAppsMapping(searchTxt)
-                        WgIncludeAppsDialog.TopLevelFilter.SELECTED_APPS ->
-                            mappingDAO.getSelectedAppsMapping(searchTxt, proxyId)
-                        WgIncludeAppsDialog.TopLevelFilter.UNSELECTED_APPS ->
-                            mappingDAO.getUnSelectedAppsMapping(searchTxt, proxyId)
-                    }
+                when (filterType) {
+                    WgIncludeAppsDialog.TopLevelFilter.ALL_APPS ->
+                        mappingDAO.getAllAppsMapping(searchTxt)
+                    WgIncludeAppsDialog.TopLevelFilter.SELECTED_APPS ->
+                        mappingDAO.getSelectedAppsMapping(searchTxt, proxyId)
+                    WgIncludeAppsDialog.TopLevelFilter.UNSELECTED_APPS ->
+                        mappingDAO.getUnSelectedAppsMapping(searchTxt, proxyId)
                 }
+            }
                 .liveData
                 .cachedIn(viewModelScope)
         }
+
+    // helper to decide if an app is selected for a given proxyId using ProxyManager cache
+    fun isAppSelectedForProxy(uid: Int, proxyId: String): Boolean {
+        return ProxyManager.getProxyIdsForApp(uid).contains(proxyId)
+    }
 
     fun setFilter(filter: String, type: WgIncludeAppsDialog.TopLevelFilter, pid: String) {
         filterType = type

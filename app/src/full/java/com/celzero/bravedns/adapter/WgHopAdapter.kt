@@ -40,6 +40,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/**
+ * Adapter for WireGuard configuration hopping
+ * 
+ * NOTE: For new implementations, consider using GenericHopAdapter which supports
+ * both WireGuard configs and RPN proxies through the HopItem sealed interface.
+ * This adapter is kept for backwards compatibility.
+ */
 class WgHopAdapter(
     private val context: Context,
     private val srcId: Int,
@@ -65,6 +72,10 @@ class WgHopAdapter(
     }
 
     override fun onBindViewHolder(holder: HopViewHolder, position: Int) {
+        if (position < 0 || position >= itemCount) {
+            Logger.w(LOG_TAG_UI, "$TAG; Invalid position $position for itemCount $itemCount")
+            return
+        }
         holder.update(hopables[position])
     }
 

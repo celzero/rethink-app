@@ -741,7 +741,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
     private fun openAppsDialog(proxyName: String) {
         val proxyId = ID_WG_BASE + configId
-        val appsAdapter = WgIncludeAppsAdapter(this, proxyId, proxyName)
+        val appsAdapter = WgIncludeAppsAdapter(this, this, proxyId, proxyName)
         mappingViewModel.apps.observe(this) { appsAdapter.submitData(lifecycle, it) }
         var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         if (Themes.isFrostTheme(themeId)) {

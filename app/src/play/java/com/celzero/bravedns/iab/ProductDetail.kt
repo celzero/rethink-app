@@ -1,5 +1,5 @@
 package com.celzero.bravedns.iab
-/*
+
 import com.android.billingclient.api.BillingClient
 
 
@@ -18,4 +18,4 @@ data class ProductDetail(
         productType = BillingClient.ProductType.SUBS,
         pricingDetails = listOf(),
     )
-}*/
+}

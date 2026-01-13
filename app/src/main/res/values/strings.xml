@@ -260,7 +260,6 @@
     <string name="status_protected_with_proxy_private_dns" translatable="true">protected with proxy &amp; private dns</string>
 
     <string name="status_protected_with_socks5_private_dns" translatable="true">protected with socks5 &amp; private dns</string>
-
     <string name="status_protected_with_http_private_dns" translatable="true">protected with http proxy &amp; private dns</string>
 
     <string name="status_protected_with_socks5" translatable="true">protected with socks proxy</string>
@@ -360,7 +359,7 @@
     <string name="always_on_dialog_neutral" translatable="true">Settings</string>
 
     <string name="private_dns_dialog_heading" translatable="true">Turn off Private DNS</string>
-    <string name="private_dns_dialog_desc" translatable="true">Rethink\'s DNS settings are overridden by Android\'s Private DNS.\n\nTo use Rethink\'s DNS go to Android Settings and turn off \"Private DNS\".</string>
+    <string name="private_dns_dialog_desc" translatable="true">Rethink\'s DNS settings are overridden by Android\'s Private DNS.\n\nTo use Rethink\'s DNS go to Android Settings and turn off "Private DNS".</string>
     <string name="private_dns_dialog_positive" translatable="true">Go to Settings</string>
 
     <string name="firewall_act_universal_tab" translatable="true">universal</string>
@@ -1921,6 +1920,13 @@
     <string name="wg_ssid_type_wildcard" translatable="true">Matches partially</string>
     <string name="wg_ssid_invalid_error" translatable="true">Wi-Fi identifiers (%1$s) must be 32 characters or less.</string>
     <string name="wg_ssid_delete_confirmation" translatable="true">Delete "%1$s"?</string>
+    <string name="wg_ssid_add_button" translatable="false">Add SSID</string>
+    <string name="wg_ssid_empty_error" translatable="false">SSID name cannot be empty</string>
+    <string name="wg_ssid_duplicate_error" translatable="false">SSID already exists in the list</string>
+    <string name="wg_ssid_delete_title" translatable="false">Delete SSID</string>
+    <string name="wg_ssid_delete_message" translatable="false">Are you sure you want to delete "%1$s"?</string>
+    <string name="wg_ssid_condition_label" translatable="false">Action</string>
+    <string name="wg_ssid_match_type_label" translatable="false">Match Type</string>
 
     <string name="settings_firebase_error_reporting_heading" translatable="true">Stability program</string>
     <string name="settings_firebase_error_reporting_desc" translatable="true">Capture error logs to help improve stability. </string>
@@ -1994,4 +2000,232 @@
     <string name="custom_lan_ip_save_error" translatable="false">Could not save custom LAN IPs</string>
     <string name="custom_lan_ip_open_error" translatable="false">Could not open Custom LAN IPs dialog</string>
     <string name="custom_lan_ip_validation_error" translatable="false">Invalid IP addresses. Ensure:\n• IPv4 must be private (10.x.x.x, 172.16-31.x.x, or 192.168.x.x)\n• IPv6 must be unique local (fc00::/7)\n• Both IP and prefix must be provided together</string>
+    <string name="vpn_not_active_dialog_title" translatable="false">VPN not active</string>
+    <string name="vpn_not_active_dialog_desc" translatable="false">Rethink is not started. Please start to use this feature.</string>
+
+    <string name="err_amz_creation_toast" translatable="false">Error creating Amnezia config</string>
+    <string name="err_se_creation_toast" translatable="false">Error registering SE to tunnel</string>
+
+    <string name="ping_strength_title" translatable="false">Strength</string>
+
+    <string name="rethink_plus_title" translatable="false">Rethink+</string>
+    <string name="rethink_plus_title_desc" translatable="false">Anti-censorship, and anti-surveillance</string>
+
+    <string name="rethink_plus_hide_ip_title" translatable="false">Hide your IP</string>
+    <string name="rethink_plus_hide_ip_desc" translatable="false">Hide your IP address from websites and apps.</string>
+
+    <string name="rethink_plus_troubleshoot_title" translatable="false">troubleshoot</string>
+
+    <string name="rethink_plus_perform_test" translatable="false">Perform test</string>
+    <string name="rethink_plus_test_desc" translatable="false">Test your connection to Rethink+ proxies.</string>
+
+    <string name="rethink_plus_report_issue" translatable="false">Report issue</string>
+    <string name="rethink_plus_report_desc" translatable="false">Report an issue with Rethink+.</string>
+
+    <string name="rpn_availablity" translatable="false">Rethink+ availability</string>
+
+    <string name="r_plus_subs_congrats" translatable="false">Congratulations!</string>
+    <string name="r_plus_subs_congrats_desc" translatable="false">You are now subscribed to Rethink+.</string>
+
+    <string name="rplus_purchase" translatable="false">Purchase</string>
+
+    <string name="rplus_not_available" translatable="false">Not available</string>
+
+    <string name="rplus_already_member" translatable="false">Already Rethink+ member</string>
+
+    <string name="dashboard_title" translatable="false">Dashboard</string>
+
+    <string name="payment_history_title" translatable="false">Payment History</string>
+
+    <string name="manage_subscription_title" translatable="false">Manage Subscription</string>
+
+    <string name="contact_support_title" translatable="false">Contact Support</string>
+
+    <string name="pause_rethink_plus_title" translatable="false">Pause Rethink+</string>
+    <string name="resume_rethink_plus_title" translatable="false">Resume Rethink+</string>
+
+    <string name="subscribe_title" translatable="false">Subscribe</string>
+
+    <string name="resubscribe_title" translatable="false">Resubscribe</string>
+
+
+    <string name="rethink_off" translatable="false">Off</string>
+    <string name="rethink_off_desc" translatable="false">Off</string>
+
+    <string name="fallback_rplus_toast" translatable="false">Rethink Plus is active, fallback dns is not supported</string>
+
+    <string name="error_loading_manage_subscription" translatable="false">Error loading manage subscription</string>
+
+    <string name="rethink_plus_not_available" translatable="false">Rethink+ is not available for your device.\n reason: %1$s</string>
+
+    <string name="no_internet_connection" translatable="false">No Internet Connection</string>
+
+    <string name="play_service_not_available" translatable="false">Google Play Services is not available on your device.</string>
+
+    <string name="product_details_error" translatable="false">Error fetching product details</string>
+
+    <string name="loading_dialog_title" translatable="false">Loading</string>
+    <string name="rethink_plus_loading_dialog_desc" translatable="false">"Please wait while we check the availability of Rethink+.</string>
+
+    <string name="payment_processing" translatable="false">Payment processing</string>
+    <string name="payment_processing_desc" translatable="false">Your payment is being processed. You’ll get access once it completes.</string>
+
+    <string name="rethink_plus_check_status" translatable="false">Checking Rethink+ status</string>
+
+    <string name="rethink_plus_purchase_error" translatable="false">Error purchasing Rethink+, would you like to try again?</string>
+    <string name="use_this_proxy" translatable="false">Use this</string>
+
+    <string name="rethink_plus_not_available_desc" translatable="false">There seems to be an issue with Rethink+ availability on your device. Please try again later or contact support.</string>
+    <string name="last_refresh_time" translatable="false">Last refresh: %1$s</string>
+    <string name="about_mail_plus_bugreport_subject" translatable="false">[Rethink_plus]: Report Issue</string>
+    <string name="rethink_terms" translatable="false">By subscribing to Rethink Plus you agree to the &lt;a href="https://rethinkdns.com/terms"&gt;Rethink Terms of Service&lt;/a&gt; and &lt;a href="https://rethinkdns.com/privacy"&gt;Privacy Policy&lt;/a&gt;.</string>
+
+    <!-- Premium Subscription UI Strings -->
+    <string name="premium_subtitle" translatable="false">Enhanced privacy, speed, and security</string>
+    <string name="choose_plan" translatable="false">Choose Your Plan</string>
+    <string name="choose_plan_subtitle" translatable="false">Select the plan that works best for you</string>
+    <string name="subscribe_now" translatable="false">Subscribe Now</string>
+    <string name="purchase_now" translatable="false">Purchase Now</string>
+    <string name="subscription_label" translatable="false">Subscription</string>
+    <string name="one_time_label" translatable="false">One-Time</string>
+    <string name="best_value" translatable="false">BEST VALUE</string>
+    <string name="monthly_plan" translatable="false">Monthly</string>
+    <string name="price_placeholder" translatable="false">$0.00</string>
+    <string name="per_month" translatable="false">/month</string>
+    <string name="per_year" translatable="false">/year</string>
+    <string name="original_price" translatable="false">Was %1$s</string>
+    <string name="billing_info" translatable="false">Cancel anytime</string>
+    <string name="free_trial" translatable="false">Free trial available</string>
+    <string name="save_percentage" translatable="false">Save %1$s</string>
+    <string name="select_plan_first" translatable="false">Please select a plan first</string>
+    <string name="subscription_activated" translatable="false">Your subscription has been activated!</string>
+
+    <!-- Purchase Processing Bottom Sheet Strings -->
+    <string name="processing_purchase" translatable="false">Processing Purchase</string>
+    <string name="please_wait_processing" translatable="false">Please wait while we process your purchase…</string>
+    <string name="verifying_purchase" translatable="false">Verifying Purchase</string>
+    <string name="verifying_with_play_store" translatable="false">Verifying with Google Play Store…</string>
+    <string name="purchase_successful" translatable="false">Purchase Successful!</string>
+    <string name="purchase_failed" translatable="false">Purchase Failed</string>
+    <string name="something_went_wrong" translatable="false">Something went wrong. Please try again.</string>
+    <string name="continue_text" translatable="false">Continue</string>
+    <string name="close" translatable="false">Close</string>
+    <string name="retry" translatable="false">Retry</string>
+    <string name="error_title" translatable="false">Error</string>
+    <string name="error_message" translatable="false">Unable to load subscription plans</string>
+
+
+
+
+    <!-- Server Selection Screen -->
+    <string name="server_selection_title" translatable="false">Select VPN Servers</string>
+    <string name="server_selection_search_hint" translatable="false">Search countries or locations…</string>
+    <string name="server_selection_clear_search" translatable="false">Clear search</string>
+    <string name="server_selection_none_selected" translatable="false">No servers selected</string>
+    <string name="server_selection_max_info" translatable="false">Select up to 5 servers</string>
+    <string name="server_selection_max_reached" translatable="false">Maximum %1$d servers can be selected</string>
+    <string name="server_selection_no_servers" translatable="false">No servers found</string>
+    <string name="server_selection_no_servers_desc" translatable="false">Try adjusting your search or check back later</string>
+    <string name="server_selection_no_servers_error" translatable="false">No servers available to connect. Please check your subscription or try again later.</string>
+    <string name="server_selection_error_title" translatable="false">No Servers Available</string>
+    <string name="server_selection_error_message" translatable="false">We couldn\'t find any servers to connect to. Please check your subscription status or try refreshing.</string>
+    <string name="server_selection_retry" translatable="false">Retry</string>
+    <string name="loading" translatable="false">Loading…</string>
+    <string name="server_selection_tap_to_select" translatable="false">Tap a server to expand and select</string>
+    <string name="server_selection_all_servers" translatable="false">All Servers</string>
+    <string name="server_selection_current_location" translatable="false">Current Location</string>
+    <string name="server_selection_multi_connection_info" translatable="false">Up to 5 WireGuard connections can be active at the same time</string>
+
+    <string name="vpn_status_connected" translatable="false">Connected</string>
+    <string name="vpn_status_disconnected" translatable="false">Disconnected</string>
+    <string name="vpn_status_connecting" translatable="false">Connecting…</string>
+
+    <string name="server_location_format" translatable="false">%1$s • %2$s</string>
+
+    <string name="server_latency_label" translatable="false">Latency</string>
+    <string name="server_upload_label" translatable="false">Upload</string>
+    <string name="server_download_label" translatable="false">Download</string>
+    <string name="lbl_country" translatable="false">Country: %1$s</string>
+    <string name="lbl_latency" translatable="false">Latency: %1$s</string>
+
+    <string name="server_chip_secure" translatable="false">Secure</string>
+    <string name="server_chip_hop" translatable="false">Multi-hop</string>
+    <string name="server_chip_split_ip" translatable="false">Split IP</string>
+
+    <string name="server_selection_selected_count">%1$s / %2$s</string>
+
+    <plurals name="server_selection_count">
+        <item quantity="zero">No servers selected</item>
+        <item quantity="one">%1$d server selected</item>
+        <item quantity="other">%1$d servers selected</item>
+    </plurals>
+
+    <plurals name="server_count">
+        <item quantity="one">%1$d server</item>
+        <item quantity="other">%1$d servers</item>
+    </plurals>
+
+    <!-- Server Removal Notification -->
+    <string name="server_removal_title" translatable="false">Server Location Removed</string>
+    <string name="server_removal_subtitle" translatable="false">This location is no longer available</string>
+    <string name="server_removal_understand" translatable="false">I Understand</string>
+    <string name="server_removed" translatable="false">Removed</string>
+    <string name="notification_icon" translatable="false">Notification Icon</string>
+
+    <!-- Country SSID Dialog -->
+    <string name="country_ssid_dialog_title" translatable="false">WiFi Settings for %1$s</string>
+    <string name="country_ssid_dialog_description" translatable="false">%1$s to %2$s when connected to %3$s that %4$s match the list below</string>
+    <string name="country_ssid_add_new" translatable="false">Add New SSID</string>
+    <string name="country_ssid_configured_list" translatable="false">Configured SSIDs</string>
+    <string name="country_ssid_empty_state" translatable="false">No SSIDs configured yet</string>
+    <string name="country_ssid_icon" translatable="false">SSID Icon</string>
+
+    <!-- Server WireGuard Config Detail -->
+    <string name="lbl_peers" translatable="false">Peers</string>
+    <string name="lbl_server_config" translatable="false">Server Configuration</string>
+    <string name="lbl_server_config_readonly" translatable="false">Server Configuration (Read-only)</string>
+    <string name="lbl_mtu_hint" translatable="false">e.g. 1420</string>
+    <string name="lbl_persistent_keepalive_hint" translatable="false">e.g. 25 (seconds)</string>
+    <string name="lbl_not_set" translatable="false">Not set</string>
+    <string name="wg_mtu_empty_error" translatable="false">MTU cannot be empty</string>
+    <string name="wg_mtu_invalid_error" translatable="false">MTU must be between 1280 and 1500</string>
+    <string name="wg_mtu_update_success" translatable="false">MTU updated successfully</string>
+    <string name="wg_listen_port_update_success" translatable="false">Listen port updated successfully</string>
+    <string name="wg_update_error" translatable="false">Error updating configuration</string>
+    <string name="wg_peer_keepalive_invalid" translatable="false">Persistent keepalive must be between 0 and 65535</string>
+    <string name="wg_peer_update_success" translatable="false">Peer updated successfully</string>
+    <string name="wg_peer_edit_keepalive_title" translatable="false">Edit Peer Keepalive</string>
+    <string name="wg_peer_edit_keepalive_desc" translatable="false">Modify the persistent keepalive interval for this peer. This determines how often keepalive packets are sent to maintain the connection.</string>
+
+    <!-- Server WireGuard Config Detail -->
+    <string name="server_config_detail_title" translatable="false">Server Configuration</string>
+
+    <!-- Country Configuration -->
+    <string name="lbl_country_config" translatable="false">Country Configuration</string>
+    <string name="desc_mobile_only" translatable="false">Use this country only on mobile data</string>
+    <string name="lbl_ssid_based" translatable="false">SSID Based</string>
+    <string name="desc_ssid_based" translatable="false">Use based on WiFi network</string>
+
+    <!-- Actions -->
+    <string name="configuration_saved" translatable="false">Configuration saved successfully</string>
+    <string name="error_update_failed" translatable="false">Failed to update configuration</string>
+    <string name="error_save_failed" translatable="false">Failed to save configuration</string>
+
+    <!-- Peer Count -->
+    <plurals name="peer_count">
+        <item quantity="one">%d peer</item>
+        <item quantity="other">%d peers</item>
+    </plurals>
+
+    <string name="hint_seconds" translatable="false">Seconds</string>
+
+    <!-- Settings -->
+    <string name="settings_title" translatable="false">Settings</string>
+    <string name="lockdown_desc" translatable="false">Force all traffic through this server</string>
+
+    <!-- Premium UI -->
+    <string name="lbl_connection" translatable="false">Connection</string>
+    <string name="lbl_quick_actions" translatable="false">Quick Actions</string>
+
+    <string name="subscription_processing_timeout" translatable="false">Subscription processing is taking longer than expected. Please check your internet connection and try again.</string>
 </resources>
