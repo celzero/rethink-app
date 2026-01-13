@@ -480,7 +480,25 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             val ns = KernelProc.getNs(force)
             val sched = KernelProc.getSched(force)
             val task = KernelProc.getTask(force)
-            return stat + "\n\n" + status + "\n\n" + mem + "\n\n" + maps + "\n\n" + smaps + "\n\n" + net + "\n\n" + ns + "\n\n" + sched + "\n\n" + task
+            return buildString {
+                append(stat)
+                append("\n\n")
+                append(status)
+                append("\n\n")
+                append(mem)
+                append("\n\n")
+                append(maps)
+                append("\n\n")
+                append(smaps)
+                append("\n\n")
+                append(net)
+                append("\n\n")
+                append(ns)
+                append("\n\n")
+                append(sched)
+                append("\n\n")
+                append(task)
+            }
         }
 
         io {
