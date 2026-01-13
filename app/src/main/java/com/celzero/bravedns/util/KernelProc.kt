@@ -70,20 +70,18 @@ object KernelProc {
     }
 
     private fun readDirAsLines(dirPath: String, title: String, forceRefresh: Boolean = false): String {
-        if (forceRefresh) cachedText.remove(dirPath)
-        return cachedText.getOrPut(dirPath) {
-            runCatching {
-                val dir = File(dirPath)
-                if (!dir.exists()) return@getOrPut "$title: missing"
-                val files = dir.listFiles()?.sortedBy { it.name } ?: emptyList()
-                if (files.isEmpty()) return@getOrPut "$title: empty"
-                val body = files.joinToString(separator = "\n") { f ->
-                    val target = runCatching { f.canonicalPath }.getOrDefault(f.path)
-                    "${f.name} -> $target"
-                }
-                "$title\n$body"
-            }.getOrElse { err -> "$title: error: ${err.message ?: err::class.java.simpleName}" }
-        }
+        // Directory contents (like /proc/self/task) change often; read live instead of caching.
+        return runCatching {
+            val dir = File(dirPath)
+            if (!dir.exists()) return@runCatching "$title: missing"
+            val files = dir.listFiles()?.sortedBy { it.name } ?: emptyList()
+            if (files.isEmpty()) return@runCatching "$title: empty"
+            val body = files.joinToString(separator = "\n") { f ->
+                val target = runCatching { f.canonicalPath }.getOrDefault(f.path)
+                "${f.name} -> $target"
+            }
+            "$title\n$body"
+        }.getOrElse { err -> "$title: error: ${err.message ?: err::class.java.simpleName}" }
     }
 
     private fun readAuxvHumanReadable(): String {
