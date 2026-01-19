@@ -358,7 +358,7 @@ dependencies {
     playImplementation firestackDependency()
 
     // Work manager
-    implementation('androidx.work:work-runtime-ktx:2.10.5') {
+    implementation('androidx.work:work-runtime-ktx:2.11.0') {
         modules {
             module("com.google.guava:listenablefuture") {
                 replacedBy("com.google.guava:guava", "listenablefuture is part of guava")
