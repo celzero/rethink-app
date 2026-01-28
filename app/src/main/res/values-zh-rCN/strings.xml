@@ -259,7 +259,7 @@
     <string name="local_blocklist_download_desc">是否下载屏蔽名单（约 60 MB ）来使用此功能？</string>
     <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
     <string name="configure_dns_connected_dns_proxy_status">DNS 代理</string>
-    <string name="download_update_dialog_failure_title">似乎有什么出错了！</string>
+    <string name="download_update_dialog_failure_title">出了点问题！</string>
     <string name="search_rethinkplus_file_tag"><font size="12">搜索屏蔽名单</font></string>
     <string name="settings_lock_down_mode_desc">某些选项在 VPN 处于闭关模式时不可用。<u>请移步 VPN 设置</u>。</string>
     <string name="orbot_status_arg_3">DNS 与 TCP</string>
@@ -342,7 +342,7 @@
     <string name="category_name_others">其他</string>
     <string name="ci_bypass_universal_initial">绕</string>
     <string name="ci_bypass_universal_txt">无条件放行</string>
-    <string name="notif_download_content_text">正在下载……</string>
+    <string name="notif_download_content_text">正在下载…</string>
     <string name="rt_re_download">重新下载屏蔽名单</string>
     <string name="dc_dns_crypt">DNSCrypt</string>
     <string name="txt_home">首页</string>
@@ -463,7 +463,7 @@
     <string name="firewall_rule_exempt_app_bypass_univ">已绕行应用</string>
     <string name="firewall_rule_global_lockdown">闭关模式</string>
     <string name="firewall_rule_isolate_desc"><![CDATA[一项用户定义的防火墙规则在此<i>应用</i>尝试连接至<i>已绕行 IP </i>外的地址时将其拦截。<br/><br/>若需更改，请移步<i>所有应用</i>选项卡。]]></string>
-    <string name="notif_dialog_pause_dialog_negative">忽略</string>
+    <string name="notif_dialog_pause_dialog_negative">舍弃</string>
     <string name="notif_channel_desc_vpn_notification">在 Rethink 启用且在后台时提醒我</string>
     <string name="notif_channel_desc_vpn_failure">在 Rethink 被 Android 或其他 VPN 应用停止时提醒我</string>
     <string name="cd_remove_dialog_title">是否删除域名？</string>
@@ -633,7 +633,7 @@
     <string name="about_github_link">https://github.com/celzero/rethink-app</string>
     <string name="cd_dns_crypt_title">解析服务</string>
     <string name="cd_custom_doh_url_name">DoH %1$s</string>
-    <string name="settings_custom_downloader_heading">使用应用内附下载器</string>
+    <string name="settings_custom_downloader_heading">使用应用内下载器</string>
     <string name="settings_notification_dialog_option_2">\nDNS / DNS + 防火墙：\n显示两个按钮来快速在省电的 DNS 模式和普通的 DNS + 防火墙模式间切换。</string>
     <string name="contributors_list"><![CDATA[<i>Rethink 开源项目</i> 的存在归功于这些贡献了无数时间在其开发工作上的志愿者们。<br/>
                                               <br/>🛡️ Android 应用 <br/>
@@ -845,7 +845,7 @@
     <string name="lbl_ip_rules" translatable="true">IP 规则</string>
     <string name="lbl_apply" translatable="true">应用</string>
     <string name="lbl_domain" translatable="true">域名</string>
-    <string name="lbl_dismiss" translatable="true">忽略</string>
+    <string name="lbl_dismiss" translatable="true">关闭</string>
     <string name="lbl_allowed" translatable="true">放行</string>
     <string name="lbl_action_required" translatable="true">需采取行动</string>
     <string name="lbl_disabled" translatable="true">禁用</string>
@@ -1001,7 +1001,7 @@
     <string name="config_add_success_toast">配置已添加</string>
     <string name="include_all_app_wg_dialog_title">包含所有应用</string>
     <string name="exclude_all_app_wg_dialog_desc">是否从此隧道排除所有应用？</string>
-    <string name="wireguard_no_config_msg">无 WireGuard VPN 。添加一些配置以开始连接。</string>
+    <string name="wireguard_no_config_msg">无 WireGuard VPN。添加一些配置以开始连接。</string>
     <string name="cloudflare_dns_desc" translatable="true">不拦截任何 DNS 请求。使用 Cloudflare 的 1.1.1.1 DNS 端点。</string>
     <string name="cloudflare_family_dns_desc" translatable="true">拦截恶意软件与成人内容。使用 Cloudflare 的 1.1.1.3 DNS 端点。</string>
     <string name="cleanbrowsing_family_dns_desc" translatable="true">家庭过滤器拦截对所有成人、色情与露骨网站的访问。其亦将拦截可用于绕行过滤器的代理与 VPN 域名。包含混合内容的网站（如 Reddit ）也被拦截。 Google 、 Bing 与 YouTube 被设置为安全模式。</string>
@@ -1060,7 +1060,7 @@
     <string name="wg_apps_dialog_title_include" translatable="true">包含 %1$s 个应用</string>
     <string name="wg_apps_dialog_title_exclude" translatable="true">排除 %1$s 个应用</string>
     <string name="wireguard_disable_title" translatable="true">停止 WireGuard</string>
-    <string name="wireguard_disable_message" translatable="true">是否停止所有活跃 WireGuard VPN ？</string>
+    <string name="wireguard_disable_message" translatable="true">是否停止所有正在运行的 WireGuard VPN？</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> 可能导致连接丢失。 更改设置以允许 Rethink 在后台使用数据和其他资源。</string>
     <string name="toast_allow_bypass_disabled" translatable="true">因已启用代理， %1$s 已被禁用</string>
     <string name="lbl_unselected" translatable="true">未选</string>
@@ -1217,4 +1217,27 @@
     <string name="settings_tunnel_metered" translatable="true">始终按流量计费</string>
     <string name="settings_tunnel_metered_desc" translatable="true">将 Rethink 虚拟专用网络隧道标记为按流量计费，以引导应用减少数据消耗。注意：此举可能导致应用暂停大型上传和下载任务（如备份操作）。</string>
     <string name="stability_program_toast" translatable="true">加入<i>稳定性项目</i>，以体验<i>实验性功能</i>。</string>
+    <string name="ac_never_split_desc" translatable="true">不修改数据包。</string>
+    <string name="ac_split_auto_desc" translatable="true">必要时修改数据包。</string>
+    <string name="ac_split_tcp_desc" translatable="true">修改 TCP 数据包。</string>
+    <string name="ac_split_tls_desc" translatable="true">更改 TCP 或 TLS 数据包。</string>
+    <string name="ac_desync" translatable="true">异步干扰</string>
+    <string name="ac_desync_desc" translatable="true">必要时发送诱饵数据包。</string>
+    <string name="ac_retry_options_title" translatable="true">策略</string>
+    <string name="ac_retry_options_desc" translatable="true">设置受审查连接的重试方式。</string>
+    <string name="ac_retry_options_never_desc" translatable="true">失败时永不重试反审查技术。</string>
+    <string name="ac_retry_options_with_split_desc" translatable="true">必要时应用反审查技术。</string>
+    <string name="ac_retry_options_after_split_desc" translatable="true">始终应用反审查技术。</string>
+    <string name="ac_toast_retry_disabled" translatable="true">选择任意反审查选项以确定策略。</string>
+    <string name="vpn_policy_title" translatable="true">连接变更策略</string>
+    <string name="vpn_policy_sensitive" translatable="true">敏感</string>
+    <string name="vpn_policy_relaxed" translatable="true">宽松</string>
+    <string name="vpn_policy_fixed" translatable="true">保守</string>
+    <string name="vpn_policy_auto_desc" translatable="true">对重要网络及连接变更作出响应。</string>
+    <string name="vpn_policy_sensitive_desc" translatable="true">对所有网络与连接变更作出响应。</string>
+    <string name="vpn_policy_relaxed_desc" translatable="true">对值得关注的连接变更作出响应。</string>
+    <string name="vpn_policy_fixed_desc" translatable="true">对网络变更作出最低限度响应。</string>
+    <string name="smart_dns" translatable="true">智能 DNS</string>
+    <string name="smart_dns_desc" translatable="true"><i>智能 DNS</i> 会随机使用以下任意一个 DNS 解析器：</string>
+    <string name="title_database_dump" translatable="true">数据库</string>
 </resources>
