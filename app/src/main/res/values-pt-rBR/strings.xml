@@ -730,7 +730,7 @@
     <string name="private_dns_dialog_positive">Ir para as configurações</string>
     <string name="lbl_apply" translatable="true">Aplicar</string>
     <string name="lbl_disabled" translatable="true">Desativado</string>
-    <string name="title_statistics" translatable="true">Estatísticas</string>
+    <string name="title_statistics" translatable="true">Status</string>
     <string name="fapps_info_isolate_msg" translatable="true">Bloquear todos, exceto IPs de confiança.</string>
     <string name="fapps_isolate_block_dialog_title" translatable="true">Isolar aplicativos</string>
     <string name="lbl_cancel" translatable="true">Cancelar</string>
