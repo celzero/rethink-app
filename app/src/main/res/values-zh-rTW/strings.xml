@@ -1112,4 +1112,20 @@
     <string name="firewall_rule_lockdown_wg" translatable="true">閉關代理</string>
     <string name="firewall_rule_proxy_error" translatable="true">代理錯誤</string>
     <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[此連線正在尋找一個不存在的<i>私人 DNS</i> 伺服器。]]></string>
+    <string name="dns_record_types_auto_mode_status" translatable="true">自動（所有類型）</string>
+    <string name="anti_censorship_title" translatable="true">反審查</string>
+    <string name="ac_title" translatable="true">反審查</string>
+    <string name="ac_split_tcp" translatable="true">TCP</string>
+    <string name="ac_split_tls" translatable="true">TCP/TLS</string>
+    <string name="ac_desync" translatable="true">不同步</string>
+    <string name="ac_retry_options_title" translatable="true">策略</string>
+    <string name="lbl_always" translatable="true">總是</string>
+    <string name="adv_taster_title" translatable="true">自動化</string>
+    <string name="vpn_policy_sensitive" translatable="true">敏感</string>
+    <string name="title_database_dump" translatable="true">資料庫</string>
+    <string name="copied_clipboard" translatable="true">已複製</string>
+    <string name="vpn_policy_fixed" translatable="true">保守</string>
+    <string name="load_more" translatable="true">載入全部</string>
+    <string name="close_all" translatable="true">關閉全部</string>
+    <string name="smart_dns" translatable="true">智慧 DNS</string>
 </resources>
