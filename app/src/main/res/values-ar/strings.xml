@@ -6,7 +6,7 @@
     <string name="alert_firewall_accessibility_regrant_explanation">توقفت خدمة إمكانية الوصول RethinkDNS أو تعطلت. <i> <b> انتقل إلى الإعدادات وفرض الإيقاف </b> </i> أعد التفكير في DNS وابدأ مرة أخرى لاستخدام <i> احظر أي تطبيق غير مستخدم </i>.
 \n
 \nيستخدم RethinkDNS خدمة إمكانية الوصول لتتبع التطبيقات قيد الاستخدام (المقدمة) مقابل التطبيقات غير المستخدمة (الخلفية).</string>
-    <string name="default_dns_name">RDNS افتراضي</string>
+    <string name="default_dns_name">RDNS المبدئي</string>
     <string name="about_settings_vpn_profile">ملف تعريف VPN</string>
     <string name="dns_proxy_dialog_message">اسم التطبيق: %1$s
 \n
@@ -20,10 +20,10 @@
     <string name="dns_proxy_connection_failure_lockdown">يمكن أن يؤدي استبعاد %1$s لـ %2$s في وضع الإغلاق إلى حدوث مشكلات في الاتصال بالإنترنت.</string>
     <string name="new_app_notification_action_deny">استمر فى الحجز</string>
     <string name="settings_dns_proxy_dialog_password">كلمة المرور</string>
-    <string name="settings_notification_desc1">إيقاف مؤقت / إيقاف (افتراضي)</string>
+    <string name="settings_notification_desc1">ألبث / أوقف (المبدئي)</string>
     <string name="ada_app_bypass_univ">تجاوز عالمي</string>
     <string name="lbl_advanced">متقدم</string>
-    <string name="dns_crypt_relay_remove_dialog_message">حذف مرحل DNSCrypt من التكوين المحفوظ.</string>
+    <string name="dns_crypt_relay_remove_dialog_message">احذف مرحل DNSCrypt من التكوين المحفوظ.</string>
     <string name="orbot_install_dialog_title">تثبيت Orbot؟</string>
     <string name="settings_check_update_desc">تحقق تلقائيًا من تحديثات التطبيق مرة واحدة في الأسبوع.</string>
     <string name="hsf_vpn_prepare_failure">إما إذن VPN مفقود ، أو أن هناك تطبيقًا آخر في وضع VPN قيد التشغيل دائمًا.</string>
@@ -84,7 +84,7 @@
     <string name="fapps_firewall_filter_bypass_universal">تجاوز</string>
     <string name="about_settings">النظام</string>
     <string name="pause_text">متوقف مؤقتاً</string>
-    <string name="dns_crypt_relay_remove_success">تم حذف DNSCrypt Relay.</string>
+    <string name="dns_crypt_relay_remove_success">حُذف DNSCrypt Relay.</string>
     <string name="fapps_info_dialog_positive_btn">حسنًا</string>
     <string name="finish">إنهاء</string>
     <string name="firewall_rule_no_rule">لا توجد قاعدة</string>
@@ -133,7 +133,7 @@
     <string name="about_app_update_check">تحقق من وجود تحديثات التطبيق</string>
     <string name="about_app_contributors">المؤلفين</string>
     <string name="about_dialog_positive_button">لنذهب</string>
-    <string name="notif_dialog_pause_dialog_title">تم إيقاف التطبيق مؤقتا!</string>
+    <string name="notif_dialog_pause_dialog_title">التطبيق مُلبث!</string>
     <string name="cd_no_rule_txt">لا توجد قاعدة</string>
     <string name="ci_block">حظر</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">تحذير: تم إلغاء تنشيط Rethink</string>
@@ -143,7 +143,7 @@
     <string name="univ_firewall_dialog_message">سيسمح حذف هذه القاعدة لأي تطبيق بالاتصال بعنوان IP هذا. هل تريد المتابعة؟</string>
     <string name="app_mode_wireguard">VPN</string>
     <string name="orbot">Orbot</string>
-    <string name="orbot_none">لا شيء (افتراضي)</string>
+    <string name="orbot_none">لا شيء (المبدئي)</string>
     <string name="orbot_title">Orbot و Proxies</string>
     <string name="settings_network_all_networks">استخدم جميع الشبكات المتاحة (تجريبي)</string>
     <string name="settings_dns_proxy_dialog_username">اسم المستخدم</string>
@@ -169,7 +169,7 @@
     <string name="rt_download">تنزيل قوائم الحظر</string>
     <string name="untracked">لم يتم تعقبه</string>
     <string name="notification_action_resume_vpn">استكمل</string>
-    <string name="notification_action_pause_vpn">إيقاف مؤقت</string>
+    <string name="notification_action_pause_vpn">ألبث</string>
     <string name="always_on_dialog_stop_heading">دائمًا على VPN</string>
     <string name="dns_proxy_remove_success">تم حذف وكيل DNS.</string>
     <string name="local_blocklist_download">تنزيل قوائم الحظر</string>
@@ -259,10 +259,10 @@
     <string name="download_update_dialog_trylater_message">لا يمكن تنفيذ التحديث الآن ، يرجى المحاولة مرة أخرى لاحقًا.</string>
     <string name="search_rethinkplus_file_tag"><font size="12"> البحث في قوائم الحظر </font></string>
     <string name="app_mode_firewall">جدار الحماية</string>
-    <string name="app_mode_dns_firewall">DNS وجدار الحماية (افتراضي)</string>
+    <string name="app_mode_dns_firewall">DNS وجدار الحماية (المبدئي)</string>
     <string name="orbot_stop_dialog_negative">أوقف Orbot</string>
     <string name="settings_http_proxy_error_text3">اسم المضيف فارغ</string>
-    <string name="settings_socks_forwarding_default_desc">قم بإعادة توجيه الاتصالات إلى نقطة نهاية SOCKS5.</string>
+    <string name="settings_socks_forwarding_default_desc">أعد توجيه الاتصالات إلى نقطة نهاية SOCKS5.</string>
     <string name="settings_theme_dialog_themes_4">أسود قاتم</string>
     <string name="dc_block_heading">قواعد</string>
     <string name="dc_local_block_heading">قوائم الحظر على الجهاز</string>
@@ -313,7 +313,7 @@
     <string name="brbs_backup_dialog_title">خذ نسخة احتياطية</string>
     <string name="exclude">استثني</string>
     <string name="dns_explanation_firewall_connected">متصل بجدار الحماية</string>
-    <string name="doh_custom_url_remove_dialog_message">حذف DNS عبر نقطة نهاية Https من التكوين المحفوظ.</string>
+    <string name="doh_custom_url_remove_dialog_message">احذف DNS عبر نقطة نهاية Https من التكوين المحفوظ.</string>
     <string name="download_update_dialog_message_ok_title">حتى الآن!</string>
     <string name="orbot_none_desc">لا شيء مما بالأعلى.</string>
     <string name="settings_autostart_bootup_desc">عند تشغيل الجهاز ، ابدأ Rethink إذا كان يعمل قبل إيقاف التشغيل.</string>
@@ -385,7 +385,7 @@
     <string name="orbot_app_issue">تعذر تشغيل Orbot. هل تم تركيبه؟</string>
     <string name="always_on_dialog_stop_message">تم تمكين Always-on VPN لـ Rethink. هل أنت متأكد أنك تريد إيقاف Rethink بأية حال؟</string>
     <string name="settings_dns_proxy_dialog_header">تعيين بروكسي SOCKS5</string>
-    <string name="settings_ip_dialog_ipv4">IPv4 (افتراضي)</string>
+    <string name="settings_ip_dialog_ipv4">IPv4 (المبدئي)</string>
     <string name="firewall_status_blocked">منعت</string>
     <string name="hsf_proxy_chip_text">الوكيل نشط</string>
     <string name="hsf_exclude_error">الاستبعاد غير ممكن في وضع تأمين VPN</string>
@@ -404,7 +404,7 @@
     <string name="notif_channel_desc_vpn_notification">أبلغ عندما يكون Rethink نشطًا ويعمل في الخلفية</string>
     <string name="category_name_installed">التطبيقات المثبتة</string>
     <string name="ci_dialog_error_invalid_ip">عنوان IP أو الشبكة الفرعية أو المنفذ غير صالح.</string>
-    <string name="dns_act_configure_tab">الضبط</string>
+    <string name="dns_act_configure_tab">كوِّن</string>
     <string name="local_blocklist_download_desc">هل تريد تنزيل قوائم الحظر (حوالي 60 ميجابايت) لاستخدام هذه الميزة؟</string>
     <string name="download_update_dialog_message_ok">أنت بالفعل على أحدث إصدار.</string>
     <string name="search_firewall_network_log"><font size="12"> بحث في التطبيقات وعناوين IP والمجالات </font></string>
@@ -523,7 +523,7 @@
     <string name="orbot_install_dialog_positive">ثبّت</string>
     <string name="settings_http_proxy_dialog_title">عنوان URL مخصص للخادم</string>
     <string name="hsf_start_dialog_message">أنت على بعد خطوة واحدة من نظام Android الآمن: شاهد نشاط الشبكة على الفور وحظر مواقع الويب وعناوين IP والتطبيقات التي تعمل بشكل سيء.</string>
-    <string name="hsf_pause_vpn_failure">لا يمكن التوقف مؤقتاً: Rethink غير نشط</string>
+    <string name="hsf_pause_vpn_failure">لا يمكن الألباث: Rethink غير نشط</string>
     <string name="dc_entries">%1$s مداخل »</string>
     <string name="settings_notification_dialog_option_3">\nلا شيء:\nلا يظهر أي زر.\n</string>
     <string name="about_web">الروابط</string>
@@ -547,7 +547,7 @@
     <string name="ci_dialog_added_success">تمت إضافة IP إلى القائمة</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s تطبيق (تطبيقات) أخرى</string>
     <string name="cd_dns_proxy_error_text_3">المنفذ غير صالح</string>
-    <string name="cd_dnscrypt_relay_heading">المرحلات</string>
+    <string name="cd_dnscrypt_relay_heading">المُرحلات</string>
     <string name="fapps_filter_clear_btn">امسح</string>
     <string name="cd_doh_dialog_heading">أضف DNS عبر HTTPS</string>
     <string name="ctbs_app_info_not_available_toast">صفحة إعدادات التطبيق غير موجودة</string>
@@ -567,7 +567,7 @@
     <string name="firewall_rule_exempt_orbot_setup_desc">تم السماح بهذا الاتصال لأن تهيئة <i>Tor-as-a-proxy بنقرة واحدة</i> من خلال Orbot كانت جارية.</string>
     <string name="firewall_rule_block_http_desc">تم حظر هذا الاتصال لأنه من المحتمل أنه استخدم <i> HTTP غير آمن </i>. <br/> <br/> للتغيير انتقل إلى علامة التبويب <i> العالمي </i>.</string>
     <string name="new_app_notification_action_toast_allow">الاتصال بالشبكة مسموح به للتطبيق</string>
-    <string name="notif_dialog_pause_dialog_message">التطبيق في حالة الإيقاف المؤقت، استكمل للمتابعة</string>
+    <string name="notif_dialog_pause_dialog_message">التطبيق في حالة الألباث، استكمل للمتابعة</string>
     <string name="notif_dialog_pause_dialog_positive">استكمل</string>
     <string name="firewall_rule_trusted_ip_desc">تم السماح بهذا الاتصال لأنه تم تعيين عنوان IP الوجهة <i> </i> لتجاوز جميع القواعد الخاصة بالتطبيق. <br/> <br/> للتغيير ، انتقل إلى شاشة جدار الحماية <i> الخاصة بالتطبيق </i>.</string>
     <string name="firewall_rule_block_dns_bypass_desc">تم حظر هذا الاتصال لأن التطبيق المصدر <i> </i> تجاوز DNS المفضل للمستخدم <br/> <br/> لتغيير هذا السلوك ، انتقل إلى علامة التبويب <i> العالمي </i>.</string>
@@ -612,7 +612,7 @@
     <string name="orbot_bs_status_1">إعادة توجيه %1$s اتصالات إلى Orbot.</string>
     <string name="slide_2_desc">تطبيق Rethink هو أسهل طريقة لمراقبة نشاط الشبكة، وتجاوز الرقابة على الإنترنت، وتطبيقات جدار الحماية على جهازك الأندرويد.</string>
     <string name="rdns_plus">RDNS Plus</string>
-    <string name="pause_mode_notification_title">متوقف مؤقتاً! سيستمر منع اتصال التطبيقات المحظورة.</string>
+    <string name="pause_mode_notification_title">مُلبث! سيستمر منع اتصال التطبيقات المحظورة.</string>
     <string name="status_protected_with_proxy_private_dns">محمي بواسطة بروكسي و DNS خاص</string>
     <string name="dns_mode_notification_title">محمي! متصل بـ DNS السريع والآمن.</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">ينتظر</string>
@@ -630,7 +630,7 @@
     <string name="settings_https_desc">إعادة توجيه الاتصالات إلى نقطة نهاية HTTP(S) CONNECT.</string>
     <string name="firewall_status_block_metered">محظور على شبكات (المحمول) المقننة</string>
     <string name="firewall_card_status_active">تطبيقات %1$s</string>
-    <string name="cd_dns_crypt_relay_heading">تناوب</string>
+    <string name="cd_dns_crypt_relay_heading">مُرحل</string>
     <string name="dns_query_clear_logs_message">هذا يحذف سجلات DNS على الجهاز. هذه العملية غير قابلة للعكس. هل تريد المتابعة؟</string>
     <string name="settings_ip_network_heading">اختر إصدار IP</string>
     <string name="orbot_bs_status_2">تم تعيين وكيل HTTP.</string>
@@ -643,7 +643,7 @@
     <string name="bsct_conn_block_desc_device">منعت %1$s على الجهاز</string>
     <string name="always_on_dialog_lockdown_stop_message">يقوم Rethink بتشغيل VPN في وضع <i> الإغلاق </i>. قد يؤدي إيقافه إلى فقدان الإتصال بالأنترنت في ملف تعريف المستخدم هذا. هل تريد المتابعة على أية حال؟</string>
     <string name="dns_crypt_custom_url_remove_dialog_title">هل تريد حذف محلل DNSCrypt؟</string>
-    <string name="dns_crypt_url_remove_dialog_message">حذف محلل DNSCrypt من التكوين المحفوظ.</string>
+    <string name="dns_crypt_url_remove_dialog_message">احذف محلل DNSCrypt من التكوين المحفوظ.</string>
     <string name="download_update_dialog_failure_title">هناك خطأ ما !</string>
     <string name="download_update_dialog_failure_message">إما أن خوادمنا معطلة أو لا يمكن إنشاء الاتصال. من فضلك حاول مرة أخرى بعد بعض من الوقت.</string>
     <string name="dns_explanation_dns_connected">متصل بـ RethinkDNS</string>
@@ -673,7 +673,7 @@
     <string name="settings_notification_dialog_option_2">\nDNS / DNS + جدار الحماية:\nيعرض زرين للتبديل بسرعة بين وضع DNS الموفر للبطارية ووضع DNS + Firewall العادي.</string>
     <string name="dc_dns_leaks_desc">عند التمكين ، تلتقط Rethink جميع الحزم الموجودة على المنفذ 53 وتعيد توجيهها إلى نقطة نهاية DNS التي يحددها المستخدم</string>
     <string name="cd_dns_crypt_dialog_desc">وصف (اختياري)</string>
-    <string name="settings_notification_dialog_option_1">\nإيقاف مؤقت / إيقاف (افتراضي):\nيظهر زرين، للإيقاف المؤقت بسرعة وإيقاف Rethink.</string>
+    <string name="settings_notification_dialog_option_1">\nألبث / أوقف (المبدئي):\nيظهر زرين، لألبث بسرعة وإيقاف Rethink.</string>
     <string name="hsf_downtime">(غير نشط منذ %1$s)</string>
     <string name="firewall_status_excluded">مستبعد من نظام dns وجدار الحماية</string>
     <string name="firewall_status_whitelisted">يتجاوز قواعد جدار الحماية العالمية</string>
@@ -835,7 +835,7 @@
     <string name="lbl_secure" translatable="true">آمن</string>
     <string name="lbl_anonymous" translatable="true">مجهول</string>
     <string name="lbl_peer" translatable="true">نظير</string>
-    <string name="dot_custom_url_remove_dialog_message" translatable="true">حذف DNS عبر نقطة نهاية TLS من التكوين المحفوظ.</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">احذف DNS عبر نقطة نهاية TLS من التكوين المحفوظ.</string>
     <string name="fapps_info_bypass_msg" translatable="true">تجاوز قواعد جدار الحماية العالمي.</string>
     <string name="failed_using_default" translatable="true">فشل: استخدام DNS الإحتياطي</string>
     <string name="hs_biometeric_title" translatable="true">إلغاء قفل Rethink</string>
@@ -985,7 +985,7 @@
     <string name="lbl_protos" translatable="true">بروتوكولات</string>
     <string name="lbl_experimental" translatable="true">)تجريبي(</string>
     <string name="lbl_service_providers" translatable="true">مقدموا الخدمة</string>
-    <string name="lbl_hop" translatable="true">تتابع</string>
+    <string name="lbl_hop" translatable="true">مرحلات</string>
     <string name="lbl_manual" translatable="true">يدوي</string>
     <string name="wireguard_title" translatable="true">إنترنت آمن مع WireGuard</string>
     <string name="wireguard_desc" translatable="true">شفّر حركة مرور الإنترنت لديك باستخدام WireGuard. اختر مسارات مختلفة لتطبيقات مختلفة.</string>
@@ -1038,4 +1038,7 @@
     <string name="fapps_bypass_block_dialog_title" translatable="true">تجاوز التطبيقات</string>
     <string name="fail_open_network_title" translatable="true">لا تتوقف عند فقدان الشبكة</string>
     <string name="fail_open_network_desc" translatable="true">عند تعطيله، يقوم Rethink بإيقاف جميع البيانات عند عدم توفر أي إتصال، كما هو الحال في <i>وضع الطائرة</i>.</string>
+    <string name="lbl_fallback" translatable="true">بديل احتياطي</string>
+    <string name="lbl_default" translatable="true">المبدئي</string>
+    <string name="lbl_action" translatable="true">الإجراء</string>
 </resources>
