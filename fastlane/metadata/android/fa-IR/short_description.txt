@@ -1,1 +1,1 @@
-Firewall apps, use WireGuard VPN, monitor network, block malware, change DNS.
+برنامه های آتش نشانی، استفاده از VPN WireGuard، شبکه مانیتور، بدافزار بلاک، تغییر DNS.

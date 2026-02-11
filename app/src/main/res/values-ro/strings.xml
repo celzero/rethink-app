@@ -883,7 +883,7 @@
     <string name="ada_ip_connection_count_zero" translatable="true">0 adrese IP</string>
     <string name="ada_ip_no_connection" translatable="true">Nu există înregistrări în jurnal pentru această categorie.</string>
     <string name="ada_app_status_whitelist" translatable="true">va ocoli regulile universale de firewall</string>
-    <string name="ada_app_status_isolate" translatable="true">este izolată; numai IP-urile de încredere sunt permise</string>
+    <string name="ada_app_status_isolate" translatable="true">este izolată; sunt permise numai IP-urile și domeniile de încredere</string>
     <string name="ada_app_status_exclude" translatable="true">este exclusă de la dns și firewall</string>
     <string name="ada_app_status_block_md" translatable="true">este blocată în rețelele contorizate (mobile)</string>
     <string name="ada_app_status_block_wifi" translatable="true">este blocată în rețelele necontorizate (wifi)</string>
@@ -1171,8 +1171,8 @@
     <string name="wg_ssid_and_mobile_err" translatable="true">Nu se pot utiliza ambele %1$s și %2$s</string>
     <string name="wg_ssid_dialog_description" translatable="true">%1$s această VPN Wireguard când este <i>activ</i> identificatorul Wi-Fi (%2$s) %3$s.</string>
     <string name="wg_ssid_input_hint" translatable="true">Introdu identificatorul Wi-Fi (%1$s)</string>
-    <string name="wg_ssid_type_exact" translatable="true">Precis</string>
-    <string name="wg_ssid_type_wildcard" translatable="true">Parțial</string>
+    <string name="wg_ssid_type_exact" translatable="true">Potrivire exactă</string>
+    <string name="wg_ssid_type_wildcard" translatable="true">Potrivire parțială</string>
     <string name="wg_ssid_invalid_error" translatable="true">Identificatorii Wi-Fi (%1$s) trebuie să conțină cel mult 32 caractere..</string>
     <string name="wg_ssid_delete_confirmation" translatable="true">Ștergi %1$s?</string>
     <string name="settings_firebase_error_reporting_heading" translatable="true">Program stabilitate</string>
@@ -1189,4 +1189,5 @@
     <string name="settings_tunnel_metered" translatable="true">Contorizat întotdeauna</string>
     <string name="settings_tunnel_metered_desc" translatable="true">Marchează tunelul VPN al Rethink ca și contorizat pentru ca aplicațiile să folosească mai puține date mobile. Atenție: Asta poate determina aplicațiile să oprească descărcările și încărcările masive, cum ar fi copiile de rezervă.</string>
     <string name="stability_program_toast" translatable="true">Înscris în <i>programul de stabilitate</i> pentru <i>caracteristici experimentale</i>.</string>
+    <string name="dns_record_types_auto_mode_status" translatable="true">Auto (toate tipurile)</string>
 </resources>
