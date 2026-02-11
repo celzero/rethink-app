@@ -5,11 +5,11 @@
     <string name="about_web">ссылки</string>
     <string name="apps_info_title">Приложения</string>
     <string name="always_on_dialog_neutral">Настройки</string>
-    <string name="status_protected_with_tor_private_dns">защищено с помощью tor и персонального DNS</string>
+    <string name="status_protected_with_tor_private_dns">защищено с помощью tor и приватного dns</string>
     <string name="firewall_mode_info_title">Брандмауэр</string>
     <string name="settings_socks5_dialog_hint_port">Порт</string>
     <string name="orbot">Orbot</string>
-    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">частные днс включены</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">включен приватный DNS</string>
     <string name="notification_action_pause_vpn">ПАУЗА</string>
     <string name="firewall_act_universal_tab">Универсальные правила</string>
     <string name="settings_dns_proxy_dialog_app">Приложение</string>
@@ -36,7 +36,7 @@
     <string name="dns_mode_info_title">DNS</string>
     <string name="about_docs_link">https://docs.rethinkdns.com/</string>
     <string name="settings_dns_proxy_dialog_hostname">Имя хоста</string>
-    <string name="status_protected_with_http_private_dns">защищено http-прокси и персональным DNS</string>
+    <string name="status_protected_with_http_private_dns">защищено http-прокси и приватного dns</string>
     <string name="notification_action_resume_vpn">ПРОДОЛЖИТЬ</string>
     <string name="dc_block_heading">правила</string>
     <string name="always_on_dialog_positive">Остановить</string>
@@ -48,7 +48,7 @@
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Предупреждение: Rethink был деактивирован</string>
     <string name="notification_action_dns_firewall_mode">DNS + Брандмауэр</string>
     <string name="settings_theme_heading">Внешний вид</string>
-    <string name="dc_other_dns_heading">Используемый DNS</string>
+    <string name="dc_other_dns_heading">тип</string>
     <string name="settings_app_list_default_app">Ничего</string>
     <string name="skip">Пропустить</string>
     <string name="untracked">неотслеживаемый</string>
@@ -60,7 +60,7 @@
     <string name="accessibility_service_description">Rethink использует службу специальных возможностей для обнаружения и блокирования фоновых приложений. Rethink не собирает и не продает какую-либо информацию.</string>
     <string name="slide_2_desc">RethinkDNS — это самый простой способ обходить интернет-цензуру, отслеживать и блокировать сетевую активность приложений на вашем Android устройстве.</string>
     <string name="title_about">О приложении</string>
-    <string name="next">Следующий</string>
+    <string name="next">Далее</string>
     <string name="slide_1_title">Свободный и с открытым исходным кодом</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">ожидание</string>
     <string name="status_dns_server_down">dns-сервер не работает</string>
@@ -69,7 +69,7 @@
     <string name="app_name_small_case">rethink</string>
     <string name="title_settings">Настройки</string>
     <string name="about_title_desc">Обнаружение и блокировка угроз сетевой безопасности</string>
-    <string name="finish">Закончить</string>
+    <string name="finish">Готово</string>
     <string name="slide_1_desc">Rethink — это программное обеспечение с открытым исходным кодом, поддерживаемое программой MVP Mozilla Builders, FOSS United Foundation.</string>
     <string name="hybrid_mode_notification_title">Защищен! Подключен к DNS + брандмауэр.</string>
     <string name="pause_title_desc">сплю…</string>
@@ -78,7 +78,7 @@
     <string name="dns_mode_notification_title">Защищено! Подключен к быстрому и безопасному DNS.</string>
     <string name="firewall_mode_notification_title">Защищено! Подключен к брандмауэру.</string>
     <string name="pause_mode_notification_title">Приостановлен! Заблокированные приложения по-прежнему защищены брандмауэром.</string>
-    <string name="status_protected_with_socks5_private_dns">защищено с помощью socks5 и персонального DNS</string>
+    <string name="status_protected_with_socks5_private_dns">защищено с помощью socks5 и приватного dns</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">защищено</string>
     <string name="status_app_error">ошибка приложения</string>
     <string name="status_dns_error">ошибка dns</string>
@@ -801,7 +801,7 @@
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Блокировка вредоносного ПО, фишинга, программ-вымогателей, криптософта и прочих угроз.</string>
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">Блокировка вредоносного ПО, привлекающего внимание, программ шпионов и программ-страшилок.</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">Списков блокировок: %1$s</string>
-    <string name="private_dns_error">Не удалось отправить настройки персонального DNS.</string>
+    <string name="private_dns_error">Не удалось запустить настройки приватного dns.</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Очистить журналы</string>
     <string name="title_statistics">Статистика</string>
     <string name="settings_locale_heading">Изменить язык</string>
@@ -836,9 +836,9 @@
     <string name="ssv_see_more">Показать все</string>
     <string name="settings_locale_dialog_title">Выберите предпочтительный язык</string>
     <string name="settings_locale_dialog_neutral">Помогите перевести это приложение</string>
-    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">самые блокируемые IP</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">самые блокируемые ip</string>
     <string name="ci_trust_txt">Доверенный</string>
-    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">самые встречающиеся IP</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">самые встречающиеся ip</string>
     <string name="firewall_rule_block_domain" translatable="true">Домен (приложение)</string>
     <string name="lbl_cancel" translatable="true">Отмена</string>
     <string name="lbl_apply" translatable="true">Применить</string>
@@ -865,7 +865,7 @@
     <string name="settings_pcap_dialog_option_1" translatable="true">Выкл. (по умолчанию)</string>
     <string name="settings_pcap_dialog_option_2" translatable="true">Вывод в Logcat</string>
     <string name="settings_pcap_dialog_option_3" translatable="true">Вывод в папку загрузок</string>
-    <string name="firewall_status_bypass_dns_firewall" translatable="true">обходит правила DNS и брандмауэра</string>
+    <string name="firewall_status_bypass_dns_firewall" translatable="true">обходит правила dns и брандмауэра</string>
     <string name="firewall_card_universal_rules" translatable="true">%1$s универсальное(ых) правил(а)</string>
     <string name="rules_card_domain_count" translatable="true">%1$s правил(а) домена</string>
     <string name="logs_card_network_count" translatable="true">%1$s подключения(й)</string>
@@ -967,7 +967,7 @@
     <string name="lbl_listen_port" translatable="true">Слушать порт</string>
     <string name="lbl_select_all" translatable="true">выбрать все</string>
     <string name="lbl_active" translatable="true">Активно</string>
-    <string name="lbl_inactive" translatable="true">Деактивировано</string>
+    <string name="lbl_inactive" translatable="true">Выключено</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
     <string name="lbl_http" translatable="true">HTTP</string>
     <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
@@ -1094,8 +1094,8 @@
     <string name="dns_title" translatable="true">Блокируйте рекламу и вредоносы с помощью DNS</string>
     <string name="dns_desc" translatable="true">Выбирайте из 190+ списков, чтобы остановить рекламу, трекеры и вредоносное ПО.</string>
     <string name="status_no_network" translatable="true">нет подключения к сети</string>
-    <string name="settings_mobile_metered_heading" translatable="true">измерить мобильные сети</string>
-    <string name="settings_mobile_metered_desc" translatable="true">Рассматривайте мобильные сети только как платные, остальные - как не платные.</string>
+    <string name="settings_mobile_metered_heading" translatable="true">Платная мобильная сеть</string>
+    <string name="settings_mobile_metered_desc" translatable="true">Рассматривать только мобильные сети как платные, остальные - как не платные.</string>
     <string name="settings_theme_dialog_themes_5" translatable="true">светлая plus</string>
     <string name="settings_theme_dialog_themes_6" translatable="true">тёмная plus</string>
     <string name="settings_biometric_dialog_heading" translatable="true">Биометрическая аутентификация</string>
