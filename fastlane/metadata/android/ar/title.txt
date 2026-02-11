@@ -1,1 +1,1 @@
-Rethink: DNS + جدار حماية + VPN
+Rethink: DNS + جدار حماية وVPN
