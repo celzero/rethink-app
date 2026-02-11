@@ -9,7 +9,7 @@
     <string name="firewall_mode_info_title">Брандмауэр</string>
     <string name="settings_socks5_dialog_hint_port">Порт</string>
     <string name="orbot">Orbot</string>
-    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">частные днс включены</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">включен частный DNS</string>
     <string name="notification_action_pause_vpn">ПАУЗА</string>
     <string name="firewall_act_universal_tab">Универсальные правила</string>
     <string name="settings_dns_proxy_dialog_app">Приложение</string>
@@ -60,7 +60,7 @@
     <string name="accessibility_service_description">Rethink использует службу специальных возможностей для обнаружения и блокирования фоновых приложений. Rethink не собирает и не продает какую-либо информацию.</string>
     <string name="slide_2_desc">RethinkDNS — это самый простой способ обходить интернет-цензуру, отслеживать и блокировать сетевую активность приложений на вашем Android устройстве.</string>
     <string name="title_about">О приложении</string>
-    <string name="next">Следующий</string>
+    <string name="next">Далее</string>
     <string name="slide_1_title">Свободный и с открытым исходным кодом</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">ожидание</string>
     <string name="status_dns_server_down">dns-сервер не работает</string>
@@ -69,7 +69,7 @@
     <string name="app_name_small_case">rethink</string>
     <string name="title_settings">Настройки</string>
     <string name="about_title_desc">Обнаружение и блокировка угроз сетевой безопасности</string>
-    <string name="finish">Закончить</string>
+    <string name="finish">Готово</string>
     <string name="slide_1_desc">Rethink — это программное обеспечение с открытым исходным кодом, поддерживаемое программой MVP Mozilla Builders, FOSS United Foundation.</string>
     <string name="hybrid_mode_notification_title">Защищен! Подключен к DNS + брандмауэр.</string>
     <string name="pause_title_desc">сплю…</string>
@@ -473,7 +473,7 @@
     <string name="firewall_status_block_metered">блокируется в сетях с тарификацией (мобильная связь)</string>
     <string name="settings_notification_dialog_option_3">\nНет:\nНе показывает кнопку.\n</string>
     <string name="firewall_status_whitelisted">обходит универсальные правила брандмауэра</string>
-    <string name="firewall_card_text_inactive">Включить режим брандмауэра.</string>
+    <string name="firewall_card_text_inactive">Включить защиту.</string>
     <string name="about_docs">Читать документацию</string>
     <string name="about_twitter">Посетите нашу страницу в Twitter</string>
     <string name="firewall_status_block_unmetered">блокируется в сетях без тарификации (wifi)</string>
@@ -967,7 +967,7 @@
     <string name="lbl_listen_port" translatable="true">Слушать порт</string>
     <string name="lbl_select_all" translatable="true">выбрать все</string>
     <string name="lbl_active" translatable="true">Активно</string>
-    <string name="lbl_inactive" translatable="true">Деактивировано</string>
+    <string name="lbl_inactive" translatable="true">Выключено</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
     <string name="lbl_http" translatable="true">HTTP</string>
     <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
