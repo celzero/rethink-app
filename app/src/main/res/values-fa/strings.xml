@@ -875,4 +875,9 @@ href="https://central.sonatype.com/">Sonatype</a><br/> ]]></string>
     <string name="firewall_rule_block_http" translatable="true">HTTP نا‌امن</string>
     <string name="firewall_rule_global_lockdown" translatable="true">قفل</string>
     <string name="rules_load_failure_heading" translatable="true">­تنظیمات سیو شود</string>
+    <string name="dns_record_types_auto_mode_status" translatable="true">Auto (All types)</string>
+    <string name="pause_desc" translatable="true">Love</string>
+    <string name="other_dns_list_tab3" translatable="true">پروکسی دی ان اس</string>
+    <string name="hs_btm_sheet_lock_down" translatable="true">امکان تغییر حالت‌ها زمانی که VPN در <i>Lockdown</i> است وجود ندارد. برای &lt;u&gt;ویرایش تنظیمات VPN&lt;/u&gt; ضربه بزنید.</string>
+    <string name="lockdown_download_message" translatable="true">&lt;/i&gt;</string>
 </resources>
