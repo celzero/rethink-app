@@ -991,4 +991,5 @@
     <string name="wireguard_disable_failure" translatable="true">\"Always-on WireGuard\" को बंद नहीं किया जा सकता</string>
     <string name="wireguard_apps_proxy_map_desc" translatable="true">%1$s का हिस्सा</string>
     <string name="lbl_on_device" translatable="true">ऑन-डिवाइस</string>
+    <string name="lbl_test" translatable="true">मूल्यांकन</string>
 </resources>
