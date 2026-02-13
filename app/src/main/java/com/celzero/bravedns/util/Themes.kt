@@ -18,6 +18,21 @@ package com.celzero.bravedns.util
 import com.celzero.bravedns.R
 import com.celzero.bravedns.util.Utilities.isAtleastS
 
+/**
+ * Theme management for the application.
+ *
+ * Note: This app may occasionally experience non-fatal TimeoutExceptions in
+ * android.content.res.ResourcesImpl$ThemeImpl.finalize(). This is a known Android framework
+ * limitation where theme objects cannot be garbage collected fast enough when many activities
+ * and dialogs apply custom themes. This is not directly fixable at the application level.
+ * See: https://github.com/celzero/rethink-app/issues/[issue-number]
+ *
+ * Best practices followed to minimize theme-related issues:
+ * - Theme application is done once per Activity/Dialog in onCreate/getTheme
+ * - Proper cleanup in onDestroyView for dialogs and fragments
+ * - View bindings are nulled out to allow garbage collection
+ */
+
 // Application themes enum
 enum class Themes(val id: Int) {
     SYSTEM_DEFAULT(0),

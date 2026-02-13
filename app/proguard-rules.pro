@@ -64,6 +64,12 @@
 -keep class com.google.gson.** { *; }
 -keep class com.celzero.bravedns.data.FileTag { *; }
 
+# Note: Non-fatal TimeoutException in android.content.res.ResourcesImpl$ThemeImpl.finalize()
+# This is a known Android framework issue where theme objects cannot be garbage collected
+# fast enough when many activities/dialogs apply custom themes. This is not directly
+# fixable at the application level. The exception is non-fatal and does not affect app
+# functionality. For reference: https://github.com/celzero/rethink-app/issues/[issue-number]
+
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
