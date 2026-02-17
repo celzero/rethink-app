@@ -28,7 +28,7 @@
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">geschützt</string>
     <string name="status_protected_with_tor">geschützt mit Tor</string>
     <string name="status_app_error">Anwendungsfehler</string>
-    <string name="status_dns_error">DNS Fehler</string>
+    <string name="status_dns_error">DNS-Fehler</string>
     <string name="status_dns_server_down">DNS-Server ausgefallen</string>
     <string name="status_no_internet">Kein Internet</string>
     <string name="status_protected_with_private_dns">geschützt durch privaten DNS</string>
@@ -97,7 +97,7 @@
     <string name="settings_vpn_heading">vpn</string>
     <string name="info_dialog_copy_toast_msg">IP-Adresse kopiert.</string>
     <string name="settings_enable_logs_desc">DNS- und Firewall-Logs lokal auf dem Gerät speichern.</string>
-    <string name="settings_enable_logs">Geräteinteres Logging aktivieren</string>
+    <string name="settings_enable_logs">Geräteinterne Protokollierung aktivieren</string>
     <string name="conn_track_clear_logs_title">Alle Netzwerk-Logs löschen?</string>
     <string name="bsct_conn_block_desc_device">blockiert %1$s auf dem Gerät</string>
     <string name="bsct_conn_rule_explanation"><u>#1</u>: Blockiert eine App daran, eine Verbindung zum Internet herzustellen. \n <u>#2</u>: Blockiert alle Apps, sich mit einer bestimmten IP-Adresse zu verbinden. \n <u>#3</u>: Blockiert alle Verbindungen, während das Gerät gesperrt ist (Universelle Firewall). \n <u>#4</u>: Blockiert alle nicht verwendeten Apps (Universelle Firewall). \n <u>#5</u>: Blockiert Verbindungen, wenn die Quell-App unbekannt ist (Universelle Firewall). \n <u>#6</u>: Blockiert den gesamten UDP-Datenverkehr außer DNS (Universelle Firewall). \n <u>#7</u>: Blockiert Verbindungen, wenn DNS umgangen wird (Universelle Firewall).</string>
@@ -132,7 +132,7 @@
     <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
     <string name="configure_dns_connected_dns_proxy_status">DNS-Proxy</string>
     <string name="configure_dns_connection_name">Verbunden mit %1$s</string>
-    <string name="configure_dns_crypt">DNSCrypt: %1$s Auflöser</string>
+    <string name="configure_dns_crypt">DNSCrypt: %1$s Resolver</string>
     <string name="http_proxy_dialog_heading">HTTP(S)-CONNECT-Proxy festlegen</string>
     <string name="download_update_dialog_failure_title">Etwas ist schiefgelaufen!</string>
     <string name="download_update_dialog_failure_message">Entweder sind unsere Server ausgefallen oder die Verbindung konnte nicht hergestellt werden. Bitte versuche es nach einiger Zeit erneut.</string>
@@ -238,11 +238,11 @@
     <string name="pause_text">pausiert</string>
     <string name="pause_desc">Hinweis: %1$s blockierte Anwendungen werden weiterhin mit einer Firewall versehen.</string>
     <string name="other_dns_list_tab1">DoH</string>
-    <string name="other_dns_list_tab3">Dns-Proxy</string>
-    <string name="other_dns_list_tab2">Dnscrypt</string>
+    <string name="other_dns_list_tab3">DNS-Proxy</string>
+    <string name="other_dns_list_tab2">DNSCrypt</string>
     <string name="firewall_rule_block_app">App gesperrt</string>
     <string name="firewall_rule_no_rule">Keine Regel</string>
-    <string name="firewall_rule_block_unmetered">Ungezählt (Wlan)</string>
+    <string name="firewall_rule_block_unmetered">Unbegrenzt (WLAN)</string>
     <string name="firewall_rule_block_metered">Getaktet (Mobil)</string>
     <string name="firewall_rule_univ_block_metered">Getaktet (Universell)</string>
     <string name="firewall_rule_isolate">Isolieren</string>
@@ -302,7 +302,7 @@
     <string name="firewall_status_allow">erlaubt</string>
     <string name="accessibility_failure_toast">Der Rethink-Dienst für Barrierefreiheit wurde angehalten oder ist abgestürzt. Anwendungen im Hintergrund werden nicht mehr blockiert.</string>
     <string name="coming_soon_toast">demnächst</string>
-    <string name="hs_btm_sheet_lock_down">Der Modus kann nicht geändert werden, wenn VPN im Modus <i>Sperre</i> ist. Tippe hier, um &lt;u&gt;VPN-Einstellungen zu bearbeiten&lt;/u&gt;.</string>
+    <string name="hs_btm_sheet_lock_down">Der Modus kann nicht geändert werden, wenn das VPN <i>gesperrt</i> ist. Tippen Sie auf &lt;u&gt;VPN-Einstellungen bearbeiten&lt;/u&gt;.</string>
     <string name="firewall_rule_block_ip">IP/ Port (App)</string>
     <string name="firewall_rule_trusted_ip">Vertrauenswürdige IP</string>
     <string name="firewall_rule_bypass_universal_ip">Umgangene IP</string>
@@ -367,7 +367,7 @@
     <string name="ada_app_status_allow">ist erlaubt</string>
     <string name="ada_ip_no_connection">Keine Netzwerkprotokolle für diese Kategorie.</string>
     <string name="ada_app_status_block">ist blockiert</string>
-    <string name="ada_app_status_block_wifi">wird in nicht gebührenpflichtigen Netzwerken (Wlan) blockiert</string>
+    <string name="ada_app_status_block_wifi">wird in unbegrenzten (WLAN-)Netzwerken blockiert</string>
     <string name="ada_app_status_isolate">ist isoliert; nur vertrauenswürdige IPs und Domains erlaubt</string>
     <string name="ada_app_status_unknown">ist unbekannt</string>
     <string name="ada_app_status_whitelist">umgeht die universellen Firewall-Regeln</string>
@@ -386,9 +386,9 @@
     <string name="radio_max_btn">🪂 Max</string>
     <string name="rt_filter_hint">Zeige <u>alle</u> Blocklisten</string>
     <string name="rt_filter_desc"><![CDATA[Zeige <u>%1$s</u> Blockierlisten an]]></string>
-    <string name="rethink_max_desc">50+ Standorte; mehr privat; rekursiver Resolver läuft auf fly.io</string>
+    <string name="rethink_max_desc">50+ Standorte; mehr Privatsphäre; rekursiver Resolver läuft auf fly.io</string>
     <string name="rt_filter_desc_subgroups"><![CDATA[Zeige <u>%1$s</u> Blocklisten in Gruppe: %2$s und Untergruppe: %3$s]]></string>
-    <string name="rethink_sky_desc">280+ Standorte; höhere Betriebszeit; Stub Resolver läuft auf cloudflare.com</string>
+    <string name="rethink_sky_desc">280+ Standorte; höhere Betriebszeit; Stub-Resolver läuft auf cloudflare.com</string>
     <string name="bsrf_sub_group_heading">Untergruppe</string>
     <string name="bsrf_clear_filter">Leeren</string>
     <string name="dc_rethink_dns">Rethink DNS</string>
@@ -425,11 +425,11 @@
     <string name="ada_app_status_exclude">ist von DNS und Firewall ausgeschlossen</string>
     <string name="ada_firewall_title">Firewall-Regeln für diese Anwendung</string>
     <string name="bsdl_blocked_desc">blockiert %1$s durch %2$s</string>
-    <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Sperren Sie Inhalte für Erwachsene und Raubkopien, Online-Glücksspiele und -Dating, sowie soziale Medien.</string>
+    <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Sperren Sie Inhalte für Erwachsene und Raubkopien, Online-Glücksspiele und -Dating sowie soziale Medien.</string>
     <string name="rt_dialog_message">Möchten Sie neu konfigurierte Blocklisten anwenden\?</string>
     <string name="rt_dialog_neutral">Weiter</string>
     <string name="cd_no_rule_txt">Keine Regel</string>
-    <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Blockieren Sie Malware, Ransomware (Erpressersoftware), Kryptoware, Phisher und andere Bedrohungen.</string>
+    <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Blockieren Sie Malware, Ransomware, Cryptoware, Phisher und andere Bedrohungen.</string>
     <string name="brbs_restore_desc">Aus Sicherungsdatei wiederherstellen</string>
     <string name="brbs_backup_desc">Sichern von Anwendungseinstellungen, Netzwerk- und DNS-Protokollen</string>
     <string name="alert_firewall_accessibility_regrant_explanation">Der Rethink Dienst für Barrierefreiheit wurde angehalten oder ist abgestürzt. <i><b>Erzwinge das Beenden von Rethink über die Systemeinstellungen</b></i> und starte Rethink erneut, um die Funktion <i>Blockieren aller nicht genutzten Apps</i> zu verwenden.\n\nRethink verwendet den Dienst für Barrierefreiheit, um zu verfolgen, welche Apps in Gebrauch sind (im Vordergrund) und welche nicht (im Hintergrund).</string>
@@ -447,7 +447,7 @@
     <string name="notif_dialog_pause_dialog_positive">Fortfahren</string>
     <string name="notif_dialog_pause_dialog_negative">Verwerfen</string>
     <string name="notif_channel_desc_firewall_alerts">Warnung vor Firewall-Fehlern und Anomalien</string>
-    <string name="build__flavor_website">webseite</string>
+    <string name="build__flavor_website">Webseite</string>
     <string name="build__flavor_play_store">Spiel {fileName}</string>
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="cd_toast_added">Domain erfolgreich hinzugefügt</string>
@@ -491,14 +491,14 @@
     <string name="firewall_card_text_inactive">Firewall-Modus aktivieren.</string>
     <string name="dns_card_latency_active">%1$s ms</string>
     <string name="hsf_vpn_dialog_header">Achtung!</string>
-    <string name="hsf_vpn_prepare_failure">Entweder fehlt die VPN-Berechtigung, oder eine andere Anwendung befindet sich im Always-on-VPN-Modus.</string>
+    <string name="hsf_vpn_prepare_failure">Entweder fehlt die VPN-Berechtigung oder eine andere Anwendung befindet sich im Always-on-VPN-Modus.</string>
     <string name="lbl_proceed">Fortfahren</string>
     <string name="hsf_notification_permission_failure">Erteile die Berechtigung für Benachrichtigungen in den Android-Einstellungen</string>
     <string name="firewall_status_block_unmetered">in gebührenfreien Netzen (WLAN) blockiert</string>
     <string name="firewall_status_block_metered">in gebührenpflichtigen (mobilen) Netzen gesperrt</string>
     <string name="firewall_status_blocked">blockiert</string>
     <string name="firewall_status_unknown">unbekannt</string>
-    <string name="ct_bs_app_info_error">App Info nicht gefunden</string>
+    <string name="ct_bs_app_info_error">App-Info nicht gefunden</string>
     <string name="firewall_card_status_active">%1$s Apps</string>
     <string name="dns_card_latency_inactive">DNS-Modus aktivieren.</string>
     <string name="apps_card_ips_count">%1$s IP- und Port-Regel(n)</string>
@@ -512,7 +512,7 @@
     <string name="hsf_start_dialog_message">Du bist nur einen Schritt von einem sicheren Android-System entfernt: Kontrolliere Netzwerkaktivitäten, blockiere Webseiten, IP-Adressen und sich unerwünscht verhaltende Apps.</string>
     <string name="hsf_proxy_chip_text">Proxy aktiviert</string>
     <string name="hsf_blocklist_chip_text_no_data">RDNS+ aktivieren</string>
-    <string name="hsf_exclude_error">Ausschließen im VPN-Lockdown-Modus nicht möglich</string>
+    <string name="hsf_exclude_error">Ausschließen im VPN-Sperrmodus nicht möglich</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy entfernt</string>
     <string name="hsf_proxy_chip_remove_text">Stoppen…</string>
     <string name="hsf_whats_new_remove_text">Schließen…</string>
@@ -549,10 +549,10 @@
     <string name="cd_custom_doh_dialog_title">Benutzerdefinierte Server-URL</string>
     <string name="cd_custom_doh_url_name_default">DoH</string>
     <string name="cd_dns_crypt_name_default">DNSCrypt</string>
-    <string name="cd_dns_crypt_dialog_title">DNSCrypt Resolver oder Relay hinzufügen</string>
+    <string name="cd_dns_crypt_dialog_title">DNSCrypt-Resolver oder -Relay hinzufügen</string>
     <string name="cd_dns_crypt_name">DNSCrypt %1$s</string>
-    <string name="cd_dns_crypt_dialog_heading">DNSCrypt Resolver oder Relay hinzufügen</string>
-    <string name="cd_dns_crypt_resolver_heading">Auflöser</string>
+    <string name="cd_dns_crypt_dialog_heading">DNSCrypt-Resolver oder -Relay hinzufügen</string>
+    <string name="cd_dns_crypt_resolver_heading">Resolver</string>
     <string name="cd_dns_crypt_relay_heading">Relay</string>
     <string name="cd_dns_crypt_dialog_name">Name</string>
     <string name="cd_dns_crypt_dialog_stamp">Stamp</string>
@@ -628,7 +628,7 @@
     <string name="dns_btm_record_type">Abfragetyp: %1$s</string>
     <string name="hs_download_positive_default">ok</string>
     <string name="hs_download_positive_play_store">Update abgeschlossen</string>
-    <string name="hs_download_positive_website">Besuche Webseite</string>
+    <string name="hs_download_positive_website">Webseite besuchen</string>
     <string name="hs_download_negative_default">Später erinnern</string>
     <string name="univ_firewall_rule_1">Blockiere alle Apps, wenn das Gerät gesperrt ist</string>
     <string name="univ_firewall_rule_2">Blockiere jede App, die nicht in Benutzung ist</string>
@@ -788,7 +788,7 @@
     <string name="hs_biometeric_error">Fehler bei der biometrischen Authentifizierung</string>
     <string name="fapps_firewall_filter_bypass_universal">Umgangen</string>
     <string name="fapps_firewall_filter_isolate">Isoliert</string>
-    <string name="fapps_info_exclude_msg">Sowohl von DNS + Firewall ausschließen.</string>
+    <string name="fapps_info_exclude_msg">Sowohl von DNS als auch von der Firewall ausschließen.</string>
     <string name="fapps_bypass_block_dialog_title">Apps umgehen</string>
     <string name="fapps_unblock_dialog_message">Verbindungen für <i>aufgelistete</i> Apps erlauben\?</string>
     <string name="fapps_exclude_block_dialog_title">Apps ausschließen</string>
@@ -883,7 +883,7 @@
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[Diese Verbindung wurde zugelassen, da die <i>Quell-App</i> auf <i>DNS- und Firewall-Regeln umgehen</i> gesetzt ist.<br/><br/> Zum Ändern gehen Sie zum Bildschirm <i>App-spezifische Firewall</i>.]]></string>
     <string name="settings_default_dns_desc" translatable="true">In seltenen Fällen kann das bevorzugte DNS nicht ermittelt bzw. erreicht werden. Dann wird das Ausweich-DNS verwendet.</string>
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[Diese Verbindung wurde zugelassen, da die <i>Domain</i> in den universellen Domain-Regeln als vertrauenswürdig eingestuft ist.<br/><br/> Um dieses Verhalten zu ändern, gehen Sie zum Tab <i>DNS konfigurieren</i>.]]></string>
-    <string name="lbl_maybe_blocked" translatable="true">Evtl. blockiert</string>
+    <string name="lbl_maybe_blocked" translatable="true">Eventuell blockiert</string>
     <string name="lbl_network" translatable="true">Netzwerk</string>
     <string name="bypass_dns_firewall_tooltip">%1$s funktioniert nur mit Rethink\'s DNS</string>
     <string name="settings_allow_lan_heading" translatable="true">Private IPs nicht umlenken (experimentell)</string>
@@ -909,7 +909,7 @@
     <string name="lbl_public_key" translatable="true">Öffentlicher Schlüssel</string>
     <string name="lbl_private_key" translatable="true">Privater Schlüssel</string>
     <string name="lbl_applications" translatable="true">Anwendungen</string>
-    <string name="lbl_include" translatable="true">Miteinbeziehen</string>
+    <string name="lbl_include" translatable="true">Einbeziehen</string>
     <string name="lbl_very" translatable="true">sehr</string>
     <string name="lbl_select_all" translatable="true">Alles auswählen</string>
     <string name="lbl_create" translatable="true">Erstellen</string>
@@ -1062,7 +1062,7 @@
     <string name="quad9_dns_desc" translatable="true">Quad9 leitet deine DNS-Anfragen über ein sicheres Netz von Servern rund um den Globus.</string>
     <string name="crypt_quad9_security_desc" translatable="true">Quad9 (anycast) mit DNSSEC, ohne Logging, mit Filter (IP-Adressen: 9.9.9.9 – 149.112.112.9 – 149.112.112.112)</string>
     <string name="crypt_relay_us" translatable="true">Anonymisiertes DNS-Relay, gehostet in Los Angeles, Kalifornien, USA und bereitgestellt von https://cryptostrom.is/.</string>
-    <string name="crypt_cleanbrowsing_family_desc" translatable="true">Blockiert den Zugang zu allen nicht jugendfreien, pornografischen und expliziten Webseiten. Proxys und VPNs, welche zur Umgehung der Filter verwendet werden können, werden ebenso gesperrt. Seiten mit gemischten Inhalten wie Reddit werden ebenfalls blockiert. Google, Bing und YoutTube werden auf den abgesicherten Suchmodus eingestellt.</string>
+    <string name="crypt_cleanbrowsing_family_desc" translatable="true">Blockiert den Zugang zu allen nicht jugendfreien, pornografischen und expliziten Webseiten. Außerdem werden Proxy- und VPN-Domains blockiert, die zur Umgehung der Filter verwendet werden. Seiten mit gemischten Inhalten wie Reddit werden ebenfalls blockiert. Google, Bing und YouTube werden auf den abgesicherten Suchmodus eingestellt.</string>
     <string name="crypt_quad9_desc" translatable="true">Quad9 (anycast) ohne DNSSEC, ohne Logging, ohne Filter, mit ECS (IP-Adressen: 9.9.9.12 – 149.112.112.12)</string>
     <string name="crypt_relay_france" translatable="true">Anonymisiertes DNS-Relay, gehostet in Paris, Frankreich und bereitgestellt von https://cryptostrom.is/.</string>
     <string name="crypt_relay_sweden" translatable="true">Anonymisiertes DNS-Relay, gehostet in Schweden und bereitgestellt von https://cryptostrom.is/.</string>
@@ -1071,8 +1071,8 @@
     <string name="lbl_hop" translatable="true">Relays</string>
     <string name="lbl_protos" translatable="true">protos</string>
     <string name="lbl_service_providers" translatable="true">Service Provider</string>
-    <string name="firewall_title" translatable="true">Schütze dein Android mit einer Firewall</string>
-    <string name="status_no_network" translatable="true">kein Netzwerk</string>
+    <string name="firewall_title" translatable="true">Schutz für Ihr Android-Gerät mit einer Firewall</string>
+    <string name="status_no_network" translatable="true">Kein Netzwerk</string>
     <string name="settings_theme_dialog_themes_6" translatable="true">Dunkel Plus</string>
     <string name="settings_biometric_dialog_heading" translatable="true">Biometrische Authentifizierung</string>
     <string name="settings_biometric_dialog_option_2" translatable="true">Nach 5 Minuten</string>
@@ -1084,7 +1084,7 @@
     <string name="wireguard_title" translatable="true">Internet mit WireGuard absichern</string>
     <string name="wireguard_desc" translatable="true">Verschlüsselt deinen Internetverkehr mit WireGuard. Für unterschiedliche Apps lassen sich verschiedene Routen auswählen.</string>
     <string name="firewall_desc" translatable="true">Kontrolliere die Internetnutzung pro App und schränke Verbindungen basierend auf der Netzwerkaktivität oder je nach App ein.</string>
-    <string name="dns_title" translatable="true">Blockiere Werbung und Malware über DNS</string>
+    <string name="dns_title" translatable="true">Werbung und Malware mit DNS blockieren</string>
     <string name="dns_desc" translatable="true">Wähle aus über 190 Listen, um Werbung, Tracker und Malware zu stoppen.</string>
     <string name="settings_mobile_metered_heading" translatable="true">Kostenpflichtiges mobiles Netz</string>
     <string name="settings_mobile_metered_desc" translatable="true">Nur Mobilfunknetze als „kostenpflichtig“ behandeln, den Rest als „ohne Datenlimit“.</string>
@@ -1110,7 +1110,7 @@
     <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[Diese Verbindung sucht nach einem <i>privaten DNS</i>-Server, der nicht existiert.]]></string>
     <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[Diese Verbindung wurde zugelassen, da für die <i>Quellanwendung</i> die Regeln für <i>Proxy umgehen</i> festgelegt sind.<br/><br/> Um dies zu ändern, gehen Sie zum Bildschirm <i>Anwendungsspezifische Firewall</i>.]]></string>
     <string name="firewall_rule_paused_app_desc" translatable="true"><![CDATA[Diese Verbindung wurde zugelassen, da die <i>App</i> im <i>Pausiert</i>-Status ist.]]></string>
-    <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[Diese Verbindung wurde blockiert, da WireGuard im <i>Lockdown</i>-Modus ist.<br/><br/> Um dies zu ändern, wechseln Sie zum <i>WireGuard</i>-Bildschirm.]]></string>
+    <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[Diese Verbindung wurde blockiert, da WireGuard sich im <i>Sperrmodus</i> befindet.<br/><br/> Um dies zu ändern, gehen Sie zum Bildschirm <i>WireGuard</i>.]]></string>
     <string name="wireguard_disable_failure_relay" translatable="true">\"WireGuard Relais\" kann nicht deaktiviert werden</string>
     <string name="config_invalid_desc" translatable="true">Ungültige WireGuard-Konfiguration</string>
     <string name="console_log_title" translatable="true">App Protokolle</string>
@@ -1174,7 +1174,7 @@
     <string name="smart_dns" translatable="true">Smart DNS</string>
     <string name="processing_dialog_title" translatable="true">Verarbeitung</string>
     <string name="processing_dialog_desc" translatable="true">Bitte warte, während wir die Anfrage bearbeiten.</string>
-    <string name="smart_dns_desc" translatable="true"><i>Smart DNS</i> verwendet zufällig einen der folgenden DNS-Resolver:</string>
+    <string name="smart_dns_desc" translatable="true"><i>Smart DNS</i> verwendet nach dem Zufallsprinzip einen dieser DNS-Resolver:</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">Alle Domain-Regeln löschen?</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">Das Löschen dieser Regeln würde es jeder Anwendung gestatten, sich mit den aktuell blockierten Domains zu verbinden.</string>
     <string name="vpn_policy_auto_desc" translatable="true">Reagiert auf wichtige Netzwerk- und Verbindungsänderungen.</string>
@@ -1201,7 +1201,7 @@
     <string name="wg_setting_ssid_title" translatable="true">Nur WLAN</string>
     <string name="wg_setting_ssid_desc" translatable="true">Dieses WireGuard-VPN nur aktivieren, wenn eine Verbindung zu WLAN oder bestimmten WLAN-Kennungen (%1$s) besteht.</string>
     <string name="ssid_permission_explanation" translatable="true">Rethink benötigt Standortberechtigungen, um auf WLAN-Kennungen (%1$s) zugreifen zu können.</string>
-    <string name="location_enable_explanation" translatable="true">Aktiviere den Standortdienst, um auf WLAN-Kennungen (%1$s) zugreifen zu können.</string>
+    <string name="location_enable_explanation" translatable="true">Aktivieren Sie den Standortdienst, um auf WLAN-Kennungen (%1$s) zugreifen zu können.</string>
     <string name="ssid_location_error" translatable="true">Standortdienst aktivieren</string>
     <string name="ssid_permission_error_action" translatable="true">Berechtigung gewähren</string>
     <string name="ssid_location_error_action" translatable="true">Standort aktivieren</string>
@@ -1220,7 +1220,7 @@
     <string name="settings_allow_incoming_wg_packets_desc" translatable="true">Wenn aktiviert, werden eingehende Verbindungen von WireGuard-Peers zugelassen.</string>
     <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[Diese Verbindung wurde blockiert, da der für die App ausgewählte <i>Proxy</i> nicht ausgewählt wurde.<br/><br/> Um dies zu ändern, gehe auf dem Bildschirm <i>Konfigurieren</i> zu <i>Proxy</i>.]]></string>
     <string name="wg_ssid_dialog_description" translatable="true">%1$s dieses WireGuard-VPN, wenn <i>aktiv</i> WLAN-Kennung (%2$s) %3$s.</string>
-    <string name="lockdown_download_message" translatable="true">Der in Android integrierte <i>Download-Manager</i> funktioniert möglicherweise nicht, da sich das VPN im <i>Lockdown</i>-Modus befindet. Möchtest du stattdessen den Downloader von Rethink aktivieren?</string>
+    <string name="lockdown_download_message" translatable="true">Der in Android integrierte <i>Download-Manager</i> funktioniert möglicherweise nicht, da sich das VPN im <i>Sperrmodus</i> befindet. Möchten Sie stattdessen den Downloader von Rethink aktivieren?</string>
     <string name="lockdown_download_enable_inapp" translatable="true">Downloader aktivieren</string>
     <string name="settings_jumbo_packets_desc" translatable="true">Verwendet <i>Jumbo-Pakete</i> innerhalb des VPN-Tunnels von Rethink.</string>
     <string name="settings_tunnel_metered" translatable="true">Immer getaktet</string>
