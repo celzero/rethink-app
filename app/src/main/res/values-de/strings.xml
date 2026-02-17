@@ -121,7 +121,7 @@
     <string name="settings_allow_bypass_desc">Anfragenden Apps erlauben, alle verfügbaren Netzwerke zu benutzen. Diese Apps könnten die RethinkDNS-Firewall bei Bedarf umgehen. Einige Audio-/Videokonferenz-Apps wie Zoom und Meet können dies erfordern, um richtig zu funktionieren.</string>
     <string name="orbot_http_desc">Baut einen HTTP-CONNECT-Tunnel zu Orbot auf.</string>
     <string name="orbot_stop_dialog_message">Rethink hat aufgehört Verbindungen zu Orbot weiterzuleiten, aber Orbot läuft vielleicht noch im Hintergrund.</string>
-    <string name="orbot_explanation">Orbot ist eine kostenlose Proxy-App, die es anderen Apps ermöglicht, das Internet <u>sicherer</u> zu nutzen.\nOrbot verwendet <u>Tor</u>, um Ihren Internetverkehr zu verschlüsseln, was Ihnen hilft, <u>Zensur zu umgehen</u> und sich gegen Formen der <u>Netzwerküberwachung</u> zu verteidigen, die die persönliche Freiheit und Privatsphäre bedrohen.\n<u>TCP Proxy</u>: Rethink leitet nur TCP-Verbindungen von <i>eingeschlossenen</i> Apps an Orbot weiter.\n<u>HTTP Proxy</u>: Rethink <i>stellt</i> einen HTTP CONNECT-Tunnel zu Orbot <i>her</i> und leitet nur TCP-Verbindungen von <i>eingeschlossenen</i> Apps weiter.</string>
+    <string name="orbot_explanation">Orbot ist eine kostenlose Proxy-App, die es anderen Apps ermöglicht, das Internet <u>sicherer</u> zu nutzen.\nOrbot verwendet <u>Tor</u>, um deinen Internetverkehr zu verschlüsseln, was dir dabei hilft, <u>Zensur zu umgehen</u> und dich gegen Formen der <u>Netzwerküberwachung</u> zu verteidigen, die die persönliche Freiheit und Privatsphäre bedrohen.\n<u>TCP Proxy</u>: Rethink leitet nur TCP-Verbindungen von <i>eingeschlossenen</i> Apps an Orbot weiter.\n<u>HTTP Proxy</u>: Rethink <i>stellt</i> einen HTTP CONNECT-Tunnel zu Orbot <i>her</i> und leitet nur TCP-Verbindungen von <i>eingeschlossenen</i> Apps weiter.</string>
     <string name="orbot_install_dialog_title">Orbot installieren\?</string>
     <string name="settings_orbot_desc">Orbot im nicht-VPN-Modus mit HTTPS/SOCKS5.</string>
     <string name="private_dns_dialog_positive">Einstellungen öffnen</string>
@@ -252,9 +252,9 @@
     <string name="firewall_rule_exempt_app_bypass_univ">umgangene App</string>
     <string name="firewall_rule_block_app_desc"><![CDATA[Eine benutzerdefinierte Firewall-Regel hat diese <i>App</i> blockiert.<br/><br/> Zum Ändern gehe zum Tab <i>Alle Apps</i> .]]></string>
     <string name="firewall_rule_new_app_desc"><![CDATA[Diese App hat zum <i>ersten</i> Mal eine Verbindung hergestellt.<br/><br/> Um dies zu ändern, gehe zum Tab <i>Universal</i>.]]></string>
-    <string name="firewall_rule_block_app_mobile_desc"><![CDATA[Eine benutzerdefinierte Firewall-Regel hat diese <i>App</i> beim Versuch, eine Verbindung in einem <i>nach Datenvolumen begrenzten</i> Netzwerk herzustellen, blockiert.<br/><br/> Um dies zu ändern, gehen Sie zum Tab <i>Alle Apps</i>.]]></string>
-    <string name="firewall_rule_block_ip_univ_desc"><![CDATA[Eine benutzerdefinierte Firewall-Regel hat die <i>Ziel-IP / den Ziel-Port</i> blockiert.<br/><br/> Zum Ändern gehen Sie zum Tab <i>Universell</i>.]]></string>
-    <string name="firewall_rule_block_ip_desc"><![CDATA[Eine benutzerdefinierte Firewall-Regel hat die <i>Ziel-IP</i> blockiert.<br/><br/> Um dies zu ändern, gehen Sie zum Bildschirm <i>App-spezifische Firewall</i>.]]></string>
+    <string name="firewall_rule_block_app_mobile_desc"><![CDATA[Eine benutzerdefinierte Firewall-Regel hat diese <i>App</i> beim Versuch, eine Verbindung in einem <i>nach Datenvolumen begrenzten</i> Netzwerk herzustellen, blockiert.<br/><br/> Um dies zu ändern, gehe zum Tab <i>Alle Apps</i>.]]></string>
+    <string name="firewall_rule_block_ip_univ_desc"><![CDATA[Eine benutzerdefinierte Firewall-Regel hat die <i>Ziel-IP / den Ziel-Port</i> blockiert.<br/><br/> Zum Ändern gehe zum Tab <i>Universell</i>.]]></string>
+    <string name="firewall_rule_block_ip_desc"><![CDATA[Eine benutzerdefinierte Firewall-Regel hat die <i>Ziel-IP</i> blockiert.<br/><br/> Um dies zu ändern, gehe zum Bildschirm <i>App-spezifische Firewall</i>.]]></string>
     <string name="settings_app_notification_a13_desc">Berechtigung für Benachrichtigungen erteilen</string>
     <string name="settings_http_proxy_error_text4">Verbindung mit dem Host fehlgeschlagen. Versuche es erneut.</string>
     <string name="settings_ip_dialog_ipv46">Auto (experimentell)</string>
@@ -266,14 +266,14 @@
     <string name="firewall_rule_block_univ_ip">IP / Port (Universell)</string>
     <string name="firewall_rule_device_lock">Gerät gesperrt</string>
     <string name="firewall_rule_block_app_unmetered_desc"><![CDATA[Eine benutzerdefinierte Firewall-Regel hat diese <i>App</i> beim Versuch, eine Verbindung im <i>Unmetered</i>-Netzwerk herzustellen, blockiert.<br/><br/> Um dies zu ändern, wechsel zum Tab <i>Alle Apps</i>.]]></string>
-    <string name="firewall_rule_block_app_univ_mobile_desc"><![CDATA[Eine vom Benutzer festgelegte universelle Firewall-Regel hat diese <i>App</i> blockiert, als sie versuchte, eine Verbindung in einem <i>gedrosselten</i> (mobilen) Netzwerk herzustellen.<br/><br/> Um dies zu ändern, gehen Sie zum Reiter <i>Universell</i>.]]></string>
+    <string name="firewall_rule_block_app_univ_mobile_desc"><![CDATA[Eine vom Benutzer festgelegte universelle Firewall-Regel hat diese <i>App</i> blockiert, als sie versuchte, eine Verbindung in einem <i>gedrosselten</i> (mobilen) Netzwerk herzustellen.<br/><br/> Um dies zu ändern, gehe zum Reiter <i>Universell</i>.]]></string>
     <string name="firewall_rule_device_lock_desc"><![CDATA[Diese Verbindung wurde blockiert, da das <i>Gerät zu diesem Zeitpunkt gesperrt</i> war.<br/><br/> Um dieses Verhalten zu ändern, gehe zum Tab <i>Universal</i>.]]></string>
-    <string name="firewall_rule_bypass_universal_ip_desc"><![CDATA[Diese Verbindung wurde zugelassen, da die <i>Ziel-IP</i> so eingestellt ist, dass alle universellen Firewall-Regeln umgangen werden.<br/><br/> Um dies zu ändern, gehen Sie zu <i>IP-Regeln</i> im Tab <i>Universell</i>.]]></string>
-    <string name="firewall_rule_foreground_desc"><![CDATA[Diese Verbindung wurde blockiert, weil die Quell-App <i>nicht im Vordergrund</i> war.<br/><br/> Um dieses Verhalten zu ändern, gehen Sie zum Tab <i>Universal</i>.]]></string>
+    <string name="firewall_rule_bypass_universal_ip_desc"><![CDATA[Diese Verbindung wurde zugelassen, da die <i>Ziel-IP</i> so eingestellt ist, dass alle universellen Firewall-Regeln umgangen werden.<br/><br/> Um dies zu ändern, gehe zu <i>IP-Regeln</i> im Tab <i>Universell</i>.]]></string>
+    <string name="firewall_rule_foreground_desc"><![CDATA[Diese Verbindung wurde blockiert, weil die Quell-App <i>nicht im Vordergrund</i> war.<br/><br/> Um dieses Verhalten zu ändern, gehe zum Tab <i>Universal</i>.]]></string>
     <string name="firewall_rule_block_dns_bypass_desc"><![CDATA[Diese Verbindung wurde blockiert, da die <i>Quell-App</i> die vom Benutzer bevorzugte DNS-Auflösung umgangen hat.<br/><br/> Um dieses Verhalten zu ändern, gehe zum Tab <i>Universal</i>.]]></string>
-    <string name="firewall_rule_block_udp_ntp_desc"><![CDATA[Eine benutzerdefinierte Firewall-Regel hat diese <i>UDP</i>-Verbindung blockiert.<br/><br/> Um dies zu ändern, gehen Sie zum Tab <i>Universal</i>.]]></string>
+    <string name="firewall_rule_block_udp_ntp_desc"><![CDATA[Eine benutzerdefinierte Firewall-Regel hat diese <i>UDP</i>-Verbindung blockiert.<br/><br/> Um dies zu ändern, gehe zum Tab <i>Universal</i>.]]></string>
     <string name="firewall_rule_block_http_desc"><![CDATA[Diese Verbindung wurde blockiert, da sie wahrscheinlich <i>unsicheres HTTP</i> verwendete.<br/><br/> Um dies zu ändern, gehe zum Tab <i>Universal</i>.]]></string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc"><![CDATA[Diese Verbindung wurde zugelassen, da die <i>Quell-App</i> auf <i>universelle Firewall-Regeln umgehen</i> eingestellt ist.<br/><br/> Um dies zu ändern, gehen Sie zum Bildschirm <i>App-spezifische Firewall</i>.]]></string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc"><![CDATA[Diese Verbindung wurde zugelassen, da die <i>Quell-App</i> auf <i>universelle Firewall-Regeln umgehen</i> eingestellt ist.<br/><br/> Um dies zu ändern, gehe zum Bildschirm <i>App-spezifische Firewall</i>.]]></string>
     <string name="settings_http_proxy_dialog_title">Benutzerdefinierte Server-URL</string>
     <string name="settings_http_proxy_error_text1">Der Portbereich muss zwischen 1024 und 65535 liegen</string>
     <string name="settings_http_proxy_error_text2">Ungültiger Port</string>
@@ -302,7 +302,7 @@
     <string name="firewall_status_allow">erlaubt</string>
     <string name="accessibility_failure_toast">Der Rethink-Dienst für Barrierefreiheit wurde angehalten oder ist abgestürzt. Anwendungen im Hintergrund werden nicht mehr blockiert.</string>
     <string name="coming_soon_toast">demnächst</string>
-    <string name="hs_btm_sheet_lock_down">Der Modus kann nicht geändert werden, wenn das VPN <i>gesperrt</i> ist. Tippen Sie auf &lt;u&gt;VPN-Einstellungen bearbeiten&lt;/u&gt;.</string>
+    <string name="hs_btm_sheet_lock_down">Der Modus kann nicht geändert werden, wenn das VPN <i>gesperrt</i> ist. Tippe auf &lt;u&gt;VPN-Einstellungen bearbeiten&lt;/u&gt;.</string>
     <string name="firewall_rule_block_ip">IP/ Port (App)</string>
     <string name="firewall_rule_trusted_ip">Vertrauenswürdige IP</string>
     <string name="firewall_rule_bypass_universal_ip">Umgangene IP</string>
@@ -312,9 +312,9 @@
     <string name="firewall_rule_global_lockdown">totale Sperrung</string>
     <string name="firewall_rule_no_rule_desc">Für diese Verbindung gibt es keine passenden Firewall-Regeln.</string>
     <string name="firewall_rule_isolate_desc"><![CDATA[Eine benutzerdefinierte Firewall-Regel hat verhindert, dass diese <i>App</i> sich mit anderen Zielen als <i>umgangenen IPs</i> verbindet.<br/><br/> Um dies zu ändern, gehe zum Tab <i>Alle Apps</i>.]]></string>
-    <string name="firewall_rule_trusted_ip_desc"><![CDATA[Diese Verbindung wurde zugelassen, weil die <i>Ziel-IP</i> als vertrauenswürdige IP festgelegt ist.<br/><br/> Zum Ändern gehen Sie zum Bildschirm <i>App-spezifische Firewall</i>.]]></string>
-    <string name="firewall_rule_unknown_desc"><![CDATA[Diese Verbindung wurde blockiert, da die <i>Quell-App</i> nicht ermittelt werden konnte.<br/><br/> Um dieses Verhalten zu ändern, gehen Sie zur Registerkarte <i>Universal</i>.]]></string>
-    <string name="firewall_rule_exempt_dns_proxied_desc"><![CDATA[Diese DNS-Verbindung wurde weitergeleitet und an den vom Benutzer bevorzugten DNS-Endpunkt gesendet.<br/><br/> Um dies zu ändern, deaktivieren Sie <i>DNS-Leaks verhindern</i> auf dem Bildschirm <i>DNS konfigurieren</i>.]]></string>
+    <string name="firewall_rule_trusted_ip_desc"><![CDATA[Diese Verbindung wurde zugelassen, weil die <i>Ziel-IP</i> als vertrauenswürdige IP festgelegt ist.<br/><br/> Zum Ändern gehe zum Bildschirm <i>App-spezifische Firewall</i>.]]></string>
+    <string name="firewall_rule_unknown_desc"><![CDATA[Diese Verbindung wurde blockiert, da die <i>Quell-App</i> nicht ermittelt werden konnte.<br/><br/> Um dieses Verhalten zu ändern, gehe zur Registerkarte <i>Universal</i>.]]></string>
+    <string name="firewall_rule_exempt_dns_proxied_desc"><![CDATA[Diese DNS-Verbindung wurde weitergeleitet und an den vom Benutzer bevorzugten DNS-Endpunkt gesendet.<br/><br/> Um dies zu ändern, deaktiviere <i>DNS-Leaks verhindern</i> auf dem Bildschirm <i>DNS konfigurieren</i>.]]></string>
     <string name="firewall_rule_exempt_orbot_setup_desc"><![CDATA[Diese Verbindung wurde erlaubt, da die <i>One-Click-Tor-als-Proxy</i>-Einrichtung über Orbot im Gange war.]]></string>
     <string name="settings_import_export_desc">Manuelles Sichern oder Wiederherstellen der App-Daten und Einstellungen.</string>
     <string name="settings_custom_downloader_heading">In-App-Downloader verwenden</string>
@@ -381,7 +381,7 @@
     <string name="rt_chip_update_available">Aktualisierung verfügbar</string>
     <string name="rt_chip_check_update">Nach Updates suchen</string>
     <string name="rt_re_download">Blocklisten erneut herunterladen</string>
-    <string name="rt_download_desc">Laden Sie Blocklisten herunter (ca. 60 MB), um diese Funktion zu nutzen.</string>
+    <string name="rt_download_desc">Blocklisten herunterladen (ca. 60 MB), um diese Funktion zu nutzen.</string>
     <string name="radio_sky_btn">⛅ Himmel</string>
     <string name="radio_max_btn">🪂 Max</string>
     <string name="rt_filter_hint">Zeige <u>alle</u> Blocklisten</string>
@@ -408,28 +408,28 @@
     <string name="brbs_backup_dialog_message">Sichert die App-Einstellungen, Netzwerk- und DNS-Protokolle in einer Datei. Dadurch wird das VPN neu gestartet.</string>
     <string name="brbs_restore_dialog_title">Sicherung (Backup) wiederherstellen</string>
     <string name="brbs_backup_dialog_positive">Sichern (Backup)</string>
-    <string name="brbs_restore_dialog_message">Stellen Sie die App-Einstellungen, Netzwerk- und DNS-Protokolle aus einer Sicherungsdatei wieder her. Dadurch wird die App neu gestartet.</string>
+    <string name="brbs_restore_dialog_message">App-Einstellungen, Netzwerk- und DNS-Protokolle aus einer Sicherungsdatei wiederherstellen. Dadurch wird die App neu gestartet.</string>
     <string name="brbs_restore_dialog_positive">Wiederherstellen</string>
     <string name="brbs_restore_dialog_failure_message">Konnte nicht wiederhergestellt werden. Erneut versuchen\?</string>
     <string name="brbs_restore_dialog_failure_positive">Wiederherstellen wiederholen</string>
     <string name="brbs_restore_complete_toast">Wiederherstellung abgeschlossen, Neustart der Anwendung…</string>
     <string name="brbs_backup_complete_toast">Sicherung komplett</string>
-    <string name="brbs_restore_no_uri_toast">Wiederherstellung fehlgeschlagen; versuchen Sie es nochmal</string>
+    <string name="brbs_restore_no_uri_toast">Wiederherstellung fehlgeschlagen; versuche es nochmal</string>
     <string name="brbs_restore_dialog_failure_title">Wiederherstellung fehlgeschlagen</string>
     <string name="ci_blocked_initial">B</string>
     <string name="category_name_installed">Installierte Apps</string>
     <string name="cd_toast_deleted">Domäne aus der benutzerdefinierten Liste entfernt</string>
     <string name="cd_no_rule_initial">N</string>
-    <string name="cd_remove_dialog_message">Löschen Sie die Domäne aus den gespeicherten Konfiguration.</string>
+    <string name="cd_remove_dialog_message">Lösche die Domain aus den gespeicherten Konfiguration.</string>
     <string name="ci_dialog_desc">IP-Adresse, IP-Subnetz (Bereich), Port zulassen (umgehen) oder sperren. Beispiel: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80,[10.1.0.0/16]:80, *.*:80</string>
     <string name="ada_app_status_exclude">ist von DNS und Firewall ausgeschlossen</string>
     <string name="ada_firewall_title">Firewall-Regeln für diese Anwendung</string>
     <string name="bsdl_blocked_desc">blockiert %1$s durch %2$s</string>
-    <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Sperren Sie Inhalte für Erwachsene und Raubkopien, Online-Glücksspiele und -Dating sowie soziale Medien.</string>
-    <string name="rt_dialog_message">Möchten Sie neu konfigurierte Blocklisten anwenden\?</string>
+    <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Sperre Inhalte für Erwachsene und Raubkopien, Online-Glücksspiele und -Dating sowie soziale Medien.</string>
+    <string name="rt_dialog_message">Möchtest du neu konfigurierte Blocklisten anwenden?</string>
     <string name="rt_dialog_neutral">Weiter</string>
     <string name="cd_no_rule_txt">Keine Regel</string>
-    <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Blockieren Sie Malware, Ransomware, Cryptoware, Phisher und andere Bedrohungen.</string>
+    <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Malware, Ransomware, Cryptoware, Phisher und andere Bedrohungen blockieren.</string>
     <string name="brbs_restore_desc">Aus Sicherungsdatei wiederherstellen</string>
     <string name="brbs_backup_desc">Sichern von Anwendungseinstellungen, Netzwerk- und DNS-Protokollen</string>
     <string name="alert_firewall_accessibility_regrant_explanation">Der Rethink Dienst für Barrierefreiheit wurde angehalten oder ist abgestürzt. <i><b>Erzwinge das Beenden von Rethink über die Systemeinstellungen</b></i> und starte Rethink erneut, um die Funktion <i>Blockieren aller nicht genutzten Apps</i> zu verwenden.\n\nRethink verwendet den Dienst für Barrierefreiheit, um zu verfolgen, welche Apps in Gebrauch sind (im Vordergrund) und welche nicht (im Hintergrund).</string>
@@ -463,13 +463,13 @@
     <string name="ada_app_exclude">Ausblenden</string>
     <string name="ada_app_isolate">Isolieren</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Protokolle löschen</string>
-    <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Löschen Sie alle Protokolle, die sich auf diese Anwendung beziehen.</string>
+    <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Lösche alle Protokolle, die sich auf diese App beziehen.</string>
     <string name="bsac_title_desc">Die Regeln gelten nur für diese App.</string>
     <string name="network_dns">System DNS</string>
     <string name="notif_download_content_title">On-Device Blockliste herunterladen</string>
     <string name="notif_download_content_text">Download in Arbeit…</string>
-    <string name="notif_download_failure_content">Download fehlgeschlagen. Versuchen Sie es erneut.</string>
-    <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">Blockieren Sie Attentionware, Spyware und Scareware.</string>
+    <string name="notif_download_failure_content">Download fehlgeschlagen. Versuche es erneut.</string>
+    <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">Attentionware, Spyware und Scareware blockieren.</string>
     <string name="rbl_security" description="The text appears as part of the blocklist setup screen as categories or headlines">Sicherheit</string>
     <string name="rt_dialog_title">Änderungen speichern</string>
     <string name="rt_list_simple_btn_txt">einfach</string>
@@ -820,7 +820,7 @@
     <string name="copy_clipboard_label">URL</string>
     <string name="fapps_unmetered_block_dialog_title" translatable="true">Blockieren auf nicht getakteten Verbindung</string>
     <string name="fapps_info_metered_msg" translatable="true">Zulassen / Blockieren in gebührenpflichtigen Netzen (mobile Netze).</string>
-    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Starten Sie Rethink, um fortzufahren</string>
+    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Starte Rethink, um fortzufahren</string>
     <string name="lbl_wildcard" translatable="true">Platzhalter</string>
     <string name="lbl_allowed" translatable="true">Erlaubt</string>
     <string name="lbl_blocked" translatable="true">Blockiert</string>
@@ -830,8 +830,8 @@
     <string name="fapps_info_unmetered_msg" translatable="true">Zulassen / Blockieren in gebührenfreien Netzen (WLAN).</string>
     <string name="firewall_rule_exempt_dns_proxied" translatable="true">DNS durch Proxy geleitet</string>
     <string name="firewall_rule_block_domain" translatable="true">Domäne (App)</string>
-    <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[Eine benutzerdefinierte Firewall-Regel hat die <i>Domain</i> blockiert.<br/><br/> Um dies zu ändern, gehen Sie zum Bildschirm <i>App-spezifische Firewall</i>.]]></string>
-    <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[Diese Verbindung wurde zugelassen, da die <i>Domain</i> als vertrauenswürdige Domain festgelegt wurde.<br/><br/> Zum Ändern gehen Sie zum Bildschirm <i>App-spezifische Firewall</i>.]]></string>
+    <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[Eine benutzerdefinierte Firewall-Regel hat die <i>Domain</i> blockiert.<br/><br/> Um dies zu ändern, gehe zum Bildschirm <i>App-spezifische Firewall</i>.]]></string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[Diese Verbindung wurde zugelassen, da die <i>Domain</i> als vertrauenswürdige Domain festgelegt wurde.<br/><br/> Zum Ändern gehe zum Bildschirm <i>App-spezifische Firewall</i>.]]></string>
     <string name="lbl_cancel" translatable="true">Abbrechen</string>
     <string name="lbl_apply" translatable="true">Übernehmen</string>
     <string name="lbl_dismiss" translatable="true">Verwerfen</string>
@@ -872,17 +872,17 @@
     <string name="settings_lock_down_proxy_desc" translatable="true">Proxies können nicht aufgesetzt werden, während das VPN im DNS only - Modus läuft.</string>
     <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Sollen universelle DNS- &amp; Firewall-Regeln für <i>aufgelisteten</i> Apps umgangen werden\?</string>
     <string name="firewall_rule_domain_trusted_univ" translatable="true">Vertrauenswürdige Domäne (Univ)</string>
-    <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[Diese Verbindung wurde blockiert, da die <i>Domain</i> vom benutzer bevorzugten DNS blockiert wird.<br/><br/> Um dieses Verhalten zu ändern, wechseln Sie zum Tab <i>DNS konfigurieren</i>.]]></string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[Diese Verbindung wurde blockiert, da die <i>Domain</i> vom benutzer bevorzugten DNS blockiert wird.<br/><br/> Um dieses Verhalten zu ändern, gehe zum Tab <i>DNS konfigurieren</i>.]]></string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">Umgehe DNS &amp; Firewall</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">Vereine Anfragen, cache Antworten, robuste Fehlerbehandlung</string>
-    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[Diese Verbindung wurde blockiert, da die <i>Domain</i> in den universellen Domain-Regeln als blockiert festgelegt ist.<br/><br/> Um dieses Verhalten zu ändern, gehen Sie zur Registerkarte <i>DNS konfigurieren</i>.]]></string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[Diese Verbindung wurde blockiert, da die <i>Domain</i> in den universellen Domain-Regeln als blockiert festgelegt ist.<br/><br/> Um dieses Verhalten zu ändern, gehe zum Tab<i>DNS konfigurieren</i>.]]></string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">wird universelle DNS- &amp; Firewall-Regeln umgehen</string>
     <string name="rules_card_domain_count" translatable="true">%1$s Domain-Regel(n)</string>
     <string name="cd_dns_alg_desc" translatable="true">Einzigartige IP für jede DNS-Anfrage verwenden.</string>
     <string name="firewall_rule_domain_blocked_univ" translatable="true">Domäne (Univ)</string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[Diese Verbindung wurde zugelassen, da die <i>Quell-App</i> auf <i>DNS- und Firewall-Regeln umgehen</i> gesetzt ist.<br/><br/> Zum Ändern gehen Sie zum Bildschirm <i>App-spezifische Firewall</i>.]]></string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[Diese Verbindung wurde zugelassen, da die <i>Quell-App</i> auf <i>DNS- und Firewall-Regeln umgehen</i> gesetzt ist.<br/><br/> Zum Ändern gehe zum Bildschirm <i>App-spezifische Firewall</i>.]]></string>
     <string name="settings_default_dns_desc" translatable="true">In seltenen Fällen kann das bevorzugte DNS nicht ermittelt bzw. erreicht werden. Dann wird das Ausweich-DNS verwendet.</string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[Diese Verbindung wurde zugelassen, da die <i>Domain</i> in den universellen Domain-Regeln als vertrauenswürdig eingestuft ist.<br/><br/> Um dieses Verhalten zu ändern, gehen Sie zum Tab <i>DNS konfigurieren</i>.]]></string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[Diese Verbindung wurde zugelassen, da die <i>Domain</i> in den universellen Domain-Regeln als vertrauenswürdig eingestuft ist.<br/><br/> Um dieses Verhalten zu ändern, gehe zum Tab <i>DNS konfigurieren</i>.]]></string>
     <string name="lbl_maybe_blocked" translatable="true">Eventuell blockiert</string>
     <string name="lbl_network" translatable="true">Netzwerk</string>
     <string name="bypass_dns_firewall_tooltip">%1$s funktioniert nur mit Rethink\'s DNS</string>
@@ -908,7 +908,7 @@
     <string name="lbl_app_wise" translatable="true">pro App</string>
     <string name="lbl_public_key" translatable="true">Öffentlicher Schlüssel</string>
     <string name="lbl_private_key" translatable="true">Privater Schlüssel</string>
-    <string name="lbl_applications" translatable="true">Anwendungen</string>
+    <string name="lbl_applications" translatable="true">Apps</string>
     <string name="lbl_include" translatable="true">Einbeziehen</string>
     <string name="lbl_very" translatable="true">sehr</string>
     <string name="lbl_select_all" translatable="true">Alles auswählen</string>
@@ -919,7 +919,7 @@
     <string name="bad_config_reason_invalid_key" translatable="true">Ungültiger Schlüssel</string>
     <string name="parse_error_inet_network" translatable="true">IP-Netzwerk</string>
     <string name="parse_error_inet_address" translatable="true">IP-Adresse</string>
-    <string name="crypt_adguard_desc" translatable="true">Schützt Ihr Gerät vor Schadsoftware und mehr.</string>
+    <string name="crypt_adguard_desc" translatable="true">Schützt dein Gerät vor Schadsoftware und mehr.</string>
     <string name="wireguard_description" translatable="true">WireGuard als ein Proxy.</string>
     <string name="univ_firewall_heading" translatable="true">Universelle Firewall-Regeln</string>
     <string name="lbl_allowed_ips" translatable="true">Zulässige IPs</string>
@@ -933,7 +933,7 @@
     <string name="key_length_explanation_hex" translatable="true">: WireGuard Hex-Schlüssel müssen 64 Zeichen (32 Bytes) lang sein</string>
     <string name="crypt_relay_singapore" translatable="true">Anonymisiertes DNS-Relay, gehostet in Singapur.</string>
     <string name="lbl_hour" translatable="true">Std</string>
-    <string name="wireguard_enabled_failure">Schalten Sie andere aktive Proxys aus, um WireGuard zu aktivieren</string>
+    <string name="wireguard_enabled_failure">Schalte andere aktive Proxys aus, um WireGuard zu aktivieren</string>
     <string name="lbl_save" translatable="true">speichern</string>
     <string name="cd_deleted_toast" translatable="true">Alle Domain-Regeln gelöscht</string>
     <string name="lbl_optional" translatable="true">(optional)</string>
@@ -970,7 +970,7 @@
     <string name="key_length_error" translatable="true">Falsche Schlüssellänge</string>
     <string name="config_delete_dialog_title">Konfiguration löschen</string>
     <string name="logs_card_duration" translatable="true">da %1$s</string>
-    <string name="config_delete_dialog_desc">Sind Sie sicher, dass Sie diese Konfiguration löschen möchten\?</string>
+    <string name="config_delete_dialog_desc">Bist du sicher, dass du diese Konfiguration löschen möchten?</string>
     <string name="new_warp_config_desc" translatable="true">WARP-Konfiguration vom Server abrufen</string>
     <string name="parse_error_generic" translatable="true">Zeichenkette</string>
     <string name="generic_error" translatable="true">Unbekannter Fehler „%s“</string>
@@ -1071,7 +1071,7 @@
     <string name="lbl_hop" translatable="true">Relays</string>
     <string name="lbl_protos" translatable="true">protos</string>
     <string name="lbl_service_providers" translatable="true">Service Provider</string>
-    <string name="firewall_title" translatable="true">Schutz für Ihr Android-Gerät mit einer Firewall</string>
+    <string name="firewall_title" translatable="true">Schütze dein Android-Gerät mit einer Firewall</string>
     <string name="status_no_network" translatable="true">Kein Netzwerk</string>
     <string name="settings_theme_dialog_themes_6" translatable="true">Dunkel Plus</string>
     <string name="settings_biometric_dialog_heading" translatable="true">Biometrische Authentifizierung</string>
@@ -1108,9 +1108,9 @@
     <string name="firewall_rule_paused_app" translatable="true">App angehalten</string>
     <string name="firewall_rule_lockdown_wg" translatable="true">Lockdown-Proxy</string>
     <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[Diese Verbindung sucht nach einem <i>privaten DNS</i>-Server, der nicht existiert.]]></string>
-    <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[Diese Verbindung wurde zugelassen, da für die <i>Quellanwendung</i> die Regeln für <i>Proxy umgehen</i> festgelegt sind.<br/><br/> Um dies zu ändern, gehen Sie zum Bildschirm <i>Anwendungsspezifische Firewall</i>.]]></string>
+    <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[Diese Verbindung wurde zugelassen, da für die <i>Quellanwendung</i> die Regeln für <i>Proxy umgehen</i> festgelegt sind.<br/><br/> Um dies zu ändern, gehe zum Bildschirm <i>Anwendungsspezifische Firewall</i>.]]></string>
     <string name="firewall_rule_paused_app_desc" translatable="true"><![CDATA[Diese Verbindung wurde zugelassen, da die <i>App</i> im <i>Pausiert</i>-Status ist.]]></string>
-    <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[Diese Verbindung wurde blockiert, da WireGuard sich im <i>Sperrmodus</i> befindet.<br/><br/> Um dies zu ändern, gehen Sie zum Bildschirm <i>WireGuard</i>.]]></string>
+    <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[Diese Verbindung wurde blockiert, da sich WireGuard im <i>Sperrmodus</i> befindet.<br/><br/> Um dies zu ändern, gehe zum Bildschirm <i>WireGuard</i>.]]></string>
     <string name="wireguard_disable_failure_relay" translatable="true">\"WireGuard Relais\" kann nicht deaktiviert werden</string>
     <string name="config_invalid_desc" translatable="true">Ungültige WireGuard-Konfiguration</string>
     <string name="console_log_title" translatable="true">App Protokolle</string>
@@ -1201,7 +1201,7 @@
     <string name="wg_setting_ssid_title" translatable="true">Nur WLAN</string>
     <string name="wg_setting_ssid_desc" translatable="true">Dieses WireGuard-VPN nur aktivieren, wenn eine Verbindung zu WLAN oder bestimmten WLAN-Kennungen (%1$s) besteht.</string>
     <string name="ssid_permission_explanation" translatable="true">Rethink benötigt Standortberechtigungen, um auf WLAN-Kennungen (%1$s) zugreifen zu können.</string>
-    <string name="location_enable_explanation" translatable="true">Aktivieren Sie den Standortdienst, um auf WLAN-Kennungen (%1$s) zugreifen zu können.</string>
+    <string name="location_enable_explanation" translatable="true">Aktiviere den Standortdienst, um auf WLAN-Kennungen (%1$s) zugreifen zu können.</string>
     <string name="ssid_location_error" translatable="true">Standortdienst aktivieren</string>
     <string name="ssid_permission_error_action" translatable="true">Berechtigung gewähren</string>
     <string name="ssid_location_error_action" translatable="true">Standort aktivieren</string>
@@ -1220,11 +1220,11 @@
     <string name="settings_allow_incoming_wg_packets_desc" translatable="true">Wenn aktiviert, werden eingehende Verbindungen von WireGuard-Peers zugelassen.</string>
     <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[Diese Verbindung wurde blockiert, da der für die App ausgewählte <i>Proxy</i> nicht ausgewählt wurde.<br/><br/> Um dies zu ändern, gehe auf dem Bildschirm <i>Konfigurieren</i> zu <i>Proxy</i>.]]></string>
     <string name="wg_ssid_dialog_description" translatable="true">%1$s dieses WireGuard-VPN, wenn <i>aktiv</i> WLAN-Kennung (%2$s) %3$s.</string>
-    <string name="lockdown_download_message" translatable="true">Der in Android integrierte <i>Download-Manager</i> funktioniert möglicherweise nicht, da sich das VPN im <i>Sperrmodus</i> befindet. Möchten Sie stattdessen den Downloader von Rethink aktivieren?</string>
+    <string name="lockdown_download_message" translatable="true">Der in Android integrierte <i>Download-Manager</i> funktioniert möglicherweise nicht, da sich das VPN im <i>Sperrmodus</i> befindet. Möchtest du stattdessen den Downloader von Rethink aktivieren?</string>
     <string name="lockdown_download_enable_inapp" translatable="true">Downloader aktivieren</string>
     <string name="settings_jumbo_packets_desc" translatable="true">Verwendet <i>Jumbo-Pakete</i> innerhalb des VPN-Tunnels von Rethink.</string>
     <string name="settings_tunnel_metered" translatable="true">Immer getaktet</string>
     <string name="settings_tunnel_metered_desc" translatable="true">Markiere den VPN-Tunnel als getaktet, um Apps anzuweisen, weniger Daten zu verbrauchen. Achtung: Dies kann dazu führen, dass Apps große Uploads und Downloads, wie z. B. Backups, unterbrechen.</string>
     <string name="stability_program_toast" translatable="true">Für das <i>Stabilitätsprogramm</i> für <i>experimentelle Funktionen</i> angemeldet.</string>
-    <string name="dns_record_types_auto_mode_status" translatable="true">Automaisch (Alle Arten)</string>
+    <string name="dns_record_types_auto_mode_status" translatable="true">Automatisch (Alle Arten)</string>
 </resources>
