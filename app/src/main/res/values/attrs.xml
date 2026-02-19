@@ -47,4 +47,7 @@
     <attr name="homeScreenBtnGradientStart" format="reference" />
     <attr name="homeScreenBtnGradientEnd" format="reference" />
     <attr name="bottomSheetBackground" format="reference" />
+    <attr name="vpnHeaderGradientStart" format="reference" />
+    <attr name="vpnHeaderGradientCenter" format="reference" />
+    <attr name="vpnHeaderGradientEnd" format="reference" />
 </resources>

@@ -92,27 +92,9 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:padding="15dp"
-                    android:text=""
+                    android:text="@string/rethink_terms"
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/small_font_text_view" />
-
-                <!-- @string/rplus_see_if_works -->
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/test_ping_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:backgroundTint="?attr/accentGood"
-                    android:fontFamily="serif-monospace"
-                    android:gravity="center"
-                    android:padding="16dp"
-                    android:text=""
-                    android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:textStyle="bold"
-                    android:visibility="visible" />
 
             </LinearLayout>
 
@@ -135,7 +117,7 @@
                     android:id="@+id/tvPendingTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=""
+                    android:text="@string/payment_processing"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:layout_marginTop="16dp" />
@@ -145,7 +127,7 @@
                     android:id="@+id/tvPendingMessage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=""
+                    android:text="@string/payment_processing_desc"
                     android:textAlignment="center"
                     android:layout_marginTop="8dp"
                     android:paddingHorizontal="16dp" />
@@ -177,7 +159,7 @@
                     android:id="@+id/title_unavailable"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=""
+                    android:text="@string/rethink_plus_title"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:layout_marginTop="24dp"
@@ -188,7 +170,7 @@
                     android:id="@+id/desc_unavailable"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=""
+                    android:text="@string/rethink_plus_not_available_desc"
                     android:textSize="16sp"
                     android:layout_marginTop="16dp"
                     android:textAlignment="center"
@@ -241,7 +223,7 @@
                 android:layout_marginStart="30dp"
                 android:layout_marginEnd="30dp"
                 android:letterSpacing="0.15"
-                android:text=""
+                android:text="@string/subscribe_title"
                 android:textColor="?attr/chipTextColor"
                 android:background="@drawable/rounded_corners_button_accent"
                 android:textSize="18sp" />

@@ -1,75 +1,200 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/subs_card"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/plan_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="8dp"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="4dp"
+    app:strokeWidth="2dp"
+    app:strokeColor="@android:color/transparent"
+    app:cardBackgroundColor="?attr/background">
 
-    <RelativeLayout
-        android:id="@+id/subs_parent"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="0.5dp"
-        android:background="?android:attr/selectableItemBackground">
+        android:padding="20dp">
 
-        <RelativeLayout
-            android:id="@+id/subs_detail"
-            android:layout_width="match_parent"
+        <!-- Best Value Badge -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/badge_container"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:padding="5dp"
-            android:visibility="visible">
+            android:visibility="gone"
+            app:cardBackgroundColor="?attr/accentGood"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:visibility="visible">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/product_name"
+                android:id="@+id/badge_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_toStartOf="@id/price_container"
-                android:ellipsize="end"
-                android:fontFamily="serif-monospace"
-                android:maxLines="10"
-                android:padding="10dp"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/extra_large_font_text_view" />
+                android:paddingStart="12dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="4dp"
+                android:text="@string/best_value"
+                android:textColor="@android:color/white"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                tools:text="BEST VALUE" />
 
-            <LinearLayout
-                android:id="@+id/price_container"
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Plan Duration (e.g., "Monthly", "Yearly") -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/plan_duration"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/monthly_plan"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@+id/badge_container"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/selection_indicator"
+            tools:text="Monthly" />
+
+        <!-- Selection Radio Button -->
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:id="@+id/selection_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:focusable="false"
+            app:layout_constraintTop_toTopOf="@+id/plan_duration"
+            app:layout_constraintBottom_toBottomOf="@+id/plan_duration"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Price -->
+        <LinearLayout
+            android:id="@+id/price_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            app:layout_constraintTop_toBottomOf="@+id/plan_duration"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="10dp"
-                android:orientation="vertical">
+                android:text="@string/price_placeholder"
+                android:textColor="?attr/accentGood"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                tools:text="$4.99" />
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/offer_price"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:alpha="0.8"
-                    android:ellipsize="end"
-                    android:fontFamily="serif-monospace"
-                    android:maxLines="10"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/heading_font_text_view" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/price_period"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="@string/per_month"
+                android:textColor="?attr/secondaryTextColor"
+                android:textSize="14sp"
+                tools:text="/month" />
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/original_price"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="serif-monospace"
-                    android:gravity="end"
-                    android:padding="5dp"
-                    android:visibility="gone"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/large_font_text_view" />
-            </LinearLayout>
-        </RelativeLayout>
+        </LinearLayout>
 
-    </RelativeLayout>
+        <!-- Original Price (if discounted) -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/original_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/original_price"
+            android:textColor="?attr/secondaryTextColor"
+            android:textSize="14sp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/price_container"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:visibility="visible"
+            tools:text="Was $9.99" />
+
+        <!-- Billing Info -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/billing_info"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/billing_info"
+            android:textColor="?attr/secondaryTextColor"
+            android:textSize="12sp"
+            app:layout_constraintTop_toBottomOf="@+id/original_price"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="Billed monthly • Cancel anytime" />
+
+        <!-- Free Trial Info (if available) -->
+        <LinearLayout
+            android:id="@+id/trial_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/rectangle_border_background"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/billing_info"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:visibility="visible">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_rethink_plus_sparkle"
+                app:tint="?attr/accentGood" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/trial_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="@string/free_trial"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                tools:text="7 days free trial" />
+
+        </LinearLayout>
+
+        <!-- Savings Badge (for annual plans) -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/savings_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/chip_bg_positive"
+            android:paddingStart="10dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="4dp"
+            android:text="@string/save_percentage"
+            android:textColor="?attr/accentGood"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/trial_container"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:visibility="visible"
+            tools:text="Save 40%" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </com.google.android.material.card.MaterialCardView>
+

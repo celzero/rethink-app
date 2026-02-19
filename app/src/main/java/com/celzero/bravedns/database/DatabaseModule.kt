@@ -47,6 +47,7 @@ object DatabaseModule {
         single { get<AppDatabase>().wgHopMapDao() }
         single { get<AppDatabase>().subscriptionStatusDao() }
         single { get<AppDatabase>().subscriptionStateHistoryDao()}
+        single { get<AppDatabase>().countryConfigDAO() }
 
         single { get<LogDatabase>().connectionTrackerDAO() }
         single { get<LogDatabase>().dnsLogDAO() }
@@ -82,6 +83,7 @@ object DatabaseModule {
         single { get<AppDatabase>().wgHopMapRepository() }
         single { get<AppDatabase>().subscriptionStatusRepository() }
         single { get<AppDatabase>().subscriptionStateHistoryDao() }
+        single { get<AppDatabase>().countryConfigRepository() }
 
         single { get<LogDatabase>().rethinkConnectionLogRepository() }
         single { get<LogDatabase>().connectionTrackerRepository() }

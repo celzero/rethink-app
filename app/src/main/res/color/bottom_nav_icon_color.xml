@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Selector for bottom navigation icon colors -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Selected state uses primary color -->
+    <item android:color="?attr/accentGood" android:state_checked="true"/>
+    <!-- Unselected state uses secondary text color -->
+    <item android:color="?attr/primaryLightColorText"/>
+</selector>

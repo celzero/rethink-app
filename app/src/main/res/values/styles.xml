@@ -87,6 +87,9 @@
 
         <item name="homeScreenBtnGradientEnd">@color/colorPrimaryDark</item>
         <item name="homeScreenBtnGradientStart">@color/colorPrimary</item>
+        <item name="vpnHeaderGradientStart">@color/vpnHeaderGradientStart</item>
+        <item name="vpnHeaderGradientCenter">@color/vpnHeaderGradientCenter</item>
+        <item name="vpnHeaderGradientEnd">@color/vpnHeaderGradientEnd</item>
         <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView</item>
     </style>
 
@@ -162,6 +165,9 @@
 
         <item name="homeScreenBtnGradientEnd">@color/colorPrimaryDarkLight</item>
         <item name="homeScreenBtnGradientStart">@color/accentGoodLight</item>
+        <item name="vpnHeaderGradientStart">@color/vpnHeaderGradientStartLight</item>
+        <item name="vpnHeaderGradientCenter">@color/vpnHeaderGradientCenterLight</item>
+        <item name="vpnHeaderGradientEnd">@color/vpnHeaderGradientEndLight</item>
         <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView</item>
     </style>
 
@@ -238,6 +244,9 @@
 
         <item name="homeScreenBtnGradientEnd">@color/homeScreenBtnBackgroundBlack</item>
         <item name="homeScreenBtnGradientStart">@color/colorPrimaryDarkBlack</item>
+        <item name="vpnHeaderGradientStart">@color/vpnHeaderGradientStartBlack</item>
+        <item name="vpnHeaderGradientCenter">@color/vpnHeaderGradientCenterBlack</item>
+        <item name="vpnHeaderGradientEnd">@color/vpnHeaderGradientEndBlack</item>
         <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView</item>
     </style>
 
@@ -313,6 +322,9 @@
 
         <item name="homeScreenBtnGradientEnd">@color/accentGoodLightPlus</item>
         <item name="homeScreenBtnGradientStart">@color/colorPrimaryDarkLightPlus</item>
+        <item name="vpnHeaderGradientStart">@color/vpnHeaderGradientStartLightPlus</item>
+        <item name="vpnHeaderGradientCenter">@color/vpnHeaderGradientCenterLightPlus</item>
+        <item name="vpnHeaderGradientEnd">@color/vpnHeaderGradientEndLightPlus</item>
         <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView</item>
     </style>
 
@@ -389,6 +401,9 @@
 
         <item name="homeScreenBtnGradientEnd">@color/colorPrimaryDarkBlackPlus</item>
         <item name="homeScreenBtnGradientStart">@color/colorBackgroundFloatingBlackPlus</item>
+        <item name="vpnHeaderGradientStart">@color/vpnHeaderGradientStartBlackPlus</item>
+        <item name="vpnHeaderGradientCenter">@color/vpnHeaderGradientCenterBlackPlus</item>
+        <item name="vpnHeaderGradientEnd">@color/vpnHeaderGradientEndBlackPlus</item>
         <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView</item>
     </style>
 
@@ -465,6 +480,9 @@
 
         <item name="homeScreenBtnGradientEnd">@color/homeScreenBtnBackgroundBlack</item>
         <item name="homeScreenBtnGradientStart">@color/colorPrimaryDarkBlack</item>
+        <item name="vpnHeaderGradientStart">@color/vpnHeaderGradientStartBlack</item>
+        <item name="vpnHeaderGradientCenter">@color/vpnHeaderGradientCenterBlack</item>
+        <item name="vpnHeaderGradientEnd">@color/vpnHeaderGradientEndBlack</item>
         <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView.Frost</item>
     </style>
 

@@ -81,7 +81,7 @@ object MemoryUtils {
         val debugMemInfo = Debug.MemoryInfo()
         Debug.getMemoryInfo(debugMemInfo)
 
-        val totalPssBytes = debugMemInfo.totalPss * BYTES_TO_KB
+        val totalPssBytes = debugMemInfo.totalPss * 1024L
 
         // "summary.native-heap" etc return values in KB
         val nativePssBytes = (debugMemInfo.getMemoryStat("summary.native-heap")?.toLongOrNull() ?: 0L) * BYTES_TO_KB

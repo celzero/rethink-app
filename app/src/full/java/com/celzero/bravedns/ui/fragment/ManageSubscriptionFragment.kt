@@ -15,16 +15,37 @@
  */
  package com.celzero.bravedns.ui.fragment
 
+import Logger.LOG_TAG_UI
+import android.graphics.Paint
+import android.os.Bundle
+import android.view.View
+import android.widget.Toast
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.android.billingclient.api.BillingClient
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
+import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.databinding.FragmentManageSubscriptionBinding
+import com.celzero.bravedns.iab.InAppBillingHandler
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
+import com.celzero.bravedns.ui.activity.FragmentHostActivity
+import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.UIUtils.openUrl
+import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ManageSubscriptionFragment : Fragment(R.layout.fragment_manage_subscription) {
     private val b by viewBinding(FragmentManageSubscriptionBinding::bind)
 
     // You can fetch these details dynamically, e.g. from your backend or Play Billing Library
-    /*private val appIconRes = R.drawable.ic_launcher_foreground
+    private val appIconRes = R.drawable.ic_launcher_foreground
     private val benefits = listOf(
         "Unlimited skips",
         "Offline download",
@@ -159,7 +180,7 @@ class ManageSubscriptionFragment : Fragment(R.layout.fragment_manage_subscriptio
         val linkWithSubs = link.replace("$1", productId)
         val linkWithSubsAndPackage = linkWithSubs.replace("$2", requireContext().packageName)
         openUrl(requireContext(), linkWithSubsAndPackage)
-        InAppBillingHandler.fetchPurchases(listOf(ProductType.SUBS))
+        InAppBillingHandler.fetchPurchases(listOf(BillingClient.ProductType.SUBS, BillingClient.ProductType.INAPP))
     }
 
     private fun showDialogConfirmCancelOrRevoke(isCancel: Boolean) {
@@ -213,7 +234,7 @@ class ManageSubscriptionFragment : Fragment(R.layout.fragment_manage_subscriptio
                 )
                 return@io
             }
-            *//*val curr = subsDb.getCurrentSubscription()
+            /*val curr = subsDb.getCurrentSubscription()
             if (curr == null) {
                 Logger.w(LOG_TAG_UI, "$TAG cancel subscription clicked but no active subscription found")
                 showToastUiCentered(requireContext(), "No active subscription found", Toast.LENGTH_SHORT)
@@ -223,7 +244,7 @@ class ManageSubscriptionFragment : Fragment(R.layout.fragment_manage_subscriptio
                 Logger.w(LOG_TAG_UI, "$TAG cancel subscription clicked but subscription is not active")
                 showToastUiCentered(requireContext(), "Subscription is not active", Toast.LENGTH_SHORT)
                 return@io
-            }*//*
+            }*/
             val curr = RpnProxyManager.getCurrentSubscription()
             if (curr == null) {
                 Logger.w(
@@ -279,14 +300,14 @@ class ManageSubscriptionFragment : Fragment(R.layout.fragment_manage_subscriptio
                 initView()
             }
             Logger.i(LOG_TAG_UI, "$TAG cancel subscription request sent, success? ${res.first}, msg: ${res.second}")
-            InAppBillingHandler.fetchPurchases(listOf(ProductType.SUBS))
+            InAppBillingHandler.fetchPurchases(listOf(BillingClient.ProductType.SUBS, BillingClient.ProductType.INAPP))
             checkForGracePeriod()
         }
     }
 
     private fun revokeSubscription() {
         io {
-            *//*val curr = subsDb.getCurrentSubscription()
+            /*val curr = subsDb.getCurrentSubscription()
             if (curr == null) {
                 Logger.w(LOG_TAG_UI, "$TAG revoke subscription clicked but no active subscription found")
                 showToastUiCentered(requireContext(), "No active subscription found", Toast.LENGTH_SHORT)
@@ -296,7 +317,7 @@ class ManageSubscriptionFragment : Fragment(R.layout.fragment_manage_subscriptio
                 Logger.w(LOG_TAG_UI, "$TAG revoke subscription clicked but subscription is not active")
                 showToastUiCentered(requireContext(), "Subscription is not active", Toast.LENGTH_SHORT)
                 return@io
-            }*//*
+            }*/
             val state = RpnProxyManager.getSubscriptionState()
             if (!state.hasValidSubscription) {
                 Logger.w(
@@ -310,7 +331,7 @@ class ManageSubscriptionFragment : Fragment(R.layout.fragment_manage_subscriptio
                 )
                 return@io
             }
-            *//*val curr = subsDb.getCurrentSubscription()
+            /*val curr = subsDb.getCurrentSubscription()
             if (curr == null) {
                 Logger.w(LOG_TAG_UI, "$TAG cancel subscription clicked but no active subscription found")
                 showToastUiCentered(requireContext(), "No active subscription found", Toast.LENGTH_SHORT)
@@ -320,7 +341,7 @@ class ManageSubscriptionFragment : Fragment(R.layout.fragment_manage_subscriptio
                 Logger.w(LOG_TAG_UI, "$TAG cancel subscription clicked but subscription is not active")
                 showToastUiCentered(requireContext(), "Subscription is not active", Toast.LENGTH_SHORT)
                 return@io
-            }*//*
+            }*/
             val curr = RpnProxyManager.getCurrentSubscription()
             if (curr == null) {
                 Logger.w(
@@ -376,7 +397,7 @@ class ManageSubscriptionFragment : Fragment(R.layout.fragment_manage_subscriptio
                 initView()
             }
             Logger.i(LOG_TAG_UI, "$TAG revoke subscription request sent, success: ${res.first}, msg: ${res.second}")
-            InAppBillingHandler.fetchPurchases(listOf(ProductType.SUBS))
+            InAppBillingHandler.fetchPurchases(listOf(BillingClient.ProductType.SUBS, BillingClient.ProductType.INAPP))
         }
     }
 
@@ -396,5 +417,5 @@ class ManageSubscriptionFragment : Fragment(R.layout.fragment_manage_subscriptio
 
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
-    }*/
+    }
 }

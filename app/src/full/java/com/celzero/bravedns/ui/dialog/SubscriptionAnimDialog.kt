@@ -49,6 +49,17 @@ class SubscriptionAnimDialog : DialogFragment() {
         private const val POSITION_Y_BOTTOM = 1.0
     }
 
+
+    private val autoDismissRunnable = Runnable {
+        if (isAdded && !isStateSaved) {
+            // safe to dismiss normally
+            dismiss()
+        } else if (isAdded) {
+            // if state is already saved, allow state loss to avoid IllegalStateException
+            dismissAllowingStateLoss()
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -61,9 +72,14 @@ class SubscriptionAnimDialog : DialogFragment() {
         dialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         dialog?.setCancelable(true)
         b.konfettiView.start(festive())
-        b.konfettiView.postDelayed({
-            dismiss()
-        }, DIALOG_DISPLAY_DURATION_MS)
+        // post delayed auto-dismiss safely
+        b.konfettiView.postDelayed(autoDismissRunnable, DIALOG_DISPLAY_DURATION_MS)
+    }
+
+    override fun onDestroyView() {
+        // cancel pending auto-dismiss runnable to avoid running after view/state is gone
+        b.konfettiView.removeCallbacks(autoDismissRunnable)
+        super.onDestroyView()
     }
 
     private fun festive(): List<Party> {

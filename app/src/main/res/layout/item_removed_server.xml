@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="?attr/chipBgColorNeutral"
+    app:strokeWidth="1dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/background"
+        android:padding="16dp">
+
+        <!-- Flag/Icon -->
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/server_flag"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:textSize="24sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="🇺🇸" />
+
+        <!-- Server Name -->
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/server_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/removal_badge"
+            app:layout_constraintStart_toEndOf="@id/server_flag"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="USA - New York" />
+
+        <!-- Server Location -->
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/server_location"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
+            android:alpha="0.6"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toStartOf="@id/removal_badge"
+            app:layout_constraintStart_toEndOf="@id/server_flag"
+            app:layout_constraintTop_toBottomOf="@id/server_name"
+            tools:text="New York, United States" />
+
+        <!-- Removal Badge -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/removal_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/server_removed"
+            android:textColor="?attr/accentBad"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            app:chipBackgroundColor="?attr/chipBgColorNegative"
+            app:chipCornerRadius="8dp"
+            app:chipMinHeight="24dp"
+            app:chipStrokeWidth="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>
+

@@ -23,6 +23,7 @@ import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsCryptRelayEndpoint
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.ui.activity.AntiCensorshipActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
@@ -364,7 +365,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var rpnMode by intPref("rpn_mode").withDefault<Int>(1)
 
     // current rpn state, see enum RpnState
-    //var rpnState by intPref("rpn_state").withDefault<Int>(RpnProxyManager.RpnState.DISABLED.id)
+    var rpnState by intPref("rpn_state").withDefault<Int>(RpnProxyManager.RpnState.DISABLED.id)
 
     // subscribe product id for the current user, empty string if not subscribed
     var rpnProductId by stringPref("rpn_product_id").withDefault<String>("")

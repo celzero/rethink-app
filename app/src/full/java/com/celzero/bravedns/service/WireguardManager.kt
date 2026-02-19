@@ -19,6 +19,7 @@ import Logger
 import Logger.LOG_TAG_PROXY
 import android.content.Context
 import android.text.format.DateUtils
+import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.backup.BackupHelper.Companion.TEMP_WG_DIR
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.SsidItem
@@ -34,7 +35,6 @@ import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.WgHopManager
 import com.celzero.bravedns.wireguard.WgInterface
-import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.RouterStats
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -398,6 +398,7 @@ object WireguardManager : KoinComponent {
         val lockdown = persistentState.wgGlobalLockdown
         val block = Backend.Block
         val proxyIds: MutableList<String> = mutableListOf()
+
         if (oneWireGuardEnabled()) {
             val id = getOneWireGuardProxyId()
             if (id == null || id == INVALID_CONF_ID) {
@@ -465,25 +466,32 @@ object WireguardManager : KoinComponent {
         if (dcProxyPair.first.isNotEmpty()) proxyIds.add(dcProxyPair.first) // domain-app specific
         */
 
-        // check for app specific config
-        val ac = ProxyManager.getProxyIdForApp(uid)
-        // app-specific config can be empty, if the app is not configured
-        // app-specific config id
-        val acid = if (ac == ID_NONE) "" else ac // ignore id string if it is ID_NONE
-        val appProxyPair = canUseConfig(acid, "app($uid)", usesMobileNw, ssid)
-        if (!appProxyPair.second) {
-            if (appProxyPair.first == block) {
-                proxyIds.clear()
-                proxyIds.add(block)
-            } else {
-                proxyIds.add(appProxyPair.first)
-            }
-            Logger.i(LOG_TAG_PROXY, "lockdown wg for app($uid) => return $proxyIds")
-            return proxyIds
-        }
+        // --- App-specific WireGuard configs (multi-proxy aware) ---
+        // collect all proxy-ids for this uid and keep only WireGuard ones (wgX)
+        val allProxyIdsForApp = ProxyManager.getProxyIdsForApp(uid)
+        val wgProxyIdsForApp = allProxyIdsForApp.filter { it.startsWith(ID_WG_BASE) }
 
-        // add the app specific config to the list
-        if (appProxyPair.first.isNotEmpty()) proxyIds.add(appProxyPair.first)
+        // app-specific configs may be empty if the app is not configured
+        if (wgProxyIdsForApp.isNotEmpty()) {
+            for (pid in wgProxyIdsForApp) {
+                val appProxyPair = canUseConfig(pid, "app($uid)", usesMobileNw, ssid)
+                if (!appProxyPair.second) {
+                    // lockdown or block; honor it and stop further processing
+                    proxyIds.clear()
+                    if (appProxyPair.first == block) {
+                        proxyIds.add(block)
+                    } else if (appProxyPair.first.isNotEmpty()) {
+                        proxyIds.add(appProxyPair.first)
+                    }
+                    Logger.i(LOG_TAG_PROXY, "lockdown wg for app($uid) => return $proxyIds")
+                    return proxyIds
+                }
+                if (appProxyPair.first.isNotEmpty()) {
+                    // add eligible app-specific config in the order we see them
+                    proxyIds.add(appProxyPair.first)
+                }
+            }
+        }
 
         /* TODO: commenting the code as v055o doesn't use universal ip and domain rules
         // check for universal ip config
@@ -524,7 +532,9 @@ object WireguardManager : KoinComponent {
         // if catch-all config is enabled, then add the config id to the list
         val cac = mappings.filter { it.isActive && it.isCatchAll }
         cac.forEach {
-            if ((checkEligibilityBasedOnNw(it.id, usesMobileNw) && checkEligibilityBasedOnSsid(it.id, ssid)) && !proxyIds.contains(ID_WG_BASE + it.id)) {
+            if ((checkEligibilityBasedOnNw(it.id, usesMobileNw) || checkEligibilityBasedOnSsid(it.id, ssid)) &&
+                !proxyIds.contains(ID_WG_BASE + it.id)
+            ) {
                 proxyIds.add(ID_WG_BASE + it.id)
                 Logger.i(
                     LOG_TAG_PROXY,
@@ -534,7 +544,10 @@ object WireguardManager : KoinComponent {
         }
 
         if (proxyIds.isEmpty()) {
-            Logger.i(LOG_TAG_PROXY, "no proxy ids found for $uid, $ip, $port, $domain; returning $default")
+            Logger.i(
+                LOG_TAG_PROXY,
+                "no proxy ids found for $uid, $ip, $port, $domain; returning $default"
+            )
             return listOf(default)
         }
 

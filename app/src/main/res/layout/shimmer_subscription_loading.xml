@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Hero Banner Shimmer -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/shimmer_placeholder" />
+
+    <!-- Title Shimmer -->
+    <View
+        android:layout_width="150dp"
+        android:layout_height="24dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/shimmer_placeholder" />
+
+    <!-- Feature Card Shimmers -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/shimmer_placeholder" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/shimmer_placeholder" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/shimmer_placeholder" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/shimmer_placeholder" />
+
+    <!-- Plans Title Shimmer -->
+    <View
+        android:layout_width="120dp"
+        android:layout_height="24dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/shimmer_placeholder" />
+
+    <!-- Plan Card Shimmers -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/shimmer_placeholder" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/shimmer_placeholder" />
+
+</LinearLayout>
+

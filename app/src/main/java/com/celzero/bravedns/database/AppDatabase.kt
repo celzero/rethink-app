@@ -51,9 +51,10 @@ import com.celzero.bravedns.util.Constants
         RpnProxy::class,
         WgHopMap::class,
         SubscriptionStatus::class,
-        SubscriptionStateHistory::class
+        SubscriptionStateHistory::class,
+        CountryConfig::class
     ],
-    version = 27,
+    version = 31,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -101,6 +102,10 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_24_25)
                 .addMigrations(MIGRATION_25_26)
                 .addMigrations(MIGRATION_26_27)
+                .addMigrations(MIGRATION_27_28)
+                .addMigrations(MIGRATION_28_29)
+                .addMigrations(MIGRATION_29_30)
+                .addMigrations(MIGRATION_30_31)
                 .build()
 
         private val roomCallback: Callback =
@@ -1087,22 +1092,203 @@ abstract class AppDatabase : RoomDatabase() {
                     // insert new columns with default values (modifiedTs)
                     db.execSQL("ALTER TABLE WgConfigFiles ADD COLUMN modifiedTs INTEGER NOT NULL DEFAULT 0")
                     Logger.i(LOG_TAG_APP_DB, "MIGRATION_26_27: removed isLockdown column")
+                    db.execSQL(
+                        """
+                                           CREATE TABLE IF NOT EXISTS CountryConfig (
+                                               cc TEXT PRIMARY KEY NOT NULL,
+                                               catchAll INTEGER NOT NULL DEFAULT 0,
+                                               lockdown INTEGER NOT NULL DEFAULT 0,
+                                               mobileOnly INTEGER NOT NULL DEFAULT 0,
+                                               ssidBased INTEGER NOT NULL DEFAULT 0,
+                                               lastModified INTEGER NOT NULL DEFAULT 0,
+                                               enabled INTEGER NOT NULL DEFAULT 1,
+                                               priority INTEGER NOT NULL DEFAULT 0
+                                           )
+                                           """.trimIndent()
+                    )
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_26_27: created CountryConfig table")
+                }
+            }
+
+        private val MIGRATION_27_28: Migration =
+            object : Migration(27, 28) {
+                override fun migrate(db: SupportSQLiteDatabase) {
                     // Add modifiedTs column to AppInfo table to track when firewall/proxy rules change
                     try {
                         db.execSQL("ALTER TABLE AppInfo ADD COLUMN modifiedTs INTEGER NOT NULL DEFAULT 0")
                         // Backfill all existing rows with 0 (already done by DEFAULT 0)
-                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_26_27: added modifiedTs column to AppInfo")
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_27_28: added modifiedTs column to AppInfo")
                     } catch (e: Exception) {
-                        Logger.e(LOG_TAG_APP_DB, "MIGRATION_26_27: modifiedTs column already exists, ignore", e)
+                        Logger.e(LOG_TAG_APP_DB, "MIGRATION_27_28: modifiedTs column already exists, ignore", e)
                     }
+                    // Legacy migration kept for users upgrading stepwise; RpnWinServers
+                    // will be dropped in MIGRATION_28_29 when we introduce unified CountryConfig.
+                    db.execSQL(
+                        """
+                                            CREATE TABLE IF NOT EXISTS RpnWinServers (
+                                                id TEXT PRIMARY KEY NOT NULL,
+                                                name TEXT NOT NULL,
+                                                countryCode TEXT NOT NULL,
+                                                address TEXT NOT NULL,
+                                                city TEXT NOT NULL,
+                                                key TEXT NOT NULL,
+                                                load INTEGER NOT NULL,
+                                                link INTEGER NOT NULL,
+                                                count INTEGER NOT NULL,
+                                                isActive INTEGER NOT NULL,
+                                                lastUpdated INTEGER NOT NULL
+                                            )
+                                            """.trimIndent()
+                    )
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_RpnWinServers_countryCode ON RpnWinServers(countryCode)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_RpnWinServers_isActive ON RpnWinServers(isActive)")
+                    Logger.i(
+                        LOG_TAG_APP_DB,
+                        "MIGRATION_27_28: created RpnWinServers table with indexes"
+                    )
+                }
+            }
+
+        private val MIGRATION_28_29: Migration =
+            object : Migration(28, 29) {
+                override fun migrate(db: SupportSQLiteDatabase) {
                     // Add tempAllowEnabled and tempAllowExpiryTime columns to AppInfo table for temporary allow feature
                     try {
                         db.execSQL("ALTER TABLE AppInfo ADD COLUMN tempAllowEnabled INTEGER NOT NULL DEFAULT 0")
                         db.execSQL("ALTER TABLE AppInfo ADD COLUMN tempAllowExpiryTime INTEGER NOT NULL DEFAULT 0")
-                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_26_27: added tempAllowEnabled and tempAllowExpiryTime columns to AppInfo")
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_28_29: added tempAllowEnabled and tempAllowExpiryTime columns to AppInfo")
                     } catch (e: Exception) {
-                        Logger.e(LOG_TAG_APP_DB, "MIGRATION_26_27: temp allow columns already exist, ignore", e)
+                        Logger.e(LOG_TAG_APP_DB, "MIGRATION_28_29: temp allow columns already exist, ignore", e)
                     }
+                    try {
+                        db.execSQL("DROP TABLE IF EXISTS RpnWinServers")
+                        db.execSQL("DROP INDEX IF EXISTS index_RpnWinServers_countryCode")
+                        db.execSQL("DROP INDEX IF EXISTS index_RpnWinServers_isActive")
+                    } catch (_: Exception) {
+                        // Table or indexes may not exist on some upgrade paths; ignore.
+                    }
+
+                    // Drop any old CountryConfig if schema doesn’t match; recreate clean.
+                    try {
+                        db.execSQL("DROP TABLE IF EXISTS CountryConfig")
+                    } catch (_: Exception) {
+                        // Ignore
+                    }
+
+                    db.execSQL(
+                        """
+                                            CREATE TABLE IF NOT EXISTS CountryConfig (
+                                                id TEXT NOT NULL PRIMARY KEY,
+                                                cc TEXT NOT NULL,
+                                                name TEXT NOT NULL,
+                                                address TEXT NOT NULL,
+                                                city TEXT NOT NULL,
+                                                key TEXT NOT NULL,
+                                                load INTEGER NOT NULL,
+                                                link INTEGER NOT NULL,
+                                                count INTEGER NOT NULL,
+                                                isActive INTEGER NOT NULL,
+                                                catchAll INTEGER NOT NULL DEFAULT 0,
+                                                lockdown INTEGER NOT NULL DEFAULT 0,
+                                                mobileOnly INTEGER NOT NULL DEFAULT 0,
+                                                ssidBased INTEGER NOT NULL DEFAULT 0,
+                                                enabled INTEGER NOT NULL DEFAULT 1,
+                                                priority INTEGER NOT NULL DEFAULT 0,
+                                                lastModified INTEGER NOT NULL DEFAULT 0
+                                            )
+                                            """.trimIndent()
+                    )
+
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_CountryConfig_cc ON CountryConfig(cc)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_CountryConfig_isActive ON CountryConfig(isActive)")
+
+                    Logger.i(
+                        LOG_TAG_APP_DB,
+                        "MIGRATION_28_29: dropped RpnWinServers and recreated CountryConfig table"
+                    )
+                }
+            }
+
+        // v30: Add ssids column to CountryConfig (ssidBased already exists)
+        private val MIGRATION_29_30: Migration =
+            object : Migration(29, 30) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    // Add ssids column (defaults to empty string) - ssidBased already exists from v29
+                    if (!doesColumnExistInTable(db, "CountryConfig", "ssids")) {
+                        db.execSQL("ALTER TABLE CountryConfig ADD COLUMN ssids TEXT NOT NULL DEFAULT ''")
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_29_30: added ssids column to CountryConfig")
+                    }
+
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_29_30: SSID configuration support complete (ssidBased + ssids)")
+                }
+            }
+
+        // v31: Remove redundant 'enabled' column from CountryConfig (use isActive instead)
+        private val MIGRATION_30_31: Migration =
+            object : Migration(30, 31) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    // SQLite doesn't support DROP COLUMN directly, so we need to recreate the table
+                    // First, create a temporary table with the new schema (without 'enabled')
+                    db.execSQL("""
+                        CREATE TABLE CountryConfig_temp (
+                            id TEXT PRIMARY KEY NOT NULL,
+                            cc TEXT NOT NULL,
+                            name TEXT NOT NULL DEFAULT '',
+                            address TEXT NOT NULL DEFAULT '',
+                            city TEXT NOT NULL DEFAULT '',
+                            key TEXT NOT NULL DEFAULT '',
+                            load INTEGER NOT NULL DEFAULT 0,
+                            link INTEGER NOT NULL DEFAULT 0,
+                            count INTEGER NOT NULL DEFAULT 0,
+                            isActive INTEGER NOT NULL DEFAULT 1,
+                            catchAll INTEGER NOT NULL DEFAULT 0,
+                            lockdown INTEGER NOT NULL DEFAULT 0,
+                            mobileOnly INTEGER NOT NULL DEFAULT 0,
+                            ssidBased INTEGER NOT NULL DEFAULT 0,
+                            priority INTEGER NOT NULL DEFAULT 0,
+                            ssids TEXT NOT NULL DEFAULT '',
+                            lastModified INTEGER NOT NULL DEFAULT 0
+                        )
+                    """.trimIndent())
+
+                    // Copy data from old table to new table
+                    // If 'enabled' column exists, merge it with isActive (enabled takes precedence if different)
+                    // Otherwise, just copy isActive as-is
+                    if (doesColumnExistInTable(db, "CountryConfig", "enabled") || doesColumnExistInTable(db, "CountryConfig", "isSelected")) {
+                        db.execSQL("""
+                            INSERT INTO CountryConfig_temp 
+                            (id, cc, name, address, city, key, load, link, count, isActive, 
+                             catchAll, lockdown, mobileOnly, ssidBased, priority, ssids, lastModified)
+                            SELECT 
+                                id, cc, name, address, city, key, load, link, count, 
+                                CASE WHEN enabled = 0 THEN 0 ELSE isActive END,
+                                catchAll, lockdown, mobileOnly, ssidBased, priority, ssids, lastModified
+                            FROM CountryConfig
+                        """.trimIndent())
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_30_31: merged 'enabled' column into 'isActive'")
+                    } else {
+                        db.execSQL("""
+                            INSERT INTO CountryConfig_temp 
+                            (id, cc, name, address, city, key, load, link, count, isActive, 
+                             catchAll, lockdown, mobileOnly, ssidBased, priority, ssids, lastModified)
+                            SELECT 
+                                id, cc, name, address, city, key, load, link, count, isActive,
+                                catchAll, lockdown, mobileOnly, ssidBased, priority, ssids, lastModified
+                            FROM CountryConfig
+                        """.trimIndent())
+                    }
+
+                    // Drop the old table
+                    db.execSQL("DROP TABLE CountryConfig")
+
+                    // Rename the temporary table to the original name
+                    db.execSQL("ALTER TABLE CountryConfig_temp RENAME TO CountryConfig")
+
+                    // Recreate indices
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_CountryConfig_cc ON CountryConfig(cc)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_CountryConfig_isActive ON CountryConfig(isActive)")
+
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_30_31: removed redundant 'enabled' column from CountryConfig")
                 }
             }
 
@@ -1175,9 +1361,13 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun subscriptionStateHistoryDao(): SubscriptionStateHistoryDao
 
+    abstract fun countryConfigDAO(): CountryConfigDAO
+
     fun appInfoRepository() = AppInfoRepository(appInfoDAO())
 
     fun dohEndpointRepository() = DoHEndpointRepository(dohEndpointsDAO())
+
+    fun countryConfigRepository() = CountryConfigRepository(countryConfigDAO())
 
     fun dnsCryptEndpointRepository() = DnsCryptEndpointRepository(dnsCryptEndpointDAO())
 

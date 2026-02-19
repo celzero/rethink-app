@@ -48,33 +48,28 @@ interface ProxyApplicationMappingDAO {
     @Query("select * from ProxyApplicationMapping")
     fun getWgAppMapping(): List<ProxyApplicationMapping>
 
-    // query to get apps for pager adapter
-    @Query(
-        "select * from ProxyApplicationMapping where appName like :appName order by lower(appName)"
-    )
+    // query to get apps for pager adapter: distinct apps ordered by name
+    @Query("SELECT * FROM ProxyApplicationMapping WHERE rowid IN ( SELECT MIN(rowid) FROM ProxyApplicationMapping WHERE appName LIKE :appName GROUP BY uid, packageName)ORDER BY lower(appName)")
     fun getAllAppsMapping(appName: String): PagingSource<Int, ProxyApplicationMapping>
 
-    @Query(
-        "select * from ProxyApplicationMapping where appName like :appName and proxyId = :proxyId order by lower(appName)"
-    )
-    fun getSelectedAppsMapping(
-        appName: String,
-        proxyId: String
-    ): PagingSource<Int, ProxyApplicationMapping>
+    @Query("SELECT * FROM ProxyApplicationMapping WHERE rowid IN (SELECT MIN(rowid) FROM ProxyApplicationMapping WHERE appName LIKE :appName AND proxyId = :proxyId GROUP BY uid, packageName) ORDER BY lower(appName)")
+    fun getSelectedAppsMapping(appName: String, proxyId: String): PagingSource<Int, ProxyApplicationMapping>
 
-    @Query(
-        "select * from ProxyApplicationMapping where appName like :appName and proxyId != :proxyId order by lower(appName)"
-    )
-    fun getUnSelectedAppsMapping(
-        appName: String,
-        proxyId: String
-    ): PagingSource<Int, ProxyApplicationMapping>
+    @Query("SELECT * FROM ProxyApplicationMapping WHERE rowid IN ( SELECT MIN(rowid) FROM ProxyApplicationMapping WHERE appName LIKE :appName  AND proxyId != :proxyId GROUP BY uid, packageName) ORDER BY lower(appName)")
+    fun getUnSelectedAppsMapping(appName: String, proxyId: String): PagingSource<Int, ProxyApplicationMapping>
 
     @Query("select count(packageName) from ProxyApplicationMapping where proxyId = :id")
     fun getAppCountById(id: String): Int
 
     @Query("select count(packageName) from ProxyApplicationMapping where proxyId = :id")
     fun getAppCountByIdLiveData(id: String): LiveData<Int>
+
+    @Query("select count(packageName) from ProxyApplicationMapping where proxyId = :id")
+    fun getSelectedAppsCountLiveData(id: String): LiveData<Int>
+
+    // unselected: apps in mapping table that are not using this proxyId
+    @Query("select count(packageName) from ProxyApplicationMapping where proxyId != :id")
+    fun getUnselectedAppsCountLiveData(id: String): LiveData<Int>
 
     @Query(
         "update ProxyApplicationMapping set proxyId = :cfgId, proxyName = :cfgName where uid = :uid"
@@ -103,4 +98,16 @@ interface ProxyApplicationMappingDAO {
 
     @Query("update ProxyApplicationMapping set uid = :newUid where uid = :oldUid")
     fun tombstoneApp(oldUid: Int, newUid: Int)
+
+    @Query("select * from ProxyApplicationMapping where uid = :uid and packageName = :packageName")
+    fun getProxiesForApp(uid: Int, packageName: String): List<ProxyApplicationMapping>
+
+    @Query("select proxyId from ProxyApplicationMapping where uid = :uid and packageName = :packageName")
+    fun getProxyIdsForApp(uid: Int, packageName: String): List<String>
+
+    @Query("select * from ProxyApplicationMapping where proxyId = :proxyId")
+    fun getAppsForProxy(proxyId: String): List<ProxyApplicationMapping>
+
+    @Query("delete from ProxyApplicationMapping where uid = :uid and packageName = :packageName and proxyId = :proxyId")
+    fun deleteMapping(uid: Int, packageName: String, proxyId: String)
 }

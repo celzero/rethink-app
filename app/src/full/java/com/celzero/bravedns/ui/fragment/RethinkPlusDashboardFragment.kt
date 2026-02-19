@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.fragment
-/*
+
 import Logger
 import Logger.LOG_TAG_UI
 import android.content.ClipData
@@ -59,7 +59,6 @@ import com.celzero.bravedns.ui.activity.PingTestActivity
 import com.celzero.bravedns.ui.activity.RpnWinProxyDetailsActivity
 import com.celzero.bravedns.ui.dialog.SubscriptionAnimDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
-import com.celzero.bravedns.ui.location.LocationSelectorActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
@@ -79,7 +78,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.util.concurrent.TimeUnit
-import kotlin.getValue
+import kotlin.jvm.java
 
 class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_dashboard) {
     private val b by viewBinding(ActivityRethinkPlusDashboardBinding::bind)
@@ -406,7 +405,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
                     val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
                     val proxyId = id.toString()
                     val proxyName = "Win-US"
-                    val appsAdapter = WgIncludeAppsAdapter(requireContext(), proxyId, proxyName)
+                    val appsAdapter = WgIncludeAppsAdapter(requireContext(), this, proxyId, proxyName)
                     mappingViewModel.apps.observe(viewLifecycleOwner) {
                         appsAdapter.submitData(
                             lifecycle,
@@ -713,9 +712,6 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
             }
             return@io
         }*/
-
-        val intent = Intent(requireContext(), LocationSelectorActivity::class.java)
-        startActivity(intent)
     }
 
     private fun showInfoDialog(type: RpnProxyManager.RpnType,prop: RpnProxyManager.RpnProps) {
@@ -931,4 +927,3 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
         lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 }
-*/

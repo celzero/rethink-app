@@ -15,9 +15,9 @@
  */
 package com.celzero.bravedns.ui.dialog
 
-import Logger
-import Logger.LOG_TAG_UI
 import android.app.Activity
+import com.celzero.bravedns.adapter.HopItem
+import com.celzero.bravedns.service.WireguardManager
 import android.app.Dialog
 import android.os.Bundle
 import android.view.Window
@@ -28,73 +28,49 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.celzero.bravedns.adapter.WgHopAdapter
 import com.celzero.bravedns.databinding.DialogWgHopBinding
 import com.celzero.bravedns.wireguard.Config
-import org.koin.core.component.KoinComponent
 
+/**
+ * Dialog for WireGuard configuration hopping
+ * Now extends GenericHopDialog to reuse common hop logic
+ */
 class WgHopDialog(
-    private var activity: Activity,
+    activity: Activity,
     themeID: Int,
-    private val srcId: Int,
-    private val hopables: List<Config>,
-    private val selectedId: Int
-) : Dialog(activity, themeID), KoinComponent {
-
-    private lateinit var b: DialogWgHopBinding
-    private lateinit var animation: Animation
-    private lateinit var adapter: WgHopAdapter
-
+    srcId: Int,
+    configs: List<Config>,
+    selectedId: Int,
+    onHopChanged: ((Int) -> Unit)? = null
+) : GenericHopDialog(
+    activity,
+    themeID,
+    srcId,
+    configs.map { config ->
+        val mapping = WireguardManager.getConfigFilesById(config.getId())
+        HopItem.WireGuardHop(config, mapping?.isActive ?: false)
+    },
+    selectedId,
+    onHopChanged
+) {
     companion object {
-        private const val ANIMATION_DURATION = 750L
-        private const val ANIMATION_REPEAT_COUNT = -1
-        private const val ANIMATION_PIVOT_VALUE = 0.5f
-        private const val ANIMATION_START_DEGREE = 0.0f
-        private const val ANIMATION_END_DEGREE = 360.0f
-
-        private const val TAG = "HopDlg"
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
-        b = DialogWgHopBinding.inflate(layoutInflater)
-        setContentView(b.root)
-        setCancelable(false)
-        addAnimation()
-        init()
-        setupClickListeners()
-    }
-
-    private fun addAnimation() {
-        animation =
-            RotateAnimation(
-                ANIMATION_START_DEGREE,
-                ANIMATION_END_DEGREE,
-                Animation.RELATIVE_TO_SELF,
-                ANIMATION_PIVOT_VALUE,
-                Animation.RELATIVE_TO_SELF,
-                ANIMATION_PIVOT_VALUE
+        /**
+         * Create WireGuard hop dialog
+         */
+        fun create(
+            activity: Activity,
+            themeID: Int,
+            srcConfigId: Int,
+            availableConfigs: List<Config>,
+            currentlySelectedConfigId: Int = -1,
+            onHopChanged: ((Int) -> Unit)? = null
+        ): WgHopDialog {
+            return WgHopDialog(
+                activity,
+                themeID,
+                srcConfigId,
+                availableConfigs,
+                currentlySelectedConfigId,
+                onHopChanged
             )
-        animation.repeatCount = ANIMATION_REPEAT_COUNT
-        animation.duration = ANIMATION_DURATION
-    }
-
-    private fun init() {
-        window?.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.MATCH_PARENT
-        )
-        Logger.v(LOG_TAG_UI, "$TAG; init called")
-
-        val layoutManager = LinearLayoutManager(activity)
-        b.wgHopRecyclerView.layoutManager = layoutManager
-        adapter = WgHopAdapter(activity, srcId, hopables, selectedId)
-        b.wgHopRecyclerView.adapter = adapter
-    }
-
-    private fun setupClickListeners() {
-        b.wgHopDialogOkButton.setOnClickListener {
-            Logger.d(LOG_TAG_UI, "$TAG; dismiss hop dialog")
-            dismiss()
         }
     }
 }

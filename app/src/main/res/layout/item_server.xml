@@ -1,50 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="12dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="12dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:background="?attr/selectableItemBackground"
     android:gravity="center_vertical"
-    android:foreground="?android:attr/selectableItemBackground"
-    android:background="?attr/background"
-    android:clickable="true"
-    android:focusable="true">
+    android:minHeight="48dp">
 
-    <LinearLayout
+    <!-- City/Location name -->
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_city_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="vertical"
-        android:layout_marginEnd="16dp">
+        android:textSize="14sp"
+        android:textColor="?android:attr/textColorPrimary"
+        android:ellipsize="end"
+        android:maxLines="1"
+        tools:text="New York" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_server_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textColor="?android:attr/textColorPrimary"
-            android:textStyle="normal"
-            tools:text="New York" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_server_latency"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="11sp"
-            android:textColor="?android:attr/textColorSecondary"
-            android:layout_marginTop="2dp"
-            tools:text="25ms" />
-
-    </LinearLayout>
-
-    <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/cb_server_selected"
+    <!-- Server metrics badge (latency, load, etc.) -->
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_server_metric"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:buttonTint="?attr/colorPrimary"
+        android:textSize="12sp"
+        android:textColor="?android:attr/textColorSecondary"
+        android:layout_marginEnd="12dp"
+        android:fontFamily="sans-serif-medium"
+        tools:text="45ms • 85%" />
+
+    <!-- Selection checkbox -->
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/checkbox_server"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:buttonTint="?attr/accentGood"
         android:clickable="false"
         android:focusable="false" />
 
 </LinearLayout>
+

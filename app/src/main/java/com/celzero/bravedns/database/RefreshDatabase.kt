@@ -65,7 +65,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
-import kotlin.math.log
+import kotlin.jvm.java
 import kotlin.random.Random
 
 class RefreshDatabase

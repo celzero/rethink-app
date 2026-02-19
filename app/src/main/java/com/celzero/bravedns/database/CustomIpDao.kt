@@ -23,6 +23,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
 import androidx.room.Update
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
@@ -98,7 +99,7 @@ interface CustomIpDao {
     )
     fun getAppWiseCustomIp(query: String, uid: Int): PagingSource<Int, CustomIp>
 
-    @androidx.room.RewriteQueriesToDropUnusedColumns
+    @RewriteQueriesToDropUnusedColumns
     @Query(
         "SELECT * FROM (SELECT *, (SELECT COUNT(*) FROM CustomIp ci2 WHERE ci2.uid = ci1.uid AND ci2.rowid <= ci1.rowid) row_num FROM CustomIp ci1 WHERE ipAddress LIKE :query AND isActive = 1 AND uid != $UID_EVERYBODY) WHERE row_num <= 5 ORDER BY uid, row_num"
     )

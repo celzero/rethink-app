@@ -23,6 +23,8 @@ import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.ServiceModule
+import com.celzero.bravedns.subscription.StateMachineDatabaseSyncService
+import com.celzero.bravedns.subscription.SubscriptionStateMachineV2
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.viewmodel.ViewModelModule
@@ -47,13 +49,13 @@ private val appDownloadManagerModule = module {
 private val workerModule = module { single { WorkScheduler(androidContext()) } }
 
 private val schedulerModule = module { single { ScheduleManager(androidContext()) } }
-/*
+
 private val stateMachine = module {
     single { SubscriptionStateMachineV2() }
     single { StateMachineDatabaseSyncService() }
-}*/
+}
 
-//private val stateMachineModules = listOf(stateMachine)
+private val stateMachineModules = listOf(stateMachine)
 
 val AppModules: List<Module> by lazy {
     mutableListOf<Module>().apply {
@@ -62,7 +64,7 @@ val AppModules: List<Module> by lazy {
         addAll(ViewModelModule.modules)
         addAll(DataModule.modules)
         addAll(ServiceModule.modules)
-        //addAll(stateMachineModules)
+        addAll(stateMachineModules)
         addAll(updaterModules)
         add(schedulerModule)
         add(workerModule)

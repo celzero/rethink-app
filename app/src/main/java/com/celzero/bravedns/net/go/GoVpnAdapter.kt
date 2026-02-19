@@ -36,6 +36,7 @@ import com.celzero.bravedns.data.AppConfig.Companion.DOH_INDEX
 import com.celzero.bravedns.data.AppConfig.Companion.DOT_INDEX
 import com.celzero.bravedns.data.AppConfig.Companion.FALLBACK_DNS_IF_NET_DNS_EMPTY
 import com.celzero.bravedns.data.AppConfig.TunnelOptions
+import com.celzero.bravedns.database.CountryConfig
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsCryptRelayEndpoint
 import com.celzero.bravedns.database.EventSource
@@ -43,6 +44,7 @@ import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.BraveVPNService.Companion.FIRESTACK_MUST_DUP_TUNFD
 import com.celzero.bravedns.service.BraveVPNService.Companion.NW_ENGINE_NOTIFICATION_ID
@@ -82,8 +84,10 @@ import com.celzero.firestack.backend.DNSResolver
 import com.celzero.firestack.backend.DNSTransport
 import com.celzero.firestack.backend.NetStat
 import com.celzero.firestack.backend.Proxies
+import com.celzero.firestack.backend.Proxy
 import com.celzero.firestack.backend.RDNS
 import com.celzero.firestack.backend.RouterStats
+import com.celzero.firestack.backend.RpnProxy
 import com.celzero.firestack.intra.Controller
 import com.celzero.firestack.intra.DefaultDNS
 import com.celzero.firestack.intra.Intra
@@ -171,7 +175,7 @@ class GoVpnAdapter : KoinComponent {
         setDialStrategy()
         setTransparency()
         undelegatedDomains()
-        setExperimentalSettings()
+        setExperimentalWireGuardSettings()
         setAutoDialsParallel()
         setAutoMode()
         registerSeProxyIfNeeded()
@@ -1998,7 +2002,6 @@ class GoVpnAdapter : KoinComponent {
             )
             rdns?.rdnsLocal?.stamp = stamp.togs()
             Logger.i(LOG_TAG_VPN, "$TAG local brave dns object is set with stamp: $stamp")
-            logEvent(Severity.LOW, "set local blocklist", "Local blocklist set with stamp: $stamp")
         } catch (ex: Exception) {
             // Set local blocklist enabled to false and reset the timestamp
             // if there is a failure creating bravedns
@@ -2242,7 +2245,7 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    /*suspend fun getRpnProps(rpnType: RpnProxyManager.RpnType): Pair<RpnProxyManager.RpnProps?, String?> {
+    suspend fun getRpnProps(rpnType: RpnProxyManager.RpnType): Pair<RpnProxyManager.RpnProps?, String?> {
         try {
             var errMsg: String? = ""
             val rpn: RpnProxy? = try {
@@ -2279,7 +2282,7 @@ class GoVpnAdapter : KoinComponent {
             Logger.w(LOG_TAG_PROXY, "$TAG err rpn props($rpnType): ${e.message}")
             return Pair(null, e.message)
         }
-    }*/
+    }
 
     suspend fun testRpnProxy(proxyId: String): Boolean {
         if (!tunnel.isConnected) {
@@ -2350,6 +2353,21 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
+    suspend fun getWinByKey(key: String): Proxy? {
+        if (!tunnel.isConnected) {
+            Logger.i(LOG_TAG_PROXY, "$TAG no tunnel, skip get win(rpn) by key")
+            return null
+        }
+        return try {
+            val win = tunnel.proxies.rpn().win().get(key.togs())
+            Logger.i(LOG_TAG_PROXY, "$TAG no win(rpn) found by key: $key")
+            win
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG err get win(rpn) by key: ${e.message}", e)
+            null
+        }
+    }
+
     suspend fun updateWin(): ByteArray? {
         if (!tunnel.isConnected) {
             Logger.i(LOG_TAG_PROXY, "$TAG no tunnel, skip update win(rpn)")
@@ -2365,12 +2383,12 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    /*suspend fun addNewWinServer(server: RpnProxyManager.RpnWinServer): Pair<Boolean, String> {
+    suspend fun addNewWinServer(key: String): Pair<Boolean, String> {
         if (!tunnel.isConnected) {
             Logger.i(LOG_TAG_PROXY, "$TAG no tunnel, skip add new win(rpn) server")
             return Pair(false, "No tunnel connected")
         }
-        if (server.countryCode.isEmpty()) {
+        if (key.isEmpty()) {
             Logger.w(LOG_TAG_PROXY, "$TAG empty country code for new win(rpn) server")
             return Pair(false, "Empty country code for server")
         }
@@ -2382,7 +2400,7 @@ class GoVpnAdapter : KoinComponent {
                 Logger.w(LOG_TAG_PROXY, "$TAG max win servers reached: $prevServerCount, skipping add")
                 return Pair(false, "Max servers reached: $prevServerCount, skipping add")
             }
-            val name = server.countryCode.togs()
+            val name = key.togs()
             val res = win.fork(name)
             Logger.i(LOG_TAG_PROXY, "$TAG add new win(rpn) server: $res")
             return Pair(true, "Added new server: $name")
@@ -2390,7 +2408,28 @@ class GoVpnAdapter : KoinComponent {
             Logger.e(LOG_TAG_PROXY, "$TAG err add new win(rpn) server: ${e.message}", e)
             Pair(false, e.message ?: "Error adding new server")
         }
-    }*/
+    }
+
+    suspend fun removeWinServer(key: String): Pair<Boolean, String> {
+        if (!tunnel.isConnected) {
+            Logger.i(LOG_TAG_PROXY, "$TAG no tunnel, skip remove win(rpn) server")
+            return Pair(false, "No tunnel connected")
+        }
+        if (key.isEmpty()) {
+            Logger.w(LOG_TAG_PROXY, "$TAG empty country code for remove win(rpn) server")
+            return Pair(false, "Empty country code for server")
+        }
+        return try {
+            val win = tunnel.proxies.rpn().win()
+            val name = key.togs()
+            val res = win.purge(name)
+            Logger.i(LOG_TAG_PROXY, "$TAG remove win(rpn) server: $res")
+            return Pair(true, "Removed server: $name")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG err remove win(rpn) server: ${e.message}", e)
+            Pair(false, e.message ?: "Error removing server")
+        }
+    }
 
     suspend fun unregisterWin(): Boolean {
         if (!tunnel.isConnected) {
@@ -2407,7 +2446,7 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    /*suspend fun setRpnAutoMode(): Boolean {
+    suspend fun setRpnAutoMode(): Boolean {
         if (!tunnel.isConnected) {
             Logger.i(LOG_TAG_PROXY, "$TAG no tunnel, skip set rpn auto mode")
             return false
@@ -2435,7 +2474,7 @@ class GoVpnAdapter : KoinComponent {
             Logger.e(LOG_TAG_PROXY, "$TAG err set rpn auto mode: ${e.message}", e)
             false
         }
-    }*/
+    }
 
     suspend fun isProxyReachable(
         proxyId: String,
@@ -2504,17 +2543,13 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    suspend fun setExperimentalSettings(value: Boolean = persistentState.nwEngExperimentalFeatures) {
+    suspend fun setExperimentalWireGuardSettings(value: Boolean = persistentState.nwEngExperimentalFeatures) {
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip set experimental settings")
-            logEvent(
-                Severity.CRITICAL,
-                "Set experimental settings failed",
-                "Failed to set experimental settings to $value: no tunnel"
-            )
             return
         }
         try {
+            // modified from overall experimental settings to only wireguard experimental settings
             Intra.experimentalWireGuard(value)
             // refresh proxies on experimental settings change (required for wireguard)
             //refreshOrReAddProxies()
@@ -2650,7 +2685,7 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    /*suspend fun updateRpnProxy(type: RpnProxyManager.RpnType): ByteArray? {
+    suspend fun updateRpnProxy(type: RpnProxyManager.RpnType): ByteArray? {
         if (!tunnel.isConnected) {
             Logger.i(LOG_TAG_PROXY, "$TAG no tunnel, skip update rpn proxy")
             return null
@@ -2672,7 +2707,7 @@ class GoVpnAdapter : KoinComponent {
             Logger.w(LOG_TAG_PROXY, "$TAG err update rpn proxy($type): ${e.message}")
             null
         }
-    }*/
+    }
 
     suspend fun addMultipleDnsAsPlus() {
         if (!tunnel.isConnected) {
@@ -2836,7 +2871,6 @@ class GoVpnAdapter : KoinComponent {
         try {
             Intra.panicAtRandom(shouldPanic)
             Logger.i(LOG_TAG_VPN, "$TAG panic at random: $shouldPanic")
-            logEvent(Severity.HIGH, "Panic at random set", "Panic at random: $shouldPanic")
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG err panic at random: ${e.message}")
         }
@@ -2868,9 +2902,7 @@ class GoVpnAdapter : KoinComponent {
             Logger.e(LOG_TAG_VPN, "$TAG err start flight recorder: ${e.message}")
             try {
                 Intra.flightRecorder(false)
-            } catch (_: Exception) {
-                // ignore
-            }
+            } catch (_: Exception) { }
         }
     }
 

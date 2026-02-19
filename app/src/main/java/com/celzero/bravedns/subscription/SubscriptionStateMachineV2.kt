@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.subscription
-/*
+
 import Logger.LOG_IAB
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingResult
@@ -1174,4 +1174,3 @@ class SubscriptionStateMachineV2 : KoinComponent {
         CoroutineScope(Dispatchers.IO).launch { f() }
     }
 }
-*/
