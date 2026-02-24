@@ -43,10 +43,10 @@ jobs:
         # TODO: change build variant to fdroid if json does not exist
         # developers.google.com/android/guides/google-services-plugin#adding_the_json_file
         run: |
-          mkdir -p app/src/debug
+          mkdir -p app/src/alpha
           echo "${GSCV_TEST_JSON}" > app/src/alpha/google-services.json
           # expected: l:29 w:45 m:691
-          wc -lwm app/src/debug/google-services.json
+          wc -lwm app/src/alpha/google-services.json
         env:
           GSCV_TEST_JSON: ${{ secrets.GOOGLE_SERVICES_TEST_JSON }}
 
