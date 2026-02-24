@@ -88,7 +88,7 @@ jobs:
         with:
           prerelease: true
           files: |
-            ${{ env. APKFILE }}
+            ${{ env.APKFILE }}
  
       - name: 💬 Telegram
         continue-on-error: true
