@@ -102,9 +102,9 @@ jobs:
           #  -F caption="sha256: ${CAP}" \
           #  -F parse_mode=HTML \
           #  -F document=@"$DOC"
-          env:
-            NOM: "rdns-alpha-${{ github.sha }}"
-            DOC: ${{ steps.a3.outputs.artifact-url }}
-            CAP: ${{ steps.a3.outputs.artifact-id }}
+        env:
+          NOM: "rdns-alpha-${{ github.sha }}"
+          DOC: ${{ steps.a3.outputs.artifact-url }}
+          CAP: ${{ steps.a3.outputs.artifact-id }}
 
           
