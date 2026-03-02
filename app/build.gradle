@@ -278,7 +278,7 @@ def firestackDependency = { suffix = ":debug" ->
 }
 
 dependencies {
-    def room_version = "2.8.1"
+    def room_version = "2.8.3"
     def paging_version = "3.3.6"
 
     implementation 'com.google.guava:guava:33.5.0-android'
