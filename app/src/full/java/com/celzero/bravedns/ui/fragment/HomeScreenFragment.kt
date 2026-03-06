@@ -1409,15 +1409,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         val curr = TxRx()
         if (txRx.time <= 0L) {
             txRx = curr
-            b.fhsInternetSpeed.visibility = View.GONE
-            b.fhsInternetSpeedUnit.visibility = View.GONE
+            b.fhsInternetSpeed.visibility = View.INVISIBLE
+            b.fhsInternetSpeedUnit.visibility = View.INVISIBLE
             return
         }
         val dur = (curr.time - txRx.time) / 1000L
 
         if (dur <= 0) {
-            b.fhsInternetSpeed.visibility = View.GONE
-            b.fhsInternetSpeedUnit.visibility = View.GONE
+            b.fhsInternetSpeed.visibility = View.INVISIBLE
+            b.fhsInternetSpeedUnit.visibility = View.INVISIBLE
             return
         }
         val tx = curr.tx - txRx.tx

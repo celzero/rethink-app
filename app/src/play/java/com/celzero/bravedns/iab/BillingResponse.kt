@@ -1,6 +1,6 @@
 package com.celzero.bravedns.iab
 
-/*import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.BillingClient
 
 @JvmInline
 value class BillingResponse(private val code: Int) {
@@ -35,4 +35,4 @@ value class BillingResponse(private val code: Int) {
             BillingClient.BillingResponseCode.FEATURE_NOT_SUPPORTED,
             BillingClient.BillingResponseCode.ITEM_NOT_OWNED,
         )
-}*/
+}
