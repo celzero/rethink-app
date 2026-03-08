@@ -1063,4 +1063,17 @@
     <string name="notif_channel_desc_firewall_alerts" translatable="true">방화벽 오류 및 예외에 대한 경고</string>
     <string name="notif_channed_desc_download" translatable="true">온 디바이스 블록 목록에 대한 다운로드 진행 중 경보</string>
     <string name="cd_toast_deleted" translatable="true">사용자 지정 목록에서 제거 된 도메인</string>
+    <string name="rt_filter_desc" translatable="true"><![CDATA[차단 목록 <u>%1$s</u>개 표시 중]]></string>
+    <string name="catch_all_wg_dialog_title" translatable="true">항상 켜기</string>
+    <string name="about_terms_of_service" translatable="true">이용약관</string>
+    <string name="copied_clipboard" translatable="true">복사됨</string>
+    <string name="wg_setting_ssid_title" translatable="true">Wi-Fi 전용</string>
+    <string name="settings_allow_incoming_wg_packets" translatable="true">WireGuard P2P</string>
+    <string name="settings_allow_incoming_wg_packets_desc" translatable="true">켜져 있으면, WireGuard 피어가 시작한 연결 수신을 허용합니다.</string>
+    <string name="location_enable_explanation" translatable="true">Wi-Fi 식별자(%1$s)에 접근하려면, 위치 서비스를 켭니다.</string>
+    <string name="hop_add_remove_title" translatable="true">릴레이 추가/제거</string>
+    <string name="wg_setting_use_on_mobile" translatable="true">모바일 데이터 전용</string>
+    <string name="hop_failure_toast" translatable="true">릴레이 오류: %1$s -&gt; %2$s</string>
+    <string name="no_stats_available" translatable="true">통계 없음</string>
+    <string name="title_database_dump" translatable="true">데이터베이스</string>
 </resources>
