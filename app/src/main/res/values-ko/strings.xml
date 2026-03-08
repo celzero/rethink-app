@@ -1057,4 +1057,10 @@
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[<i>소스 앱</i>이 <i>DNS 및 방화벽</i> 규칙을 우회하도록 설정되었기 때문에 이 연결이 허용되었습니다.<br/><br/> 변경하려면 <i>앱별 방화벽</i> 화면으로 이동하세요.]]></string>
     <string name="firewall_rule_block_ip_univ_desc" translatable="true"><![CDATA[사용자 설정 방화벽 규칙이 <i>대상 IP / 포트</i>를 차단했습니다.<br/><br/> 변경하려면 <i>전역</i> 탭으로 이동하세요.]]></string>
     <string name="firewall_rule_block_ip_desc" translatable="true"><![CDATA[사용자가 설정한 방화벽 규칙이 <i>대상 IP</i>를 차단했습니다.<br/><br/> 변경하려면 <i>앱별 방화벽</i> 화면으로 이동하세요.]]></string>
+    <string name="firewall_rule_trusted_ip_desc" translatable="true">&lt;! CDATA [이 연결은 &lt;i&gt; 대상 IP &lt;/ i&gt;가 신뢰할 수있는 IP로 설정되므로 허용되었습니다. &lt;br/&gt; &lt;br/&gt; &lt;A&gt; App 관련 특성 방화벽 &lt;/ i&gt; 화면으로 이동하십시오.]]&gt;</string>
+    <string name="notif_channel_desc_vpn_notification" translatable="true">Rethink가 활성화되고 배경에서 실행 중일 때 알려주십시오</string>
+    <string name="notif_channel_desc_vpn_failure" translatable="true">Rethink가 Android 또는 다른 VPN 앱에서 멈 춥니 다</string>
+    <string name="notif_channel_desc_firewall_alerts" translatable="true">방화벽 오류 및 예외에 대한 경고</string>
+    <string name="notif_channed_desc_download" translatable="true">온 디바이스 블록 목록에 대한 다운로드 진행 중 경보</string>
+    <string name="cd_toast_deleted" translatable="true">사용자 지정 목록에서 제거 된 도메인</string>
 </resources>
