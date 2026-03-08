@@ -119,7 +119,7 @@
     <string name="conn_track_clear_logs_message">يؤدي هذا إلى حذف سجلات الشبكة فقط وليس قواعد جدار الحماية. هذه العملية غير قابلة للعكس. هل تريد المتابعة؟</string>
     <string name="bsct_app_info">معلومات التطبيق</string>
     <string name="dns_proxy_remove_dialog_title">هل تريد حذف وكيل DNS؟</string>
-    <string name="local_blocklist_redownload">حتى الآن!</string>
+    <string name="local_blocklist_redownload">مُحدَّث!</string>
     <string name="settings_lock_down_mode_desc">يتم تعطيل بعض الخيارات عندما يكون VPN في وضع الإغلاق. <u>أنظر في إعدادات VPN</u>.</string>
     <string name="orbot_http">بروسكي HTTP</string>
     <string name="settings_orbot_notification_action">افتح Orbot</string>
@@ -446,7 +446,7 @@
     <string name="settings_notification_heading">اختر إجراء الإشعار</string>
     <string name="hsf_proxy_chip_removed_toast">تمت إزالة الوكيل</string>
     <string name="dc_other_dns_heading">النوع</string>
-    <string name="about_connect">اتصل</string>
+    <string name="about_connect">تواصل</string>
     <string name="univ_ip_delete_toast_success">تم حذف جميع قواعد IP.</string>
     <string name="accessibility_failure_toast">توقفت خدمة إمكانية الوصول Rethink أو تعطلت. لم يعد يحظر التطبيقات التي تعمل في الخلفية.</string>
     <string name="firewall_rule_isolate">عزل</string>
@@ -648,7 +648,7 @@
     <string name="download_update_dialog_failure_message">إما أن خوادمنا معطلة أو لا يمكن إنشاء الاتصال. من فضلك حاول مرة أخرى بعد بعض من الوقت.</string>
     <string name="dns_explanation_dns_connected">متصل بـ RethinkDNS</string>
     <string name="settings_http_proxy_error_text1">يجب أن يتراوح نطاق المنفذ بين 1024 و 65535</string>
-    <string name="local_blocklist_redownload_desc">قوائم الحظر على الجهاز موجودة بالفعل في أحدث إصدار v %1$s.</string>
+    <string name="local_blocklist_redownload_desc">قوائم الحظر على الجهاز موجودة بالفعل في أحدث إصدار %1$s.</string>
     <string name="blocklist_update_check_failure">هناك خطأ ما. حاول مرة أخرى في وقت لاحق!</string>
     <string name="info_dialog_rethink_toast_msg">تم نسخه كـ RDNS + DNS-over-HTTPS URL</string>
     <string name="settings_ptrans_desc">ترجمة حركة مرور IPv6 الصادرة إلى IPv4 على الجهاز. قم بتمكينه إذا كنت متصلاً بشبكة IPv4 فقط.</string>
@@ -897,8 +897,8 @@
     <string name="ada_app_bypass_dns_firewall" translatable="true">تجاوز DNS وجدار الحماية</string>
     <string name="brbs_backup_restore_desc" translatable="true">لا يعمل عبر إصدارات التطبيق</string>
     <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">أكثر التطبيقات التي تم حظرها</string>
-    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">أكثر عناوين IP التي تم حظرها</string>
-    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">أكثر البلدان التي تم حظرها</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">أكثر عناوين IP حُظرت</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">أكثر الدول المحظورة</string>
     <string name="bad_config_reason_invalid_key" translatable="true">مفتاح غير صالح</string>
     <string name="bad_config_reason_invalid_number" translatable="true">رقم غير صالح</string>
     <string name="one_wg_apps_added" translatable="true">توجيه جميع التطبيقات</string>
@@ -919,13 +919,13 @@
     <string name="remaining_apps_dialog_desc" translatable="true">تضمين جميع التطبيقات المتبقية التي لم يتم توجيهها بواسطة أي وكيل آخر</string>
     <string name="cloudflare_dns_desc" translatable="true">لا يمنع أي طلبات DNS. يستخدم نقطة نهاية DNS الخاصة بـ Cloudflare 1.1.1.1 .</string>
     <string name="bypass_dns_firewall_tooltip">%1$s يعمل مع DNS الخاص بـ Rethink فقط</string>
-    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">أكثر البلدان التي تم الإتصال بها</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">أكثر الدول تواصلاً</string>
     <string name="new_warp_invalid_config_toast" translatable="true">تكوين WARP غير صالح</string>
     <string name="add_remove_apps" translatable="true">إضافة / إزالة (%1$s apps)</string>
     <string name="new_warp_error_toast" translatable="true">غير قادر على جلب تكوين WARP</string>
     <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">أكثر النطاقات التي تم حظرها</string>
-    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">أكثر عناوين IP التي تم الإتصال بها</string>
-    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">أكثر النطاقات التي تم الإتصال بها</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">أكثر عناوين IP تواصلًا</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">النطاقات الأكثر تواصلاً</string>
     <string name="bad_config_reason_invalid_value" translatable="true">قيمة غير صالحة</string>
     <string name="ssv_see_more" translatable="true">عرض الكل</string>
     <string name="bad_config_explanation_udp_port" translatable="true">: يجب أن يكون رقم منفذ UDP صالحًا</string>
@@ -997,7 +997,7 @@
     <string name="settings_allow_lan_heading" translatable="true">لا تقم بتوجيه عناوين IP الخاصة (تجريبي)</string>
     <string name="settings_allow_lan_desc" translatable="true">استبعد مسارات LAN، وloopback، وmulticast، وlink-local من نفق VPN الخاص بـ Rethink.</string>
     <string name="settings_mobile_metered_heading" translatable="true">قياس شبكات الهاتف المحمول</string>
-    <string name="settings_mobile_metered_desc" translatable="true">تعامل دائمًا مع شبكات الهاتف المحمول على أنها مقيسة.</string>
+    <string name="settings_mobile_metered_desc" translatable="true">اعتبر شبكات الجوال فقط محدودة الاستهلاك، والباقي غير محدود.</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">تطبيقات إعادة توجيه الوكيل الحلقي</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">عند تعطيله، يتم استبعاد تطبيقات إعادة التوجيه بالوكيل (SOCKS5، HTTP، DNS) من نفق VPN الخاص بـ Rethink.</string>
     <string name="settings_rinr_desc_disabled" translatable="true">إعادة النظر في حركة المرور الخاصة بـ Rethink، مثل تنزيلات القائمة المحظورة، وفحوصات الاتصال، واتصالات DNS، مرة أخرى إلى النفق.</string>
@@ -1041,4 +1041,10 @@
     <string name="lbl_fallback" translatable="true">بديل احتياطي</string>
     <string name="lbl_default" translatable="true">المبدئي</string>
     <string name="lbl_action" translatable="true">الإجراء</string>
+    <string name="lbl_connect" translatable="true">اتصل</string>
+    <string name="most_contacted_asn" translatable="true">أكثر المزودين تواصلًا</string>
+    <string name="lbl_criteria" translatable="true">معايير</string>
+    <string name="conn_track_clear_rule_logs_title" translatable="true">أتريد حذف سجلات هذه القاعدة؟</string>
+    <string name="conn_track_clear_rule_logs_message" translatable="true">سيؤدي هذا فقط إلى حذف سجلات الشبكة لقاعدة جدار الحماية المعروضة حاليًا. هذه العملية غير قابلة للتراجع. أتريد الاستمرار؟</string>
+    <string name="settings_theme_dialog_themes_7" translatable="true">صقيع</string>
 </resources>
