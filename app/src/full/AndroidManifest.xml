@@ -170,14 +170,15 @@
             android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.RpnWinProxyDetailsActivity"
             android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.BubbleActivity"
+        <activity android:name=".ui.activity.BubbleActivity"
             android:allowEmbedded="true"
             android:resizeableActivity="true"
             android:exported="false"
             android:excludeFromRecents="true"
             android:taskAffinity=""
             android:launchMode="standard"/>
+        <activity android:name=".ui.activity.ServerWgConfigDetailActivity"
+                    android:finishOnTaskLaunch="true" />
        <!-- <activity android:name=".ui.location.LocationSelectorActivity"
             android:finishOnTaskLaunch="true" />-->
 

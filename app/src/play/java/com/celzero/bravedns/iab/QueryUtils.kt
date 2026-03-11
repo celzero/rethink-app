@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.iab
-/*
+
 import Logger
 import Logger.LOG_IAB
 import com.android.billingclient.api.AcknowledgePurchaseParams
@@ -44,6 +44,8 @@ internal class QueryUtils(private val billingClient: BillingClient) {
             "P6M" -> "6 months"
             "P8M" -> "8 months"
             "P1Y" -> "Yearly"
+            "P2Y" -> "2 years"
+            "P5Y" -> "5 years"
             else -> ""
         }
 
@@ -57,6 +59,8 @@ internal class QueryUtils(private val billingClient: BillingClient) {
             "P6M" -> 180
             "P8M" -> 240
             "P1Y" -> 365
+            "P2Y" -> 730
+            "P5Y" -> 1825
             else -> 0
         }
     }
@@ -144,4 +148,4 @@ internal class QueryUtils(private val billingClient: BillingClient) {
             if (map.values.all { it }) callback(BillingResponse(result.responseCode).isOk)
         }
     }
-}*/
+}

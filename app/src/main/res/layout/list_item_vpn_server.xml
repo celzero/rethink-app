@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/server_card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:paddingStart="16dp"
+    android:paddingEnd="12dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="12dp"
+    android:minHeight="64dp">
+
+    <!-- Flag -->
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_flag"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:gravity="center"
+        android:textSize="26sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="🇺🇸" />
+
+    <!-- Premium badge overlay (small, minimal) -->
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/premium_badge_mini"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:src="@drawable/ic_rethink_plus_sparkle"
+        android:tint="?attr/accentGood"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/tv_flag"
+        app:layout_constraintEnd_toEndOf="@id/tv_flag"
+        tools:visibility="visible" />
+
+    <!-- Country name and location (compact, single line preferred) -->
+    <LinearLayout
+        android:id="@+id/country_info_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/latency_badge"
+        app:layout_constraintStart_toEndOf="@id/tv_flag"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_country_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="15sp"
+            tools:text="United States" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_server_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="12sp"
+            tools:text="New York • US" />
+
+    </LinearLayout>
+
+    <!-- Latency Badge (compact) -->
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/latency_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/checkbox_select"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="45ms"
+        tools:textColor="?attr/chipTextPositive" />
+
+    <!-- Checkbox for selection (compact) -->
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/checkbox_select"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="4dp"
+        android:buttonTint="?attr/accentGood"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/info_icon"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Info/details icon -->
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/info_icon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/ic_expand_more_24"
+        android:tint="?attr/primaryLightColorText"
+        android:padding="6dp"
+        android:rotation="270"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Bottom divider (subtle) -->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:layout_marginStart="48dp"
+        android:background="?attr/divider"
+        android:alpha="0.15"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
