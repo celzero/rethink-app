@@ -1119,4 +1119,17 @@
     <string name="lbl_always" translatable="true">항상</string>
     <string name="adv_taster_title" translatable="true">자동화</string>
     <string name="processing_dialog_title" translatable="true">처리 중</string>
+    <string name="firewall_rule_bypass_universal_ip_desc" translatable="true"><![CDATA[<i>대상 IP</i>가 모든 전역 방화벽 규칙을 우회하도록 설정되었기 때문에 연결이 허용되었습니다.<br/><br/> 변경하려면 <i>전역</i> 탭의 <i>IP 규칙</i> 설정으로 이동합니다.]]></string>
+    <string name="firewall_rule_device_lock_desc" translatable="true">이 연결은 당시 <i>장치가 잠겨</i> 있었기 때문에 방화벽으로 보호되었습니다.<br/><br/> 이 동작을 변경하려면 <i>Universal</i> 탭으로 이동하십시오.</string>
+    <string name="radio_max_btn" translatable="true">🪂 Max</string>
+    <string name="wireguard_disclaimer" translatable="true">DNS를 %1$s에 포워딩했습니다.</string>
+    <string name="brbs_backup_restore_desc" translatable="true">앱 버전이 다르면 호환되지 않습니다</string>
+    <string name="bypass_dns_firewall_tooltip">%1$s 기능은 Rethink의 DNS에서만 동작합니다</string>
+    <string name="wireguard_enabled_failure" translatable="true">WireGuard를 켜려면 다른 모든 프록시를 중단하세요</string>
+    <string name="crypt_adguard_desc" translatable="true">악성코드 등으로부터 기기를 보호합니다.</string>
+    <string name="crypt_adguard_family_desc" translatable="true">세이프서치 및 성인 콘텐츠 차단 기능을 탑재한 Adguard DNS입니다.</string>
+    <string name="radio_sky_btn" translatable="true">⛅ Sky</string>
+    <string name="cleanbrowsing_adult_dns_desc" translatable="true">성인 필터는 모든 성인, 음란물, 노골적인 사이트에 대한 접속을 차단합니다. 프록시나 VPN, 일반 콘텐츠와 성인 콘텐츠가 섞인 사이트는 차단하지 않습니다. Reddit같은 사이트는 허용됩니다. Google 및 Bing은 안전 모드로 설정됩니다.</string>
+    <string name="crypt_cleanbrowsing_family_desc" translatable="true">모든 성인, 음란물, 노골적인 사이트로의 접속을 차단합니다. 필터를 우회할 때 쓰이는 프록시 및 VPN 도메인도 차단합니다. 일반 콘텐츠와 성인 콘텐츠가 섞인 (Reddit같은) 사이트도 차단합니다. Google, Bing, YouTube는 안전 모드로 설정됩니다.</string>
+    <string name="cleanbrowsing_family_dns_desc" translatable="true">가족 필터는 모든 성인, 음란물, 노골적인 사이트로의 접속을 차단합니다. 필터를 우회할 때 쓰이는 프록시 및 VPN 도메인도 차단합니다. 일반 콘텐츠와 성인 콘텐츠가 섞인 (Reddit같은) 사이트도 차단합니다. Google, Bing, YouTube는 안전 모드로 설정됩니다.</string>
 </resources>
