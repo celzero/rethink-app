@@ -12,7 +12,7 @@ jobs:
     outputs:
       SHOULD_BUILD: ${{ steps.check.outputs.shouldBuild }}
     steps:
-      - name: Check
+      - name: 🌡️ Check
         id: check
         run: |
           echo shouldBuild=true >> $GITHUB_OUTPUT
@@ -25,29 +25,42 @@ jobs:
     env:
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
       TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-      SCHEDULED_BUILD_VARIANT: "assembleWebsiteFullAlpha"
+      ALPHA_BUILD_VARIANT: "assembleWebsiteFullAlpha"
+      # glob: github.com/actions/toolkit/tree/b48854e/packages/glob
+      ALPHA_BUILD_OUT: "./app/build/outputs/apk/**/*.apk"
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: 🥏 Checkout
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
-      - name: JDK17
-        uses: actions/setup-java@v4
+      - name: ☕️ JDKv17
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Alpha keystore
+      - name: 🎪 Secrets
+        if: success()
+        # TODO: change build variant to fdroid if json does not exist
+        # developers.google.com/android/guides/google-services-plugin#adding_the_json_file
+        run: |
+          mkdir -p app/src/alpha
+          echo "${GSCV_TEST_JSON}" > app/src/alpha/google-services.json
+          # expected: l:29 w:45 m:691
+          wc -lwm app/src/alpha/google-services.json
+        env:
+          GSCV_TEST_JSON: ${{ secrets.GOOGLE_SERVICES_TEST_JSON }}
+
+      - name: 🫙 Alpha keystore
         run: |
           echo "${{ secrets.ALPHA_KS_ASC }}" > alphaKeystore.jks.asc
           gpg -d --passphrase "${{ secrets.ALPHA_KS_PASSPHRASE }}" --batch alphaKeystore.jks.asc > app/rdnsAlpha.jks
           wc -wcl alphaKeystore.jks.asc app/rdnsAlpha.jks
 
-      - name: Build & notify 
-        if: env.TELEGRAM_CHAT_ID && env.SCHEDULED_BUILD_VARIANT && env.TELEGRAM_TOKEN
+      - name: 🏗️ Build & notify
         run: |
-          ./gradlew ${SCHEDULED_BUILD_VARIANT} --info --warning-mode all
+          ./gradlew ${ALPHA_BUILD_VARIANT} --info --warning-mode all
         env:
           ALPHA_KS_ALIAS: ${{ vars.ALPHA_KS_ALIAS }}
           ALPHA_KS_FILE: ${{ vars.ALPHA_KS_FILE }}
@@ -56,40 +69,42 @@ jobs:
           VERSION_CODE: ${{ github.run_number }}
           # version-code: archive.is/y8uCB
 
-      - name: Grab APK
+      - name: 🍫 APKs
         run: |
-          apk_path="$(find . -type f -iname '*.apk' | head -n1)"
-          echo $apk_path
-          echo "APKFILE=${apk_path}" >> $GITHUB_ENV
+          # ./app/build/outputs/apk/websiteFull/alpha/app-website-full-armeabi-v7a-alpha.apk
+          find "$PWD" -type f -iname '*.apk'
 
       # github.com/actions/upload-artifact
-      - name: Artifact
-        uses: actions/upload-artifact@v4
-        if: success()
+      - name: 📜 Upload artifact
+        uses: actions/upload-artifact@v6
+        id: a3
         with:
-          name: rdns-${{ github.sha }}
-          path: ${{ env.APKFILE }}
+          name: rdns-alpha-${{ github.sha }}
+          path: ${{ env.ALPHA_BUILD_OUT }}
           if-no-files-found: error
+          retention-days: 72
+          compression-level: 9
 
-      # github.com/softprops/action-gh-release
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          prerelease: true
-          files: |
-            ${{ env. APKFILE }}
- 
-      - name: Telegram
+      - name: 💬 Telegram
+        continue-on-error: true
+        if: env.TELEGRAM_CHAT_ID && env.TELEGRAM_TOKEN
         run: |
-          # exit okay on errors
           set +e
-          apk_path="$(find . -type f -iname '*.apk' | head -n1)"
-          echo $apk_path
-          echo "APKFILE=${apk_path}" >> $GITHUB_ENV
-          curl https://api.telegram.org/bot$TELEGRAM_TOKEN/sendDocument \
-            -F chat_id="$TELEGRAM_CHAT_ID" \
-            -F "caption=Size: $(ls -l --block-size=K "$apk_path" | awk '{ print $5 }')" \
-            -F parse_mode=HTML \
-            -F document=@"$apk_path"
+          # core.telegram.org/bots/api#sendmessage
+          curl -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+           -d "chat_id=${TELEGRAM_CHAT_ID}" \
+           -d "parse_mode=HTML" \
+           --data-urlencode "text=<a href='${DOC}'>${NOM}</a>"
+          # core.telegram.org/bots/api#senddocument
+          # size limit 50mb
+          # curl https://api.telegram.org/bot$TELEGRAM_TOKEN/sendDocument \
+          #  -F chat_id="$TELEGRAM_CHAT_ID" \
+          #  -F caption="sha256: ${CAP}" \
+          #  -F parse_mode=HTML \
+          #  -F document=@"$DOC"
+        env:
+          NOM: "rdns-alpha-${{ github.sha }}"
+          DOC: ${{ steps.a3.outputs.artifact-url }}
+          CAP: ${{ steps.a3.outputs.artifact-id }}
 
           

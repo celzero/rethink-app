@@ -8,14 +8,14 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
+    env:
+      VARIANT: assembleWebsiteFullDebug
     steps:
     - name: 🥏 Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: ☕️ JDKv17
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v5
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -31,6 +31,9 @@ jobs:
         echo "${GSCV_TEST_JSON}" > app/src/debug/google-services.json
         # expected: l:29 w:45 m:691
         wc -lwm app/src/debug/google-services.json
+        if [ -z "$GSCV_TEST_JSON" ]; then
+          echo "VARIANT=assembleFdroidFullDebug" >> "$GITHUB_ENV"
+        fi
       env:
         GSCV_TEST_JSON: ${{ secrets.GOOGLE_SERVICES_TEST_JSON }}
     - name: 🚂 Assemble
@@ -38,6 +41,8 @@ jobs:
       run: |
         ./gradlew lint
         ./gradlew \
-          assembleWebsiteFullDebug \
+          ${VARIANT} \
           --info \
           --warning-mode all
+      env:
+        VARIANT: ${{ env.VARIANT }}
