@@ -190,7 +190,7 @@
     <string name="ctbs_block_other_apps">Las normas aplicadas para %1$s también serán aplicables para %2$s u otras aplicaciones</string>
     <string name="ctbs_dialog_negative_btn">Atrás</string>
     <string name="dns_log_dialog_positive">Borrar registros</string>
-    <string name="dns_btm_sheet_dialog_ips"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_ips"><Data><![CDATA[ %1$s %2$s <br/>]]></Data></string>
     <string name="dns_btm_sheet_chip">+%1$s Otras IPs</string>
     <string name="dns_btm_sheet_chip_no_answer">Sin respuesta</string>
     <string name="dns_btm_resolved_crypt">resuelto <u>de forma anónima</u> %1$s por %2$s a través de %3$s</string>
@@ -325,7 +325,7 @@
     <string name="ada_app_status_block_md">se bloquea en las redes con límites (móvil)</string>
     <string name="ada_app_status_whitelist">omitirá las reglas del cortafuegos universal</string>
     <string name="ada_app_status_exclude">se excluye del dns y cortafuegos</string>
-    <string name="ada_app_status_isolate">"está aislada; sólo se permiten IPs  y dominios de confianza"</string>
+    <string name="ada_app_status_isolate">está aislada; sólo se permiten IPs y dominios de confianza</string>
     <string name="ada_app_status_unknown">es desconocido</string>
     <string name="ada_app_isolate">Aislamiento</string>
     <string name="ada_app_dns_settings">Configuración DNS</string>
@@ -359,12 +359,12 @@
     <string name="lbbs_heading">Configurar más de 195 listas de bloqueo</string>
     <string name="brbs_restore_title">Restaurar</string>
     <string name="brbs_restore_desc">Restaurar desde un archivo de copia de seguridad</string>
-    <string name="brbs_backup_desc">Copia de seguridad de la configuración de la aplicación, la red y los registros DNS</string>
+    <string name="brbs_backup_desc">Copia de seguridad de la configuración de la aplicación, red y registros DNS</string>
     <string name="brbs_backup_dialog_title">Hacer un respaldo</string>
     <string name="brbs_backup_dialog_message">Realiza una copia de seguridad de la configuración de la aplicación, la red y los registros DNS en un archivo. Esto reiniciará la VPN.</string>
-    <string name="brbs_backup_dialog_positive">Respaldo</string>
+    <string name="brbs_backup_dialog_positive">Copia de seguridad</string>
     <string name="brbs_restore_dialog_title">Restaurar copia de seguridad</string>
-    <string name="brbs_restore_dialog_message">Restaurar la configuración de la aplicación, la red y los registros DNS desde un archivo de copia de seguridad. Esto reiniciará la aplicación.</string>
+    <string name="brbs_restore_dialog_message">Restaurar la configuración de la aplicación, red y registros DNS desde un archivo de copia de seguridad. Esto reiniciará la aplicación.</string>
     <string name="brbs_backup_dialog_failure_title">Falló la copia de respaldo</string>
     <string name="brbs_backup_dialog_failure_message">No se ha podido realizar la copia de seguridad. ¿Intentar de nuevo\?</string>
     <string name="brbs_backup_dialog_failure_positive">Reintentar la copia de seguridad</string>
@@ -611,7 +611,7 @@
     <string name="firewall_status_blocked">bloqueadas</string>
     <string name="firewall_card_text_inactive">Activar el modo cortafuegos.</string>
     <string name="about_faq">Ver preguntas frecuentes</string>
-    <string name="dns_btm_sheet_dialog_message"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s lista(s) de bloqueo</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_message"><Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s lista(s) de bloqueo</h3>%3$s.<br/><br/>]]></Data></string>
     <string name="about_app">aplicación</string>
     <string name="show_logs_disabled_dns_message">El registro de solicitudes DNS ha sido desactivado. Para volver a activarlo, vaya a <i>Ajustes</i> y habilite <i>Activar el registro en el dispositivo.</i></string>
     <string name="orbot_bs_status_3">Reenviando %1$s a Orbot, Proxy HTTP también configurado.</string>
@@ -1065,9 +1065,9 @@
     <string name="wireguard_apps_proxy_map_desc" translatable="true">parte de %1$s</string>
     <string name="wg_apps_dialog_title_include" translatable="true">incluye %1$s aplicaciones</string>
     <string name="lbl_idle" translatable="true">Inactivo</string>
-    <string name="lbl_split" translatable="true">Dividir (Split)</string>
+    <string name="lbl_split" translatable="true">Dividir</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">¡Protegido! Conectado a DNS + Firewall + Proxy.</string>
-    <string name="dc_proxy_dns_heading" translatable="true">Nunca un proxy DNS</string>
+    <string name="dc_proxy_dns_heading" translatable="true">Nunca usar proxy para DNS</string>
     <string name="dc_proxy_dns_desc" translatable="true">No utilice DNS a través de servidores proxy WireGuard siempre activo, SOCKS5 o HTTP.</string>
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s está deshabilitado porque los servidores proxy están activos</string>
     <string name="lbl_on_device" translatable="true">en el dispositivo</string>
@@ -1077,9 +1077,9 @@
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> puede provocar la pérdida de conectividad. Cambia la configuración para permitir que Rethink utilice datos y otros recursos cuando esté en segundo plano.</string>
     <string name="lbl_battery_optimization" translatable="true">Optimización de la batería</string>
     <string name="battery_optimization_dialog_heading" translatable="true">Deshabilitar %1$s</string>
-    <string name="settings_exclude_proxy_apps_heading" translatable="true">Aplicaciones de reenvío proxy en bucle invertido</string>
-    <string name="settings_exclude_proxy_apps_desc" translatable="true">Si se desactiva, excluye las aplicaciones proxy (SOCKS5, HTTP, DNS) del túnel VPN de Rethink.</string>
-    <string name="exclude_apps_from_proxy">Omitir la aplicación desde todos los proxies</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">Aplicaciones reenviadoras de proxy en loopback</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">Si se desactiva, excluye las aplicaciones reenviadoras de proxy (SOCKS5, HTTP, DNS) del túnel VPN de Rethink.</string>
+    <string name="exclude_apps_from_proxy">Excluir la aplicación de todos los proxies</string>
     <string name="exclude_apps_from_proxy_failure_toast">Esta aplicación evita los servidores proxy</string>
     <string name="lbl_notification" translatable="true">notification</string>
     <string name="memory_notification_text">Rethink tiene poca memoria. Las acciones del sistema pueden estar limitadas.</string>
@@ -1132,7 +1132,7 @@
     <string name="settings_mobile_metered_desc" translatable="true">Considera solo las redes móviles como medidas, el resto como no medidas.</string>
     <string name="settings_biometric_dialog_option_0" translatable="true">Ninguna</string>
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Usar el DNS del sistema para dominios no delegados</string>
-    <string name="adv_tasker_dialog_instructions" translatable="true">Instrucciones:\nAl enviar el broadcast es requerido:\n• Key: sender\n• Value: Nombre del paquete de la app.\n\nEjemplo: key:sender value:com.termux\n\nAcciones disponibles:\n\n• Iniciar VPN – com.celzero.bravedns.intent.action.VPN_START\n\n• Detener VPN – com.celzero.bravedns.intent.action.VPN_STOP</string>
+    <string name="adv_tasker_dialog_instructions" translatable="true">Instrucciones:\n Al enviar el broadcast es requerido:\n • Key: sender\n • Value: Nombre del paquete de la app\n\n Ejemplo: key:sender value:com.termux\n\n Acciones disponibles:\n • Iniciar VPN – com.celzero.bravedns.intent.action.VPN_START\n • Detener VPN – com.celzero.bravedns.intent.action.VPN_STOP</string>
     <string name="adv_tasker_dialog_msg" translatable="true">Introduce los nombres de paquete (separado por comas) se les permite iniciar o detener Rethink.</string>
     <string name="no_stats_available" translatable="true">Sin estadísticas</string>
     <string name="adv_set_dial_timeout_title" translatable="true">Tiempo de espera inactivo</string>
