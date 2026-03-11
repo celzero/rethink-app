@@ -801,8 +801,8 @@
     <string name="ci_trust_rule">Vertrauen</string>
     <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">meistblockierte Apps</string>
     <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">meisterlaubte Apps</string>
-    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">meistkontaktierte IPs</string>
-    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">meistblockierte IPs</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">meist kontaktierte ips</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">meist blockierte IPs</string>
     <string name="ssv_see_more">Alle anzeigen</string>
     <string name="fapps_bypass_block_dialog_message">Universelle Firewall-Regeln für <i>aufgelistete</i> Apps umgehen\?</string>
     <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">meistkontaktierte Domains</string>
@@ -875,7 +875,7 @@
     <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[Diese Verbindung wurde blockiert, da die <i>Domain</i> vom benutzer bevorzugten DNS blockiert wird.<br/><br/> Um dieses Verhalten zu ändern, gehe zum Tab <i>DNS konfigurieren</i>.]]></string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">Umgehe DNS &amp; Firewall</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">Vereine Anfragen, cache Antworten, robuste Fehlerbehandlung</string>
-    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[Diese Verbindung wurde blockiert, da die <i>Domain</i> in den universellen Domain-Regeln als blockiert festgelegt ist.<br/><br/> Um dieses Verhalten zu ändern, gehe zum Tab<i>DNS konfigurieren</i>.]]></string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[Diese Verbindung wurde blockiert, da die <i>Domain</i> in den universellen Domain-Regeln als blockiert festgelegt ist.<br/><br/> Um dieses Verhalten zu ändern, gehe zum Tab <i>DNS konfigurieren</i>.]]></string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">wird universelle DNS- &amp; Firewall-Regeln umgehen</string>
     <string name="rules_card_domain_count" translatable="true">%1$s Domain-Regel(n)</string>
     <string name="cd_dns_alg_desc" translatable="true">Einzigartige IP für jede DNS-Anfrage verwenden.</string>
