@@ -932,5 +932,5 @@
     <string name="firewall_rule_proxied_desc" translatable="true">Questa connessione è stata inoltrata al Proxy preferito dall\'utente.<br/><br/> Per cambiare, andare su <i>Proxy</i> dalla schermata <i>Configura</i>.</string>
     <string name="cd_deleted_toast" translatable="true">Cancellate tutte le regole di dominio</string>
     <string name="cd_toast_edit" translatable="true">Modificato</string>
-    <string name="adv_taster_title" translatable="true">Automatizzazione</string>
+    <string name="adv_taster_title" translatable="true">Automazione</string>
 </resources>
