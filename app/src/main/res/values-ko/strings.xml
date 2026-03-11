@@ -1042,7 +1042,6 @@
     <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[WireGuard가 <i>락다운</i> 모드라서 연결이 차단되었습니다.<br/><br/> 변경하려면 <i>WireGuard</i> 화면으로 갑니다.]]></string>
     <string name="lockdown_download_message" translatable="true">Android 내장 <i>다운로드 관리자</i>는 VPN이 <i>락다운</i> 모드일 때 작동하지 않을 수 있습니다. 대신 Rethink의 다운로더를 켤까요?</string>
     <string name="exclude_apps_from_proxy">앱을 모든 프록시로부터 우회</string>
-    <string name="firewall_rule_bypass_proxy" translatable="true"></string>
     <string name="ac_split_tls_desc" translatable="true">TCP나 TLS 패킷을 변경합니다.</string>
     <string name="ac_split_tcp_desc" translatable="true">TCP 패킷을 변경합니다.</string>
     <string name="ac_split_tcp" translatable="true">TCP</string>
