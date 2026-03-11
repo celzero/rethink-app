@@ -37,7 +37,75 @@
     <string name="vpn_profile_error">Não foi possível iniciar o perfil VPN.</string>
     <string name="cd_dns_proxy_mode_external">Externo</string>
     <string name="cd_dns_crypt_dialog_title">Adicionar resolvedor ou relé DNSCrypt</string>
-    <string name="contributors_list">The &lt;i&gt;Rethink Open Source Project&lt;/i&gt; owes its existence to these volunteers who devote countless hours on its development.&lt;br/&gt; &lt;br/&gt;🛡️ Android app &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Mygod&gt;Mygod&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Network engine &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Lanius-collaris&gt;Lanius-collaris&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Resolver &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Community mods &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TronSlayer&gt;Andersen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Geo-IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Translations &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 Icons &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Build servers &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list"><![CDATA[O <i>Projeto Rethink Open Source</i> deve sua existência a esses voluntários que dedicam inúmeras horas ao seu desenvolvimento.<br/>
+<br/>🛡️ Aplicativo Android <br/>
+<a href="https://github.com/anthonyryan1">Anthony Ryan</a> /
+<a href="https://github.com/BayLee4">BayLee4</a> /
+<a href="https://github.com/Ch4t4r">Ch4t4r</a> /
+<a href="https://github.com/samthesamman">CodingAttack</a> /
+<a href="https://github.com/HrBDev">HrBDev</a> /
+<a href="https://github.com/hussainmohd-a">hussainmohd-a</a> /
+<a href="https://github.com/ignoramous">ignorante</a> / 
+<a href="https://github.com/ironveil">véu de ferro</a> / 
+<a href="https://github.com/markwmuller">markwmuller</a> / 
+<a href="https://github.com/mohammaduvez">Mohammaduvez</a> / 
+<a href="https://github.com/Mygod">Meu Deus</a> / 
+<a href="https://github.com/Poussinou">Poussinou</a> / 
+<a href="https://github.com/pjosingh">pjosingh</a> / 
+<a href="https://github.com/RohitSurwase">RohitSurwase</a> / 
+<a href="https://github.com/ShantanuVichare">Shantanu</a> /
+<a href="https://github.com/Uldiniad">Uldiniad</a><br/> /
+<a href="https://github.com/yurtpage">yurtpage</a><br/>
+<br/>🚂 Motor de rede <br/>
+<a href="https://github.com/alalamav">alalamav</a> /
+<a href="https://github.com/bemasc">bemasc</a> /
+<a href="https://github.com/dmcardle">dmcardle</a> /
+<a href="https://github.com/fortuna">fortuna</a> /
+<a href="https://github.com/ignoramous">ignoramous</a> /
+<a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /
+<a <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
+<a href="https://github.com/SeanBurford">SeanBurford</a><br/>
+<br/>📚 Resolver <br/>
+<a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a> /
+<a href="https://github.com/amithm7">amithm7</a> /
+<a href="https://github.com/arfshl">arfshl</a> /
+<a href="https://github.com/badmojr">badmojr</a> /
+<a href="https://github.com/bongochong">bongochong</a> /
+<a href="https://github.com/elliotwutingfeng">elliotwutingfeng</a> /
+<a <a href="https://github.com/georgyo">georgyo</a> /
+<a href="https://github.com/GiddyGoatGaming">GiddyGoatGaming</a> /
+<a href="https://github.com/Harish-Narayan">Harish-Narayan</a> /
+<a href="https://github.com/ignoramous">ignoramous</a> /
+<a href="https://github.com/JakeChampion">JakeChampion</a> /
+<a href="https://github.com/MasterKia">MasterKia</a> /
+<a href="https://github.com/mtxadmin">mtxadmin</a> /
+<a href="https://github.com/neneeen">neneeen</a> /
+
+<a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /
+<a <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
+<a href="https://github.com/shruuub">shruuub</a> /
+<a href="https://github.com/shuvashish76">shuvashish76</a><br/>
+<br/>⚜ Moderadores da comunidade <br/>
+<a href="https://t.me/amithm7">amithm7</a> /
+<a href="https://t.me/TronSlayer">Andersen</a> /
+<a href="https://t.me/ppatra">ppatra</a> /
+<a href="https://t.me/InFamous23">InFamous23</a> /
+<a href="https://t.me/TheTr1ckst3r">TheTr1ckst3r</a> /
+<a href="https://t.me/Ch4t4r">Ch4t4r</a> /
+<a href="https://t.me/Billi_ance">Billi_ance</a> /
+<a href="https://t.me/kaliangel">kaliangel</a> /
+<a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>
+<br/>📌 Geo-IP <br/>
+<a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IPinfo Lite</a><br/>
+<br/>❇ Traduções <br/>
+<a href="https://weblate.org/en/">Weblate</a><br/>
+<br/>🦆 Ícones <br/>
+<a href="https://github.com/celzero/rethink-app/issues/346">Ícones</a><br/>
+<br/>📦 Servidores de compilação <br/>
+<a href="https://jitpack.io/">JitPack</a> /
+<a href="https://github.com/">GitHub</a> /
+<a href="https://central.sonatype.com/">Sonatype</a><br/>
+]]></string>
     <string name="firewall_status_excluded">excluído do dns e firewall</string>
     <string name="cd_custom_dns_proxy_name">Proxy %1$s</string>
     <string name="cd_custom_dns_proxy_default_ip">127.0.0.1</string>
@@ -66,7 +134,7 @@
     <string name="dc_block_heading">regras</string>
     <string name="dc_dns_website_heading">Mostrar ícone de sites em registros de DNS (experimental)</string>
     <string name="about_github">Contribuir no GitHub</string>
-    <string name="about_mozilla">O Rethink é apoiado pela Mozilla Builders, FOSS United Foundation.</string>
+    <string name="about_mozilla">O Rethink conta com o apoio da Mozilla Builders, da FOSS United Foundation e do FLOSS/fund.</string>
     <string name="about_web">links</string>
     <string name="about_website">Acessar rethinkdns.com</string>
     <string name="about_faq">Perguntas frequentes</string>
@@ -117,8 +185,8 @@
     <string name="firewall_rule_no_rule_desc">Nenhuma regra de firewall correspondeu a esta conexão.</string>
     <string name="firewall_rule_block_dns_bypass">DNS ignorado</string>
     <string name="firewall_rule_global_lockdown">Restrito</string>
-    <string name="firewall_rule_block_app_mobile_desc">Uma regra de firewall definida pelo usuário bloqueou este <i>aplicativo</i> ao tentar se conectar em uma rede <i>móvel</i>.<br/><br/> Para alterar, acesse a guia <i>Todos os aplicativos</i>.</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc">Uma regra de firewall universal definida pelo usuário bloqueou este <i>aplicativo</i> ao tentar se conectar em uma rede <i>móvel</i>.<br/><br/>Para alterar, acesse a guia <i>Universal</i>.</string>
+    <string name="firewall_rule_block_app_mobile_desc"><![CDATA[Uma regra de firewall definida pelo usuário bloqueou este <i>aplicativo</i> ao tentar se conectar à rede <i>Medida</i>.<br/><br/> Para alterar, acesse a guia <i>Todos os Aplicativos</i>.]]></string>
+    <string name="firewall_rule_block_app_univ_mobile_desc"><![CDATA[Uma regra de firewall universal definida pelo usuário bloqueou este <i>aplicativo</i> ao tentar se conectar à rede <i>Móvel</i> (Móvel).<br/><br/> Para alterar, acesse a guia <i>Universal</i>.]]></string>
     <string name="firewall_rule_trusted_ip_desc">Esta conexão foi permitida porque o <i>IP de destino</i> está configurado como IP confiável.<br/><br/> Para alterar, acesse a tela <i>Firewall específico do aplicativo</i>.</string>
     <string name="firewall_rule_device_lock_desc">Esta conexão foi bloqueada porque o dispositivo <i>estava bloqueado</i> naquele momento.<br/><br/> Para mudar este comportamento, acesse a guia <i>Universal</i>.</string>
     <string name="firewall_rule_block_udp_ntp_desc">Uma regra de firewall definida pelo usuário bloqueou esta conexão <i>UDP</i>.<br/><br/> Para alterar, acesse a guia <i>Universal</i>.</string>
@@ -572,7 +640,7 @@
     <string name="other_dns_list_tab1">DoH</string>
     <string name="other_dns_list_tab2">Dnscrypt</string>
     <string name="other_dns_list_tab3">Proxy DNS</string>
-    <string name="hs_btm_sheet_lock_down">Não é possível alterar entre modos quando a VPN está em modo <i>restrito</i>. Toque para <u>editar configurações da VPN</u>.</string>
+    <string name="hs_btm_sheet_lock_down">Não é possível alterar os modos quando a VPN está bloqueada. Toque para editar as configurações da VPN.</string>
     <string name="firewall_rule_no_rule">Sem regras</string>
     <string name="firewall_rule_block_app">Aplicativo bloqueado</string>
     <string name="firewall_rule_block_unmetered">Wi-Fi</string>
@@ -585,10 +653,10 @@
     <string name="firewall_rule_foreground">Aplicativo não está em uso</string>
     <string name="firewall_rule_unknown">Fonte desconhecida</string>
     <string name="firewall_rule_block_udp_ntp">UDP bloqueado</string>
-    <string name="firewall_rule_block_app_desc">Uma regra de firewall definida pelo usuário bloqueou este <i>aplicativo</i>.<br/><br/> Para alterar, acesse a guia <i>Todos os aplicativos</i>.</string>
-    <string name="firewall_rule_new_app_desc">Este aplicativo fez uma conexão pela <i>primeira</i> vez.<br/><br/> Para alterar, acesse a guia <i>Universal</i>.</string>
-    <string name="firewall_rule_block_app_unmetered_desc">Uma regra de firewall definida pelo usuário bloqueou este <i>aplicativo</i> ao tentar se conectar em uma rede <i>Wi-Fi</i>.<br/><br/> Para alterar, acesse a guia <i>Todos os aplicativos</i>.</string>
-    <string name="firewall_rule_isolate_desc">Uma regra de firewall definida pelo usuário bloqueou a conexão deste <i>aplicativo</i> com outros <i>IPs ignorados</i>.<br/><br/> Para alterar, acesse a guia <i>Todos os aplicativos</i>.</string>
+    <string name="firewall_rule_block_app_desc"><![CDATA[Uma regra de firewall definida pelo usuário bloqueou este <i>aplicativo</i>.<br/><br/> Para alterar, acesse a guia <i>Todos os Aplicativos</i>.]]></string>
+    <string name="firewall_rule_new_app_desc"><![CDATA[Este aplicativo se conectou pela <i>primeira</i> vez.<br/><br/> Para alterar, acesse a guia <i>Universal</i>.]]></string>
+    <string name="firewall_rule_block_app_unmetered_desc"><![CDATA[Uma regra de firewall definida pelo usuário bloqueou este <i>aplicativo</i> ao tentar se conectar à rede <i>Ilimitada</i>.<br/><br/> Para alterar, acesse a guia <i>Todos os Aplicativos</i>.]]></string>
+    <string name="firewall_rule_isolate_desc"><![CDATA[Uma regra de firewall definida pelo usuário bloqueou a conexão deste <i>aplicativo</i> com IPs que não sejam <i>IPs ignorados</i>.<br/><br/> Para alterar, acesse a guia <i>Todos os Aplicativos</i>.]]></string>
     <string name="firewall_rule_block_ip_univ_desc">Uma regra de firewall definida pelo usuário bloqueou o <i>IP / Porta de destino</i>.<br/><br/> Para alterar, acesse a guia <i>Universal</i>.</string>
     <string name="firewall_rule_block_ip_desc">Uma regra de firewall definida pelo usuário bloqueou o <i>IP de destino</i>.<br/><br/> Para alterar, acesse a tela <i>Firewall específico do aplicativo</i>.</string>
     <string name="firewall_rule_bypass_universal_ip_desc">Esta conexão foi permitida porque o &lt;i&gt;IP de destino&lt;/i&gt; está configurado para ignorar todas as regras universais de firewall.&lt;br/&gt;&lt;br/&gt; Para alterar, acesse a guia &lt;i&gt;Regras de IP&lt;i&gt; em &lt;i&gt;Universal&lt;/i&gt;.</string>
@@ -1054,4 +1122,11 @@
     <string name="firewall_rule_lockdown_wg" translatable="true">Proxy de bloqueio</string>
     <string name="settings_theme_dialog_themes_5" translatable="true">Luz Plus</string>
     <string name="settings_theme_dialog_themes_6" translatable="true">Escuro Plus</string>
+    <string name="lbl_default" translatable="true">Padrão</string>
+    <string name="lbl_action" translatable="true">Ação</string>
+    <string name="lbl_connect" translatable="true">Conectar</string>
+    <string name="lbl_criteria" translatable="true">Criteria</string>
+    <string name="settings_theme_dialog_themes_7" translatable="true">Geada</string>
+    <string name="dns_record_types_auto_mode_status" translatable="true">Automático (todos os tipos)</string>
+    <string name="firewall_rule_proxy_error" translatable="true">Erro de proxy</string>
 </resources>
