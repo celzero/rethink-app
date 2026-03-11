@@ -23,6 +23,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Transaction
 
 @Dao
 interface ProxyApplicationMappingDAO {
@@ -101,6 +102,23 @@ interface ProxyApplicationMappingDAO {
     @Query("update ProxyApplicationMapping set uid = :uid where packageName = :packageName")
     fun updateUidForApp(uid: Int, packageName: String)
 
-    @Query("update ProxyApplicationMapping set uid = :newUid where uid = :oldUid")
-    fun tombstoneApp(oldUid: Int, newUid: Int)
+    @Transaction
+    fun tombstoneApp(oldUid: Int, newUid: Int) {
+        // Only apply the logic bellow, if the uid is from a work profile
+        if (newUid >= 1_000_000) {
+            // If a record with the 'newUid' already exists, delete it first
+            // This prevents an application crash: database constraint
+            deleteMappingByUid(newUid)
+        }
+        
+        // Now that the slot is empty, move the 'oldUid' records to 'newUid'
+        updateUidByOldUid(oldUid, newUid)
+    }
+
+    @Query("delete from ProxyApplicationMapping where uid = :uid")
+    fun deleteMappingByUid(uid: Int)
+
+    // 'ignore' provides an extra layer of safety
+    @Query("update or ignore ProxyApplicationMapping set uid = :newUid where uid = :oldUid")
+    fun updateUidByOldUid(oldUid: Int, newUid: Int)
 }
