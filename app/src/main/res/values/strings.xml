@@ -1615,6 +1615,9 @@
     <string name="config_delete_dialog_title" translatable="true">Delete</string>
     <string name="config_add_success_toast" translatable="true">Done</string>
 
+    <string name="config_delete_all_dialog_desc" translatable="true">Are you sure you want to delete ALL WireGuard VPN configurations? This is IRREVERSIBLE.</string>
+    <string name="config_delete_all_dialog_title" translatable="true">Delete All</string>
+
     <string name="include_all_app_wg_dialog_title" translatable="true">Include all apps</string>
     <string name="include_all_app_wg_dialog_desc" translatable="true">Use this WireGuard VPN for all apps?</string>
 
