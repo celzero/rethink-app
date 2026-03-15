@@ -173,6 +173,26 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/delete_all_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="40dp"
+        android:clickable="true"
+        android:contentDescription="@string/lbl_delete"
+        android:focusable="true"
+        android:text="@string/config_delete_all_dialog_title"
+        android:textColor="?attr/primaryTextColor"
+        app:backgroundTint="@color/accentBadLight"
+        app:fabSize="mini"
+        app:icon="@android:drawable/ic_menu_delete"
+        app:iconTint="@android:color/transparent"
+        app:iconTintMode="add"
+        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/wg_add_fab"
         android:layout_width="wrap_content"

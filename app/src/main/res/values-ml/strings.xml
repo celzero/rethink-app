@@ -48,4 +48,6 @@
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">സംരക്ഷിച്ചിട്ടില്ല</string>
     <string name="brbs_restore_dialog_failure_positive" translatable="true">പുനഃസ്ഥാപിക്കാൻ വീണ്ടും ശ്രമിക്കുക</string>
     <string name="private_dns_dialog_positive" translatable="true">ക്രമീകരണങ്ങളിലേക്ക് പോകുക</string>
+    <string name="config_delete_all_dialog_desc">ഈ നിയമനം എല്ലാ വയർഗാര്ഡ്‌ വി.പി.എൻ. ക്രമീകരണങ്ങളേയും മായിച്ച് ഇല്ലാതാക്കും. ഇത് പിൻവലിക്കാൻ കഴിയാത്ത ഏർപ്പാടാണ്.</string>
+    <string name="config_delete_all_dialog_title">എല്ലാം മായിക്കുക</string>
 </resources>
