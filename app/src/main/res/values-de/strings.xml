@@ -194,7 +194,7 @@
     <string name="settings_orbot_header">Orbot ❯</string>
     <string name="bsct_conn_desc_allowed">erlaubt bei %1$s %2$s</string>
     <string name="app_mode_dns_low_battery">DNS (energiesparend)</string>
-    <string name="orbot_bs_status_2">HTTP-Proxy ist festgelegt.</string>
+    <string name="orbot_bs_status_2">HTTP-Proxy ist eingestellt.</string>
     <string name="orbot_stop_dialog_title">Manueller Eingriff erforderlich</string>
     <string name="orbot_stop_dialog_negative">Orbot stoppen</string>
     <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
@@ -244,7 +244,7 @@
     <string name="firewall_rule_no_rule">Keine Regel</string>
     <string name="firewall_rule_block_unmetered">Unbegrenzt (WLAN)</string>
     <string name="firewall_rule_block_metered">Getaktet (Mobil)</string>
-    <string name="firewall_rule_univ_block_metered">Getaktet (Universell)</string>
+    <string name="firewall_rule_univ_block_metered">Getaktet (universell)</string>
     <string name="firewall_rule_isolate">Isolieren</string>
     <string name="firewall_rule_block_app_new_install">Neue App</string>
     <string name="firewall_rule_block_app_exception">Fehler</string>
@@ -324,7 +324,7 @@
     <string name="settings_import_export_heading">Sichern und Wiederherstellen</string>
     <string name="bypass_universal">Pauschale Umgehung</string>
     <string name="alert_firewall_accessibility_exception">Öffnen der Einstellungen für Barrierefreiheit fehlgeschlagen. Versuche es später erneut!</string>
-    <string name="firewall_act_universal_tab">Pauschal</string>
+    <string name="firewall_act_universal_tab">Universell</string>
     <string name="new_app_bulk_notification_title">Achtung</string>
     <string name="notif_channel_download">Download Warnung</string>
     <string name="notif_channel_desc_vpn_notification">Informieren, wenn Rethink aktiv ist und im Hintergrund läuft</string>
@@ -432,7 +432,7 @@
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Malware, Ransomware, Cryptoware, Phisher und andere Bedrohungen blockieren.</string>
     <string name="brbs_restore_desc">Aus Sicherungsdatei wiederherstellen</string>
     <string name="brbs_backup_desc">Sichern von Anwendungseinstellungen, Netzwerk- und DNS-Protokollen</string>
-    <string name="alert_firewall_accessibility_regrant_explanation">Der Rethink Dienst für Barrierefreiheit wurde angehalten oder ist abgestürzt. <i><b>Erzwinge das Beenden von Rethink über die Systemeinstellungen</b></i> und starte Rethink erneut, um die Funktion <i>Blockieren aller nicht genutzten Apps</i> zu verwenden.\n\nRethink verwendet den Dienst für Barrierefreiheit, um zu verfolgen, welche Apps in Gebrauch sind (im Vordergrund) und welche nicht (im Hintergrund).</string>
+    <string name="alert_firewall_accessibility_regrant_explanation">Der Rethink-Dienst für Barrierefreiheit wurde angehalten oder ist abgestürzt. <i><b>Erzwinge das Beenden von Rethink über die Systemeinstellungen</b></i> und starte Rethink erneut, um die Funktion <i>Blockieren aller nicht genutzten Apps</i> zu verwenden.\n\nRethink verwendet den Dienst für Barrierefreiheit, um zu verfolgen, welche Apps in Gebrauch sind (im Vordergrund) und welche nicht (im Hintergrund).</string>
     <string name="firewall_status_isolate">isoliert</string>
     <string name="firewall_status_excluded">von DNS und Firewall ausgeschlossen</string>
     <string name="firewall_status_whitelisted">umgeht die universellen Firewall-Regeln</string>
@@ -510,7 +510,7 @@
     <string name="hsf_start_dialog_positive">Start</string>
     <string name="hsf_whats_new_chip_text">Was gibt\'s Neues</string>
     <string name="hsf_start_dialog_message">Du bist nur einen Schritt von einem sicheren Android-System entfernt: Kontrolliere Netzwerkaktivitäten, blockiere Webseiten, IP-Adressen und sich unerwünscht verhaltende Apps.</string>
-    <string name="hsf_proxy_chip_text">Proxy aktiviert</string>
+    <string name="hsf_proxy_chip_text">Proxy aktiv</string>
     <string name="hsf_blocklist_chip_text_no_data">RDNS+ aktivieren</string>
     <string name="hsf_exclude_error">Ausschließen im VPN-Sperrmodus nicht möglich</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy entfernt</string>
@@ -540,8 +540,8 @@
     <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
     <string name="about_version">v%1$s</string>
     <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
-    <string name="no_browser_error">Webseite konnte nicht im Browser geöffnet werden.</string>
-    <string name="notification_screen_error">App-Benachrichtigungs-Bildschirm konnte nicht geöffnet werden.</string>
+    <string name="no_browser_error">Die Webseite kann nicht im Browser geöffnet werden.</string>
+    <string name="notification_screen_error">Der Benachrichtigungsbildschirm der App konnte nicht gestartet werden.</string>
     <string name="log_file_not_available">Kein Absturzbericht gefunden</string>
     <string name="error_loading_log_file">Fehler beim Laden der Protokolldatei</string>
     <string name="collecting_logs_progress_text">Sammle…</string>
@@ -600,8 +600,8 @@
     <string name="about_website_link">https://www.rethinkdns.com/</string>
     <string name="about_version_install_source">v%1$s (%2$s)</string>
     <string name="about_dialog_neutral_button">Funktion vorschlagen</string>
-    <string name="app_info_error">App-Info konnte nicht geöffnet werden.</string>
-    <string name="vpn_profile_error">VPN-Profile konnten nicht geöffnet werden.</string>
+    <string name="app_info_error">App-Info konnte nicht gestartet werden.</string>
+    <string name="vpn_profile_error">Das VPN-Profil konnte nicht gestartet werden.</string>
     <string name="private_dns_error">Einstellung für Privates DNS konnte nicht geöffnet werden.</string>
     <string name="cd_custom_doh_url_name">DoH %1$s</string>
     <string name="cd_custom_dns_proxy_title">Benutzerdefinierter DNS-Proxy</string>
@@ -626,20 +626,20 @@
     <string name="dns_btm_resolved_doh_no_server">aufgelöst %1$s</string>
     <string name="dns_btm_latency_ms">%1$ss</string>
     <string name="dns_btm_record_type">Abfragetyp: %1$s</string>
-    <string name="hs_download_positive_default">ok</string>
+    <string name="hs_download_positive_default">OK</string>
     <string name="hs_download_positive_play_store">Update abgeschlossen</string>
     <string name="hs_download_positive_website">Webseite besuchen</string>
     <string name="hs_download_negative_default">Später erinnern</string>
-    <string name="univ_firewall_rule_1">Blockiere alle Apps, wenn das Gerät gesperrt ist</string>
-    <string name="univ_firewall_rule_2">Blockiere jede App, die nicht in Benutzung ist</string>
+    <string name="univ_firewall_rule_1">Alle Apps blockieren, wenn das Gerät gesperrt ist</string>
+    <string name="univ_firewall_rule_2">Alle nicht verwendeten Apps blockieren</string>
     <string name="univ_firewall_rule_3">Blockieren, wenn die Quell-App unbekannt ist</string>
-    <string name="univ_firewall_rule_4">Blockiere UDP, außer DNS und NTP</string>
+    <string name="univ_firewall_rule_4">UDP außer DNS und NTP blockieren</string>
     <string name="univ_firewall_rule_5">Blockieren, wenn DNS umgangen wird</string>
-    <string name="univ_firewall_rule_6">Blockiere neu installierte Apps standardmäßig</string>
-    <string name="univ_firewall_rule_7">Blockiere IPv4 in IPv6 (experimentell)</string>
-    <string name="univ_firewall_rule_8">Blockiere Port 80-Verkehr (unsicheres HTTP)</string>
-    <string name="univ_firewall_rule_9">Blockiere gebührenpflichtige Netzwerke (z.B. mobile Netzwerke)</string>
-    <string name="univ_firewall_rule_10">Blockiere alles außer umgehende Apps und IPs</string>
+    <string name="univ_firewall_rule_6">Neu installierte Apps standardmäßig blockieren</string>
+    <string name="univ_firewall_rule_7">IPv4 in IPv6 blockieren (experimentell)</string>
+    <string name="univ_firewall_rule_8">Port 80 blockieren (unsicherer HTTP-Verkehr)</string>
+    <string name="univ_firewall_rule_9">Gebührenpflichtige (mobile) Netzwerke blockieren</string>
+    <string name="univ_firewall_rule_10">Alles außer umgehende Apps und IPs blockieren</string>
     <string name="univ_view_blocked_ip">IP- &amp; Port-Regeln</string>
     <string name="cd_dns_proxy_error_text_3">Ungültiger Port</string>
     <string name="about_bug_report_desc">Absturzprotokolle per E-Mail senden</string>
@@ -768,7 +768,7 @@
     <string name="fapps_filter_clear_btn">Leeren</string>
     <string name="fapps_filter_parent_installed">Installiert</string>
     <string name="fapps_info_dialog_positive_btn">OK</string>
-    <string name="fapps_metered_block_dialog_message">Verbindungen in kostenpflichtigen Netzwerken (Mobilfunknetze) für die auf <i>aufgeführten</i> Apps blockieren?</string>
+    <string name="fapps_metered_block_dialog_message">Verbindungen in kostenpflichtigen (mobilen) Netzwerken für <i>aufgelistete</i> Apps blockieren?</string>
     <string name="fapps_metered_unblock_dialog_title">Erlaubt im kostenpflichtigen</string>
     <string name="fapps_metered_unblock_dialog_message">Verbindungen in kostenpflichtigen Netzwerken (Mobilfunknetze) für die auf <i>aufgeführten</i> Apps erlauben?</string>
     <string name="rules_load_failure_desc">Keine Firewall-Regeln gefunden</string>
@@ -801,11 +801,11 @@
     <string name="ci_trust_rule">Vertrauen</string>
     <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">meistblockierte Apps</string>
     <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">meisterlaubte Apps</string>
-    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">meist kontaktierte ips</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">meist kontaktierte IPs</string>
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">meist blockierte IPs</string>
     <string name="ssv_see_more">Alle anzeigen</string>
     <string name="fapps_bypass_block_dialog_message">Universelle Firewall-Regeln für <i>aufgelistete</i> Apps umgehen\?</string>
-    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">meistkontaktierte Domains</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">meist kontaktierte Domains</string>
     <string name="settings_locale_desc">Bevorzugte Sprache wählen</string>
     <string name="settings_locale_dialog_title">Bevorzugte Sprache wählen</string>
     <string name="hs_biometeric_title">Rethink entsperren</string>
@@ -819,7 +819,7 @@
     <string name="fapps_filter_filter_heading">Typ</string>
     <string name="copy_clipboard_label">URL</string>
     <string name="fapps_unmetered_block_dialog_title" translatable="true">Blockieren auf nicht getakteten Verbindung</string>
-    <string name="fapps_info_metered_msg" translatable="true">Zulassen / Blockieren in gebührenpflichtigen Netzen (mobile Netze).</string>
+    <string name="fapps_info_metered_msg" translatable="true">Zulassen / Blockieren im gebührenpflichtigen (mobilen) Netz.</string>
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Starte Rethink, um fortzufahren</string>
     <string name="lbl_wildcard" translatable="true">Platzhalter</string>
     <string name="lbl_allowed" translatable="true">Erlaubt</string>
@@ -886,8 +886,8 @@
     <string name="lbl_maybe_blocked" translatable="true">Eventuell blockiert</string>
     <string name="lbl_network" translatable="true">Netzwerk</string>
     <string name="bypass_dns_firewall_tooltip">%1$s funktioniert nur mit Rethink\'s DNS</string>
-    <string name="settings_allow_lan_heading" translatable="true">Private IPs nicht umlenken (experimentell)</string>
-    <string name="settings_allow_lan_desc" translatable="true">LAN, Loopback, Multicast und Link-Local Routen von Rethinks VPN-Tunnel ausschließen.</string>
+    <string name="settings_allow_lan_heading" translatable="true">Private IPs nicht weiterleiten (experimentell)</string>
+    <string name="settings_allow_lan_desc" translatable="true">LAN, Loopback, Multicast und Link-Local-Routen von Rethinks VPN-Tunnel ausschließen.</string>
     <string name="lbl_import" translatable="true">Importieren</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
     <string name="lbl_http" translatable="true">HTTP</string>
@@ -955,7 +955,7 @@
     <string name="unknown_error" translatable="true">Unbekannter Fehler</string>
     <string name="search_proxy_add_apps" translatable="true">Apps nach Namen suchen</string>
     <string name="include_all_app_wg_dialog_title">Alle Apps einbeziehen</string>
-    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">meistkontaktierte Länder</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">meist kontaktierte Länder</string>
     <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">meistblockierte Länder</string>
     <string name="status_protected_with_wg" translatable="true">geschützt mit WireGuard</string>
     <string name="config_add_success_toast">Konfiguration hinzugefügt</string>
@@ -1010,9 +1010,9 @@
     <string name="settings_rinr_dialog_title" translatable="true">Loopback (experimentell)</string>
     <string name="settings_rinr_dialog_desc" translatable="true">Aktiviert auch die<!--settings_network_all_networks--> %1$s Einstellung. Fortfahren?</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">Dauerhafte Benachrichtigung</string>
-    <string name="settings_app_notification_persistent_desc" translatable="true">Zu dauerhafter Benachrichtigung machen</string>
+    <string name="settings_app_notification_persistent_desc" translatable="true">Die Benachrichtigung dauerhaft anzeigen</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Rethinks eigenen Netzwerkverkehr, wie z.B. Blocklisten-Downloads, Verbindungschecks oder DNS-Verbindungen in den Tunnel zurückleiten.</string>
-    <string name="settings_exclude_proxy_apps_desc" translatable="true">Bei Deaktivierung werden Proxy-Apps (SOCKS5, HTTP, DNS) aus Rethinks VPN-Tunnel ausgeschlossen.</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">Wenn deaktiviert, werden Proxy-Apps (SOCKS5, HTTP, DNS) aus Rethinks VPN-Tunnel ausgeschlossen.</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">Endpunkt für DNS-over-TLS (DoT) aus der gespeicherten Konfiguration löschen.</string>
     <string name="http_proxy_dialog_desc" translatable="true">Richte die URL in der Form \"&lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt;\" ein. Beispiel: https://proxy.example.com:8080/</string>
     <string name="battery_optimization_dialog_heading" translatable="true">%1$s deaktivieren</string>
@@ -1153,7 +1153,7 @@
     <string name="hop_add_remove_title" translatable="true">Relay hinzufügen / entfernen</string>
     <string name="about_terms_of_service" translatable="true">Nutzungsbedingungen</string>
     <string name="bypasses_network_restrictions" translatable="true">Erreichbarkeitsprüfungen umgehen alle Netzwerkbeschränkungen. Im <i>Auto</i>-Modus verwendet Rethink zufällig zuvor verbundene IPs und Hostnamen.</string>
-    <string name="most_contacted_asn" translatable="true">meistkontaktierten Anbieter</string>
+    <string name="most_contacted_asn" translatable="true">meist kontaktierte Anbieter</string>
     <string name="most_blocked_asn" translatable="true">meist blockierte Anbieter</string>
     <string name="adv_tasker_dialog_msg" translatable="true">Paketnamen eingeben (kommagetrennt), die Rethink starten oder stoppen dürfen.</string>
     <string name="adv_tasker_dialog_instructions" translatable="true">Anleitung:\nErforderliche Extras in der Broadcast-Nachricht:\n • Schlüssel: sender\n • Wert: Der Paketname der aufrufenden App\n\n Beispiel: key:sender value:com.termux\n\n Unterstützte Aktionen:\n • VPN starten – com.celzero.bravedns.intent.action.VPN_START\n • VPN stoppen – com.celzero.bravedns.intent.action.VPN_STOP</string>
