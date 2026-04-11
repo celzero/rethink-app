@@ -17,6 +17,7 @@ package com.celzero.bravedns.ui.fragment
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.format.DateUtils
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -24,6 +25,8 @@ import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.data.PowerProfileStore
+import com.celzero.bravedns.data.SavedPowerProfile
 import com.celzero.bravedns.databinding.FragmentActiveProfilesBinding
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.AppListActivity
@@ -51,9 +54,23 @@ class ActiveProfilesFragment : Fragment(R.layout.fragment_active_profiles) {
 
     private fun bindState() {
         val braveMode = appConfig.getBraveMode()
+        val savedProfiles = PowerProfileStore.listSavedProfiles(requireContext())
 
-        b.fapEmptyTitle.text = getString(R.string.power_active_profiles_empty_title)
-        b.fapEmptyDesc.text = getString(R.string.power_active_profiles_empty_desc)
+        if (savedProfiles.isEmpty()) {
+            b.fapEmptyTitle.text = getString(R.string.power_active_profiles_empty_title)
+            b.fapEmptyDesc.text = getString(R.string.power_active_profiles_empty_desc)
+        } else {
+            val latestProfile = savedProfiles.first()
+            b.fapEmptyTitle.text =
+                getString(R.string.power_active_profiles_saved_title, savedProfiles.size)
+            b.fapEmptyDesc.text =
+                getString(
+                    R.string.power_active_profiles_saved_desc,
+                    latestProfile.name,
+                    formatProfileTimestamp(latestProfile),
+                    latestProfile.engineMode
+                )
+        }
 
         b.fapSetupStatusValue.text =
             when {
@@ -88,11 +105,26 @@ class ActiveProfilesFragment : Fragment(R.layout.fragment_active_profiles) {
         }
 
         b.fapSaveCurrentSetupCard.setOnClickListener {
-            showToastUiCentered(
-                requireContext(),
-                getString(R.string.power_feature_coming_soon),
-                Toast.LENGTH_SHORT
-            )
+            saveCurrentSetup()
         }
+    }
+
+    private fun saveCurrentSetup() {
+        val savedProfile = PowerProfileStore.saveCurrentSetup(requireContext(), appConfig)
+        bindState()
+        showToastUiCentered(
+            requireContext(),
+            getString(R.string.power_saved_profile_saved_message, savedProfile.name),
+            Toast.LENGTH_SHORT
+        )
+    }
+
+    private fun formatProfileTimestamp(profile: SavedPowerProfile): CharSequence {
+        return DateUtils.getRelativeTimeSpanString(
+            profile.createdAt,
+            System.currentTimeMillis(),
+            DateUtils.MINUTE_IN_MILLIS,
+            DateUtils.FORMAT_ABBREV_RELATIVE
+        )
     }
 }

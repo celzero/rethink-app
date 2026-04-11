@@ -17,13 +17,17 @@ package com.celzero.bravedns.ui.fragment
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.format.DateUtils
 import android.view.View
 import android.widget.Toast
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.data.PowerProfileStore
+import com.celzero.bravedns.data.SavedPowerProfile
 import com.celzero.bravedns.databinding.FragmentPowerBinding
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.AppListActivity
@@ -37,16 +41,18 @@ class PowerFragment : Fragment(R.layout.fragment_power) {
 
     private val b by viewBinding(FragmentPowerBinding::bind)
     private val appConfig by inject<AppConfig>()
+    private var activeProfilesDescView: TextView? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        activeProfilesDescView = b.fpActiveProfilesCard.findViewById(R.id.fp_active_profiles_desc)
         setupClickListeners()
-        updateProtectionStatus()
+        bindState()
     }
 
     override fun onResume() {
         super.onResume()
-        updateProtectionStatus()
+        bindState()
     }
 
     private fun setupClickListeners() {
@@ -56,7 +62,7 @@ class PowerFragment : Fragment(R.layout.fragment_power) {
         b.fpDiscoverProfilesCard.setOnClickListener {
             findNavController().navigate(R.id.discoverProfilesFragment)
         }
-        b.fpSaveSetupCard.setOnClickListener { showComingSoon() }
+        b.fpSaveSetupCard.setOnClickListener { saveCurrentSetup() }
 
         b.fpAppsCard.setOnClickListener {
             startActivity(Intent(requireContext(), AppListActivity::class.java))
@@ -84,6 +90,11 @@ class PowerFragment : Fragment(R.layout.fragment_power) {
         }
     }
 
+    private fun bindState() {
+        updateProtectionStatus()
+        updateSavedProfilesSummary()
+    }
+
     private fun updateProtectionStatus() {
         val braveMode = appConfig.getBraveMode()
         val statusText =
@@ -104,11 +115,37 @@ class PowerFragment : Fragment(R.layout.fragment_power) {
         b.fpStatusDesc.text = getString(R.string.power_status_desc, modeText)
     }
 
-    private fun showComingSoon() {
+    private fun updateSavedProfilesSummary() {
+        val profiles = PowerProfileStore.listSavedProfiles(requireContext())
+        if (profiles.isEmpty()) {
+            activeProfilesDescView?.text = getString(R.string.power_active_profiles_desc)
+            return
+        }
+
+        activeProfilesDescView?.text =
+            getString(
+                R.string.power_active_profiles_saved_summary,
+                profiles.size,
+                formatProfileTimestamp(profiles.first())
+            )
+    }
+
+    private fun saveCurrentSetup() {
+        val savedProfile = PowerProfileStore.saveCurrentSetup(requireContext(), appConfig)
+        updateSavedProfilesSummary()
         showToastUiCentered(
             requireContext(),
-            getString(R.string.power_feature_coming_soon),
+            getString(R.string.power_saved_profile_saved_message, savedProfile.name),
             Toast.LENGTH_SHORT
+        )
+    }
+
+    private fun formatProfileTimestamp(profile: SavedPowerProfile): CharSequence {
+        return DateUtils.getRelativeTimeSpanString(
+            profile.createdAt,
+            System.currentTimeMillis(),
+            DateUtils.MINUTE_IN_MILLIS,
+            DateUtils.FORMAT_ABBREV_RELATIVE
         )
     }
 }
