@@ -69,6 +69,7 @@
                     android:textStyle="bold" />
 
                 <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fdp_intro_desc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:alpha="0.75"

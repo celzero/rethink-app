@@ -35,6 +35,7 @@
     <string name="power_discover_profiles_screen_desc" translatable="true">Start from curated profile ideas before we wire in real imports and community publishing.</string>
     <string name="power_discover_profiles_intro_title" translatable="true">Curated starting points</string>
     <string name="power_discover_profiles_intro_desc" translatable="true">These are example profile concepts that show how named bundles can package app blocking into a simple switch.</string>
+    <string name="power_discover_profiles_catalog_count" translatable="true">This catalog currently includes %1$d starter profiles.</string>
     <string name="power_discover_profiles_curated_heading" translatable="true">Suggested profiles</string>
     <string name="power_discover_profiles_import_heading" translatable="true">Bring your own profile</string>
     <string name="power_discover_profiles_import_title" translatable="true">Import from a file</string>
