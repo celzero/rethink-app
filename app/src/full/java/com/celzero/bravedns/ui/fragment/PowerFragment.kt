@@ -53,7 +53,9 @@ class PowerFragment : Fragment(R.layout.fragment_power) {
         b.fpActiveProfilesCard.setOnClickListener {
             findNavController().navigate(R.id.activeProfilesFragment)
         }
-        b.fpDiscoverProfilesCard.setOnClickListener { showComingSoon() }
+        b.fpDiscoverProfilesCard.setOnClickListener {
+            findNavController().navigate(R.id.discoverProfilesFragment)
+        }
         b.fpSaveSetupCard.setOnClickListener { showComingSoon() }
 
         b.fpAppsCard.setOnClickListener {
