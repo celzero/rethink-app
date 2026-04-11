@@ -23,5 +23,9 @@ data class PowerProfileDefinition(
     @StringRes val titleRes: Int,
     @StringRes val descriptionRes: Int,
     @StringRes val metaRes: Int,
-    @DrawableRes val iconRes: Int
+    @DrawableRes val iconRes: Int,
+    val sourceProvider: String? = null,
+    val sourceSummary: String? = null,
+    val sourceDocUrl: String? = null,
+    val sourceTokens: List<String> = emptyList()
 )

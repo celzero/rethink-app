@@ -23,6 +23,7 @@ import com.celzero.bravedns.service.VpnController
 object PowerProfileStore {
 
     private const val PREF_KEY_SAVED_PROFILES = "power.saved_profiles.v1"
+    private const val PREF_KEY_ACTIVE_PROFILES = "power.active_profiles.v1"
     private const val MAX_SAVED_PROFILES = 25
 
     fun listSavedProfiles(context: Context): List<SavedPowerProfile> {
@@ -53,11 +54,47 @@ object PowerProfileStore {
         return savedProfile
     }
 
+    fun listActiveProfiles(context: Context): List<ActivePowerProfile> {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        val raw = prefs.getString(PREF_KEY_ACTIVE_PROFILES, "").orEmpty()
+        return ActivePowerProfile.parseStorageList(raw)
+    }
+
+    fun activateProfile(context: Context, profile: PowerProfileDefinition): ActivePowerProfile {
+        val now = System.currentTimeMillis()
+        val activeProfile =
+            ActivePowerProfile(
+                id = profile.id,
+                name = context.getString(profile.titleRes),
+                provider = profile.sourceProvider.orEmpty(),
+                sourceSummary = profile.sourceSummary.orEmpty(),
+                sourceDocUrl = profile.sourceDocUrl.orEmpty(),
+                sourceTokens = profile.sourceTokens,
+                activatedAt = now
+            )
+
+        val updatedProfiles =
+            buildList {
+                add(activeProfile)
+                addAll(listActiveProfiles(context).filterNot { it.id == profile.id })
+            }
+        persistActiveProfiles(context, updatedProfiles.take(MAX_SAVED_PROFILES))
+        return activeProfile
+    }
+
     private fun persist(context: Context, profiles: List<SavedPowerProfile>) {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
         prefs
             .edit()
             .putString(PREF_KEY_SAVED_PROFILES, SavedPowerProfile.toStorageList(profiles))
+            .apply()
+    }
+
+    private fun persistActiveProfiles(context: Context, profiles: List<ActivePowerProfile>) {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        prefs
+            .edit()
+            .putString(PREF_KEY_ACTIVE_PROFILES, ActivePowerProfile.toStorageList(profiles))
             .apply()
     }
 

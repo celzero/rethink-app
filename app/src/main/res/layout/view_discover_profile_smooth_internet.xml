@@ -17,7 +17,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="39dp"
-        android:text="@string/power_profile_smooth_internet_title"
+        android:text="@string/power_profile_smooth_browsing_title"
         android:textColor="?attr/primaryTextColor"
         android:textSize="16sp"
         android:textStyle="bold" />
@@ -30,7 +30,7 @@
         android:layout_marginStart="39dp"
         android:layout_marginTop="4dp"
         android:layout_toStartOf="@id/fdp_smooth_arrow"
-        android:text="@string/power_profile_smooth_internet_desc"
+        android:text="@string/power_profile_smooth_browsing_desc"
         android:textColor="?attr/secondaryTextColor"
         android:textSize="14sp" />
 
@@ -41,7 +41,7 @@
         android:layout_below="@id/fdp_smooth_title"
         android:layout_marginStart="39dp"
         android:layout_marginTop="56dp"
-        android:text="@string/power_profile_smooth_internet_meta"
+        android:text="@string/power_profile_smooth_browsing_meta"
         android:textColor="?attr/secondaryTextColor"
         android:textSize="13sp" />
 

@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.data.ActivePowerProfile
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.PowerProfileStore
 import com.celzero.bravedns.data.SavedPowerProfile
@@ -54,9 +55,21 @@ class ActiveProfilesFragment : Fragment(R.layout.fragment_active_profiles) {
 
     private fun bindState() {
         val braveMode = appConfig.getBraveMode()
+        val activeProfiles = PowerProfileStore.listActiveProfiles(requireContext())
         val savedProfiles = PowerProfileStore.listSavedProfiles(requireContext())
 
-        if (savedProfiles.isEmpty()) {
+        if (activeProfiles.isNotEmpty()) {
+            val latestProfile = activeProfiles.first()
+            b.fapEmptyTitle.text =
+                getString(R.string.power_active_profiles_live_title, activeProfiles.size)
+            b.fapEmptyDesc.text =
+                getString(
+                    R.string.power_active_profiles_live_desc,
+                    latestProfile.name,
+                    formatActiveTimestamp(latestProfile),
+                    latestProfile.sourceSummary
+                )
+        } else if (savedProfiles.isEmpty()) {
             b.fapEmptyTitle.text = getString(R.string.power_active_profiles_empty_title)
             b.fapEmptyDesc.text = getString(R.string.power_active_profiles_empty_desc)
         } else {
@@ -122,6 +135,15 @@ class ActiveProfilesFragment : Fragment(R.layout.fragment_active_profiles) {
     private fun formatProfileTimestamp(profile: SavedPowerProfile): CharSequence {
         return DateUtils.getRelativeTimeSpanString(
             profile.createdAt,
+            System.currentTimeMillis(),
+            DateUtils.MINUTE_IN_MILLIS,
+            DateUtils.FORMAT_ABBREV_RELATIVE
+        )
+    }
+
+    private fun formatActiveTimestamp(profile: ActivePowerProfile): CharSequence {
+        return DateUtils.getRelativeTimeSpanString(
+            profile.activatedAt,
             System.currentTimeMillis(),
             DateUtils.MINUTE_IN_MILLIS,
             DateUtils.FORMAT_ABBREV_RELATIVE

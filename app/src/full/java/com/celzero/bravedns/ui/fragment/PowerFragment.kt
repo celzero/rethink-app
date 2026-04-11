@@ -26,6 +26,7 @@ import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.data.ActivePowerProfile
 import com.celzero.bravedns.data.PowerProfileStore
 import com.celzero.bravedns.data.SavedPowerProfile
 import com.celzero.bravedns.databinding.FragmentPowerBinding
@@ -116,6 +117,18 @@ class PowerFragment : Fragment(R.layout.fragment_power) {
     }
 
     private fun updateSavedProfilesSummary() {
+        val activeProfiles = PowerProfileStore.listActiveProfiles(requireContext())
+        if (activeProfiles.isNotEmpty()) {
+            activeProfilesDescView?.text =
+                getString(
+                    R.string.power_active_profiles_active_summary,
+                    activeProfiles.size,
+                    activeProfiles.first().name,
+                    formatActiveTimestamp(activeProfiles.first())
+                )
+            return
+        }
+
         val profiles = PowerProfileStore.listSavedProfiles(requireContext())
         if (profiles.isEmpty()) {
             activeProfilesDescView?.text = getString(R.string.power_active_profiles_desc)
@@ -143,6 +156,15 @@ class PowerFragment : Fragment(R.layout.fragment_power) {
     private fun formatProfileTimestamp(profile: SavedPowerProfile): CharSequence {
         return DateUtils.getRelativeTimeSpanString(
             profile.createdAt,
+            System.currentTimeMillis(),
+            DateUtils.MINUTE_IN_MILLIS,
+            DateUtils.FORMAT_ABBREV_RELATIVE
+        )
+    }
+
+    private fun formatActiveTimestamp(profile: ActivePowerProfile): CharSequence {
+        return DateUtils.getRelativeTimeSpanString(
+            profile.activatedAt,
             System.currentTimeMillis(),
             DateUtils.MINUTE_IN_MILLIS,
             DateUtils.FORMAT_ABBREV_RELATIVE

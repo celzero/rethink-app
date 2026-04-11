@@ -25,6 +25,7 @@ import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.CuratedPowerProfileCatalog
+import com.celzero.bravedns.data.PowerProfileStore
 import com.celzero.bravedns.data.PowerProfileDefinition
 import com.celzero.bravedns.databinding.FragmentDiscoverProfilesBinding
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
@@ -41,7 +42,7 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
     }
 
     private fun bindCatalog() {
-        val smoothInternet = requireProfile(CuratedPowerProfileCatalog.SMOOTH_INTERNET_ID)
+        val smoothBrowsing = requireProfile(CuratedPowerProfileCatalog.SMOOTH_BROWSING_ID)
         val exam = requireProfile(CuratedPowerProfileCatalog.EXAM_ID)
         val deepFocus = requireProfile(CuratedPowerProfileCatalog.DEEP_FOCUS_ID)
 
@@ -49,7 +50,7 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
             getString(R.string.power_discover_profiles_catalog_count, profiles.size)
 
         bindProfileCard(
-            profile = smoothInternet,
+            profile = smoothBrowsing,
             root = b.fdpSmoothInternetCard,
             iconId = R.id.fdp_smooth_icon,
             titleId = R.id.fdp_smooth_title,
@@ -80,7 +81,7 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
         b.fdpBackCard.setOnClickListener { findNavController().navigateUp() }
 
         b.fdpSmoothInternetCard.setOnClickListener {
-            showMergePlaceholder(requireProfile(CuratedPowerProfileCatalog.SMOOTH_INTERNET_ID))
+            activateSmoothBrowsing()
         }
         b.fdpExamCard.setOnClickListener {
             showMergePlaceholder(requireProfile(CuratedPowerProfileCatalog.EXAM_ID))
@@ -111,6 +112,17 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
 
     private fun requireProfile(id: String): PowerProfileDefinition {
         return checkNotNull(CuratedPowerProfileCatalog.get(id)) { "Missing curated profile: $id" }
+    }
+
+    private fun activateSmoothBrowsing() {
+        val profile = requireProfile(CuratedPowerProfileCatalog.SMOOTH_BROWSING_ID)
+        val activeProfile = PowerProfileStore.activateProfile(requireContext(), profile)
+        showToastUiCentered(
+            requireContext(),
+            getString(R.string.power_profile_activated_message, activeProfile.name),
+            Toast.LENGTH_SHORT
+        )
+        findNavController().navigate(R.id.activeProfilesFragment)
     }
 
     private fun showMergePlaceholder(profile: PowerProfileDefinition) {

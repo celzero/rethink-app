@@ -24,10 +24,13 @@
     <string name="power_controls_section" translatable="true">Controls</string>
     <string name="power_active_profiles_title" translatable="true">Active profiles</string>
     <string name="power_active_profiles_desc" translatable="true">See what profile bundles are shaping your current setup.</string>
+    <string name="power_active_profiles_active_summary" translatable="true">%1$d active. Latest %2$s, enabled %3$s.</string>
     <string name="power_active_profiles_saved_summary" translatable="true">%1$d saved locally. Latest %2$s.</string>
     <string name="power_active_profiles_screen_desc" translatable="true">Profiles will eventually become the named bundles users can enable, save, and share.</string>
     <string name="power_active_profiles_empty_title" translatable="true">No active profiles yet</string>
     <string name="power_active_profiles_empty_desc" translatable="true">Your device is still protected by the current firewall and DNS engine settings.</string>
+    <string name="power_active_profiles_live_title" translatable="true">%1$d active profiles</string>
+    <string name="power_active_profiles_live_desc" translatable="true">Latest: %1$s, enabled %2$s. Source: %3$s</string>
     <string name="power_active_profiles_saved_title" translatable="true">%1$d saved profiles on this device</string>
     <string name="power_active_profiles_saved_desc" translatable="true">Latest: %1$s, saved %2$s, using %3$s.</string>
     <string name="power_active_profiles_current_setup_title" translatable="true">Current device setup</string>
@@ -43,9 +46,9 @@
     <string name="power_discover_profiles_import_heading" translatable="true">Bring your own profile</string>
     <string name="power_discover_profiles_import_title" translatable="true">Import from a file</string>
     <string name="power_discover_profiles_import_desc" translatable="true">Later, this will accept a shared profile file and merge it into your setup.</string>
-    <string name="power_profile_smooth_internet_title" translatable="true">Smooth Internet</string>
-    <string name="power_profile_smooth_internet_desc" translatable="true">A cleaner web experience that aims to reduce ads and obvious trackers across the apps you use daily.</string>
-    <string name="power_profile_smooth_internet_meta" translatable="true">Intent: ad-light browsing and calmer app feeds</string>
+    <string name="power_profile_smooth_browsing_title" translatable="true">Smooth browsing</string>
+    <string name="power_profile_smooth_browsing_desc" translatable="true">A calmer browsing profile based on the default uBO network filterlists for ads, privacy, and malicious destinations.</string>
+    <string name="power_profile_smooth_browsing_meta" translatable="true">Source: uBO defaults including EasyList, EasyPrivacy, URLHaus, and Peter Lowe</string>
     <string name="power_profile_exam_title" translatable="true">Exam</string>
     <string name="power_profile_exam_desc" translatable="true">A distraction-reduction profile that would eventually suppress social and entertainment apps during study time.</string>
     <string name="power_profile_exam_meta" translatable="true">Intent: reduce social media and other attention sinks</string>
@@ -53,6 +56,7 @@
     <string name="power_profile_focus_desc" translatable="true">A more aggressive productivity profile for keeping only essential traffic open while muting distracting apps.</string>
     <string name="power_profile_focus_meta" translatable="true">Intent: keep the phone useful without letting it become the task</string>
     <string name="power_profile_merge_placeholder" translatable="true">%1$s merge is the next step.</string>
+    <string name="power_profile_activated_message" translatable="true">%1$s is now active.</string>
     <string name="power_profile_import_placeholder" translatable="true">Profile import is the next step.</string>
     <string name="power_save_setup_title" translatable="true">Save current setup</string>
     <string name="power_save_setup_desc" translatable="true">Capture your current app blocking setup as a reusable profile.</string>
