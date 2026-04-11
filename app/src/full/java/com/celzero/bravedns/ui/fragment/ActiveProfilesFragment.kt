@@ -24,7 +24,7 @@ import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.databinding.FragmentPowerBinding
+import com.celzero.bravedns.databinding.FragmentActiveProfilesBinding
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.ui.activity.FirewallActivity
@@ -33,80 +33,66 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import org.koin.android.ext.android.inject
 
-class PowerFragment : Fragment(R.layout.fragment_power) {
+class ActiveProfilesFragment : Fragment(R.layout.fragment_active_profiles) {
 
-    private val b by viewBinding(FragmentPowerBinding::bind)
+    private val b by viewBinding(FragmentActiveProfilesBinding::bind)
     private val appConfig by inject<AppConfig>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        bindState()
         setupClickListeners()
-        updateProtectionStatus()
     }
 
     override fun onResume() {
         super.onResume()
-        updateProtectionStatus()
+        bindState()
     }
 
-    private fun setupClickListeners() {
-        b.fpActiveProfilesCard.setOnClickListener {
-            findNavController().navigate(R.id.activeProfilesFragment)
-        }
-        b.fpDiscoverProfilesCard.setOnClickListener { showComingSoon() }
-        b.fpSaveSetupCard.setOnClickListener { showComingSoon() }
-
-        b.fpAppsCard.setOnClickListener {
-            startActivity(Intent(requireContext(), AppListActivity::class.java))
-        }
-
-        b.fpFirewallCard.setOnClickListener {
-            val intent = Intent(requireContext(), FirewallActivity::class.java)
-            intent.putExtra(
-                Constants.VIEW_PAGER_SCREEN_TO_LOAD,
-                FirewallActivity.Tabs.UNIVERSAL.screen
-            )
-            startActivity(intent)
-        }
-
-        b.fpLogsCard.setOnClickListener {
-            startActivity(Intent(requireContext(), NetworkLogsActivity::class.java))
-        }
-
-        b.fpDashboardCard.setOnClickListener {
-            findNavController().navigate(R.id.homeScreenFragment)
-        }
-
-        b.fpConfigureCard.setOnClickListener {
-            findNavController().navigate(R.id.configureFragment)
-        }
-    }
-
-    private fun updateProtectionStatus() {
+    private fun bindState() {
         val braveMode = appConfig.getBraveMode()
-        val statusText =
+
+        b.fapEmptyTitle.text = getString(R.string.power_active_profiles_empty_title)
+        b.fapEmptyDesc.text = getString(R.string.power_active_profiles_empty_desc)
+
+        b.fapSetupStatusValue.text =
             when {
                 VpnController.isAppPaused() -> getString(R.string.power_status_paused)
                 VpnController.hasTunnel() -> getString(R.string.power_status_on)
                 else -> getString(R.string.power_status_off)
             }
 
-        val modeText =
+        b.fapSetupModeValue.text =
             when {
                 braveMode.isDnsFirewallMode() -> getString(R.string.power_mode_dns_firewall)
                 braveMode.isFirewallMode() -> getString(R.string.power_mode_firewall)
                 else -> getString(R.string.power_mode_dns)
             }
-
-        b.fpStatusValue.text = statusText
-        b.fpStatusDesc.text = getString(R.string.power_status_desc, modeText)
     }
 
-    private fun showComingSoon() {
-        showToastUiCentered(
-            requireContext(),
-            getString(R.string.power_feature_coming_soon),
-            Toast.LENGTH_SHORT
-        )
+    private fun setupClickListeners() {
+        b.fapBackCard.setOnClickListener { findNavController().navigateUp() }
+
+        b.fapOpenFirewallCard.setOnClickListener {
+            val intent = Intent(requireContext(), FirewallActivity::class.java)
+            intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, FirewallActivity.Tabs.UNIVERSAL.screen)
+            startActivity(intent)
+        }
+
+        b.fapOpenAppsCard.setOnClickListener {
+            startActivity(Intent(requireContext(), AppListActivity::class.java))
+        }
+
+        b.fapOpenLogsCard.setOnClickListener {
+            startActivity(Intent(requireContext(), NetworkLogsActivity::class.java))
+        }
+
+        b.fapSaveCurrentSetupCard.setOnClickListener {
+            showToastUiCentered(
+                requireContext(),
+                getString(R.string.power_feature_coming_soon),
+                Toast.LENGTH_SHORT
+            )
+        }
     }
 }
