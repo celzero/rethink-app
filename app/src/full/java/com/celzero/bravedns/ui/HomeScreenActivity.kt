@@ -738,7 +738,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                     val navHostFragment =
                         supportFragmentManager.findFragmentById(R.id.fragment_container) as? NavHostFragment
                     val navController = navHostFragment?.navController
-                    val homeId = R.id.homeScreenFragment
+                    val homeId = R.id.powerFragment
                     if (navController?.currentDestination?.id != homeId) {
                         val btmNavView = findViewById<BottomNavigationView>(R.id.nav_view)
                         btmNavView.selectedItemId = homeId
@@ -769,7 +769,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         val navController = navHostFragment?.navController
 
         btmNavView.setOnItemSelectedListener { item ->
-            val homeId = R.id.homeScreenFragment
+            val homeId = R.id.powerFragment
 
             when (item.itemId) {
                 R.id.rethinkPlus -> {

@@ -2,6 +2,7 @@
     <string name="app_name" translatable="false">Rethink</string>
     <string name="app_name_small_case" translatable="false">rethink</string>
     <string name="title_about" translatable="true">About</string>
+    <string name="title_power" translatable="true">Power</string>
     <string name="title_settings" translatable="true">Settings</string>
     <string name="title_statistics" translatable="true">Stats</string>
     <string name="title_proc" translatable="false">Proc</string>
@@ -10,6 +11,32 @@
     <string name="about_title_desc" translatable="true">Detect and block network security threats</string>
 
     <string name="txt_home" translatable="true">Home</string>
+    <string name="power_title_desc" translatable="true">Profiles, app control, and sharable blocking in one place.</string>
+    <string name="power_status_label" translatable="true">Protection</string>
+    <string name="power_status_on" translatable="true">On</string>
+    <string name="power_status_off" translatable="true">Off</string>
+    <string name="power_status_paused" translatable="true">Paused</string>
+    <string name="power_status_desc" translatable="true">Current engine mode: %1$s</string>
+    <string name="power_mode_dns_firewall" translatable="true">DNS + Firewall</string>
+    <string name="power_mode_firewall" translatable="true">Firewall only</string>
+    <string name="power_mode_dns" translatable="true">DNS only</string>
+    <string name="power_profiles_section" translatable="true">Profiles</string>
+    <string name="power_controls_section" translatable="true">Controls</string>
+    <string name="power_active_profiles_title" translatable="true">Active profiles</string>
+    <string name="power_active_profiles_desc" translatable="true">See what profile bundles are shaping your current setup.</string>
+    <string name="power_discover_profiles_title" translatable="true">Discover profiles</string>
+    <string name="power_discover_profiles_desc" translatable="true">Browse and merge community packs once profile browsing lands.</string>
+    <string name="power_save_setup_title" translatable="true">Save current setup</string>
+    <string name="power_save_setup_desc" translatable="true">Capture your current app blocking setup as a reusable profile.</string>
+    <string name="power_apps_title" translatable="true">Top controlled apps</string>
+    <string name="power_apps_desc" translatable="true">Open app-level controls and inspect what is being managed per app.</string>
+    <string name="power_firewall_desc" translatable="true">Jump straight into the firewall engine that powers most blocking decisions.</string>
+    <string name="power_logs_title" translatable="true">Recent blocks and logs</string>
+    <string name="power_logs_desc" translatable="true">Inspect captured connections and blocked traffic.</string>
+    <string name="power_dashboard_title" translatable="true">Technical dashboard</string>
+    <string name="power_dashboard_desc" translatable="true">Open the original engine-centric dashboard while the new surface evolves.</string>
+    <string name="power_configure_desc" translatable="true">Reach the full advanced settings area without making it the front page.</string>
+    <string name="power_feature_coming_soon" translatable="true">This part of Power is coming next.</string>
 
     <string name="accessibility_service_description" translatable="true">
         Rethink uses accessibility service to detect and firewall background applications.
