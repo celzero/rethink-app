@@ -236,6 +236,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                     domainRuleCount = preview.appBlocklist.domainRules.size
                 )
                 updateFirewallStatusUi(appStatus, connStatus)
+                PowerProfilePreviewUiPolicy.applyReadOnlyFirewallControls(b)
                 b.aadFirewallStatus.text =
                     getString(
                         R.string.power_profile_app_preview_status,
@@ -307,8 +308,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         b.aadAsnChip.visibility = View.GONE
         val hasIpRules = (previewAppBlocklist?.ipRules?.isNotEmpty() == true)
         val hasDomainRules = (previewAppBlocklist?.domainRules?.isNotEmpty() == true)
-        applyPreviewRuleCardState(b.aadIpBlockCard, hasIpRules)
-        applyPreviewRuleCardState(b.aadDomainBlockCard, hasDomainRules)
+        PowerProfilePreviewUiPolicy.applyRulePreviewState(b, hasIpRules, hasDomainRules)
     }
 
     private fun setPreviewRuleCounts(ipRuleCount: Int, domainRuleCount: Int) {
@@ -379,13 +379,6 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
     private fun formatPreviewDomainRule(rule: PowerProfileAppDomainRule): String {
         return rule.domain
-    }
-
-    private fun applyPreviewRuleCardState(card: View, enabled: Boolean) {
-        card.isEnabled = enabled
-        card.isClickable = enabled
-        card.isFocusable = enabled
-        card.alpha = if (enabled) 1.0f else ALPHA_DISABLED
     }
 
     private fun displayDataUsage() {

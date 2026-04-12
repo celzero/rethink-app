@@ -24,6 +24,7 @@ import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.util.Constants
+import kotlinx.coroutines.delay
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -32,6 +33,9 @@ data class PowerProfileDisableSummary(
 )
 
 object PowerProfileManager : KoinComponent {
+    private const val LOCAL_BLOCKLIST_STAMP_RETRY_ATTEMPTS = 20
+    private const val LOCAL_BLOCKLIST_STAMP_RETRY_DELAY_MS = 250L
+
     private val appInfoRepository by inject<AppInfoRepository>()
     private val customDomainRepository by inject<CustomDomainRepository>()
     private val customIpRepository by inject<CustomIpRepository>()
@@ -43,6 +47,7 @@ object PowerProfileManager : KoinComponent {
                 RethinkBlocklistManager.RethinkBlocklistType.LOCAL
             )
         }
+    internal var waitBeforeRetry: suspend (Long) -> Unit = { delay(it) }
     internal var syncLocalBlocklistSelections: suspend (Set<Int>) -> Unit =
         { selectedTagIds ->
             RethinkBlocklistManager.clearTagsSelectionLocal()
@@ -52,6 +57,46 @@ object PowerProfileManager : KoinComponent {
         }
     internal var reloadDomainRules: suspend () -> Unit = ::defaultReloadDomainRules
     internal var reloadIpRules: suspend () -> Unit = ::defaultReloadIpRules
+
+    suspend fun reconcileActiveProfiles(context: Context): Boolean {
+        val activeProfiles = PowerProfileStore.listActiveProfiles(context)
+        if (activeProfiles.isEmpty()) return false
+
+        val activeNativeProfiles =
+            activeProfiles.filter {
+                PowerProfileOwnershipStore.read(context, it.id).localBlocklistTagIds.isNotEmpty()
+            }
+        if (activeNativeProfiles.isEmpty()) return false
+
+        val currentSelectedLocalBlocklists =
+            RethinkBlocklistManager.getTagsFromStamp(
+                persistentState.localBlocklistStamp,
+                RethinkBlocklistManager.RethinkBlocklistType.LOCAL
+            )
+        val desiredLocalBlocklists =
+            activeNativeProfiles
+                .flatMap { PowerProfileOwnershipStore.read(context, it.id).localBlocklistTagIds }
+                .toSet()
+
+        val nativeStateAlreadyAligned =
+            persistentState.blocklistEnabled &&
+                persistentState.localBlocklistStamp.isNotBlank() &&
+                persistentState.numberOfLocalBlocklists == currentSelectedLocalBlocklists.size &&
+                currentSelectedLocalBlocklists.containsAll(desiredLocalBlocklists)
+
+        if (nativeStateAlreadyAligned) return false
+
+        val reconciledSelection = currentSelectedLocalBlocklists + desiredLocalBlocklists
+        if (reconciledSelection.isNotEmpty()) {
+            val applied = applyLocalBlocklistSelection(reconciledSelection)
+            if (applied) return true
+        }
+
+        activeNativeProfiles.forEach { activeProfile ->
+            PowerProfileStore.deactivateProfile(context, activeProfile.id)
+        }
+        return true
+    }
 
     suspend fun enableProfile(context: Context, profile: PowerProfileDefinition): ActivePowerProfile? {
         if (!profile.readyForActivation) return null
@@ -226,7 +271,7 @@ object PowerProfileManager : KoinComponent {
             return true
         }
 
-        val stamp = computeLocalBlocklistStamp(selectedTagIds)
+        val stamp = computeLocalBlocklistStampWithRetries(selectedTagIds)
         if (stamp.isBlank()) return false
 
         persistentState.localBlocklistStamp = stamp
@@ -234,6 +279,18 @@ object PowerProfileManager : KoinComponent {
         persistentState.blocklistEnabled = true
         syncLocalBlocklistSelections(selectedTagIds)
         return true
+    }
+
+    private suspend fun computeLocalBlocklistStampWithRetries(selectedTagIds: Set<Int>): String {
+        repeat(LOCAL_BLOCKLIST_STAMP_RETRY_ATTEMPTS) { attempt ->
+            val stamp = computeLocalBlocklistStamp(selectedTagIds)
+            if (stamp.isNotBlank()) return stamp
+            if (attempt < LOCAL_BLOCKLIST_STAMP_RETRY_ATTEMPTS - 1) {
+                waitBeforeRetry(LOCAL_BLOCKLIST_STAMP_RETRY_DELAY_MS)
+            }
+        }
+
+        return ""
     }
 
     private suspend fun rollbackImportedRules(ownedRules: PowerProfileOwnedRules) {

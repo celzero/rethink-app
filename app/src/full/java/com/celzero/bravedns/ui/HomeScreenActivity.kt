@@ -58,6 +58,7 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.data.PowerProfileManager
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.service.AppUpdater
@@ -191,6 +192,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     override fun onResume() {
         super.onResume()
+        lifecycleScope.launch {
+            PowerProfileManager.reconcileActiveProfiles(this@HomeScreenActivity)
+        }
         // if app is coming from background, don't reset the activity stack
         if (appInBackground) {
             appInBackground = false

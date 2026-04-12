@@ -45,6 +45,10 @@ data class PowerProfileDefinition(
         return descriptionText ?: descriptionRes?.let(context::getString).orEmpty()
     }
 
+    fun resolveDescription(context: Context, maxWords: Int): String {
+        return PowerProfileText.truncateWords(resolveDescription(context), maxWords)
+    }
+
     fun resolveMeta(context: Context): String {
         return metaText ?: metaRes?.let(context::getString).orEmpty()
     }

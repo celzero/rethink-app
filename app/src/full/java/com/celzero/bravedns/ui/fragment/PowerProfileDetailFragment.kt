@@ -15,13 +15,23 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import android.Manifest
+import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.content.pm.PackageManager
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.net.Uri
+import android.net.VpnService
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -31,6 +41,8 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.ActivePowerProfile
 import com.celzero.bravedns.data.ImportedPowerProfileStore
+import com.celzero.bravedns.data.PowerProfileActivationAction
+import com.celzero.bravedns.data.PowerProfileActivationPolicy
 import com.celzero.bravedns.data.PowerProfileLocalCatalogManager
 import com.celzero.bravedns.data.PowerProfileArtifacts
 import com.celzero.bravedns.data.PowerProfileBlocklistPreviewManager
@@ -48,22 +60,33 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.NumberFormat
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_detail) {
+    private enum class ActionButtonMode {
+        ENABLE,
+        DISABLE,
+        NEUTRAL
+    }
+
     private val b by viewBinding(FragmentPowerProfileDetailBinding::bind)
     private val persistentState by inject<PersistentState>()
     private val appDownloadManager by inject<AppDownloadManager>()
     private var profileId: String = ""
     private var pendingExportProfileId: String? = null
     private var pendingLocalCatalogActivationProfileId: String? = null
+    private var pendingProtectionStartProfileId: String? = null
     private var localCatalogDownloadInProgress = false
     private var localCatalogBootstrapAttempted = false
     private var bindVersion = 0
+    private lateinit var startForResult: ActivityResultLauncher<android.content.Intent>
+    private lateinit var notificationPermissionResult: ActivityResultLauncher<String>
     private val exportActivityResult =
         registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
             handleExportResult(uri)
@@ -72,13 +95,18 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
     companion object {
         const val ARG_PROFILE_ID = "power.profile_id"
         private const val UNKNOWN_COUNT_PLACEHOLDER = "-"
+        private const val PROFILE_DESC_WORD_LIMIT = 30
+        private const val PROTECTION_WAIT_ATTEMPTS = 20
+        private const val PROTECTION_WAIT_INTERVAL_MS = 250L
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         profileId = arguments?.getString(ARG_PROFILE_ID).orEmpty()
+        registerForActivityResult()
         observeLocalCatalogDownloads()
         setupClickListeners()
+        updateExportButtonStyle()
         bindState()
         maybeBootstrapLocalCatalog(requireProfile())
     }
@@ -105,7 +133,9 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
         val currentBindVersion = ++bindVersion
 
         b.fppdTitle.text = profile.resolveTitle(requireContext())
-        b.fppdDesc.visibility = View.GONE
+        b.fppdDesc.text = profile.resolveDescription(requireContext(), PROFILE_DESC_WORD_LIMIT)
+        b.fppdDesc.visibility =
+            if (b.fppdDesc.text.isNullOrBlank()) View.GONE else View.VISIBLE
         b.fppdSourceProvider.visibility = View.GONE
         b.fppdSourceProvider.text =
             getString(
@@ -123,6 +153,7 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
                 if (profile.sourceTokens.isEmpty()) "-" else profile.sourceTokens.joinToString(", ")
             )
         b.fppdExportBtn.isEnabled = profile.readyForActivation
+        updateExportButtonStyle()
         bindSectionCards(profile, currentBindVersion)
         bindLoadingState()
 
@@ -134,18 +165,23 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
     }
 
     private fun bindLoadingState() {
+        b.fppdStatusCard.visibility = View.VISIBLE
+        b.fppdStatusTitle.visibility = View.VISIBLE
         b.fppdStatusTitle.text = getString(R.string.power_profile_detail_status_loading)
         b.fppdStatusDesc.text = getString(R.string.power_profile_detail_loading_desc)
         b.fppdStatusMeta.text = getString(R.string.power_profile_detail_loading_meta)
-        b.fppdActionBtn.isEnabled = false
-        b.fppdActionBtn.setText(R.string.power_profile_detail_loading_action)
+        updateActionButton(
+            enabled = false,
+            textRes = R.string.power_profile_detail_loading_action,
+            mode = ActionButtonMode.NEUTRAL
+        )
     }
 
     private fun showInfoDialog() {
         val profile = requireProfile()
         val message =
             listOfNotNull(
-                profile.resolveDescription(requireContext()),
+                profile.resolveDescription(requireContext(), PROFILE_DESC_WORD_LIMIT),
                 getString(
                     R.string.power_profile_detail_provider,
                     profile.sourceProvider ?: getString(R.string.app_name)
@@ -168,6 +204,8 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
     }
 
     private fun bindActiveState(activeProfile: ActivePowerProfile) {
+        b.fppdStatusCard.visibility = View.VISIBLE
+        b.fppdStatusTitle.visibility = View.VISIBLE
         b.fppdStatusTitle.text = getString(R.string.power_profile_detail_status_active)
         b.fppdStatusDesc.text =
             getString(
@@ -183,11 +221,17 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
                 activeProfile.supportedRuleKind.ifBlank { "-" }
             )
         if (localCatalogDownloadInProgress) {
-            b.fppdActionBtn.isEnabled = false
-            b.fppdActionBtn.setText(R.string.power_profile_download_in_progress_action)
+            updateActionButton(
+                enabled = false,
+                textRes = R.string.power_profile_download_in_progress_action,
+                mode = ActionButtonMode.NEUTRAL
+            )
         } else {
-            b.fppdActionBtn.isEnabled = true
-            b.fppdActionBtn.setText(R.string.power_profile_disable_action)
+            updateActionButton(
+                enabled = true,
+                textRes = R.string.power_profile_disable_action,
+                mode = ActionButtonMode.DISABLE
+            )
         }
     }
 
@@ -201,12 +245,12 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
                 withContext(Dispatchers.IO) {
                     PowerProfileLocalCatalogManager.hasCatalog(profile.localBlocklistTagIds)
                 }
-            val supportedEntries = (artifact?.supportedRuleCount() ?: 0) + profile.localBlocklistTagIds.size
-            val supportedKind = mergeSupportedKinds(artifact?.supportedRuleKind.orEmpty(), profile)
             val needsProtection =
                 profile.localBlocklistTagIds.isNotEmpty() && !VpnController.hasTunnel()
             if (!isAdded || currentBindVersion != bindVersion) return@launch
             if (profile.localBlocklistTagIds.isNotEmpty() && !localCatalogReady) {
+                b.fppdStatusCard.visibility = View.VISIBLE
+                b.fppdStatusTitle.visibility = View.VISIBLE
                 b.fppdStatusTitle.text = getString(R.string.power_profile_detail_status_preparing)
                 b.fppdStatusDesc.text =
                     if (localCatalogDownloadInProgress) {
@@ -222,38 +266,36 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
                     }
                 b.fppdStatusMeta.text =
                     getString(R.string.power_profile_local_catalog_hint)
-                b.fppdActionBtn.isEnabled = false
-                b.fppdActionBtn.setText(
-                    if (localCatalogDownloadInProgress) {
-                        R.string.power_profile_download_in_progress_action
-                    } else {
-                        R.string.power_profile_enable_action
-                    }
+                updateActionButton(
+                    enabled = false,
+                    textRes =
+                        if (localCatalogDownloadInProgress) {
+                            R.string.power_profile_download_in_progress_action
+                        } else {
+                            R.string.power_profile_enable_action
+                        },
+                    mode = ActionButtonMode.NEUTRAL
                 )
             } else if (needsProtection) {
+                b.fppdStatusCard.visibility = View.VISIBLE
+                b.fppdStatusTitle.visibility = View.VISIBLE
                 b.fppdStatusTitle.text = getString(R.string.power_profile_detail_status_needs_protection)
                 b.fppdStatusDesc.text =
                     getString(R.string.power_profile_local_catalog_needs_protection_desc)
                 b.fppdStatusMeta.text =
                     getString(R.string.power_profile_local_catalog_hint)
-                b.fppdActionBtn.isEnabled = false
-                b.fppdActionBtn.setText(R.string.power_profile_turn_on_protection_action)
+                updateActionButton(
+                    enabled = true,
+                    textRes = R.string.power_profile_enable_action,
+                    mode = ActionButtonMode.ENABLE
+                )
             } else {
-                b.fppdStatusTitle.text = getString(R.string.power_profile_detail_status_ready)
-                b.fppdStatusDesc.text =
-                    getString(
-                        R.string.power_profile_detail_ready_desc,
-                        supportedEntries,
-                        supportedKind
-                    )
-                b.fppdStatusMeta.text =
-                    getString(
-                        R.string.power_profile_detail_rule_meta,
-                        supportedEntries,
-                        supportedKind
-                    )
-                b.fppdActionBtn.isEnabled = true
-                b.fppdActionBtn.setText(R.string.power_profile_enable_action)
+                b.fppdStatusCard.visibility = View.GONE
+                updateActionButton(
+                    enabled = true,
+                    textRes = R.string.power_profile_enable_action,
+                    mode = ActionButtonMode.ENABLE
+                )
             }
         }
     }
@@ -408,23 +450,68 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
     }
 
     private fun bindComingSoonState() {
+        b.fppdStatusCard.visibility = View.VISIBLE
+        b.fppdStatusTitle.visibility = View.VISIBLE
         b.fppdStatusTitle.text = getString(R.string.power_profile_detail_status_coming_soon)
         b.fppdStatusDesc.text = getString(R.string.power_profile_detail_coming_desc)
         b.fppdStatusMeta.text = ""
-        b.fppdActionBtn.isEnabled = false
-        b.fppdActionBtn.setText(R.string.power_profile_coming_soon_action)
+        updateActionButton(
+            enabled = false,
+            textRes = R.string.power_profile_coming_soon_action,
+            mode = ActionButtonMode.NEUTRAL
+        )
         b.fppdExportBtn.isEnabled = false
+        updateExportButtonStyle()
+    }
+
+    private fun updateActionButton(enabled: Boolean, textRes: Int, mode: ActionButtonMode) {
+        b.fppdActionBtn.isEnabled = enabled
+        b.fppdActionBtn.setText(textRes)
+        when (mode) {
+            ActionButtonMode.DISABLE -> {
+                b.fppdActionBtn.background = ContextCompat.getDrawable(requireContext(), R.drawable.home_screen_button_start_bg)
+                b.fppdActionBtn.backgroundTintList = null
+                b.fppdActionBtn.setTextColor(Color.WHITE)
+            }
+            ActionButtonMode.ENABLE,
+            ActionButtonMode.NEUTRAL -> {
+                b.fppdActionBtn.background = ContextCompat.getDrawable(requireContext(), R.drawable.home_screen_button_stop_bg)
+                b.fppdActionBtn.backgroundTintList = ColorStateList.valueOf(Color.WHITE)
+                b.fppdActionBtn.setTextColor(Color.BLACK)
+            }
+        }
+        b.fppdActionBtn.alpha = if (enabled) 1.0f else 0.7f
+    }
+
+    private fun updateExportButtonStyle() {
+        b.fppdExportBtn.background = ContextCompat.getDrawable(requireContext(), R.drawable.home_screen_button_stop_bg)
+        b.fppdExportBtn.backgroundTintList = ColorStateList.valueOf(Color.WHITE)
+        b.fppdExportBtn.setTextColor(Color.BLACK)
+        b.fppdExportBtn.alpha = if (b.fppdExportBtn.isEnabled) 1.0f else 0.7f
     }
 
     private fun handleAction() {
         val profile = requireProfile()
         val activeProfile = PowerProfileStore.getActiveProfile(requireContext(), profile.id)
-        if (activeProfile != null) {
-            disableProfile(activeProfile)
-            return
-        }
-        if (profile.readyForActivation) {
-            enableProfile(profile)
+        when (
+            PowerProfileActivationPolicy.resolve(
+                profile = profile,
+                isActive = activeProfile != null,
+                hasTunnel = VpnController.hasTunnel()
+            )
+        ) {
+            PowerProfileActivationAction.DISABLE_PROFILE -> {
+                if (activeProfile != null) disableProfile(activeProfile)
+            }
+            PowerProfileActivationAction.START_PROTECTION_AND_ENABLE -> {
+                startProtectionThenEnable(profile)
+            }
+            PowerProfileActivationAction.ENABLE_PROFILE -> {
+                enableProfile(profile)
+            }
+            PowerProfileActivationAction.IGNORE -> {
+                // no-op
+            }
         }
     }
 
@@ -440,6 +527,46 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
             }
             continueEnableProfile(profile)
         }
+    }
+
+    private fun startProtectionThenEnable(profile: PowerProfileDefinition) {
+        pendingProtectionStartProfileId = profile.id
+        if (prepareVpnService()) {
+            startVpnService()
+            awaitProtectionAndEnablePendingProfile()
+        }
+    }
+
+    private fun awaitProtectionAndEnablePendingProfile() {
+        val pendingProfileId = pendingProtectionStartProfileId ?: return
+        viewLifecycleOwner.lifecycleScope.launch {
+            val protectionStarted =
+                withContext(Dispatchers.IO) {
+                    waitForProtectionToStart()
+                }
+            val pendingProfile = PowerProfileCatalog.get(requireContext(), pendingProfileId)
+            pendingProtectionStartProfileId = null
+            if (pendingProfile == null) return@launch
+            if (!protectionStarted) {
+                bindState()
+                showToastUiCentered(
+                    requireContext(),
+                    getString(R.string.power_profile_activation_failed_message),
+                    Toast.LENGTH_SHORT
+                )
+                return@launch
+            }
+            enableProfile(pendingProfile)
+        }
+    }
+
+    private suspend fun waitForProtectionToStart(): Boolean {
+        repeat(PROTECTION_WAIT_ATTEMPTS) {
+            if (VpnController.hasTunnel()) return true
+            delay(PROTECTION_WAIT_INTERVAL_MS)
+        }
+
+        return VpnController.hasTunnel()
     }
 
     private suspend fun continueEnableProfile(profile: PowerProfileDefinition) {
@@ -536,13 +663,6 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
         return "${profile.id}.powerprofile.json"
     }
 
-    private fun mergeSupportedKinds(existingKind: String, profile: PowerProfileDefinition): String {
-        val kinds = linkedSetOf<String>()
-        if (existingKind.isNotBlank()) kinds.add(existingKind)
-        if (profile.localBlocklistTagIds.isNotEmpty()) kinds.add("rethink-local-blocklists")
-        return kinds.joinToString(", ").ifBlank { "-" }
-    }
-
     private fun disableProfile(activeProfile: ActivePowerProfile) {
         viewLifecycleOwner.lifecycleScope.launch {
             val disableSummary =
@@ -560,6 +680,77 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
             )
             bindState()
         }
+    }
+
+    @Throws(ActivityNotFoundException::class)
+    private fun prepareVpnService(): Boolean {
+        val prepareVpnIntent =
+            try {
+                VpnService.prepare(requireContext())
+            } catch (_: NullPointerException) {
+                pendingProtectionStartProfileId = null
+                return false
+            }
+
+        if (prepareVpnIntent != null) {
+            startForResult.launch(prepareVpnIntent)
+            return false
+        }
+
+        return true
+    }
+
+    private fun startVpnService() {
+        getNotificationPermissionIfNeeded()
+        VpnController.start(requireContext(), true)
+    }
+
+    private fun getNotificationPermissionIfNeeded() {
+        if (!Utilities.isAtleastT()) return
+
+        if (
+            ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+
+        if (!persistentState.shouldRequestNotificationPermission) {
+            return
+        }
+
+        notificationPermissionResult.launch(Manifest.permission.POST_NOTIFICATIONS)
+    }
+
+    private fun registerForActivityResult() {
+        startForResult =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+                when (result.resultCode) {
+                    Activity.RESULT_OK -> {
+                        startVpnService()
+                        awaitProtectionAndEnablePendingProfile()
+                    }
+                    Activity.RESULT_CANCELED -> {
+                        pendingProtectionStartProfileId = null
+                        showToastUiCentered(
+                            requireContext(),
+                            getString(R.string.hsf_vpn_prepare_failure),
+                            Toast.LENGTH_LONG
+                        )
+                    }
+                    else -> {
+                        pendingProtectionStartProfileId = null
+                        VpnController.stop("power-profile-detail", requireContext())
+                    }
+                }
+            }
+
+        notificationPermissionResult =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+                persistentState.shouldRequestNotificationPermission = it
+            }
     }
 
     private fun formatActiveTimestamp(profile: ActivePowerProfile): CharSequence {
@@ -695,7 +886,24 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
             val pendingActivationProfileId = pendingLocalCatalogActivationProfileId
             pendingLocalCatalogActivationProfileId = null
             if (pendingActivationProfileId == profileId) {
-                continueEnableProfile(requireProfile())
+                val profile = requireProfile()
+                when (
+                    PowerProfileActivationPolicy.resolve(
+                        profile = profile,
+                        isActive = PowerProfileStore.getActiveProfile(requireContext(), profile.id) != null,
+                        hasTunnel = VpnController.hasTunnel()
+                    )
+                ) {
+                    PowerProfileActivationAction.START_PROTECTION_AND_ENABLE -> {
+                        startProtectionThenEnable(profile)
+                    }
+                    PowerProfileActivationAction.ENABLE_PROFILE -> {
+                        continueEnableProfile(profile)
+                    }
+                    else -> {
+                        bindState()
+                    }
+                }
             }
         }
     }

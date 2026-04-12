@@ -38,6 +38,9 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
+    companion object {
+        private const val PROFILE_CARD_DESC_WORD_LIMIT = 15
+    }
 
     private val b by viewBinding(FragmentDiscoverProfilesBinding::bind)
     private lateinit var importActivityResult:
@@ -56,16 +59,12 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
     }
 
     private fun bindCatalog() {
-        val profiles = PowerProfileCatalog.list(requireContext())
         val smoothBrowsing = requireProfile("smooth-browsing")
         val safeBeautiful = requireProfile(CuratedPowerProfileCatalog.SAFE_BEAUTIFUL_INTERNET_ID)
         val parentalControl = requireProfile(CuratedPowerProfileCatalog.PARENTAL_CONTROL_ID)
         val appHorse = requireProfile(CuratedPowerProfileCatalog.APP_HORSE_ID)
         val exam = requireProfile("exam")
         val deepFocus = requireProfile("deep-focus")
-
-        b.fdpIntroDesc.text =
-            getString(R.string.power_discover_profiles_catalog_count, profiles.size)
 
         bindProfileCard(
             profile = smoothBrowsing,
@@ -162,7 +161,8 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
         val metaView = root.findViewById<TextView>(metaId)
         iconView.setImageResource(profile.iconRes)
         titleView.text = profile.resolveTitle(requireContext())
-        descriptionView.text = profile.resolveDescription(requireContext())
+        descriptionView.text =
+            profile.resolveDescription(requireContext(), PROFILE_CARD_DESC_WORD_LIMIT)
         metaView.text = profile.resolveMeta(requireContext())
     }
 
@@ -196,7 +196,7 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
                 )
             card.findViewById<TextView>(R.id.vappi_title).text = profile.resolveTitle(requireContext())
             card.findViewById<TextView>(R.id.vappi_desc).text =
-                profile.resolveDescription(requireContext())
+                profile.resolveDescription(requireContext(), PROFILE_CARD_DESC_WORD_LIMIT)
             card.findViewById<TextView>(R.id.vappi_meta).text = profile.resolveMeta(requireContext())
             card.setOnClickListener { openProfileDetail(profile.id) }
             b.fdpImportedProfilesContainer.addView(card)

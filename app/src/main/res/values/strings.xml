@@ -46,8 +46,6 @@
     <string name="power_discover_profiles_screen_desc" translatable="true">Start from curated profile ideas before we wire in real imports and community publishing.</string>
     <string name="power_discover_profiles_intro_title" translatable="true">Curated starting points</string>
     <string name="power_discover_profiles_intro_desc" translatable="true">These are example profile concepts that show how named bundles can package app blocking into a simple switch.</string>
-    <string name="power_discover_profiles_catalog_count" translatable="true">This catalog currently includes %1$d starter profiles.</string>
-    <string name="power_discover_profiles_curated_heading" translatable="true">Suggested profiles</string>
     <string name="power_discover_profiles_import_heading" translatable="true">Bring your own profile</string>
     <string name="power_discover_profiles_import_title" translatable="true">Import from a file</string>
     <string name="power_discover_profiles_import_desc" translatable="true">Later, this will accept a shared profile file and merge it into your setup.</string>
@@ -84,7 +82,6 @@
     <string name="power_profile_export_action" translatable="true">Export profile</string>
     <string name="power_profile_coming_soon_action" translatable="true">Coming next</string>
     <string name="power_profile_detail_status_active" translatable="true">Active now</string>
-    <string name="power_profile_detail_status_ready" translatable="true">Ready to enable</string>
     <string name="power_profile_detail_status_preparing" translatable="true">Preparing profile</string>
     <string name="power_profile_detail_status_needs_protection" translatable="true">Turn on protection first</string>
     <string name="power_profile_detail_status_coming_soon" translatable="true">Not wired yet</string>
@@ -93,7 +90,7 @@
     <string name="power_profile_detail_loading_meta" translatable="true">This usually settles in a moment.</string>
     <string name="power_profile_detail_loading_action" translatable="true">Loading…</string>
     <string name="power_profile_detail_active_desc" translatable="true">Enabled %1$s. This profile currently contributes %2$d applied entries out of %3$d supported entries.</string>
-    <string name="power_profile_detail_ready_desc" translatable="true">This profile is ready to merge into your setup. It currently supports about %1$d entries using %2$s.</string>
+    <string name="power_profile_detail_supported_desc" translatable="true">This profile currently supports about %1$d entries using %2$s.</string>
     <string name="power_profile_detail_coming_desc" translatable="true">This profile concept is visible in the catalog, but its engine mapping is still being built.</string>
     <string name="power_profile_detail_source_heading" translatable="true">Source and provenance</string>
     <string name="power_profile_detail_blocklists_heading" translatable="true">Included Rethink blocklists</string>
@@ -140,7 +137,7 @@
     <string name="power_profile_rethink_blocklists_unavailable_hint" translatable="true">Open this profile on a device with the local Rethink catalog to inspect the exact list names.</string>
     <string name="power_profile_local_catalog_preparing_desc" translatable="true">Downloading the local Rethink blocklist catalog so this profile can apply its %1$s native selections.</string>
     <string name="power_profile_local_catalog_missing_desc" translatable="true">This profile uses %1$s native Rethink blocklists. The local catalog will be downloaded automatically before activation.</string>
-    <string name="power_profile_local_catalog_needs_protection_desc" translatable="true">The local Rethink catalog is ready, but native on-device blocklists only apply when protection is on.</string>
+    <string name="power_profile_local_catalog_needs_protection_desc" translatable="true">Protection is off. Enabling this profile will start protection first, then apply its native on-device blocklists.</string>
     <string name="power_profile_local_catalog_hint" translatable="true">Native Rethink blocklists do not appear as custom firewall IP/domain rules. They apply through Rethink’s on-device blocklist engine.</string>
     <string name="power_profile_local_catalog_download_started" translatable="true">Downloading the local Rethink blocklist catalog…</string>
     <string name="power_profile_local_catalog_download_failed" translatable="true">Couldn’t prepare the local Rethink blocklist catalog.</string>

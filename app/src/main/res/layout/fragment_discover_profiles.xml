@@ -54,29 +54,7 @@
                         android:src="@drawable/ic_info" />
                 </RelativeLayout>
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fdp_intro_desc"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:alpha="0.75"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:text="@string/power_discover_profiles_screen_desc"
-                    android:textColor="?attr/secondaryTextColor"
-                    android:textSize="15sp" />
             </LinearLayout>
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="18dp"
-                android:paddingTop="20dp"
-                android:paddingEnd="18dp"
-                android:paddingBottom="8dp"
-                android:text="@string/power_discover_profiles_curated_heading"
-                android:textColor="?attr/secondaryTextColor"
-                android:textSize="13sp"
-                android:textStyle="bold" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/fdp_smooth_internet_card"

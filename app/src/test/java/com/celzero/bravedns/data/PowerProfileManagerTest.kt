@@ -77,6 +77,7 @@ class PowerProfileManagerTest {
         PowerProfileImportManager.reloadIpRules = {}
         PowerProfileManager.computeLocalBlocklistStamp = { "stamp" }
         PowerProfileManager.syncLocalBlocklistSelections = {}
+        PowerProfileManager.waitBeforeRetry = {}
         PowerProfileManager.reloadDomainRules = {}
         PowerProfileManager.reloadIpRules = {}
         PowerProfileStore.defaultNameProvider = { _, index -> "Saved setup $index" }
@@ -123,6 +124,7 @@ class PowerProfileManagerTest {
                     )
                 }
             }
+        PowerProfileManager.waitBeforeRetry = {}
         PowerProfileManager.reloadDomainRules = {}
         PowerProfileManager.reloadIpRules = {}
         PowerProfileStore.defaultNameProvider =
@@ -311,5 +313,120 @@ class PowerProfileManagerTest {
         verify(exactly = 1) { persistentState.numberOfLocalBlocklists = 2 }
         verify(exactly = 1) { persistentState.blocklistEnabled = true }
         assertTrue(PowerProfileStore.isProfileActive(context, profile.id))
+    }
+
+    @Test
+    fun enableProfile_withLocalBlocklists_retriesUntilStampBecomesAvailable() = runTest {
+        val profile =
+            PowerProfileDefinition(
+                id = "local-profile",
+                titleText = "Local profile",
+                descriptionText = "desc",
+                metaText = "meta",
+                iconRes = android.R.drawable.ic_menu_info_details,
+                localBlocklistTagIds = listOf(101, 202),
+                readyForActivation = true
+            )
+        mockkObject(PowerProfileImportManager)
+        coEvery {
+            PowerProfileImportManager.importBundledRules(context, profile, any())
+        } returns
+            PowerProfileImportResult(
+                summary = PowerProfileImportSummary(0, 0, 0, 0, "", 0L),
+                ownedRules = PowerProfileOwnedRules.empty()
+            )
+
+        var attempts = 0
+        PowerProfileManager.computeLocalBlocklistStamp = {
+            attempts += 1
+            if (attempts < 3) "" else "stamp"
+        }
+        every { persistentState.localBlocklistStamp = any() } just runs
+        every { persistentState.numberOfLocalBlocklists = any() } just runs
+        every { persistentState.blocklistEnabled = any() } just runs
+
+        val active = PowerProfileManager.enableProfile(context, profile)
+
+        assertNotNull(active)
+        assertEquals(3, attempts)
+        verify(exactly = 1) { persistentState.localBlocklistStamp = "stamp" }
+    }
+
+    @Test
+    fun reconcileActiveProfiles_reappliesMissingNativeSelection() = runTest {
+        val profile =
+            PowerProfileDefinition(
+                id = "local-profile",
+                titleText = "Local profile",
+                descriptionText = "desc",
+                metaText = "meta",
+                iconRes = android.R.drawable.ic_menu_info_details,
+                localBlocklistTagIds = listOf(101, 202),
+                readyForActivation = true
+            )
+
+        var computedSelection = emptySet<Int>()
+        var syncedSelections = emptySet<Int>()
+        every { persistentState.localBlocklistStamp } returns ""
+        every { persistentState.blocklistEnabled } returns false
+        every { persistentState.numberOfLocalBlocklists } returns 0
+        PowerProfileManager.computeLocalBlocklistStamp = {
+            computedSelection = it
+            "stamp"
+        }
+        PowerProfileManager.syncLocalBlocklistSelections = { syncedSelections = it }
+
+        PowerProfileStore.activateProfile(context, profile)
+        PowerProfileOwnershipStore.write(
+            context,
+            profile.id,
+            PowerProfileOwnedRules(
+                domains = emptyList(),
+                ips = emptyList(),
+                localBlocklistTagIds = listOf(101, 202)
+            )
+        )
+
+        val changed = PowerProfileManager.reconcileActiveProfiles(context)
+
+        assertTrue(changed)
+        assertTrue(PowerProfileStore.isProfileActive(context, profile.id))
+        assertEquals(setOf(101, 202), computedSelection)
+        assertEquals(setOf(101, 202), syncedSelections)
+    }
+
+    @Test
+    fun reconcileActiveProfiles_deactivatesNativeProfilesWhenReapplyFails() = runTest {
+        val profile =
+            PowerProfileDefinition(
+                id = "local-profile",
+                titleText = "Local profile",
+                descriptionText = "desc",
+                metaText = "meta",
+                iconRes = android.R.drawable.ic_menu_info_details,
+                localBlocklistTagIds = listOf(101, 202),
+                readyForActivation = true
+            )
+
+        every { persistentState.localBlocklistStamp } returns ""
+        every { persistentState.blocklistEnabled } returns false
+        every { persistentState.numberOfLocalBlocklists } returns 0
+        PowerProfileManager.computeLocalBlocklistStamp = { "" }
+
+        PowerProfileStore.activateProfile(context, profile)
+        PowerProfileOwnershipStore.write(
+            context,
+            profile.id,
+            PowerProfileOwnedRules(
+                domains = emptyList(),
+                ips = emptyList(),
+                localBlocklistTagIds = listOf(101, 202)
+            )
+        )
+
+        val changed = PowerProfileManager.reconcileActiveProfiles(context)
+
+        assertTrue(changed)
+        assertFalse(PowerProfileStore.isProfileActive(context, profile.id))
     }
 }

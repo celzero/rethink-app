@@ -65,6 +65,7 @@
             </LinearLayout>
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/fppd_status_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -188,6 +189,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/fppd_action_btn"
+                style="@style/Button.HomeScreen.Main"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
