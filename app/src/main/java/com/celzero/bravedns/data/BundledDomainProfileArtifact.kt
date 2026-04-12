@@ -15,6 +15,10 @@
  */
 package com.celzero.bravedns.data
 
+import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.FirewallManager
+import com.celzero.bravedns.service.IpRulesManager
+import com.celzero.bravedns.util.Constants
 import org.json.JSONObject
 
 data class BundledDomainProfileArtifact(
@@ -24,15 +28,17 @@ data class BundledDomainProfileArtifact(
     val generatedAtEpochMs: Long,
     val supportedRuleKind: String,
     val domains: List<String>,
-    val ips: List<String>
+    val ips: List<String>,
+    val apps: List<PowerProfileAppBlocklist> = emptyList()
 ) {
-    fun supportedRuleCount(): Int = domains.size + ips.size
+    fun supportedRuleCount(): Int = domains.size + ips.size + apps.sumOf { it.supportedRuleCount() }
 
     companion object {
         fun fromJson(raw: String): BundledDomainProfileArtifact {
             val json = JSONObject(raw)
             val domainsJson = json.optJSONArray("domains")
             val ipsJson = json.optJSONArray("ips")
+            val appsJson = json.optJSONArray("apps")
             val domains =
                 buildList {
                     if (domainsJson != null) {
@@ -51,6 +57,71 @@ data class BundledDomainProfileArtifact(
                         }
                     }
                 }
+            val apps =
+                buildList {
+                    if (appsJson != null) {
+                        for (index in 0 until appsJson.length()) {
+                            val appJson = appsJson.optJSONObject(index) ?: continue
+                            val packageName = appJson.optString("packageName", "").trim()
+                            val appName = appJson.optString("appName", "").trim()
+                            if (packageName.isEmpty() || appName.isEmpty()) continue
+                            val appDomainsJson = appJson.optJSONArray("domainRules")
+                            val appIpsJson = appJson.optJSONArray("ipRules")
+                            val domainRules =
+                                buildList {
+                                    if (appDomainsJson != null) {
+                                        for (domainIndex in 0 until appDomainsJson.length()) {
+                                            val domainJson = appDomainsJson.optJSONObject(domainIndex) ?: continue
+                                            val domain = domainJson.optString("domain", "").trim().lowercase()
+                                            if (domain.isEmpty()) continue
+                                            add(
+                                                PowerProfileAppDomainRule(
+                                                    domain = domain,
+                                                    status = domainJson.optInt("status", DomainRulesManager.Status.BLOCK.id),
+                                                    type = domainJson.optInt("type", DomainRulesManager.DomainType.DOMAIN.id),
+                                                    ips = domainJson.optString("ips", "").trim(),
+                                                    proxyId = domainJson.optString("proxyId", "").trim(),
+                                                    proxyCC = domainJson.optString("proxyCC", "").trim()
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+                            val ipRules =
+                                buildList {
+                                    if (appIpsJson != null) {
+                                        for (ipIndex in 0 until appIpsJson.length()) {
+                                            val ipJson = appIpsJson.optJSONObject(ipIndex) ?: continue
+                                            val ipAddress = ipJson.optString("ipAddress", "").trim().lowercase()
+                                            if (ipAddress.isEmpty()) continue
+                                            add(
+                                                PowerProfileAppIpRule(
+                                                    ipAddress = ipAddress,
+                                                    port = ipJson.optInt("port", Constants.UNSPECIFIED_PORT),
+                                                    protocol = ipJson.optString("protocol", "").trim(),
+                                                    status = ipJson.optInt("status", IpRulesManager.IpRuleStatus.BLOCK.id),
+                                                    isActive = ipJson.optBoolean("isActive", true),
+                                                    wildcard = ipJson.optBoolean("wildcard", false),
+                                                    proxyId = ipJson.optString("proxyId", "").trim(),
+                                                    proxyCC = ipJson.optString("proxyCC", "").trim()
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+                            add(
+                                PowerProfileAppBlocklist(
+                                    packageName = packageName,
+                                    appName = appName,
+                                    firewallStatus = appJson.optInt("firewallStatus", FirewallManager.FirewallStatus.NONE.id),
+                                    connectionStatus = appJson.optInt("connectionStatus", FirewallManager.ConnectionStatus.ALLOW.id),
+                                    domainRules = domainRules,
+                                    ipRules = ipRules
+                                )
+                            )
+                        }
+                    }
+                }
 
             return BundledDomainProfileArtifact(
                 profileId = json.optString("profileId", "").trim(),
@@ -59,7 +130,8 @@ data class BundledDomainProfileArtifact(
                 generatedAtEpochMs = json.optLong("generatedAtEpochMs", 0L),
                 supportedRuleKind = json.optString("supportedRuleKind", "").trim(),
                 domains = domains,
-                ips = ips
+                ips = ips,
+                apps = apps
             )
         }
     }

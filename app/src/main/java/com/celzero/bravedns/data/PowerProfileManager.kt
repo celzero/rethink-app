@@ -16,6 +16,7 @@
 package com.celzero.bravedns.data
 
 import android.content.Context
+import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.database.CustomIpRepository
 import com.celzero.bravedns.service.PersistentState
@@ -31,6 +32,7 @@ data class PowerProfileDisableSummary(
 )
 
 object PowerProfileManager : KoinComponent {
+    private val appInfoRepository by inject<AppInfoRepository>()
     private val customDomainRepository by inject<CustomDomainRepository>()
     private val customIpRepository by inject<CustomIpRepository>()
     private val persistentState by inject<PersistentState>()
@@ -45,8 +47,7 @@ object PowerProfileManager : KoinComponent {
             PowerProfileImportManager.importBundledRules(
                 context = context,
                 profile = profile,
-                currentlyManagedDomains = existingManagedRules.domains.toSet(),
-                currentlyManagedIps = existingManagedRules.ips.toSet()
+                currentlyManagedRules = existingManagedRules
             )
                 ?: PowerProfileImportResult(
                     summary = PowerProfileImportSummary(0, 0, 0, 0, "", 0L),
@@ -87,9 +88,11 @@ object PowerProfileManager : KoinComponent {
             context,
             profile.id,
             PowerProfileOwnedRules(
-                importResult.ownedRules.domains,
-                importResult.ownedRules.ips,
-                profileLocalBlocklists.toList()
+                domains = importResult.ownedRules.domains,
+                ips = importResult.ownedRules.ips,
+                appDomains = importResult.ownedRules.appDomains,
+                appIps = importResult.ownedRules.appIps,
+                localBlocklistTagIds = profileLocalBlocklists.toList()
             )
         )
         return PowerProfileStore.activateProfile(context, profile, mergedSummary)
@@ -103,10 +106,14 @@ object PowerProfileManager : KoinComponent {
             PowerProfileOwnershipStore.aggregateOwnership(context, remainingProfileIds)
         val remainingOwnedDomains = remainingOwnedRules.domains.toSet()
         val remainingOwnedIps = remainingOwnedRules.ips.toSet()
+        val remainingOwnedAppDomains = remainingOwnedRules.appDomains.map { it.key() }.toSet()
+        val remainingOwnedAppIps = remainingOwnedRules.appIps.map { it.key() }.toSet()
         val remainingOwnedLocalBlocklists = remainingOwnedRules.localBlocklistTagIds.toSet()
 
         val removableDomains = ownedRules.domains.filterNot { it in remainingOwnedDomains }
         val removableIps = ownedRules.ips.filterNot { it in remainingOwnedIps }
+        val removableAppDomains = ownedRules.appDomains.filterNot { it.key() in remainingOwnedAppDomains }
+        val removableAppIps = ownedRules.appIps.filterNot { it.key() in remainingOwnedAppIps }
         val removableLocalBlocklists =
             ownedRules.localBlocklistTagIds.filterNot { it in remainingOwnedLocalBlocklists }
 
@@ -118,6 +125,24 @@ object PowerProfileManager : KoinComponent {
                 Constants.UNSPECIFIED_PORT,
                 removableIps
             )
+        val removedAppDomains =
+            removableAppDomains.groupBy { it.packageName }.entries.sumOf { (packageName, rules) ->
+                val uid = appInfoRepository.getAppInfoUidForPackageName(packageName)
+                if (uid <= 0) return@sumOf 0
+                customDomainRepository.deleteDomains(uid, rules.map { it.domain })
+            }
+        val removedAppIps =
+            removableAppIps.groupBy { it.packageName }.entries.sumOf { (packageName, rules) ->
+                val uid = appInfoRepository.getAppInfoUidForPackageName(packageName)
+                if (uid <= 0) return@sumOf 0
+                rules.groupBy { it.port }.entries.sumOf { (port, portRules) ->
+                    customIpRepository.deleteRulesByUidAndIpAddresses(
+                        uid,
+                        port,
+                        portRules.map { it.ipAddress }
+                    )
+                }
+            }
         val currentSelectedLocalBlocklists =
             RethinkBlocklistManager.getTagsFromStamp(
                 persistentState.localBlocklistStamp,
@@ -127,13 +152,15 @@ object PowerProfileManager : KoinComponent {
             applyLocalBlocklistSelection(currentSelectedLocalBlocklists - removableLocalBlocklists.toSet())
         }
 
-        if (removedDomains > 0) DomainRulesManager.load()
-        if (removedIps > 0) IpRulesManager.load()
+        if (removedDomains > 0 || removedAppDomains > 0) DomainRulesManager.load()
+        if (removedIps > 0 || removedAppIps > 0) IpRulesManager.load()
 
         PowerProfileOwnershipStore.delete(context, profileId)
         PowerProfileStore.deactivateProfile(context, profileId)
 
-        return PowerProfileDisableSummary(removedDomains + removedIps + removableLocalBlocklists.size)
+        return PowerProfileDisableSummary(
+            removedDomains + removedIps + removedAppDomains + removedAppIps + removableLocalBlocklists.size
+        )
     }
 
     private fun resolveOwnedRulesForDisable(
@@ -141,7 +168,13 @@ object PowerProfileManager : KoinComponent {
         profileId: String
     ): PowerProfileOwnedRules {
         val storedRules = PowerProfileOwnershipStore.read(context, profileId)
-        if (storedRules.domains.isNotEmpty() || storedRules.ips.isNotEmpty()) {
+        if (
+            storedRules.domains.isNotEmpty() ||
+                storedRules.ips.isNotEmpty() ||
+                storedRules.appDomains.isNotEmpty() ||
+                storedRules.appIps.isNotEmpty() ||
+                storedRules.localBlocklistTagIds.isNotEmpty()
+        ) {
             return storedRules
         }
 
@@ -150,6 +183,12 @@ object PowerProfileManager : KoinComponent {
         return PowerProfileOwnedRules(
             artifact?.domains ?: emptyList(),
             artifact?.ips ?: emptyList(),
+            artifact?.apps?.flatMap { app ->
+                app.domainRules.map { PowerProfileOwnedAppDomainRule(app.packageName, it.domain) }
+            } ?: emptyList(),
+            artifact?.apps?.flatMap { app ->
+                app.ipRules.map { PowerProfileOwnedAppIpRule(app.packageName, it.ipAddress, it.port) }
+            } ?: emptyList(),
             profile.localBlocklistTagIds
         )
     }

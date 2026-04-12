@@ -24,6 +24,10 @@
         android:name="com.celzero.bravedns.ui.fragment.PowerProfileEntriesFragment"
         android:label="PowerProfileEntriesFragment" />
     <fragment
+        android:id="@+id/powerProfileAppsFragment"
+        android:name="com.celzero.bravedns.ui.fragment.PowerProfileAppsFragment"
+        android:label="PowerProfileAppsFragment" />
+    <fragment
         android:id="@+id/homeScreenFragment"
         android:name="com.celzero.bravedns.ui.fragment.HomeScreenFragment"
         android:label="HomeScreenFragment" />

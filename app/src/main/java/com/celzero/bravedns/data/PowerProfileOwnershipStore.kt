@@ -23,12 +23,41 @@ import java.io.File
 data class PowerProfileOwnedRules(
     val domains: List<String>,
     val ips: List<String>,
+    val appDomains: List<PowerProfileOwnedAppDomainRule> = emptyList(),
+    val appIps: List<PowerProfileOwnedAppIpRule> = emptyList(),
     val localBlocklistTagIds: List<Int> = emptyList()
 ) {
     fun toJson(): JSONObject {
         return JSONObject().apply {
             put("domains", JSONArray(domains))
             put("ips", JSONArray(ips))
+            put(
+                "appDomains",
+                JSONArray().apply {
+                    appDomains.forEach {
+                        put(
+                            JSONObject().apply {
+                                put("packageName", it.packageName)
+                                put("domain", it.domain)
+                            }
+                        )
+                    }
+                }
+            )
+            put(
+                "appIps",
+                JSONArray().apply {
+                    appIps.forEach {
+                        put(
+                            JSONObject().apply {
+                                put("packageName", it.packageName)
+                                put("ipAddress", it.ipAddress)
+                                put("port", it.port)
+                            }
+                        )
+                    }
+                }
+            )
             put("localBlocklistTagIds", JSONArray(localBlocklistTagIds))
         }
     }
@@ -41,6 +70,8 @@ data class PowerProfileOwnedRules(
                 val json = JSONObject(raw)
                 val domainsJson = json.optJSONArray("domains")
                 val ipsJson = json.optJSONArray("ips")
+                val appDomainsJson = json.optJSONArray("appDomains")
+                val appIpsJson = json.optJSONArray("appIps")
                 val localBlocklistTagIdsJson = json.optJSONArray("localBlocklistTagIds")
                 val domains =
                     buildList {
@@ -69,7 +100,34 @@ data class PowerProfileOwnedRules(
                             }
                         }
                     }
-                PowerProfileOwnedRules(domains, ips, localBlocklistTagIds)
+                val appDomains =
+                    buildList {
+                        if (appDomainsJson != null) {
+                            for (index in 0 until appDomainsJson.length()) {
+                                val value = appDomainsJson.optJSONObject(index) ?: continue
+                                val packageName = value.optString("packageName", "").trim()
+                                val domain = value.optString("domain", "").trim().lowercase()
+                                if (packageName.isNotEmpty() && domain.isNotEmpty()) {
+                                    add(PowerProfileOwnedAppDomainRule(packageName, domain))
+                                }
+                            }
+                        }
+                    }
+                val appIps =
+                    buildList {
+                        if (appIpsJson != null) {
+                            for (index in 0 until appIpsJson.length()) {
+                                val value = appIpsJson.optJSONObject(index) ?: continue
+                                val packageName = value.optString("packageName", "").trim()
+                                val ipAddress = value.optString("ipAddress", "").trim().lowercase()
+                                val port = value.optInt("port", Int.MIN_VALUE)
+                                if (packageName.isNotEmpty() && ipAddress.isNotEmpty() && port != Int.MIN_VALUE) {
+                                    add(PowerProfileOwnedAppIpRule(packageName, ipAddress, port))
+                                }
+                            }
+                        }
+                    }
+                PowerProfileOwnedRules(domains, ips, appDomains, appIps, localBlocklistTagIds)
             } catch (_: Exception) {
                 empty()
             }
@@ -99,14 +157,24 @@ object PowerProfileOwnershipStore {
     fun aggregateOwnership(context: Context, profileIds: List<String>): PowerProfileOwnedRules {
         val domains = linkedSetOf<String>()
         val ips = linkedSetOf<String>()
+        val appDomains = linkedMapOf<String, PowerProfileOwnedAppDomainRule>()
+        val appIps = linkedMapOf<String, PowerProfileOwnedAppIpRule>()
         val localBlocklistTagIds = linkedSetOf<Int>()
         profileIds.forEach { profileId ->
             val ownedRules = read(context, profileId)
             domains.addAll(ownedRules.domains)
             ips.addAll(ownedRules.ips)
+            ownedRules.appDomains.forEach { appDomains[it.key()] = it }
+            ownedRules.appIps.forEach { appIps[it.key()] = it }
             localBlocklistTagIds.addAll(ownedRules.localBlocklistTagIds)
         }
-        return PowerProfileOwnedRules(domains.toList(), ips.toList(), localBlocklistTagIds.toList())
+        return PowerProfileOwnedRules(
+            domains = domains.toList(),
+            ips = ips.toList(),
+            appDomains = appDomains.values.toList(),
+            appIps = appIps.values.toList(),
+            localBlocklistTagIds = localBlocklistTagIds.toList()
+        )
     }
 
     private fun profileDirectory(context: Context): File {

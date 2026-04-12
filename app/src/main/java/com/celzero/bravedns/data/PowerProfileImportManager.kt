@@ -16,6 +16,7 @@
 package com.celzero.bravedns.data
 
 import android.content.Context
+import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.database.CustomIp
@@ -43,17 +44,17 @@ data class PowerProfileImportResult(
 
 object PowerProfileImportManager : KoinComponent {
 
+    private val appInfoRepository by inject<AppInfoRepository>()
     private val customDomainRepository by inject<CustomDomainRepository>()
     private val customIpRepository by inject<CustomIpRepository>()
 
     suspend fun importBundledRules(
         context: Context,
         profile: PowerProfileDefinition,
-        currentlyManagedDomains: Set<String> = emptySet(),
-        currentlyManagedIps: Set<String> = emptySet()
+        currentlyManagedRules: PowerProfileOwnedRules = PowerProfileOwnedRules.empty()
     ): PowerProfileImportResult? {
         val artifact = PowerProfileArtifacts.loadArtifact(context, profile) ?: return null
-        if (artifact.domains.isEmpty() && artifact.ips.isEmpty()) {
+        if (artifact.domains.isEmpty() && artifact.ips.isEmpty() && artifact.apps.isEmpty()) {
             return PowerProfileImportResult(
                 PowerProfileImportSummary(
                     0,
@@ -80,6 +81,8 @@ object PowerProfileImportManager : KoinComponent {
         val ipsToInsert = mutableListOf<CustomIp>()
         val ownedDomains = linkedSetOf<String>()
         val ownedIps = linkedSetOf<String>()
+        val ownedAppDomains = linkedSetOf<PowerProfileOwnedAppDomainRule>()
+        val ownedAppIps = linkedSetOf<PowerProfileOwnedAppIpRule>()
         var alreadyBlockedCount = 0
         var skippedExistingCount = 0
         val now = System.currentTimeMillis()
@@ -106,7 +109,7 @@ object PowerProfileImportManager : KoinComponent {
                 }
                 existing.status == DomainRulesManager.Status.BLOCK.id -> {
                     alreadyBlockedCount += 1
-                    if (domain in currentlyManagedDomains) ownedDomains.add(domain)
+                    if (domain in currentlyManagedRules.domains) ownedDomains.add(domain)
                 }
                 else -> skippedExistingCount += 1
             }
@@ -141,9 +144,94 @@ object PowerProfileImportManager : KoinComponent {
                 }
                 existing.status == IpRulesManager.IpRuleStatus.BLOCK.id -> {
                     alreadyBlockedCount += 1
-                    if (normalizedIp in currentlyManagedIps) ownedIps.add(normalizedIp)
+                    if (normalizedIp in currentlyManagedRules.ips) ownedIps.add(normalizedIp)
                 }
                 else -> skippedExistingCount += 1
+            }
+        }
+
+        artifact.apps.forEach { app ->
+            val targetUid = appInfoRepository.getAppInfoUidForPackageName(app.packageName)
+            if (targetUid <= 0) {
+                skippedExistingCount += app.supportedRuleCount()
+                return@forEach
+            }
+            val existingAppDomains =
+                customDomainRepository.getDomainsByUID(targetUid).associateBy { it.domain.lowercase() }
+            val existingAppIps =
+                customIpRepository.getRulesByUid(targetUid).associateBy {
+                    "${it.ipAddress.lowercase()}|${it.port}"
+                }
+
+            app.domainRules.forEach { appDomain ->
+                val normalizedDomain = appDomain.domain.trim().trimEnd('.').lowercase()
+                if (normalizedDomain.isEmpty()) return@forEach
+                val existing = existingAppDomains[normalizedDomain]
+                val ownedRule = PowerProfileOwnedAppDomainRule(app.packageName, normalizedDomain)
+                when {
+                    existing == null -> {
+                        ownedAppDomains.add(ownedRule)
+                        domainsToInsert.add(
+                            CustomDomain(
+                                domain = normalizedDomain,
+                                uid = targetUid,
+                                ips = appDomain.ips,
+                                type = appDomain.type,
+                                status = appDomain.status,
+                                proxyId = appDomain.proxyId,
+                                proxyCC = appDomain.proxyCC,
+                                modifiedTs = now,
+                                deletedTs = 0L,
+                                version = CustomDomain.getCurrentVersion()
+                            )
+                        )
+                    }
+                    existing.status == DomainRulesManager.Status.BLOCK.id -> {
+                        alreadyBlockedCount += 1
+                        if (currentlyManagedRules.appDomains.any { it.key() == ownedRule.key() }) {
+                            ownedAppDomains.add(ownedRule)
+                        }
+                    }
+                    else -> skippedExistingCount += 1
+                }
+            }
+
+            app.ipRules.forEach { appIp ->
+                val normalizedIp = normalizeIp(appIp.ipAddress) ?: return@forEach
+                val ownedRule = PowerProfileOwnedAppIpRule(app.packageName, normalizedIp, appIp.port)
+                val existing = existingAppIps["$normalizedIp|${appIp.port}"]
+                when {
+                    existing == null -> {
+                        ownedAppIps.add(ownedRule)
+                        ipsToInsert.add(
+                            CustomIp().apply {
+                                uid = targetUid
+                                ipAddress = normalizedIp
+                                status = appIp.status
+                                port = appIp.port
+                                protocol = appIp.protocol
+                                isActive = appIp.isActive
+                                wildcard = appIp.wildcard
+                                proxyId = appIp.proxyId
+                                proxyCC = appIp.proxyCC
+                                modifiedDateTime = now
+                                ruleType =
+                                    if (normalizedIp.contains(":")) {
+                                        IpRulesManager.IPRuleType.IPV6.id
+                                    } else {
+                                        IpRulesManager.IPRuleType.IPV4.id
+                                    }
+                            }
+                        )
+                    }
+                    existing.status == IpRulesManager.IpRuleStatus.BLOCK.id -> {
+                        alreadyBlockedCount += 1
+                        if (currentlyManagedRules.appIps.any { it.key() == ownedRule.key() }) {
+                            ownedAppIps.add(ownedRule)
+                        }
+                    }
+                    else -> skippedExistingCount += 1
+                }
             }
         }
 
@@ -162,11 +250,17 @@ object PowerProfileImportManager : KoinComponent {
                     importedCount = domainsToInsert.size + ipsToInsert.size,
                     alreadyBlockedCount = alreadyBlockedCount,
                     skippedExistingCount = skippedExistingCount,
-                    artifactRuleCount = artifact.domains.size + artifact.ips.size,
+                    artifactRuleCount = artifact.supportedRuleCount(),
                     supportedRuleKind = artifact.supportedRuleKind,
                     artifactGeneratedAtEpochMs = artifact.generatedAtEpochMs
                 ),
-            ownedRules = PowerProfileOwnedRules(ownedDomains.toList(), ownedIps.toList())
+            ownedRules =
+                PowerProfileOwnedRules(
+                    domains = ownedDomains.toList(),
+                    ips = ownedIps.toList(),
+                    appDomains = ownedAppDomains.toList(),
+                    appIps = ownedAppIps.toList()
+                )
         )
     }
 

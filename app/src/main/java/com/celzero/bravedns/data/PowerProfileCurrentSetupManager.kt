@@ -60,6 +60,7 @@ object PowerProfileCurrentSetupManager : KoinComponent {
                 supportedRuleKind = "rethink-local-blocklists",
                 domains = emptyList(),
                 ips = emptyList(),
+                apps = emptyList(),
                 localBlocklistTagIds = localBlocklistTagIds
             )
         return ImportedPowerProfileStore.saveDocument(context, doc)

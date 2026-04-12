@@ -58,6 +58,7 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
         val profiles = PowerProfileCatalog.list(requireContext())
         val smoothBrowsing = requireProfile("smooth-browsing")
         val safeBeautiful = requireProfile(CuratedPowerProfileCatalog.SAFE_BEAUTIFUL_INTERNET_ID)
+        val appHorse = requireProfile(CuratedPowerProfileCatalog.APP_HORSE_ID)
         val exam = requireProfile("exam")
         val deepFocus = requireProfile("deep-focus")
 
@@ -80,6 +81,15 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
             titleId = R.id.fdp_safe_title,
             descriptionId = R.id.fdp_safe_desc,
             metaId = R.id.fdp_safe_meta
+        )
+
+        bindProfileCard(
+            profile = appHorse,
+            root = b.fdpAppHorseCard,
+            iconId = R.id.fdp_app_horse_icon,
+            titleId = R.id.fdp_app_horse_title,
+            descriptionId = R.id.fdp_app_horse_desc,
+            metaId = R.id.fdp_app_horse_meta
         )
 
         bindProfileCard(
@@ -111,6 +121,9 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
         }
         b.fdpSafeBeautifulCard.setOnClickListener {
             openProfileDetail(CuratedPowerProfileCatalog.SAFE_BEAUTIFUL_INTERNET_ID)
+        }
+        b.fdpAppHorseCard.setOnClickListener {
+            openProfileDetail(CuratedPowerProfileCatalog.APP_HORSE_ID)
         }
         b.fdpExamCard.setOnClickListener {
             openProfileDetail("exam")

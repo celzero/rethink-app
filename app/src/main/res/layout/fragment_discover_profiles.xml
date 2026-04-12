@@ -137,6 +137,14 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/fdp_app_horse_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <include layout="@layout/view_discover_profile_app_horse" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/fdp_exam_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">

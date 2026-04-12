@@ -39,6 +39,7 @@ object PowerProfileArtifacts {
             supportedRuleKind = mergeSupportedKinds(artifact?.supportedRuleKind.orEmpty(), profile),
             domains = artifact?.domains ?: emptyList(),
             ips = artifact?.ips ?: emptyList(),
+            apps = artifact?.apps ?: emptyList(),
             localBlocklistTagIds = profile.localBlocklistTagIds
         )
     }

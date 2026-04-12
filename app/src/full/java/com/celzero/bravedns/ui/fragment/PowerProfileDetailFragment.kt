@@ -74,7 +74,7 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
         b.fppdExportBtn.setOnClickListener { exportProfile() }
         b.fppdDomainCard.root.setOnClickListener { openEntriesSection(PowerProfileEntriesFragment.SECTION_DOMAINS) }
         b.fppdIpCard.root.setOnClickListener { openEntriesSection(PowerProfileEntriesFragment.SECTION_IPS) }
-        b.fppdAppsCard.root.setOnClickListener { openEntriesSection(PowerProfileEntriesFragment.SECTION_APPS) }
+        b.fppdAppsCard.root.setOnClickListener { openAppsSection() }
         b.fppdRethinkCard.root.setOnClickListener { openEntriesSection(PowerProfileEntriesFragment.SECTION_RETHINK) }
     }
 
@@ -220,6 +220,24 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
                         formatCount(artifact?.ips?.size ?: 0)
                     )
             )
+            val appCount = artifact?.apps?.size ?: 0
+            val appRuleCount = artifact?.apps?.sumOf { it.supportedRuleCount() } ?: 0
+            bindSectionCard(
+                card = b.fppdAppsCard,
+                title = getString(R.string.power_profile_apps_blocklist_title),
+                iconRes = R.drawable.ic_app_info_accent,
+                count = formatCount(appCount),
+                meta =
+                    if (appCount == 0) {
+                        getString(R.string.power_profile_apps_card_meta_empty)
+                    } else {
+                        getString(
+                            R.string.power_profile_apps_card_meta,
+                            formatCount(appCount),
+                            formatCount(appRuleCount)
+                        )
+                    }
+            )
             bindSectionCard(
                 card = b.fppdRethinkCard,
                 title = getString(R.string.power_profile_rethink_blocklists_title),
@@ -240,6 +258,15 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
                 formatCount(groupCount)
             )
         }
+    }
+
+    private fun openAppsSection() {
+        findNavController().navigate(
+            R.id.powerProfileAppsFragment,
+            Bundle().apply {
+                putString(PowerProfileAppsFragment.ARG_PROFILE_ID, profileId)
+            }
+        )
     }
 
     private fun bindSectionCard(

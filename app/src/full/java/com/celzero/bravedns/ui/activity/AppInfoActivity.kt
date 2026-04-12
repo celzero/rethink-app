@@ -41,6 +41,7 @@ import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppWiseDomainsAdapter
 import com.celzero.bravedns.adapter.AppWiseIpsAdapter
+import com.celzero.bravedns.data.PowerProfileAppManager
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
@@ -97,6 +98,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         const val INTENT_UID = "UID"
         const val INTENT_ACTIVE_CONNS = "ACTIVE_CONNS"
         const val INTENT_ASN = "ASN"
+        const val INTENT_PREVIEW_PROFILE_ID = "PREVIEW_PROFILE_ID"
+        const val INTENT_PREVIEW_APP_PACKAGE = "PREVIEW_APP_PACKAGE"
         private const val TAG = "AppInfoActivity"
 
         // Temp allow duration constants
@@ -114,6 +117,13 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
             controller.isAppearanceLightNavigationBars = false
             window.isNavigationBarContrastEnforced = false
+        }
+
+        val previewProfileId = intent.getStringExtra(INTENT_PREVIEW_PROFILE_ID).orEmpty()
+        val previewAppPackage = intent.getStringExtra(INTENT_PREVIEW_APP_PACKAGE).orEmpty()
+        if (previewProfileId.isNotEmpty() && previewAppPackage.isNotEmpty()) {
+            initPreviewMode(previewProfileId, previewAppPackage)
+            return
         }
 
         uid = intent.getIntExtra(INTENT_UID, INVALID_UID)
@@ -192,6 +202,51 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         }
     }
 
+    private fun initPreviewMode(profileId: String, packageName: String) {
+        io {
+            val preview = PowerProfileAppManager.buildPreview(this@AppInfoActivity, profileId, packageName)
+            if (preview == null) {
+                uiCtx { showNoAppFoundDialog() }
+                return@io
+            }
+
+            val installedApp = preview.installedAppInfo
+            val previewAppInfo =
+                installedApp ?: buildPreviewAppInfo(preview.appBlocklist.packageName, preview.appBlocklist.appName)
+            uid = previewAppInfo.uid
+            appInfo = previewAppInfo
+            appStatus = FirewallManager.FirewallStatus.getStatus(preview.appBlocklist.firewallStatus)
+            connStatus = FirewallManager.ConnectionStatus.getStatus(preview.appBlocklist.connectionStatus)
+
+            uiCtx {
+                b.aadAppDetailName.text = previewAppInfo.appName
+                b.aadPkgName.text = previewAppInfo.packageName
+                displayIcon(
+                    Utilities.getIcon(this@AppInfoActivity, previewAppInfo.packageName, previewAppInfo.appName),
+                    b.aadAppDetailIcon
+                )
+                applyPreviewUi()
+                setPreviewRuleCounts(
+                    ipRuleCount = preview.appBlocklist.ipRules.size,
+                    domainRuleCount = preview.appBlocklist.domainRules.size
+                )
+                updateFirewallStatusUi(appStatus, connStatus)
+                b.aadFirewallStatus.text =
+                    getString(
+                        R.string.power_profile_app_preview_status,
+                        getFirewallText(appStatus, connStatus)
+                    )
+                b.aadDataUsageStatus.text =
+                    getString(R.string.power_profile_app_preview_data_usage) +
+                        " " +
+                        getString(
+                            R.string.power_profile_app_preview_source,
+                            preview.profile.resolveTitle(this@AppInfoActivity)
+                        )
+            }
+        }
+    }
+
     private fun displayProxyStatus() {
         val proxy = ProxyManager.getProxyIdForApp(uid)
         if (proxy.isEmpty() || proxy == ID_NONE) {
@@ -207,6 +262,48 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         intent.putExtra(VIEW_PAGER_SCREEN_TO_LOAD, CustomRulesActivity.Tabs.IP_RULES.screen)
         intent.putExtra(Constants.INTENT_UID, uid)
         startActivity(intent)
+    }
+
+    private fun buildPreviewAppInfo(packageName: String, appName: String): AppInfo {
+        return AppInfo(
+            packageName = packageName,
+            appName = appName,
+            uid = INVALID_UID,
+            isSystemApp = false,
+            firewallStatus = FirewallManager.FirewallStatus.NONE.id,
+            appCategory = "",
+            wifiDataUsed = 0,
+            mobileDataUsed = 0,
+            connectionStatus = FirewallManager.ConnectionStatus.ALLOW.id,
+            isProxyExcluded = false,
+            screenOffAllowed = false,
+            backgroundAllowed = false
+        )
+    }
+
+    private fun applyPreviewUi() {
+        b.aadProxyDetails.visibility = View.GONE
+        b.aadAppInfoIcon.visibility = View.GONE
+        b.aadActiveConnsRl.visibility = View.GONE
+        b.aadAsnRl.visibility = View.GONE
+        b.aadMostContactedDomainRl.visibility = View.GONE
+        b.aadMostContactedIpsRl.visibility = View.GONE
+        b.excludeProxyRl.visibility = View.GONE
+        b.tempAllowRl.visibility = View.GONE
+        b.aadCloseConnsChip.visibility = View.GONE
+        b.aadIpsChip.visibility = View.GONE
+        b.aadDomainsChip.visibility = View.GONE
+        b.aadActiveConnsChip.visibility = View.GONE
+        b.aadAsnChip.visibility = View.GONE
+        b.aadIpBlockCard.isClickable = false
+        b.aadDomainBlockCard.isClickable = false
+        b.aadIpBlockCard.alpha = ALPHA_DISABLED
+        b.aadDomainBlockCard.alpha = ALPHA_DISABLED
+    }
+
+    private fun setPreviewRuleCounts(ipRuleCount: Int, domainRuleCount: Int) {
+        b.aadIpBlockHeader.text = ipRuleCount.toString()
+        b.aadDomainBlockHeader.text = domainRuleCount.toString()
     }
 
     private fun openCustomDomainScreen() {

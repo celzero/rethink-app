@@ -21,6 +21,7 @@ object CuratedPowerProfileCatalog {
 
     const val SMOOTH_BROWSING_ID = "smooth-browsing"
     const val SAFE_BEAUTIFUL_INTERNET_ID = "safe-beautiful-internet"
+    const val APP_HORSE_ID = "app-horse"
     const val EXAM_ID = "exam"
     const val DEEP_FOCUS_ID = "deep-focus"
 
@@ -76,6 +77,18 @@ object CuratedPowerProfileCatalog {
                 sourceSummary =
                     "Samsung-curated local blocklist setup with 80 privacy and security selections.",
                 sourceTokens = listOf("rethink-local-blocklists", "privacy", "security"),
+                readyForActivation = true
+            ),
+            PowerProfileDefinition(
+                id = APP_HORSE_ID,
+                titleRes = R.string.power_profile_app_horse_title,
+                descriptionRes = R.string.power_profile_app_horse_desc,
+                metaRes = R.string.power_profile_app_horse_meta,
+                iconRes = R.drawable.ic_app_info_accent,
+                bundledArtifactAssetPath = "power/app-horse-profile.json",
+                sourceProvider = "App Horse",
+                sourceSummary = "Community app pack for Parrot Downloader with the validated ad-network IP blocklist.",
+                sourceTokens = listOf("community-app-pack", "com.parrot.downloader", "ad-network"),
                 readyForActivation = true
             ),
             PowerProfileDefinition(
