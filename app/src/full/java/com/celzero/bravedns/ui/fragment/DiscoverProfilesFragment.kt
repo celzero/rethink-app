@@ -29,6 +29,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.data.CuratedPowerProfileCatalog
 import com.celzero.bravedns.data.ImportedPowerProfileStore
 import com.celzero.bravedns.data.PowerProfileCatalog
 import com.celzero.bravedns.data.PowerProfileDefinition
@@ -56,6 +57,7 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
     private fun bindCatalog() {
         val profiles = PowerProfileCatalog.list(requireContext())
         val smoothBrowsing = requireProfile("smooth-browsing")
+        val safeBeautiful = requireProfile(CuratedPowerProfileCatalog.SAFE_BEAUTIFUL_INTERNET_ID)
         val exam = requireProfile("exam")
         val deepFocus = requireProfile("deep-focus")
 
@@ -69,6 +71,15 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
             titleId = R.id.fdp_smooth_title,
             descriptionId = R.id.fdp_smooth_desc,
             metaId = R.id.fdp_smooth_meta
+        )
+
+        bindProfileCard(
+            profile = safeBeautiful,
+            root = b.fdpSafeBeautifulCard,
+            iconId = R.id.fdp_safe_icon,
+            titleId = R.id.fdp_safe_title,
+            descriptionId = R.id.fdp_safe_desc,
+            metaId = R.id.fdp_safe_meta
         )
 
         bindProfileCard(
@@ -97,6 +108,9 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
 
         b.fdpSmoothInternetCard.setOnClickListener {
             openProfileDetail("smooth-browsing")
+        }
+        b.fdpSafeBeautifulCard.setOnClickListener {
+            openProfileDetail(CuratedPowerProfileCatalog.SAFE_BEAUTIFUL_INTERNET_ID)
         }
         b.fdpExamCard.setOnClickListener {
             openProfileDetail("exam")

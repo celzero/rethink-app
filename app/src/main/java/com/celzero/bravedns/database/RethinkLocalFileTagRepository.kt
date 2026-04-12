@@ -63,6 +63,11 @@ class RethinkLocalFileTagRepository(private val rethinkLocalFileTagDao: RethinkL
         return rethinkLocalFileTagDao.getSelectedTags()
     }
 
+    suspend fun getTagsByIds(values: List<Int>): List<RethinkLocalFileTag> {
+        if (values.isEmpty()) return emptyList()
+        return rethinkLocalFileTagDao.getTagsByIds(values)
+    }
+
     suspend fun deleteAll() {
         return rethinkLocalFileTagDao.deleteAll()
     }

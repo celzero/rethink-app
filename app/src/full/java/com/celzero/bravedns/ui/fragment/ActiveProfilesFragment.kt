@@ -127,6 +127,10 @@ class ActiveProfilesFragment : Fragment(R.layout.fragment_active_profiles) {
             startActivity(Intent(requireContext(), NetworkLogsActivity::class.java))
         }
 
+        b.fapDiscoverProfilesCard.setOnClickListener {
+            findNavController().navigate(R.id.discoverProfilesFragment)
+        }
+
         b.fapSaveCurrentSetupCard.setOnClickListener {
             saveCurrentSetup()
         }

@@ -129,6 +129,14 @@
                 android:visibility="gone" />
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/fap_discover_profiles_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <include layout="@layout/view_power_list_item_discover_profiles" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 

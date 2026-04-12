@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="16dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:background="@drawable/home_screen_cards_bg"
+        android:padding="16dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/vppsc_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:drawablePadding="8dp"
+            android:gravity="center_vertical"
+            android:textColor="?attr/homeScreenHeaderTextColor"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/vppsc_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/vppsc_title"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="18dp"
+            android:textColor="?attr/homeScreenHeaderTextColor"
+            android:textSize="34sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/vppsc_meta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_toStartOf="@id/vppsc_chevron"
+            android:alpha="0.85"
+            android:textColor="?attr/homeScreenHeaderTextColor"
+            android:textSize="13sp" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/vppsc_chevron"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:alpha="0.85"
+            android:src="@drawable/ic_right_arrow_white" />
+    </RelativeLayout>
+</com.google.android.material.card.MaterialCardView>

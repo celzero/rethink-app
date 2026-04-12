@@ -51,6 +51,9 @@
     <string name="power_profile_smooth_browsing_title" translatable="true">Smooth browsing</string>
     <string name="power_profile_smooth_browsing_desc" translatable="true">A calmer browsing profile based on the default uBO network filterlists for ads, privacy, and malicious destinations.</string>
     <string name="power_profile_smooth_browsing_meta" translatable="true">Source: uBO defaults including EasyList, EasyPrivacy, URLHaus, and Peter Lowe</string>
+    <string name="power_profile_safe_beautiful_title" translatable="true">Safe and Beautiful Internet (powered by Rethink DNS)</string>
+    <string name="power_profile_safe_beautiful_desc" translatable="true">A strong on-device Rethink profile tuned for safer, cleaner browsing using a broad privacy and security blocklist stack.</string>
+    <string name="power_profile_safe_beautiful_meta" translatable="true">Source: 80 curated Rethink on-device blocklists across privacy and security</string>
     <string name="power_profile_exam_title" translatable="true">Exam</string>
     <string name="power_profile_exam_desc" translatable="true">A distraction-reduction profile that would eventually suppress social and entertainment apps during study time.</string>
     <string name="power_profile_exam_meta" translatable="true">Intent: reduce social media and other attention sinks</string>
@@ -74,11 +77,44 @@
     <string name="power_profile_detail_ready_desc" translatable="true">This profile is ready to merge into your setup. It currently supports about %1$d entries using %2$s.</string>
     <string name="power_profile_detail_coming_desc" translatable="true">This profile concept is visible in the catalog, but its engine mapping is still being built.</string>
     <string name="power_profile_detail_source_heading" translatable="true">Source and provenance</string>
+    <string name="power_profile_detail_blocklists_heading" translatable="true">Included Rethink blocklists</string>
+    <string name="power_profile_detail_sections_heading" translatable="true">What this profile controls</string>
     <string name="power_profile_detail_provider" translatable="true">Provider: %1$s</string>
     <string name="power_profile_detail_source_summary" translatable="true">Summary: %1$s</string>
     <string name="power_profile_detail_source_tokens" translatable="true">Tokens: %1$s</string>
     <string name="power_profile_detail_rule_meta" translatable="true">Supported entries: %1$d. Kind: %2$s.</string>
     <string name="power_profile_detail_manage_latest" translatable="true">Manage the latest active profile from here.</string>
+    <string name="power_profile_detail_blocklists_meta" translatable="true">%1$d blocklists in this group</string>
+    <string name="power_profile_detail_blocklists_subgroup" translatable="true">%1$s</string>
+    <string name="power_profile_domain_blocklist_title" translatable="true">Domain Blocklist</string>
+    <string name="power_profile_ip_blocklist_title" translatable="true">IP Blocklist</string>
+    <string name="power_profile_apps_blocklist_title" translatable="true">Apps Blocklist</string>
+    <string name="power_profile_rethink_blocklists_title" translatable="true">Rethink Blocklists</string>
+    <string name="power_profile_cards_loading" translatable="true">Loading...</string>
+    <string name="power_profile_domain_card_meta" translatable="true">%1$s exact domain entries</string>
+    <string name="power_profile_ip_card_meta" translatable="true">%1$s explicit IP entries</string>
+    <string name="power_profile_apps_card_meta_empty" translatable="true">App-level entries coming next</string>
+    <string name="power_profile_rethink_card_meta" translatable="true">%1$s lists across %2$s groups</string>
+    <string name="power_profile_rethink_card_meta_fallback" translatable="true">%1$s referenced lists</string>
+    <string name="power_profile_entries_desc" translatable="true">Showing the %1$s included by %2$s.</string>
+    <string name="power_profile_entries_rule_meta" translatable="true">%1$s total entries from %2$s.</string>
+    <string name="power_profile_entries_empty_title" translatable="true">Nothing here yet</string>
+    <string name="power_profile_entries_empty_meta" translatable="true">This section is ready for future profile content.</string>
+    <string name="power_profile_entries_preview_title" translatable="true">Entry preview</string>
+    <string name="power_profile_entries_preview_meta" translatable="true">Showing %1$s of %2$s entries</string>
+    <string name="power_profile_domain_entries_desc" translatable="true">This profile currently carries %1$s exact domain entries.</string>
+    <string name="power_profile_ip_entries_desc" translatable="true">This profile currently carries %1$s explicit IP entries.</string>
+    <string name="power_profile_apps_entries_desc" translatable="true">%1$s does not include app-specific blocks yet.</string>
+    <string name="power_profile_domain_entries_empty_desc" translatable="true">No domain entries are bundled with this profile yet.</string>
+    <string name="power_profile_ip_entries_empty_desc" translatable="true">No IP entries are bundled with this profile yet.</string>
+    <string name="power_profile_apps_entries_empty_desc" translatable="true">App-level blocklists will plug into profiles once we add authoring for them.</string>
+    <string name="power_profile_rethink_blocklists_desc" translatable="true">This profile reuses %1$s native Rethink blocklists grouped into %2$s categories.</string>
+    <string name="power_profile_rethink_blocklists_empty_desc" translatable="true">This profile does not include any native Rethink blocklists.</string>
+    <string name="power_profile_rethink_blocklists_unavailable_desc" translatable="true">This profile references %1$s native Rethink blocklists, but this device cannot resolve their grouped catalog details yet.</string>
+    <string name="power_profile_rethink_blocklists_unavailable_meta" translatable="true">This device does not currently have the local Rethink blocklist catalog needed to show names and groups.</string>
+    <string name="power_profile_rethink_blocklists_unavailable_hint" translatable="true">Open this profile on a device with the local Rethink catalog to inspect the exact list names.</string>
+    <string name="power_profile_blocklist_subgroup_other" translatable="true">others</string>
+    <string name="power_profile_blocklist_entry_line" translatable="true">• %1$s (%2$s entries)</string>
     <string name="power_profile_import_success_message" translatable="true">%1$s imported. Review and enable it from here.</string>
     <string name="power_profile_import_failure_message" translatable="true">That file could not be imported as a profile.</string>
     <string name="power_profile_export_success_message" translatable="true">%1$s exported.</string>
