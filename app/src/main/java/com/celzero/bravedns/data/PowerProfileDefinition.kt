@@ -30,6 +30,7 @@ data class PowerProfileDefinition(
     @DrawableRes val iconRes: Int,
     val bundledArtifactAssetPath: String? = null,
     val localArtifactFileName: String? = null,
+    val localBlocklistTagIds: List<Int> = emptyList(),
     val sourceProvider: String? = null,
     val sourceSummary: String? = null,
     val sourceDocUrl: String? = null,

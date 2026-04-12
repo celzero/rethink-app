@@ -53,6 +53,16 @@ object ImportedPowerProfileStore {
         return doc.toDefinition(file.name)
     }
 
+    fun saveDocument(context: Context, doc: PowerProfilePortableDocument): PowerProfileDefinition {
+        val fileName = sanitizeFileName(doc.id) + ".json"
+        val file = File(profileDirectory(context), fileName)
+        file.parentFile?.let { parent ->
+            if (!parent.exists()) parent.mkdirs()
+        }
+        file.writeText(doc.toJson())
+        return doc.toDefinition(file.name)
+    }
+
     fun exportToCache(context: Context, profile: PowerProfileDefinition): File? {
         val doc = PowerProfileArtifacts.loadPortableDocument(context, profile) ?: return null
         val directory = File(context.cacheDir, "power-profile-exports")

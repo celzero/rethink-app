@@ -18,8 +18,10 @@ package com.celzero.bravedns.data
 import android.content.Context
 import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.database.CustomIpRepository
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.IpRulesManager
+import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.util.Constants
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -31,6 +33,7 @@ data class PowerProfileDisableSummary(
 object PowerProfileManager : KoinComponent {
     private val customDomainRepository by inject<CustomDomainRepository>()
     private val customIpRepository by inject<CustomIpRepository>()
+    private val persistentState by inject<PersistentState>()
 
     suspend fun enableProfile(context: Context, profile: PowerProfileDefinition): ActivePowerProfile? {
         if (!profile.readyForActivation) return null
@@ -44,10 +47,52 @@ object PowerProfileManager : KoinComponent {
                 profile = profile,
                 currentlyManagedDomains = existingManagedRules.domains.toSet(),
                 currentlyManagedIps = existingManagedRules.ips.toSet()
-            ) ?: return null
+            )
+                ?: PowerProfileImportResult(
+                    summary = PowerProfileImportSummary(0, 0, 0, 0, "", 0L),
+                    ownedRules = PowerProfileOwnedRules.empty()
+                )
 
-        PowerProfileOwnershipStore.write(context, profile.id, importResult.ownedRules)
-        return PowerProfileStore.activateProfile(context, profile, importResult.summary)
+        if (importResult.summary.artifactRuleCount == 0 && profile.localBlocklistTagIds.isEmpty()) {
+            return null
+        }
+
+        val currentSelectedLocalBlocklists =
+            RethinkBlocklistManager.getTagsFromStamp(
+                persistentState.localBlocklistStamp,
+                RethinkBlocklistManager.RethinkBlocklistType.LOCAL
+            )
+        val profileLocalBlocklists = profile.localBlocklistTagIds.toSet()
+        val alreadySelectedLocalBlocklists = profileLocalBlocklists.intersect(currentSelectedLocalBlocklists)
+        val newlySelectedLocalBlocklists = profileLocalBlocklists - currentSelectedLocalBlocklists
+
+        if (profileLocalBlocklists.isNotEmpty()) {
+            applyLocalBlocklistSelection(currentSelectedLocalBlocklists + profileLocalBlocklists)
+        }
+
+        val mergedSummary =
+            importResult.summary.copy(
+                importedCount = importResult.summary.importedCount + newlySelectedLocalBlocklists.size,
+                alreadyBlockedCount =
+                    importResult.summary.alreadyBlockedCount + alreadySelectedLocalBlocklists.size,
+                artifactRuleCount = importResult.summary.artifactRuleCount + profileLocalBlocklists.size,
+                supportedRuleKind =
+                    mergeSupportedKinds(
+                        importResult.summary.supportedRuleKind,
+                        profileLocalBlocklists.isNotEmpty()
+                    )
+            )
+
+        PowerProfileOwnershipStore.write(
+            context,
+            profile.id,
+            PowerProfileOwnedRules(
+                importResult.ownedRules.domains,
+                importResult.ownedRules.ips,
+                profileLocalBlocklists.toList()
+            )
+        )
+        return PowerProfileStore.activateProfile(context, profile, mergedSummary)
     }
 
     suspend fun disableProfile(context: Context, profileId: String): PowerProfileDisableSummary {
@@ -58,9 +103,12 @@ object PowerProfileManager : KoinComponent {
             PowerProfileOwnershipStore.aggregateOwnership(context, remainingProfileIds)
         val remainingOwnedDomains = remainingOwnedRules.domains.toSet()
         val remainingOwnedIps = remainingOwnedRules.ips.toSet()
+        val remainingOwnedLocalBlocklists = remainingOwnedRules.localBlocklistTagIds.toSet()
 
         val removableDomains = ownedRules.domains.filterNot { it in remainingOwnedDomains }
         val removableIps = ownedRules.ips.filterNot { it in remainingOwnedIps }
+        val removableLocalBlocklists =
+            ownedRules.localBlocklistTagIds.filterNot { it in remainingOwnedLocalBlocklists }
 
         val removedDomains =
             customDomainRepository.deleteDomains(Constants.UID_EVERYBODY, removableDomains)
@@ -70,6 +118,14 @@ object PowerProfileManager : KoinComponent {
                 Constants.UNSPECIFIED_PORT,
                 removableIps
             )
+        val currentSelectedLocalBlocklists =
+            RethinkBlocklistManager.getTagsFromStamp(
+                persistentState.localBlocklistStamp,
+                RethinkBlocklistManager.RethinkBlocklistType.LOCAL
+            )
+        if (removableLocalBlocklists.isNotEmpty()) {
+            applyLocalBlocklistSelection(currentSelectedLocalBlocklists - removableLocalBlocklists.toSet())
+        }
 
         if (removedDomains > 0) DomainRulesManager.load()
         if (removedIps > 0) IpRulesManager.load()
@@ -77,7 +133,7 @@ object PowerProfileManager : KoinComponent {
         PowerProfileOwnershipStore.delete(context, profileId)
         PowerProfileStore.deactivateProfile(context, profileId)
 
-        return PowerProfileDisableSummary(removedDomains + removedIps)
+        return PowerProfileDisableSummary(removedDomains + removedIps + removableLocalBlocklists.size)
     }
 
     private fun resolveOwnedRulesForDisable(
@@ -90,7 +146,33 @@ object PowerProfileManager : KoinComponent {
         }
 
         val profile = PowerProfileCatalog.get(context, profileId) ?: return storedRules
-        val artifact = PowerProfileArtifacts.loadArtifact(context, profile) ?: return storedRules
-        return PowerProfileOwnedRules(artifact.domains, artifact.ips)
+        val artifact = PowerProfileArtifacts.loadArtifact(context, profile)
+        return PowerProfileOwnedRules(
+            artifact?.domains ?: emptyList(),
+            artifact?.ips ?: emptyList(),
+            profile.localBlocklistTagIds
+        )
+    }
+
+    private suspend fun applyLocalBlocklistSelection(selectedTagIds: Set<Int>) {
+        val stamp =
+            RethinkBlocklistManager.getStamp(
+                selectedTagIds,
+                RethinkBlocklistManager.RethinkBlocklistType.LOCAL
+            )
+        persistentState.localBlocklistStamp = stamp
+        persistentState.numberOfLocalBlocklists = selectedTagIds.size
+        persistentState.blocklistEnabled = selectedTagIds.isNotEmpty()
+        RethinkBlocklistManager.clearTagsSelectionLocal()
+        if (selectedTagIds.isNotEmpty()) {
+            RethinkBlocklistManager.updateFiletagsLocal(selectedTagIds, 1)
+        }
+    }
+
+    private fun mergeSupportedKinds(existingKind: String, hasLocalBlocklists: Boolean): String {
+        val kinds = linkedSetOf<String>()
+        if (existingKind.isNotBlank()) kinds.add(existingKind)
+        if (hasLocalBlocklists) kinds.add("rethink-local-blocklists")
+        return kinds.joinToString(", ")
     }
 }

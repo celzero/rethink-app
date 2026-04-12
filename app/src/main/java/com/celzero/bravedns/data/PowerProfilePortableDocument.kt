@@ -31,7 +31,8 @@ data class PowerProfilePortableDocument(
     val generatedAtEpochMs: Long,
     val supportedRuleKind: String,
     val domains: List<String>,
-    val ips: List<String>
+    val ips: List<String>,
+    val localBlocklistTagIds: List<Int>
 ) {
     fun toJson(): String {
         return JSONObject().apply {
@@ -47,6 +48,7 @@ data class PowerProfilePortableDocument(
             put("sourceTokens", JSONArray(sourceTokens))
             put("domains", JSONArray(domains))
             put("ips", JSONArray(ips))
+            put("localBlocklistTagIds", JSONArray(localBlocklistTagIds))
         }.toString()
     }
 
@@ -58,6 +60,7 @@ data class PowerProfilePortableDocument(
             metaText = meta,
             iconRes = R.drawable.ic_logs_accent,
             localArtifactFileName = localArtifactFileName,
+            localBlocklistTagIds = localBlocklistTagIds,
             sourceProvider = provider,
             sourceSummary = sourceSummary,
             sourceDocUrl = sourceDocUrl,
@@ -72,6 +75,7 @@ data class PowerProfilePortableDocument(
             val sourceTokensJson = json.optJSONArray("sourceTokens")
             val domainsJson = json.optJSONArray("domains")
             val ipsJson = json.optJSONArray("ips")
+            val localBlocklistTagIdsJson = json.optJSONArray("localBlocklistTagIds")
 
             fun readStrings(array: JSONArray?): List<String> =
                 buildList {
@@ -95,9 +99,17 @@ data class PowerProfilePortableDocument(
                 generatedAtEpochMs = json.optLong("generatedAtEpochMs", 0L),
                 supportedRuleKind = json.optString("supportedRuleKind", "").trim(),
                 domains = readStrings(domainsJson),
-                ips = readStrings(ipsJson)
+                ips = readStrings(ipsJson),
+                localBlocklistTagIds =
+                    buildList {
+                        if (localBlocklistTagIdsJson != null) {
+                            for (index in 0 until localBlocklistTagIdsJson.length()) {
+                                val value = localBlocklistTagIdsJson.optInt(index, Int.MIN_VALUE)
+                                if (value != Int.MIN_VALUE) add(value)
+                            }
+                        }
+                    }
             )
         }
     }
 }
-

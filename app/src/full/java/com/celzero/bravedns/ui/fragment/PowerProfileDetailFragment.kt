@@ -126,17 +126,19 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
                 withContext(Dispatchers.IO) {
                     PowerProfileArtifacts.loadArtifact(requireContext(), profile)
                 }
+            val supportedEntries = (artifact?.supportedRuleCount() ?: 0) + profile.localBlocklistTagIds.size
+            val supportedKind = mergeSupportedKinds(artifact?.supportedRuleKind.orEmpty(), profile)
             b.fppdStatusDesc.text =
                 getString(
                     R.string.power_profile_detail_ready_desc,
-                    artifact?.supportedRuleCount() ?: 0,
-                    artifact?.supportedRuleKind ?: "-"
+                    supportedEntries,
+                    supportedKind
                 )
             b.fppdStatusMeta.text =
                 getString(
                     R.string.power_profile_detail_rule_meta,
-                    artifact?.supportedRuleCount() ?: 0,
-                    artifact?.supportedRuleKind ?: "-"
+                    supportedEntries,
+                    supportedKind
                 )
         }
         b.fppdActionBtn.isEnabled = true
@@ -242,6 +244,13 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
 
     private fun suggestExportName(profile: PowerProfileDefinition): String {
         return "${profile.id}.powerprofile.json"
+    }
+
+    private fun mergeSupportedKinds(existingKind: String, profile: PowerProfileDefinition): String {
+        val kinds = linkedSetOf<String>()
+        if (existingKind.isNotBlank()) kinds.add(existingKind)
+        if (profile.localBlocklistTagIds.isNotEmpty()) kinds.add("rethink-local-blocklists")
+        return kinds.joinToString(", ").ifBlank { "-" }
     }
 
     private fun disableProfile(activeProfile: ActivePowerProfile) {

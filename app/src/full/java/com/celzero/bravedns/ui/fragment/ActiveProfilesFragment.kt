@@ -23,11 +23,13 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.ActivePowerProfile
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.data.PowerProfileCurrentSetupManager
 import com.celzero.bravedns.data.PowerProfileStore
 import com.celzero.bravedns.data.SavedPowerProfile
 import com.celzero.bravedns.databinding.FragmentActiveProfilesBinding
@@ -37,6 +39,9 @@ import com.celzero.bravedns.ui.activity.FirewallActivity
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class ActiveProfilesFragment : Fragment(R.layout.fragment_active_profiles) {
@@ -128,13 +133,24 @@ class ActiveProfilesFragment : Fragment(R.layout.fragment_active_profiles) {
     }
 
     private fun saveCurrentSetup() {
-        val savedProfile = PowerProfileStore.saveCurrentSetup(requireContext(), appConfig)
-        bindState()
-        showToastUiCentered(
-            requireContext(),
-            getString(R.string.power_saved_profile_saved_message, savedProfile.name),
-            Toast.LENGTH_SHORT
-        )
+        viewLifecycleOwner.lifecycleScope.launch {
+            val savedProfile = PowerProfileStore.saveCurrentSetup(requireContext(), appConfig)
+            val reusableProfile =
+                withContext(Dispatchers.IO) {
+                    PowerProfileCurrentSetupManager.saveCurrentSetupAsImportedProfile(
+                        requireContext(),
+                        PowerProfileStore.listSavedProfiles(requireContext()).size
+                    )
+                }
+            bindState()
+            val message =
+                if (reusableProfile != null) {
+                    getString(R.string.power_saved_profile_saved_as_profile_message, reusableProfile.resolveTitle(requireContext()))
+                } else {
+                    getString(R.string.power_saved_profile_saved_message, savedProfile.name)
+                }
+            showToastUiCentered(requireContext(), message, Toast.LENGTH_SHORT)
+        }
     }
 
     private fun bindActiveProfileCards(activeProfiles: List<ActivePowerProfile>) {

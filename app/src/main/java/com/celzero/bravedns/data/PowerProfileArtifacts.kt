@@ -24,8 +24,8 @@ object PowerProfileArtifacts {
     }
 
     fun loadPortableDocument(context: Context, profile: PowerProfileDefinition): PowerProfilePortableDocument? {
-        val raw = loadRawArtifact(context, profile) ?: return null
-        val artifact = BundledDomainProfileArtifact.fromJson(raw)
+        val artifact = loadRawArtifact(context, profile)?.let(BundledDomainProfileArtifact::fromJson)
+        if (artifact == null && profile.localBlocklistTagIds.isEmpty()) return null
         return PowerProfilePortableDocument(
             id = profile.id,
             name = profile.resolveTitle(context),
@@ -35,10 +35,11 @@ object PowerProfileArtifacts {
             sourceSummary = profile.sourceSummary.orEmpty(),
             sourceDocUrl = profile.sourceDocUrl.orEmpty(),
             sourceTokens = profile.sourceTokens,
-            generatedAtEpochMs = artifact.generatedAtEpochMs,
-            supportedRuleKind = artifact.supportedRuleKind,
-            domains = artifact.domains,
-            ips = artifact.ips
+            generatedAtEpochMs = artifact?.generatedAtEpochMs ?: System.currentTimeMillis(),
+            supportedRuleKind = mergeSupportedKinds(artifact?.supportedRuleKind.orEmpty(), profile),
+            domains = artifact?.domains ?: emptyList(),
+            ips = artifact?.ips ?: emptyList(),
+            localBlocklistTagIds = profile.localBlocklistTagIds
         )
     }
 
@@ -51,5 +52,12 @@ object PowerProfileArtifacts {
             if (file.exists()) return file.readText()
         }
         return null
+    }
+
+    private fun mergeSupportedKinds(existingKind: String, profile: PowerProfileDefinition): String {
+        val kinds = linkedSetOf<String>()
+        if (existingKind.isNotBlank()) kinds.add(existingKind)
+        if (profile.localBlocklistTagIds.isNotEmpty()) kinds.add("rethink-local-blocklists")
+        return kinds.joinToString(", ")
     }
 }

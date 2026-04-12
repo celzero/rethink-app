@@ -22,12 +22,14 @@ import java.io.File
 
 data class PowerProfileOwnedRules(
     val domains: List<String>,
-    val ips: List<String>
+    val ips: List<String>,
+    val localBlocklistTagIds: List<Int> = emptyList()
 ) {
     fun toJson(): JSONObject {
         return JSONObject().apply {
             put("domains", JSONArray(domains))
             put("ips", JSONArray(ips))
+            put("localBlocklistTagIds", JSONArray(localBlocklistTagIds))
         }
     }
 
@@ -39,6 +41,7 @@ data class PowerProfileOwnedRules(
                 val json = JSONObject(raw)
                 val domainsJson = json.optJSONArray("domains")
                 val ipsJson = json.optJSONArray("ips")
+                val localBlocklistTagIdsJson = json.optJSONArray("localBlocklistTagIds")
                 val domains =
                     buildList {
                         if (domainsJson != null) {
@@ -57,7 +60,16 @@ data class PowerProfileOwnedRules(
                             }
                         }
                     }
-                PowerProfileOwnedRules(domains, ips)
+                val localBlocklistTagIds =
+                    buildList {
+                        if (localBlocklistTagIdsJson != null) {
+                            for (index in 0 until localBlocklistTagIdsJson.length()) {
+                                val value = localBlocklistTagIdsJson.optInt(index, Int.MIN_VALUE)
+                                if (value != Int.MIN_VALUE) add(value)
+                            }
+                        }
+                    }
+                PowerProfileOwnedRules(domains, ips, localBlocklistTagIds)
             } catch (_: Exception) {
                 empty()
             }
@@ -87,12 +99,14 @@ object PowerProfileOwnershipStore {
     fun aggregateOwnership(context: Context, profileIds: List<String>): PowerProfileOwnedRules {
         val domains = linkedSetOf<String>()
         val ips = linkedSetOf<String>()
+        val localBlocklistTagIds = linkedSetOf<Int>()
         profileIds.forEach { profileId ->
             val ownedRules = read(context, profileId)
             domains.addAll(ownedRules.domains)
             ips.addAll(ownedRules.ips)
+            localBlocklistTagIds.addAll(ownedRules.localBlocklistTagIds)
         }
-        return PowerProfileOwnedRules(domains.toList(), ips.toList())
+        return PowerProfileOwnedRules(domains.toList(), ips.toList(), localBlocklistTagIds.toList())
     }
 
     private fun profileDirectory(context: Context): File {
@@ -103,4 +117,3 @@ object PowerProfileOwnershipStore {
         return File(profileDirectory(context), "$profileId.json")
     }
 }
-
