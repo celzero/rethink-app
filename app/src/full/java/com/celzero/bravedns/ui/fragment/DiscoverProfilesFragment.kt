@@ -21,14 +21,19 @@ import android.widget.Toast
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.CuratedPowerProfileCatalog
+import com.celzero.bravedns.data.PowerProfileImportManager
 import com.celzero.bravedns.data.PowerProfileStore
 import com.celzero.bravedns.data.PowerProfileDefinition
 import com.celzero.bravedns.databinding.FragmentDiscoverProfilesBinding
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
 
@@ -116,13 +121,28 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
 
     private fun activateSmoothBrowsing() {
         val profile = requireProfile(CuratedPowerProfileCatalog.SMOOTH_BROWSING_ID)
-        val activeProfile = PowerProfileStore.activateProfile(requireContext(), profile)
-        showToastUiCentered(
-            requireContext(),
-            getString(R.string.power_profile_activated_message, activeProfile.name),
-            Toast.LENGTH_SHORT
-        )
-        findNavController().navigate(R.id.activeProfilesFragment)
+        viewLifecycleOwner.lifecycleScope.launch {
+            showToastUiCentered(
+                requireContext(),
+                getString(R.string.power_profile_activation_in_progress, getString(profile.titleRes)),
+                Toast.LENGTH_SHORT
+            )
+            val importSummary =
+                withContext(Dispatchers.IO) {
+                    PowerProfileImportManager.importBundledRules(requireContext(), profile)
+                }
+            val activeProfile = PowerProfileStore.activateProfile(requireContext(), profile, importSummary)
+            showToastUiCentered(
+                requireContext(),
+                getString(
+                    R.string.power_profile_activated_with_rules_message,
+                    activeProfile.name,
+                    activeProfile.importedRuleCount
+                ),
+                Toast.LENGTH_SHORT
+            )
+            findNavController().navigate(R.id.activeProfilesFragment)
+        }
     }
 
     private fun showMergePlaceholder(profile: PowerProfileDefinition) {

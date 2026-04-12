@@ -24,6 +24,7 @@ data class PowerProfileDefinition(
     @StringRes val descriptionRes: Int,
     @StringRes val metaRes: Int,
     @DrawableRes val iconRes: Int,
+    val bundledArtifactAssetPath: String? = null,
     val sourceProvider: String? = null,
     val sourceSummary: String? = null,
     val sourceDocUrl: String? = null,

@@ -67,6 +67,8 @@ class ActiveProfilesFragment : Fragment(R.layout.fragment_active_profiles) {
                     R.string.power_active_profiles_live_desc,
                     latestProfile.name,
                     formatActiveTimestamp(latestProfile),
+                    latestProfile.importedRuleCount,
+                    latestProfile.artifactRuleCount,
                     latestProfile.sourceSummary
                 )
         } else if (savedProfiles.isEmpty()) {

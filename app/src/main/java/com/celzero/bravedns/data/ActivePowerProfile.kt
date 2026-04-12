@@ -25,7 +25,13 @@ data class ActivePowerProfile(
     val sourceSummary: String,
     val sourceDocUrl: String,
     val sourceTokens: List<String>,
-    val activatedAt: Long
+    val activatedAt: Long,
+    val importedRuleCount: Int = 0,
+    val alreadyPresentRuleCount: Int = 0,
+    val skippedExistingRuleCount: Int = 0,
+    val artifactRuleCount: Int = 0,
+    val supportedRuleKind: String = "",
+    val artifactGeneratedAtEpochMs: Long = 0L
 ) {
     fun toJson(): JSONObject {
         return JSONObject().apply {
@@ -35,6 +41,12 @@ data class ActivePowerProfile(
             put("sourceSummary", sourceSummary)
             put("sourceDocUrl", sourceDocUrl)
             put("activatedAt", activatedAt)
+            put("importedRuleCount", importedRuleCount)
+            put("alreadyPresentRuleCount", alreadyPresentRuleCount)
+            put("skippedExistingRuleCount", skippedExistingRuleCount)
+            put("artifactRuleCount", artifactRuleCount)
+            put("supportedRuleKind", supportedRuleKind)
+            put("artifactGeneratedAtEpochMs", artifactGeneratedAtEpochMs)
             put("sourceTokens", JSONArray(sourceTokens))
         }
     }
@@ -49,6 +61,12 @@ data class ActivePowerProfile(
             val sourceSummary = json.optString("sourceSummary", "").trim()
             val sourceDocUrl = json.optString("sourceDocUrl", "").trim()
             val activatedAt = json.optLong("activatedAt", 0L)
+            val importedRuleCount = json.optInt("importedRuleCount", 0)
+            val alreadyPresentRuleCount = json.optInt("alreadyPresentRuleCount", 0)
+            val skippedExistingRuleCount = json.optInt("skippedExistingRuleCount", 0)
+            val artifactRuleCount = json.optInt("artifactRuleCount", 0)
+            val supportedRuleKind = json.optString("supportedRuleKind", "").trim()
+            val artifactGeneratedAtEpochMs = json.optLong("artifactGeneratedAtEpochMs", 0L)
             val sourceTokensJson = json.optJSONArray("sourceTokens")
             val sourceTokens =
                 buildList {
@@ -69,7 +87,13 @@ data class ActivePowerProfile(
                 sourceSummary = sourceSummary,
                 sourceDocUrl = sourceDocUrl,
                 sourceTokens = sourceTokens,
-                activatedAt = activatedAt
+                activatedAt = activatedAt,
+                importedRuleCount = importedRuleCount,
+                alreadyPresentRuleCount = alreadyPresentRuleCount,
+                skippedExistingRuleCount = skippedExistingRuleCount,
+                artifactRuleCount = artifactRuleCount,
+                supportedRuleKind = supportedRuleKind,
+                artifactGeneratedAtEpochMs = artifactGeneratedAtEpochMs
             )
         }
 

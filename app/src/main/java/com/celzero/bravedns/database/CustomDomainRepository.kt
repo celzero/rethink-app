@@ -29,6 +29,11 @@ class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
         customDomainDAO.insert(customDomain)
     }
 
+    suspend fun insertAll(customDomains: List<CustomDomain>) {
+        if (customDomains.isEmpty()) return
+        customDomainDAO.insertAll(customDomains)
+    }
+
     suspend fun delete(customDomain: CustomDomain) {
         customDomainDAO.delete(customDomain)
     }

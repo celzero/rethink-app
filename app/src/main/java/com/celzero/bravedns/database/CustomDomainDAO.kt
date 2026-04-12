@@ -34,6 +34,9 @@ interface CustomDomainDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(customDomain: CustomDomain): Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(customDomains: List<CustomDomain>): List<Long>
+
     @Delete fun delete(customDomain: CustomDomain)
 
     @Delete fun deleteAll(customDomains: List<CustomDomain>)

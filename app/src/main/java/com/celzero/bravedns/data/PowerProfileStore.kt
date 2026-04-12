@@ -61,6 +61,14 @@ object PowerProfileStore {
     }
 
     fun activateProfile(context: Context, profile: PowerProfileDefinition): ActivePowerProfile {
+        return activateProfile(context, profile, null)
+    }
+
+    fun activateProfile(
+        context: Context,
+        profile: PowerProfileDefinition,
+        importSummary: PowerProfileImportSummary?
+    ): ActivePowerProfile {
         val now = System.currentTimeMillis()
         val activeProfile =
             ActivePowerProfile(
@@ -70,7 +78,13 @@ object PowerProfileStore {
                 sourceSummary = profile.sourceSummary.orEmpty(),
                 sourceDocUrl = profile.sourceDocUrl.orEmpty(),
                 sourceTokens = profile.sourceTokens,
-                activatedAt = now
+                activatedAt = now,
+                importedRuleCount = importSummary?.importedCount ?: 0,
+                alreadyPresentRuleCount = importSummary?.alreadyBlockedCount ?: 0,
+                skippedExistingRuleCount = importSummary?.skippedExistingCount ?: 0,
+                artifactRuleCount = importSummary?.artifactRuleCount ?: 0,
+                supportedRuleKind = importSummary?.supportedRuleKind.orEmpty(),
+                artifactGeneratedAtEpochMs = importSummary?.artifactGeneratedAtEpochMs ?: 0L
             )
 
         val updatedProfiles =

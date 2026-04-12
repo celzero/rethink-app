@@ -30,7 +30,7 @@
     <string name="power_active_profiles_empty_title" translatable="true">No active profiles yet</string>
     <string name="power_active_profiles_empty_desc" translatable="true">Your device is still protected by the current firewall and DNS engine settings.</string>
     <string name="power_active_profiles_live_title" translatable="true">%1$d active profiles</string>
-    <string name="power_active_profiles_live_desc" translatable="true">Latest: %1$s, enabled %2$s. Source: %3$s</string>
+    <string name="power_active_profiles_live_desc" translatable="true">Latest: %1$s, enabled %2$s. Imported %3$d of %4$d supported rules. Source: %5$s</string>
     <string name="power_active_profiles_saved_title" translatable="true">%1$d saved profiles on this device</string>
     <string name="power_active_profiles_saved_desc" translatable="true">Latest: %1$s, saved %2$s, using %3$s.</string>
     <string name="power_active_profiles_current_setup_title" translatable="true">Current device setup</string>
@@ -57,6 +57,8 @@
     <string name="power_profile_focus_meta" translatable="true">Intent: keep the phone useful without letting it become the task</string>
     <string name="power_profile_merge_placeholder" translatable="true">%1$s merge is the next step.</string>
     <string name="power_profile_activated_message" translatable="true">%1$s is now active.</string>
+    <string name="power_profile_activation_in_progress" translatable="true">Activating %1$s…</string>
+    <string name="power_profile_activated_with_rules_message" translatable="true">%1$s is active with %2$d imported rules.</string>
     <string name="power_profile_import_placeholder" translatable="true">Profile import is the next step.</string>
     <string name="power_save_setup_title" translatable="true">Save current setup</string>
     <string name="power_save_setup_desc" translatable="true">Capture your current app blocking setup as a reusable profile.</string>

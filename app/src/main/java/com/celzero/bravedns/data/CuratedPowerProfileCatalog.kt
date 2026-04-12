@@ -49,6 +49,7 @@ object CuratedPowerProfileCatalog {
                 descriptionRes = R.string.power_profile_smooth_browsing_desc,
                 metaRes = R.string.power_profile_smooth_browsing_meta,
                 iconRes = R.drawable.ic_logs_accent,
+                bundledArtifactAssetPath = "power/smooth-browsing-domain-artifact.json",
                 sourceProvider = UBO_PROVIDER,
                 sourceSummary = UBO_DEFAULT_SUMMARY,
                 sourceDocUrl = UBO_DOC_URL,
