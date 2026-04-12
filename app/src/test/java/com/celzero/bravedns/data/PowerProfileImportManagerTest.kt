@@ -12,6 +12,7 @@ package com.celzero.bravedns.data
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.database.CustomIp
@@ -62,6 +63,7 @@ class PowerProfileImportManagerTest {
         customDomainRepository = mockk()
         customIpRepository = mockk()
 
+        PowerProfileImportManager.applyAppFirewallRule = { _, _, _ -> }
         PowerProfileImportManager.reloadDomainRules = {}
         PowerProfileImportManager.reloadIpRules = {}
 
@@ -82,6 +84,7 @@ class PowerProfileImportManagerTest {
         if (GlobalContext.getOrNull() != null) {
             GlobalContext.stopKoin()
         }
+        PowerProfileImportManager.applyAppFirewallRule = { _, _, _ -> }
         PowerProfileImportManager.reloadDomainRules = {}
         PowerProfileImportManager.reloadIpRules = {}
         unmockkAll()
@@ -128,20 +131,39 @@ class PowerProfileImportManagerTest {
                 }
             )
         coEvery { appInfoRepository.getAppInfoUidForPackageName("com.example.app") } returns 12345
+        coEvery { appInfoRepository.getAppInfoByUid(12345) } returns
+            AppInfo(
+                packageName = "com.example.app",
+                appName = "Example App",
+                uid = 12345,
+                isSystemApp = false,
+                firewallStatus = PowerProfileFirewallValue.FIREWALL_STATUS_NONE,
+                appCategory = "",
+                wifiDataUsed = 0,
+                mobileDataUsed = 0,
+                connectionStatus = PowerProfileFirewallValue.CONNECTION_STATUS_ALLOW,
+                isProxyExcluded = false,
+                screenOffAllowed = false,
+                backgroundAllowed = false
+            )
         every { customDomainRepository.getDomainsByUID(12345) } returns emptyList()
         coEvery { customIpRepository.getRulesByUid(12345) } returns emptyList()
 
         val insertedDomains = slot<List<CustomDomain>>()
         val insertedIps = slot<List<CustomIp>>()
+        val appFirewallUpdates = mutableListOf<Triple<Int, Int, Int>>()
+        PowerProfileImportManager.applyAppFirewallRule = { uid, firewallStatus, connectionStatus ->
+            appFirewallUpdates.add(Triple(uid, firewallStatus, connectionStatus))
+        }
         coEvery { customDomainRepository.insertAll(capture(insertedDomains)) } just runs
         coEvery { customIpRepository.insertAll(capture(insertedIps)) } just runs
 
         val result = PowerProfileImportManager.importBundledRules(context, profile)
 
-        assertEquals(4, result?.summary?.importedCount)
+        assertEquals(5, result?.summary?.importedCount)
         assertEquals(2, result?.summary?.alreadyBlockedCount)
         assertEquals(1, result?.summary?.skippedExistingCount)
-        assertEquals(7, result?.summary?.artifactRuleCount)
+        assertEquals(8, result?.summary?.artifactRuleCount)
         assertEquals(
             listOf("appdomain.example", "fresh.example"),
             insertedDomains.captured.map { it.domain }.sorted()
@@ -154,6 +176,19 @@ class PowerProfileImportManagerTest {
         assertTrue(result?.ownedRules?.ips?.contains("2.2.2.2") == true)
         assertTrue(result?.ownedRules?.appDomains?.any { it.packageName == "com.example.app" } == true)
         assertTrue(result?.ownedRules?.appIps?.any { it.packageName == "com.example.app" } == true)
+        assertTrue(
+            result?.ownedRules?.appFirewalls?.any { it.packageName == "com.example.app" } == true
+        )
+        assertEquals(
+            listOf(
+                Triple(
+                    12345,
+                    PowerProfileFirewallValue.FIREWALL_STATUS_NONE,
+                    PowerProfileFirewallValue.CONNECTION_STATUS_BOTH
+                )
+            ),
+            appFirewallUpdates
+        )
 
         coVerify(exactly = 1) { customDomainRepository.insertAll(any()) }
         coVerify(exactly = 1) { customIpRepository.insertAll(any()) }
@@ -179,7 +214,7 @@ class PowerProfileImportManagerTest {
                       "packageName": "com.example.app",
                       "appName": "Example App",
                       "firewallStatus": 5,
-                      "connectionStatus": 3,
+                      "connectionStatus": 0,
                       "domainRules": [{"domain": "appdomain.example"}],
                       "ipRules": [{"ipAddress": "8.8.8.8", "port": 443}]
                     }

@@ -59,21 +59,10 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
     }
 
     private fun bindCatalog() {
-        val smoothBrowsing = requireProfile("smooth-browsing")
         val safeBeautiful = requireProfile(CuratedPowerProfileCatalog.SAFE_BEAUTIFUL_INTERNET_ID)
         val parentalControl = requireProfile(CuratedPowerProfileCatalog.PARENTAL_CONTROL_ID)
         val appHorse = requireProfile(CuratedPowerProfileCatalog.APP_HORSE_ID)
-        val exam = requireProfile("exam")
-        val deepFocus = requireProfile("deep-focus")
-
-        bindProfileCard(
-            profile = smoothBrowsing,
-            root = b.fdpSmoothInternetCard,
-            iconId = R.id.fdp_smooth_icon,
-            titleId = R.id.fdp_smooth_title,
-            descriptionId = R.id.fdp_smooth_desc,
-            metaId = R.id.fdp_smooth_meta
-        )
+        val deepFocus = requireProfile(CuratedPowerProfileCatalog.DEEP_FOCUS_ID)
 
         bindProfileCard(
             profile = safeBeautiful,
@@ -103,15 +92,6 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
         )
 
         bindProfileCard(
-            profile = exam,
-            root = b.fdpExamCard,
-            iconId = R.id.fdp_exam_icon,
-            titleId = R.id.fdp_exam_title,
-            descriptionId = R.id.fdp_exam_desc,
-            metaId = R.id.fdp_exam_meta
-        )
-
-        bindProfileCard(
             profile = deepFocus,
             root = b.fdpFocusCard,
             iconId = R.id.fdp_focus_icon,
@@ -126,9 +106,6 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
     private fun setupClickListeners() {
         b.fdpInfoIcon.setOnClickListener { showInfoDialog() }
 
-        b.fdpSmoothInternetCard.setOnClickListener {
-            openProfileDetail("smooth-browsing")
-        }
         b.fdpSafeBeautifulCard.setOnClickListener {
             openProfileDetail(CuratedPowerProfileCatalog.SAFE_BEAUTIFUL_INTERNET_ID)
         }
@@ -138,11 +115,8 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
         b.fdpAppHorseCard.setOnClickListener {
             openProfileDetail(CuratedPowerProfileCatalog.APP_HORSE_ID)
         }
-        b.fdpExamCard.setOnClickListener {
-            openProfileDetail("exam")
-        }
         b.fdpFocusCard.setOnClickListener {
-            openProfileDetail("deep-focus")
+            openProfileDetail(CuratedPowerProfileCatalog.DEEP_FOCUS_ID)
         }
         b.fdpImportCard.setOnClickListener { importProfile() }
     }

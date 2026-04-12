@@ -23,6 +23,7 @@ import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.database.CustomIpRepository
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.util.Constants
 import inet.ipaddr.IPAddressString
 import org.koin.core.component.KoinComponent
@@ -47,6 +48,7 @@ object PowerProfileImportManager : KoinComponent {
     private val appInfoRepository by inject<AppInfoRepository>()
     private val customDomainRepository by inject<CustomDomainRepository>()
     private val customIpRepository by inject<CustomIpRepository>()
+    internal var applyAppFirewallRule: suspend (Int, Int, Int) -> Unit = ::defaultApplyAppFirewallRule
     internal var reloadDomainRules: suspend () -> Unit = ::defaultReloadDomainRules
     internal var reloadIpRules: suspend () -> Unit = ::defaultReloadIpRules
 
@@ -85,6 +87,8 @@ object PowerProfileImportManager : KoinComponent {
         val ownedIps = linkedSetOf<String>()
         val ownedAppDomains = linkedSetOf<PowerProfileOwnedAppDomainRule>()
         val ownedAppIps = linkedSetOf<PowerProfileOwnedAppIpRule>()
+        val ownedAppFirewalls = linkedSetOf<PowerProfileOwnedAppFirewallRule>()
+        val appFirewallUpdates = mutableListOf<Triple<Int, Int, Int>>()
         var alreadyBlockedCount = 0
         var skippedExistingCount = 0
         val now = System.currentTimeMillis()
@@ -157,6 +161,39 @@ object PowerProfileImportManager : KoinComponent {
             if (targetUid <= 0) {
                 skippedExistingCount += app.supportedRuleCount()
                 return@forEach
+            }
+            if (app.hasFirewallRule()) {
+                val existingAppInfo = appInfoRepository.getAppInfoByUid(targetUid)
+                val ownedRule =
+                    PowerProfileOwnedAppFirewallRule(
+                        packageName = app.packageName,
+                        firewallStatus = app.firewallStatus,
+                        connectionStatus = app.connectionStatus
+                    )
+                when {
+                    existingAppInfo == null -> {
+                        skippedExistingCount += 1
+                    }
+                    existingAppInfo.firewallStatus == app.firewallStatus &&
+                        existingAppInfo.connectionStatus == app.connectionStatus -> {
+                        alreadyBlockedCount += 1
+                        if (currentlyManagedRules.appFirewalls.any { it.key() == ownedRule.key() }) {
+                            ownedAppFirewalls.add(ownedRule)
+                        }
+                    }
+                    existingAppInfo.firewallStatus ==
+                        PowerProfileFirewallValue.FIREWALL_STATUS_NONE &&
+                        existingAppInfo.connectionStatus ==
+                            PowerProfileFirewallValue.CONNECTION_STATUS_ALLOW -> {
+                        ownedAppFirewalls.add(ownedRule)
+                        appFirewallUpdates.add(
+                            Triple(targetUid, app.firewallStatus, app.connectionStatus)
+                        )
+                    }
+                    else -> {
+                        skippedExistingCount += 1
+                    }
+                }
             }
             val existingAppDomains =
                 customDomainRepository.getDomainsByUID(targetUid).associateBy { it.domain.lowercase() }
@@ -245,11 +282,15 @@ object PowerProfileImportManager : KoinComponent {
         if (ipsToInsert.isNotEmpty()) {
             reloadIpRules()
         }
+        appFirewallUpdates.forEach { (uid, firewallStatus, connectionStatus) ->
+            applyAppFirewallRule(uid, firewallStatus, connectionStatus)
+        }
 
         return PowerProfileImportResult(
             summary =
                 PowerProfileImportSummary(
-                    importedCount = domainsToInsert.size + ipsToInsert.size,
+                    importedCount =
+                        domainsToInsert.size + ipsToInsert.size + appFirewallUpdates.size,
                     alreadyBlockedCount = alreadyBlockedCount,
                     skippedExistingCount = skippedExistingCount,
                     artifactRuleCount = artifact.supportedRuleCount(),
@@ -261,7 +302,8 @@ object PowerProfileImportManager : KoinComponent {
                     domains = ownedDomains.toList(),
                     ips = ownedIps.toList(),
                     appDomains = ownedAppDomains.toList(),
-                    appIps = ownedAppIps.toList()
+                    appIps = ownedAppIps.toList(),
+                    appFirewalls = ownedAppFirewalls.toList()
                 )
         )
     }
@@ -280,5 +322,17 @@ object PowerProfileImportManager : KoinComponent {
 
     private suspend fun defaultReloadIpRules() {
         IpRulesManager.load()
+    }
+
+    private suspend fun defaultApplyAppFirewallRule(
+        uid: Int,
+        firewallStatus: Int,
+        connectionStatus: Int
+    ) {
+        FirewallManager.updateFirewallStatus(
+            uid,
+            FirewallManager.FirewallStatus.getStatus(firewallStatus),
+            FirewallManager.ConnectionStatus.getStatus(connectionStatus)
+        )
     }
 }

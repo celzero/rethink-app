@@ -48,6 +48,14 @@ class PowerProfileOwnershipStoreTest {
                 ips = listOf("1.1.1.1"),
                 appDomains = listOf(PowerProfileOwnedAppDomainRule("com.example", "app.example")),
                 appIps = listOf(PowerProfileOwnedAppIpRule("com.example", "8.8.8.8", 443)),
+                appFirewalls =
+                    listOf(
+                        PowerProfileOwnedAppFirewallRule(
+                            "com.example",
+                            PowerProfileFirewallValue.FIREWALL_STATUS_NONE,
+                            PowerProfileFirewallValue.CONNECTION_STATUS_BOTH
+                        )
+                    ),
                 localBlocklistTagIds = listOf(1, 2)
             )
         )
@@ -59,6 +67,14 @@ class PowerProfileOwnershipStoreTest {
                 ips = listOf("1.1.1.1", "2.2.2.2"),
                 appDomains = listOf(PowerProfileOwnedAppDomainRule("com.example", "app.example")),
                 appIps = listOf(PowerProfileOwnedAppIpRule("com.example", "8.8.4.4", 443)),
+                appFirewalls =
+                    listOf(
+                        PowerProfileOwnedAppFirewallRule(
+                            "com.example",
+                            PowerProfileFirewallValue.FIREWALL_STATUS_NONE,
+                            PowerProfileFirewallValue.CONNECTION_STATUS_BOTH
+                        )
+                    ),
                 localBlocklistTagIds = listOf(2, 3)
             )
         )
@@ -69,6 +85,7 @@ class PowerProfileOwnershipStoreTest {
         assertEquals(listOf("1.1.1.1", "2.2.2.2"), aggregated.ips)
         assertEquals(1, aggregated.appDomains.size)
         assertEquals(2, aggregated.appIps.size)
+        assertEquals(1, aggregated.appFirewalls.size)
         assertEquals(listOf(1, 2, 3), aggregated.localBlocklistTagIds)
     }
 

@@ -1,0 +1,83 @@
+{
+  "profileId": "deep-focus",
+  "provider": "Rethink DNS",
+  "sourceDocUrl": "",
+  "generatedAtEpochMs": 1775926300000,
+  "supportedRuleKind": "app-specific-firewall",
+  "domains": [],
+  "ips": [],
+  "apps": [
+    {
+      "packageName": "com.instagram.android",
+      "appName": "Instagram",
+      "firewallStatus": 5,
+      "connectionStatus": 0,
+      "domainRules": [],
+      "ipRules": []
+    },
+    {
+      "packageName": "com.instagram.lite",
+      "appName": "Instagram Lite",
+      "firewallStatus": 5,
+      "connectionStatus": 0,
+      "domainRules": [],
+      "ipRules": []
+    },
+    {
+      "packageName": "org.telegram.messenger",
+      "appName": "Telegram",
+      "firewallStatus": 5,
+      "connectionStatus": 0,
+      "domainRules": [],
+      "ipRules": []
+    },
+    {
+      "packageName": "com.pubg.imobile",
+      "appName": "BGMI",
+      "firewallStatus": 5,
+      "connectionStatus": 0,
+      "domainRules": [],
+      "ipRules": []
+    },
+    {
+      "packageName": "com.tencent.ig",
+      "appName": "PUBG MOBILE",
+      "firewallStatus": 5,
+      "connectionStatus": 0,
+      "domainRules": [],
+      "ipRules": []
+    },
+    {
+      "packageName": "com.pubg.krmobile",
+      "appName": "PUBG MOBILE KR",
+      "firewallStatus": 5,
+      "connectionStatus": 0,
+      "domainRules": [],
+      "ipRules": []
+    },
+    {
+      "packageName": "com.vng.pubgmobile",
+      "appName": "PUBG MOBILE VN",
+      "firewallStatus": 5,
+      "connectionStatus": 0,
+      "domainRules": [],
+      "ipRules": []
+    },
+    {
+      "packageName": "com.twitter.android",
+      "appName": "X",
+      "firewallStatus": 5,
+      "connectionStatus": 0,
+      "domainRules": [],
+      "ipRules": []
+    },
+    {
+      "packageName": "com.discord",
+      "appName": "Discord",
+      "firewallStatus": 5,
+      "connectionStatus": 0,
+      "domainRules": [],
+      "ipRules": []
+    }
+  ]
+}

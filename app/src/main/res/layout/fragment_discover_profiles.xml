@@ -57,14 +57,6 @@
             </LinearLayout>
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/fdp_smooth_internet_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <include layout="@layout/view_discover_profile_smooth_internet" />
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/fdp_safe_beautiful_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -86,14 +78,6 @@
                 android:layout_height="wrap_content">
 
                 <include layout="@layout/view_discover_profile_app_horse" />
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/fdp_exam_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <include layout="@layout/view_discover_profile_exam" />
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView

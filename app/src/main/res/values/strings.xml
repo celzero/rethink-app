@@ -50,9 +50,6 @@
     <string name="power_discover_profiles_import_title" translatable="true">Import from a file</string>
     <string name="power_discover_profiles_import_desc" translatable="true">Later, this will accept a shared profile file and merge it into your setup.</string>
     <string name="power_discover_profiles_imported_heading" translatable="true">Imported profiles</string>
-    <string name="power_profile_smooth_browsing_title" translatable="true">Smooth browsing</string>
-    <string name="power_profile_smooth_browsing_desc" translatable="true">A calmer browsing profile based on the default uBO network filterlists for ads, privacy, and malicious destinations.</string>
-    <string name="power_profile_smooth_browsing_meta" translatable="true">Source: uBO defaults including EasyList, EasyPrivacy, URLHaus, and Peter Lowe</string>
     <string name="power_profile_safe_beautiful_title" translatable="true">Safe and Beautiful Internet (powered by Rethink DNS)</string>
     <string name="power_profile_safe_beautiful_desc" translatable="true">A strong on-device Rethink profile tuned for safer, cleaner browsing using a broad privacy and security blocklist stack.</string>
     <string name="power_profile_safe_beautiful_meta" translatable="true">Source: 80 curated Rethink on-device blocklists across privacy and security</string>
@@ -62,12 +59,9 @@
     <string name="power_profile_app_horse_title" translatable="true">App Horse</string>
     <string name="power_profile_app_horse_desc" translatable="true">A community app pack for Parrot Downloader that carries the ad-network blocklist we validated during live analysis.</string>
     <string name="power_profile_app_horse_meta" translatable="true">Source: 1 app pack with 21 app-specific IP rules for Parrot Downloader</string>
-    <string name="power_profile_exam_title" translatable="true">Exam</string>
-    <string name="power_profile_exam_desc" translatable="true">A distraction-reduction profile that would eventually suppress social and entertainment apps during study time.</string>
-    <string name="power_profile_exam_meta" translatable="true">Intent: reduce social media and other attention sinks</string>
     <string name="power_profile_focus_title" translatable="true">Deep Focus</string>
-    <string name="power_profile_focus_desc" translatable="true">A more aggressive productivity profile for keeping only essential traffic open while muting distracting apps.</string>
-    <string name="power_profile_focus_meta" translatable="true">Intent: keep the phone useful without letting it become the task</string>
+    <string name="power_profile_focus_desc" translatable="true">A study-first profile that fully blocks Instagram, Telegram, X, Discord, and BGMI or PUBG variants, then layers in social and gaming blocklists while leaving regular YouTube available.</string>
+    <string name="power_profile_focus_meta" translatable="true">Apps + 10 native Rethink social and gaming blocklists; YouTube Shorts path-only blocking is not supported yet</string>
     <string name="power_profile_merge_placeholder" translatable="true">%1$s merge is the next step.</string>
     <string name="power_profile_activated_message" translatable="true">%1$s is now active.</string>
     <string name="power_profile_activation_in_progress" translatable="true">Activating %1$s…</string>

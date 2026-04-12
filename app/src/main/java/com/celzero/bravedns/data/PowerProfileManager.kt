@@ -21,6 +21,7 @@ import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.database.CustomIpRepository
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.util.Constants
@@ -55,6 +56,7 @@ object PowerProfileManager : KoinComponent {
                 RethinkBlocklistManager.updateFiletagsLocal(selectedTagIds, 1)
             }
         }
+    internal var applyAppFirewallRule: suspend (Int, Int, Int) -> Unit = ::defaultApplyAppFirewallRule
     internal var reloadDomainRules: suspend () -> Unit = ::defaultReloadDomainRules
     internal var reloadIpRules: suspend () -> Unit = ::defaultReloadIpRules
 
@@ -157,6 +159,7 @@ object PowerProfileManager : KoinComponent {
                 ips = importResult.ownedRules.ips,
                 appDomains = importResult.ownedRules.appDomains,
                 appIps = importResult.ownedRules.appIps,
+                appFirewalls = importResult.ownedRules.appFirewalls,
                 localBlocklistTagIds = profileLocalBlocklists.toList()
             )
         )
@@ -173,12 +176,16 @@ object PowerProfileManager : KoinComponent {
         val remainingOwnedIps = remainingOwnedRules.ips.toSet()
         val remainingOwnedAppDomains = remainingOwnedRules.appDomains.map { it.key() }.toSet()
         val remainingOwnedAppIps = remainingOwnedRules.appIps.map { it.key() }.toSet()
+        val remainingOwnedAppFirewalls =
+            remainingOwnedRules.appFirewalls.map { it.key() }.toSet()
         val remainingOwnedLocalBlocklists = remainingOwnedRules.localBlocklistTagIds.toSet()
 
         val removableDomains = ownedRules.domains.filterNot { it in remainingOwnedDomains }
         val removableIps = ownedRules.ips.filterNot { it in remainingOwnedIps }
         val removableAppDomains = ownedRules.appDomains.filterNot { it.key() in remainingOwnedAppDomains }
         val removableAppIps = ownedRules.appIps.filterNot { it.key() in remainingOwnedAppIps }
+        val removableAppFirewalls =
+            ownedRules.appFirewalls.filterNot { it.key() in remainingOwnedAppFirewalls }
         val removableLocalBlocklists =
             ownedRules.localBlocklistTagIds.filterNot { it in remainingOwnedLocalBlocklists }
         val currentSelectedLocalBlocklists =
@@ -221,6 +228,24 @@ object PowerProfileManager : KoinComponent {
                     )
                 }
             }
+        val removedAppFirewalls =
+            removableAppFirewalls.sumOf { ownedFirewall ->
+                val uid = appInfoRepository.getAppInfoUidForPackageName(ownedFirewall.packageName)
+                if (uid <= 0) return@sumOf 0
+                val appInfo = appInfoRepository.getAppInfoByUid(uid) ?: return@sumOf 0
+                if (
+                    appInfo.firewallStatus != ownedFirewall.firewallStatus ||
+                        appInfo.connectionStatus != ownedFirewall.connectionStatus
+                ) {
+                    return@sumOf 0
+                }
+                applyAppFirewallRule(
+                    uid,
+                    PowerProfileFirewallValue.FIREWALL_STATUS_NONE,
+                    PowerProfileFirewallValue.CONNECTION_STATUS_ALLOW
+                )
+                1
+            }
         if (removedDomains > 0 || removedAppDomains > 0) reloadDomainRules()
         if (removedIps > 0 || removedAppIps > 0) reloadIpRules()
 
@@ -228,7 +253,12 @@ object PowerProfileManager : KoinComponent {
         PowerProfileStore.deactivateProfile(context, profileId)
 
         return PowerProfileDisableSummary(
-            removedDomains + removedIps + removedAppDomains + removedAppIps + removableLocalBlocklists.size
+            removedDomains +
+                removedIps +
+                removedAppDomains +
+                removedAppIps +
+                removedAppFirewalls +
+                removableLocalBlocklists.size
         )
     }
 
@@ -238,10 +268,11 @@ object PowerProfileManager : KoinComponent {
     ): PowerProfileOwnedRules {
         val storedRules = PowerProfileOwnershipStore.read(context, profileId)
         if (
-            storedRules.domains.isNotEmpty() ||
+                storedRules.domains.isNotEmpty() ||
                 storedRules.ips.isNotEmpty() ||
                 storedRules.appDomains.isNotEmpty() ||
                 storedRules.appIps.isNotEmpty() ||
+                storedRules.appFirewalls.isNotEmpty() ||
                 storedRules.localBlocklistTagIds.isNotEmpty()
         ) {
             return storedRules
@@ -258,6 +289,15 @@ object PowerProfileManager : KoinComponent {
             artifact?.apps?.flatMap { app ->
                 app.ipRules.map { PowerProfileOwnedAppIpRule(app.packageName, it.ipAddress, it.port) }
             } ?: emptyList(),
+            artifact?.apps
+                ?.filter { it.hasFirewallRule() }
+                ?.map {
+                    PowerProfileOwnedAppFirewallRule(
+                        packageName = it.packageName,
+                        firewallStatus = it.firewallStatus,
+                        connectionStatus = it.connectionStatus
+                    )
+                } ?: emptyList(),
             profile.localBlocklistTagIds
         )
     }
@@ -324,6 +364,21 @@ object PowerProfileManager : KoinComponent {
                 )
             }
         }
+        ownedRules.appFirewalls.forEach { ownedFirewall ->
+            val uid = appInfoRepository.getAppInfoUidForPackageName(ownedFirewall.packageName)
+            if (uid <= 0) return@forEach
+            val appInfo = appInfoRepository.getAppInfoByUid(uid) ?: return@forEach
+            if (
+                appInfo.firewallStatus == ownedFirewall.firewallStatus &&
+                    appInfo.connectionStatus == ownedFirewall.connectionStatus
+            ) {
+                applyAppFirewallRule(
+                    uid,
+                    PowerProfileFirewallValue.FIREWALL_STATUS_NONE,
+                    PowerProfileFirewallValue.CONNECTION_STATUS_ALLOW
+                )
+            }
+        }
 
         if (
             ownedRules.domains.isNotEmpty() ||
@@ -352,5 +407,17 @@ object PowerProfileManager : KoinComponent {
 
     private suspend fun defaultReloadIpRules() {
         IpRulesManager.load()
+    }
+
+    private suspend fun defaultApplyAppFirewallRule(
+        uid: Int,
+        firewallStatus: Int,
+        connectionStatus: Int
+    ) {
+        FirewallManager.updateFirewallStatus(
+            uid,
+            FirewallManager.FirewallStatus.getStatus(firewallStatus),
+            FirewallManager.ConnectionStatus.getStatus(connectionStatus)
+        )
     }
 }

@@ -25,6 +25,7 @@ data class PowerProfileOwnedRules(
     val ips: List<String>,
     val appDomains: List<PowerProfileOwnedAppDomainRule> = emptyList(),
     val appIps: List<PowerProfileOwnedAppIpRule> = emptyList(),
+    val appFirewalls: List<PowerProfileOwnedAppFirewallRule> = emptyList(),
     val localBlocklistTagIds: List<Int> = emptyList()
 ) {
     fun toJson(): JSONObject {
@@ -58,6 +59,20 @@ data class PowerProfileOwnedRules(
                     }
                 }
             )
+            put(
+                "appFirewalls",
+                JSONArray().apply {
+                    appFirewalls.forEach {
+                        put(
+                            JSONObject().apply {
+                                put("packageName", it.packageName)
+                                put("firewallStatus", it.firewallStatus)
+                                put("connectionStatus", it.connectionStatus)
+                            }
+                        )
+                    }
+                }
+            )
             put("localBlocklistTagIds", JSONArray(localBlocklistTagIds))
         }
     }
@@ -72,6 +87,7 @@ data class PowerProfileOwnedRules(
                 val ipsJson = json.optJSONArray("ips")
                 val appDomainsJson = json.optJSONArray("appDomains")
                 val appIpsJson = json.optJSONArray("appIps")
+                val appFirewallsJson = json.optJSONArray("appFirewalls")
                 val localBlocklistTagIdsJson = json.optJSONArray("localBlocklistTagIds")
                 val domains =
                     buildList {
@@ -127,7 +143,39 @@ data class PowerProfileOwnedRules(
                             }
                         }
                     }
-                PowerProfileOwnedRules(domains, ips, appDomains, appIps, localBlocklistTagIds)
+                val appFirewalls =
+                    buildList {
+                        if (appFirewallsJson != null) {
+                            for (index in 0 until appFirewallsJson.length()) {
+                                val value = appFirewallsJson.optJSONObject(index) ?: continue
+                                val packageName = value.optString("packageName", "").trim()
+                                val firewallStatus = value.optInt("firewallStatus", Int.MIN_VALUE)
+                                val connectionStatus =
+                                    value.optInt("connectionStatus", Int.MIN_VALUE)
+                                if (
+                                    packageName.isNotEmpty() &&
+                                        firewallStatus != Int.MIN_VALUE &&
+                                        connectionStatus != Int.MIN_VALUE
+                                ) {
+                                    add(
+                                        PowerProfileOwnedAppFirewallRule(
+                                            packageName = packageName,
+                                            firewallStatus = firewallStatus,
+                                            connectionStatus = connectionStatus
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    }
+                PowerProfileOwnedRules(
+                    domains = domains,
+                    ips = ips,
+                    appDomains = appDomains,
+                    appIps = appIps,
+                    appFirewalls = appFirewalls,
+                    localBlocklistTagIds = localBlocklistTagIds
+                )
             } catch (_: Exception) {
                 empty()
             }
@@ -159,6 +207,7 @@ object PowerProfileOwnershipStore {
         val ips = linkedSetOf<String>()
         val appDomains = linkedMapOf<String, PowerProfileOwnedAppDomainRule>()
         val appIps = linkedMapOf<String, PowerProfileOwnedAppIpRule>()
+        val appFirewalls = linkedMapOf<String, PowerProfileOwnedAppFirewallRule>()
         val localBlocklistTagIds = linkedSetOf<Int>()
         profileIds.forEach { profileId ->
             val ownedRules = read(context, profileId)
@@ -166,6 +215,7 @@ object PowerProfileOwnershipStore {
             ips.addAll(ownedRules.ips)
             ownedRules.appDomains.forEach { appDomains[it.key()] = it }
             ownedRules.appIps.forEach { appIps[it.key()] = it }
+            ownedRules.appFirewalls.forEach { appFirewalls[it.key()] = it }
             localBlocklistTagIds.addAll(ownedRules.localBlocklistTagIds)
         }
         return PowerProfileOwnedRules(
@@ -173,6 +223,7 @@ object PowerProfileOwnershipStore {
             ips = ips.toList(),
             appDomains = appDomains.values.toList(),
             appIps = appIps.values.toList(),
+            appFirewalls = appFirewalls.values.toList(),
             localBlocklistTagIds = localBlocklistTagIds.toList()
         )
     }

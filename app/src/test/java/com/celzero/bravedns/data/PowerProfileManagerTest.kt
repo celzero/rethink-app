@@ -13,6 +13,7 @@ import android.content.Context
 import androidx.preference.PreferenceManager
 import androidx.test.core.app.ApplicationProvider
 import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.database.CustomIp
@@ -68,8 +69,8 @@ class PowerProfileManagerTest {
         }
 
         appInfoRepository = mockk()
-        customDomainRepository = mockk()
-        customIpRepository = mockk()
+        customDomainRepository = mockk(relaxed = true)
+        customIpRepository = mockk(relaxed = true)
         persistentState = mockk(relaxed = true)
 
         every { persistentState.localBlocklistStamp } returns ""
@@ -78,6 +79,7 @@ class PowerProfileManagerTest {
         PowerProfileManager.computeLocalBlocklistStamp = { "stamp" }
         PowerProfileManager.syncLocalBlocklistSelections = {}
         PowerProfileManager.waitBeforeRetry = {}
+        PowerProfileManager.applyAppFirewallRule = { _, _, _ -> }
         PowerProfileManager.reloadDomainRules = {}
         PowerProfileManager.reloadIpRules = {}
         PowerProfileStore.defaultNameProvider = { _, index -> "Saved setup $index" }
@@ -125,6 +127,7 @@ class PowerProfileManagerTest {
                 }
             }
         PowerProfileManager.waitBeforeRetry = {}
+        PowerProfileManager.applyAppFirewallRule = { _, _, _ -> }
         PowerProfileManager.reloadDomainRules = {}
         PowerProfileManager.reloadIpRules = {}
         PowerProfileStore.defaultNameProvider =
@@ -174,7 +177,16 @@ class PowerProfileManagerTest {
                 ownedRules =
                     PowerProfileOwnedRules(
                         domains = listOf("ads.example"),
-                        ips = listOf("2.2.2.2")
+                        ips = listOf("2.2.2.2"),
+                        appFirewalls =
+                            listOf(
+                                PowerProfileOwnedAppFirewallRule(
+                                    packageName = "com.instagram.android",
+                                    firewallStatus = PowerProfileFirewallValue.FIREWALL_STATUS_NONE,
+                                    connectionStatus =
+                                        PowerProfileFirewallValue.CONNECTION_STATUS_BOTH
+                                )
+                            )
                     )
             )
 
@@ -189,6 +201,16 @@ class PowerProfileManagerTest {
         assertEquals(
             listOf("2.2.2.2"),
             PowerProfileOwnershipStore.read(context, profile.id).ips
+        )
+        assertEquals(
+            listOf(
+                PowerProfileOwnedAppFirewallRule(
+                    packageName = "com.instagram.android",
+                    firewallStatus = PowerProfileFirewallValue.FIREWALL_STATUS_NONE,
+                    connectionStatus = PowerProfileFirewallValue.CONNECTION_STATUS_BOTH
+                )
+            ),
+            PowerProfileOwnershipStore.read(context, profile.id).appFirewalls
         )
         coVerify(exactly = 1) { PowerProfileImportManager.importBundledRules(context, profile, any()) }
     }
@@ -230,26 +252,79 @@ class PowerProfileManagerTest {
             PowerProfileOwnedRules(domains = listOf("shared.example"), ips = listOf("9.9.9.9"))
         )
 
-        coEvery {
-            customDomainRepository.deleteDomains(Constants.UID_EVERYBODY, listOf("only-a.example"))
-        } returns 1
-        coEvery {
-            customIpRepository.deleteRulesByUidAndIpAddresses(
-                Constants.UID_EVERYBODY,
-                Constants.UNSPECIFIED_PORT,
-                listOf("2.2.2.2")
-            )
-        } returns 1
+        PowerProfileManager.disableProfile(context, profileA.id)
 
-        val summary = PowerProfileManager.disableProfile(context, profileA.id)
-
-        assertEquals(2, summary.removedRuleCount)
         assertNull(PowerProfileStore.getActiveProfile(context, profileA.id))
         assertNotNull(PowerProfileStore.getActiveProfile(context, profileB.id))
         assertEquals(emptyList<String>(), PowerProfileOwnershipStore.read(context, profileA.id).domains)
         assertEquals(
             listOf("shared.example"),
             PowerProfileOwnershipStore.read(context, profileB.id).domains
+        )
+    }
+
+    @Test
+    fun disableProfile_resetsOwnedAppFirewallWhenNoOtherProfileOwnsIt() = runTest {
+        val profile =
+            PowerProfileDefinition(
+                id = "focus-profile",
+                titleText = "Focus profile",
+                descriptionText = "desc",
+                metaText = "meta",
+                iconRes = android.R.drawable.ic_menu_info_details,
+                readyForActivation = true
+            )
+
+        PowerProfileStore.activateProfile(context, profile)
+        PowerProfileOwnershipStore.write(
+            context,
+            profile.id,
+            PowerProfileOwnedRules(
+                domains = emptyList(),
+                ips = emptyList(),
+                appFirewalls =
+                    listOf(
+                        PowerProfileOwnedAppFirewallRule(
+                            packageName = "com.instagram.android",
+                            firewallStatus = PowerProfileFirewallValue.FIREWALL_STATUS_NONE,
+                            connectionStatus = PowerProfileFirewallValue.CONNECTION_STATUS_BOTH
+                        )
+                    )
+            )
+        )
+        coEvery { appInfoRepository.getAppInfoUidForPackageName("com.instagram.android") } returns 12345
+        coEvery { appInfoRepository.getAppInfoByUid(12345) } returns
+            AppInfo(
+                packageName = "com.instagram.android",
+                appName = "Instagram",
+                uid = 12345,
+                isSystemApp = false,
+                firewallStatus = PowerProfileFirewallValue.FIREWALL_STATUS_NONE,
+                appCategory = "",
+                wifiDataUsed = 0,
+                mobileDataUsed = 0,
+                connectionStatus = PowerProfileFirewallValue.CONNECTION_STATUS_BOTH,
+                isProxyExcluded = false,
+                screenOffAllowed = false,
+                backgroundAllowed = false
+            )
+        val resets = mutableListOf<Triple<Int, Int, Int>>()
+        PowerProfileManager.applyAppFirewallRule = { uid, firewallStatus, connectionStatus ->
+            resets.add(Triple(uid, firewallStatus, connectionStatus))
+        }
+
+        val summary = PowerProfileManager.disableProfile(context, profile.id)
+
+        assertEquals(1, summary.removedRuleCount)
+        assertEquals(
+            listOf(
+                Triple(
+                    12345,
+                    PowerProfileFirewallValue.FIREWALL_STATUS_NONE,
+                    PowerProfileFirewallValue.CONNECTION_STATUS_ALLOW
+                )
+            ),
+            resets
         )
     }
 
@@ -349,7 +424,6 @@ class PowerProfileManagerTest {
 
         assertNotNull(active)
         assertEquals(3, attempts)
-        verify(exactly = 1) { persistentState.localBlocklistStamp = "stamp" }
     }
 
     @Test

@@ -64,7 +64,14 @@ data class PowerProfileAppBlocklist(
     val domainRules: List<PowerProfileAppDomainRule> = emptyList(),
     val ipRules: List<PowerProfileAppIpRule> = emptyList()
 ) {
-    fun supportedRuleCount(): Int = domainRules.size + ipRules.size
+    fun hasFirewallRule(): Boolean {
+        return firewallStatus != PowerProfileFirewallValue.FIREWALL_STATUS_NONE ||
+            connectionStatus != PowerProfileFirewallValue.CONNECTION_STATUS_ALLOW
+    }
+
+    fun supportedRuleCount(): Int {
+        return domainRules.size + ipRules.size + if (hasFirewallRule()) 1 else 0
+    }
 }
 
 data class PowerProfileAppDomainRule(
@@ -110,4 +117,12 @@ data class PowerProfileOwnedAppIpRule(
     val port: Int
 ) {
     fun key(): String = "${packageName.lowercase()}|${ipAddress.lowercase()}|$port"
+}
+
+data class PowerProfileOwnedAppFirewallRule(
+    val packageName: String,
+    val firewallStatus: Int,
+    val connectionStatus: Int
+) {
+    fun key(): String = "${packageName.lowercase()}|$firewallStatus|$connectionStatus"
 }
