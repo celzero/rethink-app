@@ -48,6 +48,13 @@ class CustomIpRepository(private val customIpDao: CustomIpDao) {
         return customIpDao.deleteRule(uid, ipAddress, port)
     }
 
+    suspend fun deleteRulesByUidAndIpAddresses(uid: Int, port: Int, ipAddresses: List<String>): Int {
+        if (ipAddresses.isEmpty()) return 0
+        return ipAddresses.chunked(500).sumOf { chunk ->
+            customIpDao.deleteRulesByUidAndIpAddresses(uid, port, chunk)
+        }
+    }
+
     suspend fun deleteRulesByUid(uid: Int) {
         customIpDao.deleteRulesByUid(uid)
     }

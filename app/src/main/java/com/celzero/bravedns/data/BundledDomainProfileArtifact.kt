@@ -26,6 +26,8 @@ data class BundledDomainProfileArtifact(
     val domains: List<String>,
     val ips: List<String>
 ) {
+    fun supportedRuleCount(): Int = domains.size + ips.size
+
     companion object {
         fun fromJson(raw: String): BundledDomainProfileArtifact {
             val json = JSONObject(raw)

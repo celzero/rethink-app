@@ -84,7 +84,8 @@ object PowerProfileStore {
                 skippedExistingRuleCount = importSummary?.skippedExistingCount ?: 0,
                 artifactRuleCount = importSummary?.artifactRuleCount ?: 0,
                 supportedRuleKind = importSummary?.supportedRuleKind.orEmpty(),
-                artifactGeneratedAtEpochMs = importSummary?.artifactGeneratedAtEpochMs ?: 0L
+                artifactGeneratedAtEpochMs = importSummary?.artifactGeneratedAtEpochMs ?: 0L,
+                profileEnabled = true
             )
 
         val updatedProfiles =
@@ -94,6 +95,19 @@ object PowerProfileStore {
             }
         persistActiveProfiles(context, updatedProfiles.take(MAX_SAVED_PROFILES))
         return activeProfile
+    }
+
+    fun getActiveProfile(context: Context, profileId: String): ActivePowerProfile? {
+        return listActiveProfiles(context).firstOrNull { it.id == profileId }
+    }
+
+    fun isProfileActive(context: Context, profileId: String): Boolean {
+        return getActiveProfile(context, profileId) != null
+    }
+
+    fun deactivateProfile(context: Context, profileId: String) {
+        val updatedProfiles = listActiveProfiles(context).filterNot { it.id == profileId }
+        persistActiveProfiles(context, updatedProfiles)
     }
 
     private fun persist(context: Context, profiles: List<SavedPowerProfile>) {

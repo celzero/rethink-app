@@ -89,6 +89,9 @@ interface CustomDomainDAO {
     @Query("delete from CustomDomain where domain = :domain and uid = :uid")
     fun deleteDomain(domain: String, uid: Int): Int
 
+    @Query("delete from CustomDomain where uid = :uid and domain in (:domains)")
+    fun deleteDomains(uid: Int, domains: List<String>): Int
+
     @Query("update CustomDomain set status = :status where :clause")
     fun cpUpdate(status: Int, clause: String): Int
 

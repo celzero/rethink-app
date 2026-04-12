@@ -31,7 +31,8 @@ data class ActivePowerProfile(
     val skippedExistingRuleCount: Int = 0,
     val artifactRuleCount: Int = 0,
     val supportedRuleKind: String = "",
-    val artifactGeneratedAtEpochMs: Long = 0L
+    val artifactGeneratedAtEpochMs: Long = 0L,
+    val profileEnabled: Boolean = true
 ) {
     fun toJson(): JSONObject {
         return JSONObject().apply {
@@ -47,6 +48,7 @@ data class ActivePowerProfile(
             put("artifactRuleCount", artifactRuleCount)
             put("supportedRuleKind", supportedRuleKind)
             put("artifactGeneratedAtEpochMs", artifactGeneratedAtEpochMs)
+            put("profileEnabled", profileEnabled)
             put("sourceTokens", JSONArray(sourceTokens))
         }
     }
@@ -67,6 +69,7 @@ data class ActivePowerProfile(
             val artifactRuleCount = json.optInt("artifactRuleCount", 0)
             val supportedRuleKind = json.optString("supportedRuleKind", "").trim()
             val artifactGeneratedAtEpochMs = json.optLong("artifactGeneratedAtEpochMs", 0L)
+            val profileEnabled = json.optBoolean("profileEnabled", true)
             val sourceTokensJson = json.optJSONArray("sourceTokens")
             val sourceTokens =
                 buildList {
@@ -93,7 +96,8 @@ data class ActivePowerProfile(
                 skippedExistingRuleCount = skippedExistingRuleCount,
                 artifactRuleCount = artifactRuleCount,
                 supportedRuleKind = supportedRuleKind,
-                artifactGeneratedAtEpochMs = artifactGeneratedAtEpochMs
+                artifactGeneratedAtEpochMs = artifactGeneratedAtEpochMs,
+                profileEnabled = profileEnabled
             )
         }
 

@@ -31,6 +31,7 @@
     <string name="power_active_profiles_empty_desc" translatable="true">Your device is still protected by the current firewall and DNS engine settings.</string>
     <string name="power_active_profiles_live_title" translatable="true">%1$d active profiles</string>
     <string name="power_active_profiles_live_desc" translatable="true">Latest: %1$s, enabled %2$s. Imported %3$d of %4$d supported rules. Source: %5$s</string>
+    <string name="power_active_profiles_enabled_heading" translatable="true">Enabled profiles</string>
     <string name="power_active_profiles_saved_title" translatable="true">%1$d saved profiles on this device</string>
     <string name="power_active_profiles_saved_desc" translatable="true">Latest: %1$s, saved %2$s, using %3$s.</string>
     <string name="power_active_profiles_current_setup_title" translatable="true">Current device setup</string>
@@ -59,7 +60,23 @@
     <string name="power_profile_activated_message" translatable="true">%1$s is now active.</string>
     <string name="power_profile_activation_in_progress" translatable="true">Activating %1$s…</string>
     <string name="power_profile_activated_with_rules_message" translatable="true">%1$s is active with %2$d imported rules.</string>
+    <string name="power_profile_disabled_with_rules_message" translatable="true">%1$s is off. Removed %2$d profile rules.</string>
     <string name="power_profile_import_placeholder" translatable="true">Profile import is the next step.</string>
+    <string name="power_profile_enable_action" translatable="true">Enable profile</string>
+    <string name="power_profile_disable_action" translatable="true">Disable profile</string>
+    <string name="power_profile_coming_soon_action" translatable="true">Coming next</string>
+    <string name="power_profile_detail_status_active" translatable="true">Active now</string>
+    <string name="power_profile_detail_status_ready" translatable="true">Ready to enable</string>
+    <string name="power_profile_detail_status_coming_soon" translatable="true">Not wired yet</string>
+    <string name="power_profile_detail_active_desc" translatable="true">Enabled %1$s. This profile currently contributes %2$d imported rules out of %3$d supported rules.</string>
+    <string name="power_profile_detail_ready_desc" translatable="true">This profile is ready to merge into your setup. It currently supports about %1$d rules using %2$s.</string>
+    <string name="power_profile_detail_coming_desc" translatable="true">This profile concept is visible in the catalog, but its engine mapping is still being built.</string>
+    <string name="power_profile_detail_source_heading" translatable="true">Source and provenance</string>
+    <string name="power_profile_detail_provider" translatable="true">Provider: %1$s</string>
+    <string name="power_profile_detail_source_summary" translatable="true">Summary: %1$s</string>
+    <string name="power_profile_detail_source_tokens" translatable="true">Tokens: %1$s</string>
+    <string name="power_profile_detail_rule_meta" translatable="true">Supported rules: %1$d. Kind: %2$s.</string>
+    <string name="power_profile_detail_manage_latest" translatable="true">Manage the latest active profile from here.</string>
     <string name="power_save_setup_title" translatable="true">Save current setup</string>
     <string name="power_save_setup_desc" translatable="true">Capture your current app blocking setup as a reusable profile.</string>
     <string name="power_saved_profile_default_name" translatable="true">Saved setup %1$d</string>

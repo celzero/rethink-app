@@ -18,7 +18,9 @@ package com.celzero.bravedns.ui.fragment
 import android.content.Intent
 import android.os.Bundle
 import android.text.format.DateUtils
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -57,6 +59,7 @@ class ActiveProfilesFragment : Fragment(R.layout.fragment_active_profiles) {
         val braveMode = appConfig.getBraveMode()
         val activeProfiles = PowerProfileStore.listActiveProfiles(requireContext())
         val savedProfiles = PowerProfileStore.listSavedProfiles(requireContext())
+        bindActiveProfileCards(activeProfiles)
 
         if (activeProfiles.isNotEmpty()) {
             val latestProfile = activeProfiles.first()
@@ -132,6 +135,45 @@ class ActiveProfilesFragment : Fragment(R.layout.fragment_active_profiles) {
             getString(R.string.power_saved_profile_saved_message, savedProfile.name),
             Toast.LENGTH_SHORT
         )
+    }
+
+    private fun bindActiveProfileCards(activeProfiles: List<ActivePowerProfile>) {
+        b.fapProfilesContainer.removeAllViews()
+        val hasActiveProfiles = activeProfiles.isNotEmpty()
+        b.fapProfilesHeading.visibility = if (hasActiveProfiles) View.VISIBLE else View.GONE
+        b.fapProfilesContainer.visibility = if (hasActiveProfiles) View.VISIBLE else View.GONE
+        if (!hasActiveProfiles) return
+
+        val inflater = LayoutInflater.from(requireContext())
+        activeProfiles.forEach { profile ->
+            val card =
+                inflater.inflate(
+                    R.layout.view_active_power_profile_item,
+                    b.fapProfilesContainer,
+                    false
+                )
+            card.findViewById<TextView>(R.id.vappi_title).text = profile.name
+            card.findViewById<TextView>(R.id.vappi_desc).text =
+                getString(
+                    R.string.power_active_profiles_live_desc,
+                    profile.name,
+                    formatActiveTimestamp(profile),
+                    profile.importedRuleCount,
+                    profile.artifactRuleCount,
+                    profile.sourceSummary
+                )
+            card.findViewById<TextView>(R.id.vappi_meta).text =
+                getString(R.string.power_profile_detail_manage_latest)
+            card.setOnClickListener {
+                findNavController().navigate(
+                    R.id.powerProfileDetailFragment,
+                    Bundle().apply {
+                        putString(PowerProfileDetailFragment.ARG_PROFILE_ID, profile.id)
+                    }
+                )
+            }
+            b.fapProfilesContainer.addView(card)
+        }
     }
 
     private fun formatProfileTimestamp(profile: SavedPowerProfile): CharSequence {

@@ -36,6 +36,11 @@ data class PowerProfileImportSummary(
     val artifactGeneratedAtEpochMs: Long
 )
 
+data class PowerProfileImportResult(
+    val summary: PowerProfileImportSummary,
+    val ownedRules: PowerProfileOwnedRules
+)
+
 object PowerProfileImportManager : KoinComponent {
 
     private val customDomainRepository by inject<CustomDomainRepository>()
@@ -43,13 +48,25 @@ object PowerProfileImportManager : KoinComponent {
 
     suspend fun importBundledRules(
         context: Context,
-        profile: PowerProfileDefinition
-    ): PowerProfileImportSummary? {
+        profile: PowerProfileDefinition,
+        currentlyManagedDomains: Set<String> = emptySet(),
+        currentlyManagedIps: Set<String> = emptySet()
+    ): PowerProfileImportResult? {
         val assetPath = profile.bundledArtifactAssetPath ?: return null
         val raw = context.assets.open(assetPath).bufferedReader().use { it.readText() }
         val artifact = BundledDomainProfileArtifact.fromJson(raw)
         if (artifact.domains.isEmpty() && artifact.ips.isEmpty()) {
-            return PowerProfileImportSummary(0, 0, 0, 0, artifact.supportedRuleKind, artifact.generatedAtEpochMs)
+            return PowerProfileImportResult(
+                PowerProfileImportSummary(
+                    0,
+                    0,
+                    0,
+                    0,
+                    artifact.supportedRuleKind,
+                    artifact.generatedAtEpochMs
+                ),
+                PowerProfileOwnedRules.empty()
+            )
         }
 
         val existingRules =
@@ -63,6 +80,8 @@ object PowerProfileImportManager : KoinComponent {
 
         val domainsToInsert = mutableListOf<CustomDomain>()
         val ipsToInsert = mutableListOf<CustomIp>()
+        val ownedDomains = linkedSetOf<String>()
+        val ownedIps = linkedSetOf<String>()
         var alreadyBlockedCount = 0
         var skippedExistingCount = 0
         val now = System.currentTimeMillis()
@@ -71,6 +90,7 @@ object PowerProfileImportManager : KoinComponent {
             val existing = existingRules[domain]
             when {
                 existing == null -> {
+                    ownedDomains.add(domain)
                     domainsToInsert.add(
                         CustomDomain(
                             domain = domain,
@@ -86,7 +106,10 @@ object PowerProfileImportManager : KoinComponent {
                         )
                     )
                 }
-                existing.status == DomainRulesManager.Status.BLOCK.id -> alreadyBlockedCount += 1
+                existing.status == DomainRulesManager.Status.BLOCK.id -> {
+                    alreadyBlockedCount += 1
+                    if (domain in currentlyManagedDomains) ownedDomains.add(domain)
+                }
                 else -> skippedExistingCount += 1
             }
         }
@@ -96,6 +119,7 @@ object PowerProfileImportManager : KoinComponent {
             val existing = existingIpRules[normalizedIp]
             when {
                 existing == null -> {
+                    ownedIps.add(normalizedIp)
                     ipsToInsert.add(
                         CustomIp().apply {
                             uid = Constants.UID_EVERYBODY
@@ -117,7 +141,10 @@ object PowerProfileImportManager : KoinComponent {
                         }
                     )
                 }
-                existing.status == IpRulesManager.IpRuleStatus.BLOCK.id -> alreadyBlockedCount += 1
+                existing.status == IpRulesManager.IpRuleStatus.BLOCK.id -> {
+                    alreadyBlockedCount += 1
+                    if (normalizedIp in currentlyManagedIps) ownedIps.add(normalizedIp)
+                }
                 else -> skippedExistingCount += 1
             }
         }
@@ -131,13 +158,17 @@ object PowerProfileImportManager : KoinComponent {
             IpRulesManager.load()
         }
 
-        return PowerProfileImportSummary(
-            importedCount = domainsToInsert.size + ipsToInsert.size,
-            alreadyBlockedCount = alreadyBlockedCount,
-            skippedExistingCount = skippedExistingCount,
-            artifactRuleCount = artifact.domains.size + artifact.ips.size,
-            supportedRuleKind = artifact.supportedRuleKind,
-            artifactGeneratedAtEpochMs = artifact.generatedAtEpochMs
+        return PowerProfileImportResult(
+            summary =
+                PowerProfileImportSummary(
+                    importedCount = domainsToInsert.size + ipsToInsert.size,
+                    alreadyBlockedCount = alreadyBlockedCount,
+                    skippedExistingCount = skippedExistingCount,
+                    artifactRuleCount = artifact.domains.size + artifact.ips.size,
+                    supportedRuleKind = artifact.supportedRuleKind,
+                    artifactGeneratedAtEpochMs = artifact.generatedAtEpochMs
+                ),
+            ownedRules = PowerProfileOwnedRules(ownedDomains.toList(), ownedIps.toList())
         )
     }
 

@@ -81,6 +81,11 @@ class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
         return customDomainDAO.deleteDomain(domain, uid)
     }
 
+    suspend fun deleteDomains(uid: Int, domains: List<String>): Int {
+        if (domains.isEmpty()) return 0
+        return domains.chunked(500).sumOf { chunk -> customDomainDAO.deleteDomains(uid, chunk) }
+    }
+
     fun cpUpdate(customDomain: CustomDomain): Int {
         return customDomainDAO.update(customDomain)
     }

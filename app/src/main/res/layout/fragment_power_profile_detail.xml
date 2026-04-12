@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:orientation="vertical">
+    android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -21,7 +20,7 @@
             app:layout_constraintWidth_max="700dp">
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/fap_back_card"
+                android:id="@+id/fppd_back_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -59,22 +58,22 @@
                 android:paddingBottom="15dp">
 
                 <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fppd_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingStart="7dp"
                     android:paddingEnd="7dp"
-                    android:text="@string/power_active_profiles_title"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="28sp"
                     android:textStyle="bold" />
 
                 <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fppd_desc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:alpha="0.75"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
-                    android:text="@string/power_active_profiles_screen_desc"
                     android:textColor="?attr/secondaryTextColor"
                     android:textSize="15sp" />
             </LinearLayout>
@@ -90,7 +89,7 @@
                     android:padding="20dp">
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fap_empty_title"
+                        android:id="@+id/fppd_status_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textColor="?attr/primaryTextColor"
@@ -98,35 +97,22 @@
                         android:textStyle="bold" />
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fap_empty_desc"
+                        android:id="@+id/fppd_status_desc"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:textColor="?attr/secondaryTextColor"
                         android:textSize="15sp" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/fppd_status_meta"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:textColor="?attr/secondaryTextColor"
+                        android:textSize="14sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/fap_profiles_heading"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="18dp"
-                android:paddingTop="20dp"
-                android:paddingEnd="18dp"
-                android:paddingBottom="8dp"
-                android:text="@string/power_active_profiles_enabled_heading"
-                android:textColor="?attr/secondaryTextColor"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:visibility="gone" />
-
-            <LinearLayout
-                android:id="@+id/fap_profiles_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone" />
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
@@ -141,118 +127,45 @@
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/power_active_profiles_current_setup_title"
+                        android:text="@string/power_profile_detail_source_heading"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/fppd_source_provider"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:text="@string/power_active_profiles_current_setup_desc"
+                        android:layout_marginTop="8dp"
                         android:textColor="?attr/secondaryTextColor"
                         android:textSize="14sp" />
 
-                    <LinearLayout
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/fppd_source_summary"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:orientation="horizontal"
-                        android:weightSum="2">
+                        android:layout_marginTop="6dp"
+                        android:textColor="?attr/secondaryTextColor"
+                        android:textSize="14sp" />
 
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/power_status_label"
-                                android:textColor="?attr/secondaryTextColor"
-                                android:textSize="13sp" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/fap_setup_status_value"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:textColor="?attr/primaryTextColor"
-                                android:textSize="20sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/power_active_profiles_mode_label"
-                                android:textColor="?attr/secondaryTextColor"
-                                android:textSize="13sp" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/fap_setup_mode_value"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:textColor="?attr/primaryTextColor"
-                                android:textSize="20sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-                    </LinearLayout>
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/fppd_source_tokens"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:textColor="?attr/secondaryTextColor"
+                        android:textSize="13sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/fppd_action_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="18dp"
-                android:paddingTop="20dp"
-                android:paddingEnd="18dp"
-                android:paddingBottom="8dp"
-                android:text="@string/power_controls_section"
-                android:textColor="?attr/secondaryTextColor"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/fap_open_firewall_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <include layout="@layout/view_power_list_item_firewall" />
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/fap_open_apps_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <include layout="@layout/view_power_list_item_apps" />
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/fap_open_logs_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <include layout="@layout/view_power_list_item_logs" />
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/fap_save_current_setup_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <include layout="@layout/view_power_list_item_save_setup" />
-            </com.google.android.material.card.MaterialCardView>
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="16dp"
+                android:text="@string/lbl_apply" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

@@ -53,7 +53,8 @@ object CuratedPowerProfileCatalog {
                 sourceProvider = UBO_PROVIDER,
                 sourceSummary = UBO_DEFAULT_SUMMARY,
                 sourceDocUrl = UBO_DOC_URL,
-                sourceTokens = UBO_DEFAULT_TOKENS
+                sourceTokens = UBO_DEFAULT_TOKENS,
+                readyForActivation = true
             ),
             PowerProfileDefinition(
                 id = EXAM_ID,

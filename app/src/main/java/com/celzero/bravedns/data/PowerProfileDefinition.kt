@@ -28,5 +28,6 @@ data class PowerProfileDefinition(
     val sourceProvider: String? = null,
     val sourceSummary: String? = null,
     val sourceDocUrl: String? = null,
-    val sourceTokens: List<String> = emptyList()
+    val sourceTokens: List<String> = emptyList(),
+    val readyForActivation: Boolean = false
 )
