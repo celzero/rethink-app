@@ -1,0 +1,30 @@
+{
+  "kind": "power-profile-registry",
+  "schemaVersion": 1,
+  "id": "app-horse-community",
+  "name": "App Horse Community Registry",
+  "description": "A static registry of hosted Power profiles for sharable app and browsing control.",
+  "homepageUrl": "https://github.com/anjani-1/rethink-again/tree/codex/power-page-foundation/community-knowledge",
+  "generatedAtEpochMs": 1775926300000,
+  "profiles": [
+    {
+      "id": "app-horse",
+      "name": "App Horse",
+      "description": "A community app pack for Parrot Downloader with a validated ad-network IP blocklist.",
+      "provider": "App Horse",
+      "version": "1.0.0",
+      "artifactUrl": "https://raw.githubusercontent.com/anjani-1/rethink-again/codex/power-page-foundation/community-knowledge/profiles/app-horse/app-horse.power-profile.v1.json",
+      "homepageUrl": "https://github.com/anjani-1/rethink-again/tree/codex/power-page-foundation/community-knowledge/profiles/app-horse",
+      "readmeUrl": "https://github.com/anjani-1/rethink-again/blob/codex/power-page-foundation/community-knowledge/README.md",
+      "sha256": "124165fae5ee9663416adad787a870b4bd3570d5b58d151ae16702aaa51bcc21",
+      "publishedAtEpochMs": 1775926300000,
+      "sourceTokens": [
+        "community-app-pack",
+        "com.parrot.downloader",
+        "ad-network"
+      ],
+      "supportedRuleKind": "app-specific-exact-ip",
+      "estimatedRuleCount": 21
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "kind": "power-profile",
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "publishedAtEpochMs": 1775926300000,
+  "license": "CC-BY-4.0",
+  "homepageUrl": "https://github.com/anjani-1/rethink-again/tree/codex/power-page-foundation/community-knowledge/profiles/app-horse",
+  "id": "app-horse",
+  "name": "App Horse",
+  "description": "A community app pack for Parrot Downloader that carries the ad-network blocklist validated during live analysis.",
+  "meta": "Source: 1 app pack with 21 app-specific IP rules for Parrot Downloader",
+  "provider": "App Horse",
+  "sourceSummary": "Community app pack for Parrot Downloader with the validated ad-network IP blocklist.",
+  "sourceDocUrl": "",
+  "sourceTokens": [
+    "community-app-pack",
+    "com.parrot.downloader",
+    "ad-network"
+  ],
+  "generatedAtEpochMs": 1775926300000,
+  "supportedRuleKind": "app-specific-exact-ip",
+  "domains": [],
+  "ips": [],
+  "apps": [
+    {
+      "packageName": "com.parrot.downloader",
+      "appName": "Parrot Downloader",
+      "firewallStatus": 5,
+      "connectionStatus": 3,
+      "domainRules": [],
+      "ipRules": [
+        { "ipAddress": "34.102.162.219", "port": 443, "protocol": "", "status": 1, "isActive": true, "wildcard": false, "proxyId": "", "proxyCC": "" },
+        { "ipAddress": "34.117.147.68", "port": 443, "protocol": "", "status": 1, "isActive": true, "wildcard": false, "proxyId": "", "proxyCC": "" },
+        { "ipAddress": "34.160.241.208", "port": 443, "protocol": "", "status": 1, "isActive": true, "wildcard": false, "proxyId": "", "proxyCC": "" },
+        { "ipAddress": "34.110.229.214", "port": 443, "protocol": "", "status": 1, "isActive": true, "wildcard": false, "proxyId": "", "proxyCC": "" },
+        { "ipAddress": "34.144.246.101", "port": 443, "protocol": "", "status": 1, "isActive": true, "wildcard": false, "proxyId": "", "proxyCC": "" },
+        { "ipAddress": "35.212.103.4", "port": 443, "protocol": "", "status": 1, "isActive": true, "wildcard": false, "proxyId": "", "proxyCC": "" },
+        { "ipAddress": "35.213.156.3", "port": 443, "protocol": "", "status": 1, "isActive": true, "wildcard": false, "proxyId": "", "proxyCC": "" },
+        { "ipAddress": "57.144.54.1", "port": 443, "protocol": "", "status": 1, "isActive": true, "wildcard": false, "proxyId": "", "proxyCC": "" },
+        { "ipAddress": "34.160.136.185", "port": 443, "protocol": "", "status": 1, "isActive": true, "wildcard": false, "proxyId": "", "proxyCC": "" },
+        { "ipAddress": "34.1.194.76", "port": 443, "protocol": "", "status": 1, "isActive": true, "wildcard": false, "proxyId": "", "proxyCC": "" },
+        { "ipAddress": "35.212.127.185", "port": 443, "protocol": "", "status": 1, "isActive": true, "wildcard": false, "proxyId": "", "proxyCC": "" },
+        { "ipAddress": "34.1.199.80", "port": 443, "protocol": "", "status": 1, "isActive": true, "wildcard": false, "proxyId": "", "proxyCC": "" },
+        { "ipAddress": "35.212.2.2", "port": 443, "protocol": "", "status": 1, "isActive": true, "wildcard": false, "proxyId": "", "proxyCC": "" },
+        { "ipAddress": "57.144.54.128", "port": 443, "protocol": "", "status": 1, "isActive": true, "wildcard": false, "proxyId": "", "proxyCC": "" },
+        { "ipAddress": "57.144.54.141", "port": 443, "protocol": "", "status": 1, "isActive": true, "wildcard": false, "proxyId": "", "proxyCC": "" },
+        { "ipAddress": "34.110.179.88", "port": 443, "protocol": "", "status": 1, "isActive": true, "wildcard": false, "proxyId": "", "proxyCC": "" },
+        { "ipAddress": "35.212.81.85", "port": 443, "protocol": "", "status": 1, "isActive": true, "wildcard": false, "proxyId": "", "proxyCC": "" },
+        { "ipAddress": "34.111.80.193", "port": 443, "protocol": "", "status": 1, "isActive": true, "wildcard": false, "proxyId": "", "proxyCC": "" },
+        { "ipAddress": "34.8.190.96", "port": 443, "protocol": "", "status": 1, "isActive": true, "wildcard": false, "proxyId": "", "proxyCC": "" },
+        { "ipAddress": "20.207.73.85", "port": 443, "protocol": "", "status": 1, "isActive": true, "wildcard": false, "proxyId": "", "proxyCC": "" },
+        { "ipAddress": "164.52.120.106", "port": 443, "protocol": "", "status": 1, "isActive": true, "wildcard": false, "proxyId": "", "proxyCC": "" }
+      ]
+    }
+  ],
+  "localBlocklistTagIds": []
+}
