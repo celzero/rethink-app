@@ -186,6 +186,45 @@ data class PowerProfileOwnedRules(
 object PowerProfileOwnershipStore {
     private const val DIRECTORY_NAME = "power-profile-ownership"
 
+    data class ManagedDomainRule(
+        val domain: String,
+        val ownerProfiles: List<ActivePowerProfile>
+    )
+
+    data class ManagedIpRule(
+        val ipAddress: String,
+        val ownerProfiles: List<ActivePowerProfile>
+    )
+
+    data class ManagedAppDomainRule(
+        val rule: PowerProfileOwnedAppDomainRule,
+        val ownerProfiles: List<ActivePowerProfile>
+    )
+
+    data class ManagedAppIpRule(
+        val rule: PowerProfileOwnedAppIpRule,
+        val ownerProfiles: List<ActivePowerProfile>
+    )
+
+    data class ManagedAppFirewallRule(
+        val rule: PowerProfileOwnedAppFirewallRule,
+        val ownerProfiles: List<ActivePowerProfile>
+    )
+
+    data class ManagedLocalBlocklistRule(
+        val tagId: Int,
+        val ownerProfiles: List<ActivePowerProfile>
+    )
+
+    data class ManagedRuleSources(
+        val domains: List<ManagedDomainRule>,
+        val ips: List<ManagedIpRule>,
+        val appDomains: List<ManagedAppDomainRule>,
+        val appIps: List<ManagedAppIpRule>,
+        val appFirewalls: List<ManagedAppFirewallRule>,
+        val localBlocklists: List<ManagedLocalBlocklistRule>
+    )
+
     fun read(context: Context, profileId: String): PowerProfileOwnedRules {
         val file = profileFile(context, profileId)
         if (!file.exists()) return PowerProfileOwnedRules.empty()
@@ -225,6 +264,96 @@ object PowerProfileOwnershipStore {
             appIps = appIps.values.toList(),
             appFirewalls = appFirewalls.values.toList(),
             localBlocklistTagIds = localBlocklistTagIds.toList()
+        )
+    }
+
+    fun listManagedRuleSources(
+        context: Context,
+        activeProfiles: List<ActivePowerProfile> = PowerProfileStore.listActiveProfiles(context)
+    ): ManagedRuleSources {
+        if (activeProfiles.isEmpty()) {
+            return ManagedRuleSources(
+                domains = emptyList(),
+                ips = emptyList(),
+                appDomains = emptyList(),
+                appIps = emptyList(),
+                appFirewalls = emptyList(),
+                localBlocklists = emptyList()
+            )
+        }
+
+        val domains = linkedMapOf<String, MutableList<ActivePowerProfile>>()
+        val ips = linkedMapOf<String, MutableList<ActivePowerProfile>>()
+        val appDomains =
+            linkedMapOf<String, Pair<PowerProfileOwnedAppDomainRule, MutableList<ActivePowerProfile>>>()
+        val appIps =
+            linkedMapOf<String, Pair<PowerProfileOwnedAppIpRule, MutableList<ActivePowerProfile>>>()
+        val appFirewalls =
+            linkedMapOf<String, Pair<PowerProfileOwnedAppFirewallRule, MutableList<ActivePowerProfile>>>()
+        val localBlocklists = linkedMapOf<Int, MutableList<ActivePowerProfile>>()
+
+        activeProfiles.forEach { activeProfile ->
+            val ownedRules = read(context, activeProfile.id)
+            ownedRules.domains.forEach { domain ->
+                domains.getOrPut(domain) { mutableListOf() }.add(activeProfile)
+            }
+            ownedRules.ips.forEach { ipAddress ->
+                ips.getOrPut(ipAddress) { mutableListOf() }.add(activeProfile)
+            }
+            ownedRules.appDomains.forEach { rule ->
+                val existing = appDomains[rule.key()]
+                if (existing == null) {
+                    appDomains[rule.key()] = rule to mutableListOf(activeProfile)
+                } else {
+                    existing.second.add(activeProfile)
+                }
+            }
+            ownedRules.appIps.forEach { rule ->
+                val existing = appIps[rule.key()]
+                if (existing == null) {
+                    appIps[rule.key()] = rule to mutableListOf(activeProfile)
+                } else {
+                    existing.second.add(activeProfile)
+                }
+            }
+            ownedRules.appFirewalls.forEach { rule ->
+                val existing = appFirewalls[rule.key()]
+                if (existing == null) {
+                    appFirewalls[rule.key()] = rule to mutableListOf(activeProfile)
+                } else {
+                    existing.second.add(activeProfile)
+                }
+            }
+            ownedRules.localBlocklistTagIds.forEach { tagId ->
+                localBlocklists.getOrPut(tagId) { mutableListOf() }.add(activeProfile)
+            }
+        }
+
+        return ManagedRuleSources(
+            domains =
+                domains.map { (domain, ownerProfiles) ->
+                    ManagedDomainRule(domain = domain, ownerProfiles = ownerProfiles.toList())
+                },
+            ips =
+                ips.map { (ipAddress, ownerProfiles) ->
+                    ManagedIpRule(ipAddress = ipAddress, ownerProfiles = ownerProfiles.toList())
+                },
+            appDomains =
+                appDomains.values.map { (rule, ownerProfiles) ->
+                    ManagedAppDomainRule(rule = rule, ownerProfiles = ownerProfiles.toList())
+                },
+            appIps =
+                appIps.values.map { (rule, ownerProfiles) ->
+                    ManagedAppIpRule(rule = rule, ownerProfiles = ownerProfiles.toList())
+                },
+            appFirewalls =
+                appFirewalls.values.map { (rule, ownerProfiles) ->
+                    ManagedAppFirewallRule(rule = rule, ownerProfiles = ownerProfiles.toList())
+                },
+            localBlocklists =
+                localBlocklists.map { (tagId, ownerProfiles) ->
+                    ManagedLocalBlocklistRule(tagId = tagId, ownerProfiles = ownerProfiles.toList())
+                }
         )
     }
 

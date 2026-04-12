@@ -20,11 +20,12 @@ import android.text.format.DateUtils
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.ActivePowerProfile
-import com.celzero.bravedns.data.PowerProfileArtifacts
-import com.celzero.bravedns.data.PowerProfileCatalog
+import com.celzero.bravedns.data.PowerProfileCurrentSetupOverrideStore
+import com.celzero.bravedns.data.PowerProfileManager
 import com.celzero.bravedns.data.PowerProfileStore
 import com.celzero.bravedns.data.SavedPowerProfile
 import com.celzero.bravedns.databinding.FragmentActiveProfilesBinding
@@ -56,11 +57,11 @@ class ActiveProfilesFragment : Fragment(R.layout.fragment_active_profiles) {
 
         if (activeProfiles.isNotEmpty()) {
             val latestProfile = activeProfiles.first()
-            b.fapEmptyTitle.text =
-                getString(R.string.power_active_profiles_live_title, activeProfiles.size)
+            b.fapEmptyTitle.text = getString(R.string.power_active_profiles_live_title)
             b.fapEmptyDesc.text =
                 getString(
-                    R.string.power_active_profiles_live_desc_compact,
+                    R.string.power_active_profiles_active_summary,
+                    activeProfiles.size,
                     latestProfile.name,
                     formatActiveTimestamp(latestProfile)
                 )
@@ -82,6 +83,10 @@ class ActiveProfilesFragment : Fragment(R.layout.fragment_active_profiles) {
 
     private fun setupClickListeners() {
         b.fapInfoIcon.setOnClickListener { showInfoDialog() }
+        b.fapDomainCard.root.setOnClickListener { openEntriesSection(PowerProfileEntriesFragment.SECTION_DOMAINS) }
+        b.fapIpCard.root.setOnClickListener { openEntriesSection(PowerProfileEntriesFragment.SECTION_IPS) }
+        b.fapAppsCard.root.setOnClickListener { openAppsSection() }
+        b.fapRethinkCard.root.setOnClickListener { openEntriesSection(PowerProfileEntriesFragment.SECTION_RETHINK) }
     }
 
     private fun showInfoDialog() {
@@ -129,25 +134,40 @@ class ActiveProfilesFragment : Fragment(R.layout.fragment_active_profiles) {
         viewLifecycleOwner.lifecycleScope.launch {
             val summary =
                 withContext(Dispatchers.IO) {
-                    val globalDomains = linkedSetOf<String>()
-                    val globalIps = linkedSetOf<String>()
-                    val appPackages = linkedSetOf<String>()
-                    val rethinkTags = linkedSetOf<Int>()
-
-                    activeProfiles.forEach { activeProfile ->
-                        val profile = PowerProfileCatalog.get(requireContext(), activeProfile.id) ?: return@forEach
-                        val artifact = PowerProfileArtifacts.loadArtifact(requireContext(), profile)
-                        artifact?.domains?.let(globalDomains::addAll)
-                        artifact?.ips?.let(globalIps::addAll)
-                        artifact?.apps?.forEach { appPackages.add(it.packageName) }
-                        rethinkTags.addAll(profile.localBlocklistTagIds)
-                    }
+                    val managedSources = PowerProfileManager.getManagedRuleSources(requireContext())
+                    val overrides = PowerProfileCurrentSetupOverrideStore.read(requireContext())
+                    val effectiveDomains =
+                        managedSources.domains.count { it.domain !in overrides.disabledDomains.toSet() }
+                    val effectiveIps =
+                        managedSources.ips.count { it.ipAddress !in overrides.disabledIps.toSet() }
+                    val effectiveBlocklists =
+                        managedSources.localBlocklists.count {
+                            it.tagId !in overrides.disabledLocalBlocklistTagIds.toSet()
+                        }
+                    val effectiveApps =
+                        buildSet {
+                            managedSources.appDomains
+                                .filter { managed ->
+                                    overrides.disabledAppDomains.none { it.key() == managed.rule.key() }
+                                }
+                                .forEach { add(it.rule.packageName) }
+                            managedSources.appIps
+                                .filter { managed ->
+                                    overrides.disabledAppIps.none { it.key() == managed.rule.key() }
+                                }
+                                .forEach { add(it.rule.packageName) }
+                            managedSources.appFirewalls
+                                .filter { managed ->
+                                    overrides.disabledAppFirewalls.none { it.key() == managed.rule.key() }
+                                }
+                                .forEach { add(it.rule.packageName) }
+                        }
 
                     ActiveProfileCoverageSummary(
-                        domainCount = globalDomains.size,
-                        ipCount = globalIps.size,
-                        appCount = appPackages.size,
-                        rethinkCount = rethinkTags.size
+                        domainCount = effectiveDomains,
+                        ipCount = effectiveIps,
+                        appCount = effectiveApps.size,
+                        rethinkCount = effectiveBlocklists
                     )
                 }
             if (!isAdded) return@launch
@@ -206,9 +226,28 @@ class ActiveProfilesFragment : Fragment(R.layout.fragment_active_profiles) {
         }
         card.vppscCount.text = count
         card.vppscMeta.text = meta
-        card.vppscChevron.visibility = View.GONE
-        card.root.isClickable = false
-        card.root.isFocusable = false
+        card.vppscChevron.visibility = View.VISIBLE
+        card.root.isClickable = true
+        card.root.isFocusable = true
+    }
+
+    private fun openEntriesSection(section: String) {
+        findNavController().navigate(
+            R.id.powerProfileEntriesFragment,
+            Bundle().apply {
+                putString(PowerProfileEntriesFragment.ARG_PROFILE_ID, PowerProfileStore.MERGED_ACTIVE_PROFILE_ID)
+                putString(PowerProfileEntriesFragment.ARG_SECTION, section)
+            }
+        )
+    }
+
+    private fun openAppsSection() {
+        findNavController().navigate(
+            R.id.powerProfileAppsFragment,
+            Bundle().apply {
+                putString(PowerProfileAppsFragment.ARG_PROFILE_ID, PowerProfileStore.MERGED_ACTIVE_PROFILE_ID)
+            }
+        )
     }
 
     private fun formatProfileTimestamp(profile: SavedPowerProfile): CharSequence {

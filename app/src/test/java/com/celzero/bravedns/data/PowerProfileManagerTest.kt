@@ -64,6 +64,7 @@ class PowerProfileManagerTest {
         PreferenceManager.getDefaultSharedPreferences(context).edit().clear().commit()
         File(context.filesDir, "power-imported-profiles").deleteRecursively()
         File(context.filesDir, "power-profile-ownership").deleteRecursively()
+        File(context.filesDir, "power-profile-current-setup-overrides.json").delete()
         if (GlobalContext.getOrNull() != null) {
             GlobalContext.stopKoin()
         }
@@ -104,6 +105,7 @@ class PowerProfileManagerTest {
         PreferenceManager.getDefaultSharedPreferences(context).edit().clear().commit()
         File(context.filesDir, "power-imported-profiles").deleteRecursively()
         File(context.filesDir, "power-profile-ownership").deleteRecursively()
+        File(context.filesDir, "power-profile-current-setup-overrides.json").delete()
         if (GlobalContext.getOrNull() != null) {
             GlobalContext.stopKoin()
         }
@@ -391,6 +393,49 @@ class PowerProfileManagerTest {
     }
 
     @Test
+    fun enableProfile_withDisabledSetupOverride_skipsDisabledLocalBlocklists() = runTest {
+        val profile =
+            PowerProfileDefinition(
+                id = "local-profile",
+                titleText = "Local profile",
+                descriptionText = "desc",
+                metaText = "meta",
+                iconRes = android.R.drawable.ic_menu_info_details,
+                localBlocklistTagIds = listOf(101, 202),
+                readyForActivation = true
+            )
+        mockkObject(PowerProfileImportManager)
+        coEvery {
+            PowerProfileImportManager.importBundledRules(context, profile, any())
+        } returns
+            PowerProfileImportResult(
+                summary = PowerProfileImportSummary(0, 0, 0, 0, "", 0L),
+                ownedRules = PowerProfileOwnedRules.empty()
+            )
+
+        PowerProfileCurrentSetupOverrideStore.write(
+            context,
+            PowerProfileCurrentSetupOverrides(disabledLocalBlocklistTagIds = listOf(101))
+        )
+
+        var syncedSelections = emptySet<Int>()
+        every { persistentState.localBlocklistStamp = any() } just runs
+        every { persistentState.numberOfLocalBlocklists = any() } just runs
+        every { persistentState.blocklistEnabled = any() } just runs
+        PowerProfileManager.computeLocalBlocklistStamp = { "stamp" }
+        PowerProfileManager.syncLocalBlocklistSelections = { syncedSelections = it }
+
+        val active = PowerProfileManager.enableProfile(context, profile)
+
+        assertNotNull(active)
+        assertEquals(setOf(202), syncedSelections)
+        assertEquals(
+            listOf(101, 202),
+            PowerProfileOwnershipStore.read(context, profile.id).localBlocklistTagIds
+        )
+    }
+
+    @Test
     fun enableProfile_withLocalBlocklists_retriesUntilStampBecomesAvailable() = runTest {
         val profile =
             PowerProfileDefinition(
@@ -424,6 +469,55 @@ class PowerProfileManagerTest {
 
         assertNotNull(active)
         assertEquals(3, attempts)
+    }
+
+    @Test
+    fun setLocalBlocklistEnabledInCurrentSetup_updatesEffectiveSelection() = runTest {
+        val profile =
+            PowerProfileDefinition(
+                id = "local-profile",
+                titleText = "Local profile",
+                descriptionText = "desc",
+                metaText = "meta",
+                iconRes = android.R.drawable.ic_menu_info_details,
+                localBlocklistTagIds = listOf(101, 202),
+                readyForActivation = true
+            )
+
+        var syncedSelections = emptySet<Int>()
+        every { persistentState.localBlocklistStamp = any() } just runs
+        every { persistentState.numberOfLocalBlocklists = any() } just runs
+        every { persistentState.blocklistEnabled = any() } just runs
+        PowerProfileManager.computeLocalBlocklistStamp = { "stamp" }
+        PowerProfileManager.syncLocalBlocklistSelections = { syncedSelections = it }
+
+        PowerProfileStore.activateProfile(context, profile)
+        PowerProfileOwnershipStore.write(
+            context,
+            profile.id,
+            PowerProfileOwnedRules(
+                domains = emptyList(),
+                ips = emptyList(),
+                localBlocklistTagIds = listOf(101, 202)
+            )
+        )
+
+        val disabled = PowerProfileManager.setLocalBlocklistEnabledInCurrentSetup(context, 101, false)
+        val disabledState = PowerProfileManager.getLocalBlocklistRuntimeState(context, 101)
+        val reenabled = PowerProfileManager.setLocalBlocklistEnabledInCurrentSetup(context, 101, true)
+        val enabledState = PowerProfileManager.getLocalBlocklistRuntimeState(context, 101)
+
+        assertTrue(disabled)
+        assertTrue(reenabled)
+        assertEquals(setOf(101, 202), syncedSelections)
+        assertTrue(disabledState.disabledInCurrentSetup)
+        assertFalse(disabledState.effectiveInCurrentSetup)
+        assertFalse(enabledState.disabledInCurrentSetup)
+        assertTrue(enabledState.effectiveInCurrentSetup)
+        assertEquals(
+            emptyList<Int>(),
+            PowerProfileCurrentSetupOverrideStore.read(context).disabledLocalBlocklistTagIds
+        )
     }
 
     @Test
@@ -502,5 +596,91 @@ class PowerProfileManagerTest {
 
         assertTrue(changed)
         assertFalse(PowerProfileStore.isProfileActive(context, profile.id))
+    }
+
+    @Test
+    fun reconcileActiveProfiles_keepsProfilesActiveWhenOverridesDisableAllLocalBlocklists() = runTest {
+        val profile =
+            PowerProfileDefinition(
+                id = "local-profile",
+                titleText = "Local profile",
+                descriptionText = "desc",
+                metaText = "meta",
+                iconRes = android.R.drawable.ic_menu_info_details,
+                localBlocklistTagIds = listOf(101, 202),
+                readyForActivation = true
+            )
+
+        var syncedSelections = setOf(999)
+        every { persistentState.localBlocklistStamp } returns ""
+        every { persistentState.blocklistEnabled } returns false
+        every { persistentState.numberOfLocalBlocklists } returns 0
+        every { persistentState.localBlocklistStamp = any() } just runs
+        every { persistentState.numberOfLocalBlocklists = any() } just runs
+        every { persistentState.blocklistEnabled = any() } just runs
+        PowerProfileManager.syncLocalBlocklistSelections = { syncedSelections = it }
+
+        PowerProfileStore.activateProfile(context, profile)
+        PowerProfileOwnershipStore.write(
+            context,
+            profile.id,
+            PowerProfileOwnedRules(
+                domains = emptyList(),
+                ips = emptyList(),
+                localBlocklistTagIds = listOf(101, 202)
+            )
+        )
+        PowerProfileCurrentSetupOverrideStore.write(
+            context,
+            PowerProfileCurrentSetupOverrides(disabledLocalBlocklistTagIds = listOf(101, 202))
+        )
+
+        val changed = PowerProfileManager.reconcileActiveProfiles(context)
+
+        assertFalse(changed)
+        assertTrue(PowerProfileStore.isProfileActive(context, profile.id))
+        assertEquals(setOf(999), syncedSelections)
+    }
+
+    @Test
+    fun setDomainEnabledInCurrentSetup_updatesOverridesAndUnderlyingRule() = runTest {
+        val profile =
+            PowerProfileDefinition(
+                id = "domain-profile",
+                titleText = "Domain profile",
+                descriptionText = "desc",
+                metaText = "meta",
+                iconRes = android.R.drawable.ic_menu_info_details,
+                readyForActivation = true
+            )
+        PowerProfileStore.activateProfile(context, profile)
+        PowerProfileOwnershipStore.write(
+            context,
+            profile.id,
+            PowerProfileOwnedRules(
+                domains = listOf("ads.example"),
+                ips = emptyList()
+            )
+        )
+
+        val disabled =
+            PowerProfileManager.setDomainEnabledInCurrentSetup(context, "ads.example", enabled = false)
+        val overridesAfterDisable = PowerProfileCurrentSetupOverrideStore.read(context)
+
+        assertTrue(disabled)
+        assertEquals(listOf("ads.example"), overridesAfterDisable.disabledDomains)
+        assertTrue(
+            PowerProfileManager.getDomainRuntimeState(context, "ads.example").disabledInCurrentSetup
+        )
+
+        val reenabled =
+            PowerProfileManager.setDomainEnabledInCurrentSetup(context, "ads.example", enabled = true)
+        val overridesAfterEnable = PowerProfileCurrentSetupOverrideStore.read(context)
+
+        assertTrue(reenabled)
+        assertTrue(overridesAfterEnable.disabledDomains.isEmpty())
+        assertFalse(
+            PowerProfileManager.getDomainRuntimeState(context, "ads.example").disabledInCurrentSetup
+        )
     }
 }

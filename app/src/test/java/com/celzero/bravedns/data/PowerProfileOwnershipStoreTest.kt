@@ -95,4 +95,68 @@ class PowerProfileOwnershipStoreTest {
         assertTrue(ownedRules.domains.isEmpty())
         assertTrue(ownedRules.ips.isEmpty())
     }
+
+    @Test
+    fun listManagedRuleSources_mapsRulesToSourceProfiles() {
+        val firstProfile =
+            PowerProfileDefinition(
+                id = "first",
+                titleText = "First profile",
+                descriptionText = "desc",
+                metaText = "meta",
+                iconRes = android.R.drawable.ic_menu_info_details,
+                readyForActivation = true
+            )
+        val secondProfile =
+            PowerProfileDefinition(
+                id = "second",
+                titleText = "Second profile",
+                descriptionText = "desc",
+                metaText = "meta",
+                iconRes = android.R.drawable.ic_menu_info_details,
+                readyForActivation = true
+            )
+        PowerProfileStore.activateProfile(context, firstProfile)
+        PowerProfileStore.activateProfile(context, secondProfile)
+
+        PowerProfileOwnershipStore.write(
+            context,
+            "first",
+            PowerProfileOwnedRules(
+                domains = listOf("shared.example", "first.example"),
+                ips = listOf("1.1.1.1"),
+                appDomains = listOf(PowerProfileOwnedAppDomainRule("com.example", "app.example")),
+                appIps = emptyList(),
+                appFirewalls =
+                    listOf(
+                        PowerProfileOwnedAppFirewallRule(
+                            "com.example",
+                            PowerProfileFirewallValue.FIREWALL_STATUS_NONE,
+                            PowerProfileFirewallValue.CONNECTION_STATUS_BOTH
+                        )
+                    ),
+                localBlocklistTagIds = listOf(101)
+            )
+        )
+        PowerProfileOwnershipStore.write(
+            context,
+            "second",
+            PowerProfileOwnedRules(
+                domains = listOf("shared.example"),
+                ips = listOf("2.2.2.2"),
+                appDomains = listOf(PowerProfileOwnedAppDomainRule("com.example", "app.example")),
+                appIps = listOf(PowerProfileOwnedAppIpRule("com.example", "8.8.8.8", 443)),
+                appFirewalls = emptyList(),
+                localBlocklistTagIds = listOf(101, 202)
+            )
+        )
+
+        val managedSources = PowerProfileOwnershipStore.listManagedRuleSources(context)
+
+        assertEquals(2, managedSources.domains.first { it.domain == "shared.example" }.ownerProfiles.size)
+        assertEquals(1, managedSources.domains.first { it.domain == "first.example" }.ownerProfiles.size)
+        assertEquals(2, managedSources.appDomains.first().ownerProfiles.size)
+        assertEquals(1, managedSources.appIps.first().ownerProfiles.size)
+        assertEquals(2, managedSources.localBlocklists.first { it.tagId == 101 }.ownerProfiles.size)
+    }
 }

@@ -23,23 +23,23 @@
     <string name="power_mode_dns" translatable="true">DNS only</string>
     <string name="power_profiles_section" translatable="true">Profiles</string>
     <string name="power_controls_section" translatable="true">Controls</string>
-    <string name="power_active_profiles_title" translatable="true">Active profiles</string>
-    <string name="power_active_profiles_desc" translatable="true">See what profile bundles are shaping your current setup.</string>
-    <string name="power_active_profiles_active_summary" translatable="true">%1$d active. Latest %2$s, enabled %3$s.</string>
+    <string name="power_active_profiles_title" translatable="true">Active profile</string>
+    <string name="power_active_profiles_desc" translatable="true">See and edit the merged profile rules shaping your current setup.</string>
+    <string name="power_active_profiles_active_summary" translatable="true">%1$d source profiles merged. Latest %2$s, enabled %3$s.</string>
     <string name="power_active_profiles_saved_summary" translatable="true">%1$d saved locally. Latest %2$s.</string>
     <string name="power_active_profiles_screen_desc" translatable="true">Profiles will eventually become the named bundles users can enable, save, and share.</string>
-    <string name="power_active_profiles_empty_title" translatable="true">No active profiles yet</string>
+    <string name="power_active_profiles_empty_title" translatable="true">No active profile yet</string>
     <string name="power_active_profiles_empty_desc" translatable="true">Your device is still protected by the current firewall and DNS engine settings.</string>
-    <string name="power_active_profiles_live_title" translatable="true">%1$d active profiles</string>
+    <string name="power_active_profiles_live_title" translatable="true">Active profile</string>
     <string name="power_active_profiles_live_desc" translatable="true">Latest: %1$s, enabled %2$s. Applied %3$d of %4$d supported profile entries. Source: %5$s</string>
     <string name="power_active_profiles_live_desc_compact" translatable="true">Latest: %1$s, enabled %2$s.</string>
     <string name="power_active_profiles_card_meta" translatable="true">Applied %1$d of %2$d supported entries. Source: %3$s</string>
-    <string name="power_active_profiles_enabled_heading" translatable="true">Enabled profiles</string>
+    <string name="power_active_profiles_enabled_heading" translatable="true">Source profiles</string>
     <string name="power_active_profiles_saved_title" translatable="true">%1$d saved profiles on this device</string>
     <string name="power_active_profiles_saved_desc" translatable="true">Latest: %1$s, saved %2$s, using %3$s.</string>
     <string name="power_active_profiles_saved_desc_compact" translatable="true">Latest: %1$s, saved %2$s.</string>
     <string name="power_active_profiles_current_setup_title" translatable="true">Current device setup</string>
-    <string name="power_active_profiles_current_setup_desc" translatable="true">Right now your blocking comes from engine settings and rules, not from named profiles.</string>
+    <string name="power_active_profiles_current_setup_desc" translatable="true">This is the merged view of the profile rules currently shaping your setup.</string>
     <string name="power_active_profiles_mode_label" translatable="true">Engine mode</string>
     <string name="power_discover_profiles_title" translatable="true">Discover profiles</string>
     <string name="power_discover_profiles_desc" translatable="true">Browse and merge community packs once profile browsing lands.</string>
@@ -111,6 +111,7 @@
     <string name="power_active_profiles_rethink_card_meta" translatable="true">%1$s native Rethink lists enabled by current profiles</string>
     <string name="power_profile_entries_desc" translatable="true">Showing the %1$s included by %2$s.</string>
     <string name="power_profile_entries_rule_meta" translatable="true">%1$s total entries from %2$s.</string>
+    <string name="power_profile_entries_rule_meta_with_disabled" translatable="true">%1$s total entries from %2$s. %3$s disabled in the current setup.</string>
     <string name="power_profile_entries_empty_title" translatable="true">Nothing here yet</string>
     <string name="power_profile_entries_empty_meta" translatable="true">This section is ready for future profile content.</string>
     <string name="power_profile_entries_preview_title" translatable="true">Entry preview</string>
@@ -137,6 +138,32 @@
     <string name="power_profile_local_catalog_download_failed" translatable="true">Couldn’t prepare the local Rethink blocklist catalog.</string>
     <string name="power_profile_blocklist_subgroup_other" translatable="true">others</string>
     <string name="power_profile_blocklist_entry_line" translatable="true">• %1$s (%2$s entries)</string>
+    <string name="power_profile_blocklist_entry_meta" translatable="true">%1$s entries</string>
+    <string name="power_profile_blocklist_disabled_in_current_setup" translatable="true">Disabled in the current setup</string>
+    <string name="power_profile_blocklist_shared_by_profiles" translatable="true">Shared by %1$s active profiles</string>
+    <string name="power_profile_blocklist_disable_dialog_title" translatable="true">Disable blocklist</string>
+    <string name="power_profile_blocklist_disable_dialog_message" translatable="true">Turn off %1$s from %2$s in your current setup?</string>
+    <string name="power_profile_blocklist_disable_dialog_message_shared" translatable="true">Turn off %1$s in your current setup? It is currently shared by %2$s active profiles: %3$s.</string>
+    <string name="power_profile_blocklist_reenable_dialog_title" translatable="true">Re-enable blocklist</string>
+    <string name="power_profile_blocklist_reenable_dialog_message" translatable="true">Turn %1$s back on in your current setup?</string>
+    <string name="power_profile_blocklist_disable_action" translatable="true">Disable in current setup</string>
+    <string name="power_profile_blocklist_reenable_action" translatable="true">Re-enable in current setup</string>
+    <string name="power_profile_blocklist_disabled_message" translatable="true">%1$s is now off in the current setup.</string>
+    <string name="power_profile_blocklist_reenabled_message" translatable="true">%1$s is back on in the current setup.</string>
+    <string name="power_profile_blocklist_update_failed_message" translatable="true">Could not update %1$s right now.</string>
+    <string name="power_profile_entries_current_setup_meta" translatable="true">%1$s active entries in the current setup. %2$s disabled here.</string>
+    <string name="power_profile_rule_entry_meta_sources" translatable="true">Source profiles: %1$s</string>
+    <string name="power_profile_rule_shared_by_profiles" translatable="true">Shared by %1$s source profiles</string>
+    <string name="power_profile_rule_disable_dialog_title" translatable="true">Disable rule</string>
+    <string name="power_profile_rule_disable_dialog_message" translatable="true">Turn off %1$s in your current setup?</string>
+    <string name="power_profile_rule_disable_dialog_message_shared" translatable="true">Turn off %1$s in your current setup? It is currently shared by %2$s source profiles: %3$s.</string>
+    <string name="power_profile_rule_reenable_dialog_title" translatable="true">Re-enable rule</string>
+    <string name="power_profile_rule_reenable_dialog_message" translatable="true">Turn %1$s back on in your current setup?</string>
+    <string name="power_profile_rule_disable_action" translatable="true">Disable in current setup</string>
+    <string name="power_profile_rule_reenable_action" translatable="true">Re-enable in current setup</string>
+    <string name="power_profile_rule_disabled_message" translatable="true">%1$s is now off in the current setup.</string>
+    <string name="power_profile_rule_reenabled_message" translatable="true">%1$s is back on in the current setup.</string>
+    <string name="power_profile_rule_update_failed_message" translatable="true">Could not update %1$s right now.</string>
     <string name="power_profile_app_preview_status" translatable="true">Profile preview: %1$s</string>
     <string name="power_profile_app_preview_data_usage" translatable="true">Previewing rules that will be applied if this profile is enabled.</string>
     <string name="power_profile_app_preview_source" translatable="true">From profile: %1$s</string>

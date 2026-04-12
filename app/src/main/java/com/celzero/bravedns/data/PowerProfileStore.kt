@@ -25,6 +25,7 @@ object PowerProfileStore {
     private const val PREF_KEY_SAVED_PROFILES = "power.saved_profiles.v1"
     private const val PREF_KEY_ACTIVE_PROFILES = "power.active_profiles.v1"
     private const val MAX_SAVED_PROFILES = 25
+    const val MERGED_ACTIVE_PROFILE_ID = "power.merged-active-profile"
     internal var defaultNameProvider: (Context, Int) -> String =
         { context, index ->
             context.getString(R.string.power_saved_profile_default_name, index)
