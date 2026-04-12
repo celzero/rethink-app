@@ -89,14 +89,8 @@ object PowerProfileManager : KoinComponent {
             return storedRules
         }
 
-        val profile = CuratedPowerProfileCatalog.get(profileId) ?: return storedRules
-        val assetPath = profile.bundledArtifactAssetPath ?: return storedRules
-        return try {
-            val raw = context.assets.open(assetPath).bufferedReader().use { it.readText() }
-            val artifact = BundledDomainProfileArtifact.fromJson(raw)
-            PowerProfileOwnedRules(artifact.domains, artifact.ips)
-        } catch (_: Exception) {
-            storedRules
-        }
+        val profile = PowerProfileCatalog.get(context, profileId) ?: return storedRules
+        val artifact = PowerProfileArtifacts.loadArtifact(context, profile) ?: return storedRules
+        return PowerProfileOwnedRules(artifact.domains, artifact.ips)
     }
 }

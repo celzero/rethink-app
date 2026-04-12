@@ -15,18 +15,22 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import android.net.Uri
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.ActivePowerProfile
-import com.celzero.bravedns.data.BundledDomainProfileArtifact
-import com.celzero.bravedns.data.CuratedPowerProfileCatalog
+import com.celzero.bravedns.data.ImportedPowerProfileStore
+import com.celzero.bravedns.data.PowerProfileArtifacts
+import com.celzero.bravedns.data.PowerProfileCatalog
+import com.celzero.bravedns.data.PowerProfileDefinition
 import com.celzero.bravedns.data.PowerProfileManager
 import com.celzero.bravedns.data.PowerProfileStore
 import com.celzero.bravedns.databinding.FragmentPowerProfileDetailBinding
@@ -38,6 +42,11 @@ import kotlinx.coroutines.withContext
 class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_detail) {
     private val b by viewBinding(FragmentPowerProfileDetailBinding::bind)
     private var profileId: String = ""
+    private var pendingExportProfileId: String? = null
+    private val exportActivityResult =
+        registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+            handleExportResult(uri)
+        }
 
     companion object {
         const val ARG_PROFILE_ID = "power.profile_id"
@@ -58,14 +67,15 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
     private fun setupClickListeners() {
         b.fppdBackCard.setOnClickListener { findNavController().navigateUp() }
         b.fppdActionBtn.setOnClickListener { handleAction() }
+        b.fppdExportBtn.setOnClickListener { exportProfile() }
     }
 
     private fun bindState() {
-        val profile = requireNotNull(CuratedPowerProfileCatalog.get(profileId))
+        val profile = requireProfile()
         val activeProfile = PowerProfileStore.getActiveProfile(requireContext(), profile.id)
 
-        b.fppdTitle.setText(profile.titleRes)
-        b.fppdDesc.setText(profile.descriptionRes)
+        b.fppdTitle.text = profile.resolveTitle(requireContext())
+        b.fppdDesc.text = profile.resolveDescription(requireContext())
         b.fppdSourceProvider.text =
             getString(
                 R.string.power_profile_detail_provider,
@@ -74,13 +84,14 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
         b.fppdSourceSummary.text =
             getString(
                 R.string.power_profile_detail_source_summary,
-                profile.sourceSummary ?: getString(profile.metaRes)
+                profile.sourceSummary ?: profile.resolveMeta(requireContext())
             )
         b.fppdSourceTokens.text =
             getString(
                 R.string.power_profile_detail_source_tokens,
                 if (profile.sourceTokens.isEmpty()) "-" else profile.sourceTokens.joinToString(", ")
             )
+        b.fppdExportBtn.isEnabled = profile.readyForActivation
 
         when {
             activeProfile != null -> bindActiveState(activeProfile)
@@ -108,11 +119,13 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
         b.fppdActionBtn.setText(R.string.power_profile_disable_action)
     }
 
-    private fun bindReadyState(profile: com.celzero.bravedns.data.PowerProfileDefinition) {
+    private fun bindReadyState(profile: PowerProfileDefinition) {
         b.fppdStatusTitle.text = getString(R.string.power_profile_detail_status_ready)
         viewLifecycleOwner.lifecycleScope.launch {
             val artifact =
-                withContext(Dispatchers.IO) { loadArtifact(profile.bundledArtifactAssetPath.orEmpty()) }
+                withContext(Dispatchers.IO) {
+                    PowerProfileArtifacts.loadArtifact(requireContext(), profile)
+                }
             b.fppdStatusDesc.text =
                 getString(
                     R.string.power_profile_detail_ready_desc,
@@ -136,10 +149,11 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
         b.fppdStatusMeta.text = ""
         b.fppdActionBtn.isEnabled = false
         b.fppdActionBtn.setText(R.string.power_profile_coming_soon_action)
+        b.fppdExportBtn.isEnabled = false
     }
 
     private fun handleAction() {
-        val profile = requireNotNull(CuratedPowerProfileCatalog.get(profileId))
+        val profile = requireProfile()
         val activeProfile = PowerProfileStore.getActiveProfile(requireContext(), profile.id)
         if (activeProfile != null) {
             disableProfile(activeProfile)
@@ -150,11 +164,14 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
         }
     }
 
-    private fun enableProfile(profile: com.celzero.bravedns.data.PowerProfileDefinition) {
+    private fun enableProfile(profile: PowerProfileDefinition) {
         viewLifecycleOwner.lifecycleScope.launch {
             showToastUiCentered(
                 requireContext(),
-                getString(R.string.power_profile_activation_in_progress, getString(profile.titleRes)),
+                getString(
+                    R.string.power_profile_activation_in_progress,
+                    profile.resolveTitle(requireContext())
+                ),
                 Toast.LENGTH_SHORT
             )
             val activatedProfile =
@@ -176,6 +193,57 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
         }
     }
 
+    private fun exportProfile() {
+        val profile = requireProfile()
+        if (!profile.readyForActivation) return
+        pendingExportProfileId = profile.id
+        exportActivityResult.launch(suggestExportName(profile))
+    }
+
+    private fun handleExportResult(uri: Uri?) {
+        val exportProfileId = pendingExportProfileId
+        pendingExportProfileId = null
+        if (uri == null || exportProfileId.isNullOrBlank()) return
+        val profile = PowerProfileCatalog.get(requireContext(), exportProfileId) ?: return
+        viewLifecycleOwner.lifecycleScope.launch {
+            val exported =
+                withContext(Dispatchers.IO) {
+                    val exportFile =
+                        ImportedPowerProfileStore.exportToCache(requireContext(), profile) ?: return@withContext false
+                    requireContext().contentResolver.openOutputStream(uri)?.use { output ->
+                        exportFile.inputStream().use { input -> input.copyTo(output) }
+                    } != null
+                }
+            val messageId =
+                if (exported) {
+                    R.string.power_profile_export_success_message
+                } else {
+                    R.string.power_profile_export_failure_message
+                }
+            val message =
+                if (exported) {
+                    getString(messageId, profile.resolveTitle(requireContext()))
+                } else {
+                    getString(messageId)
+                }
+            showToastUiCentered(
+                requireContext(),
+                message,
+                Toast.LENGTH_SHORT
+            )
+        }
+    }
+
+    private fun requireProfile(): PowerProfileDefinition {
+        return checkNotNull(PowerProfileCatalog.get(requireContext(), profileId)) {
+            "Missing profile: $profileId"
+        }
+    }
+
+    private fun suggestExportName(profile: PowerProfileDefinition): String {
+        return "${profile.id}.powerprofile.json"
+    }
+
     private fun disableProfile(activeProfile: ActivePowerProfile) {
         viewLifecycleOwner.lifecycleScope.launch {
             val disableSummary =
@@ -193,12 +261,6 @@ class PowerProfileDetailFragment : Fragment(R.layout.fragment_power_profile_deta
             )
             bindState()
         }
-    }
-
-    private fun loadArtifact(assetPath: String): BundledDomainProfileArtifact? {
-        if (assetPath.isBlank()) return null
-        val raw = requireContext().assets.open(assetPath).bufferedReader().use { it.readText() }
-        return BundledDomainProfileArtifact.fromJson(raw)
     }
 
     private fun formatActiveTimestamp(profile: ActivePowerProfile): CharSequence {

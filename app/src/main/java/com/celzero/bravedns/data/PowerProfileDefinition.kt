@@ -15,19 +15,36 @@
  */
 package com.celzero.bravedns.data
 
+import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 
 data class PowerProfileDefinition(
     val id: String,
-    @StringRes val titleRes: Int,
-    @StringRes val descriptionRes: Int,
-    @StringRes val metaRes: Int,
+    @StringRes val titleRes: Int? = null,
+    @StringRes val descriptionRes: Int? = null,
+    @StringRes val metaRes: Int? = null,
+    val titleText: String? = null,
+    val descriptionText: String? = null,
+    val metaText: String? = null,
     @DrawableRes val iconRes: Int,
     val bundledArtifactAssetPath: String? = null,
+    val localArtifactFileName: String? = null,
     val sourceProvider: String? = null,
     val sourceSummary: String? = null,
     val sourceDocUrl: String? = null,
     val sourceTokens: List<String> = emptyList(),
     val readyForActivation: Boolean = false
-)
+) {
+    fun resolveTitle(context: Context): String {
+        return titleText ?: titleRes?.let(context::getString).orEmpty()
+    }
+
+    fun resolveDescription(context: Context): String {
+        return descriptionText ?: descriptionRes?.let(context::getString).orEmpty()
+    }
+
+    fun resolveMeta(context: Context): String {
+        return metaText ?: metaRes?.let(context::getString).orEmpty()
+    }
+}

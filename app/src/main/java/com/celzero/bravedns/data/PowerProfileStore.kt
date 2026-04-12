@@ -73,7 +73,7 @@ object PowerProfileStore {
         val activeProfile =
             ActivePowerProfile(
                 id = profile.id,
-                name = context.getString(profile.titleRes),
+                name = profile.resolveTitle(context),
                 provider = profile.sourceProvider.orEmpty(),
                 sourceSummary = profile.sourceSummary.orEmpty(),
                 sourceDocUrl = profile.sourceDocUrl.orEmpty(),

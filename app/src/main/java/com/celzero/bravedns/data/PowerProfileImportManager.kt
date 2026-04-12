@@ -52,9 +52,7 @@ object PowerProfileImportManager : KoinComponent {
         currentlyManagedDomains: Set<String> = emptySet(),
         currentlyManagedIps: Set<String> = emptySet()
     ): PowerProfileImportResult? {
-        val assetPath = profile.bundledArtifactAssetPath ?: return null
-        val raw = context.assets.open(assetPath).bufferedReader().use { it.readText() }
-        val artifact = BundledDomainProfileArtifact.fromJson(raw)
+        val artifact = PowerProfileArtifacts.loadArtifact(context, profile) ?: return null
         if (artifact.domains.isEmpty() && artifact.ips.isEmpty()) {
             return PowerProfileImportResult(
                 PowerProfileImportSummary(

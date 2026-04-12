@@ -47,6 +47,7 @@
     <string name="power_discover_profiles_import_heading" translatable="true">Bring your own profile</string>
     <string name="power_discover_profiles_import_title" translatable="true">Import from a file</string>
     <string name="power_discover_profiles_import_desc" translatable="true">Later, this will accept a shared profile file and merge it into your setup.</string>
+    <string name="power_discover_profiles_imported_heading" translatable="true">Imported profiles</string>
     <string name="power_profile_smooth_browsing_title" translatable="true">Smooth browsing</string>
     <string name="power_profile_smooth_browsing_desc" translatable="true">A calmer browsing profile based on the default uBO network filterlists for ads, privacy, and malicious destinations.</string>
     <string name="power_profile_smooth_browsing_meta" translatable="true">Source: uBO defaults including EasyList, EasyPrivacy, URLHaus, and Peter Lowe</string>
@@ -64,6 +65,7 @@
     <string name="power_profile_import_placeholder" translatable="true">Profile import is the next step.</string>
     <string name="power_profile_enable_action" translatable="true">Enable profile</string>
     <string name="power_profile_disable_action" translatable="true">Disable profile</string>
+    <string name="power_profile_export_action" translatable="true">Export profile</string>
     <string name="power_profile_coming_soon_action" translatable="true">Coming next</string>
     <string name="power_profile_detail_status_active" translatable="true">Active now</string>
     <string name="power_profile_detail_status_ready" translatable="true">Ready to enable</string>
@@ -77,6 +79,10 @@
     <string name="power_profile_detail_source_tokens" translatable="true">Tokens: %1$s</string>
     <string name="power_profile_detail_rule_meta" translatable="true">Supported rules: %1$d. Kind: %2$s.</string>
     <string name="power_profile_detail_manage_latest" translatable="true">Manage the latest active profile from here.</string>
+    <string name="power_profile_import_success_message" translatable="true">%1$s imported. Review and enable it from here.</string>
+    <string name="power_profile_import_failure_message" translatable="true">That file could not be imported as a profile.</string>
+    <string name="power_profile_export_success_message" translatable="true">%1$s exported.</string>
+    <string name="power_profile_export_failure_message" translatable="true">Profile export failed.</string>
     <string name="power_save_setup_title" translatable="true">Save current setup</string>
     <string name="power_save_setup_desc" translatable="true">Capture your current app blocking setup as a reusable profile.</string>
     <string name="power_saved_profile_default_name" translatable="true">Saved setup %1$d</string>
