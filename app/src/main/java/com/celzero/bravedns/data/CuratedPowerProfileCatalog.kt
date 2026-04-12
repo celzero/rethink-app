@@ -39,11 +39,11 @@ object CuratedPowerProfileCatalog {
                         104, 105, 106, 126, 109, 111, 128, 93, 83, 65, 66, 55, 54, 56, 75,
                         68, 71, 72, 61, 64, 70, 69, 90, 88, 87, 58, 180, 178, 77, 195, 76,
                         89, 85, 91, 60, 97, 59, 81, 84, 74, 57, 82, 62, 79, 78, 63, 67, 92,
-                        86, 80, 73, 189
+                        86, 80, 73, 189, 133, 135, 139, 140, 153, 156, 172, 188
                     ),
                 sourceProvider = "Rethink DNS",
                 sourceSummary =
-                    "Samsung-curated local blocklist setup with 80 privacy and security selections.",
+                    "Samsung-curated local blocklist setup with 88 privacy and security selections.",
                 sourceTokens = listOf("rethink-local-blocklists", "privacy", "security"),
                 readyForActivation = true
             ),

@@ -52,7 +52,7 @@
     <string name="power_discover_profiles_imported_heading" translatable="true">Imported profiles</string>
     <string name="power_profile_safe_beautiful_title" translatable="true">Safe and Beautiful Internet (powered by Rethink DNS)</string>
     <string name="power_profile_safe_beautiful_desc" translatable="true">A strong on-device Rethink profile tuned for safer, cleaner browsing using a broad privacy and security blocklist stack.</string>
-    <string name="power_profile_safe_beautiful_meta" translatable="true">Source: 80 curated Rethink on-device blocklists across privacy and security</string>
+    <string name="power_profile_safe_beautiful_meta" translatable="true">Source: 88 curated Rethink on-device blocklists across privacy and security</string>
     <string name="power_profile_parental_control_title" translatable="true">Parental control</string>
     <string name="power_profile_parental_control_desc" translatable="true">A native Rethink profile focused on blocking adult content, gambling, piracy, bypass methods, and selected distracting services.</string>
     <string name="power_profile_parental_control_meta" translatable="true">Source: 67 curated Rethink on-device blocklists from the parental-control category</string>
