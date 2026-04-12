@@ -27,6 +27,11 @@ class CustomIpRepository(private val customIpDao: CustomIpDao) {
         customIpDao.insert(customIp)
     }
 
+    suspend fun insertAll(customIps: List<CustomIp>) {
+        if (customIps.isEmpty()) return
+        customIpDao.insertAll(customIps)
+    }
+
     suspend fun updateUid(uid: Int, newUid: Int) {
         customIpDao.updateUid(uid, newUid)
     }

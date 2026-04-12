@@ -23,18 +23,29 @@ data class BundledDomainProfileArtifact(
     val sourceDocUrl: String,
     val generatedAtEpochMs: Long,
     val supportedRuleKind: String,
-    val domains: List<String>
+    val domains: List<String>,
+    val ips: List<String>
 ) {
     companion object {
         fun fromJson(raw: String): BundledDomainProfileArtifact {
             val json = JSONObject(raw)
             val domainsJson = json.optJSONArray("domains")
+            val ipsJson = json.optJSONArray("ips")
             val domains =
                 buildList {
                     if (domainsJson != null) {
                         for (index in 0 until domainsJson.length()) {
                             val domain = domainsJson.optString(index, "").trim().lowercase()
                             if (domain.isNotEmpty()) add(domain)
+                        }
+                    }
+                }
+            val ips =
+                buildList {
+                    if (ipsJson != null) {
+                        for (index in 0 until ipsJson.length()) {
+                            val ip = ipsJson.optString(index, "").trim().lowercase()
+                            if (ip.isNotEmpty()) add(ip)
                         }
                     }
                 }
@@ -45,7 +56,8 @@ data class BundledDomainProfileArtifact(
                 sourceDocUrl = json.optString("sourceDocUrl", "").trim(),
                 generatedAtEpochMs = json.optLong("generatedAtEpochMs", 0L),
                 supportedRuleKind = json.optString("supportedRuleKind", "").trim(),
-                domains = domains
+                domains = domains,
+                ips = ips
             )
         }
     }

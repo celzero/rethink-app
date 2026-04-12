@@ -34,6 +34,9 @@ interface CustomIpDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(customIp: CustomIp)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(customIps: List<CustomIp>)
+
     @Delete fun delete(customIp: CustomIp)
 
     @Delete fun deleteAll(customIp: List<CustomIp>)
