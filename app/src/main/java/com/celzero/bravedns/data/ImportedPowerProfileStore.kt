@@ -17,6 +17,7 @@ package com.celzero.bravedns.data
 
 import android.content.Context
 import android.net.Uri
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 object ImportedPowerProfileStore {
@@ -38,9 +39,7 @@ object ImportedPowerProfileStore {
     }
 
     fun importFromUri(context: Context, uri: Uri): PowerProfileDefinition? {
-        val raw =
-            context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
-                ?: return null
+        val raw = readProfileText(context, uri) ?: return null
         val doc = PowerProfilePortableDocument.fromJson(raw)
         if (doc.id.isBlank() || doc.name.isBlank()) return null
 
@@ -79,5 +78,22 @@ object ImportedPowerProfileStore {
 
     private fun sanitizeFileName(value: String): String {
         return value.lowercase().replace(Regex("[^a-z0-9._-]+"), "-")
+    }
+
+    private fun readProfileText(context: Context, uri: Uri): String? {
+        val input = context.contentResolver.openInputStream(uri) ?: return null
+        input.use { stream ->
+            val buffer = ByteArray(8 * 1024)
+            val output = ByteArrayOutputStream()
+            var total = 0
+            while (true) {
+                val read = stream.read(buffer)
+                if (read == -1) break
+                total += read
+                if (total > PowerProfileSecurity.MAX_PROFILE_BYTES) return null
+                output.write(buffer, 0, read)
+            }
+            return output.toString(Charsets.UTF_8.name())
+        }
     }
 }

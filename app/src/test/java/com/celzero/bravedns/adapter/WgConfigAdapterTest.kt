@@ -24,6 +24,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.celzero.bravedns.adapter.OneWgConfigAdapter.DnsStatusListener
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.database.WgHopMap
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.VpnController
@@ -79,6 +80,9 @@ class WgConfigAdapterTest : KoinTest {
 
     @MockK
     private lateinit var mockWgInterface: WgInterface
+
+    @MockK(relaxed = true)
+    private lateinit var mockEventLogger: EventLogger
 
     @Before
     fun setup() {
@@ -144,8 +148,8 @@ class WgConfigAdapterTest : KoinTest {
         every { mockViewHolder.cancelJobIfAny() } just Runs
 
         // Create real adapters for integration tests
-        realAdapter = WgConfigAdapter(context, mockDnsStatusListener, false)
-        realOneWgAdapter = OneWgConfigAdapter(context, mockDnsStatusListener)
+        realAdapter = WgConfigAdapter(context, mockDnsStatusListener, false, mockEventLogger)
+        realOneWgAdapter = OneWgConfigAdapter(context, mockDnsStatusListener, mockEventLogger)
     }
 
     @After
@@ -185,7 +189,6 @@ class WgConfigAdapterTest : KoinTest {
         id: Int = 1,
         name: String = "Test Config",
         isActive: Boolean = false,
-        isLockdown: Boolean = false,
         isCatchAll: Boolean = false,
         useOnlyOnMetered: Boolean = false,
         ssidEnabled: Boolean = false
@@ -194,7 +197,6 @@ class WgConfigAdapterTest : KoinTest {
         every { wgConfig.id } returns id
         every { wgConfig.name } returns name
         every { wgConfig.isActive } returns isActive
-        every { wgConfig.isLockdown } returns isLockdown
         every { wgConfig.isCatchAll } returns isCatchAll
         every { wgConfig.useOnlyOnMetered } returns useOnlyOnMetered
         every { wgConfig.ssidEnabled } returns ssidEnabled
@@ -329,7 +331,6 @@ class WgConfigAdapterTest : KoinTest {
             id = 123,
             name = "TestConfig",
             isActive = true,
-            isLockdown = false,
             isCatchAll = true,
             useOnlyOnMetered = true,
             ssidEnabled = true
@@ -338,22 +339,19 @@ class WgConfigAdapterTest : KoinTest {
         assertEquals("Expected ID: 123", 123, config.id)
         assertEquals("Expected name: TestConfig", "TestConfig", config.name)
         assertTrue("Expected isActive: true", config.isActive)
-        assertFalse("Expected isLockdown: false", config.isLockdown)
         assertTrue("Expected isCatchAll: true", config.isCatchAll)
         assertTrue("Expected useOnlyOnMetered: true", config.useOnlyOnMetered)
         assertTrue("Expected ssidEnabled: true", config.ssidEnabled)
     }
 
     @Test
-    fun `test WgConfigFiles lockdown configuration`() {
-        val lockdownConfig = createTestWgConfigFiles(
+    fun `test WgConfigFiles inactive configuration`() {
+        val inactiveConfig = createTestWgConfigFiles(
             id = 1,
-            isActive = false,
-            isLockdown = true
+            isActive = false
         )
 
-        assertFalse("Expected isActive: false", lockdownConfig.isActive)
-        assertTrue("Expected isLockdown: true", lockdownConfig.isLockdown)
+        assertFalse("Expected isActive: false", inactiveConfig.isActive)
     }
 
     @Test
@@ -403,15 +401,15 @@ class WgConfigAdapterTest : KoinTest {
 
     @Test
     fun `test adapter with lockdown configurations`() = testScope.runTest {
-        val lockdownConfig = createTestWgConfigFiles(
+        val catchAllConfig = createTestWgConfigFiles(
             id = 3,
-            name = "Lockdown Config",
+            name = "Catch-all Config",
             isActive = false,
-            isLockdown = true
+            isCatchAll = true
         )
 
-        mockViewHolder.update(lockdownConfig)
-        verify { mockViewHolder.update(lockdownConfig) }
+        mockViewHolder.update(catchAllConfig)
+        verify { mockViewHolder.update(catchAllConfig) }
     }
 
     // === CHIP VISIBILITY TESTS ===
@@ -424,8 +422,7 @@ class WgConfigAdapterTest : KoinTest {
         val combinedConfig = createTestWgConfigFiles(
             isCatchAll = true,
             useOnlyOnMetered = true,
-            ssidEnabled = true,
-            isLockdown = true
+            ssidEnabled = true
         )
 
         // Test each configuration

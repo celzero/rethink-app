@@ -19,35 +19,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_max="700dp">
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/fppd_back_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="20dp">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
-                        android:rotation="180"
-                        android:src="@drawable/ic_right_arrow_white" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="39dp"
-                        android:text="@string/lbl_back"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="16sp" />
-                </RelativeLayout>
-            </com.google.android.material.card.MaterialCardView>
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -57,15 +28,30 @@
                 android:paddingEnd="15dp"
                 android:paddingBottom="15dp">
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fppd_title"
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="7dp"
-                    android:paddingEnd="7dp"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="28sp"
-                    android:textStyle="bold" />
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/fppd_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_toStartOf="@id/fppd_info_icon"
+                        android:paddingStart="7dp"
+                        android:paddingEnd="7dp"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="28sp"
+                        android:textStyle="bold" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/fppd_info_icon"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:contentDescription="@string/power_info_button_content_description"
+                        android:src="@drawable/ic_info" />
+                </RelativeLayout>
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/fppd_desc"
@@ -114,49 +100,27 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fppd_source_provider"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:paddingStart="24dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="24dp"
+                android:textColor="?attr/secondaryTextColor"
+                android:textSize="13sp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fppd_source_summary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/power_profile_detail_source_heading"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fppd_source_provider"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:textColor="?attr/secondaryTextColor"
-                        android:textSize="14sp" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fppd_source_summary"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:textColor="?attr/secondaryTextColor"
-                        android:textSize="14sp" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fppd_source_tokens"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:textColor="?attr/secondaryTextColor"
-                        android:textSize="13sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fppd_source_tokens"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/fppd_sections_heading"

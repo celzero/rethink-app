@@ -140,93 +140,111 @@ data class PowerProfilePortableDocument(
                     }
                 }
 
-            return PowerProfilePortableDocument(
-                id = json.optString("id", "").trim(),
-                name = json.optString("name", "").trim(),
-                description = json.optString("description", "").trim(),
-                meta = json.optString("meta", "").trim(),
-                provider = json.optString("provider", "").trim(),
-                sourceSummary = json.optString("sourceSummary", "").trim(),
-                sourceDocUrl = json.optString("sourceDocUrl", "").trim(),
-                sourceTokens = readStrings(sourceTokensJson),
-                generatedAtEpochMs = json.optLong("generatedAtEpochMs", 0L),
-                supportedRuleKind = json.optString("supportedRuleKind", "").trim(),
-                domains = readStrings(domainsJson),
-                ips = readStrings(ipsJson),
-                apps =
-                    buildList {
-                        if (appsJson != null) {
-                            for (index in 0 until appsJson.length()) {
-                                val appJson = appsJson.optJSONObject(index) ?: continue
-                                val packageName = appJson.optString("packageName", "").trim()
-                                val appName = appJson.optString("appName", "").trim()
-                                if (packageName.isEmpty() || appName.isEmpty()) continue
-                                val domainRules =
-                                    buildList {
-                                        val domainJsonArray = appJson.optJSONArray("domainRules")
-                                        if (domainJsonArray != null) {
-                                            for (domainIndex in 0 until domainJsonArray.length()) {
-                                                val domainJson = domainJsonArray.optJSONObject(domainIndex) ?: continue
-                                                val domain = domainJson.optString("domain", "").trim()
-                                                if (domain.isEmpty()) continue
-                                                add(
-                                                    PowerProfileAppDomainRule(
-                                                        domain = domain,
-                                                        status = domainJson.optInt("status", 0),
-                                                        type = domainJson.optInt("type", 0),
-                                                        ips = domainJson.optString("ips", "").trim(),
-                                                        proxyId = domainJson.optString("proxyId", "").trim(),
-                                                        proxyCC = domainJson.optString("proxyCC", "").trim()
+            val sanitized =
+                PowerProfileSecurity.sanitizePortableProfile(
+                    id = json.optString("id", "").trim(),
+                    name = json.optString("name", "").trim(),
+                    description = json.optString("description", "").trim(),
+                    meta = json.optString("meta", "").trim(),
+                    provider = json.optString("provider", "").trim(),
+                    sourceSummary = json.optString("sourceSummary", "").trim(),
+                    sourceDocUrl = json.optString("sourceDocUrl", "").trim(),
+                    sourceTokens = readStrings(sourceTokensJson),
+                    generatedAtEpochMs = json.optLong("generatedAtEpochMs", 0L),
+                    supportedRuleKind = json.optString("supportedRuleKind", "").trim(),
+                    domains = readStrings(domainsJson),
+                    ips = readStrings(ipsJson),
+                    apps =
+                        buildList {
+                            if (appsJson != null) {
+                                for (index in 0 until appsJson.length()) {
+                                    val appJson = appsJson.optJSONObject(index) ?: continue
+                                    val packageName = appJson.optString("packageName", "").trim()
+                                    val appName = appJson.optString("appName", "").trim()
+                                    if (packageName.isEmpty() || appName.isEmpty()) continue
+                                    val domainRules =
+                                        buildList {
+                                            val domainJsonArray = appJson.optJSONArray("domainRules")
+                                            if (domainJsonArray != null) {
+                                                for (domainIndex in 0 until domainJsonArray.length()) {
+                                                    val domainJson = domainJsonArray.optJSONObject(domainIndex) ?: continue
+                                                    val domain = domainJson.optString("domain", "").trim()
+                                                    if (domain.isEmpty()) continue
+                                                    add(
+                                                        PowerProfileAppDomainRule(
+                                                            domain = domain,
+                                                            status = domainJson.optInt("status", 0),
+                                                            type = domainJson.optInt("type", 0),
+                                                            ips = domainJson.optString("ips", "").trim(),
+                                                            proxyId = domainJson.optString("proxyId", "").trim(),
+                                                            proxyCC = domainJson.optString("proxyCC", "").trim()
+                                                        )
                                                     )
-                                                )
+                                                }
                                             }
                                         }
-                                    }
-                                val ipRules =
-                                    buildList {
-                                        val ipJsonArray = appJson.optJSONArray("ipRules")
-                                        if (ipJsonArray != null) {
-                                            for (ipIndex in 0 until ipJsonArray.length()) {
-                                                val ipJson = ipJsonArray.optJSONObject(ipIndex) ?: continue
-                                                val ipAddress = ipJson.optString("ipAddress", "").trim()
-                                                if (ipAddress.isEmpty()) continue
-                                                add(
-                                                    PowerProfileAppIpRule(
-                                                        ipAddress = ipAddress,
-                                                        port = ipJson.optInt("port", 0),
-                                                        protocol = ipJson.optString("protocol", "").trim(),
-                                                        status = ipJson.optInt("status", 0),
-                                                        isActive = ipJson.optBoolean("isActive", true),
-                                                        wildcard = ipJson.optBoolean("wildcard", false),
-                                                        proxyId = ipJson.optString("proxyId", "").trim(),
-                                                        proxyCC = ipJson.optString("proxyCC", "").trim()
+                                    val ipRules =
+                                        buildList {
+                                            val ipJsonArray = appJson.optJSONArray("ipRules")
+                                            if (ipJsonArray != null) {
+                                                for (ipIndex in 0 until ipJsonArray.length()) {
+                                                    val ipJson = ipJsonArray.optJSONObject(ipIndex) ?: continue
+                                                    val ipAddress = ipJson.optString("ipAddress", "").trim()
+                                                    if (ipAddress.isEmpty()) continue
+                                                    add(
+                                                        PowerProfileAppIpRule(
+                                                            ipAddress = ipAddress,
+                                                            port = ipJson.optInt("port", 0),
+                                                            protocol = ipJson.optString("protocol", "").trim(),
+                                                            status = ipJson.optInt("status", 0),
+                                                            isActive = ipJson.optBoolean("isActive", true),
+                                                            wildcard = ipJson.optBoolean("wildcard", false),
+                                                            proxyId = ipJson.optString("proxyId", "").trim(),
+                                                            proxyCC = ipJson.optString("proxyCC", "").trim()
+                                                        )
                                                     )
-                                                )
+                                                }
                                             }
                                         }
-                                    }
-                                add(
-                                    PowerProfileAppBlocklist(
-                                        packageName = packageName,
-                                        appName = appName,
-                                        firewallStatus = appJson.optInt("firewallStatus", 0),
-                                        connectionStatus = appJson.optInt("connectionStatus", 0),
-                                        domainRules = domainRules,
-                                        ipRules = ipRules
+                                    add(
+                                        PowerProfileAppBlocklist(
+                                            packageName = packageName,
+                                            appName = appName,
+                                            firewallStatus = appJson.optInt("firewallStatus", 0),
+                                            connectionStatus = appJson.optInt("connectionStatus", 0),
+                                            domainRules = domainRules,
+                                            ipRules = ipRules
+                                        )
                                     )
-                                )
+                                }
+                            }
+                        },
+                    localBlocklistTagIds =
+                        buildList {
+                            if (localBlocklistTagIdsJson != null) {
+                                for (index in 0 until localBlocklistTagIdsJson.length()) {
+                                    val value = localBlocklistTagIdsJson.optInt(index, Int.MIN_VALUE)
+                                    if (value != Int.MIN_VALUE) add(value)
+                                }
                             }
                         }
-                    },
-                localBlocklistTagIds =
-                    buildList {
-                        if (localBlocklistTagIdsJson != null) {
-                            for (index in 0 until localBlocklistTagIdsJson.length()) {
-                                val value = localBlocklistTagIdsJson.optInt(index, Int.MIN_VALUE)
-                                if (value != Int.MIN_VALUE) add(value)
-                            }
-                        }
-                    }
+                )
+
+            return PowerProfilePortableDocument(
+                id = sanitized.id,
+                name = sanitized.name,
+                description = sanitized.description,
+                meta = sanitized.meta,
+                provider = sanitized.provider,
+                sourceSummary = sanitized.sourceSummary,
+                sourceDocUrl = sanitized.sourceDocUrl,
+                sourceTokens = sanitized.sourceTokens,
+                generatedAtEpochMs = sanitized.generatedAtEpochMs,
+                supportedRuleKind = sanitized.supportedRuleKind,
+                domains = sanitized.domains,
+                ips = sanitized.ips,
+                apps = sanitized.apps,
+                localBlocklistTagIds = sanitized.localBlocklistTagIds
             )
         }
     }

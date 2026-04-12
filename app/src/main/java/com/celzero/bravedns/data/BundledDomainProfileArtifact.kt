@@ -16,7 +16,6 @@
 package com.celzero.bravedns.data
 
 import com.celzero.bravedns.service.DomainRulesManager
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.util.Constants
 import org.json.JSONObject
@@ -113,8 +112,20 @@ data class BundledDomainProfileArtifact(
                                 PowerProfileAppBlocklist(
                                     packageName = packageName,
                                     appName = appName,
-                                    firewallStatus = appJson.optInt("firewallStatus", FirewallManager.FirewallStatus.NONE.id),
-                                    connectionStatus = appJson.optInt("connectionStatus", FirewallManager.ConnectionStatus.ALLOW.id),
+                                    firewallStatus =
+                                        PowerProfileFirewallValue.sanitizeFirewallStatus(
+                                            appJson.optInt(
+                                                "firewallStatus",
+                                                PowerProfileFirewallValue.FIREWALL_STATUS_NONE
+                                            )
+                                        ),
+                                    connectionStatus =
+                                        PowerProfileFirewallValue.sanitizeConnectionStatus(
+                                            appJson.optInt(
+                                                "connectionStatus",
+                                                PowerProfileFirewallValue.CONNECTION_STATUS_ALLOW
+                                            )
+                                        ),
                                     domainRules = domainRules,
                                     ipRules = ipRules
                                 )
@@ -123,15 +134,27 @@ data class BundledDomainProfileArtifact(
                     }
                 }
 
+            val sanitized =
+                PowerProfileSecurity.sanitizeArtifact(
+                    profileId = json.optString("profileId", "").trim(),
+                    provider = json.optString("provider", "").trim(),
+                    sourceDocUrl = json.optString("sourceDocUrl", "").trim(),
+                    generatedAtEpochMs = json.optLong("generatedAtEpochMs", 0L),
+                    supportedRuleKind = json.optString("supportedRuleKind", "").trim(),
+                    domains = domains,
+                    ips = ips,
+                    apps = apps
+                )
+
             return BundledDomainProfileArtifact(
-                profileId = json.optString("profileId", "").trim(),
-                provider = json.optString("provider", "").trim(),
-                sourceDocUrl = json.optString("sourceDocUrl", "").trim(),
-                generatedAtEpochMs = json.optLong("generatedAtEpochMs", 0L),
-                supportedRuleKind = json.optString("supportedRuleKind", "").trim(),
-                domains = domains,
-                ips = ips,
-                apps = apps
+                profileId = sanitized.profileId,
+                provider = sanitized.provider,
+                sourceDocUrl = sanitized.sourceDocUrl,
+                generatedAtEpochMs = sanitized.generatedAtEpochMs,
+                supportedRuleKind = sanitized.supportedRuleKind,
+                domains = sanitized.domains,
+                ips = sanitized.ips,
+                apps = sanitized.apps
             )
         }
     }

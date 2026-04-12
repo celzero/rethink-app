@@ -47,6 +47,8 @@ object PowerProfileImportManager : KoinComponent {
     private val appInfoRepository by inject<AppInfoRepository>()
     private val customDomainRepository by inject<CustomDomainRepository>()
     private val customIpRepository by inject<CustomIpRepository>()
+    internal var reloadDomainRules: suspend () -> Unit = ::defaultReloadDomainRules
+    internal var reloadIpRules: suspend () -> Unit = ::defaultReloadIpRules
 
     suspend fun importBundledRules(
         context: Context,
@@ -238,10 +240,10 @@ object PowerProfileImportManager : KoinComponent {
         customDomainRepository.insertAll(domainsToInsert)
         customIpRepository.insertAll(ipsToInsert)
         if (domainsToInsert.isNotEmpty()) {
-            DomainRulesManager.load()
+            reloadDomainRules()
         }
         if (ipsToInsert.isNotEmpty()) {
-            IpRulesManager.load()
+            reloadIpRules()
         }
 
         return PowerProfileImportResult(
@@ -270,5 +272,13 @@ object PowerProfileImportManager : KoinComponent {
         } catch (_: Exception) {
             null
         }
+    }
+
+    private suspend fun defaultReloadDomainRules() {
+        DomainRulesManager.load()
+    }
+
+    private suspend fun defaultReloadIpRules() {
+        IpRulesManager.load()
     }
 }

@@ -34,6 +34,8 @@ data class PowerProfileAppPreview(
 )
 
 object PowerProfileAppManager {
+    internal var lookupInstalledApp: suspend (String) -> AppInfo? = ::defaultLookupInstalledApp
+
     fun listApps(context: Context, profile: PowerProfileDefinition): List<PowerProfileAppBlocklist> {
         return PowerProfileArtifacts.loadArtifact(context, profile)?.apps.orEmpty()
     }
@@ -51,7 +53,7 @@ object PowerProfileAppManager {
         profile: PowerProfileDefinition
     ): List<PowerProfileAppSummary> {
         return listApps(context, profile).map { app ->
-            val installed = FirewallManager.getAppInfoByPackage(app.packageName)
+            val installed = lookupInstalledApp(app.packageName)
             PowerProfileAppSummary(
                 packageName = app.packageName,
                 appName = installed?.appName ?: app.appName,
@@ -69,11 +71,15 @@ object PowerProfileAppManager {
     ): PowerProfileAppPreview? {
         val profile = PowerProfileCatalog.get(context, profileId) ?: return null
         val appBlocklist = getApp(context, profile, packageName) ?: return null
-        val installedAppInfo = FirewallManager.getAppInfoByPackage(packageName)
+        val installedAppInfo = lookupInstalledApp(packageName)
         return PowerProfileAppPreview(
             profile = profile,
             appBlocklist = appBlocklist,
             installedAppInfo = installedAppInfo
         )
+    }
+
+    private suspend fun defaultLookupInstalledApp(packageName: String): AppInfo? {
+        return FirewallManager.getAppInfoByPackage(packageName)
     }
 }

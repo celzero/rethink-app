@@ -34,6 +34,7 @@ import com.celzero.bravedns.data.PowerProfileCatalog
 import com.celzero.bravedns.data.PowerProfileDefinition
 import com.celzero.bravedns.databinding.FragmentPowerProfileEntriesBinding
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.NumberFormat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -60,19 +61,13 @@ class PowerProfileEntriesFragment : Fragment(R.layout.fragment_power_profile_ent
         super.onViewCreated(view, savedInstanceState)
         profileId = arguments?.getString(ARG_PROFILE_ID).orEmpty()
         sectionId = arguments?.getString(ARG_SECTION).orEmpty().ifBlank { SECTION_RETHINK }
-        b.fppeBackCard.setOnClickListener { findNavController().navigateUp() }
+        b.fppeInfoIcon.setOnClickListener { showInfoDialog() }
         bindState()
     }
 
     private fun bindState() {
         val profile = requireProfile()
         b.fppeTitle.text = sectionTitle()
-        b.fppeDesc.text =
-            getString(
-                R.string.power_profile_entries_desc,
-                sectionTitle().lowercase(),
-                profile.resolveTitle(requireContext())
-            )
 
         viewLifecycleOwner.lifecycleScope.launch {
             val artifact =
@@ -235,6 +230,21 @@ class PowerProfileEntriesFragment : Fragment(R.layout.fragment_power_profile_ent
         card.findViewById<TextView>(R.id.vappi_desc).text = description
         card.findViewById<TextView>(R.id.vappi_meta).text = meta
         b.fppeContentContainer.addView(card)
+    }
+
+    private fun showInfoDialog() {
+        val profile = requireProfile()
+        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+            .setTitle(sectionTitle())
+            .setMessage(
+                getString(
+                    R.string.power_profile_entries_desc,
+                    sectionTitle().lowercase(),
+                    profile.resolveTitle(requireContext())
+                )
+            )
+            .setPositiveButton(R.string.lbl_dismiss, null)
+            .show()
     }
 
     private fun addGroupedBlocklistEntries(

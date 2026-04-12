@@ -15,39 +15,28 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.format.DateUtils
-import android.view.LayoutInflater
 import android.view.View
-import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.ActivePowerProfile
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.data.PowerProfileCurrentSetupManager
+import com.celzero.bravedns.data.PowerProfileArtifacts
+import com.celzero.bravedns.data.PowerProfileCatalog
 import com.celzero.bravedns.data.PowerProfileStore
 import com.celzero.bravedns.data.SavedPowerProfile
 import com.celzero.bravedns.databinding.FragmentActiveProfilesBinding
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.activity.AppListActivity
-import com.celzero.bravedns.ui.activity.FirewallActivity
-import com.celzero.bravedns.ui.activity.NetworkLogsActivity
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.databinding.ViewPowerProfileSectionCardBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
 
 class ActiveProfilesFragment : Fragment(R.layout.fragment_active_profiles) {
 
     private val b by viewBinding(FragmentActiveProfilesBinding::bind)
-    private val appConfig by inject<AppConfig>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -61,10 +50,9 @@ class ActiveProfilesFragment : Fragment(R.layout.fragment_active_profiles) {
     }
 
     private fun bindState() {
-        val braveMode = appConfig.getBraveMode()
         val activeProfiles = PowerProfileStore.listActiveProfiles(requireContext())
         val savedProfiles = PowerProfileStore.listSavedProfiles(requireContext())
-        bindActiveProfileCards(activeProfiles)
+        bindCoverageCards(activeProfiles)
 
         if (activeProfiles.isNotEmpty()) {
             val latestProfile = activeProfiles.first()
@@ -72,12 +60,9 @@ class ActiveProfilesFragment : Fragment(R.layout.fragment_active_profiles) {
                 getString(R.string.power_active_profiles_live_title, activeProfiles.size)
             b.fapEmptyDesc.text =
                 getString(
-                    R.string.power_active_profiles_live_desc,
+                    R.string.power_active_profiles_live_desc_compact,
                     latestProfile.name,
-                    formatActiveTimestamp(latestProfile),
-                    latestProfile.importedRuleCount,
-                    latestProfile.artifactRuleCount,
-                    latestProfile.sourceSummary
+                    formatActiveTimestamp(latestProfile)
                 )
         } else if (savedProfiles.isEmpty()) {
             b.fapEmptyTitle.text = getString(R.string.power_active_profiles_empty_title)
@@ -88,112 +73,142 @@ class ActiveProfilesFragment : Fragment(R.layout.fragment_active_profiles) {
                 getString(R.string.power_active_profiles_saved_title, savedProfiles.size)
             b.fapEmptyDesc.text =
                 getString(
-                    R.string.power_active_profiles_saved_desc,
+                    R.string.power_active_profiles_saved_desc_compact,
                     latestProfile.name,
-                    formatProfileTimestamp(latestProfile),
-                    latestProfile.engineMode
+                    formatProfileTimestamp(latestProfile)
                 )
         }
-
-        b.fapSetupStatusValue.text =
-            when {
-                VpnController.isAppPaused() -> getString(R.string.power_status_paused)
-                VpnController.hasTunnel() -> getString(R.string.power_status_on)
-                else -> getString(R.string.power_status_off)
-            }
-
-        b.fapSetupModeValue.text =
-            when {
-                braveMode.isDnsFirewallMode() -> getString(R.string.power_mode_dns_firewall)
-                braveMode.isFirewallMode() -> getString(R.string.power_mode_firewall)
-                else -> getString(R.string.power_mode_dns)
-            }
     }
 
     private fun setupClickListeners() {
-        b.fapBackCard.setOnClickListener { findNavController().navigateUp() }
-
-        b.fapOpenFirewallCard.setOnClickListener {
-            val intent = Intent(requireContext(), FirewallActivity::class.java)
-            intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, FirewallActivity.Tabs.UNIVERSAL.screen)
-            startActivity(intent)
-        }
-
-        b.fapOpenAppsCard.setOnClickListener {
-            startActivity(Intent(requireContext(), AppListActivity::class.java))
-        }
-
-        b.fapOpenLogsCard.setOnClickListener {
-            startActivity(Intent(requireContext(), NetworkLogsActivity::class.java))
-        }
-
-        b.fapDiscoverProfilesCard.setOnClickListener {
-            findNavController().navigate(R.id.discoverProfilesFragment)
-        }
-
-        b.fapSaveCurrentSetupCard.setOnClickListener {
-            saveCurrentSetup()
-        }
+        b.fapInfoIcon.setOnClickListener { showInfoDialog() }
     }
 
-    private fun saveCurrentSetup() {
+    private fun showInfoDialog() {
+        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+            .setTitle(R.string.power_active_profiles_title)
+            .setMessage(
+                getString(R.string.power_active_profiles_screen_desc) +
+                    "\n\n" +
+                    getString(R.string.power_active_profiles_current_setup_desc)
+            )
+            .setPositiveButton(R.string.lbl_dismiss, null)
+            .show()
+    }
+
+    private fun bindCoverageCards(activeProfiles: List<ActivePowerProfile>) {
+        bindSectionCard(
+            b.fapDomainCard,
+            getString(R.string.power_profile_domain_blocklist_title),
+            R.drawable.ic_dns_cache,
+            "0",
+            getString(R.string.power_profile_domain_card_meta, "0")
+        )
+        bindSectionCard(
+            b.fapIpCard,
+            getString(R.string.power_profile_ip_blocklist_title),
+            R.drawable.ic_firewall_shield,
+            "0",
+            getString(R.string.power_profile_ip_card_meta, "0")
+        )
+        bindSectionCard(
+            b.fapAppsCard,
+            getString(R.string.power_profile_apps_blocklist_title),
+            R.drawable.ic_app_info_accent,
+            "0",
+            getString(R.string.power_profile_apps_card_meta_empty)
+        )
+        bindSectionCard(
+            b.fapRethinkCard,
+            getString(R.string.power_profile_rethink_blocklists_title),
+            R.drawable.ic_dns_firewall,
+            "0",
+            getString(R.string.power_profile_rethink_card_meta_fallback, "0")
+        )
+
         viewLifecycleOwner.lifecycleScope.launch {
-            val savedProfile = PowerProfileStore.saveCurrentSetup(requireContext(), appConfig)
-            val reusableProfile =
+            val summary =
                 withContext(Dispatchers.IO) {
-                    PowerProfileCurrentSetupManager.saveCurrentSetupAsImportedProfile(
-                        requireContext(),
-                        PowerProfileStore.listSavedProfiles(requireContext()).size
+                    val globalDomains = linkedSetOf<String>()
+                    val globalIps = linkedSetOf<String>()
+                    val appPackages = linkedSetOf<String>()
+                    val rethinkTags = linkedSetOf<Int>()
+
+                    activeProfiles.forEach { activeProfile ->
+                        val profile = PowerProfileCatalog.get(requireContext(), activeProfile.id) ?: return@forEach
+                        val artifact = PowerProfileArtifacts.loadArtifact(requireContext(), profile)
+                        artifact?.domains?.let(globalDomains::addAll)
+                        artifact?.ips?.let(globalIps::addAll)
+                        artifact?.apps?.forEach { appPackages.add(it.packageName) }
+                        rethinkTags.addAll(profile.localBlocklistTagIds)
+                    }
+
+                    ActiveProfileCoverageSummary(
+                        domainCount = globalDomains.size,
+                        ipCount = globalIps.size,
+                        appCount = appPackages.size,
+                        rethinkCount = rethinkTags.size
                     )
                 }
-            bindState()
-            val message =
-                if (reusableProfile != null) {
-                    getString(R.string.power_saved_profile_saved_as_profile_message, reusableProfile.resolveTitle(requireContext()))
+            if (!isAdded) return@launch
+
+            bindSectionCard(
+                b.fapDomainCard,
+                getString(R.string.power_profile_domain_blocklist_title),
+                R.drawable.ic_dns_cache,
+                formatCount(summary.domainCount),
+                getString(R.string.power_profile_domain_card_meta, formatCount(summary.domainCount))
+            )
+            bindSectionCard(
+                b.fapIpCard,
+                getString(R.string.power_profile_ip_blocklist_title),
+                R.drawable.ic_firewall_shield,
+                formatCount(summary.ipCount),
+                getString(R.string.power_profile_ip_card_meta, formatCount(summary.ipCount))
+            )
+            bindSectionCard(
+                b.fapAppsCard,
+                getString(R.string.power_profile_apps_blocklist_title),
+                R.drawable.ic_app_info_accent,
+                formatCount(summary.appCount),
+                if (summary.appCount == 0) {
+                    getString(R.string.power_profile_apps_card_meta_empty)
                 } else {
-                    getString(R.string.power_saved_profile_saved_message, savedProfile.name)
+                    getString(
+                        R.string.power_active_profiles_apps_card_meta,
+                        formatCount(summary.appCount)
+                    )
                 }
-            showToastUiCentered(requireContext(), message, Toast.LENGTH_SHORT)
+            )
+            bindSectionCard(
+                b.fapRethinkCard,
+                getString(R.string.power_profile_rethink_blocklists_title),
+                R.drawable.ic_dns_firewall,
+                formatCount(summary.rethinkCount),
+                getString(
+                    R.string.power_active_profiles_rethink_card_meta,
+                    formatCount(summary.rethinkCount)
+                )
+            )
         }
     }
 
-    private fun bindActiveProfileCards(activeProfiles: List<ActivePowerProfile>) {
-        b.fapProfilesContainer.removeAllViews()
-        val hasActiveProfiles = activeProfiles.isNotEmpty()
-        b.fapProfilesHeading.visibility = if (hasActiveProfiles) View.VISIBLE else View.GONE
-        b.fapProfilesContainer.visibility = if (hasActiveProfiles) View.VISIBLE else View.GONE
-        if (!hasActiveProfiles) return
-
-        val inflater = LayoutInflater.from(requireContext())
-        activeProfiles.forEach { profile ->
-            val card =
-                inflater.inflate(
-                    R.layout.view_active_power_profile_item,
-                    b.fapProfilesContainer,
-                    false
-                )
-            card.findViewById<TextView>(R.id.vappi_title).text = profile.name
-            card.findViewById<TextView>(R.id.vappi_desc).text =
-                getString(
-                    R.string.power_active_profiles_live_desc,
-                    profile.name,
-                    formatActiveTimestamp(profile),
-                    profile.importedRuleCount,
-                    profile.artifactRuleCount,
-                    profile.sourceSummary
-                )
-            card.findViewById<TextView>(R.id.vappi_meta).text =
-                getString(R.string.power_profile_detail_manage_latest)
-            card.setOnClickListener {
-                findNavController().navigate(
-                    R.id.powerProfileDetailFragment,
-                    Bundle().apply {
-                        putString(PowerProfileDetailFragment.ARG_PROFILE_ID, profile.id)
-                    }
-                )
-            }
-            b.fapProfilesContainer.addView(card)
+    private fun bindSectionCard(
+        card: ViewPowerProfileSectionCardBinding,
+        title: String,
+        iconRes: Int,
+        count: String,
+        meta: String
+    ) {
+        card.vppscTitle.apply {
+            text = title
+            setCompoundDrawablesRelativeWithIntrinsicBounds(iconRes, 0, 0, 0)
         }
+        card.vppscCount.text = count
+        card.vppscMeta.text = meta
+        card.vppscChevron.visibility = View.GONE
+        card.root.isClickable = false
+        card.root.isFocusable = false
     }
 
     private fun formatProfileTimestamp(profile: SavedPowerProfile): CharSequence {
@@ -213,4 +228,13 @@ class ActiveProfilesFragment : Fragment(R.layout.fragment_active_profiles) {
             DateUtils.FORMAT_ABBREV_RELATIVE
         )
     }
+
+    private fun formatCount(value: Int): String = value.toString()
+
+    private data class ActiveProfileCoverageSummary(
+        val domainCount: Int,
+        val ipCount: Int,
+        val appCount: Int,
+        val rethinkCount: Int
+    )
 }

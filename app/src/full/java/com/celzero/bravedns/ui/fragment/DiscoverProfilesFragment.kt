@@ -35,6 +35,7 @@ import com.celzero.bravedns.data.PowerProfileCatalog
 import com.celzero.bravedns.data.PowerProfileDefinition
 import com.celzero.bravedns.databinding.FragmentDiscoverProfilesBinding
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
 
@@ -58,6 +59,7 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
         val profiles = PowerProfileCatalog.list(requireContext())
         val smoothBrowsing = requireProfile("smooth-browsing")
         val safeBeautiful = requireProfile(CuratedPowerProfileCatalog.SAFE_BEAUTIFUL_INTERNET_ID)
+        val parentalControl = requireProfile(CuratedPowerProfileCatalog.PARENTAL_CONTROL_ID)
         val appHorse = requireProfile(CuratedPowerProfileCatalog.APP_HORSE_ID)
         val exam = requireProfile("exam")
         val deepFocus = requireProfile("deep-focus")
@@ -81,6 +83,15 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
             titleId = R.id.fdp_safe_title,
             descriptionId = R.id.fdp_safe_desc,
             metaId = R.id.fdp_safe_meta
+        )
+
+        bindProfileCard(
+            profile = parentalControl,
+            root = b.fdpParentalControlCard,
+            iconId = R.id.fdp_parental_icon,
+            titleId = R.id.fdp_parental_title,
+            descriptionId = R.id.fdp_parental_desc,
+            metaId = R.id.fdp_parental_meta
         )
 
         bindProfileCard(
@@ -114,13 +125,16 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
     }
 
     private fun setupClickListeners() {
-        b.fdpBackCard.setOnClickListener { findNavController().navigateUp() }
+        b.fdpInfoIcon.setOnClickListener { showInfoDialog() }
 
         b.fdpSmoothInternetCard.setOnClickListener {
             openProfileDetail("smooth-browsing")
         }
         b.fdpSafeBeautifulCard.setOnClickListener {
             openProfileDetail(CuratedPowerProfileCatalog.SAFE_BEAUTIFUL_INTERNET_ID)
+        }
+        b.fdpParentalControlCard.setOnClickListener {
+            openProfileDetail(CuratedPowerProfileCatalog.PARENTAL_CONTROL_ID)
         }
         b.fdpAppHorseCard.setOnClickListener {
             openProfileDetail(CuratedPowerProfileCatalog.APP_HORSE_ID)
@@ -224,5 +238,17 @@ class DiscoverProfilesFragment : Fragment(R.layout.fragment_discover_profiles) {
                 bindCatalog()
                 openProfileDetail(importedProfile.id)
             }
+    }
+
+    private fun showInfoDialog() {
+        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+            .setTitle(R.string.power_discover_profiles_title)
+            .setMessage(
+                getString(R.string.power_discover_profiles_screen_desc) +
+                    "\n\n" +
+                    getString(R.string.power_discover_profiles_intro_desc)
+            )
+            .setPositiveButton(R.string.lbl_dismiss, null)
+            .show()
     }
 }

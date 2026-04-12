@@ -54,6 +54,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/ic_right_arrow_white" />
+            android:src="@drawable/ic_right_arrow_secondary" />
     </RelativeLayout>
 </com.google.android.material.card.MaterialCardView>

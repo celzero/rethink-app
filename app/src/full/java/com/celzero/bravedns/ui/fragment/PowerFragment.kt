@@ -33,10 +33,7 @@ import com.celzero.bravedns.data.PowerProfileStore
 import com.celzero.bravedns.data.SavedPowerProfile
 import com.celzero.bravedns.databinding.FragmentPowerBinding
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.activity.AppListActivity
-import com.celzero.bravedns.ui.activity.FirewallActivity
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -70,29 +67,12 @@ class PowerFragment : Fragment(R.layout.fragment_power) {
         }
         b.fpSaveSetupCard.setOnClickListener { saveCurrentSetup() }
 
-        b.fpAppsCard.setOnClickListener {
-            startActivity(Intent(requireContext(), AppListActivity::class.java))
-        }
-
-        b.fpFirewallCard.setOnClickListener {
-            val intent = Intent(requireContext(), FirewallActivity::class.java)
-            intent.putExtra(
-                Constants.VIEW_PAGER_SCREEN_TO_LOAD,
-                FirewallActivity.Tabs.UNIVERSAL.screen
-            )
-            startActivity(intent)
-        }
-
         b.fpLogsCard.setOnClickListener {
             startActivity(Intent(requireContext(), NetworkLogsActivity::class.java))
         }
 
         b.fpDashboardCard.setOnClickListener {
             findNavController().navigate(R.id.homeScreenFragment)
-        }
-
-        b.fpConfigureCard.setOnClickListener {
-            findNavController().navigate(R.id.configureFragment)
         }
     }
 

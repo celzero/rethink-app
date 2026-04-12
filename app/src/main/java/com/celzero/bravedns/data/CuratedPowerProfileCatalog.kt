@@ -21,6 +21,7 @@ object CuratedPowerProfileCatalog {
 
     const val SMOOTH_BROWSING_ID = "smooth-browsing"
     const val SAFE_BEAUTIFUL_INTERNET_ID = "safe-beautiful-internet"
+    const val PARENTAL_CONTROL_ID = "parental-control"
     const val APP_HORSE_ID = "app-horse"
     const val EXAM_ID = "exam"
     const val DEEP_FOCUS_ID = "deep-focus"
@@ -77,6 +78,33 @@ object CuratedPowerProfileCatalog {
                 sourceSummary =
                     "Samsung-curated local blocklist setup with 80 privacy and security selections.",
                 sourceTokens = listOf("rethink-local-blocklists", "privacy", "security"),
+                readyForActivation = true
+            ),
+            PowerProfileDefinition(
+                id = PARENTAL_CONTROL_ID,
+                titleRes = R.string.power_profile_parental_control_title,
+                descriptionRes = R.string.power_profile_parental_control_desc,
+                metaRes = R.string.power_profile_parental_control_meta,
+                iconRes = R.drawable.ic_local_blocklist,
+                localBlocklistTagIds =
+                    listOf(
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                        19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+                        36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52,
+                        53, 173, 174, 176, 177, 179, 182, 183, 184, 185, 186, 191, 192, 194
+                    ),
+                sourceProvider = "Rethink DNS",
+                sourceSummary =
+                    "Native parental-control stack from Rethink's on-device catalog, including adult content, gambling, piracy, bypass methods, and selected services.",
+                sourceTokens =
+                    listOf(
+                        "rethink-local-blocklists",
+                        "parental-control",
+                        "adult-content",
+                        "gambling",
+                        "piracy",
+                        "social-media"
+                    ),
                 readyForActivation = true
             ),
             PowerProfileDefinition(

@@ -739,7 +739,14 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                         supportFragmentManager.findFragmentById(R.id.fragment_container) as? NavHostFragment
                     val navController = navHostFragment?.navController
                     val homeId = R.id.powerFragment
-                    if (navController?.currentDestination?.id != homeId) {
+                    val currentDestinationId = navController?.currentDestination?.id
+                    if (
+                        currentDestinationId != null &&
+                        PowerDestinationPolicy.isDeepPowerDestination(currentDestinationId) &&
+                        navController.previousBackStackEntry != null
+                    ) {
+                        navController.navigateUp()
+                    } else if (currentDestinationId != homeId) {
                         val btmNavView = findViewById<BottomNavigationView>(R.id.nav_view)
                         btmNavView.selectedItemId = homeId
                         navController?.navigate(
@@ -828,11 +835,19 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             }
         }
 
-        // Optionally sync the bottom nav highlight with nav changes
-        /*navController?.addOnDestinationChangedListener { _, destination, _ ->
-            // Update Rethink Plus badge or icon here if needed
-            updateRethinkPlusHighlight()
-        }*/
+        navController?.addOnDestinationChangedListener { _, destination, _ ->
+            val destinationId = destination.id
+            btmNavView.visibility =
+                if (PowerDestinationPolicy.isDeepPowerDestination(destinationId)) View.GONE else View.VISIBLE
+
+            val menuItem = PowerDestinationPolicy.topLevelMenuItem(destinationId)
+
+            menuItem?.let {
+                if (btmNavView.selectedItemId != it) {
+                    btmNavView.menu.findItem(it)?.isChecked = true
+                }
+            }
+        }
     }
 
     private fun io(f: suspend () -> Unit) {

@@ -20,11 +20,47 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.util.Constants
 
+internal object PowerProfileFirewallValue {
+    const val FIREWALL_STATUS_BYPASS_UNIVERSAL = 2
+    const val FIREWALL_STATUS_EXCLUDE = 3
+    const val FIREWALL_STATUS_ISOLATE = 4
+    const val FIREWALL_STATUS_NONE = 5
+    const val FIREWALL_STATUS_UNTRACKED = 6
+    const val FIREWALL_STATUS_BYPASS_DNS_FIREWALL = 7
+
+    const val CONNECTION_STATUS_BOTH = 0
+    const val CONNECTION_STATUS_UNMETERED = 1
+    const val CONNECTION_STATUS_METERED = 2
+    const val CONNECTION_STATUS_ALLOW = 3
+
+    fun sanitizeFirewallStatus(id: Int): Int {
+        return when (id) {
+            FIREWALL_STATUS_BYPASS_UNIVERSAL,
+            FIREWALL_STATUS_EXCLUDE,
+            FIREWALL_STATUS_ISOLATE,
+            FIREWALL_STATUS_NONE,
+            FIREWALL_STATUS_UNTRACKED,
+            FIREWALL_STATUS_BYPASS_DNS_FIREWALL -> id
+            else -> FIREWALL_STATUS_NONE
+        }
+    }
+
+    fun sanitizeConnectionStatus(id: Int): Int {
+        return when (id) {
+            CONNECTION_STATUS_BOTH,
+            CONNECTION_STATUS_UNMETERED,
+            CONNECTION_STATUS_METERED,
+            CONNECTION_STATUS_ALLOW -> id
+            else -> CONNECTION_STATUS_ALLOW
+        }
+    }
+}
+
 data class PowerProfileAppBlocklist(
     val packageName: String,
     val appName: String,
-    val firewallStatus: Int = FirewallManager.FirewallStatus.NONE.id,
-    val connectionStatus: Int = FirewallManager.ConnectionStatus.ALLOW.id,
+    val firewallStatus: Int = PowerProfileFirewallValue.FIREWALL_STATUS_NONE,
+    val connectionStatus: Int = PowerProfileFirewallValue.CONNECTION_STATUS_ALLOW,
     val domainRules: List<PowerProfileAppDomainRule> = emptyList(),
     val ipRules: List<PowerProfileAppIpRule> = emptyList()
 ) {

@@ -25,6 +25,16 @@ object PowerProfileStore {
     private const val PREF_KEY_SAVED_PROFILES = "power.saved_profiles.v1"
     private const val PREF_KEY_ACTIVE_PROFILES = "power.active_profiles.v1"
     private const val MAX_SAVED_PROFILES = 25
+    internal var defaultNameProvider: (Context, Int) -> String =
+        { context, index ->
+            context.getString(R.string.power_saved_profile_default_name, index)
+        }
+    internal var defaultNoteProvider: (Context) -> String =
+        { context -> context.getString(R.string.power_saved_profile_default_note) }
+    internal var protectionStatusResolver: (Context) -> String =
+        { context -> resolveProtectionStatus(context) }
+    internal var engineModeResolver: (Context, AppConfig) -> String =
+        { context, appConfig -> resolveEngineMode(context, appConfig) }
 
     fun listSavedProfiles(context: Context): List<SavedPowerProfile> {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
@@ -38,15 +48,11 @@ object PowerProfileStore {
         val savedProfile =
             SavedPowerProfile(
                 id = "saved-$now",
-                name =
-                    context.getString(
-                        R.string.power_saved_profile_default_name,
-                        existingProfiles.size + 1
-                    ),
-                note = context.getString(R.string.power_saved_profile_default_note),
+                name = defaultNameProvider(context, existingProfiles.size + 1),
+                note = defaultNoteProvider(context),
                 createdAt = now,
-                protectionStatus = resolveProtectionStatus(context),
-                engineMode = resolveEngineMode(context, appConfig)
+                protectionStatus = protectionStatusResolver(context),
+                engineMode = engineModeResolver(context, appConfig)
             )
 
         val updatedProfiles = listOf(savedProfile) + existingProfiles

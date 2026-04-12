@@ -24,6 +24,7 @@ import com.celzero.bravedns.data.PowerProfileCatalog
 import com.celzero.bravedns.databinding.FragmentPowerProfileAppsBinding
 import com.celzero.bravedns.ui.activity.AppInfoActivity
 import com.celzero.bravedns.util.Utilities
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.NumberFormat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,15 +41,13 @@ class PowerProfileAppsFragment : Fragment(R.layout.fragment_power_profile_apps) 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         profileId = arguments?.getString(ARG_PROFILE_ID).orEmpty()
-        b.fppaBackCard.setOnClickListener { findNavController().navigateUp() }
+        b.fppaInfoIcon.setOnClickListener { showInfoDialog() }
         bindState()
     }
 
     private fun bindState() {
         val profile = requireProfile()
         b.fppaTitle.text = getString(R.string.power_profile_apps_page_title)
-        b.fppaDesc.text =
-            getString(R.string.power_profile_apps_page_desc, profile.resolveTitle(requireContext()))
 
         viewLifecycleOwner.lifecycleScope.launch {
             val apps =
@@ -108,6 +107,20 @@ class PowerProfileAppsFragment : Fragment(R.layout.fragment_power_profile_apps) 
             }
             b.fppaAppsContainer.addView(card)
         }
+    }
+
+    private fun showInfoDialog() {
+        val profile = requireProfile()
+        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+            .setTitle(R.string.power_profile_apps_page_title)
+            .setMessage(
+                getString(
+                    R.string.power_profile_apps_page_desc,
+                    profile.resolveTitle(requireContext())
+                )
+            )
+            .setPositiveButton(R.string.lbl_dismiss, null)
+            .show()
     }
 
     private fun requireProfile() =
