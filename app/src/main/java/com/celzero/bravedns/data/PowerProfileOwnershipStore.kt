@@ -16,6 +16,7 @@
 package com.celzero.bravedns.data
 
 import android.content.Context
+import inet.ipaddr.IPAddressString
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -293,14 +294,74 @@ object PowerProfileOwnershipStore {
         val localBlocklists = linkedMapOf<Int, MutableList<ActivePowerProfile>>()
 
         activeProfiles.forEach { activeProfile ->
-            val ownedRules = read(context, activeProfile.id)
-            ownedRules.domains.forEach { domain ->
+            val profile = PowerProfileCatalog.get(context, activeProfile.id)
+            val artifact = profile?.let { PowerProfileArtifacts.loadArtifact(context, it) }
+            val fallbackOwnedRules = read(context, activeProfile.id)
+
+            val sourceDomains =
+                if (artifact != null) {
+                    artifact.domains
+                } else {
+                    fallbackOwnedRules.domains
+                }
+            val sourceIps =
+                if (artifact != null) {
+                    artifact.ips.mapNotNull { normalizeIp(it) }
+                } else {
+                    fallbackOwnedRules.ips
+                }
+            val sourceAppDomains =
+                if (artifact != null) {
+                    artifact.apps.flatMap { app ->
+                        app.domainRules.map { rule ->
+                            PowerProfileOwnedAppDomainRule(
+                                packageName = app.packageName,
+                                domain = rule.domain.trim().trimEnd('.').lowercase()
+                            )
+                        }
+                    }
+                } else {
+                    fallbackOwnedRules.appDomains
+                }
+            val sourceAppIps =
+                if (artifact != null) {
+                    artifact.apps.flatMap { app ->
+                        app.ipRules.mapNotNull { rule ->
+                            val normalizedIp = normalizeIp(rule.ipAddress) ?: return@mapNotNull null
+                            PowerProfileOwnedAppIpRule(
+                                packageName = app.packageName,
+                                ipAddress = normalizedIp,
+                                port = rule.port
+                            )
+                        }
+                    }
+                } else {
+                    fallbackOwnedRules.appIps
+                }
+            val sourceAppFirewalls =
+                if (artifact != null) {
+                    artifact.apps
+                        .filter { it.hasFirewallRule() }
+                        .map { app ->
+                            PowerProfileOwnedAppFirewallRule(
+                                packageName = app.packageName,
+                                firewallStatus = app.firewallStatus,
+                                connectionStatus = app.connectionStatus
+                            )
+                        }
+                } else {
+                    fallbackOwnedRules.appFirewalls
+                }
+            val sourceLocalBlocklists =
+                profile?.localBlocklistTagIds ?: fallbackOwnedRules.localBlocklistTagIds
+
+            sourceDomains.forEach { domain ->
                 domains.getOrPut(domain) { mutableListOf() }.add(activeProfile)
             }
-            ownedRules.ips.forEach { ipAddress ->
+            sourceIps.forEach { ipAddress ->
                 ips.getOrPut(ipAddress) { mutableListOf() }.add(activeProfile)
             }
-            ownedRules.appDomains.forEach { rule ->
+            sourceAppDomains.forEach { rule ->
                 val existing = appDomains[rule.key()]
                 if (existing == null) {
                     appDomains[rule.key()] = rule to mutableListOf(activeProfile)
@@ -308,7 +369,7 @@ object PowerProfileOwnershipStore {
                     existing.second.add(activeProfile)
                 }
             }
-            ownedRules.appIps.forEach { rule ->
+            sourceAppIps.forEach { rule ->
                 val existing = appIps[rule.key()]
                 if (existing == null) {
                     appIps[rule.key()] = rule to mutableListOf(activeProfile)
@@ -316,7 +377,7 @@ object PowerProfileOwnershipStore {
                     existing.second.add(activeProfile)
                 }
             }
-            ownedRules.appFirewalls.forEach { rule ->
+            sourceAppFirewalls.forEach { rule ->
                 val existing = appFirewalls[rule.key()]
                 if (existing == null) {
                     appFirewalls[rule.key()] = rule to mutableListOf(activeProfile)
@@ -324,7 +385,7 @@ object PowerProfileOwnershipStore {
                     existing.second.add(activeProfile)
                 }
             }
-            ownedRules.localBlocklistTagIds.forEach { tagId ->
+            sourceLocalBlocklists.forEach { tagId ->
                 localBlocklists.getOrPut(tagId) { mutableListOf() }.add(activeProfile)
             }
         }
@@ -363,5 +424,13 @@ object PowerProfileOwnershipStore {
 
     private fun profileFile(context: Context, profileId: String): File {
         return File(profileDirectory(context), "$profileId.json")
+    }
+
+    private fun normalizeIp(ipAddress: String): String? {
+        return try {
+            IPAddressString(ipAddress).address?.toNormalizedString()
+        } catch (_: Exception) {
+            null
+        }
     }
 }
