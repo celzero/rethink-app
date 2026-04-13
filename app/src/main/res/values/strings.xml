@@ -2,6 +2,7 @@
     <string name="app_name" translatable="false">Rethink</string>
     <string name="app_name_small_case" translatable="false">rethink</string>
     <string name="title_about" translatable="true">About</string>
+    <string name="title_power" translatable="true">Power</string>
     <string name="title_settings" translatable="true">Settings</string>
     <string name="title_statistics" translatable="true">Stats</string>
     <string name="title_proc" translatable="false">Proc</string>
@@ -10,6 +11,186 @@
     <string name="about_title_desc" translatable="true">Detect and block network security threats</string>
 
     <string name="txt_home" translatable="true">Home</string>
+    <string name="power_info_button_content_description" translatable="true">Info</string>
+    <string name="power_title_desc" translatable="true">Profiles, app control, and sharable blocking in one place.</string>
+    <string name="power_status_label" translatable="true">Protection</string>
+    <string name="power_status_on" translatable="true">On</string>
+    <string name="power_status_off" translatable="true">Off</string>
+    <string name="power_status_paused" translatable="true">Paused</string>
+    <string name="power_status_desc" translatable="true">Current engine mode: %1$s</string>
+    <string name="power_mode_dns_firewall" translatable="true">DNS + Firewall</string>
+    <string name="power_mode_firewall" translatable="true">Firewall only</string>
+    <string name="power_mode_dns" translatable="true">DNS only</string>
+    <string name="power_profiles_section" translatable="true">Profiles</string>
+    <string name="power_controls_section" translatable="true">Controls</string>
+    <string name="power_active_profiles_title" translatable="true">Active profile</string>
+    <string name="power_active_profiles_desc" translatable="true">See and edit the merged profile rules shaping your current setup.</string>
+    <string name="power_active_profiles_active_summary" translatable="true">%1$d source profiles merged. Latest %2$s, enabled %3$s.</string>
+    <string name="power_active_profiles_saved_summary" translatable="true">%1$d saved locally. Latest %2$s.</string>
+    <string name="power_active_profiles_screen_desc" translatable="true">Profiles will eventually become the named bundles users can enable, save, and share.</string>
+    <string name="power_active_profiles_empty_title" translatable="true">No active profile yet</string>
+    <string name="power_active_profiles_empty_desc" translatable="true">Your device is still protected by the current firewall and DNS engine settings.</string>
+    <string name="power_active_profiles_live_title" translatable="true">Active profile</string>
+    <string name="power_active_profiles_live_desc" translatable="true">Latest: %1$s, enabled %2$s. Applied %3$d of %4$d supported profile entries. Source: %5$s</string>
+    <string name="power_active_profiles_live_desc_compact" translatable="true">Latest: %1$s, enabled %2$s.</string>
+    <string name="power_active_profiles_card_meta" translatable="true">Applied %1$d of %2$d supported entries. Source: %3$s</string>
+    <string name="power_active_profiles_enabled_heading" translatable="true">Source profiles</string>
+    <string name="power_active_profiles_saved_title" translatable="true">%1$d saved profiles on this device</string>
+    <string name="power_active_profiles_saved_desc" translatable="true">Latest: %1$s, saved %2$s, using %3$s.</string>
+    <string name="power_active_profiles_saved_desc_compact" translatable="true">Latest: %1$s, saved %2$s.</string>
+    <string name="power_active_profiles_current_setup_title" translatable="true">Current device setup</string>
+    <string name="power_active_profiles_current_setup_desc" translatable="true">This is the merged view of the profile rules currently shaping your setup.</string>
+    <string name="power_active_profiles_mode_label" translatable="true">Engine mode</string>
+    <string name="power_discover_profiles_title" translatable="true">Discover profiles</string>
+    <string name="power_discover_profiles_desc" translatable="true">Browse and merge community packs once profile browsing lands.</string>
+    <string name="power_discover_profiles_screen_desc" translatable="true">Start from curated profile ideas before we wire in real imports and community publishing.</string>
+    <string name="power_discover_profiles_intro_title" translatable="true">Curated starting points</string>
+    <string name="power_discover_profiles_intro_desc" translatable="true">These are example profile concepts that show how named bundles can package app blocking into a simple switch.</string>
+    <string name="power_discover_profiles_import_heading" translatable="true">Bring your own profile</string>
+    <string name="power_discover_profiles_import_title" translatable="true">Import from a file</string>
+    <string name="power_discover_profiles_import_desc" translatable="true">Later, this will accept a shared profile file and merge it into your setup.</string>
+    <string name="power_discover_profiles_imported_heading" translatable="true">Imported profiles</string>
+    <string name="power_profile_safe_beautiful_title" translatable="true">Safe and Beautiful Internet (powered by Rethink DNS)</string>
+    <string name="power_profile_safe_beautiful_desc" translatable="true">A strong on-device Rethink profile tuned for safer, cleaner browsing using a broad privacy and security blocklist stack.</string>
+    <string name="power_profile_safe_beautiful_meta" translatable="true">Source: 88 curated Rethink on-device blocklists across privacy and security</string>
+    <string name="power_profile_parental_control_title" translatable="true">Parental control</string>
+    <string name="power_profile_parental_control_desc" translatable="true">A native Rethink profile focused on blocking adult content, gambling, piracy, bypass methods, and selected distracting services.</string>
+    <string name="power_profile_parental_control_meta" translatable="true">Source: 67 curated Rethink on-device blocklists from the parental-control category</string>
+    <string name="power_profile_app_horse_title" translatable="true">App Horse</string>
+    <string name="power_profile_app_horse_desc" translatable="true">A community app pack for Parrot Downloader that carries the ad-network blocklist we validated during live analysis.</string>
+    <string name="power_profile_app_horse_meta" translatable="true">Source: 1 app pack with 21 app-specific IP rules for Parrot Downloader</string>
+    <string name="power_profile_focus_title" translatable="true">Deep Focus</string>
+    <string name="power_profile_focus_desc" translatable="true">A study-first profile that fully blocks Instagram, Telegram, X, Discord, and BGMI or PUBG variants, then layers in social and gaming blocklists while leaving regular YouTube available.</string>
+    <string name="power_profile_focus_meta" translatable="true">Apps + 10 native Rethink social and gaming blocklists; YouTube Shorts path-only blocking is not supported yet</string>
+    <string name="power_profile_merge_placeholder" translatable="true">%1$s merge is the next step.</string>
+    <string name="power_profile_activated_message" translatable="true">%1$s is now active.</string>
+    <string name="power_profile_activation_in_progress" translatable="true">Activating %1$s…</string>
+    <string name="power_profile_activated_with_rules_message" translatable="true">%1$s is active with %2$d profile entries.</string>
+    <string name="power_profile_activation_failed_message" translatable="true">Couldn’t enable this profile yet. Make sure protection is on for native Rethink blocklists.</string>
+    <string name="power_profile_disabled_with_rules_message" translatable="true">%1$s is off. Removed %2$d profile entries.</string>
+    <string name="power_profile_import_placeholder" translatable="true">Profile import is the next step.</string>
+    <string name="power_profile_enable_action" translatable="true">Enable profile</string>
+    <string name="power_profile_disable_action" translatable="true">Disable profile</string>
+    <string name="power_profile_download_in_progress_action" translatable="true">Downloading blocklists…</string>
+    <string name="power_profile_turn_on_protection_action" translatable="true">Turn on protection</string>
+    <string name="power_profile_export_action" translatable="true">Export profile</string>
+    <string name="power_profile_coming_soon_action" translatable="true">Coming next</string>
+    <string name="power_profile_detail_status_active" translatable="true">Active now</string>
+    <string name="power_profile_detail_status_preparing" translatable="true">Preparing profile</string>
+    <string name="power_profile_detail_status_needs_protection" translatable="true">Turn on protection first</string>
+    <string name="power_profile_detail_status_coming_soon" translatable="true">Not wired yet</string>
+    <string name="power_profile_detail_status_loading" translatable="true">Loading profile</string>
+    <string name="power_profile_detail_loading_desc" translatable="true">Checking rule coverage and native blocklist readiness for this profile.</string>
+    <string name="power_profile_detail_loading_meta" translatable="true">This usually settles in a moment.</string>
+    <string name="power_profile_detail_loading_action" translatable="true">Loading…</string>
+    <string name="power_profile_detail_active_desc" translatable="true">Enabled %1$s. This profile currently contributes %2$d applied entries out of %3$d supported entries.</string>
+    <string name="power_profile_detail_supported_desc" translatable="true">This profile currently supports about %1$d entries using %2$s.</string>
+    <string name="power_profile_detail_coming_desc" translatable="true">This profile concept is visible in the catalog, but its engine mapping is still being built.</string>
+    <string name="power_profile_detail_source_heading" translatable="true">Source and provenance</string>
+    <string name="power_profile_detail_blocklists_heading" translatable="true">Included Rethink blocklists</string>
+    <string name="power_profile_detail_sections_heading" translatable="true">What this profile controls</string>
+    <string name="power_profile_detail_provider" translatable="true">Provider: %1$s</string>
+    <string name="power_profile_detail_source_summary" translatable="true">Summary: %1$s</string>
+    <string name="power_profile_detail_source_tokens" translatable="true">Tokens: %1$s</string>
+    <string name="power_profile_detail_rule_meta" translatable="true">Supported entries: %1$d. Kind: %2$s.</string>
+    <string name="power_profile_detail_manage_latest" translatable="true">Manage the latest active profile from here.</string>
+    <string name="power_profile_detail_blocklists_meta" translatable="true">%1$d blocklists in this group</string>
+    <string name="power_profile_detail_blocklists_subgroup" translatable="true">%1$s</string>
+    <string name="power_profile_domain_blocklist_title" translatable="true">Domain Blocklist</string>
+    <string name="power_profile_ip_blocklist_title" translatable="true">IP Blocklist</string>
+    <string name="power_profile_apps_blocklist_title" translatable="true">Apps Blocklist</string>
+    <string name="power_profile_rethink_blocklists_title" translatable="true">Rethink Blocklists</string>
+    <string name="power_profile_cards_loading" translatable="true">Loading...</string>
+    <string name="power_profile_domain_card_meta" translatable="true">%1$s exact domain entries</string>
+    <string name="power_profile_ip_card_meta" translatable="true">%1$s explicit IP entries</string>
+    <string name="power_profile_apps_card_meta_empty" translatable="true">App-level entries coming next</string>
+    <string name="power_profile_apps_card_meta" translatable="true">%1$s apps with %2$s app-specific rules</string>
+    <string name="power_active_profiles_apps_card_meta" translatable="true">%1$s apps covered by current profiles</string>
+    <string name="power_profile_rethink_card_meta" translatable="true">%1$s lists across %2$s groups</string>
+    <string name="power_profile_rethink_card_meta_fallback" translatable="true">%1$s referenced lists</string>
+    <string name="power_active_profiles_rethink_card_meta" translatable="true">%1$s native Rethink lists enabled by current profiles</string>
+    <string name="power_profile_entries_desc" translatable="true">Showing the %1$s included by %2$s.</string>
+    <string name="power_profile_entries_rule_meta" translatable="true">%1$s total entries from %2$s.</string>
+    <string name="power_profile_entries_rule_meta_with_disabled" translatable="true">%1$s total entries from %2$s. %3$s disabled in the current setup.</string>
+    <string name="power_profile_entries_empty_title" translatable="true">Nothing here yet</string>
+    <string name="power_profile_entries_empty_meta" translatable="true">This section is ready for future profile content.</string>
+    <string name="power_profile_entries_preview_title" translatable="true">Entry preview</string>
+    <string name="power_profile_entries_preview_meta" translatable="true">Showing %1$s of %2$s entries</string>
+    <string name="power_profile_domain_entries_desc" translatable="true">This profile currently carries %1$s exact domain entries.</string>
+    <string name="power_profile_ip_entries_desc" translatable="true">This profile currently carries %1$s explicit IP entries.</string>
+    <string name="power_profile_apps_entries_desc" translatable="true">%1$s does not include app-specific blocks yet.</string>
+    <string name="power_profile_domain_entries_empty_desc" translatable="true">No domain entries are bundled with this profile yet.</string>
+    <string name="power_profile_ip_entries_empty_desc" translatable="true">No IP entries are bundled with this profile yet.</string>
+    <string name="power_profile_apps_entries_empty_desc" translatable="true">App-level blocklists will plug into profiles once we add authoring for them.</string>
+    <string name="power_profile_apps_page_title" translatable="true">Apps Blocklist</string>
+    <string name="power_profile_apps_page_desc" translatable="true">These apps are covered by %1$s. Tap an app to preview the app-level firewall rules this profile will contribute.</string>
+    <string name="power_profile_apps_item_meta" translatable="true">%1$s IP rules • %2$s domain rules</string>
+    <string name="power_profile_rethink_blocklists_desc" translatable="true">This profile reuses %1$s native Rethink blocklists grouped into %2$s categories.</string>
+    <string name="power_profile_rethink_blocklists_empty_desc" translatable="true">This profile does not include any native Rethink blocklists.</string>
+    <string name="power_profile_rethink_blocklists_unavailable_desc" translatable="true">This profile references %1$s native Rethink blocklists, but this device cannot resolve their grouped catalog details yet.</string>
+    <string name="power_profile_rethink_blocklists_unavailable_meta" translatable="true">This device does not currently have the local Rethink blocklist catalog needed to show names and groups.</string>
+    <string name="power_profile_rethink_blocklists_unavailable_hint" translatable="true">Open this profile on a device with the local Rethink catalog to inspect the exact list names.</string>
+    <string name="power_profile_local_catalog_preparing_desc" translatable="true">Downloading the local Rethink blocklist catalog so this profile can apply its %1$s native selections.</string>
+    <string name="power_profile_local_catalog_missing_desc" translatable="true">This profile uses %1$s native Rethink blocklists. The local catalog will be downloaded automatically before activation.</string>
+    <string name="power_profile_local_catalog_needs_protection_desc" translatable="true">Protection is off. Enabling this profile will start protection first, then apply its native on-device blocklists.</string>
+    <string name="power_profile_local_catalog_hint" translatable="true">Native Rethink blocklists do not appear as custom firewall IP/domain rules. They apply through Rethink’s on-device blocklist engine.</string>
+    <string name="power_profile_local_catalog_download_started" translatable="true">Downloading the local Rethink blocklist catalog…</string>
+    <string name="power_profile_local_catalog_download_failed" translatable="true">Couldn’t prepare the local Rethink blocklist catalog.</string>
+    <string name="power_profile_blocklist_subgroup_other" translatable="true">others</string>
+    <string name="power_profile_blocklist_entry_line" translatable="true">• %1$s (%2$s entries)</string>
+    <string name="power_profile_blocklist_entry_meta" translatable="true">%1$s entries</string>
+    <string name="power_profile_blocklist_disabled_in_current_setup" translatable="true">Disabled in the current setup</string>
+    <string name="power_profile_blocklist_shared_by_profiles" translatable="true">Shared by %1$s active profiles</string>
+    <string name="power_profile_blocklist_disable_dialog_title" translatable="true">Disable blocklist</string>
+    <string name="power_profile_blocklist_disable_dialog_message" translatable="true">Turn off %1$s from %2$s in your current setup?</string>
+    <string name="power_profile_blocklist_disable_dialog_message_shared" translatable="true">Turn off %1$s in your current setup? It is currently shared by %2$s active profiles: %3$s.</string>
+    <string name="power_profile_blocklist_reenable_dialog_title" translatable="true">Re-enable blocklist</string>
+    <string name="power_profile_blocklist_reenable_dialog_message" translatable="true">Turn %1$s back on in your current setup?</string>
+    <string name="power_profile_blocklist_disable_action" translatable="true">Disable in current setup</string>
+    <string name="power_profile_blocklist_reenable_action" translatable="true">Re-enable in current setup</string>
+    <string name="power_profile_blocklist_disabled_message" translatable="true">%1$s is now off in the current setup.</string>
+    <string name="power_profile_blocklist_reenabled_message" translatable="true">%1$s is back on in the current setup.</string>
+    <string name="power_profile_blocklist_update_failed_message" translatable="true">Could not update %1$s right now.</string>
+    <string name="power_profile_entries_current_setup_meta" translatable="true">%1$s active entries in the current setup. %2$s disabled here.</string>
+    <string name="power_profile_rule_entry_meta_sources" translatable="true">Source profiles: %1$s</string>
+    <string name="power_profile_rule_shared_by_profiles" translatable="true">Shared by %1$s source profiles</string>
+    <string name="power_profile_rule_disable_dialog_title" translatable="true">Disable rule</string>
+    <string name="power_profile_rule_disable_dialog_message" translatable="true">Turn off %1$s in your current setup?</string>
+    <string name="power_profile_rule_disable_dialog_message_shared" translatable="true">Turn off %1$s in your current setup? It is currently shared by %2$s source profiles: %3$s.</string>
+    <string name="power_profile_rule_reenable_dialog_title" translatable="true">Re-enable rule</string>
+    <string name="power_profile_rule_reenable_dialog_message" translatable="true">Turn %1$s back on in your current setup?</string>
+    <string name="power_profile_rule_disable_action" translatable="true">Disable in current setup</string>
+    <string name="power_profile_rule_reenable_action" translatable="true">Re-enable in current setup</string>
+    <string name="power_profile_rule_disabled_message" translatable="true">%1$s is now off in the current setup.</string>
+    <string name="power_profile_rule_reenabled_message" translatable="true">%1$s is back on in the current setup.</string>
+    <string name="power_profile_rule_update_failed_message" translatable="true">Could not update %1$s right now.</string>
+    <string name="power_profile_app_preview_status" translatable="true">Profile preview: %1$s</string>
+    <string name="power_profile_app_preview_data_usage" translatable="true">Previewing rules that will be applied if this profile is enabled.</string>
+    <string name="power_profile_app_preview_source" translatable="true">From profile: %1$s</string>
+    <string name="power_profile_app_preview_ip_rules_empty" translatable="true">This profile does not include any app-specific IP rules for this app.</string>
+    <string name="power_profile_app_preview_domain_rules_empty" translatable="true">This profile does not include any app-specific domain rules for this app.</string>
+    <string name="power_profile_import_success_message" translatable="true">%1$s imported. Review and enable it from here.</string>
+    <string name="power_profile_import_failure_message" translatable="true">That file could not be imported as a profile.</string>
+    <string name="power_profile_export_success_message" translatable="true">%1$s exported.</string>
+    <string name="power_profile_export_failure_message" translatable="true">Profile export failed.</string>
+    <string name="power_save_setup_title" translatable="true">Save current setup</string>
+    <string name="power_save_setup_desc" translatable="true">Capture your current app blocking setup as a reusable profile.</string>
+    <string name="power_saved_profile_default_name" translatable="true">Saved setup %1$d</string>
+    <string name="power_saved_profile_default_note" translatable="true">Created from your current device setup.</string>
+    <string name="power_saved_profile_saved_message" translatable="true">%1$s saved locally.</string>
+    <string name="power_saved_profile_saved_as_profile_message" translatable="true">%1$s saved locally as a reusable profile.</string>
+    <string name="power_saved_profile_reusable_desc" translatable="true">A reusable profile captured from your current Rethink on-device blocklist setup.</string>
+    <string name="power_saved_profile_reusable_meta" translatable="true">%1$d Rethink on-device blocklist entries</string>
+    <string name="power_saved_profile_reusable_summary" translatable="true">Captured from your current on-device blocklist selections: %1$d entries.</string>
+    <string name="power_apps_title" translatable="true">Top controlled apps</string>
+    <string name="power_apps_desc" translatable="true">Open app-level controls and inspect what is being managed per app.</string>
+    <string name="power_firewall_desc" translatable="true">Jump straight into the firewall engine that powers most blocking decisions.</string>
+    <string name="power_logs_title" translatable="true">Recent blocks and logs</string>
+    <string name="power_logs_desc" translatable="true">Inspect captured connections and blocked traffic.</string>
+    <string name="power_dashboard_title" translatable="true">Technical dashboard</string>
+    <string name="power_dashboard_desc" translatable="true">Open the original engine-centric dashboard while the new surface evolves.</string>
+    <string name="power_configure_desc" translatable="true">Reach the full advanced settings area without making it the front page.</string>
+    <string name="power_feature_coming_soon" translatable="true">This part of Power is coming next.</string>
 
     <string name="accessibility_service_description" translatable="true">
         Rethink uses accessibility service to detect and firewall background applications.
@@ -21,6 +202,7 @@
     <string name="finish" translatable="true">Finish</string>
 
     <string name="lbl_cancel" translatable="true">Cancel</string>
+    <string name="lbl_back" translatable="true">Back</string>
     <string name="lbl_apply" translatable="true">Apply</string>
     <string name="lbl_dismiss" translatable="true">Dismiss</string>
     <string name="lbl_all" translatable="true">All</string>

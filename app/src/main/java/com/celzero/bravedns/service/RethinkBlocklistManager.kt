@@ -375,7 +375,8 @@ object RethinkBlocklistManager : KoinComponent {
     suspend fun getStamp(fileValues: Set<Int>, type: RethinkBlocklistType): String {
         return try {
             val flags = convertListToCsv(fileValues)
-            val flags2Stamp = getRDNS(type)?.flagsToStamp(flags.togs(), Backend.EB32).tos() ?: ""
+            val flags2Stamp =
+                getRDNSWithFallback(type)?.flagsToStamp(flags.togs(), Backend.EB32).tos() ?: ""
             Logger.d(LOG_TAG_VPN, "${type.name} flags: $flags; stamp: $flags2Stamp")
             flags2Stamp
         } catch (e: java.lang.Exception) {
@@ -386,7 +387,7 @@ object RethinkBlocklistManager : KoinComponent {
 
     suspend fun getTagsFromStamp(stamp: String, type: RethinkBlocklistType): Set<Int> {
         return try {
-            val tags = convertCsvToList(getRDNS(type)?.stampToFlags(stamp.togs()).tos())
+            val tags = convertCsvToList(getRDNSWithFallback(type)?.stampToFlags(stamp.togs()).tos())
             Logger.d(LOG_TAG_VPN, "${type.name} stamp: $stamp; tags: $tags")
             tags
         } catch (e: Exception) {
@@ -407,6 +408,13 @@ object RethinkBlocklistManager : KoinComponent {
 
     private suspend fun getRDNS(type: RethinkBlocklistType): RDNS? {
         return VpnController.getRDNS(type)
+    }
+
+    private suspend fun getRDNSWithFallback(type: RethinkBlocklistType): RDNS? {
+        val rdns = getRDNS(type)
+        if (rdns != null) return rdns
+        if (!type.isLocal()) return null
+        return getRDNS(RethinkBlocklistType.REMOTE)
     }
 
     private fun io(f: suspend () -> Unit) {

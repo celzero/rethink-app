@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="20dp">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_firewall_shield" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/fp_active_profiles_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="39dp"
+        android:text="@string/power_active_profiles_title"
+        android:textColor="?attr/primaryTextColor"
+        android:textSize="16sp" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/fp_active_profiles_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/fp_active_profiles_title"
+        android:layout_marginStart="39dp"
+        android:layout_marginTop="4dp"
+        android:layout_toStartOf="@id/fp_active_profiles_arrow"
+        android:text="@string/power_active_profiles_desc"
+        android:textColor="?attr/secondaryTextColor"
+        android:textSize="14sp" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/fp_active_profiles_arrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_right_arrow_white" />
+</RelativeLayout>

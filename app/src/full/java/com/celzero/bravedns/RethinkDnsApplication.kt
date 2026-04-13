@@ -22,6 +22,7 @@ import android.content.pm.ApplicationInfo
 import android.os.StrictMode
 import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.scheduler.WorkScheduler
+import com.celzero.bravedns.data.PowerProfileManager
 import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.GlobalExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -56,6 +57,7 @@ class RethinkDnsApplication : Application() {
         turnOnStrictMode()
 
         CoroutineScope(SupervisorJob()).launch {
+            PowerProfileManager.reconcileActiveProfiles(this@RethinkDnsApplication)
             scheduleJobs()
         }
     }

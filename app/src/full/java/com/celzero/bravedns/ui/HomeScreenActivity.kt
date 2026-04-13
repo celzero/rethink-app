@@ -58,6 +58,7 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.data.PowerProfileManager
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.service.AppUpdater
@@ -191,6 +192,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     override fun onResume() {
         super.onResume()
+        lifecycleScope.launch {
+            PowerProfileManager.reconcileActiveProfiles(this@HomeScreenActivity)
+        }
         // if app is coming from background, don't reset the activity stack
         if (appInBackground) {
             appInBackground = false
@@ -738,8 +742,15 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                     val navHostFragment =
                         supportFragmentManager.findFragmentById(R.id.fragment_container) as? NavHostFragment
                     val navController = navHostFragment?.navController
-                    val homeId = R.id.homeScreenFragment
-                    if (navController?.currentDestination?.id != homeId) {
+                    val homeId = R.id.powerFragment
+                    val currentDestinationId = navController?.currentDestination?.id
+                    if (
+                        currentDestinationId != null &&
+                        PowerDestinationPolicy.isDeepPowerDestination(currentDestinationId) &&
+                        navController.previousBackStackEntry != null
+                    ) {
+                        navController.navigateUp()
+                    } else if (currentDestinationId != homeId) {
                         val btmNavView = findViewById<BottomNavigationView>(R.id.nav_view)
                         btmNavView.selectedItemId = homeId
                         navController?.navigate(
@@ -769,7 +780,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         val navController = navHostFragment?.navController
 
         btmNavView.setOnItemSelectedListener { item ->
-            val homeId = R.id.homeScreenFragment
+            val homeId = R.id.powerFragment
 
             when (item.itemId) {
                 R.id.rethinkPlus -> {
@@ -828,11 +839,19 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             }
         }
 
-        // Optionally sync the bottom nav highlight with nav changes
-        /*navController?.addOnDestinationChangedListener { _, destination, _ ->
-            // Update Rethink Plus badge or icon here if needed
-            updateRethinkPlusHighlight()
-        }*/
+        navController?.addOnDestinationChangedListener { _, destination, _ ->
+            val destinationId = destination.id
+            btmNavView.visibility =
+                if (PowerDestinationPolicy.isDeepPowerDestination(destinationId)) View.GONE else View.VISIBLE
+
+            val menuItem = PowerDestinationPolicy.topLevelMenuItem(destinationId)
+
+            menuItem?.let {
+                if (btmNavView.selectedItemId != it) {
+                    btmNavView.menu.findItem(it)?.isChecked = true
+                }
+            }
+        }
     }
 
     private fun io(f: suspend () -> Unit) {

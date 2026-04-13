@@ -158,6 +158,27 @@ class AppInfoActivityUnitTest {
     }
 
     @Test
+    fun testPreviewIntentCarriesProfileAndPackageExtras() {
+        println("$testTag: Starting testPreviewIntentCarriesProfileAndPackageExtras")
+
+        val intent = Intent(context, AppInfoActivity::class.java).apply {
+            putExtra(AppInfoActivity.INTENT_PREVIEW_PROFILE_ID, "app-horse")
+            putExtra(AppInfoActivity.INTENT_PREVIEW_APP_PACKAGE, "com.parrot.downloader")
+        }
+
+        assertEquals(
+            "app-horse",
+            intent.getStringExtra(AppInfoActivity.INTENT_PREVIEW_PROFILE_ID)
+        )
+        assertEquals(
+            "com.parrot.downloader",
+            intent.getStringExtra(AppInfoActivity.INTENT_PREVIEW_APP_PACKAGE)
+        )
+
+        println("$testTag: testPreviewIntentCarriesProfileAndPackageExtras completed successfully")
+    }
+
+    @Test
     fun testEdgeCaseUidValues() {
         println("$testTag: Starting testEdgeCaseUidValues")
         

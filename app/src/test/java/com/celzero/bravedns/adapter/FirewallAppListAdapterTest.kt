@@ -21,6 +21,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.test.core.app.ApplicationProvider
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
@@ -60,6 +61,9 @@ class FirewallAppListAdapterTest {
 
     @MockK
     private lateinit var mockPersistentState: PersistentState
+
+    @MockK(relaxed = true)
+    private lateinit var mockEventLogger: EventLogger
 
     @MockK
     private lateinit var mockViewHolder: FirewallAppListAdapter.AppListViewHolder
@@ -115,7 +119,7 @@ class FirewallAppListAdapterTest {
         every { ProxyManager.getProxyIdForApp(any()) } returns ProxyManager.ID_NONE
         println("✅ SETUP: ProxyManager methods mocked")
 
-        adapter = FirewallAppListAdapter(context, lifecycleOwner)
+        adapter = FirewallAppListAdapter(context, lifecycleOwner, mockEventLogger)
         println("✅ SETUP: FirewallAppListAdapter instance created")
 
         // Mock the ViewHolder to avoid layout inflation issues

@@ -41,6 +41,10 @@ import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppWiseDomainsAdapter
 import com.celzero.bravedns.adapter.AppWiseIpsAdapter
+import com.celzero.bravedns.data.PowerProfileAppBlocklist
+import com.celzero.bravedns.data.PowerProfileAppDomainRule
+import com.celzero.bravedns.data.PowerProfileAppIpRule
+import com.celzero.bravedns.data.PowerProfileAppManager
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
@@ -63,7 +67,6 @@ import com.celzero.bravedns.util.UIUtils.openAndroidAppInfo
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
-import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
@@ -90,6 +93,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
     private var appStatus = FirewallManager.FirewallStatus.NONE
     private var connStatus = FirewallManager.ConnectionStatus.ALLOW
+    private var previewAppBlocklist: PowerProfileAppBlocklist? = null
 
     private var showBypassToolTip: Boolean = true
 
@@ -97,6 +101,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         const val INTENT_UID = "UID"
         const val INTENT_ACTIVE_CONNS = "ACTIVE_CONNS"
         const val INTENT_ASN = "ASN"
+        const val INTENT_PREVIEW_PROFILE_ID = "PREVIEW_PROFILE_ID"
+        const val INTENT_PREVIEW_APP_PACKAGE = "PREVIEW_APP_PACKAGE"
         private const val TAG = "AppInfoActivity"
 
         // Temp allow duration constants
@@ -104,16 +110,24 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         private const val MILLIS_PER_MINUTE = 60
         private const val MILLIS_PER_SECOND = 1000L
         private const val ALPHA_DISABLED = 0.5f
+        private const val PREVIEW_RULE_DIALOG_LIMIT = 120
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
-        handleFrostEffectIfNeeded(persistentState.theme)
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
             controller.isAppearanceLightNavigationBars = false
             window.isNavigationBarContrastEnforced = false
+        }
+
+        val previewProfileId = intent.getStringExtra(INTENT_PREVIEW_PROFILE_ID).orEmpty()
+        val previewAppPackage = intent.getStringExtra(INTENT_PREVIEW_APP_PACKAGE).orEmpty()
+        if (previewProfileId.isNotEmpty() && previewAppPackage.isNotEmpty()) {
+            setupClickListeners()
+            initPreviewMode(previewProfileId, previewAppPackage)
+            return
         }
 
         uid = intent.getIntExtra(INTENT_UID, INVALID_UID)
@@ -192,6 +206,53 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         }
     }
 
+    private fun initPreviewMode(profileId: String, packageName: String) {
+        io {
+            val preview = PowerProfileAppManager.buildPreview(this@AppInfoActivity, profileId, packageName)
+            if (preview == null) {
+                uiCtx { showNoAppFoundDialog() }
+                return@io
+            }
+
+            val installedApp = preview.installedAppInfo
+            val previewAppInfo =
+                installedApp ?: buildPreviewAppInfo(preview.appBlocklist.packageName, preview.appBlocklist.appName)
+            uid = previewAppInfo.uid
+            appInfo = previewAppInfo
+            previewAppBlocklist = preview.appBlocklist
+            appStatus = FirewallManager.FirewallStatus.getStatus(preview.appBlocklist.firewallStatus)
+            connStatus = FirewallManager.ConnectionStatus.getStatus(preview.appBlocklist.connectionStatus)
+
+            uiCtx {
+                b.aadAppDetailName.text = previewAppInfo.appName
+                b.aadPkgName.text = previewAppInfo.packageName
+                displayIcon(
+                    Utilities.getIcon(this@AppInfoActivity, previewAppInfo.packageName, previewAppInfo.appName),
+                    b.aadAppDetailIcon
+                )
+                applyPreviewUi()
+                setPreviewRuleCounts(
+                    ipRuleCount = preview.appBlocklist.ipRules.size,
+                    domainRuleCount = preview.appBlocklist.domainRules.size
+                )
+                updateFirewallStatusUi(appStatus, connStatus)
+                PowerProfilePreviewUiPolicy.applyReadOnlyFirewallControls(b)
+                b.aadFirewallStatus.text =
+                    getString(
+                        R.string.power_profile_app_preview_status,
+                        getFirewallText(appStatus, connStatus)
+                    )
+                b.aadDataUsageStatus.text =
+                    getString(R.string.power_profile_app_preview_data_usage) +
+                        " " +
+                        getString(
+                            R.string.power_profile_app_preview_source,
+                            preview.profile.resolveTitle(this@AppInfoActivity)
+                        )
+            }
+        }
+    }
+
     private fun displayProxyStatus() {
         val proxy = ProxyManager.getProxyIdForApp(uid)
         if (proxy.isEmpty() || proxy == ID_NONE) {
@@ -203,17 +264,121 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     }
 
     private fun openCustomIpScreen() {
+        previewAppBlocklist?.let {
+            if (it.ipRules.isEmpty()) return
+            showPreviewIpRulesDialog(it)
+            return
+        }
         val intent = Intent(this, CustomRulesActivity::class.java)
         intent.putExtra(VIEW_PAGER_SCREEN_TO_LOAD, CustomRulesActivity.Tabs.IP_RULES.screen)
         intent.putExtra(Constants.INTENT_UID, uid)
         startActivity(intent)
     }
 
+    private fun buildPreviewAppInfo(packageName: String, appName: String): AppInfo {
+        return AppInfo(
+            packageName = packageName,
+            appName = appName,
+            uid = INVALID_UID,
+            isSystemApp = false,
+            firewallStatus = FirewallManager.FirewallStatus.NONE.id,
+            appCategory = "",
+            wifiDataUsed = 0,
+            mobileDataUsed = 0,
+            connectionStatus = FirewallManager.ConnectionStatus.ALLOW.id,
+            isProxyExcluded = false,
+            screenOffAllowed = false,
+            backgroundAllowed = false
+        )
+    }
+
+    private fun applyPreviewUi() {
+        b.aadProxyDetails.visibility = View.GONE
+        b.aadAppInfoIcon.visibility = View.GONE
+        b.aadActiveConnsRl.visibility = View.GONE
+        b.aadAsnRl.visibility = View.GONE
+        b.aadMostContactedDomainRl.visibility = View.GONE
+        b.aadMostContactedIpsRl.visibility = View.GONE
+        b.excludeProxyRl.visibility = View.GONE
+        b.tempAllowRl.visibility = View.GONE
+        b.aadCloseConnsChip.visibility = View.GONE
+        b.aadIpsChip.visibility = View.GONE
+        b.aadDomainsChip.visibility = View.GONE
+        b.aadActiveConnsChip.visibility = View.GONE
+        b.aadAsnChip.visibility = View.GONE
+        val hasIpRules = (previewAppBlocklist?.ipRules?.isNotEmpty() == true)
+        val hasDomainRules = (previewAppBlocklist?.domainRules?.isNotEmpty() == true)
+        PowerProfilePreviewUiPolicy.applyRulePreviewState(b, hasIpRules, hasDomainRules)
+    }
+
+    private fun setPreviewRuleCounts(ipRuleCount: Int, domainRuleCount: Int) {
+        b.aadIpBlockHeader.text = ipRuleCount.toString()
+        b.aadDomainBlockHeader.text = domainRuleCount.toString()
+    }
+
     private fun openCustomDomainScreen() {
+        previewAppBlocklist?.let {
+            if (it.domainRules.isEmpty()) return
+            showPreviewDomainRulesDialog(it)
+            return
+        }
         val intent = Intent(this, CustomRulesActivity::class.java)
         intent.putExtra(VIEW_PAGER_SCREEN_TO_LOAD, CustomRulesActivity.Tabs.DOMAIN_RULES.screen)
         intent.putExtra(Constants.INTENT_UID, uid)
         startActivity(intent)
+    }
+
+    private fun showPreviewIpRulesDialog(appBlocklist: PowerProfileAppBlocklist) {
+        showPreviewRulesDialog(
+            title = getString(R.string.lbl_ip_rules),
+            previewLines = appBlocklist.ipRules.map(::formatPreviewIpRule),
+            emptyMessage = getString(R.string.power_profile_app_preview_ip_rules_empty)
+        )
+    }
+
+    private fun showPreviewDomainRulesDialog(appBlocklist: PowerProfileAppBlocklist) {
+        showPreviewRulesDialog(
+            title = getString(R.string.lbl_domain_rules),
+            previewLines = appBlocklist.domainRules.map(::formatPreviewDomainRule),
+            emptyMessage = getString(R.string.power_profile_app_preview_domain_rules_empty)
+        )
+    }
+
+    private fun showPreviewRulesDialog(
+        title: String,
+        previewLines: List<String>,
+        emptyMessage: String
+    ) {
+        val message =
+            if (previewLines.isEmpty()) {
+                emptyMessage
+            } else {
+                val shown = previewLines.take(PREVIEW_RULE_DIALOG_LIMIT)
+                val previewText = shown.joinToString("\n")
+                val meta =
+                    getString(
+                        R.string.power_profile_entries_preview_meta,
+                        shown.size.toString(),
+                        previewLines.size.toString()
+                    )
+                "$previewText\n\n$meta"
+            }
+
+        MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(R.string.lbl_dismiss, null)
+            .show()
+    }
+
+    private fun formatPreviewIpRule(rule: PowerProfileAppIpRule): String {
+        val port = if (rule.port > 0) ":${rule.port}" else ""
+        val protocol = rule.protocol.takeIf { it.isNotBlank() }?.let { " ($it)" }.orEmpty()
+        return "${rule.ipAddress}$port$protocol"
+    }
+
+    private fun formatPreviewDomainRule(rule: PowerProfileAppDomainRule): String {
+        return rule.domain
     }
 
     private fun displayDataUsage() {

@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/homeScreenFragment"
-        android:icon="@drawable/ic_home_black_24dp"
-        android:title="@string/txt_home" />
+        android:id="@+id/powerFragment"
+        android:icon="@drawable/ic_firewall_shield"
+        android:title="@string/title_power" />
     <item
         android:id="@+id/summaryStatisticsFragment"
         android:icon="@drawable/ic_statistics"

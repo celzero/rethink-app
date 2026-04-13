@@ -104,6 +104,9 @@ interface RethinkLocalFileTagDao {
     @Query("select value from RethinkLocalFileTag where isSelected = 1")
     fun getSelectedTags(): List<Int>
 
+    @Query("select * from RethinkLocalFileTag where value in (:values) order by lower(`group`), lower(subg), lower(vname)")
+    fun getTagsByIds(values: List<Int>): List<RethinkLocalFileTag>
+
     @Query("delete from RethinkLocalFileTag") fun deleteAll()
 
     @Query("select * from RethinkLocalFileTag order by `group`") fun getFileTags(): Cursor

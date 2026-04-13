@@ -29,6 +29,11 @@ class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
         customDomainDAO.insert(customDomain)
     }
 
+    suspend fun insertAll(customDomains: List<CustomDomain>) {
+        if (customDomains.isEmpty()) return
+        customDomainDAO.insertAll(customDomains)
+    }
+
     suspend fun delete(customDomain: CustomDomain) {
         customDomainDAO.delete(customDomain)
     }
@@ -74,6 +79,11 @@ class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
 
     fun cpDelete(domain: String, uid: Int): Int {
         return customDomainDAO.deleteDomain(domain, uid)
+    }
+
+    suspend fun deleteDomains(uid: Int, domains: List<String>): Int {
+        if (domains.isEmpty()) return 0
+        return domains.chunked(500).sumOf { chunk -> customDomainDAO.deleteDomains(uid, chunk) }
     }
 
     fun cpUpdate(customDomain: CustomDomain): Int {
