@@ -74,6 +74,7 @@ jobs:
           # ./app/build/outputs/apk/websiteFull/alpha/app-website-full-armeabi-v7a-alpha.apk
           # /home/runner/work/rethink-app/rethink-app/app/build/outputs/apk/websiteFull/alpha/app-website-full-alpha.apk
           find "$PWD" -type f -iname '*.apk'
+          # TODO: check if it the universal + full apk?
           APKFILE=$(find "$PWD" -type f -iname '*.apk' | head -n 1)
           if [ -n "$APKFILE" ] && [ -f "$APKFILE" ]; then
             SIZE=$(stat -c%s "$APKFILE")
@@ -110,6 +111,17 @@ jobs:
            -d "parse_mode=HTML" \
            --data-urlencode "text=<a href='${DOC}'>${NOM}</a>"
 
+          # {"ok":false,"error_code":400,"description":"Bad Request: chat not found"}
+          # {"ok":true,
+          # "result":{"message_id":60,
+          #   "sender_chat":{"id":-100...,"title":"...","username":"...","type":"channel"},
+          #   "chat":{"id":-100...,"title":"...","username":"...","type":"channel"},
+          #   "date":1777375686,
+          #   "document":{"file_name":"...","mime_type":"application/zip",
+          #     "file_id":"urlbase64","file_unique_id":"base64","file_size":22222222
+          #   },
+          #   "caption":"id: ... / sha256: ..."
+          # }
           # size limit 50mb
           curl https://api.telegram.org/bot$TELEGRAM_TOKEN/sendDocument \
             -F chat_id="$TELEGRAM_CHAT_ID" \
