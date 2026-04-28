@@ -72,11 +72,25 @@ jobs:
       - name: 🍫 APKs
         run: |
           # ./app/build/outputs/apk/websiteFull/alpha/app-website-full-armeabi-v7a-alpha.apk
+          # /home/runner/work/rethink-app/rethink-app/app/build/outputs/apk/websiteFull/alpha/app-website-full-alpha.apk
           find "$PWD" -type f -iname '*.apk'
+          APKFILE=$(find "$PWD" -type f -iname '*.apk' | head -n 1)
+          if [ -n "$APKFILE" ] && [ -f "$APKFILE" ]; then
+            SIZE=$(stat -c%s "$APKFILE")
+            # Telegram file upload 50mb (52428800) limit
+            if [ "$SIZE" -gt 52428800 ]; then
+              echo "::notice title=apk too big::$(($SIZE / 1048576))MB"
+            fi
+            echo "Sharing... $APKFILE ($SIZE bytes)"
+            echo "APK=$APKFILE" >> $GITHUB_ENV
+          else
+            echo "::error::APK not found"
+            # will error out in upload artifact step
+          fi
 
       # github.com/actions/upload-artifact
       - name: 📜 Upload artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         id: a3
         with:
           name: rdns-alpha-${{ github.sha }}
@@ -95,16 +109,16 @@ jobs:
            -d "chat_id=${TELEGRAM_CHAT_ID}" \
            -d "parse_mode=HTML" \
            --data-urlencode "text=<a href='${DOC}'>${NOM}</a>"
-          # core.telegram.org/bots/api#senddocument
+
           # size limit 50mb
-          # curl https://api.telegram.org/bot$TELEGRAM_TOKEN/sendDocument \
-          #  -F chat_id="$TELEGRAM_CHAT_ID" \
-          #  -F caption="sha256: ${CAP}" \
-          #  -F parse_mode=HTML \
-          #  -F document=@"$DOC"
+          curl https://api.telegram.org/bot$TELEGRAM_TOKEN/sendDocument \
+            -F chat_id="$TELEGRAM_CHAT_ID" \
+            -F caption="id: ${CAP} / sha256: ${SHA}" \
+            -F parse_mode=HTML \
+            -F document=@"$APK"
         env:
           NOM: "rdns-alpha-${{ github.sha }}"
+          APK: ${{ env.APK }}
           DOC: ${{ steps.a3.outputs.artifact-url }}
           CAP: ${{ steps.a3.outputs.artifact-id }}
-
-          
+          SHA: ${{ steps.a3.outputs.artifact-digest }}
