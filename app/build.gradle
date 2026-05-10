@@ -294,6 +294,47 @@ android {
     lint {
         abortOnError true
     }
+
+    // ------------------------------------------------------------------
+    // rethink-tv fork: env-var-based signing for the `release` build type
+    // when used to ship TV builds via GitHub Actions.
+    //
+    // When the CI workflow `.github/workflows/android-tv-release.yml`
+    // injects the `TV_RELEASE_KS_*` secrets, we:
+    //   1. create a `tvRelease` signing config that reads those env vars
+    //      (same shape as upstream's `alpha` signing config — see line 101
+    //      of this file)
+    //   2. attach it to the `release` build type so that
+    //      `assembleFdroidTvRelease` produces a signed APK suitable for
+    //      attaching to a GitHub Release.
+    //
+    // When the env vars are NOT set (local builds, `🫣 Android CI`, the
+    // `📺 Android TV CI` debug job, manual unsigned-release dry runs):
+    //   - upstream's existing `keystore.properties`-based `config` signing
+    //     config remains the only signing config that touches `release`,
+    //     preserving 100% upstream behaviour for phone builds.
+    //
+    // This block intentionally does not modify upstream's existing signing
+    // configs or build types — it only conditionally appends.
+    // ------------------------------------------------------------------
+    def tvKsAlias = System.getenv("TV_RELEASE_KS_ALIAS")
+    def tvKsPassphrase = System.getenv("TV_RELEASE_KS_PASSPHRASE")
+    def tvKsFile = System.getenv("TV_RELEASE_KS_FILE")
+    def tvKsStorePassphrase = System.getenv("TV_RELEASE_KS_STORE_PASSPHRASE")
+    if (tvKsAlias && tvKsPassphrase && tvKsFile && tvKsStorePassphrase) {
+        signingConfigs {
+            tvRelease {
+                keyAlias tvKsAlias
+                keyPassword tvKsPassphrase
+                storeFile file(tvKsFile)
+                storePassword tvKsStorePassphrase
+            }
+        }
+        buildTypes.release.signingConfig = signingConfigs.tvRelease
+        println("rethink-tv: TV_RELEASE_KS_* env vars detected; \`release\` build type will be signed with signingConfigs.tvRelease")
+    } else {
+        println("rethink-tv: TV_RELEASE_KS_* env vars NOT set; \`release\` builds will be unsigned (upstream default)")
+    }
 }
 
 configurations {
