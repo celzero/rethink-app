@@ -259,6 +259,18 @@ android {
             versionName = gitVersion
             vectorDrawables.useSupportLibrary = true
         }
+        // Android TV flavor (rethink-tv fork addition).
+        // Peer of `full` in the releaseType dimension. Keeps the upstream engine
+        // (DNS / firewall / VpnService / per-app rules) untouched and adds a
+        // dedicated `app/src/tv/` source set with a leanback launcher and a
+        // Compose-for-TV UI in subsequent commits. See README for the fork notice.
+        tv {
+            dimension "releaseType"
+            applicationIdSuffix ".tv"
+            versionCode = getVersionCode()
+            versionName = gitVersion
+            vectorDrawables.useSupportLibrary = true
+        }
     }
     lint {
         abortOnError true
@@ -405,6 +417,48 @@ dependencies {
     fullImplementation 'androidx.navigation:navigation-ui-ktx:2.9.6'
 
     fullImplementation 'androidx.biometric:biometric:1.1.0'
+
+    // ------------------------------------------------------------------
+    // rethink-tv fork: Android TV flavor (`tv`) dependencies.
+    // Mirror of the `fullImplementation` UI/runtime deps so that the shared
+    // `app/src/main/` sources continue to compile under the `tv` variant.
+    // The Android TV UI itself lives entirely in `app/src/tv/` and is added
+    // in subsequent commits. This block is intentionally append-only and
+    // does not modify upstream's existing dependency declarations.
+    // ------------------------------------------------------------------
+    tvImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20'
+    tvImplementation 'androidx.appcompat:appcompat:1.7.1'
+    tvImplementation 'androidx.core:core-ktx:1.17.0'
+    tvImplementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+    tvImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    tvImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2'
+    tvImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2'
+    tvImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4'
+    tvImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.9.4'
+    tvImplementation 'androidx.fragment:fragment-ktx:1.8.9'
+    tvImplementation 'androidx.viewpager2:viewpager2:1.1.0'
+    tvImplementation 'com.squareup.okhttp3:okhttp:5.3.2'
+    tvImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:5.3.2'
+    tvImplementation 'com.squareup.okhttp3:logging-interceptor:5.3.2'
+    tvImplementation 'com.squareup.retrofit2:retrofit:3.0.0'
+    tvImplementation 'com.squareup.retrofit2:converter-gson:3.0.0'
+    tvImplementation('com.github.bumptech.glide:glide:5.0.5') {
+        exclude group: 'glide-parent'
+    }
+    tvImplementation('com.github.bumptech.glide:okhttp3-integration:5.0.5') {
+        exclude group: 'glide-parent'
+    }
+    kspTv 'com.github.bumptech.glide:compiler:5.0.5'
+    tvImplementation 'com.facebook.shimmer:shimmer:0.5.0'
+    tvImplementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.9'
+    tvImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
+    tvImplementation firestackDependency()
+    tvImplementation 'androidx.navigation:navigation-fragment-ktx:2.9.6'
+    tvImplementation 'androidx.navigation:navigation-ui-ktx:2.9.6'
+    tvImplementation 'androidx.biometric:biometric:1.1.0'
+    tvImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+    tvImplementation 'com.simplecityapps:recyclerview-fastscroll:2.0.1'
+    tvImplementation 'nl.dionsegijn:konfetti-xml:2.0.5'
 
     playImplementation 'com.google.android.play:app-update:2.1.0'
     playImplementation 'com.google.android.play:app-update-ktx:2.1.0'
