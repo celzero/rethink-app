@@ -2,6 +2,10 @@ plugins {
     id 'com.android.application'
     id 'com.google.devtools.ksp'
     id 'kotlin-android'
+    // rethink-tv fork: Compose Compiler plugin for the `tv` flavor's
+    // Compose-for-TV UI. Safe to apply project-wide — phone variants
+    // contain no @Composable and the plugin then no-ops.
+    id 'org.jetbrains.kotlin.plugin.compose'
 }
 
 // apply Google Services and Firebase Crashlytics plugins conditionally
@@ -220,6 +224,11 @@ android {
     buildFeatures {
         viewBinding true
         buildConfig true
+        // rethink-tv fork: Compose UI for the `tv` flavor. Project-wide so
+        // the Compose Compiler picks up @Composable declarations under
+        // `app/src/tv/`. Phone variants have no @Composable code so this
+        // costs nothing at compile time.
+        compose true
     }
 
     compileOptions {
@@ -283,12 +292,14 @@ android {
     // shared `app/src/main/` code references via constants like `ID_WG_BASE`)
     // are visible to the `tv` variants. The `app/src/tv/` source set then
     // layers TV-specific resources (e.g. `strings.xml` to rename the app to
-    // "Rethink TV") on top via the standard Android resource overlay rules.
+    // "Rethink TV") and a TV launcher Activity on top via the standard
+    // Android resource / manifest overlay rules. `src/tv/AndroidManifest.xml`
+    // is the flavor's primary manifest — see that file for the rationale
+    // (it currently mirrors full's manifest and adds the TV launcher).
     sourceSets {
         tv {
             java.srcDirs += ['src/full/java']
             res.srcDirs += ['src/full/res']
-            manifest.srcFile 'src/full/AndroidManifest.xml'
         }
     }
     lint {
@@ -525,6 +536,31 @@ dependencies {
     tvImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
     tvImplementation 'com.simplecityapps:recyclerview-fastscroll:2.0.1'
     tvImplementation 'nl.dionsegijn:konfetti-xml:2.0.5'
+
+    // ------------------------------------------------------------------
+    // rethink-tv fork: Compose-for-TV stack for the `tv` flavor.
+    // Scoped to `tvImplementation` so phone variants pull none of this in.
+    // BOM pins all `androidx.compose.*` artifacts to a consistent set;
+    // Kotlin Compose Compiler 2.1.20 (applied via the project-wide plugin
+    // declaration) matches Compose runtime 1.7.x in the 2024.12 BOM.
+    // ------------------------------------------------------------------
+    tvImplementation platform('androidx.compose:compose-bom:2024.12.01')
+    tvImplementation 'androidx.compose.ui:ui'
+    tvImplementation 'androidx.compose.ui:ui-tooling-preview'
+    tvImplementation 'androidx.compose.foundation:foundation'
+    tvImplementation 'androidx.compose.runtime:runtime'
+    tvImplementation 'androidx.compose.runtime:runtime-livedata'
+    tvImplementation 'androidx.compose.material3:material3'
+    // TV-styled Material 3 components (focusable Surface / Button /
+    // Card with the focus borders Android TV users expect).
+    tvImplementation 'androidx.tv:tv-material:1.0.0'
+    tvImplementation 'androidx.activity:activity-compose:1.9.3'
+    tvImplementation 'androidx.lifecycle:lifecycle-runtime-compose:2.8.7'
+    tvImplementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7'
+    // Koin's Compose extensions (`koinInject` / `koinViewModel`) so the TV
+    // UI can pull `PersistentState` and other injected singletons without
+    // hand-wiring KoinComponent into every Composable.
+    tvImplementation 'io.insert-koin:koin-androidx-compose:4.1.1'
 
     playImplementation 'com.google.android.play:app-update:2.1.0'
     playImplementation 'com.google.android.play:app-update-ktx:2.1.0'

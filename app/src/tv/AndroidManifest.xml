@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  rethink-tv fork: `tv` flavor manifest.
+
+  This file mirrors `app/src/full/AndroidManifest.xml` because the `tv`
+  flavor inherits the entire `app/src/full/java` source set (see
+  `sourceSets.tv` in `app/build.gradle`). Every activity / receiver /
+  service that upstream's Kotlin code references must be declared, or
+  startActivity / PackageManager calls from the inherited classes will
+  crash at runtime with ActivityNotFoundException / NameNotFoundException.
+
+  rethink-tv additions on top of full's manifest:
+
+  1. <uses-feature android:name="android.software.leanback" required=false />
+     and <uses-feature android:name="android.hardware.touchscreen"
+     required=false /> — the standard Android TV declarations so the
+     Play Store / Android TV launcher recognise this APK as a TV app.
+
+  2. <activity com.ezelab.rethinktv.ui.TvHomeActivity ...> with
+     LEANBACK_LAUNCHER + LAUNCHER intent filters — the TV-specific
+     launcher entry. LAUNCHER is included so the activity is also
+     reachable from the standard launcher if the .tv APK happens to
+     be installed on a phone (e.g. when QA-ing on hardware that's not
+     a TV box).
+
+  Drift management: when `upstream/main` modifies
+  `app/src/full/AndroidManifest.xml`, `scripts/sync-upstream.sh` flags
+  the divergence so a maintainer can mirror the change here. The bulk
+  of this file is therefore intentionally a verbatim copy of full's
+  manifest at fork time — the diff between this file and full's is
+  the actual rethink-tv contribution surface.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- rethink-tv: Android TV declarations. -->
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+
+    <application
+        android:name=".RethinkDnsApplication"
+        android:theme="@style/AppThemeInitial">
+        <meta-data
+            android:name="android.webkit.WebView.MetricsOptOut"
+            android:value="true" />
+
+        <!--
+          rethink-tv: TV launcher Activity. Declared as the LEANBACK
+          entry point so the Android TV launcher row picks it up. Also
+          declared as a plain LAUNCHER target so QA on non-TV hardware
+          can reach it from the standard app drawer.
+        -->
+        <activity
+            android:name="com.ezelab.rethinktv.ui.TvHomeActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:label="@string/app_name"
+            android:icon="@mipmap/ic_launcher"
+            android:theme="@style/AppThemeInitial">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.activity.FirewallActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.HomeScreenActivity"
+            android:launchMode="singleTask" />
+        <activity
+            android:name=".ui.activity.AppLockActivity"
+            android:exported="true"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="*/*" />
+                <data android:pathPattern=".*\\.rbk" />
+                <data android:host="*" />
+            </intent-filter>
+        </activity>
+        <!-- Alias for AppLockActivity -->
+        <activity-alias
+            android:name=".ui.activity.LauncherAliasAppLock"
+            android:enabled="true"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:targetActivity=".ui.activity.AppLockActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- Alias for HomeScreenActivity -->
+        <activity-alias
+            android:name=".ui.LauncherAliasHome"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:targetActivity=".ui.HomeScreenActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity
+            android:name=".ui.activity.DnsDetailActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.WelcomeActivity"
+            android:finishOnTaskLaunch="true"
+            android:noHistory="true" />
+        <activity
+            android:name=".ui.activity.AppInfoActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.PauseActivity"
+            android:launchMode="singleInstance" />
+        <activity
+            android:name=".ui.activity.DnsListActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.CustomRulesActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.ConfigureRethinkBasicActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.ProxySettingsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.MiscSettingsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.TunnelSettingsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.AppListActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.DetailedStatisticsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.NetworkLogsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.WgMainActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.WgConfigEditorActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.WgConfigDetailActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.CheckoutActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.PurchaseHistoryActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.ServerOrderHistoryActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.CustomerSupportActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.TcpProxyMainActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.UniversalFirewallSettingsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.ConfigureOtherDnsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.AppWiseIpLogsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.AppWiseDomainLogsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.activity.ConsoleLogActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.activity.EventsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.NotificationHandlerActivity"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:taskAffinity=""
+            android:theme="@style/AppThemeDialog" />
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="fullSensor"
+            tools:replace="screenOrientation" />
+        <activity
+            android:name=".ui.activity.AlertsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.AntiCensorshipActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.TestDialogActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.AdvancedSettingActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.DomainConnectionsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.PingTestActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.activity.FragmentHostActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.activity.RpnWinProxyDetailsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.activity.BubbleActivity"
+            android:allowEmbedded="true"
+            android:resizeableActivity="true"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:launchMode="standard"/>
+        <activity android:name=".ui.activity.RpnConfigDetailActivity"
+                    android:finishOnTaskLaunch="true" />
+
+        <receiver
+            android:name=".receiver.BraveAutoStartReceiver"
+            android:directBootAware="false"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter android:priority="999">
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.REBOOT" />
+                <action android:name="android.intent.action.USER_UNLOCKED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".receiver.VpnControlReceiver"
+            android:exported="true"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="com.celzero.bravedns.intent.action.VPN_START" />
+                <action android:name="com.celzero.bravedns.intent.action.VPN_STOP" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".receiver.NotificationActionReceiver"
+            android:exported="false"
+            android:label="@string/app_name" />
+        <receiver android:name=".receiver.UserPresentReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".receiver.BubbleDismissReceiver"
+            android:exported="false" />
+
+        <service
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:enabled="false"
+            android:exported="false">
+            <meta-data
+                android:name="autoStoreLocales"
+                android:value="true" />
+        </service>
+
+        <service
+            android:name=".util.BackgroundAccessibilityService"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider;${applicationId}.backup.BackupAgent"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider_paths" />
+        </provider>
+    </application>
+</manifest>
