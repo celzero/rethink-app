@@ -260,16 +260,35 @@ android {
             vectorDrawables.useSupportLibrary = true
         }
         // Android TV flavor (rethink-tv fork addition).
-        // Peer of `full` in the releaseType dimension. Keeps the upstream engine
-        // (DNS / firewall / VpnService / per-app rules) untouched and adds a
-        // dedicated `app/src/tv/` source set with a leanback launcher and a
-        // Compose-for-TV UI in subsequent commits. See README for the fork notice.
+        // Peer of `full` in the releaseType dimension. Inherits the entire
+        // upstream `app/src/full/` source set (java + res + manifest) so the
+        // engine and shared `app/src/main/` code compile unchanged. Phase 2
+        // intentionally reuses upstream's phone UI to validate the build /
+        // distribution pipeline; the dedicated Compose-for-TV navigation host
+        // is introduced in a subsequent phase (`tv-ux-dashboard`). The TV
+        // override surface lives in `app/src/tv/` and is layered on top of
+        // `full/` via the `sourceSets` block below. See README for the fork
+        // notice and `docs/` for the upstream-sync workflow.
         tv {
             dimension "releaseType"
             applicationIdSuffix ".tv"
             versionCode = getVersionCode()
             versionName = gitVersion
             vectorDrawables.useSupportLibrary = true
+        }
+    }
+
+    // The `tv` flavor inherits the entire `full` source set so that engine /
+    // service / view-model classes upstream keeps in `app/src/full/` (which
+    // shared `app/src/main/` code references via constants like `ID_WG_BASE`)
+    // are visible to the `tv` variants. The `app/src/tv/` source set then
+    // layers TV-specific resources (e.g. `strings.xml` to rename the app to
+    // "Rethink TV") on top via the standard Android resource overlay rules.
+    sourceSets {
+        tv {
+            java.srcDirs += ['src/full/java']
+            res.srcDirs += ['src/full/res']
+            manifest.srcFile 'src/full/AndroidManifest.xml'
         }
     }
     lint {
@@ -420,11 +439,18 @@ dependencies {
 
     // ------------------------------------------------------------------
     // rethink-tv fork: Android TV flavor (`tv`) dependencies.
-    // Mirror of the `fullImplementation` UI/runtime deps so that the shared
-    // `app/src/main/` sources continue to compile under the `tv` variant.
-    // The Android TV UI itself lives entirely in `app/src/tv/` and is added
-    // in subsequent commits. This block is intentionally append-only and
-    // does not modify upstream's existing dependency declarations.
+    // The `tv` flavor's source set inherits `app/src/full/` (configured in
+    // the `android.sourceSets` block above), so it needs the same UI /
+    // runtime dependencies that `fullImplementation` provides. This block
+    // mirrors them as `tvImplementation` declarations. It is intentionally
+    // append-only and does not modify upstream's existing declarations,
+    // keeping the upstream-sync diff minimal.
+    //
+    // Note: `firestackDependency()` is NOT mirrored here because firestack
+    // is scoped by `releaseChannel` (play / fdroid / website) above, and
+    // the `tv` flavor lives in the orthogonal `releaseType` dimension —
+    // each combined variant (e.g. `fdroidTv`) already picks up firestack
+    // via `fdroidImplementation`. Mirroring here would double-add it.
     // ------------------------------------------------------------------
     tvImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20'
     tvImplementation 'androidx.appcompat:appcompat:1.7.1'
@@ -452,7 +478,6 @@ dependencies {
     tvImplementation 'com.facebook.shimmer:shimmer:0.5.0'
     tvImplementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.9'
     tvImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
-    tvImplementation firestackDependency()
     tvImplementation 'androidx.navigation:navigation-fragment-ktx:2.9.6'
     tvImplementation 'androidx.navigation:navigation-ui-ktx:2.9.6'
     tvImplementation 'androidx.biometric:biometric:1.1.0'
