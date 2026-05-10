@@ -49,6 +49,7 @@ import androidx.tv.material3.Text
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.ezelab.rethinktv.ui.streams.StreamsContent
 import com.ezelab.rethinktv.ui.theme.RethinkTvTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -57,12 +58,13 @@ import org.koin.compose.koinInject
 /**
  * Root composable for the TV launcher.
  *
- * Hosts a three-tab top-bar navigation (Home / Settings / About).
- * Tab switching is plain state-driven `when`-routing rather than the
- * androidx.navigation library — Phase 5 has too few destinations to
- * justify the extra dependency and the boilerplate around
- * `NavController`. We'll graduate to androidx.navigation when there
- * are nested destinations or back-stack semantics worth modelling.
+ * Hosts a four-tab top-bar navigation (Home / Streams / Settings /
+ * About). Tab switching is plain state-driven `when`-routing rather
+ * than the androidx.navigation library — we still don't have nested
+ * destinations or back-stack semantics, so the dependency isn't yet
+ * worth its weight. We'll graduate to androidx.navigation when a
+ * screen needs sub-navigation (likely once "All apps" lands and the
+ * Streams tab gains a detail view).
  *
  * Pulls injected singletons via Koin's Compose extensions
  * (`koinInject`), so the entire UI surface can be tested / previewed
@@ -80,6 +82,7 @@ fun TvHomeApp() {
 
 private enum class TvDestination(val label: String) {
     Home("Home"),
+    Streams("Streams"),
     Settings("Settings"),
     About("About"),
 }
@@ -113,6 +116,7 @@ private fun NavScaffold() {
         Box(modifier = Modifier.fillMaxSize()) {
             when (destinations[selectedIndex]) {
                 TvDestination.Home -> HomeContent()
+                TvDestination.Streams -> StreamsContent()
                 TvDestination.Settings -> SettingsContent()
                 TvDestination.About -> AboutContent()
             }
