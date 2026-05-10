@@ -76,6 +76,7 @@ for arg in "$@"; do
 done
 
 say() { printf '\033[36m▶\033[0m %s\n' "$*"; }
+warn() { printf '\033[33m⚠\033[0m %s\n' "$*" >&2; }
 die() { printf '\033[31m✖\033[0m %s\n' "$*" >&2; exit 1; }
 
 [ -d .git ] || die "not a git repo — run from the rethink-tv root"
@@ -172,6 +173,53 @@ if ! grep -q 'rethink-tv fork: Android TV flavor' app/build.gradle; then
 fi
 if ! grep -q "sourceSets {" app/build.gradle || ! grep -q "src/full/java" app/build.gradle; then
   die "rethink-tv inherit-from-full sourceSets block missing from app/build.gradle after merge — bailing out"
+fi
+
+# Manifest drift check.
+#
+# `app/src/tv/AndroidManifest.xml` is a near-verbatim copy of
+# `app/src/full/AndroidManifest.xml` plus a TV launcher activity and a
+# `<uses-feature android:name="android.software.leanback">`. The copy
+# exists because AGP source-sets only accept one manifest per set, so
+# we can't redirect `src/tv/AndroidManifest.xml` at full's file the way
+# we redirect the Java/res source dirs.
+#
+# Drift hazard: when upstream adds a new <activity>, <service>,
+# <receiver>, or <provider> to full's manifest, our tv manifest has to
+# learn about it or that component silently disappears on the TV build.
+# This block flags every `android:name=` declared in full's manifest
+# that does NOT appear verbatim in tv's manifest.
+#
+# We warn rather than fail — sometimes a component is intentionally
+# dropped on TV (the BootReceiver was on the chopping block at one
+# point) — but the maintainer should see the list and decide.
+FULL_MANIFEST="app/src/full/AndroidManifest.xml"
+TV_MANIFEST="app/src/tv/AndroidManifest.xml"
+if [ -e "$FULL_MANIFEST" ] && [ -e "$TV_MANIFEST" ]; then
+  # Extract `android:name="…"` values that appear on an <activity|
+  # service|receiver|provider> line, normalised one per line.
+  full_names=$(awk '
+    /<(activity|service|receiver|provider)[[:space:]>]/ {in_el=1}
+    in_el && match($0, /android:name="[^"]+"/) {
+      s = substr($0, RSTART, RLENGTH)
+      gsub(/^android:name="|"$/, "", s)
+      print s
+      in_el=0
+    }
+  ' "$FULL_MANIFEST" | sort -u)
+  missing=()
+  while IFS= read -r name; do
+    [ -z "$name" ] && continue
+    grep -Fq "android:name=\"$name\"" "$TV_MANIFEST" || missing+=("$name")
+  done <<< "$full_names"
+
+  if [ ${#missing[@]} -gt 0 ]; then
+    warn "manifest drift detected — full/AndroidManifest declares components missing from tv/AndroidManifest:"
+    for n in "${missing[@]}"; do
+      printf '    %s\n' "$n" >&2
+    done
+    warn "if these should ship on the TV build, mirror them into $TV_MANIFEST"
+  fi
 fi
 
 say "Merge clean. $SYNC_BRANCH is now $(git rev-parse --short HEAD)"
