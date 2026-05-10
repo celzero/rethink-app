@@ -21,14 +21,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Observer
 import androidx.tv.material3.Button
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
@@ -37,6 +39,76 @@ import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.service.FirewallManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+
+/**
+ * Immutable snapshot of one streamer row's state, suitable for direct
+ * consumption by Compose.
+ *
+ * This indirection exists because of a subtle interaction between
+ * upstream `FirewallManager` and Compose's snapshot system:
+ *
+ *   * `FirewallManager.invalidateFirewallStatus()` mutates the
+ *     `AppInfo.firewallStatus` field IN PLACE on the cached objects.
+ *   * It then calls `appInfosLiveData.postValue(snapshotAppInfos())`.
+ *     The new List contains the SAME AppInfo references, just with
+ *     their fields mutated.
+ *   * `LiveData.observeAsState` writes to a `MutableState` that uses
+ *     `structuralEqualityPolicy()`. Comparing old list vs new list
+ *     returns "equal" because the elements are the same references
+ *     (and their custom `equals()` resolves to identity for any pair).
+ *   * Result: Compose decides "no change" and skips recomposition —
+ *     the row never updates until the activity is rebuilt.
+ *
+ * We work around this by subscribing to the LiveData ourselves and
+ * mapping each emission to a fresh list of [StreamerView] data classes
+ * with snapshotted primitive fields. When `firewallStatus` flips for
+ * one app, the corresponding `excluded: Boolean` flips, the data class
+ * is no longer equal, the list is no longer equal, and Compose
+ * correctly recomposes the row.
+ */
+private data class StreamerView(
+    val uid: Int,
+    val displayName: String,
+    val excluded: Boolean,
+)
+
+/**
+ * Subscribe to the upstream applist LiveData and project each emission
+ * into an immutable [StreamerView] list filtered to recognised
+ * streaming apps. See [StreamerView] for why the indirection is
+ * necessary.
+ */
+@Composable
+private fun rememberStreamerViews(): State<List<StreamerView>> {
+    val liveData = remember { FirewallManager.getApplistObserver() }
+    return produceState(initialValue = emptyList<StreamerView>(), liveData) {
+        val observer = Observer<Collection<AppInfo>> { apps ->
+            value = apps.orEmpty()
+                .asSequence()
+                .filter {
+                    it.tombstoneTs == 0L &&
+                        KnownStreamers.isStreamer(it.packageName)
+                }
+                .map { app ->
+                    StreamerView(
+                        uid = app.uid,
+                        displayName = KnownStreamers.friendlyName(
+                            app.packageName,
+                        ) ?: app.appName,
+                        excluded = app.firewallStatus ==
+                            FirewallManager.FirewallStatus.EXCLUDE.id,
+                    )
+                }
+                .sortedBy { it.displayName }
+                .toList()
+        }
+        // observeForever is correct here because produceState's lambda
+        // is scoped to the composition; awaitDispose tears the
+        // observer down deterministically when the composable leaves.
+        liveData.observeForever(observer)
+        awaitDispose { liveData.removeObserver(observer) }
+    }
+}
 
 /**
  * The "Streams" tab. Surfaces the subset of installed apps that
@@ -69,15 +141,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun StreamsContent() {
-    val allApps by FirewallManager.getApplistObserver()
-        .observeAsState(emptyList())
+    val streamers by rememberStreamerViews()
     val scope = rememberCoroutineScope()
-
-    val streamers = remember(allApps) {
-        allApps
-            .filter { it.tombstoneTs == 0L && KnownStreamers.isStreamer(it.packageName) }
-            .sortedBy { KnownStreamers.friendlyName(it.packageName) ?: it.appName }
-    }
 
     Column(
         modifier = Modifier
@@ -102,17 +167,15 @@ fun StreamsContent() {
         Spacer(Modifier.height(24.dp))
 
         when {
-            allApps.isEmpty() -> {
+            streamers.isEmpty() -> {
+                // No emission yet OR genuinely no recognised streamers
+                // installed. Phase 6 doesn't distinguish these — both
+                // are extremely brief / rare on a real TV device — but
+                // we err toward the "looking" copy because a fresh
+                // launch on an unprovisioned device hits this state for
+                // a few hundred ms while FirewallManager enumerates.
                 Text(
                     text = "Looking for installed apps…",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            }
-
-            streamers.isEmpty() -> {
-                Text(
-                    text = "No recognised streaming apps installed.",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodyLarge,
                 )
@@ -123,13 +186,21 @@ fun StreamsContent() {
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.fillMaxSize(),
                 ) {
-                    items(items = streamers, key = { it.uid }) { app ->
+                    items(items = streamers, key = { it.uid }) { view ->
+                        val uid = view.uid
+                        val excluded = view.excluded
                         StreamerRow(
-                            app = app,
-                            onToggle = { newStatus ->
+                            displayName = view.displayName,
+                            excluded = excluded,
+                            onToggle = {
+                                val newStatus = if (excluded) {
+                                    FirewallManager.FirewallStatus.NONE
+                                } else {
+                                    FirewallManager.FirewallStatus.EXCLUDE
+                                }
                                 scope.launch(Dispatchers.IO) {
                                     FirewallManager.updateFirewallStatus(
-                                        app.uid,
+                                        uid,
                                         newStatus,
                                         FirewallManager.ConnectionStatus.ALLOW,
                                     )
@@ -146,12 +217,10 @@ fun StreamsContent() {
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 private fun StreamerRow(
-    app: AppInfo,
-    onToggle: (FirewallManager.FirewallStatus) -> Unit,
+    displayName: String,
+    excluded: Boolean,
+    onToggle: () -> Unit,
 ) {
-    val excluded = app.firewallStatus == FirewallManager.FirewallStatus.EXCLUDE.id
-    val display = KnownStreamers.friendlyName(app.packageName) ?: app.appName
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -160,7 +229,7 @@ private fun StreamerRow(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = display,
+                text = displayName,
                 style = MaterialTheme.typography.titleLarge,
             )
             Text(
@@ -172,12 +241,7 @@ private fun StreamerRow(
             )
         }
         Button(
-            onClick = {
-                onToggle(
-                    if (excluded) FirewallManager.FirewallStatus.NONE
-                    else FirewallManager.FirewallStatus.EXCLUDE,
-                )
-            },
+            onClick = onToggle,
             contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
         ) {
             Text(

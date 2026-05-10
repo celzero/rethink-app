@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
@@ -36,6 +37,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -92,6 +95,15 @@ private enum class TvDestination(val label: String) {
 private fun NavScaffold() {
     var selectedIndex by remember { mutableIntStateOf(TvDestination.Home.ordinal) }
     val destinations = remember { TvDestination.entries.toList() }
+    // Park initial focus on the first Tab so the user's D-pad input
+    // immediately drives navigation rather than landing on whatever
+    // focusable happens to be highest in z-order on the active screen
+    // (which on Home is the "Start protection" button — confusing
+    // because D-pad RIGHT then has nowhere to go).
+    val firstTabFocus = remember { FocusRequester() }
+    LaunchedEffect(Unit) {
+        runCatching { firstTabFocus.requestFocus() }
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         TabRow(
@@ -104,6 +116,11 @@ private fun NavScaffold() {
                 Tab(
                     selected = index == selectedIndex,
                     onFocus = { selectedIndex = index },
+                    modifier = if (index == 0) {
+                        Modifier.focusRequester(firstTabFocus)
+                    } else {
+                        Modifier
+                    },
                 ) {
                     Text(
                         text = destination.label,
