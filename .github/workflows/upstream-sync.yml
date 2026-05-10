@@ -1,0 +1,77 @@
+name: 🔄 Upstream Sync
+
+# rethink-tv fork: weekly merge of upstream celzero/rethink-app into
+# the long-lived `upstream-sync` branch, then open (or update) a PR
+# `upstream-sync → main`. The actual merge logic lives in
+# `scripts/sync-upstream.sh`; this workflow is a thin scheduler that
+# also lets a maintainer trigger a sync on-demand from the GitHub UI.
+#
+# See `docs/upstream-sync.md` for the conflict-resolution playbook.
+
+on:
+  schedule:
+    # Mondays at 03:00 UTC. Same time every week, mid-week-friendly
+    # so any merge-conflict cleanup can land on weekdays.
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+    inputs:
+      open_pr:
+        description: "Open / update the upstream-sync → main PR via gh"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write       # push to the upstream-sync branch
+  pull-requests: write  # open / update the sync PR
+
+concurrency:
+  # Two simultaneous syncs would race on the upstream-sync branch.
+  group: upstream-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🥏 Checkout main with full history
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          # Required so subsequent `gh pr create` operates against
+          # the fork repo automatically.
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🪪 Configure git identity
+        run: |
+          git config user.name "rethink-tv-sync[bot]"
+          git config user.email "223556219+Copilot@users.noreply.github.com"
+
+      - name: 🔗 Add upstream remote
+        run: |
+          git remote add upstream https://github.com/celzero/rethink-app.git
+          git remote -v
+
+      - name: 🔄 Run sync script
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          chmod +x scripts/sync-upstream.sh
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.open_pr }}" = "false" ]; then
+            scripts/sync-upstream.sh --push
+          else
+            scripts/sync-upstream.sh --open-pr
+          fi
+
+      - name: 🧾 Step summary
+        if: always()
+        run: |
+          {
+            echo "## Upstream sync summary"
+            echo ""
+            echo "* event: \`${{ github.event_name }}\`"
+            echo "* upstream HEAD: \`$(git ls-remote https://github.com/celzero/rethink-app.git refs/heads/main | cut -f1 | cut -c1-12)\`"
+            echo "* fork main HEAD: \`$(git rev-parse --short origin/main 2>/dev/null || echo 'unknown')\`"
+            echo "* upstream-sync HEAD: \`$(git rev-parse --short HEAD 2>/dev/null || echo 'unchanged')\`"
+            echo ""
+            echo "See \`docs/upstream-sync.md\` for the conflict-resolution playbook."
+          } >> "${GITHUB_STEP_SUMMARY}"
