@@ -331,9 +331,9 @@ android {
             }
         }
         buildTypes.release.signingConfig = signingConfigs.tvRelease
-        println("rethink-tv: TV_RELEASE_KS_* env vars detected; \`release\` build type will be signed with signingConfigs.tvRelease")
+        println("rethink-tv: TV_RELEASE_KS_* env vars detected; 'release' build type will be signed with signingConfigs.tvRelease")
     } else {
-        println("rethink-tv: TV_RELEASE_KS_* env vars NOT set; \`release\` builds will be unsigned (upstream default)")
+        println("rethink-tv: TV_RELEASE_KS_* env vars NOT set; 'release' builds will be unsigned (upstream default)")
     }
 }
 
