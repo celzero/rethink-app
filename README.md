@@ -1,3 +1,22 @@
+> ## 📺 rethink-tv — Android TV fork of RethinkDNS
+>
+> This repository is a fork of [`celzero/rethink-app`](https://github.com/celzero/rethink-app)
+> (Apache-2.0) maintained by [ezelab](https://github.com/ezelab). It adds an
+> Android TV UI on top of the upstream RethinkDNS engine — the engine,
+> filtering, DNS, VpnService, and per-app rules are unchanged.
+>
+> All TV-specific code lives in a dedicated Gradle source set so the fork
+> stays trivially mergeable with upstream and contribute-back-friendly.
+> See [`CONTRIBUTING.md`](./CONTRIBUTING.md) once added for the upstream-sync
+> and flavor structure (planned).
+>
+> Full credit for the engine and original app goes to the
+> [RethinkDNS team](https://github.com/celzero/rethink-app).
+>
+> The original upstream README follows.
+>
+> ---
+
 ## Rethink DNS + Firewall + VPN for Android
 A [WireGuard](https://github.com/wireguard/wireguard-go) client, an [OpenSnitch](https://github.com/evilsocket/opensnitch)-inspired firewall and network monitor + a [pi-hole](https://github.com/pi-hole/pi-hole)-inspired DNS over HTTPS, DNS over TLS, DNSCrypt client with blocklists.
 
