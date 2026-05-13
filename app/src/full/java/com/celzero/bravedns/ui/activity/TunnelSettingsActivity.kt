@@ -120,9 +120,9 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
     }
 
     private fun initView() {
-        b.settingsActivityWireguardText.text = getString(R.string.settings_proxy_header).lowercase()
-        val text = getString(R.string.two_argument, getString(R.string.orbot_status_arg_2).lowercase(), getString(R.string.lbl_ip))
-        b.settingsActivityTcpText.text = text.lowercase()
+        b.settingsActivityWireguardText.text = getString(R.string.settings_proxy_header)
+        val text = getString(R.string.two_argument, getString(R.string.orbot_status_arg_2), getString(R.string.lbl_ip))
+        b.settingsActivityTcpText.text = text.uppercase()
         b.dvWgAllowIncomingTxt.text = getString(R.string.two_argument_space, getString(R.string.settings_allow_incoming_wg_packets), getString(R.string.lbl_experimental))
         b.settingsUseMaxMtuHeading.text = getString(R.string.two_argument_space, getString(R.string.settings_jumbo_packets), getString(R.string.lbl_experimental))
 

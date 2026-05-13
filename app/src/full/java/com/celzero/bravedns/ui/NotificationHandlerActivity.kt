@@ -191,13 +191,13 @@ class NotificationHandlerActivity: BaseActivity() {
             }
 
             val error = ServerApiError.Conflict409(
-                endpoint      = intent.getStringExtra(PurchaseConflictNotifier.EXTRA_ENDPOINT)
+                endpoint = intent.getStringExtra(PurchaseConflictNotifier.EXTRA_ENDPOINT)
                                     ?: operation.endpoint,
-                operation     = operation,
+                operation = operation,
                 serverMessage = intent.getStringExtra(PurchaseConflictNotifier.EXTRA_SERVER_MSG),
-                accountId     = intent.getStringExtra(PurchaseConflictNotifier.EXTRA_ACCOUNT_ID) ?: "",
+                accountId = intent.getStringExtra(PurchaseConflictNotifier.EXTRA_ACCOUNT_ID) ?: "",
                 purchaseToken = intent.getStringExtra(PurchaseConflictNotifier.EXTRA_PURCHASE_TOKEN) ?: "",
-                sku           = intent.getStringExtra(PurchaseConflictNotifier.EXTRA_SKU) ?: ""
+                sku = intent.getStringExtra(PurchaseConflictNotifier.EXTRA_SKU) ?: ""
             )
 
             InAppBillingHandler.serverApiErrorLiveData.value = error
