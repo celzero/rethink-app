@@ -309,7 +309,7 @@
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/large_font_text_view" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/bs_conn_unknown_app_check"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

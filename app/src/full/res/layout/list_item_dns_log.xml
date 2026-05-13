@@ -18,7 +18,7 @@
             android:id="@+id/dns_status_indicator"
             android:layout_width="1.5dp"
             android:layout_height="match_parent"
-            android:background="@color/colorRed_A400"
+            android:background="?attr/colorError"
             android:padding="5dp" />
 
         <androidx.appcompat.widget.AppCompatTextView

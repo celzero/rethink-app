@@ -82,10 +82,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/support_section_describe"
-                android:textSize="12sp"
                 android:textStyle="bold"
-                android:fontFamily="sans-serif-medium"
-                android:textColor="?attr/accentGood"
+                style="@style/TextAppearance.Material3.TitleSmall"
+                android:textColor="?attr/colorPrimary"
                 android:letterSpacing="0.08"
                 android:layout_marginStart="4dp"
                 android:layout_marginBottom="8dp" />
@@ -126,7 +125,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/support_category_payment"
                             android:checkable="true"
-                            style="@style/Widget.MaterialComponents.Chip.Filter" />
+                            style="@style/Widget.Material3.Chip.Filter" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chip_activation"
@@ -134,7 +133,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/support_category_activation"
                             android:checkable="true"
-                            style="@style/Widget.MaterialComponents.Chip.Filter" />
+                            style="@style/Widget.Material3.Chip.Filter" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chip_connectivity"
@@ -142,7 +141,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/support_category_connectivity"
                             android:checkable="true"
-                            style="@style/Widget.MaterialComponents.Chip.Filter" />
+                            style="@style/Widget.Material3.Chip.Filter" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chip_refund"
@@ -150,7 +149,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/support_category_refund"
                             android:checkable="true"
-                            style="@style/Widget.MaterialComponents.Chip.Filter" />
+                            style="@style/Widget.Material3.Chip.Filter" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chip_other"
@@ -158,7 +157,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/support_category_other"
                             android:checkable="true"
-                            style="@style/Widget.MaterialComponents.Chip.Filter" />
+                            style="@style/Widget.Material3.Chip.Filter" />
 
                     </com.google.android.material.chip.ChipGroup>
 
@@ -167,7 +166,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/support_description_hint"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
@@ -197,10 +196,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/support_section_attachments"
-                android:textSize="12sp"
                 android:textStyle="bold"
-                android:fontFamily="sans-serif-medium"
-                android:textColor="?attr/accentGood"
+                style="@style/TextAppearance.Material3.TitleSmall"
+                android:textColor="?attr/colorPrimary"
                 android:letterSpacing="0.08"
                 android:layout_marginStart="4dp"
                 android:layout_marginBottom="8dp" />
@@ -245,9 +243,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/support_attach_sub_status"
-                                android:textSize="14sp"
                                 android:textStyle="bold"
-                                android:fontFamily="sans-serif-medium"
                                 android:textColor="?attr/primaryTextColor" />
 
                             <androidx.appcompat.widget.AppCompatTextView
@@ -260,8 +256,9 @@
 
                         </LinearLayout>
 
-                        <com.google.android.material.switchmaterial.SwitchMaterial
+                        <com.google.android.material.materialswitch.MaterialSwitch
                             android:id="@+id/switch_attach_status"
+                            style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checked="true" />
@@ -306,8 +303,9 @@
 
                         </LinearLayout>
 
-                        <com.google.android.material.switchmaterial.SwitchMaterial
+                        <com.google.android.material.materialswitch.MaterialSwitch
                             android:id="@+id/switch_attach_history"
+                            style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checked="true" />
@@ -351,8 +349,9 @@
 
                         </LinearLayout>
 
-                        <com.google.android.material.switchmaterial.SwitchMaterial
+                        <com.google.android.material.materialswitch.MaterialSwitch
                             android:id="@+id/switch_attach_stats"
+                            style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checked="true" />
@@ -400,7 +399,7 @@
                 app:iconGravity="textStart"
                 android:textColor="?attr/accentGood"
                 app:iconPadding="8dp"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                style="@style/Widget.Material3.Button.OutlinedButton" />
 
             <LinearLayout
                 android:id="@+id/layout_loading"

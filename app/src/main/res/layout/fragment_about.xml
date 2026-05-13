@@ -280,18 +280,15 @@
             android:paddingBottom="15dp">
 
             <androidx.appcompat.widget.AppCompatTextView
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_marginStart="54dp"
-                android:fontFamily="sans-serif-smallcaps"
-                android:gravity="center_vertical"
-                android:lineSpacingExtra="5dp"
-                android:padding="5dp"
                 android:text="@string/about_app"
-                android:textColor="?attr/accentGood"
-                android:textSize="@dimen/extra_large_font_text_view"
-                android:textStyle="bold" />
+                style="@style/TextAppearance.Material3.TitleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:padding="5dp"
+                android:textColor="?attr/colorPrimary" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_whats_new"
@@ -368,18 +365,15 @@
             android:paddingBottom="15dp">
 
             <androidx.appcompat.widget.AppCompatTextView
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_marginStart="54dp"
-                android:fontFamily="sans-serif-smallcaps"
-                android:gravity="center_vertical"
-                android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_web"
-                android:textColor="?attr/accentGood"
-                android:textSize="@dimen/extra_large_font_text_view"
-                android:textStyle="bold" />
+                style="@style/TextAppearance.Material3.TitleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:textColor="?attr/colorPrimary" />
 
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -489,18 +483,15 @@
             android:paddingBottom="10dp">
 
             <androidx.appcompat.widget.AppCompatTextView
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_marginStart="54dp"
-                android:fontFamily="sans-serif-smallcaps"
-                android:gravity="center_vertical"
-                android:lineSpacingExtra="5dp"
-                android:padding="5dp"
                 android:text="@string/about_connect"
-                android:textColor="?attr/accentGood"
-                android:textSize="@dimen/extra_large_font_text_view"
-                android:textStyle="bold" />
+                style="@style/TextAppearance.Material3.TitleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:padding="5dp"
+                android:textColor="?attr/colorPrimary" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_twitter"
@@ -584,7 +575,6 @@
                 android:text="@string/lbl_mastodon"
                 android:textSize="@dimen/large_font_text_view" />
 
-
         </LinearLayout>
 
         <LinearLayout
@@ -595,18 +585,15 @@
             android:paddingBottom="10dp">
 
             <androidx.appcompat.widget.AppCompatTextView
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_marginStart="54dp"
-                android:fontFamily="sans-serif-smallcaps"
-                android:gravity="center_vertical"
-                android:lineSpacingExtra="5dp"
-                android:padding="5dp"
                 android:text="@string/about_settings"
-                android:textColor="?attr/accentGood"
-                android:textSize="@dimen/extra_large_font_text_view"
-                android:textStyle="bold" />
+                style="@style/TextAppearance.Material3.TitleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:padding="5dp"
+                android:textColor="?attr/colorPrimary" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_app_info"
@@ -667,18 +654,15 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/title_stats"
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_marginStart="54dp"
-                android:fontFamily="sans-serif-smallcaps"
-                android:gravity="center_vertical"
-                android:lineSpacingExtra="5dp"
-                android:padding="5dp"
                 android:text="@string/title_statistics"
-                android:textColor="?attr/accentGood"
-                android:textSize="@dimen/extra_large_font_text_view"
-                android:textStyle="bold" />
+                style="@style/TextAppearance.Material3.TitleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:padding="5dp"
+                android:textColor="?attr/colorPrimary" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_stats"

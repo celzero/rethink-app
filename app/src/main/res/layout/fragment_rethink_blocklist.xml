@@ -195,7 +195,7 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/lb_blocklist_cancel_btn"
-                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                style="@style/Widget.Material3.Button.TextButton.Dialog"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="1dp"
@@ -205,7 +205,7 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/lb_blocklist_apply_btn"
-                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                style="@style/Widget.Material3.Button.TextButton.Dialog"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
@@ -277,7 +277,7 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/lb_download_btn"
-                style="@style/Widget.AppCompat.Button.Borderless"
+                style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
@@ -289,7 +289,7 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/lb_cancel_download_btn"
-            style="@style/Widget.AppCompat.Button.Borderless"
+            style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/lb_download_rl"

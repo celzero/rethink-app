@@ -477,9 +477,9 @@
                                 android:textSize="@dimen/default_font_text_view" />
                         </LinearLayout>
 
-                        <com.google.android.material.switchmaterial.SwitchMaterial
+                        <com.google.android.material.materialswitch.MaterialSwitch
                             android:id="@+id/lockdown_check"
-                            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                            style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
@@ -522,9 +522,9 @@
                                 android:textSize="@dimen/default_font_text_view" />
                         </LinearLayout>
 
-                        <com.google.android.material.switchmaterial.SwitchMaterial
+                        <com.google.android.material.materialswitch.MaterialSwitch
                             android:id="@+id/catch_all_check"
-                            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                            style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
@@ -608,9 +608,9 @@
                                 android:textSize="@dimen/default_font_text_view" />
                         </LinearLayout>
 
-                        <com.google.android.material.switchmaterial.SwitchMaterial
+                        <com.google.android.material.materialswitch.MaterialSwitch
                             android:id="@+id/use_mobile_check"
-                            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                            style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
@@ -655,9 +655,9 @@
 
                         </LinearLayout>
 
-                        <com.google.android.material.switchmaterial.SwitchMaterial
+                        <com.google.android.material.materialswitch.MaterialSwitch
                             android:id="@+id/ssid_check"
-                            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                            style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"

@@ -113,7 +113,7 @@
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/bs_home_screen_radio_dns"
-                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -181,7 +181,7 @@
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/bs_home_screen_radio_firewall"
-                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -252,7 +252,7 @@
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/bs_home_screen_radio_dns_firewall"
-                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"

@@ -73,7 +73,7 @@
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/ac_radio_never_split"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
@@ -126,7 +126,7 @@
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/ac_radio_split_auto"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
@@ -179,7 +179,7 @@
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/ac_radio_split_tcp"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
@@ -232,7 +232,7 @@
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/ac_radio_split_tls"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
@@ -288,7 +288,7 @@
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/ac_radio_desync"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
@@ -343,7 +343,7 @@
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/ac_radio_tcp_proxy"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
@@ -447,7 +447,7 @@
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/ac_radio_never_retry"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
@@ -503,7 +503,7 @@
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/ac_radio_retry_with_split"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
@@ -555,7 +555,7 @@
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/ac_radio_retry_after_split"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"

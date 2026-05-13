@@ -1,11 +1,25 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppThemeInitial" parent="Theme.MaterialComponents.NoActionBar.Bridge">
+    <style name="AppThemeInitial" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowDisablePreview">true</item>
+
+        <!-- Use Material 3 Standard Typography -->
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.Material3.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.Material3.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.Material3.BodySmall</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.Material3.LabelLarge</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.Material3.LabelMedium</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.Material3.LabelSmall</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.Material3.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.Material3.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.Material3.TitleSmall</item>
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.Material3.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.Material3.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.Material3.HeadlineSmall</item>
     </style>
 
-    <style name="AppThemeDialog" parent="Theme.MaterialComponents.Dialog.Bridge">
+    <style name="AppThemeDialog" parent="Theme.Material3.DayNight.Dialog">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowContentOverlay">@null</item>
@@ -14,52 +28,78 @@
         <item name="android:backgroundDimEnabled">false</item>
     </style>
 
-    <style name="AppTheme" parent="Theme.MaterialComponents.NoActionBar.Bridge">
-        <item name="colorPrimary">@color/colorPrimary</item>
+    <style name="AppTheme" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- M3 Standard Palette -->
+        <item name="colorPrimary">@color/accentGood</item>
+        <item name="colorOnPrimary">@android:color/black</item>
+        <item name="colorPrimaryContainer">@color/colorPrimary</item>
+        <item name="colorOnPrimaryContainer">@color/primaryText</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorSecondaryContainer">@color/colorPrimaryDark</item>
+        <item name="colorOnSecondaryContainer">@color/primaryText</item>
+        <item name="colorTertiary">@color/accentWarning</item>
+        <item name="colorOnTertiary">@android:color/black</item>
+        <item name="colorError">@color/accentBad</item>
+        <item name="colorOnError">@color/primaryText</item>
+
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOnSurface">@color/primaryText</item>
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariantDark</item>
+        <item name="colorOnSurfaceVariant">@color/primaryLightColorText</item>
+        <item name="colorSurfaceContainer">@color/colorSurfaceContainerDark</item>
+        <item name="colorSurfaceContainerLow">@color/colorSurface</item>
+        <item name="colorSurfaceContainerHigh">@color/colorSurfaceContainerDark</item>
+        <item name="colorSurfaceContainerHighest">@color/colorSurfaceVariantDark</item>
+        <item name="colorSurfaceContainerLowest">@color/colorSurface</item>
+
+        <item name="colorOutline">@color/border</item>
         <item name="colorBackgroundFloating">@color/colorBackgroundFloating</item>
         <item name="android:colorBackgroundFloating">@color/colorBackgroundFloating</item>
 
+        <!-- Legacy / Custom Attributes Mapping -->
         <item name="android:colorAccent">@color/accentGood</item>
         <item name="colorAccent">@color/accentGood</item>
-        <item name="accentGood">@color/accentGood</item>
-        <item name="accentBad">@color/accentBad</item>
-        <item name="accentWarning">@color/accentWarning</item>
+        <item name="accentGood">?attr/colorPrimary</item>
+        <item name="accentBad">?attr/colorError</item>
+        <item name="accentWarning">?attr/colorTertiary</item>
+
+        <item name="background">?attr/colorSurface</item>
+        <item name="navBarColor">@color/navBarColor</item>
+        <item name="divider">?attr/colorSurfaceVariant</item>
+        <item name="border">?attr/colorOutline</item>
+        <item name="homeScreenBtnBackground">?attr/colorSecondaryContainer</item>
+        <item name="textViewBackground">@color/textViewBackground</item>
+        <item name="buttonBackground">?attr/colorPrimary</item>
+        <item name="bottomSheetBackground">?attr/colorSurface</item>
+        <item name="cardBackgroundColor">?attr/colorSurfaceContainer</item>
+
+        <item name="primaryTextColor">?attr/colorOnSurface</item>
+        <item name="primaryLightColorText">?attr/colorOnSurfaceVariant</item>
+        <item name="secondaryTextColor">?attr/accentGood</item>
+        <item name="chipTextColor">?attr/colorOnSurface</item>
+        <item name="invertedPrimaryTextColor">?attr/colorOnPrimary</item>
+        <item name="textColorAccentBad">?attr/colorError</item>
+        <item name="homeScreenHeaderTextColor">?attr/colorOnSurface</item>
 
         <item name="switchNormal">@color/switchNormal</item>
         <item name="colorSwitchThumbNormal">@color/colorSwitchThumbNormal</item>
         <item name="controlActivated">@color/colorControlActivated</item>
         <item name="controlActivatedBad">@color/colorControlActivatedBad</item>
-        <item name="colorSurface">@color/colorSurface</item>
+
+        <item name="materialSwitchStyle">@style/CustomMaterialSwitch</item>
+        <item name="switchStyle">@style/CustomMaterialSwitch</item>
+        <item name="android:switchStyle">@style/CustomMaterialSwitch</item>
 
         <item name="tabIndicator">@color/tabIndicator</item>
-        <item name="chipStyle">@style/Widget.MaterialComponents.Chip.Action</item>
+        <item name="chipStyle">@style/Widget.Material3.Chip.Assist</item>
         <item name="android:splitMotionEvents">false</item>
         <item name="android:windowEnableSplitTouch">false</item>
         <item name="android:searchViewStyle">@style/SearchView.Custom</item>
         <item name="android:navigationBarColor">@color/navBarColor</item>
 
-        <item name="background">@color/background</item>
-        <item name="navBarColor">@color/navBarColor</item>
-        <item name="divider">@color/divider</item>
-        <item name="border">@color/border</item>
-        <item name="homeScreenBtnBackground">@color/homeScreenBtnBackground</item>
-        <item name="textViewBackground">@color/textViewBackground</item>
-        <item name="buttonBackground">@color/buttonBackground</item>
-        <item name="bottomSheetBackground">@color/btmSheetBgColor</item>
-        <item name="cardBackgroundColor">@color/colorPrimaryDark</item>
-
-        <item name="primaryTextColor">@color/primaryText</item>
-        <item name="primaryLightColorText">@color/primaryLightColorText</item>
-        <item name="secondaryTextColor">@color/secondaryText</item>
-        <item name="chipTextColor">@color/chipTextColor</item>
-        <item name="invertedPrimaryTextColor">@color/invertedPrimaryText</item>
-        <item name="textColorAccentBad">@color/textColorAccentBad</item>
-        <item name="homeScreenHeaderTextColor">@color/homeScreenHeaderTextColor</item>
-
-        <item name="svgStrokeColor">@color/stroke</item>
-        <item name="svgFillColor">@color/fill</item>
+        <item name="svgStrokeColor">?attr/colorOnSurface</item>
+        <item name="svgFillColor">@android:color/transparent</item>
 
         <item name="selectedCardBg">@color/selectedCardBg</item>
 
@@ -95,55 +135,81 @@
         <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView</item>
         <!-- Guided Tour -->
         <item name="tourOverlayColor">@color/tourOverlayDark</item>
-        <item name="tourTooltipBackground">@color/colorSurface</item>
+        <item name="tourTooltipBackground">?attr/colorSurface</item>
         <item name="tourStrokeColor">@color/tourStrokeDark</item>
         <item name="tourButtonBackground">@color/buttonBackground</item>
-        <item name="tourButtonTextColor">@color/primaryText</item>
+        <item name="tourButtonTextColor">?attr/colorOnSurface</item>
     </style>
 
-    <style name="AppThemeWhite" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
-        <item name="colorPrimary">@color/colorPrimaryLight</item>
+    <style name="AppThemeWhite" parent="Theme.Material3.Light.NoActionBar">
+        <!-- M3 Standard Palette -->
+        <item name="colorPrimary">@color/accentGoodLight</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorPrimaryContainer">@color/colorPrimaryLight</item>
+        <item name="colorOnPrimaryContainer">@color/primaryTextLight</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkLight</item>
         <item name="colorSecondary">@color/colorSecondaryLight</item>
+        <item name="colorSecondaryContainer">@color/colorPrimaryDarkLight</item>
+        <item name="colorOnSecondaryContainer">@color/primaryTextLight</item>
+        <item name="colorTertiary">@color/accentWarningLight</item>
+        <item name="colorOnTertiary">@android:color/white</item>
+        <item name="colorError">@color/accentBadLight</item>
+        <item name="colorOnError">@color/primaryTextLight</item>
+
+        <item name="colorSurface">@color/colorSurfaceLight</item>
+        <item name="colorOnSurface">@color/primaryTextLight</item>
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariantLight</item>
+        <item name="colorOnSurfaceVariant">@color/primaryLightColorTextLight</item>
+        <item name="colorSurfaceContainer">@color/colorSurfaceContainerLight</item>
+        <item name="colorSurfaceContainerLow">@color/colorSurfaceLight</item>
+        <item name="colorSurfaceContainerHigh">@color/colorSurfaceContainerLight</item>
+        <item name="colorSurfaceContainerHighest">@color/colorSurfaceVariantLight</item>
+        <item name="colorSurfaceContainerLowest">@android:color/white</item>
+
+        <item name="colorOutline">@color/borderLight</item>
         <item name="colorBackgroundFloating">@color/colorBackgroundFloatingLight</item>
         <item name="android:colorBackgroundFloating">@color/colorBackgroundFloatingLight</item>
 
+        <!-- Legacy / Custom Attributes Mapping -->
         <item name="android:colorAccent">@color/accentGoodLight</item>
         <item name="colorAccent">@color/accentGoodLight</item>
-        <item name="accentGood">@color/accentGoodLight</item>
-        <item name="accentBad">@color/accentBadLight</item>
-        <item name="accentWarning">@color/accentWarningLight</item>
+        <item name="accentGood">?attr/colorPrimary</item>
+        <item name="accentBad">?attr/colorError</item>
+        <item name="accentWarning">?attr/colorTertiary</item>
+
+        <item name="background">?attr/colorSurface</item>
+        <item name="cardBackgroundColor">?attr/colorSurfaceContainer</item>
+        <item name="navBarColor">@color/navBarColorLight</item>
+        <item name="divider">?attr/colorSurfaceVariant</item>
+        <item name="border">?attr/colorOutline</item>
+        <item name="textViewBackground">@color/textViewBackgroundLight</item>
+        <item name="homeScreenBtnBackground">@color/homeScreenBtnBackgroundLight</item>
+        <item name="buttonBackground">@color/buttonBackgroundLight</item>
+        <item name="bottomSheetBackground">@color/btmSheetBgColorLight</item>
+
+        <item name="primaryTextColor">?attr/colorOnSurface</item>
+        <item name="primaryLightColorText">?attr/colorOnSurfaceVariant</item>
+        <item name="invertedPrimaryTextColor">?attr/colorOnPrimary</item>
+        <item name="chipTextColor">?attr/colorOnPrimary</item>
+        <item name="secondaryTextColor">?attr/accentGood</item>
+        <item name="textColorAccentBad">?attr/colorError</item>
+        <item name="homeScreenHeaderTextColor">?attr/colorOnPrimary</item>
 
         <item name="switchNormal">@color/switchNormalLight</item>
         <item name="colorSwitchThumbNormal">@color/colorSwitchThumbNormalLight</item>
         <item name="controlActivated">@color/colorControlActivatedLight</item>
         <item name="controlActivatedBad">@color/colorControlActivatedBadLight</item>
         <item name="android:navigationBarColor">@color/switchNormalLight</item>
-        <item name="colorSurface">@color/colorSurfaceLight</item>
 
-        <item name="chipStyle">@style/Widget.MaterialComponents.Chip.Action</item>
+        <item name="materialSwitchStyle">@style/CustomMaterialSwitch</item>
+        <item name="switchStyle">@style/CustomMaterialSwitch</item>
+        <item name="android:switchStyle">@style/CustomMaterialSwitch</item>
+
+        <item name="chipStyle">@style/Widget.Material3.Chip.Assist</item>
         <item name="tabIndicator">@color/tabIndicatorLight</item>
         <item name="android:splitMotionEvents">false</item>
         <item name="android:windowEnableSplitTouch">false</item>
         <item name="android:searchViewStyle">@style/SearchView.Custom</item>
-
-        <item name="background">@color/backgroundLight</item>
-        <item name="cardBackgroundColor">@color/backgroundLight</item>
-        <item name="navBarColor">@color/navBarColorLight</item>
-        <item name="divider">@color/dividerLight</item>
-        <item name="border">@color/borderLight</item>
-        <item name="textViewBackground">@color/textViewBackgroundLight</item>
-        <item name="homeScreenBtnBackground">@color/homeScreenBtnBackgroundLight</item>
-        <item name="buttonBackground">@color/buttonBackgroundLight</item>
-        <item name="bottomSheetBackground">@color/btmSheetBgColorLight</item>
-
-        <item name="primaryTextColor">@color/primaryTextLight</item>
-        <item name="primaryLightColorText">@color/primaryLightColorTextLight</item>
-        <item name="invertedPrimaryTextColor">@color/invertedPrimaryTextLight</item>
-        <item name="chipTextColor">@color/chipTextColorLight</item>
-        <item name="secondaryTextColor">@color/secondaryTextLight</item>
-        <item name="textColorAccentBad">@color/textColorAccentBadLight</item>
-        <item name="homeScreenHeaderTextColor">@color/homeScreenHeaderTextColorLight</item>
 
         <item name="svgStrokeColor">@color/strokeLight</item>
         <item name="svgFillColor">@color/fillLight</item>
@@ -173,12 +239,13 @@
         <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgLight</item>
 
         <item name="homeScreenBtnGradientEnd">@color/colorPrimaryDarkLight</item>
-        <item name="homeScreenBtnGradientStart">@color/accentGoodLight</item>
+        <item name="homeScreenBtnGradientStart">@color/colorSecondaryLight</item>
         <item name="vpnHeaderGradientStart">@color/vpnHeaderGradientStartLight</item>
         <item name="vpnHeaderGradientCenter">@color/vpnHeaderGradientCenterLight</item>
         <item name="vpnHeaderGradientEnd">@color/vpnHeaderGradientEndLight</item>
         <item name="colorGolden">@color/colorGoldenLight</item>
         <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView</item>
+
         <!-- Guided Tour -->
         <item name="tourOverlayColor">@color/tourOverlayLight</item>
         <item name="tourTooltipBackground">@color/colorSurfaceLight</item>
@@ -187,50 +254,76 @@
         <item name="tourButtonTextColor">@color/tourBtnTextLight</item>
     </style>
 
-    <style name="AppThemeTrueBlack" parent="Theme.MaterialComponents.NoActionBar.Bridge">
-        <item name="colorPrimary">@color/colorPrimaryBlack</item>
+    <style name="AppThemeTrueBlack" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- M3 Standard Palette -->
+        <item name="colorPrimary">@color/accentGoodBlack</item>
+        <item name="colorOnPrimary">@android:color/black</item>
+        <item name="colorPrimaryContainer">@color/colorPrimaryBlack</item>
+        <item name="colorOnPrimaryContainer">@color/primaryTextBlack</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkBlack</item>
         <item name="colorSecondary">@color/colorSecondaryBlack</item>
+        <item name="colorSecondaryContainer">@color/selectedCardBgBlack</item>
+        <item name="colorOnSecondaryContainer">@color/primaryTextBlack</item>
+        <item name="colorTertiary">@color/accentWarningBlack</item>
+        <item name="colorOnTertiary">@android:color/black</item>
+        <item name="colorError">@color/accentBadBlack</item>
+        <item name="colorOnError">@color/primaryTextBlack</item>
+
+        <item name="colorSurface">@color/colorSurfaceBlack</item>
+        <item name="colorOnSurface">@color/primaryTextBlack</item>
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariantBlack</item>
+        <item name="colorOnSurfaceVariant">@color/primaryLightColorTextBlack</item>
+        <item name="colorSurfaceContainer">@color/colorSurfaceContainerBlack</item>
+        <item name="colorSurfaceContainerLow">@android:color/black</item>
+        <item name="colorSurfaceContainerHigh">@color/colorSurfaceContainerBlack</item>
+        <item name="colorSurfaceContainerHighest">@color/colorSurfaceVariantBlack</item>
+        <item name="colorSurfaceContainerLowest">@android:color/black</item>
+
+        <item name="colorOutline">@color/borderBlack</item>
         <item name="colorBackgroundFloating">@color/colorPrimaryBlack</item>
         <item name="android:colorBackgroundFloating">@color/colorPrimaryBlack</item>
 
+        <!-- Legacy / Custom Attributes Mapping -->
         <item name="android:colorAccent">@color/accentGoodBlack</item>
         <item name="colorAccent">@color/accentGoodBlack</item>
-        <item name="accentGood">@color/accentGoodBlack</item>
-        <item name="accentBad">@color/accentBadBlack</item>
-        <item name="accentWarning">@color/accentWarningBlack</item>
+        <item name="accentGood">?attr/colorPrimary</item>
+        <item name="accentBad">?attr/colorError</item>
+        <item name="accentWarning">?attr/colorTertiary</item>
 
+        <item name="background">?attr/colorSurface</item>
+        <item name="cardBackgroundColor">?attr/colorSurfaceContainer</item>
         <item name="navBarColor">@color/navBarColorBlack</item>
-        <item name="android:navigationBarColor">@color/navBarColorBlack</item>
-        <item name="tabIndicator">@color/tabIndicatorBlack</item>
+        <item name="divider">?attr/colorSurfaceVariant</item>
+        <item name="border">?attr/colorOutline</item>
+        <item name="textViewBackground">@color/textViewBackgroundBlack</item>
+        <item name="buttonBackground">?attr/colorSecondaryContainer</item>
+        <item name="homeScreenBtnBackground">?attr/colorSecondaryContainer</item>
+        <item name="homeScreenHeaderTextColor">?attr/colorOnSurface</item>
+        <item name="bottomSheetBackground">?attr/colorSurface</item>
+
+        <item name="primaryTextColor">?attr/colorOnSurface</item>
+        <item name="primaryLightColorText">?attr/colorOnSurfaceVariant</item>
+        <item name="chipTextColor">?attr/colorOnSurface</item>
+        <item name="invertedPrimaryTextColor">?attr/colorOnPrimary</item>
+        <item name="secondaryTextColor">?attr/accentGood</item>
+        <item name="textColorAccentBad">?attr/colorError</item>
 
         <item name="switchNormal">@color/switchNormalBlack</item>
         <item name="colorSwitchThumbNormal">@color/colorSwitchThumbNormalBlack</item>
         <item name="controlActivated">@color/colorControlActivatedBlack</item>
         <item name="controlActivatedBad">@color/colorControlActivatedBadBlack</item>
-        <item name="colorSurface">@color/colorSurfaceBlack</item>
 
-        <item name="chipStyle">@style/Widget.MaterialComponents.Chip.Action</item>
+        <item name="materialSwitchStyle">@style/CustomMaterialSwitch</item>
+        <item name="switchStyle">@style/CustomMaterialSwitch</item>
+        <item name="android:switchStyle">@style/CustomMaterialSwitch</item>
+
+        <item name="android:navigationBarColor">@color/navBarColorBlack</item>
+        <item name="tabIndicator">@color/tabIndicatorBlack</item>
+
+        <item name="chipStyle">@style/Widget.Material3.Chip.Assist</item>
         <item name="android:splitMotionEvents">false</item>
         <item name="android:windowEnableSplitTouch">false</item>
         <item name="android:searchViewStyle">@style/SearchView.Custom</item>
-
-        <item name="background">@color/backgroundBlack</item>
-        <item name="cardBackgroundColor">@color/backgroundBlack</item>
-        <item name="divider">@color/dividerBlack</item>
-        <item name="border">@color/borderBlack</item>
-        <item name="homeScreenBtnBackground">@color/homeScreenBtnBackgroundBlack</item>
-        <item name="textViewBackground">@color/textViewBackgroundBlack</item>
-        <item name="buttonBackground">@color/buttonBackgroundBlack</item>
-        <item name="homeScreenHeaderTextColor">@color/homeScreenHeaderTextColorBlack</item>
-        <item name="bottomSheetBackground">@color/btmSheetBgColorBlack</item>
-
-        <item name="primaryTextColor">@color/primaryTextBlack</item>
-        <item name="primaryLightColorText">@color/primaryLightColorTextBlack</item>
-        <item name="chipTextColor">@color/chipTextColorBlack</item>
-        <item name="invertedPrimaryTextColor">@color/invertedPrimaryTextBlack</item>
-        <item name="secondaryTextColor">@color/secondaryTextBlack</item>
-        <item name="textColorAccentBad">@color/textColorAccentBadBlack</item>
 
         <item name="svgStrokeColor">@color/strokeBlack</item>
         <item name="svgFillColor">@color/fillBlack</item>
@@ -266,6 +359,7 @@
         <item name="vpnHeaderGradientEnd">@color/vpnHeaderGradientEndBlack</item>
         <item name="colorGolden">@color/colorGoldenBlack</item>
         <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView</item>
+
         <!-- Guided Tour -->
         <item name="tourOverlayColor">@color/tourOverlayBlack</item>
         <item name="tourTooltipBackground">@color/colorSurfaceBlack</item>
@@ -274,49 +368,75 @@
         <item name="tourButtonTextColor">@color/tourBtnTextDark</item>
     </style>
 
-    <style name="AppThemeWhitePlus" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
-        <item name="colorPrimary">@color/colorPrimaryLightPlus</item>
+    <style name="AppThemeWhitePlus" parent="Theme.Material3.Light.NoActionBar">
+        <!-- M3 Standard Palette -->
+        <item name="colorPrimary">@color/accentGoodLightPlus</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorPrimaryContainer">@color/colorPrimaryLightPlus</item>
+        <item name="colorOnPrimaryContainer">@color/primaryTextLightPlus</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkLightPlus</item>
         <item name="colorSecondary">@color/colorSecondaryLightPlus</item>
+        <item name="colorSecondaryContainer">@color/colorPrimaryDarkLightPlus</item>
+        <item name="colorOnSecondaryContainer">@color/primaryTextLightPlus</item>
+        <item name="colorTertiary">@color/accentWarningLightPlus</item>
+        <item name="colorOnTertiary">@android:color/white</item>
+        <item name="colorError">@color/accentBadLightPlus</item>
+        <item name="colorOnError">@color/primaryTextLightPlus</item>
+
+        <item name="colorSurface">@color/colorSurfaceLightPlus</item>
+        <item name="colorOnSurface">@color/primaryTextLightPlus</item>
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariantLightPlus</item>
+        <item name="colorOnSurfaceVariant">@color/primaryDarkColorTextLightPlus</item>
+        <item name="colorSurfaceContainer">@color/colorSurfaceContainerLightPlus</item>
+        <item name="colorSurfaceContainerLow">@color/colorSurfaceLightPlus</item>
+        <item name="colorSurfaceContainerHigh">@color/colorSurfaceContainerLightPlus</item>
+        <item name="colorSurfaceContainerHighest">@color/colorSurfaceVariantLightPlus</item>
+        <item name="colorSurfaceContainerLowest">@android:color/white</item>
+
+        <item name="colorOutline">@color/borderLightPlus</item>
         <item name="colorBackgroundFloating">@color/colorBackgroundFloatingLightPlus</item>
         <item name="android:colorBackgroundFloating">@color/colorBackgroundFloatingLightPlus</item>
 
+        <!-- Legacy / Custom Attributes Mapping -->
         <item name="android:colorAccent">@color/accentGoodLightPlus</item>
         <item name="colorAccent">@color/accentGoodLightPlus</item>
-        <item name="accentGood">@color/accentGoodLightPlus</item>
-        <item name="accentBad">@color/accentBadLightPlus</item>
-        <item name="accentWarning">@color/accentWarningLightPlus</item>
+        <item name="accentGood">?attr/colorPrimary</item>
+        <item name="accentBad">?attr/colorError</item>
+        <item name="accentWarning">?attr/colorTertiary</item>
+
+        <item name="background">?attr/colorSurface</item>
+        <item name="cardBackgroundColor">?attr/colorSurfaceContainer</item>
+        <item name="navBarColor">@color/navBarColorLightPlus</item>
+        <item name="divider">?attr/colorSurfaceVariant</item>
+        <item name="border">?attr/colorOutline</item>
+        <item name="textViewBackground">@color/textViewBackgroundLightPlus</item>
+        <item name="homeScreenBtnBackground">@color/homeScreenBtnBackgroundLightPlus</item>
+        <item name="buttonBackground">@color/buttonBackgroundLightPlus</item>
+        <item name="bottomSheetBackground">@color/btmSheetBgColorLightPlus</item>
+
+        <item name="primaryTextColor">?attr/colorOnSurface</item>
+        <item name="primaryLightColorText">?attr/colorOnSurfaceVariant</item>
+        <item name="invertedPrimaryTextColor">?attr/colorOnPrimary</item>
+        <item name="chipTextColor">?attr/colorOnPrimary</item>
+        <item name="secondaryTextColor">?attr/accentGood</item>
+        <item name="textColorAccentBad">?attr/colorError</item>
+        <item name="homeScreenHeaderTextColor">?attr/colorOnPrimary</item>
 
         <item name="switchNormal">@color/switchNormalLightPlus</item>
         <item name="colorSwitchThumbNormal">@color/colorSwitchThumbNormalLightPlus</item>
         <item name="controlActivated">@color/colorControlActivatedLightPlus</item>
         <item name="controlActivatedBad">@color/colorControlActivatedBadLightPlus</item>
         <item name="android:navigationBarColor">@color/switchNormalLightPlus</item>
-        <item name="colorSurface">@color/colorSurfaceLightPlus</item>
 
-        <item name="chipStyle">@style/Widget.MaterialComponents.Chip.Action</item>
+        <item name="materialSwitchStyle">@style/CustomMaterialSwitch</item>
+        <item name="switchStyle">@style/CustomMaterialSwitch</item>
+        <item name="android:switchStyle">@style/CustomMaterialSwitch</item>
+
+        <item name="chipStyle">@style/Widget.Material3.Chip.Assist</item>
         <item name="tabIndicator">@color/tabIndicatorLightPlus</item>
         <item name="android:splitMotionEvents">false</item>
         <item name="android:windowEnableSplitTouch">false</item>
         <item name="android:searchViewStyle">@style/SearchView.Custom</item>
-
-        <item name="background">@color/backgroundLightPlus</item>
-        <item name="cardBackgroundColor">@color/backgroundLightPlus</item>
-        <item name="navBarColor">@color/navBarColorLightPlus</item>
-        <item name="divider">@color/dividerLightPlus</item>
-        <item name="border">@color/borderLightPlus</item>
-        <item name="textViewBackground">@color/textViewBackgroundLightPlus</item>
-        <item name="homeScreenBtnBackground">@color/homeScreenBtnBackgroundLightPlus</item>
-        <item name="buttonBackground">@color/buttonBackgroundLightPlus</item>
-        <item name="bottomSheetBackground">@color/btmSheetBgColorLightPlus</item>
-
-        <item name="primaryTextColor">@color/primaryTextLightPlus</item>
-        <item name="primaryLightColorText">@color/primaryLightColorTextLightPlus</item>
-        <item name="invertedPrimaryTextColor">@color/invertedPrimaryTextLightPlus</item>
-        <item name="chipTextColor">@color/chipTextColorLightPlus</item>
-        <item name="secondaryTextColor">@color/secondaryTextLightPlus</item>
-        <item name="textColorAccentBad">@color/textColorAccentBadLightPlus</item>
-        <item name="homeScreenHeaderTextColor">@color/homeScreenHeaderTextColorLightPlus</item>
 
         <item name="svgStrokeColor">@color/strokeLightPlus</item>
         <item name="svgFillColor">@color/fillLightPlus</item>
@@ -345,8 +465,8 @@
         <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtLightPlus</item>
         <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgLightPlus</item>
 
-        <item name="homeScreenBtnGradientEnd">@color/accentGoodLightPlus</item>
-        <item name="homeScreenBtnGradientStart">@color/colorPrimaryDarkLightPlus</item>
+        <item name="homeScreenBtnGradientEnd">@color/colorPrimaryDarkLightPlus</item>
+        <item name="homeScreenBtnGradientStart">@color/colorSecondaryLightPlus</item>
         <item name="vpnHeaderGradientStart">@color/vpnHeaderGradientStartLightPlus</item>
         <item name="vpnHeaderGradientCenter">@color/vpnHeaderGradientCenterLightPlus</item>
         <item name="vpnHeaderGradientEnd">@color/vpnHeaderGradientEndLightPlus</item>
@@ -360,50 +480,76 @@
         <item name="tourButtonTextColor">@color/tourBtnTextLight</item>
     </style>
 
-    <style name="AppThemeTrueBlackPlus" parent="Theme.MaterialComponents.NoActionBar.Bridge">
-        <item name="colorPrimary">@color/colorPrimaryBlackPlus</item>
+    <style name="AppThemeTrueBlackPlus" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- M3 Standard Palette -->
+        <item name="colorPrimary">@color/accentGoodBlackPlus</item>
+        <item name="colorOnPrimary">@android:color/black</item>
+        <item name="colorPrimaryContainer">@color/colorPrimaryBlackPlus</item>
+        <item name="colorOnPrimaryContainer">@color/primaryTextBlackPlus</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkBlackPlus</item>
         <item name="colorSecondary">@color/colorSecondaryBlackPlus</item>
+        <item name="colorSecondaryContainer">@color/selectedCardBgBlackPlus</item>
+        <item name="colorOnSecondaryContainer">@color/primaryTextBlackPlus</item>
+        <item name="colorTertiary">@color/accentWarningBlackPlus</item>
+        <item name="colorOnTertiary">@android:color/black</item>
+        <item name="colorError">@color/accentBadBlackPlus</item>
+        <item name="colorOnError">@color/primaryTextBlackPlus</item>
+
+        <item name="colorSurface">@color/colorSurfaceBlackPlus</item>
+        <item name="colorOnSurface">@color/primaryTextBlackPlus</item>
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariantBlackPlus</item>
+        <item name="colorOnSurfaceVariant">@color/primaryLightColorTextBlackPlus</item>
+        <item name="colorSurfaceContainer">@color/colorSurfaceContainerBlackPlus</item>
+        <item name="colorSurfaceContainerLow">@android:color/black</item>
+        <item name="colorSurfaceContainerHigh">@color/colorSurfaceContainerBlackPlus</item>
+        <item name="colorSurfaceContainerHighest">@color/colorSurfaceVariantBlackPlus</item>
+        <item name="colorSurfaceContainerLowest">@android:color/black</item>
+
+        <item name="colorOutline">@color/borderBlackPlus</item>
         <item name="colorBackgroundFloating">@color/colorPrimaryBlackPlus</item>
         <item name="android:colorBackgroundFloating">@color/colorPrimaryBlackPlus</item>
 
+        <!-- Legacy / Custom Attributes Mapping -->
         <item name="android:colorAccent">@color/accentGoodBlackPlus</item>
         <item name="colorAccent">@color/accentGoodBlackPlus</item>
-        <item name="accentGood">@color/accentGoodBlackPlus</item>
-        <item name="accentBad">@color/accentBadBlackPlus</item>
-        <item name="accentWarning">@color/accentWarningBlackPlus</item>
+        <item name="accentGood">?attr/colorPrimary</item>
+        <item name="accentBad">?attr/colorError</item>
+        <item name="accentWarning">?attr/colorTertiary</item>
 
+        <item name="background">?attr/colorSurface</item>
+        <item name="cardBackgroundColor">?attr/colorSurfaceContainer</item>
         <item name="navBarColor">@color/navBarColorBlackPlus</item>
-        <item name="android:navigationBarColor">@color/navBarColorBlackPlus</item>
-        <item name="tabIndicator">@color/tabIndicatorBlackPlus</item>
+        <item name="divider">?attr/colorSurfaceVariant</item>
+        <item name="border">?attr/colorOutline</item>
+        <item name="textViewBackground">@color/textViewBackgroundBlackPlus</item>
+        <item name="buttonBackground">?attr/colorSecondaryContainer</item>
+        <item name="homeScreenBtnBackground">?attr/colorSecondaryContainer</item>
+        <item name="homeScreenHeaderTextColor">?attr/colorOnSurface</item>
+        <item name="bottomSheetBackground">?attr/colorSurface</item>
+
+        <item name="primaryTextColor">?attr/colorOnSurface</item>
+        <item name="primaryLightColorText">?attr/colorOnSurfaceVariant</item>
+        <item name="chipTextColor">?attr/colorOnSurface</item>
+        <item name="invertedPrimaryTextColor">?attr/colorOnPrimary</item>
+        <item name="secondaryTextColor">?attr/accentGood</item>
+        <item name="textColorAccentBad">?attr/colorError</item>
 
         <item name="switchNormal">@color/switchNormalBlackPlus</item>
         <item name="colorSwitchThumbNormal">@color/colorSwitchThumbNormalBlackPlus</item>
         <item name="controlActivated">@color/colorControlActivatedBlackPlus</item>
         <item name="controlActivatedBad">@color/colorControlActivatedBadBlackPlus</item>
-        <item name="colorSurface">@color/colorSurfaceBlackPlus</item>
 
-        <item name="chipStyle">@style/Widget.MaterialComponents.Chip.Action</item>
+        <item name="materialSwitchStyle">@style/CustomMaterialSwitch</item>
+        <item name="switchStyle">@style/CustomMaterialSwitch</item>
+        <item name="android:switchStyle">@style/CustomMaterialSwitch</item>
+
+        <item name="android:navigationBarColor">@color/navBarColorBlackPlus</item>
+        <item name="tabIndicator">@color/tabIndicatorBlackPlus</item>
+
+        <item name="chipStyle">@style/Widget.Material3.Chip.Assist</item>
         <item name="android:splitMotionEvents">false</item>
         <item name="android:windowEnableSplitTouch">false</item>
         <item name="android:searchViewStyle">@style/SearchView.Custom</item>
-
-        <item name="background">@color/backgroundBlackPlus</item>
-        <item name="cardBackgroundColor">@color/colorPrimaryDarkBlackPlus</item>
-        <item name="divider">@color/dividerBlackPlus</item>
-        <item name="border">@color/borderBlackPlus</item>
-        <item name="homeScreenBtnBackground">@color/homeScreenBtnBackgroundBlackPlus</item>
-        <item name="textViewBackground">@color/textViewBackgroundBlackPlus</item>
-        <item name="buttonBackground">@color/buttonBackgroundBlackPlus</item>
-        <item name="homeScreenHeaderTextColor">@color/homeScreenHeaderTextColorBlackPlus</item>
-        <item name="bottomSheetBackground">@color/btmSheetBgColorBlackPlus</item>
-
-        <item name="primaryTextColor">@color/primaryTextBlackPlus</item>
-        <item name="primaryLightColorText">@color/primaryLightColorTextBlackPlus</item>
-        <item name="chipTextColor">@color/chipTextColorBlackPlus</item>
-        <item name="invertedPrimaryTextColor">@color/invertedPrimaryTextBlackPlus</item>
-        <item name="secondaryTextColor">@color/secondaryTextBlackPlus</item>
-        <item name="textColorAccentBad">@color/textColorAccentBadBlackPlus</item>
 
         <item name="svgStrokeColor">@color/strokeBlackPlus</item>
         <item name="svgFillColor">@color/fillBlackPlus</item>
@@ -447,50 +593,71 @@
         <item name="tourButtonTextColor">@color/tourBtnTextDark</item>
     </style>
 
-    <style name="AppThemeTrueBlackFrost" parent="Theme.MaterialComponents.NoActionBar.Bridge">
-        <item name="colorPrimary">@color/colorPrimaryBlack</item>
+    <style name="AppThemeTrueBlackFrost" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- M3 Standard Palette -->
+        <item name="colorPrimary">@color/accentGoodBlack</item>
+        <item name="colorOnPrimary">@android:color/black</item>
+        <item name="colorPrimaryContainer">@color/colorPrimaryBlack</item>
+        <item name="colorOnPrimaryContainer">@color/primaryTextBlack</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkBlack</item>
         <item name="colorSecondary">@color/colorSecondaryBlack</item>
+        <item name="colorSecondaryContainer">@color/selectedCardBgBlack</item>
+        <item name="colorOnSecondaryContainer">@color/primaryTextBlack</item>
+        <item name="colorTertiary">@color/accentWarningBG</item>
+        <item name="colorOnTertiary">@android:color/black</item>
+        <item name="colorError">@color/accentBadBlack</item>
+        <item name="colorOnError">@color/primaryTextBlack</item>
+
+        <item name="colorSurface">@color/colorSurfaceBlack</item>
+        <item name="colorOnSurface">@color/primaryTextBlack</item>
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariantBlack</item>
+        <item name="colorOnSurfaceVariant">@color/primaryLightColorTextBlack</item>
+        <item name="colorSurfaceContainer">@color/colorSurfaceContainerBlack</item>
+
+        <item name="colorOutline">@color/borderBlack</item>
         <item name="colorBackgroundFloating">@color/colorPrimaryBlack</item>
         <item name="android:colorBackgroundFloating">@color/colorPrimaryBlack</item>
 
+        <!-- Legacy / Custom Attributes Mapping -->
         <item name="android:colorAccent">@color/accentGoodBlack</item>
         <item name="colorAccent">@color/accentGoodBlack</item>
-        <item name="accentGood">@color/accentGoodBlack</item>
-        <item name="accentBad">@color/accentBadBlack</item>
-        <item name="accentWarning">@color/accentWarningBG</item>
+        <item name="accentGood">?attr/colorPrimary</item>
+        <item name="accentBad">?attr/colorError</item>
+        <item name="accentWarning">?attr/colorTertiary</item>
 
-        <item name="navBarColor">@color/navBarColorBlack</item>
-        <item name="android:navigationBarColor">@color/navBarColorBlack</item>
-        <item name="tabIndicator">@color/tabIndicatorBlack</item>
+        <item name="background">@android:color/transparent</item>
+        <item name="cardBackgroundColor">@color/cardBackgroundBG</item>
+        <item name="divider">?attr/colorSurfaceVariant</item>
+        <item name="border">?attr/colorOutline</item>
+        <item name="homeScreenBtnBackground">?attr/colorSecondaryContainer</item>
+        <item name="textViewBackground">@color/textViewBackgroundBlack</item>
+        <item name="buttonBackground">@color/buttonBackgroundBlack</item>
+        <item name="homeScreenHeaderTextColor">?attr/colorOnSurface</item>
+        <item name="bottomSheetBackground">@color/btmSheetBgColorBG</item>
+
+        <item name="primaryTextColor">?attr/colorOnSurface</item>
+        <item name="primaryLightColorText">?attr/colorOnSurfaceVariant</item>
+        <item name="chipTextColor">?attr/colorOnSurface</item>
+        <item name="invertedPrimaryTextColor">?attr/colorOnPrimary</item>
+        <item name="secondaryTextColor">?attr/accentGood</item>
+        <item name="textColorAccentBad">?attr/colorError</item>
 
         <item name="switchNormal">@color/switchNormalBlack</item>
         <item name="colorSwitchThumbNormal">@color/colorSwitchThumbNormalBlack</item>
         <item name="controlActivated">@color/colorControlActivatedBlack</item>
         <item name="controlActivatedBad">@color/colorControlActivatedBadBlack</item>
-        <item name="colorSurface">@color/colorSurfaceBlack</item>
 
-        <item name="chipStyle">@style/Widget.MaterialComponents.Chip.Action</item>
+        <item name="materialSwitchStyle">@style/CustomMaterialSwitch</item>
+        <item name="switchStyle">@style/CustomMaterialSwitch</item>
+        <item name="android:switchStyle">@style/CustomMaterialSwitch</item>
+
+        <item name="android:navigationBarColor">@color/navBarColorBlack</item>
+        <item name="tabIndicator">@color/tabIndicatorBlack</item>
+
+        <item name="chipStyle">@style/Widget.Material3.Chip.Assist</item>
         <item name="android:splitMotionEvents">false</item>
         <item name="android:windowEnableSplitTouch">false</item>
         <item name="android:searchViewStyle">@style/SearchView.Custom</item>
-
-        <item name="background">@android:color/transparent</item>
-        <item name="cardBackgroundColor">@color/cardBackgroundBG</item>
-        <item name="divider">@color/dividerBlack</item>
-        <item name="border">@color/borderBlack</item>
-        <item name="homeScreenBtnBackground">@color/homeScreenBtnBackgroundBlack</item>
-        <item name="textViewBackground">@color/textViewBackgroundBlack</item>
-        <item name="buttonBackground">@color/buttonBackgroundBlack</item>
-        <item name="homeScreenHeaderTextColor">@color/homeScreenHeaderTextColorBlack</item>
-        <item name="bottomSheetBackground">@color/btmSheetBgColorBG</item>
-
-        <item name="primaryTextColor">@color/primaryTextBlack</item>
-        <item name="primaryLightColorText">@color/primaryLightColorTextBlack</item>
-        <item name="chipTextColor">@color/chipTextColorBlack</item>
-        <item name="invertedPrimaryTextColor">@color/invertedPrimaryTextBlack</item>
-        <item name="secondaryTextColor">@color/secondaryTextBlack</item>
-        <item name="textColorAccentBad">@color/textColorAccentBadBlack</item>
 
         <item name="svgStrokeColor">@color/strokeBlack</item>
         <item name="svgFillColor">@color/fillBlack</item>
@@ -524,8 +691,9 @@
         <item name="vpnHeaderGradientStart">@color/vpnHeaderGradientStartBlack</item>
         <item name="vpnHeaderGradientCenter">@color/vpnHeaderGradientCenterBlack</item>
         <item name="vpnHeaderGradientEnd">@color/vpnHeaderGradientEndBlack</item>
-        <item name="colorGolden">@color/colorGoldenBlackFrost</item>
-        <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView.Frost</item>
+        <item name="colorGolden">@color/colorGoldenBlack</item>
+        <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView</item>
+
         <!-- Guided Tour -->
         <item name="tourOverlayColor">@color/tourOverlayBlack</item>
         <item name="tourTooltipBackground">@color/colorSurfaceBlack</item>
@@ -534,7 +702,7 @@
         <item name="tourButtonTextColor">@color/tourBtnTextDark</item>
     </style>
 
-    <style name="CustomWidget.MaterialComponents.CompoundButton.Switch" parent="Widget.MaterialComponents.CompoundButton.Switch">
+    <style name="CustomWidget.Material3.CompoundButton.MaterialSwitch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
         <item name="materialThemeOverlay">@style/CustomCompoundButtonSwitch</item>
     </style>
 
@@ -546,21 +714,16 @@
         <item name="colorOnSecondary">@color/colorSecondary</item>
     </style>
 
-    <!-- Custom Material Switch to override purple colors -->
     <style name="CustomMaterialSwitch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
-        <item name="thumbTint">@color/accentGood</item>
-        <item name="trackTint">@color/colorSurface</item>
-        <item name="thumbTintMode">src_in</item>
-        <item name="trackTintMode">src_in</item>
         <item name="materialThemeOverlay">@style/CustomSwitchThemeOverlay</item>
     </style>
 
     <!-- Theme overlay to force switch colors -->
     <style name="CustomSwitchThemeOverlay">
-        <item name="colorPrimary">@color/accentGood</item>
-        <item name="colorSecondary">@color/accentGood</item>
-        <item name="colorOnSurface">@color/primaryText</item>
-        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorPrimary">?attr/accentGood</item>
+        <item name="colorSurfaceVariant">?attr/colorSurfaceVariant</item>
+        <item name="colorSurface">?attr/colorSurface</item>
+        <item name="colorOutline">?attr/colorOutline</item>
     </style>
 
     <!-- Light theme switch style -->
@@ -575,16 +738,68 @@
     <!-- Light theme overlay to force switch colors -->
     <style name="CustomSwitchThemeOverlayLight">
         <item name="colorPrimary">@color/accentGoodLight</item>
-        <item name="colorSecondary">@color/accentGoodLight</item>
-        <item name="colorOnSurface">@color/primaryTextLight</item>
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariantLight</item>
         <item name="colorSurface">@color/colorSurfaceLight</item>
+        <item name="colorOutline">@color/borderLight</item>
     </style>
 
-    <style name="BottomSheet" parent="@style/Theme.Design.BottomSheetDialog">
+    <!-- Base required by Android dot-notation implicit parent resolution -->
+    <style name="SwitchOverlay.Sheet" />
+    <style name="SwitchOverlay" />
+
+    <style name="SwitchOverlay.Sheet.Dark">
+        <item name="colorPrimary">@color/accentGood</item>
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariantDark</item>
+        <item name="colorSurface">@color/colorSurfaceBG</item>
+        <item name="colorOutline">@color/borderBG</item>
+    </style>
+    <style name="SwitchOverlay.Sheet.Light">
+        <item name="colorPrimary">@color/accentGoodLight</item>
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariantLight</item>
+        <item name="colorSurface">@color/colorSurfaceLight</item>
+        <item name="colorOutline">@color/borderLight</item>
+    </style>
+    <style name="SwitchOverlay.Sheet.Black">
+        <item name="colorPrimary">@color/accentGoodBlack</item>
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariantBlack</item>
+        <item name="colorSurface">@color/colorSurfaceBlack</item>
+        <item name="colorOutline">@color/borderBlack</item>
+    </style>
+    <style name="SwitchOverlay.Sheet.LightPlus">
+        <item name="colorPrimary">@color/accentGoodLightPlus</item>
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariantLightPlus</item>
+        <item name="colorSurface">@color/colorSurfaceLightPlus</item>
+        <item name="colorOutline">@color/borderLightPlus</item>
+    </style>
+    <style name="SwitchOverlay.Sheet.BlackPlus">
+        <item name="colorPrimary">@color/accentGoodBlackPlus</item>
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariantBlackPlus</item>
+        <item name="colorSurface">@color/colorSurfaceBlackPlus</item>
+        <item name="colorOutline">@color/borderBlackPlus</item>
+    </style>
+
+    <!-- Per-theme switch widget styles for bottom sheets -->
+    <style name="MaterialSwitch.Sheet.Dark" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="materialThemeOverlay">@style/SwitchOverlay.Sheet.Dark</item>
+    </style>
+    <style name="MaterialSwitch.Sheet.Light" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="materialThemeOverlay">@style/SwitchOverlay.Sheet.Light</item>
+    </style>
+    <style name="MaterialSwitch.Sheet.Black" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="materialThemeOverlay">@style/SwitchOverlay.Sheet.Black</item>
+    </style>
+    <style name="MaterialSwitch.Sheet.LightPlus" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="materialThemeOverlay">@style/SwitchOverlay.Sheet.LightPlus</item>
+    </style>
+    <style name="MaterialSwitch.Sheet.BlackPlus" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="materialThemeOverlay">@style/SwitchOverlay.Sheet.BlackPlus</item>
+    </style>
+
+    <style name="BottomSheet" parent="Theme.Material3.DayNight.BottomSheetDialog">
         <item name="android:background">@drawable/bg_bottom_sheet_dialog_fragment</item>
     </style>
 
-    <style name="App.Dialog.NoDim" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+    <style name="App.Dialog.NoDim" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:backgroundDimEnabled">false</item>
         <item name="android:windowBackground">@android:color/transparent</item>
@@ -594,38 +809,54 @@
     </style>
 
 
-    <style name="App.AlertDialog.PositiveButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+    <style name="App.AlertDialog.PositiveButton" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textAppearance">@style/TextAppearance.Material3.LabelLarge</item>
+    </style>
+
+    <style name="App.AlertDialog.NegativeButton" parent="Widget.Material3.Button.TextButton.Dialog">
         <item name="android:textColor">?attr/secondaryTextColor</item>
-        <item name="android:textAllCaps">true</item>
-        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Button</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textAppearance">@style/TextAppearance.Material3.LabelLarge</item>
     </style>
 
-    <style name="App.AlertDialog.NegativeButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">?attr/primaryLightColorText</item>
-        <item name="android:textAllCaps">true</item>
-        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Button</item>
+    <style name="App.AlertDialog.NeutralButton" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/secondaryTextColor</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textAppearance">@style/TextAppearance.Material3.LabelLarge</item>
     </style>
 
-    <style name="App.AlertDialog.NeutralButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">?attr/primaryLightColorText</item>
-        <item name="android:textAllCaps">true</item>
-        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Button</item>
-    </style>
-
-    <style name="BaseBottomSheetDialog" parent="@style/Theme.Design.BottomSheetDialog">
+    <style name="BaseBottomSheetDialog" parent="Theme.Material3.DayNight.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/BottomSheet</item>
         <item name="android:navigationBarColor">?attr/navBarColor</item>
         <item name="android:windowIsFloating">false</item>
     </style>
 
     <style name="BottomSheetDialogTheme" parent="BaseBottomSheetDialog">
-        <item name="colorSurface">@color/switchNormal</item>
-        <item name="colorOnSurface">@color/switchNormal</item>
-        <item name="colorSwitchThumbNormal">@color/switchNormal</item>
-        <item name="colorControlActivated">@color/colorControlActivatedBad</item>
-        <item name="android:colorForeground">@color/switchNormal</item>
+        <!-- Surface / background -->
+        <item name="colorSurface">@color/btmSheetBgColor</item>
+        <item name="colorOnSurface">@color/primaryText</item>
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariantDark</item>
+        <item name="colorOnSurfaceVariant">@color/primaryLightColorText</item>
+        <item name="colorSurfaceContainer">@color/btmSheetCardBgColor</item>
+        <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView</item>
+        <item name="colorPrimary">@color/accentGood</item>
+        <item name="colorOnPrimary">@android:color/black</item>
+        <item name="colorOutline">@color/border</item>
+        <item name="navBarColor">@color/navBarColor</item>
+        <item name="switchNormal">@color/switchNormal</item>
+        <item name="colorSwitchThumbNormal">@color/colorSwitchThumbNormal</item>
+        <item name="controlActivated">@color/colorControlActivated</item>
+        <item name="controlActivatedBad">@color/colorControlActivatedBad</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:navigationBarColor">@color/navBarColor</item>
+
+        <item name="accentGood">@color/accentGood</item>
+
+        <item name="materialSwitchStyle">@style/CustomMaterialSwitch</item>
+        <item name="switchStyle">@style/CustomMaterialSwitch</item>
+        <item name="android:switchStyle">@style/CustomMaterialSwitch</item>
 
         <item name="firewallNoRuleToggleBtnTxt">@color/firewallNoRuleToggleBtnTxt</item>
         <item name="firewallNoRuleToggleBtnBg">@color/firewallNoRuleToggleBtnBg</item>
@@ -640,13 +871,29 @@
     </style>
 
     <style name="BottomSheetDialogThemeWhite" parent="BaseBottomSheetDialog">
-        <item name="colorSurface">@color/switchNormalLight</item>
-        <item name="colorOnSurface">@color/switchNormalLight</item>
-        <item name="colorSwitchThumbNormal">@color/switchNormalLight</item>
-        <item name="colorControlActivated">@color/colorControlActivatedBadLight</item>
-        <item name="android:colorForeground">@color/switchNormalLight</item>
+        <!-- Surface / background -->
+        <item name="colorSurface">@color/btmSheetBgColorLight</item>
+        <item name="colorOnSurface">@color/primaryTextLight</item>
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariantLight</item>
+        <item name="colorOnSurfaceVariant">@color/primaryLightColorTextLight</item>
+        <item name="colorSurfaceContainer">@android:color/white</item>
+        <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView</item>
+        <item name="colorPrimary">@color/accentGoodLight</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorOutline">@color/borderLight</item>
+        <item name="navBarColor">@color/navBarColorLight</item>
+        <item name="switchNormal">@color/switchNormalLight</item>
+        <item name="colorSwitchThumbNormal">@color/colorSwitchThumbNormalLight</item>
+        <item name="controlActivated">@color/colorControlActivatedLight</item>
+        <item name="controlActivatedBad">@color/colorControlActivatedBadLight</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:navigationBarColor">@color/navBarColorLight</item>
+
+        <item name="accentGood">@color/accentGoodLight</item>
+
+        <item name="materialSwitchStyle">@style/CustomMaterialSwitch</item>
+        <item name="switchStyle">@style/CustomMaterialSwitch</item>
+        <item name="android:switchStyle">@style/CustomMaterialSwitch</item>
 
         <item name="firewallNoRuleToggleBtnTxt">@color/firewallNoRuleToggleBtnTxtLight</item>
         <item name="firewallNoRuleToggleBtnBg">@color/firewallNoRuleToggleBtnBgLight</item>
@@ -661,13 +908,30 @@
     </style>
 
     <style name="BottomSheetDialogThemeTrueBlack" parent="BaseBottomSheetDialog">
-        <item name="colorSurface">@color/switchNormalBlack</item>
-        <item name="colorOnSurface">@color/switchNormalBlack</item>
-        <item name="colorSwitchThumbNormal">@color/switchNormalBlack</item>
-        <item name="colorControlActivated">@color/colorControlActivatedBadBlack</item>
-        <item name="android:colorForeground">@color/switchNormalBlack</item>
+        <!-- Surface / background -->
+        <item name="colorSurface">@color/btmSheetBgColorBlack</item>
+        <item name="colorOnSurface">@color/primaryTextBlack</item>
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariantBlack</item>
+        <item name="colorOnSurfaceVariant">@color/primaryLightColorTextBlack</item>
+        <item name="colorSurfaceContainer">@color/colorSurfaceContainerBlack</item>
+        <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView</item>
+        <item name="colorPrimary">@color/accentGoodBlack</item>
+        <item name="colorOnPrimary">@android:color/black</item>
+        <item name="colorOutline">@color/borderBlack</item>
+        <item name="navBarColor">@color/navBarColorBlack</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:navigationBarColor">@color/navBarColorBlack</item>
+
+        <item name="accentGood">@color/accentGoodBlack</item>
+
+        <item name="switchNormal">@color/switchNormalBlack</item>
+        <item name="colorSwitchThumbNormal">@color/colorSwitchThumbNormalBlack</item>
+        <item name="controlActivated">@color/colorControlActivatedBlack</item>
+        <item name="controlActivatedBad">@color/colorControlActivatedBadBlack</item>
+
+        <item name="materialSwitchStyle">@style/CustomMaterialSwitch</item>
+        <item name="switchStyle">@style/CustomMaterialSwitch</item>
+        <item name="android:switchStyle">@style/CustomMaterialSwitch</item>
 
         <item name="firewallNoRuleToggleBtnTxt">@color/firewallNoRuleToggleBtnTxtBlack</item>
         <item name="firewallNoRuleToggleBtnBg">@color/firewallNoRuleToggleBtnBgBlack</item>
@@ -682,13 +946,29 @@
     </style>
 
     <style name="BottomSheetDialogThemeWhitePlus" parent="BaseBottomSheetDialog">
-        <item name="colorSurface">@color/switchNormalLightPlus</item>
-        <item name="colorOnSurface">@color/switchNormalLightPlus</item>
-        <item name="colorSwitchThumbNormal">@color/switchNormalLightPlus</item>
-        <item name="colorControlActivated">@color/colorControlActivatedBadLightPlus</item>
-        <item name="android:colorForeground">@color/switchNormalLightPlus</item>
+        <!-- Surface / background -->
+        <item name="colorSurface">@color/btmSheetBgColorLightPlus</item>
+        <item name="colorOnSurface">@color/primaryTextLightPlus</item>
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariantLightPlus</item>
+        <item name="colorOnSurfaceVariant">@color/primaryLightColorTextLightPlus</item>
+        <item name="colorSurfaceContainer">@color/colorSurfaceContainerLightPlus</item>
+        <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView</item>
+        <item name="colorPrimary">@color/accentGoodLightPlus</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorOutline">@color/borderLightPlus</item>
+        <item name="navBarColor">@color/navBarColorLightPlus</item>
+        <item name="switchNormal">@color/switchNormalLightPlus</item>
+        <item name="colorSwitchThumbNormal">@color/colorSwitchThumbNormalLightPlus</item>
+        <item name="controlActivated">@color/colorControlActivatedLightPlus</item>
+        <item name="controlActivatedBad">@color/colorControlActivatedBadLightPlus</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:navigationBarColor">@color/navBarColorLightPlus</item>
+
+        <item name="accentGood">@color/accentGoodLightPlus</item>
+
+        <item name="materialSwitchStyle">@style/CustomMaterialSwitch</item>
+        <item name="switchStyle">@style/CustomMaterialSwitch</item>
+        <item name="android:switchStyle">@style/CustomMaterialSwitch</item>
 
         <item name="firewallNoRuleToggleBtnTxt">@color/firewallNoRuleToggleBtnTxtLightPlus</item>
         <item name="firewallNoRuleToggleBtnBg">@color/firewallNoRuleToggleBtnBgLightPlus</item>
@@ -702,23 +982,33 @@
         <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgLightPlus</item>
 
         <item name="homeScreenBtnGradientEnd">@color/colorPrimaryDarkLightPlus</item>
-        <item name="homeScreenBtnGradientStart">@color/colorPrimary</item>
-
-        <!-- Force switch colors -->
-        <item name="materialSwitchStyle">@style/CustomMaterialSwitch</item>
-        <!-- Also override SwitchMaterial style -->
-        <item name="switchStyle">@style/CustomMaterialSwitch</item>
-        <item name="android:switchStyle">@style/CustomMaterialSwitch</item>
+        <item name="homeScreenBtnGradientStart">@color/accentGoodLightPlus</item>
     </style>
 
+    <!-- Restore missing bottom sheet theme for BlackPlus -->
     <style name="BottomSheetDialogThemeTrueBlackPlus" parent="BaseBottomSheetDialog">
-        <item name="colorSurface">@color/switchNormalBlackPlus</item>
-        <item name="colorOnSurface">@color/switchNormalBlackPlus</item>
-        <item name="colorSwitchThumbNormal">@color/switchNormalBlackPlus</item>
-        <item name="colorControlActivated">@color/colorControlActivatedBadBlackPlus</item>
-        <item name="android:colorForeground">@color/switchNormalBlackPlus</item>
+        <item name="colorSurface">@color/btmSheetBgColorBlackPlus</item>
+        <item name="colorOnSurface">@color/primaryTextBlackPlus</item>
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariantBlackPlus</item>
+        <item name="colorOnSurfaceVariant">@color/primaryLightColorTextBlackPlus</item>
+        <item name="colorSurfaceContainer">@color/btmSheetCardBgColorBlackPlus</item>
+        <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView</item>
+        <item name="colorPrimary">@color/accentGoodBlackPlus</item>
+        <item name="colorOnPrimary">@android:color/black</item>
+        <item name="colorOutline">@color/borderBlackPlus</item>
+        <item name="navBarColor">@color/navBarColorBlackPlus</item>
+        <item name="switchNormal">@color/switchNormalBlackPlus</item>
+        <item name="colorSwitchThumbNormal">@color/colorSwitchThumbNormalBlackPlus</item>
+        <item name="controlActivated">@color/colorControlActivatedBlackPlus</item>
+        <item name="controlActivatedBad">@color/colorControlActivatedBadBlackPlus</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:navigationBarColor">@color/navBarColorBlackPlus</item>
+
+        <item name="accentGood">@color/accentGoodBlackPlus</item>
+
+        <item name="materialSwitchStyle">@style/CustomMaterialSwitch</item>
+        <item name="switchStyle">@style/CustomMaterialSwitch</item>
+        <item name="android:switchStyle">@style/CustomMaterialSwitch</item>
 
         <item name="firewallNoRuleToggleBtnTxt">@color/firewallNoRuleToggleBtnTxtBlackPlus</item>
         <item name="firewallNoRuleToggleBtnBg">@color/firewallNoRuleToggleBtnBgBlackPlus</item>
@@ -737,7 +1027,7 @@
         <item name="android:maxWidth">@dimen/max_size</item>
     </style>
 
-    <style name="Chip.HomeScreen.Entry" parent="Widget.MaterialComponents.Chip.Entry">
+    <style name="Chip.HomeScreen.Entry" parent="Widget.Material3.Chip.Assist">
         <item name="android:padding">10dp</item>
         <item name="android:textColor">?attr/chipTextColor</item>
         <item name="checkedIconVisible">false</item>
@@ -746,7 +1036,7 @@
         <item name="chipBackgroundColor">?attr/homeScreenBtnBackground</item>
     </style>
 
-    <style name="Chip.HomeScreen.Action" parent="Widget.MaterialComponents.Chip.Action">
+    <style name="Chip.HomeScreen.Action" parent="Widget.Material3.Chip.Assist">
         <item name="android:padding">10dp</item>
         <item name="android:textColor">?attr/chipTextColor</item>
         <item name="checkedIconVisible">false</item>
@@ -755,7 +1045,7 @@
         <item name="chipBackgroundColor">?attr/homeScreenBtnBackground</item>
     </style>
 
-    <style name="ThinnerChip" parent="Widget.MaterialComponents.Chip.Filter">
+    <style name="ThinnerChip" parent="Widget.Material3.Chip.Filter">
         <item name="chipCornerRadius">12dp</item>
         <item name="chipMinHeight">24dp</item>
         <item name="android:textSize">11sp</item>
@@ -763,7 +1053,7 @@
         <item name="chipBackgroundColor">?attr/homeScreenBtnBackground</item>
     </style>
 
-    <style name="ThinnerChip.Large" parent="Widget.MaterialComponents.Chip.Filter">
+    <style name="ThinnerChip.Large" parent="Widget.Material3.Chip.Filter">
         <item name="chipCornerRadius">18dp</item>
         <item name="chipMinHeight">32dp</item>
         <item name="android:textSize">14sp</item>
@@ -771,7 +1061,7 @@
         <item name="android:textColor">@drawable/chip_text_color</item>
     </style>
 
-    <style name="ThinnerChip.Action" parent="Widget.MaterialComponents.Chip.Action">
+    <style name="ThinnerChip.Action" parent="Widget.Material3.Chip.Assist">
         <item name="chipCornerRadius">12dp</item>
         <item name="chipMinHeight">24dp</item>
         <item name="android:textSize">11sp</item>
@@ -780,14 +1070,14 @@
         <item name="chipBackgroundColor">?attr/homeScreenBtnBackground</item>
     </style>
 
-    <style name="ThinnerChip.Entry" parent="Widget.MaterialComponents.Chip.Entry">
+    <style name="ThinnerChip.Entry" parent="Widget.Material3.Chip.Assist">
         <item name="chipCornerRadius">12dp</item>
         <item name="chipMinHeight">24dp</item>
         <item name="android:textSize">11sp</item>
         <item name="chipMinTouchTargetSize">30dp</item>
     </style>
 
-    <style name="ShapeAppearance.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+    <style name="ShapeAppearance.LargeComponent" parent="ShapeAppearance.Material3.LargeComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">1dp</item>
         <item name="cornerRadius">1dp</item>
@@ -797,30 +1087,31 @@
         <item name="chipMinTouchTargetSize">40dp</item>
     </style>
 
-    <style name="TextAppearance.Heading.HomeScreen" parent="">
+    <style name="TextAppearance.Heading.HomeScreen" parent="TextAppearance.Material3.HeadlineMedium.Emphasized">
         <item name="android:layout_gravity">center</item>
         <item name="android:fontFamily">sans-serif-smallcaps</item>
         <item name="android:letterSpacing">0.25</item>
-        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:textSize">@dimen/rethink_header_text</item>
     </style>
 
-    <style name="TextAppearance.SubHeading.HomeScreen" parent="">
-        <item name="android:textColor">?attr/primaryTextColor</item>
+    <style name="TextAppearance.SubHeading.HomeScreen" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:textSize">@dimen/small_font_subheading_text</item>
     </style>
 
-    <style name="TextAppearance.Widget.HomeScreen.Title" parent="">
+    <style name="TextAppearance.Widget.HomeScreen.Title" parent="TextAppearance.Material3.TitleLarge">
         <item name="android:background">@android:color/transparent</item>
         <item name="android:drawablePadding">10dp</item>
         <item name="android:padding">5dp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:alpha">0.8</item>
-        <item name="android:textColor">?attr/homeScreenHeaderTextColor</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:textSize">@dimen/extra_large_font_text_view</item>
     </style>
 
-    <style name="TextAppearance.Widget.HomeScreen.Desc" parent="">
+    <style name="TextAppearance.Widget.HomeScreen.Desc" parent="TextAppearance.Material3.BodyMedium">
         <item name="android:background">@android:color/transparent</item>
         <item name="android:drawablePadding">10dp</item>
         <item name="android:paddingStart">10dp</item>
@@ -832,28 +1123,18 @@
         <item name="android:textSize">@dimen/extra_large_font_text_view</item>
     </style>
 
-    <style name="TextAppearance.Widget.HomeScreen.Desc.1" parent="">
-        <item name="android:background">@android:color/transparent</item>
-        <item name="android:drawablePadding">10dp</item>
-        <item name="android:paddingStart">10dp</item>
-        <item name="android:paddingEnd">10dp</item>
-        <item name="android:alpha">0.8</item>
-        <item name="android:ellipsize">end</item>
-        <item name="android:textColor">?attr/homeScreenHeaderTextColor</item>
-        <item name="android:textSize">@dimen/extra_large_font_text_view</item>
-    </style>
-
-    <style name="Button.HomeScreen.Borderless" parent="Widget.AppCompat.Button.Borderless">
+    <style name="Button.HomeScreen.Borderless" parent="Widget.Material3.Button.TextButton">
         <item name="android:textAlignment">viewStart</item>
-        <item name="android:textColor">?attr/invertedPrimaryTextColor</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
         <item name="android:textSize">@dimen/default_font_text_view</item>
         <item name="android:drawableEnd">@drawable/ic_right_arrow_white</item>
         <item name="android:padding">10dp</item>
     </style>
 
-    <style name="Button.HomeScreen.Main" parent="Widget.AppCompat.Button">
+    <style name="Button.HomeScreen.Main" parent="Widget.Material3.Button">
         <item name="android:layout_gravity">center</item>
         <item name="android:background">@drawable/home_screen_button_start_bg</item>
+        <item name="backgroundTint">@null</item>
         <item name="android:fontFamily">sans-serif-condensed-medium</item>
         <item name="android:gravity">center</item>
         <item name="android:paddingStart">10dp</item>
@@ -863,14 +1144,14 @@
         <item name="android:textSize">@dimen/home_screen_stat_text</item>
     </style>
 
-    <style name="toggleButtonStyle" parent="Widget.MaterialComponents.Button.OutlinedButton">
+    <style name="toggleButtonStyle" parent="Widget.Material3.Button.OutlinedButton">
         <item name="android:paddingLeft">@dimen/default_padding</item>
         <item name="android:paddingRight">@dimen/default_padding</item>
         <item name="strokeColor">?attr/accentGood</item>
         <item name="strokeWidth">@dimen/default_stroke_width</item>
     </style>
 
-    <style name="toggleButtonNoStyle" parent="Widget.MaterialComponents.Button.OutlinedButton">
+    <style name="toggleButtonNoStyle" parent="Widget.Material3.Button.OutlinedButton">
         <item name="android:paddingLeft">@dimen/default_padding</item>
         <item name="android:paddingRight">@dimen/default_padding</item>
         <item name="strokeColor">?attr/primaryTextColor</item>
@@ -898,16 +1179,16 @@
         <item name="tabTextColor">?attr/primaryLightColorText</item>
     </style>
 
-    <style name="Widget.Rethink.MaterialCardView" parent="Widget.MaterialComponents.CardView">
+    <style name="Widget.Rethink.MaterialCardView" parent="Widget.Material3.CardView.Elevated">
         <item name="cardCornerRadius">8dp</item>
-        <item name="cardElevation">6dp</item>
-        <item name="cardBackgroundColor">?attr/cardBackgroundColor</item>
+        <item name="cardElevation">2dp</item>
+        <item name="cardBackgroundColor">?attr/colorSurfaceContainer</item>
         <item name="cardUseCompatPadding">true</item>
         <item name="android:clipToPadding">true</item>
     </style>
 
     <!-- Frosted Card Style -->
-    <style name="Widget.Rethink.MaterialCardView.Frost" parent="Widget.MaterialComponents.CardView">
+    <style name="Widget.Rethink.MaterialCardView.Frost" parent="Widget.Material3.CardView.Elevated">
         <item name="cardBackgroundColor">?attr/cardBackgroundColor</item>
         <item name="cardElevation">0dp</item>
         <item name="cardCornerRadius">8dp</item>

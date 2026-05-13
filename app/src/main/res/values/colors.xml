@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="primaryLightColorText">#BFBDBDBD</color>
+    <color name="primaryLightColorText">#CAC4D0</color>
 
     <!-- 2nd Gradient color -->
     <color name="colorAmber_900">#FF1744</color>
@@ -13,39 +13,13 @@
     <!-- 4th Gradient color -->
     <color name="colorRed_A400">#FF1744</color>
 
-    <!-- dots inactive colors -->
-    <color name="dot_dark_screen1">#2278d4</color>
-    <color name="dot_dark_screen2">#2278d4</color>
-    <color name="dot_dark_screen3">#2278d4</color>
-    <color name="dot_dark_screen4">#2278d4</color>
+    <!-- app theme (Default Dark) -->
+    <color name="colorPrimary">#2D2F33</color>
+    <color name="colorPrimaryDark">#3F4145</color>
+    <color name="colorSecondary">#3F4145</color>
+    <color name="colorBackgroundFloating">#1A1B1E</color>
 
-    <!-- dots active colors -->
-    <color name="dot_light_screen1">#93c6fd</color>
-    <color name="dot_light_screen2">#93c6fd</color>
-    <color name="dot_light_screen3">#93c6fd</color>
-    <color name="dot_light_screen4">#93c6fd</color>
-
-    <array name="array_dot_active">
-        <item>@color/dot_light_screen1</item>
-        <item>@color/dot_light_screen2</item>
-        <item>@color/dot_light_screen3</item>
-        <item>@color/dot_light_screen4</item>
-    </array>
-
-    <array name="array_dot_inactive">
-        <item>@color/dot_dark_screen1</item>
-        <item>@color/dot_dark_screen2</item>
-        <item>@color/dot_dark_screen3</item>
-        <item>@color/dot_dark_screen4</item>
-    </array>
-
-    <!-- app theme -->
-    <color name="colorPrimary">#636363</color>
-    <color name="colorPrimaryDark">#444444</color>
-    <color name="colorSecondary">#444444</color>
-    <color name="colorBackgroundFloating">#636363</color>
-
-    <color name="navBarColor">#2d2c2c</color>
+    <color name="navBarColor">#1A1B1E</color>
 
     <color name="accentGood">#18ffff</color>
     <color name="colorGolden">#C9A000</color>
@@ -56,22 +30,26 @@
     <color name="colorGoldenBlackFrost">#C9A000</color>
     <color name="accentBad">#ff4081</color>
 
-    <color name="background">#393939</color>
+    <color name="background">#1A1B1E</color>
     <color name="accentWarning">#ffd149</color>
-    <color name="divider">#444444</color>
-    <color name="border">#77959595</color>
-    <color name="homeScreenBtnBackground">#A0444444</color>
+    <color name="divider">#2D2F33</color>
+    <color name="border">#3F4145</color>
+    <color name="homeScreenBtnBackground">#2D2F33</color>
     <color name="textViewBackground">#1A000000</color>
     <color name="buttonBackground">#006f67</color>
     <color name="chipBackgroundColor">#006f67</color>
-    <color name="btmSheetBgColor">#636363</color>
+    <color name="btmSheetBgColor">#2D2F33</color>
+    <color name="btmSheetCardBgColor">#3A3C41</color>
 
     <color name="tabIndicator">#18ffff</color>
     <color name="colorControlActivated">#FF18ffff</color>
     <color name="colorControlActivatedBad">#DF3520</color>
     <color name="colorSwitchThumbNormal">#959595</color>
     <color name="switchNormal">#959595</color>
-    <color name="colorSurface">#393939</color>
+    <color name="colorSurface">#1A1B1E</color>
+    <!-- M3 Roles Dark -->
+    <color name="colorSurfaceContainerDark">#24262A</color>
+    <color name="colorSurfaceVariantDark">#2D2F33</color>
 
     <color name="chipBgPositive">#3380CBC4</color>
     <color name="chipTextPositive">#18ffff</color>
@@ -116,7 +94,7 @@
     <!-- theme light -->
     <color name="colorPrimaryLight">#ececec</color>
     <color name="colorPrimaryDarkLight">#1e88e5</color>
-    <color name="colorSecondaryLight">#1e88e5</color>
+    <color name="colorSecondaryLight">#881e88e5</color>
     <color name="colorBackgroundFloatingLight">#efefef</color>
 
     <color name="navBarColorLight">#FFFFFF</color>
@@ -140,6 +118,9 @@
     <color name="colorControlActivatedBadLight">#ff1744</color>
     <color name="colorSwitchThumbNormalLight">#757575</color>
     <color name="colorSurfaceLight">#fafafa</color>
+    <!-- M3 Roles Light -->
+    <color name="colorSurfaceContainerLight">#F3F3F3</color>
+    <color name="colorSurfaceVariantLight">#EEEEEE</color>
 
     <color name="chipBackgroundColorLight">#CCC5E1A5</color>
 
@@ -159,8 +140,8 @@
     <color name="strokeLight">#000000</color>
     <color name="fillLight">#00000000</color>
 
-    <color name="primaryTextLight">#000000</color>
-    <color name="primaryLightColorTextLight">#BF000000</color>
+    <color name="primaryTextLight">#1C1B1F</color>
+    <color name="primaryLightColorTextLight">#49454F</color>
     <color name="primaryDarkColorTextLight">#FFFFFF</color>
     <color name="chipTextColorLight">#FFFFFF</color>
     <color name="invertedPrimaryTextLight">#FFFFFF</color>
@@ -202,7 +183,7 @@
 
     <color name="chipBackgroundColorBlack">#4fc3f7</color>
     <color name="backgroundBlack">#121212</color>
-    <color name="dividerBlack">#000000</color>
+    <color name="dividerBlack">#1C1C1C</color>
     <color name="borderBlack">#77959595</color>
     <color name="homeScreenBtnBackgroundBlack">#402e2c2c</color>
     <color name="buttonBackgroundBlack">#4fc3f7</color>
@@ -215,11 +196,14 @@
     <color name="colorSwitchThumbNormalBlack">#959595</color>
     <color name="switchNormalBlack">#959595</color>
     <color name="colorSurfaceBlack">#121212</color>
+    <!-- M3 Roles Black -->
+    <color name="colorSurfaceContainerBlack">#1E1E1E</color>
+    <color name="colorSurfaceVariantBlack">#1C1C1C</color>
 
     <color name="strokeBlack">#FFFFFF</color>
     <color name="fillBlack">#00000000</color>
 
-    <color name="primaryTextBlack">#FDFDFD</color>
+    <color name="primaryTextBlack">#F2F2F2</color>
     <color name="primaryLightColorTextBlack">#BFFDFDFD</color>
     <color name="chipTextColorBlack">#ececec</color>
     <color name="invertedPrimaryTextBlack">#4fc3f7</color>
@@ -283,6 +267,9 @@
     <color name="colorControlActivatedBadLightPlus">#ff4b5c</color>
     <color name="colorSwitchThumbNormalLightPlus">#b3b3b3</color>
     <color name="colorSurfaceLightPlus">#f0fbfa</color>
+    <!-- M3 Roles Light Plus -->
+    <color name="colorSurfaceContainerLightPlus">#EAF7F5</color>
+    <color name="colorSurfaceVariantLightPlus">#D0E5E3</color>
 
     <color name="chipBackgroundColorLightPlus">#c8edea</color>
 
@@ -353,12 +340,16 @@
     <color name="textViewBackgroundBlackPlus">#1C2A34</color>
     <color name="tabIndicatorBlackPlus">#00A859</color>
     <color name="btmSheetBgColorBlackPlus">#2D404E</color>
+    <color name="btmSheetCardBgColorBlackPlus">#3C566A</color>
 
     <color name="colorControlActivatedBlackPlus">#00A859</color>
     <color name="colorControlActivatedBadBlackPlus">#FF5A5E</color>
     <color name="colorSwitchThumbNormalBlackPlus">#7B8A95</color>
     <color name="switchNormalBlackPlus">#7B8A95</color>
     <color name="colorSurfaceBlackPlus">#0E1B21</color>
+    <!-- M3 Roles Black Plus -->
+    <color name="colorSurfaceContainerBlackPlus">#16242C</color>
+    <color name="colorSurfaceVariantBlackPlus">#243341</color>
 
     <color name="strokeBlackPlus">#B0C4D4</color>
     <color name="fillBlackPlus">#00000000</color>

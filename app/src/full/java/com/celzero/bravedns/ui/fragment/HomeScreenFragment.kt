@@ -2128,28 +2128,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 R.color.accentBad -> {
                     R.attr.accentBad
                 }
-                R.color.primaryLightColorText -> {
-                    R.attr.primaryLightColorText
-                }
-                R.color.secondaryText -> {
-                    R.attr.invertedPrimaryTextColor
-                }
-                R.color.primaryText -> {
-                    R.attr.primaryTextColor
-                }
-                R.color.primaryTextLight -> {
-                    R.attr.primaryTextColor
-                }
                 else -> {
-                    R.attr.accentGood
+                    R.attr.colorOnSurfaceVariant
                 }
             }
-        val typedValue = TypedValue()
-        val a: TypedArray =
-            requireContext().obtainStyledAttributes(typedValue.data, intArrayOf(attributeFetch))
-        val color = a.getColor(0, 0)
-        a.recycle()
-        return color
+        return UIUtils.fetchColor(requireContext(), attributeFetch)
     }
 
     /**

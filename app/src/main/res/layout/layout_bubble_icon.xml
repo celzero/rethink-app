@@ -9,7 +9,7 @@
         android:layout_height="56dp"
         app:cardCornerRadius="28dp"
         app:cardElevation="8dp"
-        app:cardBackgroundColor="@color/colorPrimary">
+        app:cardBackgroundColor="?attr/colorPrimary">
 
         <ImageView
             android:layout_width="match_parent"
