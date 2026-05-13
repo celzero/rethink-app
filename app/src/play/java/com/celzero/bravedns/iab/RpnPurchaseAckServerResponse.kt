@@ -123,26 +123,26 @@ data class ResponseOk(
 ) {
     companion object {
         fun fromJson(json: JSONObject): ResponseOk = ResponseOk(
-            success                  = json.optBoolean("success", true),
-            message                  = json.optStringOrNull("message"),
-            cid                      = json.optStringOrNull("cid"),
-            sku                      = json.optStringOrNull("sku"),
-            purchaseId               = json.optStringOrNull("purchaseId"),
-            orderId                  = json.optStringOrNull("orderId"),
-            state                    = json.optStringOrNull("state"),
-            status                   = json.optStringOrNull("status"),
-            test                     = json.optBooleanOrNull("test"),
-            expiry                   = json.optStringOrNull("expiry"),
-            start                    = json.optStringOrNull("start"),
-            windowDays               = json.optIntOrNull("windowDays"),
-            cancelCtx                = json.optStringOrNull("cancelCtx"),
-            allProducts              = json.optStringListOrNull("allProducts"),
-            unconsumedProducts       = json.optStringListOrNull("unconsumedProducts"),
-            developerPayload         = json.optStringOrNull("developerPayload"),
-            hadEntitlement           = json.optBooleanOrNull("hadEntitlement"),
-            deletedEntitlement       = json.optBooleanOrNull("deletedEntitlement"),
-            wasAlreadyFullyRefunded  = json.optBooleanOrNull("wasAlreadyFullyRefunded"),
-            ray                      = json.optStringOrNull("ray"),
+            success = json.optBoolean("success", true),
+            message = json.optStringOrNull("message"),
+            cid = json.optStringOrNull("cid"),
+            sku = json.optStringOrNull("sku"),
+            purchaseId = json.optStringOrNull("purchaseId"),
+            orderId = json.optStringOrNull("orderId"),
+            state = json.optStringOrNull("state"),
+            status = json.optStringOrNull("status"),
+            test = json.optBooleanOrNull("test"),
+            expiry = json.optStringOrNull("expiry"),
+            start = json.optStringOrNull("start"),
+            windowDays = json.optIntOrNull("windowDays"),
+            cancelCtx = json.optStringOrNull("cancelCtx"),
+            allProducts = json.optStringListOrNull("allProducts"),
+            unconsumedProducts = json.optStringListOrNull("unconsumedProducts"),
+            developerPayload = json.optStringOrNull("developerPayload"),
+            hadEntitlement = json.optBooleanOrNull("hadEntitlement"),
+            deletedEntitlement = json.optBooleanOrNull("deletedEntitlement"),
+            wasAlreadyFullyRefunded = json.optBooleanOrNull("wasAlreadyFullyRefunded"),
+            ray = json.optStringOrNull("ray"),
         )
     }
 
@@ -202,33 +202,26 @@ data class ResponseErr(
     companion object {
         fun fromJson(json: JSONObject, httpCode: Int = 0): ResponseErr = ResponseErr(
             // "error" takes precedence; fall back to "message" (mirrors the JS constructor)
-            error              = json.optString("error").ifEmpty { json.optString("message", "") },
-            details            = json.optStringOrNull("details"),
-            cid                = json.optStringOrNull("cid"),
-            sku                = json.optStringOrNull("sku"),
-            purchaseId         = json.optStringOrNull("purchaseId"),
-            orderId            = json.optStringOrNull("orderId"),
-            state              = json.optStringOrNull("state"),
-            status             = json.optStringOrNull("status"),
-            test               = json.optBooleanOrNull("test"),
-            expiry             = json.optStringOrNull("expiry"),
-            start              = json.optStringOrNull("start"),
-            windowDays         = json.optIntOrNull("windowDays"),
-            allProducts        = json.optStringListOrNull("allProducts"),
+            error = json.optString("error").ifEmpty { json.optString("message", "") },
+            details = json.optStringOrNull("details"),
+            cid = json.optStringOrNull("cid"),
+            sku = json.optStringOrNull("sku"),
+            purchaseId = json.optStringOrNull("purchaseId"),
+            orderId = json.optStringOrNull("orderId"),
+            state = json.optStringOrNull("state"),
+            status = json.optStringOrNull("status"),
+            test = json.optBooleanOrNull("test"),
+            expiry = json.optStringOrNull("expiry"),
+            start = json.optStringOrNull("start"),
+            windowDays = json.optIntOrNull("windowDays"),
+            allProducts = json.optStringListOrNull("allProducts"),
             unconsumedProducts = json.optStringListOrNull("unconsumedProducts"),
-            ray                = json.optStringOrNull("ray"),
-            httpCode           = httpCode,
+            ray = json.optStringOrNull("ray"),
+            httpCode = httpCode,
         )
     }
 
-    /** True if this is a client-side / user error (4xx). */
-    val isClientError: Boolean get() = httpCode in 400..499
 
-    /** True if this is a server-side error (5xx). */
-    val isServerError: Boolean get() = httpCode in 500..599
-
-    /** True if the error is potentially retryable (network or 5xx). */
-    val isRetryable: Boolean get() = httpCode == 0 || isServerError
 
     override fun toString(): String =
         "PlayErr(http=$httpCode, error='$error', status=$status, sku=$sku, ray=$ray)"
