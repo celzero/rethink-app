@@ -141,7 +141,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // user chosen blocklists stored custom dictionary indexed in base64
     var localBlocklistStamp by
         stringPref("local_block_list_stamp")
-            .withDefault<String>(if (Utilities.isHeadlessFlavour()) "1:YAYBACABEDAgAA==" else "")
+            .withDefault<String>("")
 
     // whether to drop packets when the source app originating the reqs couldn't be determined
     private var _blockUnknownConnections by
@@ -149,7 +149,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // whether user has enable on-device blocklists
     var blocklistEnabled by
-        booleanPref("enable_local_list").withDefault<Boolean>(Utilities.isHeadlessFlavour())
+        booleanPref("enable_local_list").withDefault<Boolean>(false)
 
     // the version (which is a unix timestamp) of the current rethinkdns+ remote blocklist files
     var remoteBlocklistTimestamp by
@@ -172,10 +172,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // user set among AppConfig.DnsType enum; RETHINK_REMOTE is default which is Rethink-DoH
     var dnsType by
         intPref("dns_type")
-            .withDefault<Int>(
-                if (!Utilities.isHeadlessFlavour()) AppConfig.DnsType.RETHINK_REMOTE.type
-                else AppConfig.DnsType.SYSTEM_DNS.type
-            )
+            .withDefault<Int>(AppConfig.DnsType.RETHINK_REMOTE.type)
 
     // whether the app must attempt to startup on reboot if it was running before shutdown
     var prefAutoStartBootUp by booleanPref("auto_start_on_boot").withDefault<Boolean>(true)
@@ -262,10 +259,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // user-preferred Internet Protocol type, default IPv4
     var internetProtocolType by
         intPref(INTERNET_PROTOCOL)
-            .withDefault<Int>(
-                if (!Utilities.isHeadlessFlavour()) InternetProtocol.IPv4.id
-                else InternetProtocol.IPv46.id
-            )
+            .withDefault<Int>(InternetProtocol.IPv4.id)
 
     // user-preferred 6to4 protocol translation, on IPv6 mode (default: PTMODEAUTO)
     var protocolTranslationType by booleanPref(PROTOCOL_TRANSLATION).withDefault<Boolean>(false)
