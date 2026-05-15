@@ -325,13 +325,12 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
         b.reachResultContainer.visibility = View.GONE
 
         io {
-            val proxyId = VpnController.getWinProxyId()
-            if (proxyId.isNullOrEmpty()) {
+            if (!RpnProxyManager.isRpnActive()) {
                 uiCtx { showReachabilityResult(input, success = false, noProxy = true) }
                 return@io
             }
-            val reachable = VpnController.isProxyReachable(proxyId, input)
-            Logger.d(Logger.LOG_IAB, "$TAG reachability($input) via $proxyId: $reachable")
+            val reachable = VpnController.isRpnReachable(input)
+            Logger.d(Logger.LOG_IAB, "$TAG rpn reachability($input) $reachable")
             uiCtx { showReachabilityResult(input, success = reachable, noProxy = false) }
         }
     }
