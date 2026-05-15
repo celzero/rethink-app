@@ -811,7 +811,6 @@ object IpRulesManager : KoinComponent {
         val sb = StringBuilder()
         sb.append("   iptree len: ${iptree.len()}\n")
         sb.append("   db len: ${db.getRulesCount()}\n")
-        sb.append("   cache len: ${resultsCache.size()}\n")
 
         return sb.toString()
     }
