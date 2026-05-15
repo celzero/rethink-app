@@ -54,7 +54,6 @@ import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.DnsLogTracker
 import com.celzero.bravedns.util.Constants.Companion.BUILD_TYPE_ALPHA
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
-import com.celzero.bravedns.util.Constants.Companion.FLAVOR_HEADLESS
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_WEBSITE
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
@@ -578,9 +577,6 @@ object Utilities {
         return BuildConfig.FLAVOR_releaseChannel == FLAVOR_PLAY
     }
 
-    fun isHeadlessFlavour(): Boolean {
-        return BuildConfig.FLAVOR_releaseType == FLAVOR_HEADLESS
-    }
 
     /** Returns true when the app is built with the "alpha" build type. */
     fun isAlphaBuild(): Boolean {
