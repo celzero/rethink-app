@@ -779,16 +779,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     uiCtx {
                         if (!isAdded || view == null) return@uiCtx
                         b.fhsCardOtherProxyCount.visibility = View.VISIBLE
-
-                        if (proxyType.isProxyTypeWireguard() && !WireguardManager.isLoaded()) {
-                            Logger.v(LOG_TAG_UI, "$TAG wg configs empty – manager still loading, showing Checking")
-                            b.fhsCardProxyCount.setTextAnimated(getString(R.string.lbl_checking))
-                        } else if (RpnProxyManager.isRpnActive()) {
-                            Logger.v(LOG_TAG_UI, "$TAG rpn configs empty – manager still loading, showing Checking")
-                            b.fhsCardProxyCount.setTextAnimated(getString(R.string.lbl_checking))
-                        } else {
-                            b.fhsCardProxyCount.setTextAnimated(getString(R.string.lbl_inactive))
-                        }
+                        b.fhsCardProxyCount.setTextAnimated(getString(R.string.lbl_checking))
                         b.fhsCardOtherProxyCount.setTextAnimated(getString(resId))
                     }
                     return@withContext
@@ -804,9 +795,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 }
                 // Fetch the live win proxy id once for the AUTO entry.
                 // Falls back to the wildcard only when the tunnel is not connected.
-                val winProxyId = VpnController.getWinProxyId() ?: "${Backend.RpnWin}**"
                 rpnProxies.forEach {
-                    val proxyId = if (it.key.equals(AUTO_SERVER_ID, true)) winProxyId else Backend.RpnWin + it.key
+                    val proxyId = if (it.key.equals(AUTO_SERVER_ID, true)) Backend.RpnWin else Backend.RpnWin + it.key
                     val triple = getProxyStatus(proxyId, now, active, failing, idle)
                     active = triple.first
                     failing = triple.second
