@@ -98,6 +98,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         // e.g. "default", "privacy,family", "privacy,family,security"
         const val RPN_DNS_TUN_TYPES = "rpn_dns_tun_types"
 
+        const val ADV_SETTINGS_FORCE_PT_MODE = "adv_setting_force_pt_mode"
+
         // Guided tour version bump this constant to re-show the tour after major UI changes.
         // Any stored version lower than this will cause the tour to re-trigger.
         // v2: added Rethink+ premium nav-item step (step 6) + fixed tour button text contrast.
@@ -441,6 +443,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     var appTestMode by booleanPref("app_test_mode").withDefault<Boolean>(false)
 
+    var advSettingForcePTMode by booleanPref("adv_setting_force_pt_mode").withDefault<Boolean>(false)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
     var universalRulesCount: MutableLiveData<Int> = MutableLiveData()
@@ -712,8 +716,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // RPN DNS url
     var rpnDnsUrl by stringPref(RPN_DNS_URL).withDefault<String>(RpnProxyManager.DnsMode.DEFAULT.url)
 
-    /** Comma-separated [RpnProxyManager.DnsMode.tunType] values for the multi-select DNS filter.
-     *  Defaults to "privacy" (ANTI_AD) so new installations have the Privacy filter pre-selected. */
+    // comma-separated [RpnProxyManager.DnsMode.tunType] values for the multi-select DNS filter
     var rpnDnsTunTypes by stringPref(RPN_DNS_TUN_TYPES).withDefault<String>(RpnProxyManager.DnsMode.PRIVACY.tunType)
 
     // RPN configuration handling mode: false = AUTO (app decides), true = MANUAL (user decides)
