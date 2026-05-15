@@ -201,7 +201,6 @@ class Constants {
         const val FLAVOR_PLAY = "play"
         const val FLAVOR_FDROID = "fdroid"
         const val FLAVOR_WEBSITE = "website"
-        const val FLAVOR_HEADLESS = "headless"
 
         const val BUILD_TYPE_ALPHA = "alpha"
 
