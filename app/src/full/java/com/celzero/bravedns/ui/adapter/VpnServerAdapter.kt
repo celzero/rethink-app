@@ -402,12 +402,6 @@ class VpnServerAdapter(
                 val statusPair = VpnController.getProxyStatusById(id)
                 val stats = VpnController.getProxyStats(id)
                 val apps = ProxyManager.getAppCountForProxy(id)
-                // show who, if not available show city name
-                val who = if (group.key.equals(AUTO_SERVER_ID, ignoreCase = true)) {
-                    VpnController.getWin()?.who() ?: group.cityName
-                } else {
-                    group.cityName
-                }
 
                 // Fetch IP metadata for this server (cached by since-timestamp; live fetches
                 // only happen when the tunnel connects for the first time or after a reconnect).
@@ -436,12 +430,6 @@ class VpnServerAdapter(
                 val key = group.key
                 val since = stats?.since ?: 0L
                 val cachedSince = RpnProxyManager.getCachedSinceTs(key)
-                val cached = RpnProxyManager.getCachedIpMeta(key)
-
-                // Fast path: cache is warm and the tunnel hasn't reconnected.
-                if (since > 0L && since == cachedSince && cached != null) {
-                    return cached.first
-                }
 
                 // Slow path: fetch live from the Go backend (3 s timeout to stay responsive).
                 val client = withTimeoutOrNull(3_000L) {
@@ -449,12 +437,11 @@ class VpnServerAdapter(
                 }
                 val ip4 = runCatching { client?.iP4() }.getOrNull()
                 val ip6 = runCatching { client?.iP6() }.getOrNull()
-                RpnProxyManager.updateIpMeta(key, since, ip4, ip6)
+                RpnProxyManager.updateIpMeta(key, since)
                 ip4
             } catch (t: Throwable) {
                 Logger.w(LOG_TAG_UI, "VpnServerAdapter fetchIpForGroup[${group.key}]: ${t.message}")
-                // Degrade gracefully: return stale cache rather than hiding the IP row.
-                RpnProxyManager.getCachedIpMeta(group.key)?.first
+                null
             }
         }
 
