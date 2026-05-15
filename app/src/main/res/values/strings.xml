@@ -34,8 +34,8 @@
     <string name="lbl_action_required" translatable="true">Action Required</string>
     <string name="lbl_rules" translatable="true">rules</string>
     <string name="lbl_configure" translatable="true">Configure</string>
-    <string name="lbl_logs" translatable="true">logs</string>
-    <string name="lbl_network" translatable="true">network</string>
+    <string name="lbl_logs" translatable="true">Logs</string>
+    <string name="lbl_network" translatable="true">Network</string>
     <string name="lbl_create" translatable="true">Create</string>
     <string name="lbl_qr_code" translatable="true">QR Code</string>
     <string name="lbl_import" translatable="true">Import</string>
@@ -66,8 +66,8 @@
     <string name="lbl_fast" translatable="true">fast</string>
     <string name="lbl_slow" translatable="true">slow</string>
     <string name="lbl_very" translatable="true">very</string>
-    <string name="lbl_add" translatable="true">add</string>
-    <string name="lbl_app_wise" translatable="true">per app</string>
+    <string name="lbl_add" translatable="true">Add</string>
+    <string name="lbl_app_wise" translatable="true">Per App</string>
     <string name="lbl_sec" translatable="true">sec</string>
     <string name="lbl_min" translatable="true">min</string>
     <string name="lbl_hour" translatable="true">hr</string>
@@ -77,7 +77,8 @@
     <string name="lbl_optional" translatable="true">(optional)</string>
     <string name="lbl_persistent_keepalive" translatable="true">Persistent keepalive</string>
     <string name="lbl_allowed_ips" translatable="true">Allowed IPs</string>
-    <string name="lbl_save" translatable="true">save</string>
+    <string name="lbl_save" translatable="true">Save</string>
+    <string name="lbl_saving" translatable="true">Saving…</string>
     <string name="lbl_dot" translatable="false">DoT</string>
     <string name="lbl_odoh" translatable="false">ODoH</string>
     <string name="lbl_cache" translatable="true">Cache</string>
@@ -109,11 +110,11 @@
     <string name="lbl_on_device" translatable="true">on-device</string>
     <string name="lbl_ip" translatable="false">IP</string>
     <string name="lbl_unselected" translatable="true">Unselected</string>
-    <string name="lbl_notification" translatable="true">notification</string>
+    <string name="lbl_notification" translatable="true">Notification</string>
     <string name="lbl_mastodon" translatable="false">Mastodon</string>
     <string name="lbl_matrix" translatable="false">Matrix</string>
     <string name="lbl_reddit" translatable="false">Reddit</string>
-    <string name="lbl_test" translatable="true">test</string>
+    <string name="lbl_test" translatable="true">Test</string>
     <string name="lbl_protos" translatable="true">protos</string>
     <string name="lbl_experimental" translatable="true">(experimental)</string>
     <string name="lbl_service_providers" translatable="true">Service Providers</string>
@@ -205,9 +206,9 @@
         <item>Exclude</item>
     </string-array>
 
-    <string name="allow" translatable="true">allow</string>
-    <string name="block" translatable="true">block</string>
-    <string name="bypass_universal" translatable="true">bypass universal</string>
+    <string name="allow" translatable="true">Allow</string>
+    <string name="block" translatable="true">Block</string>
+    <string name="bypass_universal" translatable="true">Bypass Universal</string>
     <string name="exclude" translatable="true">exclude</string>
     <string name="isolate" translatable="true">isolate</string>
     <string name="untracked" translatable="true">untracked</string>
@@ -375,7 +376,7 @@
     <string name="private_dns_dialog_desc" translatable="true">Rethink\'s DNS settings are overridden by Android\'s Private DNS.\n\nTo use Rethink\'s DNS go to Android Settings and turn off "Private DNS".</string>
     <string name="private_dns_dialog_positive" translatable="true">Go to Settings</string>
 
-    <string name="firewall_act_universal_tab" translatable="true">universal</string>
+    <string name="firewall_act_universal_tab" translatable="true">Universal</string>
 
     <string name="firewall_act_network_monitor_tab" translatable="true">Network</string>
 
@@ -502,7 +503,7 @@
     <string name="settings_allow_bypass_desc" translatable="true">Allow requesting apps to access all available networks. These apps may bypass Rethink\'s VPN tunnel on-demand. Some audio/video conference apps like Zoom and Meet may require this to function properly.</string>
     <string name="settings_lock_down_mode_desc" translatable="true">Certain options disabled when VPN is in lockdown mode. <u>See VPN settings</u>.</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Cannot setup proxies when VPN is running in DNS only mode.</string>
-    <string name="settings_proxy_header" translatable="true">proxy</string>
+    <string name="settings_proxy_header" translatable="true">Proxy</string>
     <string name="settings_socks5_heading" translatable="true">Setup SOCKS5 Proxy</string>
     <string name="settings_socks5_desc" translatable="true">Forward connections to SOCKS5 endpoint.</string>
     <string name="settings_https_heading" translatable="true">Setup HTTP(S) CONNECT Proxy</string>
@@ -568,8 +569,8 @@
 
     <string name="settings_orbot_notification_action" translatable="true">Open Orbot</string>
 
-    <string name="settings_general_header" translatable="true">general</string>
-    <string name="settings_general_customize" translatable="true">customize</string>
+    <string name="settings_general_header" translatable="true">General</string>
+    <string name="settings_general_customize" translatable="true">Customize</string>
 
     <string name="settings_autostart_bootup_heading" translatable="true">Auto-start on power-up (experimental)</string>
     <string name="settings_autostart_bootup_desc" translatable="true">On device power-up, start Rethink if it was running before shut down.</string>
@@ -628,7 +629,7 @@
     <string name="settings_dns_proxy_dialog_port_number" translatable="true">Port Number</string>
     <string name="settings_dns_proxy_dialog_username" translatable="true">Username</string>
     <string name="settings_dns_proxy_dialog_password" translatable="true">Password</string>
-    <string name="settings_dns_proxy_dialog_positive_btn" translatable="true">set</string>
+    <string name="settings_dns_proxy_dialog_positive_btn" translatable="true">Set</string>
     <string name="settings_dns_proxy_dialog_app_desc" translatable="false">The selected app will be excluded from the VPN to let it proxy connections on your behalf.</string>
 
     <string name="settings_app_list_default_app" translatable="true">None</string>
@@ -786,8 +787,8 @@
 
     <!-- DNS configure screen -->
 
-    <string name="dc_block_heading" translatable="true">rules</string>
-    <string name="dc_other_dns_heading" translatable="true">type</string>
+    <string name="dc_block_heading" translatable="true">Rules</string>
+    <string name="dc_other_dns_heading" translatable="true">Type</string>
 
     <string name="dc_custom_dns_radio" translatable="true">Other DNS</string>
     <string name="dc_rethink_dns_radio" translatable="true">Rethink DNS</string>
@@ -814,7 +815,7 @@
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Use System DNS for undelegated domains</string>
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Use System DNS for undelgated domains like <i>.lan</i>, <i>.internal</i>, etc.</string>
 
-    <string name="dc_filtering_heading" translatable="true">filtering</string>
+    <string name="dc_filtering_heading" translatable="true">Filtering</string>
 
     <!-- About fragment -->
     <string name="about_bravedns_explantion" translatable="true">Rethink is the easiest way to monitor app activity, circumvent Internet censorship, and firewall apps on your Android device. </string>
@@ -840,17 +841,17 @@
     <string name="bug_report_delete_failed" translatable="false">Failed to delete \"%1$s\"</string>
     <string name="bug_report_no_files_available" translatable="false">No bug report files available</string>
 
-    <string name="about_web" translatable="true">links</string>
+    <string name="about_web" translatable="true">Links</string>
     <string name="about_website" translatable="true">Visit rethinkdns.com</string>
     <string name="about_github" translatable="true">Contribute on GitHub</string>
     <string name="about_faq" translatable="true">View FAQs</string>
     <string name="about_docs" translatable="true">Read docs</string>
     <string name="about_privacy_policy" translatable="true">Read privacy policy</string>
-    <string name="about_connect" translatable="true">contact</string>
+    <string name="about_connect" translatable="true">Contact</string>
     <string name="about_sponsor_link_text" translatable="true">Sponsor</string>
-    <string name="about_app" translatable="true">app</string>
+    <string name="about_app" translatable="true">App</string>
     <string name="about_email" translatable="true">Email us</string>
-    <string name="about_settings" translatable="true">system</string>
+    <string name="about_settings" translatable="true">System</string>
     <string name="about_settings_app_info" translatable="true">App Info</string>
     <string name="about_settings_vpn_profile" translatable="true">VPN Profile</string>
     <string name="about_settings_notification" translatable="true">Notification Settings</string>
@@ -969,7 +970,7 @@
                                               <a href="https://central.sonatype.com/">Sonatype</a><br/>
                                               ]]></string>
     <!-- Configure DNS Fragment string == cd -->
-    <string name="cd_dns_crypt_title" translatable="true">resolvers</string>
+    <string name="cd_dns_crypt_title" translatable="true">Resolvers</string>
     <string name="cd_custom_doh_dialog_title" translatable="true">Custom Server URL</string>
     <string name="cd_custom_doh_url_name_default" translatable="true">DoH</string>
     <string name="cd_custom_doh_url_name" translatable="true">DoH %1$s</string>
@@ -1401,9 +1402,9 @@
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">will bypass universal dns &amp; firewall rules</string>
     <string name="ada_app_status_unknown" translatable="true">is unknown</string>
 
-    <string name="ada_firewall_title" translatable="true">firewall rules for this app</string>
+    <string name="ada_firewall_title" translatable="true">Firewall rules for this app</string>
 
-    <string name="ada_network_log_title" translatable="true">network log for this app</string>
+    <string name="ada_network_log_title" translatable="true">Network log for this app</string>
 
     <string name="ada_app_firewall" translatable="true">Firewall</string>
     <string name="ada_app_metered" translatable="true">Metered</string>
@@ -1469,8 +1470,8 @@
     <string name="rt_chip_check_update" translatable="true">Check for update</string>
     <string name="rt_re_download" translatable="true">Re-download blocklists</string>
 
-    <string name="rt_list_simple_btn_txt" translatable="true">simple</string>
-    <string name="lbl_advanced" translatable="true">advanced</string>
+    <string name="rt_list_simple_btn_txt" translatable="true">Simple</string>
+    <string name="lbl_advanced" translatable="true">Advanced</string>
 
     <string name="rt_filter_parent_selected" translatable="true">Selected</string>
 
@@ -1546,14 +1547,14 @@
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category" translatable="true">%1$s blocklists</string>
 
     <!-- Summary statistics view-->
-    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">most allowed apps</string>
-    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">most blocked apps</string>
-    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">most contacted domains</string>
-    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">most contacted countries</string>
-    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">most blocked domains</string>
-    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">most contacted ips</string>
-    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">most blocked ips</string>
-    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">most blocked countries</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">Most Allowed Apps</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">Most Blocked Apps</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">Most Contacted Domains</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">Most Contacted Countries</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">Most Blocked Domains</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">Most Contacted IPs</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">Most Blocked IPs</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">Most Blocked Countries</string>
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Start Rethink to proceed</string>
     <string name="ssv_see_more" translatable="true">Show All</string>
 
@@ -1762,8 +1763,8 @@
 
     <string name="bypasses_network_restrictions" translatable="true">Reachability checks bypass all network restrictions. In <i>Auto</i> mode, Rethink randomly uses previously connected IPs and hostnames.</string>
 
-    <string name="most_contacted_asn" translatable="true">most contacted providers</string>
-    <string name="most_blocked_asn" translatable="true">most blocked providers</string>
+    <string name="most_contacted_asn" translatable="true">Most Contacted Providers</string>
+    <string name="most_blocked_asn" translatable="true">Most Blocked Providers</string>
 
     <string name="adv_tasker_dialog_msg" translatable="true">Enter package names (comma-separated) allowed to start or stop Rethink.</string>
     <string name="adv_tasker_dialog_instructions" translatable="true">Instructions:\n
@@ -1788,7 +1789,7 @@
     <string name="adv_taster_title" translatable="true">Automation</string>
     <string name="adv_taster_desc" translatable="true">Configure apps that can start or stop Rethink.</string>
 
-    <string name="top_active_conns" translatable="true">top active connections</string>
+    <string name="top_active_conns" translatable="true">Top Active Connections</string>
 
     <string name="load_more" translatable="true">Load All</string>
     <string name="close_conns_dialog_title" translatable="true">Close Connections</string>
@@ -2175,8 +2176,8 @@
     <string name="subscription_processing_timeout" translatable="false">Purchase processing is taking longer than expected. Please check your internet connection and try again.</string>
 
     <!-- Customer Support Activity -->
-    <string name="support_section_describe" translatable="false">DESCRIBE YOUR ISSUE</string>
-    <string name="support_section_attachments" translatable="false">DIAGNOSTIC DATA</string>
+    <string name="support_section_describe" translatable="false">Describe Your Issue</string>
+    <string name="support_section_attachments" translatable="false">Diagnostic Data</string>
     <string name="support_sub_plan_label" translatable="false">Plan</string>
     <string name="support_sub_token_label" translatable="false">Token (abbr.)</string>
     <string name="support_sub_no_subscription" translatable="false">No active purchase</string>
@@ -2238,9 +2239,11 @@
     <string name="server_settings_dns_family" translatable="false">Family</string>
     <string name="server_settings_dns_security" translatable="false">Security</string>
     <string name="server_settings_dns_desc_includes" translatable="false">Includes %1$s</string>
+    <string name="server_settings_dns_no_filters" translatable="false">No filters</string>
     <string name="server_settings_actions_section" translatable="false">Actions</string>
     <string name="server_settings_refresh_servers" translatable="false">Refresh Servers</string>
     <string name="server_settings_stop_proxies" translatable="false">Stop RPN</string>
+    <string name="server_settings_start_rpn" translatable="false">Start RPN</string>
     <string name="server_settings_refreshing" translatable="false">Refreshing…</string>
     <string name="server_settings_open" translatable="false">Open server settings</string>
     <string name="server_settings_split_dns_disabled" translatable="false">Split DNS is disabled. Enable it to use DNS filtering on your VPN servers.</string>
@@ -2250,6 +2253,22 @@
     <string name="server_settings_proxy_stopped" translatable="false">Proxy Stopped</string>
     <string name="server_settings_proxy_starting" translatable="false">Starting…</string>
     <string name="server_settings_proxy_stopping" translatable="false">Stopping…</string>
+
+    <!-- Auto Exclude Countries bottom sheet -->
+    <string name="auto_exclude_cc_title" translatable="false">Exclude Countries</string>
+    <string name="auto_exclude_cc_subtitle" translatable="false">Selected countries will be skipped during AUTO server selection</string>
+    <string name="auto_exclude_cc_row_title" translatable="false">Excluded Countries for AUTO</string>
+    <string name="auto_exclude_cc_row_desc" translatable="false">Block specific countries from AUTO server selection</string>
+    <string name="auto_exclude_cc_none" translatable="false">None excluded</string>
+    <string name="auto_exclude_cc_count" translatable="false">%d countries excluded</string>
+    <string name="auto_exclude_cc_min_info" translatable="false">At least %d countries must remain available for AUTO selection</string>
+    <string name="auto_exclude_cc_limit_reached" translatable="false">Limit reached, at least %d countries must remain available</string>
+    <string name="auto_exclude_cc_no_servers" translatable="false">No countries available</string>
+    <string name="auto_exclude_cc_loading" translatable="false">Loading countries…</string>
+    <string name="auto_exclude_cc_select_all" translatable="false">Select all</string>
+    <string name="auto_exclude_cc_clear_all" translatable="false">Clear all</string>
+    <string name="auto_exclude_cc_search_hint" translatable="false">Search countries…</string>
+
     <!-- Server settings bottom sheet -->
     <string name="server_settings_sheet_title" translatable="false">Server Settings</string>
     <string name="server_settings_sheet_subtitle" translatable="false">Configure VPN server preferences</string>
