@@ -17,13 +17,22 @@ package com.celzero.bravedns.ui.bottomsheet
 
 import Logger
 import Logger.LOG_TAG_UI
+import android.animation.ValueAnimator
 import android.content.res.Configuration
+import android.graphics.Canvas
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.DrawableWrapper
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.LinearInterpolator
+import androidx.core.graphics.withRotation
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.BottomsheetServerSettingsBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
@@ -31,9 +40,12 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.viewmodel.ServerSelectionViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 /**
  * bottom sheet combining DNS filter settings and new Configuration Handling section.
@@ -47,8 +59,12 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
 
     private val persistentState by inject<PersistentState>()
 
+    private val serverSelectionViewModel: ServerSelectionViewModel by activityViewModel()
+
     /** True while the proxy is stopped; some controls are additionally locked. */
     private var isProxyStopped: Boolean = false
+    /** Looping spin animator attached to the refresh button icon while a refresh is in progress. */
+    private var refreshAnimator: ValueAnimator? = null
 
     companion object {
         private const val TAG = "ServerSettingsBS"
@@ -89,6 +105,17 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
          */
         fun onConfigChanged()
         fun onReset()
+
+        /**
+         * Fired when the user confirms a new set of excluded country codes via the
+         * Exclude Countries bottom sheet. [excludedCcCsv] is a comma-separated
+         * string of country codes (e.g. "US,DE,FR"), or an empty string when the
+         * exclusion list is cleared.
+         *
+         * The default implementation is intentionally empty; callers that do not
+         * need to react to this event are not required to override it.
+         */
+        fun onAutoExcludeCountriesChanged(excludedCcCsv: String)
     }
 
     private var listener: OnSettingsChangedListener? = null
@@ -102,7 +129,7 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
      * Tracks the last comma-separated tunType string emitted to the listener so we can
      * guard against spurious re-emissions when checkboxes are programmatically initialised.
      */
-    private var lastEmittedTunTypes: String = RpnProxyManager.DnsMode.DEFAULT.tunType
+    private var lastEmittedTunTypes: String = RpnProxyManager.DnsMode.PRIVACY.tunType
 
     // Used by hasConfigChanged() to decide whether to fire onConfigChanged().
     private var snapshotConfigManual: Boolean = false
@@ -160,9 +187,13 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
 
         setupDnsSection()
         setupConfigHandlingSection()
+        setupExcludeCountriesRow()
 
         binding.btnDone.setOnClickListener { dismiss() }
         binding.btnResetRpn.setOnClickListener { showResetConfirmationDialog() }
+        binding.refreshBtn.setOnClickListener { doRefreshServers() }
+
+        observeRefreshState()
 
         Logger.i(LOG_TAG_UI, "$TAG: view created, proxyStopped=$isProxyStopped")
     }
@@ -174,6 +205,8 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
             Logger.i(LOG_TAG_UI, "$TAG: config changed on dismiss, notifying listener")
             listener?.onConfigChanged()
         }
+        refreshAnimator?.cancel()
+        refreshAnimator = null
         super.onDismiss(dialog)
     }
 
@@ -183,23 +216,89 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
         _binding = null
     }
 
+    /** Starts a continuous (infinite) clockwise spin on the refresh button icon. */
+    private fun startRefreshAnimation() {
+        refreshAnimator?.cancel()
+
+        val raw = binding.refreshBtn.icon
+        val spinning: RotatingDrawable = if (raw is RotatingDrawable) raw
+        else RotatingDrawable(raw ?: return).also { binding.refreshBtn.icon = it }
+        spinning.rotation = 0f
+        refreshAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
+            duration = 700L
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.RESTART
+            interpolator = LinearInterpolator()
+            addUpdateListener { spinning.rotation = it.animatedValue as Float }
+            start()
+        }
+    }
+
     /**
-     * Sets up the DNS filter section using four independent [AppCompatCheckBox] rows.
-     * Any combination of Default / Privacy / Family / Security may be selected.
+     * Stops the spin and eases the icon back to 0° so it doesn't snap
+     * abruptly when the IO operation completes.
+     */
+    private fun stopRefreshAnimation() {
+        refreshAnimator?.cancel()
+        refreshAnimator = null
+        val icon = binding.refreshBtn.icon as? RotatingDrawable ?: return
+        ValueAnimator.ofFloat(icon.rotation, 0f).apply {
+            duration = 200L
+            interpolator = AccelerateDecelerateInterpolator()
+            addUpdateListener { icon.rotation = it.animatedValue as Float }
+            start()
+        }
+    }
+
+    /**
+     * Observes [ServerSelectionViewModel.refreshState] to drive the refresh button
+     * appearance.
+     */
+    private fun observeRefreshState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                serverSelectionViewModel.refreshState.collect { state ->
+                    val inProgress = state is ServerSelectionViewModel.RefreshState.InProgress
+                    binding.refreshBtn.isClickable = !inProgress && !isProxyStopped
+                    if (inProgress) {
+                        startRefreshAnimation()
+                    } else {
+                        stopRefreshAnimation()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun doRefreshServers() {
+        if (isProxyStopped) return
+        // Guard: ViewModel ignores duplicate calls while InProgress.
+        serverSelectionViewModel.refresh()
+    }
+
+    /**
+     * Sets up the DNS filter section using three independent [AppCompatCheckBox] rows:
+     * Privacy, Family, and Security. Default is no longer a selectable option.
      *
-     * State is persisted in two [PersistentState] fields:
-     * - [PersistentState.rpnDnsTunTypes]: CSV of active [RpnProxyManager.DnsMode.tunType] values
+     * When all three are unchecked the description shows "No filters" and the backend uses
+     * the DEFAULT DNS URL (no explicit filter). Selecting any combination enables those
+     * server-side blocklists.
      *
-     * [OnSettingsChangedListener.onDnsModeChanged] is fired on every real change with the
-     * updated CSV string so the caller can propagate the change to the tunnel.
+     * State is persisted in [PersistentState.rpnDnsTunTypes] as a CSV of active
+     * [RpnProxyManager.DnsMode.tunType] values, or an empty string for "no filters".
+     *
+     * [OnSettingsChangedListener.onDnsModeChanged] is fired on every real change.
      */
     private fun setupDnsSection() {
-        // restore initial selection
+        // restore initial selection (DEFAULT is filtered out and migrated to Privacy)
         val activeModes = getActiveModesFromState()
-        lastEmittedTunTypes = RpnProxyManager.DnsMode.tunTypesFromSet(activeModes)
+        lastEmittedTunTypes = if (activeModes.isEmpty()) ""
+                              else RpnProxyManager.DnsMode.tunTypesFromSet(activeModes)
 
         // Initialise checkboxes without triggering listeners (listeners are registered below).
         setCheckboxesQuietly(activeModes)
+        // Show the initial description immediately.
+        updateDnsFilterDesc(activeModes)
 
         val splitEnabled = persistentState.splitDns
         binding.splitDnsBanner.visibility = if (splitEnabled) View.GONE else View.VISIBLE
@@ -221,7 +320,6 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
         }
 
         val rows = listOf(
-            binding.dnsRowDefault  to binding.cbDnsDefault,
             binding.dnsRowPrivacy  to binding.cbDnsPrivacy,
             binding.dnsRowFamily   to binding.cbDnsFamily,
             binding.dnsRowSecurity to binding.cbDnsSecurity,
@@ -239,7 +337,6 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
                 onDnsCheckboxChanged()
             }
         }
-        binding.cbDnsDefault .setOnCheckedChangeListener(changeListener)
         binding.cbDnsPrivacy .setOnCheckedChangeListener(changeListener)
         binding.cbDnsFamily  .setOnCheckedChangeListener(changeListener)
         binding.cbDnsSecurity.setOnCheckedChangeListener(changeListener)
@@ -247,61 +344,55 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
 
     /**
      * Called whenever any DNS checkbox state changes.
-     * Derives the new active set, enforces the "at least one selected" invariant,
-     * persists both [PersistentState.rpnDnsTunTypes]
-     * and fires [OnSettingsChangedListener.onDnsModeChanged] only on a real change.
+     * Derives the new active set (Privacy / Family / Security only), updates the
+     * description text, persists [PersistentState.rpnDnsTunTypes] (empty string for
+     * "no filters"), and fires [OnSettingsChangedListener.onDnsModeChanged] only on
+     * a real change.
      */
     private fun onDnsCheckboxChanged() {
         val selected = buildSelectedModes()
 
-        // Enforce at least one selection — silently re-check Default if everything is cleared.
-        val effective: Set<RpnProxyManager.DnsMode> = selected.ifEmpty {
-            // Re-check Default without triggering the listener again.
-            binding.cbDnsDefault.setOnCheckedChangeListener(null)
-            binding.cbDnsDefault.isChecked = true
-            binding.cbDnsDefault.setOnCheckedChangeListener { _, _ ->
-                if (persistentState.splitDns && !isProxyStopped) onDnsCheckboxChanged()
-            }
-            setOf(RpnProxyManager.DnsMode.DEFAULT)
-        }
+        // Always refresh the description regardless of whether the tunTypes string changed.
+        updateDnsFilterDesc(selected)
 
-        val newTunTypes = RpnProxyManager.DnsMode.tunTypesFromSet(effective)
+        // Empty selection = "no filters"; store blank so getActiveModesFromState() detects it.
+        val newTunTypes = if (selected.isEmpty()) ""
+                          else RpnProxyManager.DnsMode.tunTypesFromSet(selected)
 
-        // Guard against spurious re-emissions during programmatic initialisation.
+        // Guard against spurious re-emissions during programmatic initialization.
         if (newTunTypes == lastEmittedTunTypes) return
         lastEmittedTunTypes = newTunTypes
 
-        // Persist: CSV tunTypes for the filter; primary URL for GoVpnAdapter DNS routing.
+        // csv tunTypes for the filter
         persistentState.rpnDnsTunTypes = newTunTypes
 
         listener?.onDnsModeChanged(newTunTypes)
-        Logger.i(LOG_TAG_UI, "$TAG: DNS filter → $newTunTypes")
+        Logger.i(LOG_TAG_UI, "$TAG: DNS filter → ${newTunTypes.ifEmpty { "(no filters)" }}")
     }
 
     /**
-     * Reads the current checkbox states and returns the corresponding [RpnProxyManager.DnsMode] set.
+     * Reads the current checkbox states and returns the corresponding [RpnProxyManager.DnsMode]
+     * set. Only Privacy / Family / Security are selectable; DEFAULT is never included.
      */
     private fun buildSelectedModes(): Set<RpnProxyManager.DnsMode> {
         val result = mutableSetOf<RpnProxyManager.DnsMode>()
-        if (binding.cbDnsDefault .isChecked) result += RpnProxyManager.DnsMode.DEFAULT
-        if (binding.cbDnsPrivacy .isChecked) result += RpnProxyManager.DnsMode.ANTI_AD
+        if (binding.cbDnsPrivacy .isChecked) result += RpnProxyManager.DnsMode.PRIVACY
         if (binding.cbDnsFamily  .isChecked) result += RpnProxyManager.DnsMode.PARENTAL
         if (binding.cbDnsSecurity.isChecked) result += RpnProxyManager.DnsMode.SECURITY
         return result
     }
 
     /**
-     * Sets all four checkboxes to match [modes] **without** triggering their change-listeners
-     * (used during initialisation to avoid spurious emissions).
+     * Sets all three checkboxes (Privacy / Family / Security) to match [modes]
+     * **without** triggering their change-listeners (used during initialisation to
+     * avoid spurious emissions).
      */
     private fun setCheckboxesQuietly(modes: Set<RpnProxyManager.DnsMode>) {
-        binding.cbDnsDefault .setOnCheckedChangeListener(null)
         binding.cbDnsPrivacy .setOnCheckedChangeListener(null)
         binding.cbDnsFamily  .setOnCheckedChangeListener(null)
         binding.cbDnsSecurity.setOnCheckedChangeListener(null)
 
-        binding.cbDnsDefault .isChecked = RpnProxyManager.DnsMode.DEFAULT  in modes
-        binding.cbDnsPrivacy .isChecked = RpnProxyManager.DnsMode.ANTI_AD  in modes
+        binding.cbDnsPrivacy .isChecked = RpnProxyManager.DnsMode.PRIVACY  in modes
         binding.cbDnsFamily  .isChecked = RpnProxyManager.DnsMode.PARENTAL in modes
         binding.cbDnsSecurity.isChecked = RpnProxyManager.DnsMode.SECURITY in modes
         // Listeners are wired in setupDnsSection() after this call.
@@ -310,28 +401,60 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
     /**
      * Resolves the active [RpnProxyManager.DnsMode] set from [PersistentState].
      *
+     * - Blank stored value → empty set (user explicitly chose "no filters").
+     * - (Privacy) which is the default.
      */
     private fun getActiveModesFromState(): Set<RpnProxyManager.DnsMode> {
-        return RpnProxyManager.DnsMode.setFromCsv(persistentState.rpnDnsTunTypes)
+        val stored = persistentState.rpnDnsTunTypes
+        // no filter
+        if (stored.isBlank()) return emptySet()
+        val modes = RpnProxyManager.DnsMode.setFromCsv(stored)
+        val nonDefault = modes.filter { it != RpnProxyManager.DnsMode.DEFAULT }.toSet()
+        return nonDefault.ifEmpty { setOf(RpnProxyManager.DnsMode.PRIVACY) }
     }
 
     /**
-     * Enables or disables all four DNS checkbox rows.
+     * Enables or disables all three DNS checkbox rows (Privacy / Family / Security).
      * The container alpha provides a clear disabled affordance without hiding controls.
      */
     private fun setDnsCheckboxesEnabled(enabled: Boolean) {
         binding.dnsCheckboxContainer.alpha = if (enabled) 1f else 0.38f
         listOf(
-            binding.dnsRowDefault, binding.dnsRowPrivacy,
+            binding.dnsRowPrivacy,
             binding.dnsRowFamily,  binding.dnsRowSecurity,
         ).forEach {
             it.isClickable = enabled
             it.isFocusable  = enabled
         }
         listOf(
-            binding.cbDnsDefault, binding.cbDnsPrivacy,
+            binding.cbDnsPrivacy,
             binding.cbDnsFamily,  binding.cbDnsSecurity,
         ).forEach { it.isEnabled = enabled }
+    }
+
+    /**
+     * Updates the DNS filter description TextView.
+     * Shows "No filters" when [modes] is empty; otherwise lists the active filter names.
+     */
+    private fun updateDnsFilterDesc(modes: Set<RpnProxyManager.DnsMode>) {
+        if (!isAdded) return
+        val text = if (modes.isEmpty()) {
+            getString(R.string.server_settings_dns_no_filters)
+        } else {
+            val names = modes
+                .filter { it != RpnProxyManager.DnsMode.DEFAULT }
+                .sortedBy { it.id }
+                .joinToString(", ") { mode ->
+                    when (mode) {
+                        RpnProxyManager.DnsMode.PRIVACY  -> getString(R.string.server_settings_dns_privacy)
+                        RpnProxyManager.DnsMode.PARENTAL -> getString(R.string.server_settings_dns_family)
+                        RpnProxyManager.DnsMode.SECURITY -> getString(R.string.server_settings_dns_security)
+                        else -> ""
+                    }
+                }
+            getString(R.string.server_settings_dns_desc_includes, names)
+        }
+        binding.tvDnsFilterDesc.text = text
     }
 
     private fun setupConfigHandlingSection() {
@@ -447,6 +570,73 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
     }
 
     /**
+     * Sets up the "Excluded Countries for AUTO" row.
+     *
+     * - Reads [PersistentState.rpnAutoExcludedCcs] to populate the subtitle with the current
+     *   exclusion count.
+     * - On tap, opens [AutoExcludeCountriesBottomSheet] via the parent fragment manager so it
+     *   appears as a second sheet layered on top of this one.
+     * - When the country sheet calls [AutoExcludeCountriesBottomSheet.OnExcludeCountriesChangedListener.onExcludeCountriesChanged],
+     *   updates the subtitle and propagates to [OnSettingsChangedListener.onAutoExcludeCountriesChanged].
+     */
+    private fun setupExcludeCountriesRow() {
+        if (!isAdded) return
+
+        updateExcludeCcSubtitle()
+
+        binding.excludeCountriesRow.setOnClickListener {
+            if (parentFragmentManager.findFragmentByTag(AutoExcludeCountriesBottomSheet.TAG) != null) {
+                return@setOnClickListener
+            }
+
+            // Subtle scale-pop to indicate navigation
+            binding.excludeCountriesRow.animate()
+                .scaleX(0.97f).scaleY(0.97f)
+                .setDuration(80)
+                .withEndAction {
+                    if (isAdded) {
+                        binding.excludeCountriesRow.animate()
+                            .scaleX(1f).scaleY(1f)
+                            .setDuration(100)
+                            .setInterpolator(AccelerateDecelerateInterpolator())
+                            .start()
+                    }
+                }
+                .start()
+
+            val sheet = AutoExcludeCountriesBottomSheet.newInstance()
+            sheet.setOnExcludeCountriesChangedListener(object :
+                AutoExcludeCountriesBottomSheet.OnExcludeCountriesChangedListener {
+                override fun onExcludeCountriesChanged(excludedCcCsv: String) {
+                    // Update the subtitle in the settings row
+                    if (isAdded) updateExcludeCcSubtitle()
+                    // Propagate to the parent listener
+                    listener?.onAutoExcludeCountriesChanged(excludedCcCsv)
+                    Logger.i(LOG_TAG_UI, "$TAG.setupExcludeCountriesRow: excluded CCs updated='${excludedCcCsv.ifEmpty { "(none)" }}'")
+                }
+            })
+            sheet.show(parentFragmentManager, AutoExcludeCountriesBottomSheet.TAG)
+        }
+    }
+
+    /**
+     * Updates the subtitle of the "Excluded Countries" row to reflect the current
+     * [PersistentState.rpnAutoExcludedCcs] value.
+     */
+    private fun updateExcludeCcSubtitle() {
+        if (!isAdded) return
+        val stored = persistentState.rpnAutoExcludedCcs
+        val count = stored.split(",")
+            .map { it.trim() }
+            .count { it.isNotEmpty() }
+        binding.tvExcludeCcDesc.text = if (count == 0) {
+            getString(R.string.auto_exclude_cc_none)
+        } else {
+            getString(R.string.auto_exclude_cc_count, count)
+        }
+    }
+
+    /**
      * Shows a [MaterialAlertDialogBuilder] single-choice dialog for selecting
      * the connection port. The current selection is pre-checked.
      */
@@ -501,5 +691,25 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
             }
             .setNegativeButton(getString(R.string.lbl_cancel), null)
             .show()
+    }
+
+
+    /**
+     * A [DrawableWrapper] that applies a canvas rotation around its own center
+     * during [draw], leaving the host view's background and tint untouched.
+     */
+    private class RotatingDrawable(drawable: Drawable) : DrawableWrapper(drawable.mutate()) {
+        var rotation: Float = 0f
+            set(value) {
+                field = value
+                invalidateSelf()
+            }
+
+        override fun draw(canvas: Canvas) {
+            val b = bounds
+            canvas.withRotation(rotation, b.exactCenterX(), b.exactCenterY()) {
+                super.draw(this)
+            }
+        }
     }
 }

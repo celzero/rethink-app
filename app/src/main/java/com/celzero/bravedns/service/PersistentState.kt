@@ -712,8 +712,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // RPN DNS url
     var rpnDnsUrl by stringPref(RPN_DNS_URL).withDefault<String>(RpnProxyManager.DnsMode.DEFAULT.url)
 
-    /** Comma-separated [RpnProxyManager.DnsMode.tunType] values for the multi-select DNS filter. */
-    var rpnDnsTunTypes by stringPref(RPN_DNS_TUN_TYPES).withDefault<String>(RpnProxyManager.DnsMode.DEFAULT.tunType)
+    /** Comma-separated [RpnProxyManager.DnsMode.tunType] values for the multi-select DNS filter.
+     *  Defaults to "privacy" (ANTI_AD) so new installations have the Privacy filter pre-selected. */
+    var rpnDnsTunTypes by stringPref(RPN_DNS_TUN_TYPES).withDefault<String>(RpnProxyManager.DnsMode.PRIVACY.tunType)
 
     // RPN configuration handling mode: false = AUTO (app decides), true = MANUAL (user decides)
     var rpnConfigHandlingManual by booleanPref("rpn_config_handling_manual").withDefault<Boolean>(false)
@@ -727,6 +728,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // RPN use permanent configuration: only effective when rpnConfigHandlingManual=true
     var rpnUsePermanentConfig by booleanPref("rpn_use_permanent_config").withDefault<Boolean>(false)
+
+    /** Comma-separated country codes (e.g. "US,DE,FR") excluded from AUTO server selection.
+     *  Empty string = no exclusions (default). */
+    var rpnAutoExcludedCcs by stringPref("rpn_auto_excluded_ccs").withDefault<String>("")
 
     // timestamp of the last successful /g/device registration call.
     var deviceRegistrationTimestamp by longPref("device_registration_timestamp").withDefault<Long>(0L)

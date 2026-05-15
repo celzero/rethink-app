@@ -19,7 +19,6 @@ import Logger
 import Logger.LOG_TAG_PROXY
 import androidx.room.Transaction
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
-import kotlinx.coroutines.flow.Flow
 
 class CountryConfigRepository(private val countryConfigDAO: CountryConfigDAO) {
 
@@ -51,24 +50,8 @@ class CountryConfigRepository(private val countryConfigDAO: CountryConfigDAO) {
         countryConfigDAO.delete(config)
     }
 
-    suspend fun deleteByCountryCode(cc: String) {
-        countryConfigDAO.deleteByCountryCode(cc)
-    }
-
-    suspend fun deleteAll() {
-        countryConfigDAO.deleteAll()
-    }
-
     suspend fun updateSsidBased(cc: String, value: Boolean) {
         countryConfigDAO.updateSsidBased(cc, value)
-    }
-
-    suspend fun exists(cc: String): Boolean {
-        return countryConfigDAO.exists(cc)
-    }
-
-    suspend fun isEnabled(cc: String): Boolean {
-        return countryConfigDAO.isEnabled(cc)
     }
 
     suspend fun getCount(): Int {
@@ -125,10 +108,10 @@ class CountryConfigRepository(private val countryConfigDAO: CountryConfigDAO) {
         Logger.d(LOG_TAG_PROXY, "$TAG.updateSsids: $cc, ssids length=${ssids.length}")
     }
 
-    suspend fun incrementSelectionCount(cc: String) {
-        if (cc.isBlank() || cc == AUTO_SERVER_ID) return
-        countryConfigDAO.incrementSelectionCount(cc)
-        Logger.d(LOG_TAG_PROXY, "$TAG.incrementSelectionCount: cc=$cc")
+    suspend fun incrementSelectionCount(key: String) {
+        if (key.isBlank() || key == AUTO_SERVER_ID) return
+        countryConfigDAO.incrementSelectionCount(key)
+        Logger.d(LOG_TAG_PROXY, "$TAG.incrementSelectionCount: key=$key")
     }
 
     suspend fun updateFavourite(cc: String, isFavourite: Boolean) {
@@ -138,5 +121,20 @@ class CountryConfigRepository(private val countryConfigDAO: CountryConfigDAO) {
 
     suspend fun getTopFrequentCcs(limit: Int = 5): List<String> {
         return countryConfigDAO.getTopFrequentCcs(limit)
+    }
+
+    /**
+     * Atomically clears all user-specific state on every server:
+     *  - deselects all non-AUTO servers (isEnabled = false)
+     *  - removes the favourite mark from all servers (isFavourite = false)
+     *  - resets the selection count to 0 on all non-AUTO servers
+     *
+     * Must only be called from [com.celzero.bravedns.rpnproxy.RpnProxyManager.resetAndRefetchRpn].
+     */
+    suspend fun resetUserSelections() {
+        countryConfigDAO.resetAllIsEnabled()
+        countryConfigDAO.resetAllIsFavourite()
+        countryConfigDAO.resetAllSelectionCounts()
+        Logger.i(LOG_TAG_PROXY, "$TAG.resetUserSelections: cleared all selections, favourites, and counts")
     }
 }

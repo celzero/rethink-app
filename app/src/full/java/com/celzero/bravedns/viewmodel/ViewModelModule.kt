@@ -51,6 +51,7 @@ object ViewModelModule {
         viewModel { PurchaseHistoryViewModel(get()) }
         viewModel { ManagePurchaseViewModel() }
         viewModel { ServerOrderHistoryViewModel(get()) }
+        viewModel { ServerSelectionViewModel() }
     }
 
     val modules = listOf(modelModules)

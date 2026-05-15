@@ -18,26 +18,22 @@ package com.celzero.bravedns.ui.fragment
 import Logger
 import Logger.LOG_TAG_UI
 import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
-import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.DrawableWrapper
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.LinearInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.withRotation
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -60,6 +56,7 @@ import com.celzero.bravedns.ui.bottomsheet.ServerSettingsBottomSheet
 import com.celzero.bravedns.util.SnackbarHelper
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.viewmodel.ServerSelectionViewModel
 import com.celzero.firestack.backend.Backend
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.chip.Chip
@@ -72,6 +69,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -87,6 +85,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private val subscriptionStatusDao by inject<SubscriptionStatusDao>()
     private val countryConfigRepository by inject<CountryConfigRepository>()
     private val b by viewBinding(FragmentServerSelectionBinding::bind)
+    private val serverSelectionViewModel: ServerSelectionViewModel by activityViewModel()
 
     private lateinit var serverAdapter: CountryServerAdapter
     private lateinit var selectedAdapter: VpnServerAdapter
@@ -111,12 +110,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      */
     private var tunnelWatchJob: Job? = null
 
-    /** Guards against double-tapping the refresh button. */
-    private var refreshServersInFlight = false
     /** Guards against double-tapping the FAB stop/start. */
     private var toggleProxyInFlight = false
-    /** Looping spin animator attached to the refresh button icon while a refresh is in progress. */
-    private var refreshAnimator: ValueAnimator? = null
     /** Looping spin animator running on the FAB icon while stop/start is in progress. */
     private var fabLoadingAnimator: ObjectAnimator? = null
 
@@ -164,22 +159,31 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
         isProxyStopped = RpnProxyManager.rpnMode().isNone()
 
-        val fabExtraMarginPx = (16f * resources.displayMetrics.density + 0.5f).toInt()
-        val fabEndMarginPx   = (16f * resources.displayMetrics.density + 0.5f).toInt()
+        val density = resources.displayMetrics.density
+        // 16dp baseline margin for FABs.
+        val fabMarginPx = (16f * density + 0.5f).toInt()
 
         ViewCompat.setOnApplyWindowInsetsListener(b.root) { _, insets ->
             val navBarBottom  = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
-            // nav_view is in the activity layout and is already measured by the time insets
-            // are dispatched, so .height is reliable here.
             val navViewHeight = requireActivity().findViewById<View>(R.id.nav_view)?.height ?: 0
-            Logger.d(LOG_TAG_UI, "$TAG.onViewCreated: navBarBottom=$navBarBottom, navViewHeight=$navViewHeight, val=${navBarBottom + navViewHeight + fabExtraMarginPx}")
-            (b.fabToggleProxy.layoutParams as? android.view.ViewGroup.MarginLayoutParams)?.let { lp ->
-                lp.bottomMargin = navBarBottom + navViewHeight + fabExtraMarginPx
-                lp.marginEnd    = fabEndMarginPx
-                b.fabToggleProxy.layoutParams = lp
+            val fabBottom = navBarBottom + navViewHeight + fabMarginPx
+            Logger.d(LOG_TAG_UI, "$TAG.onViewCreated: navBarBottom=$navBarBottom, navViewHeight=$navViewHeight, fabBottom=$fabBottom")
+
+            // Apply margins to both FABs so they clear nav bar + bottom nav.
+            listOf(b.fabStopProxy, b.fabStartProxy).forEach { fab ->
+                (fab.layoutParams as? android.view.ViewGroup.MarginLayoutParams)?.let { lp ->
+                    lp.bottomMargin = fabBottom
+                    lp.marginEnd    = fabMarginPx
+                    fab.layoutParams = lp
+                }
             }
             insets
         }
+
+        // FAB position is handled exclusively via bottomMargin in the listener above.
+        ViewCompat.setOnApplyWindowInsetsListener(b.fabStopProxy)  { _, _ -> WindowInsetsCompat.CONSUMED }
+        ViewCompat.setOnApplyWindowInsetsListener(b.fabStartProxy) { _, _ -> WindowInsetsCompat.CONSUMED }
+
         // Force inset dispatch, needed on some OEM devices where the system does not
         // automatically re-dispatch insets after the fragment view is attached.
         ViewCompat.requestApplyInsets(b.root)
@@ -191,12 +195,14 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         setupHeaderUI()
         setupRpnState()
 
-        // Set initial FAB appearance to match current proxy state
+        // Show the correct FAB immediately (no animation on first load).
         if (isProxyStopped) {
             applyProxyStoppedUi()
-            applyFabStoppedState()
+            b.fabStopProxy.visibility  = View.GONE
+            b.fabStartProxy.visibility = View.VISIBLE
         } else {
-            applyFabRunningState()
+            b.fabStopProxy.visibility  = View.VISIBLE
+            b.fabStartProxy.visibility = View.GONE
         }
 
         // Apply bottom padding so the last list item is not hidden behind the
@@ -214,6 +220,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         }
 
         animateHeaderEntry()
+        observeRefreshState()
+        observeResetState()
     }
 
     private fun applyScrollPadding() {
@@ -281,6 +289,104 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         Logger.vv(LOG_TAG_UI, "$TAG.onResume")
         super.onResume()
         redriveProxyStartStopState()
+    }
+
+    /**
+     * Observes [ServerSelectionViewModel.refreshState] and reacts to refresh results.
+     *
+     * [ServerSelectionViewModel.RefreshState.Done] and [NeedsLoading] are consumed immediately
+     * via [ServerSelectionViewModel.onRefreshConsumed] so that late subscribers (e.g. a
+     * re-opened bottom sheet) do not replay stale results.
+     */
+    private fun observeRefreshState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                serverSelectionViewModel.refreshState.collect { state ->
+                    when (state) {
+                        is ServerSelectionViewModel.RefreshState.Done -> {
+                            Logger.i(LOG_TAG_UI, "$TAG.observeRefreshState: Done, ${state.servers.size} servers")
+                            serverSelectionViewModel.onRefreshConsumed()
+                            initServers(state.servers, state.selected)
+                        }
+                        is ServerSelectionViewModel.RefreshState.NeedsLoading -> {
+                            Logger.w(LOG_TAG_UI, "$TAG.observeRefreshState: NeedsLoading, showing dialog")
+                            serverSelectionViewModel.onRefreshConsumed()
+                            showServerLoadingDialog()
+                        }
+                        is ServerSelectionViewModel.RefreshState.InProgress,
+                        is ServerSelectionViewModel.RefreshState.Idle -> {
+                            // no ui action needed here; the bottom sheet owns the animation.
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Observes [ServerSelectionViewModel.resetState] and reacts to the reset lifecycle.
+     *
+     * **[ServerSelectionViewModel.ResetState.InProgress]**: If the fragment was recreated
+     * while a reset was running (rotation during the progress dialog), re-show the dialog
+     * and restart the animation loop. The ViewModel's [viewModelScope] job is still alive.
+     *
+     * **[ServerSelectionViewModel.ResetState.Done]**: Consumes the result, dismisses the
+     * dialog, and delegates UI update to [handleResetResult].
+     */
+    private fun observeResetState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                serverSelectionViewModel.resetState.collect { state ->
+                    when (state) {
+                        is ServerSelectionViewModel.ResetState.InProgress -> {
+                            // Handles rotation: if the fragment is recreated while a reset is
+                            // already running, re-show the progress dialog so the user still
+                            // sees feedback.  The ViewModel's coroutine keeps running regardless.
+                            if (rpnResetDialog?.isShowing != true) {
+                                Logger.i(LOG_TAG_UI, "$TAG.observeResetState: InProgress (re-attach after rotation?), showing dialog")
+                                showRpnResetDialog()
+                            }
+                        }
+                        is ServerSelectionViewModel.ResetState.Done -> {
+                            Logger.i(LOG_TAG_UI, "$TAG.observeResetState: Done, result=${state.result}")
+                            serverSelectionViewModel.onResetConsumed()
+                            dismissRpnResetDialog()
+                            handleResetResult(state.result, state.servers, state.selected)
+                        }
+                        is ServerSelectionViewModel.ResetState.Idle -> { /* nothing to do */ }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Handles the UI update after a reset completes.
+     * Called from [observeResetState] on the main thread after [dismissRpnResetDialog].
+     */
+    private fun handleResetResult(
+        result: RpnProxyManager.ResetResult,
+        servers: List<CountryConfig>,
+        selected: Set<CountryConfig>
+    ) {
+        if (!isAdded) return
+        when (result) {
+            is RpnProxyManager.ResetResult.Success -> {
+                isProxyStopped = false
+                showToast(getString(R.string.rpn_restore_success))
+                if (servers.isNotEmpty()) initServers(servers, selected)
+            }
+            is RpnProxyManager.ResetResult.Failure -> {
+                Logger.w(LOG_TAG_UI, "$TAG.handleResetResult: reset failed, reason: ${result.reason}")
+                showToast(getString(R.string.rpn_restore_failure, result.reason))
+                if (!RpnProxyManager.isRpnActive()) {
+                    isProxyStopped = true
+                    applyProxyStoppedUi()
+                } else if (servers.isNotEmpty()) {
+                    initServers(servers, selected)
+                }
+            }
+        }
     }
 
     private fun redriveProxyStartStopState() {
@@ -394,9 +500,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         runCatching {
             fabLoadingAnimator?.cancel()
             fabLoadingAnimator = null
-            refreshAnimator?.cancel()
-            refreshAnimator = null
-            b.fabToggleProxy.animate().cancel()
+            b.fabStopProxy.animate().cancel()
+            b.fabStartProxy.animate().cancel()
             b.statusIndicator.animate().cancel()
             b.statusCard.animate().cancel()
             b.searchCard.animate().cancel()
@@ -738,8 +843,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun setupNavigationButtons() {
         b.supportBtn.setOnClickListener { openHelpAndSupport() }
         b.settingsBtn.setOnClickListener { showServerSettingsBottomSheet() }
-        b.refreshBtn.setOnClickListener { doRefreshServers() }
-        b.fabToggleProxy.setOnClickListener { onToggleProxyFabClicked() }
+        b.fabStopProxy.setOnClickListener  { onToggleProxyFabClicked() }
+        b.fabStartProxy.setOnClickListener { onToggleProxyFabClicked() }
         // Status chip: open settings when running, show a hint when stopped
         b.statusChip.setOnClickListener {
             if (isProxyStopped) {
@@ -758,159 +863,142 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         val sheet = ServerSettingsBottomSheet.newInstance(isProxyStopped)
         sheet.setOnSettingsChangedListener(object : ServerSettingsBottomSheet.OnSettingsChangedListener {
             override fun onDnsModeChanged(tunTypes: String) {
-                io { VpnController.onRpnDnsChange() }
+                Logger.v(LOG_TAG_UI, "$TAG.onDnsModeChanged: tunTypes=$tunTypes")
+                io { VpnController.onRpnOptsChange() }
             }
             override fun onConfigChanged() {
-                io {
-                    VpnController.updateWin()
-                }
+                Logger.v(LOG_TAG_UI, "$TAG.onConfigChanged")
+                io { VpnController.onRpnOptsChange() }
             }
 
             override fun onReset() {
-                // onReset() is delivered on the main thread.
-                // showRpnResetDialog manages its own coroutine internally.
+                // Kick off the IO work in the ViewModel so it survives rotation;
+                // then show the progress dialog (animation only — no IO here).
+                serverSelectionViewModel.reset()
                 showRpnResetDialog()
+            }
+
+            override fun onAutoExcludeCountriesChanged(excludedCcCsv: String) {
+                Logger.v(LOG_TAG_UI, "$TAG.onAutoExcludeCountriesChanged: excludedCcCsv=$excludedCcCsv")
+                io { VpnController.onRpnOptsChange() }
             }
         })
         sheet.show(parentFragmentManager, "ServerSettings")
     }
 
-
-    /** Starts a continuous (infinite) clockwise spin on the refresh button icon. */
-    private fun startRefreshAnimation() {
-        refreshAnimator?.cancel()
-
-        val raw = b.refreshBtn.icon
-        val spinning: RotatingDrawable = if (raw is RotatingDrawable) raw
-        else RotatingDrawable(raw ?: return).also { b.refreshBtn.icon = it }
-        spinning.rotation = 0f
-        refreshAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
-            duration = 700L
-            repeatCount = ValueAnimator.INFINITE
-            repeatMode = ValueAnimator.RESTART
-            interpolator = LinearInterpolator()
-            addUpdateListener { spinning.rotation = it.animatedValue as Float }
-            start()
-        }
-    }
-
-    /**
-     * Stops the spin and eases the icon back to 0° so it doesn't snap
-     * abruptly when the IO operation completes.
-     */
-    private fun stopRefreshAnimation() {
-        refreshAnimator?.cancel()
-        refreshAnimator = null
-        val icon = b.refreshBtn.icon as? RotatingDrawable ?: return
-        ValueAnimator.ofFloat(icon.rotation, 0f).apply {
-            duration = 200L
-            interpolator = AccelerateDecelerateInterpolator()
-            addUpdateListener { icon.rotation = it.animatedValue as Float }
-            start()
-        }
-    }
-
-    /**
-     * A [DrawableWrapper] that applies a canvas rotation around its own centre
-     * during [draw], leaving the host view's background and tint untouched.
-     */
-    private class RotatingDrawable(drawable: Drawable) : DrawableWrapper(drawable.mutate()) {
-        var rotation: Float = 0f
-            set(value) {
-                field = value
-                invalidateSelf()
-            }
-
-        override fun draw(canvas: Canvas) {
-            val b = bounds
-            canvas.withRotation(rotation, b.exactCenterX(), b.exactCenterY()) {
-                super.draw(this)
-            }
-        }
-    }
-
-    private fun doRefreshServers() {
-        if (isProxyStopped || refreshServersInFlight) return
-        refreshServersInFlight = true
-        b.refreshBtn.isClickable = false
-        startRefreshAnimation()
-
-        io {
-            val selectedList = try {
-                RpnProxyManager.getEnabledConfigs()
-            } catch (e: Exception) {
-                Logger.w(LOG_TAG_UI, "$TAG.doRefreshServers: getEnabledCCs failed: ${e.message}")
-                emptySet()
-            }
-            val refreshed = try {
-                RpnProxyManager.updateWinProxy(userRequest = true) ?: emptyList()
-            } catch (e: Exception) {
-                Logger.e(LOG_TAG_UI, "$TAG.doRefreshServers: error: ${e.message}", e)
-                emptyList()
-            }
-            uiCtx {
-                stopRefreshAnimation()
-                b.refreshBtn.isClickable = true
-                refreshServersInFlight = false
-                if (!isAdded) return@uiCtx
-                if (refreshed.isNotEmpty()) {
-                    initServers(refreshed, selectedList)
-                } else {
-                    showServerLoadingDialog()
-                }
-            }
-        }
-    }
-
     private fun onToggleProxyFabClicked() {
         if (toggleProxyInFlight) return
         toggleProxyInFlight = true
-        b.fabToggleProxy.isClickable = false
+        b.fabStopProxy.isClickable  = false
+        b.fabStartProxy.isClickable = false
         applyFabLoadingState()
         if (isProxyStopped) doStartProxy() else doStopProxy()
     }
 
     private fun applyFabLoadingState() {
         if (!isAdded) return
-        b.fabToggleProxy.animate().cancel()
-        // Bounce: pop up slightly then settle back
-        b.fabToggleProxy.animate()
-            .scaleX(1.12f).scaleY(1.12f)
-            .setDuration(110)
-            .setInterpolator(OvershootInterpolator(2.5f))
-            .withEndAction {
-                if (isAdded) {
-                    b.fabToggleProxy.animate()
-                        .scaleX(1f).scaleY(1f)
-                        .setDuration(120)
-                        .setInterpolator(AccelerateDecelerateInterpolator())
-                        .start()
-                }
-            }
-            .start()
-        // Swap icon to the refresh arrow and spin it clockwise continuously.
-        b.fabToggleProxy.setImageResource(R.drawable.ic_refresh)
         fabLoadingAnimator?.cancel()
-        fabLoadingAnimator = ObjectAnimator.ofFloat(b.fabToggleProxy, View.ROTATION, 0f, 360f).apply {
-            duration = 850L
+        fabLoadingAnimator = null
+
+        // Determine the currently visible FAB and reset it to a known state so
+        // any previously-running ViewPropertyAnimator is cleanly cancelled before
+        // we take over with the ObjectAnimator pulse.
+        val activeFab: View = if (isProxyStopped) b.fabStartProxy else b.fabStopProxy
+        activeFab.animate().cancel()
+        activeFab.alpha  = 1f
+        activeFab.scaleX = 1f
+        activeFab.scaleY = 1f
+
+        // Continuous alpha pulse tracked by fabLoadingAnimator so stopFabLoadingState()
+        // can cancel it cleanly without triggering any nested end-action.
+        fabLoadingAnimator = ObjectAnimator.ofFloat(activeFab, "alpha", 1f, 0.45f).apply {
+            duration = 650L
             repeatCount = ObjectAnimator.INFINITE
-            repeatMode = ObjectAnimator.RESTART
-            interpolator = LinearInterpolator()
+            repeatMode = ObjectAnimator.REVERSE
+            interpolator = AccelerateDecelerateInterpolator()
             start()
         }
     }
 
     private fun stopFabLoadingState() {
+        // Cancel the pulse ObjectAnimator first so it releases its hold on the FAB's alpha.
         fabLoadingAnimator?.cancel()
         fabLoadingAnimator = null
-        b.fabToggleProxy.animate().cancel()
-        b.fabToggleProxy.rotation = 0f
-        b.fabToggleProxy.scaleX = 1f
-        b.fabToggleProxy.scaleY = 1f
-        b.fabToggleProxy.isClickable = true
+
+        // Re-enable interaction immediately.
+        b.fabStopProxy.isClickable  = true
+        b.fabStartProxy.isClickable = true
         toggleProxyInFlight = false
+
+        if (isAdded) {
+            // Cancel any ViewPropertyAnimator still running on either FAB and reset
+            // all transform properties to their resting state so the subsequent
+            // applyFabRunningState / applyFabStoppedState swap animations start clean.
+            b.fabStopProxy.animate().cancel()
+            b.fabStartProxy.animate().cancel()
+            b.fabStopProxy.alpha  = 1f; b.fabStopProxy.scaleX  = 1f; b.fabStopProxy.scaleY  = 1f
+            b.fabStartProxy.alpha = 1f; b.fabStartProxy.scaleX = 1f; b.fabStartProxy.scaleY = 1f
+        }
     }
 
+    /** Pops in the stop FAB (red circle) and pops out the start FAB. */
+    private fun applyFabRunningState() {
+        if (!isAdded) return
+        // Cancel any running animation so we start from a clean resting state.
+        b.fabStartProxy.animate().cancel()
+        b.fabStartProxy.scaleX = 1f
+        b.fabStartProxy.scaleY = 1f
+        b.fabStartProxy.alpha  = 1f
+        // Shrink + fade the start FAB out.
+        b.fabStartProxy.animate()
+            .scaleX(0f).scaleY(0f).alpha(0f)
+            .setDuration(200)
+            .setInterpolator(AccelerateDecelerateInterpolator())
+            .withEndAction { if (isAdded) b.fabStartProxy.visibility = View.GONE }
+            .start()
+        // Pop the stop FAB in with a short delay so both animations overlap and the
+        // screen is never empty
+        b.fabStopProxy.scaleX = 0f
+        b.fabStopProxy.scaleY = 0f
+        b.fabStopProxy.alpha  = 0f
+        b.fabStopProxy.visibility = View.VISIBLE
+        b.fabStopProxy.animate().cancel()
+        b.fabStopProxy.animate()
+            .scaleX(1f).scaleY(1f).alpha(1f)
+            .setStartDelay(80)
+            .setDuration(240)
+            .setInterpolator(OvershootInterpolator(1.8f))
+            .start()
+    }
+
+    /** Pops in the start FAB (green pill) and pops out the stop FAB. */
+    private fun applyFabStoppedState() {
+        if (!isAdded) return
+        // Cancel any running animation so we start from a clean resting state.
+        b.fabStopProxy.animate().cancel()
+        b.fabStopProxy.scaleX = 1f
+        b.fabStopProxy.scaleY = 1f
+        b.fabStopProxy.alpha  = 1f
+        // Shrink + fade the stop FAB out.
+        b.fabStopProxy.animate()
+            .scaleX(0f).scaleY(0f).alpha(0f)
+            .setDuration(200)
+            .setInterpolator(AccelerateDecelerateInterpolator())
+            .withEndAction { if (isAdded) b.fabStopProxy.visibility = View.GONE }
+            .start()
+        // Pop the start FAB in with overlap.
+        b.fabStartProxy.scaleX = 0f
+        b.fabStartProxy.scaleY = 0f
+        b.fabStartProxy.alpha  = 0f
+        b.fabStartProxy.visibility = View.VISIBLE
+        b.fabStartProxy.animate().cancel()
+        b.fabStartProxy.animate()
+            .scaleX(1f).scaleY(1f).alpha(1f)
+            .setStartDelay(80)
+            .setDuration(240)
+            .setInterpolator(OvershootInterpolator(1.8f))
+            .start()
+    }
     private fun doStopProxy() {
         io {
             val success = try {
@@ -946,22 +1034,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 Logger.i(LOG_TAG_UI, "$TAG: proxy started")
             }
         }
-    }
-
-    /** Switches the FAB to "stop" appearance (red, stop icon). */
-    private fun applyFabRunningState() {
-        if (!isAdded) return
-        b.fabToggleProxy.setImageResource(R.drawable.ic_stop)
-        b.fabToggleProxy.backgroundTintList =
-            ContextCompat.getColorStateList(requireContext(), R.color.colorRed_A400)
-    }
-
-    /** Switches the FAB to "start" appearance (green, VPN/play icon). */
-    private fun applyFabStoppedState() {
-        if (!isAdded) return
-        b.fabToggleProxy.setImageResource(R.drawable.ic_vpn)
-        b.fabToggleProxy.backgroundTintList =
-            ContextCompat.getColorStateList(requireContext(), R.color.accentGood)
     }
 
     private fun startTunnelWatchJob(pendingKeys: Set<String>) {
@@ -1015,9 +1087,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.searchBar.isEnabled     = false
         b.searchBar.isFocusable   = false
 
-        // Dim and disable action buttons
-        b.refreshBtn.alpha      = stoppedAlpha
-        b.refreshBtn.isClickable = false
         b.settingsBtn.alpha     = stoppedAlpha
 
         // Adapters replace click handlers so tapping any server item opens the
@@ -1051,9 +1120,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.searchBar.isFocusable        = true
         b.searchBar.isFocusableInTouchMode = true
 
-        // Restore action buttons
-        b.refreshBtn.alpha       = 1f
-        b.refreshBtn.isClickable = true
         b.settingsBtn.alpha      = 1f
 
         selectedAdapter.setProxyStopped(false)
@@ -1165,7 +1231,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.searchCard.isVisible = false
         b.supportBtn.isVisible = false
         b.settingsBtn.isVisible = false
-        b.refreshBtn.isVisible = false
         b.statusCard.isVisible = false
 
         b.selectedServersCard.isVisible = false
@@ -1211,7 +1276,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.searchCard.isVisible = true
         b.supportBtn.isVisible = true
         b.settingsBtn.isVisible = true
-        b.refreshBtn.isVisible = true
         b.statusCard.isVisible = true
     }
 
@@ -1393,14 +1457,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                     // clear the "Connecting…" indicator.
                     selectedAdapter.clearLoadingTunnelKey(server.key)
                     Logger.v(LOG_TAG_UI, "$TAG.onServerSelected: best: $best, grouped: $grouped")
-
-                    // Record the selection for frequent-country tracking and refresh chips.
-                    io {
-                        countryConfigRepository.incrementSelectionCount(server.cc)
-                        uiCtx {
-                            if (isAdded && !isProxyStopped) loadAndShowFrequentChips()
-                        }
-                    }
                 }
             }
         } else {
@@ -1440,9 +1496,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         }
     }
 
-    /**
-     * Single call to refresh adapters + header + counts after any selection change.
-     */
     private fun refreshAfterSelectionChange() {
         selectedAdapter.updateServers(selectedServers)
         serverAdapter.updateCountries(buildCountries(unselectedServers))
@@ -2037,30 +2090,10 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         )
 
         rpnResetJob = lifecycleScope.launch {
-            var resetResult: RpnProxyManager.ResetResult? = null
-
-            // Launch the actual reset on IO so network/crypto work stays off the main thread.
-            val resetWorkJob = launch(Dispatchers.IO) {
-                resetResult = try {
-                    RpnProxyManager.resetAndRefetchRpn()
-                } catch (e: Exception) {
-                    Logger.e(LOG_TAG_UI, "$TAG: resetAndRefetchRpn threw unexpectedly: ${e.message}", e)
-                    RpnProxyManager.ResetResult.Failure(e.message ?: "Unexpected error")
-                }
-            }
-
-            // Animation loop runs on the main thread while the IO job is active.
             val startTime = System.currentTimeMillis()
             var msgIdx = 0
-            while (resetWorkJob.isActive) {
+            while (serverSelectionViewModel.resetState.value is ServerSelectionViewModel.ResetState.InProgress) {
                 val elapsed = System.currentTimeMillis() - startTime
-                if (elapsed >= LOADING_DIALOG_TIMEOUT_MS) {
-                    resetWorkJob.cancel()
-                    resetResult = RpnProxyManager.ResetResult.Failure(
-                        getString(R.string.rpn_restore_timeout_reason)
-                    )
-                    break
-                }
 
                 val statusMsg = when {
                     elapsed > LOADING_DIALOG_TIMEOUT_MS * 0.75 ->
@@ -2082,48 +2115,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
                 delay(LOADING_DIALOG_POLL_INTERVAL_MS)
                 msgIdx++
-            }
-
-            resetWorkJob.join() // ensure IO work has fully stopped
-
-            if (!isAdded) return@launch
-
-            dismissRpnResetDialog()
-            Logger.i(LOG_TAG_UI, "$TAG: reset result=$resetResult")
-
-            when (val r = resetResult) {
-                is RpnProxyManager.ResetResult.Success -> {
-                    isProxyStopped = false
-                    showToast(getString(R.string.rpn_restore_success))
-                    // Refresh displayed server list with freshly-fetched data.
-                    val servers = withContext(Dispatchers.IO) {
-                        try { RpnProxyManager.getWinServers() } catch (_: Exception) { emptyList() }
-                    }
-                    val selectedList = withContext(Dispatchers.IO) {
-                        try { RpnProxyManager.getEnabledConfigs() } catch (_: Exception) { emptySet() }
-                    }
-                    if (isAdded) initServers(servers, selectedList)
-                }
-                is RpnProxyManager.ResetResult.Failure -> {
-                    Logger.w(LOG_TAG_UI, "$TAG: reset failed, reason: ${r.reason}")
-                    showToast(getString(R.string.rpn_restore_failure, r.reason))
-                    // Never leave the UI in an indeterminate state.
-                    if (!RpnProxyManager.isRpnActive()) {
-                        isProxyStopped = true
-                        applyProxyStoppedUi()
-                    } else {
-                        val servers = withContext(Dispatchers.IO) {
-                            try { RpnProxyManager.getWinServers() } catch (_: Exception) { emptyList() }
-                        }
-                        val selectedList = withContext(Dispatchers.IO) {
-                            try { RpnProxyManager.getEnabledConfigs() } catch (_: Exception) { emptySet() }
-                        }
-                        if (isAdded) initServers(servers, selectedList)
-                    }
-                }
-                null -> {
-                    showToast(getString(R.string.rpn_restore_failure, "Unknown error"))
-                }
             }
         }
     }

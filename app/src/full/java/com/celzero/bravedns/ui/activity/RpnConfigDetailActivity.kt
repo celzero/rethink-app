@@ -292,20 +292,12 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         var sinceTs = 0L
         try {
             val pid = if (id.contains(AUTO_SERVER_ID, ignoreCase = true)) {
-                VpnController.getWinProxyId() ?: (Backend.RpnWin + "**")
+                Backend.RpnWin
             } else {
                 Backend.RpnWin + id
             }
             sinceTs = VpnController.getProxyStats(pid)?.since ?: 0L
             val cachedSince = RpnProxyManager.getCachedSinceTs(id)
-            val cached = RpnProxyManager.getCachedIpMeta(id)
-
-            // Cache hit: tunnel has not reconnected and we already have metadata.
-            if (sinceTs > 0L && sinceTs == cachedSince && cached != null) {
-                if (DEBUG) Logger.d(LOG_TAG_UI, "resolveClientIps[$id]: cache hit, since=$sinceTs")
-                uiCtx { applyClientIps(cached.first, cached.second) }
-                return
-            }
 
             if (DEBUG) Logger.d(
                 LOG_TAG_UI,
@@ -320,7 +312,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             Logger.w(LOG_TAG_UI, "failed to resolve client ips: ${e.message}")
         }
         // Persist to Manager cache; preserves selectedAt for this server key.
-        RpnProxyManager.updateIpMeta(id, sinceTs, ip4Meta, ip6Meta)
+        RpnProxyManager.updateIpMeta(id, sinceTs)
         uiCtx { applyClientIps(ip4Meta, ip6Meta) }
     }
 
@@ -464,13 +456,13 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         // For AUTO use the live win proxy ID from the tunnel so the stats lookup targets the
         // real proxy entry rather than a hardcoded wildcard.  Fall back to the wildcard only
         val pid = if (id.contains(AUTO_SERVER_ID, ignoreCase = true)) {
-            VpnController.getWinProxyId() ?: (Backend.RpnWin + "**")
+            Backend.RpnWin
         } else {
             Backend.RpnWin + id
         }
         val statusPair = VpnController.getProxyStatusById(pid)
         val stats = VpnController.getProxyStats(pid)
-        val who = VpnController.getWin()?.who()
+        val who = VpnController.getWinIdentifier()
         val config = countryConfig
         // Use the time when this server key was selected by the user, not the VPN uptime.
         val selectedSinceTs = RpnProxyManager.getSelectedSinceTs(id)
@@ -613,11 +605,9 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 loadPct <= 80 -> getString(R.string.server_load_very_busy)
                 else -> getString(R.string.server_load_overloaded)
             }
-            b.valueHealth.text = getString(R.string.two_argument_dot,"$loadPct%",tier)
             healthText = "$loadPct% · $tier"
         } else {
-            b.valueHealth.text = getString(R.string.lbl_not_available_short)
-            healthText = ""
+            healthText = getString(R.string.lbl_not_available_short)
         }
 
         val speedText: String
@@ -633,11 +623,9 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 }
                 else -> "$linkMbps Mbps"
             }
-            b.valueLoad.text = formatted
             speedText = formatted
         } else {
-            b.valueLoad.text = getString(R.string.lbl_not_available_short)
-            speedText = ""
+            speedText = getString(R.string.lbl_not_available_short)
         }
 
         // Compose hero-banner stats chip: "1 Gbps · 35% · Normal"
@@ -677,6 +665,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     b.catchAllCheck.isChecked = config.catchAll
                     b.useMobileCheck.isChecked = config.mobileOnly
                     b.ssidCheck.isChecked = config.ssidBased
+                    b.hopCheck.isChecked = config.hopEnabled
                     b.otherSettingsCard.visibility = View.VISIBLE
                     b.mobileSsidSettingsCard.visibility = View.VISIBLE
                     // Update apps section immediately based on catchAll state
@@ -685,6 +674,11 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                         b.applicationsBtn.alpha = 0.5f
                         b.appsLabel.setTextColor(fetchColor(this, R.attr.primaryTextColor))
                         b.appsLabel.text = getString(R.string.lbl_all_apps)
+                    }
+                    if (config.id == AUTO_SERVER_ID) {
+                        // Hide hop settings for AUTO since it will be the src for all other
+                        // configs
+                        b.hopRl.visibility = View.GONE
                     }
                 } else {
                     showInvalidConfigDialog()
@@ -719,6 +713,19 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             b.otherSettingsCard.visibility = View.GONE
             b.mobileSsidSettingsCard.visibility = View.GONE
             return
+        }
+
+        b.hopCheck.setOnCheckedChangeListener { _, isChecked ->
+            io {
+                RpnProxyManager.setHopForWinServer(configKey, isChecked)
+                uiCtx {
+                    Utilities.showToastUiCentered(
+                        this,
+                        if (isChecked) "Hop mode enabled" else "Hop mode disabled",
+                        Toast.LENGTH_SHORT
+                    )
+                }
+            }
         }
 
         b.catchAllCheck.setOnCheckedChangeListener { _, isChecked ->

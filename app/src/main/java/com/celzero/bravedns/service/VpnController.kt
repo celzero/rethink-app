@@ -37,7 +37,6 @@ import com.celzero.firestack.backend.RDNS
 import com.celzero.firestack.backend.RouterStats
 import com.celzero.firestack.backend.Proxy
 import com.celzero.firestack.backend.RpnEntitlement
-import com.celzero.firestack.backend.RpnProxy
 import com.celzero.firestack.intra.Controller
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -388,8 +387,8 @@ object VpnController : KoinComponent {
         return braveVpnService?.updateWin()
     }
 
-    suspend fun onRpnDnsChange() {
-        braveVpnService?.onRpnDnsChange()
+    suspend fun onRpnOptsChange() {
+        braveVpnService?.onRpnOptsChange()
     }
 
     suspend fun getWinLastUpdatedTs(): Long? {
@@ -416,8 +415,8 @@ object VpnController : KoinComponent {
         return braveVpnService?.testRpnProxy(proxyId) == true
     }
 
-    suspend fun isProxyReachable(proxyId: String, csv: String): Boolean {
-        return braveVpnService?.isProxyReachable(proxyId, csv) == true
+    suspend fun isRpnReachable(csv: String): Boolean {
+        return braveVpnService?.isRpnReachable(csv) == true
     }
 
     suspend fun testHop(src: String, hop: String): Pair<Boolean, String?> {
@@ -440,12 +439,20 @@ object VpnController : KoinComponent {
         return braveVpnService?.addNewWinServer(key) ?: Pair(false, "vpn service not available")
     }
 
+    suspend fun handleRpnHop(key: String): Pair<Boolean, String> {
+        return braveVpnService?.handleRpnHop(key) ?: Pair(false, "vpn service not available")
+    }
+
     suspend fun removeWinServer(key: String): Pair<Boolean, String> {
         return braveVpnService?.removeWinServer(key) ?: Pair(false, "vpn service not available")
     }
 
     suspend fun refreshRpnProxy(id: String): Boolean {
         return braveVpnService?.refreshRpnProxy(id) ?: false
+    }
+
+    suspend fun stopRpnProxy(): Boolean {
+        return braveVpnService?.stopRpnProxy() ?: false
     }
 
     suspend fun reconnectRpnProxy(id: String): Boolean {
@@ -512,8 +519,8 @@ object VpnController : KoinComponent {
         return braveVpnService?.getWinByKey(key)
     }
 
-    suspend fun getWin(): RpnProxy? {
-        return braveVpnService?.getWin()
+    suspend fun getWinIdentifier(): String? {
+        return braveVpnService?.getWinIdentifier()
     }
 
     suspend fun getWinProxyId(): String? {
