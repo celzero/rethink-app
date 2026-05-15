@@ -51,7 +51,7 @@ import com.celzero.bravedns.util.Utilities
  * fragment is already on screen.
  *
  * ### Channel
- * Reuses [NOTIF_CHANNEL_ID_RPN_ALERTS] ("Rpn_Alerts"): the existing high-priority
+ * Reuses [NOTIF_CHANNEL_ID_RPN_ALERTS] ("RPN_Alerts"): the existing high-priority
  * channel already created and registered by DeviceNotRegisteredNotifier.
  * No new channel is needed.
  *
