@@ -67,27 +67,40 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/persistent_keepalive_edit_text">
 
-        <androidx.appcompat.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/dialog_cancel_btn"
+            style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
             android:layout_weight="0.5"
             android:background="@drawable/rectangle_border_background"
             android:text="@string/lbl_cancel"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/heading_font_text_view" />
+            android:padding="10dp"
+            android:textColor="?attr/accentGood"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:textSize="@dimen/large_font_text_view"
+            app:layout_constraintEnd_toStartOf="@id/dialog_save_btn"
+            app:layout_constraintTop_toBottomOf="@id/dialog_title" />
 
-        <androidx.appcompat.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/dialog_save_btn"
+            android:padding="10dp"
+            style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_weight="0.5"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:layout_marginBottom="10dp"
             android:background="@drawable/rectangle_border_background"
             android:text="@string/lbl_save"
-            android:textColor="?attr/accentGood"
-            android:textSize="@dimen/heading_font_text_view" />
+            android:textColor="?attr/accentGood" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -418,7 +418,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/save_button"
-                style="@style/Widget.Material3.Button.TextButton.Dialog"
+                style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="0dp"
                 android:layout_weight="0.5"
                 android:layout_height="wrap_content"
@@ -433,7 +433,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/test_button"
-                style="@style/Widget.Material3.Button.TextButton.Dialog"
+                style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="0dp"
                 android:layout_weight="0.5"
                 android:layout_height="wrap_content"
