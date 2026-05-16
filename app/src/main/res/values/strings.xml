@@ -2372,7 +2372,6 @@
     <string name="payment_history_open_error" translatable="false">Could not open purchase history</string>
     <string name="payment_history_unknown_product" translatable="false">Unknown product</string>
     <string name="payment_history_transition_fmt" translatable="false">%1$s → %2$s</string>
-    <string name="payment_history_token_fmt" translatable="false">Token: %1$s</string>
     <string name="payment_history_state_revoked" translatable="false">Revoked</string>
     <string name="payment_history_state_pending" translatable="false">Pending</string>
 
