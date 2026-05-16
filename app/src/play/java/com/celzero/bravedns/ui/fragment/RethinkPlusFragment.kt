@@ -446,7 +446,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     }
 
     private fun showConnectionInfo(state: SubscriptionUiState.Available) {
-        if (state.ip.isEmpty()) {
+        if (state.ip.isEmpty() || viewModel.extendMode) {
             b.connectionInfoCard.isVisible = false
             return
         }
