@@ -179,6 +179,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.collections.firstOrNull
+import kotlin.collections.joinToString
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.abs
 import kotlin.math.min
@@ -4139,7 +4140,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // this must be called before using Backend.BlockFree. in rethink’s dns case, BlockFree
         // transport is added to tun so calling this method is not required.
         return if (persistentState.useFallbackDnsToBypass) { // setting to use fallback dns
-            Pair(Backend.BlockFree, "")
+            // If the BlockFree transport is available then it will use the blockfree else it will
+            // fallback to default transport. Only case Blockfree will be available is when the dns
+            // is selected as Rethink's transport, all other cases, to bypass the blocks default
+            // transport will be used.
+            Pair(Backend.BlockFree, Backend.Default)
         } else {
             id
         }
@@ -4178,6 +4183,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     }
 
     // function to decide which transport id to return on DnsFirewall mode
+    // Note: Now the trusted rules will be using the same transport id similar to the normal
+    // queries, the decision to resolve the query will be based on the answer returned from the
+    // upstream dns server. If the query is resolved by the upstream dns server, then there will be
+    // no dns leak for the queries, but if it is blocked by upstream server then the unblock can be
+    // done for that particular query in onUpstreamAnswer based on the fqdn and uid, so that we can
+    // avoid the possibility of dns leak for the trusted queries / app which is set to bypass
+    // dns + firewall rule
     private suspend fun getTransportIdForDnsFirewallMode(uid: Int, fqdn: String, srcType: String?, rinr: Boolean): DNSOpts {
         val splitDns = persistentState.splitDns && (WireguardManager.isAdvancedWgActive() || RpnProxyManager.isRpnActive())
         val tid = determineDnsTransportIdForDFMode(uid, fqdn, splitDns, rinr, srcType)
@@ -4201,12 +4213,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // in the DNS.uid (AID_DNS) field, so set the uid as INVALID_UID from flow()
         if (uid == INVALID_UID) {
             return if (FirewallManager.isAnyAppBypassesDns()) {
+                // using same tid, see #getTransportIdForDnsFirewallMode for details
                 // if any app is bypassed (dns + firewall), then set bypass local blocklist as true
-                // so that the domain is resolved and the decision is made by in flow()
                 Logger.vv(LOG_TAG_VPN, "$TAG; onQuery: no uid, some app is bypassed $fqdn")
                 makeNsOpts(uid, transportIdsAlg(tid, splitDns), fqdn, true, rinr = rinr)
             } else if (DomainRulesManager.isDomainTrusted(fqdn)) {
-                // set isBlockFree as true so that the decision is made by in flow() function
+                // using same tid, see #getTransportIdForDnsFirewallMode for details
                 Logger.vv(LOG_TAG_VPN, "$TAG; onQuery: no uid, univ domain trusted $fqdn")
                 makeNsOpts(uid, transportIdsAlg(tid, splitDns), fqdn, true, rinr = rinr)
             } else if (getDomainRule(fqdn, UID_EVERYBODY).first == DomainRulesManager.Status.BLOCK) {
@@ -4232,7 +4244,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             if (isTempAllowed) {
                 // if the app is temp allowed, bypass local blocklists
                 Logger.vv(LOG_TAG_VPN, "$TAG onQuery, $uid is temp allowed, $fqdn")
-                return makeNsOpts(uid, getTransportIdToBypass(tid), fqdn, true, rinr = rinr)
+                return makeNsOpts(uid, tid, fqdn, true, rinr = rinr)
             }
             val connectionStatus = FirewallManager.connectionStatus(uid)
             if (connectionStatus.blocked()) {
@@ -4244,17 +4256,19 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
             val appStatus = FirewallManager.appStatus(uid)
             if (appStatus.bypassDnsFirewall()) {
-                // in case of bypass dns, bypass the local blocklists and set only block-free
+                // using same tid, see #getTransportIdForDnsFirewallMode for details
+                // in case of bypass dns, bypass the local blocklists
                 Logger.vv(LOG_TAG_VPN, "$TAG onQuery, $uid bypasses dns+firewall, $fqdn")
-                return makeNsOpts(uid, getTransportIdToBypass(tid), fqdn, true, rinr = rinr)
+                return makeNsOpts(uid, tid, fqdn, true, rinr = rinr)
             }
 
             // returns the app specific domain rule in pair(first: status, second: domain)
             val appDomainRule =  getDomainRule(fqdn, uid).first
             when (appDomainRule) {
                 DomainRulesManager.Status.TRUST -> {
+                    // using same tid, see #getTransportIdForDnsFirewallMode for details
                     Logger.vv(LOG_TAG_VPN, "$TAG onQuery, $uid, domain trusted: $fqdn")
-                    return makeNsOpts(uid, getTransportIdToBypass(tid), fqdn, true, rinr = rinr)
+                    return makeNsOpts(uid, tid, fqdn, true, rinr = rinr)
                 }
                 DomainRulesManager.Status.BLOCK -> {
                     Logger.vv(LOG_TAG_VPN, "$TAG onQuery, $uid, domain blocked: $fqdn")
@@ -4269,8 +4283,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val globalDomainRule = getDomainRule(fqdn, UID_EVERYBODY).first
             when (globalDomainRule) {
                 DomainRulesManager.Status.TRUST -> {
+                    // using same tid, see #getTransportIdForDnsFirewallMode for details
                     Logger.vv(LOG_TAG_VPN, "$TAG onQuery, $uid, univ domain trusted: $fqdn")
-                    return makeNsOpts(uid, getTransportIdToBypass(tid), fqdn, true, rinr = rinr)
+                    return makeNsOpts(uid, tid, fqdn, true, rinr = rinr)
                 }
                 DomainRulesManager.Status.BLOCK -> {
                     Logger.vv(LOG_TAG_VPN, "$TAG onQuery, $uid, univ domain blocked: $fqdn")
@@ -4374,6 +4389,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         rinr: Boolean
     ): DNSOpts {
         val opts = DNSOpts()
+        opts.uid = uid.toString()
         opts.ipcsv = "" // as of now, no suggested ips
         // add CT for all primary and sec transport ids if dns cache is enabled regardless of
         // tids. Go will remove if its not applicable for that transport id.
@@ -4387,9 +4403,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // for rethink when not in rinr no need to set the proxyId, always set base
             opts.pidcsv = Backend.Base
         } else {
+            // no need to calculate pid when the app is in DNS only mode, use base as default
             // only when there is no wireguard / rpn as tid, we need to calculate proxyIds
             // to avoid undesired hop behavior
-            if (isAnyWgOrRpnDns(tid)) {
+            if (isAnyWgOrRpnDns(tid) || appConfig.getBraveMode().isDnsMode()) {
                 opts.pidcsv = Backend.Base
             } else {
                 opts.pidcsv = proxyIdForOnQuery(uid, domain)
@@ -4406,6 +4423,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     }
 
     private fun transportIdsAlg(preferredId: Pair<String, String>, splitDns: Boolean): Pair<String, String> {
+        if (!persistentState.enableDnsAlg) {
+            // if dns alg is not enabled, then return the preferred id as it is, no need to append
+            // BlockFree, only alg needs ip address mapping which is why we use BlockFree transport
+            return preferredId
+        }
         if (splitDns) {
             // case when splitDns is true, then tid will already be appended with Fixed
             // so no need to append BlockFree again
@@ -4657,7 +4679,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // no-op
     }
 
-    override fun onUpstreamAnswer(smm: DNSSummary, ipcsv: String): DNSOpts = go2kt(upstreamQueryDispatcher) {
+    override fun onUpstreamAnswer(smm: DNSSummary, rcvdDnsOpts: DNSOpts, ipcsv: String): DNSOpts = go2kt(upstreamQueryDispatcher) {
         if (ipcsv.isEmpty()) {
             Logger.i(LOG_TAG_VPN, "onUpstreamAnswer: received null summary for upstream answer")
             return@go2kt DNSOpts()
@@ -4690,7 +4712,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val connId = "" // no need of connId as only firewall decision is taken here
         val isSplApp = isSpecialApp(uidInt)
         val domain = smm.qName.orEmpty()
-        val anyRealIpBlocked = !ipcsv.split(",").none { isUnspecifiedIp(it.trim()) }
+        val anyRealIpBlocked = false
         val connType =
             if (isConnectionMetered(firstDestIp)) {
                 ConnectionTracker.ConnType.METERED
@@ -4721,15 +4743,28 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             logd("onUpstreamAnswer: blocked by firewall, rule: $rule, connInfo: $connInfo, ipcsv: $ipcsv")
             return@go2kt DNSOpts().apply {
                 tidcsv = Backend.BlockAll
-                pidcsv = Backend.Base
+                pidcsv = rcvdDnsOpts.pidcsv
                 noblock = false
+            }
+        }
+        val isBypass = FirewallRuleset.isBypassRule(rule)
+        if (isBypass) {
+            // use the same pid for non-blocking case, as the decision is already made in onQuery
+            // and the same pid will be used in tunnel for the upstream query
+            // For tid, based on the useFallbackDnsToBypass settings, the blockfree, default
+            // will be used, else the same tid from onQuery will be used
+            return@go2kt DNSOpts().apply {
+                val id = Pair(rcvdDnsOpts.tidcsv, rcvdDnsOpts.tidseccsv)
+                val tid = getTransportIdToBypass(id)
+                tidcsv = tid.first.split(",").joinToString(",") { appendDnsCacheIfNeeded(it) }
+                tidseccsv = tid.second.split(",").joinToString(",") { appendDnsCacheIfNeeded(it) }
+                pidcsv = rcvdDnsOpts.pidcsv
+                noblock = true
             }
         }
 
         if (DEBUG) logd("onUpstreamAnswer: $smm, ipcsv: $ipcsv")
-        // no need to take action if not blocked, send default DNSOpts, as of now no need
-        // modify the tid, pid for non-blocking case in upstream answer, as the decision is already
-        // made in onQuery and the same tid, pid will be used in tunnel for the upstream query
+        // no need to take action if not blocked / bypassed, send default DNSOpts
         return@go2kt DNSOpts()
     }
 
