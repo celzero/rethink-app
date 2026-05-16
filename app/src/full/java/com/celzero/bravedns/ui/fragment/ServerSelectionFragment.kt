@@ -293,10 +293,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
     /**
      * Observes [ServerSelectionViewModel.refreshState] and reacts to refresh results.
-     *
-     * [ServerSelectionViewModel.RefreshState.Done] and [NeedsLoading] are consumed immediately
-     * via [ServerSelectionViewModel.onRefreshConsumed] so that late subscribers (e.g. a
-     * re-opened bottom sheet) do not replay stale results.
      */
     private fun observeRefreshState() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -309,9 +305,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                             initServers(state.servers, state.selected)
                         }
                         is ServerSelectionViewModel.RefreshState.NeedsLoading -> {
-                            Logger.w(LOG_TAG_UI, "$TAG.observeRefreshState: NeedsLoading, showing dialog")
+                            // updateWinProxy returned no servers on a user-initiated refresh.
+                            Logger.w(LOG_TAG_UI, "$TAG.observeRefreshState: NeedsLoading on user-initiated refresh — consuming silently")
                             serverSelectionViewModel.onRefreshConsumed()
-                            showServerLoadingDialog()
                         }
                         is ServerSelectionViewModel.RefreshState.InProgress,
                         is ServerSelectionViewModel.RefreshState.Idle -> {

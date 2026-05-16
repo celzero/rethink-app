@@ -251,19 +251,23 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
     }
 
     /**
-     * Observes [ServerSelectionViewModel.refreshState] to drive the refresh button
-     * appearance.
+     * Observes [ServerSelectionViewModel.refreshState] to manage the refresh button state.
      */
     private fun observeRefreshState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 serverSelectionViewModel.refreshState.collect { state ->
-                    val inProgress = state is ServerSelectionViewModel.RefreshState.InProgress
-                    binding.refreshBtn.isClickable = !inProgress && !isProxyStopped
-                    if (inProgress) {
-                        startRefreshAnimation()
-                    } else {
-                        stopRefreshAnimation()
+                    when (state) {
+                        is ServerSelectionViewModel.RefreshState.InProgress -> {
+                            // Re-attach case: sheet opened while a refresh was already running.
+                            binding.refreshBtn.isClickable = false
+                            startRefreshAnimation()
+                        }
+                        else -> {
+                            // Done, NeedsLoading, or Idle — operation finished; restore button.
+                            binding.refreshBtn.isClickable = !isProxyStopped
+                            stopRefreshAnimation()
+                        }
                     }
                 }
             }
@@ -272,7 +276,13 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
 
     private fun doRefreshServers() {
         if (isProxyStopped) return
-        // Guard: ViewModel ignores duplicate calls while InProgress.
+        // Start animation synchronously here, before the ViewModel coroutine is even scheduled.
+        // This bypasses the StateFlow conflation race: if the IO completes before the Main thread
+        // processes the InProgress emission, the collector skips it — but the animation is
+        // already running because we started it here on the call-site thread.
+        // The ViewModel's internal guard (InProgress check) prevents duplicate refreshes.
+        binding.refreshBtn.isClickable = false
+        startRefreshAnimation()
         serverSelectionViewModel.refresh()
     }
 
