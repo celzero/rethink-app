@@ -338,11 +338,33 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
     @Volatile
     private var purchaseFlowActive = false
 
+    // Job that watches oneTimePurchaseCompletedFlow while an extend-mode purchase is in flight.
+    // Cancelled when the flow resolves (success or error) or the ViewModel is cleared.
+    private var extendObserverJob: Job? = null
 
     fun markPurchaseFlowActive() {
         purchaseFlowActive = true
         _uiState.value = SubscriptionUiState.Processing("Initializing purchase...")
         Logger.d(LOG_IAB, "$TAG: purchaseFlowActive set manually (extend mode)")
+
+        // Watch InAppBillingHandler.oneTimePurchaseCompletedFlow so we can detect success even
+        // when the state machine stays in Active (Active → Active is de-duplicated by StateFlow
+        // and therefore never re-emitted to our regular subscription state observer).
+        extendObserverJob?.cancel()
+        extendObserverJob = viewModelScope.launch {
+            InAppBillingHandler.oneTimePurchaseCompletedFlow.collect {
+                if (purchaseFlowActive && extendMode) {
+                    Logger.i(LOG_IAB, "$TAG: extend-mode INAPP purchase completed, emitting Success")
+                    purchaseFlowActive = false
+                    extendObserverJob = null
+                    _uiState.value = SubscriptionUiState.Success(
+                        productId = RpnProxyManager.getRpnProductId() ?: "",
+                        isExtend = true
+                    )
+                    return@collect
+                }
+            }
+        }
     }
 
     /**
@@ -374,10 +396,16 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
             is SubscriptionStateMachineV2.SubscriptionState.Active -> {
                 stopPendingPurchasePolling()
                 if (purchaseFlowActive) {
-                    // Real new purchase completed → show success with confetti
+                    // Real new purchase completed (non-extend path) → show success with confetti.
+                    // In extend mode this block is typically skipped because StateFlow
+                    // de-duplicates the Active → Active transition; success is detected by
+                    // extendObserverJob watching oneTimePurchaseCompletedFlow instead.
                     purchaseFlowActive = false
+                    extendObserverJob?.cancel()
+                    extendObserverJob = null
                     _uiState.value = SubscriptionUiState.Success(
-                        RpnProxyManager.getRpnProductId() ?: ""
+                        productId = RpnProxyManager.getRpnProductId() ?: "",
+                        isExtend = false
                     )
                 } else {
                     val current = _uiState.value
@@ -393,6 +421,8 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
             is SubscriptionStateMachineV2.SubscriptionState.Error -> {
                 val wasInFlow = purchaseFlowActive
                 purchaseFlowActive = false
+                extendObserverJob?.cancel()
+                extendObserverJob = null
                 stopPendingPurchasePolling()
                 if (wasInFlow) {
                     // Real purchase flow failed, show an actionable error.
@@ -428,6 +458,8 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
             is SubscriptionStateMachineV2.SubscriptionState.Revoked,
             is SubscriptionStateMachineV2.SubscriptionState.Expired -> {
                 purchaseFlowActive = false
+                extendObserverJob?.cancel()
+                extendObserverJob = null
                 stopPendingPurchasePolling()
                 val currentUi = _uiState.value
                 // Don't disrupt Loading or Processing states triggered by an explicit action
@@ -608,6 +640,8 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
         super.onCleared()
         stopPendingPurchasePolling()
         cancelLoadingWatchdog()
+        extendObserverJob?.cancel()
+        extendObserverJob = null
     }
 }
 
@@ -641,7 +675,7 @@ sealed class SubscriptionUiState {
 
     object PendingPurchase : SubscriptionUiState()
 
-    data class Success(val productId: String) : SubscriptionUiState()
+    data class Success(val productId: String, val isExtend: Boolean = false) : SubscriptionUiState()
 
     data class Error(
         val title: String,

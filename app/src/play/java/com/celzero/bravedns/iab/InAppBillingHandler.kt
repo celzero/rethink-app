@@ -42,18 +42,36 @@ import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.database.SubscriptionStatus
+import com.celzero.bravedns.iab.InAppBillingHandler.ONE_TIME_PRODUCT_2YRS
+import com.celzero.bravedns.iab.InAppBillingHandler.ONE_TIME_PRODUCT_5YRS
+import com.celzero.bravedns.iab.InAppBillingHandler.UNACK_ESCALATION_THRESHOLD
+import com.celzero.bravedns.iab.InAppBillingHandler.cancelPlaySubscription
+import com.celzero.bravedns.iab.InAppBillingHandler.getObfuscatedDeviceId
+import com.celzero.bravedns.iab.InAppBillingHandler.getRemainingDaysForInApp
+import com.celzero.bravedns.iab.InAppBillingHandler.getRemainingDaysForInAppSuspend
+import com.celzero.bravedns.iab.InAppBillingHandler.handleConflict409
+import com.celzero.bravedns.iab.InAppBillingHandler.handlePurchase
+import com.celzero.bravedns.iab.InAppBillingHandler.purchasesLiveData
+import com.celzero.bravedns.iab.InAppBillingHandler.queryProductDetails
+import com.celzero.bravedns.iab.InAppBillingHandler.queryUtils
+import com.celzero.bravedns.iab.InAppBillingHandler.registerDevice
+import com.celzero.bravedns.iab.InAppBillingHandler.revokeSubscription
+import com.celzero.bravedns.iab.InAppBillingHandler.serverApiErrorLiveData
+import com.celzero.bravedns.iab.InAppBillingHandler.startStateObserver
+import com.celzero.bravedns.iab.InAppBillingHandler.updateUIForState
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
-import com.celzero.bravedns.rpnproxy.RpnProxyManager.extractWsObject
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.getExpiryFromPayload
 import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
 import com.google.gson.JsonObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -121,6 +139,15 @@ object InAppBillingHandler : KoinComponent {
     val transactionErrorLiveData = MutableLiveData<BillingResult?>()
 
     val serverApiErrorLiveData = MutableLiveData<ServerApiError?>()
+
+    /**
+     * Emits whenever an INAPP (one-time) purchase is successfully processed by the billing
+     * listener. Unlike [purchasesLiveData], this SharedFlow always fires even for Active →
+     * Active transitions that occur during extend-mode purchases where the subscription state
+     * does not change.
+     */
+    private val _oneTimePurchaseCompletedFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val oneTimePurchaseCompletedFlow: SharedFlow<Unit> = _oneTimePurchaseCompletedFlow.asSharedFlow()
 
     private val subscriptionStateMachine: SubscriptionStateMachineV2 by inject()
 
@@ -454,6 +481,13 @@ object InAppBillingHandler : KoinComponent {
                             }
 
                             handlePurchase(purchasesList)
+
+                            // Emit so extend-mode observers can detect INAPP purchase success
+                            // even when the subscription state machine stays in Active (no StateFlow
+                            // re-emission for same-state Active → Active transitions).
+                            if (purchasesList?.any { getProductType(it) == ProductType.INAPP } == true) {
+                                _oneTimePurchaseCompletedFlow.tryEmit(Unit)
+                            }
                         }
 
                         response.isAlreadyOwned -> {

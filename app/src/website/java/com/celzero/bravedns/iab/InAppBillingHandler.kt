@@ -53,7 +53,10 @@ import com.google.gson.JsonObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -121,6 +124,15 @@ object InAppBillingHandler : KoinComponent {
     val transactionErrorLiveData = MutableLiveData<BillingResult?>()
 
     val serverApiErrorLiveData = MutableLiveData<ServerApiError?>()
+
+    /**
+     * Emits whenever an INAPP (one-time) purchase is successfully processed by the billing
+     * listener. Unlike [purchasesLiveData], this SharedFlow always fires even for Active →
+     * Active transitions that occur during extend-mode purchases where the subscription state
+     * does not change.
+     */
+    private val _oneTimePurchaseCompletedFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val oneTimePurchaseCompletedFlow: SharedFlow<Unit> = _oneTimePurchaseCompletedFlow.asSharedFlow()
 
     private val subscriptionStateMachine: SubscriptionStateMachineV2 by inject()
 
@@ -454,9 +466,13 @@ object InAppBillingHandler : KoinComponent {
                             }
 
                             handlePurchase(purchasesList)
-                        }
 
-                        response.isAlreadyOwned -> {
+                            // Emit so extend-mode observers can detect INAPP purchase success
+                            // even when the subscription state machine stays in Active (no StateFlow
+                            // re-emission for same-state Active → Active transitions).
+                            if (purchasesList?.any { getProductType(it) == ProductType.INAPP } == true) {
+                                _oneTimePurchaseCompletedFlow.tryEmit(Unit)
+                            }
                             log(mname, "item already owned; restoring subscription")
                             purchasesList?.forEach { purchase ->
                                 try {
