@@ -45,10 +45,20 @@ sealed class QueryEntitlementResult {
     object Conflict : QueryEntitlementResult()
 
     /**
-     * Any other failure: network error, 5xx, response parse error, etc.
+u     * Server responded with a business-level error (e.g. [RpnPurchaseAckServerResponse.Err]:
+     * invalid token, purchase revoked/refunded per server records, etc.).
+     * The server was reachable but explicitly said the purchase is not valid.
      * [purchase] is the *original* [PurchaseDetail] unchanged (fail-safe: preserve it).
+     * The local billing expiry is still the authoritative gate for INAPP purchases.
      */
     data class Failure(val purchase: PurchaseDetail) : QueryEntitlementResult()
+
+    /**
+     * Transient / infrastructure failure: network error, server unreachable, timeout,
+     * null HTTP response, or any unexpected exception.
+     * The server was **not reached**; [purchase] is the *original* [PurchaseDetail] unchanged.
+     * Callers must fail-safe and preserve the token; the local billing expiry is authoritative.
+     * Do NOT expire a locally-valid purchase based on this result.
+     */
+    data class Transient(val purchase: PurchaseDetail) : QueryEntitlementResult()
 }
-
-

@@ -22,17 +22,20 @@ import com.android.billingclient.api.BillingClient.ProductType
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.customdownloader.IBillingServerApi
 import com.celzero.bravedns.customdownloader.IBillingServerApiTest
-import com.celzero.bravedns.customdownloader.SafeResponseConverterFactory
 import com.celzero.bravedns.customdownloader.RetrofitManager
+import com.celzero.bravedns.customdownloader.SafeResponseConverterFactory
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Constants
 import com.google.gson.JsonObject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import okhttp3.Interceptor
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import retrofit2.Response
+import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.net.ConnectException
 import java.net.SocketTimeoutException
@@ -42,27 +45,16 @@ import java.time.Instant
 
 
 /**
- * Pure data/service layer for all Rethink backend (non-Play) billing API calls.
+ * Pure data/service layer for all Rethink backend billing API calls.
  *
  * This class owns every HTTP interaction with the `/d/acc`, `/d/reg`,
- * `/g/ack`, `/g/stop`, `/g/refund`, and `/g/consume` endpoints.
+ * `/g/ack`, `/g/stop`, `/g/refund`, and `/g/con` endpoints.
  *
  * ### Responsibilities
  * - Build and dispatch all [IBillingServerApi] requests.
  * - Read accountId / deviceId from [SecureIdentityStore] (encrypted file).
  * - Send CID as `x-rethink-app-cid` header and DID as `x-rethink-app-did` header on every request.
  * - Construct meta JSON objects for registration calls.
- * - Resolve the `test` query-param via [RpnProxyManager].
- * - Parse and surface [RpnPurchaseAckServerResponse].
- *
- * ### Non-responsibilities
- * - No Android UI, LiveData, or Activity dependencies.
- * - No Google Play BillingClient interactions.
- * - No state-machine transitions (callers handle those).
- *
- * ### Flavors
- * Shared by `play` and `website` source sets via the `billing` source set.
- * `fdroid` uses a separate stub in the `fdroid` source set.
  */
 class BillingBackendClient(
     private val identityStore: SecureIdentityStore
@@ -82,7 +74,30 @@ class BillingBackendClient(
          *   3rd: after 11000 ms
          */
         private val ACK_RETRY_DELAYS = longArrayOf(4_000L, 11_000L)
+
+        // Session headers for database routing (sent in requests).
+        private const val DB_SESSION_HEADER = "x-rethink-db-rpn-session"
+        private const val DB_SESSION_TEST_HEADER = "x-rethink-db-rpn-test-session"
+
+        // Session headers returned by the server (note: server omits the "rethink-" prefix).
+        private const val DB_SESSION_RESPONSE_HEADER = "x-db-rpn-session"
+        private const val DB_SESSION_TEST_RESPONSE_HEADER = "x-db-rpn-test-session"
+
+        // DID token echoed back on every request after the first server response.
+        private const val DID_TOKEN_HEADER = "x-rethink-app-did-token"
+
+        // Sentinel on read endpoints; replaced with the cached bookmark if one is available.
+        private const val DB_SESSION_UNCONSTRAINED = "first-unconstrained"
     }
+
+    /** Latest session bookmark received from the production server. */
+    @Volatile private var dbSessionBookmark: String? = null
+
+    /** Latest session bookmark received from the test server. */
+    @Volatile private var dbSessionTestBookmark: String? = null
+
+    /** Latest DID token received from the server; echoed on every subsequent request. */
+    @Volatile private var didToken: String? = null
 
     /**
      * Returns a server-driven **account** identifier (CID).
@@ -103,7 +118,7 @@ class BillingBackendClient(
             return storedAcc
         }
         return when (val result = refreshIdentity()) {
-            is RefreshIdentityResult.Success      -> {
+            is RefreshIdentityResult.Success -> {
                 Logger.i(LOG_IAB, "$TAG $mname: received from server (len=${result.cid.length})")
                 result.cid
             }
@@ -111,11 +126,11 @@ class BillingBackendClient(
                 Logger.e(LOG_IAB, "$TAG $mname: 401 unauthorized; cid unavailable")
                 ""
             }
-            is RefreshIdentityResult.Conflict     -> {
+            is RefreshIdentityResult.Conflict -> {
                 Logger.e(LOG_IAB, "$TAG $mname: 409 conflict; cid unavailable")
                 ""
             }
-            is RefreshIdentityResult.Failure      -> {
+            is RefreshIdentityResult.Failure -> {
                 Logger.w(LOG_IAB, "$TAG $mname: cid unavailable (transient)")
                 ""
             }
@@ -127,7 +142,7 @@ class BillingBackendClient(
      *
      * Resolution order:
      * 1. CID reconciliation: if [recvCid] is provided and differs from the stored CID,
-     *    a fresh DID is obtained via [createOrRegisterDid] and both IDs are persisted.
+     *    a fresh DID is obtained via [createOrRegisterDid] for the recvCid.
      * 2. [SecureIdentityStore]: returned directly when no reconciliation is needed.
      * 3. [refreshIdentity]: obtains and persists both CID and DID from the server.
      *
@@ -162,7 +177,7 @@ class BillingBackendClient(
         // No usable DID in store; perform a full identity refresh so both CID and DID
         // are resolved and persisted atomically.
         return when (val result = refreshIdentity()) {
-            is RefreshIdentityResult.Success      -> {
+            is RefreshIdentityResult.Success -> {
                 Logger.i(LOG_IAB, "$TAG $mname: received from server (len=${result.did.length})")
                 result.did
             }
@@ -170,11 +185,11 @@ class BillingBackendClient(
                 Logger.e(LOG_IAB, "$TAG $mname: 401 unauthorized; did unavailable")
                 ""
             }
-            is RefreshIdentityResult.Conflict     -> {
+            is RefreshIdentityResult.Conflict -> {
                 Logger.e(LOG_IAB, "$TAG $mname: 409 conflict; did unavailable")
                 ""
             }
-            is RefreshIdentityResult.Failure      -> {
+            is RefreshIdentityResult.Failure -> {
                 Logger.w(LOG_IAB, "$TAG $mname: did unavailable (transient)")
                 ""
             }
@@ -204,10 +219,10 @@ class BillingBackendClient(
         // Fetch CID then DID from the server and persist both.
         val result = refreshIdentity()
         when (result) {
-            is RefreshIdentityResult.Success    -> Logger.i(LOG_IAB, "$TAG $mname: obtained from server and persisted")
+            is RefreshIdentityResult.Success -> Logger.i(LOG_IAB, "$TAG $mname: obtained from server and persisted")
             is RefreshIdentityResult.Unauthorized -> Logger.e(LOG_IAB, "$TAG $mname: 401 unauthorized; identity unavailable")
-            is RefreshIdentityResult.Conflict   -> Logger.e(LOG_IAB, "$TAG $mname: 409 conflict; identity unavailable")
-            is RefreshIdentityResult.Failure    -> Logger.w(LOG_IAB, "$TAG $mname: identity unavailable (transient)")
+            is RefreshIdentityResult.Conflict -> Logger.e(LOG_IAB, "$TAG $mname: 409 conflict; identity unavailable")
+            is RefreshIdentityResult.Failure -> Logger.w(LOG_IAB, "$TAG $mname: identity unavailable (transient)")
         }
         return result
     }
@@ -216,16 +231,14 @@ class BillingBackendClient(
      * Fetches or registers a **CID** (account ID) from the server via `POST /d/acc`.
      *
      * The server creates a new account when [existingCid] is blank, or confirms /
-     * corrects an existing one when it is non-blank.  The returned ID is **not**
+     * corrects an existing one when it is non-blank. The returned ID is **not**
      * persisted by this method; the caller (or [refreshIdentity]) is responsible
      * for saving it together with the DID.
      *
      * ### Error codes in [CidResult.errorCode]
-     * - 0   → success ([CidResult.isSuccess] == true, [CidResult.accountId] is non-blank)
      * - 401 → server refused to authorize this account
      * - 409 → conflict; account already exists in an incompatible state
-     * - -1  → transient / network error ([CidResult.EMPTY])
-     * - other non-zero → HTTP error from server
+     * - other → HTTP error from server
      *
      * @param existingCid Previously known account ID, or blank for new registrations.
      */
@@ -296,13 +309,11 @@ class BillingBackendClient(
      * [accountId] is required, a device cannot exist without an account.
      *
      * ### Error codes in [DidResult.errorCode]
-     * - 0   → success ([DidResult.isSuccess] == true, [DidResult.deviceId] is non-blank)
      * - 401 → server refused to authorize this device
      * - 409 → conflict; device already registered in an incompatible state
-     * - -1  → blank [accountId] guard or transient / network error ([DidResult.EMPTY])
-     * - other non-zero → HTTP error from server
+     * - other → HTTP error from server
      *
-     * @param accountId      The account (CID) this device belongs to.  Must be non-blank.
+     * @param accountId The account (CID) this device belongs to.  Must be non-blank.
      * @param existingDeviceId Previously known device ID, or blank for new device registrations.
      */
     suspend fun createOrRegisterDid(
@@ -372,8 +383,8 @@ class BillingBackendClient(
      * Ensures both CID and DID are present and up-to-date (heartbeat / identity sync).
      *
      * This is the **single entry point** for any code that needs a fully-resolved identity
-     * pair.  Call it when the store is known to be empty or stale, or periodically to
-     * confirm the server still recognises both IDs.
+     * pair. Call it when the store is known to be empty or stale, or periodically to
+     * confirm the server still recognizes both IDs.
      *
      * ### Resolution logic
      * **CID**
@@ -426,7 +437,7 @@ class BillingBackendClient(
         }
 
         // Reuse the stored DID only when the CID hasn't changed; a new CID means
-        // the old DID belongs to a different account and must not be re-used.
+        // the old DID belong to a different account and must not be re-used.
         var did = if (!cidWasAbsent && !storedDid.isNullOrBlank()) storedDid else ""
         if (did.isBlank()) {
             val didResult = createOrRegisterDid(cid, storedDid ?: "")
@@ -548,7 +559,6 @@ class BillingBackendClient(
         val pt  = URLEncoder.encode(purchaseToken, "UTF-8")
         val sku = skuForType(productType)
 
-        // TODO: for now the deviceId is not used in /g/ack, see if its needed
         executeAckWithRetry(mname) { handle ->
             when (handle) {
                 is ApiHandle.Production -> handle.api.acknowledgePurchase(accountId, deviceId, sku, pt)
@@ -560,9 +570,8 @@ class BillingBackendClient(
     /**
      * Core retry engine for [acknowledgePurchase].
      *
-     * Executes [attempt] up to 3 times with delays of 3000 ms and 9000 ms between
-     * consecutive tries.  The [ApiHandle] is resolved **once** before the first
-     * attempt so the test/production split is stable for the entire retry sequence.
+     * Executes [attempt] up to 3 times with delays of 4000 ms and 11000 ms between
+     * consecutive tries. This is to mitigate the max request reached / timeout issues.
      *
      * ### Retry policy
      * - **Retry**: [UnknownHostException], [ConnectException], [SocketTimeoutException],
@@ -623,6 +632,11 @@ class BillingBackendClient(
                     return Pair(false, "Conflict: 409")
                 }
 
+                if (httpCode == 429) {
+                    Logger.w(LOG_IAB, "$TAG $caller: 429 too many req, retrying with timeout ${response.errorBody()?.string()}")
+                    continue
+                }
+
                 if (httpCode in 400..499) {
                     Logger.e(LOG_IAB, "$TAG $caller: permanent client error $httpCode not retrying; ${response.errorBody()?.string()}")
                     return Pair(false, "Client error: $httpCode")
@@ -676,8 +690,13 @@ class BillingBackendClient(
      * - [QueryEntitlementResult.Success] with the [PurchaseDetail] updated from the server.
      * - [QueryEntitlementResult.Unauthorized] on HTTP 401 (caller should surface the error UI).
      * - [QueryEntitlementResult.Conflict] on HTTP 409 (caller should surface the conflict UI).
-     * - [QueryEntitlementResult.Failure] with the *original* [purchase] on any other error
-     *   (network error, 5xx, parse error); the caller should fail-safe and preserve the token.
+     * - [QueryEntitlementResult.Failure] when the server responded with a business-level error
+     *   (e.g. [RpnPurchaseAckServerResponse.Err]: purchase revoked/refunded per server records).
+     *   [purchase] is the *original* [PurchaseDetail] unchanged; the local billing expiry is
+     *   still the authoritative gate for INAPP purchases.
+     * - [QueryEntitlementResult.Transient] on network error, timeout, or null response.
+     *   The server was not reached; [purchase] is unchanged. Callers must fail-safe and
+     *   preserve the token — do NOT expire a locally-valid purchase on a transient failure.
      */
     suspend fun queryEntitlement(
         accountId: String,
@@ -688,7 +707,8 @@ class BillingBackendClient(
         val mname = "queryEntitlement"
         if (accountId.isEmpty()) {
             Logger.e(LOG_IAB, "$TAG $mname: empty accountId skipping")
-            return@withContext QueryEntitlementResult.Failure(purchase)
+            // Treat missing accountId as a transient/infrastructure problem, not a business error.
+            return@withContext QueryEntitlementResult.Transient(purchase)
         }
         try {
             val encodedPt = URLEncoder.encode(purchaseToken, "UTF-8")
@@ -699,8 +719,9 @@ class BillingBackendClient(
             }
             Logger.d(LOG_IAB, "$TAG $mname: code=${response?.code()}, err? ${response?.errorBody()?.string()}")
             if (response == null) {
+                // Null response = server unreachable / transport error → transient.
                 Logger.w(LOG_IAB, "$TAG $mname: null response from server for entitlement query")
-                return@withContext QueryEntitlementResult.Failure(purchase)
+                return@withContext QueryEntitlementResult.Transient(purchase)
             }
             val httpCode = response.code()
             if (httpCode == 401) {
@@ -717,25 +738,33 @@ class BillingBackendClient(
                     Logger.d(LOG_IAB, "$TAG $mname: ok, hasEntitlement=${result.payload.hasEntitlement}")
                     QueryEntitlementResult.Success(
                         purchase.copy(
-                            payload    = result.payload.developerPayload.orEmpty(),
+                            payload = result.payload.developerPayload.orEmpty(),
                             expiryTime = parseIsoToEpochMillis(result.payload.expiry),
                             windowDays = result.payload.windowDays ?: 0
                         )
                     )
                 }
                 is RpnPurchaseAckServerResponse.Err -> {
+                    // Server explicitly responded with a business error (e.g. purchase revoked).
+                    // Return the original purchase unchanged — the local billing expiry is still
+                    // the authority for INAPP; callers should not zero out local expiry based on
+                    // a server-side error response.
                     Logger.e(LOG_IAB, "$TAG $mname: server business error, ${result.payload}")
-                    QueryEntitlementResult.Failure(
-                        purchase.copy(
-                            expiryTime = parseIsoToEpochMillis(result.payload.expiry),
-                            windowDays = result.payload.windowDays ?: 0
-                        )
-                    )
+                    QueryEntitlementResult.Failure(purchase)
                 }
             }
+        } catch (e: UnknownHostException) {
+            Logger.w(LOG_IAB, "$TAG $mname: no internet (${e.message}); transient failure")
+            QueryEntitlementResult.Transient(purchase)
+        } catch (e: ConnectException) {
+            Logger.w(LOG_IAB, "$TAG $mname: connection failed (${e.message}); transient failure")
+            QueryEntitlementResult.Transient(purchase)
+        } catch (e: SocketTimeoutException) {
+            Logger.w(LOG_IAB, "$TAG $mname: timeout (${e.message}); transient failure")
+            QueryEntitlementResult.Transient(purchase)
         } catch (e: Exception) {
-            Logger.e(LOG_IAB, "$TAG $mname: err  ${e.message}", e)
-            QueryEntitlementResult.Failure(purchase)
+            Logger.e(LOG_IAB, "$TAG $mname: unexpected error (${e.message}); transient failure", e)
+            QueryEntitlementResult.Transient(purchase)
         }
     }
 
@@ -1024,35 +1053,84 @@ class BillingBackendClient(
         }
     }
 
-    /**
-     * Builds a Retrofit instance backed by [IBillingServerApi] (production).
-     *
-     * Used when [RpnProxyManager.getIsTestEntitlement] returns `null`.
-     * Endpoints that accept `test` will have it omitted from the URL.
-     */
+    /** Builds a Retrofit instance for the production billing API. */
     private fun buildProductionApi(): IBillingServerApi {
-        return RetrofitManager
-            .getRpnBaseBuilder(persistentState.routeRethinkInRethink)
+        val client = RetrofitManager
+            .okHttpClient(persistentState.routeRethinkInRethink)
+            .newBuilder()
+            .addInterceptor(buildSessionInterceptor(
+                DB_SESSION_HEADER, DB_SESSION_RESPONSE_HEADER,
+                { dbSessionBookmark }, { dbSessionBookmark = it }, "prod"
+            ))
+            .build()
+        return Retrofit.Builder()
+            .baseUrl(Constants.RPN_BASE_URL)
+            .client(client)
             .addConverterFactory(SafeResponseConverterFactory())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(IBillingServerApi::class.java)
     }
 
-    /**
-     * Builds a Retrofit instance backed by [IBillingServerApiTest] (test).
-     *
-     * Used when [RpnProxyManager.getIsTestEntitlement] returns a non-null string.
-     * All endpoints on this interface require the `test` parameter to be passed.
-     * enforce it so it can never be accidentally omitted.
-     */
+    /** Builds a Retrofit instance for the test billing API. */
     private fun buildTestApi(): IBillingServerApiTest {
-        return RetrofitManager
-            .getRpnBaseBuilder(persistentState.routeRethinkInRethink)
+        val client = RetrofitManager
+            .okHttpClient(persistentState.routeRethinkInRethink)
+            .newBuilder()
+            .addInterceptor(buildSessionInterceptor(
+                DB_SESSION_TEST_HEADER, DB_SESSION_TEST_RESPONSE_HEADER,
+                { dbSessionTestBookmark }, { dbSessionTestBookmark = it }, "test"
+            ))
+            .build()
+        return Retrofit.Builder()
+            .baseUrl(Constants.RPN_BASE_URL)
+            .client(client)
             .addConverterFactory(SafeResponseConverterFactory())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(IBillingServerApiTest::class.java)
+    }
+
+    /**
+     * OkHttp interceptor that manages session bookmarks and the DID token header.
+     *
+     * Requests without the session header are passed through unmodified.
+     * On read endpoints (session header == [DB_SESSION_UNCONSTRAINED]), the cached
+     * bookmark is substituted if one is available. The DID token, if present, is
+     * added to every session-bearing request. Bookmark and DID token are updated
+     * from each server response.
+     */
+    private fun buildSessionInterceptor(
+        reqHeader: String,
+        respHeader: String,
+        getBookmark: () -> String?,
+        setBookmark: (String) -> Unit,
+        tag: String
+    ): Interceptor = Interceptor { chain ->
+        val original = chain.request()
+        val sessionHdr = original.header(reqHeader)
+
+        if (sessionHdr == null) {
+            return@Interceptor chain.proceed(original)
+        }
+
+        val reqBuilder = original.newBuilder()
+        if (sessionHdr == DB_SESSION_UNCONSTRAINED) {
+            getBookmark()?.let { reqBuilder.header(reqHeader, it) }
+        }
+        didToken?.let { reqBuilder.header(DID_TOKEN_HEADER, it) }
+
+        val response = chain.proceed(reqBuilder.build())
+
+        response.header(respHeader)?.takeIf { it.isNotBlank() }?.let {
+            setBookmark(it)
+            if (DEBUG) Logger.d(LOG_IAB, "$TAG interceptor($tag): bookmark updated (len=${it.length})")
+        }
+        response.header(DID_TOKEN_HEADER)?.takeIf { it.isNotBlank() }?.let {
+            didToken = it
+            if (DEBUG) Logger.d(LOG_IAB, "$TAG interceptor($tag): didToken updated (len=${it.length})")
+        }
+        response
     }
 
     private fun skuForType(productType: String): String =

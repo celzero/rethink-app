@@ -609,17 +609,45 @@ object InAppBillingHandler : KoinComponent {
                                     queryEntitlementFromServer(effectiveAccountId, deviceId, purchaseDetailForQuery)
                                 } catch (serverEx: Exception) {
                                     loge(mname, "server entitlement check failed for token=${sub.purchaseToken.take(8)}: ${serverEx.message}", serverEx)
-                                    // Fail-safe: server unreachable → preserve the token.
+                                    // Fail-safe: unexpected exception (queryEntitlementFromServer normally
+                                    // catches all errors internally, but guard here for safety).
                                     serverConfirmedValidTokens.add(sub.purchaseToken)
                                     continue
                                 }
                                 val tunnelExpiry: Long = getExpiryFromPayload(updatedDetail.payload) ?: 0L
-                                logd(mname, "server entitlement for token=${sub.purchaseToken.take(8)}: tunExp: $tunnelExpiry, did=${deviceId.take(8)}, now=$now, payload: ${updatedDetail.payload}")
+                                // billingExpiry is the authoritative local clock for INAPP purchases.
+                                // The VPN session token (tunnelExpiry) can expire weeks or months before
+                                // the billing window ends (e.g. 2 years). Only skip preservation when
+                                // BOTH the session token AND the local billing window are confirmed expired.
+                                // This prevents internet outages or server errors from silently expiring
+                                // an otherwise-valid purchase.
+                                val billingKnownExpired = sub.billingExpiry > 0L &&
+                                    sub.billingExpiry != Long.MAX_VALUE &&
+                                    sub.billingExpiry <= now
+                                logd(mname, "INAPP entitlement for token=${sub.purchaseToken.take(8)}: " +
+                                    "tunnelExpiry=$tunnelExpiry, billingExpiry=${sub.billingExpiry}, " +
+                                    "now=$now, billingKnownExpired=$billingKnownExpired, did=${deviceId.take(8)}")
                                 if (tunnelExpiry > now) {
-                                    logd(mname, "INAPP token=${sub.purchaseToken.take(8)} server-confirmed valid (expiry=$tunnelExpiry); skipping expire")
+                                    // Server returned a fresh, valid session token — definitely preserve.
+                                    logd(mname, "INAPP token=${sub.purchaseToken.take(8)} server-confirmed valid " +
+                                        "(tunnelExpiry=$tunnelExpiry); skipping expire")
+                                    serverConfirmedValidTokens.add(sub.purchaseToken)
+                                } else if (!billingKnownExpired) {
+                                    // Session token has expired (or server/network unavailable) but the
+                                    // local billing window is still open (or unknown).
+                                    // Covers: network errors, 401 (surfaced to UI by queryEntitlementFromServer),
+                                    // 409, server business errors, stale session needing refresh.
+                                    // Billing window is the authority — do NOT expire a valid purchase
+                                    // simply because the server could not be reached.
+                                    logd(mname, "INAPP token=${sub.purchaseToken.take(8)}: tunnelExpiry expired/zero " +
+                                        "but billing window not expired (billingExpiry=${sub.billingExpiry}); " +
+                                        "preserving (fail-safe — internet/server issues must not expire a valid purchase)")
                                     serverConfirmedValidTokens.add(sub.purchaseToken)
                                 } else {
-                                    logd(mname, "INAPP token=${sub.purchaseToken.take(8)} is not valid per server (tunnelExpiry=$tunnelExpiry, now=$now); will expire")
+                                    // Both the session token AND the local billing window are expired.
+                                    // Allow expireStaleInAppFromDb to handle via the locallyExpired check.
+                                    logd(mname, "INAPP token=${sub.purchaseToken.take(8)}: tunnelExpiry=$tunnelExpiry " +
+                                        "and billing=${sub.billingExpiry} both expired; will expire")
                                 }
                             } catch (e: Exception) {
                                 loge(mname, "unexpected error checking INAPP entitlement for id=${sub.id}: ${e.message}", e)
@@ -2547,7 +2575,7 @@ object InAppBillingHandler : KoinComponent {
             is QueryEntitlementResult.Unauthorized -> {
                 loge(mname, "queryEntitlement 401 unauthorized for token=${pt.take(8)}; surfacing auth error")
                 handleUnauthorized401(ServerApiError.Operation.ACKNOWLEDGE, result.accountId, result.deviceId)
-                // Fail-safe: preserve the original purchase so the token is not expired.
+                // Fail-safe: server auth error must not expire a locally-valid purchase.
                 purchase
             }
             is QueryEntitlementResult.Conflict -> {
@@ -2556,10 +2584,21 @@ object InAppBillingHandler : KoinComponent {
                     ServerApiError.Operation.ACKNOWLEDGE, accountId, deviceId,
                     pt, skuForType(purchase.productType), "Conflict: 409"
                 )
-                // Fail-safe: preserve the original purchase so the token is not expired.
+                // Fail-safe: conflict error must not expire a locally-valid purchase.
                 purchase
             }
-            is QueryEntitlementResult.Failure -> result.purchase
+            is QueryEntitlementResult.Failure -> {
+                // Server responded with a business error.
+                // Preserve the original purchase; the local billing expiry is the authority.
+                loge(mname, "queryEntitlement server business error for token=${pt.take(8)}; preserving original purchase")
+                result.purchase
+            }
+            is QueryEntitlementResult.Transient -> {
+                // Network/transient failure — server was not reached.
+                // Always preserve the original purchase; never expire on a connectivity issue.
+                logd(mname, "queryEntitlement transient failure for token=${pt.take(8)}; preserving original purchase (fail-safe)")
+                result.purchase
+            }
         }
     }
 

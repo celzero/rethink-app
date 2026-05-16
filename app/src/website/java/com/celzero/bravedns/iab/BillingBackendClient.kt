@@ -676,8 +676,13 @@ class BillingBackendClient(
      * - [QueryEntitlementResult.Success] with the [PurchaseDetail] updated from the server.
      * - [QueryEntitlementResult.Unauthorized] on HTTP 401 (caller should surface the error UI).
      * - [QueryEntitlementResult.Conflict] on HTTP 409 (caller should surface the conflict UI).
-     * - [QueryEntitlementResult.Failure] with the *original* [purchase] on any other error
-     *   (network error, 5xx, parse error); the caller should fail-safe and preserve the token.
+     * - [QueryEntitlementResult.Failure] when the server responded with a business-level error
+     *   (e.g. [RpnPurchaseAckServerResponse.Err]: purchase revoked/refunded per server records).
+     *   [purchase] is the *original* [PurchaseDetail] unchanged; the local billing expiry is
+     *   still the authoritative gate for INAPP purchases.
+     * - [QueryEntitlementResult.Transient] on network error, timeout, or null response.
+     *   The server was not reached; [purchase] is unchanged. Callers must fail-safe and
+     *   preserve the token — do NOT expire a locally-valid purchase on a transient failure.
      */
     suspend fun queryEntitlement(
         accountId: String,
@@ -688,7 +693,8 @@ class BillingBackendClient(
         val mname = "queryEntitlement"
         if (accountId.isEmpty()) {
             Logger.e(LOG_IAB, "$TAG $mname: empty accountId skipping")
-            return@withContext QueryEntitlementResult.Failure(purchase)
+            // Treat missing accountId as a transient/infrastructure problem, not a business error.
+            return@withContext QueryEntitlementResult.Transient(purchase)
         }
         try {
             val encodedPt = URLEncoder.encode(purchaseToken, "UTF-8")
@@ -699,8 +705,9 @@ class BillingBackendClient(
             }
             Logger.d(LOG_IAB, "$TAG $mname: code=${response?.code()}, err? ${response?.errorBody()?.string()}")
             if (response == null) {
+                // Null response = server unreachable / transport error → transient.
                 Logger.w(LOG_IAB, "$TAG $mname: null response from server for entitlement query")
-                return@withContext QueryEntitlementResult.Failure(purchase)
+                return@withContext QueryEntitlementResult.Transient(purchase)
             }
             val httpCode = response.code()
             if (httpCode == 401) {
@@ -724,18 +731,26 @@ class BillingBackendClient(
                     )
                 }
                 is RpnPurchaseAckServerResponse.Err -> {
+                    // Server explicitly responded with a business error (e.g. purchase revoked).
+                    // Return the original purchase unchanged — the local billing expiry is still
+                    // the authority for INAPP; callers should not zero out local expiry based on
+                    // a server-side error response.
                     Logger.e(LOG_IAB, "$TAG $mname: server business error, ${result.payload}")
-                    QueryEntitlementResult.Failure(
-                        purchase.copy(
-                            expiryTime = parseIsoToEpochMillis(result.payload.expiry),
-                            windowDays = result.payload.windowDays ?: 0
-                        )
-                    )
+                    QueryEntitlementResult.Failure(purchase)
                 }
             }
+        } catch (e: UnknownHostException) {
+            Logger.w(LOG_IAB, "$TAG $mname: no internet (${e.message}); transient failure")
+            QueryEntitlementResult.Transient(purchase)
+        } catch (e: ConnectException) {
+            Logger.w(LOG_IAB, "$TAG $mname: connection failed (${e.message}); transient failure")
+            QueryEntitlementResult.Transient(purchase)
+        } catch (e: SocketTimeoutException) {
+            Logger.w(LOG_IAB, "$TAG $mname: timeout (${e.message}); transient failure")
+            QueryEntitlementResult.Transient(purchase)
         } catch (e: Exception) {
-            Logger.e(LOG_IAB, "$TAG $mname: err  ${e.message}", e)
-            QueryEntitlementResult.Failure(purchase)
+            Logger.e(LOG_IAB, "$TAG $mname: unexpected error (${e.message}); transient failure", e)
+            QueryEntitlementResult.Transient(purchase)
         }
     }
 

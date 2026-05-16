@@ -406,8 +406,14 @@ class SubscriptionCheckWorker(
                             "for token=${purchase.purchaseToken.take(8)}; skipping expiry resolution")
                     }
                     is QueryEntitlementResult.Failure -> {
-                        Logger.w(LOG_IAB, "$TAG; $mname: server entitlement query returned failure " +
-                            "for token=${purchase.purchaseToken.take(8)}")
+                        Logger.w(LOG_IAB, "$TAG; $mname: server business error on entitlement query " +
+                            "for token=${purchase.purchaseToken.take(8)}; skipping expiry resolution (local billing expiry is authority)")
+                    }
+                    is QueryEntitlementResult.Transient -> {
+                        // Network/transient failure — server was not reached.
+                        // Fall through without an expiry; the worker will retry on the next cycle.
+                        Logger.w(LOG_IAB, "$TAG; $mname: transient failure (network/timeout) on entitlement query " +
+                            "for token=${purchase.purchaseToken.take(8)}; will retry on next cycle")
                     }
                 }
             } else {
