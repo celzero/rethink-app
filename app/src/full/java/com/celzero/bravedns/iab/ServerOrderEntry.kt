@@ -56,6 +56,7 @@ data class ServerOrderEntry(
     val autoRenewEnabled: Boolean,
     val isTestPurchase: Boolean,
     val productId: String,
+    val planId: String
 ) {
     companion object {
         const val KIND_SUBSCRIPTION = "androidpublisher#subscriptionPurchaseV2"
