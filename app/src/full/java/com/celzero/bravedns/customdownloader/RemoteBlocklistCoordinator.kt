@@ -62,15 +62,32 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
             if (downloadStatus) {
                 // update the download related persistence status on download success
                 updatePersistenceOnCopySuccess(timestamp)
+                // Delete stale remote blocklist directories, keeping only the one whose
+                // timestamp matches persistentState.remoteBlocklistTimestamp
                 BlocklistDownloadHelper.deleteBlocklistResidue(
                     context,
                     Constants.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                    timestamp
+                    persistentState.remoteBlocklistTimestamp
                 )
             } else {
-                // reset the remote blocklist timestamp, a copy of remote blocklist is already
-                // available in asset folder (go back to that version)
-                RemoteFileTagUtil.moveFileToLocalDir(context.applicationContext, persistentState)
+                // clean up the partial directory created for this failed download attempt
+                cleanupFailedRemoteDownload(timestamp)
+
+                // Only fall back to the packaged (asset) remote blocklist when there is no
+                // valid remote blocklist already installed. If the user already has a newer
+                // remote blocklist (e.g. a previously successful download), do NOT overwrite
+                // the timestamp with the older packaged value, that would orphan the good
+                // files and cause them to be swept up by the next residue-cleanup run.
+                val existingTs = persistentState.remoteBlocklistTimestamp
+                if (existingTs <= Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP) {
+                    // No valid downloaded version; restore from the bundled asset.
+                    RemoteFileTagUtil.moveFileToLocalDir(context.applicationContext, persistentState)
+                } else {
+                    Logger.i(
+                        LOG_TAG_DOWNLOAD,
+                        "Remote blocklist download failed but existing version ($existingTs) is still valid; keeping it"
+                    )
+                }
             }
 
             return when (downloadStatus) {
@@ -178,5 +195,28 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
     private fun updatePersistenceOnCopySuccess(timestamp: Long) {
         persistentState.remoteBlocklistTimestamp = timestamp
         persistentState.newestRemoteBlocklistTimestamp = Constants.INIT_TIME_MS
+    }
+
+    /**
+     * Deletes the directory that was (partially) created for a failed remote blocklist download.
+     * This prevents stale / incomplete directories from accumulating in remote_blocklist/.
+     * Only removes the directory for the *new* [timestamp] that just failed, it never touches
+     * the currently-active remote blocklist directory.
+     */
+    private fun cleanupFailedRemoteDownload(timestamp: Long) {
+        if (timestamp == Constants.INIT_TIME_MS) return // nothing to clean for an invalid timestamp
+        try {
+            val failedDir =
+                Utilities.blocklistDir(context, Constants.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp)
+            if (failedDir != null && failedDir.exists()) {
+                val deleted = Utilities.deleteRecursive(failedDir)
+                Logger.i(
+                    LOG_TAG_DOWNLOAD,
+                    "cleanupFailedRemoteDownload: deleted partial dir ${failedDir.path}? $deleted"
+                )
+            }
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_DOWNLOAD, "cleanupFailedRemoteDownload: error for ts $timestamp", e)
+        }
     }
 }
