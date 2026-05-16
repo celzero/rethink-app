@@ -360,6 +360,7 @@ class WgMainActivity :
             }
         }
         b.createFab.setOnClickListener { openTunnelEditorActivity() }
+        b.deleteAllFab.setOnClickListener { showDeleteAllInterfacesDialog() }
 
         b.wgGeneralToggleBtn.setOnClickListener {
             if (WireguardManager.oneWireGuardEnabled()) {
@@ -378,6 +379,42 @@ class WgMainActivity :
             }
             showOneWgToggle()
         }
+    }
+
+    private fun showDeleteAllInterfacesDialog() {
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+        val delText =
+            getString(
+                R.string.two_argument_space,
+                getString(R.string.config_delete_all_dialog_title),
+                getString(R.string.lbl_wireguard)
+            )
+        builder.setTitle(delText)
+        builder.setMessage(getString(R.string.config_delete_all_dialog_desc))
+        builder.setCancelable(true)
+        builder.setPositiveButton(delText) { _, _ ->
+            io {
+                WireguardManager.deleteAllConfigs()
+                logEvent(
+                    "Delete All WireGuard configs",
+                    "User deleted all WireGuard configs"
+                )
+                uiCtx {
+                    Utilities.showToastUiCentered(
+                        this,
+                        getString(R.string.config_add_success_toast),
+                        Toast.LENGTH_SHORT
+                    )
+                    finish()
+                }
+            }
+        }
+
+        builder.setNegativeButton(this.getString(R.string.lbl_cancel)) { _, _ ->
+            // no-op
+        }
+        val dialog = builder.create()
+        dialog.show()
     }
 
     private fun openTunnelEditorActivity() {
@@ -440,18 +477,22 @@ class WgMainActivity :
         b.createFab.visibility = View.VISIBLE
         b.importFab.visibility = View.VISIBLE
         b.qrCodeFab.visibility = View.VISIBLE
+        b.deleteAllFab.visibility = View.VISIBLE
         b.createFab.animate().translationY(-resources.getDimension(R.dimen.standard_55))
         b.importFab.animate().translationY(-resources.getDimension(R.dimen.standard_105))
         b.qrCodeFab.animate().translationY(-resources.getDimension(R.dimen.standard_155))
+        b.deleteAllFab.animate().translationY(-resources.getDimension(R.dimen.standard_205))
     }
 
     private fun collapseFab() {
         b.createFab.animate().translationY(resources.getDimension(R.dimen.standard_0))
         b.importFab.animate().translationY(resources.getDimension(R.dimen.standard_0))
         b.qrCodeFab.animate().translationY(resources.getDimension(R.dimen.standard_0))
+        b.deleteAllFab.animate().translationY(resources.getDimension(R.dimen.standard_0))
         b.createFab.visibility = View.GONE
         b.importFab.visibility = View.GONE
         b.qrCodeFab.visibility = View.GONE
+        b.deleteAllFab.visibility = View.GONE
     }
 
     private fun logEvent(msg: String, details: String) {
