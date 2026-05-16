@@ -301,6 +301,12 @@ class GoVpnAdapter : KoinComponent {
                 }
             }
         }
+
+        // only in rethink's remote dns, we have block free transport, so need to remove the
+        // block free transport if the selected dns type is not rethink remote, to avoid having
+        // stale block free transport when user switches from rethink remote to other dns type.
+        // for other dns types, the block free transport is not added at all, so no need to remove.
+        removeBlockFreeTransportIfNeeded()
         Logger.v(LOG_TAG_VPN, "$TAG addTransport done")
     }
 
@@ -318,6 +324,13 @@ class GoVpnAdapter : KoinComponent {
         }
         // this will in-turn updates the ui and calls the adapter to update the transport
         appConfig.handleRethinkChanges(rethinkDefault)
+    }
+
+    private suspend fun removeBlockFreeTransportIfNeeded() {
+        if (appConfig.getDnsType() != AppConfig.DnsType.RETHINK_REMOTE) {
+            Logger.i(LOG_TAG_VPN, "$TAG removing block free transport as dns type is not rethink remote")
+            removeResolver(Backend.BlockFree)
+        }
     }
 
     private suspend fun removeResolver(id: String) {
