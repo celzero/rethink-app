@@ -248,7 +248,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
-                            android:text="Enabling with force to 64 mode"
+                            android:text="Off: PTMODENO46, On: PTMODAUTO"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
