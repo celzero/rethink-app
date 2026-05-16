@@ -488,7 +488,7 @@ class VpnServerAdapter(
             if (config.catchAll) {
                 b.tvAppsCount.text = ctx.getString(R.string.routing_remaining_apps)
             } else {
-                b.tvAppsCount.text = ctx.getString(R.string.add_remove_apps, appsCount)
+                b.tvAppsCount.text = ctx.getString(R.string.firewall_card_status_active, appsCount)
             }
             b.tvAppsCount.setTextColor(
                 fetchColor(ctx, if (appsCount > 0 || config.catchAll) R.attr.primaryLightColorText else R.attr.accentBad)
@@ -512,7 +512,7 @@ class VpnServerAdapter(
             val ipText = ip4?.ip?.takeIf { it.isNotEmpty() }
             when {
                 ipText != null -> {
-                    val ispLabel = buildIspLabel(ip4!!)
+                    val ispLabel = "" // buildIspLabel(ip4)
                     b.tvServerIp.text = if (ispLabel.isNotEmpty()) "$ipText · $ispLabel" else ipText
                     b.tvServerIp.visibility = View.VISIBLE
                 }
