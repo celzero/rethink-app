@@ -156,7 +156,7 @@ class WgProxyPingController(private val scope: CoroutineScope) {
                 VpnController.initiateWgPing(proxyId)
             }
 
-            // spl-case: auto proxy can send empty proxyId which will ping main proxy
+            // spl-case: for auto proxy send empty proxyId which will ping main proxy
             proxyId == Backend.RpnWin -> {
                 VpnController.initiateRpnPing("")
             }
