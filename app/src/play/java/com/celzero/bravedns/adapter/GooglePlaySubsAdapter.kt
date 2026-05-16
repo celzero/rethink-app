@@ -34,6 +34,7 @@ import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.ProductDetail
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.facebook.shimmer.ShimmerFrameLayout
+import java.util.Locale
 
 class GooglePlaySubsAdapter(
     val listener: SubscriptionChangeListener,
@@ -250,9 +251,9 @@ class GooglePlaySubsAdapter(
                 // Extract currency prefix/suffix from sample (e.g. "₹" or "US$")
                 val numericPart = sampleFormatted.replace(Regex("[0-9,. ]+"), "").trim()
                 val formatted = if (amount >= 100) {
-                    String.format("%.0f", amount)
+                    String.format(Locale.getDefault(), "%.0f", amount)
                 } else {
-                    String.format("%.2f", amount).trimEnd('0').trimEnd('.')
+                    String.format(Locale.getDefault(), "%.2f", amount).trimEnd('0').trimEnd('.')
                 }
                 if (numericPart.isNotEmpty()) "$numericPart$formatted" else "$currencyCode $formatted"
             } catch (_: Exception) {
