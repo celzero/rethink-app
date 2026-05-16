@@ -378,8 +378,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // treat only mobile data as metered
     var treatOnlyMobileNetworkAsMetered by booleanPref("treat_only_mobile_nw_as_metered").withDefault<Boolean>(false)
 
-    var showConfettiOnRPlus by booleanPref("show_confetti_on_rplus").withDefault<Boolean>(true)
-
     var autoDialsParallel by booleanPref("auto_dials_parallel").withDefault<Boolean>(false)
 
     // user setting whether to download ip info for the given ip address

@@ -388,7 +388,6 @@ object RpnProxyManager : KoinComponent {
 
         try {
             persistentState.rpnState = RpnState.ENABLED.id
-            persistentState.showConfettiOnRPlus = true
             Logger.i(
                 LOG_TAG_PROXY,
                 "$TAG; activateRpn: rpn activated, mode: ${rpnMode()}, product: ${purchase.productId}"
