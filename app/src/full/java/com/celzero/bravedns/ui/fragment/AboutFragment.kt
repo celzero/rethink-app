@@ -158,8 +158,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         updateVersionInfo()
         updateSponsorInfo()
         updateTokenUi(persistentState.firebaseUserToken)
-
-        b.titleStats.text = getString(R.string.title_statistics).lowercase()
+        
         b.aboutStats.text = getString(R.string.settings_general_header).replaceFirstChar(Char::titlecase)
 
         if (DEBUG) {
