@@ -134,21 +134,16 @@ android {
     android.applicationVariants.configureEach { variant ->
         println("variant name: ${variant.name}")
         variant.outputs.configureEach { output ->
-            // def abi = output.filters.find { it.filterType.name == "ABI" }?.identifier
-            def abi = variant.outputs.first().getFilter(com.android.build.OutputFile.ABI)
-            def baseAbiVersionCode = project.ext.versionCodes.get(abi)
-            println("base version code: $baseAbiVersionCode")
+            def abi = output.getFilter(com.android.build.OutputFile.ABI)
             if (abi != null) {
-                println("variant name: ${variant.name}, abi: $abi")
+                def baseAbiVersionCode = project.ext.versionCodes.get(abi)
                 // assign different version code for each output
                 // eg for arm64-v8a, version code will be 30000000 + variant.versionCode
                 def v = baseAbiVersionCode * 10000000 + variant.versionCode
                 // API 'ApkVariantOutput.getVersionCodeOverride()' is obsolete and has been replaced
                 // with 'VariantOutput.versionCode()'
                 output.versionCodeOverride = v
-                println("version code override: $v")
-            } else {
-                println("no ABI filter applied for variant: ${variant.name}")
+                println("variant name: ${variant.name}, abi: $abi, version code override: $v")
             }
         }
     }
