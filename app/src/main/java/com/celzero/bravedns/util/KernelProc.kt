@@ -343,6 +343,13 @@ object KernelProc {
             val file = File(AUXV_PATH)
             if (!file.exists()) return@runCatching "auxv: missing ($AUXV_PATH)"
 
+            // some of the values in AUXV are pointers (e.g. AT_PLATFORM) which are not directly
+            // human-readable, but we can at least show the raw hex value and decimal value for
+            // reference.
+            // 51L to "UNKNOWN(51)" // seen on some devices as a pointer to a string like
+            // "com.google.android.runtime"
+            // TODO: for known pointer types (e.g. AT_PLATFORM, AT_RANDOM) we could
+            // attempt to read the pointed-to string from memory
             val bytes = file.readBytes()
             val wordSize = if (Process.is64Bit()) 8 else 4
             val buffer = ByteBuffer.wrap(bytes).order(ByteOrder.nativeOrder())

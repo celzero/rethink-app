@@ -250,6 +250,10 @@ object VpnController : KoinComponent {
         return braveVpnService?.getWireGuardStats(id)
     }
 
+    suspend fun getRpnStats(id: String): WireguardManager.WgStats? {
+        return braveVpnService?.getRpnStats(id)
+    }
+
     suspend fun getSupportedIpVersion(id: String): Pair<Boolean, Boolean> {
         return braveVpnService?.getSupportedIpVersion(id) ?: Pair(false, false)
     }
@@ -439,8 +443,8 @@ object VpnController : KoinComponent {
         return braveVpnService?.addNewWinServer(key) ?: Pair(false, "vpn service not available")
     }
 
-    suspend fun handleRpnHop(key: String): Pair<Boolean, String> {
-        return braveVpnService?.handleRpnHop(key) ?: Pair(false, "vpn service not available")
+    suspend fun handleRpnHop(key: String, configChanged: Boolean): Pair<Boolean, String> {
+        return braveVpnService?.handleRpnHop(key, configChanged) ?: Pair(false, "vpn service not available")
     }
 
     suspend fun removeWinServer(key: String): Pair<Boolean, String> {

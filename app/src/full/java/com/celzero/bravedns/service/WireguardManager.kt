@@ -1257,12 +1257,14 @@ object WireguardManager : KoinComponent {
             sb.append("   errRx: ${routerStats?.errRx}\n")
             sb.append("   errTx: ${routerStats?.errTx}\n")
             sb.append("   extra: ${routerStats?.extra}\n")
-            sb.append("   clientV4: ${stats?.clientV4}\n")
-            sb.append("   clientV6: ${stats?.clientV6}\n\n")
+            sb.append("   clientV4: ${stats?.clientV4?.toString()}\n")
+            sb.append("   clientV6: ${stats?.clientV6?.toString()}\n\n")
         }
         if (sb.isEmpty()) {
             sb.append("   N/A\n\n")
         }
+        val s = sb.toString()
+        Logger.d(LOG_TAG_PROXY, "wg stats: $s")
         return sb.toString()
     }
 

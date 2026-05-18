@@ -4609,10 +4609,20 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             return@go2kt
         }
 
-        if (!iid.contains(ID_WG_BASE, true)) {
-            // only wireguard proxies are considered for overlay network
+        if (!iid.contains(ID_WG_BASE, true) && !iid.contains(Backend.RpnWin, true)) {
+            // only wireguard / rpn proxies are considered for overlay network
             logd("onProxyAdded: no-op as it is not wireguard proxy, added $iid")
             return@go2kt
+        }
+
+        if (iid.contains(Backend.RpnWin, true) && RpnProxyManager.isRpnActive()) {
+            logd("onProxyAdded: rpn proxy added $iid, handle post addition logics")
+            vpnAdapter?.handleOnRpnAdded(iid)
+        }
+
+        if (iid.contains(ID_WG_BASE, true)) {
+            logd("onProxyAdded: wg proxy added $iid, handle post addition logics")
+            vpnAdapter?.handleOnWgAdded(iid)
         }
 
         // new proxy added, refresh overlay network pair
@@ -4620,19 +4630,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val nw: OverlayNetworks? = vpnAdapter?.getActiveProxiesIpAndMtu()
             logd("onProxyAdded for proxy $iid: $nw")
             onOverlayNetworkChanged(nw ?: OverlayNetworks())
-        }
-        val id = iid.substringAfter(ID_WG_BASE).toIntOrNull() ?: return@go2kt
-        val files = WireguardManager.getConfigFilesById(id) ?: return@go2kt
-
-        if (!files.useOnlyOnMetered || files.oneWireGuard) return@go2kt
-        withContext(CoroutineName("onProxyAdded") + serializer) {
-            val newNet = underlyingNetworks
-            val v4first = newNet?.ipv4Net?.firstOrNull()
-            val v6first = newNet?.ipv6Net?.firstOrNull()
-            val v4Mobile = v4first?.capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ?: false
-            val v6Mobile = v6first?.capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ?: false
-            val isActiveMobile = v4Mobile || (v4first == null && v6Mobile)
-            Logger.i(LOG_TAG_VPN, "onProxyAdded: wg proxy $iid is added, isActiveMobile: $isActiveMobile")
         }
     }
 
@@ -4642,9 +4639,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             return
         }
 
-        if (!iid.contains(ID_WG_BASE)) {
+        if (!iid.contains(ID_WG_BASE) && !iid.contains(Backend.RpnWin)) {
             // only wireguard proxies are considered for overlay network
-            logd("onProxyRemoved: proxy removed $iid, not wireguard")
+            logd("onProxyRemoved: proxy removed $iid, not wg or rpn proxy, no-op for overlay network")
             return
         }
         // proxy removed, refresh overlay network pair
@@ -5805,6 +5802,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return vpnAdapter?.getWireGuardStats(id)
     }
 
+    suspend fun getRpnStats(id: String): WireguardManager.WgStats? {
+        return vpnAdapter?.getRpnStats(id)
+    }
+
     suspend fun getSupportedIpVersion(id: String): Pair<Boolean, Boolean>? {
         return vpnAdapter?.getSupportedIpVersion(id) ?: return Pair(false, false)
     }
@@ -5990,8 +5991,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return vpnAdapter?.addNewWinServer(key) ?: Pair(false, "adapter is null")
     }
 
-    suspend fun handleRpnHop(key: String): Pair<Boolean, String> {
-        return vpnAdapter?.handleRpnHop(key) ?: Pair(false, "adapter is null")
+    suspend fun handleRpnHop(key: String, configChanged: Boolean): Pair<Boolean, String> {
+        return vpnAdapter?.handleRpnHop(key, configChanged) ?: Pair(false, "adapter is null")
     }
 
     suspend fun removeWinServer(key: String): Pair<Boolean, String> {
