@@ -37,7 +37,6 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.RpnConfigDetailActivity
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
@@ -124,7 +123,7 @@ class VpnServerAdapter(
     }
 
     companion object {
-        private const val STATS_POLL_MS = 1500L
+        private const val STATS_POLL_MS = 2500L
     }
 
     data class ServerGroup(
@@ -405,7 +404,7 @@ class VpnServerAdapter(
 
                 // Fetch IP metadata for this server (cached by since-timestamp; live fetches
                 // only happen when the tunnel connects for the first time or after a reconnect).
-                val ip4 = fetchIpForGroup(group, stats)
+                val ip4 = fetchIpForGroup(group)
 
                 Logger.v(LOG_TAG_UI, "VpnServerAdapter fetchAndApplyStats for id: $id, config: $config, status: $statusPair, stats: $stats, apps/always-on: $apps/${config?.catchAll}")
                 withContext(Dispatchers.Main) {
@@ -425,11 +424,9 @@ class VpnServerAdapter(
          * call only when the tunnel has reconnected (since-timestamp mismatch).
          * Returns the IPv4 [IPMetadata] or null if not yet available.
          */
-        private suspend fun fetchIpForGroup(group: ServerGroup, stats: RouterStats?): IPMetadata? {
+        private suspend fun fetchIpForGroup(group: ServerGroup): IPMetadata? {
             return try {
                 val key = group.key
-                val since = stats?.since ?: 0L
-                val cachedSince = RpnProxyManager.getCachedSinceTs(key)
 
                 // Slow path: fetch live from the Go backend (3 s timeout to stay responsive).
                 val client = withTimeoutOrNull(3_000L) {
@@ -437,8 +434,7 @@ class VpnServerAdapter(
                 }
                 val ip4 = runCatching { client?.iP4() }.getOrNull()
                 val ip6 = runCatching { client?.iP6() }.getOrNull()
-                RpnProxyManager.updateIpMeta(key, since)
-                ip4
+                ip4 ?: ip6
             } catch (t: Throwable) {
                 Logger.w(LOG_TAG_UI, "VpnServerAdapter fetchIpForGroup[${group.key}]: ${t.message}")
                 null
@@ -535,14 +531,17 @@ class VpnServerAdapter(
             b.tvServerIp.visibility = View.GONE
         }
 
+        @Suppress("UNUSED_PARAMETER")
         private fun getStatusColor(status: UIUtils.ProxyStatus?, stats: RouterStats?): Int {
-            val now = System.currentTimeMillis()
-            val lastOk = stats?.lastOK ?: 0L
-            val since = stats?.since  ?: 0L
-            val failing = now - since > WireguardManager.WG_UPTIME_THRESHOLD && lastOk == 0L
+            // For RPN proxies, trust the status enum directly.  The since/lastOK heuristic
+            // (lastOK == 0 && since > WG_UPTIME_THRESHOLD → "Failing") is designed for
+            // WireGuard where lastOK is the handshake timestamp.  For RPN, lastOK tracks
+            // routed-traffic time; it is 0 on a healthy just-connected proxy that hasn't
+            // yet forwarded a packet.  Applying the heuristic causes the card to oscillate
+            // between green (Connected) during the brief startup window (< 5 s) and red
+            // (Failing) once that window expires – even though the backend reports TOK.
             return when (status) {
-                UIUtils.ProxyStatus.TOK ->
-                    if (failing) R.attr.chipTextNegative else R.attr.accentGood
+                UIUtils.ProxyStatus.TOK -> R.attr.accentGood
                 UIUtils.ProxyStatus.TUP,
                 UIUtils.ProxyStatus.TZZ,
                 UIUtils.ProxyStatus.TNT -> R.attr.chipTextNeutral
@@ -550,6 +549,7 @@ class VpnServerAdapter(
             }
         }
 
+        @Suppress("UNUSED_PARAMETER")
         private fun getStatusText(
             status: UIUtils.ProxyStatus?,
             stats: RouterStats?,
@@ -566,12 +566,8 @@ class VpnServerAdapter(
                 return ctx.getString(UIUtils.getProxyStatusStringRes(status.id))
                     .replaceFirstChar(Char::titlecase)
             }
-            val now = System.currentTimeMillis()
-            val lastOk = stats?.lastOK ?: 0L
-            val since = stats?.since  ?: 0L
-            if (now - since > WireguardManager.WG_UPTIME_THRESHOLD && lastOk == 0L) {
-                return ctx.getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
-            }
+            // For RPN proxies, trust the status enum directly – no since/lastOK override.
+            // See getStatusColor() for the full rationale.
             return ctx.getString(UIUtils.getProxyStatusStringRes(status.id))
                 .replaceFirstChar(Char::titlecase)
         }
