@@ -14,6 +14,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.VpnService
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -46,7 +47,9 @@ import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.ezelab.rethinktv.ui.common.TvScreenScaffold
+import com.ezelab.rethinktv.ui.common.WelcomeBanner
 import com.ezelab.rethinktv.ui.common.rememberAsImmutableState
+import com.ezelab.rethinktv.ui.common.rememberOnboardingState
 import org.koin.compose.koinInject
 
 /**
@@ -132,6 +135,8 @@ fun HomeScreen() {
         }
     }
 
+    val onboarding = rememberOnboardingState()
+
     TvScreenScaffold(
         title = "Rethink TV",
         subtitle = if (isOn) {
@@ -141,6 +146,7 @@ fun HomeScreen() {
         },
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
+            WelcomeBanner(onboarding)
             StatusRow(
                 isOn = isOn,
                 mode = mode,
@@ -156,10 +162,15 @@ fun HomeScreen() {
                             try {
                                 vpnConsentLauncher.launch(consentIntent)
                             } catch (_: ActivityNotFoundException) {
-                                // Devices without a VPN-consent UI
-                                // (stripped-down OEMs). Phase J's
-                                // first-run wizard will surface a
-                                // user-facing error here.
+                                // OEM stripped the VPN-consent UI from
+                                // their TV image. Tell the user instead
+                                // of silently failing.
+                                Toast.makeText(
+                                    context,
+                                    "This device can't show the VPN consent screen. " +
+                                        "Sideloading a stock VpnDialogs APK usually fixes it.",
+                                    Toast.LENGTH_LONG,
+                                ).show()
                             }
                         },
                     )
