@@ -404,6 +404,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // whether to use default dns for trusted ips and domains
     var useFallbackDnsToBypass by booleanPref("use_fallback_dns_to_bypass").withDefault<Boolean>(true)
 
+    // Block-free DNS: stored as "TYPE::url" e.g. "DOH::https://dns.google/dns-query"
+    // Empty string means no block-free DNS configured
+    var blockFreeDns by stringPref("block_free_dns").withDefault<String>("")
+
     // Firebase error reporting enabled (only for play and website variants)
     var firebaseErrorReportingEnabled by booleanPref("firebase_error_reporting").withDefault<Boolean>(Utilities.isPlayStoreFlavour())
 

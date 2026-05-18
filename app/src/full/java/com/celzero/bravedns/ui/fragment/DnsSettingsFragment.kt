@@ -46,6 +46,7 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
+import com.celzero.bravedns.ui.activity.BlockFreeDnsActivity
 import com.celzero.bravedns.ui.activity.DnsListActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.bottomsheet.DnsRecordTypesBottomSheet
@@ -106,6 +107,8 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         updateLocalBlocklistUi()
         // update allowed record types ui
         updateAllowedRecordTypesUi()
+        // update block-free dns ui
+        updateBlockFreeDnsUi()
         showNewBadgeIfNeeded()
     }
 
@@ -210,6 +213,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
     private fun updateLocalBlocklistUi() {
         if (isPlayStoreFlavour()) {
             b.dcLocalBlocklistRl.visibility = View.GONE
+            b.dividerLocalBlocklist.visibility = View.GONE
             return
         }
 
@@ -291,13 +295,16 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         if (isAtleastR()) {
             // show split dns by default only if the device is running on Android 12 or above
             b.dcSplitDnsRl.visibility = View.VISIBLE
+            b.dividerSplitDns.visibility = View.VISIBLE
             b.dcSplitDnsSwitch.isChecked = persistentState.splitDns
         } else {
             if (persistentState.enableDnsAlg) {
                 b.dcSplitDnsRl.visibility = View.VISIBLE
+                b.dividerSplitDns.visibility = View.VISIBLE
                 b.dcSplitDnsSwitch.isChecked = persistentState.splitDns
             } else {
                 b.dcSplitDnsRl.visibility = View.GONE
+                b.dividerSplitDns.visibility = View.GONE
             }
         }
     }
@@ -307,6 +314,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             // no-op, no need to depend of alg when device is running on Android 12 or above
             // as split dns option is shown to user regardless of dns alg
             b.dcSplitDnsRl.visibility = View.VISIBLE
+            b.dividerSplitDns.visibility = View.VISIBLE
             b.dcSplitDnsSwitch.isChecked = persistentState.splitDns
             updateConnectedStatus(persistentState.connectedDnsName)
             showSplitDnsUi()
@@ -704,6 +712,10 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.dcAllowedRecordTypesRl.setOnClickListener {
             showDnsRecordTypesBottomSheet()
         }
+
+        b.dcBlockFreeDnsRl.setOnClickListener {
+            openBlockFreeDns()
+        }
     }
 
     private fun showDnsRecordTypesBottomSheet() {
@@ -825,6 +837,21 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
     private fun showCustomDns() {
         val intent = Intent(requireContext(), DnsListActivity::class.java)
         startActivity(intent)
+    }
+
+    private fun openBlockFreeDns() {
+        val intent = Intent(requireContext(), BlockFreeDnsActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun updateBlockFreeDnsUi() {
+        val key = persistentState.blockFreeDns
+        if (key.isEmpty()) {
+            b.dcBlockFreeDnsDesc.text = "Fallback DNS without any blocking"
+        } else {
+            val url = key.substringAfter("::", key)
+            b.dcBlockFreeDnsDesc.text = url
+        }
     }
 
     private fun setNetworkDns() {

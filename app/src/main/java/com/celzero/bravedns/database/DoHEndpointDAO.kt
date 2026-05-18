@@ -62,5 +62,8 @@ interface DoHEndpointDAO {
     @Query("select * from DoHEndpoint where isCustom = 0")
     fun getAllDefaultDoHEndpoints(): List<DoHEndpoint>
 
+    @Query("select * from DoHEndpoint order by dohName asc")
+    fun getAll(): List<DoHEndpoint>
+
     @Query("select count(*) from DoHEndpoint") fun getCount(): Int
 }

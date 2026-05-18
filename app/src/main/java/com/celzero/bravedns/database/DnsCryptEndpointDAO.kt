@@ -68,4 +68,7 @@ interface DnsCryptEndpointDAO {
     fun updateConnectionStatus(liveServerID: Int)
 
     @Transaction @Query("update DNSCryptEndpoint set isSelected=0") fun updateFailingConnections()
+
+    @Query("select * from DNSCryptEndpoint order by dnsCryptName asc")
+    fun getAll(): List<DnsCryptEndpoint>
 }
