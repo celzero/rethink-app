@@ -42,7 +42,10 @@ import com.ezelab.rethinktv.ui.dns.DnsScreen
 import com.ezelab.rethinktv.ui.firewall.FirewallScreen
 import com.ezelab.rethinktv.ui.home.HomeScreen
 import com.ezelab.rethinktv.ui.logs.LogsScreen
+import com.ezelab.rethinktv.ui.proxy.ProxyEditorKind
+import com.ezelab.rethinktv.ui.proxy.ProxyEditorScreen
 import com.ezelab.rethinktv.ui.proxy.ProxyScreen
+import com.ezelab.rethinktv.ui.proxy.WgDetailScreen
 import com.ezelab.rethinktv.ui.rules.RulesScreen
 import com.ezelab.rethinktv.ui.settings.SettingsScreen
 import com.ezelab.rethinktv.ui.stats.StatsScreen
@@ -171,6 +174,19 @@ fun TvNavScaffold() {
                             AppDetailScreen(uid = uid, navController = navController)
                         }
                         composable(TvDestination.Proxy.route) { ProxyScreen(navController) }
+                        composable(
+                            route = "wg/{id}",
+                            arguments = listOf(
+                                androidx.navigation.navArgument("id") {
+                                    type = androidx.navigation.NavType.IntType
+                                },
+                            ),
+                        ) { backStackEntry ->
+                            val id = backStackEntry.arguments?.getInt("id") ?: -1
+                            WgDetailScreen(configId = id)
+                        }
+                        composable("proxy/socks5") { ProxyEditorScreen(kind = ProxyEditorKind.SOCKS5) }
+                        composable("proxy/http") { ProxyEditorScreen(kind = ProxyEditorKind.HTTP) }
                         composable(TvDestination.Logs.route) { LogsScreen() }
                         composable(TvDestination.Stats.route) { StatsScreen() }
                         composable(TvDestination.Settings.route) { SettingsScreen() }

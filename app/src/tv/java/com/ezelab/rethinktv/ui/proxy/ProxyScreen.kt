@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
@@ -83,7 +84,7 @@ import org.koin.compose.koinInject
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-fun ProxyScreen() {
+fun ProxyScreen(navController: NavController) {
     val appConfig = koinInject<AppConfig>()
     val scope = rememberCoroutineScope()
 
@@ -142,16 +143,7 @@ fun ProxyScreen() {
                 tunnels.forEach { wg ->
                     TunnelCard(
                         wg = wg,
-                        onToggle = {
-                            scope.launch(Dispatchers.IO) {
-                                if (wg.isActive) {
-                                    WireguardManager.disableConfig(wg)
-                                } else {
-                                    WireguardManager.enableConfig(wg)
-                                }
-                                withContext(Dispatchers.Main) { reloadKey++ }
-                            }
-                        },
+                        onClick = { navController.navigate("wg/${wg.id}") },
                     )
                 }
             }
@@ -161,19 +153,22 @@ fun ProxyScreen() {
             ProxyStatusCard(
                 label = "SOCKS5",
                 value = proxyDetails.socks5,
+                onClick = { navController.navigate("proxy/socks5") },
             )
             ProxyStatusCard(
                 label = "HTTP",
                 value = proxyDetails.http,
+                onClick = { navController.navigate("proxy/http") },
             )
             ProxyStatusCard(
                 label = "Orbot",
                 value = if (proxyDetails.orbot) "Active" else null,
+                onClick = null,
             )
 
             Spacer(Modifier.height(24.dp))
             Text(
-                text = "WG import, per-tunnel detail, and SOCKS5/HTTP/Orbot editors will land here next.",
+                text = "Tap a tunnel to manage its peers and per-tunnel behaviour. Tap SOCKS5 or HTTP to edit the proxy credentials.",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 24.dp),
@@ -190,9 +185,9 @@ private data class ProxyDetails(
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun TunnelCard(wg: WgConfigFilesImmutable, onToggle: () -> Unit) {
+private fun TunnelCard(wg: WgConfigFilesImmutable, onClick: () -> Unit) {
     Surface(
-        onClick = onToggle,
+        onClick = onClick,
         shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(10.dp)),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -265,14 +260,8 @@ private fun TagPill(label: String) {
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun ProxyStatusCard(label: String, value: String?) {
-    Surface(
-        shape = RoundedCornerShape(10.dp),
-        colors = androidx.tv.material3.SurfaceDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
+private fun ProxyStatusCard(label: String, value: String?, onClick: (() -> Unit)?) {
+    val content: @Composable () -> Unit = {
         Row(
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -294,5 +283,28 @@ private fun ProxyStatusCard(label: String, value: String?) {
                 overflow = TextOverflow.Ellipsis,
             )
         }
+    }
+    if (onClick != null) {
+        Surface(
+            onClick = onClick,
+            shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(10.dp)),
+            colors = ClickableSurfaceDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            ),
+            modifier = Modifier.fillMaxWidth(),
+        ) { content() }
+    } else {
+        Surface(
+            shape = RoundedCornerShape(10.dp),
+            colors = androidx.tv.material3.SurfaceDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            ),
+            modifier = Modifier.fillMaxWidth(),
+        ) { content() }
     }
 }
