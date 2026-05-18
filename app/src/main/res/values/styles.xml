@@ -386,7 +386,7 @@
         <item name="colorSurface">@color/colorSurfaceLightPlus</item>
         <item name="colorOnSurface">@color/primaryTextLightPlus</item>
         <item name="colorSurfaceVariant">@color/colorSurfaceVariantLightPlus</item>
-        <item name="colorOnSurfaceVariant">@color/primaryDarkColorTextLightPlus</item>
+        <item name="colorOnSurfaceVariant">@color/primaryLightColorTextLightPlus</item>
         <item name="colorSurfaceContainer">@color/colorSurfaceContainerLightPlus</item>
         <item name="colorSurfaceContainerLow">@color/colorSurfaceLightPlus</item>
         <item name="colorSurfaceContainerHigh">@color/colorSurfaceContainerLightPlus</item>
