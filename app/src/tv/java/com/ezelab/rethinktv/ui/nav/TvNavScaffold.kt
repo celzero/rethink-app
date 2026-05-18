@@ -43,6 +43,7 @@ import com.ezelab.rethinktv.ui.firewall.FirewallScreen
 import com.ezelab.rethinktv.ui.home.HomeScreen
 import com.ezelab.rethinktv.ui.logs.LogsScreen
 import com.ezelab.rethinktv.ui.proxy.ProxyScreen
+import com.ezelab.rethinktv.ui.rules.RulesScreen
 import com.ezelab.rethinktv.ui.settings.SettingsScreen
 import com.ezelab.rethinktv.ui.stats.StatsScreen
 import com.ezelab.rethinktv.ui.theme.RethinkTvTheme
@@ -157,6 +158,7 @@ fun TvNavScaffold() {
                         composable(TvDestination.Dns.route) { DnsScreen() }
                         composable(TvDestination.Firewall.route) { FirewallScreen() }
                         composable(TvDestination.Apps.route) { AppsScreen(navController) }
+                        composable(TvDestination.Rules.route) { RulesScreen() }
                         composable(
                             route = "apps/{uid}",
                             arguments = listOf(
@@ -168,7 +170,7 @@ fun TvNavScaffold() {
                             val uid = backStackEntry.arguments?.getInt("uid") ?: -1
                             AppDetailScreen(uid = uid, navController = navController)
                         }
-                        composable(TvDestination.Proxy.route) { ProxyScreen() }
+                        composable(TvDestination.Proxy.route) { ProxyScreen(navController) }
                         composable(TvDestination.Logs.route) { LogsScreen() }
                         composable(TvDestination.Stats.route) { StatsScreen() }
                         composable(TvDestination.Settings.route) { SettingsScreen() }

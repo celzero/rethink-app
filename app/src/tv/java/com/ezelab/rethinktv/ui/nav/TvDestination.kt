@@ -11,6 +11,7 @@ package com.ezelab.rethinktv.ui.nav
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Article
+import androidx.compose.material.icons.automirrored.filled.Rule
 import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.filled.Home
@@ -34,8 +35,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
  *
  * Order is the rendered order in the drawer, which is also the
  * order users will D-pad through. We follow the convention "most-used
- * first": Home, then the four control surfaces (DNS / Firewall / Apps
- * / Proxy), then the two visibility surfaces (Logs / Stats), then
+ * first": Home, then the five control surfaces (DNS / Firewall / Apps
+ * / Rules / Proxy), then the two visibility surfaces (Logs / Stats), then
  * Settings last (matching every Android TV launcher's convention of
  * parking Settings at the bottom).
  *
@@ -53,6 +54,7 @@ enum class TvDestination(
     Dns("dns", "DNS", Icons.Filled.Dns),
     Firewall("firewall", "Firewall", Icons.Filled.Shield),
     Apps("apps", "Apps", Icons.Filled.Apps),
+    Rules("rules", "Rules", Icons.AutoMirrored.Filled.Rule),
     Proxy("proxy", "Proxy", Icons.Filled.Hub),
     Logs("logs", "Logs", Icons.AutoMirrored.Filled.Article),
     Stats("stats", "Stats", Icons.Filled.Insights),
