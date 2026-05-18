@@ -6,7 +6,6 @@
     android:fillViewport="true"
     android:orientation="vertical">
 
-    <!-- Wrap content in ConstraintLayout with maxWidth for foldables/tablets -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

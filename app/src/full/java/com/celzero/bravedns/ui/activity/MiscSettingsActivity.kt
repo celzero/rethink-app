@@ -191,14 +191,18 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
 
         if (isFdroidFlavour()) {
             b.settingsActivityCheckUpdateRl.visibility = View.GONE
+            b.dividerCheckUpdate.visibility = View.GONE
             // Hide Firebase error reporting for F-Droid variant
             b.settingsFirebaseErrorReportingRl.visibility = View.GONE
+            b.dividerAutoStart.visibility = View.GONE
         } else {
             // Show Firebase error reporting for play and website variants
             b.settingsFirebaseErrorReportingRl.visibility = View.VISIBLE
+            b.dividerAutoStart.visibility = View.VISIBLE
             // Firebase error reporting
             b.settingsFirebaseErrorReportingSwitch.isChecked = persistentState.firebaseErrorReportingEnabled
             b.settingsActivityCheckUpdateRl.visibility = View.VISIBLE
+            b.dividerCheckUpdate.visibility = View.VISIBLE
             // check for app updates
             b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
         }
@@ -281,12 +285,15 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
             }
         } else {
             b.settingsBiometricRl.visibility = View.GONE
+            b.dividerBiometric.visibility = View.GONE
         }
 
         if (isAtleastQ()) {
             b.settingsFirewallBubbleRl.visibility = View.VISIBLE
+            b.dividerFirewallBubble.visibility = View.VISIBLE
         } else {
             b.settingsFirewallBubbleRl.visibility = View.GONE
+            b.dividerFirewallBubble.visibility = View.GONE
         }
 
         // Auto start app after reboot
@@ -1260,13 +1267,16 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
         if (!isAtleastT()) {
             // notification permission and persistent is only needed for version 13 or above
             b.settingsActivityAppNotificationRl.visibility = View.GONE
+            b.dividerNotification.visibility = View.GONE
             b.settingsActivityAppNotificationPersistentRl.visibility = View.GONE
+            b.dividerAppNotification.visibility = View.GONE
             return
         }
 
         if (isNotificationPermissionGranted()) {
             // notification permission is granted to the app, enable switch
             b.settingsActivityAppNotificationRl.visibility = View.VISIBLE
+            b.dividerNotification.visibility = View.VISIBLE
             b.settingsActivityAppNotificationSwitch.isChecked = true
             if (!persistentState.shouldRequestNotificationPermission) {
                 // if the user has already granted the permission, set the flag to true
@@ -1274,10 +1284,12 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
             }
         } else {
             b.settingsActivityAppNotificationRl.visibility = View.VISIBLE
+            b.dividerNotification.visibility = View.VISIBLE
             b.settingsActivityAppNotificationSwitch.isChecked = false
             persistentState.shouldRequestNotificationPermission = false
         }
         b.settingsActivityAppNotificationPersistentRl.visibility = View.VISIBLE
+        b.dividerAppNotification.visibility = View.VISIBLE
         b.settingsActivityAppNotificationPersistentSwitch.isChecked =
             persistentState.persistentNotification
     }

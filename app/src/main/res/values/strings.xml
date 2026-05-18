@@ -2448,6 +2448,14 @@
     <string name="extend_mode_banner_title" translatable="false">Extending Your Access</string>
     <string name="extend_mode_banner_desc" translatable="false">Your new purchase adds to your remaining time. Access continues uninterrupted.</string>
 
+    <!-- Extend-mode purchase success celebration -->
+    <string name="extend_purchase_activated" translatable="false">Access Extended!</string>
+    <string name="extend_purchase_success_message" translatable="false">Your access has been extended. Enjoy uninterrupted privacy!</string>
+
+    <!-- Normal subscription success celebration -->
+    <string name="subscription_congrats_title" translatable="false">Welcome to RPN!</string>
+    <string name="subscription_congrats_desc" translatable="false">Your subscription is now active. Enjoy enhanced privacy and security!</string>
+
     <!-- Per-month price breakdown for one-time plans (e.g. "₹141 / mo") -->
     <string name="price_per_month_format" translatable="false">%s / mo</string>
 
