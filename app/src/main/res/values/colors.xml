@@ -260,7 +260,7 @@
     <color name="buttonBackgroundLightPlus">#21a095</color>
     <color name="tabIndicatorLightPlus">#ff6f6f</color>
     <color name="cardBackgroundLightPlus">#FFFFFF</color>
-    <color name="btmSheetBgColorLightPlus">#d2fff5</color>
+    <color name="btmSheetBgColorLightPlus">#e1f7f3</color>
 
     <color name="switchNormalLightPlus">#b3b3b3</color>
     <color name="colorControlActivatedLightPlus">#21a095</color>

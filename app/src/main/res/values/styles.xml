@@ -723,7 +723,7 @@
         <item name="colorPrimary">?attr/accentGood</item>
         <item name="colorSurfaceVariant">?attr/colorSurfaceVariant</item>
         <item name="colorSurface">?attr/colorSurface</item>
-        <item name="colorOutline">?attr/colorOutline</item>
+        <item name="colorOutline">?attr/switchNormal</item>
     </style>
 
     <!-- Light theme switch style -->
