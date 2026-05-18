@@ -36,6 +36,7 @@ import androidx.tv.material3.NavigationDrawer
 import androidx.tv.material3.NavigationDrawerItem
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
+import com.ezelab.rethinktv.ui.apps.AppDetailScreen
 import com.ezelab.rethinktv.ui.apps.AppsScreen
 import com.ezelab.rethinktv.ui.dns.DnsScreen
 import com.ezelab.rethinktv.ui.firewall.FirewallScreen
@@ -155,7 +156,18 @@ fun TvNavScaffold() {
                         composable(TvDestination.Home.route) { HomeScreen() }
                         composable(TvDestination.Dns.route) { DnsScreen() }
                         composable(TvDestination.Firewall.route) { FirewallScreen() }
-                        composable(TvDestination.Apps.route) { AppsScreen() }
+                        composable(TvDestination.Apps.route) { AppsScreen(navController) }
+                        composable(
+                            route = "apps/{uid}",
+                            arguments = listOf(
+                                androidx.navigation.navArgument("uid") {
+                                    type = androidx.navigation.NavType.IntType
+                                },
+                            ),
+                        ) { backStackEntry ->
+                            val uid = backStackEntry.arguments?.getInt("uid") ?: -1
+                            AppDetailScreen(uid = uid, navController = navController)
+                        }
                         composable(TvDestination.Proxy.route) { ProxyScreen() }
                         composable(TvDestination.Logs.route) { LogsScreen() }
                         composable(TvDestination.Stats.route) { StatsScreen() }
