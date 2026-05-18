@@ -579,7 +579,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         try {
             val popped = findNavController().popBackStack()
             if (!popped) {
-                // Nothing to pop — finish the host activity so the user isn't stuck.
+                // Nothing to pop, finish the host activity so the user isn't stuck.
                 requireActivity().finish()
             }
         } catch (_: IllegalStateException) {

@@ -194,6 +194,13 @@ data class ResponseErr(
     val allProducts: List<String>? = null,
     /** Unconsumed product identifiers, if known. */
     val unconsumedProducts: List<String>? = null,
+    /**
+     * Google Play purchase token of an older purchase that was superseded by the one
+     * identified by [purchaseId].  Present only when the server cancelled [purchaseId]
+     * but detected a still-valid predecessor; the client should query /g/ack for this
+     * token and reactivate the corresponding DB row if the server confirms it is valid.
+     */
+    val linkedPurchaseId: String? = null,
     /** Cloudflare Ray ID for server-side log correlation. */
     val ray: String? = null,
     /** HTTP status code from the server response; 0 if not from an HTTP layer. */
@@ -216,6 +223,7 @@ data class ResponseErr(
             windowDays = json.optIntOrNull("windowDays"),
             allProducts = json.optStringListOrNull("allProducts"),
             unconsumedProducts = json.optStringListOrNull("unconsumedProducts"),
+            linkedPurchaseId = json.optStringOrNull("linkedPurchaseId"),
             ray = json.optStringOrNull("ray"),
             httpCode = httpCode,
         )

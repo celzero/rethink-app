@@ -37,6 +37,7 @@ import org.koin.core.component.inject
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.URLEncoder
@@ -749,8 +750,13 @@ class BillingBackendClient(
                     // Return the original purchase unchanged — the local billing expiry is still
                     // the authority for INAPP; callers should not zero out local expiry based on
                     // a server-side error response.
+                    // If the server included a linkedPurchaseId, surface it so the caller can
+                    // attempt to reactivate the superseded purchase.
                     Logger.e(LOG_IAB, "$TAG $mname: server business error, ${result.payload}")
-                    QueryEntitlementResult.Failure(purchase)
+                    QueryEntitlementResult.Failure(
+                        purchase = purchase,
+                        linkedPurchaseId = result.payload.linkedPurchaseId,
+                    )
                 }
             }
         } catch (e: UnknownHostException) {
@@ -1058,6 +1064,11 @@ class BillingBackendClient(
         val client = RetrofitManager
             .okHttpClient(persistentState.routeRethinkInRethink)
             .newBuilder()
+            // Outermost: on 5xx or network IOException, transparently retries against
+            // RPN_FALLBACK_URL before the response surfaces to Retrofit. Must be added
+            // before the session interceptor so that the session interceptor still runs
+            // (and correctly attaches headers) for the fallback request as well.
+            .addInterceptor(buildFallbackInterceptor())
             .addInterceptor(buildSessionInterceptor(
                 DB_SESSION_HEADER, DB_SESSION_RESPONSE_HEADER,
                 { dbSessionBookmark }, { dbSessionBookmark = it }, "prod"
@@ -1072,7 +1083,12 @@ class BillingBackendClient(
             .create(IBillingServerApi::class.java)
     }
 
-    /** Builds a Retrofit instance for the test billing API. */
+    /**
+     * Builds a Retrofit instance for the test billing API.
+     *
+     * Test calls always target [Constants.RPN_FALLBACK_URL] directly — no primary/fallback
+     * split is needed for the test path.
+     */
     private fun buildTestApi(): IBillingServerApiTest {
         val client = RetrofitManager
             .okHttpClient(persistentState.routeRethinkInRethink)
@@ -1083,12 +1099,61 @@ class BillingBackendClient(
             ))
             .build()
         return Retrofit.Builder()
-            .baseUrl(Constants.RPN_BASE_URL)
+            .baseUrl(Constants.RPN_FALLBACK_URL)
             .client(client)
             .addConverterFactory(SafeResponseConverterFactory())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(IBillingServerApiTest::class.java)
+    }
+
+    /**
+     * OkHttp Application Interceptor that transparently retries a failed production request
+     * against [Constants.RPN_FALLBACK_URL] when [Constants.RPN_BASE_URL] is unreachable or
+     * returns a server error.
+     *
+     * ### Fallback triggers
+     * - **5xx** HTTP responses (server-side errors): the primary response is closed and the
+     *   request is re-issued against the fallback URL.
+     * - **[IOException]** (covers [java.net.UnknownHostException], [java.net.ConnectException],
+     *   [java.net.SocketTimeoutException], and all other network-level failures): the request
+     *   is re-issued against the fallback URL.
+     *
+     * ### Non-fallback cases
+     * - **4xx** client errors are returned as-is; the request cannot succeed on a different
+     *   server (the error is in the request itself, not the server).
+     * - **2xx / 3xx** responses are returned as-is.
+     *
+     * ### Interceptor ordering
+     * This interceptor is added as the **outermost** application interceptor (before the
+     * session interceptor). When the fallback request is issued via `chain.proceed()`, it
+     * passes through the session interceptor again, so session headers (bookmarks, DID token)
+     * are attached correctly to the fallback request too.
+     *
+     * Only used for [IBillingServerApi] (production). [IBillingServerApiTest] already
+     * targets [Constants.RPN_FALLBACK_URL] directly and does not need this interceptor.
+     */
+    private fun buildFallbackInterceptor(): Interceptor = Interceptor { chain ->
+        val request = chain.request()
+        try {
+            val response = chain.proceed(request)
+            if (response.code in 500..599) {
+                Logger.w(LOG_IAB, "$TAG fallback: server error ${response.code} on ${request.url}, retrying with fallback URL")
+                response.close()
+                val fallbackRequest = request.newBuilder()
+                    .url(request.url.toString().replace(Constants.RPN_BASE_URL, Constants.RPN_FALLBACK_URL))
+                    .build()
+                chain.proceed(fallbackRequest)
+            } else {
+                response
+            }
+        } catch (e: IOException) {
+            Logger.w(LOG_IAB, "$TAG fallback: network error (${e.message}) on ${request.url}, retrying with fallback URL")
+            val fallbackRequest = request.newBuilder()
+                .url(request.url.toString().replace(Constants.RPN_BASE_URL, Constants.RPN_FALLBACK_URL))
+                .build()
+            chain.proceed(fallbackRequest)
+        }
     }
 
     /**

@@ -2627,9 +2627,21 @@ object InAppBillingHandler : KoinComponent {
                 purchase
             }
             is QueryEntitlementResult.Failure -> {
-                // Server responded with a business error.
+                // Server responded with a business error (e.g. purchase cancelled/revoked).
                 // Preserve the original purchase; the local billing expiry is the authority.
                 loge(mname, "queryEntitlement server business error for token=${pt.take(8)}; preserving original purchase")
+                // If the server included a linkedPurchaseId, the revoked purchase may have been
+                // superseded by an older one that is still valid.  Attempt to reactivate it so
+                // the user is not left in a broken state.
+                val linked = result.linkedPurchaseId
+                if (!linked.isNullOrBlank()) {
+                    logd(mname, "linkedPurchaseId present for token=${pt.take(8)}; attempting reactivation of linkedToken=${linked.take(8)}")
+                    try {
+                        RpnProxyManager.tryReactivateLinkedPurchase(accountId, deviceId, linked)
+                    } catch (e: Exception) {
+                        loge(mname, "tryReactivateLinkedPurchase threw for linkedToken=${linked.take(8)}: ${e.message}", e)
+                    }
+                }
                 result.purchase
             }
             is QueryEntitlementResult.Transient -> {

@@ -408,6 +408,21 @@ class SubscriptionCheckWorker(
                     is QueryEntitlementResult.Failure -> {
                         Logger.w(LOG_IAB, "$TAG; $mname: server business error on entitlement query " +
                             "for token=${purchase.purchaseToken.take(8)}; skipping expiry resolution (local billing expiry is authority)")
+                        // If the server included a linkedPurchaseId, the revoked purchase may have been
+                        // superseded by an older one that is still valid. Attempt to reactivate it so
+                        // the user is not left in a broken state.
+                        val linked = result.linkedPurchaseId
+                        if (!linked.isNullOrBlank()) {
+                            Logger.i(LOG_IAB, "$TAG; $mname: linkedPurchaseId present for " +
+                                "token=${purchase.purchaseToken.take(8)}; attempting reactivation of " +
+                                "linkedToken=${linked.take(8)}")
+                            try {
+                                RpnProxyManager.tryReactivateLinkedPurchase(accountId, deviceId, linked)
+                            } catch (e: Exception) {
+                                Logger.e(LOG_IAB, "$TAG; $mname: tryReactivateLinkedPurchase threw for " +
+                                    "linkedToken=${linked.take(8)}: ${e.message}", e)
+                            }
+                        }
                     }
                     is QueryEntitlementResult.Transient -> {
                         // Network/transient failure — server was not reached.

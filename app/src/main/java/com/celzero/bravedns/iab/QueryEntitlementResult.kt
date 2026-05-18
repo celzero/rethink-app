@@ -45,13 +45,20 @@ sealed class QueryEntitlementResult {
     object Conflict : QueryEntitlementResult()
 
     /**
-u     * Server responded with a business-level error (e.g. [RpnPurchaseAckServerResponse.Err]:
+     * Server responded with a business-level error (e.g. [RpnPurchaseAckServerResponse.Err]:
      * invalid token, purchase revoked/refunded per server records, etc.).
      * The server was reachable but explicitly said the purchase is not valid.
      * [purchase] is the *original* [PurchaseDetail] unchanged (fail-safe: preserve it).
      * The local billing expiry is still the authoritative gate for INAPP purchases.
+     *
+     * [linkedPurchaseId] is the Google Play purchase token of a superseded purchase that the
+     * server included in the error response.  When non-null, the client should query /g/ack
+     * for this token and reactivate the corresponding DB row if the server confirms it valid.
      */
-    data class Failure(val purchase: PurchaseDetail) : QueryEntitlementResult()
+    data class Failure(
+        val purchase: PurchaseDetail,
+        val linkedPurchaseId: String? = null,
+    ) : QueryEntitlementResult()
 
     /**
      * Transient / infrastructure failure: network error, server unreachable, timeout,

@@ -106,8 +106,7 @@ object RpnProxyManager : KoinComponent {
     val serverRemovedEvent: SharedFlow<List<CountryConfig>> = _serverRemovedEvent.asSharedFlow()
 
     data class ServerKeyMeta(
-        val selectedAt: Long,
-        val sinceTs: Long = 0L
+        val selectedAt: Long
     )
 
     // Tracks per-server-key metadata (selection time, last tunnel-start ts, cached client IPs).
@@ -1191,6 +1190,92 @@ object RpnProxyManager : KoinComponent {
     }
 
     /**
+     * Called when a purchase revocation error from the server includes a [linkedToken]
+     * (the Google Play purchase token of an older, superseded purchase).
+     *
+     * This method:
+     * 1. Looks up [linkedToken] in the local DB.
+     * 2. Issues a `/g/ack` query for [linkedToken].
+     * 3. If the server confirms the linked purchase is valid, reactivates it by driving
+     *    [paymentSuccessful] in the state machine and re-enabling RPN access.
+     *
+     * The caller's original purchase remains unchanged regardless of the outcome; this
+     * operation only acts on the linked purchase row.
+     *
+     * @return `true` if the linked purchase was found and successfully reactivated.
+     */
+    suspend fun tryReactivateLinkedPurchase(
+        accountId: String,
+        deviceId: String,
+        linkedToken: String,
+    ): Boolean {
+        val mname = "tryReactivateLinkedPurchase"
+        if (linkedToken.isBlank() || accountId.isBlank()) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; $mname: blank accountId or linkedToken, skipping")
+            return false
+        }
+
+        // 1. Look up the linked purchase token in the local DB.
+        val linkedSub = try {
+            subscriptionStatusRepository.getByPurchaseToken(linkedToken)
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG; $mname: DB lookup failed for linkedToken=${linkedToken.take(8)}: ${e.message}", e)
+            return false
+        }
+
+        if (linkedSub == null) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; $mname: linkedToken=${linkedToken.take(8)} not found in DB, cannot reactivate")
+            return false
+        }
+
+        // 2. Build a PurchaseDetail from the DB row and query /g/ack for the linked token.
+        val linkedPurchaseDetail = subscriptionStateMachine.createPurchaseDetailFromSubscription(linkedSub)
+        val result = try {
+            billingBackendClient.queryEntitlement(accountId, deviceId, linkedPurchaseDetail, linkedToken)
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG; $mname: entitlement query failed for linkedToken=${linkedToken.take(8)}: ${e.message}", e)
+            return false
+        }
+
+        // 3. If the server confirms the linked purchase, reactivate it.
+        return when (result) {
+            is com.celzero.bravedns.iab.QueryEntitlementResult.Success -> {
+                val updatedPurchase = result.purchase
+                Logger.i(LOG_TAG_PROXY, "$TAG; $mname: linkedToken=${linkedToken.take(8)} confirmed valid by server; reactivating")
+                try {
+                    subscriptionStateMachine.paymentSuccessful(updatedPurchase)
+                    activateRpn(updatedPurchase)
+                    Logger.i(LOG_TAG_PROXY, "$TAG; $mname: reactivation complete for linkedToken=${linkedToken.take(8)}, product=${updatedPurchase.productId}")
+                    true
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_PROXY, "$TAG; $mname: reactivation state update failed for linkedToken=${linkedToken.take(8)}: ${e.message}", e)
+                    false
+                }
+            }
+            is com.celzero.bravedns.iab.QueryEntitlementResult.Failure -> {
+                Logger.w(LOG_TAG_PROXY, "$TAG; $mname: linkedToken=${linkedToken.take(8)} also invalid per server (no linkedPurchaseId in response)")
+                false
+            }
+            is com.celzero.bravedns.iab.QueryEntitlementResult.Transient -> {
+                Logger.w(LOG_TAG_PROXY, "$TAG; $mname: transient failure querying linkedToken=${linkedToken.take(8)}, not reactivating (fail-safe)")
+                false
+            }
+            is com.celzero.bravedns.iab.QueryEntitlementResult.Unauthorized -> {
+                Logger.e(LOG_TAG_PROXY, "$TAG; $mname: 401 unauthorized for linkedToken=${linkedToken.take(8)}")
+                false
+            }
+            is com.celzero.bravedns.iab.QueryEntitlementResult.Conflict -> {
+                Logger.w(LOG_TAG_PROXY, "$TAG; $mname: 409 conflict for linkedToken=${linkedToken.take(8)}")
+                false
+            }
+            else -> {
+                Logger.w(LOG_TAG_PROXY, "$TAG; $mname: unhandled result type for linkedToken=${linkedToken.take(8)}")
+                false
+            }
+        }
+    }
+
+    /**
      * Called from [SubscriptionStateMachineV2.handlePaymentSuccessful] after the DB row is
      * written and the state machine has been updated.
      *
@@ -1479,7 +1564,7 @@ object RpnProxyManager : KoinComponent {
         }
 
         try {
-            val res = VpnController.handleRpnHop(config.key)
+            val res = VpnController.handleRpnHop(config.key, oldValue != enabled)
             if (res.first) {
                 Logger.i(LOG_TAG_PROXY, "$TAG; setHopForWinServer: tunnel updated hop for server $key successfully")
             } else {
@@ -1504,14 +1589,6 @@ object RpnProxyManager : KoinComponent {
      */
     fun getSelectedSinceTs(key: String): Long {
         return serverKeyMeta[key]?.selectedAt ?: 0L
-    }
-
-    fun getCachedSinceTs(key: String): Long = serverKeyMeta[key]?.sinceTs ?: 0L
-
-    fun updateIpMeta(key: String, sinceTs: Long) {
-        val existing = serverKeyMeta[key]
-        serverKeyMeta[key] = existing?.copy(sinceTs = sinceTs)
-            ?: ServerKeyMeta(selectedAt = 0L, sinceTs = sinceTs)
     }
 
     suspend fun getEnabledConfigs(): Set<CountryConfig> {
@@ -2889,9 +2966,9 @@ object RpnProxyManager : KoinComponent {
             val id = if (it.key.equals(AUTO_SERVER_ID, true)) {
                 Backend.RpnWin
             } else {
-                Backend.RpnWin + it.key
+                it.key
             }
-            val stats = VpnController.getWireGuardStats(id)
+            val stats = VpnController.getRpnStats(id)
             val routerStats = stats?.routerStats
             sb.append("   id: ${it.id}, name: ${it.name}\n")
             sb.append("   addr: ${routerStats?.addrs}").append("\n")
@@ -2912,7 +2989,11 @@ object RpnProxyManager : KoinComponent {
             sb.append("   since: ${getRelativeTimeSpan(routerStats?.since)}\n")
             sb.append("   errRx: ${routerStats?.errRx}\n")
             sb.append("   errTx: ${routerStats?.errTx}\n")
-            sb.append("   extra: ${routerStats?.extra}\n\n")
+            sb.append("   extra: ${routerStats?.extra}\n")
+            sb.append("   client4: ${stats?.clientV4}\n")
+            sb.append("   client6: ${stats?.clientV6}\n\n")
+            val s = sb.toString()
+            Logger.d(LOG_TAG_PROXY, "$TAG; id: $id stats:\n$s")
         }
         if (sb.isEmpty()) {
             sb.append("   N/A\n\n")
