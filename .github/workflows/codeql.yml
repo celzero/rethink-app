@@ -39,9 +39,12 @@ jobs:
       - name: ⚡️ +x gradlew
         run: chmod +x gradlew
 
-      - name: 🔨 Build (fdroid, no google-services.json required)
+      - name: 🔨 Build analyzed flavor variants
         run: |
-          ./gradlew assembleFdroidFullDebug \
+          ./gradlew \
+            assembleFdroidFullDebug \
+            assemblePlayFullDebug \
+            assembleWebsiteFullDebug \
             --no-daemon \
             --warning-mode all
 
