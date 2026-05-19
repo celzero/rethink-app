@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,12 +26,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.AltRoute
 import androidx.compose.material.icons.filled.AccessibilityNew
+import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Lan
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayCircleOutline
 import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.PublicOff
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.SettingsEthernet
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.WifiTethering
@@ -41,11 +45,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.tv.material3.Button
 import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
+import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
@@ -95,7 +102,7 @@ import org.koin.compose.koinInject
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(navController: NavController? = null) {
     val persistentState = koinInject<PersistentState>()
     val appConfig = koinInject<AppConfig>()
     val composeScope = rememberCoroutineScope()
@@ -228,7 +235,79 @@ fun SettingsScreen() {
                 },
             )
 
+            Spacer(Modifier.height(12.dp))
+            SettingSectionHeader("Advanced")
+            SettingNavRow(
+                title = "Pause protection",
+                description = "Snooze DNS and firewall rules for a set duration without bringing the tunnel down.",
+                leadingIcon = Icons.Filled.Pause,
+                onClick = { navController?.navigate("settings/pause") },
+            )
+            SettingNavRow(
+                title = "Anti-censorship",
+                description = "Pick the dial-strategy + retry behaviour used to bypass DPI on hostile networks.",
+                leadingIcon = Icons.Filled.Shield,
+                onClick = { navController?.navigate("settings/anti-censorship") },
+            )
+            SettingNavRow(
+                title = "Console log",
+                description = "Rolling app diagnostics. Helpful when something looks broken — useful for bug reports.",
+                leadingIcon = Icons.Filled.BugReport,
+                onClick = { navController?.navigate("settings/console-log") },
+            )
+
             Spacer(Modifier.height(32.dp))
+        }
+    }
+}
+
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+private fun SettingNavRow(
+    title: String,
+    description: String,
+    leadingIcon: ImageVector,
+    onClick: () -> Unit,
+) {
+    Surface(
+        onClick = onClick,
+        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(12.dp)),
+        colors = ClickableSurfaceDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 16.dp),
+        ) {
+            Icon(
+                imageVector = leadingIcon,
+                contentDescription = null,
+                modifier = Modifier.size(28.dp),
+            )
+            Spacer(Modifier.width(16.dp))
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.SemiBold,
+                    ),
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
         }
     }
 }

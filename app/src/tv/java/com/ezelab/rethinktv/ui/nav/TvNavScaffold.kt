@@ -38,7 +38,9 @@ import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
 import com.ezelab.rethinktv.ui.apps.AppDetailScreen
 import com.ezelab.rethinktv.ui.apps.AppsScreen
+import com.ezelab.rethinktv.ui.console.ConsoleLogScreen
 import com.ezelab.rethinktv.ui.dns.DnsScreen
+import com.ezelab.rethinktv.ui.dns.OdohAddScreen
 import com.ezelab.rethinktv.ui.firewall.FirewallScreen
 import com.ezelab.rethinktv.ui.home.HomeScreen
 import com.ezelab.rethinktv.ui.logs.LogsScreen
@@ -46,8 +48,13 @@ import com.ezelab.rethinktv.ui.proxy.ProxyEditorKind
 import com.ezelab.rethinktv.ui.proxy.ProxyEditorScreen
 import com.ezelab.rethinktv.ui.proxy.ProxyScreen
 import com.ezelab.rethinktv.ui.proxy.WgDetailScreen
+import com.ezelab.rethinktv.ui.proxy.WgImportScreen
 import com.ezelab.rethinktv.ui.rules.RulesScreen
+import com.ezelab.rethinktv.ui.settings.AntiCensorshipScreen
+import com.ezelab.rethinktv.ui.settings.PauseVpnScreen
 import com.ezelab.rethinktv.ui.settings.SettingsScreen
+import com.ezelab.rethinktv.ui.stats.StatsDetailKind
+import com.ezelab.rethinktv.ui.stats.StatsDetailScreen
 import com.ezelab.rethinktv.ui.stats.StatsScreen
 import com.ezelab.rethinktv.ui.theme.RethinkTvTheme
 
@@ -158,7 +165,8 @@ fun TvNavScaffold() {
                         modifier = Modifier.fillMaxSize(),
                     ) {
                         composable(TvDestination.Home.route) { HomeScreen() }
-                        composable(TvDestination.Dns.route) { DnsScreen() }
+                        composable(TvDestination.Dns.route) { DnsScreen(navController) }
+                        composable("dns/odoh/add") { OdohAddScreen(navController) }
                         composable(TvDestination.Firewall.route) { FirewallScreen() }
                         composable(TvDestination.Apps.route) { AppsScreen(navController) }
                         composable(TvDestination.Rules.route) { RulesScreen() }
@@ -187,9 +195,29 @@ fun TvNavScaffold() {
                         }
                         composable("proxy/socks5") { ProxyEditorScreen(kind = ProxyEditorKind.SOCKS5) }
                         composable("proxy/http") { ProxyEditorScreen(kind = ProxyEditorKind.HTTP) }
+                        composable("wg/import") { WgImportScreen(navController) }
                         composable(TvDestination.Logs.route) { LogsScreen() }
-                        composable(TvDestination.Stats.route) { StatsScreen() }
-                        composable(TvDestination.Settings.route) { SettingsScreen() }
+                        composable(TvDestination.Stats.route) { StatsScreen(navController) }
+                        composable(
+                            route = "stats/detail/{kind}/{value}",
+                            arguments = listOf(
+                                androidx.navigation.navArgument("kind") {
+                                    type = androidx.navigation.NavType.StringType
+                                },
+                                androidx.navigation.navArgument("value") {
+                                    type = androidx.navigation.NavType.StringType
+                                },
+                            ),
+                        ) { backStackEntry ->
+                            val kindArg = backStackEntry.arguments?.getString("kind") ?: "domain"
+                            val value = backStackEntry.arguments?.getString("value").orEmpty()
+                            val kind = if (kindArg == "ip") StatsDetailKind.IP else StatsDetailKind.DOMAIN
+                            StatsDetailScreen(value = value, kind = kind)
+                        }
+                        composable(TvDestination.Settings.route) { SettingsScreen(navController) }
+                        composable("settings/anti-censorship") { AntiCensorshipScreen() }
+                        composable("settings/pause") { PauseVpnScreen() }
+                        composable("settings/console-log") { ConsoleLogScreen() }
                     }
                 }
             }

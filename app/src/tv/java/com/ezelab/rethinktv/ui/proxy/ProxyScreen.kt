@@ -132,10 +132,19 @@ fun ProxyScreen(navController: NavController) {
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            SettingSectionHeader("WireGuard tunnels (${tunnels.size})")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                SettingSectionHeader(
+                    text = "WireGuard tunnels (${tunnels.size})",
+                    modifier = Modifier.weight(1f),
+                )
+                AddTunnelButton(onClick = { navController.navigate("wg/import") })
+            }
             if (tunnels.isEmpty()) {
                 Text(
-                    text = "No WireGuard tunnels yet. The TV file-picker import flow will land in a follow-up — for now sideload from the phone build.",
+                    text = "No WireGuard tunnels yet. Use \"+ Add tunnel\" above to paste a .conf you copied from your phone, or sideload from the phone build.",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(start = 4.dp, top = 4.dp),
                 )
@@ -182,6 +191,30 @@ private data class ProxyDetails(
     val http: String? = null,
     val orbot: Boolean = false,
 )
+
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+private fun AddTunnelButton(onClick: () -> Unit) {
+    Surface(
+        onClick = onClick,
+        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(50)),
+        colors = ClickableSurfaceDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        ),
+    ) {
+        Box(modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp)) {
+            Text(
+                text = "+ Add tunnel",
+                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+            )
+        }
+    }
+}
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable

@@ -24,6 +24,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,8 +40,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
+import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
@@ -47,6 +51,8 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.database.DoTEndpoint
 import com.celzero.bravedns.database.ODoHEndpoint
+import com.celzero.bravedns.database.ODoHEndpointDAO
+import com.celzero.bravedns.database.ODoHEndpointRepository
 import com.ezelab.rethinktv.ui.common.SettingSectionHeader
 import com.ezelab.rethinktv.ui.common.TvScreenScaffold
 import com.ezelab.rethinktv.ui.common.rememberAsImmutableState
@@ -110,8 +116,10 @@ private enum class DnsTab(
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-fun DnsScreen() {
+fun DnsScreen(navController: NavController? = null) {
     val appConfig = koinInject<AppConfig>()
+    val odohDao = koinInject<ODoHEndpointDAO>()
+    val odohRepository = koinInject<ODoHEndpointRepository>()
     val scope = rememberCoroutineScope()
 
     // Tracks the user's currently-focused tab. Independent of the
@@ -128,7 +136,7 @@ fun DnsScreen() {
             when (activeTab) {
                 DnsTab.DOH -> appConfig.getAllDefaultDoHEndpoints().map { it.toRow() }
                 DnsTab.DOT -> appConfig.getAllDefaultDoTEndpoints().map { it.toRow() }
-                DnsTab.ODOH -> emptyList() // populated below
+                DnsTab.ODOH -> odohDao.getAllAsList().map { it.toRow() }
             }
         }
     }
@@ -157,7 +165,18 @@ fun DnsScreen() {
             Spacer(Modifier.height(8.dp))
             DnsTabs(active = activeTab, onSelect = { activeTab = it })
             Spacer(Modifier.height(4.dp))
-            SettingSectionHeader("${activeTab.label} endpoints")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                SettingSectionHeader(
+                    text = "${activeTab.label} endpoints",
+                    modifier = Modifier.weight(1f),
+                )
+                if (activeTab == DnsTab.ODOH) {
+                    AddOdohButton(onClick = { navController?.navigate("dns/odoh/add") })
+                }
+            }
 
             if (rows.isEmpty()) {
                 Text(
@@ -177,7 +196,11 @@ fun DnsScreen() {
                             row = row,
                             onSelect = {
                                 scope.launch(Dispatchers.IO) {
-                                    activateRow(appConfig, activeTab, row.key)
+                                    if (activeTab == DnsTab.ODOH) {
+                                        activateOdoh(appConfig, odohDao, row.key)
+                                    } else {
+                                        activateRow(appConfig, activeTab, row.key)
+                                    }
                                     // Bounce reload back to main thread so
                                     // produceState observes the change.
                                     withContext(Dispatchers.Main) { reloadKey++ }
@@ -423,7 +446,56 @@ private suspend fun activateRow(appConfig: AppConfig, tab: DnsTab, key: String) 
             appConfig.handleDoTChanges(ep)
         }
         DnsTab.ODOH -> {
-            // ODoH list path TBD; left as no-op until we add a custom-add UX.
+            // Caller injects the DAO; resolve the row by id and
+            // flip the selected flag via handleODoHChanges (matches
+            // the phone's tap flow).
+            // Activation is handled in the screen-scope via a
+            // dedicated helper below to avoid pulling Koin into a
+            // top-level suspend.
+        }
+    }
+}
+
+private suspend fun activateOdoh(
+    appConfig: AppConfig,
+    odohDao: ODoHEndpointDAO,
+    key: String,
+) {
+    val id = key.substringAfter('/').toIntOrNull() ?: return
+    val ep = odohDao.getAllAsList().firstOrNull { it.id == id } ?: return
+    ep.isSelected = true
+    appConfig.handleODoHChanges(ep)
+}
+
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+private fun AddOdohButton(onClick: () -> Unit) {
+    Surface(
+        onClick = onClick,
+        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(50)),
+        colors = ClickableSurfaceDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        ),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = null,
+                modifier = Modifier.width(18.dp),
+            )
+            Spacer(Modifier.width(6.dp))
+            Text(
+                "Add custom",
+                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+            )
         }
     }
 }

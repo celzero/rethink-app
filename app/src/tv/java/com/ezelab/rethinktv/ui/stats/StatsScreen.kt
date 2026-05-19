@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -51,6 +52,8 @@ import com.celzero.bravedns.database.StatsSummaryDao
 import com.ezelab.rethinktv.ui.common.TvScreenScaffold
 import kotlinx.coroutines.flow.Flow
 import org.koin.compose.koinInject
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 /**
  * Stats destination — summary of who used the tunnel, who got
@@ -82,7 +85,7 @@ import org.koin.compose.koinInject
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-fun StatsScreen() {
+fun StatsScreen(navController: NavController? = null) {
     val statsDao = koinInject<StatsSummaryDao>()
     val connDao = koinInject<ConnectionTrackerDAO>()
 
@@ -104,7 +107,7 @@ fun StatsScreen() {
                 pagerFlowFor(tab, to, statsDao, connDao)
             }
             val items = flow.collectAsLazyPagingItems()
-            StatsList(tab = tab, items = items)
+            StatsList(tab = tab, items = items, navController = navController)
         }
     }
 }
@@ -196,7 +199,11 @@ private fun WindowChip(label: String, active: Boolean, onClick: () -> Unit) {
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun StatsList(tab: StatsTab, items: LazyPagingItems<AppConnection>) {
+private fun StatsList(
+    tab: StatsTab,
+    items: LazyPagingItems<AppConnection>,
+    navController: NavController?,
+) {
     val isEmpty = items.loadState.refresh is androidx.paging.LoadState.NotLoading &&
         items.itemCount == 0
     val isLoading = items.loadState.refresh is androidx.paging.LoadState.Loading
@@ -213,8 +220,33 @@ private fun StatsList(tab: StatsTab, items: LazyPagingItems<AppConnection>) {
                 key = items.itemKey { keyFor(it) },
             ) { index ->
                 val row = items[index] ?: return@items
-                StatsRow(tab = tab, row = row, rank = index + 1)
+                StatsRow(
+                    tab = tab,
+                    row = row,
+                    rank = index + 1,
+                    onClick = { navigateForRow(navController, tab, row) },
+                )
             }
+        }
+    }
+}
+
+private fun navigateForRow(nav: NavController?, tab: StatsTab, row: AppConnection) {
+    nav ?: return
+    when (tab) {
+        StatsTab.TOP_APPS, StatsTab.BLOCKED_APPS -> {
+            // Reuse the existing per-app firewall detail screen.
+            if (row.uid >= 0) nav.navigate("apps/${row.uid}")
+        }
+        StatsTab.TOP_DOMAINS, StatsTab.BLOCKED_DOMAINS -> {
+            val name = row.appOrDnsName?.takeIf { it.isNotBlank() } ?: return
+            val encoded = URLEncoder.encode(name, StandardCharsets.UTF_8.name())
+            nav.navigate("stats/detail/domain/$encoded")
+        }
+        StatsTab.TOP_IPS -> {
+            val ip = row.ipAddress.takeIf { it.isNotBlank() } ?: return
+            val encoded = URLEncoder.encode(ip, StandardCharsets.UTF_8.name())
+            nav.navigate("stats/detail/ip/$encoded")
         }
     }
 }
@@ -224,9 +256,9 @@ private fun keyFor(row: AppConnection): String =
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun StatsRow(tab: StatsTab, row: AppConnection, rank: Int) {
+private fun StatsRow(tab: StatsTab, row: AppConnection, rank: Int, onClick: () -> Unit) {
     Surface(
-        onClick = {},
+        onClick = onClick,
         shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(8.dp)),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
