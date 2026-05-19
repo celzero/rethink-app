@@ -29,7 +29,7 @@ object ServiceModule {
         // SecureIdentityStore: encrypted file-backed store for accountId + deviceId.
         // Registered here (main) so both PipKeyManager (main) and BillingServerRepository
         // (play/website) share the same singleton and never diverge on stored values.
-        single { SecureIdentityStore(androidContext(), get()) }
+        single { SecureIdentityStore(androidContext()) }
     }
 
     val modules = listOf(serviceModules)

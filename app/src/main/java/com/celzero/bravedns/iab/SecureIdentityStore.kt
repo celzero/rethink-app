@@ -51,7 +51,7 @@ import java.io.File
  * All I/O is dispatched on [Dispatchers.IO].  No in-process caching is performed
  * here; callers own their own in-memory caching strategy.
  */
-class SecureIdentityStore(private val context: Context, private val persistentState: PersistentState) {
+class SecureIdentityStore(private val context: Context) {
 
     companion object {
         private const val TAG = "SecureIdentityStore"
