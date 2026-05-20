@@ -149,7 +149,7 @@ class GooglePlaySubsAdapter(
             val isSelected = selectedPos == pos
             val isInApp = prod.productType == ProductType.INAPP
 
-            // Plan Duration label
+            // plan duration label
             val durationMonths = getInAppDurationMonths(prod.planId)
             binding.planDuration.text = if (isInApp && durationMonths > 0) {
                 formatDurationLabel(durationMonths, planTitle)
@@ -157,8 +157,7 @@ class GooglePlaySubsAdapter(
                 planTitle
             }
 
-            // Main price
-            binding.price.text = displayPrice
+            Logger.d(LOG_TAG_UI, "InAppBilling Binding plan: ${prod.productId}, ${prod.planId}, Title: $planTitle, Price: $displayPrice, FreeTrial: $freeTrialDays days, Yearly: $isYearly, InApp: $isInApp")
 
             // Original Price (struck through, below price)
             if (discountedPrice.isNotEmpty() && currentPrice.isNotEmpty()) {
@@ -169,9 +168,14 @@ class GooglePlaySubsAdapter(
                 binding.originalPrice.visibility = View.GONE
             }
 
-            // Per-month breakdown for INAPP (e.g. "2-year plan = ₹141/mo")
-            if (isInApp && durationMonths > 0 && displayPriceMicros > 0) {
-                val perMonthMicros = displayPriceMicros / durationMonths
+            val durationMonthsForCalc: Int = when {
+                isInApp  -> getInAppDurationMonths(prod.planId)
+                isYearly -> 12
+                else     -> 1 // monthly subscription
+            }
+
+            if (displayPriceMicros > 0 && durationMonthsForCalc > 0) {
+                val perMonthMicros = displayPriceMicros / durationMonthsForCalc
                 val perMonthFormatted = formatMicrosAsCurrency(perMonthMicros, currencyCode, displayPrice)
                 if (perMonthFormatted != null) {
                     binding.pricePerMonth.visibility = View.VISIBLE
@@ -179,8 +183,25 @@ class GooglePlaySubsAdapter(
                 } else {
                     binding.pricePerMonth.visibility = View.GONE
                 }
+                // Show the aggregate total only for multi-period plans (yearly subs, 2yr/5yr INAPP).
+                // For monthly subs durationMonthsForCalc == 1, so the per-month price IS the total
+                // no need to repeat it in the smaller field.
+                if (durationMonthsForCalc > 1 && displayPrice.isNotEmpty()) {
+                    binding.price.visibility = View.VISIBLE
+                    binding.price.text = displayPrice
+                } else {
+                    binding.price.visibility = View.GONE
+                }
             } else {
+                // per-month cannot be calculated (unknown purchase duration).
+                // Show at least the full price in the primary field.
                 binding.pricePerMonth.visibility = View.GONE
+                if (displayPrice.isNotEmpty()) {
+                    binding.price.visibility = View.VISIBLE
+                    binding.price.text = displayPrice
+                } else {
+                    binding.price.visibility = View.GONE
+                }
             }
 
             val billingText = getBillingText(prod.productType, pricing.billingPeriod)
