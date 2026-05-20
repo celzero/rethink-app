@@ -26,7 +26,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -42,6 +44,7 @@ import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
+import kotlinx.coroutines.delay
 import com.ezelab.rethinktv.ui.apps.AppDetailScreen
 import com.ezelab.rethinktv.ui.apps.AppsScreen
 import com.ezelab.rethinktv.ui.console.ConsoleLogScreen
@@ -100,14 +103,50 @@ fun TvNavScaffold() {
             // means the big "Start protection" button — confusing
             // because D-pad LEFT then has nowhere obvious to go.
             val firstItemFocus = remember { FocusRequester() }
+            // A FocusRequester per top-level rail destination. When
+            // the user descends into a sub-screen (e.g. proxy → wg/0)
+            // the OS focus engine snaps focus to the topologically
+            // first focusable in the tree, which is *not* the rail
+            // item that matches the new route. Result: the rail's
+            // "focused" highlight lands on the wrong icon (typically
+            // the second item, DNS) while the correct icon is shown
+            // "selected". We compensate by re-anchoring focus on the
+            // parent rail item on every route change so the rail's
+            // focused & selected highlight stay in lock-step with the
+            // visible route. The user can still press D-pad RIGHT to
+            // enter the screen content — same as the existing
+            // top-level destination UX — so this preserves the
+            // ten-foot rail navigation pattern.
+            val railFocusRequesters = remember {
+                TvDestination.entries.associateWith { FocusRequester() }
+            }
             LaunchedEffect(Unit) {
                 runCatching { firstItemFocus.requestFocus() }
+            }
+
+            var previousRoute by remember { mutableStateOf<String?>(null) }
+            LaunchedEffect(currentRoute) {
+                val prev = previousRoute
+                previousRoute = currentRoute
+                if (currentRoute == null || prev == null || currentRoute == prev) {
+                    return@LaunchedEffect
+                }
+                val parent = TvDestination.entries.firstOrNull {
+                    currentRoute == it.route ||
+                        currentRoute.startsWith(it.route + "/")
+                } ?: return@LaunchedEffect
+                // Wait for the rail's recomposition (selected-state
+                // change) to settle so the FocusRequester has actually
+                // attached to the new measure pass before we request.
+                delay(80)
+                runCatching { railFocusRequesters[parent]?.requestFocus() }
             }
 
             NavRailContent(
                 destinations = destinations,
                 currentRoute = currentRoute,
                 firstItemFocus = firstItemFocus,
+                railFocusRequesters = railFocusRequesters,
                 onSelect = { dest ->
                     if (currentRoute != dest.route) {
                         navController.navigate(dest.route) {
@@ -209,6 +248,7 @@ private fun NavRailContent(
     destinations: List<TvDestination>,
     currentRoute: String?,
     firstItemFocus: FocusRequester,
+    railFocusRequesters: Map<TvDestination, FocusRequester>,
     onSelect: (TvDestination) -> Unit,
     content: @Composable () -> Unit,
 ) {
@@ -221,13 +261,22 @@ private fun NavRailContent(
                 .padding(vertical = 12.dp, horizontal = 8.dp),
         ) {
             destinations.forEachIndexed { index, dest ->
+                val perItemFocus = railFocusRequesters[dest]
+                val itemModifier = when {
+                    // The first-item requester must win over the
+                    // per-destination one for the Home item so the
+                    // initial-launch focus park is preserved.
+                    index == 0 -> Modifier.focusRequester(firstItemFocus)
+                    perItemFocus != null -> Modifier.focusRequester(perItemFocus)
+                    else -> Modifier
+                }
                 NavRailItem(
                     selected = currentRoute == dest.route ||
                         (currentRoute != null && currentRoute.startsWith(dest.route + "/")),
                     icon = dest.icon,
                     label = dest.label,
                     onClick = { onSelect(dest) },
-                    modifier = if (index == 0) Modifier.focusRequester(firstItemFocus) else Modifier,
+                    modifier = itemModifier,
                 )
                 Spacer(Modifier.height(6.dp))
             }
