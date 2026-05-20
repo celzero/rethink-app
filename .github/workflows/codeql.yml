@@ -12,6 +12,8 @@ jobs:
   analyze:
     name: Analyze (java-kotlin)
     runs-on: ubuntu-latest
+    env:
+      VARIANT: assembleWebsiteFullDebug
     permissions:
       security-events: write
       packages: read
@@ -39,14 +41,29 @@ jobs:
       - name: ⚡️ +x gradlew
         run: chmod +x gradlew
 
-      - name: 🔨 Build analyzed flavor variants
+      - name: 🎪 Secrets
+        if: success()
+        # developers.google.com/android/guides/google-services-plugin#adding_the_json_file
+        run: |
+          mkdir -p app/src/debug
+          echo "${GSCV_TEST_JSON}" > app/src/debug/google-services.json
+          # expected: l:29 w:45 m:691
+          wc -lwm app/src/debug/google-services.json
+          if [ -z "$GSCV_TEST_JSON" ]; then
+            echo "VARIANT=assembleFdroidFullDebug" >> "$GITHUB_ENV"
+          fi
+        env:
+          GSCV_TEST_JSON: ${{ secrets.GOOGLE_SERVICES_TEST_JSON }}
+
+      - name: 🔨 Build
+        if: success()
         run: |
           ./gradlew \
-            assembleFdroidFullDebug \
-            assemblePlayFullDebug \
-            assembleWebsiteFullDebug \
+            ${VARIANT} \
             --no-daemon \
             --warning-mode all
+        env:
+          VARIANT: ${{ env.VARIANT }}
 
       - name: 🔎 Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
