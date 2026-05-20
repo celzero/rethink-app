@@ -11,11 +11,18 @@ package com.ezelab.rethinktv.ui.nav
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,11 +36,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.NavigationDrawer
-import androidx.tv.material3.NavigationDrawerItem
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
 import com.ezelab.rethinktv.ui.apps.AppDetailScreen
@@ -98,57 +104,19 @@ fun TvNavScaffold() {
                 runCatching { firstItemFocus.requestFocus() }
             }
 
-            NavigationDrawer(
-                drawerContent = {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(vertical = 24.dp, horizontal = 12.dp),
-                    ) {
-                        Text(
-                            text = "Rethink TV",
-                            style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.padding(
-                                horizontal = 16.dp,
-                                vertical = 8.dp,
-                            ),
-                        )
-                        Spacer(Modifier.height(16.dp))
-                        destinations.forEachIndexed { index, dest ->
-                            NavigationDrawerItem(
-                                selected = currentRoute == dest.route,
-                                onClick = {
-                                    if (currentRoute != dest.route) {
-                                        navController.navigate(dest.route) {
-                                            // Top-level destinations are a flat set:
-                                            // popping back to start prevents the
-                                            // back-stack from accumulating
-                                            // duplicates as the user pingpongs
-                                            // through the drawer.
-                                            popUpTo(TvDestination.Home.route) {
-                                                inclusive = false
-                                                saveState = true
-                                            }
-                                            launchSingleTop = true
-                                            restoreState = true
-                                        }
-                                    }
-                                },
-                                leadingContent = {
-                                    Icon(
-                                        imageVector = dest.icon,
-                                        contentDescription = dest.label,
-                                        modifier = Modifier.size(24.dp),
-                                    )
-                                },
-                                modifier = if (index == 0) {
-                                    Modifier.focusRequester(firstItemFocus)
-                                } else {
-                                    Modifier
-                                },
-                            ) {
-                                Text(text = dest.label)
+            NavRailContent(
+                destinations = destinations,
+                currentRoute = currentRoute,
+                firstItemFocus = firstItemFocus,
+                onSelect = { dest ->
+                    if (currentRoute != dest.route) {
+                        navController.navigate(dest.route) {
+                            popUpTo(TvDestination.Home.route) {
+                                inclusive = false
+                                saveState = true
                             }
+                            launchSingleTop = true
+                            restoreState = true
                         }
                     }
                 },
@@ -156,7 +124,7 @@ fun TvNavScaffold() {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(start = 24.dp),
+                        .padding(start = 8.dp),
                     contentAlignment = Alignment.TopStart,
                 ) {
                     NavHost(
@@ -221,6 +189,88 @@ fun TvNavScaffold() {
                     }
                 }
             }
+        }
+    }
+}
+
+/**
+ * Permanent left nav rail.
+ *
+ * We previously used [androidx.tv.material3.NavigationDrawer], but in
+ * tv-material 1.0.0 its content slot mis-measures on a 1920×1080
+ * surface — the NavHost renders zero-sized and every destination
+ * appears blank. A hand-rolled [Row] with a fixed-width rail + a
+ * weighted content [Box] sidesteps that entirely and gives us full
+ * control over focus traversal.
+ */
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+private fun NavRailContent(
+    destinations: List<TvDestination>,
+    currentRoute: String?,
+    firstItemFocus: FocusRequester,
+    onSelect: (TvDestination) -> Unit,
+    content: @Composable () -> Unit,
+) {
+    Row(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .width(80.dp)
+                .fillMaxHeight()
+                .verticalScroll(rememberScrollState())
+                .padding(vertical = 12.dp, horizontal = 8.dp),
+        ) {
+            destinations.forEachIndexed { index, dest ->
+                NavRailItem(
+                    selected = currentRoute == dest.route ||
+                        (currentRoute != null && currentRoute.startsWith(dest.route + "/")),
+                    icon = dest.icon,
+                    label = dest.label,
+                    onClick = { onSelect(dest) },
+                    modifier = if (index == 0) Modifier.focusRequester(firstItemFocus) else Modifier,
+                )
+                Spacer(Modifier.height(6.dp))
+            }
+        }
+        Box(modifier = Modifier.fillMaxSize()) {
+            content()
+        }
+    }
+}
+
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+private fun NavRailItem(
+    selected: Boolean,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        onClick = onClick,
+        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(50)),
+        colors = ClickableSurfaceDefaults.colors(
+            containerColor = if (selected) MaterialTheme.colorScheme.primary
+            else MaterialTheme.colorScheme.surface,
+            contentColor = if (selected) MaterialTheme.colorScheme.onPrimary
+            else MaterialTheme.colorScheme.onSurfaceVariant,
+            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        ),
+        modifier = modifier.size(56.dp),
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                modifier = Modifier.size(22.dp),
+            )
         }
     }
 }
