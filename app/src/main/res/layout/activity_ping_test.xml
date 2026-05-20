@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
-        android:paddingBottom="60dp">
+        android:paddingBottom="72dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -19,52 +19,25 @@
             android:orientation="vertical"
             android:gravity="center_horizontal">
 
-            <LinearLayout
+            <!-- Header -->
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:paddingHorizontal="24dp"
                 android:paddingTop="32dp"
-                android:paddingBottom="16dp">
+                android:paddingBottom="16dp"
+                android:text="@string/ping_test_title"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="22sp"
+                android:textStyle="bold" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="24dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/ping_test_title"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/subtitle_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/ping_test_subtitle"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:textSize="14sp"
-                    android:lineSpacingExtra="4dp" />
-
-            </LinearLayout>
-
+            <!-- Single merged card: status + input + button -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/test_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="16dp"
-                android:visibility="visible"
-                app:cardCornerRadius="16dp"
+                app:cardCornerRadius="20dp"
                 app:cardElevation="4dp"
                 app:strokeWidth="0dp">
 
@@ -72,30 +45,31 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="32dp"
+                    android:padding="24dp"
                     android:gravity="center_horizontal">
 
+                    <!-- Animated Icon + Progress Ring -->
                     <FrameLayout
-                        android:layout_width="160dp"
-                        android:layout_height="160dp"
-                        android:layout_marginBottom="24dp">
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:layout_marginBottom="16dp">
 
                         <com.google.android.material.progressindicator.CircularProgressIndicator
                             android:id="@+id/progress_indicator"
-                            android:layout_width="140dp"
-                            android:layout_height="140dp"
+                            android:layout_width="104dp"
+                            android:layout_height="104dp"
                             android:layout_gravity="center"
                             android:indeterminate="true"
                             android:visibility="gone"
                             app:indicatorColor="?attr/accentGood"
-                            app:indicatorSize="140dp"
+                            app:indicatorSize="104dp"
                             app:trackColor="@android:color/transparent"
                             app:trackThickness="4dp" />
 
                         <ImageView
                             android:id="@+id/status_icon"
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
                             android:layout_gravity="center"
                             android:src="@drawable/ic_shield_check"
                             android:contentDescription="@string/ping_test_title"
@@ -109,35 +83,36 @@
                         android:layout_height="wrap_content"
                         android:text="@string/ping_ready_title"
                         android:textColor="?attr/primaryTextColor"
-                        android:textSize="24sp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
                         android:gravity="center" />
 
                     <TextView
                         android:id="@+id/status_description"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="4dp"
                         android:text="@string/ping_ready_desc"
                         android:textColor="?attr/primaryLightColorText"
-                        android:textSize="14sp"
-                        android:gravity="center"
-                        android:lineSpacingExtra="4dp" />
+                        android:textSize="13sp"
+                        android:gravity="center" />
 
+                    <!-- Latency badge -->
                     <LinearLayout
                         android:id="@+id/latency_container"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="10dp"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:visibility="visible"
-                        android:paddingHorizontal="16dp"
-                        android:paddingVertical="8dp">
+                        android:visibility="gone"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="5dp"
+                        android:background="@drawable/bg_card_ripple">
 
                         <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
+                            android:layout_width="13dp"
+                            android:layout_height="13dp"
                             android:src="@drawable/ic_timer"
                             android:contentDescription="@string/lbl_status"
                             app:tint="?attr/accentGood" />
@@ -146,213 +121,23 @@
                             android:id="@+id/latency_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
+                            android:layout_marginStart="5dp"
                             android:textColor="?attr/accentGood"
-                            android:textSize="14sp"
+                            android:textSize="12sp"
                             android:textStyle="bold"
-                            tools:text="Response: 45ms" />
+                            tools:text="320ms" />
 
                     </LinearLayout>
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/ping_button"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:layout_marginTop="12dp"
-                        android:text="@string/ping_test_button"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="16sp"
-                        android:textAllCaps="false"
-                        app:cornerRadius="28dp"
-                        app:strokeColor="?attr/border" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/server_info_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="16dp"
-                android:visibility="visible"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
-                app:strokeWidth="0dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/ping_server_details"
-                        android:textColor="?attr/secondaryTextColor"
-                        android:textSize="12sp"
-                        android:textAllCaps="true"
-                        android:letterSpacing="0.1" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_rethink_plus"
-                            android:contentDescription="@string/ping_server_details"
-                            app:tint="?attr/accentGood" />
-
-                        <TextView
-                            android:id="@+id/server_name_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:textColor="?attr/primaryTextColor"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            tools:text="RPN" />
-
-                    </LinearLayout>
-
+                    <!-- Divider -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:layout_marginVertical="12dp"
-                        android:background="?attr/divider" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/lbl_status"
-                                android:textColor="?attr/secondaryTextColor"
-                                android:textSize="12sp" />
-
-                            <TextView
-                                android:id="@+id/connection_status_text"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:textColor="?attr/accentGood"
-                                android:textSize="14sp"
-                                android:textStyle="bold"
-                                tools:text="Connected" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/ping_test_time_label"
-                                android:textColor="?attr/secondaryTextColor"
-                                android:textSize="12sp" />
-
-                            <TextView
-                                android:id="@+id/test_time_text"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:textColor="?attr/primaryTextColor"
-                                android:textSize="14sp"
-                                tools:text="Just now" />
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/reachability_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
-                app:strokeWidth="0dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="12dp">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_search"
-                            android:contentDescription="@string/ping_reach_title"
-                            app:tint="?attr/primaryTextColor" />
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:layout_marginStart="12dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/ping_reach_title"
-                                android:textColor="?attr/primaryTextColor"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:text="@string/ping_reach_subtitle"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="12sp"
-                                android:lineSpacingExtra="2dp" />
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
+                        android:layout_marginTop="20dp"
                         android:layout_marginBottom="16dp"
                         android:background="?attr/divider" />
 
+                    <!-- Domain/IP input -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/reach_input_layout"
                         android:layout_width="match_parent"
@@ -372,54 +157,47 @@
                             android:imeOptions="actionDone"
                             android:singleLine="true"
                             android:textColor="?attr/primaryTextColor"
-                            android:textSize="14sp" />
+                            android:textSize="13sp" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <!-- Run Test button -->
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/reach_test_button"
+                        android:id="@+id/ping_button"
                         style="@style/Widget.Material3.Button.OutlinedButton"
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
+                        android:layout_height="52dp"
                         android:layout_marginTop="12dp"
-                        android:text="@string/ping_reach_button"
+                        android:text="@string/ping_test_button"
                         android:textColor="?attr/primaryTextColor"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         android:textAllCaps="false"
-                        app:cornerRadius="28dp"
+                        app:cornerRadius="26dp"
                         app:strokeColor="?attr/border" />
 
-                    <LinearLayout
-                        android:id="@+id/reach_result_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:visibility="gone"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="10dp"
-                        android:background="@drawable/bg_card_ripple">
-
-                        <ImageView
-                            android:id="@+id/reach_result_icon"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@drawable/ic_tick"
-                            android:contentDescription="@string/lbl_status" />
-
-                        <TextView
-                            android:id="@+id/reach_result_text"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="8dp"
-                            android:textSize="13sp"
-                            android:lineSpacingExtra="2dp" />
-
-                    </LinearLayout>
-
                 </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Results Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/results_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:id="@+id/results_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="12dp" />
 
             </com.google.android.material.card.MaterialCardView>
 
