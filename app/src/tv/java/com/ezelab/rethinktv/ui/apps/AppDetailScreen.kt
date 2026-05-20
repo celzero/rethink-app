@@ -33,7 +33,7 @@ import androidx.navigation.NavController
 import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.Surface
+import com.ezelab.rethinktv.ui.common.Surface
 import androidx.tv.material3.Text
 import com.celzero.bravedns.service.FirewallManager
 import com.ezelab.rethinktv.ui.common.TvScreenScaffold

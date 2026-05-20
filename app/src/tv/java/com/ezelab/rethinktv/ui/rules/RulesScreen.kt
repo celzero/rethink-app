@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.Surface
+import com.ezelab.rethinktv.ui.common.Surface
 import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
 import com.ezelab.rethinktv.ui.common.SettingSectionHeader

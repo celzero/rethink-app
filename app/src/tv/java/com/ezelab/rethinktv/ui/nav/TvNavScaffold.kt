@@ -42,7 +42,7 @@ import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.Surface
+import com.ezelab.rethinktv.ui.common.Surface
 import androidx.tv.material3.Text
 import kotlinx.coroutines.delay
 import com.ezelab.rethinktv.ui.apps.AppDetailScreen
