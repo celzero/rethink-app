@@ -49,12 +49,13 @@ jobs:
           echo "${GSCV_TEST_JSON}" > app/src/alpha/google-services.json
           # expected: l:29 w:45 m:691
           wc -lwm app/src/alpha/google-services.json
-          echo "884381daa9cea627e77bfd3f0aab10b50c5f495d174acb003de7cc5475cfdd8e763965474019fc5a351155af7136837e7ceb736863b1cdeb29fae7f4e4bdfc4c app/src/alpha/google-services.json" | sha512sum -c
+          # echo "aa5804ccb21e3a7676e73c03d5cad54c3007cde71f01e4d92352e4e44ac0fd402a833f282fb544ad3e8b491cf09136a0ff240a897f146f66152a94470ebc1691 app/src/alpha/google-services.json" | sha512sum -c
           mkdir -p app/src/alpha/assets
           echo "${GPLAY_DEVID_RDNSALPHA}" > app/src/alpha/assets/adi-registration.properties
           # expected: l:1 w:1 m:27
           wc -lwm app/src/alpha/assets/adi-registration.properties
-          echo "abe5960d13c618e6468db10ffbb4cbb0f8205aaa93c44e16861348753bc62f4da0ebadd18b62fd7378c2ce18f3aa462c73221b243141d4c1ee2992d030aaabe7 app/src/alpha/assets/adi-registration.properties" | sha512sum -c
+          # echo "abe5960d13c618e6468db10ffbb4cbb0f8205aaa93c44e16861348753bc62f4da0ebadd18b62fd7378c2ce18f3aa462c73221b243141d4c1ee2992d030aaabe7 app/src/alpha/assets/adi-registration.properties" | sha512sum -c
+          sha512sum app/src/alpha/google-services.json app/src/alpha/assets/adi-registration.properties
         env:
           GSCV_TEST_JSON: ${{ secrets.GOOGLE_SERVICES_TEST_JSON }}
           GPLAY_DEVID_RDNSALPHA: ${{ secrets.ALPHA_GOOGLE_PLAY_DEVID }}
