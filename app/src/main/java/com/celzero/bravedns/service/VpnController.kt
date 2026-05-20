@@ -53,7 +53,6 @@ object VpnController : KoinComponent {
 
     private var braveVpnService: BraveVPNService? = null
     private var connectionState: BraveVPNService.State? = null
-    private var lastConnectedServerName: String? = null
     private val persistentState by inject<PersistentState>()
     private var states: Channel<BraveVPNService.State?>? = null
     private var protocol: Pair<Boolean, Boolean> = Pair(false, false)
@@ -69,6 +68,8 @@ object VpnController : KoinComponent {
     // FIXME: Publish VpnState through this live-data to relieve direct access
     // into VpnController's state(), isOn(), hasTunnel() etc.
     var connectionStatus: MutableLiveData<BraveVPNService.State?> = MutableLiveData()
+
+    private var isLastConnectionEch: Boolean = false
 
     // TODO: make clients listen on create, start, stop, destroy from vpn-service
     fun onVpnCreated(b: BraveVPNService) {
@@ -126,8 +127,8 @@ object VpnController : KoinComponent {
         externalScope?.launch { states?.send(state) }
     }
 
-    fun onServerNameUpdated(name: String?) {
-        lastConnectedServerName = name
+    fun onEchUpdate(isEch: Boolean) {
+        isLastConnectionEch = isEch
     }
 
     private fun updateState(state: BraveVPNService.State?) {
@@ -179,7 +180,7 @@ object VpnController : KoinComponent {
     fun state(): VpnState {
         val requested: Boolean = persistentState.getVpnEnabled()
         val on = isOn()
-        return VpnState(requested, on, connectionState, lastConnectedServerName)
+        return VpnState(requested, on, connectionState, isLastConnectionEch)
     }
 
     @Deprecated(message = "use hasTunnel() instead", replaceWith = ReplaceWith("hasTunnel()"))
