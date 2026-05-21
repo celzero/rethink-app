@@ -35,7 +35,7 @@ jobs:
             --sarif
             --output results.sarif
             --ignore-rule android_kotlin_hiddenui
-            || true
+          continue-on-error: true
 
       - name: Upload mobsfscan report
         uses: github/codeql-action/upload-sarif@v4
