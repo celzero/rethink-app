@@ -5874,6 +5874,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         vpnAdapter?.performFlightRecording()
     }
 
+    suspend fun printStack(): String {
+        return vpnAdapter?.printStack() ?: ""
+    }
+
     suspend fun isRpnReachable(csv: String): Boolean { // can be ippcsv or hostpcsv
         return vpnAdapter?.isRpnReachable(csv) == true
     }

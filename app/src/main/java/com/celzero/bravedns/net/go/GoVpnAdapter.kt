@@ -96,6 +96,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
@@ -2456,6 +2457,7 @@ class GoVpnAdapter : KoinComponent {
         return try {
             val rpn = tunnel.proxies.rpn()
             Logger.i(LOG_TAG_PROXY, "$TAG start win(rpn) reg, existing bytes size: ${prevBytes?.size}, device-len: ${deviceId.length}")
+            if (DEBUG) Logger.i(LOG_TAG_PROXY, "$TAG win(rpn) reg bytes: ${prevBytes?.toString()}")
             val bytes = rpn.registerWin(prevBytes, deviceId, constructRpnOps())
             Logger.i(LOG_TAG_PROXY, "$TAG win(rpn) registered, ${bytes?.size} bytes")
             logEvent(Severity.MEDIUM, "register win(rpn)", "win(rpn) registered, ${bytes?.size} bytes")
@@ -3296,6 +3298,33 @@ class GoVpnAdapter : KoinComponent {
             try {
                 Intra.flightRecorder(false)
             } catch (_: Exception) { }
+        }
+    }
+
+    suspend fun printStack(): String {
+        // where=0: stdout, where=1: console (no bytes returned by Go),
+        // any other value: returns goroutine stacks as bytes.
+        val where = 2
+        return withContext(Dispatchers.IO) {
+            try {
+                val bytes = Intra.printStack(where)
+                if (bytes == null || bytes.isEmpty()) {
+                    Logger.w(LOG_TAG_VPN, "$TAG print stack: null or empty")
+                    return@withContext ""
+                }
+                // The buffer may be zero-padded at the tail; trim trailing null bytes.
+                val end = bytes.indexOfLast { it != 0.toByte() }
+                if (end < 0) {
+                    Logger.w(LOG_TAG_VPN, "$TAG print stack: buffer entirely zero-padded")
+                    return@withContext ""
+                }
+                val content = bytes.copyOfRange(0, end + 1)
+                Logger.i(LOG_TAG_VPN, "$TAG print stack: ${content.size} bytes (buffer=${bytes.size})")
+                String(content, Charsets.UTF_8)
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_VPN, "$TAG err print stack: ${e.message}")
+                ""
+            }
         }
     }
 
