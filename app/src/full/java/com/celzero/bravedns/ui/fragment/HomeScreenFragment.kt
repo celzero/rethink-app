@@ -114,6 +114,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import org.koin.java.KoinJavaComponent.inject
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -1923,7 +1924,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     // Sets the UI DNS status on/off.
     private fun syncDnsStatus() {
         val vpnState = VpnController.state()
-        val isEch = vpnState.serverName?.contains(DnsLogTracker.ECH, true) == true
 
         // Change status and explanation text
         var statusId: Int
@@ -2054,7 +2054,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             b.fhsProtectionLevelTxt.setTextColor(colorId)
             b.fhsProtectionLevelTxt.text = string
         } else {
-            if (isEch) {
+            if (vpnState.isEch) {
                 val stat = getString(statusId)
                 val s  = stat.replaceFirst(getString(R.string.status_protected), getString(R.string.lbl_ultra_secure), true)
                 Logger.d(LOG_TAG_UI, "Ech status : $stat")
