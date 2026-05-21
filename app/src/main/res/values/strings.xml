@@ -2338,30 +2338,29 @@
 
     <!-- Ping Test Activity -->
     <string name="ping_test_title" translatable="false">Connection Test</string>
-    <string name="ping_test_subtitle" translatable="false">Test your RPN proxy connection to ensure everything is working properly.</string>
-    <string name="ping_test_button" translatable="false">Run Connection Test</string>
+    <string name="ping_test_button" translatable="false">Run Test</string>
     <string name="ping_ready_title" translatable="false">Ready to Test</string>
-    <string name="ping_ready_desc" translatable="false">Tap the button below to verify your RPN proxy connection is working.</string>
-    <string name="ping_testing_title" translatable="false">Testing Connection…</string>
-    <string name="ping_testing_desc" translatable="false">Please wait while we verify your proxy connection.</string>
-    <string name="ping_success_title" translatable="false">Connection Successful</string>
-    <string name="ping_success_desc" translatable="false">Your proxy is working perfectly. You\'re all set!</string>
-    <string name="ping_failure_title" translatable="false">Connection Failed</string>
-    <string name="ping_failure_desc" translatable="false">Unable to reach RPN proxy servers. Please check your network connection and try again.</string>
-    <string name="ping_server_details" translatable="false">Connection Details</string>
-    <string name="ping_test_time_label" translatable="false">Tested</string>
+    <string name="ping_ready_desc" translatable="false">Enter domains below and tap Run Test.</string>
+    <string name="ping_testing_title" translatable="false">Testing…</string>
+    <string name="ping_testing_desc" translatable="false">Checking reachability through the proxy.</string>
+    <string name="ping_success_title" translatable="false">All Reachable</string>
+    <string name="ping_success_desc" translatable="false">Every target is reachable through your RPN proxy.</string>
+    <string name="ping_partial_title" translatable="false">Partial Connectivity</string>
+    <string name="ping_partial_desc" translatable="false">Some targets are unreachable through the proxy.</string>
+    <string name="ping_failure_title" translatable="false">Unreachable</string>
+    <string name="ping_failure_desc" translatable="false">None of the targets could be reached. Check your RPN proxy.</string>
+    <string name="ping_no_proxy_title" translatable="false">No Active Proxy</string>
+    <string name="ping_no_proxy_desc" translatable="false">Enable RPN first, then run the test.</string>
     <string name="ping_status_failed" translatable="false">Failed</string>
-    <string name="ping_server_name" translatable="false">RPN Proxy Network</string>
     <string name="ping_test_again" translatable="false">Test Again</string>
-    <string name="ping_reach_title" translatable="false">Reachability Test</string>
-    <string name="ping_reach_subtitle" translatable="false">Check if a specific IP address or domain is reachable through the RPN proxy.</string>
-    <string name="ping_reach_hint" translatable="false">Enter IP or domain (e.g. 8.8.8.8, example.com)</string>
-    <string name="ping_reach_button" translatable="false">Check Reachability</string>
+    <string name="ping_reach_hint" translatable="false">Domains or IPs, comma-separated</string>
     <string name="ping_reach_reachable" translatable="false">Reachable</string>
     <string name="ping_reach_unreachable" translatable="false">Unreachable</string>
-    <string name="ping_reach_rpn_disabled" translatable="false">Reachability test requires an active RPN proxy. Enable RPN to use this feature.</string>
-    <string name="ping_reach_empty_input" translatable="false">Please enter an IP address or domain name.</string>
-    <string name="ping_reach_no_proxy" translatable="false">No active RPN proxy found. Please ensure RPN is configured and active.</string>
+    <string name="ping_reach_rpn_disabled" translatable="false">Enable RPN to run this test.</string>
+    <string name="ping_reach_empty_input" translatable="false">Enter at least one domain or IP.</string>
+    <string name="ping_results_title" translatable="false">Results</string>
+    <string name="ping_default_domains" translatable="false">dl.rethinkdns.com,test.windscribe.com</string>
+    <string name="ping_total_latency" translatable="false">%1$dms</string>
 
     <!-- Purchase History Screen -->
     <string name="payment_history_summary_title" translatable="false">All Transactions</string>
@@ -2505,7 +2504,7 @@
     <!-- Pre-filled email content -->
     <string name="device_auth_error_email_body_greeting" translatable="false">Hello Rethink Support,</string>
     <string name="device_auth_error_email_body_details" translatable="false">I am experiencing a device authorization issue (HTTP 401). My account details are:</string>
-    <string name="device_auth_error_email_body_closing" translatable="false">Please help me resolve this. Thank you.</string>
+    <string name="device_auth_error_email_body_closing" translatable="false">Help me resolve this.</string>
 
     <!-- Device Not Registered bottom sheet -->
     <string name="device_not_registered_title" translatable="false">Device Not Registered</string>
@@ -2521,6 +2520,8 @@
     <!-- Device-not-registered system notification -->
     <string name="device_not_registered_notif_title" translatable="false">Device Not Registered</string>
     <string name="device_not_registered_notif_body" translatable="false">Your device could not be linked to your active subscription. Tap to review and contact support.</string>
+    <string name="device_auth_error_notif_title" translatable="false">Device Authorization Failed</string>
+    <string name="device_auth_error_notif_body" translatable="false">Your device could not be authorized by the Rethink server (HTTP 401). Tap to view details and contact support.</string>
 
     <!-- Step counter chip label: "Step 1 of 5" -->
     <string name="tour_step_counter">%1$d of %2$d</string>
@@ -2566,5 +2567,13 @@
     <string name="tour_step_rpn_desc" translatable="false">Unlock advanced privacy features with RPN: hide your real IP with rotating exits, access anti-censorship servers, and route traffic through private proxy networks for total control.</string>
     <!-- Label shown in the golden badge strip inside the tooltip card -->
     <string name="tour_premium_badge_label" translatable="false">Premium Feature</string>
+
+    <!-- Configure fragment card subtitles -->
+    <string name="fs_configure_apps_desc" translatable="true">Per-app firewall rules and network policy</string>
+    <string name="fs_configure_network_desc" translatable="true">VPN tunnel mode and network preferences</string>
+    <string name="fs_configure_proxy_desc" translatable="true">WireGuard, SOCKS5, and HTTP proxy routing</string>
+    <string name="fs_configure_others_desc" translatable="true">Appearance, notifications, and more</string>
+    <string name="fs_configure_advanced_desc" translatable="true">Developer tools and diagnostics</string>
+    <string name="fs_configure_logs_desc" translatable="true">Review DNS queries and connection logs</string>
 
 </resources>
