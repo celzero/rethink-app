@@ -593,7 +593,7 @@ object WireguardManager : KoinComponent {
         // if catch-all config is enabled, then add the config id to the list
         val cac = mappings.filter { it.isActive && it.isCatchAll }
         cac.forEach {
-            if ((checkEligibilityBasedOnNw(it.id, usesMobileNw) || checkEligibilityBasedOnSsid(it.id, ssid)) &&
+            if ((checkEligibilityBasedOnNw(it.id, usesMobileNw) && checkEligibilityBasedOnSsid(it.id, ssid)) &&
                 !proxyIds.contains(ID_WG_BASE + it.id)
             ) {
                 proxyIds.add(ID_WG_BASE + it.id)
