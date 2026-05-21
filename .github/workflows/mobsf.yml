@@ -34,8 +34,13 @@ jobs:
             . 
             --sarif
             --output results.sarif
-            --ignore-rule android_kotlin_hiddenui
           continue-on-error: true
+
+      - name: Remove hidden UI findings
+        run: |
+          jq '
+            .runs[].results |= map(select(.ruleId != "android_kotlin_hiddenui"))
+            ' results.sarif > filtered.sarif
 
       - name: Upload mobsfscan report
         uses: github/codeql-action/upload-sarif@v4
