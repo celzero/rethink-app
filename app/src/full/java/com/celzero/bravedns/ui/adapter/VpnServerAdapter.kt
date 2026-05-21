@@ -38,6 +38,7 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.RpnConfigDetailActivity
+import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
@@ -678,11 +679,5 @@ class VpnServerAdapter(
             ctx.startActivity(intent)
         }
 
-        private fun String.capitalizeWords(): String {
-            return split(" ")
-                .joinToString(" ") { word ->
-                    word.lowercase().replaceFirstChar { it.uppercase() }
-                }
-        }
     }
 }

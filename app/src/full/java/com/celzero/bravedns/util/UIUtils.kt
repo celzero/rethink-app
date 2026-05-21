@@ -892,6 +892,17 @@ object SnackbarHelper {
     }
 
     /**
+     * Capitalize the first letter of each word and lowercase the rest.
+     * E.g. "HELLO WORLD" → "Hello World", "hELLO wORLD" → "Hello World"
+     */
+    fun String.capitalizeWords(): String {
+        return split(" ")
+            .joinToString(" ") { word ->
+                word.lowercase().replaceFirstChar { it.uppercase() }
+            }
+    }
+
+    /**
      * Walk the view hierarchy upward to find the nearest [CoordinatorLayout] ancestor.
      * Falls back to the root decor view so the Snackbar is never clipped by
      * `fitsSystemWindows` insets on the fragment root.

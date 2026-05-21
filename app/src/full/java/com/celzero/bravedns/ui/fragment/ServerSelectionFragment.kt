@@ -54,6 +54,7 @@ import com.celzero.bravedns.ui.bottomsheet.ManageRpnPurchaseBtmSht
 import com.celzero.bravedns.ui.bottomsheet.ServerRemovalNotificationBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.ServerSettingsBottomSheet
 import com.celzero.bravedns.util.SnackbarHelper
+import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ServerSelectionViewModel
@@ -817,12 +818,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.tvCurrentLocation.text = location.capitalizeWords()
     }
 
-    private fun String.capitalizeWords(): String {
-        return split(" ")
-            .joinToString(" ") { word ->
-                word.lowercase().replaceFirstChar { it.uppercase() }
-            }
-    }
 
     private fun animateHeaderEntry() {
         if (!isAdded) return

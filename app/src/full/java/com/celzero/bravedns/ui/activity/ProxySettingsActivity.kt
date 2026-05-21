@@ -64,6 +64,7 @@ import com.celzero.bravedns.ui.fragment.RethinkPlusFragment
 import com.celzero.bravedns.ui.fragment.ServerSelectionFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.OrbotHelper
+import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.openUrl
@@ -1205,12 +1206,6 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             modifiedDataTime = 0L,
             latency = 0,
         )
-    }
-
-    private fun String.capitalizeWords(): String {
-        return split(" ").joinToString(" ") { word ->
-            word.lowercase().replaceFirstChar { it.uppercase() }
-        }
     }
 
     private fun logEvent(msg: String, details: String) {

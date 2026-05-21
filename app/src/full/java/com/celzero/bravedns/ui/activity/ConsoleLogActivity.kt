@@ -46,6 +46,7 @@ import com.celzero.bravedns.scheduler.BugReportZipper
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
@@ -147,6 +148,7 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), androidx
                 b.consoleLogInfoText.text = descWithTime
             }
         }
+        b.fabShareLog.text = getString(R.string.about_bug_report_desc).capitalizeWords()
         b.searchView.setOnQueryTextListener(this)
         val logLevel = Logger.uiLogLevel.toInt()
         if (logLevel >= Logger.LoggerLevel.ERROR.id) {
