@@ -338,6 +338,7 @@ object RpnProxyManager : KoinComponent {
             }
             purchase.payload.isNotEmpty() -> {
                 Logger.i(LOG_TAG_PROXY, "$TAG; activateRpn: using purchase.payload")
+                if (DEBUG) Logger.d(LOG_TAG_PROXY, "$TAG; activateRpn: purchase.payload content: ${purchase.payload}")
                 purchase.payload
             }
             else -> {
@@ -743,6 +744,7 @@ object RpnProxyManager : KoinComponent {
             val ws = extractWsObject(payload)
             if (ws == null) {
                 Logger.e(LOG_TAG_PROXY, "$TAG; storeWinEntitlement: ws object not found in payload")
+                if (DEBUG) Logger.d(LOG_TAG_PROXY, "$TAG; storeWinEntitlement: payload content: $payload")
                 return
             }
 
@@ -768,7 +770,7 @@ object RpnProxyManager : KoinComponent {
 
             val file = File(folder, fileName)
             val res = try {
-                EncryptedFileManager.write(applicationContext, ws.toString(), file)
+                EncryptedFileManager.write(applicationContext, ws, file)
             } catch (e: Exception) {
                 Logger.e(LOG_TAG_PROXY, "$TAG; storeWinEntitlement: exception writing file: ${e.message}", e)
                 false
@@ -1121,7 +1123,10 @@ object RpnProxyManager : KoinComponent {
         if (!file.exists()) return null
         return try {
             val bytes = EncryptedFileManager.readByteArray(applicationContext, file)
-            if (bytes.isNotEmpty()) bytes else null
+            if (bytes.isNotEmpty()) {
+                if (DEBUG) Logger.d(LOG_TAG_PROXY, "$TAG; getWinEntitlement: read entitlement bytes from file, bytes: $bytes, len: ${bytes.size}")
+                bytes
+            } else null
         } catch (e: EncryptionException) {
             // File is corrupted, encrypted with an invalidated key, or unreadable.
             // Return null so the caller falls back to fetching fresh entitlement from the API.
@@ -1409,6 +1414,11 @@ object RpnProxyManager : KoinComponent {
         return try {
             val ws = extractWsObject(payload) ?: return false
             val ent = VpnController.getEntitlementDetails(ws, billingBackendClient.getDeviceId())
+            Logger.i(LOG_TAG_PROXY, "$TAG; isPayloadUsable: extracted entitlement from payload, checking session token usability")
+            if (DEBUG) {
+                Logger.d(LOG_TAG_PROXY, "$TAG; isPayloadUsable: payload ws block: $ws")
+                Logger.d(LOG_TAG_PROXY, "$TAG; isPayloadUsable: entitlement details: ${ent?.expiry()}, ${ent?.token()}, ${ent?.status()}, cidLen=${ent?.cid()?.length}, didLen=${ent?.did()?.length}, ${ent?.test()}, ${ent?.json()}")
+            }
             val sessionToken = ent?.token() ?: ""
             val isUsable = sessionToken.isNotEmpty()
             if (!isUsable) Logger.d(LOG_TAG_PROXY, "$TAG; isPayloadUsable: ws found but sessiontoken is empty")
@@ -2520,10 +2530,8 @@ object RpnProxyManager : KoinComponent {
         cac.forEach {
             try {
                 val configId = Backend.RpnWin + it.key
-                if ((checkEligibilityBasedOnNw(
-                        it.id,
-                        usesMobileNw
-                    ) || checkEligibilityBasedOnSsid(it.id, ssid)) &&
+                if ((checkEligibilityBasedOnNw(it.id, usesMobileNw) &&
+                            checkEligibilityBasedOnSsid(it.id, ssid)) &&
                     !proxyIds.contains(configId)
                 ) {
                     val key = if (it.id == AUTO_SERVER_ID) {

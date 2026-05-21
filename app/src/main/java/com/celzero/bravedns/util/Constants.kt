@@ -238,6 +238,12 @@ class Constants {
         // Stable notification ID for the device-not-registered alert (only one at a time)
         const val NOTIF_ID_IAB_DEVICE_NOT_REGISTERED = 0x410
 
+        // IAB device auth error (HTTP 401) notification tapping opens DeviceAuthErrorBottomSheet
+        const val NOTIF_INTENT_EXTRA_IAB_DEVICE_AUTH_ERROR_NAME  = "IAB_DEVICE_AUTH_ERROR"
+        const val NOTIF_INTENT_EXTRA_IAB_DEVICE_AUTH_ERROR_VALUE = "IAB_DEVICE_AUTH_ERROR_401"
+        // Stable notification ID for the 401 auth-error alert (only one at a time)
+        const val NOTIF_ID_IAB_DEVICE_AUTH_ERROR = 0x401
+
         // new app install intent extra name for uid. see RefreshDatabase#makeNewAppVpnIntent()
         const val NOTIF_INTENT_EXTRA_APP_UID = "NEW_APP_UID"
 

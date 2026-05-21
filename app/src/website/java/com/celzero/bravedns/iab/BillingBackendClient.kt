@@ -26,6 +26,7 @@ import com.celzero.bravedns.customdownloader.SafeResponseConverterFactory
 import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.google.gson.JsonObject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.Dispatchers
@@ -85,10 +86,24 @@ class BillingBackendClient(
     }
 
     /**
+     * Returns the [SecureIdentityStore.Env] that corresponds to the current app mode.
+     *
+     * [SecureIdentityStore.Env.TEST] is returned when [PersistentState.appTestMode] is `true`
+     * (matching the test billing URL used in [createOrRegisterCid] / [createOrRegisterDid]).
+     * [SecureIdentityStore.Env.PROD] is returned otherwise.
+     *
+     * **All** identity store reads and writes in this class must use this helper so that
+     * test identities are never accidentally served for production requests, and vice-versa.
+     */
+    private fun currentEnv(): SecureIdentityStore.Env =
+        if (persistentState.appTestMode) SecureIdentityStore.Env.TEST
+        else SecureIdentityStore.Env.PROD
+
+    /**
      * Returns a server-driven **account** identifier (CID).
      *
      * Resolution order:
-     * 1. [SecureIdentityStore] (AES-256-GCM encrypted file)
+     * 1. [SecureIdentityStore] (AES-256-GCM encrypted file, env-scoped via [currentEnv])
      * 2. [refreshIdentity] - calls `POST /d/acc` and `POST /d/reg` to obtain and persist
      *    both CID and DID atomically; the CID is returned on success.
      *
@@ -97,26 +112,27 @@ class BillingBackendClient(
      */
     suspend fun getAccountId(): String {
         val mname = this::getAccountId.name
-        val (storedAcc, _) = identityStore.get()
+        val env = currentEnv()
+        val (storedAcc, _) = identityStore.get(env)
         if (!storedAcc.isNullOrBlank()) {
-            Logger.v(LOG_IAB, "$TAG $mname: loaded from SecureIdentityStore (len=${storedAcc.length})")
+            Logger.v(LOG_IAB, "$TAG $mname [${env.label}]: loaded from SecureIdentityStore (len=${storedAcc.length})")
             return storedAcc
         }
         return when (val result = refreshIdentity()) {
             is RefreshIdentityResult.Success      -> {
-                Logger.i(LOG_IAB, "$TAG $mname: received from server (len=${result.cid.length})")
+                Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: received from server (len=${result.cid.length})")
                 result.cid
             }
             is RefreshIdentityResult.Unauthorized -> {
-                Logger.e(LOG_IAB, "$TAG $mname: 401 unauthorized; cid unavailable")
+                Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 401 unauthorized; cid unavailable")
                 ""
             }
             is RefreshIdentityResult.Conflict     -> {
-                Logger.e(LOG_IAB, "$TAG $mname: 409 conflict; cid unavailable")
+                Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 409 conflict; cid unavailable")
                 ""
             }
             is RefreshIdentityResult.Failure      -> {
-                Logger.w(LOG_IAB, "$TAG $mname: cid unavailable (transient)")
+                Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: cid unavailable (transient)")
                 ""
             }
         }
@@ -136,26 +152,27 @@ class BillingBackendClient(
      */
     suspend fun getDeviceId(recvCid: String = ""): String {
         val mname = this::getDeviceId.name
-        val (storedCid, storedDid) = identityStore.get()
+        val env = currentEnv()
+        val (storedCid, storedDid) = identityStore.get(env)
 
         if (recvCid.isNotEmpty() && storedCid != recvCid) {
-            Logger.i(LOG_IAB, "$TAG $mname: recvCid differs from storedCid; re-registering device under new cid, recvCid=${recvCid.take(8)}, storedCid=${storedCid?.take(8) ?: "null"}, storedDid=${storedDid?.length ?: "null"}")
+            Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: recvCid differs from storedCid; re-registering device under new cid, recvCid=${recvCid.take(8)}, storedCid=${storedCid?.take(8) ?: "null"}, storedDid=${storedDid?.length ?: "null"}")
             val didResult = createOrRegisterDid(recvCid, "")
             if (didResult.isSuccess) {
-                identityStore.save(recvCid, didResult.deviceId)
-                Logger.i(LOG_IAB, "$TAG $mname: re-registered device (didLen=${didResult.deviceId.length})")
+                identityStore.save(env, recvCid, didResult.deviceId)
+                Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: re-registered device (didLen=${didResult.deviceId.length})")
                 return didResult.deviceId
             }
             // Log specific error code so callers using createOrRegisterDid() directly can surface it.
             when (didResult.errorCode) {
-                401  -> Logger.e(LOG_IAB, "$TAG $mname: 401 unauthorized on re-registration for recvCid=${recvCid.take(8)}; falling through to store")
-                409  -> Logger.e(LOG_IAB, "$TAG $mname: 409 conflict on re-registration for recvCid=${recvCid.take(8)}; falling through to store")
-                else -> Logger.w(LOG_IAB, "$TAG $mname: re-registration failed (code=${didResult.errorCode}); falling through to store")
+                401  -> Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 401 unauthorized on re-registration for recvCid=${recvCid.take(8)}; falling through to store")
+                409  -> Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 409 conflict on re-registration for recvCid=${recvCid.take(8)}; falling through to store")
+                else -> Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: re-registration failed (code=${didResult.errorCode}); falling through to store")
             }
         }
 
         if (!storedDid.isNullOrBlank()) {
-            Logger.v(LOG_IAB, "$TAG $mname: loaded from SecureIdentityStore (len=${storedDid.length})")
+            Logger.v(LOG_IAB, "$TAG $mname [${env.label}]: loaded from SecureIdentityStore (len=${storedDid.length})")
             return storedDid
         }
 
@@ -163,19 +180,19 @@ class BillingBackendClient(
         // are resolved and persisted atomically.
         return when (val result = refreshIdentity()) {
             is RefreshIdentityResult.Success      -> {
-                Logger.i(LOG_IAB, "$TAG $mname: received from server (len=${result.did.length})")
+                Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: received from server (len=${result.did.length})")
                 result.did
             }
             is RefreshIdentityResult.Unauthorized -> {
-                Logger.e(LOG_IAB, "$TAG $mname: 401 unauthorized; did unavailable")
+                Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 401 unauthorized; did unavailable")
                 ""
             }
             is RefreshIdentityResult.Conflict     -> {
-                Logger.e(LOG_IAB, "$TAG $mname: 409 conflict; did unavailable")
+                Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 409 conflict; did unavailable")
                 ""
             }
             is RefreshIdentityResult.Failure      -> {
-                Logger.w(LOG_IAB, "$TAG $mname: did unavailable (transient)")
+                Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: did unavailable (transient)")
                 ""
             }
         }
@@ -195,19 +212,20 @@ class BillingBackendClient(
      */
     suspend fun resolveIdentity(): RefreshIdentityResult {
         val mname = this::resolveIdentity.name
+        val env = currentEnv()
         // Encrypted file: both IDs present → no server call needed.
-        val (storedAcc, storedDev) = identityStore.get()
+        val (storedAcc, storedDev) = identityStore.get(env)
         if (!storedAcc.isNullOrBlank() && !storedDev.isNullOrBlank()) {
-            Logger.d(LOG_IAB, "$TAG $mname: loaded from SecureIdentityStore")
+            Logger.d(LOG_IAB, "$TAG $mname [${env.label}]: loaded from SecureIdentityStore (cidLen=${storedAcc.length}, didLen=${storedDev.length})")
             return RefreshIdentityResult.Success(storedAcc, storedDev)
         }
         // Fetch CID then DID from the server and persist both.
         val result = refreshIdentity()
         when (result) {
-            is RefreshIdentityResult.Success    -> Logger.i(LOG_IAB, "$TAG $mname: obtained from server and persisted")
-            is RefreshIdentityResult.Unauthorized -> Logger.e(LOG_IAB, "$TAG $mname: 401 unauthorized; identity unavailable")
-            is RefreshIdentityResult.Conflict   -> Logger.e(LOG_IAB, "$TAG $mname: 409 conflict; identity unavailable")
-            is RefreshIdentityResult.Failure    -> Logger.w(LOG_IAB, "$TAG $mname: identity unavailable (transient)")
+            is RefreshIdentityResult.Success    -> Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: obtained from server and persisted (cidLen=${result.cid.length}, didLen=${result.did.length})")
+            is RefreshIdentityResult.Unauthorized -> Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 401 unauthorized; identity unavailable")
+            is RefreshIdentityResult.Conflict   -> Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 409 conflict; identity unavailable")
+            is RefreshIdentityResult.Failure    -> Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: identity unavailable (transient)")
         }
         return result
     }
@@ -231,12 +249,11 @@ class BillingBackendClient(
      */
     suspend fun createOrRegisterCid(existingCid: String = ""): CidResult = withContext(Dispatchers.IO) {
         val mname = "createOrRegisterCid"
+        val env = currentEnv()
         try {
             val meta = buildCustomerMeta()
-            // Pass null when blank so Retrofit omits the header entirely, letting the server
-            // assign a fresh CID.  A non-blank value asks the server to confirm/correct it.
             val cidHeader = existingCid.takeIf { it.isNotBlank() }
-            Logger.v(LOG_IAB, "$TAG $mname: calling /d/acc, cidHeader=${if (cidHeader != null) "present(len=${cidHeader.length})" else "absent"}")
+            Logger.v(LOG_IAB, "$TAG $mname [${env.label}]: calling /d/acc, cidHeader=${if (cidHeader != null) "present(len=${cidHeader.length})" else "absent"}")
             val response = if (persistentState.appTestMode) {
                 buildTestApi().registerCustomer(cidHeader, "", test = "", meta)
             } else {
@@ -244,43 +261,43 @@ class BillingBackendClient(
             }
             return@withContext when {
                 response == null -> {
-                    Logger.e(LOG_IAB, "$TAG $mname: null response")
+                    Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: null response")
                     CidResult.EMPTY
                 }
                 response.isSuccessful -> {
                     val cid = response.body()?.get("cid")?.asString?.trim() ?: ""
                     if (cid.isBlank()) {
-                        Logger.w(LOG_IAB, "$TAG $mname: server returned blank cid, body=${response.body()}, msg=${response.message()}")
+                        Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: server returned blank cid, body=${response.body()}, msg=${response.message()}")
                         CidResult.EMPTY
                     } else {
-                        Logger.i(LOG_IAB, "$TAG $mname: received cid (len=${cid.length})")
+                        Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: received cid (len=${cid.length})")
                         CidResult(cid)
                     }
                 }
                 response.code() == 401 -> {
-                    Logger.e(LOG_IAB, "$TAG $mname: 401 unauthorized, err=${response.errorBody()?.string()}")
+                    Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 401 unauthorized, err=${response.errorBody()?.string()}")
                     CidResult.error(401)
                 }
                 response.code() == 409 -> {
-                    Logger.w(LOG_IAB, "$TAG $mname: 409 conflict, err=${response.errorBody()?.string()}")
+                    Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: 409 conflict, err=${response.errorBody()?.string()}")
                     CidResult.error(409)
                 }
                 else -> {
-                    Logger.e(LOG_IAB, "$TAG $mname: failed code=${response.code()}, err=${response.errorBody()?.string()}")
+                    Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: failed code=${response.code()}, err=${response.errorBody()?.string()}")
                     CidResult.error(response.code())
                 }
             }
         } catch (e: UnknownHostException) {
-            Logger.w(LOG_IAB, "$TAG $mname: no internet; ${e.message}")
+            Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: no internet; ${e.message}")
             CidResult.EMPTY
         } catch (e: ConnectException) {
-            Logger.w(LOG_IAB, "$TAG $mname: connection failed; ${e.message}")
+            Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: connection failed; ${e.message}")
             CidResult.EMPTY
         } catch (e: SocketTimeoutException) {
-            Logger.w(LOG_IAB, "$TAG $mname: timeout; ${e.message}")
+            Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: timeout; ${e.message}")
             CidResult.EMPTY
         } catch (e: Exception) {
-            Logger.e(LOG_IAB, "$TAG $mname: unexpected error; ${e.message}", e)
+            Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: unexpected error; ${e.message}", e)
             CidResult.EMPTY
         }
     }
@@ -310,16 +327,15 @@ class BillingBackendClient(
         existingDeviceId: String = ""
     ): DidResult = withContext(Dispatchers.IO) {
         val mname = "createOrRegisterDid"
+        val env = currentEnv()
         if (accountId.isBlank()) {
-            Logger.e(LOG_IAB, "$TAG $mname: blank accountId; cannot register device without account")
+            Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: blank accountId; cannot register device without account")
             return@withContext DidResult.error(-1)
         }
         try {
             val meta = buildCustomerMeta()
-            // Pass null for did when blank so Retrofit omits the header, letting the server
-            // assign a fresh DID.  accountId is always required and sent as a non-null header.
             val didHeader = existingDeviceId.takeIf { it.isNotBlank() }
-            Logger.v(LOG_IAB, "$TAG $mname: calling /d/reg, cidLen=${accountId.length}, didHeader=${if (didHeader != null) "present(len=${didHeader.length})" else "absent"}, test? ${persistentState.appTestMode}")
+            Logger.v(LOG_IAB, "$TAG $mname [${env.label}]: calling /d/reg, cidLen=${accountId.length}, didHeader=${if (didHeader != null) "present(len=${didHeader.length})" else "absent"}")
             val response = if (persistentState.appTestMode) {
                 buildTestApi().registerDevice(accountId, didHeader, test = "", meta = meta)
             } else {
@@ -327,45 +343,100 @@ class BillingBackendClient(
             }
             return@withContext when {
                 response == null -> {
-                    Logger.e(LOG_IAB, "$TAG $mname: null response")
+                    Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: null response")
                     DidResult.EMPTY
                 }
                 response.isSuccessful -> {
                     val did = response.body()?.get("did")?.asString?.trim() ?: ""
                     if (did.isBlank()) {
-                        Logger.w(LOG_IAB, "$TAG $mname: server returned blank did, body=${response.body()}, msg=${response.message()}")
+                        Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: server returned blank did, body=${response.body()}, msg=${response.message()}")
                         DidResult.EMPTY
                     } else {
-                        Logger.i(LOG_IAB, "$TAG $mname: received did (len=${did.length})")
+                        Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: received did (len=${did.length})")
                         DidResult(did)
                     }
                 }
                 response.code() == 401 -> {
-                    Logger.e(LOG_IAB, "$TAG $mname: 401 unauthorized, err=${response.errorBody()?.string()}")
+                    Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 401 unauthorized, err=${response.errorBody()?.string()}")
                     DidResult.error(401)
                 }
                 response.code() == 409 -> {
-                    Logger.w(LOG_IAB, "$TAG $mname: 409 conflict, err=${response.errorBody()?.string()}")
+                    Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: 409 conflict, err=${response.errorBody()?.string()}")
                     DidResult.error(409)
                 }
                 else -> {
-                    Logger.e(LOG_IAB, "$TAG $mname: failed code=${response.code()}, err=${response.errorBody()?.string()}")
+                    Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: failed code=${response.code()}, err=${response.errorBody()?.string()}")
                     DidResult.error(response.code())
                 }
             }
         } catch (e: UnknownHostException) {
-            Logger.w(LOG_IAB, "$TAG $mname: no internet; ${e.message}")
+            Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: no internet; ${e.message}")
             DidResult.EMPTY
         } catch (e: ConnectException) {
-            Logger.w(LOG_IAB, "$TAG $mname: connection failed; ${e.message}")
+            Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: connection failed; ${e.message}")
             DidResult.EMPTY
         } catch (e: SocketTimeoutException) {
-            Logger.w(LOG_IAB, "$TAG $mname: timeout; ${e.message}")
+            Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: timeout; ${e.message}")
             DidResult.EMPTY
         } catch (e: Exception) {
-            Logger.e(LOG_IAB, "$TAG $mname: unexpected error; ${e.message}", e)
+            Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: unexpected error; ${e.message}", e)
             DidResult.EMPTY
         }
+    }
+
+    /**
+     * One-time migration for users upgrading from a build that stored the identity in the
+     * legacy unscoped `identity.json` file.
+     *
+     * ### Why this is needed
+     * Previous builds used a single `pip/identity.json` file for both test and production
+     * identities.  The new env-scoped design uses `identity_prod.json` / `identity_test.json`.
+     * Without migration those users would lose their CID/DID and trigger a new server
+     * registration on every restart, unnecessarily creating duplicate accounts.
+     *
+     * ### Env determination strategy
+     * 1. **VPN tunnel active**: call [VpnController.getEntitlementDetails] with the legacy
+     *    DID. The returned `RpnEntitlement.test()` flag is the authoritative source —
+     *    it says which server issued the purchase.
+     * 2. **Tunnel unavailable** (null entitlement or exception): fall back to
+     *    [PersistentState.appTestMode], which historically controlled which server
+     *    ([com.celzero.bravedns.util.Constants.RPN_BASE_URL] vs fallback) was called when
+     *    the CID/DID were originally obtained — so it is the best static proxy.
+     *
+     * This function is **idempotent**: once the legacy file is gone,
+     * [SecureIdentityStore.hasLegacyIdentity] returns false immediately and subsequent
+     * calls are no-ops.
+     */
+    private suspend fun migrateIdentityIfNeeded() = withContext(Dispatchers.IO) {
+        if (!identityStore.hasLegacyIdentity()) return@withContext
+
+        val (legacyCid, legacyDid) = identityStore.readLegacy()
+        if (legacyCid.isNullOrBlank() || legacyDid.isNullOrBlank()) {
+            Logger.w(LOG_IAB, "$TAG migrateIdentityIfNeeded: legacy identity blank/corrupt; deleting without migration")
+            identityStore.migrateFromLegacy(currentEnv())
+            return@withContext
+        }
+
+        val env = try {
+            val entitlement = VpnController.getEntitlementDetails(null, legacyDid)
+            if (entitlement != null) {
+                val isTest = entitlement.test()
+                Logger.i(LOG_IAB, "$TAG migrateIdentityIfNeeded: entitlement resolved, isTest=$isTest " +
+                    "(cidLen=${legacyCid.length}, didLen=${legacyDid.length})")
+                if (isTest) SecureIdentityStore.Env.TEST else SecureIdentityStore.Env.PROD
+            } else {
+                val isTest = persistentState.appTestMode
+                Logger.i(LOG_IAB, "$TAG migrateIdentityIfNeeded: tunnel unavailable, using appTestMode=$isTest as env " +
+                    "(cidLen=${legacyCid.length}, didLen=${legacyDid.length})")
+                if (isTest) SecureIdentityStore.Env.TEST else SecureIdentityStore.Env.PROD
+            }
+        } catch (e: Exception) {
+            val isTest = persistentState.appTestMode
+            Logger.w(LOG_IAB, "$TAG migrateIdentityIfNeeded: entitlement lookup failed (${e.message}); falling back to appTestMode=$isTest")
+            if (isTest) SecureIdentityStore.Env.TEST else SecureIdentityStore.Env.PROD
+        }
+
+        identityStore.migrateFromLegacy(env)
     }
 
     /**
@@ -396,7 +467,11 @@ class BillingBackendClient(
      */
     suspend fun refreshIdentity(): RefreshIdentityResult {
         val mname = "refreshIdentity"
-        val (storedCid, storedDid) = identityStore.get()
+        // One-time migration: move legacy identity.json into the correct env-scoped file
+        // before any read, so the migrated data is found by identityStore.get(env) below.
+        migrateIdentityIfNeeded()
+        val env = currentEnv()
+        val (storedCid, storedDid) = identityStore.get(env)
 
         var cid = storedCid ?: ""
         var cidWasAbsent = false
@@ -406,23 +481,23 @@ class BillingBackendClient(
                 cidResult.isSuccess -> {
                     cid = cidResult.accountId
                     cidWasAbsent = true
-                    Logger.i(LOG_IAB, "$TAG $mname: new cid obtained from server (len=${cid.length})")
+                    Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: new cid obtained from server (len=${cid.length})")
                 }
                 cidResult.errorCode == 401 -> {
-                    Logger.e(LOG_IAB, "$TAG $mname: 401 on cid step; cannot resolve identity")
+                    Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 401 on cid step; cannot resolve identity")
                     return RefreshIdentityResult.Unauthorized
                 }
                 cidResult.errorCode == 409 -> {
-                    Logger.e(LOG_IAB, "$TAG $mname: 409 on cid step; cannot resolve identity")
+                    Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 409 on cid step; cannot resolve identity")
                     return RefreshIdentityResult.Conflict
                 }
                 else -> {
-                    Logger.w(LOG_IAB, "$TAG $mname: failed to resolve cid (code=${cidResult.errorCode})")
+                    Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: failed to resolve cid (code=${cidResult.errorCode})")
                     return RefreshIdentityResult.Failure
                 }
             }
         } else {
-            Logger.d(LOG_IAB, "$TAG $mname: cid loaded from store (len=${cid.length})")
+            Logger.d(LOG_IAB, "$TAG $mname [${env.label}]: cid loaded from store (len=${cid.length})")
         }
 
         // Reuse the stored DID only when the CID hasn't changed; a new CID means
@@ -433,28 +508,28 @@ class BillingBackendClient(
             when {
                 didResult.isSuccess -> {
                     did = didResult.deviceId
-                    Logger.i(LOG_IAB, "$TAG $mname: new did obtained from server (len=${did.length})")
+                    Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: new did obtained from server (len=${did.length})")
                 }
                 didResult.errorCode == 401 -> {
-                    Logger.e(LOG_IAB, "$TAG $mname: 401 on did step; cannot resolve identity")
+                    Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 401 on did step; cannot resolve identity")
                     return RefreshIdentityResult.Unauthorized
                 }
                 didResult.errorCode == 409 -> {
-                    Logger.e(LOG_IAB, "$TAG $mname: 409 on did step; cannot resolve identity")
+                    Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 409 on did step; cannot resolve identity")
                     return RefreshIdentityResult.Conflict
                 }
                 else -> {
-                    Logger.w(LOG_IAB, "$TAG $mname: failed to resolve did (code=${didResult.errorCode})")
+                    Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: failed to resolve did (code=${didResult.errorCode})")
                     return RefreshIdentityResult.Failure
                 }
             }
         } else {
-            Logger.d(LOG_IAB, "$TAG $mname: did loaded from store (len=${did.length})")
+            Logger.d(LOG_IAB, "$TAG $mname [${env.label}]: did loaded from store (len=${did.length})")
         }
 
         if (storedCid != cid || storedDid != did) {
-            identityStore.save(cid, did)
-            Logger.i(LOG_IAB, "$TAG $mname: identity persisted (cidLen=${cid.length}, didLen=${did.length})")
+            identityStore.save(env, cid, did)
+            Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: identity persisted (cidLen=${cid.length}, didLen=${did.length})")
         }
 
         return RefreshIdentityResult.Success(cid, did)
@@ -481,31 +556,32 @@ class BillingBackendClient(
         }
         val meta = m ?: buildCustomerMeta()
         try {
-            val response = when (val handle = resolveApi()) {
+            val handle = resolveApi()
+            val response = when (handle) {
                 is ApiHandle.Production -> handle.api.registerDevice(accountId, deviceId, meta = meta)
                 is ApiHandle.Test -> handle.api.registerDevice(accountId, deviceId, test = "", meta = meta)
             }
             when {
                 response == null -> {
-                    Logger.e(LOG_IAB, "$TAG $mname: null response")
+                    Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: null response")
                     RegisterDeviceResult.Failure(0, "null response")
                 }
                 response.isSuccessful -> {
-                    Logger.i(LOG_IAB, "$TAG $mname: success " +
+                    Logger.i(LOG_IAB, "$TAG $mname [${handle.envLabel}]: success " +
                         "(accLen=${accountId.length}, devLen=${deviceId.length}, res=${response.message()}, body=${response.body()})")
                     persistentState.deviceRegistrationTimestamp = System.currentTimeMillis()
                     RegisterDeviceResult.Success
                 }
                 response.code() == 401 -> {
-                    Logger.e(LOG_IAB, "$TAG $mname: 401 unauthorized; accLen=${accountId.length}, devLen=${deviceId.length}, err=${response.errorBody()?.string()}")
+                    Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: 401 unauthorized; accLen=${accountId.length}, devLen=${deviceId.length}, err=${response.errorBody()?.string()}")
                     RegisterDeviceResult.Unauthorized(accountId, deviceId)
                 }
                 response.code() == 409 -> {
-                    Logger.w(LOG_IAB, "$TAG $mname: 409 (device already registered), err=${response.errorBody()?.string()}")
+                    Logger.w(LOG_IAB, "$TAG $mname [${handle.envLabel}]: 409 (device already registered), err=${response.errorBody()?.string()}")
                     RegisterDeviceResult.Conflict
                 }
                 else -> {
-                    Logger.e(LOG_IAB, "$TAG $mname: failed code=${response.code()}, err=${response.errorBody()?.string()}")
+                    Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: failed code=${response.code()}, err=${response.errorBody()?.string()}")
                     RegisterDeviceResult.Failure(response.code(), response.message())
                 }
             }
@@ -543,7 +619,7 @@ class BillingBackendClient(
         productType: String
     ): Pair<Boolean, String> = withContext(Dispatchers.IO) {
         val mname = "acknowledgePurchase"
-        Logger.d(LOG_IAB, "$TAG $mname: accLen=${accountId.length}, type=$productType")
+        Logger.d(LOG_IAB, "$TAG $mname [${currentEnv().label}]: accLen=${accountId.length}, type=$productType")
 
         val pt  = URLEncoder.encode(purchaseToken, "UTF-8")
         val sku = skuForType(productType)
@@ -584,19 +660,15 @@ class BillingBackendClient(
         // Resolve the test/production split once, stable across all retries.
         val handle = resolveApi()
 
-        // Back-off delays in ms.  The first attempt is immediate (no leading delay).
-        // After attempt N fails transiently, wait ACK_RETRY_DELAYS[N] before attempt N+1.
-        // When all delays are exhausted the loop exits and we return the last failure.
         val delaysMs = ACK_RETRY_DELAYS
-        val maxAttempts = delaysMs.size + 1   // 3: one immediate + one per delay
+        val maxAttempts = delaysMs.size + 1
 
         var lastFailureMsg = "No response from server"
 
         for (attemptIndex in 0 until maxAttempts) {
-            // Wait before every attempt except the first.
             if (attemptIndex > 0) {
                 val waitMs = delaysMs[attemptIndex - 1]
-                Logger.i(LOG_IAB, "$TAG $caller: retry #$attemptIndex, waiting ${waitMs}ms")
+                Logger.i(LOG_IAB, "$TAG $caller [${handle.envLabel}]: retry #$attemptIndex, waiting ${waitMs}ms")
                 delay(waitMs)
             }
 
@@ -605,67 +677,66 @@ class BillingBackendClient(
 
                 if (response == null) {
                     lastFailureMsg = "No response from server"
-                    Logger.w(LOG_IAB, "$TAG $caller: attempt ${attemptIndex + 1} null response, will retry")
-                    continue   // transient retry
+                    Logger.w(LOG_IAB, "$TAG $caller [${handle.envLabel}]: attempt ${attemptIndex + 1} null response, will retry")
+                    continue
                 }
 
                 val httpCode = response.code()
                 val url = response.raw().request.url.toString()
-                Logger.d(LOG_IAB, "$TAG $caller: attempt ${attemptIndex + 1} for url: $url, code: $httpCode, err: ${response.errorBody()?.string()}")
+                Logger.d(LOG_IAB, "$TAG $caller [${handle.envLabel}]: attempt ${attemptIndex + 1} for url: $url, code: $httpCode, err: ${response.errorBody()?.string()}")
 
                 if (httpCode == 401) {
-                    Logger.e(LOG_IAB, "$TAG $caller: 401 unauthorized, not retrying; ${response.errorBody()?.string()}")
+                    Logger.e(LOG_IAB, "$TAG $caller [${handle.envLabel}]: 401 unauthorized, not retrying; ${response.errorBody()?.string()}")
                     return Pair(false, "Unauthorized: 401")
                 }
 
                 if (httpCode == 409) {
-                    Logger.w(LOG_IAB, "$TAG $caller: 409 conflict, not retrying; ${response.errorBody()?.string()}")
+                    Logger.w(LOG_IAB, "$TAG $caller [${handle.envLabel}]: 409 conflict, not retrying; ${response.errorBody()?.string()}")
                     return Pair(false, "Conflict: 409")
                 }
 
                 if (httpCode in 400..499) {
-                    Logger.e(LOG_IAB, "$TAG $caller: permanent client error $httpCode not retrying; ${response.errorBody()?.string()}")
+                    Logger.e(LOG_IAB, "$TAG $caller [${handle.envLabel}]: permanent client error $httpCode not retrying; ${response.errorBody()?.string()}")
                     return Pair(false, "Client error: $httpCode")
                 }
 
                 if (httpCode >= 500) {
                     lastFailureMsg = "Server error: $httpCode"
-                    Logger.w(LOG_IAB, "$TAG $caller: attempt ${attemptIndex + 1} server error $httpCode, will retry; ${response.errorBody()?.string()}")
+                    Logger.w(LOG_IAB, "$TAG $caller [${handle.envLabel}]: attempt ${attemptIndex + 1} server error $httpCode, will retry; ${response.errorBody()?.string()}")
                     continue
                 }
 
                 val bodyStr = response.body()?.toString()
                 val rawForParsing = bodyStr?.takeIf { it.isNotBlank() }
                     ?: response.errorBody()?.string()
-                if (DEBUG) Logger.d(LOG_IAB, "$TAG $caller: body=$rawForParsing")
+                if (DEBUG) Logger.d(LOG_IAB, "$TAG $caller [${handle.envLabel}]: body=$rawForParsing")
 
                 return when (val result = RpnPurchaseAckServerResponse.from(rawForParsing, httpCode)) {
                     is RpnPurchaseAckServerResponse.Ok -> {
-                        Logger.d(LOG_IAB, "$TAG $caller: ack ok, hasEntitlement=${result.payload.hasEntitlement}")
+                        Logger.d(LOG_IAB, "$TAG $caller [${handle.envLabel}]: ack ok, hasEntitlement=${result.payload.hasEntitlement}")
                         Pair(true, result.payload.developerPayload.orEmpty())
                     }
                     is RpnPurchaseAckServerResponse.Err -> {
-                        // Business-level error (e.g. invalid token): do not retry.
-                        Logger.e(LOG_IAB, "$TAG $caller: server business error: ${result.payload.error}")
+                        Logger.e(LOG_IAB, "$TAG $caller [${handle.envLabel}]: server business error: ${result.payload.error}")
                         Pair(false, "Server error: ${result.payload.error}")
                     }
                 }
             } catch (e: UnknownHostException) {
                 lastFailureMsg = "No internet: ${e.message}"
-                Logger.w(LOG_IAB, "$TAG $caller: attempt ${attemptIndex + 1}; no internet (${e.message}), will retry")
+                Logger.w(LOG_IAB, "$TAG $caller [${handle.envLabel}]: attempt ${attemptIndex + 1}; no internet (${e.message}), will retry")
             } catch (e: ConnectException) {
                 lastFailureMsg = "Connection failed: ${e.message}"
-                Logger.w(LOG_IAB, "$TAG $caller: attempt ${attemptIndex + 1}; connect error (${e.message}), will retry")
+                Logger.w(LOG_IAB, "$TAG $caller [${handle.envLabel}]: attempt ${attemptIndex + 1}; connect error (${e.message}), will retry")
             } catch (e: SocketTimeoutException) {
                 lastFailureMsg = "Timeout: ${e.message}"
-                Logger.w(LOG_IAB, "$TAG $caller: attempt ${attemptIndex + 1}; timeout (${e.message}), will retry")
+                Logger.w(LOG_IAB, "$TAG $caller [${handle.envLabel}]: attempt ${attemptIndex + 1}; timeout (${e.message}), will retry")
             } catch (e: Exception) {
                 lastFailureMsg = "Error: ${e.message}"
-                Logger.e(LOG_IAB, "$TAG $caller: attempt ${attemptIndex + 1}; unexpected (${e.message}), will retry", e)
+                Logger.e(LOG_IAB, "$TAG $caller [${handle.envLabel}]: attempt ${attemptIndex + 1}; unexpected (${e.message}), will retry", e)
             }
         }
 
-        Logger.e(LOG_IAB, "$TAG $caller: all $maxAttempts attempts exhausted; $lastFailureMsg")
+        Logger.e(LOG_IAB, "$TAG $caller [${handle.envLabel}]: all $maxAttempts attempts exhausted; $lastFailureMsg")
         return Pair(false, lastFailureMsg)
     }
 
@@ -693,35 +764,34 @@ class BillingBackendClient(
         val mname = "queryEntitlement"
         if (accountId.isEmpty()) {
             Logger.e(LOG_IAB, "$TAG $mname: empty accountId skipping")
-            // Treat missing accountId as a transient/infrastructure problem, not a business error.
             return@withContext QueryEntitlementResult.Transient(purchase)
         }
         try {
             val encodedPt = URLEncoder.encode(purchaseToken, "UTF-8")
             val sku = skuForType(purchase.productType)
-            val response = when (val handle = resolveApi()) {
+            val handle = resolveApi()
+            val response = when (handle) {
                 is ApiHandle.Production -> handle.api.queryEntitlement(accountId, deviceId, sku, encodedPt)
                 is ApiHandle.Test -> handle.api.queryEntitlement(accountId, deviceId, sku, encodedPt, test = "")
             }
-            Logger.d(LOG_IAB, "$TAG $mname: code=${response?.code()}, err? ${response?.errorBody()?.string()}")
             if (response == null) {
-                // Null response = server unreachable / transport error → transient.
-                Logger.w(LOG_IAB, "$TAG $mname: null response from server for entitlement query")
+                Logger.w(LOG_IAB, "$TAG $mname [${handle.envLabel}]: null response from server for entitlement query")
                 return@withContext QueryEntitlementResult.Transient(purchase)
             }
             val httpCode = response.code()
+            val bodyStr = response.body()?.toString() ?: response.errorBody()?.string()
+            Logger.d(LOG_IAB, "$TAG $mname [${handle.envLabel}]: code=$httpCode, body? $bodyStr")
             if (httpCode == 401) {
-                Logger.e(LOG_IAB, "$TAG $mname: 401 unauthorized; accLen=${accountId.length}, devLen=${deviceId.length}, err=${response.errorBody()?.string()}")
+                Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: 401 unauthorized; accLen=${accountId.length}, devLen=${deviceId.length}")
                 return@withContext QueryEntitlementResult.Unauthorized(accountId, deviceId)
             }
             if (httpCode == 409) {
-                Logger.w(LOG_IAB, "$TAG $mname: 409 conflict, err=${response.errorBody()?.string()}")
+                Logger.w(LOG_IAB, "$TAG $mname [${handle.envLabel}]: 409 conflict")
                 return@withContext QueryEntitlementResult.Conflict
             }
-            val bodyStr = response.body()?.toString() ?: response.errorBody()?.string()
             when (val result = RpnPurchaseAckServerResponse.from(bodyStr, httpCode)) {
                 is RpnPurchaseAckServerResponse.Ok  -> {
-                    Logger.d(LOG_IAB, "$TAG $mname: ok, hasEntitlement=${result.payload.hasEntitlement}")
+                    Logger.d(LOG_IAB, "$TAG $mname [${handle.envLabel}]: ok, hasEntitlement=${result.payload.hasEntitlement}")
                     QueryEntitlementResult.Success(
                         purchase.copy(
                             payload    = result.payload.developerPayload.orEmpty(),
@@ -731,12 +801,14 @@ class BillingBackendClient(
                     )
                 }
                 is RpnPurchaseAckServerResponse.Err -> {
-                    // Server explicitly responded with a business error (e.g. purchase revoked).
-                    // Return the original purchase unchanged — the local billing expiry is still
-                    // the authority for INAPP; callers should not zero out local expiry based on
-                    // a server-side error response.
-                    Logger.e(LOG_IAB, "$TAG $mname: server business error, ${result.payload}")
-                    QueryEntitlementResult.Failure(purchase)
+                    Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: server business error, ${result.payload}")
+                    if (result.payload.isSubscriptionExpired) {
+                        Logger.w(LOG_IAB, "$TAG $mname [${handle.envLabel}]: subscription definitively expired on server " +
+                            "(state=${result.payload.state}); returning Expired to caller")
+                        QueryEntitlementResult.Expired(purchase)
+                    } else {
+                        QueryEntitlementResult.Failure(purchase)
+                    }
                 }
             }
         } catch (e: UnknownHostException) {
@@ -767,23 +839,24 @@ class BillingBackendClient(
     ): Pair<Boolean, String> = withContext(Dispatchers.IO) {
         val mname = "cancelPurchase"
         try {
-            Logger.d(LOG_IAB, "$TAG $mname: accLen=${accountId}, dev=${deviceId}, sku=$sku, $purchaseToken")
-            val response = when (val handle = resolveApi()) {
+            val handle = resolveApi()
+            Logger.d(LOG_IAB, "$TAG $mname [${handle.envLabel}]: accLen=${accountId.length}, devLen=${deviceId.length}, sku=$sku")
+            val response = when (handle) {
                 is ApiHandle.Production -> handle.api.cancelPurchase(accountId, deviceId, sku, purchaseToken)
                 is ApiHandle.Test -> handle.api.cancelSubscription(accountId, deviceId, sku, purchaseToken, test = "")
             } ?: return@withContext Pair(false, "No response")
             when {
                 response.code() == 401 -> {
-                    Logger.e(LOG_IAB, "$TAG $mname: 401 unauthorized; accLen=${accountId.length}, err=${response.errorBody()?.string()}")
+                    Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: 401 unauthorized; accLen=${accountId.length}, err=${response.errorBody()?.string()}")
                     Pair(false, "Unauthorized: 401")
                 }
                 response.code() == 409 -> Pair(false, "Conflict: 409")
                 response.isSuccessful  -> {
-                    Logger.i(LOG_IAB, "$TAG $mname: cancelled sku=$sku")
+                    Logger.i(LOG_IAB, "$TAG $mname [${handle.envLabel}]: cancelled sku=$sku")
                     Pair(true, "Cancelled")
                 }
                 else -> {
-                    Logger.e(LOG_IAB, "$TAG $mname: error code=${response.code()}, msg=${response.message()}, err=${response.errorBody()?.string()}")
+                    Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: error code=${response.code()}, msg=${response.message()}, err=${response.errorBody()?.string()}")
                     Pair(false, "Server error: ${response.code()}")
                 }
             }
@@ -806,22 +879,23 @@ class BillingBackendClient(
     ): Pair<Boolean, String> = withContext(Dispatchers.IO) {
         val mname = "revokePurchase"
         try {
-            val response = when (val handle = resolveApi()) {
+            val handle = resolveApi()
+            val response = when (handle) {
                 is ApiHandle.Production -> handle.api.revokeSubscription(accountId, deviceId, sku, purchaseToken)
                 is ApiHandle.Test -> handle.api.revokeSubscription(accountId, deviceId, sku, purchaseToken, test = "")
             } ?: return@withContext Pair(false, "No response")
             when {
                 response.code() == 401 -> {
-                    Logger.e(LOG_IAB, "$TAG $mname: 401 unauthorized; accLen=${accountId.length}, err=${response.errorBody()?.string()}")
+                    Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: 401 unauthorized; accLen=${accountId.length}, err=${response.errorBody()?.string()}")
                     Pair(false, "Unauthorized: 401")
                 }
                 response.code() == 409 -> Pair(false, "Conflict: 409")
                 response.isSuccessful  -> {
-                    Logger.i(LOG_IAB, "$TAG $mname: revoked sku=$sku, raw: ${response.raw().body}")
+                    Logger.i(LOG_IAB, "$TAG $mname [${handle.envLabel}]: revoked sku=$sku, raw: ${response.raw().body}")
                     Pair(true, "Revoked")
                 }
                 else -> {
-                    Logger.e(LOG_IAB, "$TAG $mname: err code=${response.code()}, " +
+                    Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: err code=${response.code()}, " +
                         "url=${response.raw().request.url}")
                     Pair(false, "server err: ${response.code()}, ${response.errorBody()?.string()}")
                 }
@@ -859,7 +933,8 @@ class BillingBackendClient(
             return@withContext FetchOrdersRawResult.NoCredentials
         }
         try {
-            val response = when (val handle = resolveApi()) {
+            val handle = resolveApi()
+            val response = when (handle) {
                 is ApiHandle.Production -> handle.api.getPurchaseHistory(
                     accountId = accountId,
                     deviceId = deviceId,
@@ -876,21 +951,21 @@ class BillingBackendClient(
             }
             when {
                 response == null -> {
-                    Logger.w(LOG_IAB, "$TAG $mname: null response")
+                    Logger.w(LOG_IAB, "$TAG $mname [${handle.envLabel}]: null response")
                     FetchOrdersRawResult.Error("Empty response from server")
                 }
                 !response.isSuccessful -> {
                     val code = response.code()
-                    Logger.w(LOG_IAB, "$TAG $mname: HTTP $code, ${response.errorBody()?.string()}")
+                    Logger.w(LOG_IAB, "$TAG $mname [${handle.envLabel}]: HTTP $code, ${response.errorBody()?.string()}")
                     FetchOrdersRawResult.Error("Server returned HTTP $code")
                 }
                 else -> {
                     val body = response.body()
                     if (body == null) {
-                        Logger.w(LOG_IAB, "$TAG $mname: null body")
+                        Logger.w(LOG_IAB, "$TAG $mname [${handle.envLabel}]: null body")
                         FetchOrdersRawResult.Error("No data returned from server")
                     } else {
-                        if (DEBUG) Logger.vv(LOG_IAB, "$TAG $mname: body=$body")
+                        if (DEBUG) Logger.vv(LOG_IAB, "$TAG $mname [${handle.envLabel}]: body=$body")
                         FetchOrdersRawResult.Success(body)
                     }
                 }
@@ -921,35 +996,36 @@ class BillingBackendClient(
         }
         try {
             val encodedToken = URLEncoder.encode(purchaseToken, "UTF-8")
-            val response = when (val handle = resolveApi()) {
+            val handle = resolveApi()
+            val response = when (handle) {
                 is ApiHandle.Production -> handle.api.consumePurchase(accountId, deviceId, sku, encodedToken)
                 is ApiHandle.Test       -> handle.api.consumePurchase(accountId, deviceId, sku, encodedToken, test = "")
             }
             if (response == null) {
-                Logger.e(LOG_IAB, "$TAG $mname: null response")
+                Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: null response")
                 return@withContext false
             }
             val bodyStr  = response.body()?.toString() ?: response.errorBody()?.string()
             val httpCode = response.code()
             when {
                 response.isSuccessful -> {
-                    Logger.i(LOG_IAB, "$TAG $mname: consumed sku=$sku body=$bodyStr")
+                    Logger.i(LOG_IAB, "$TAG $mname [${handle.envLabel}]: consumed sku=$sku body=$bodyStr")
                     true
                 }
                 httpCode == 409 && bodyStr?.contains("already consumed", ignoreCase = true) == true -> {
-                    Logger.i(LOG_IAB, "$TAG $mname: idempotent already consumed sku=$sku")
+                    Logger.i(LOG_IAB, "$TAG $mname [${handle.envLabel}]: idempotent already consumed sku=$sku")
                     true
                 }
                 httpCode == 409 -> {
-                    Logger.w(LOG_IAB, "$TAG $mname: 409 conflict sku=$sku body=$bodyStr")
+                    Logger.w(LOG_IAB, "$TAG $mname [${handle.envLabel}]: 409 conflict sku=$sku body=$bodyStr")
                     false
                 }
                 httpCode in 400..499 -> {
-                    Logger.e(LOG_IAB, "$TAG $mname: permanent client error $httpCode sku=$sku body=$bodyStr")
+                    Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: permanent client error $httpCode sku=$sku body=$bodyStr")
                     false
                 }
                 else -> {
-                    Logger.w(LOG_IAB, "$TAG $mname: transient server error $httpCode sku=$sku")
+                    Logger.w(LOG_IAB, "$TAG $mname [${handle.envLabel}]: transient server error $httpCode sku=$sku")
                     false
                 }
             }
@@ -1002,10 +1078,16 @@ class BillingBackendClient(
      * string that must be forwarded as the `test` query param.
      */
     private sealed class ApiHandle {
+        /** Human-readable label for log messages: "prod" or "test". */
+        abstract val envLabel: String
         /** Use for production entitlements. Pass `test = null` to every endpoint. */
-        data class Production(val api: IBillingServerApi) : ApiHandle()
+        data class Production(val api: IBillingServerApi) : ApiHandle() {
+            override val envLabel = "prod"
+        }
         /** Use for test entitlements. Pass `test = testValue` to every endpoint. */
-        data class Test(val api: IBillingServerApiTest, val testValue: Boolean) : ApiHandle()
+        data class Test(val api: IBillingServerApiTest, val testValue: Boolean) : ApiHandle() {
+            override val envLabel = "test"
+        }
     }
 
     /**

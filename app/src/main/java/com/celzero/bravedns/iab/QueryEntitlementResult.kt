@@ -61,6 +61,17 @@ sealed class QueryEntitlementResult {
     ) : QueryEntitlementResult()
 
     /**
+     * Server definitively confirmed the subscription is expired
+     * (e.g. state=SUBSCRIPTION_STATE_EXPIRED in the error response).
+     *
+     * This is distinct from [Failure] because the server has authoritatively stated the
+     * subscription is no longer active — callers MUST expire the local purchase rather
+     * than preserving it.  [purchase] is the *original* [PurchaseDetail]; callers should
+     * zero out [PurchaseDetail.expiryTime] and clear [PurchaseDetail.payload].
+     */
+    data class Expired(val purchase: PurchaseDetail) : QueryEntitlementResult()
+
+    /**
      * Transient / infrastructure failure: network error, server unreachable, timeout,
      * null HTTP response, or any unexpected exception.
      * The server was **not reached**; [purchase] is the *original* [PurchaseDetail] unchanged.

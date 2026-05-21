@@ -134,14 +134,14 @@ class SubscriptionCheckWorker(
                 dispatchDeviceRegistration(storedAccountId, freshDeviceId, purchase)
                 return
             } else {
-                Logger.d(LOG_IAB, "$TAG; $name: stored did=${storedDeviceId.take(4)}, stored cid=${storedAccountId.take(8)}")
+                Logger.d(LOG_IAB, "$TAG; $name: stored did=${storedDeviceId.take(4)}(len=${storedDeviceId.length}), stored cid=${storedAccountId.take(8)}(len=${storedAccountId.length})")
             }
 
             if (!isStale) {
                 Logger.d(LOG_IAB, "$TAG; $name: device already registered within window, skipping")
                 return
             }
-            Logger.i(LOG_IAB, "$TAG; $name: register device with cid: ${storedAccountId.take(8)}, did: ${storedDeviceId.take(4)}")
+            Logger.i(LOG_IAB, "$TAG; $name: register device with cid: ${storedAccountId.take(8)}(len=${storedAccountId.length}), did: ${storedDeviceId.take(4)}(len=${storedDeviceId.length})")
             dispatchDeviceRegistration(storedAccountId, storedDeviceId, purchase)
 
         } catch (e: Exception) {
@@ -208,14 +208,11 @@ class SubscriptionCheckWorker(
             }
             is RegisterDeviceResult.Unauthorized -> {
                 Logger.e(LOG_IAB, "$TAG; $name: 401 unauthorized; posting DeviceAuthError to UI")
-                withContext(Dispatchers.Main) {
-                    val error = ServerApiError.Unauthorized401(
-                        operation      = ServerApiError.Operation.DEVICE,
-                        accountId      = accountId,
-                        deviceIdPrefix = deviceId.take(6)
-                    )
-                    InAppBillingHandler.serverApiErrorLiveData.value = error
-                }
+                InAppBillingHandler.handleUnauthorized401(
+                    operation = ServerApiError.Operation.DEVICE,
+                    accountId = accountId,
+                    deviceId  = deviceId
+                )
             }
             is RegisterDeviceResult.Conflict -> {
                 Logger.w(LOG_IAB, "$TAG; $name: 409 conflict, device already registered")
@@ -392,14 +389,11 @@ class SubscriptionCheckWorker(
                     }
                     is QueryEntitlementResult.Unauthorized -> {
                         Logger.e(LOG_IAB, "$TAG; $mname: 401 on entitlement query; posting auth error to UI")
-                        withContext(Dispatchers.Main) {
-                            val error = ServerApiError.Unauthorized401(
-                                operation      = ServerApiError.Operation.ACKNOWLEDGE,
-                                accountId      = accountId,
-                                deviceIdPrefix = deviceId.take(6)
-                            )
-                            InAppBillingHandler.serverApiErrorLiveData.value = error
-                        }
+                        InAppBillingHandler.handleUnauthorized401(
+                            operation = ServerApiError.Operation.ACKNOWLEDGE,
+                            accountId = accountId,
+                            deviceId  = deviceId
+                        )
                     }
                     is QueryEntitlementResult.Conflict -> {
                         Logger.w(LOG_IAB, "$TAG; $mname: 409 conflict on entitlement query " +
@@ -408,6 +402,14 @@ class SubscriptionCheckWorker(
                     is QueryEntitlementResult.Failure -> {
                         Logger.w(LOG_IAB, "$TAG; $mname: server business error on entitlement query " +
                             "for token=${purchase.purchaseToken.take(8)}; skipping expiry resolution (local billing expiry is authority)")
+                    }
+                    is QueryEntitlementResult.Expired -> {
+                        // Server has authoritatively confirmed the subscription is expired.
+                        // Return a timestamp in the past so the worker treats this purchase
+                        // as expired and proceeds with the consume / expiry flow.
+                        Logger.w(LOG_IAB, "$TAG; $mname: server confirmed subscription expired " +
+                            "for token=${purchase.purchaseToken.take(8)}; returning expired timestamp")
+                        return System.currentTimeMillis() - 1L
                     }
                     is QueryEntitlementResult.Transient -> {
                         // Network/transient failure — server was not reached.

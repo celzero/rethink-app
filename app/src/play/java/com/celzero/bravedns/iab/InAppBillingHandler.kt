@@ -160,7 +160,12 @@ object InAppBillingHandler : KoinComponent {
 
 
     private const val EMPTY_QUERY_THRESHOLD = 3
-    @Volatile private var consecutiveEmptyQueries = 0
+    // Separate per-product-type counters so that a non-empty INAPP result does not
+    // reset the SUBS empty counter (and vice-versa). The previous single shared counter
+    // caused the SUBS expiry threshold to never be reached when any INAPP purchases
+    // exist, because the INAPP query (always run first) always reset it to 0.
+    @Volatile private var consecutiveEmptySubsQueries = 0
+    @Volatile private var consecutiveEmptyInAppQueries = 0
 
     /**
      * How many times a token must be seen still-unacknowledged before we stop waiting
@@ -245,7 +250,8 @@ object InAppBillingHandler : KoinComponent {
             if (isSuccess) {
                 logd(mname, "billing connected, fetching initial state")
                 // reset empty-query counters on a fresh connection
-                consecutiveEmptyQueries = 0
+                consecutiveEmptySubsQueries = 0
+                consecutiveEmptyInAppQueries = 0
                 fetchPurchases(listOf(ProductType.SUBS, ProductType.INAPP))
             } else {
                 loge(mname, "billing connection failed: $message")
@@ -571,30 +577,30 @@ object InAppBillingHandler : KoinComponent {
             // google play can return empty purchase lists on some devices (Play Services issue,
             // network flake, etc.). single empty response must never expire an active purchase.
             if (queriedProductType == ProductType.SUBS) {
-                consecutiveEmptyQueries++
-                if (consecutiveEmptyQueries < EMPTY_QUERY_THRESHOLD) {
-                    logd(mname, "SUBS, empty purchase, ignoring (consecutive=$consecutiveEmptyQueries/$EMPTY_QUERY_THRESHOLD)")
+                consecutiveEmptySubsQueries++
+                if (consecutiveEmptySubsQueries < EMPTY_QUERY_THRESHOLD) {
+                    logd(mname, "SUBS, empty purchase, ignoring (consecutive=$consecutiveEmptySubsQueries/$EMPTY_QUERY_THRESHOLD)")
                     queryPurchases(queriedProductType, false)
                     return
                 }
-                logd(mname, "SUBS query returned empty, threshold reached ($consecutiveEmptyQueries/$EMPTY_QUERY_THRESHOLD), reconcile...")
+                logd(mname, "SUBS query returned empty, threshold reached ($consecutiveEmptySubsQueries/$EMPTY_QUERY_THRESHOLD), reconcile...")
 
                 // reset so repeated polls don't re-fire the reconcile path every iteration.
-                consecutiveEmptyQueries = 0
+                consecutiveEmptySubsQueries = 0
                 subscriptionStateMachine.reconcileWithPlayBilling(
                     purchases = emptyList(),
                     queriedProductType = queriedProductType
                 )
             } else {
-                consecutiveEmptyQueries++
-                if (consecutiveEmptyQueries < EMPTY_QUERY_THRESHOLD) {
-                    logd(mname, "INAPP, empty purchase, ignoring (consecutive=$consecutiveEmptyQueries/$EMPTY_QUERY_THRESHOLD)")
+                consecutiveEmptyInAppQueries++
+                if (consecutiveEmptyInAppQueries < EMPTY_QUERY_THRESHOLD) {
+                    logd(mname, "INAPP, empty purchase, ignoring (consecutive=$consecutiveEmptyInAppQueries/$EMPTY_QUERY_THRESHOLD)")
                     queryPurchases(queriedProductType, false)
                     return
                 }
-                logd(mname, "INAPP query returned empty, threshold reached ($consecutiveEmptyQueries/$EMPTY_QUERY_THRESHOLD), expire old purchases...")
+                logd(mname, "INAPP query returned empty, threshold reached ($consecutiveEmptyInAppQueries/$EMPTY_QUERY_THRESHOLD), expire old purchases...")
 
-                consecutiveEmptyQueries = 0
+                consecutiveEmptyInAppQueries = 0
 
                 // Before expiring, confirm from the server that no active INAPP purchase
                 // still has a valid entitlement. this can happen when the user chose to
@@ -732,8 +738,22 @@ object InAppBillingHandler : KoinComponent {
             return
         }
 
-        logd(mname, "non-empty response, size (${purchasesList?.size}; resetting empty counter (was $consecutiveEmptyQueries)")
-        consecutiveEmptyQueries = 0
+        // Reset only the counter for the type that returned a non-empty result.
+        when (queriedProductType) {
+            ProductType.SUBS  -> {
+                logd(mname, "non-empty SUBS response, size=${purchasesList?.size}; resetting SUBS empty counter (was $consecutiveEmptySubsQueries)")
+                consecutiveEmptySubsQueries = 0
+            }
+            ProductType.INAPP -> {
+                logd(mname, "non-empty INAPP response, size=${purchasesList?.size}; resetting INAPP empty counter (was $consecutiveEmptyInAppQueries)")
+                consecutiveEmptyInAppQueries = 0
+            }
+            else -> {
+                logd(mname, "non-empty response, size=${purchasesList?.size}; resetting both empty counters")
+                consecutiveEmptySubsQueries = 0
+                consecutiveEmptyInAppQueries = 0
+            }
+        }
 
         // print all the values in purchase
         if (DEBUG) {
@@ -790,7 +810,7 @@ object InAppBillingHandler : KoinComponent {
         logd(mname, "Handling ${oneTimePurchases.size} one-time purchases")
 
         if (subsPurchases.isNotEmpty()) {
-            consecutiveEmptyQueries = 0
+            consecutiveEmptySubsQueries = 0
 
             // Partition SUBS by acknowledgement state.
             // Acknowledged tokens always go straight to reconcile so no counter needed.
@@ -851,11 +871,12 @@ object InAppBillingHandler : KoinComponent {
                 }
             }
         } else if (queriedProductType == ProductType.SUBS) {
-            consecutiveEmptyQueries++
-            if (consecutiveEmptyQueries >= EMPTY_QUERY_THRESHOLD) {
+            consecutiveEmptySubsQueries++
+            if (consecutiveEmptySubsQueries >= EMPTY_QUERY_THRESHOLD) {
                 logd(mname, "No SUBS in purchase list despite SUBS query;" +
-                    "threshold reached ($consecutiveEmptyQueries/$EMPTY_QUERY_THRESHOLD), " +
+                    "threshold reached ($consecutiveEmptySubsQueries/$EMPTY_QUERY_THRESHOLD), " +
                     "expiring stale SUBS DB rows")
+                consecutiveEmptySubsQueries = 0
                 try {
                     subscriptionStateMachine.reconcileWithPlayBilling(
                         purchases          = emptyList<Purchase>(),
@@ -866,7 +887,7 @@ object InAppBillingHandler : KoinComponent {
                 }
             } else {
                 logd(mname, "No SUBS in purchase list despite SUBS query;" +
-                    "ignoring (consecutive=$consecutiveEmptyQueries/$EMPTY_QUERY_THRESHOLD)")
+                    "ignoring (consecutive=$consecutiveEmptySubsQueries/$EMPTY_QUERY_THRESHOLD)")
             }
         }
 
@@ -965,7 +986,8 @@ object InAppBillingHandler : KoinComponent {
             logd(mname, "cid empty, skipping reconcile")
             return
         }
-        val (storedCid, storedDid) = secureIdentityStore.get()
+        val env = currentEnv()
+        val (storedCid, storedDid) = secureIdentityStore.get(env)
         if (storedCid == cid && storedDid?.isNotEmpty() == true) {
             logv(mname, "no need to reconcile cid, did from purchase")
             return
@@ -980,7 +1002,7 @@ object InAppBillingHandler : KoinComponent {
         when {
             didResult.isSuccess -> {
                 logd(mname, "reconcile succeeded; persisting new (cid, did)")
-                secureIdentityStore.save(cid, didResult.deviceId)
+                secureIdentityStore.save(env, cid, didResult.deviceId)
             }
             didResult.errorCode == 401 -> {
                 loge(mname, "401 unauthorized on device re-registration for cid=${cid.take(8)}; surfacing auth error")
@@ -995,6 +1017,11 @@ object InAppBillingHandler : KoinComponent {
             }
         }
     }
+
+    /** Returns the identity-store environment that matches the current app mode. */
+    private fun currentEnv(): SecureIdentityStore.Env =
+        if (persistentState.appTestMode) SecureIdentityStore.Env.TEST
+        else SecureIdentityStore.Env.PROD
 
 
     private fun resolveOfferDetailsForPurchase(
@@ -2092,7 +2119,19 @@ object InAppBillingHandler : KoinComponent {
             deviceIdPrefix = deviceId.take(6)
         )
         withContext(Dispatchers.Main) {
+            val alreadyAuthErrorActive = serverApiErrorLiveData.value is ServerApiError.Unauthorized401
             serverApiErrorLiveData.value = error
+            if (!alreadyAuthErrorActive && !serverApiErrorLiveData.hasActiveObservers()) {
+                val ctx = appContext
+                if (ctx != null) {
+                    logd("handleUnauthorized401", "posting auth-error notification")
+                    DeviceAuthErrorNotifier.notify(ctx, error, persistentState.theme)
+                } else {
+                    loge("handleUnauthorized401", "appContext null; cannot post auth-error notification")
+                }
+            } else if (alreadyAuthErrorActive) {
+                logd("handleUnauthorized401", "auth error already active, skipping duplicate notification")
+            }
         }
         loge("handleUnauthorized401", "401 on ${operation.endpoint}: accLen=${accountId.length}")
     }
@@ -2400,8 +2439,9 @@ object InAppBillingHandler : KoinComponent {
             } else {
                 logEvent(EventType.PROXY_SWITCH, Severity.LOW, "cancelOneTimePurchase", "cancelOneTimePurchase success")
             }
-            fetchPurchases(listOf(ProductType.SUBS, ProductType.INAPP))
-            try {
+            // Update state machine BEFORE triggering a Play refresh. ManagePurchaseViewModel
+            // calls fetchPurchases() after this function returns; no duplicate query needed.
+            return@withLock try {
                 subscriptionStateMachine.userCancelled()
                 logd(mname, "One-time purchase cancelled successfully")
                 Pair(true, "One-time purchase cancelled successfully")
@@ -2450,8 +2490,9 @@ object InAppBillingHandler : KoinComponent {
             } else {
                 logEvent(EventType.PROXY_SWITCH, Severity.LOW, "revokeOneTimePurchase", "revokeOneTimePurchase success")
             }
-            fetchPurchases(listOf(ProductType.SUBS, ProductType.INAPP))
-            try {
+            // Update state machine BEFORE triggering a Play refresh. ManagePurchaseViewModel
+            // calls fetchPurchases() after this function returns; no duplicate query needed.
+            return@withLock try {
                 subscriptionStateMachine.subscriptionRevoked()
                 logd(mname, "One-time purchase revoked successfully")
                 Pair(true, "One-time purchase revoked successfully")
@@ -2553,8 +2594,12 @@ object InAppBillingHandler : KoinComponent {
                 } else {
                     logEvent(EventType.PROXY_SWITCH, Severity.LOW, "cancelPlaySubscription", "cancelPlaySubscription success")
                 }
-                fetchPurchases(listOf(ProductType.SUBS, ProductType.INAPP))
-                try {
+                // Update state machine BEFORE triggering a Play purchase refresh so that the
+                // LOCAL_CANCEL_REVOKE_GUARD_MS guard in handlePaymentSuccessful can protect the
+                // newly-written STATE_CANCELLED status from being overwritten by a stale Play
+                // response.  The caller (ManagePurchaseViewModel) issues fetchPurchases() after
+                // this function returns, so we do NOT call it here to avoid a double-query.
+                return@withLock try {
                     subscriptionStateMachine.userCancelled()
                     logd(mname, "subscription cancelled successfully")
                     Pair(true, "Subscription cancelled successfully")
@@ -2588,8 +2633,13 @@ object InAppBillingHandler : KoinComponent {
                 } else {
                     logEvent(EventType.PROXY_SWITCH, Severity.LOW, "revokeSubscription", "revokeSubscription success")
                 }
-                fetchPurchases(listOf(ProductType.SUBS, ProductType.INAPP))
-                try {
+                // Update state machine BEFORE triggering a Play purchase refresh so that the
+                // LOCAL_CANCEL_REVOKE_GUARD_MS guard in handlePaymentSuccessful can protect the
+                // newly-written STATE_REVOKED status from being overwritten by a stale Play
+                // response (Play still returns isAutoRenewing=true until revocation propagates).
+                // The caller (ManagePurchaseViewModel) issues fetchPurchases() after this function
+                // returns, so we do NOT call it here to avoid a double-query.
+                return@withLock try {
                     subscriptionStateMachine.subscriptionRevoked()
                     logd(mname, "Subscription revoked successfully")
                     Pair(true, "Subscription revoked successfully")
@@ -2643,6 +2693,14 @@ object InAppBillingHandler : KoinComponent {
                     }
                 }
                 result.purchase
+            }
+            is QueryEntitlementResult.Expired -> {
+                // Server has authoritatively confirmed the subscription is expired.
+                // Do NOT preserve the old purchase — clear the payload and zero the expiry so
+                // every downstream caller (RpnProxyManager, state machine, SubscriptionCheckWorker)
+                // treats this as an expired entitlement rather than re-storing the old one.
+                loge(mname, "queryEntitlement server confirmed subscription expired for token=${pt.take(8)}; expiring local purchase")
+                result.purchase.copy(expiryTime = 0L, payload = "")
             }
             is QueryEntitlementResult.Transient -> {
                 // Network/transient failure — server was not reached.

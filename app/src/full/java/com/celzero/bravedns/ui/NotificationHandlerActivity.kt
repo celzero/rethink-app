@@ -27,6 +27,7 @@ import android.provider.Settings
 import androidx.core.net.toUri
 import androidx.core.view.WindowInsetsControllerCompat
 import com.celzero.bravedns.R
+import com.celzero.bravedns.iab.DeviceAuthErrorNotifier
 import com.celzero.bravedns.iab.DeviceNotRegisteredNotifier
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.PurchaseConflictNotifier
@@ -45,6 +46,8 @@ import com.celzero.bravedns.ui.fragment.RethinkPlusDashboardFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_IAB_CONFLICT_NAME
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_IAB_CONFLICT_VALUE
+import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_IAB_DEVICE_AUTH_ERROR_NAME
+import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_IAB_DEVICE_AUTH_ERROR_VALUE
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_IAB_DEVICE_NOT_REGISTERED_NAME
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_IAB_DEVICE_NOT_REGISTERED_VALUE
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
@@ -73,6 +76,7 @@ class NotificationHandlerActivity: BaseActivity() {
         WIREGUARD_ACTIVITY,
         PURCHASE_CONFLICT,
         RPN_DEVICE_NOT_REGISTERED,
+        DEVICE_AUTH_ERROR,
         NONE
     }
 
@@ -135,6 +139,8 @@ class NotificationHandlerActivity: BaseActivity() {
                 TrampolineType.PURCHASE_CONFLICT
             } else if (isDeviceNotRegisteredIntent(intent)) {
                 TrampolineType.RPN_DEVICE_NOT_REGISTERED
+            } else if (isDeviceAuthErrorIntent(intent)) {
+                TrampolineType.DEVICE_AUTH_ERROR
             } else {
                 TrampolineType.NONE
             }
@@ -165,6 +171,9 @@ class NotificationHandlerActivity: BaseActivity() {
             }
             TrampolineType.RPN_DEVICE_NOT_REGISTERED -> {
                 launchDeviceNotRegisteredAndFinish(intent)
+            }
+            TrampolineType.DEVICE_AUTH_ERROR -> {
+                launchDeviceAuthErrorAndFinish(intent)
             }
             TrampolineType.NONE -> {
                 launchHomeScreenAndFinish()
@@ -256,6 +265,53 @@ class NotificationHandlerActivity: BaseActivity() {
             finish()
         } catch (e: Exception) {
             Logger.e(LOG_TAG_UI, "launchDeviceNotRegisteredAndFinish: error: ${e.message}", e)
+            launchHomeScreenAndFinish()
+        }
+    }
+
+    /**
+     * Rebuilds [ServerApiError.Unauthorized401] from the notification intent extras,
+     * re-posts it to [InAppBillingHandler.serverApiErrorLiveData], cancels the notification,
+     * then opens [RethinkPlusDashboardFragment].
+     *
+     * [RethinkPlusDashboardFragment.setupServerErrorObserver] will immediately show
+     * [com.celzero.bravedns.ui.bottomsheet.DeviceAuthErrorBottomSheet].
+     */
+    private fun launchDeviceAuthErrorAndFinish(intent: Intent) {
+        try {
+            val operationName = intent.getStringExtra(DeviceAuthErrorNotifier.EXTRA_OPERATION)
+                ?: ServerApiError.Operation.DEVICE.name
+            val operation = try {
+                ServerApiError.Operation.valueOf(operationName)
+            } catch (_: IllegalArgumentException) {
+                ServerApiError.Operation.DEVICE
+            }
+
+            val error = ServerApiError.Unauthorized401(
+                operation      = operation,
+                accountId      = intent.getStringExtra(DeviceAuthErrorNotifier.EXTRA_ACCOUNT_ID) ?: "",
+                deviceIdPrefix = intent.getStringExtra(DeviceAuthErrorNotifier.EXTRA_DEVICE_ID_PREFIX) ?: ""
+            )
+
+            // Re-post to LiveData on the main thread so RethinkPlusDashboardFragment's observer
+            // picks it up and shows DeviceAuthErrorBottomSheet automatically.
+            InAppBillingHandler.serverApiErrorLiveData.value = error
+
+            DeviceAuthErrorNotifier.cancel(this)
+
+            Logger.i(LOG_TAG_UI, "launchDeviceAuthErrorAndFinish: re-posted Unauthorized401, op=$operation")
+
+            val hostIntent = FragmentHostActivity.createIntent(
+                context = this,
+                fragmentClass = RethinkPlusDashboardFragment::class.java,
+                args = Bundle()
+            ).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+            startActivity(hostIntent)
+            finish()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "launchDeviceAuthErrorAndFinish: error: ${e.message}", e)
             launchHomeScreenAndFinish()
         }
     }
@@ -384,5 +440,12 @@ class NotificationHandlerActivity: BaseActivity() {
         if (intent.extras == null) return false
         val what = intent.extras?.getString(NOTIF_INTENT_EXTRA_IAB_DEVICE_NOT_REGISTERED_NAME)
         return NOTIF_INTENT_EXTRA_IAB_DEVICE_NOT_REGISTERED_VALUE == what
+    }
+
+    /* checks if it's a device-auth-error (HTTP 401) intent sent from notification */
+    private fun isDeviceAuthErrorIntent(intent: Intent): Boolean {
+        if (intent.extras == null) return false
+        val what = intent.extras?.getString(NOTIF_INTENT_EXTRA_IAB_DEVICE_AUTH_ERROR_NAME)
+        return NOTIF_INTENT_EXTRA_IAB_DEVICE_AUTH_ERROR_VALUE == what
     }
 }
