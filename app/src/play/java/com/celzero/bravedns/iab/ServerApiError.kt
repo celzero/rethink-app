@@ -114,18 +114,6 @@ sealed class ServerApiError {
         val deviceIdPrefix: String
     ) : ServerApiError()
 
-    /** Returns true when this error should trigger the 409 conflict bottom sheet. */
-    val isConflict: Boolean get() = this is Conflict409
-
-    /** Returns true when this error should trigger the device-auth-error bottom sheet. */
-    val isUnauthorized: Boolean get() = this is Unauthorized401
-
-    /** Returns true when the device is not registered under the entitlement account. */
-    val isDeviceNotRegistered: Boolean get() = this is DeviceNotRegistered
-
-    /** Returns true when no error occurred. */
-    val isNone: Boolean get() = this is None
-
     /**
      * The specific ITcpProxy operation that produced a 409.
      * Used by [PurchaseConflictBottomSheet] to customise title, description,

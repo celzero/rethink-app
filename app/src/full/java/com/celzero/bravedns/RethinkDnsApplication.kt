@@ -76,7 +76,7 @@ class RethinkDnsApplication : Application() {
     private suspend fun scheduleJobs() {
         Logger.d(LOG_TAG_SCHEDULER, "Schedule job")
         get<WorkScheduler>().scheduleAppExitInfoCollectionJob()
-        // database refresh is used in both headless and main project
+        // database refresh to keep app data up to date
         get<ScheduleManager>().scheduleDatabaseRefreshJob()
         get<WorkScheduler>().scheduleDataUsageJob()
         get<WorkScheduler>().schedulePurgeConnectionsLog()

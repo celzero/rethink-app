@@ -120,9 +120,9 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
     }
 
     private fun initView() {
-        b.settingsActivityWireguardText.text = getString(R.string.settings_proxy_header).lowercase()
-        val text = getString(R.string.two_argument, getString(R.string.orbot_status_arg_2).lowercase(), getString(R.string.lbl_ip))
-        b.settingsActivityTcpText.text = text.lowercase()
+        b.settingsActivityWireguardText.text = getString(R.string.settings_proxy_header)
+        val text = getString(R.string.two_argument, getString(R.string.orbot_status_arg_2), getString(R.string.lbl_ip))
+        b.settingsActivityTcpText.text = text.uppercase()
         b.dvWgAllowIncomingTxt.text = getString(R.string.two_argument_space, getString(R.string.settings_allow_incoming_wg_packets), getString(R.string.lbl_experimental))
         b.settingsUseMaxMtuHeading.text = getString(R.string.two_argument_space, getString(R.string.settings_jumbo_packets), getString(R.string.lbl_experimental))
 
@@ -158,10 +158,12 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         b.dvEimfSwitch.isChecked = persistentState.endpointIndependence
         if (persistentState.endpointIndependence) {
             b.dvWgAllowIncomingRl.visibility = View.VISIBLE
+            b.dividerWgAllowIncoming.visibility = View.VISIBLE
             b.dvWgAllowIncomingTxt.text = getString(R.string.two_argument_space, getString(R.string.settings_allow_incoming_wg_packets), getString(R.string.lbl_experimental))
             b.dvWgAllowIncomingSwitch.isChecked = persistentState.nwEngExperimentalFeatures
         } else {
             b.dvWgAllowIncomingRl.visibility = View.GONE
+            b.dividerWgAllowIncoming.visibility = View.GONE
         }
 
         b.dvTcpKeepAliveSwitch.isChecked = persistentState.tcpKeepAlive
@@ -174,6 +176,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
             b.settingsActivityTunnelMeteredSwitch.isChecked = persistentState.setVpnBuilderToMetered
         } else {
             b.settingsActivityTunnelMeteredRl.visibility = View.GONE
+            b.dividerTunnelMetered.visibility = View.GONE
         }
 
         displayDialerTimeOutUi(persistentState.dialTimeoutSec)
@@ -223,6 +226,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
             b.settingsActivityAllowBypassDesc.visibility = View.VISIBLE
             b.settingsActivityAllowBypassSwitch.visibility = View.VISIBLE
             b.settingsActivityAllowBypassProgress.visibility = View.GONE
+            b.dividerAllowBypass.visibility = View.VISIBLE
 
             b.settingsActivityAllowBypassSwitch.isChecked = persistentState.allowBypass
         } else {
@@ -230,6 +234,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
             b.settingsActivityAllowBypassDesc.visibility = View.GONE
             b.settingsActivityAllowBypassSwitch.visibility = View.GONE
             b.settingsActivityAllowBypassProgress.visibility = View.GONE
+            b.dividerAllowBypass.visibility = View.GONE
         }
     }
 
@@ -470,9 +475,11 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
             persistentState.endpointIndependence = isChecked
             if (isChecked) {
                 b.dvWgAllowIncomingRl.visibility = View.VISIBLE
+                b.dividerWgAllowIncoming.visibility = View.VISIBLE
                 b.dvWgAllowIncomingSwitch.isChecked = persistentState.nwEngExperimentalFeatures
             } else {
                 b.dvWgAllowIncomingRl.visibility = View.GONE
+                b.dividerWgAllowIncoming.visibility = View.GONE
                 persistentState.nwEngExperimentalFeatures = false
             }
             logEvent(
@@ -740,6 +747,9 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                 b.settingsActivityPtransRl.visibility = View.GONE
                 b.settingsActivityConnectivityChecksRl.visibility = View.GONE
                 b.settingsActivityPingIpsBtn.visibility = View.GONE
+
+                b.dividerIp.visibility = View.GONE
+                b.dividerPtrans.visibility = View.GONE
             }
             InternetProtocol.IPv6.id -> {
                 b.genSettingsIpDesc.text =
@@ -750,6 +760,9 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                 b.settingsActivityPtransRl.visibility = View.VISIBLE
                 b.settingsActivityConnectivityChecksRl.visibility = View.GONE
                 b.settingsActivityPingIpsBtn.visibility = View.GONE
+
+                b.dividerIp.visibility = View.VISIBLE
+                b.dividerPtrans.visibility = View.GONE
             }
             InternetProtocol.IPv46.id -> {
                 b.genSettingsIpDesc.text =
@@ -764,6 +777,9 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                 } else {
                     b.settingsActivityPingIpsBtn.visibility = View.GONE
                 }
+
+                b.dividerIp.visibility = View.VISIBLE
+                b.dividerPtrans.visibility = View.GONE
             }
             InternetProtocol.ALWAYSv46.id -> {
                 b.genSettingsIpDesc.text =
@@ -774,6 +790,9 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                 b.settingsActivityPtransRl.visibility = View.GONE
                 b.settingsActivityConnectivityChecksRl.visibility = View.GONE
                 b.settingsActivityPingIpsBtn.visibility = View.GONE
+
+                b.dividerIp.visibility = View.GONE
+                b.dividerPtrans.visibility = View.GONE
             }
             else -> {
                 b.genSettingsIpDesc.text =
@@ -784,6 +803,8 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                 b.settingsActivityPtransRl.visibility = View.GONE
                 b.settingsActivityConnectivityChecksRl.visibility = View.GONE
                 b.settingsActivityPingIpsBtn.visibility = View.GONE
+                b.dividerIp.visibility = View.GONE
+                b.dividerPtrans.visibility = View.GONE
             }
         }
     }

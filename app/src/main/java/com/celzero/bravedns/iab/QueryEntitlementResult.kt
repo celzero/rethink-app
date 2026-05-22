@@ -45,10 +45,38 @@ sealed class QueryEntitlementResult {
     object Conflict : QueryEntitlementResult()
 
     /**
-     * Any other failure: network error, 5xx, response parse error, etc.
+     * Server responded with a business-level error (e.g. [RpnPurchaseAckServerResponse.Err]:
+     * invalid token, purchase revoked/refunded per server records, etc.).
+     * The server was reachable but explicitly said the purchase is not valid.
      * [purchase] is the *original* [PurchaseDetail] unchanged (fail-safe: preserve it).
+     * The local billing expiry is still the authoritative gate for INAPP purchases.
+     *
+     * [linkedPurchaseId] is the Google Play purchase token of a superseded purchase that the
+     * server included in the error response.  When non-null, the client should query /g/ack
+     * for this token and reactivate the corresponding DB row if the server confirms it valid.
      */
-    data class Failure(val purchase: PurchaseDetail) : QueryEntitlementResult()
+    data class Failure(
+        val purchase: PurchaseDetail,
+        val linkedPurchaseId: String? = null,
+    ) : QueryEntitlementResult()
+
+    /**
+     * Server definitively confirmed the subscription is expired
+     * (e.g. state=SUBSCRIPTION_STATE_EXPIRED in the error response).
+     *
+     * This is distinct from [Failure] because the server has authoritatively stated the
+     * subscription is no longer active — callers MUST expire the local purchase rather
+     * than preserving it.  [purchase] is the *original* [PurchaseDetail]; callers should
+     * zero out [PurchaseDetail.expiryTime] and clear [PurchaseDetail.payload].
+     */
+    data class Expired(val purchase: PurchaseDetail) : QueryEntitlementResult()
+
+    /**
+     * Transient / infrastructure failure: network error, server unreachable, timeout,
+     * null HTTP response, or any unexpected exception.
+     * The server was **not reached**; [purchase] is the *original* [PurchaseDetail] unchanged.
+     * Callers must fail-safe and preserve the token; the local billing expiry is authoritative.
+     * Do NOT expire a locally-valid purchase based on this result.
+     */
+    data class Transient(val purchase: PurchaseDetail) : QueryEntitlementResult()
 }
-
-

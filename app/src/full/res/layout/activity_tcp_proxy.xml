@@ -70,9 +70,9 @@
                         android:textColor="?attr/secondaryTextColor"
                         android:textSize="@dimen/large_font_text_view" />
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
+                    <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/tcp_proxy_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -194,9 +194,9 @@
                         android:textColor="?attr/secondaryTextColor"
                         android:textSize="@dimen/large_font_text_view" />
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
+                    <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/warp_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"

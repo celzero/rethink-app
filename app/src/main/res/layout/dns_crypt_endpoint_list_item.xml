@@ -45,7 +45,7 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/dns_crypt_endpoint_list_info_image"
-            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+            style="@style/Widget.Material3.Button.TextButton.Dialog"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_centerInParent="true"

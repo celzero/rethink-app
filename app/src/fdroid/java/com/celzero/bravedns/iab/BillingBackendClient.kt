@@ -26,56 +26,57 @@ import com.google.gson.JsonObject
  * (`RpnProxyUpdateWorker`, `RpnProxyManager`) resolve without errors at runtime.
  */
 class BillingBackendClient(
-    @Suppress("UNUSED_PARAMETER") private val identityStore: SecureIdentityStore
+    @Suppress("UNUSED_PARAMETER", "UNUSED_PRIVATE_PROPERTY") private val identityStore: SecureIdentityStore
 ) {
     companion object {
+        @Suppress("UNUSED_PRIVATE_PROPERTY")
         private const val TAG = "BillingBackendClient(stub)"
     }
 
     suspend fun getAccountId(): String = ""
 
-    suspend fun getDeviceId(recvCid: String = ""): String = ""
+    suspend fun getDeviceId(@Suppress("UNUSED_PARAMETER") recvCid: String = ""): String = ""
 
     suspend fun registerDevice(
-        accountId: String,
-        deviceId: String,
-        meta: JsonObject? = null
+        @Suppress("UNUSED_PARAMETER") accountId: String,
+        @Suppress("UNUSED_PARAMETER") deviceId: String,
+        @Suppress("UNUSED_PARAMETER") meta: JsonObject? = null
     ): RegisterDeviceResult = RegisterDeviceResult.Failure(0, "Not supported in F-Droid build")
 
     suspend fun registerDeviceWithDeviceMeta(
-        accountId: String,
-        deviceId: String
+        @Suppress("UNUSED_PARAMETER") accountId: String,
+        @Suppress("UNUSED_PARAMETER") deviceId: String
     ): RegisterDeviceResult = RegisterDeviceResult.Failure(0, "Not supported in F-Droid build")
 
     suspend fun queryEntitlement(
-        accountId: String,
-        deviceId: String,
-        purchase: PurchaseDetail,
-        purchaseToken: String
+        @Suppress("UNUSED_PARAMETER") accountId: String,
+        @Suppress("UNUSED_PARAMETER") deviceId: String,
+        @Suppress("UNUSED_PARAMETER") purchase: PurchaseDetail,
+        @Suppress("UNUSED_PARAMETER") purchaseToken: String
     ): PurchaseDetail = purchase
 
     suspend fun cancelPurchase(
-        accountId: String,
-        deviceId: String,
-        sku: String,
-        purchaseToken: String
+        @Suppress("UNUSED_PARAMETER") accountId: String,
+        @Suppress("UNUSED_PARAMETER") deviceId: String,
+        @Suppress("UNUSED_PARAMETER") sku: String,
+        @Suppress("UNUSED_PARAMETER") purchaseToken: String
     ): Pair<Boolean, String> = Pair(false, "Not supported in F-Droid build")
 
     suspend fun revokePurchase(
-        accountId: String,
-        deviceId: String,
-        sku: String,
-        purchaseToken: String
+        @Suppress("UNUSED_PARAMETER") accountId: String,
+        @Suppress("UNUSED_PARAMETER") deviceId: String,
+        @Suppress("UNUSED_PARAMETER") sku: String,
+        @Suppress("UNUSED_PARAMETER") purchaseToken: String
     ): Pair<Boolean, String> = Pair(false, "Not supported in F-Droid build")
 
     suspend fun consumePurchase(
-        accountId: String,
-        deviceId: String,
-        sku: String,
-        purchaseToken: String
+        @Suppress("UNUSED_PARAMETER") accountId: String,
+        @Suppress("UNUSED_PARAMETER") deviceId: String,
+        @Suppress("UNUSED_PARAMETER") sku: String,
+        @Suppress("UNUSED_PARAMETER") purchaseToken: String
     ): Boolean = false
 
-    fun buildDeviceMeta(prodId: String = ""): JsonObject = JsonObject()
+    fun buildDeviceMeta(@Suppress("UNUSED_PARAMETER") prodId: String = ""): JsonObject = JsonObject()
 
     fun buildCustomerMeta(): JsonObject = JsonObject()
 

@@ -152,7 +152,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/tour_next_btn"
-                style="@style/Widget.MaterialComponents.Button"
+                style="@style/Widget.Material3.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:backgroundTint="?attr/tourButtonBackground"

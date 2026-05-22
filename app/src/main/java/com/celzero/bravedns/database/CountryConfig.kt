@@ -32,38 +32,39 @@ import java.util.Locale
 )
 data class CountryConfig(
     @PrimaryKey
-    val id: String,                 // Unique server id: "cc-city-key" (or similar)
+    val id: String, // Unique server id: "cc-city-key" (or similar)
 
-    val cc: String,                 // Country code for config-level operations (e.g., "US")
+    val cc: String, // Country code for config-level operations (e.g., "US")
 
     // Server / location properties (previously RpnWinServer)
-    val name: String = "",         // Aggregated location names for a country
-    val address: String = "",      // Comma-separated server addresses
-    val city: String = "",         // Primary city
-    val key: String = "",          // Server key identifier
-    val load: Int = 0,              // Server load (0..100, lower is better)
-    val link: Int = 0,              // Link metric (latency ms)
-    val count: Int = 0,             // Number of endpoints available
-    val premium: Boolean = false,   // Whether server is premium
-    var isActive: Boolean = true,   // Whether server is currently active
-    var isEnabled: Boolean = false,  // Whether server is chosen by user
+    val name: String = "", // Aggregated location names for a country
+    val address: String = "", // Comma-separated server addresses
+    val city: String = "", // Primary city
+    val key: String = "", // Server key identifier
+    val load: Int = 0, // Server load (0..100, lower is better)
+    val link: Int = 0, // Link metric (latency ms)
+    val count: Int = 0, // Number of endpoints available
+    val premium: Boolean = false, // Whether server is premium
+    var isActive: Boolean = true, // Whether server is currently active
+    var isEnabled: Boolean = false, // Whether server is chosen by user
 
     // Country-level configuration flags
-    var catchAll: Boolean = false,  // Use this country for all connections
-    var lockdown: Boolean = false,  // Force connection through this country only or block
+    var catchAll: Boolean = false, // Use this country for all connections
+    var lockdown: Boolean = false, // Force connection through this country only or block
     var mobileOnly: Boolean = false,// Use only on mobile data
     var ssidBased: Boolean = false, // SSID-based connection enabled (use with ssids field)
 
-    val priority: Int = 0,          // Priority for selection (higher = preferred)
+    val priority: Int = 0, // Priority for selection (higher = preferred)
 
     // SSID configuration (JSON string of SSID items, see SsidItem.kt)
-    val ssids: String = "",         // JSON array of SsidItem when ssidBased is true
+    val ssids: String = "", // JSON array of SsidItem when ssidBased is true
 
     val lastModified: Long = System.currentTimeMillis(), // Last update timestamp
 
     val selectionCount: Int = 0, // Number of times this country has been selected by the user
 
-    var isFavourite: Boolean = false // Whether this country is marked as a favourite by the user
+    var isFavourite: Boolean = false, // Whether this country is marked as a favourite by the user
+    var hopEnabled: Boolean = false // Whether to always hop
 ) : Parcelable {
 
     constructor(parcel: Parcel) : this(
@@ -87,6 +88,7 @@ data class CountryConfig(
         parcel.readString() ?: "",
         parcel.readLong(),
         parcel.readInt(),
+        parcel.readByte() != 0.toByte(),
         parcel.readByte() != 0.toByte()
     )
 
@@ -112,6 +114,7 @@ data class CountryConfig(
         parcel.writeLong(lastModified)
         parcel.writeInt(selectionCount)
         parcel.writeByte(if (isFavourite) 1 else 0)
+        parcel.writeByte(if (hopEnabled) 1 else 0)
     }
 
     override fun describeContents(): Int = 0

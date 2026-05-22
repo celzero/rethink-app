@@ -57,7 +57,6 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_RPN
 import com.celzero.bravedns.ui.activity.RpnConfigDetailActivity.Companion.STATS_POLL_MS
 import com.celzero.bravedns.ui.dialog.CountrySsidDialog
@@ -231,6 +230,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             ssidExperimentalTxt,
             getString(R.string.symbol_id)
         )
+        b.ssidDescTv.text = getString(R.string.wg_setting_ssid_desc, getString(R.string.lbl_ssids))
     }
 
     /**
@@ -289,27 +289,18 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     private suspend fun resolveClientIps(id: String) {
         var ip4Meta: IPMetadata? = null
         var ip6Meta: IPMetadata? = null
-        var sinceTs = 0L
+        var sinceTs: Long
         try {
             val pid = if (id.contains(AUTO_SERVER_ID, ignoreCase = true)) {
-                VpnController.getWinProxyId() ?: (Backend.RpnWin + "**")
+                Backend.RpnWin
             } else {
                 Backend.RpnWin + id
             }
             sinceTs = VpnController.getProxyStats(pid)?.since ?: 0L
-            val cachedSince = RpnProxyManager.getCachedSinceTs(id)
-            val cached = RpnProxyManager.getCachedIpMeta(id)
-
-            // Cache hit: tunnel has not reconnected and we already have metadata.
-            if (sinceTs > 0L && sinceTs == cachedSince && cached != null) {
-                if (DEBUG) Logger.d(LOG_TAG_UI, "resolveClientIps[$id]: cache hit, since=$sinceTs")
-                uiCtx { applyClientIps(cached.first, cached.second) }
-                return
-            }
 
             if (DEBUG) Logger.d(
                 LOG_TAG_UI,
-                "resolveClientIps[$id]: live fetch, sinceTs=$sinceTs cachedSince=$cachedSince"
+                "resolveClientIps[$id]: live fetch, sinceTs=$sinceTs"
             )
             // GoVpnAdapter handles AUTO and empty-string ids centrally; pass id as-is.
             val client = VpnController.getRpnClientInfoById(id)
@@ -319,8 +310,6 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         } catch (e: Exception) {
             Logger.w(LOG_TAG_UI, "failed to resolve client ips: ${e.message}")
         }
-        // Persist to Manager cache; preserves selectedAt for this server key.
-        RpnProxyManager.updateIpMeta(id, sinceTs, ip4Meta, ip6Meta)
         uiCtx { applyClientIps(ip4Meta, ip6Meta) }
     }
 
@@ -464,25 +453,18 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         // For AUTO use the live win proxy ID from the tunnel so the stats lookup targets the
         // real proxy entry rather than a hardcoded wildcard.  Fall back to the wildcard only
         val pid = if (id.contains(AUTO_SERVER_ID, ignoreCase = true)) {
-            VpnController.getWinProxyId() ?: (Backend.RpnWin + "**")
+            Backend.RpnWin
         } else {
             Backend.RpnWin + id
         }
         val statusPair = VpnController.getProxyStatusById(pid)
         val stats = VpnController.getProxyStats(pid)
-        val who = VpnController.getWin()?.who()
+        val who = VpnController.getWinIdentifier()
         val config = countryConfig
         // Use the time when this server key was selected by the user, not the VPN uptime.
         val selectedSinceTs = RpnProxyManager.getSelectedSinceTs(id)
 
-        // Re-fetch client IPs when the tunnel has reconnected (stats.since changed).
-        // stats.since is epoch-ms; a change means a new tunnel session started and the
-        // assigned client IPs may have rotated.
-        val currentSince = stats?.since ?: 0L
-        if (currentSince > 0L && currentSince != RpnProxyManager.getCachedSinceTs(id)) {
-            Logger.d(LOG_TAG_UI, "since changed to $currentSince for $id; re-fetching client IPs")
-            resolveClientIps(id)
-        }
+        resolveClientIps(id)
 
         uiCtx {
             applyStats(statusPair, stats, config, who, selectedSinceTs)
@@ -543,7 +525,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         buildLoadSpeedText(loadPct, linkMbps)
 
         // only shown when proxy is in a failing state.
-        val isFailing = isFailing(ps, stats)
+        val isFailing = isFailing(ps)
         if (isFailing && (rx == 0L && tx == 0L && selectedSinceTs > 0L)) {
             b.rowErrors.visibility = View.VISIBLE
             b.dividerErrors.visibility = View.VISIBLE
@@ -570,7 +552,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             return getString(UIUtils.getProxyStatusStringRes(status.id))
                 .replaceFirstChar(Char::titlecase)
         }
-        if (isFailing(status, stats)) {
+        if (isFailing(status)) {
             return getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
         }
         val base = getString(UIUtils.getProxyStatusStringRes(status.id))
@@ -580,22 +562,33 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
     private fun buildStatusColor(status: UIUtils.ProxyStatus?, stats: RouterStats?): Int {
         return when {
-            isFailing(status, stats) -> R.attr.chipTextNegative
+            status == null -> R.attr.primaryLightColorText
+            isFailing(status) -> R.attr.chipTextNegative
             status == UIUtils.ProxyStatus.TOK -> R.attr.accentGood
             status == UIUtils.ProxyStatus.TUP ||
             status == UIUtils.ProxyStatus.TZZ ||
             status == UIUtils.ProxyStatus.TNT -> R.attr.chipTextNeutral
-            status == null -> R.attr.primaryLightColorText
             else -> R.attr.chipTextNegative
         }
     }
 
-    private fun isFailing(status: UIUtils.ProxyStatus?, stats: RouterStats?): Boolean {
-        val now = System.currentTimeMillis()
-        val lastOK = stats?.lastOK ?: 0L
-        val since = stats?.since  ?: 0L
-        return now - since > WireguardManager.WG_UPTIME_THRESHOLD && lastOK == 0L
-                && status != null && status != UIUtils.ProxyStatus.TPU
+    /**
+     * Returns true only when the status enum explicitly signals a failure (TKO, END, or any
+     * unknown non-success value).
+     *
+     * For RPN the status enum IS the authoritative source:
+     *   TOK / TUP / TZZ / TNT → not failing (healthy or transitioning)
+     *   TKO / END / unknown   → failing
+     */
+    private fun isFailing(status: UIUtils.ProxyStatus?): Boolean {
+        if (status == null || status == UIUtils.ProxyStatus.TPU) return false
+        return when (status) {
+            UIUtils.ProxyStatus.TOK,
+            UIUtils.ProxyStatus.TUP,
+            UIUtils.ProxyStatus.TZZ,
+            UIUtils.ProxyStatus.TNT -> false
+            else -> true  // TKO, END, and any future explicitly-bad status
+        }
     }
 
     /**
@@ -613,11 +606,9 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 loadPct <= 80 -> getString(R.string.server_load_very_busy)
                 else -> getString(R.string.server_load_overloaded)
             }
-            b.valueHealth.text = getString(R.string.two_argument_dot,"$loadPct%",tier)
             healthText = "$loadPct% · $tier"
         } else {
-            b.valueHealth.text = getString(R.string.lbl_not_available_short)
-            healthText = ""
+            healthText = getString(R.string.lbl_not_available_short)
         }
 
         val speedText: String
@@ -633,11 +624,9 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 }
                 else -> "$linkMbps Mbps"
             }
-            b.valueLoad.text = formatted
             speedText = formatted
         } else {
-            b.valueLoad.text = getString(R.string.lbl_not_available_short)
-            speedText = ""
+            speedText = getString(R.string.lbl_not_available_short)
         }
 
         // Compose hero-banner stats chip: "1 Gbps · 35% · Normal"
@@ -677,6 +666,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     b.catchAllCheck.isChecked = config.catchAll
                     b.useMobileCheck.isChecked = config.mobileOnly
                     b.ssidCheck.isChecked = config.ssidBased
+                    b.hopCheck.isChecked = config.hopEnabled
                     b.otherSettingsCard.visibility = View.VISIBLE
                     b.mobileSsidSettingsCard.visibility = View.VISIBLE
                     // Update apps section immediately based on catchAll state
@@ -685,6 +675,11 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                         b.applicationsBtn.alpha = 0.5f
                         b.appsLabel.setTextColor(fetchColor(this, R.attr.primaryTextColor))
                         b.appsLabel.text = getString(R.string.lbl_all_apps)
+                    }
+                    if (config.id == AUTO_SERVER_ID) {
+                        // Hide hop settings for AUTO since it will be the src for all other
+                        // configs
+                        b.hopRl.visibility = View.GONE
                     }
                 } else {
                     showInvalidConfigDialog()
@@ -719,6 +714,19 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             b.otherSettingsCard.visibility = View.GONE
             b.mobileSsidSettingsCard.visibility = View.GONE
             return
+        }
+
+        b.hopCheck.setOnCheckedChangeListener { _, isChecked ->
+            io {
+                RpnProxyManager.setHopForWinServer(configKey, isChecked)
+                uiCtx {
+                    Utilities.showToastUiCentered(
+                        this,
+                        if (isChecked) "Hop mode enabled" else "Hop mode disabled",
+                        Toast.LENGTH_SHORT
+                    )
+                }
+            }
         }
 
         b.catchAllCheck.setOnCheckedChangeListener { _, isChecked ->

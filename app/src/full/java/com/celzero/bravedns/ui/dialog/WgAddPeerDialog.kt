@@ -26,6 +26,7 @@ import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.DialogWgAddPeerBinding
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.UIUtils.getDurationInHumanReadableFormat
@@ -129,6 +130,8 @@ class WgAddPeerDialog(
         }
 
         b.customDialogOkButton.setOnClickListener {
+            b.customDialogOkButton.isEnabled = false
+
             val peerPublicKey = b.peerPublicKey.text.toString()
             val presharedKey = b.peerPresharedKey.text.toString()
             val peerEndpoint = b.peerEndpoint.text.toString()
@@ -146,14 +149,21 @@ class WgAddPeerDialog(
                 val newPeer = builder.build()
 
                 ui {
+                    showSaving()
                     ioCtx {
                         if (wgPeer != null && isEditing)
                             WireguardManager.deletePeer(configId, wgPeer)
                         WireguardManager.addPeer(configId, newPeer)
                     }
+                    Utilities.showToastUiCentered(
+                        context,
+                        context.getString(R.string.config_add_success_toast),
+                        Toast.LENGTH_SHORT
+                    )
                     this.dismiss()
                 }
             } catch (e: Throwable) {
+                resetSaveButton()
                 val ex = Logger.throwableToException(e)
                 Logger.e(Logger.LOG_TAG_PROXY, "Error while adding peer", ex)
                 Utilities.showToastUiCentered(
@@ -164,6 +174,20 @@ class WgAddPeerDialog(
                 return@setOnClickListener
             }
         }
+    }
+
+    /** Switch the Save button into a loading state: spinner visible, text dimmed. */
+    private fun showSaving() {
+        b.customDialogOkButton.text = context.getString(R.string.lbl_saving)
+        b.customDialogOkButton.isEnabled = false
+        b.customDialogOkProgress.visibility = View.VISIBLE
+    }
+
+    /** Restore the Save button to its normal, interactive state. */
+    private fun resetSaveButton() {
+        b.customDialogOkButton.text = context.getString(R.string.lbl_save)
+        b.customDialogOkButton.isEnabled = true
+        b.customDialogOkProgress.visibility = View.GONE
     }
 
     private fun ui(f: suspend () -> Unit) {

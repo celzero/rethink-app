@@ -190,6 +190,7 @@ class ServerOrderHistoryRepository(private val billingBackendClient: BillingBack
         val lineItem   = meta.productLineItem?.firstOrNull()
         val productId  = lineItem?.productId ?: ""
         val purchaseMs = isoToMillis(meta.purchaseCompletionTime).takeIf { it > 0L } ?: mtime
+        val planId = lineItem?.productOfferDetails?.purchaseOptionId ?: productId ?: ""
 
         // purchaseStateContext.purchaseState is a String in ProductPurchaseV2;
         // mapped to the legacy Int in ServerOrderEntry (0=purchased, 1=cancelled, 2=pending).
@@ -219,6 +220,7 @@ class ServerOrderHistoryRepository(private val billingBackendClient: BillingBack
             autoRenewEnabled = false,
             isTestPurchase = isTest,
             productId = productId,
+            planId = planId
         )
     }
 
@@ -246,6 +248,7 @@ class ServerOrderHistoryRepository(private val billingBackendClient: BillingBack
         val startTime = isoToMillis(meta.startTime)
         val lineItem = meta.lineItems?.firstOrNull()
         val productId = lineItem?.productId ?: ""
+        val planId = lineItem?.offerDetails?.basePlanId
         val expiryTime = isoToMillis(lineItem?.expiryTime)
         val autoRenew = lineItem?.autoRenewingPlan?.autoRenewEnabled ?: false
         val isTest = meta.testPurchase != null
@@ -266,6 +269,7 @@ class ServerOrderHistoryRepository(private val billingBackendClient: BillingBack
             autoRenewEnabled = autoRenew,
             isTestPurchase = isTest,
             productId = productId,
+            planId = planId ?: productId
         )
     }
 

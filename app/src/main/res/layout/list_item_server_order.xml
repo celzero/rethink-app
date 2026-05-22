@@ -9,17 +9,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         android:paddingTop="16dp"
         android:paddingBottom="16dp"
         android:gravity="top">
 
         <FrameLayout
-            android:layout_width="44dp"
-            android:layout_height="44dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:background="@drawable/ic_circle"
-            android:backgroundTint="?attr/chipBgColorNeutral">
+            android:backgroundTint="?attr/chipBgColorPositive">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/iv_type_icon"
@@ -49,7 +49,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="15sp"
+                    android:textSize="@dimen/large_font_text_view"
                     android:textStyle="bold"
                     android:fontFamily="sans-serif-medium"
                     android:textColor="?attr/primaryTextColor"
@@ -58,7 +58,7 @@
                     tools:text="Standard • Monthly" />
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tv_type_badge"
+                    android:id="@+id/tv_status_chip"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
@@ -67,7 +67,6 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:textSize="@dimen/default_font_text_view"
-                    android:textStyle="bold"
                     android:fontFamily="sans-serif-medium"
                     android:background="@drawable/rectangle_border_background"
                     android:backgroundTint="?attr/chipBgColorPositive"
@@ -84,14 +83,14 @@
                 android:layout_marginTop="6dp">
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tv_status_chip"
+                    android:id="@+id/tv_type_badge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="8dp"
                     android:paddingEnd="8dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:textSize="11sp"
+                    android:textSize="@dimen/small_font_subheading_text"
                     android:textStyle="bold"
                     android:fontFamily="sans-serif-medium"
                     android:background="@drawable/rectangle_border_background"
@@ -123,7 +122,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:textSize="12sp"
+                android:textSize="@dimen/default_font_text_view"
                 android:textColor="?attr/primaryLightColorText"
                 tools:text="Jan 15, 2025  10:00 AM" />
 
@@ -132,7 +131,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:textSize="12sp"
+                android:textSize="@dimen/default_font_text_view"
                 android:textColor="?attr/primaryLightColorText"
                 android:visibility="gone"
                 tools:text="Expires Feb 15, 2025 ↻"

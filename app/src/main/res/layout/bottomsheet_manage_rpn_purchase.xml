@@ -4,8 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="?attr/background">
+    android:layout_height="wrap_content">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nested_scroll"
@@ -17,7 +16,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="32dp">
+            android:paddingBottom="60dp">
 
             <View
                 android:id="@+id/drag_handle"
@@ -40,7 +39,6 @@
                 app:cardElevation="0dp"
                 app:strokeWidth="1dp"
                 app:strokeColor="?attr/divider"
-                app:cardBackgroundColor="?attr/background"
                 app:layout_constraintTop_toBottomOf="@id/drag_handle"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
@@ -66,7 +64,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="@string/lbl_plan"
-                            android:textColor="?attr/primaryLightColorText"
+                            android:textColor="?attr/primaryTextColor"
                             android:textSize="13sp" />
 
                         <androidx.appcompat.widget.AppCompatTextView
@@ -92,7 +90,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="@string/lbl_status"
-                            android:textColor="?attr/primaryLightColorText"
+                            android:textColor="?attr/primaryTextColor"
                             android:textSize="13sp" />
 
                         <androidx.appcompat.widget.AppCompatTextView
@@ -102,7 +100,7 @@
                             android:textSize="13sp"
                             android:textStyle="bold"
                             tools:text="Active"
-                            tools:textColor="?attr/chipTextPositive" />
+                            tools:textColor="?attr/primaryTextColor" />
 
                     </LinearLayout>
 
@@ -120,7 +118,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="@string/lbl_expires_on"
-                            android:textColor="?attr/primaryLightColorText"
+                            android:textColor="?attr/primaryTextColor"
                             android:textSize="13sp" />
 
                         <androidx.appcompat.widget.AppCompatTextView
@@ -153,56 +151,60 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_cancel"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:text="@string/cancel_subscription"
                     android:textAllCaps="false"
                     android:textSize="15sp"
-                    android:textColor="?attr/accentBad"
+                    android:textColor="?attr/primaryTextColor"
                     android:visibility="gone"
                     app:cornerRadius="12dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     app:strokeWidth="1.5dp"
-                    app:strokeColor="?attr/accentBad"
                     app:icon="@drawable/ic_cross"
-                    app:iconTint="?attr/accentBad"
+                    app:iconTint="?attr/primaryTextColor"
                     app:iconGravity="textStart"
                     app:iconPadding="8dp"
                     tools:visibility="visible" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_revoke"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:text="@string/revoke_subscription"
                     android:textAllCaps="false"
                     android:textSize="15sp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     android:visibility="gone"
                     app:cornerRadius="12dp"
                     app:strokeWidth="1.5dp"
-                    android:textColor="?attr/accentBad"
-                    app:strokeColor="?attr/accentBad"
+                    android:textColor="?attr/primaryTextColor"
                     app:icon="@drawable/ic_info_white"
-                    app:iconTint="?attr/accentBad"
+                    app:iconTint="?attr/primaryTextColor"
                     app:iconGravity="textStart"
                     app:iconPadding="8dp"
                     tools:visibility="visible" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_resubscribe"
-                    style="@style/Widget.MaterialComponents.Button"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:text="@string/resubscribe_title"
                     android:textAllCaps="false"
                     android:textSize="15sp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     android:textStyle="bold"
                     android:visibility="gone"
+                    android:textColor="?attr/primaryTextColor"
                     app:cornerRadius="12dp"
-                    app:backgroundTint="?attr/accentGood"
                     app:icon="@drawable/ic_refresh"
-                    app:iconTint="?attr/homeScreenHeaderTextColor"
+                    app:iconTint="?attr/primaryTextColor"
                     app:iconGravity="textStart"
                     app:iconPadding="8dp"
                     tools:visibility="visible" />
@@ -220,21 +222,23 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_consume_purchase"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:text="Consume purchase"
+                    android:layout_marginTop="15dp"
                     android:textAllCaps="false"
                     android:textSize="15sp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     android:visibility="gone"
                     app:cornerRadius="12dp"
-                    android:textColor="?attr/secondaryTextColor"
-                    app:strokeColor="?attr/accentGood"
+                    android:textColor="?attr/primaryTextColor"
                     app:icon="@drawable/ic_rethink_plus_sparkle"
-                    app:iconTint="?attr/accentGood"
+                    app:iconTint="?attr/primaryTextColor"
                     app:iconGravity="textStart"
                     app:iconPadding="8dp"
-                    tools:visibility="gone" />
+                    tools:visibility="visible" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cancel_note_card"
@@ -253,7 +257,7 @@
                         android:layout_height="wrap_content"
                         android:padding="16dp"
                         android:text="@string/cancel_subscription_note"
-                        android:textColor="?attr/primaryLightColorText"
+                        android:textColor="?attr/primaryTextColor"
                         android:textSize="12sp"
                         android:lineSpacingMultiplier="1.3" />
 
@@ -286,7 +290,7 @@
         android:focusable="true"
         android:minHeight="300dp"
         android:visibility="gone"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="300dp"
@@ -294,7 +298,6 @@
             android:layout_gravity="center"
             app:cardCornerRadius="24dp"
             app:cardElevation="16dp"
-            app:cardBackgroundColor="?attr/background"
             app:strokeWidth="0dp">
 
             <LinearLayout

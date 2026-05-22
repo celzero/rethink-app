@@ -230,8 +230,18 @@ data class ResponseErr(
     /** True if the error is potentially retryable (network or 5xx). */
     val isRetryable: Boolean get() = httpCode == 0 || isServerError
 
+    /**
+     * True when the server has authoritatively confirmed the subscription is expired.
+     *
+     * A response with [state] == "SUBSCRIPTION_STATE_EXPIRED" is a definitive signal
+     * from the Google Play billing backend (forwarded by our server) that the subscription
+     * is no longer active.  Callers should expire the local purchase rather than preserving it.
+     */
+    val isSubscriptionExpired: Boolean
+        get() = state == "SUBSCRIPTION_STATE_EXPIRED"
+
     override fun toString(): String =
-        "PlayErr(http=$httpCode, error='$error', status=$status, sku=$sku, ray=$ray)"
+        "PlayErr(http=$httpCode, error='$error', state=$state, status=$status, sku=$sku, ray=$ray)"
 }
 
 /** Returns the string value for [key], or null if missing or empty. */

@@ -30,7 +30,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/daci_text_input_layout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -66,7 +66,7 @@
         android:layout_margin="10dp"
         android:padding="5dp"
         android:text="@string/ci_dialog_error_invalid_ip"
-        android:textColor="@color/colorRed_A400"
+        android:textColor="?attr/colorError"
         android:textSize="@dimen/default_font_text_view"
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/daci_text_input_layout" />
@@ -83,10 +83,9 @@
         android:clipToPadding="false"
         android:measureWithLargestChild="true">
 
-        <!-- Neutral button on the left -->
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/daci_cancel_btn"
-            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+            style="@style/Widget.Material3.Button.TextButton.Dialog"
             android:layout_width="0dp"
             android:layout_weight="0.3"
             android:gravity="start|center"
@@ -95,20 +94,18 @@
             android:textColor="?attr/accentGood"
             android:textSize="@dimen/large_font_text_view" />
 
-        <!-- Trust button -->
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/daci_trust_btn"
-            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+            style="@style/Widget.Material3.Button.TextButton.Dialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/ci_trust_rule"
             android:textColor="?attr/accentGood"
             android:textSize="@dimen/large_font_text_view" />
 
-        <!-- Block button -->
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/daci_block_btn"
-            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+            style="@style/Widget.Material3.Button.TextButton.Dialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/block"

@@ -171,19 +171,18 @@
                     android:layout_height="wrap_content">
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        style="@style/TextAppearance.AppCompat.Subhead"
+                        style="@style/TextAppearance.Material3.BodyMedium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="20dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="5dp"
                         android:layout_toStartOf="@id/fss_active_apps_chip"
-                        android:fontFamily="sans-serif-smallcaps"
-                        android:lineSpacingExtra="5dp"
                         android:padding="5dp"
                         android:text="@string/top_active_conns"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/extra_large_font_text_view" />
+                        android:textColor="?attr/colorOnBackground" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/fss_active_apps_chip"
@@ -225,19 +224,18 @@
                     android:layout_height="wrap_content">
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        style="@style/TextAppearance.AppCompat.Subhead"
+                        style="@style/TextAppearance.Material3.BodyMedium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="20dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="5dp"
                         android:layout_toStartOf="@id/fss_app_info_chip"
-                        android:fontFamily="sans-serif-smallcaps"
-                        android:lineSpacingExtra="5dp"
                         android:padding="5dp"
                         android:text="@string/ssv_app_network_activity_heading"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/extra_large_font_text_view" />
+                        android:textColor="?attr/colorOnBackground" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/fss_app_info_chip"
@@ -279,19 +277,18 @@
                     android:layout_height="wrap_content">
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        style="@style/TextAppearance.AppCompat.Subhead"
-                        android:layout_width="match_parent"
+                        android:layout_toStartOf="@id/fss_app_info_chip_second"
+                        android:text="@string/ssv_app_blocked_heading"
+                        style="@style/TextAppearance.Material3.BodyMedium"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="20dp"
-                        android:layout_toStartOf="@id/fss_app_info_chip_second"
-                        android:fontFamily="sans-serif-smallcaps"
-                        android:lineSpacingExtra="5dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="5dp"
                         android:padding="5dp"
-                        android:text="@string/ssv_app_blocked_heading"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/extra_large_font_text_view" />
+                        android:textColor="?attr/colorOnBackground" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/fss_app_info_chip_second"
@@ -332,19 +329,18 @@
                     android:layout_height="wrap_content">
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_toStartOf="@id/fss_asn_chip"
+                        android:text="@string/most_contacted_asn"
+                        style="@style/TextAppearance.Material3.BodyMedium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="20dp"
-                        android:layout_toStartOf="@id/fss_asn_chip"
-                        android:fontFamily="sans-serif-smallcaps"
-                        android:lineSpacingExtra="5dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="5dp"
                         android:padding="5dp"
-                        android:text="@string/most_contacted_asn"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/extra_large_font_text_view" />
+                        android:textColor="?attr/colorOnBackground" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/fss_asn_chip"
@@ -385,19 +381,18 @@
                     android:layout_height="wrap_content">
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        style="@style/TextAppearance.AppCompat.Subhead"
-                        android:layout_width="match_parent"
+                        android:layout_toStartOf="@id/fss_asn_chip_second"
+                        android:text="@string/most_blocked_asn"
+                        style="@style/TextAppearance.Material3.BodyMedium"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="20dp"
-                        android:layout_toStartOf="@id/fss_asn_chip_second"
-                        android:fontFamily="sans-serif-smallcaps"
-                        android:lineSpacingExtra="5dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="5dp"
                         android:padding="5dp"
-                        android:text="@string/most_blocked_asn"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/extra_large_font_text_view" />
+                        android:textColor="?attr/colorOnBackground" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/fss_asn_chip_second"
@@ -429,29 +424,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="gone"
                 android:paddingTop="25dp"
-                android:paddingBottom="5dp">
+                android:paddingBottom="5dp"
+                android:visibility="gone">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        style="@style/TextAppearance.AppCompat.Subhead"
-                        android:layout_width="match_parent"
+                        android:layout_toStartOf="@id/fss_dns_logs_chip"
+                        android:text="@string/ssv_most_contacted_domain_heading"
+                        style="@style/TextAppearance.Material3.BodyMedium"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="20dp"
                         android:layout_marginTop="10dp"
-                        android:layout_toStartOf="@id/fss_dns_logs_chip"
-                        android:fontFamily="sans-serif-smallcaps"
-                        android:lineSpacingExtra="5dp"
+                        android:layout_marginBottom="5dp"
                         android:padding="5dp"
-                        android:text="@string/ssv_most_contacted_domain_heading"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/extra_large_font_text_view" />
+                        android:textColor="?attr/colorOnBackground" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/fss_dns_logs_chip"
@@ -486,30 +479,28 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="gone"
                 android:paddingTop="25dp"
-                android:paddingBottom="5dp">
+                android:paddingBottom="5dp"
+                android:visibility="gone">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        style="@style/TextAppearance.AppCompat.Subhead"
-                        android:layout_width="match_parent"
+                        android:layout_toStartOf="@id/fss_dns_logs_chip_second"
+                        android:gravity="center_vertical"
+                        android:text="@string/ssv_most_blocked_domain_heading"
+                        style="@style/TextAppearance.Material3.BodyMedium"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="20dp"
                         android:layout_marginTop="10dp"
-                        android:layout_toStartOf="@id/fss_dns_logs_chip_second"
-                        android:fontFamily="sans-serif-smallcaps"
-                        android:gravity="center_vertical"
-                        android:lineSpacingExtra="5dp"
+                        android:layout_marginBottom="5dp"
                         android:padding="5dp"
-                        android:text="@string/ssv_most_blocked_domain_heading"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/extra_large_font_text_view" />
+                        android:textColor="?attr/colorOnBackground" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/fss_dns_logs_chip_second"
@@ -542,29 +533,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="gone"
                 android:paddingTop="25dp"
-                android:paddingBottom="5dp">
+                android:paddingBottom="5dp"
+                android:visibility="gone">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        style="@style/TextAppearance.AppCompat.Subhead"
-                        android:layout_width="match_parent"
+                        android:layout_toStartOf="@id/fss_countries_logs_chip"
+                        android:text="@string/ssv_most_contacted_countries_heading"
+                        style="@style/TextAppearance.Material3.BodyMedium"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="20dp"
                         android:layout_marginTop="10dp"
-                        android:layout_toStartOf="@id/fss_countries_logs_chip"
-                        android:fontFamily="sans-serif-smallcaps"
-                        android:lineSpacingExtra="5dp"
+                        android:layout_marginBottom="5dp"
                         android:padding="5dp"
-                        android:text="@string/ssv_most_contacted_countries_heading"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/extra_large_font_text_view" />
+                        android:textColor="?attr/colorOnBackground" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/fss_countries_logs_chip"
@@ -600,28 +589,27 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingTop="25dp"
-                android:visibility="gone"
-                android:paddingBottom="5dp">
+                android:paddingBottom="5dp"
+                android:visibility="gone">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        style="@style/TextAppearance.AppCompat.Subhead"
-                        android:layout_width="match_parent"
+                        android:layout_toStartOf="@id/fss_network_logs_chip"
+                        android:gravity="center_vertical"
+                        android:text="@string/ssv_most_contacted_ips_heading"
+                        style="@style/TextAppearance.Material3.BodyMedium"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="20dp"
-                        android:layout_toStartOf="@id/fss_network_logs_chip"
-                        android:fontFamily="sans-serif-smallcaps"
-                        android:gravity="center_vertical"
-                        android:lineSpacingExtra="5dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="5dp"
                         android:padding="5dp"
-                        android:text="@string/ssv_most_contacted_ips_heading"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/extra_large_font_text_view" />
+                        android:textColor="?attr/colorOnBackground" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/fss_network_logs_chip"
@@ -654,28 +642,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="gone"
                 android:paddingTop="25dp"
-                android:paddingBottom="5dp">
+                android:paddingBottom="5dp"
+                android:visibility="gone">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        style="@style/TextAppearance.AppCompat.Subhead"
-                        android:layout_width="match_parent"
+                        android:layout_toStartOf="@id/fss_network_logs_chip_second"
+                        android:text="@string/ssv_most_blocked_ips_heading"
+                        style="@style/TextAppearance.Material3.BodyMedium"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="20dp"
-                        android:layout_toStartOf="@id/fss_network_logs_chip_second"
-                        android:fontFamily="sans-serif-smallcaps"
-                        android:lineSpacingExtra="5dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="5dp"
                         android:padding="5dp"
-                        android:text="@string/ssv_most_blocked_ips_heading"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/extra_large_font_text_view" />
+                        android:textColor="?attr/colorOnBackground" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/fss_network_logs_chip_second"
@@ -710,12 +697,12 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"
         android:layout_margin="75dp"
+        android:contentDescription="@string/ssv_see_more"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
+        android:text="@string/load_more"
         android:textAlignment="center"
         android:textColor="?attr/homeScreenHeaderTextColor"
-        app:backgroundTint="?attr/buttonBackground"
-        android:contentDescription="@string/ssv_see_more"
-        android:text="@string/load_more" />
+        app:backgroundTint="?attr/buttonBackground" />
 
 </FrameLayout>

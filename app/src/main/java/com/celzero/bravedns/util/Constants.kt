@@ -28,7 +28,7 @@ class Constants {
         const val DOWNLOAD_BASE_URL = "https://dl.rethinkdns.com"
 
         // rethink base url for rpn
-        // const val RPN_BASE_URL = "https://redir.nile.workers.dev"
+        const val RPN_FALLBACK_URL = "https://redir.nile.workers.dev"
         const val RPN_BASE_URL = "https://svc.rethinkdns.com"
 
         // base url for ipinfo download
@@ -201,7 +201,6 @@ class Constants {
         const val FLAVOR_PLAY = "play"
         const val FLAVOR_FDROID = "fdroid"
         const val FLAVOR_WEBSITE = "website"
-        const val FLAVOR_HEADLESS = "headless"
 
         const val BUILD_TYPE_ALPHA = "alpha"
 
@@ -238,6 +237,12 @@ class Constants {
         const val NOTIF_INTENT_EXTRA_IAB_DEVICE_NOT_REGISTERED_VALUE = "IAB_DEVICE_NOT_REGISTERED_NOTIFY"
         // Stable notification ID for the device-not-registered alert (only one at a time)
         const val NOTIF_ID_IAB_DEVICE_NOT_REGISTERED = 0x410
+
+        // IAB device auth error (HTTP 401) notification tapping opens DeviceAuthErrorBottomSheet
+        const val NOTIF_INTENT_EXTRA_IAB_DEVICE_AUTH_ERROR_NAME  = "IAB_DEVICE_AUTH_ERROR"
+        const val NOTIF_INTENT_EXTRA_IAB_DEVICE_AUTH_ERROR_VALUE = "IAB_DEVICE_AUTH_ERROR_401"
+        // Stable notification ID for the 401 auth-error alert (only one at a time)
+        const val NOTIF_ID_IAB_DEVICE_AUTH_ERROR = 0x401
 
         // new app install intent extra name for uid. see RefreshDatabase#makeNewAppVpnIntent()
         const val NOTIF_INTENT_EXTRA_APP_UID = "NEW_APP_UID"

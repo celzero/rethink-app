@@ -66,15 +66,6 @@ class GoReportingHandler private constructor(private val scope: CoroutineScope, 
         }
     }
 
-    override fun crashFD(p0: Long): Boolean {
-        return false
-        /*Logger.i(LOG_TAG_BUG_REPORT, "$TAG crashFD: fd=$p0")
-        val crashLogFdReader = GoCrashFileDescriptorReader(ctx)
-        val started = crashLogFdReader.start(p0)
-        if (!started) Logger.w(LOG_GO_LOGGER, "$TAG failed to start go crash fd reader for fd=$p0")
-        return started*/
-    }
-
     fun getCrashFile(): File? {
         val crashLogFdReader = GoCrashFileDescriptorReader(ctx)
         return crashLogFdReader.start2()
@@ -148,5 +139,4 @@ class GoReportingHandler private constructor(private val scope: CoroutineScope, 
         notificationManager.notify(NW_ENGINE_NOTIFICATION_ID, builder.build())
         Logger.w(LOG_TAG_VPN, "nw eng notification: $msg")
     }
-
 }

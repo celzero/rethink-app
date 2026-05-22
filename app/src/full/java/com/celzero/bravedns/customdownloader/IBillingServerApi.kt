@@ -20,6 +20,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -29,6 +30,9 @@ interface IBillingServerApi {
     /*
      * Get the public key for the app version.
      * response: {"minvcode":"30","pubkey":"...","status":"ok"}
+     *
+     * No DB session header is needed since this endpoint is not account-specific and can be served
+     * by any.
     */
     @GET("/p/{appVersion}")
     suspend fun getPublicKey(@Path("appVersion") appVersion: String): Response<JsonObject?>?
@@ -53,7 +57,10 @@ interface IBillingServerApi {
       *   "cid": "<server-assigned or confirmed account id>",
       *   "did": "<server-assigned or confirmed device id>"
       * }
+      *
+      * DB routing: write; first-primary ensure to use the primary DB.
       */
+    @Headers("x-rethink-db-rpn-session: first-primary")
     @POST("/d/acc")
     suspend fun registerCustomer(
         @Header("x-rethink-app-cid") accountId: String?,
@@ -70,7 +77,10 @@ interface IBillingServerApi {
       *   x-rethink-app-did: <existing device id>  (omitted for new device registrations)
       *
       * The `meta` body carries model, appVersion.
+      *
+      * DB routing: write; first-primary ensure to use the primary DB.
      */
+    @Headers("x-rethink-db-rpn-session: first-primary")
     @POST("/d/reg")
     suspend fun registerDevice(
         @Header("x-rethink-app-cid") accountId: String,
@@ -88,7 +98,10 @@ interface IBillingServerApi {
       *   x-rethink-app-did: <device id>
       *
       * response: {"message":"canceled subscription","purchaseId":"..."}
+      *
+      * DB routing: write; first-primary ensure to use the primary DB.
      */
+    @Headers("x-rethink-db-rpn-session: first-primary")
     @POST("/g/stop")
     suspend fun cancelPurchase(
         @Header("x-rethink-app-cid") accountId: String,
@@ -106,7 +119,10 @@ interface IBillingServerApi {
       *   x-rethink-app-did: <device id>
       *
       * response: {"message":"canceled subscription","purchaseId":"..."}
+      *
+      * DB routing: write; first-primary ensure to use the primary DB.
      */
+    @Headers("x-rethink-db-rpn-session: first-primary")
     @POST("/g/refund")
     suspend fun revokeSubscription(
         @Header("x-rethink-app-cid") accountId: String,
@@ -122,7 +138,10 @@ interface IBillingServerApi {
       * Headers:
       *   x-rethink-app-cid: <account id>
       *   x-rethink-app-did: <device id>
+      *
+      * DB routing: write; first-primary ensure to use the primary DB.
      */
+    @Headers("x-rethink-db-rpn-session: first-primary")
     @POST("/g/ack")
     suspend fun acknowledgePurchase(
         @Header("x-rethink-app-cid") accountId: String,
@@ -138,7 +157,11 @@ interface IBillingServerApi {
       * Headers:
       *   x-rethink-app-cid: <account id>
       *   x-rethink-app-did: <device id>
+      *
+      * DB routing: read-only; first-unconstrained allows the server to use the nearest
+      * replica (or primary) with no consistency constraint.
      */
+    @Headers("x-rethink-db-rpn-session: first-unconstrained")
     @GET("/g/ack")
     suspend fun queryEntitlement(
         @Header("x-rethink-app-cid") accountId: String,
@@ -158,7 +181,10 @@ interface IBillingServerApi {
       *
       * response: {"message":"consumed","purchaseId":"..."}
       *           {"error":"already consumed",...}
+      *
+      * DB routing: write; first-primary ensure to use the primary DB.
      */
+    @Headers("x-rethink-db-rpn-session: first-primary")
     @POST("/g/con")
     suspend fun consumePurchase(
         @Header("x-rethink-app-cid") accountId: String,
@@ -177,7 +203,11 @@ interface IBillingServerApi {
       * - test: operate on test-entitlement records.
       *
       * Response: single PlayOrder JSON object (with optional `orders` array when tot=n).
+      *
+      * DB routing: read-only; first-unconstrained allows the server to use the nearest
+      * replica (or primary) with no consistency constraint.
      */
+    @Headers("x-rethink-db-rpn-session: first-unconstrained")
     @GET("/g/tx")
     suspend fun getPurchaseHistory(
         @Header("x-rethink-app-cid") accountId: String,

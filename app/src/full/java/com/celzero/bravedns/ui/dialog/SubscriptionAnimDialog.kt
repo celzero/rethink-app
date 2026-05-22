@@ -47,6 +47,24 @@ class SubscriptionAnimDialog : DialogFragment() {
         // Position constants
         private const val POSITION_X_CENTER = 0.5
         private const val POSITION_Y_BOTTOM = 1.0
+
+        private const val ARG_TITLE = "arg_title"
+        private const val ARG_MESSAGE = "arg_message"
+
+        /**
+         * Creates a [SubscriptionAnimDialog] with optional [title] and [message] overlaid on the
+         * konfetti animation. Pass null to leave the text fields empty (default/normal flow).
+         */
+        fun newInstance(title: String? = null, message: String? = null): SubscriptionAnimDialog {
+            return SubscriptionAnimDialog().apply {
+                if (title != null || message != null) {
+                    arguments = Bundle().apply {
+                        title?.let { putString(ARG_TITLE, it) }
+                        message?.let { putString(ARG_MESSAGE, it) }
+                    }
+                }
+            }
+        }
     }
 
 
@@ -71,6 +89,11 @@ class SubscriptionAnimDialog : DialogFragment() {
         super.onStart()
         dialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         dialog?.setCancelable(true)
+
+        // Apply optional title/message passed via arguments
+        arguments?.getString(ARG_TITLE)?.let { b.tvTitle.text = it }
+        arguments?.getString(ARG_MESSAGE)?.let { b.tvMessage.text = it }
+
         b.konfettiView.start(festive())
         // post delayed auto-dismiss safely
         b.konfettiView.postDelayed(autoDismissRunnable, DIALOG_DISPLAY_DURATION_MS)

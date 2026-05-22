@@ -84,7 +84,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/dacd_text_input_layout"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/cd_dialog_edittext_hint"
@@ -121,14 +121,14 @@
         android:layout_margin="10dp"
         android:padding="5dp"
         android:text="@string/settings_http_proxy_error_text4"
-        android:textColor="@color/colorRed_A400"
+        android:textColor="?attr/colorError"
         android:textSize="@dimen/default_font_text_view"
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/dacd_input_layout" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/dacd_block_btn"
-        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+        style="@style/Widget.Material3.Button.TextButton.Dialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
@@ -140,7 +140,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/dacd_cancel_btn"
-        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+        style="@style/Widget.Material3.Button.TextButton.Dialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
@@ -153,7 +153,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/dacd_trust_btn"
-        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+        style="@style/Widget.Material3.Button.TextButton.Dialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"

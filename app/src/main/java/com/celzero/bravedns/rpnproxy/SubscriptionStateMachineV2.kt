@@ -69,23 +69,20 @@ class SubscriptionStateMachineV2 : KoinComponent {
         private const val TAG = "SubscriptionStateMachineV2"
 
         // do not expire a subscription whose lastUpdatedTs is within
-        // this window, even if Play returned an empty snapshot.  Protects against
-        // transient Play Store cache failures on some devices.
-        // 24 hours; enough to survive temporary Play outages while still expiring
-        // genuinely revoked/refunded subscriptions within a reasonable window.
-        private const val RECENTLY_ACTIVE_GUARD_MS = 24 * 60 * 60 * 1000L // 24 hours
+        // this window, even if Play returned an empty snapshot.
+        private const val RECENTLY_ACTIVE_GUARD_MS = 2 * 60 * 60 * 1000L // 2 hours
 
         /**
          * Guard window after a local server-driven cancel/revoke during which a Play
          * reconcile will NOT overwrite the locally-set CANCELLED/REVOKED status.
          *
          * When the user cancels or revokes via our server, we immediately update the
-         * state machine and DB.  A concurrent or shortly-following Play reconcile may
+         * state machine and DB. A concurrent or shortly-following Play reconcile may
          * still return the purchase with `purchaseState=PURCHASED` / `isAutoRenewing=true`
          * because Google Play hasn't yet propagated the server-side change.
          *
          * Without this guard `handlePaymentSuccessful` would overwrite CANCELLED/REVOKED
-         * back to ACTIVE.  After this window, Play is expected to have caught up and
+         * back to ACTIVE. After this window, Play is expected to have caught up and
          * reconcile is allowed to take over.
          *
          * 5 minutes is enough to cover normal Play propagation delays while still
@@ -923,28 +920,28 @@ class SubscriptionStateMachineV2 : KoinComponent {
                 return
             }
 
-            // If a subscription was confirmed active recently (lastUpdatedTs within
-            // RECENTLY_ACTIVE_GUARD_MS), do NOT expire it based on an empty Play
-            // snapshot.  This is a defence-in-depth guard against transient Play
-            // Store cache failures.  The InAppBillingHandler already applies a
-            // consecutive-empty-query threshold, so this is the last safety net.
+            // If a specific subscription row was confirmed active very recently
+            // (lastUpdatedTs within RECENTLY_ACTIVE_GUARD_MS) it may be a transient Play
+            // cache, skip that individual row only, but still expire other rows.
             val now = System.currentTimeMillis()
-            val recentlyActive = subsRows.filter { sub ->
-                sub.lastUpdatedTs > 0L &&
-                (now - sub.lastUpdatedTs) < RECENTLY_ACTIVE_GUARD_MS
-            }
-            if (recentlyActive.isNotEmpty()) {
-                Logger.w(LOG_IAB, "$TAG: expireStaleSubsFromDb: ${recentlyActive.size} SUBS row(s) " +
-                    "were updated within the last ${RECENTLY_ACTIVE_GUARD_MS / 3600_000}h " +
-                    "skipping expiry to guard against transient Play empty responses. " +
-                    "Rows: ${recentlyActive.map { "id=${it.id},token=${it.purchaseToken.take(8)},age=${(now - it.lastUpdatedTs) / 60_000}min" }}")
-                return
-            }
 
-            Logger.w(LOG_IAB, "$TAG: expireStaleSubsFromDb: expiring ${subsRows.size} stale SUBS row(s)")
+            Logger.w(LOG_IAB, "$TAG: expireStaleSubsFromDb: expiring up to ${subsRows.size} stale SUBS row(s)")
 
+            var expiredCount = 0
             subsRows.forEach { sub ->
                 try {
+                    // Per-row recently-active guard: skip rows that were just confirmed
+                    // active (within RECENTLY_ACTIVE_GUARD_MS) to guard against the
+                    // rare case of a single transient Play miss that slipped through the
+                    // consecutiveEmptySubsQueries threshold (e.g. network partition
+                    // resolved just as the threshold was hit).
+                    if (sub.lastUpdatedTs > 0L &&
+                        (now - sub.lastUpdatedTs) < RECENTLY_ACTIVE_GUARD_MS) {
+                        Logger.w(LOG_IAB, "$TAG: expireStaleSubsFromDb: skipping row id=${sub.id} " +
+                            "updated ${(now - sub.lastUpdatedTs) / 60_000}min ago (within guard window)")
+                        return@forEach
+                    }
+
                     val prevStatus = sub.status
                     sub.status        = SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id
                     sub.lastUpdatedTs = now
@@ -959,6 +956,7 @@ class SubscriptionStateMachineV2 : KoinComponent {
                         sub.accountExpiry = now
                     }
                     subscriptionDb.upsert(sub)
+                    expiredCount++
 
                     dbSyncService.recordHistoryOnly(
                         subscriptionId = sub.id,
@@ -972,9 +970,13 @@ class SubscriptionStateMachineV2 : KoinComponent {
                 }
             }
 
-            // Transition the in-memory state machine to Expired once (idempotent).
-            processEventSafely(SubscriptionEvent.SubscriptionExpired)
-            Logger.i(LOG_IAB, "$TAG: expireStaleSubsFromDb: state machine transitioned to Expired")
+            if (expiredCount > 0) {
+                // Transition the in-memory state machine to Expired once (idempotent).
+                processEventSafely(SubscriptionEvent.SubscriptionExpired)
+                Logger.i(LOG_IAB, "$TAG: expireStaleSubsFromDb: expired $expiredCount row(s), state machine transitioned to Expired")
+            } else {
+                Logger.d(LOG_IAB, "$TAG: expireStaleSubsFromDb: all rows were within guard window, no rows expired")
+            }
         } catch (e: Exception) {
             Logger.e(LOG_IAB, "$TAG: expireStaleSubsFromDb: ${e.message}", e)
         }
@@ -1105,6 +1107,9 @@ class SubscriptionStateMachineV2 : KoinComponent {
 
             val now = System.currentTimeMillis()
             var expiredCount = 0
+            // Collect tokens that are expired in this pass so we can detect a stale state-machine
+            // pointer in the remainingValid > 0 block below.
+            val expiredTokens = mutableSetOf<String>()
 
             inAppRows.forEach { sub ->
                 try {
@@ -1147,15 +1152,63 @@ class SubscriptionStateMachineV2 : KoinComponent {
                     Logger.i(LOG_IAB, "$TAG: expireStaleInAppFromDb: expired id=${sub.id}, " +
                         "productId=${sub.productId}, token=${sub.purchaseToken.take(8)}, reason=$reason")
                     expiredCount++
+                    expiredTokens.add(sub.purchaseToken)
                 } catch (e: Exception) {
                     Logger.e(LOG_IAB, "$TAG: expireStaleInAppFromDb: error expiring id=${sub.id}: ${e.message}", e)
                 }
             }
 
             if (expiredCount > 0) {
-                // Transition in-memory state to Expired if any INAPP row was expired.
-                processEventSafely(SubscriptionEvent.SubscriptionExpired)
-                Logger.i(LOG_IAB, "$TAG: expireStaleInAppFromDb: expired $expiredCount INAPP row(s), state → Expired")
+                val remainingValid = inAppRows.size - expiredCount
+                if (remainingValid > 0) {
+                    // Some rows were cleaned up from DB but at least one INAPP purchase is still
+                    // active (e.g. user purchased a second/upgraded plan whose token IS present in
+                    // the Play snapshot). The old superseded token is legitimately absent from
+                    // Play; expiring it from DB is correct. However, the state machine MUST NOT
+                    // be transitioned to Expired because the user still has a valid purchase.
+                    Logger.i(LOG_IAB, "$TAG: expireStaleInAppFromDb: expired $expiredCount INAPP " +
+                        "row(s) but $remainingValid still active — DB cleaned, state unchanged")
+
+                    // After retiring the stale row(s), confirm the state machine's in-memory data
+                    // is pointing to a still-valid subscription, not one of the now-expired ones.
+                    //
+                    // Two scenarios where the pointer can be stale:
+                    //  1. handlePaymentSuccessful hit its dedup guard (all fields already current)
+                    //     and returned early without calling stateMachine.updateData(). The machine's
+                    //     saved subscriptionStatus may still carry the superseded token.
+                    //  2. The empty-INAPP-threshold path ran: processSinglePurchase was never called
+                    //     this cycle so handlePaymentSuccessful never ran at all.
+                    //
+                    // In both cases the valid purchase IS already marked ACTIVE in the DB
+                    // (written by a previous handlePaymentSuccessful call). We just need to update
+                    // the in-memory pointer so the UI, RPN entitlement checks, and
+                    // getEffectivePurchaseDetail() all see the right token for this session.
+                    val currentToken =
+                        stateMachine.getCurrentData()?.subscriptionStatus?.purchaseToken.orEmpty()
+                    if (currentToken.isNotEmpty() && currentToken in expiredTokens) {
+                        val validSub = inAppRows.firstOrNull { it.purchaseToken !in expiredTokens }
+                        if (validSub != null) {
+                            val validPd = createPurchaseDetailFromSubscription(validSub)
+                            stateMachine.updateData(SubscriptionData(validSub, validPd))
+                            Logger.i(
+                                LOG_IAB,
+                                "$TAG: expireStaleInAppFromDb: state machine re-pointed to " +
+                                "still-valid sub id=${validSub.id}, " +
+                                "token=${validSub.purchaseToken.take(8)}"
+                            )
+                        } else {
+                            Logger.w(
+                                LOG_IAB,
+                                "$TAG: expireStaleInAppFromDb: no valid sub found to redirect " +
+                                "state machine (unexpected; remainingValid=$remainingValid)"
+                            )
+                        }
+                    }
+                } else {
+                    // All active INAPP rows were expired — no valid purchase remains.
+                    processEventSafely(SubscriptionEvent.SubscriptionExpired)
+                    Logger.i(LOG_IAB, "$TAG: expireStaleInAppFromDb: expired $expiredCount INAPP row(s), state → Expired")
+                }
             } else {
                 Logger.d(LOG_IAB, "$TAG: expireStaleInAppFromDb: all INAPP rows still valid")
             }
@@ -1184,9 +1237,9 @@ class SubscriptionStateMachineV2 : KoinComponent {
             val inAppRows = rows.filter { sub ->
                 sub.productId.contains("onetime", ignoreCase = true) ||
                 sub.productId.contains("inapp", ignoreCase = true) ||
-                sub.productId == ONE_TIME_TEST_PRODUCT_ID ||
-                sub.productId == ONE_TIME_PRODUCT_2YRS ||
-                sub.productId == ONE_TIME_PRODUCT_5YRS ||
+                sub.productId == ONE_TIME_TEST_PRODUCT_ID             ||
+                sub.planId == ONE_TIME_PRODUCT_2YRS                ||
+                sub.planId == ONE_TIME_PRODUCT_5YRS                ||
                 sub.productId == ONE_TIME_PRODUCT_ID
             }
             // Deduplicate by purchase token (safety guard for multiple INAPP rows)
@@ -1525,17 +1578,28 @@ class SubscriptionStateMachineV2 : KoinComponent {
             // After LOCAL_CANCEL_REVOKE_GUARD_MS, Play is expected to have propagated:
             //  CANCELLED → Play returns isAutoRenewing=false → updateCancelledStatusInDb
             //  REVOKED → Play removes the token → expireOrphanedSubsFromDb / expireStaleSubsFromDb
+            //
+            // NOTE: the old condition also included `&& !purchaseDetail.isAutoRenewing` to
+            // "bypass the guard on genuine resubscription". That condition was wrong:
+            //  - After a server-side REVOKE, Play still returns the purchase with
+            //    isAutoRenewing=true until the cancellation/revoke propagates (typically
+            //    seconds to minutes). Because !true == false the guard was defeated entirely
+            //    for revocations, causing handlePaymentSuccessful to overwrite STATE_REVOKED
+            //    back to STATE_ACTIVE and re-enable RPN.
+            //  - A genuine resubscription ALWAYS gets a NEW purchaseToken from Play. The
+            //    `existing.purchaseToken == purchaseDetail.purchaseToken` equality check
+            //    above already ensures this guard never fires for a true resubscription
+            //    (different token → falls through to normal payment handling).
             if (existing != null &&
                 existing.purchaseToken == purchaseDetail.purchaseToken &&
                 (existing.status == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id ||
                  existing.status == SubscriptionStatus.SubscriptionState.STATE_REVOKED.id) &&
-                (System.currentTimeMillis() - existing.lastUpdatedTs) < LOCAL_CANCEL_REVOKE_GUARD_MS &&
-                !purchaseDetail.isAutoRenewing // bypass guard on genuine resubscription (auto-renewal re-enabled)
+                (System.currentTimeMillis() - existing.lastUpdatedTs) < LOCAL_CANCEL_REVOKE_GUARD_MS
             ) {
                 Logger.i(LOG_IAB, "$TAG: handlePaymentSuccessful: preserving local " +
                     "${SubscriptionStatus.SubscriptionState.fromId(existing.status).name} status " +
                     "for token=${purchaseDetail.purchaseToken.take(8)}, Play propagation pending " +
-                    "(guard=${LOCAL_CANCEL_REVOKE_GUARD_MS / 60_000}min)")
+                    "(guard=${LOCAL_CANCEL_REVOKE_GUARD_MS / 60_000}min, isAutoRenewing=${purchaseDetail.isAutoRenewing})")
                 stateMachine.updateData(SubscriptionData(existing, purchaseDetail))
                 return
             }

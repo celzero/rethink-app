@@ -69,7 +69,6 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.service.WireguardManager.WG_HANDSHAKE_TIMEOUT
 import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
 import com.celzero.bravedns.ui.activity.AlertsActivity
 import com.celzero.bravedns.ui.activity.AppListActivity
@@ -115,6 +114,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import org.koin.java.KoinJavaComponent.inject
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -779,16 +779,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     uiCtx {
                         if (!isAdded || view == null) return@uiCtx
                         b.fhsCardOtherProxyCount.visibility = View.VISIBLE
-
-                        if (proxyType.isProxyTypeWireguard() && !WireguardManager.isLoaded()) {
-                            Logger.v(LOG_TAG_UI, "$TAG wg configs empty – manager still loading, showing Checking")
-                            b.fhsCardProxyCount.setTextAnimated(getString(R.string.lbl_checking))
-                        } else if (RpnProxyManager.isRpnActive()) {
-                            Logger.v(LOG_TAG_UI, "$TAG rpn configs empty – manager still loading, showing Checking")
-                            b.fhsCardProxyCount.setTextAnimated(getString(R.string.lbl_checking))
-                        } else {
-                            b.fhsCardProxyCount.setTextAnimated(getString(R.string.lbl_inactive))
-                        }
+                        b.fhsCardProxyCount.setTextAnimated(getString(R.string.lbl_checking))
                         b.fhsCardOtherProxyCount.setTextAnimated(getString(resId))
                     }
                     return@withContext
@@ -802,11 +793,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     idle = triple.third
                     Logger.v(LOG_TAG_UI, "$TAG wg proxy status: act: $active, fail: $failing, idle: $idle")
                 }
-                // Fetch the live win proxy id once for the AUTO entry.
-                // Falls back to the wildcard only when the tunnel is not connected.
-                val winProxyId = VpnController.getWinProxyId() ?: "${Backend.RpnWin}**"
                 rpnProxies.forEach {
-                    val proxyId = if (it.key.equals(AUTO_SERVER_ID, true)) winProxyId else Backend.RpnWin + it.key
+                    val proxyId = if (it.key.equals(AUTO_SERVER_ID, true)) Backend.RpnWin else Backend.RpnWin + it.key
                     val triple = getProxyStatus(proxyId, now, active, failing, idle)
                     active = triple.first
                     failing = triple.second
@@ -892,42 +880,44 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         var idle = i
         Logger.vv(LOG_TAG_UI, "$TAG init stats check for $proxyId")
 
+        val isRpn = proxyId.startsWith(Backend.RpnWin)
+
         val stats = VpnController.getProxyStats(proxyId)
         val statusPair = VpnController.getProxyStatusById(proxyId)
 
         val status = UIUtils.ProxyStatus.entries.find { s -> s.id == statusPair.first }
 
-        // check for dns status of the wg if splitDns is enabled
-        val dnsStats = if (isSplitDns()) {
-            val ds = VpnController.getDnsStatus(proxyId)
-            ds
+        val dnsStats = if (!isRpn && isSplitDns()) {
+            VpnController.getDnsStatus(proxyId)
         } else {
             null
         }
 
         // Handle paused state as idle (TPU is the pause status)
         if (status == UIUtils.ProxyStatus.TPU) {
-            idle++ // paused proxies are counted as idle
+            idle++
             return Triple(active, failing, idle)
         }
 
-        // Check DNS errors first
+        // DNS error check (WireGuard only – dnsStats is null for RPN)
         if (dnsStats != null && isDnsError(dnsStats)) {
             failing++
             return Triple(active, failing, idle)
         }
 
-        // Handle null stats
+        // Null stats: for WireGuard this is a genuine failure signal.
+        // For RPN, the proxy entry might not yet be registered; treat as idle/waiting.
         if (stats == null) {
-            failing++
+            if (isRpn) idle++ else failing++
             return Triple(active, failing, idle)
         }
 
         val lastOk = stats.lastOK
         val since = stats.since
 
-        // Check if it's been running long enough without success
-        if (now - since > WG_UPTIME_THRESHOLD && lastOk == 0L) {
+        // since/lastOK uptime heuristic: only applied to WireGuard.
+        // For RPN the status enum owns the failure decision.
+        if (!isRpn && now - since > WG_UPTIME_THRESHOLD && lastOk == 0L) {
             failing++
             return Triple(active, failing, idle)
         }
@@ -935,50 +925,37 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (status != null) {
             when (status) {
                 UIUtils.ProxyStatus.TOK -> {
-                    // For TOK (connected), check if it's recently active
-                    if (lastOk > 0L && (now - lastOk < WG_HANDSHAKE_TIMEOUT)) {
-                        active++
-                    } else if (lastOk > 0L) {
-                        // Has connected before but not recently, consider idle
-                        idle++
-                    } else if (now - since < WG_UPTIME_THRESHOLD) {
-                        // Still in startup period, consider as starting (active)
+                    if (isRpn || lastOk > 0L || now - since < WG_UPTIME_THRESHOLD) {
                         active++
                     } else {
                         failing++
                     }
                 }
                 UIUtils.ProxyStatus.TUP -> {
-                    // Starting state - always consider as active (transitioning)
+                    // Starting / connecting – optimistically count as active
                     active++
                 }
                 UIUtils.ProxyStatus.TZZ -> {
-                    // For TZZ (idle), be more lenient - consider it as idle if it has had any connection
-                    if (lastOk > 0L) {
-                        // Has had successful handshake before, consider it idle
-                        idle++
-                    } else if (now - since < WG_UPTIME_THRESHOLD) {
-                        // Still in startup period, give it more time
+                    // Idle state.  For RPN, idle is a normal operational state; count it.
+                    // For WireGuard, only count as idle if it ever had a successful handshake.
+                    if (isRpn || lastOk > 0L || now - since < WG_UPTIME_THRESHOLD) {
                         idle++
                     } else {
-                        // No recent handshake and been running long enough, consider it failing
                         failing++
                     }
                 }
                 UIUtils.ProxyStatus.TNT -> {
-                    // Waiting state
-                    // see WgConfigAdapter#getStrokeColorForStatus for details
+                    // Waiting / not-yet-started
                     idle++
                 }
                 // UIUtils.ProxyStatus.TPU handled above
                 else -> {
-                    // Unknown or error states (TKO, TEND, etc.)
+                    // Explicitly bad states (TKO, END, unknown)
                     failing++
                 }
             }
         } else {
-            // No status available, mark as failing
-            failing++
+            idle++
         }
         return Triple(active, failing, idle)
     }
@@ -1947,7 +1924,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     // Sets the UI DNS status on/off.
     private fun syncDnsStatus() {
         val vpnState = VpnController.state()
-        val isEch = vpnState.serverName?.contains(DnsLogTracker.ECH, true) == true
 
         // Change status and explanation text
         var statusId: Int
@@ -2078,7 +2054,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             b.fhsProtectionLevelTxt.setTextColor(colorId)
             b.fhsProtectionLevelTxt.text = string
         } else {
-            if (isEch) {
+            if (vpnState.isEch) {
                 val stat = getString(statusId)
                 val s  = stat.replaceFirst(getString(R.string.status_protected), getString(R.string.lbl_ultra_secure), true)
                 Logger.d(LOG_TAG_UI, "Ech status : $stat")
@@ -2128,28 +2104,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 R.color.accentBad -> {
                     R.attr.accentBad
                 }
-                R.color.primaryLightColorText -> {
-                    R.attr.primaryLightColorText
-                }
-                R.color.secondaryText -> {
-                    R.attr.invertedPrimaryTextColor
-                }
-                R.color.primaryText -> {
-                    R.attr.primaryTextColor
-                }
-                R.color.primaryTextLight -> {
-                    R.attr.primaryTextColor
-                }
                 else -> {
-                    R.attr.accentGood
+                    R.attr.colorOnSurfaceVariant
                 }
             }
-        val typedValue = TypedValue()
-        val a: TypedArray =
-            requireContext().obtainStyledAttributes(typedValue.data, intArrayOf(attributeFetch))
-        val color = a.getColor(0, 0)
-        a.recycle()
-        return color
+        return UIUtils.fetchColor(requireContext(), attributeFetch)
     }
 
     /**

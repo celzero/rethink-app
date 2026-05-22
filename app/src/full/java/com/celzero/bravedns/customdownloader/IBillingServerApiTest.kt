@@ -20,6 +20,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Query
 
@@ -33,6 +34,13 @@ import retrofit2.http.Query
  * - **`test`** is a **required** query param with no default value; the compiler enforces
  *   that callers always supply it.  This prevents accidental omission of the test flag
  *   when operating against the test entitlement server path.
+ *
+ * ### DB session header
+ * Every endpoint carries an `x-rethink-db-rpn-test-session` header whose value
+ * controls which DB instance services the request:
+ * - `first-primary` - always the primary DB; required for all write (POST) endpoints.
+ * - `first-unconstrained` - no constraint; the server may use the nearest replica or
+ *                           primary; safe for all read (GET) endpoints.
  *
  * ### Identity headers
  * CID and DID are no longer passed as URL query parameters. All endpoints send:
@@ -74,7 +82,10 @@ interface IBillingServerApiTest {
       *   "cid": "<server-assigned or confirmed account id>",
       *   "did": "<server-assigned or confirmed device id>"
       * }
+      *
+      * DB routing: write; first-primary ensure to use the primary DB.
       */
+    @Headers("x-rethink-db-rpn-test-session: first-primary")
     @POST("/d/acc")
     suspend fun registerCustomer(
         @Header("x-rethink-app-cid") accountId: String?,
@@ -95,7 +106,10 @@ interface IBillingServerApiTest {
       * `test` is required and must be the non-null string returned by
       * [RpnProxyManager.getIsTestEntitlement].
       * The `meta` body carries model, appVersion.
+      *
+      * DB routing: write; first-primary ensure to use the primary DB.
      */
+    @Headers("x-rethink-db-rpn-test-session: first-primary")
     @POST("/d/reg")
     suspend fun registerDevice(
         @Header("x-rethink-app-cid") accountId: String,
@@ -116,7 +130,10 @@ interface IBillingServerApiTest {
       * `test` is required and must be the non-null string returned by
       * [RpnProxyManager.getIsTestEntitlement] (typically "test").
       * response: {"message":"canceled subscription","purchaseId":"..."}
+      *
+      * DB routing: write; first-primary ensure to use the primary DB.
      */
+    @Headers("x-rethink-db-rpn-test-session: first-primary")
     @POST("/g/stop")
     suspend fun cancelSubscription(
         @Header("x-rethink-app-cid") accountId: String,
@@ -137,7 +154,10 @@ interface IBillingServerApiTest {
       * `test` is required and must be the non-null string returned by
       * [RpnProxyManager.getIsTestEntitlement].
       * response: {"message":"canceled subscription","purchaseId":"..."}
+      *
+      * DB routing: write; first-primary ensure to use the primary DB.
      */
+    @Headers("x-rethink-db-rpn-test-session: first-primary")
     @POST("/g/refund")
     suspend fun revokeSubscription(
         @Header("x-rethink-app-cid") accountId: String,
@@ -157,7 +177,10 @@ interface IBillingServerApiTest {
       *
       * `test` is required and must be the non-null string returned by
       * [RpnProxyManager.getIsTestEntitlement].
+      *
+      * DB routing: write; first-primary ensure to use the primary DB.
      */
+    @Headers("x-rethink-db-rpn-test-session: first-primary")
     @POST("/g/ack")
     suspend fun acknowledgePurchase(
         @Header("x-rethink-app-cid") accountId: String,
@@ -177,7 +200,11 @@ interface IBillingServerApiTest {
       *
       * `test` is required and must be the non-null string returned by
       * [RpnProxyManager.getIsTestEntitlement].
+      *
+      * DB routing: read-only; first-unconstrained allows the server to use the nearest
+      * replica (or primary) with no consistency constraint.
      */
+    @Headers("x-rethink-db-rpn-test-session: first-unconstrained")
     @GET("/g/ack")
     suspend fun queryEntitlement(
         @Header("x-rethink-app-cid") accountId: String,
@@ -199,7 +226,10 @@ interface IBillingServerApiTest {
       * [RpnProxyManager.getIsTestEntitlement].
       * response: {"message":"consumed","purchaseId":"..."}
       *           {"error":"already consumed",...}
+      *
+      * DB routing: write; first-primary ensure to use the primary DB.
      */
+    @Headers("x-rethink-db-rpn-test-session: first-primary")
     @POST("/g/con")
     suspend fun consumePurchase(
         @Header("x-rethink-app-cid") accountId: String,
@@ -221,7 +251,11 @@ interface IBillingServerApiTest {
       * [RpnProxyManager.getIsTestEntitlement].
       *
       * Response: single PlayOrder JSON object (with optional `orders` array when tot=n).
+      *
+      * DB routing: read-only; first-unconstrained allows the server to use the nearest
+      * replica (or primary) with no consistency constraint.
      */
+    @Headers("x-rethink-db-rpn-test-session: first-unconstrained")
     @GET("/g/tx")
     suspend fun getPurchaseHistory(
         @Header("x-rethink-app-cid") accountId: String,

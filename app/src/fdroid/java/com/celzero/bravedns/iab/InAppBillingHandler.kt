@@ -130,6 +130,14 @@ object InAppBillingHandler {
         meta: JsonObject? = null
     ) { /* no-op */ }
 
+    /** No-op: F-Droid build has no billing server to return 401 errors. */
+    @Suppress("UNUSED_PARAMETER")
+    internal suspend fun handleUnauthorized401(
+        operation: ServerApiError.Operation,
+        accountId: String,
+        deviceId: String
+    ) { /* no-op */ }
+
     /** Returns the unchanged [purchase]: F-Droid build has no server entitlements. */
     @Suppress("UNUSED_PARAMETER")
     suspend fun queryEntitlementFromServer(

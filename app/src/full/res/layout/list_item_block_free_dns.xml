@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginBottom="6dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp"
+    app:strokeColor="?attr/border"
+    app:strokeWidth="0.5dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:padding="12dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/bfd_item_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:gravity="center"
+            tools:text="Example.com"
+            android:layout_alignParentStart="true"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/large_font_text_view"
+            android:textStyle="bold" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/bfd_item_type_chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="false"
+            android:layout_toEndOf="@id/bfd_item_name"
+            android:layout_marginStart="10dp"
+            android:clickable="false"
+            android:gravity="center"
+            android:focusable="false"
+            android:textColor="@android:color/white"
+            android:textSize="10sp"
+            app:chipCornerRadius="6dp"
+            app:chipMinHeight="24dp"
+            app:chipStartPadding="8dp"
+            app:chipEndPadding="8dp"
+            app:ensureMinTouchTargetSize="false" />
+
+        <LinearLayout
+            android:id="@+id/bfd_item_text_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bfd_item_type_chip"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@id/bfd_item_check"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="10dp"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/bfd_item_url"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="@dimen/default_font_text_view" />
+
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/bfd_item_check"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:padding="4dp"
+            android:src="@drawable/ic_tick"
+            tools:visibility="visible"
+            android:visibility="invisible" />
+
+    </RelativeLayout>
+
+</com.google.android.material.card.MaterialCardView>
+
+
+

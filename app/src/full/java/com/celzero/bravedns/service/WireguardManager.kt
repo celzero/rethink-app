@@ -34,6 +34,7 @@ import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.WgHopManager
 import com.celzero.bravedns.wireguard.WgInterface
+import com.celzero.firestack.backend.IPMetadata
 import com.celzero.firestack.backend.RouterStats
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -592,7 +593,7 @@ object WireguardManager : KoinComponent {
         // if catch-all config is enabled, then add the config id to the list
         val cac = mappings.filter { it.isActive && it.isCatchAll }
         cac.forEach {
-            if ((checkEligibilityBasedOnNw(it.id, usesMobileNw) || checkEligibilityBasedOnSsid(it.id, ssid)) &&
+            if ((checkEligibilityBasedOnNw(it.id, usesMobileNw) && checkEligibilityBasedOnSsid(it.id, ssid)) &&
                 !proxyIds.contains(ID_WG_BASE + it.id)
             ) {
                 proxyIds.add(ID_WG_BASE + it.id)
@@ -1229,7 +1230,7 @@ object WireguardManager : KoinComponent {
         }
     }
 
-    data class WgStats(val routerStats: RouterStats?, val mtu: Long?, val status: Long?, val ip4: Boolean?, val ip6: Boolean?)
+    data class WgStats(val routerStats: RouterStats?, val mtu: Long?, val status: Long?, val ip4: Boolean?, val ip6: Boolean?, val clientV4: IPMetadata?, val clientV6: IPMetadata?)
     suspend fun stats(): String {
         val sb = StringBuilder()
         mappings.filter { it.isActive }.forEach {
@@ -1255,11 +1256,15 @@ object WireguardManager : KoinComponent {
             sb.append("   since: ${getRelativeTimeSpan(routerStats?.since)}\n")
             sb.append("   errRx: ${routerStats?.errRx}\n")
             sb.append("   errTx: ${routerStats?.errTx}\n")
-            sb.append("   extra: ${routerStats?.extra}\n\n")
+            sb.append("   extra: ${routerStats?.extra}\n")
+            sb.append("   clientV4: ${stats?.clientV4?.toString()}\n")
+            sb.append("   clientV6: ${stats?.clientV6?.toString()}\n\n")
         }
         if (sb.isEmpty()) {
             sb.append("   N/A\n\n")
         }
+        val s = sb.toString()
+        Logger.d(LOG_TAG_PROXY, "wg stats: $s")
         return sb.toString()
     }
 

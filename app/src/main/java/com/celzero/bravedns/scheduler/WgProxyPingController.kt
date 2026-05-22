@@ -35,27 +35,40 @@ class WgProxyPingController(private val scope: CoroutineScope) {
     private val intervalMs = 60_000L
     private val durationMs = 5 * 60 * 1000L
 
-    private var schedulerJob: Job? = null
+    @Volatile private var schedulerJob: Job? = null
 
-    data class PingConfig(
-        val startTime: Long,
-        val continuous: Boolean,
-        var running: Boolean = false // prevents overlap
-    )
+    companion object {
+        private const val TAG = "WgProxyPingController"
+    }
 
-    fun startPing(proxyId: String, continuous: Boolean) {
-        activeProxies[proxyId] = PingConfig(
-            startTime = System.currentTimeMillis(),
-            continuous = continuous
-        )
+    // startTime is a val, captured once in startPing and never modified.
+    class PingConfig(val startTime: Long) {
+        @Volatile var running: Boolean = false
+    }
+
+    fun startPing(proxyId: String) {
+        Logger.vv(LOG_TAG_PROXY, "$TAG request to start ping: $proxyId, already active proxies=${activeProxies.keys}")
+        val existing = activeProxies[proxyId]
+
+        val newConfig = PingConfig(startTime = System.currentTimeMillis())
+        if (existing != null) newConfig.running = existing.running
+        activeProxies[proxyId] = newConfig
 
         ensureScheduler()
-        Logger.vv(LOG_TAG_PROXY, "started ping for $proxyId, continuous=$continuous")
+        if (existing != null) {
+            Logger.vv(LOG_TAG_PROXY, "$TAG restarted ping timer for $proxyId; " +
+                    "first ping in ~${intervalMs / 1000}s, " +
+                    "duration window reset to ${durationMs / 1000}s from now")
+        } else {
+            Logger.vv(LOG_TAG_PROXY, "$TAG started ping for $proxyId; " +
+                    "first ping in ~${intervalMs / 1000}s, " +
+                    "then every ${intervalMs / 1000}s for ${durationMs / 1000}s")
+        }
     }
 
     fun stopPing(proxyId: String) {
         activeProxies.remove(proxyId)
-        Logger.vv(LOG_TAG_PROXY, "stopped ping for $proxyId")
+        Logger.vv(LOG_TAG_PROXY, "$TAG stopped ping for $proxyId")
 
         if (activeProxies.isEmpty()) stopScheduler()
     }
@@ -63,11 +76,7 @@ class WgProxyPingController(private val scope: CoroutineScope) {
     fun stopAll() {
         activeProxies.clear()
         stopScheduler()
-        Logger.vv(LOG_TAG_PROXY, "stopped all ping jobs")
-    }
-
-    fun isRunning(proxyId: String): Boolean {
-        return activeProxies.containsKey(proxyId)
+        Logger.vv(LOG_TAG_PROXY, "$TAG stopped all ping jobs")
     }
 
     private fun ensureScheduler() {
@@ -77,11 +86,10 @@ class WgProxyPingController(private val scope: CoroutineScope) {
             var nextTick = alignToNextInterval(System.currentTimeMillis())
 
             while (isActive && activeProxies.isNotEmpty()) {
-
                 val delayMs = nextTick - System.currentTimeMillis()
                 if (delayMs > 0) delay(delayMs)
 
-                tick()
+                tick(System.currentTimeMillis())
 
                 nextTick += intervalMs
             }
@@ -93,30 +101,44 @@ class WgProxyPingController(private val scope: CoroutineScope) {
         schedulerJob = null
     }
 
-    private suspend fun tick() {
-        val now = System.currentTimeMillis()
-
+    private fun tick(now: Long) {
         for ((proxyId, config) in activeProxies) {
 
-            // skip if already running (prevents overlap)
-            if (config.running) continue
-
-            // check duration for non-continuous mode
-            if (!config.continuous) {
-                val elapsed = now - config.startTime
-                if (elapsed >= durationMs) {
-                    activeProxies.remove(proxyId)
-                    continue
-                }
+            // skip if a previous ping coroutine is still running (prevents overlap).
+            if (config.running) {
+                Logger.vv(LOG_TAG_PROXY, "$TAG tick skipped for $proxyId: ping already in-flight")
+                continue
             }
 
+            val elapsed = now - config.startTime
+            val remaining = durationMs - elapsed
+
+            // enforce a minimum delay of intervalMs before the very first ping.
+            if (elapsed < intervalMs) {
+                Logger.vv(LOG_TAG_PROXY, "$TAG tick: $proxyId waiting for first ping; " +
+                        "starts in ~${(intervalMs - elapsed) / 1000}s")
+                continue
+            }
+
+            if (elapsed >= durationMs) {
+                Logger.vv(LOG_TAG_PROXY, "$TAG ping window expired for $proxyId, removing")
+                activeProxies.remove(proxyId)
+                continue
+            }
+
+            Logger.vv(LOG_TAG_PROXY, "$TAG tick for $proxyId: " +
+                    "elapsed=${elapsed / 1000}s, remaining=${remaining / 1000}s " +
+                    "(window=${durationMs / 1000}s, interval=${intervalMs / 1000}s)")
+
+            // set running to true before launching so that even if the coroutine is scheduled
+            // immediately, the next tick iteration already sees it as running
             config.running = true
 
             scope.launch(Dispatchers.IO + CoroutineName("ping-$proxyId")) {
                 try {
                     pingProxy(proxyId)
                 } catch (e: Exception) {
-                    Logger.w(LOG_TAG_PROXY, "ping failed: $proxyId err=${e.message}")
+                    Logger.w(LOG_TAG_PROXY, "$TAG ping failed: $proxyId err=${e.message}")
                 } finally {
                     activeProxies[proxyId]?.running = false
                 }
@@ -134,11 +156,16 @@ class WgProxyPingController(private val scope: CoroutineScope) {
                 VpnController.initiateWgPing(proxyId)
             }
 
+            // spl-case: for auto proxy send empty proxyId which will ping main proxy
+            proxyId == Backend.RpnWin -> {
+                VpnController.initiateRpnPing("")
+            }
+
             proxyId.startsWith(Backend.RpnWin) -> {
                 VpnController.initiateRpnPing(proxyId)
             }
         }
 
-        Logger.vv(LOG_TAG_PROXY, "ping triggered: $proxyId at ${System.currentTimeMillis()}")
+        Logger.vv(LOG_TAG_PROXY, "$TAG ping triggered: $proxyId at ${System.currentTimeMillis()}")
     }
 }

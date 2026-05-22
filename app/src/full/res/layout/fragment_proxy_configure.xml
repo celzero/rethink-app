@@ -10,8 +10,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_marginTop="10dp"
+        android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -25,6 +25,8 @@
             android:paddingTop="10dp"
             android:paddingEnd="10dp"
             android:paddingBottom="10dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
             android:text="@string/settings_lock_down_proxy_desc"
             android:textSize="@dimen/default_font_text_view"
             android:visibility="visible"
@@ -37,24 +39,25 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/rpn_title"
-                style="@style/TextAppearance.AppCompat.Subhead"
+                style="@style/TextAppearance.Material3.TitleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="55dp"
-                android:fontFamily="sans-serif-smallcaps"
-                android:lineSpacingExtra="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
                 android:padding="5dp"
                 android:text="@string/rpn_title"
-                android:textColor="?attr/accentGood"
-                android:textSize="@dimen/extra_large_font_text_view"
-                android:textStyle="bold" />
+                android:textColor="?attr/colorPrimary" />
 
         </RelativeLayout>
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:cardElevation="4dp"
+            android:layout_margin="4dp"
+            app:cardCornerRadius="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -76,9 +79,9 @@
                         android:layout_centerVertical="true"
                         android:layout_marginStart="5dp"
                         android:layout_marginTop="5dp"
-                        android:alpha="0.5"
                         android:layout_marginEnd="5dp"
                         android:layout_marginBottom="5dp"
+                        android:alpha="0.5"
                         android:padding="10dp"
                         android:src="@drawable/ic_rethink_plus_sparkle" />
 
@@ -134,18 +137,16 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/settings_wireguard_title"
-                style="@style/TextAppearance.AppCompat.Subhead"
+                style="@style/TextAppearance.Material3.TitleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="55dp"
-                android:fontFamily="sans-serif-smallcaps"
-                android:lineSpacingExtra="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
                 android:padding="5dp"
                 android:text="@string/lbl_wireguard"
-                android:textColor="?attr/accentGood"
-                android:textSize="@dimen/extra_large_font_text_view"
-                android:textStyle="bold" />
+                android:textColor="?attr/colorPrimary" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/wg_refresh"
@@ -163,7 +164,10 @@
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:cardElevation="4dp"
+            android:layout_margin="4dp"
+            app:cardCornerRadius="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -236,21 +240,22 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/orbot_title"
-            style="@style/TextAppearance.AppCompat.Subhead"
+            style="@style/TextAppearance.Material3.TitleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="55dp"
-            android:fontFamily="sans-serif-smallcaps"
-            android:lineSpacingExtra="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
             android:padding="5dp"
             android:text="@string/orbot"
-            android:textColor="?attr/accentGood"
-            android:textSize="@dimen/extra_large_font_text_view"
-            android:textStyle="bold" />
+            android:textColor="?attr/colorPrimary" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:cardElevation="4dp"
+            android:layout_margin="4dp"
+            app:cardCornerRadius="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -322,22 +327,23 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/other_title"
-            style="@style/TextAppearance.AppCompat.Subhead"
+            style="@style/TextAppearance.Material3.TitleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="55dp"
-            android:fontFamily="sans-serif-smallcaps"
-            android:lineSpacingExtra="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
             android:padding="5dp"
             android:text="@string/category_name_others"
-            android:textColor="?attr/accentGood"
-            android:textSize="@dimen/extra_large_font_text_view"
-            android:textStyle="bold" />
+            android:textColor="?attr/colorPrimary" />
 
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:cardElevation="4dp"
+            android:layout_margin="4dp"
+            app:cardCornerRadius="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -388,9 +394,9 @@
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
+                    <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/settings_activity_socks5_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -456,9 +462,9 @@
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
+                    <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/settings_activity_http_proxy_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"

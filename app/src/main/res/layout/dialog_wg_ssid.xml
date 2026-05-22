@@ -123,7 +123,7 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/ssidTextInputLayout"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1">
@@ -139,7 +139,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/addSsidBtn"
-                    style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                    style="@style/Widget.Material3.Button.TextButton.Dialog"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
@@ -157,7 +157,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/cancelBtn"
-                    style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                    style="@style/Widget.Material3.Button.TextButton.Dialog"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/lbl_cancel"
@@ -166,7 +166,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/saveBtn"
-                    style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                    style="@style/Widget.Material3.Button.TextButton.Dialog"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"

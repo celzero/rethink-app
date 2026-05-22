@@ -16,7 +16,9 @@ class SubscriptionCheckWorker(
     workerParams: WorkerParameters
 ) : CoroutineWorker(context, workerParams), KoinComponent {
 
+    @Suppress("UNUSED_PRIVATE_PROPERTY")
     private val persistentState by inject<PersistentState>()
+    @Suppress("UNUSED_PRIVATE_PROPERTY")
     private val attempts = 0
 
     companion object {
@@ -40,6 +42,7 @@ class SubscriptionCheckWorker(
         // implement check for stripe subscription
     }
 
+    @Suppress("unused")
     private fun reinitiate(attempt: Int = 0) {
         if (attempt > 3) {
             Logger.e(LOG_IAB, "$WORK_NAME; reinitiate failed after 3 attempts")

@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Standard M3 attributes for legacy support mapping -->
+    <attr name="colorOnSurface" format="reference" />
+    <attr name="colorOnSurfaceVariant" format="reference" />
+    <attr name="colorSurfaceVariant" format="reference" />
+    <attr name="colorSecondaryContainer" format="reference" />
+    <attr name="colorOnSecondaryContainer" format="reference" />
+    <attr name="colorTertiaryContainer" format="reference" />
+    <attr name="colorOnTertiaryContainer" format="reference" />
+    <attr name="colorErrorContainer" format="reference" />
+    <attr name="colorOnErrorContainer" format="reference" />
+    <attr name="colorSurfaceContainer" format="reference" />
+    <attr name="colorSurfaceContainerLow" format="reference" />
+    <attr name="colorSurfaceContainerHigh" format="reference" />
+    <attr name="colorSurfaceContainerHighest" format="reference" />
+    <attr name="colorSurfaceContainerLowest" format="reference" />
+    <attr name="colorOutline" format="reference" />
+    <attr name="divider" format="reference" />
     <attr name="primaryColor" format="reference" />
     <attr name="primaryDarkColor" format="reference" />
     <attr name="primaryColorAccent" format="reference" />

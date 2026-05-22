@@ -52,7 +52,6 @@ internal constructor(
 
     companion object {
         const val DNS_LEAK_TEST = "dnsleaktest"
-        const val ECH = "ech."
 
         // Some apps like firefox, instagram do not respect ttls
         // add a reasonable grace period to account for that
@@ -60,7 +59,6 @@ internal constructor(
         val DNS_TTL_GRACE_SEC = TimeUnit.MINUTES.toSeconds(5L)
         private const val RDATA_MAX_LENGTH = 100
         private const val EMPTY_RESPONSE = "--"
-        private const val START_RESPONSE = "START"
     }
 
     private val vpnStateMap = HashMap<Transaction.Status, BraveVPNService.State>()
@@ -120,6 +118,7 @@ internal constructor(
         transaction.dnssecOk = summary.`do`
         transaction.dnssecValid = summary.ad
         transaction.blockedTarget = summary.blockedTarget
+        transaction.isEch = summary.ech
         return transaction
     }
 
@@ -146,6 +145,7 @@ internal constructor(
         dnsLog.dnssecOk = transaction.dnssecOk
         dnsLog.dnssecValid = transaction.dnssecValid
         dnsLog.blockedTarget = transaction.blockedTarget
+        dnsLog.isEch = transaction.isEch
         val typeName = ResourceRecordTypes.getTypeName(transaction.type.toInt())
         if (typeName == ResourceRecordTypes.UNKNOWN) {
             dnsLog.typeName = transaction.type.toString()
@@ -285,7 +285,7 @@ internal constructor(
 
             VpnController.onConnectionStateChanged(BraveVPNService.State.WORKING)
             // only update the server name if it is not empty as its only used to show ech
-            VpnController.onServerNameUpdated(transaction.serverName)
+            VpnController.onEchUpdate(transaction.isEch)
         } else {
             val vpnState = vpnStateMap[transaction.status] ?: BraveVPNService.State.FAILING
             VpnController.onConnectionStateChanged(vpnState)

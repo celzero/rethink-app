@@ -22,6 +22,7 @@ import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.View
+import android.view.Window
 import android.view.WindowManager
 import androidx.annotation.ColorInt
 import androidx.annotation.RequiresApi
@@ -36,6 +37,7 @@ import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import java.util.WeakHashMap
 import java.util.function.Consumer
 
 /** Utility extension functions to configure Activity/Dialog/BottomSheet window appearance generically. */
@@ -55,13 +57,16 @@ fun AppCompatActivity.handleFrostEffectIfNeeded(themeId: Int) {
     if (isAtleastS()) {
         window.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
         setupWindowBlurListener(windowBackgroundDrawable)
+        // Apply the current system blur state immediately so the first draw is
+        // already correct (the attach-listener fires later and handles transitions).
         val enabled = windowManager.isCrossWindowBlurEnabled
         Logger.v(LOG_TAG_UI, "Blur enabled by system? $enabled")
+        updateWindowForBlurs(windowBackgroundDrawable, enabled)
     } else {
         Logger.v(LOG_TAG_UI, "Blurs not supported, below Android S")
-        updateWindowForBlurs(windowBackgroundDrawable, blursEnabled = false /* blursEnabled */)
+        updateWindowForBlurs(windowBackgroundDrawable, blursEnabled = false)
     }
-    window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+    // FLAG_DIM_BEHIND is managed inside updateWindowForBlurs, not set unconditionally here.
 }
 
 @RequiresApi(Build.VERSION_CODES.S)
@@ -86,20 +91,41 @@ private fun AppCompatActivity.setupWindowBlurListener(windowBackgroundDrawable: 
 
 private const val BACKGROUND_BLUR_RADIUS = 80
 private const val BLUR_BEHIND_RADIUS = 80
-private const val DIM_AMOUNT_WITH_BLUR = 0.7f
-private const val DIM_AMOUNT_NO_BLUR = 1f
-private const val WINDOW_BACKGROUND_ALPHA_WITH_BLUR = 55
-private const val WINDOW_BACKGROUND_ALPHA_NO_BLUR = 255
+// With blur: subtle dim so the frosted overlay (window background alpha) does the heavy
+// lifting. 0.7f was far too aggressive and drowned out the blur entirely.
+private const val DIM_AMOUNT_WITH_BLUR = 0.2f
+// Frost theme is only selectable on S+, so the no-blur path is a safeguard only.
+// No dim is applied; the nearly-opaque window background acts as the backdrop.
+private const val DIM_AMOUNT_NO_BLUR = 0.0f
+// ~31 % opacity of the dark surface colour — visible frosted tint without hiding the blur.
+// The previous value (55 / 255 ≈ 22 %) was also applied to a *transparent* colour, making
+// it a no-op. Now that window_background.xml uses ?attr/colorSurface (#121212), this value
+// actually produces a visible dark tint.
+private const val WINDOW_BACKGROUND_ALPHA_WITH_BLUR = 80
+// Nearly-opaque fallback when blur is unavailable (pre-S safety net).
+private const val WINDOW_BACKGROUND_ALPHA_NO_BLUR = 230
 
 private fun AppCompatActivity.updateWindowForBlurs(
     windowBackgroundDrawable: Drawable?,
     blursEnabled: Boolean,
 ) {
+    // Adjust the frosted-glass tint overlay: low opacity when the blur is doing its job,
+    // nearly-opaque as a solid fallback when blur is unavailable.
     windowBackgroundDrawable?.alpha =
         if (blursEnabled) WINDOW_BACKGROUND_ALPHA_WITH_BLUR
         else WINDOW_BACKGROUND_ALPHA_NO_BLUR
 
-    window.setDimAmount(if (blursEnabled) DIM_AMOUNT_WITH_BLUR else DIM_AMOUNT_NO_BLUR)
+    // Manage FLAG_DIM_BEHIND together with the dim amount so they are always in sync.
+    // A subtle compositor dim complements the frosted overlay; no dim is needed in the
+    // fallback path because the opaque window background handles separation.
+    if (blursEnabled) {
+        window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+        window.setDimAmount(DIM_AMOUNT_WITH_BLUR)
+    } else {
+        window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+        window.setDimAmount(DIM_AMOUNT_NO_BLUR)
+    }
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         // Set the window background blur and blur behind radii
         window.setBackgroundBlurRadius(BACKGROUND_BLUR_RADIUS)
@@ -144,15 +170,22 @@ fun BottomSheetDialogFragment?.useTransparentNoDimBackground(
     this?.dialog?.useTransparentNoDimBackground(color)
 }
 
-private var frostWasEnabled = false
+// Keyed by Window (one per Activity instance) so concurrent activities never
+// stomp each other's saved state. WeakHashMap prevents leaks when activities finish.
+private val frostStateByWindow = WeakHashMap<Window, Boolean>()
 
 fun AppCompatActivity.disableFrostTemporarily() {
-    frostWasEnabled = window.attributes.flags and WindowManager.LayoutParams.FLAG_BLUR_BEHIND != 0
+    val blurWasEnabled =
+        window.attributes.flags and WindowManager.LayoutParams.FLAG_BLUR_BEHIND != 0
+    // Persist per-window so that a second activity's call never overwrites this one's state.
+    frostStateByWindow[window] = blurWasEnabled
 
-    if (frostWasEnabled) {
+    if (blurWasEnabled) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             window.setBackgroundBlurRadius(0)
             window.attributes.blurBehindRadius = 0
+            // Commit the attribute change to WindowManager (was missing in the original).
+            window.attributes = window.attributes
         }
         window.clearFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
         window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
@@ -162,8 +195,8 @@ fun AppCompatActivity.disableFrostTemporarily() {
 }
 
 fun AppCompatActivity.restoreFrost(themeId: Int) {
-    if (!frostWasEnabled) return
-
+    if (frostStateByWindow[window] != true) return
+    frostStateByWindow.remove(window)
     handleFrostEffectIfNeeded(themeId)
 }
 

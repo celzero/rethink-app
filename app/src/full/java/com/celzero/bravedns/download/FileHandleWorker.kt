@@ -144,8 +144,8 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             // delete the residue files in the app data directory (local_blocklist)
             deleteBlocklistResidue(
                 context,
-                Constants.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                timestamp
+                LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                persistentState.localBlocklistTimestamp
             )
             Logger.i(LOG_TAG_DOWNLOAD, "FileHandleWorker, copyFiles success? $result")
             return true

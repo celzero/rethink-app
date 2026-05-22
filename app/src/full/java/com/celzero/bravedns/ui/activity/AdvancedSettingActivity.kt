@@ -64,11 +64,14 @@ class AdvancedSettingActivity : BaseActivity(R.layout.activity_advanced_setting)
             b.settingsPanicRandRl.visibility = View.VISIBLE
             b.dvPanicRandSwitch.isChecked = persistentState.panicRandom
             b.settingsResetTourRl.visibility = View.VISIBLE
+            b.dvPtModeSwitch.isChecked = persistentState.advSettingForcePTMode
+            b.settingsPtModeRl.visibility = View.VISIBLE
         } else {
             b.settingsExperimentalRl.visibility = View.GONE
             b.settingsAutoDialRl.visibility = View.GONE
             b.settingsPanicRandRl.visibility = View.GONE
             b.settingsResetTourRl.visibility = View.GONE
+            b.settingsPtModeRl.visibility = View.GONE
         }
     }
 
@@ -106,6 +109,14 @@ class AdvancedSettingActivity : BaseActivity(R.layout.activity_advanced_setting)
         b.settingsResetTourRl.setOnClickListener {
             GuidedTourManager.resetForDebug(persistentState)
             b.settingsResetTourDesc.text = getString(R.string.tour_debug_reset_done)
+        }
+
+        b.dvPtModeSwitch.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.advSettingForcePTMode = isChecked
+        }
+
+        b.settingsPtModeRl.setOnClickListener {
+            b.dvPtModeSwitch.isChecked = !b.dvPtModeSwitch.isChecked
         }
     }
 

@@ -52,7 +52,6 @@ import com.celzero.bravedns.util.Constants.Companion.RPN_PROXY_FOLDER_NAME
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.backend.Backend
-import com.celzero.firestack.backend.IPMetadata
 import com.celzero.firestack.backend.RpnServers
 import com.celzero.firestack.settings.Settings
 import kotlinx.coroutines.CoroutineScope
@@ -72,7 +71,6 @@ import org.koin.core.component.inject
 import java.io.File
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.CopyOnWriteArraySet
 
 object RpnProxyManager : KoinComponent {
     private val applicationContext: Context by inject()
@@ -93,7 +91,6 @@ object RpnProxyManager : KoinComponent {
     const val AUTO_SERVER_ID   = "AUTO"
     const val AUTO_COUNTRY_CODE = "AUTO"
 
-    private var winConfig: ByteArray? = null
     // In-memory cache for WIN servers (CountryConfig as unified model).
     private val winServersCache = mutableListOf<CountryConfig>()
     private val winCacheMutex = Mutex()
@@ -108,15 +105,8 @@ object RpnProxyManager : KoinComponent {
     )
     val serverRemovedEvent: SharedFlow<List<CountryConfig>> = _serverRemovedEvent.asSharedFlow()
 
-    private val rpnProxies = CopyOnWriteArraySet<RpnProxy>()
-
-    private val selectedKeys = CopyOnWriteArraySet<String>()
-
     data class ServerKeyMeta(
-        val selectedAt: Long,
-        val sinceTs: Long = 0L,
-        val ip4Meta: IPMetadata? = null,
-        val ip6Meta: IPMetadata? = null,
+        val selectedAt: Long
     )
 
     // Tracks per-server-key metadata (selection time, last tunnel-start ts, cached client IPs).
@@ -127,10 +117,10 @@ object RpnProxyManager : KoinComponent {
     private val subscriptionStateMachine: SubscriptionStateMachineV2 by inject()
     private val stateObserverJob = SupervisorJob()
     private val stateObserverScope = CoroutineScope(Dispatchers.IO + stateObserverJob)
-    private const val DEFAULT_DNS = "tls://p0.freedns.controld.com"
-    private const val AD_FILTER_DNS = "tls://p2.freedns.controld.com"
-    private const val PARENTAL_FILTER_DNS = "tls://family.freedns.controld.com"
-    private const val SECURITY_FILTER_DNS = "tls://p1.freedns.controld.com"
+    private const val CD_DEFAULT_DNS = "tls://p0.freedns.controld.com"
+    private const val CD_PRIVACY_DNS = "tls://p2.freedns.controld.com"
+    private const val CD_PARENTAL_FILTER_DNS = "tls://family.freedns.controld.com"
+    private const val CD_SECURITY_FILTER_DNS = "tls://p1.freedns.controld.com"
 
     init {
         io {
@@ -207,10 +197,10 @@ object RpnProxyManager : KoinComponent {
         // presets from go-tun, see below
         // SetDNSConfig sets the DNS filter preset configuration. v is a csv of filter presets:
         // "family", "security", "social", "privacy", "default".
-        DEFAULT(0,  DEFAULT_DNS, "default"),
-        ANTI_AD(1,  AD_FILTER_DNS, "privacy"),
-        PARENTAL(2, PARENTAL_FILTER_DNS, "family"),
-        SECURITY(3, SECURITY_FILTER_DNS, "security");
+        DEFAULT(0,  CD_DEFAULT_DNS, "default"),
+        PRIVACY(1,  CD_PRIVACY_DNS, "privacy"),
+        PARENTAL(2, CD_PARENTAL_FILTER_DNS, "family"),
+        SECURITY(3, CD_SECURITY_FILTER_DNS, "security");
 
         companion object {
             fun fromId(id: Int): DnsMode  = entries.firstOrNull { it.id == id }  ?: DEFAULT
@@ -348,6 +338,7 @@ object RpnProxyManager : KoinComponent {
             }
             purchase.payload.isNotEmpty() -> {
                 Logger.i(LOG_TAG_PROXY, "$TAG; activateRpn: using purchase.payload")
+                if (DEBUG) Logger.d(LOG_TAG_PROXY, "$TAG; activateRpn: purchase.payload content: ${purchase.payload}")
                 purchase.payload
             }
             else -> {
@@ -397,7 +388,6 @@ object RpnProxyManager : KoinComponent {
 
         try {
             persistentState.rpnState = RpnState.ENABLED.id
-            persistentState.showConfettiOnRPlus = true
             Logger.i(
                 LOG_TAG_PROXY,
                 "$TAG; activateRpn: rpn activated, mode: ${rpnMode()}, product: ${purchase.productId}"
@@ -603,15 +593,42 @@ object RpnProxyManager : KoinComponent {
         }
 
         val entitlementBytes = getWinEntitlement()
+        val prevRegistrationBytes = getWinExistingData()
         val registrationBytes = try {
             VpnController.registerAndFetchWinConfig(entitlementBytes, billingBackendClient.getDeviceId())
-                ?: VpnController.registerAndFetchWinConfig(null, billingBackendClient.getDeviceId())
+                ?: VpnController.registerAndFetchWinConfig(prevRegistrationBytes, billingBackendClient.getDeviceId())
         } catch (e: Exception) {
             Logger.e(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: tunnel registration failed: ${e.message}", e)
             return ResetResult.Failure("Failed to register with tunnel")
         }
         updateWinConfigState(registrationBytes)
         Logger.i(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: re-registered with tunnel")
+
+        // Clear all user-specific server state (selections, favourites, selection counts)
+        // before syncing so the rebuilt cache starts from a clean slate.
+        try {
+            countryConfigRepo.resetUserSelections()
+            // Mirror the DB reset into the in-memory cache immediately so nothing races
+            // between the DB write and the cache rebuild inside syncWinServers().
+            winCacheMutex.withLock {
+                winServersCache.forEach { server ->
+                    if (server.id != AUTO_SERVER_ID) {
+                        server.isEnabled = false
+                        server.isFavourite = false
+                    }
+                }
+            }
+            Logger.i(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: user selections cleared from DB and cache")
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: resetUserSelections failed (non-fatal): ${e.message}")
+        }
+
+        // Restore configuration persistent-state values to their defaults.
+        persistentState.rpnDnsTunTypes = DnsMode.DEFAULT.tunType
+        persistentState.rpnConfigHandlingManual = false
+        persistentState.rpnAlwaysChangeIdentity = false
+        persistentState.rpnPort = 0
+        Logger.i(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: persistent-state config restored to defaults")
 
         val (servers, _) = fetchAndConstructWinLocations()
 
@@ -727,6 +744,7 @@ object RpnProxyManager : KoinComponent {
             val ws = extractWsObject(payload)
             if (ws == null) {
                 Logger.e(LOG_TAG_PROXY, "$TAG; storeWinEntitlement: ws object not found in payload")
+                if (DEBUG) Logger.d(LOG_TAG_PROXY, "$TAG; storeWinEntitlement: payload content: $payload")
                 return
             }
 
@@ -752,7 +770,7 @@ object RpnProxyManager : KoinComponent {
 
             val file = File(folder, fileName)
             val res = try {
-                EncryptedFileManager.write(applicationContext, ws.toString(), file)
+                EncryptedFileManager.write(applicationContext, ws, file)
             } catch (e: Exception) {
                 Logger.e(LOG_TAG_PROXY, "$TAG; storeWinEntitlement: exception writing file: ${e.message}", e)
                 false
@@ -764,7 +782,6 @@ object RpnProxyManager : KoinComponent {
             }
 
             // update the winConfig with the file path
-            winConfig = ws.toString().toByteArray()
             val winProxy = try {
                 db.getProxyById(WIN_ID)
             } catch (e: Exception) {
@@ -843,7 +860,6 @@ object RpnProxyManager : KoinComponent {
     suspend fun load(): Int {
         // need to read the filepath from database and load the file
         // there will be an entry in the database for each RPN proxy
-        selectedKeys.clear()
         serverKeyMeta.clear()
         val rp = try {
             db.getAllProxies()
@@ -852,9 +868,6 @@ object RpnProxyManager : KoinComponent {
             emptyList()
         }
         Logger.i(LOG_TAG_PROXY, "$TAG; init load, db size: ${rp.size}")
-        // Clear before adding to avoid duplicates on reload
-        rpnProxies.clear()
-        rpnProxies.addAll(rp)
         rp.forEach {
             try {
                 if (it.configPath.isEmpty() && it.id != WIN_ID) {
@@ -899,13 +912,6 @@ object RpnProxyManager : KoinComponent {
                             byteArrayOf()
                         }
 
-                        winConfig = if (state.isEmpty()) {
-                            Logger.d(LOG_TAG_PROXY, "$TAG; win state file is empty (path: ${cfgFile.absolutePath}), using entitlement")
-                            entitlement
-                        } else {
-                            state
-                        }
-                        Logger.i(LOG_TAG_PROXY, "$TAG; win config loaded, size: ${winConfig?.size ?: 0}")
                     }
                 }
             } catch (e: Exception) {
@@ -924,33 +930,15 @@ object RpnProxyManager : KoinComponent {
                 winServersCache.addAll(dbServers)
             }
             val sk = dbServers.filter { it.isEnabled }.map { it.key }
-            selectedKeys.addAll(sk)
             // Seed timestamps from the DB record's lastModified (best available proxy for
             // "when was this server selected" after a cold start / reload).
             dbServers.filter { it.isEnabled }.forEach { serverKeyMeta[it.key] = ServerKeyMeta(selectedAt = it.lastModified) }
-            Logger.i(LOG_TAG_PROXY, "$TAG; load: cached ${dbServers.size}, selected: ${selectedKeys.size} WIN servers from DB (AUTO server ensured)")
+            Logger.i(LOG_TAG_PROXY, "$TAG; load: cached ${dbServers.size}, WIN servers from DB (AUTO server ensured)")
         } catch (e: Exception) {
             Logger.w(LOG_TAG_PROXY, "$TAG; load: failed to cache WIN servers: ${e.message}")
         }
 
         return rp.size
-    }
-
-    fun getProxy(type: RpnType): RpnProxy? {
-        return when (type) {
-            RpnType.WIN -> {
-                try {
-                    rpnProxies.find { it.name == WIN_NAME || it.name == WIN_NAME.lowercase() }
-                } catch (e: Exception) {
-                    Logger.e(LOG_TAG_PROXY, "$TAG; error getting WIN proxy: ${e.message}", e)
-                    null
-                }
-            }
-            else -> {
-                Logger.w(LOG_TAG_PROXY, "$TAG; unsupported proxy type: $type")
-                null
-            }
-        }
     }
 
     // This function is called from RpnProxiesUpdateWorker
@@ -1135,7 +1123,10 @@ object RpnProxyManager : KoinComponent {
         if (!file.exists()) return null
         return try {
             val bytes = EncryptedFileManager.readByteArray(applicationContext, file)
-            if (bytes.isNotEmpty()) bytes else null
+            if (bytes.isNotEmpty()) {
+                if (DEBUG) Logger.d(LOG_TAG_PROXY, "$TAG; getWinEntitlement: read entitlement bytes from file, bytes: $bytes, len: ${bytes.size}")
+                bytes
+            } else null
         } catch (e: EncryptionException) {
             // File is corrupted, encrypted with an invalidated key, or unreadable.
             // Return null so the caller falls back to fetching fresh entitlement from the API.
@@ -1201,6 +1192,92 @@ object RpnProxyManager : KoinComponent {
         }
         handleSubscriptionRevoked()
         return true
+    }
+
+    /**
+     * Called when a purchase revocation error from the server includes a [linkedToken]
+     * (the Google Play purchase token of an older, superseded purchase).
+     *
+     * This method:
+     * 1. Looks up [linkedToken] in the local DB.
+     * 2. Issues a `/g/ack` query for [linkedToken].
+     * 3. If the server confirms the linked purchase is valid, reactivates it by driving
+     *    [paymentSuccessful] in the state machine and re-enabling RPN access.
+     *
+     * The caller's original purchase remains unchanged regardless of the outcome; this
+     * operation only acts on the linked purchase row.
+     *
+     * @return `true` if the linked purchase was found and successfully reactivated.
+     */
+    suspend fun tryReactivateLinkedPurchase(
+        accountId: String,
+        deviceId: String,
+        linkedToken: String,
+    ): Boolean {
+        val mname = "tryReactivateLinkedPurchase"
+        if (linkedToken.isBlank() || accountId.isBlank()) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; $mname: blank accountId or linkedToken, skipping")
+            return false
+        }
+
+        // 1. Look up the linked purchase token in the local DB.
+        val linkedSub = try {
+            subscriptionStatusRepository.getByPurchaseToken(linkedToken)
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG; $mname: DB lookup failed for linkedToken=${linkedToken.take(8)}: ${e.message}", e)
+            return false
+        }
+
+        if (linkedSub == null) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; $mname: linkedToken=${linkedToken.take(8)} not found in DB, cannot reactivate")
+            return false
+        }
+
+        // 2. Build a PurchaseDetail from the DB row and query /g/ack for the linked token.
+        val linkedPurchaseDetail = subscriptionStateMachine.createPurchaseDetailFromSubscription(linkedSub)
+        val result = try {
+            billingBackendClient.queryEntitlement(accountId, deviceId, linkedPurchaseDetail, linkedToken)
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG; $mname: entitlement query failed for linkedToken=${linkedToken.take(8)}: ${e.message}", e)
+            return false
+        }
+
+        // 3. If the server confirms the linked purchase, reactivate it.
+        return when (result) {
+            is com.celzero.bravedns.iab.QueryEntitlementResult.Success -> {
+                val updatedPurchase = result.purchase
+                Logger.i(LOG_TAG_PROXY, "$TAG; $mname: linkedToken=${linkedToken.take(8)} confirmed valid by server; reactivating")
+                try {
+                    subscriptionStateMachine.paymentSuccessful(updatedPurchase)
+                    activateRpn(updatedPurchase)
+                    Logger.i(LOG_TAG_PROXY, "$TAG; $mname: reactivation complete for linkedToken=${linkedToken.take(8)}, product=${updatedPurchase.productId}")
+                    true
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_PROXY, "$TAG; $mname: reactivation state update failed for linkedToken=${linkedToken.take(8)}: ${e.message}", e)
+                    false
+                }
+            }
+            is com.celzero.bravedns.iab.QueryEntitlementResult.Failure -> {
+                Logger.w(LOG_TAG_PROXY, "$TAG; $mname: linkedToken=${linkedToken.take(8)} also invalid per server (no linkedPurchaseId in response)")
+                false
+            }
+            is com.celzero.bravedns.iab.QueryEntitlementResult.Transient -> {
+                Logger.w(LOG_TAG_PROXY, "$TAG; $mname: transient failure querying linkedToken=${linkedToken.take(8)}, not reactivating (fail-safe)")
+                false
+            }
+            is com.celzero.bravedns.iab.QueryEntitlementResult.Unauthorized -> {
+                Logger.e(LOG_TAG_PROXY, "$TAG; $mname: 401 unauthorized for linkedToken=${linkedToken.take(8)}")
+                false
+            }
+            is com.celzero.bravedns.iab.QueryEntitlementResult.Conflict -> {
+                Logger.w(LOG_TAG_PROXY, "$TAG; $mname: 409 conflict for linkedToken=${linkedToken.take(8)}")
+                false
+            }
+            else -> {
+                Logger.w(LOG_TAG_PROXY, "$TAG; $mname: unhandled result type for linkedToken=${linkedToken.take(8)}")
+                false
+            }
+        }
     }
 
     /**
@@ -1337,6 +1414,11 @@ object RpnProxyManager : KoinComponent {
         return try {
             val ws = extractWsObject(payload) ?: return false
             val ent = VpnController.getEntitlementDetails(ws, billingBackendClient.getDeviceId())
+            Logger.i(LOG_TAG_PROXY, "$TAG; isPayloadUsable: extracted entitlement from payload, checking session token usability")
+            if (DEBUG) {
+                Logger.d(LOG_TAG_PROXY, "$TAG; isPayloadUsable: payload ws block: $ws")
+                Logger.d(LOG_TAG_PROXY, "$TAG; isPayloadUsable: entitlement details: ${ent?.expiry()}, ${ent?.token()}, ${ent?.status()}, cidLen=${ent?.cid()?.length}, didLen=${ent?.did()?.length}, ${ent?.test()}, ${ent?.json()}")
+            }
             val sessionToken = ent?.token() ?: ""
             val isUsable = sessionToken.isNotEmpty()
             if (!isUsable) Logger.d(LOG_TAG_PROXY, "$TAG; isPayloadUsable: ws found but sessiontoken is empty")
@@ -1454,8 +1536,59 @@ object RpnProxyManager : KoinComponent {
         }
     }
 
-    suspend fun getSelectedCCs(): Set<String> {
-        return selectedKeys
+    suspend fun setHopForWinServer(key: String, enabled: Boolean) {
+        if (key.isEmpty()) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; setHopForWinServer: key is empty")
+            return
+        }
+
+        val config = winCacheMutex.withLock {
+            winServersCache.find { it.key == key }
+        }
+
+        if (config == null) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; setHopForWinServer: server with key $key not found")
+            return
+        }
+
+        val oldValue = config.hopEnabled
+        config.hopEnabled = enabled
+        winCacheMutex.withLock {
+            winServersCache.filter { w -> w.key == key }.forEach { w ->
+                w.hopEnabled = enabled
+            }
+        }
+
+        try {
+            countryConfigRepo.update(config)
+            Logger.i(LOG_TAG_PROXY, "$TAG; setHopForWinServer: set hopEnabled=$enabled for server: $key")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG; setHopForWinServer: failed to update DB for $key: ${e.message}", e)
+            // Revert on DB failure
+            config.hopEnabled = oldValue
+            winCacheMutex.withLock {
+                winServersCache.filter { w -> w.key == key }.forEach { w ->
+                    w.hopEnabled = oldValue
+                }
+            }
+        }
+
+        try {
+            val res = VpnController.handleRpnHop(config.key, oldValue != enabled)
+            if (res.first) {
+                Logger.i(LOG_TAG_PROXY, "$TAG; setHopForWinServer: tunnel updated hop for server $key successfully")
+            } else {
+                Logger.w(LOG_TAG_PROXY, "$TAG; setHopForWinServer: tunnel failed to update hop for server $key, ${if (res.second != null) "error: ${res.second}" else "no error message"}")
+            }
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG; setHopForWinServer: error updating tunnel for $key: ${e.message}", e)
+        }
+    }
+
+    suspend fun getSelectedCCs(): Set<CountryConfig> {
+        winCacheMutex.withLock {
+            return winServersCache.filter { it.isEnabled }.toSet()
+        }
     }
 
     /**
@@ -1466,23 +1599,6 @@ object RpnProxyManager : KoinComponent {
      */
     fun getSelectedSinceTs(key: String): Long {
         return serverKeyMeta[key]?.selectedAt ?: 0L
-    }
-
-    fun getCachedSinceTs(key: String): Long = serverKeyMeta[key]?.sinceTs ?: 0L
-
-    /**
-     * Returns the cached (IPv4 metadata, IPv6 metadata) pair for [key], or `null` if the
-     * client IPs have not been resolved yet for this server.
-     */
-    fun getCachedIpMeta(key: String): Pair<IPMetadata?, IPMetadata?>? {
-        val meta = serverKeyMeta[key] ?: return null
-        return Pair(meta.ip4Meta, meta.ip6Meta)
-    }
-
-    fun updateIpMeta(key: String, sinceTs: Long, ip4Meta: IPMetadata?, ip6Meta: IPMetadata?) {
-        val existing = serverKeyMeta[key]
-        serverKeyMeta[key] = existing?.copy(sinceTs = sinceTs, ip4Meta = ip4Meta, ip6Meta = ip6Meta)
-            ?: ServerKeyMeta(selectedAt = 0L, sinceTs = sinceTs, ip4Meta = ip4Meta, ip6Meta = ip6Meta)
     }
 
     suspend fun getEnabledConfigs(): Set<CountryConfig> {
@@ -1638,7 +1754,7 @@ object RpnProxyManager : KoinComponent {
         stateObserverScope.launch { f() }
     }
 
-    private fun getConfigFileName(id: Int): String {
+    private fun getConfigFileName(id: Int,): String {
         return when (id) {
             WIN_ID -> WIN_STATE_FILE_NAME
             else -> ""
@@ -1653,7 +1769,6 @@ object RpnProxyManager : KoinComponent {
     }
 
     suspend fun getWinExistingData(): ByteArray? {
-        winConfig?.let { if (it.isNotEmpty()) return it }
         val proxy = db.getProxyById(WIN_ID) ?: return null
         val cfg = proxy.configPath
         if (cfg.isEmpty()) return null
@@ -1749,10 +1864,9 @@ object RpnProxyManager : KoinComponent {
             }
 
             if (updateResult) {
-                winConfig = byteArray
                 Logger.i(LOG_TAG_PROXY, "$TAG; updateWinConfigState: successfully updated config, size: ${byteArray.size}")
             } else {
-                Logger.w(LOG_TAG_PROXY, "$TAG; updateWinConfigState: file written but DB update failed")
+                Logger.w(LOG_TAG_PROXY, "$TAG; updateWinConfigState: file written, DB update failed")
             }
 
             updateResult
@@ -1779,7 +1893,6 @@ object RpnProxyManager : KoinComponent {
 
          val winProps = winPropsResult.first
          if (winProps == null) {
-             registerProxy(RpnType.WIN)
              Logger.w(LOG_TAG_PROXY, "$TAG; err; win props is null")
              return Pair(emptySet(), emptyList())
          }
@@ -1854,10 +1967,12 @@ object RpnProxyManager : KoinComponent {
          // Check if any removed servers were in the selected list
          val removedSelectedIds = mutableListOf<String>()
          if (removedIds.isNotEmpty()) {
+             // Snapshot the cached country codes under the lock to avoid a bare read.
+             val cachedCcs = winCacheMutex.withLock { winServersCache.map { it.cc }.toSet() }
              val countryCodesToRemove = mutableSetOf<String>()
              for (removedId in removedIds) {
                  val removed = existingServers.firstOrNull { it.id == removedId }
-                 if (removed != null && selectedKeys.contains(removed.cc)) {
+                 if (removed != null && cachedCcs.contains(removed.cc)) {
                      removedSelectedIds.add(removedId)
                      // Collect country codes to remove
                      countryCodesToRemove.add(removed.cc)
@@ -1866,11 +1981,7 @@ object RpnProxyManager : KoinComponent {
              }
              // Remove all at once to avoid ConcurrentModificationException
              if (countryCodesToRemove.isNotEmpty()) {
-                 // Use a safer approach - create a new set without the removed items
-                 val updatedCountries = selectedKeys.filter { !countryCodesToRemove.contains(it) }.toSet()
-                 selectedKeys.clear()
-                 selectedKeys.addAll(updatedCountries)
-                  countryCodesToRemove.forEach { serverKeyMeta.remove(it) }
+                 countryCodesToRemove.forEach { serverKeyMeta.remove(it) }
                  Logger.i(LOG_TAG_PROXY, "$TAG; removed ${countryCodesToRemove.size} country codes from selected list")
              }
          }
@@ -1919,6 +2030,8 @@ object RpnProxyManager : KoinComponent {
             config.isEnabled = true
             try {
                 countryConfigRepo.update(config)
+                // Record the selection for frequent-country tracking and refresh chips.
+                countryConfigRepo.incrementSelectionCount(config.key)
                 val now = System.currentTimeMillis()
                 val existing = serverKeyMeta[key]
                 serverKeyMeta[key] = existing?.copy(selectedAt = now)
@@ -2417,10 +2530,8 @@ object RpnProxyManager : KoinComponent {
         cac.forEach {
             try {
                 val configId = Backend.RpnWin + it.key
-                if ((checkEligibilityBasedOnNw(
-                        it.id,
-                        usesMobileNw
-                    ) || checkEligibilityBasedOnSsid(it.id, ssid)) &&
+                if ((checkEligibilityBasedOnNw(it.id, usesMobileNw) &&
+                            checkEligibilityBasedOnSsid(it.id, ssid)) &&
                     !proxyIds.contains(configId)
                 ) {
                     val key = if (it.id == AUTO_SERVER_ID) {
@@ -2708,7 +2819,7 @@ object RpnProxyManager : KoinComponent {
             return
         }
 
-        val config = synchronized(winServersCache) {
+        val config = winCacheMutex.withLock {
             winServersCache.find { it.key == key }
         }
 
@@ -2721,9 +2832,9 @@ object RpnProxyManager : KoinComponent {
 
         try {
             countryConfigRepo.updateSsidBased(key, ssidBased)
-            
+
             // Update cache
-            synchronized(winServersCache) {
+            winCacheMutex.withLock {
                 val cachedConfig = winServersCache.find { it.key == key }
                 if (cachedConfig != null) {
                     winServersCache.remove(cachedConfig)
@@ -2732,11 +2843,12 @@ object RpnProxyManager : KoinComponent {
                     Logger.w(LOG_TAG_PROXY, "$TAG; updateSsidBased: config disappeared from cache for key: $key")
                 }
             }
-            
+
             Logger.i(LOG_TAG_PROXY, "$TAG; updateSsidBased: $key = $ssidBased")
-            
+
             // Trigger connection monitor to update SSID info if country is selected
-            if (selectedKeys.contains(key)) {
+            val keyExists = winCacheMutex.withLock { winServersCache.any { it.key == key } }
+            if (keyExists) {
                 try {
                     if (ssidBased) {
                         VpnController.notifyConnectionMonitor(enforcePolicyChange = true)
@@ -2751,7 +2863,7 @@ object RpnProxyManager : KoinComponent {
         } catch (e: Exception) {
             Logger.e(LOG_TAG_PROXY, "$TAG; error updating SSID based for $key: ${e.message}", e)
             // Revert cache on DB failure
-            synchronized(winServersCache) {
+            winCacheMutex.withLock {
                 val cachedConfig = winServersCache.find { it.key == key }
                 if (cachedConfig != null) {
                     winServersCache.remove(cachedConfig)
@@ -2772,7 +2884,7 @@ object RpnProxyManager : KoinComponent {
             return
         }
 
-        val config = synchronized(winServersCache) {
+        val config = winCacheMutex.withLock {
             winServersCache.find { it.key == key }
         }
 
@@ -2785,9 +2897,9 @@ object RpnProxyManager : KoinComponent {
 
         try {
             countryConfigRepo.updateSsids(key, ssids)
-            
+
             // Update cache
-            synchronized(winServersCache) {
+            winCacheMutex.withLock {
                 val cachedConfig = winServersCache.find { it.key == key }
                 if (cachedConfig != null) {
                     winServersCache.remove(cachedConfig)
@@ -2796,28 +2908,28 @@ object RpnProxyManager : KoinComponent {
                     Logger.w(LOG_TAG_PROXY, "$TAG; updateSsids: config disappeared from cache for key: $key")
                 }
             }
-            
+
             Logger.i(LOG_TAG_PROXY, "$TAG; updateSsids: $key, ssids length=${ssids.length}")
-            
-            // If country is selected and SSID based enabled, refresh proxies
-            if (selectedKeys.contains(key)) {
-                val updatedConfig = synchronized(winServersCache) {
-                    winServersCache.find { it.key == key }
-                }
-                if (updatedConfig?.ssidBased == true) {
-                    try {
-                        VpnController.notifyConnectionMonitor(enforcePolicyChange = true)
-                        VpnController.refreshOrPauseOrResumeOrReAddProxies()
-                    } catch (e: Exception) {
-                        Logger.e(LOG_TAG_PROXY, "$TAG; updateSsids: failed to refresh proxies: ${e.message}", e)
-                        // Don't revert DB change if only the VPN controller refresh failed
-                    }
+
+            // If country is selected and SSID based enabled, refresh proxies.
+            // Read both pieces of state in one lock to avoid a bare read.
+            val (keyExists, isSsidBased) = winCacheMutex.withLock {
+                val c = winServersCache.find { it.key == key }
+                Pair(c != null, c?.ssidBased == true)
+            }
+            if (keyExists && isSsidBased) {
+                try {
+                    VpnController.notifyConnectionMonitor(enforcePolicyChange = true)
+                    VpnController.refreshOrPauseOrResumeOrReAddProxies()
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_PROXY, "$TAG; updateSsids: failed to refresh proxies: ${e.message}", e)
+                    // Don't revert DB change if only the VPN controller refresh failed
                 }
             }
         } catch (e: Exception) {
             Logger.e(LOG_TAG_PROXY, "$TAG; error updating SSIDs for $key: ${e.message}", e)
             // Revert cache on DB failure
-            synchronized(winServersCache) {
+            winCacheMutex.withLock {
                 val cachedConfig = winServersCache.find { it.key == key }
                 if (cachedConfig != null) {
                     winServersCache.remove(cachedConfig)
@@ -2829,7 +2941,7 @@ object RpnProxyManager : KoinComponent {
 
     suspend fun getCountryConfigByKey(key: String): CountryConfig? {
         return try {
-            synchronized(winServersCache) {
+            winCacheMutex.withLock {
                 winServersCache.find { it.key == key }
             }
         } catch (e: Exception) {
@@ -2857,13 +2969,14 @@ object RpnProxyManager : KoinComponent {
 
         if (!isRpnActive()) return sb.toString()
 
-        winServersCache.filter { it.isEnabled }.forEach {
+        val enabledServers = winCacheMutex.withLock { winServersCache.filter { it.isEnabled } }
+        enabledServers.forEach {
             val id = if (it.key.equals(AUTO_SERVER_ID, true)) {
-                VpnController.getWinProxyId() ?: (Backend.RpnWin + "**")
+                Backend.RpnWin
             } else {
-                Backend.RpnWin + it.key
+                it.key
             }
-            val stats = VpnController.getWireGuardStats(id)
+            val stats = VpnController.getRpnStats(id)
             val routerStats = stats?.routerStats
             sb.append("   id: ${it.id}, name: ${it.name}\n")
             sb.append("   addr: ${routerStats?.addrs}").append("\n")
@@ -2884,7 +2997,11 @@ object RpnProxyManager : KoinComponent {
             sb.append("   since: ${getRelativeTimeSpan(routerStats?.since)}\n")
             sb.append("   errRx: ${routerStats?.errRx}\n")
             sb.append("   errTx: ${routerStats?.errTx}\n")
-            sb.append("   extra: ${routerStats?.extra}\n\n")
+            sb.append("   extra: ${routerStats?.extra}\n")
+            sb.append("   client4: ${stats?.clientV4}\n")
+            sb.append("   client6: ${stats?.clientV6}\n\n")
+            val s = sb.toString()
+            Logger.d(LOG_TAG_PROXY, "$TAG; id: $id stats:\n$s")
         }
         if (sb.isEmpty()) {
             sb.append("   N/A\n\n")
