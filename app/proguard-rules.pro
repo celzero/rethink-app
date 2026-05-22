@@ -61,7 +61,6 @@
 -keep class com.google.common.cache.LocalCache$LocalManualCache { *; }
 -keep class com.google.common.cache.LocalCache$LocalLoadingCache { *; }
 -keep class com.google.common.base.Preconditions { *; }
--dontwarn com.google.common.**
 
 # Keep Gson classes and attributes for JSON serialization/deserialization
 # FileTag class uses Gson with custom deserializer (FileTagDeserializer) to handle
