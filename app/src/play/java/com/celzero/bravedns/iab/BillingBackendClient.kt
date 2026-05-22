@@ -351,7 +351,7 @@ class BillingBackendClient(
             // Pass null for did when blank so Retrofit omits the header, letting the server
             // assign a fresh DID.  accountId is always required and sent as a non-null header.
             val didHeader = existingDeviceId.takeIf { it.isNotBlank() }
-            Logger.v(LOG_IAB, "$TAG $mname [${env.label}]: calling /d/reg, cidLen=${accountId.length}, didHeader=${if (didHeader != null) "present(len=${didHeader.length})" else "absent"}"            )
+            Logger.v(LOG_IAB, "$TAG $mname [${env.label}]: calling /d/reg, cidLen=${accountId.length}, didHeader=${if (didHeader != null) "present(len=${didHeader.length})" else "absent"}")
             val response = if (persistentState.appTestMode) {
                 buildTestApi().registerDevice(accountId, didHeader, test = "", meta = meta)
             } else {
@@ -678,7 +678,7 @@ class BillingBackendClient(
 
         // Back-off delays in ms.  The first attempt is immediate (no leading delay).
         // After attempt N fails transiently, wait ACK_RETRY_DELAYS[N] before attempt N+1.
-        // When all delays are exhausted the loop exits and we return the last failure.
+        // When all delays are exhausted the loop exits, and we return the last failure.
         val delaysMs = ACK_RETRY_DELAYS
         val maxAttempts = delaysMs.size + 1   // 3: one immediate + one per delay
 
@@ -703,37 +703,38 @@ class BillingBackendClient(
 
                 val httpCode = response.code()
                 val url = response.raw().request.url.toString()
-                Logger.d(LOG_IAB, "$TAG $caller [${handle.envLabel}]: attempt ${attemptIndex + 1} for url: $url, code: $httpCode, err: ${response.errorBody()?.string()}")
+                val errorBody = response.errorBody()?.string()
+                Logger.d(LOG_IAB, "$TAG $caller [${handle.envLabel}]: attempt ${attemptIndex + 1} for url: $url, code: $httpCode, err: $errorBody")
 
                 if (httpCode == 401) {
-                    Logger.e(LOG_IAB, "$TAG $caller [${handle.envLabel}]: 401 unauthorized, not retrying; ${response.errorBody()?.string()}")
+                    Logger.e(LOG_IAB, "$TAG $caller [${handle.envLabel}]: 401 unauthorized, not retrying; $errorBody")
                     return Pair(false, "Unauthorized: 401")
                 }
 
                 if (httpCode == 409) {
-                    Logger.w(LOG_IAB, "$TAG $caller [${handle.envLabel}]: 409 conflict, not retrying; ${response.errorBody()?.string()}")
+                    Logger.w(LOG_IAB, "$TAG $caller [${handle.envLabel}]: 409 conflict, not retrying; $errorBody")
                     return Pair(false, "Conflict: 409")
                 }
 
                 if (httpCode == 429) {
-                    Logger.w(LOG_IAB, "$TAG $caller [${handle.envLabel}]: 429 too many req, retrying with timeout ${response.errorBody()?.string()}")
+                    Logger.w(LOG_IAB, "$TAG $caller [${handle.envLabel}]: 429 too many req, retrying with timeout $errorBody")
                     continue
                 }
 
                 if (httpCode in 400..499) {
-                    Logger.e(LOG_IAB, "$TAG $caller [${handle.envLabel}]: permanent client error $httpCode not retrying; ${response.errorBody()?.string()}")
+                    Logger.e(LOG_IAB, "$TAG $caller [${handle.envLabel}]: permanent client error $httpCode not retrying; $errorBody")
                     return Pair(false, "Client error: $httpCode")
                 }
 
                 if (httpCode >= 500) {
                     lastFailureMsg = "Server error: $httpCode"
-                    Logger.w(LOG_IAB, "$TAG $caller [${handle.envLabel}]: attempt ${attemptIndex + 1} server error $httpCode, will retry; ${response.errorBody()?.string()}")
+                    Logger.w(LOG_IAB, "$TAG $caller [${handle.envLabel}]: attempt ${attemptIndex + 1} server error $httpCode, will retry; $errorBody")
                     continue
                 }
 
                 val bodyStr = response.body()?.toString()
                 val rawForParsing = bodyStr?.takeIf { it.isNotBlank() }
-                    ?: response.errorBody()?.string()
+                    ?: errorBody
                 if (DEBUG) Logger.d(LOG_IAB, "$TAG $caller [${handle.envLabel}]: body=$rawForParsing")
 
                 return when (val result = RpnPurchaseAckServerResponse.from(rawForParsing, httpCode)) {

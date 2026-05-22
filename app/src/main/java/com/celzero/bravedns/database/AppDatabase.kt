@@ -105,7 +105,6 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_27_28)
                 .addMigrations(MIGRATION_28_29)
                 .addMigrations(MIGRATION_29_30)
-                .addMigrations(MIGRATION_30_31)
                 .build()
 
         private val roomCallback: Callback =
@@ -1219,17 +1218,6 @@ abstract class AppDatabase : RoomDatabase() {
                         db.execSQL(
                             "ALTER TABLE CountryConfig ADD COLUMN selectionCount INTEGER NOT NULL DEFAULT 0"
                         )
-                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_29_30: added selectionCount to CountryConfig")
-                    } catch (e: Exception) {
-                        Logger.e(LOG_TAG_APP_DB, "MIGRATION_29_30: selectionCount already exists, ignore", e)
-                    }
-                }
-            }
-
-        private val MIGRATION_30_31: Migration =
-            object : Migration(30, 31) {
-                override fun migrate(db: SupportSQLiteDatabase) {
-                    try {
                         db.execSQL(
                             "ALTER TABLE CountryConfig ADD COLUMN isFavourite INTEGER NOT NULL DEFAULT 0"
                         )
@@ -1239,9 +1227,9 @@ abstract class AppDatabase : RoomDatabase() {
                         db.execSQL(
                             "ALTER TABLE CountryConfig ADD COLUMN hopEnabled INTEGER NOT NULL DEFAULT 0"
                         )
-                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_30_31: added isFavourite to CountryConfig")
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_29_30: added selectionCount, isFavourite, hopEnabled to CountryConfig")
                     } catch (e: Exception) {
-                        Logger.e(LOG_TAG_APP_DB, "MIGRATION_30_31: isFavourite already exists, ignore", e)
+                        Logger.e(LOG_TAG_APP_DB, "MIGRATION_29_30: columns already exist, ignore", e)
                     }
                 }
             }
