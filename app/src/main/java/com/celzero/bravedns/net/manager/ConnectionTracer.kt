@@ -16,7 +16,6 @@ import inet.ipaddr.IPAddressString
 import java.net.InetSocketAddress
 import java.net.SocketException
 import java.time.Duration
-import java.util.concurrent.TimeUnit
 
 class ConnectionTracer(ctx: Context) {
 
@@ -29,8 +28,8 @@ class ConnectionTracer(ctx: Context) {
     }
 
     private val cm: ConnectivityManager = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    // Cache the UID for the next 60 seconds.
-    // the UID will expire after 60 seconds of to write.
+    // Cache the UID for the next 300 seconds.
+    // the UID will expire after 300 seconds of to write.
     // Key for the cache is protocol, local, remote
     private val uidCache: Cache<String, Int> = CacheBuilder.newBuilder()
         .maximumSize(CACHE_BUILDER_MAX_SIZE)
