@@ -351,7 +351,7 @@ class BillingBackendClient(
             // Pass null for did when blank so Retrofit omits the header, letting the server
             // assign a fresh DID.  accountId is always required and sent as a non-null header.
             val didHeader = existingDeviceId.takeIf { it.isNotBlank() }
-            Logger.v(LOG_IAB, "$TAG $mname [${env.label}]: calling /d/reg, cidLen=${accountId.length}, didHeader=${if (didHeader != null) "present(len=${didHeader.length})" else "absent"}"            )
+            Logger.v(LOG_IAB, "$TAG $mname [${env.label}]: calling /d/reg, cidLen=${accountId.length}, didHeader=${if (didHeader != null) "present(len=${didHeader.length})" else "absent"}")
             val response = if (persistentState.appTestMode) {
                 buildTestApi().registerDevice(accountId, didHeader, test = "", meta = meta)
             } else {
