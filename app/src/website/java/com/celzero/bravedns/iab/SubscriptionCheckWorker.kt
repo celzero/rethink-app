@@ -134,14 +134,14 @@ class SubscriptionCheckWorker(
                 dispatchDeviceRegistration(storedAccountId, freshDeviceId, purchase)
                 return
             } else {
-                Logger.d(LOG_IAB, "$TAG; $name: stored did=${storedDeviceId.take(4)}(len=${storedDeviceId.length}), stored cid=${storedAccountId.take(8)}(len=${storedAccountId.length})")
+                Logger.d(LOG_IAB, "$TAG; $name: stored did=${storedDeviceId.take(4)}, stored cid=${storedAccountId.take(8)}")
             }
 
             if (!isStale) {
                 Logger.d(LOG_IAB, "$TAG; $name: device already registered within window, skipping")
                 return
             }
-            Logger.i(LOG_IAB, "$TAG; $name: register device with cid: ${storedAccountId.take(8)}(len=${storedAccountId.length}), did: ${storedDeviceId.take(4)}(len=${storedDeviceId.length})")
+            Logger.i(LOG_IAB, "$TAG; $name: register device with cid: ${storedAccountId.take(8)}, did: ${storedDeviceId.take(4)}")
             dispatchDeviceRegistration(storedAccountId, storedDeviceId, purchase)
 
         } catch (e: Exception) {
@@ -402,6 +402,21 @@ class SubscriptionCheckWorker(
                     is QueryEntitlementResult.Failure -> {
                         Logger.w(LOG_IAB, "$TAG; $mname: server business error on entitlement query " +
                             "for token=${purchase.purchaseToken.take(8)}; skipping expiry resolution (local billing expiry is authority)")
+                        // If the server included a linkedPurchaseId, the revoked purchase may have been
+                        // superseded by an older one that is still valid. Attempt to reactivate it so
+                        // the user is not left in a broken state.
+                        val linked = result.linkedPurchaseId
+                        if (!linked.isNullOrBlank()) {
+                            Logger.i(LOG_IAB, "$TAG; $mname: linkedPurchaseId present for " +
+                                "token=${purchase.purchaseToken.take(8)}; attempting reactivation of " +
+                                "linkedToken=${linked.take(8)}")
+                            try {
+                                RpnProxyManager.tryReactivateLinkedPurchase(accountId, deviceId, linked)
+                            } catch (e: Exception) {
+                                Logger.e(LOG_IAB, "$TAG; $mname: tryReactivateLinkedPurchase threw for " +
+                                    "linkedToken=${linked.take(8)}: ${e.message}", e)
+                            }
+                        }
                     }
                     is QueryEntitlementResult.Expired -> {
                         // Server has authoritatively confirmed the subscription is expired.

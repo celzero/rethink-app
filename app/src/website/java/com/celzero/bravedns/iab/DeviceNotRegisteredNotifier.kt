@@ -43,16 +43,17 @@ import com.celzero.bravedns.util.Utilities
  * to [ManagePurchaseFragment].
  *
  * ### Channel
- * Reuses [NOTIF_CHANNEL_ID_FIREWALL_ALERTS], no new channel needed.
+ * Uses [NOTIF_CHANNEL_ID_RPN_ALERTS]
  */
 object DeviceNotRegisteredNotifier {
 
     private const val TAG = "DeviceNotRegisteredNotifier"
 
     // intent used by NotificationHandlerActivity to rebuild the error.
-    const val EXTRA_ENTITLEMENT_CID  = "dnr_entitlement_cid"
-    const val EXTRA_STORED_CID       = "dnr_stored_cid"
+    const val EXTRA_ENTITLEMENT_CID = "dnr_entitlement_cid"
+    const val EXTRA_STORED_CID = "dnr_stored_cid"
     const val EXTRA_DEVICE_ID_PREFIX = "dnr_device_id_prefix"
+    const val NOTIF_CHANNEL_ID_RPN_ALERTS = "RPN_Alerts"
 
     /**
      * Post (or update) the device-not-registered notification.
@@ -90,7 +91,7 @@ object DeviceNotRegisteredNotifier {
                 val channelName = context.getString(R.string.notif_channel_firewall_alerts)
                 val channelDesc = context.getString(R.string.notif_channel_desc_firewall_alerts)
                 val channel = NotificationChannel(
-                    NOTIF_CHANNEL_ID_FIREWALL_ALERTS,
+                    NOTIF_CHANNEL_ID_RPN_ALERTS,
                     channelName,
                     NotificationManager.IMPORTANCE_HIGH
                 ).apply { description = channelDesc }
@@ -100,7 +101,7 @@ object DeviceNotRegisteredNotifier {
             val title = context.getString(R.string.device_not_registered_notif_title)
             val body  = context.getString(R.string.device_not_registered_notif_body)
 
-            val builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
+            val builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_RPN_ALERTS)
                 .setSmallIcon(R.drawable.ic_notification_icon)
                 .setContentTitle(title)
                 .setContentText(body)
@@ -113,7 +114,7 @@ object DeviceNotRegisteredNotifier {
 
             // repeated failures update the same notification, not stack new ones.
             notificationManager.notify(
-                NOTIF_CHANNEL_ID_FIREWALL_ALERTS,
+                NOTIF_CHANNEL_ID_RPN_ALERTS,
                 NOTIF_ID_IAB_DEVICE_NOT_REGISTERED,
                 builder.build()
             )
@@ -132,7 +133,7 @@ object DeviceNotRegisteredNotifier {
     fun cancel(context: Context) {
         try {
             val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
-            nm?.cancel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, NOTIF_ID_IAB_DEVICE_NOT_REGISTERED)
+            nm?.cancel(NOTIF_CHANNEL_ID_RPN_ALERTS, NOTIF_ID_IAB_DEVICE_NOT_REGISTERED)
             Logger.d(LOG_IAB, "$TAG: notification cancelled")
         } catch (e: Exception) {
             Logger.w(LOG_IAB, "$TAG: failed to cancel notification: ${e.message}")

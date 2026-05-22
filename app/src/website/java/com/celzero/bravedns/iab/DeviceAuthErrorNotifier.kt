@@ -63,7 +63,7 @@ object DeviceAuthErrorNotifier {
     fun notify(context: Context, error: ServerApiError.Unauthorized401, theme: Int) {
         try {
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE)
-                    as? NotificationManager ?: run {
+                as? NotificationManager ?: run {
                 Logger.e(LOG_IAB, "$TAG: NotificationManager unavailable")
                 return
             }

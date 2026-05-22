@@ -339,7 +339,7 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
     private var purchaseFlowActive = false
 
     // Job that watches oneTimePurchaseCompletedFlow while an extend-mode purchase is in flight.
-    // Cancelled when the flow resolves (success or error) or the ViewModel is cleared.
+    // Canceled when the flow resolves (success or error) or the ViewModel is cleared.
     private var extendObserverJob: Job? = null
 
     fun markPurchaseFlowActive() {

@@ -26,7 +26,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
+import com.celzero.bravedns.iab.DeviceNotRegisteredNotifier.NOTIF_CHANNEL_ID_RPN_ALERTS
 import com.celzero.bravedns.ui.NotificationHandlerActivity
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_ID_IAB_CONFLICT
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_IAB_CONFLICT_NAME
@@ -39,20 +39,20 @@ import com.celzero.bravedns.util.Utilities
  * **and no UI observer is attached** to [InAppBillingHandler.serverApiErrorLiveData].
  *
  * This covers two scenarios where the active screen cannot show [PurchaseConflictBottomSheet]:
- *  - The app is in the background (e.g. triggered by [SubscriptionCheckWorker]).
+ *  - The app is in the background (e.g., triggered by [SubscriptionCheckWorker]).
  *  - The app is in the foreground but the [ManageSubscriptionFragment] is not visible
  *    (e.g. the 409 comes from an [acknowledgePurchase] call while the purchase flow screen
  *    is shown instead of the manage screen).
  *
  * Tapping the notification launches [NotificationHandlerActivity] which trampolines to
- * [ManageSubscriptionFragment].  That fragment's [setupServerErrorObserver] re-posts the
+ * [ManageSubscriptionFragment]. That fragment's [setupServerErrorObserver] re-posts the
  * [ServerApiError.Conflict409] from [InAppBillingHandler.serverApiErrorLiveData] so the
- * [PurchaseConflictBottomSheet] opens automatically, **the same UI path** used when the
+ * [PurchaseConflictBottomSheet] opens automatically, using the same UI path as when the
  * fragment is already on screen.
  *
  * ### Channel
- * Reuses [NOTIF_CHANNEL_ID_FIREWALL_ALERTS] ("Firewall_Alerts"): the existing high-priority
- * channel already created and registered by [BraveVPNService] / [RefreshDatabase].
+ * Reuses [NOTIF_CHANNEL_ID_RPN_ALERTS] ("RPN_Alerts"): the existing high-priority
+ * channel already created and registered by DeviceNotRegisteredNotifier.
  * No new channel is needed.
  *
  * ### Deduplication
@@ -72,7 +72,7 @@ object PurchaseConflictNotifier {
      * @param context Application context.
      * @param error   The [ServerApiError.Conflict409] that triggered this call.
      * @param theme   Current app theme value (from [PersistentState.theme]) used to tint the
-     *                notification accent colour, matching the existing notification style.
+     *                notification accent color, matching the existing notification style.
      */
     fun notify(context: Context, error: ServerApiError.Conflict409, theme: Int) {
         try {
@@ -108,7 +108,7 @@ object PurchaseConflictNotifier {
                 val channelName = context.getString(R.string.notif_channel_firewall_alerts)
                 val channelDesc = context.getString(R.string.notif_channel_desc_firewall_alerts)
                 val channel = NotificationChannel(
-                    NOTIF_CHANNEL_ID_FIREWALL_ALERTS,
+                    NOTIF_CHANNEL_ID_RPN_ALERTS,
                     channelName,
                     NotificationManager.IMPORTANCE_HIGH
                 ).apply { description = channelDesc }
@@ -118,7 +118,7 @@ object PurchaseConflictNotifier {
             val title = context.getString(R.string.conflict_notif_title)
             val body  = context.getString(R.string.conflict_notif_body)
 
-            val builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
+            val builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_RPN_ALERTS)
                 .setSmallIcon(R.drawable.ic_notification_icon)
                 .setContentTitle(title)
                 .setContentText(body)
@@ -130,7 +130,7 @@ object PurchaseConflictNotifier {
                 .setAutoCancel(true)
 
             // Fixed ID → repeated 409s update the same notification, not stack new ones
-            notificationManager.notify(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, NOTIF_ID_IAB_CONFLICT, builder.build())
+            notificationManager.notify(NOTIF_CHANNEL_ID_RPN_ALERTS, NOTIF_ID_IAB_CONFLICT, builder.build())
 
             Logger.i(LOG_IAB, "$TAG: conflict notification posted for op=${error.operation}, endpoint=${error.endpoint}")
         } catch (e: Exception) {
@@ -146,7 +146,7 @@ object PurchaseConflictNotifier {
     fun cancel(context: Context) {
         try {
             val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
-            nm?.cancel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, NOTIF_ID_IAB_CONFLICT)
+            nm?.cancel(NOTIF_CHANNEL_ID_RPN_ALERTS, NOTIF_ID_IAB_CONFLICT)
             Logger.d(LOG_IAB, "$TAG: conflict notification cancelled")
         } catch (e: Exception) {
             Logger.w(LOG_IAB, "$TAG: failed to cancel conflict notification: ${e.message}")
@@ -155,12 +155,11 @@ object PurchaseConflictNotifier {
 
     // Intent extra keys: mirrors PurchaseConflictBottomSheet.Companion ARG_* keys
     // so the trampoline can rebuild the Conflict409 without re-querying the server.
-    const val EXTRA_ENDPOINT       = "conflict_endpoint"
-    const val EXTRA_OPERATION      = "conflict_operation"
-    const val EXTRA_SERVER_MSG     = "conflict_server_msg"
-    const val EXTRA_ACCOUNT_ID     = "conflict_account_id"
-    const val EXTRA_DEVICE_ID      = "conflict_device_id"
+    const val EXTRA_ENDPOINT = "conflict_endpoint"
+    const val EXTRA_OPERATION = "conflict_operation"
+    const val EXTRA_SERVER_MSG = "conflict_server_msg"
+    const val EXTRA_ACCOUNT_ID = "conflict_account_id"
     const val EXTRA_PURCHASE_TOKEN = "conflict_purchase_token"
-    const val EXTRA_SKU            = "conflict_sku"
+    const val EXTRA_SKU = "conflict_sku"
 }
 
