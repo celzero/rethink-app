@@ -2376,7 +2376,7 @@ object RpnProxyManager : KoinComponent {
 
             winCacheMutex.withLock {
                 winServersCache.find { it.id == AUTO_SERVER_ID }
-            }
+            } ?: countryConfigRepo.getById(AUTO_SERVER_ID)
         } catch (e: Exception) {
             Logger.e(LOG_TAG_PROXY, "$TAG; getAutoServer: err: ${e.message}", e)
             null
