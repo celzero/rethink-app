@@ -28,9 +28,14 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
 import inet.ipaddr.IPAddressString
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
+import okhttp3.OkHttpClient
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.pow
 
 object IpInfoDownloader: KoinComponent {
@@ -46,6 +51,28 @@ object IpInfoDownloader: KoinComponent {
     private const val SECONDS_PER_MINUTE = 60
     private const val MILLIS_PER_SECOND = 1000
 
+    // Max concurrent IP-info HTTP requests; keeps thread count bounded.
+    private const val MAX_CONCURRENT_DOWNLOADS = 3
+    private val downloadSemaphore = Semaphore(MAX_CONCURRENT_DOWNLOADS)
+
+    // IPs whose download is currently in-flight; prevents duplicate concurrent fetches
+    // for the same IP driven by rapid onSocketClosed() callbacks.
+    private val inFlightIps: MutableSet<String> = ConcurrentHashMap.newKeySet()
+
+    // Cached OkHttpClient – reused across all requests to avoid spawning a separate
+    // thread-pool per call (the original cause of pthread OOM).
+    @Volatile private var cachedHttpClient: OkHttpClient? = null
+    @Volatile private var cachedIsRinRActive: Boolean? = null
+
+    private fun getOrCreateHttpClient(isRinRActive: Boolean): OkHttpClient {
+        val existing = cachedHttpClient
+        if (existing != null && cachedIsRinRActive == isRinRActive) return existing
+        val newClient = RetrofitManager.okHttpClient(isRinRActive)
+        cachedHttpClient = newClient
+        cachedIsRinRActive = isRinRActive
+        return newClient
+    }
+
     suspend fun fetchIpInfoIfRequired(ipToLookup: String) {
         if (!persistentState.downloadIpInfo) {
             return
@@ -58,16 +85,30 @@ object IpInfoDownloader: KoinComponent {
             return
         }
 
-        // check in database whether the ip info is already downloaded
-        val ipInfo = db.getIpInfo(ipToLookup)
-        if (ipInfo != null) {
-            Logger.vv(LOG_TAG_DOWNLOAD, "$TAG; already available, skip download")
+        // Deduplicate: if another coroutine is already fetching this IP, bail out.
+        if (!inFlightIps.add(ipToLookup)) {
+            Logger.vv(LOG_TAG_DOWNLOAD, "$TAG; already in-flight, skip download for $ipToLookup")
             return
         }
 
-        Logger.vv(LOG_TAG_DOWNLOAD, "$TAG; not present, proceed download...")
-        val downloadSuccessful = performIpInfoDownload(ipToLookup)
-        Logger.d(LOG_TAG_DOWNLOAD, "$TAG; download complete, success? $downloadSuccessful")
+        try {
+            // check in database whether the ip info is already downloaded
+            val ipInfo = db.getIpInfo(ipToLookup)
+            if (ipInfo != null) {
+                Logger.vv(LOG_TAG_DOWNLOAD, "$TAG; already available, skip download")
+                return
+            }
+
+            Logger.vv(LOG_TAG_DOWNLOAD, "$TAG; not present, proceed download...")
+            // Semaphore limits the total number of concurrent HTTP downloads so that
+            // OkHttp's dispatcher cannot spin up unbounded threads from rapid socket-close events.
+            downloadSemaphore.withPermit {
+                val downloadSuccessful = performIpInfoDownload(ipToLookup)
+                Logger.d(LOG_TAG_DOWNLOAD, "$TAG; download complete, success? $downloadSuccessful")
+            }
+        } finally {
+            inFlightIps.remove(ipToLookup)
+        }
     }
 
     private fun isLanIp(ipAddress: String): Boolean? {
@@ -92,7 +133,12 @@ object IpInfoDownloader: KoinComponent {
             return false
         }
 
-        val retrofitInstance = RetrofitManager.getIpInfoBaseBuilder(persistentState.routeRethinkInRethink)
+        // Reuse a cached OkHttpClient rather than creating a new one (and its thread pools)
+        // on every call. A fresh client per call was the root cause of pthread OOM errors.
+        val httpClient = getOrCreateHttpClient(persistentState.routeRethinkInRethink)
+        val retrofitInstance = Retrofit.Builder()
+            .baseUrl(com.celzero.bravedns.util.Constants.IP_INFO_BASE_URL)
+            .client(httpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
