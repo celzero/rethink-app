@@ -59,7 +59,7 @@ object IpInfoDownloader: KoinComponent {
     // for the same IP driven by rapid onSocketClosed() callbacks.
     private val inFlightIps: MutableSet<String> = ConcurrentHashMap.newKeySet()
 
-    // Cached OkHttpClient – reused across all requests to avoid spawning a separate
+    // Cached OkHttpClient, reused across all requests to avoid spawning a separate
     // thread-pool per call (the original cause of pthread OOM).
     @Volatile private var cachedHttpClient: OkHttpClient? = null
     @Volatile private var cachedIsRinRActive: Boolean? = null
