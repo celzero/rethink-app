@@ -402,11 +402,17 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var vpnBuilderPolicy by intPref("tun_network_handling_policy").withDefault<Int>(0)
 
     // whether to use default dns for trusted ips and domains
+    // TODO: remove this variable as it should not be used, BlockFreeDnsMode should be used instead
+    //  to decide the dns bypass mode for trusted ips and domains
     var useFallbackDnsToBypass by booleanPref("use_fallback_dns_to_bypass").withDefault<Boolean>(true)
 
     // Block-free DNS: stored as "TYPE::url" e.g. "DOH::https://dns.google/dns-query"
     // Empty string means no block-free DNS configured
     var blockFreeDns by stringPref("block_free_dns").withDefault<String>("")
+
+    // DNS bypass mode for block-free DNS: 1=fallback, 2=global, 3=none
+    // Default is 1 (Use fallback as DNS)
+    var blockFreeDnsMode by intPref("block_free_dns_mode").withDefault<Int>(1)
 
     // Firebase error reporting enabled (only for play and website variants)
     var firebaseErrorReportingEnabled by booleanPref("firebase_error_reporting").withDefault<Boolean>(Utilities.isPlayStoreFlavour())

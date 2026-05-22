@@ -95,6 +95,7 @@ import com.celzero.bravedns.service.ProxyManager.isNotLocalAndRpnProxy
 import com.celzero.bravedns.ui.NotificationHandlerActivity
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.ui.activity.MiscSettingsActivity
+import com.celzero.bravedns.ui.bottomsheet.BlockFreeDnsModeBottomSheet
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.BubbleHelper
@@ -4136,17 +4137,47 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     }
 
     private fun getTransportIdToBypass(id: Pair<String, String>): Pair<String, String> {
-        // determines whether fallback DNS should be used for trusted domains or IPs.
-        // this must be called before using Backend.BlockFree. in rethink’s dns case, BlockFree
-        // transport is added to tun so calling this method is not required.
-        return if (persistentState.useFallbackDnsToBypass) { // setting to use fallback dns
-            // If the BlockFree transport is available then it will use the blockfree else it will
-            // fallback to default transport. Only case Blockfree will be available is when the dns
-            // is selected as Rethink's transport, all other cases, to bypass the blocks default
-            // transport will be used.
-            Pair(Backend.BlockFree, Backend.Default)
-        } else {
-            id
+        // add already used transport id's as secondary transport id (both tid, tidsec)
+        val secTransport = id.toString()
+
+        val blockFreeMode = BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.fromMode(persistentState.blockFreeDnsMode)
+        when (blockFreeMode) {
+            BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.AUTO -> {
+                // decide based on the splitDns, if splitDns is enabled do not process
+                // trusted queries with blockfree to avoid dns leak, if splitDns is disabled,
+                // then use blockfree for trusted queries to bypass blocks
+                if (persistentState.splitDns) {
+                    // send same id, no changes needed if its blocked then it will stay blocked
+                    // in this case, even the trusted queries will be blocked, but it prevents
+                    // dns leaks which is more desired behavior when split dns /prevent dns leaks
+                    // is enabled.
+                    logd("getTransportIdToBypass: splitDns & auto, returning same id $id")
+                    return id
+                } else if (persistentState.preventDnsLeaks) {
+                    logd("getTransportIdToBypass: preventDns & auto, returning same id $id")
+                    return id
+                } else {
+                    // there are certain cases where the blockfree won't be available, so better
+                    // to use default transport in AUTO mode
+                    // chances are there that preferred transport is already in secondary
+                    logd("getTransportIdToBypass: auto, returning default with prev ids as secondary $secTransport")
+                    return Pair(Backend.Default, secTransport)
+                }
+            }
+
+            BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.GLOBAL -> {
+                // user selected dns regardless of split dns setting
+                // there maybe multiple transports when split dns is enabled, so add the already
+                // used transport id as secondary transport id
+                logd("getTransportIdToBypass: global, returning preferred with prev ids as secondary $secTransport")
+                return Pair(Backend.Preferred, secTransport)
+            }
+
+            BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.FALLBACK -> {
+                // always use the fallback dns as block free transport
+                logd("getTransportIdToBypass: fallback, returning default with prev ids as secondary $secTransport")
+                return Pair(Backend.Default, secTransport)
+            }
         }
     }
 
@@ -4744,6 +4775,17 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 noblock = false
             }
         }
+        // special case: in case of bypass rule for domain or ip, if the app is set to isolate
+        // that should be treated as allowed rule instead of bypass rule, so no need to use
+        // the blockfree / default transport. Avoid sending the same transport id back,
+        // instead send DNSOpts() object. Sending the same transport id again will make the tun
+        // to start the resolve process again which is not needed
+        val isAppIsolated = FirewallManager.appStatus(uidInt).isIsolate()
+        val isDmnOrIpTrusted = rule == FirewallRuleset.RULE2F || rule == FirewallRuleset.RULE2B
+        if (isAppIsolated && isDmnOrIpTrusted) {
+            logd("onUpstreamAnswer: app is isolate and domain/ip is trusted, treat as allowed, rule: $rule, connInfo: $connInfo, ipcsv: $ipcsv")
+            return@go2kt DNSOpts()
+        }
         val isBypass = FirewallRuleset.isBypassRule(rule)
         if (isBypass) {
             // use the same pid for non-blocking case, as the decision is already made in onQuery
@@ -4753,6 +4795,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             return@go2kt DNSOpts().apply {
                 val id = Pair(rcvdDnsOpts.tidcsv, rcvdDnsOpts.tidseccsv)
                 val tid = getTransportIdToBypass(id)
+                if (tid == id) {
+                    // there is no change in the tid, no new bypass transport needed
+                    return@go2kt DNSOpts()
+                }
                 tidcsv = tid.first.split(",").joinToString(",") { appendDnsCacheIfNeeded(it) }
                 tidseccsv = tid.second.split(",").joinToString(",") { appendDnsCacheIfNeeded(it) }
                 pidcsv = rcvdDnsOpts.pidcsv

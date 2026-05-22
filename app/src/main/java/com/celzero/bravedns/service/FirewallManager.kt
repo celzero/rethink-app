@@ -184,6 +184,10 @@ object FirewallManager : KoinComponent {
             return this == EXCLUDE
         }
 
+        fun isIsolate(): Boolean {
+            return this == ISOLATE
+        }
+
         fun isolate(): Boolean {
             return this == ISOLATE
         }

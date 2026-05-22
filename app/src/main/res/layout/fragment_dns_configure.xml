@@ -670,7 +670,7 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:paddingTop="5dp"
-                android:paddingBottom="5dp">
+                android:paddingBottom="10dp">
 
                 <RelativeLayout
                     android:id="@+id/dc_favicon_rl"
@@ -926,6 +926,7 @@
                     android:id="@+id/dc_use_fallback_to_bypass_rl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
                     android:paddingBottom="15dp">
@@ -980,6 +981,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
+                    android:visibility="gone"
                     android:layout_marginBottom="5dp"
                     android:layout_marginStart="56dp"
                     android:layout_marginEnd="16dp" />
@@ -1066,7 +1068,7 @@
                         android:layout_marginBottom="5dp"
                         android:alpha="0.5"
                         android:padding="10dp"
-                        android:src="@drawable/ic_prevent_dns_leaks" />
+                        android:src="@drawable/ic_use_fallback_bypass" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -1081,7 +1083,7 @@
                             style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Block-Free DNS" />
+                            android:text="DNS to bypass" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_block_free_dns_desc"
@@ -1089,7 +1091,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="3dp"
-                            android:text="Block-Free DNS resolves trusted and bypassed apps and domains."
+                            android:text="@string/dc_block_free_dns_desc"
                             android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
 
@@ -1101,7 +1103,7 @@
                         android:layout_centerVertical="true"
                         android:paddingStart="20dp"
                         android:paddingEnd="20dp"
-                        android:src="@drawable/ic_right_arrow_white" />
+                        android:src="@drawable/ic_arrow_down_small" />
 
                 </RelativeLayout>
 

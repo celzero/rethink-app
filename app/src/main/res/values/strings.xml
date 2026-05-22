@@ -2576,4 +2576,20 @@
     <string name="fs_configure_advanced_desc" translatable="true">Developer tools and diagnostics</string>
     <string name="fs_configure_logs_desc" translatable="true">Review DNS queries and connection logs</string>
 
+    <!-- DNS bypass mode bottom sheet -->
+    <string name="bfdm_heading" translatable="false">DNS bypass mode</string>
+    <string name="bfdm_desc" translatable="false">Select the DNS to use for trusted and bypassed apps and domains</string>
+    <string name="bfdm_option_fallback_label" translatable="false">Use fallback as DNS</string>
+    <string name="bfdm_option_fallback_desc" translatable="false">Use the fallback DNS for trusted and bypassed connections</string>
+    <string name="bfdm_option_global_label" translatable="false">Use global DNS</string>
+    <string name="bfdm_option_global_desc" translatable="false">Use the globally configured DNS for trusted and bypassed connections</string>
+    <string name="bfdm_option_auto_label" translatable="false">Automatic</string>
+    <string name="bfdm_option_auto_desc" translatable="false">Automatically select DNS based on other settings</string>
+    <!-- DNS bypass mode status labels shown in the settings list row -->
+    <string name="bfdm_status_fallback" translatable="false">Use fallback DNS to bypass</string>
+    <string name="bfdm_status_global" translatable="false">Use global selected DNS to bypass</string>
+    <string name="bfdm_status_auto" translatable="false">Automatically select based on other settings</string>
+    <!-- Static description for the DNS bypass setting row in DNS settings -->
+    <string name="dc_block_free_dns_desc" translatable="false">Selected DNS resolves trusted and bypassed apps, ips and domains.</string>
+
 </resources>

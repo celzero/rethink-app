@@ -46,8 +46,8 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
-import com.celzero.bravedns.ui.activity.BlockFreeDnsActivity
 import com.celzero.bravedns.ui.activity.DnsListActivity
+import com.celzero.bravedns.ui.bottomsheet.BlockFreeDnsModeBottomSheet
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.bottomsheet.DnsRecordTypesBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.LocalBlocklistsBottomSheet
@@ -714,8 +714,19 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         }
 
         b.dcBlockFreeDnsRl.setOnClickListener {
-            openBlockFreeDns()
+            showBlockFreeDnsModeBottomSheet()
         }
+    }
+
+    private fun showBlockFreeDnsModeBottomSheet() {
+        val bottomSheet = BlockFreeDnsModeBottomSheet()
+        parentFragmentManager.setFragmentResultListener(
+            BlockFreeDnsModeBottomSheet.FRAGMENT_RESULT_KEY,
+            viewLifecycleOwner
+        ) { _, _ ->
+            updateBlockFreeDnsUi()
+        }
+        bottomSheet.show(parentFragmentManager, bottomSheet.tag)
     }
 
     private fun showDnsRecordTypesBottomSheet() {
@@ -839,18 +850,12 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         startActivity(intent)
     }
 
-    private fun openBlockFreeDns() {
-        val intent = Intent(requireContext(), BlockFreeDnsActivity::class.java)
-        startActivity(intent)
-    }
-
     private fun updateBlockFreeDnsUi() {
-        val key = persistentState.blockFreeDns
-        if (key.isEmpty()) {
-            b.dcBlockFreeDnsDesc.text = "Fallback DNS without any blocking"
-        } else {
-            val url = key.substringAfter("::", key)
-            b.dcBlockFreeDnsDesc.text = url
+        val mode = BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.fromMode(persistentState.blockFreeDnsMode)
+        b.dcBlockFreeDnsDesc.text = when (mode) {
+            BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.FALLBACK -> getString(R.string.bfdm_status_fallback)
+            BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.GLOBAL -> getString(R.string.bfdm_status_global)
+            BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.AUTO -> getString(R.string.bfdm_status_auto)
         }
     }
 
