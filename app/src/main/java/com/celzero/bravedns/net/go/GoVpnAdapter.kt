@@ -3034,15 +3034,22 @@ class GoVpnAdapter : KoinComponent {
                 return
             }
             val dialStrategy = AntiCensorshipActivity.DialStrategies.fromInt(persistentState.dialStrategy)
+            if (dialStrategy == null) {
+                Logger.w(LOG_TAG_VPN, "$TAG invalid dial strategy: ${persistentState.dialStrategy}, no-op set auto mode")
+                return
+            }
 
             // proxy + none -> remote
             // proxy + other retry -> hybrid
             // all other dial strategies -> local
+            var modeName = "Settings.AutoModeLocal"
             val mode = if (dialStrategy == AntiCensorshipActivity.DialStrategies.TCP_PROXY) {
                 if (retryStrategy == AntiCensorshipActivity.RetryStrategies.RETRY_NEVER) {
+                    modeName = "Settings.AutoModeRemote"
                     Settings.AutoModeRemote
                 } else {
-                    Settings.AutoModeLocal
+                    modeName = "Settings.AutoModeHybrid"
+                    Settings.AutoModeHybrid
                 }
             } else {
                 Settings.AutoModeLocal
@@ -3053,7 +3060,7 @@ class GoVpnAdapter : KoinComponent {
             logEvent(
                 Severity.LOW,
                 "Set auto mode",
-                "Set auto mode to $mode"
+                "Set auto mode to $modeName (dial: ${dialStrategy.name}, retry: ${retryStrategy.name})"
             )
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG err set auto mode: ${e.message}", e)
