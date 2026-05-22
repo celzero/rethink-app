@@ -237,6 +237,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // immediately identify they are on a pre-release version.
         if (Utilities.isAlphaBuild()) {
             b.fhsTitleRethink.setText(R.string.app_name_alpha)
+            b.fhsTitleRethink.isAllCaps = false
         }
 
         // do not show the sponsor card if the rethink plus is enabled

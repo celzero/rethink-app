@@ -153,6 +153,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         // can immediately identify they are on a pre-release version.
         if (Utilities.isAlphaBuild()) {
             b.fhsTitleRethink.setText(R.string.app_name_alpha)
+            b.fhsTitleRethink.isAllCaps = false
         }
 
         updateVersionInfo()
