@@ -83,13 +83,17 @@ class RethinkGlideModule : AppGlideModule() {
             .addInterceptor { chain ->
                 val response = chain.proceed(chain.request())
                 if (response.code == 404) {
-                    // avoid crashing on 404 by returning a success-like response
-                    // Glide's OkHttpStreamFetcher (v5.0.5) crashes on 404 with a FileSystemException
+                    // avoid crashing on 404 by returning a success-like response.
+                    // Glide's OkHttpStreamFetcher (v5.0.5) crashes on 404 with a FileSystemException.
                     // ref: https://github.com/celzero/rethink-app/issues/1404
-                    return@addInterceptor response.newBuilder()
+
+                    val rewrittenResponse = response.newBuilder()
                         .code(200)
                         .body("".toResponseBody(null))
                         .build()
+                    // Close the original body first to prevent a resource leak
+                    response.body.close()
+                    return@addInterceptor rewrittenResponse
                 }
                 response
             }
