@@ -1311,12 +1311,14 @@
     <string name="notif_channel_firewall_alerts" translatable="true">Firewall Alerts</string>
     <string name="notif_channel_proxy_failure" translatable="true">Proxy Alerts</string>
     <string name="notif_channel_download" translatable="true">Download Alerts</string>
+    <string name="notif_channel_rpn" translatable="false">RPN Alerts</string>
 
     <string name="notif_channel_desc_vpn_notification" translatable="true">Inform when Rethink is active and running in the background</string>
     <string name="notif_channel_desc_vpn_failure" translatable="true">Inform when Rethink is stopped by Android or by another VPN app</string>
     <string name="notif_channel_desc_firewall_alerts" translatable="true">Alert on Firewall errors and anomalies</string>
     <string name="notif_channel_desc_proxy_failure" translatable="true">Alert on Proxy errors and anomalies</string>
     <string name="notif_channed_desc_download" translatable="true">Alert on Download Progress for On-device blocklists</string>
+    <string name="notif_channel_desc_rpn" translatable="false">Alert on RPN errors and anomalies</string>
 
     <!-- Category constants -->
     <string name="category_name_sys_components" translatable="true">System Components</string>

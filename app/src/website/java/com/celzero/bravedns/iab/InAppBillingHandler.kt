@@ -1505,11 +1505,6 @@ object InAppBillingHandler : KoinComponent {
             return
         }
 
-        if (!billingClient.isReady) {
-            loge(mname, "billing client not ready; cannot query product details")
-            appContext?.let { setupBillingClient(it) }
-        }
-
         val result = withTimeoutOrNull(timeout) {
             queryProductDetails()
         }

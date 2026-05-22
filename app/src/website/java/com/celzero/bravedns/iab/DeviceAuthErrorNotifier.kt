@@ -88,8 +88,8 @@ object DeviceAuthErrorNotifier {
 
             // Ensure the channel exists (idempotent: safe to call on every notification)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channelName = context.getString(R.string.notif_channel_firewall_alerts)
-                val channelDesc = context.getString(R.string.notif_channel_desc_firewall_alerts)
+                val channelName = context.getString(R.string.notif_channel_rpn)
+                val channelDesc = context.getString(R.string.notif_channel_desc_rpn)
                 val channel = NotificationChannel(
                     NOTIF_CHANNEL_ID_RPN_ALERTS,
                     channelName,

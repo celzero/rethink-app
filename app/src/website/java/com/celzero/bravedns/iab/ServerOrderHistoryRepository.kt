@@ -190,7 +190,7 @@ class ServerOrderHistoryRepository(private val billingBackendClient: BillingBack
         val lineItem   = meta.productLineItem?.firstOrNull()
         val productId  = lineItem?.productId ?: ""
         val purchaseMs = isoToMillis(meta.purchaseCompletionTime).takeIf { it > 0L } ?: mtime
-        val planId = lineItem?.productOfferDetails?.purchaseOptionId ?: productId ?: ""
+        val planId = lineItem?.productOfferDetails?.purchaseOptionId ?: productId
 
         // purchaseStateContext.purchaseState is a String in ProductPurchaseV2;
         // mapped to the legacy Int in ServerOrderEntry (0=purchased, 1=cancelled, 2=pending).
