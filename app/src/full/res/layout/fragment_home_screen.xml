@@ -804,7 +804,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/home_fragment_pause_icon"
                         android:layout_width="60dp"
                         android:layout_height="48dp"
@@ -825,7 +825,7 @@
                         android:letterSpacing="0.2"
                         android:text="@string/hsf_start_btn_state" />
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/home_fragment_bottom_sheet_icon"
                         android:layout_width="60dp"
                         android:layout_height="48dp"

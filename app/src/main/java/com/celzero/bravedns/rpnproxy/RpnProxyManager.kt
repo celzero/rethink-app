@@ -900,6 +900,8 @@ object RpnProxyManager : KoinComponent {
                             byteArrayOf()
                         }
 
+                        Logger.i(LOG_TAG_PROXY, "$TAG; load, win entitlement loaded, size: ${entitlement.size} bytes")
+
                         val state = if (cfgFile.exists()) {
                             try {
                                 EncryptedFileManager.readByteArray(applicationContext, cfgFile)
@@ -912,6 +914,7 @@ object RpnProxyManager : KoinComponent {
                             byteArrayOf()
                         }
 
+                        Logger.i(LOG_TAG_PROXY, "$TAG; load, win state loaded, size: ${state.size} bytes")
                     }
                 }
             } catch (e: Exception) {
@@ -929,10 +932,6 @@ object RpnProxyManager : KoinComponent {
                 winServersCache.clear()
                 winServersCache.addAll(dbServers)
             }
-            val sk = dbServers.filter { it.isEnabled }.map { it.key }
-            // Seed timestamps from the DB record's lastModified (best available proxy for
-            // "when was this server selected" after a cold start / reload).
-            dbServers.filter { it.isEnabled }.forEach { serverKeyMeta[it.key] = ServerKeyMeta(selectedAt = it.lastModified) }
             Logger.i(LOG_TAG_PROXY, "$TAG; load: cached ${dbServers.size}, WIN servers from DB (AUTO server ensured)")
         } catch (e: Exception) {
             Logger.w(LOG_TAG_PROXY, "$TAG; load: failed to cache WIN servers: ${e.message}")
@@ -2347,15 +2346,39 @@ object RpnProxyManager : KoinComponent {
     }
 
     /**
-     * Gets AUTO server from database/cache
+     * Gets AUTO server from database/cache.
+     *
+     * If the AUTO server is absent from both the in-memory cache and the database (e.g. on first
+     * launch or if [load] hasn't been called yet), [ensureAutoServerExists] is invoked to create
+     * and persist it, and the newly-created entry is returned.  This makes the function
+     * self-healing so that callers never see a spurious null.
      */
     suspend fun getAutoServer(): CountryConfig? {
         return try {
+            val cached = winCacheMutex.withLock {
+                winServersCache.find { it.id == AUTO_SERVER_ID }
+            }
+            if (cached != null) return cached
+
+            val fromDb = countryConfigRepo.getById(AUTO_SERVER_ID)
+            if (fromDb != null) {
+                // Opportunistically warm the cache so subsequent calls hit the fast path.
+                winCacheMutex.withLock {
+                    if (winServersCache.none { it.id == AUTO_SERVER_ID }) {
+                        winServersCache.add(fromDb)
+                    }
+                }
+                return fromDb
+            }
+
+            Logger.w(LOG_TAG_PROXY, "$TAG; getAutoServer: AUTO server missing from cache and DB, creating via ensureAutoServerExists")
+            ensureAutoServerExists()
+
             winCacheMutex.withLock {
                 winServersCache.find { it.id == AUTO_SERVER_ID }
             } ?: countryConfigRepo.getById(AUTO_SERVER_ID)
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; getAutoServer: error - ${e.message}", e)
+            Logger.e(LOG_TAG_PROXY, "$TAG; getAutoServer: err: ${e.message}", e)
             null
         }
     }

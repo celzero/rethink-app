@@ -95,7 +95,10 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
                 .load(subUrl)
                 .submit(SIZE_ORIGINAL, SIZE_ORIGINAL)
         try {
-            futureTarget.get()
+            val file = futureTarget.get()
+            if (file == null || file.length() <= 0) {
+                throw Exception("Empty file, likely 404")
+            }
             Logger.d(LOG_TAG_DNS, "Glide, load success from nextdns for url: $url")
         } catch (e: Exception) {
             // on exception, initiate the download of fav icon from duckduckgo
@@ -120,7 +123,10 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
                 .load(subUrl)
                 .submit(SIZE_ORIGINAL, SIZE_ORIGINAL)
         try {
-            futureTarget.get()
+            val file = futureTarget.get()
+            if (file == null || file.length() <= 0) {
+                throw Exception("Empty file, likely 404")
+            }
             Logger.d(LOG_TAG_DNS, "Glide, downloaded from duckduckgo $subUrl, $url")
         } catch (e: Exception) {
             // In case of failure the FutureTarget will throw an exception.

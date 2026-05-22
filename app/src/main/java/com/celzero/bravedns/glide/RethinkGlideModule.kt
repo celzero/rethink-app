@@ -36,6 +36,7 @@ import com.bumptech.glide.load.model.ModelLoaderFactory
 import com.bumptech.glide.load.model.MultiModelLoaderFactory
 import com.bumptech.glide.module.AppGlideModule
 import okhttp3.OkHttpClient
+import okhttp3.ResponseBody.Companion.toResponseBody
 import java.io.InputStream
 import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
@@ -60,7 +61,7 @@ class RethinkGlideModule : AppGlideModule() {
         // default disk cache executors thread count is 1, which is not enough for disk cache
         // operations. Increasing the thread count to available processors.
         val diskCacheBuilder = GlideExecutor.newDiskCacheBuilder()
-        val threadCount = Math.min(Runtime.getRuntime().availableProcessors(), 1)
+        val threadCount = Math.max(Runtime.getRuntime().availableProcessors(), 1)
         diskCacheBuilder.setThreadCount(threadCount)
         diskCacheBuilder.setName("g-disk-cache")
         builder.setDiskCacheExecutor(diskCacheBuilder.build())
@@ -79,6 +80,23 @@ class RethinkGlideModule : AppGlideModule() {
         val client: OkHttpClient = OkHttpClient.Builder()
             .readTimeout(5, TimeUnit.SECONDS)
             .connectTimeout(3, TimeUnit.SECONDS)
+            .addInterceptor { chain ->
+                val response = chain.proceed(chain.request())
+                if (response.code == 404) {
+                    // avoid crashing on 404 by returning a success-like response.
+                    // Glide's OkHttpStreamFetcher (v5.0.5) crashes on 404 with a FileSystemException.
+                    // ref: https://github.com/celzero/rethink-app/issues/1404
+
+                    val rewrittenResponse = response.newBuilder()
+                        .code(200)
+                        .body("".toResponseBody(null))
+                        .build()
+                    // Close the original body first to prevent a resource leak
+                    response.body.close()
+                    return@addInterceptor rewrittenResponse
+                }
+                response
+            }
             .build()
         registry.replace(GlideUrl::class.java, InputStream::class.java, OkHttpUrlLoader.Factory(client))
 

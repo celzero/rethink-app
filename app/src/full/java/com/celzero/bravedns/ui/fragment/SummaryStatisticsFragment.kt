@@ -99,6 +99,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         // can immediately identify they are on a pre-release version.
         if (Utilities.isAlphaBuild()) {
             b.fssTitleRethink.setText(R.string.app_name_alpha)
+            b.fssTitleRethink.isAllCaps = false
         }
         setTabbedViewTxt()
         highlightToggleBtn()

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name" translatable="false">Rethink</string>
     <string name="app_name_small_case" translatable="false">rethink</string>
-    <string name="app_name_alpha" translatable="false">rethink \u03B1</string>
+    <string name="app_name_alpha" translatable="false">RETHINK α</string>
     <string name="title_about" translatable="true">About</string>
     <string name="title_settings" translatable="true">Settings</string>
     <string name="title_statistics" translatable="true">Stats</string>

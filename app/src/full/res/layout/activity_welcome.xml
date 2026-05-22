@@ -18,9 +18,10 @@
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/layoutDots"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="12dp"
         android:layout_marginBottom="16dp"
         android:background="@android:color/transparent"
+        android:minHeight="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -28,6 +29,9 @@
         app:tabGravity="center"
         app:tabIndicatorHeight="0dp"
         app:tabMaxWidth="12dp"
+        app:tabMinWidth="12dp"
+        app:tabPaddingBottom="0dp"
+        app:tabPaddingTop="0dp"
         app:tabRippleColor="@null" />
 
     <View

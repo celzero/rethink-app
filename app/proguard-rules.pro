@@ -55,6 +55,13 @@
 -dontwarn org.bouncycastle.**
 -dontwarn org.openjsse.**
 
+# Guava: LocalCache uses reflection and Unsafe to access some of its members,
+# which can lead to AssertionError in R8 full mode if not kept properly.
+-keep class com.google.common.cache.LocalCache$Segment { *; }
+-keep class com.google.common.cache.LocalCache$LocalManualCache { *; }
+-keep class com.google.common.cache.LocalCache$LocalLoadingCache { *; }
+-keep class com.google.common.base.Preconditions { *; }
+
 # Keep Gson classes and attributes for JSON serialization/deserialization
 # FileTag class uses Gson with custom deserializer (FileTagDeserializer) to handle
 # dynamic JSON formats where "url" field can be either a string or JsonArray
