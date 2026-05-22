@@ -464,9 +464,14 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
 
         //  alpha testers get updates via direct distribution, take to the url
         if (Utilities.isAlphaBuild()) {
-            Logger.i(LOG_TAG_APP_UPDATE, "update check skipped for alpha build")
-            openUrl(this, ALPHA_UPDATE_CHECK_URL)
-            return
+            if (isInteractive == AppUpdater.UserPresent.INTERACTIVE) {
+                Logger.i(LOG_TAG_APP_UPDATE, "update check skipped for alpha build")
+                openUrl(this, ALPHA_UPDATE_CHECK_URL)
+                return
+            } else {
+                Logger.i(LOG_TAG_APP_UPDATE, "non interactive update check skipped for alpha build")
+                return
+            }
         }
 
         // Check updates only for play store / website version. Not fDroid.
