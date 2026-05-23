@@ -332,7 +332,7 @@
     <!-- Fixed bottom action button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/open_app_selector"
-        style="@style/Widget.MaterialComponents.Button"
+        style="@style/Widget.Material3.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"

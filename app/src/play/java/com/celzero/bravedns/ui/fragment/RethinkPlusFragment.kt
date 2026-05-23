@@ -398,7 +398,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             is SubscriptionUiState.Ready -> showReady(state.products, state.isResubscribe, state.availabilityData)
             is SubscriptionUiState.Processing -> showProcessing(state.message)
             is SubscriptionUiState.PendingPurchase -> showPendingPurchase()
-            is SubscriptionUiState.Success -> showSuccess(state.productId)
+            is SubscriptionUiState.Success -> showSuccess(state.productId, state.isExtend)
             is SubscriptionUiState.Error -> showError(state.title, state.message, state.isRetryable)
             is SubscriptionUiState.AlreadySubscribed -> navigateToDashboard(state.productId)
             is SubscriptionUiState.Available -> showConnectionInfo(state)
@@ -446,7 +446,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     }
 
     private fun showConnectionInfo(state: SubscriptionUiState.Available) {
-        if (state.ip.isEmpty()) {
+        if (state.ip.isEmpty() || viewModel.extendMode) {
             b.connectionInfoCard.isVisible = false
             return
         }
@@ -485,23 +485,45 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         startProcessingTimeout()
     }
 
-    private fun showSuccess(productId: String) {
+    private fun showSuccess(productId: String, isExtend: Boolean = false) {
         purchaseInFlight = false
         cancelProcessingTimeout()
+
+        val successMessage = if (isExtend) {
+            getString(R.string.extend_purchase_activated)
+        } else {
+            getString(R.string.subscription_activated)
+        }
+
         showProcessingBottomSheet(
             PurchaseProcessingBottomSheet.ProcessingState.Success,
-            getString(R.string.subscription_activated)
+            successMessage
         )
 
         try {
-            SubscriptionAnimDialog().show(childFragmentManager, "SubscriptionAnimDialog")
+            val dialog = if (isExtend) {
+                SubscriptionAnimDialog.newInstance(
+                    title = getString(R.string.extend_purchase_activated),
+                    message = getString(R.string.extend_purchase_success_message)
+                )
+            } else {
+                SubscriptionAnimDialog.newInstance(
+                    title = getString(R.string.subscription_congrats_title),
+                    message = getString(R.string.subscription_congrats_desc)
+                )
+            }
+            dialog.show(childFragmentManager, "SubscriptionAnimDialog")
         } catch (e: Exception) {
             Logger.w(Logger.LOG_IAB, "$TAG: err showing subscription anim: ${e.message}")
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
             delay(1500)
-            navigateToDashboard(productId)
+            if (isExtend) {
+                navigateBackToDashboard()
+            } else {
+                navigateToDashboard(productId)
+            }
         }
     }
 
@@ -542,6 +564,29 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             if (isAdded) requireActivity().finish()
         } catch (e: Exception) {
             Logger.e(Logger.LOG_IAB, "$TAG: navigation failed: ${e.message}", e)
+            if (isAdded) requireActivity().finish()
+        }
+    }
+
+    /**
+     * Pop back to the caller (typically [RpnDashboardFragment]) after an extend-mode purchase.
+     * The dashboard auto-refreshes on resume via its own state observation, so no extra
+     * data-passing is needed.
+     */
+    private fun navigateBackToDashboard() {
+        if (!isAdded) return
+        Logger.i(Logger.LOG_IAB, "$TAG: extend-mode: popping back to dashboard")
+        try {
+            val popped = findNavController().popBackStack()
+            if (!popped) {
+                // Nothing to pop — finish the host activity so the user isn't stuck.
+                requireActivity().finish()
+            }
+        } catch (_: IllegalStateException) {
+            Logger.w(Logger.LOG_IAB, "$TAG: no NavController for pop, finishing host activity")
+            if (isAdded) requireActivity().finish()
+        } catch (e: Exception) {
+            Logger.e(Logger.LOG_IAB, "$TAG: popBackStack failed: ${e.message}", e)
             if (isAdded) requireActivity().finish()
         }
     }

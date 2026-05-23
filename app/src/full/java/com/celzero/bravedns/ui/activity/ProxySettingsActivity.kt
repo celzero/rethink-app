@@ -36,7 +36,6 @@ import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
-import com.celzero.bravedns.ui.BaseActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -50,20 +49,22 @@ import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.DialogSetProxyBinding
 import com.celzero.bravedns.databinding.FragmentProxyConfigureBinding
 import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
+import com.celzero.bravedns.ui.BaseActivity
+import com.celzero.bravedns.ui.bottomsheet.OrbotBottomSheet
 import com.celzero.bravedns.ui.fragment.RethinkPlusFragment
 import com.celzero.bravedns.ui.fragment.ServerSelectionFragment
-import com.celzero.bravedns.ui.bottomsheet.OrbotBottomSheet
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.OrbotHelper
+import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.openUrl
@@ -76,11 +77,11 @@ import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.RouterStats
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import java.util.concurrent.TimeUnit
 
 class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
     private val b by viewBinding(FragmentProxyConfigureBinding::bind)
@@ -130,7 +131,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 Animation.RELATIVE_TO_SELF,
                 ANIMATION_PIVOT_VALUE,
                 Animation.RELATIVE_TO_SELF,
-                ANIMATION_PIVOT_VALUE
+                ANIMATION_PIVOT_VALUE,
             )
         animation.repeatCount = ANIMATION_REPEAT_COUNT
         animation.duration = ANIMATION_DURATION
@@ -146,9 +147,6 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
 
     private fun initView() {
         b.settingsActivityHttpProxyProgress.visibility = View.GONE
-        b.settingsWireguardTitle.text = getString(R.string.lbl_wireguard).lowercase()
-        b.orbotTitle.text = getString(R.string.orbot).lowercase()
-        b.otherTitle.text = getString(R.string.category_name_others).lowercase()
 
         displayRpnUi()
         displayHttpProxyUi()
@@ -157,9 +155,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
 
     private fun initClickListeners() {
 
-        b.settingsActivityRpnContainer.setOnClickListener {
-            openRpnScreen()
-        }
+        b.settingsActivityRpnContainer.setOnClickListener { openRpnScreen() }
 
         b.wgRefresh.setOnClickListener { refresh() }
 
@@ -188,7 +184,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 showToastUiCentered(
                     this,
                     getString(R.string.settings_socks5_disabled_error, s),
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_SHORT,
                 )
 
                 b.settingsActivitySocks5Switch.isChecked = false
@@ -198,7 +194,11 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 val endpoint = appConfig.getSocks5ProxyDetails()
                 if (endpoint == null) {
                     uiCtx {
-                        showToastUiCentered(this, getString(R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
+                        showToastUiCentered(
+                            this,
+                            getString(R.string.blocklist_update_check_failure),
+                            Toast.LENGTH_SHORT,
+                        )
                     }
                     return@io
                 }
@@ -208,12 +208,20 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 if (m?.isCustomSocks5() == true) {
                     val appNames: MutableList<String> = ArrayList()
                     appNames.add(getString(R.string.settings_app_list_default_app))
-                    appNames.addAll(FirewallManager.getAllAppNamesSortedByVpnPermission(this@ProxySettingsActivity))
+                    appNames.addAll(
+                        FirewallManager.getAllAppNamesSortedByVpnPermission(
+                            this@ProxySettingsActivity
+                        )
+                    )
                     uiCtx { showSocks5ProxyDialog(endpoint, appNames, app) }
                 } else {
                     val appNames: MutableList<String> = ArrayList()
                     appNames.add(getString(R.string.settings_app_list_default_app))
-                    appNames.addAll(FirewallManager.getAllAppNamesSortedByVpnPermission(this@ProxySettingsActivity))
+                    appNames.addAll(
+                        FirewallManager.getAllAppNamesSortedByVpnPermission(
+                            this@ProxySettingsActivity
+                        )
+                    )
                     uiCtx { showSocks5ProxyDialog(endpoint, appNames, app) }
                 }
             }
@@ -251,21 +259,26 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 showToastUiCentered(
                     this,
                     getString(R.string.settings_https_disabled_error, s),
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_SHORT,
                 )
                 b.settingsActivityHttpProxySwitch.isChecked = false
                 return@setOnCheckedChangeListener
             }
             io {
-                val endpoint = try {
-                    appConfig.getHttpProxyDetails()
-                } catch (e: Exception) {
-                    Logger.e(LOG_TAG_PROXY, "err fetching HTTP proxy details: ${e.message}", e)
-                    null
-                }
+                val endpoint =
+                    try {
+                        appConfig.getHttpProxyDetails()
+                    } catch (e: Exception) {
+                        Logger.e(LOG_TAG_PROXY, "err fetching HTTP proxy details: ${e.message}", e)
+                        null
+                    }
                 if (endpoint == null) {
                     uiCtx {
-                        showToastUiCentered(this, getString(R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
+                        showToastUiCentered(
+                            this,
+                            getString(R.string.blocklist_update_check_failure),
+                            Toast.LENGTH_SHORT,
+                        )
                     }
                     return@io
                 }
@@ -275,12 +288,20 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 if (m?.isCustomHttp() == true) {
                     val appNames: MutableList<String> = ArrayList()
                     appNames.add(getString(R.string.settings_app_list_default_app))
-                    appNames.addAll(FirewallManager.getAllAppNamesSortedByVpnPermission(this@ProxySettingsActivity))
+                    appNames.addAll(
+                        FirewallManager.getAllAppNamesSortedByVpnPermission(
+                            this@ProxySettingsActivity
+                        )
+                    )
                     uiCtx { showHttpProxyDialog(endpoint, appNames, app?.appName) }
                 } else {
                     val appNames: MutableList<String> = ArrayList()
                     appNames.add(getString(R.string.settings_app_list_default_app))
-                    appNames.addAll(FirewallManager.getAllAppNamesSortedByVpnPermission(this@ProxySettingsActivity))
+                    appNames.addAll(
+                        FirewallManager.getAllAppNamesSortedByVpnPermission(
+                            this@ProxySettingsActivity
+                        )
+                    )
                     uiCtx { showHttpProxyDialog(endpoint, appNames, app?.appName) }
                 }
             }
@@ -328,18 +349,18 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             showToastUiCentered(
                 this,
                 getString(R.string.orbot_install_activity_error),
-                Toast.LENGTH_SHORT
+                Toast.LENGTH_SHORT,
             )
             return
         }
 
         try {
             startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
+        } catch (_: ActivityNotFoundException) {
             showToastUiCentered(
                 this,
                 getString(R.string.orbot_install_activity_error),
-                Toast.LENGTH_SHORT
+                Toast.LENGTH_SHORT,
             )
         }
     }
@@ -356,17 +377,17 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 if (!appConfig.canEnableOrbotProxy()) {
                     val s =
                         persistentState.proxyProvider.lowercase().replaceFirstChar(Char::titlecase)
-                    if (s.lowercase() == AppConfig.ProxyProvider.CUSTOM.name.lowercase()) {
+                    if (s.equals(AppConfig.ProxyProvider.CUSTOM.name, ignoreCase = true)) {
                         showToastUiCentered(
                             this,
                             getString(R.string.settings_orbot_disabled_error),
-                            Toast.LENGTH_SHORT
+                            Toast.LENGTH_SHORT,
                         )
                     } else {
                         showToastUiCentered(
                             this,
                             getString(R.string.settings_socks5_disabled_error, s),
-                            Toast.LENGTH_SHORT
+                            Toast.LENGTH_SHORT,
                         )
                     }
                     return@uiCtx
@@ -387,7 +408,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             showToastUiCentered(
                 this,
                 getString(R.string.settings_socks5_vpn_disabled_error),
-                Toast.LENGTH_SHORT
+                Toast.LENGTH_SHORT,
             )
             return
         }
@@ -404,15 +425,24 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         if (!appConfig.isCustomHttpProxyEnabled()) return
 
         io {
-            val endpoint = try {
-                appConfig.getHttpProxyDetails()
-            } catch (e: Exception) {
-                Logger.e(LOG_TAG_PROXY, "Error fetching HTTP proxy details in displayHttpProxyUi: ${e.message}", e)
-                null
-            }
+            val endpoint =
+                try {
+                    appConfig.getHttpProxyDetails()
+                } catch (e: Exception) {
+                    Logger.e(
+                        LOG_TAG_PROXY,
+                        "Error fetching HTTP proxy details in displayHttpProxyUi: ${e.message}",
+                        e,
+                    )
+                    null
+                }
             if (endpoint == null) {
                 uiCtx {
-                    showToastUiCentered(this, getString(R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
+                    showToastUiCentered(
+                        this,
+                        getString(R.string.blocklist_update_check_failure),
+                        Toast.LENGTH_SHORT,
+                    )
                 }
                 return@io
             }
@@ -434,7 +464,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
     /**
      * Updates the RPN row description to reflect the current subscription / activation state.
      *
-     * - RPN enabled & active  → show selected-country summary (same style as WireGuard desc)
+     * - RPN enabled & active → show selected-country summary (same style as WireGuard desc)
      * - RPN enabled / valid sub but not yet active → show plan name
      * - No valid subscription → default "Subscribe" call-to-action
      *
@@ -447,13 +477,24 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         when {
             isEnabled && RpnProxyManager.isRpnActive() -> {
                 io {
-                    val selectedCCs = RpnProxyManager.getSelectedCCs()
-                    val desc = if (selectedCCs.isNotEmpty()) {
-                        val countryList = selectedCCs.take(3).joinToString(", ").capitalizeWords()
-                        getString(R.string.two_argument_dot, getString(R.string.lbl_active), countryList)
-                    } else {
-                        getString(R.string.two_argument_dot, getString(R.string.lbl_active), getString(R.string.rpn_title))
-                    }
+                    val selectedConfigs = RpnProxyManager.getSelectedCCs()
+                    val ccs = selectedConfigs.map { if (it.city == AUTO_SERVER_ID) it.city.capitalizeWords() else it.city.capitalizeWords() + ":" + it.cc.uppercase() }
+                    val desc =
+                        if (selectedConfigs.isNotEmpty()) {
+                            val countryList =
+                                ccs.take(3).joinToString(", ")
+                            getString(
+                                R.string.two_argument_dot,
+                                getString(R.string.lbl_active),
+                                countryList,
+                            )
+                        } else {
+                            getString(
+                                R.string.two_argument_dot,
+                                getString(R.string.lbl_active),
+                                getString(R.string.rpn_title),
+                            )
+                        }
                     uiCtx {
                         b.settingsActivityRpnDesc.text = desc
                         b.settingsActivityRpnIcon.alpha = 1.0f
@@ -474,9 +515,9 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
 
     /**
      * Navigates to the appropriate RPN screen:
-     *  - If the user has an active/valid subscription → open [ServerSelectionFragment]
-     *    so they can manage which countries to proxy through.
-     *  - Otherwise → open [RethinkPlusFragment] (the purchase / sign-up flow).
+     * - If the user has an active/valid subscription → open [ServerSelectionFragment] so they can
+     *   manage which countries to proxy through.
+     * - Otherwise → open [RethinkPlusFragment] (the purchase / sign-up flow).
      */
     private fun openRpnScreen() {
         val fragmentClass: Class<out androidx.fragment.app.Fragment> =
@@ -486,10 +527,8 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 RethinkPlusFragment::class.java
             }
 
-        val intent = FragmentHostActivity.createIntent(
-            context = this,
-            fragmentClass = fragmentClass
-        )
+        val intent =
+            FragmentHostActivity.createIntent(context = this, fragmentClass = fragmentClass)
         startActivity(intent)
     }
 
@@ -509,28 +548,25 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 val stats = VpnController.getProxyStats(id)
                 val dnsStatusId = VpnController.getDnsStatus(id)
 
+                val statusText =
+                    if (statusPair.first == Backend.TPU) {
+                        getString(UIUtils.getProxyStatusStringRes(UIUtils.ProxyStatus.TPU.id))
+                            .replaceFirstChar(Char::titlecase)
+                    } else if (dnsStatusId != null && isDnsError(dnsStatusId)) {
+                        // DNS is failing, show failing status
+                        getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
+                    } else {
+                        // DNS is okay, show proxy status
+                        getProxyStatusText(statusPair, stats)
+                    }
 
-                val statusText = if (statusPair.first == Backend.TPU) {
-                    getString(UIUtils.getProxyStatusStringRes(UIUtils.ProxyStatus.TPU.id)).replaceFirstChar(Char::titlecase)
-                } else if (dnsStatusId != null && isDnsError(dnsStatusId)) {
-                    // DNS is failing, show failing status
-                    getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
-                } else {
-                    // DNS is okay, show proxy status
-                    getProxyStatusText(statusPair, stats)
-                }
-
-                wgStatus += getString(
-                    R.string.ci_ip_label,
-                    it.getName(),
-                    statusText.padStart(1, ' ')
-                ) + "\n"
+                wgStatus +=
+                    getString(R.string.ci_ip_label, it.getName(), statusText.padStart(1, ' ')) +
+                        "\n"
                 Logger.d(LOG_TAG_PROXY, "current proxy status for $id: $statusText")
             }
             wgStatus = wgStatus.trimEnd()
-            uiCtx {
-                b.settingsActivityWireguardDesc.text = wgStatus
-            }
+            uiCtx { b.settingsActivityWireguardDesc.text = wgStatus }
         }
     }
 
@@ -538,10 +574,13 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         if (statusId == null) return true
 
         val s = Transaction.Status.fromId(statusId)
-        return s == Transaction.Status.BAD_QUERY || s == Transaction.Status.BAD_RESPONSE ||
-               s == Transaction.Status.NO_RESPONSE || s == Transaction.Status.SEND_FAIL ||
-               s == Transaction.Status.CLIENT_ERROR || s == Transaction.Status.INTERNAL_ERROR ||
-               s == Transaction.Status.TRANSPORT_ERROR
+        return s == Transaction.Status.BAD_QUERY ||
+            s == Transaction.Status.BAD_RESPONSE ||
+            s == Transaction.Status.NO_RESPONSE ||
+            s == Transaction.Status.SEND_FAIL ||
+            s == Transaction.Status.CLIENT_ERROR ||
+            s == Transaction.Status.INTERNAL_ERROR ||
+            s == Transaction.Status.TRANSPORT_ERROR
     }
 
     private fun getProxyStatusText(statusPair: Pair<Long?, String>, stats: RouterStats?): String {
@@ -553,14 +592,15 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
     private fun getStatusText(
         status: UIUtils.ProxyStatus?,
         stats: RouterStats?,
-        errMsg: String?
+        errMsg: String?,
     ): String {
         if (status == null) {
-            val txt = if (errMsg != null && errMsg.isNotEmpty()) {
-                getString(R.string.status_waiting) + " ($errMsg)"
-            } else {
-                getString(R.string.status_waiting)
-            }
+            val txt =
+                if (!errMsg.isNullOrEmpty()) {
+                    getString(R.string.status_waiting) + " ($errMsg)"
+                } else {
+                    getString(R.string.status_waiting)
+                }
             return txt.replaceFirstChar(Char::titlecase)
         }
 
@@ -571,19 +611,21 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             return getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
         }
 
-        val baseText = getString(UIUtils.getProxyStatusStringRes(status.id))
-            .replaceFirstChar(Char::titlecase)
+        val baseText =
+            getString(UIUtils.getProxyStatusStringRes(status.id)).replaceFirstChar(Char::titlecase)
 
-        val handshakeTime = if (stats != null && stats.lastOK > 0L) {
-            DateUtils.getRelativeTimeSpanString(
-                stats.lastOK,
-                now,
-                DateUtils.MINUTE_IN_MILLIS,
-                DateUtils.FORMAT_ABBREV_RELATIVE
-            ).toString()
-        } else {
-            null
-        }
+        val handshakeTime =
+            if (stats != null && stats.lastOK > 0L) {
+                DateUtils.getRelativeTimeSpanString(
+                        stats.lastOK,
+                        now,
+                        DateUtils.MINUTE_IN_MILLIS,
+                        DateUtils.FORMAT_ABBREV_RELATIVE,
+                    )
+                    .toString()
+            } else {
+                null
+            }
 
         return if (stats?.lastOK != 0L && handshakeTime != null) {
             getString(R.string.about_version_install_source, baseText, handshakeTime)
@@ -609,7 +651,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                     showToastUiCentered(
                         this,
                         getString(R.string.blocklist_update_check_failure),
-                        Toast.LENGTH_SHORT
+                        Toast.LENGTH_SHORT,
                     )
                 }
                 return@io
@@ -628,7 +670,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                         getString(
                             R.string.settings_socks_forwarding_desc_no_app,
                             endpoint.proxyIP,
-                            endpoint.proxyPort.toString()
+                            endpoint.proxyPort.toString(),
                         )
                 }
             } else {
@@ -639,7 +681,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                             getString(
                                 R.string.settings_socks_forwarding_desc_no_app,
                                 endpoint.proxyIP,
-                                endpoint.proxyPort.toString()
+                                endpoint.proxyPort.toString(),
                             )
                     }
                 } else {
@@ -649,7 +691,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                                 R.string.settings_socks_forwarding_desc,
                                 endpoint.proxyIP,
                                 endpoint.proxyPort.toString(),
-                                app.appName
+                                app.appName,
                             )
                     }
                 }
@@ -685,13 +727,13 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                             b.settingsActivityHttpOrbotDesc.text =
                                 getString(
                                     R.string.orbot_bs_status_1,
-                                    getString(R.string.orbot_status_arg_3)
+                                    getString(R.string.orbot_status_arg_3),
                                 )
                         } else {
                             b.settingsActivityHttpOrbotDesc.text =
                                 getString(
                                     R.string.orbot_bs_status_1,
-                                    getString(R.string.orbot_status_arg_2)
+                                    getString(R.string.orbot_status_arg_2),
                                 )
                         }
                     }
@@ -700,13 +742,13 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                             b.settingsActivityHttpOrbotDesc.text =
                                 getString(
                                     R.string.orbot_bs_status_3,
-                                    getString(R.string.orbot_status_arg_3)
+                                    getString(R.string.orbot_status_arg_3),
                                 )
                         } else {
                             b.settingsActivityHttpOrbotDesc.text =
                                 getString(
                                     R.string.orbot_bs_status_3,
-                                    getString(R.string.orbot_status_arg_2)
+                                    getString(R.string.orbot_status_arg_2),
                                 )
                         }
                     }
@@ -721,10 +763,11 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
     private fun showSocks5ProxyDialog(
         endpoint: ProxyEndpoint,
         appNames: List<String>,
-        appName: String
+        appName: String,
     ) {
         val dialogBinding = DialogSetProxyBinding.inflate(layoutInflater)
-        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim).setView(dialogBinding.root)
+        val builder =
+            MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
         val dialog = builder.create()
         lp.copyFrom(dialog.window?.attributes)
@@ -786,7 +829,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             ipAddressEditText.setText(Constants.SOCKS_DEFAULT_IP, TextView.BufferType.EDITABLE)
             portEditText.setText(
                 Constants.SOCKS_DEFAULT_PORT.toString(),
-                TextView.BufferType.EDITABLE
+                TextView.BufferType.EDITABLE,
             )
         }
 
@@ -802,7 +845,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             excludeAppCheckBox.isChecked = !excludeAppCheckBox.isChecked
             logEvent(
                 "loopback proxy forwarder apps SOCKS5 Proxy toggled",
-                "loopback proxy forwarder apps in SOCKS5 proxy: ${excludeAppCheckBox.isChecked}"
+                "loopback proxy forwarder apps in SOCKS5 proxy: ${excludeAppCheckBox.isChecked}",
             )
         }
 
@@ -810,7 +853,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             udpBlockCheckBox.isChecked = !udpBlockCheckBox.isChecked
             logEvent(
                 "UDP Block in SOCKS5 Proxy toggled",
-                "UDP block in SOCKS5 proxy: ${udpBlockCheckBox.isChecked}"
+                "UDP block in SOCKS5 proxy: ${udpBlockCheckBox.isChecked}",
             )
         }
 
@@ -861,7 +904,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                         getString(
                             R.string.settings_socks_forwarding_desc_no_app,
                             ip,
-                            port.toString()
+                            port.toString(),
                         )
                 } else {
                     b.settingsActivitySocks5Desc.text =
@@ -882,10 +925,6 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             dialog.dismiss()
         }
         dialog.show()
-    }
-
-    private fun enableTcpProxy() {
-        io { TcpProxyHelper.enable() }
     }
 
     // Should be in disabled state when the brave mode is in DNS only / Vpn in lockdown mode.
@@ -923,12 +962,13 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
     private fun showHttpProxyDialog(
         endpoint: ProxyEndpoint,
         appNames: List<String>,
-        appName: String?
+        appName: String?,
     ) {
         val defaultHost = "http://127.0.0.1:8118"
         var host: String
         val dialogBinding = DialogSetProxyBinding.inflate(layoutInflater)
-        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim).setView(dialogBinding.root)
+        val builder =
+            MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
         val dialog = builder.create()
         dialog.show()
@@ -978,7 +1018,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             excludeAppCheckBox.isChecked = !excludeAppCheckBox.isChecked
             logEvent(
                 "loopback proxy forwarder apps in HTTP Proxy toggled",
-                "loopback proxy forwarder apps in HTTP proxy: ${excludeAppCheckBox.isChecked}"
+                "loopback proxy forwarder apps in HTTP proxy: ${excludeAppCheckBox.isChecked}",
             )
         }
 
@@ -1027,13 +1067,16 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 showToastUiCentered(
                     this,
                     getString(R.string.settings_http_proxy_toast_success),
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_SHORT,
                 )
                 if (b.settingsActivityHttpProxySwitch.isChecked) {
                     b.settingsActivityHttpProxyDesc.text =
                         getString(R.string.settings_http_proxy_desc, host)
                 }
-                logEvent("Custom HTTP Proxy set", "custom HTTP proxy to $host, app: ${appNameSpinner.selectedItem}" )
+                logEvent(
+                    "Custom HTTP Proxy set",
+                    "custom HTTP proxy to $host, app: ${appNameSpinner.selectedItem}",
+                )
             }
         }
         cancelURLBtn.setOnClickListener {
@@ -1051,7 +1094,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         appName: String,
         userName: String,
         password: String,
-        isUDPBlock: Boolean
+        isUDPBlock: Boolean,
     ) {
         b.settingsActivitySocks5Switch.isEnabled = false
         b.settingsActivitySocks5Switch.visibility = View.GONE
@@ -1080,7 +1123,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                     port ?: 0,
                     userName,
                     password,
-                    isUDPBlock
+                    isUDPBlock,
                 )
 
             if (proxyEndpoint != null) {
@@ -1118,7 +1161,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                     0,
                     userName = "",
                     password = "",
-                    false /* isUdp */
+                    false, /* isUdp */
                 )
             if (proxyEndpoint != null) {
                 appConfig.updateCustomHttpProxy(proxyEndpoint)
@@ -1135,7 +1178,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         port: Int,
         userName: String,
         password: String,
-        isUdp: Boolean
+        isUdp: Boolean,
     ): ProxyEndpoint? {
         if (ip.isNullOrEmpty()) {
             Logger.w(LOG_TAG_PROXY, "cannot construct proxy with values ip: $ip, port: $port")
@@ -1161,15 +1204,8 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             isCustom = true,
             isUDP = isUdp,
             modifiedDataTime = 0L,
-            latency = 0
+            latency = 0,
         )
-    }
-
-    private fun String.capitalizeWords(): String {
-        return split(" ")
-            .joinToString(" ") { word ->
-                word.lowercase().replaceFirstChar { it.uppercase() }
-            }
     }
 
     private fun logEvent(msg: String, details: String) {

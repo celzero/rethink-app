@@ -153,13 +153,13 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         // can immediately identify they are on a pre-release version.
         if (Utilities.isAlphaBuild()) {
             b.fhsTitleRethink.setText(R.string.app_name_alpha)
+            b.fhsTitleRethink.isAllCaps = false
         }
 
         updateVersionInfo()
         updateSponsorInfo()
         updateTokenUi(persistentState.firebaseUserToken)
-
-        b.titleStats.text = getString(R.string.title_statistics).lowercase()
+        
         b.aboutStats.text = getString(R.string.settings_general_header).replaceFirstChar(Char::titlecase)
 
         if (DEBUG) {
@@ -198,6 +198,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutAppTranslate.setOnClickListener(this)
         b.aboutStats.setOnClickListener(this)
         b.aboutProc.setOnClickListener(this)
+        b.aboutStackTrace.setOnClickListener(this)
         b.aboutDbStats.setOnClickListener(this)
         b.tokenTextView.setOnClickListener(this)
         b.aboutFlightRecord.setOnClickListener(this)
@@ -436,6 +437,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.aboutProc -> {
                 openProcDialog()
             }
+            b.aboutStackTrace -> {
+                openStackTraceDialog()
+            }
             b.aboutDbStats -> {
                 openDatabaseDumpDialog()
             }
@@ -480,137 +484,20 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         Toast.makeText(requireContext(), "Flight recording started", Toast.LENGTH_SHORT).show()
     }
 
-    private fun openEventLogs() {
-        val intent = Intent(requireContext(), com.celzero.bravedns.ui.activity.EventsActivity::class.java)
-        startActivity(intent)
-    }
-
-    private fun generateNewToken(): String {
-        if (isFdroidFlavour()) return ""
-
-        val newToken = getRandomString(TOKEN_LENGTH)
-        persistentState.firebaseUserToken = newToken
-        persistentState.firebaseUserTokenTimestamp = System.currentTimeMillis()
-        updateTokenUi(newToken)
-        logEvent(EventType.SYSTEM_EVENT, "Stability Program Token", "User regenerated new token for stability program")
-        return newToken
-    }
-
-    private fun openStatsDialog() {
+    private fun openStackTraceDialog() {
         io {
-            val stat = VpnController.getNetStat()
-            val formatedStat = UIUtils.formatNetStat(stat)
-            val formatedMetrics = UIUtils.formatNetMetrics(stat)
-            val vpnStats = VpnController.vpnStats()
-            val stats = formatedStat + vpnStats
-            uiCtx {
-                if (!isAdded) return@uiCtx
-                val ctx = requireContext()
-                val pad = resources.getDimensionPixelSize(R.dimen.dots_margin_bottom)
-
-                fun makeTabButton(text: String): android.widget.Button {
-                    return android.widget.Button(ctx, null, android.R.attr.borderlessButtonStyle).apply {
-                        this.text = text
-                        textSize = 12f
-                        layoutParams = android.widget.LinearLayout.LayoutParams(
-                            0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-                        isAllCaps = false
-                    }
-                }
-
-                fun makeScrollableText(content: String?): android.widget.ScrollView {
-                    val tv = android.widget.TextView(ctx).apply {
-                        setPadding(pad, pad / 2, pad, pad)
-                        text = content ?: "No data"
-                        setTextIsSelectable(true)
-                        typeface = android.graphics.Typeface.MONOSPACE
-                        textSize = 11.5f
-                    }
-                    return android.widget.ScrollView(ctx).apply {
-                        addView(tv)
-                        scrollBarStyle = android.widget.ScrollView.SCROLLBARS_INSIDE_OVERLAY
-                    }
-                }
-
-                val statsScrollView   = makeScrollableText(stats)
-                val metricsScrollView = makeScrollableText(formatedMetrics)
-
-                val tabStats   = makeTabButton("General")
-                val tabMetrics = makeTabButton("Metrics")
-
-                fun selectTab(showStats: Boolean) {
-                    statsScrollView.visibility   = if (showStats)  View.VISIBLE else View.GONE
-                    metricsScrollView.visibility = if (!showStats) View.VISIBLE else View.GONE
-                    tabStats.alpha   = if (showStats)  1f else 0.45f
-                    tabMetrics.alpha = if (!showStats) 1f else 0.45f
-                    if (showStats)  statsScrollView.post   { statsScrollView.scrollTo(0, 0) }
-                    else            metricsScrollView.post { metricsScrollView.scrollTo(0, 0) }
-                }
-
-                tabStats.setOnClickListener   { selectTab(true) }
-                tabMetrics.setOnClickListener { selectTab(false) }
-
-                val tabRow = android.widget.LinearLayout(ctx).apply {
-                    orientation = android.widget.LinearLayout.HORIZONTAL
-                    addView(tabStats)
-                    addView(tabMetrics)
-                }
-
-                val container = android.widget.LinearLayout(ctx).apply {
-                    orientation = android.widget.LinearLayout.VERTICAL
-                    addView(tabRow)
-                    addView(statsScrollView, android.widget.LinearLayout.LayoutParams(
-                        android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
-                    addView(metricsScrollView, android.widget.LinearLayout.LayoutParams(
-                        android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
-                }
-
-                // Start on the Stats tab
-                selectTab(true)
-
-                val clipText = buildString {
-                    appendLine("=== STATS ===")
-                    appendLine(stats)
-                    appendLine("=== METRICS ===")
-                    appendLine(formatedMetrics.orEmpty())
-                }
-
-                MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
-                    .setTitle(getString(R.string.title_statistics))
-                    .setView(container)
-                    .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
-                    .setNeutralButton(R.string.dns_info_neutral) { _, _ ->
-                        copyToClipboard("stats_dump", clipText)
-                        showToastUiCentered(
-                            ctx,
-                            getString(R.string.copied_clipboard),
-                            Toast.LENGTH_SHORT
-                        )
-                    }.create()
-                    .show()
-            }
-        }
-    }
-
-    private fun openProcDialog() {
-        io {
-            // Read everything on IO so the dialog opens quickly.
             val allThreadsSched = KernelProc.parseSchedAllThreads()
-            val status = KernelProc.getStatus(forceRefresh = true)
-            val smaps = KernelProc.getSmaps(forceRefresh = true)
-            val auxv = KernelProc.getStats(forceRefresh = true)
+            val stackTrace = VpnController.printStack()
             uiCtx {
                 if (!isAdded) return@uiCtx
-                showProcDialog(allThreadsSched, status, smaps, auxv)
+                showStackTraceDialog(allThreadsSched, stackTrace)
             }
         }
     }
 
-    private fun showProcDialog(
+    private fun showStackTraceDialog(
         allThreadsSched: List<KernelProc.ThreadSchedInfo>,
-        status: String,
-        smaps: String,
-        auxv: String
+        stackTrace: String
     ) {
         if (!isAdded) return
         val ctx = requireContext()
@@ -662,11 +549,11 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 }
                 if (hasSchedFields) {
                     val sb = StringBuilder("    ")
-                    if (t.waitMax > 0)              sb.append("wait_max=${fmtNs(t.waitMax)}  ")
-                    if (t.nrWakeups > 0)            sb.append("wakeups=${fmtNum(t.nrWakeups)}  ")
-                    if (t.nrMigrations > 0)         sb.append("mig=${fmtNum(t.nrMigrations)}  ")
+                    if (t.waitMax > 0)               sb.append("wait_max=${fmtNs(t.waitMax)}  ")
+                    if (t.nrWakeups > 0)             sb.append("wakeups=${fmtNum(t.nrWakeups)}  ")
+                    if (t.nrMigrations > 0)          sb.append("mig=${fmtNum(t.nrMigrations)}  ")
                     if (t.nrInvoluntarySwitches > 0) sb.append("inv_sw=${fmtNum(t.nrInvoluntarySwitches)}  ")
-                    if (t.nrVoluntarySwitches > 0)  sb.append("vol_sw=${fmtNum(t.nrVoluntarySwitches)}")
+                    if (t.nrVoluntarySwitches > 0)   sb.append("vol_sw=${fmtNum(t.nrVoluntarySwitches)}")
                     threadsSpan.append(sb.toString().trimEnd()).append("\n")
                 }
 
@@ -677,6 +564,207 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
                 threadsSpan.append("\n")
             }
+        }
+
+        val clipText = buildString {
+            appendLine("=== THREADS ===")
+            appendLine(threadsSpan.toString())
+            appendLine("=== STACK TRACE ===")
+            appendLine(stackTrace.ifBlank { "Not available" })
+        }
+
+        fun makeTabButton(text: String): android.widget.Button {
+            return android.widget.Button(ctx, null, android.R.attr.borderlessButtonStyle).apply {
+                this.text = text
+                textSize = 12f
+                layoutParams = android.widget.LinearLayout.LayoutParams(0,
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                isAllCaps = false
+            }
+        }
+
+        fun makeScrollableSpannable(spannable: android.text.SpannableStringBuilder): android.widget.ScrollView {
+            val tv = android.widget.TextView(ctx).apply {
+                setPadding(pad, pad / 2, pad, pad)
+                setText(spannable, android.widget.TextView.BufferType.SPANNABLE)
+                setTextIsSelectable(true)
+                typeface = android.graphics.Typeface.MONOSPACE
+                textSize = 11.5f
+            }
+            return android.widget.ScrollView(ctx).apply {
+                addView(tv)
+                scrollBarStyle = android.widget.ScrollView.SCROLLBARS_INSIDE_OVERLAY
+            }
+        }
+
+        fun makeScrollableText(content: String): android.widget.ScrollView {
+            val tv = android.widget.TextView(ctx).apply {
+                setPadding(pad, pad / 2, pad, pad)
+                text = content.ifBlank { "Not available" }
+                setTextIsSelectable(true)
+                typeface = android.graphics.Typeface.MONOSPACE
+                textSize = 11.5f
+            }
+            return android.widget.ScrollView(ctx).apply {
+                addView(tv)
+                scrollBarStyle = android.widget.ScrollView.SCROLLBARS_INSIDE_OVERLAY
+            }
+        }
+
+        val threadsScrollView    = makeScrollableSpannable(threadsSpan)
+        val stackTraceScrollView = makeScrollableText(stackTrace)
+
+        val tabThreads    = makeTabButton("Threads")
+        val tabStackTrace = makeTabButton("Stack Trace")
+
+        fun selectTab(showThreads: Boolean) {
+            threadsScrollView.visibility    = if (showThreads)  View.VISIBLE else View.GONE
+            stackTraceScrollView.visibility = if (!showThreads) View.VISIBLE else View.GONE
+            tabThreads.alpha    = if (showThreads)  1f else 0.45f
+            tabStackTrace.alpha = if (!showThreads) 1f else 0.45f
+            if (showThreads) threadsScrollView.post    { threadsScrollView.scrollTo(0, 0) }
+            else             stackTraceScrollView.post { stackTraceScrollView.scrollTo(0, 0) }
+        }
+
+        tabThreads.setOnClickListener    { selectTab(true) }
+        tabStackTrace.setOnClickListener { selectTab(false) }
+
+        val tabRow = android.widget.LinearLayout(ctx).apply {
+            orientation = android.widget.LinearLayout.HORIZONTAL
+            addView(tabThreads)
+            addView(tabStackTrace)
+        }
+
+        val container = android.widget.LinearLayout(ctx).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            addView(tabRow)
+            addView(threadsScrollView, android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
+            addView(stackTraceScrollView, android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
+        }
+
+        // Start on the Threads tab
+        selectTab(true)
+
+        val dialog = MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
+            .setTitle("Stack Trace")
+            .setView(container)
+            .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
+            .setNegativeButton(R.string.dns_info_neutral) { _, _ ->
+                copyToClipboard("stack_trace", clipText)
+                showToastUiCentered(ctx, getString(R.string.copied_clipboard), Toast.LENGTH_SHORT)
+            }
+            .setNeutralButton("Refresh", null)
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(android.app.AlertDialog.BUTTON_NEUTRAL)?.setOnClickListener {
+                dialog.dismiss()
+                openStackTraceDialog()
+            }
+        }
+
+        dialog.show()
+    }
+
+    private fun openEventLogs() {
+        val intent = Intent(requireContext(), com.celzero.bravedns.ui.activity.EventsActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun generateNewToken(): String {
+        if (isFdroidFlavour()) return ""
+
+        val newToken = getRandomString(TOKEN_LENGTH)
+        persistentState.firebaseUserToken = newToken
+        persistentState.firebaseUserTokenTimestamp = System.currentTimeMillis()
+        updateTokenUi(newToken)
+        logEvent(EventType.SYSTEM_EVENT, "Stability Program Token", "User regenerated new token for stability program")
+        return newToken
+    }
+
+    private fun openStatsDialog() {
+        io {
+            val stat = VpnController.getNetStat()
+            val formatedStat = UIUtils.formatNetStat(stat)
+            val vpnStats = VpnController.vpnStats()
+            val stats = formatedStat + vpnStats
+            uiCtx {
+                if (!isAdded) return@uiCtx
+                val ctx = requireContext()
+                val pad = resources.getDimensionPixelSize(R.dimen.dots_margin_bottom)
+
+                val tv = android.widget.TextView(ctx).apply {
+                    setPadding(pad, pad / 2, pad, pad)
+                    text = stats ?: "No data"
+                    setTextIsSelectable(true)
+                    typeface = android.graphics.Typeface.MONOSPACE
+                    textSize = 11.5f
+                }
+                val scrollView = android.widget.ScrollView(ctx).apply {
+                    addView(tv)
+                    scrollBarStyle = android.widget.ScrollView.SCROLLBARS_INSIDE_OVERLAY
+                }
+
+                MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
+                    .setTitle(getString(R.string.title_statistics))
+                    .setView(scrollView)
+                    .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
+                    .setNeutralButton(R.string.dns_info_neutral) { _, _ ->
+                        copyToClipboard("stats_dump", stats.orEmpty())
+                        showToastUiCentered(
+                            ctx,
+                            getString(R.string.copied_clipboard),
+                            Toast.LENGTH_SHORT
+                        )
+                    }.create()
+                    .show()
+            }
+        }
+    }
+
+    private fun openProcDialog() {
+        io {
+            // Read everything on IO so the dialog opens quickly.
+            val status = KernelProc.getStatus(forceRefresh = true)
+            val smaps = KernelProc.getSmaps(forceRefresh = true)
+            val auxv = KernelProc.getStats(forceRefresh = true)
+            val stat = VpnController.getNetStat()
+            val formatedMetrics = UIUtils.formatNetMetrics(stat)
+            uiCtx {
+                if (!isAdded) return@uiCtx
+                showProcDialog(status, smaps, auxv, formatedMetrics)
+            }
+        }
+    }
+
+    private fun showProcDialog(
+        status: String,
+        smaps: String,
+        auxv: String,
+        formatedMetrics: String?
+    ) {
+        if (!isAdded) return
+        val ctx = requireContext()
+        val pad = resources.getDimensionPixelSize(R.dimen.dots_margin_bottom)
+
+        val colorHint = ContextCompat.getColor(ctx, android.R.color.darker_gray)
+
+        fun android.text.SpannableStringBuilder.bold(text: String): android.text.SpannableStringBuilder {
+            val start = length
+            append(text)
+            setSpan(android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+                start, length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            return this
+        }
+
+        fun android.text.SpannableStringBuilder.color(text: String, color: Int): android.text.SpannableStringBuilder {
+            val start = length
+            append(text)
+            setSpan(android.text.style.ForegroundColorSpan(color),
+                start, length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            return this
         }
 
         val otherSpan = android.text.SpannableStringBuilder()
@@ -696,10 +784,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         otherSection("AUXV  (/proc/self/auxv)", auxv)
 
         val clipText = buildString {
-            appendLine("=== THREADS / SCHED ===")
-            appendLine(threadsSpan.toString())
             appendLine("=== PROC / MEM ===")
             appendLine(otherSpan.toString())
+            appendLine("=== METRICS ===")
+            appendLine(formatedMetrics.orEmpty())
         }
 
         fun makeTabButton(text: String): android.widget.Button {
@@ -712,14 +800,13 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
         }
 
-        fun makeScrollableText(spannable: android.text.SpannableStringBuilder): android.widget.ScrollView {
+        fun makeScrollableSpannable(spannable: android.text.SpannableStringBuilder): android.widget.ScrollView {
             val tv = android.widget.TextView(ctx).apply {
                 setPadding(pad, pad / 2, pad, pad)
                 setText(spannable, android.widget.TextView.BufferType.SPANNABLE)
                 setTextIsSelectable(true)
                 typeface = android.graphics.Typeface.MONOSPACE
                 textSize = 11.5f
-                movementMethod = android.text.method.ScrollingMovementMethod.getInstance()
             }
             return android.widget.ScrollView(ctx).apply {
                 addView(tv)
@@ -727,41 +814,55 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
         }
 
-        val threadsScrollView = makeScrollableText(threadsSpan)
-        val otherScrollView   = makeScrollableText(otherSpan)
-
-        val tabOther   = makeTabButton("Proc / Mem")
-        val tabThreads = makeTabButton("Threads")
-
-        fun selectTab(showThreads: Boolean) {
-            threadsScrollView.visibility = if (showThreads) View.VISIBLE else View.GONE
-            otherScrollView.visibility   = if (!showThreads) View.VISIBLE else View.GONE
-            tabThreads.alpha = if (showThreads) 1f else 0.45f
-            tabOther.alpha   = if (!showThreads) 1f else 0.45f
-            if (showThreads) threadsScrollView.post { threadsScrollView.scrollTo(0, 0) }
-            else             otherScrollView.post   { otherScrollView.scrollTo(0, 0) }
+        fun makeScrollableText(content: String?): android.widget.ScrollView {
+            val tv = android.widget.TextView(ctx).apply {
+                setPadding(pad, pad / 2, pad, pad)
+                text = content ?: "No data"
+                setTextIsSelectable(true)
+                typeface = android.graphics.Typeface.MONOSPACE
+                textSize = 11.5f
+            }
+            return android.widget.ScrollView(ctx).apply {
+                addView(tv)
+                scrollBarStyle = android.widget.ScrollView.SCROLLBARS_INSIDE_OVERLAY
+            }
         }
 
-        tabThreads.setOnClickListener { selectTab(true) }
-        tabOther.setOnClickListener   { selectTab(false) }
+        val procScrollView    = makeScrollableSpannable(otherSpan)
+        val metricsScrollView = makeScrollableText(formatedMetrics)
+
+        val tabProc    = makeTabButton("Proc / Mem")
+        val tabMetrics = makeTabButton("Metrics")
+
+        fun selectTab(showProc: Boolean) {
+            procScrollView.visibility    = if (showProc)  View.VISIBLE else View.GONE
+            metricsScrollView.visibility = if (!showProc) View.VISIBLE else View.GONE
+            tabProc.alpha    = if (showProc)  1f else 0.45f
+            tabMetrics.alpha = if (!showProc) 1f else 0.45f
+            if (showProc) procScrollView.post    { procScrollView.scrollTo(0, 0) }
+            else          metricsScrollView.post { metricsScrollView.scrollTo(0, 0) }
+        }
+
+        tabProc.setOnClickListener    { selectTab(true) }
+        tabMetrics.setOnClickListener { selectTab(false) }
 
         val tabRow = android.widget.LinearLayout(ctx).apply {
             orientation = android.widget.LinearLayout.HORIZONTAL
-            addView(tabOther)
-            addView(tabThreads)
+            addView(tabProc)
+            addView(tabMetrics)
         }
 
         val container = android.widget.LinearLayout(ctx).apply {
             orientation = android.widget.LinearLayout.VERTICAL
             addView(tabRow)
-            addView(threadsScrollView, android.widget.LinearLayout.LayoutParams(
+            addView(procScrollView, android.widget.LinearLayout.LayoutParams(
                 android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
-            addView(otherScrollView, android.widget.LinearLayout.LayoutParams(
+            addView(metricsScrollView, android.widget.LinearLayout.LayoutParams(
                 android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
         }
 
-        // Start on the Proc / mem tab
-        selectTab(false)
+        // Start on the Proc / Mem tab
+        selectTab(true)
 
         val dialog = MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
             .setTitle("Proc Analysis")

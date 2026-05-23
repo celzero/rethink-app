@@ -98,6 +98,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         // e.g. "default", "privacy,family", "privacy,family,security"
         const val RPN_DNS_TUN_TYPES = "rpn_dns_tun_types"
 
+        const val ADV_SETTINGS_FORCE_PT_MODE = "adv_setting_force_pt_mode"
+
         // Guided tour version bump this constant to re-show the tour after major UI changes.
         // Any stored version lower than this will cause the tour to re-trigger.
         // v2: added Rethink+ premium nav-item step (step 6) + fixed tour button text contrast.
@@ -139,7 +141,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // user chosen blocklists stored custom dictionary indexed in base64
     var localBlocklistStamp by
         stringPref("local_block_list_stamp")
-            .withDefault<String>(if (Utilities.isHeadlessFlavour()) "1:YAYBACABEDAgAA==" else "")
+            .withDefault<String>("")
 
     // whether to drop packets when the source app originating the reqs couldn't be determined
     private var _blockUnknownConnections by
@@ -147,7 +149,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // whether user has enable on-device blocklists
     var blocklistEnabled by
-        booleanPref("enable_local_list").withDefault<Boolean>(Utilities.isHeadlessFlavour())
+        booleanPref("enable_local_list").withDefault<Boolean>(false)
 
     // the version (which is a unix timestamp) of the current rethinkdns+ remote blocklist files
     var remoteBlocklistTimestamp by
@@ -170,10 +172,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // user set among AppConfig.DnsType enum; RETHINK_REMOTE is default which is Rethink-DoH
     var dnsType by
         intPref("dns_type")
-            .withDefault<Int>(
-                if (!Utilities.isHeadlessFlavour()) AppConfig.DnsType.RETHINK_REMOTE.type
-                else AppConfig.DnsType.SYSTEM_DNS.type
-            )
+            .withDefault<Int>(AppConfig.DnsType.RETHINK_REMOTE.type)
 
     // whether the app must attempt to startup on reboot if it was running before shutdown
     var prefAutoStartBootUp by booleanPref("auto_start_on_boot").withDefault<Boolean>(true)
@@ -260,10 +259,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // user-preferred Internet Protocol type, default IPv4
     var internetProtocolType by
         intPref(INTERNET_PROTOCOL)
-            .withDefault<Int>(
-                if (!Utilities.isHeadlessFlavour()) InternetProtocol.IPv4.id
-                else InternetProtocol.IPv46.id
-            )
+            .withDefault<Int>(InternetProtocol.IPv4.id)
 
     // user-preferred 6to4 protocol translation, on IPv6 mode (default: PTMODEAUTO)
     var protocolTranslationType by booleanPref(PROTOCOL_TRANSLATION).withDefault<Boolean>(false)
@@ -382,8 +378,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // treat only mobile data as metered
     var treatOnlyMobileNetworkAsMetered by booleanPref("treat_only_mobile_nw_as_metered").withDefault<Boolean>(false)
 
-    var showConfettiOnRPlus by booleanPref("show_confetti_on_rplus").withDefault<Boolean>(true)
-
     var autoDialsParallel by booleanPref("auto_dials_parallel").withDefault<Boolean>(false)
 
     // user setting whether to download ip info for the given ip address
@@ -408,7 +402,17 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var vpnBuilderPolicy by intPref("tun_network_handling_policy").withDefault<Int>(0)
 
     // whether to use default dns for trusted ips and domains
+    // TODO: remove this variable as it should not be used, BlockFreeDnsMode should be used instead
+    //  to decide the dns bypass mode for trusted ips and domains
     var useFallbackDnsToBypass by booleanPref("use_fallback_dns_to_bypass").withDefault<Boolean>(true)
+
+    // Block-free DNS: stored as "TYPE::url" e.g. "DOH::https://dns.google/dns-query"
+    // Empty string means no block-free DNS configured
+    var blockFreeDns by stringPref("block_free_dns").withDefault<String>("")
+
+    // DNS bypass mode for block-free DNS: 1=fallback, 2=global, 3=none
+    // Default is 1 (Use fallback as DNS)
+    var blockFreeDnsMode by intPref("block_free_dns_mode").withDefault<Int>(1)
 
     // Firebase error reporting enabled (only for play and website variants)
     var firebaseErrorReportingEnabled by booleanPref("firebase_error_reporting").withDefault<Boolean>(Utilities.isPlayStoreFlavour())
@@ -440,6 +444,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var smartPersistentKeepalive by booleanPref("smart_persistent_keepalive").withDefault<Boolean>(false)
 
     var appTestMode by booleanPref("app_test_mode").withDefault<Boolean>(false)
+
+    var advSettingForcePTMode by booleanPref("adv_setting_force_pt_mode").withDefault<Boolean>(false)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
@@ -712,8 +718,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // RPN DNS url
     var rpnDnsUrl by stringPref(RPN_DNS_URL).withDefault<String>(RpnProxyManager.DnsMode.DEFAULT.url)
 
-    /** Comma-separated [RpnProxyManager.DnsMode.tunType] values for the multi-select DNS filter. */
-    var rpnDnsTunTypes by stringPref(RPN_DNS_TUN_TYPES).withDefault<String>(RpnProxyManager.DnsMode.DEFAULT.tunType)
+    // comma-separated [RpnProxyManager.DnsMode.tunType] values for the multi-select DNS filter
+    var rpnDnsTunTypes by stringPref(RPN_DNS_TUN_TYPES).withDefault<String>(RpnProxyManager.DnsMode.PRIVACY.tunType)
 
     // RPN configuration handling mode: false = AUTO (app decides), true = MANUAL (user decides)
     var rpnConfigHandlingManual by booleanPref("rpn_config_handling_manual").withDefault<Boolean>(false)
@@ -727,6 +733,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // RPN use permanent configuration: only effective when rpnConfigHandlingManual=true
     var rpnUsePermanentConfig by booleanPref("rpn_use_permanent_config").withDefault<Boolean>(false)
+
+    /** Comma-separated country codes (e.g. "US,DE,FR") excluded from AUTO server selection.
+     *  Empty string = no exclusions (default). */
+    var rpnAutoExcludedCcs by stringPref("rpn_auto_excluded_ccs").withDefault<String>("")
 
     // timestamp of the last successful /g/device registration call.
     var deviceRegistrationTimestamp by longPref("device_registration_timestamp").withDefault<Long>(0L)

@@ -106,7 +106,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
 
         // RpnProxyManager is a Kotlin object, must be mocked with mockkObject.
         mockkObject(RpnProxyManager)
-        every  { RpnProxyManager.getSessionTokenFromPayload(any()) } returns ""
+        coEvery { RpnProxyManager.getSessionTokenFromPayload(any()) } returns ""
         coEvery { RpnProxyManager.activateRpn(any(), any()) }        just Runs
         coEvery { RpnProxyManager.deactivateRpn(any()) }             just Runs
         coEvery { RpnProxyManager.processRpnPurchase(any(), any()) } returns true
@@ -824,7 +824,56 @@ class SubscriptionStateMachineV2Test : KoinTest {
                 it.purchaseToken == "tok-absent" &&
                 it.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id
             })
+        } // All INAPP rows were expired → state should be Expired
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
+    }
+
+    /**
+     * Regression test for the bug where a user with two INAPP purchases (e.g. bought a new
+     * plan after the original one) had their subscription forcibly expired.
+     *
+     * Scenario:
+     *  - DB contains two active INAPP rows: an OLD superseded token (absent from Play) and a
+     *    NEW active token (present in Play).
+     *  - Play snapshot returns only the NEW token.
+     *  - expireStaleInAppFromDb should expire the OLD row (DB cleanup) but MUST NOT fire
+     *    SubscriptionExpired because the NEW purchase is still active.
+     */
+    @Test
+    fun `expireStaleInAppFromDb old superseded token expired but newer active token keeps state Active`() = runBlocking {
+        val machine = createMachine()
+        transitionToActive(machine)
+
+        val now = System.currentTimeMillis()
+        val oldSub = makeActiveSub(purchaseToken = "tok-old-superseded", productId = INAPP_2YRS).also {
+            it.billingExpiry = now + 365 * 24 * 60 * 60 * 1000L  // still future — was superseded, not expired
         }
+        val newSub = makeActiveSub(purchaseToken = "tok-new-active", productId = INAPP_2YRS).also {
+            it.billingExpiry = now + 2 * 365 * 24 * 60 * 60 * 1000L  // further-future new purchase
+        }
+        // DB returns both rows as active
+        coEvery { mockRepository.getSubscriptionsByStates(any()) } returns listOf(oldSub, newSub)
+
+        // Play snapshot only contains the NEW token; old one is absent (superseded)
+        machine.expireStaleInAppFromDb(playTokens = setOf("tok-new-active"))
+
+        // Old row must be expired in DB
+        coVerify {
+            mockRepository.upsert(match {
+                it.purchaseToken == "tok-old-superseded" &&
+                it.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id
+            })
+        }
+        // New row must NOT be touched
+        coVerify(exactly = 0) {
+            mockRepository.upsert(match { it.purchaseToken == "tok-new-active" })
+        }
+        // State machine MUST remain Active — the user still has a valid purchase
+        assertEquals(
+            "State must remain Active when a newer INAPP purchase is still valid in Play snapshot",
+            SubscriptionStateMachineV2.SubscriptionState.Active,
+            machine.getCurrentState()
+        )
     }
 
     @Test

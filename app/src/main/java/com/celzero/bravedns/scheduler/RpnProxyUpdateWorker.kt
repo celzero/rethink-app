@@ -271,14 +271,11 @@ class RpnProxyUpdateWorker(
             }
             is RegisterDeviceResult.Unauthorized -> {
                 Logger.e(LOG_IAB, "$TAG; $mname: 401 unauthorized; posting DeviceAuthError to UI")
-                withContext(Dispatchers.Main) {
-                    val error = ServerApiError.Unauthorized401(
-                        operation = ServerApiError.Operation.DEVICE,
-                        accountId = accountId,
-                        deviceIdPrefix = deviceId.take(6)
-                    )
-                    InAppBillingHandler.serverApiErrorLiveData.value = error
-                }
+                InAppBillingHandler.handleUnauthorized401(
+                    operation = ServerApiError.Operation.DEVICE,
+                    accountId = accountId,
+                    deviceId  = deviceId
+                )
             }
             is RegisterDeviceResult.Conflict -> {
                 Logger.w(LOG_IAB, "$TAG; $mname: 409 conflict: device already registered (non-fatal)")

@@ -118,17 +118,16 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:fontFamily="sans-serif-smallcaps"
                 android:gravity="center_vertical"
-                android:lineSpacingExtra="5dp"
-                android:padding="5dp"
                 android:text="@string/ada_firewall_title"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/extra_large_font_text_view" />
+                style="@style/TextAppearance.Material3.TitleSmall"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:padding="5dp"
+                android:textColor="?attr/colorOnBackground" />
 
         </RelativeLayout>
 
@@ -402,9 +401,9 @@
 
                     </LinearLayout>
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
+                    <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/exclude_proxy_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -412,7 +411,6 @@
                         android:padding="10dp" />
                 </RelativeLayout>
 
-                <!-- Temporary Allow Toggle -->
                 <RelativeLayout
                     android:id="@+id/temp_allow_rl"
                     android:layout_width="wrap_content"
@@ -465,9 +463,9 @@
 
                     </LinearLayout>
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
+                    <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/temp_allow_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -489,9 +487,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <com.google.android.material.switchmaterial.SwitchMaterial
+                <com.google.android.material.materialswitch.MaterialSwitch
                     android:id="@+id/aad_dns_heading"
-                    style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                    style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
@@ -552,19 +550,19 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/aad_active_conns_title"
-                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_toStartOf="@id/aad_close_conns_chip"
+                android:lineSpacingExtra="5dp"
+                android:text="@string/top_active_conns"
+                style="@style/TextAppearance.Material3.BodyMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="20dp"
-                android:layout_toStartOf="@id/aad_close_conns_chip"
-                android:fontFamily="sans-serif-smallcaps"
-                android:lineSpacingExtra="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
                 android:padding="5dp"
-                android:text="@string/top_active_conns"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/extra_large_font_text_view" />
+                android:textColor="?attr/colorOnBackground" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/aad_close_conns_chip"
@@ -614,19 +612,18 @@
             android:visibility="gone">
 
             <androidx.appcompat.widget.AppCompatTextView
-                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_toStartOf="@id/aad_asn_chip"
+                android:text="@string/most_contacted_asn"
+                style="@style/TextAppearance.Material3.BodyMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="20dp"
-                android:layout_toStartOf="@id/aad_asn_chip"
-                android:fontFamily="sans-serif-smallcaps"
-                android:lineSpacingExtra="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
                 android:padding="5dp"
-                android:text="@string/most_contacted_asn"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/extra_large_font_text_view" />
+                android:textColor="?attr/colorOnBackground" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/aad_asn_chip"
@@ -660,19 +657,18 @@
             android:visibility="gone">
 
             <androidx.appcompat.widget.AppCompatTextView
-                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_toStartOf="@id/aad_domains_chip"
+                android:text="@string/ssv_most_contacted_domain_heading"
+                style="@style/TextAppearance.Material3.BodyMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="20dp"
-                android:layout_toStartOf="@id/aad_domains_chip"
-                android:fontFamily="sans-serif-smallcaps"
-                android:lineSpacingExtra="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
                 android:padding="5dp"
-                android:text="@string/ssv_most_contacted_domain_heading"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/extra_large_font_text_view" />
+                android:textColor="?attr/colorOnBackground" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/aad_domains_chip"
@@ -706,19 +702,18 @@
             android:visibility="gone">
 
             <androidx.appcompat.widget.AppCompatTextView
-                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_toStartOf="@id/aad_ips_chip"
+                android:text="@string/ssv_most_contacted_ips_heading"
+                style="@style/TextAppearance.Material3.BodyMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="20dp"
-                android:layout_toStartOf="@id/aad_ips_chip"
-                android:fontFamily="sans-serif-smallcaps"
-                android:lineSpacingExtra="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
                 android:padding="5dp"
-                android:text="@string/ssv_most_contacted_ips_heading"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/extra_large_font_text_view" />
+                android:textColor="?attr/colorOnBackground" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/aad_ips_chip"

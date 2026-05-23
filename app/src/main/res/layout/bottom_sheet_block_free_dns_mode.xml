@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="100dp">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="60dp"
+        android:layout_height="3dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="40dp"
+        android:background="?attr/border" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/bfdm_heading"
+        style="@style/TextAppearance.Material3.TitleMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="4dp"
+        android:text="@string/bfdm_heading"
+        android:textColor="?attr/colorOnSurface" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/bfdm_desc"
+        style="@style/TextAppearance.Material3.BodyMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/bfdm_desc"
+        android:textColor="?attr/colorOnSurfaceVariant" />
+
+    <RadioGroup
+        android:id="@+id/bfdm_radio_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp">
+
+        <RelativeLayout
+            android:id="@+id/bfdm_option_fallback_rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
+            android:paddingStart="16dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="12dp">
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/bfdm_option_fallback_rb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:clickable="false"
+                android:focusable="false" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_toEndOf="@id/bfdm_option_fallback_rb"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/bfdm_option_fallback_label"
+                    android:textColor="?attr/colorOnSurface" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.Material3.BodyMedium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/bfdm_option_fallback_desc"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp" />
+
+        <RelativeLayout
+            android:id="@+id/bfdm_option_global_rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
+            android:paddingStart="16dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="12dp">
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/bfdm_option_global_rb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:clickable="false"
+                android:focusable="false" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_toEndOf="@id/bfdm_option_global_rb"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/bfdm_option_global_label"
+                    android:textColor="?attr/colorOnSurface" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.Material3.BodyMedium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/bfdm_option_global_desc"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp" />
+
+        <RelativeLayout
+            android:id="@+id/bfdm_option_none_rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
+            android:paddingStart="16dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="12dp">
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/bfdm_option_none_rb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:clickable="false"
+                android:focusable="false" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_toEndOf="@id/bfdm_option_none_rb"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/bfdm_option_auto_label"
+                    android:textColor="?attr/colorOnSurface" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.Material3.BodyMedium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/bfdm_option_auto_desc"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+            </LinearLayout>
+        </RelativeLayout>
+
+    </RadioGroup>
+
+</LinearLayout>

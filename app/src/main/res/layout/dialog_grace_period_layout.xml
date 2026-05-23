@@ -65,7 +65,7 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/button_later"
-            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+            style="@style/Widget.Material3.Button.TextButton.Dialog"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -78,7 +78,7 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/button_renew"
-            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+            style="@style/Widget.Material3.Button.TextButton.Dialog"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

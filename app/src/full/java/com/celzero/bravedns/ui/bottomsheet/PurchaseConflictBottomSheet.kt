@@ -37,7 +37,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * Bottom sheet shown whenever an [ITcpProxy] server call returns HTTP 409 (Conflict).
+ * Bottom sheet shown whenever an [com.celzero.bravedns.customdownloader.IBillingServerApi] server
+ * call returns HTTP 409 (Conflict).
  *
  * Surfaces:
  * - Which endpoint returned the conflict

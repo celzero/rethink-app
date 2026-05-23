@@ -76,8 +76,6 @@ class ServerOrderHistoryAdapter(private val context: Context) :
             b.divider.visibility = if (isLast) View.GONE else View.VISIBLE
         }
 
-        // ── Type badge (Subscription / One-time) ─────────────────────────────
-
         private fun bindTypeBadge(entry: ServerOrderEntry) {
             if (entry.isSubscription) {
                 b.tvTypeBadge.text = context.getString(R.string.server_order_type_subscription)
@@ -180,16 +178,15 @@ class ServerOrderHistoryAdapter(private val context: Context) :
 
         private fun bindProductInfo(entry: ServerOrderEntry) {
             b.tvProductName.text = formatProductName(entry)
-            val tokenShort = entry.purchaseToken.take(16).let {
-                if (entry.purchaseToken.length > 16) "$it…" else it
-            }
-            b.tvToken.text = context.getString(R.string.payment_history_token_fmt, tokenShort)
+            val tokenShort = entry.purchaseToken.take(12)
+            val cidShort = entry.cid.take(12)
+            b.tvToken.text = context.getString(R.string.two_argument_dot, tokenShort, cidShort)
         }
 
         private fun formatProductName(entry: ServerOrderEntry): String {
-            val sku = entry.productId.ifBlank { entry.sku }
+            val sku = entry.planId.ifBlank { entry.productId }.ifBlank { entry.sku }
             return sku.split('.', '_', '-')
-                .joinToString(" • ") { part -> part.replaceFirstChar { it.uppercase() } }
+                .joinToString(" ") { part -> part.replaceFirstChar { it.uppercase() } }
         }
 
         private fun bindDates(entry: ServerOrderEntry) {
@@ -227,6 +224,15 @@ class ServerOrderHistoryAdapter(private val context: Context) :
 
         private fun bindTestBadge(entry: ServerOrderEntry) {
             b.tvTestBadge.visibility = if (entry.isTestPurchase) View.VISIBLE else View.GONE
+            if (entry.isTestPurchase) {
+                b.tvTestBadge.text = "Test"
+                b.tvTestBadge.backgroundTintList = ContextCompat.getColorStateList(
+                    context, R.color.chipBgNeutral
+                )
+                b.tvTestBadge.setTextColor(
+                    UIUtils.fetchColor(context, R.attr.chipTextNeutral)
+                )
+            }
         }
     }
 }

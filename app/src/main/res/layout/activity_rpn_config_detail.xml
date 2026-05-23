@@ -350,6 +350,39 @@
                             android:background="?attr/divider" />
 
                         <LinearLayout
+                            android:id="@+id/row_last_ok"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp">
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/label_last_ok"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/lbl_last_handshake"
+                                android:textColor="?attr/primaryLightColorText"
+                                android:textSize="13sp" />
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/value_last_ok"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="?attr/primaryTextColor"
+                                android:textSize="13sp"
+                                tools:text="2 min ago" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="0.5dp"
+                            android:alpha="0.08"
+                            android:background="?attr/divider" />
+
+                        <LinearLayout
                             android:id="@+id/row_ipv4"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -485,174 +518,6 @@
                         </LinearLayout>
 
                         <View
-                            android:layout_width="match_parent"
-                            android:layout_height="0.5dp"
-                            android:alpha="0.08"
-                            android:background="?attr/divider"
-                            android:visibility="gone" />
-
-                        <LinearLayout
-                            android:id="@+id/row_rx"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:visibility="gone">
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/label_rx"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:visibility="gone" />
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="0.5dp"
-                            android:alpha="0.08"
-                            android:background="?attr/divider"
-                            android:visibility="gone" />
-
-                        <LinearLayout
-                            android:id="@+id/row_tx"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:visibility="gone">
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/label_tx"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:visibility="gone" />
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="0.5dp"
-                            android:alpha="0.08"
-                            android:background="?attr/divider"
-                            android:visibility="gone" />
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="0.5dp"
-                            android:alpha="0.08"
-                            android:background="?attr/divider" />
-
-                        <LinearLayout
-                            android:id="@+id/row_last_ok"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:paddingTop="8dp"
-                            android:paddingBottom="8dp">
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/label_last_ok"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/lbl_last_handshake"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="13sp" />
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/value_last_ok"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="?attr/primaryTextColor"
-                                android:textSize="13sp"
-                                tools:text="2 min ago" />
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="0.5dp"
-                            android:alpha="0.08"
-                            android:background="?attr/divider"
-                            android:visibility="gone" />
-
-                        <LinearLayout
-                            android:id="@+id/row_since"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:visibility="gone">
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/label_since"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/lbl_active_since"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="13sp" />
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="0.5dp"
-                            android:alpha="0.08"
-                            android:background="?attr/divider"
-                            android:visibility="gone" />
-
-                        <LinearLayout
-                            android:id="@+id/row_load"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:visibility="gone">
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/label_load"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/lbl_bandwidth"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="13sp" />
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/value_load"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="?attr/primaryTextColor"
-                                android:textSize="13sp"
-                                tools:text="1 Gbps" />
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="0.5dp"
-                            android:alpha="0.08"
-                            android:background="?attr/divider"
-                            android:visibility="gone" />
-
-                        <LinearLayout
-                            android:id="@+id/row_health"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:visibility="gone">
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/label_health"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/lbl_load"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="13sp" />
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/value_health"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="?attr/primaryTextColor"
-                                android:textSize="13sp"
-                                tools:text="35% · Normal" />
-                        </LinearLayout>
-
-                        <View
                             android:id="@+id/divider_errors"
                             android:layout_width="match_parent"
                             android:layout_height="0.5dp"
@@ -768,6 +633,7 @@
                             android:layout_marginStart="4dp"
                             android:layout_marginEnd="4dp"
                             android:layout_weight="1"
+                            android:visibility="gone"
                             android:background="@drawable/rectangle_border_background"
                             android:foreground="?attr/selectableItemBackground"
                             android:gravity="center"
@@ -874,6 +740,53 @@
                         android:textStyle="bold" />
 
                     <RelativeLayout
+                        android:id="@+id/hop_rl"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:minHeight="64dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:layout_toStartOf="@id/hop_check"
+                            android:orientation="vertical"
+                            android:paddingEnd="16dp">
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/hop_title_tv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Relay"
+                                android:textColor="?attr/primaryTextColor"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Route this client through a Auto server. This may help if the client is in a restrictive network environment, but it will increase latency and reduce speed."
+                                android:textColor="?attr/primaryLightColorText"
+                                android:textSize="13sp" />
+
+                        </LinearLayout>
+
+                        <com.google.android.material.materialswitch.MaterialSwitch
+                            android:id="@+id/hop_check"
+                            style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
                         android:id="@+id/lockdown_rl"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -910,9 +823,9 @@
 
                         </LinearLayout>
 
-                        <com.google.android.material.switchmaterial.SwitchMaterial
+                        <com.google.android.material.materialswitch.MaterialSwitch
                             android:id="@+id/lockdown_check"
-                            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                            style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
@@ -957,9 +870,9 @@
 
                         </LinearLayout>
 
-                        <com.google.android.material.switchmaterial.SwitchMaterial
+                        <com.google.android.material.materialswitch.MaterialSwitch
                             android:id="@+id/catch_all_check"
-                            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                            style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
@@ -1032,9 +945,9 @@
 
                         </LinearLayout>
 
-                        <com.google.android.material.switchmaterial.SwitchMaterial
+                        <com.google.android.material.materialswitch.MaterialSwitch
                             android:id="@+id/use_mobile_check"
-                            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                            style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
@@ -1080,9 +993,9 @@
 
                         </LinearLayout>
 
-                        <com.google.android.material.switchmaterial.SwitchMaterial
+                        <com.google.android.material.materialswitch.MaterialSwitch
                             android:id="@+id/ssid_check"
-                            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                            style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"

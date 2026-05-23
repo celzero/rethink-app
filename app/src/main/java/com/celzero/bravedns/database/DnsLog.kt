@@ -69,6 +69,7 @@ class DnsLog {
     var dnssecOk: Boolean = false
     var dnssecValid: Boolean = false
     var blockedTarget: String = ""
+    var isEch: Boolean = false
 
     override fun equals(other: Any?): Boolean {
         if (other !is DnsLog) return false

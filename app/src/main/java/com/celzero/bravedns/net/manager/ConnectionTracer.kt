@@ -14,7 +14,8 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import inet.ipaddr.IPAddressString
 import java.net.InetSocketAddress
-import java.util.concurrent.TimeUnit
+import java.net.SocketException
+import java.time.Duration
 
 class ConnectionTracer(ctx: Context) {
 
@@ -27,12 +28,12 @@ class ConnectionTracer(ctx: Context) {
     }
 
     private val cm: ConnectivityManager = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    // Cache the UID for the next 60 seconds.
-    // the UID will expire after 60 seconds of the write.
+    // Cache the UID for the next 300 seconds.
+    // the UID will expire after 300 seconds of to write.
     // Key for the cache is protocol, local, remote
     private val uidCache: Cache<String, Int> = CacheBuilder.newBuilder()
         .maximumSize(CACHE_BUILDER_MAX_SIZE)
-        .expireAfterWrite(CACHE_BUILDER_WRITE_EXPIRE_SEC, TimeUnit.SECONDS)
+        .expireAfterWrite(Duration.ofSeconds(CACHE_BUILDER_WRITE_EXPIRE_SEC))
         .build()
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -103,11 +104,14 @@ class ConnectionTracer(ctx: Context) {
                 return uid
             }
         } catch (secEx: SecurityException) {
-            Logger.e(LOG_TAG_VPN, "err getUidQ: " + secEx.message, secEx)
+            Logger.w(LOG_TAG_VPN, "err getUidQ: " + secEx.message)
         } catch (ex: InterruptedException) { // InterruptedException is thrown by runBlocking
-            Logger.e(LOG_TAG_VPN, "err getUidQ: " + ex.message, ex)
+            Logger.w(LOG_TAG_VPN, "err getUidQ: " + ex.message)
+        } catch (ex: SocketException) {
+            // socket closed or aborted while tracing, no need to log the stack trace
+            Logger.w(LOG_TAG_VPN, "err getUidQ: " + ex.message)
         } catch (ex: Exception) {
-            Logger.e(LOG_TAG_VPN, "err getUidQ: " + ex.message, ex)
+            Logger.w(LOG_TAG_VPN, "err getUidQ: " + ex.message)
         }
 
         if (retryCount >= 2) return uid
@@ -170,8 +174,12 @@ class ConnectionTracer(ctx: Context) {
         // do not cache the DNS request (key: 17|10.111.222.1|10.111.222.3|53)
         if (key == DNS_KEY) return
 
-        Logger.d(LOG_TAG_VPN, "getUidQ; cache put: $uid, $key")
-        uidCache.put(key, uid)
+        Logger.d(LOG_TAG_VPN, "getUidQ: addUidToCache; cache put: $uid, $key")
+        try {
+            uidCache.put(key, uid)
+        } catch (t: Throwable) {
+            Logger.w(LOG_TAG_VPN, "getUidQ: err addUidToCache: " + t.message)
+        }
     }
 
     private fun makeCacheKey(

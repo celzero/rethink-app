@@ -427,7 +427,9 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
             finish()
         }
         builder.setNeutralButton(getString(R.string.lbl_delete)) { _, _ ->
-            WireguardManager.deleteConfig(configId)
+            io {
+                WireguardManager.deleteConfig(configId)
+            }
         }
         val dialog = builder.create()
         dialog.show()

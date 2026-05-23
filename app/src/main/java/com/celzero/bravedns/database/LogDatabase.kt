@@ -32,7 +32,7 @@ import com.celzero.bravedns.util.Utilities
 
 @Database(
     entities = [ConnectionTracker::class, DnsLog::class, RethinkLog::class, IpInfo::class, Event::class],
-    version = 13,
+    version = 14,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -76,6 +76,7 @@ abstract class LogDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_10_11)
                 .addMigrations(MIGRATION_11_12)
                 .addMigrations(MIGRATION_12_13)
+                .addMigrations(MIGRATION_13_14)
                 .fallbackToDestructiveMigration() // recreate the database if no migration is found
                 .build()
         }
@@ -372,6 +373,20 @@ abstract class LogDatabase : RoomDatabase() {
                 }
             }
         }
+
+        private val MIGRATION_13_14: Migration =
+            object : Migration(13, 14) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    try {
+                        db.execSQL(
+                            "ALTER TABLE DnsLogs ADD COLUMN isEch INTEGER NOT NULL DEFAULT 0"
+                        )
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_13_14: added isEch to DnsLogs")
+                    } catch (e: Exception) {
+                        Logger.e(LOG_TAG_APP_DB, "MIGRATION_13_14: isEch already exists, ignore", e)
+                    }
+                }
+            }
 
     }
 

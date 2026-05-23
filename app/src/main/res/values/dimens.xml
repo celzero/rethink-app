@@ -36,5 +36,6 @@
     <dimen name="standard_55">70dp</dimen>
     <dimen name="standard_105">140dp</dimen>
     <dimen name="standard_155">210dp</dimen>
+    <dimen name="standard_205">280dp</dimen>
 
 </resources>

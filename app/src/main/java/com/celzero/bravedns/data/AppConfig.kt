@@ -21,6 +21,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsCryptEndpoint
 import com.celzero.bravedns.database.DnsCryptEndpointRepository
@@ -382,10 +383,17 @@ internal constructor(
     }
 
     fun getProtocolTranslationMode(): ProtoTranslationMode {
+        // TODO: we need to check if the underlying network, if it has ipv6 then its better to
+        // send PTMODEFORCE64 instead of PTMODEAUTO, as it will be straight forward, though
+        // PTMODEAUTO will work in both cases, but it will add some overhead of checking.
         if (persistentState.protocolTranslationType && getInternetProtocol().isIPv6()) {
             return ProtoTranslationMode.PTMODEFORCE64
         }
 
+        // for debug builds
+        if (DEBUG && !persistentState.advSettingForcePTMode) {
+            return ProtoTranslationMode.PTMODENO46
+        }
         return ProtoTranslationMode.PTMODEAUTO
     }
 

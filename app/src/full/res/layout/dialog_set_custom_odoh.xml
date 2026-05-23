@@ -102,14 +102,14 @@
         android:layout_marginBottom="10dp"
         android:padding="5dp"
         android:text="@string/settings_http_proxy_error_text4"
-        android:textColor="@color/colorRed_A400"
+        android:textColor="?attr/colorError"
         android:textSize="@dimen/default_font_text_view"
         android:visibility="invisible"
         app:layout_constraintTop_toBottomOf="@id/text_input_layout2" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/dialog_custom_url_ok_btn"
-        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+        style="@style/Widget.Material3.Button.TextButton.Dialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
@@ -124,7 +124,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/dialog_custom_url_cancel_btn"
-        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+        style="@style/Widget.Material3.Button.TextButton.Dialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"

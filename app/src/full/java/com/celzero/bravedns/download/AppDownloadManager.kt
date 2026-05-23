@@ -299,6 +299,12 @@ class AppDownloadManager(
 
         val updatableTs = getDownloadableTimestamp(response)
 
+        // Guard: an INIT_TIME_MS (0) timestamp means the server returned an unexpected version.
+        if (updatableTs == INIT_TIME_MS) {
+            Logger.w(LOG_TAG_DNS, "remote blocklist: updatableTs is (0), aborting download")
+            return false
+        }
+
         if (updatableTs <= currentTs && !isRedownload) {
             Logger.i(
                 LOG_TAG_DNS,

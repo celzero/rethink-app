@@ -65,4 +65,7 @@ interface ODoHEndpointDAO {
     fun getConnectedODoH(): ODoHEndpoint?
 
     @Query("select count(*) from ODoHEndpoint") fun getCount(): Int
+
+    @Query("select * from ODoHEndpoint order by name asc")
+    fun getAll(): List<ODoHEndpoint>
 }

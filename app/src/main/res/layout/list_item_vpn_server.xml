@@ -32,6 +32,7 @@
         android:tint="?attr/primaryTextColor"
         android:alpha="0.8"
         android:visibility="gone"
+        tools:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -92,6 +93,7 @@
             android:textColor="?attr/primaryLightColorText"
             android:textSize="12sp"
             android:alpha="0.85"
+            tools:visibility="visible"
             android:visibility="gone"
             tools:text="100.82.27.93 · Cloudflare" />
 
@@ -135,6 +137,7 @@
                 android:text="@string/lbl_separator_dot"
                 android:textColor="?attr/primaryLightColorText"
                 android:textSize="11sp"
+                tools:visibility="visible"
                 android:visibility="gone" />
 
             <androidx.appcompat.widget.AppCompatTextView

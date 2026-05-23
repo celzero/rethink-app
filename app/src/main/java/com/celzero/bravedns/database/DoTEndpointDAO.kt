@@ -63,4 +63,7 @@ interface DoTEndpointDAO {
 
     @Query("select * from DoTEndpoint where isCustom = 0")
     fun getAllDefaultDoTEndpoints(): List<DoTEndpoint>
+
+    @Query("select * from DoTEndpoint order by name asc")
+    fun getAll(): List<DoTEndpoint>
 }

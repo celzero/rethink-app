@@ -30,6 +30,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CountryConfig
 import com.celzero.bravedns.databinding.ItemServerGroupBinding
 import com.celzero.bravedns.databinding.ListItemCountryCardBinding
+import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import java.util.Locale
 
@@ -422,13 +423,6 @@ class CountryServerAdapter(
                     }
                 }
                 return Pair(label, attr)
-            }
-
-            private fun String.capitalizeWords(): String {
-                return split(" ")
-                    .joinToString(" ") { word ->
-                        word.lowercase().replaceFirstChar { it.uppercase() }
-                    }
             }
         }
     }

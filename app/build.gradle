@@ -136,23 +136,22 @@ android {
             'x86_64'     : 9
     ]
     android.applicationVariants.configureEach { variant ->
-        println("variant name: ${variant.name}")
         variant.outputs.configureEach { output ->
-            // def abi = output.filters.find { it.filterType.name == "ABI" }?.identifier
-            def abi = variant.outputs.first().getFilter(com.android.build.OutputFile.ABI)
-            def baseAbiVersionCode = project.ext.versionCodes.get(abi)
-            println("base version code: $baseAbiVersionCode")
+            def abi = output.getFilter(com.android.build.OutputFile.ABI)
             if (abi != null) {
-                println("variant name: ${variant.name}, abi: $abi")
-                // assign different version code for each output
-                // eg for arm64-v8a, version code will be 30000000 + variant.versionCode
-                def v = baseAbiVersionCode * 10000000 + variant.versionCode
-                // API 'ApkVariantOutput.getVersionCodeOverride()' is obsolete and has been replaced
-                // with 'VariantOutput.versionCode()'
+                // ABI-specific output: assign the correct per-ABI version code
+                // eg for arm64-v8a: 3 * 10000000 + versionCode
+                def v = project.ext.versionCodes.get(abi) * 10000000 + variant.versionCode
                 output.versionCodeOverride = v
-                println("version code override: $v")
             } else {
-                println("no ABI filter applied for variant: ${variant.name}")
+                // universal APK: preserve existing production behaviour (arm64-v8a multiplier)
+                // so installed universal APKs are not treated as a downgrade
+                // when splits are disabled (e.g. alpha builds), firstAbi is null; fall back to
+                // the arm64-v8a multiplier (3) so versionCode arithmetic still works
+                def firstAbi = variant.outputs.first().getFilter(com.android.build.OutputFile.ABI)
+                def multiplier = firstAbi != null ? project.ext.versionCodes.get(firstAbi) : project.ext.versionCodes.get('arm64-v8a')
+                def v = multiplier * 10000000 + variant.versionCode
+                output.versionCodeOverride = v
             }
         }
     }
@@ -374,7 +373,7 @@ dependencies {
     def room_version = "2.8.1"
     def paging_version = "3.3.6"
 
-    implementation 'com.google.guava:guava:33.5.0-android'
+    implementation 'com.google.guava:guava:33.6.0-android'
 
     // https://developer.android.com/studio/write/java8-support
     // included to fix issues with Android 6 support, issue#563

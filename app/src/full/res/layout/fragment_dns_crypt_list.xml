@@ -12,17 +12,17 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/recycler_dns_crypt_servers_title"
+            style="@style/TextAppearance.Material3.BodyLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
             android:layout_toStartOf="@id/add_relay_btn"
-            android:fontFamily="sans-serif-smallcaps"
             android:padding="5dp"
             android:text="@string/cd_dns_crypt_title"
-            android:textColor="?attr/secondaryTextColor"
-            android:textSize="@dimen/extra_large_font_text_view"
+            android:textColor="?attr/colorPrimary"
             android:visibility="visible" />
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -63,10 +63,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="30dp"
-        android:padding="10dp"
         android:clickable="true"
-        android:focusable="true"
         android:contentDescription="@string/lbl_create"
+        android:focusable="true"
+        android:padding="10dp"
         android:src="@drawable/ic_fab_without_border"
         app:fabSize="normal"
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"

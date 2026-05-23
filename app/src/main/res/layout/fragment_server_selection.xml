@@ -432,7 +432,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/support_btn"
-                    style="@style/Widget.MaterialComponents.Button.Icon"
+                    style="@style/Widget.Material3.Button.IconButton"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
                     android:insetTop="0dp"
@@ -451,7 +451,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/settings_btn"
-                    style="@style/Widget.MaterialComponents.Button.Icon"
+                    style="@style/Widget.Material3.Button.IconButton"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
                     android:layout_marginStart="4dp"
@@ -465,28 +465,6 @@
                     app:backgroundTint="?attr/chipBgColorPositive"
                     app:cornerRadius="8dp"
                     app:icon="@drawable/ic_settings"
-                    app:iconGravity="textStart"
-                    app:iconPadding="0dp"
-                    app:iconSize="24dp"
-                    app:iconTint="?attr/accentGood" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/refresh_btn"
-                    style="@style/Widget.MaterialComponents.Button.Icon"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginEnd="4dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:insetLeft="0dp"
-                    android:insetRight="0dp"
-                    android:paddingStart="0dp"
-                    android:paddingEnd="0dp"
-                    android:contentDescription="@string/server_settings_refresh_servers"
-                    app:backgroundTint="?attr/chipBgColorPositive"
-                    app:cornerRadius="8dp"
-                    app:icon="@drawable/ic_refresh"
                     app:iconGravity="textStart"
                     app:iconPadding="0dp"
                     app:iconSize="24dp"
@@ -626,7 +604,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/error_retry_btn"
-                    style="@style/Widget.MaterialComponents.Button"
+                    style="@style/Widget.Material3.Button"
                     android:layout_width="wrap_content"
                     android:layout_height="52dp"
                     android:paddingStart="28dp"
@@ -801,27 +779,45 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_toggle_proxy"
+        android:id="@+id/fab_stop_proxy"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:elevation="8dp"
-        app:elevation="8dp"
-        app:layout_anchorGravity="bottom|end"
         android:contentDescription="@string/server_settings_stop_proxies"
         android:src="@drawable/ic_stop"
-        app:backgroundTint="@color/colorRed_A400"
+        android:visibility="gone"
+        app:elevation="8dp"
+        app:backgroundTint="?attr/colorError"
         app:tint="@android:color/white" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab_start_proxy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:elevation="8dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:text="@string/server_settings_start_rpn"
+        android:textColor="@android:color/white"
+        android:visibility="gone"
+        app:elevation="8dp"
+        app:icon="@drawable/ic_vpn"
+        app:iconTint="@android:color/white"
+        app:backgroundTint="@color/accentGood" />
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progress_indicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="12dp"
+        android:layout_marginEnd="12dp"
         android:visibility="gone"
         app:indicatorColor="@android:color/white"
         app:indicatorSize="64dp"

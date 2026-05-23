@@ -47,6 +47,7 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
 import com.celzero.bravedns.ui.activity.DnsListActivity
+import com.celzero.bravedns.ui.bottomsheet.BlockFreeDnsModeBottomSheet
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.bottomsheet.DnsRecordTypesBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.LocalBlocklistsBottomSheet
@@ -106,6 +107,8 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         updateLocalBlocklistUi()
         // update allowed record types ui
         updateAllowedRecordTypesUi()
+        // update block-free dns ui
+        updateBlockFreeDnsUi()
         showNewBadgeIfNeeded()
     }
 
@@ -210,6 +213,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
     private fun updateLocalBlocklistUi() {
         if (isPlayStoreFlavour()) {
             b.dcLocalBlocklistRl.visibility = View.GONE
+            b.dividerLocalBlocklist.visibility = View.GONE
             return
         }
 
@@ -291,13 +295,16 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         if (isAtleastR()) {
             // show split dns by default only if the device is running on Android 12 or above
             b.dcSplitDnsRl.visibility = View.VISIBLE
+            b.dividerSplitDns.visibility = View.VISIBLE
             b.dcSplitDnsSwitch.isChecked = persistentState.splitDns
         } else {
             if (persistentState.enableDnsAlg) {
                 b.dcSplitDnsRl.visibility = View.VISIBLE
+                b.dividerSplitDns.visibility = View.VISIBLE
                 b.dcSplitDnsSwitch.isChecked = persistentState.splitDns
             } else {
                 b.dcSplitDnsRl.visibility = View.GONE
+                b.dividerSplitDns.visibility = View.GONE
             }
         }
     }
@@ -307,6 +314,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             // no-op, no need to depend of alg when device is running on Android 12 or above
             // as split dns option is shown to user regardless of dns alg
             b.dcSplitDnsRl.visibility = View.VISIBLE
+            b.dividerSplitDns.visibility = View.VISIBLE
             b.dcSplitDnsSwitch.isChecked = persistentState.splitDns
             updateConnectedStatus(persistentState.connectedDnsName)
             showSplitDnsUi()
@@ -704,6 +712,21 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.dcAllowedRecordTypesRl.setOnClickListener {
             showDnsRecordTypesBottomSheet()
         }
+
+        b.dcBlockFreeDnsRl.setOnClickListener {
+            showBlockFreeDnsModeBottomSheet()
+        }
+    }
+
+    private fun showBlockFreeDnsModeBottomSheet() {
+        val bottomSheet = BlockFreeDnsModeBottomSheet()
+        parentFragmentManager.setFragmentResultListener(
+            BlockFreeDnsModeBottomSheet.FRAGMENT_RESULT_KEY,
+            viewLifecycleOwner
+        ) { _, _ ->
+            updateBlockFreeDnsUi()
+        }
+        bottomSheet.show(parentFragmentManager, bottomSheet.tag)
     }
 
     private fun showDnsRecordTypesBottomSheet() {
@@ -825,6 +848,15 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
     private fun showCustomDns() {
         val intent = Intent(requireContext(), DnsListActivity::class.java)
         startActivity(intent)
+    }
+
+    private fun updateBlockFreeDnsUi() {
+        val mode = BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.fromMode(persistentState.blockFreeDnsMode)
+        b.dcBlockFreeDnsDesc.text = when (mode) {
+            BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.FALLBACK -> getString(R.string.bfdm_status_fallback)
+            BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.GLOBAL -> getString(R.string.bfdm_status_global)
+            BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.AUTO -> getString(R.string.bfdm_status_auto)
+        }
     }
 
     private fun setNetworkDns() {

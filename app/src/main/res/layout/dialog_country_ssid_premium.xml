@@ -353,6 +353,7 @@
                     android:text="@string/lbl_save"
                     android:textSize="14sp"
                     android:textStyle="bold"
+                    android:textColor="@android:color/white"
                     app:backgroundTint="?attr/accentGood"
                     app:cornerRadius="12dp"
                     app:elevation="0dp" />

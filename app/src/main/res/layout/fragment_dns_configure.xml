@@ -21,18 +21,15 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/dc_dns_heading"
-                style="@style/TextAppearance.AppCompat.Subhead"
+                style="@style/TextAppearance.Material3.TitleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
                 android:layout_centerInParent="true"
+                android:layout_alignParentStart="true"
                 android:layout_toStartOf="@id/dc_refresh"
-                android:fontFamily="sans-serif-smallcaps"
                 android:padding="5dp"
                 android:text="@string/dc_other_dns_heading"
-                android:textColor="?attr/accentGood"
-                android:textSize="@dimen/extra_large_font_text_view"
-                android:textStyle="bold" />
+                android:textColor="?attr/colorPrimary" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/dc_refresh"
@@ -44,19 +41,21 @@
                 android:padding="5dp"
                 android:src="@drawable/ic_refresh_white" />
         </RelativeLayout>
-
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:cardElevation="4dp"
+            android:layout_margin="4dp"
+            app:cardCornerRadius="8dp"
             android:layout_marginTop="5dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
+                android:orientation="vertical"
                 android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:orientation="vertical">
+                android:paddingBottom="10dp">
 
                 <com.google.android.material.radiobutton.MaterialRadioButton
                     android:id="@+id/wireguard_rb"
@@ -208,31 +207,37 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/dc_blocklist_heading"
-            style="@style/TextAppearance.AppCompat.Subhead"
+            style="@style/TextAppearance.Material3.TitleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="55dp"
-            android:fontFamily="sans-serif-smallcaps"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
             android:padding="5dp"
             android:text="@string/dc_block_heading"
-            android:textColor="?attr/accentGood"
-            android:textSize="@dimen/extra_large_font_text_view"
-            android:textStyle="bold" />
+            android:textColor="?attr/colorPrimary" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:cardElevation="4dp"
+            android:layout_margin="4dp"
+            app:cardCornerRadius="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp">
 
                 <RelativeLayout
                     android:id="@+id/dc_local_blocklist_rl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="?android:attr/selectableItemBackground">
+                    android:background="?android:attr/selectableItemBackground"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/dc_local_blocklist_icon"
@@ -253,35 +258,33 @@
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_local_blocklist_img"
                         android:layout_toEndOf="@id/dc_local_blocklist_icon"
-                        android:orientation="vertical"
-                        android:paddingTop="15dp">
+                        android:orientation="vertical">
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_local_blocklist_heading"
-                            style="@style/TextAppearance.AppCompat.Subhead"
+                            style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
                             android:layout_marginEnd="5dp"
-                            android:text="@string/dc_local_block_heading"
-                            android:textSize="@dimen/large_font_text_view" />
+                            android:text="@string/dc_local_block_heading" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_local_blocklist_count"
+                            style="@style/TextAppearance.Material3.BodyMedium"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
-                            android:textColor="?attr/accentBad"
-                            android:textSize="@dimen/default_font_text_view" />
+                            android:paddingTop="3dp"
+                            android:textColor="?attr/accentBad" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_local_blocklist_desc"
+                            style="@style/TextAppearance.Material3.BodyMedium"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
-                            android:paddingBottom="5dp"
+                            android:paddingTop="3dp"
                             android:text="@string/dc_local_block_desc_1"
-                            android:textSize="@dimen/default_font_text_view" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
 
                     <androidx.appcompat.widget.AppCompatImageView
@@ -295,6 +298,15 @@
                         android:src="@drawable/ic_arrow_down_small" />
 
                 </RelativeLayout>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:id="@+id/divider_local_blocklist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginStart="56dp"
+                    android:layout_marginEnd="16dp" />
 
                 <RelativeLayout
                     android:id="@+id/dc_downloader_rl"
@@ -326,30 +338,37 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_downloader_txt"
-                            style="@style/TextAppearance.AppCompat.Subhead"
+                            style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/settings_custom_downloader_heading"
-                            android:textSize="@dimen/large_font_text_view" />
+                            android:text="@string/settings_custom_downloader_heading" />
 
                         <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
-                            android:paddingBottom="5dp"
+                            android:paddingTop="3dp"
                             android:text="@string/settings_custom_downloader_desc"
-                            android:textSize="@dimen/default_font_text_view" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
+                    <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/dc_downloader_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:padding="10dp" />
                 </RelativeLayout>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginStart="56dp"
+                    android:layout_marginEnd="16dp" />
 
                 <RelativeLayout
                     android:id="@+id/dc_check_update_rl"
@@ -381,25 +400,23 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_check_update_heading"
-                            style="@style/TextAppearance.AppCompat.Subhead"
+                            style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:drawablePadding="10dp"
-                            android:text="@string/dc_check_update_heading"
-                            android:textSize="@dimen/large_font_text_view" />
+                            android:text="@string/dc_check_update_heading" />
 
                         <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
-                            android:paddingBottom="5dp"
+                            android:paddingTop="3dp"
                             android:text="@string/dc_check_update_desc"
-                            android:textSize="@dimen/default_font_text_view" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
+                    <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/dc_check_update_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -413,25 +430,29 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/dc_filtering_heading"
-            style="@style/TextAppearance.AppCompat.Subhead"
+            style="@style/TextAppearance.Material3.TitleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="55dp"
-            android:fontFamily="sans-serif-smallcaps"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
             android:padding="5dp"
             android:text="@string/dc_filtering_heading"
-            android:textColor="?attr/accentGood"
-            android:textSize="@dimen/extra_large_font_text_view"
-            android:textStyle="bold" />
+            android:textColor="?attr/colorPrimary" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:cardElevation="4dp"
+            android:layout_margin="4dp"
+            app:cardCornerRadius="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp">
 
                 <RelativeLayout
                     android:id="@+id/dc_alg_rl"
@@ -464,25 +485,23 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_alg_heading"
-                            style="@style/TextAppearance.AppCompat.Subhead"
+                            style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:drawablePadding="10dp"
-                            android:text="@string/cd_dns_alg_heading"
-                            android:textSize="@dimen/large_font_text_view" />
+                            android:text="@string/cd_dns_alg_heading" />
 
                         <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
-                            android:paddingBottom="5dp"
+                            android:paddingTop="3dp"
                             android:text="@string/cd_dns_alg_desc"
-                            android:textSize="@dimen/default_font_text_view" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
+                    <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/dc_alg_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -490,6 +509,14 @@
                         android:padding="10dp" />
 
                 </RelativeLayout>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginStart="56dp"
+                    android:layout_marginEnd="16dp" />
 
                 <RelativeLayout
                     android:id="@+id/dc_split_dns_rl"
@@ -506,9 +533,9 @@
                         android:layout_centerVertical="true"
                         android:layout_marginStart="5dp"
                         android:layout_marginTop="5dp"
-                        android:alpha="0.5"
                         android:layout_marginEnd="5dp"
                         android:layout_marginBottom="5dp"
+                        android:alpha="0.5"
                         android:padding="10dp"
                         android:src="@drawable/ic_split_dns" />
 
@@ -522,24 +549,24 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_split_dns_txt"
-                            style="@style/TextAppearance.AppCompat.Subhead"
+                            style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/cd_split_dns_heading"
-                            android:textSize="@dimen/large_font_text_view" />
+                            android:text="@string/cd_split_dns_heading" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_split_dns_desc"
+                            style="@style/TextAppearance.Material3.BodyMedium"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
+                            android:paddingTop="3dp"
                             android:text="@string/cd_split_dns_desc"
-                            android:textSize="@dimen/default_font_text_view" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
+                    <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/dc_split_dns_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -547,6 +574,15 @@
                         android:padding="10dp" />
 
                 </RelativeLayout>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:id="@+id/divider_split_dns"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginStart="56dp"
+                    android:layout_marginEnd="16dp" />
 
                 <RelativeLayout
                     android:id="@+id/dc_allowed_record_types_rl"
@@ -565,8 +601,8 @@
                         android:layout_marginTop="5dp"
                         android:layout_marginEnd="5dp"
                         android:layout_marginBottom="5dp"
-                        android:padding="10dp"
                         android:alpha="0.5"
+                        android:padding="10dp"
                         android:src="@drawable/ic_allow_dns_records" />
 
                     <LinearLayout
@@ -579,19 +615,19 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_allowed_record_types_heading"
-                            style="@style/TextAppearance.AppCompat.Subhead"
+                            style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/cd_allowed_dns_record_types_heading"
-                            android:textSize="@dimen/large_font_text_view" />
+                            android:text="@string/cd_allowed_dns_record_types_heading" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_allowed_record_types_desc"
+                            style="@style/TextAppearance.Material3.BodyMedium"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
+                            android:paddingTop="3dp"
                             android:text="@string/cd_allowed_dns_record_types_desc"
-                            android:textSize="@dimen/default_font_text_view" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
 
                     <androidx.appcompat.widget.AppCompatImageView
@@ -600,8 +636,8 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:padding="10dp"
                         android:layout_marginEnd="10dp"
+                        android:padding="10dp"
                         android:src="@drawable/ic_arrow_down_small" />
 
                 </RelativeLayout>
@@ -612,25 +648,29 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/dc_other_settings_heading"
-            style="@style/TextAppearance.AppCompat.Subhead"
+            style="@style/TextAppearance.Material3.TitleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="55dp"
-            android:fontFamily="sans-serif-smallcaps"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
             android:padding="5dp"
             android:text="@string/lbl_advanced"
-            android:textColor="?attr/accentGood"
-            android:textSize="@dimen/extra_large_font_text_view"
-            android:textStyle="bold" />
+            android:textColor="?attr/colorPrimary" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:cardElevation="4dp"
+            android:layout_margin="4dp"
+            app:cardCornerRadius="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingTop="5dp"
+                android:paddingBottom="10dp">
 
                 <RelativeLayout
                     android:id="@+id/dc_favicon_rl"
@@ -663,25 +703,23 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_favicon_heading"
-                            style="@style/TextAppearance.AppCompat.Subhead"
+                            style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:drawablePadding="10dp"
-                            android:text="@string/dc_dns_website_heading"
-                            android:textSize="@dimen/large_font_text_view" />
+                            android:text="@string/dc_dns_website_heading" />
 
                         <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
-                            android:paddingBottom="5dp"
+                            android:paddingTop="3dp"
                             android:text="@string/dc_dns_website_desc"
-                            android:textSize="@dimen/default_font_text_view" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
+                    <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/dc_favicon_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -689,6 +727,14 @@
                         android:padding="10dp" />
 
                 </RelativeLayout>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginStart="56dp"
+                    android:layout_marginEnd="16dp" />
 
                 <RelativeLayout
                     android:id="@+id/dc_enable_cache_rl"
@@ -720,30 +766,37 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_enable_cache_txt"
-                            style="@style/TextAppearance.AppCompat.Subhead"
+                            style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/dc_setting_dns_cache_heading"
-                            android:textSize="@dimen/large_font_text_view" />
+                            android:text="@string/dc_setting_dns_cache_heading" />
 
                         <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
-                            android:paddingBottom="5dp"
+                            android:paddingTop="3dp"
                             android:text="@string/dc_setting_dns_cache_desc"
-                            android:textSize="@dimen/default_font_text_view" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
+                    <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/dc_enable_cache_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:padding="10dp" />
                 </RelativeLayout>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginStart="56dp"
+                    android:layout_marginEnd="16dp" />
 
                 <RelativeLayout
                     android:id="@+id/dc_proxy_dns_rl"
@@ -775,25 +828,23 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_proxy_dns_heading"
-                            style="@style/TextAppearance.AppCompat.Subhead"
+                            style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:drawablePadding="10dp"
-                            android:text="@string/dc_proxy_dns_heading"
-                            android:textSize="@dimen/large_font_text_view" />
+                            android:text="@string/dc_proxy_dns_heading" />
 
                         <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
-                            android:paddingBottom="5dp"
+                            android:paddingTop="3dp"
                             android:text="@string/dc_proxy_dns_desc"
-                            android:textSize="@dimen/default_font_text_view" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
+                    <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/dc_proxy_dns_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -802,13 +853,21 @@
 
                 </RelativeLayout>
 
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginStart="56dp"
+                    android:layout_marginEnd="16dp" />
+
                 <RelativeLayout
                     android:id="@+id/dc_prevent_dns_leaks_rl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
-                    android:paddingBottom="20dp">
+                    android:paddingBottom="15dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/dc_prevent_dns_leaks_img"
@@ -830,25 +889,23 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_prevent_dns_leaks_heading"
-                            style="@style/TextAppearance.AppCompat.Subhead"
+                            style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:drawablePadding="10dp"
-                            android:text="@string/dc_dns_leaks_heading"
-                            android:textSize="@dimen/large_font_text_view" />
+                            android:text="@string/dc_dns_leaks_heading" />
 
                         <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
-                            android:paddingBottom="5dp"
+                            android:paddingTop="3dp"
                             android:text="@string/dc_dns_leaks_desc"
-                            android:textSize="@dimen/default_font_text_view" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
+                    <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/dc_prevent_dns_leaks_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -857,13 +914,22 @@
 
                 </RelativeLayout>
 
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginStart="56dp"
+                    android:layout_marginEnd="16dp" />
+
                 <RelativeLayout
                     android:id="@+id/dc_use_fallback_to_bypass_rl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
-                    android:paddingBottom="20dp">
+                    android:paddingBottom="15dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/dc_use_fallback_to_bypass_img"
@@ -872,8 +938,8 @@
                         android:layout_marginStart="5dp"
                         android:layout_marginTop="5dp"
                         android:layout_marginEnd="5dp"
-                        android:padding="10dp"
                         android:alpha="0.5"
+                        android:padding="10dp"
                         android:src="@drawable/ic_use_fallback_bypass" />
 
                     <LinearLayout
@@ -886,25 +952,23 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_use_fallback_to_bypass_heading"
-                            style="@style/TextAppearance.AppCompat.Subhead"
+                            style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:drawablePadding="10dp"
-                            android:text="@string/use_fallback_dns_to_bypass"
-                            android:textSize="@dimen/large_font_text_view" />
+                            android:text="@string/use_fallback_dns_to_bypass" />
 
                         <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
-                            android:paddingBottom="5dp"
+                            android:paddingTop="3dp"
                             android:text="@string/use_fallback_dns_to_bypass_desc"
-                            android:textSize="@dimen/default_font_text_view" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
+                    <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/dc_use_fallback_to_bypass_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -913,13 +977,22 @@
 
                 </RelativeLayout>
 
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:visibility="gone"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginStart="56dp"
+                    android:layout_marginEnd="16dp" />
+
                 <RelativeLayout
                     android:id="@+id/dc_undelegated_domains_rl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
-                    android:paddingBottom="20dp">
+                    android:paddingBottom="15dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/dc_undelegated_domains_img"
@@ -943,30 +1016,94 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_undelegated_domains_heading"
-                            style="@style/TextAppearance.AppCompat.Subhead"
+                            style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:drawablePadding="10dp"
-                            android:text="@string/dc_use_sys_dns_undelegated_heading"
-                            android:textSize="@dimen/large_font_text_view" />
+                            android:text="@string/dc_use_sys_dns_undelegated_heading" />
 
                         <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
-                            android:paddingBottom="5dp"
+                            android:paddingTop="3dp"
                             android:text="@string/dc_use_sys_dns_undelegated_desc"
-                            android:textSize="@dimen/default_font_text_view" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
+                    <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/dc_undelegated_domains_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:padding="10dp" />
+
+                </RelativeLayout>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginStart="56dp"
+                    android:layout_marginEnd="16dp" />
+
+                <RelativeLayout
+                    android:id="@+id/dc_block_free_dns_rl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/dc_block_free_dns_img"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:alpha="0.5"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_use_fallback_bypass" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/dc_block_free_dns_arrow"
+                        android:layout_toEndOf="@id/dc_block_free_dns_img"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/dc_block_free_dns_heading"
+                            style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="DNS to bypass" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/dc_block_free_dns_desc"
+                            style="@style/TextAppearance.Material3.BodyMedium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="3dp"
+                            android:text="@string/dc_block_free_dns_desc"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/dc_block_free_dns_arrow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
+                        android:src="@drawable/ic_arrow_down_small" />
 
                 </RelativeLayout>
 

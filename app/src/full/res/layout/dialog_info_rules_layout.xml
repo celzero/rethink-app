@@ -29,7 +29,7 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/info_rules_dialog_ok_btn"
-                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                style="@style/Widget.Material3.Button.TextButton.Dialog"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toStartOf="@id/info_rules_dialog_cancel_img"

@@ -1,8 +1,3 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
 name: MobSF
 
 on:
@@ -25,19 +20,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
       - name: Setup python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v6
         with:
-          python-version: 3.8
+          python-version: 3.12
 
       - name: Run mobsfscan
-        uses: MobSF/mobsfscan@a60d10a83af68e23e0b30611c6515da604f06f65
+        uses: MobSF/mobsfscan@3d87bc570c4614d705547bddb521395663dba353 # 0.4.5
         with:
           args: . --sarif --output results.sarif || true
 
       - name: Upload mobsfscan report
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: results.sarif

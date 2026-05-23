@@ -85,24 +85,34 @@ class BlocklistDownloadHelper {
             timestamp: Long,
             type: RethinkBlocklistManager.DownloadType
         ) {
-            val path =
-                if (type == RethinkBlocklistManager.DownloadType.LOCAL) {
-                    Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH
-                } else {
-                    Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH
-                }
+            if (type != RethinkBlocklistManager.DownloadType.LOCAL) {
+                // Remote blocklists do not use the Android Download Manager temp path.
+                logw(
+                    "deleteOldFiles called for non-local type (${type.name}); skipping",
+                    IllegalArgumentException("deleteOldFiles for non-local type")
+                )
+                return
+            }
+            val path = Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH
             val dir = File(context.getExternalFilesDir(null).toString() + path + timestamp)
             logd("deleteOldFiles, File : ${dir.path}, ${dir.isDirectory}")
             deleteRecursive(dir)
         }
 
         fun deleteBlocklistResidue(context: Context, which: String, timestamp: Long) {
+            // skip delete anything if timestamp is invalid
+            if (timestamp == INIT_TIME_MS) {
+                logw(
+                    "deleteBlocklistResidue called with timestamp=0 for $which; aborting",
+                    IllegalArgumentException("timestamp must not be 0")
+                )
+                return
+            }
             val dir = File(blocklistCanonicalPath(context, which))
             if (!dir.exists()) return
 
             dir.listFiles()?.forEach {
-            logd("delete blocklist list residue for $which, dir: ${it.name}"
-                )
+                logd("delete blocklist list residue for $which, dir: ${it.name}")
                 // delete all the dir other than current timestamp dir
                 if (it.name != timestamp.toString()) {
                     deleteRecursive(it)

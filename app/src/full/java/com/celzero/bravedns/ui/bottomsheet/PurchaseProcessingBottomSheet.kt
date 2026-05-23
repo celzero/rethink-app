@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.BottomsheetPurchaseProcessingBinding
+import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import java.io.Serializable
 
@@ -56,7 +57,7 @@ class PurchaseProcessingBottomSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val state = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+        val state = if (isAtleastT()) {
             arguments?.getSerializable(ARG_STATE, ProcessingState::class.java)
         } else {
             @Suppress("DEPRECATION")

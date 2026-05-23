@@ -123,26 +123,26 @@ data class ResponseOk(
 ) {
     companion object {
         fun fromJson(json: JSONObject): ResponseOk = ResponseOk(
-            success                  = json.optBoolean("success", true),
-            message                  = json.optStringOrNull("message"),
-            cid                      = json.optStringOrNull("cid"),
-            sku                      = json.optStringOrNull("sku"),
-            purchaseId               = json.optStringOrNull("purchaseId"),
-            orderId                  = json.optStringOrNull("orderId"),
-            state                    = json.optStringOrNull("state"),
-            status                   = json.optStringOrNull("status"),
-            test                     = json.optBooleanOrNull("test"),
-            expiry                   = json.optStringOrNull("expiry"),
-            start                    = json.optStringOrNull("start"),
-            windowDays               = json.optIntOrNull("windowDays"),
-            cancelCtx                = json.optStringOrNull("cancelCtx"),
-            allProducts              = json.optStringListOrNull("allProducts"),
-            unconsumedProducts       = json.optStringListOrNull("unconsumedProducts"),
-            developerPayload         = json.optStringOrNull("developerPayload"),
-            hadEntitlement           = json.optBooleanOrNull("hadEntitlement"),
-            deletedEntitlement       = json.optBooleanOrNull("deletedEntitlement"),
-            wasAlreadyFullyRefunded  = json.optBooleanOrNull("wasAlreadyFullyRefunded"),
-            ray                      = json.optStringOrNull("ray"),
+            success = json.optBoolean("success", true),
+            message = json.optStringOrNull("message"),
+            cid = json.optStringOrNull("cid"),
+            sku = json.optStringOrNull("sku"),
+            purchaseId = json.optStringOrNull("purchaseId"),
+            orderId = json.optStringOrNull("orderId"),
+            state = json.optStringOrNull("state"),
+            status = json.optStringOrNull("status"),
+            test = json.optBooleanOrNull("test"),
+            expiry = json.optStringOrNull("expiry"),
+            start = json.optStringOrNull("start"),
+            windowDays = json.optIntOrNull("windowDays"),
+            cancelCtx = json.optStringOrNull("cancelCtx"),
+            allProducts = json.optStringListOrNull("allProducts"),
+            unconsumedProducts = json.optStringListOrNull("unconsumedProducts"),
+            developerPayload = json.optStringOrNull("developerPayload"),
+            hadEntitlement = json.optBooleanOrNull("hadEntitlement"),
+            deletedEntitlement = json.optBooleanOrNull("deletedEntitlement"),
+            wasAlreadyFullyRefunded = json.optBooleanOrNull("wasAlreadyFullyRefunded"),
+            ray = json.optStringOrNull("ray"),
         )
     }
 
@@ -194,6 +194,13 @@ data class ResponseErr(
     val allProducts: List<String>? = null,
     /** Unconsumed product identifiers, if known. */
     val unconsumedProducts: List<String>? = null,
+    /**
+     * Google Play purchase token of an older purchase that was superseded by the one
+     * identified by [purchaseId].  Present only when the server cancelled [purchaseId]
+     * but detected a still-valid predecessor; the client should query /g/ack for this
+     * token and reactivate the corresponding DB row if the server confirms it is valid.
+     */
+    val linkedPurchaseId: String? = null,
     /** Cloudflare Ray ID for server-side log correlation. */
     val ray: String? = null,
     /** HTTP status code from the server response; 0 if not from an HTTP layer. */
@@ -202,36 +209,40 @@ data class ResponseErr(
     companion object {
         fun fromJson(json: JSONObject, httpCode: Int = 0): ResponseErr = ResponseErr(
             // "error" takes precedence; fall back to "message" (mirrors the JS constructor)
-            error              = json.optString("error").ifEmpty { json.optString("message", "") },
-            details            = json.optStringOrNull("details"),
-            cid                = json.optStringOrNull("cid"),
-            sku                = json.optStringOrNull("sku"),
-            purchaseId         = json.optStringOrNull("purchaseId"),
-            orderId            = json.optStringOrNull("orderId"),
-            state              = json.optStringOrNull("state"),
-            status             = json.optStringOrNull("status"),
-            test               = json.optBooleanOrNull("test"),
-            expiry             = json.optStringOrNull("expiry"),
-            start              = json.optStringOrNull("start"),
-            windowDays         = json.optIntOrNull("windowDays"),
-            allProducts        = json.optStringListOrNull("allProducts"),
+            error = json.optString("error").ifEmpty { json.optString("message", "") },
+            details = json.optStringOrNull("details"),
+            cid = json.optStringOrNull("cid"),
+            sku = json.optStringOrNull("sku"),
+            purchaseId = json.optStringOrNull("purchaseId"),
+            orderId = json.optStringOrNull("orderId"),
+            state = json.optStringOrNull("state"),
+            status = json.optStringOrNull("status"),
+            test = json.optBooleanOrNull("test"),
+            expiry = json.optStringOrNull("expiry"),
+            start = json.optStringOrNull("start"),
+            windowDays = json.optIntOrNull("windowDays"),
+            allProducts = json.optStringListOrNull("allProducts"),
             unconsumedProducts = json.optStringListOrNull("unconsumedProducts"),
-            ray                = json.optStringOrNull("ray"),
-            httpCode           = httpCode,
+            linkedPurchaseId = json.optStringOrNull("linkedPurchaseId"),
+            ray = json.optStringOrNull("ray"),
+            httpCode = httpCode,
         )
     }
 
-    /** True if this is a client-side / user error (4xx). */
-    val isClientError: Boolean get() = httpCode in 400..499
 
-    /** True if this is a server-side error (5xx). */
-    val isServerError: Boolean get() = httpCode in 500..599
 
-    /** True if the error is potentially retryable (network or 5xx). */
-    val isRetryable: Boolean get() = httpCode == 0 || isServerError
+    /**
+     * True when the server has authoritatively confirmed the subscription is expired.
+     *
+     * A response with [state] == "SUBSCRIPTION_STATE_EXPIRED" is a definitive signal
+     * from the Google Play billing backend (forwarded by our server) that the subscription
+     * is no longer active.  Callers should expire the local purchase rather than preserving it.
+     */
+    val isSubscriptionExpired: Boolean
+        get() = state == "SUBSCRIPTION_STATE_EXPIRED"
 
     override fun toString(): String =
-        "PlayErr(http=$httpCode, error='$error', status=$status, sku=$sku, ray=$ray)"
+        "PlayErr(http=$httpCode, error='$error', state=$state, status=$status, sku=$sku, ray=$ray)"
 }
 
 /** Returns the string value for [key], or null if missing or empty. */

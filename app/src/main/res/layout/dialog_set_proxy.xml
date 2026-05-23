@@ -271,7 +271,7 @@
             android:layout_height="wrap_content"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:textColor="@color/colorRed_A400"
+            android:textColor="?attr/colorError"
             android:textSize="@dimen/default_font_text_view" />
 
 
@@ -283,7 +283,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/dialog_proxy_cancel_btn"
-                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                style="@style/Widget.Material3.Button.TextButton.Dialog"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
@@ -294,7 +294,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/dialog_proxy_apply_btn"
-                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                style="@style/Widget.Material3.Button.TextButton.Dialog"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"

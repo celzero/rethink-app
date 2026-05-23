@@ -10,13 +10,17 @@ import retrofit2.Response
 
 class SubscriptionViewModel : ViewModel() {
 
+    @Suppress("UNUSED_PRIVATE_PROPERTY")
     private val _pricesLiveData = MutableLiveData<List<Price>>()
     val pricesLiveData: LiveData<List<Price>> get() = _pricesLiveData
 
+    @Suppress("UNUSED_PRIVATE_PROPERTY")
     private val productKey = ""
 
     //private val stripeApi = RetrofitInstance.api
+    @Suppress("UNUSED_PRIVATE_PROPERTY")
     private val publishableKey = ""
+    @Suppress("UNUSED_PRIVATE_PROPERTY")
     private val secretKey = ""
 
     fun fetchPrices() {

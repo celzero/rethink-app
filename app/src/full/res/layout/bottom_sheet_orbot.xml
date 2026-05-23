@@ -105,7 +105,7 @@
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/bs_orbot_radio_http"
-                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -154,7 +154,7 @@
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/bs_orbot_radio_socks5"
-                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -207,7 +207,7 @@
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/bs_orbot_radio_both"
-                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -261,7 +261,7 @@
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/bs_orbot_radio_none"
-                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"

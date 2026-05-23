@@ -28,6 +28,7 @@
                 android:layout_height="wrap_content"
                 android:alpha="0.5"
                 android:gravity="center"
+                app:textAllCaps="true"
                 android:text="@string/app_name_small_case"
                 android:textStyle="bold" />
 
@@ -803,7 +804,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/home_fragment_pause_icon"
                         android:layout_width="60dp"
                         android:layout_height="48dp"
@@ -820,10 +821,11 @@
                         android:drawableEnd="@drawable/ic_arrow_down"
                         android:paddingStart="20dp"
                         android:paddingEnd="20dp"
+                        app:textAllCaps="true"
                         android:letterSpacing="0.2"
                         android:text="@string/hsf_start_btn_state" />
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/home_fragment_bottom_sheet_icon"
                         android:layout_width="60dp"
                         android:layout_height="48dp"

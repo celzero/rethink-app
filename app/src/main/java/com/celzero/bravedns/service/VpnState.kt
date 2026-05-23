@@ -15,7 +15,7 @@ limitations under the License.
 */
 package com.celzero.bravedns.service
 
-class VpnState(requested: Boolean, on: Boolean, connectionState: BraveVPNService.State?, server: String?) {
+class VpnState(requested: Boolean, on: Boolean, connectionState: BraveVPNService.State?, isEch: Boolean) {
 
     var activationRequested = false
 
@@ -25,14 +25,12 @@ class VpnState(requested: Boolean, on: Boolean, connectionState: BraveVPNService
     // Whether we have a connection to a DOH server, and if so, whether the connection is ready or
     // has recently been failing.
     var connectionState: BraveVPNService.State? = null
-
-    // The server we are connected to, or null if we are not connected.
-    var serverName: String? = null
+    var isEch: Boolean = false
 
     init {
         this.activationRequested = requested
         this.on = on
         this.connectionState = connectionState
-        this.serverName = server
+        this.isEch = isEch
     }
 }

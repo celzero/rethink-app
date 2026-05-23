@@ -42,6 +42,7 @@ object ViewModelModule {
         viewModel { WgConfigViewModel(get()) }
         viewModel { DoTEndpointViewModel(get()) }
         viewModel { ODoHEndpointViewModel(get()) }
+        viewModel { BlockFreeDnsViewModel(get(), get(), get(), get(), get(), get()) }
         viewModel { RethinkLogViewModel(get()) }
         viewModel { AlertsViewModel(get(), get()) }
         viewModel { ConsoleLogViewModel(get()) }
@@ -51,6 +52,7 @@ object ViewModelModule {
         viewModel { PurchaseHistoryViewModel(get()) }
         viewModel { ManagePurchaseViewModel() }
         viewModel { ServerOrderHistoryViewModel(get()) }
+        viewModel { ServerSelectionViewModel() }
     }
 
     val modules = listOf(modelModules)

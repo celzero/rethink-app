@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppThemeInitial" parent="Theme.MaterialComponents.NoActionBar.Bridge">
+    <style name="AppThemeInitial" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowDisablePreview">true</item>
         <item name="android:fitsSystemWindows">true</item>
     </style>
