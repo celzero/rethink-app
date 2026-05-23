@@ -538,16 +538,24 @@ dependencies {
 
     // ------------------------------------------------------------------
     // rethink-tv fork: Compose-for-TV stack for the `tv` flavor.
-    // Scoped to `tvImplementation` so phone variants pull none of this in.
-    // BOM pins all `androidx.compose.*` artifacts to a consistent set;
-    // Kotlin Compose Compiler 2.1.20 (applied via the project-wide plugin
-    // declaration) matches Compose runtime 1.7.x in the 2024.12 BOM.
+    // The Compose Compiler plugin (applied project-wide so a single
+    // `id 'org.jetbrains.kotlin.plugin.compose'` covers every variant)
+    // performs a classpath check at compile time on every applied variant,
+    // including phone variants that contain zero @Composable code. To
+    // satisfy that check without pulling the full UI stack into phone
+    // builds, we expose only the BOM and the runtime artifact to all
+    // variants; the rest (ui, foundation, material3, tv-material,
+    // navigation-compose, etc.) stays scoped to `tvImplementation`.
+    // Cost to phone variants: ~250 KB of unused Compose runtime classes,
+    // which never get loaded because phone code never invokes @Composable.
     // ------------------------------------------------------------------
+    implementation platform('androidx.compose:compose-bom:2024.12.01')
+    implementation 'androidx.compose.runtime:runtime'
+
     tvImplementation platform('androidx.compose:compose-bom:2024.12.01')
     tvImplementation 'androidx.compose.ui:ui'
     tvImplementation 'androidx.compose.ui:ui-tooling-preview'
     tvImplementation 'androidx.compose.foundation:foundation'
-    tvImplementation 'androidx.compose.runtime:runtime'
     tvImplementation 'androidx.compose.runtime:runtime-livedata'
     tvImplementation 'androidx.compose.material3:material3'
     // TV-styled Material 3 components (focusable Surface / Button /
