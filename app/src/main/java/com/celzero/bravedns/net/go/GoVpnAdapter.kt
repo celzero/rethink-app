@@ -2194,8 +2194,6 @@ class GoVpnAdapter : KoinComponent {
                 return null
             }
             val px = tunnel.proxies
-            // px.getProxy(1).client().iP4()
-            // px.getProxy("".togs()).client().iP6()
             return px
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG err get proxies: ${e.message}", e)
@@ -2536,7 +2534,7 @@ class GoVpnAdapter : KoinComponent {
 
         return try {
             // if id is empty or AUTO, resolve to the current win proxy id from the tunnel
-            if (id.isEmpty() || id.equals(AUTO_SERVER_ID, true)) {
+            if (id.isEmpty() || id.equals(AUTO_SERVER_ID, true) || id == Backend.RpnWin) {
                 tunnel.proxies.rpn().win().refresh()
             } else {
                 tunnel.proxies.rpn().win().get(id).refresh()
