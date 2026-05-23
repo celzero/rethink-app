@@ -570,7 +570,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             appendLine("=== THREADS ===")
             appendLine(threadsSpan.toString())
             appendLine("=== STACK TRACE ===")
-            appendLine(stackTrace.ifBlank { "Not available" })
+            appendLine(stackTrace.ifBlank { requireContext().getString(R.string.lbl_not_available_short) })
         }
 
         fun makeTabButton(text: String): android.widget.Button {
@@ -600,7 +600,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         fun makeScrollableText(content: String): android.widget.ScrollView {
             val tv = android.widget.TextView(ctx).apply {
                 setPadding(pad, pad / 2, pad, pad)
-                text = content.ifBlank { "Not available" }
+                text = content.ifBlank { requireContext().getString(R.string.lbl_not_available_short)}
                 setTextIsSelectable(true)
                 typeface = android.graphics.Typeface.MONOSPACE
                 textSize = 11.5f
@@ -697,7 +697,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
                 val tv = android.widget.TextView(ctx).apply {
                     setPadding(pad, pad / 2, pad, pad)
-                    text = stats.ifEmpty { "Not available" }
+                    text = stats.ifEmpty { requireContext().getString(R.string.lbl_not_available_short) }
                     setTextIsSelectable(true)
                     typeface = android.graphics.Typeface.MONOSPACE
                     textSize = 11.5f
@@ -817,7 +817,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         fun makeScrollableText(content: String?): android.widget.ScrollView {
             val tv = android.widget.TextView(ctx).apply {
                 setPadding(pad, pad / 2, pad, pad)
-                text = content ?: "Not available"
+                text = content ?: requireContext().getString(R.string.lbl_not_available_short)
                 setTextIsSelectable(true)
                 typeface = android.graphics.Typeface.MONOSPACE
                 textSize = 11.5f
