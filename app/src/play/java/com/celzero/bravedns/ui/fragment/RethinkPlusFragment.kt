@@ -569,7 +569,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     }
 
     /**
-     * Pop back to the caller (typically [RpnDashboardFragment]) after an extend-mode purchase.
+     * Pop back to the caller ([RethinkPlusDashboardFragment]) after an extend-mode purchase.
      * The dashboard auto-refreshes on resume via its own state observation, so no extra
      * data-passing is needed.
      */

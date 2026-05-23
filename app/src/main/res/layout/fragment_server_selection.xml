@@ -549,6 +549,7 @@
                 android:orientation="vertical"
                 android:paddingStart="32dp"
                 android:paddingEnd="32dp"
+                tools:visibility="visible"
                 android:visibility="gone">
 
                 <FrameLayout
@@ -747,6 +748,7 @@
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="32dp"
+                tools:visibility="visible"
                 android:visibility="gone">
 
                 <androidx.appcompat.widget.AppCompatImageView

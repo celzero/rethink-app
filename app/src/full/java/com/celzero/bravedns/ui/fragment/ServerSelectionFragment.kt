@@ -1219,9 +1219,12 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun showErrorState() {
         if (!isAdded) return
         b.rvServers.isVisible = false
-        b.searchCard.isVisible = false
-        b.supportBtn.isVisible = false
-        b.settingsBtn.isVisible = false
+        b.searchCard.isVisible = true
+        b.searchCard.isEnabled = false
+        b.searchBar.isEnabled = false
+
+        b.supportBtn.isVisible = true
+        b.settingsBtn.isVisible = true
         b.statusCard.isVisible = false
 
         b.selectedServersCard.isVisible = false
@@ -1268,6 +1271,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.supportBtn.isVisible = true
         b.settingsBtn.isVisible = true
         b.statusCard.isVisible = true
+        b.searchCard.isEnabled = true
+        b.searchBar.isEnabled = true
     }
 
     private fun retryLoadingServers() {
