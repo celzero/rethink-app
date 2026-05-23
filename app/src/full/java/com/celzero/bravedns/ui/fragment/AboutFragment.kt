@@ -687,8 +687,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     private fun openStatsDialog() {
         io {
             val stat = VpnController.getNetStat()
-            val formatedStat = UIUtils.formatNetStat(stat)
-            val vpnStats = VpnController.vpnStats()
+            val formatedStat = UIUtils.formatNetStat(stat) ?: ""
+            val vpnStats = VpnController.vpnStats() ?: ""
             val stats = formatedStat + vpnStats
             uiCtx {
                 if (!isAdded) return@uiCtx
@@ -697,7 +697,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
                 val tv = android.widget.TextView(ctx).apply {
                     setPadding(pad, pad / 2, pad, pad)
-                    text = stats ?: "No data"
+                    text = stats.ifEmpty { "Not available" }
                     setTextIsSelectable(true)
                     typeface = android.graphics.Typeface.MONOSPACE
                     textSize = 11.5f
@@ -817,7 +817,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         fun makeScrollableText(content: String?): android.widget.ScrollView {
             val tv = android.widget.TextView(ctx).apply {
                 setPadding(pad, pad / 2, pad, pad)
-                text = content ?: "No data"
+                text = content ?: "Not available"
                 setTextIsSelectable(true)
                 typeface = android.graphics.Typeface.MONOSPACE
                 textSize = 11.5f
