@@ -71,7 +71,30 @@ abstract class AppDatabase : RoomDatabase() {
         // Otherwise, WRITE_AHEAD_LOGGING will be used.
         // Ref:
         // https://developer.android.com/reference/android/arch/persistence/room/RoomDatabase.JournalMode#automatic
-        fun buildDatabase(context: Context) =
+        fun buildDatabase(context: Context): AppDatabase {
+            return try {
+                val db = newBuilder(context).build()
+                // Force the DB to open now so that any
+                // `Room cannot verify the data integrity` failure (e.g. an older
+                // install whose schema, after running the registered migration
+                // chain, no longer matches the current entity hashes) surfaces
+                // here instead of at the first VPN-service DAO access, which
+                // would crash BraveVPNService on every cold start.
+                db.openHelper.writableDatabase
+                db
+            } catch (e: IllegalStateException) {
+                val msg = e.message.orEmpty()
+                if ("Room cannot verify" in msg || "data integrity" in msg) {
+                    Logger.w(LOG_TAG_APP_DB, "schema mismatch; wiping db and recreating: $msg")
+                    context.deleteDatabase(DATABASE_NAME)
+                    newBuilder(context).build()
+                } else {
+                    throw e
+                }
+            }
+        }
+
+        private fun newBuilder(context: Context) =
             Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DATABASE_NAME)
                 .createFromAsset(DATABASE_PATH)
                 .addCallback(roomCallback)
@@ -105,7 +128,9 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_27_28)
                 .addMigrations(MIGRATION_28_29)
                 .addMigrations(MIGRATION_29_30)
-                .build()
+                // Belt and suspenders: if a migration is *missing* (not just
+                // mismatched), let Room destructively rebuild from the asset.
+                .fallbackToDestructiveMigration(dropAllTables = true)
 
         private val roomCallback: Callback =
             object : Callback() {

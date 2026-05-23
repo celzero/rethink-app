@@ -29,10 +29,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -136,6 +139,13 @@ fun HomeScreen() {
     }
 
     val onboarding = rememberOnboardingState()
+    // Mark the welcome banner seen as soon as the user actually
+    // starts protection — they've clearly figured out how the app
+    // works. Leaving the banner up after that just clutters Home
+    // and pushes the toggle button further off-screen.
+    LaunchedEffect(isOn) {
+        if (isOn && onboarding.shouldShow) onboarding.markSeen()
+    }
 
     TvScreenScaffold(
         title = "Rethink TV",
@@ -250,10 +260,20 @@ private fun StatusBadge(isOn: Boolean) {
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 private fun ToggleRow(isOn: Boolean, onClick: () -> Unit) {
+    // The big toggle button is the primary action on Home, so park
+    // focus on it whenever the screen first composes and whenever
+    // the `isOn` state flips (which would otherwise drop focus on
+    // some Compose-for-TV versions, leaving the user with no visible
+    // focus indicator after they hit Start/Stop once).
+    val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(isOn) {
+        runCatching { focusRequester.requestFocus() }
+    }
     Box {
         Button(
             onClick = onClick,
             contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp),
+            modifier = Modifier.focusRequester(focusRequester),
         ) {
             Text(
                 text = if (isOn) "Stop protection" else "Start protection",
