@@ -6123,8 +6123,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     // initiate ping for wg or rpn proxies if smart persistent keepalive is enabled,
     // this will initiate the ping if the proxy is not already running and is one of the following:
     suspend fun handleWgOrRpnProxiesToPing(proxyId: String) {
+        if (!RpnProxyManager.isRpnActive()) {
+            Logger.vv(LOG_TAG_VPN, "rpnProxiesToPing: rpn is not active, skip ping for $proxyId")
+            return
+        }
+
+        val winId = VpnController.getWinProxyId()
         val active: Boolean = when {
-            proxyId == Backend.RpnWin -> {
+            proxyId == winId -> {
                 val config = RpnProxyManager.getAutoServer()
                 if (config == null) {
                     Logger.w(LOG_TAG_VPN, "rpnProxiesToPing: auto config is null")
