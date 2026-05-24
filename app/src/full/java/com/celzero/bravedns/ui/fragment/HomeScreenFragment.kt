@@ -25,7 +25,6 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.TypedArray
 import android.icu.text.CompactDecimalFormat
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -35,7 +34,6 @@ import android.os.Bundle
 import android.os.SystemClock
 import android.provider.Settings
 import android.text.format.DateUtils
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
@@ -60,7 +58,6 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.service.DnsLogTracker
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
@@ -114,7 +111,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import org.koin.java.KoinJavaComponent.inject
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -1925,7 +1921,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     // Sets the UI DNS status on/off.
     private fun syncDnsStatus() {
         val vpnState = VpnController.state()
-
         // Change status and explanation text
         var statusId: Int
         var colorId: Int
@@ -2055,10 +2050,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             b.fhsProtectionLevelTxt.setTextColor(colorId)
             b.fhsProtectionLevelTxt.text = string
         } else {
-            if (vpnState.isEch) {
+            if (persistentState.wgGlobalLockdown) {
+                val stat = getString(statusId)
+                val s  = stat.replaceFirst(getString(R.string.status_protected), getString(R.string.firewall_rule_global_lockdown), true)
+                b.fhsProtectionLevelTxt.setTextColor(fetchTextColor(R.color.accentGood))
+                b.fhsProtectionLevelTxt.text = s
+            } else if (vpnState.isEch) {
                 val stat = getString(statusId)
                 val s  = stat.replaceFirst(getString(R.string.status_protected), getString(R.string.lbl_ultra_secure), true)
-                Logger.d(LOG_TAG_UI, "Ech status : $stat")
                 b.fhsProtectionLevelTxt.setTextColor(fetchTextColor(R.color.accentGood))
                 b.fhsProtectionLevelTxt.text = s
             } else {
