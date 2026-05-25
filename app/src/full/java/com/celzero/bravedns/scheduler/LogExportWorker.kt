@@ -62,9 +62,16 @@ class LogExportWorker(context: Context, workerParams: WorkerParameters) :
     private fun exportLogsChunked(filePath: String): Boolean {
         return try {
             val file = File(filePath)
+
+            // ensure the parent directory exists before creating the file.
+            file.parentFile?.mkdirs()
+
             if (file.exists()) {
                 Logger.v(LOG_TAG_BUG_REPORT, "Deleting existing zip file: ${file.absolutePath}")
-                file.delete()
+                // log a warning if deletion fails so it is observable.
+                if (!file.delete()) {
+                    Logger.w(LOG_TAG_BUG_REPORT, "Failed to delete existing file: ${file.absolutePath}")
+                }
             }
 
             ZipOutputStream(BufferedOutputStream(FileOutputStream(file), 128 * 1024)).use { zos ->
@@ -80,9 +87,12 @@ class LogExportWorker(context: Context, workerParams: WorkerParameters) :
                     if (chunk.isEmpty()) break
 
                     for (log in chunk) {
+                        val safeMessage = log.message.replace("\n", "\\n").replace("\r", "\\r")
                         writer.write(log.timestamp.toString())
                         writer.write(",")
-                        writer.write(log.message)
+                        writer.write(log.level.toString())
+                        writer.write(",")
+                        writer.write(safeMessage)
                         writer.newLine()
                     }
                     // Flush writer periodically so zos can compress incrementally
