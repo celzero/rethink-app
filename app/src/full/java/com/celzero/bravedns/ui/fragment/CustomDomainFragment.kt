@@ -128,8 +128,8 @@ class CustomDomainFragment :
         adapter = CustomDomainAdapter(requireContext(), this, rule, eventLogger)
         b.cdaRecycler.adapter = adapter
         viewModel.setUid(uid)
-        viewModel.customDomains.observe(this as LifecycleOwner) {
-            adapter.submitData(this.lifecycle, it)
+        viewModel.customDomains.observe(viewLifecycleOwner) {
+            adapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
         io {
             val appName = FirewallManager.getAppNameByUid(uid)
@@ -156,8 +156,8 @@ class CustomDomainFragment :
         observeAllRules()
         adapter = CustomDomainAdapter(requireContext(), this, rule, eventLogger)
         b.cdaRecycler.adapter = adapter
-        viewModel.allDomainRules.observe(this as LifecycleOwner) {
-            adapter.submitData(this.lifecycle, it)
+        viewModel.allDomainRules.observe(viewLifecycleOwner) {
+            adapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
     }
 
