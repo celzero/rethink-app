@@ -43,8 +43,14 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
             return
         }
 
-        if (!persistentState.prefAutoStartBootUp && (intent.action == Intent.ACTION_BOOT_COMPLETED || intent.action == Intent.ACTION_REBOOT || intent.action == Intent.ACTION_LOCKED_BOOT_COMPLETED)) {
-            Logger.w(LOG_TAG_VPN, "auto-start not enabled: ${persistentState.prefAutoStartBootUp}, skipping")
+        // Honor prefAutoStartBootUp for every trigger this receiver listens to,
+        // not just BOOT_COMPLETED / REBOOT / LOCKED_BOOT_COMPLETED. The previous
+        // gate skipped the check on ACTION_USER_UNLOCKED + ACTION_MY_PACKAGE_REPLACED
+        // — so even with auto-start disabled, RethinkDNS would relaunch on every
+        // screen unlock (Private Space) or app update if activationRequested was
+        // true. That contradicts the user-facing pref label.
+        if (!persistentState.prefAutoStartBootUp) {
+            Logger.w(LOG_TAG_VPN, "auto-start disabled by pref; ignoring trigger ${intent.action}")
             return
         }
 
