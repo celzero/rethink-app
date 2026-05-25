@@ -168,6 +168,12 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
         }
 
         private fun displayUnicodeIfNeeded(log: DnsLog) {
+            // no need to show Unicode hints for failed transactions as the hints are relevant only
+            // for complete transactions and can be misleading in case of failed transactions
+            if (Transaction.Status.COMPLETE.name != log.status) {
+                return
+            }
+
             // rtt -> show rocket if less than 20ms, treat it as rtt
             if (isRoundTripShorter(log.latency, log.isBlocked)) {
                 b.dnsUnicodeHint.text =
