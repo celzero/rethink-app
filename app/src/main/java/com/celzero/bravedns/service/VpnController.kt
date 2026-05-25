@@ -40,6 +40,7 @@ import com.celzero.firestack.backend.RpnEntitlement
 import com.celzero.firestack.intra.Controller
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
@@ -74,7 +75,7 @@ object VpnController : KoinComponent {
     // TODO: make clients listen on create, start, stop, destroy from vpn-service
     fun onVpnCreated(b: BraveVPNService) {
         braveVpnService = b
-        externalScope = CoroutineScope(Dispatchers.IO)
+        externalScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         states = Channel(Channel.CONFLATED) // drop unconsumed states
 
         // store app start time, used in HomeScreenBottomSheet
