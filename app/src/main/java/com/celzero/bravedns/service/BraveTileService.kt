@@ -26,6 +26,7 @@ import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.Observer
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.ui.activity.MiscSettingsActivity
 import com.celzero.bravedns.util.Utilities
@@ -37,13 +38,17 @@ class BraveTileService : TileService(), KoinComponent {
 
     private val persistentState by inject<PersistentState>()
 
+    // Single stable Observer instance so addObserver/removeObserver actually
+    // match the same callback. Kotlin method references like `this::updateTile`
+    // generate a new function-reference object per `::` expression — meaning
+    // removeObserver(this::updateTile) does NOT find the observer previously
+    // registered with observeForever(this::updateTile), and the observer leaks.
+    private val tileObserver = Observer<Boolean> { enabled -> updateTile(enabled) }
+
     override fun onCreate() {
-        // may be called multiple times, but we only need to observe once
-        // can't use onStartListening() as it is not called when the tile is added
-        // to the quick settings panel
         super.onCreate()
         try {
-            persistentState.vpnEnabledLiveData.observeForever(this::updateTile)
+            persistentState.vpnEnabledLiveData.observeForever(tileObserver)
         } catch (e: Exception) {
             Logger.w(Logger.LOG_TAG_UI, "Tile: err in observing VPN state", e)
         }
@@ -58,21 +63,19 @@ class BraveTileService : TileService(), KoinComponent {
 
     override fun onStartListening() {
         super.onStartListening()
-        try {
-            persistentState.vpnEnabledLiveData.observeForever(this::updateTile)
-        } catch (e: Exception) {
-            Logger.w(Logger.LOG_TAG_UI, "Tile: err in observing VPN state", e)
-        }
+        // Just seed the current value; the observer is already attached in onCreate
+        // and will fire on subsequent changes. Re-registering here would either
+        // stack a second observer (leak) or be a no-op duplicate.
         updateTile(persistentState.getVpnEnabled())
     }
 
-    override fun onStopListening() {
-        super.onStopListening()
+    override fun onDestroy() {
         try {
-            persistentState.vpnEnabledLiveData.removeObserver(this::updateTile)
+            persistentState.vpnEnabledLiveData.removeObserver(tileObserver)
         } catch (e: Exception) {
             Logger.w(Logger.LOG_TAG_UI, "Tile: err in removing observer", e)
         }
+        super.onDestroy()
     }
 
     private fun isAppRunningOnTv(): Boolean {
