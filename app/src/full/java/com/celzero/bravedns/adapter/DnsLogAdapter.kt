@@ -38,6 +38,7 @@ import com.bumptech.glide.request.target.CustomViewTarget
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.adapter.DnsLogAdapter.DnsLogViewHolder
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.ListItemDnsLogBinding
@@ -168,6 +169,17 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
         }
 
         private fun displayUnicodeIfNeeded(log: DnsLog) {
+            if (DEBUG) {
+                val msg = log.msg.split(";").firstOrNull() ?: ""
+                if (msg.isNotEmpty() && msg == Backend.OriginInternal) {
+                    b.dnsUnicodeHint.text = context.getString(
+                        R.string.ci_desc,
+                        b.dnsUnicodeHint.text,
+                        "🌀"
+                    )
+                }
+            }
+
             // no need to show Unicode hints for failed transactions as the hints are relevant only
             // for complete transactions and can be misleading in case of failed transactions
             if (Transaction.Status.COMPLETE.name != log.status) {
