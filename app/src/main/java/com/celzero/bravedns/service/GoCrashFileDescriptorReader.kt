@@ -21,7 +21,6 @@ import android.content.Context
 import android.system.Os
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.GoCrashFileDescriptorReader.Companion.MAX_LINE_BYTES
-import com.celzero.bravedns.util.FileObserverManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -59,36 +58,7 @@ class GoCrashFileDescriptorReader(private val context: Context?) {
             return null
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
-            observeFile(file)
-        }
-
         return file
-    }
-
-    private suspend fun observeFile(file: File) {
-        val parent = file.parentFile
-        if (parent == null) {
-            Logger.e(LOG_TAG_BUG_REPORT, "$TAG createCrashFile2 returned null")
-            return
-        }
-
-        val observer = FileObserverManager(
-            path = parent.absolutePath,
-            fileName = file.name
-        ) {
-            Logger.e(LOG_TAG_BUG_REPORT, "$TAG Crash file written → exiting process")
-            CoroutineScope(Dispatchers.Default).launch {
-                delay(5000)
-
-                Logger.e(LOG_TAG_BUG_REPORT, "$TAG Killing process now")
-                android.os.Process.killProcess(android.os.Process.myPid())
-                exitProcess(1)
-            }
-        }
-
-        observer.start()
-        Logger.d(LOG_TAG_BUG_REPORT, "$TAG Crash file observer started, ${file.absolutePath}")
     }
 
     private fun createCrashFile2(): File? {
