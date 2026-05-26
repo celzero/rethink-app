@@ -212,7 +212,7 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
         b.statusIcon.setImageResource(R.drawable.ic_cross_accent)
         b.statusIcon.setColorFilter(ContextCompat.getColor(this, R.color.accentBad))
         b.statusTitle.text = getString(R.string.ping_no_proxy_title)
-        b.statusDescription.text = getString(R.string.ping_no_proxy_desc)
+        b.statusDescription.text = getString(R.string.ping_reach_rpn_disabled)
         b.pingButton.text = getString(R.string.ping_test_again)
         b.pingButton.isEnabled = true
 
