@@ -65,6 +65,8 @@ import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.activity.ConsoleLogActivity
+import com.celzero.bravedns.ui.activity.EventsActivity
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
 import com.celzero.bravedns.ui.bottomsheet.BugReportFilesBottomSheet
 import com.celzero.bravedns.ui.fragment.RethinkPlusDashboardFragment
@@ -202,6 +204,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutDbStats.setOnClickListener(this)
         b.tokenTextView.setOnClickListener(this)
         b.aboutFlightRecord.setOnClickListener(this)
+        b.aboutConsoleLogs.setOnClickListener(this)
         b.aboutEventLogs.setOnClickListener(this)
 
         val gestureDetector = GestureDetector(
@@ -449,6 +452,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.aboutFlightRecord -> {
                 initiateFlightRecord()
             }
+            b.aboutConsoleLogs -> {
+                openConsoleLogs()
+            }
             b.aboutEventLogs -> {
                 openEventLogs()
             }
@@ -669,7 +675,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun openEventLogs() {
-        val intent = Intent(requireContext(), com.celzero.bravedns.ui.activity.EventsActivity::class.java)
+        val intent = Intent(requireContext(), EventsActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun openConsoleLogs() {
+        val intent = Intent(requireContext(), ConsoleLogActivity::class.java)
         startActivity(intent)
     }
 
