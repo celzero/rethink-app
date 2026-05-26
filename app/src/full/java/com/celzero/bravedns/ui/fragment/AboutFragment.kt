@@ -288,7 +288,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun updateSponsorInfo() {
-        if (RpnProxyManager.isRpnActive()) {
+        if (RpnProxyManager.isRpnEnabled()) {
             b.aboutSponsor.visibility = View.GONE
             b.aboutManageRpn.visibility = View.VISIBLE
             b.sponsorInfoUsage.visibility = View.GONE
