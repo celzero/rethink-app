@@ -16,7 +16,6 @@
 package com.celzero.bravedns.ui.fragment
 
 import Logger
-import Logger.LOG_IAB
 import Logger.LOG_TAG_UI
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
@@ -69,7 +68,6 @@ import com.celzero.bravedns.ui.activity.ConsoleLogActivity
 import com.celzero.bravedns.ui.activity.EventsActivity
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
 import com.celzero.bravedns.ui.bottomsheet.BugReportFilesBottomSheet
-import com.celzero.bravedns.ui.fragment.RethinkPlusDashboardFragment
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_4
@@ -859,8 +857,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
         val tabRow = android.widget.LinearLayout(ctx).apply {
             orientation = android.widget.LinearLayout.HORIZONTAL
-            addView(tabProc)
             addView(tabMetrics)
+            addView(tabProc)
         }
 
         val container = android.widget.LinearLayout(ctx).apply {
@@ -873,7 +871,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         }
 
         // Start on the Proc / Mem tab
-        selectTab(true)
+        selectTab(false)
 
         val dialog = MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
             .setTitle("Proc Analysis")
