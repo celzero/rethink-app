@@ -417,8 +417,8 @@ object VpnController : KoinComponent {
         return (braveVpnService?.createWgHop(origin, hop) ?: Pair(false, "vpn service not available"))
     }
 
-    suspend fun testRpnProxy(proxyId: String): Boolean {
-        return braveVpnService?.testRpnProxy(proxyId) == true
+    suspend fun testRpnProxy(): Boolean {
+        return braveVpnService?.testRpnProxy() == true
     }
 
     suspend fun isRpnReachable(csv: String): Boolean {
@@ -535,6 +535,10 @@ object VpnController : KoinComponent {
 
     suspend fun getWinProxyId(): String? {
         return braveVpnService?.getWinProxyId()
+    }
+
+    suspend fun crashTun() {
+        braveVpnService?.crashTun()
     }
 
     suspend fun getEntitlementDetails(prevBytes: ByteArray?, deviceId: String): RpnEntitlement? {
