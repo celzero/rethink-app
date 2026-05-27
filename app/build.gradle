@@ -334,15 +334,15 @@ dependencies {
 
     implementation 'com.squareup.okio:okio-jvm:3.16.4'
     // Glide
-    fullImplementation('com.github.bumptech.glide:glide:5.0.5') {
+    fullImplementation('com.github.bumptech.glide:glide:5.0.7') {
         exclude group: 'glide-parent'
     }
-    fullImplementation('com.github.bumptech.glide:okhttp3-integration:5.0.5') {
+    fullImplementation('com.github.bumptech.glide:okhttp3-integration:5.0.7') {
         exclude group: 'glide-parent'
     }
 
     // Ref: https://stackoverflow.com/a/46638213
-    kspFull 'com.github.bumptech.glide:compiler:5.0.5'
+    kspFull 'com.github.bumptech.glide:compiler:5.0.7'
 
     // Swipe button animation
     fullImplementation 'com.facebook.shimmer:shimmer:0.5.0'
