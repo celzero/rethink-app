@@ -376,7 +376,6 @@ object InAppBillingHandler : KoinComponent {
                                 setupProcessors()
                                 queryBillingConfig()
                                 billingScope.launch (Dispatchers.IO) { queryProductDetails() }
-                                fetchPurchases(listOf(ProductType.SUBS, ProductType.INAPP))
                             } else {
                                 loge(mname, "billing connection failed: ${billingResult.responseCode}, ${billingResult.debugMessage}")
                             }
@@ -1284,9 +1283,10 @@ object InAppBillingHandler : KoinComponent {
     private fun resolveOneTimeRevokeDays(productId: String): Int = when (productId) {
         ONE_TIME_PRODUCT_2YRS -> REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
         ONE_TIME_PRODUCT_5YRS -> REVOKE_WINDOW_ONE_TIME_5YRS_DAYS
-        ONE_TIME_PRODUCT_ID -> REVOKE_WINDOW_SUBS_MONTHLY_DAYS
+        // Legacy one-time product has the same 2-year access window as ONE_TIME_PRODUCT_2YRS.
+        ONE_TIME_PRODUCT_ID -> REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
         ONE_TIME_TEST_PRODUCT_ID -> REVOKE_WINDOW_SUBS_MONTHLY_DAYS
-        else -> REVOKE_WINDOW_SUBS_MONTHLY_DAYS
+        else -> REVOKE_WINDOW_ONE_TIME_2YRS_DAYS // conservative default for unknown one-time products
     }
 
     private fun Int.toSubscriptionStatusId(): Int = when (this) {
@@ -1402,6 +1402,9 @@ object InAppBillingHandler : KoinComponent {
 
     /**
      * resolves product type from the known product-ID set.
+     *
+     * ONE_TIME_PRODUCT_2YRS ("proxy-yearly-2") and ONE_TIME_PRODUCT_5YRS ("proxy-yearly-5") are
+     * standalone INAPP product IDs distinct from ONE_TIME_PRODUCT_ID ("onetime.tier").
      */
     private fun resolveProductTypeFromKnownIds(productId: String): String {
         val mname = "resolveProductTypeFromKnownIds"

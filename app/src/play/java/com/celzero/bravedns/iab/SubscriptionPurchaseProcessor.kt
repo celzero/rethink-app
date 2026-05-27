@@ -349,12 +349,10 @@ internal class SubscriptionPurchaseProcessor(
         return true
     }
 
-    /** Maps a SUBS plan/product id to its revoke-window in days. */
-    private fun resolveRevokeDays(productId: String)= when (productId)  {
-        InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
-        InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_5YRS_DAYS
-        InAppBillingHandler.ONE_TIME_PRODUCT_ID -> InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
-        InAppBillingHandler.ONE_TIME_TEST_PRODUCT_ID -> InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
+    private fun resolveRevokeDays(planId: String): Int = when {
+        planId == InAppBillingHandler.SUBS_PRODUCT_YEARLY -> InAppBillingHandler.REVOKE_WINDOW_SUBS_YEARLY_DAYS
+        planId.contains("yearly", ignoreCase = true) -> InAppBillingHandler.REVOKE_WINDOW_SUBS_YEARLY_DAYS
+        planId.contains("annual", ignoreCase = true) -> InAppBillingHandler.REVOKE_WINDOW_SUBS_YEARLY_DAYS
         else -> InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
     }
 

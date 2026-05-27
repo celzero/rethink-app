@@ -77,10 +77,7 @@ class StateMachineDatabaseSyncService : KoinComponent {
         val hasRealExpiry = sub.billingExpiry > 0L && sub.billingExpiry != Long.MAX_VALUE
         val isLocallyExpired = hasRealExpiry && sub.billingExpiry < now
 
-        // Determine if this is a one-time (INAPP) purchase by productId
-        val isInApp = sub.productId.contains("onetime", ignoreCase = true) ||
-                sub.productId.contains("inapp",   ignoreCase = true) ||
-                sub.productId == "test_product"
+        val isInApp = SubscriptionStateMachineV2.isInAppProduct(sub.productId)
 
         Logger.d(
             LOG_IAB, "$TAG: determineState: status=${sub.status}, productId=${sub.productId}, " +
