@@ -312,11 +312,22 @@ class VpnServerAdapter(
                 io {
                     var animator: ObjectAnimator? = null
                     uiCtx {
-                        animator = ObjectAnimator.ofFloat(b.infoIcon, "rotation", 0f, 360f).apply {
-                            duration = 600L
-                            repeatCount = ObjectAnimator.INFINITE
-                            interpolator = LinearInterpolator()
-                            start()
+                        try {
+                            uiCtx {
+                                animator =
+                                    ObjectAnimator.ofFloat(b.infoIcon, "rotation", 0f, 360f).apply {
+                                        duration = 600L
+                                        repeatCount = ObjectAnimator.INFINITE
+                                        interpolator = LinearInterpolator()
+                                        start()
+                                    }
+                            }
+                            VpnController.refreshRpnProxy(Backend.RpnWin)
+                        } finally {
+                            uiCtx {
+                                animator?.cancel()
+                                b.infoIcon.rotation = 0f
+                            }
                         }
                     }
                     VpnController.refreshRpnProxy(Backend.RpnWin)
