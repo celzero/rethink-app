@@ -48,8 +48,8 @@ class ServerOrderHistoryAdapter(private val context: Context) :
                 old == new
         }
 
-        private val DATE_FMT = SimpleDateFormat("MMM dd, yyyy  hh:mm a", Locale.getDefault())
-        private val DATE_ONLY = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+        private val DATE_FMT = SimpleDateFormat("MMM dd, yyyy  hh:mm a", Locale.ENGLISH)
+        private val DATE_ONLY = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderViewHolder {
@@ -121,7 +121,7 @@ class ServerOrderHistoryAdapter(private val context: Context) :
                 return when (entry.subscriptionState) {
                     ServerOrderEntry.STATE_ACTIVE -> Triple(
                         context.getString(R.string.lbl_active),
-                        R.color.chipBackgroundColor,
+                        R.color.chipBgPositive,
                         R.attr.chipTextPositive
                     )
                     ServerOrderEntry.STATE_CANCELLED -> Triple(
@@ -157,12 +157,17 @@ class ServerOrderHistoryAdapter(private val context: Context) :
                 }
             } else {
                 return when (entry.purchaseState) {
-                    0 -> Triple(
+                    ServerOrderEntry.PURCHASE_STATE_PURCHASED -> Triple(
                         context.getString(R.string.rpn_purchased_state),
-                        R.color.chipBackgroundColor,
+                        R.color.chipBgPositive,
                         R.attr.chipTextPositive
                     )
-                    2 -> Triple(
+                    ServerOrderEntry.PURCHASE_STATE_CANCELLED -> Triple(
+                        context.getString(R.string.lbl_cancelled),
+                        R.color.chipBgNegative,
+                        R.attr.chipTextNegative
+                    )
+                    ServerOrderEntry.PURCHASE_STATE_PENDING -> Triple(
                         context.getString(R.string.payment_history_state_pending),
                         R.color.chipBgNeutral,
                         R.attr.chipTextNeutral
@@ -194,13 +199,22 @@ class ServerOrderHistoryAdapter(private val context: Context) :
                 val startLabel = if (entry.startTimeMs > 0)
                     context.getString(R.string.server_order_started_fmt,
                         DATE_ONLY.format(Date(entry.startTimeMs))) else ""
-                val expiryLabel = if (entry.expiryTimeMs > 0)
-                    context.getString(R.string.server_order_expires_fmt,
-                        DATE_ONLY.format(Date(entry.expiryTimeMs))) else ""
-                val renewIcon = if (entry.autoRenewEnabled) " ↻" else " ✕"
 
                 b.tvDatePrimary.text = startLabel.ifEmpty { DATE_FMT.format(Date(entry.mtime)) }
-                val secondaryText = if (expiryLabel.isNotEmpty()) "$expiryLabel$renewIcon" else ""
+
+                val now = System.currentTimeMillis()
+                val expiryPassed = entry.expiryTimeMs in 1..now
+                val showExpiry = !entry.autoRenewEnabled || expiryPassed
+
+                val secondaryText = if (showExpiry) {
+                    if (entry.expiryTimeMs > 0)
+                        context.getString(R.string.server_order_expires_fmt,
+                            DATE_ONLY.format(Date(entry.expiryTimeMs)))
+                    else ""
+                } else {
+                    context.getString(R.string.server_order_auto_renew, DATE_ONLY.format(Date(entry.expiryTimeMs)))
+                }
+
                 b.tvDateSecondary.text = secondaryText
                 b.tvDateSecondary.visibility =
                     if (secondaryText.isNotEmpty()) View.VISIBLE else View.GONE

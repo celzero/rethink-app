@@ -134,7 +134,7 @@
                 android:textSize="@dimen/default_font_text_view"
                 android:textColor="?attr/primaryLightColorText"
                 android:visibility="gone"
-                tools:text="Expires Feb 15, 2025 ↻"
+                tools:text="Expires Feb 15, 2025"
                 tools:visibility="visible" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -169,12 +169,11 @@
 
     </LinearLayout>
 
-    <!-- Divider -->
     <View
         android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginStart="78dp"
+        android:layout_marginStart="55dp"
         android:background="?attr/border" />
 
 </LinearLayout>
