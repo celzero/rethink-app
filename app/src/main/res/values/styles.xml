@@ -1208,6 +1208,7 @@
         AlphaLight : Purple 700 — sufficient contrast on white/light surfaces.
     -->
     <style name="ThemeOverlay.App.AlphaDark" parent="">
+        <item name="colorPrimary">@color/alpha_accent_dark</item>
         <item name="colorAccent">@color/alpha_accent_dark</item>
         <item name="android:colorAccent">@color/alpha_accent_dark</item>
         <item name="accentGood">@color/alpha_accent_dark</item>
@@ -1216,6 +1217,7 @@
     </style>
 
     <style name="ThemeOverlay.App.AlphaLight" parent="">
+        <item name="colorPrimary">@color/alpha_accent_light</item>
         <item name="colorAccent">@color/alpha_accent_light</item>
         <item name="android:colorAccent">@color/alpha_accent_light</item>
         <item name="accentGood">@color/alpha_accent_light</item>
