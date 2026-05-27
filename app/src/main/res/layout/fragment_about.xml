@@ -745,6 +745,22 @@
                 android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_console_logs"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:drawableStart="@drawable/ic_app_log"
+                android:drawablePadding="20dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/console_log_title"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_event_logs"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"

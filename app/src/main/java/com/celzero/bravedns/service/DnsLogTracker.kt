@@ -111,7 +111,7 @@ internal constructor(
         transaction.blocklist = summary.blocklists ?: ""
         transaction.relayName = summary.rpid ?: ""
         transaction.proxyId = summary.pid ?: ""
-        transaction.msg = summary.msg ?: ""
+        transaction.msg = summary.origin + "; " + summary.msg + "; " + summary.extra
         transaction.upstreamBlock = summary.upstreamBlocks
         transaction.region = summary.region
         transaction.isCached = summary.cached

@@ -45,6 +45,7 @@ import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.scheduler.BugReportZipper
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.Themes
@@ -80,9 +81,10 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), androidx
         private const val FILE_NAME = "rethink_app_logs_"
         private const val FILE_EXTENSION = ".zip"
         private const val QUERY_TEXT_DELAY: Long = 1000
+        private const val CRASH_CODE = "**CRASH**"
     }
 
-    // Guard against rapid double-taps on share buttons while a job is in-flight
+    // Guard against rapid double-taps on share buttons while a job is in-progress
     private var isShareInProgress = false
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -435,13 +437,27 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), androidx
     val searchQuery = MutableStateFlow("")
     @OptIn(FlowPreview::class)
     override fun onQueryTextSubmit(query: String): Boolean {
+        if (query == CRASH_CODE) {
+            crashTun()
+            return true
+        }
         searchQuery.value = query
         return true
     }
 
     @OptIn(FlowPreview::class)
     override fun onQueryTextChange(query: String): Boolean {
+        if (query == CRASH_CODE) {
+            crashTun()
+            return true
+        }
         searchQuery.value = query
         return true
+    }
+
+    private fun crashTun() {
+        io {
+            VpnController.crashTun()
+        }
     }
 }

@@ -245,7 +245,7 @@ internal class OneTimePurchaseProcessor(
             payload = purchase.developerPayload,
             expiryTime = expiryTime,
             status = purchase.purchaseState.toSubscriptionStatusId(),
-            windowDays = resolveRevokeDays(planId),
+            windowDays = resolveRevokeDays(productId),
             orderId = purchase.orderId.orEmpty()
         )
 
@@ -497,9 +497,10 @@ internal class OneTimePurchaseProcessor(
     private fun resolveRevokeDays(productId: String): Int = when (productId) {
         InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
         InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_5YRS_DAYS
-        InAppBillingHandler.ONE_TIME_PRODUCT_ID -> InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
+        // Legacy one-time product has same 2-year access window → use the same revoke window.
+        InAppBillingHandler.ONE_TIME_PRODUCT_ID -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
         InAppBillingHandler.ONE_TIME_TEST_PRODUCT_ID -> InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
-        else -> InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
+        else -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_DAYS // conservative default
     }
 
     private fun Int.toSubscriptionStatusId(): Int = when (this) {

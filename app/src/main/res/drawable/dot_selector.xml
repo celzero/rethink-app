@@ -4,7 +4,7 @@
         <layer-list>
             <item android:left="2dp" android:right="2dp" android:top="2dp" android:bottom="2dp">
                 <shape android:shape="oval">
-                    <solid android:color="?attr/controlActivated" />
+                    <solid android:color="?attr/svgStrokeColor" />
                     <size android:width="8dp" android:height="8dp" />
                 </shape>
             </item>
@@ -14,7 +14,7 @@
         <layer-list>
             <item android:left="2dp" android:right="2dp" android:top="2dp" android:bottom="2dp">
                 <shape android:shape="oval">
-                    <solid android:color="?attr/switchNormal" />
+                    <solid android:color="?attr/svgStrokeColor" />
                     <size android:width="8dp" android:height="8dp" />
                 </shape>
             </item>

@@ -30,6 +30,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusDao
 import com.celzero.bravedns.databinding.ActivityRethinkPlusDashboardBinding
@@ -221,8 +222,8 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
                         return@uiCtx
                     }
                     val isExpiringSoon = remainingDays in 0..EXPIRING_SOON_THRESHOLD_DAYS
-                    b.expiringBannerCard.isVisible = isExpiringSoon || true
-                    if (isExpiringSoon || true) {
+                    b.expiringBannerCard.isVisible = isExpiringSoon || DEBUG
+                    if (isExpiringSoon || DEBUG) {
                         val days = remainingDays.coerceAtLeast(0L)
                         b.tvExpiringBanner.text = getString(R.string.inapp_expiry_soon, days)
                         b.btnExtendAccess.setOnClickListener { navigateToOneTimePurchase() }

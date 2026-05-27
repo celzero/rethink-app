@@ -17,12 +17,15 @@ package com.celzero.bravedns.ui.adapter
 
 import Logger
 import Logger.LOG_TAG_UI
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -41,7 +44,6 @@ import com.celzero.bravedns.ui.activity.RpnConfigDetailActivity
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.IPMetadata
 import com.celzero.firestack.backend.RouterStats
@@ -213,12 +215,14 @@ class VpnServerAdapter(
             b.tvServerIp.visibility = View.GONE
 
             if (group.key.equals(AUTO_SERVER_ID, ignoreCase = true)) {
-                b.infoIcon.visibility = View.GONE
+                b.infoIcon.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.ic_refresh_white))
+                b.infoIcon.visibility = View.VISIBLE
                 // AUTO server: show the vector ic_rpn_auto, hide the emoji text view
                 b.tvFlag.text = ""
                 b.ivFlagImage.visibility = View.VISIBLE
             } else {
                 b.infoIcon.visibility = View.VISIBLE
+                b.infoIcon.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.ic_cross))
                 // Regular server: show the country flag emoji, hide the globe image
                 b.tvFlag.text = group.flagEmoji
                 b.ivFlagImage.visibility = View.GONE
@@ -285,17 +289,55 @@ class VpnServerAdapter(
                 // WIN tunnel for this server is still being set up (getWinByKey returned null).
                 // Show a "Connecting…" indicator with a gentle pulse.
                 showTunnelLoadingStatus()
-                b.infoIcon.setOnClickListener { listener.onServerGroupRemoved(group) }
+                b.infoIcon.setOnClickListener {
+                    handleInfoIconClick(group)
+                }
                 b.serverCard.setOnClickListener { openServerDetail(group.getBestServer()) }
                 // Always start polling
                 statsJob = pollStatsLoop(group)
             } else {
-                b.infoIcon.setOnClickListener { listener.onServerGroupRemoved(group) }
+                b.infoIcon.setOnClickListener {
+                    handleInfoIconClick(group)
+                }
                 b.serverCard.setOnClickListener { openServerDetail(group.getBestServer()) }
 
                 // Show "Checking…" immediately so the item is never left stranded
                 showCheckingStatus()
                 statsJob = pollStatsLoop(group)
+            }
+        }
+
+        private fun handleInfoIconClick(group: ServerGroup) {
+            if (group.key.equals(AUTO_SERVER_ID, ignoreCase = true)) {
+                io {
+                    var animator: ObjectAnimator? = null
+                    uiCtx {
+                        try {
+                            uiCtx {
+                                animator =
+                                    ObjectAnimator.ofFloat(b.infoIcon, "rotation", 0f, 360f).apply {
+                                        duration = 600L
+                                        repeatCount = ObjectAnimator.INFINITE
+                                        interpolator = LinearInterpolator()
+                                        start()
+                                    }
+                            }
+                            VpnController.refreshRpnProxy(Backend.RpnWin)
+                        } finally {
+                            uiCtx {
+                                animator?.cancel()
+                                b.infoIcon.rotation = 0f
+                            }
+                        }
+                    }
+                    VpnController.refreshRpnProxy(Backend.RpnWin)
+                    uiCtx {
+                        animator?.cancel()
+                        b.infoIcon.rotation = 0f
+                    }
+                }
+            } else {
+                listener.onServerGroupRemoved(group)
             }
         }
 
@@ -310,7 +352,6 @@ class VpnServerAdapter(
             b.tvServerStatus.setTextColor(fetchColor(ctx, R.attr.chipTextNeutral))
             b.tvStatusSep.visibility = View.GONE
             b.tvAppsCount.visibility = View.GONE
-            b.tvRxTx.visibility = View.GONE
             b.tvUptimeSep.visibility = View.GONE
             b.tvUptime.visibility = View.GONE
         }
@@ -329,7 +370,6 @@ class VpnServerAdapter(
             b.tvServerStatus.setTextColor(fetchColor(ctx, R.attr.chipTextNeutral))
             b.tvStatusSep.visibility = View.GONE
             b.tvAppsCount.visibility = View.GONE
-            b.tvRxTx.visibility = View.GONE
             b.tvUptimeSep.visibility = View.GONE
             b.tvUptime.visibility = View.GONE
             // Kick off a gentle alpha pulse so the user can tell this item is "live"
@@ -353,7 +393,6 @@ class VpnServerAdapter(
             b.tvServerStatus.setTextColor(fetchColor(ctx, R.attr.chipTextNeutral))
             b.tvStatusSep.visibility = View.GONE
             b.tvAppsCount.visibility = View.GONE
-            b.tvRxTx.visibility = View.GONE
             b.tvUptimeSep.visibility = View.GONE
             b.tvUptime.visibility = View.GONE
             // states feel distinct to the user.
@@ -442,21 +481,6 @@ class VpnServerAdapter(
             }
         }
 
-        /**
-         * Builds a compact ISP / city label from [ip4] metadata.
-         * Format: "City · ASN Org", "ASN Org", "City", or "" if neither is set.
-         */
-        private fun buildIspLabel(ip4: IPMetadata): String {
-            val city = ip4.city?.takeIf { it.isNotEmpty() }
-            val org  = ip4.asnOrg?.takeIf { it.isNotEmpty() }
-            return when {
-                city != null && org != null -> "$city · $org"
-                org  != null -> org
-                city != null -> city
-                else -> ""
-            }
-        }
-
         private fun applyStats(
             config: CountryConfig?,
             statusPair: Pair<Long?, String>,
@@ -491,11 +515,6 @@ class VpnServerAdapter(
                 fetchColor(ctx, if (appsCount > 0 || config.catchAll) R.attr.primaryLightColorText else R.attr.accentBad)
             )
 
-            // Rx / Tx
-            val rxtx = getRxTx(stats)
-            b.tvRxTx.visibility = if (rxtx.isNotEmpty()) View.VISIBLE else View.GONE
-            if (rxtx.isNotEmpty()) b.tvRxTx.text = rxtx
-
             // Uptime
             val uptime = getUpTime(config.key)
             b.tvUptimeSep.visibility = if (uptime.isNotEmpty()) View.VISIBLE else View.GONE
@@ -503,26 +522,24 @@ class VpnServerAdapter(
             if (uptime.isNotEmpty()) b.tvUptime.text = uptime
 
             // Server IP row.
-            // Show the actual IP+ISP label when available, fall back to "N/A" once the
-            // tunnel has provided stats (so the row is never blank once we have context),
-            // or hide the row entirely while still waiting for the first stats reply.
+            // Show the actual IP label when available, fall back to "N/A"
             val ipText = ip4?.ip?.takeIf { it.isNotEmpty() }
             when {
                 ipText != null -> {
-                    val ispLabel = "" // buildIspLabel(ip4)
-                    b.tvServerIp.text = if (ispLabel.isNotEmpty()) "$ipText · $ispLabel" else ipText
+                    b.tvServerIp.text = ipText
                     b.tvServerIp.visibility = View.VISIBLE
                 }
                 stats != null -> {
                     // Tunnel is up and returning stats but the IP metadata isn't available
-                    // yet (or the backend didn't return one) — show "N/A" so the row is
+                    // yet (or the backend didn't return one), show "N/A" so the row is
                     // never left empty.
                     b.tvServerIp.text = ctx.getString(R.string.lbl_not_available_short)
                     b.tvServerIp.visibility = View.VISIBLE
                 }
                 else -> {
-                    // No stats yet — keep the IP row hidden until we have real data.
+                    // No stats yet, keep the IP row hidden until we have real data.
                     b.tvServerIp.visibility = View.GONE
+                    b.tvUptimeSep.visibility = View.GONE
                 }
             }
         }
@@ -571,15 +588,6 @@ class VpnServerAdapter(
             // See getStatusColor() for the full rationale.
             return ctx.getString(UIUtils.getProxyStatusStringRes(status.id))
                 .replaceFirstChar(Char::titlecase)
-        }
-
-        private fun getRxTx(stats: RouterStats?): String {
-            if (stats == null || (stats.rx == 0L && stats.tx == 0L)) return ""
-            val rx = ctx.getString(R.string.symbol_download,
-                Utilities.humanReadableByteCount(stats.rx, true))
-            val tx = ctx.getString(R.string.symbol_upload,
-                Utilities.humanReadableByteCount(stats.tx, true))
-            return ctx.getString(R.string.two_argument_space, tx, rx)
         }
 
         private fun getUpTime(id: String): CharSequence {
@@ -677,6 +685,14 @@ class VpnServerAdapter(
             intent.putExtra(RpnConfigDetailActivity.INTENT_EXTRA_FROM_SERVER_SELECTION, true)
             intent.putExtra(RpnConfigDetailActivity.INTENT_EXTRA_CONFIG_KEY, server.key)
             ctx.startActivity(intent)
+        }
+
+        private fun io(f: suspend () -> Unit) {
+            b.root.findViewTreeLifecycleOwner()?.lifecycleScope?.launch(Dispatchers.IO) { f() }
+        }
+
+        private suspend fun uiCtx(f: suspend () -> Unit) {
+            withContext(Dispatchers.Main) { f() }
         }
 
     }

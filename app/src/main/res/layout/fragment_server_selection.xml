@@ -355,6 +355,19 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/registration_progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone"
+        android:elevation="5dp"
+        app:indicatorColor="?attr/accentGood"
+        app:trackColor="@android:color/transparent"
+        app:trackThickness="3dp"
+        app:layout_anchor="@id/appBarLayout"
+        app:layout_anchorGravity="bottom" />
+
     <androidx.core.widget.NestedScrollView
         android:id="@+id/servers_scroll_view"
         android:layout_width="match_parent"
@@ -549,6 +562,7 @@
                 android:orientation="vertical"
                 android:paddingStart="32dp"
                 android:paddingEnd="32dp"
+                tools:visibility="visible"
                 android:visibility="gone">
 
                 <FrameLayout
@@ -747,6 +761,7 @@
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="32dp"
+                tools:visibility="visible"
                 android:visibility="gone">
 
                 <androidx.appcompat.widget.AppCompatImageView

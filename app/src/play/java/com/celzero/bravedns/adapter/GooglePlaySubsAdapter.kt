@@ -239,8 +239,10 @@ class GooglePlaySubsAdapter(
             }
         }
 
-        /** Returns the total duration in months for known INAPP product IDs, or 0 if unknown. */
-        private fun getInAppDurationMonths(productId: String): Int = when (productId) {
+        /**
+         * Returns the total duration in months for a given plan ID, or 0 if unknown.
+         */
+        private fun getInAppDurationMonths(planId: String): Int = when (planId) {
             InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> 24
             InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> 60
             InAppBillingHandler.ONE_TIME_PRODUCT_ID -> 24 // legacy default 2yr

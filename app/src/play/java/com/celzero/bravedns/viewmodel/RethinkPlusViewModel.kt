@@ -342,6 +342,23 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
     // Canceled when the flow resolves (success or error) or the ViewModel is cleared.
     private var extendObserverJob: Job? = null
 
+    /**
+     * Called by the Fragment when a billing transaction error fires while in extend mode.
+     * The state machine stays in [SubscriptionStateMachineV2.SubscriptionState.Active]
+     * (no PurchaseFailed transition exists from Active), so [observeSubscriptionState] never
+     * sees an Error state and cannot clean up the extend-mode flow flags itself.
+     * This method must be called explicitly from the Fragment's transactionErrorLiveData
+     * observer so [purchaseFlowActive] and [extendObserverJob] are always reset on failure.
+     */
+    fun onTransactionError() {
+        if (purchaseFlowActive) {
+            Logger.d(LOG_IAB, "$TAG: onTransactionError: clearing purchaseFlowActive (extendMode=$extendMode)")
+            purchaseFlowActive = false
+            extendObserverJob?.cancel()
+            extendObserverJob = null
+        }
+    }
+
     fun markPurchaseFlowActive() {
         purchaseFlowActive = true
         _uiState.value = SubscriptionUiState.Processing("Initializing purchase...")

@@ -315,7 +315,6 @@ object RpnProxyManager : KoinComponent {
         setRpnMode(RpnMode.ANTI_CENSORSHIP)
         setRpnState(RpnState.ENABLED)
         VpnController.handleRpnProxies()
-        serverKeyMeta.clear()
         Logger.i(LOG_TAG_PROXY, "$TAG; startProxy: proxy routing started (mode=ANTI_CENSORSHIP)")
     }
 
@@ -1591,13 +1590,34 @@ object RpnProxyManager : KoinComponent {
     }
 
     /**
-     * Returns the epoch-millisecond timestamp at which [key] was last selected
-     * (i.e. [enableWinServer] succeeded), or the [CountryConfig.lastModified] value
-     * that was seeded from the database on startup.  Returns 0 if the key is not
-     * currently selected.
+     * Returns the epoch-millisecond timestamp at which [key] was last added to the tunnel
+     * Returns 0 if the server has not been added to the tunnel since the last process start.
      */
     fun getSelectedSinceTs(key: String): Long {
         return serverKeyMeta[key]?.selectedAt ?: 0L
+    }
+
+    /**
+     * Records the epoch-ms timestamp at which [key] was last added to the VPN tunnel.
+     *
+     * Must be called immediately after every successful [VpnController.addNewWinServer] call,
+     * regardless of whether it is the user explicitly enabling a server ([enableWinServer]),
+     * the tunnel being re-established on a phone reboot / VPN reconnect
+     * ([BraveVPNService.handleRpnProxies]), or a periodic refresh ([updateWinProxy]).
+     */
+    fun notifyServerAddedToTun(key: String) {
+        if (key.isEmpty()) return
+        val now = System.currentTimeMillis()
+        serverKeyMeta[key] = ServerKeyMeta(selectedAt = now)
+        if (DEBUG) Logger.d(LOG_TAG_PROXY, "$TAG; notifyServerAddedToTun: key=$key, ts=$now")
+    }
+
+    /**
+     * Removes the in-memory tunnel timestamp for [key].
+     * Called when a server is explicitly removed from the tunnel (e.g. [disableWinServer]).
+     */
+    private fun clearServerMeta(key: String) {
+        serverKeyMeta.remove(key)
     }
 
     suspend fun getEnabledConfigs(): Set<CountryConfig> {
@@ -1644,18 +1664,46 @@ object RpnProxyManager : KoinComponent {
             return currentServers
         }
 
-        val bytes: ByteArray? = VpnController.updateWin()
+        val isRpnRegistered = VpnController.isWinRegistered()
+        if (!isRpnRegistered) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: WIN not registered, attempting to register")
+            val entitlementBytes = getWinEntitlement()
+            val prevRegistrationBytes = getWinExistingData()
+            val regBytes = try {
+                VpnController.registerAndFetchWinConfig(entitlementBytes, billingBackendClient.getDeviceId())
+                    ?: VpnController.registerAndFetchWinConfig(prevRegistrationBytes, billingBackendClient.getDeviceId())
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: tunnel registration failed: ${e.message}", e)
+                return null
+            }
+            if (regBytes == null) {
+                Logger.e(LOG_TAG_PROXY, "$TAG; updateWinProxy: registration attempt failed, cannot proceed with update")
+                return null
+            }
+            val persisted = updateWinConfigState(regBytes)
+            if (!persisted) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: failed to persist WIN config state after registration (continuing)")
+             }
+        } else {
+            val bytes: ByteArray? = VpnController.updateWin()
 
-        if (bytes == null) {
-            Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: updateWin() returned null, attempting re-register")
-            return null
-        }
+            if (bytes == null) {
+                Logger.w(
+                    LOG_TAG_PROXY,
+                    "$TAG; updateWinProxy: updateWin() returned null, attempting re-register"
+                )
+                return null
+            }
 
-        val persisted = updateWinConfigState(bytes)
-        if (!persisted) {
-            // Log the failure but do NOT return null; the in-memory state is already
-            // updated by updateWinConfigState before it touches the DB.
-            Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: failed to persist WIN config state (continuing)")
+            val persisted = updateWinConfigState(bytes)
+            if (!persisted) {
+                // Log the failure but do NOT return null; the in-memory state is already
+                // updated by updateWinConfigState before it touches the DB.
+                Logger.w(
+                    LOG_TAG_PROXY,
+                    "$TAG; updateWinProxy: failed to persist WIN config state (continuing)"
+                )
+            }
         }
 
         var fetchResult: Pair<Set<CountryConfig>, List<String>> = Pair(emptySet(), emptyList())
@@ -1703,6 +1751,9 @@ object RpnProxyManager : KoinComponent {
             try {
                 val result = VpnController.addNewWinServer(config.key)
                 if (result.first) {
+                    // Update the in-memory timestamp so uptime display shows the last
+                    // time this server was (re-)added to the tunnel.
+                    notifyServerAddedToTun(config.key)
                     Logger.i(LOG_TAG_PROXY, "$TAG; updateWinProxy: re-added server key=${config.key}")
                 } else {
                     Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: failed to re-add server key=${config.key}: ${result.second}")
@@ -1966,22 +2017,18 @@ object RpnProxyManager : KoinComponent {
          // Check if any removed servers were in the selected list
          val removedSelectedIds = mutableListOf<String>()
          if (removedIds.isNotEmpty()) {
-             // Snapshot the cached country codes under the lock to avoid a bare read.
-             val cachedCcs = winCacheMutex.withLock { winServersCache.map { it.cc }.toSet() }
-             val countryCodesToRemove = mutableSetOf<String>()
+             val keysToRemove = mutableSetOf<String>()
              for (removedId in removedIds) {
                  val removed = existingServers.firstOrNull { it.id == removedId }
-                 if (removed != null && cachedCcs.contains(removed.cc)) {
+                 if (removed != null && serverKeyMeta.containsKey(removed.key)) {
                      removedSelectedIds.add(removedId)
-                     // Collect country codes to remove
-                     countryCodesToRemove.add(removed.cc)
-                     Logger.w(LOG_TAG_PROXY, "$TAG; removed server $removedId (${removed.cc}) was in selected list")
+                     keysToRemove.add(removed.key)
+                     Logger.w(LOG_TAG_PROXY, "$TAG; removed server $removedId (key=${removed.key}) was in tunnel")
                  }
              }
-             // Remove all at once to avoid ConcurrentModificationException
-             if (countryCodesToRemove.isNotEmpty()) {
-                 countryCodesToRemove.forEach { serverKeyMeta.remove(it) }
-                 Logger.i(LOG_TAG_PROXY, "$TAG; removed ${countryCodesToRemove.size} country codes from selected list")
+             if (keysToRemove.isNotEmpty()) {
+                 keysToRemove.forEach { serverKeyMeta.remove(it) }
+                 Logger.i(LOG_TAG_PROXY, "$TAG; cleared ${keysToRemove.size} server keys from serverKeyMeta")
              }
          }
 
@@ -2031,10 +2078,8 @@ object RpnProxyManager : KoinComponent {
                 countryConfigRepo.update(config)
                 // Record the selection for frequent-country tracking and refresh chips.
                 countryConfigRepo.incrementSelectionCount(config.key)
-                val now = System.currentTimeMillis()
-                val existing = serverKeyMeta[key]
-                serverKeyMeta[key] = existing?.copy(selectedAt = now)
-                    ?: ServerKeyMeta(selectedAt = now)
+                // Mark when this server was added to the tunnel so the UI can show uptime.
+                notifyServerAddedToTun(key)
                 Logger.i(LOG_TAG_PROXY, "$TAG; enableWinServer: enabled rpn: $key")
             } catch (e: Exception) {
                 Logger.e(LOG_TAG_PROXY, "$TAG; enableWinServer: failed to update DB for $key: ${e.message}", e)
@@ -2267,7 +2312,8 @@ object RpnProxyManager : KoinComponent {
             }
                 try {
                     countryConfigRepo.update(config)
-                    serverKeyMeta.remove(key)
+                    // Clear the in-memory tunnel timestamp for this server.
+                    clearServerMeta(key)
                     Logger.i(LOG_TAG_PROXY, "$TAG; disableWinServer: disabled rpn: $key")
                 } catch (e: Exception) {
                     Logger.e(LOG_TAG_PROXY, "$TAG; disableWinServer: failed to update DB for $key: ${e.message}", e)
@@ -2276,10 +2322,6 @@ object RpnProxyManager : KoinComponent {
                         winServersCache.filter { it.key == key }.forEach { it.isEnabled = true }
                     }
                     config.isEnabled = true
-                    val now = System.currentTimeMillis()
-                    val existing = serverKeyMeta[key]
-                    serverKeyMeta[key] = existing?.copy(selectedAt = now)
-                        ?: ServerKeyMeta(selectedAt = now)
                     return Pair(false, "Failed to update database: ${e.message}")
                 }
         } else {

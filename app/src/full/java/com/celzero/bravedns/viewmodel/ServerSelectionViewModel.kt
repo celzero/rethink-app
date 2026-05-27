@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.celzero.bravedns.database.CountryConfig
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
+import com.celzero.bravedns.service.VpnController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -54,10 +55,12 @@ class ServerSelectionViewModel : ViewModel() {
      * - [Done]        – IO succeeded; servers and selected are ready to initialize the list.
      * - [NeedsLoading]– [RpnProxyManager.updateWinProxy] returned an empty list; the fragment
      *                   should show the server-loading dialog.
+     * - [NoTunnel]    – The VPN tunnel is not running; registration/refresh is impossible until
+     *                   the user starts Rethink.
      *
-     * [Done] and [NeedsLoading] are one-shot results: the Fragment must call [onRefreshConsumed]
-     * after handling them so the flow returns to [Idle] and late subscribers (e.g. a re-created
-     * sheet) do not replay a stale result.
+     * [Done], [NeedsLoading], and [NoTunnel] are one-shot results: the Fragment must call
+     * [onRefreshConsumed] after handling them so the flow returns to [Idle] and late
+     * subscribers (e.g. a re-created sheet) do not replay a stale result.
      */
     sealed class RefreshState {
         object Idle : RefreshState()
@@ -68,6 +71,8 @@ class ServerSelectionViewModel : ViewModel() {
         ) : RefreshState()
         /** Proxy returned no servers; fragment should show the loading / registration dialog. */
         object NeedsLoading : RefreshState()
+        /** VPN tunnel is not running; fragment should show the "Start Rethink" error. */
+        object NoTunnel : RefreshState()
     }
 
     private val _refreshState = MutableStateFlow<RefreshState>(RefreshState.Idle)
@@ -76,12 +81,21 @@ class ServerSelectionViewModel : ViewModel() {
 
     /**
      * Starts a server refresh unless one is already in progress.
+     * Emits [RefreshState.NoTunnel] immediately if [VpnController.hasTunnel] is false so the
+     * fragment surface the "Start Rethink" error without waiting for a network timeout.
      */
     fun refresh() {
         if (_refreshState.value is RefreshState.InProgress) return
         viewModelScope.launch(Dispatchers.IO) {
             _refreshState.value = RefreshState.InProgress
             Logger.i(LOG_TAG_UI, "$TAG.refresh: starting server refresh")
+
+            // Guard: registration/fetch requires an active VPN tunnel.
+            if (!VpnController.hasTunnel()) {
+                Logger.w(LOG_TAG_UI, "$TAG.refresh: no VPN tunnel available, aborting refresh")
+                _refreshState.value = RefreshState.NoTunnel
+                return@launch
+            }
 
             val selectedList: Set<CountryConfig> = try {
                 RpnProxyManager.getEnabledConfigs()
@@ -124,6 +138,8 @@ class ServerSelectionViewModel : ViewModel() {
      * - [Done]       – Completed (success or failure). The fragment must call
      *                  [onResetConsumed] after handling this state so late re-subscribers
      *                  (e.g. a recreated fragment after rotation) do not replay stale results.
+     * - [NoTunnel]   – VPN tunnel is not running; reset cannot proceed. Fragment should show
+     *                  the "Start Rethink" error.
      */
     sealed class ResetState {
         object Idle : ResetState()
@@ -135,6 +151,8 @@ class ServerSelectionViewModel : ViewModel() {
             /** Currently-enabled configs fetched after the reset. */
             val selected: Set<CountryConfig>
         ) : ResetState()
+        /** VPN tunnel is not running; fragment should show the "Start Rethink" error. */
+        object NoTunnel : ResetState()
     }
 
     private val _resetState = MutableStateFlow<ResetState>(ResetState.Idle)
@@ -144,6 +162,8 @@ class ServerSelectionViewModel : ViewModel() {
 
     /**
      * Starts the RPN reset unless one is already in progress.
+     * Emits [ResetState.NoTunnel] immediately if [VpnController.hasTunnel] is false so the
+     * fragment surfaces the "Start Rethink" error without waiting for a reset timeout.
      *
      * Result data ([ResetState.Done.servers] / [ResetState.Done.selected]) is fetched
      * while still inside this scope so the fragment receives everything it needs to call
@@ -154,6 +174,14 @@ class ServerSelectionViewModel : ViewModel() {
         viewModelScope.launch {
             _resetState.value = ResetState.InProgress
             Logger.i(LOG_TAG_UI, "$TAG.reset: starting RPN reset")
+
+            // Guard: reset requires an active VPN tunnel; fail fast instead of timing out.
+            val hasTunnel = withContext(Dispatchers.IO) { VpnController.hasTunnel() }
+            if (!hasTunnel) {
+                Logger.w(LOG_TAG_UI, "$TAG.reset: no VPN tunnel available, aborting reset")
+                _resetState.value = ResetState.NoTunnel
+                return@launch
+            }
 
             val result = withContext(Dispatchers.IO) {
                 try {
@@ -184,8 +212,9 @@ class ServerSelectionViewModel : ViewModel() {
     }
 
     /**
-     * Must be called by the Fragment **after** it has handled a [ResetState.Done] result.
-     * Resets to [ResetState.Idle] so late re-subscribers do not replay a stale result.
+     * Must be called by the Fragment **after** it has handled a [ResetState.Done] or
+     * [ResetState.NoTunnel] result. Resets to [ResetState.Idle] so late re-subscribers do
+     * not replay a stale result.
      */
     fun onResetConsumed() {
         _resetState.value = ResetState.Idle

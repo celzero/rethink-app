@@ -36,6 +36,7 @@ import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -148,7 +149,6 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
     private fun initView() {
         b.settingsActivityHttpProxyProgress.visibility = View.GONE
 
-        displayRpnUi()
         displayHttpProxyUi()
         displaySocks5Ui()
     }
@@ -157,7 +157,9 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
 
         b.settingsActivityRpnContainer.setOnClickListener { openRpnScreen() }
 
-        b.wgRefresh.setOnClickListener { refresh() }
+        b.rpnRefresh.setOnClickListener { refresh(b.rpnRefresh) }
+
+        b.wgRefresh.setOnClickListener { refresh(b.wgRefresh) }
 
         b.settingsActivitySocks5Rl.setOnClickListener {
             b.settingsActivitySocks5Switch.isChecked = !b.settingsActivitySocks5Switch.isChecked
@@ -308,14 +310,21 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         }
     }
 
-    private fun refresh() {
-        b.wgRefresh.isEnabled = false
-        b.wgRefresh.animation = animation
-        b.wgRefresh.startAnimation(animation)
-        io { VpnController.refreshOrPauseOrResumeOrReAddProxies() }
+    private fun refresh(iv: AppCompatImageView) {
+        iv.isEnabled = false
+        iv.animation = animation
+        iv.startAnimation(animation)
+        io {
+            if (RpnProxyManager.isRpnActive()) {
+                VpnController.refreshRpnProxy(Backend.RpnWin)
+            }
+            VpnController.refreshOrPauseOrResumeOrReAddProxies()
+        }
         delay(REFRESH_TIMEOUT, lifecycleScope) {
-            b.wgRefresh.isEnabled = true
-            b.wgRefresh.clearAnimation()
+            if (isFinishing) return@delay
+
+            iv.isEnabled = true
+            iv.clearAnimation()
             showToastUiCentered(this, getString(R.string.dc_refresh_toast), Toast.LENGTH_SHORT)
         }
     }
@@ -473,9 +482,10 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
     private fun displayRpnUi() {
         val isEnabled = RpnProxyManager.isRpnEnabled()
         val hasValidSub = RpnProxyManager.hasValidSubscription()
+        val isActive = RpnProxyManager.isRpnActive()
 
         when {
-            isEnabled && RpnProxyManager.isRpnActive() -> {
+            isEnabled && isActive -> {
                 io {
                     val selectedConfigs = RpnProxyManager.getSelectedCCs()
                     val ccs = selectedConfigs.map { if (it.city == AUTO_SERVER_ID) it.city.capitalizeWords() else it.city.capitalizeWords() + ":" + it.cc.uppercase() }
@@ -498,6 +508,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                     uiCtx {
                         b.settingsActivityRpnDesc.text = desc
                         b.settingsActivityRpnIcon.alpha = 1.0f
+                        b.wgRefresh.visibility = View.GONE
                     }
                 }
             }
@@ -505,10 +516,12 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 // Subscription valid but proxy not yet active
                 b.settingsActivityRpnDesc.text = getString(R.string.rpn_title)
                 b.settingsActivityRpnIcon.alpha = 1.0f
+                b.wgRefresh.visibility = View.GONE
             }
             else -> {
                 b.settingsActivityRpnDesc.text = getString(R.string.proxy_rpn_desc_inactive)
                 b.settingsActivityRpnIcon.alpha = 0.5f
+                b.wgRefresh.visibility = View.VISIBLE
             }
         }
     }
@@ -937,14 +950,12 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             b.settingsActivityWireguardContainer.alpha = 1f
             b.settingsActivitySocks5Rl.alpha = 1f
             b.settingsActivityHttpProxyContainer.alpha = 1f
-            b.wgRefresh.visibility = View.VISIBLE
         } else {
             b.settingsActivityOrbotContainer.alpha = 0.5f
             b.settingsActivityWireguardContainer.alpha = 0.5f
             b.settingsActivityVpnLockdownDesc.visibility = View.VISIBLE
             b.settingsActivitySocks5Rl.alpha = 0.5f
             b.settingsActivityHttpProxyContainer.alpha = 0.5f
-            b.wgRefresh.visibility = View.GONE
         }
 
         // Wireguard

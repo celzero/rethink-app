@@ -254,6 +254,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
+                        tools:visibility="visible"
                         android:visibility="gone">
 
                         <androidx.appcompat.widget.AppCompatTextView

@@ -1989,7 +1989,7 @@
     <string name="stability_program_snackbar_disable" translatable="true">Disable</string>
 
     <string name="settings_wireguard_lockdown_mode" translatable="false">WireGuard Lockdown</string>
-    <string name="settings_wireguard_lockdown_mode_desc" translatable="false">When enabled, all traffic is forced through WireGuard VPN.</string>
+    <string name="settings_wireguard_lockdown_mode_desc" translatable="false">When enabled, all traffic is forced through WireGuard VPN or blocked.</string>
 
     <string name="settings_smart_persistent_keepalive" translatable="false">Smart Persistent Keep Alive</string>
     <string name="settings_smart_persistent_keepalive_desc" translatable="false">Proactively maintains WireGuard tunnel connectivity by sending keep-alive probes only when needed, minimizing reconnection delays on intermittent networks.</string>
@@ -2111,14 +2111,8 @@
     <string name="server_selection_error_retry" translatable="false">Try Again</string>
     <string name="server_selection_proxy_unavailable" translatable="false">Could not load server locations. Proxy may not be ready yet.</string>
 
-    <!-- Server loading / registration-in-progress dialog -->
-    <string name="server_loading_dialog_title" translatable="false">Setting up your connection</string>
-    <string name="server_loading_dialog_status_checking" translatable="false">Checking server registration…</string>
-    <string name="server_loading_dialog_status_connecting" translatable="false">Connecting to RPN network…</string>
-    <string name="server_loading_dialog_status_fetching" translatable="false">Fetching available servers…</string>
-    <string name="server_loading_dialog_status_almost" translatable="false">Almost ready…</string>
+    <!-- RPN reset progress dialog (dialog_server_loading layout) -->
     <string name="server_loading_dialog_status_timeout" translatable="false">Taking a bit longer than expected…</string>
-    <string name="server_loading_dialog_hint" translatable="false">This usually takes a few seconds. Check your internet connection if it takes longer.</string>
 
     <!-- RPN Restore dialog -->
     <string name="rpn_restore_confirm_title" translatable="false">Restore to Defaults</string>
@@ -2133,6 +2127,8 @@
     <string name="rpn_restore_timeout_reason" translatable="false">Reset timed out, please try again</string>
     <string name="rpn_restore_success" translatable="false">RPN restored successfully</string>
     <string name="rpn_restore_failure" translatable="false">Restore failed: %s</string>
+    <!-- Short label shown on the reset button while a reset is running in the background -->
+    <string name="rpn_restore_in_progress_btn" translatable="false">Restoring…</string>
 
     <string name="loading" translatable="false">Loading…</string>
     <string name="server_selection_tap_to_select" translatable="false">Start RPN to proceed</string>
@@ -2211,7 +2207,7 @@
 
     <!-- Dashboard subscription banner labels -->
     <string name="dashboard_activated_label" translatable="false">Activated</string>
-    <string name="dashboard_expiry_label" translatable="false">Expires</string>
+    <string name="dashboard_expiry_label" translatable="false">Valid until</string>
     <string name="manage_subscription_desc" translatable="false">Cancel, revoke or manage your plan</string>
 
     <!-- Manage Subscription loading overlay -->
@@ -2230,7 +2226,6 @@
 
     <!-- Subscription banner strings -->
     <string name="server_selection_sub_on_hold" translatable="false">On Hold</string>
-    <string name="server_selection_sub_expires_on" translatable="false">Expires on</string>
     <string name="server_selection_sub_ends_on" translatable="false">Ends on</string>
     <string name="server_selection_sub_expired_on" translatable="false">Expired on</string>
     <string name="server_selection_sub_days_left" translatable="false">%1$dd left</string>
@@ -2352,7 +2347,6 @@
     <string name="ping_failure_title" translatable="false">Unreachable</string>
     <string name="ping_failure_desc" translatable="false">None of the targets could be reached. Check your RPN proxy.</string>
     <string name="ping_no_proxy_title" translatable="false">No Active Proxy</string>
-    <string name="ping_no_proxy_desc" translatable="false">Enable RPN first, then run the test.</string>
     <string name="ping_status_failed" translatable="false">Failed</string>
     <string name="ping_test_again" translatable="false">Test Again</string>
     <string name="ping_reach_hint" translatable="false">Domains or IPs, comma-separated</string>
@@ -2361,7 +2355,6 @@
     <string name="ping_reach_rpn_disabled" translatable="false">Enable RPN to run this test.</string>
     <string name="ping_reach_empty_input" translatable="false">Enter at least one domain or IP.</string>
     <string name="ping_results_title" translatable="false">Results</string>
-    <string name="ping_default_domains" translatable="false">dl.rethinkdns.com,test.windscribe.com</string>
     <string name="ping_total_latency" translatable="false">%1$dms</string>
 
     <!-- Purchase History Screen -->
@@ -2387,6 +2380,7 @@
     <string name="server_order_type_onetime" translatable="false">ONE-TIME</string>
     <string name="server_order_started_fmt" translatable="false">Started %1$s</string>
     <string name="server_order_expires_fmt" translatable="false">Expires %1$s</string>
+    <string name="server_order_auto_renew" translatable="false">Renews %1$s</string>
     <string name="server_order_id_fmt" translatable="false">Order: %1$s</string>
     <string name="server_order_desc" translatable="false">View orders fetched from server</string>
     <string name="server_order_open_error" translatable="false">Could not open order history</string>
@@ -2583,7 +2577,7 @@
     <string name="bfdm_desc" translatable="false">Select the DNS to use for trusted and bypassed apps and domains</string>
     <string name="bfdm_option_fallback_label" translatable="false">Use fallback as DNS</string>
     <string name="bfdm_option_fallback_desc" translatable="false">Use the fallback DNS for trusted and bypassed connections</string>
-    <string name="bfdm_option_global_label" translatable="false">Use global DNS</string>
+    <string name="bfdm_option_global_label" translatable="false">Use Global DNS</string>
     <string name="bfdm_option_global_desc" translatable="false">Use the globally configured DNS for trusted and bypassed connections</string>
     <string name="bfdm_option_auto_label" translatable="false">Automatic</string>
     <string name="bfdm_option_auto_desc" translatable="false">Automatically select DNS based on other settings</string>

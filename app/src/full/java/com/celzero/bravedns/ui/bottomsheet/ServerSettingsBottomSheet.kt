@@ -28,6 +28,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.LinearInterpolator
+import android.widget.Toast
 import androidx.core.graphics.withRotation
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
@@ -37,8 +38,10 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.BottomsheetServerSettingsBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.viewmodel.ServerSelectionViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -65,6 +68,8 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
     private var isProxyStopped: Boolean = false
     /** Looping spin animator attached to the refresh button icon while a refresh is in progress. */
     private var refreshAnimator: ValueAnimator? = null
+    /** Original text of [binding.btnResetRpn] captured in [onViewCreated]; restored when reset finishes. */
+    private var originalResetBtnText: CharSequence = ""
 
     companion object {
         private const val TAG = "ServerSettingsBS"
@@ -190,10 +195,27 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
         setupExcludeCountriesRow()
 
         binding.btnDone.setOnClickListener { dismiss() }
-        binding.btnResetRpn.setOnClickListener { showResetConfirmationDialog() }
+        binding.btnResetRpn.setOnClickListener {
+            if (!VpnController.hasTunnel()) {
+                Logger.w(LOG_TAG_UI, "$TAG: reset tapped but no VPN tunnel, showing hint")
+                if (isAdded) {
+                    Utilities.showToastUiCentered(
+                        requireContext(),
+                        getString(R.string.ssv_toast_start_rethink),
+                        Toast.LENGTH_SHORT
+                    )
+                }
+                return@setOnClickListener
+            }
+            showResetConfirmationDialog()
+        }
         binding.refreshBtn.setOnClickListener { doRefreshServers() }
 
+        // Capture original reset button text before any state observer can change it.
+        originalResetBtnText = binding.btnResetRpn.text
+
         observeRefreshState()
+        observeResetState()
 
         Logger.i(LOG_TAG_UI, "$TAG: view created, proxyStopped=$isProxyStopped")
     }
@@ -274,8 +296,58 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
+    /**
+     * Observes [ServerSelectionViewModel.resetState] to keep the reset and refresh buttons
+     * in sync with any ongoing reset — including when the user opens this sheet while a
+     * reset triggered from a previous sheet visit is still running in the background.
+     *
+     * While [ServerSelectionViewModel.ResetState.InProgress]:
+     * - The reset button is disabled and its label changes to "Restoring…" so the user
+     *   understands what is happening without needing the progress dialog to be open.
+     * - The refresh button is also blocked (a refresh during a reset is unsafe).
+     *
+     * When the reset reaches a terminal state the buttons are restored to their normal state.
+     */
+    private fun observeResetState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                serverSelectionViewModel.resetState.collect { state ->
+                    val resetInProgress = state is ServerSelectionViewModel.ResetState.InProgress
+                    if (resetInProgress) {
+                        binding.btnResetRpn.isEnabled   = false
+                        binding.btnResetRpn.alpha        = 0.55f
+                        binding.btnResetRpn.text         = getString(R.string.rpn_restore_in_progress_btn)
+                        // Block refresh during reset — they both touch server registration
+                        binding.refreshBtn.isClickable  = false
+                        stopRefreshAnimation()
+                    } else {
+                        binding.btnResetRpn.isEnabled   = !isProxyStopped
+                        binding.btnResetRpn.alpha        = if (isProxyStopped) 0.55f else 1f
+                        binding.btnResetRpn.text         = originalResetBtnText
+                        // Restore refresh only if a refresh itself isn't also running
+                        val refreshRunning = serverSelectionViewModel.refreshState.value is ServerSelectionViewModel.RefreshState.InProgress
+                        binding.refreshBtn.isClickable  = !isProxyStopped && !refreshRunning
+                    }
+                }
+            }
+        }
+    }
+
     private fun doRefreshServers() {
         if (isProxyStopped) return
+        // Pre-flight: no VPN tunnel → refresh/registration will fail; show a hint rather than
+        // kicking off a VM coroutine that will immediately emit NoTunnel and return.
+        if (!VpnController.hasTunnel()) {
+            Logger.w(LOG_TAG_UI, "$TAG.doRefreshServers: no VPN tunnel, showing hint")
+            if (isAdded) {
+                Utilities.showToastUiCentered(
+                    requireContext(),
+                    getString(R.string.ssv_toast_start_rethink),
+                    Toast.LENGTH_SHORT
+                )
+            }
+            return
+        }
         // Start animation synchronously here, before the ViewModel coroutine is even scheduled.
         // This bypasses the StateFlow conflation race: if the IO completes before the Main thread
         // processes the InProgress emission, the collector skips it — but the animation is

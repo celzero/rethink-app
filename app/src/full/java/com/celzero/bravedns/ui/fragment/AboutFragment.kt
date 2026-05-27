@@ -16,7 +16,6 @@
 package com.celzero.bravedns.ui.fragment
 
 import Logger
-import Logger.LOG_IAB
 import Logger.LOG_TAG_UI
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
@@ -65,9 +64,10 @@ import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.activity.ConsoleLogActivity
+import com.celzero.bravedns.ui.activity.EventsActivity
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
 import com.celzero.bravedns.ui.bottomsheet.BugReportFilesBottomSheet
-import com.celzero.bravedns.ui.fragment.RethinkPlusDashboardFragment
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_4
@@ -202,6 +202,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutDbStats.setOnClickListener(this)
         b.tokenTextView.setOnClickListener(this)
         b.aboutFlightRecord.setOnClickListener(this)
+        b.aboutConsoleLogs.setOnClickListener(this)
         b.aboutEventLogs.setOnClickListener(this)
 
         val gestureDetector = GestureDetector(
@@ -285,7 +286,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun updateSponsorInfo() {
-        if (RpnProxyManager.isRpnActive()) {
+        if (RpnProxyManager.isRpnEnabled()) {
             b.aboutSponsor.visibility = View.GONE
             b.aboutManageRpn.visibility = View.VISIBLE
             b.sponsorInfoUsage.visibility = View.GONE
@@ -449,6 +450,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.aboutFlightRecord -> {
                 initiateFlightRecord()
             }
+            b.aboutConsoleLogs -> {
+                openConsoleLogs()
+            }
             b.aboutEventLogs -> {
                 openEventLogs()
             }
@@ -486,165 +490,132 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
     private fun openStackTraceDialog() {
         io {
-            val allThreadsSched = KernelProc.parseSchedAllThreads()
-            val stackTrace = VpnController.printStack()
+            val goStackTrace = VpnController.printStack()
+            val kotlinStackTrace = captureKotlinStackTraces()
             uiCtx {
                 if (!isAdded) return@uiCtx
-                showStackTraceDialog(allThreadsSched, stackTrace)
+                showStackTraceDialog(goStackTrace, kotlinStackTrace)
             }
         }
     }
 
+    /** Captures the current stack trace of every live JVM/Kotlin thread off the main thread. */
+    private fun captureKotlinStackTraces(): String = buildString {
+        Thread.getAllStackTraces().entries
+            .sortedBy { it.key.name }
+            .forEach { (thread, frames) ->
+                appendLine(
+                    "Thread: ${thread.name}" +
+                    "  [id=${thread.id}" +
+                    "  state=${thread.state}" +
+                    "  daemon=${thread.isDaemon}" +
+                    "  priority=${thread.priority}]"
+                )
+                if (frames.isEmpty()) {
+                    appendLine("  (no stack frames)")
+                } else {
+                    frames.forEach { frame -> appendLine("  at $frame") }
+                }
+                appendLine()
+            }
+    }
+
     private fun showStackTraceDialog(
-        allThreadsSched: List<KernelProc.ThreadSchedInfo>,
-        stackTrace: String
+        goStackTrace: String,
+        kotlinStackTrace: String
     ) {
         if (!isAdded) return
         val ctx = requireContext()
         val pad = resources.getDimensionPixelSize(R.dimen.dots_margin_bottom)
 
-        val colorHint = ContextCompat.getColor(ctx, android.R.color.darker_gray)
-
-        fun android.text.SpannableStringBuilder.bold(text: String): android.text.SpannableStringBuilder {
-            val start = length
-            append(text)
-            setSpan(android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
-                start, length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            return this
-        }
-
-        fun android.text.SpannableStringBuilder.color(text: String, color: Int): android.text.SpannableStringBuilder {
-            val start = length
-            append(text)
-            setSpan(android.text.style.ForegroundColorSpan(color),
-                start, length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            return this
-        }
-
-        fun fmtNs(ns: Long): String = when {
-            ns <= 0 -> "-"
-            ns < 1_000L -> "$ns ns"
-            ns < 1_000_000L -> "${"%.1f".format(ns / 1_000.0)} µs"
-            ns < 1_000_000_000L -> "${"%.2f".format(ns / 1_000_000.0)} ms"
-            else -> "${"%.3f".format(ns / 1_000_000_000.0)} s"
-        }
-        fun fmtNum(v: Long): String = if (v <= 0) "-" else "%,d".format(v)
-
-        val threadsSpan = android.text.SpannableStringBuilder()
-
-        if (allThreadsSched.isEmpty()) {
-            threadsSpan.bold("  /proc/self/task not available or empty\n")
-        } else {
-            allThreadsSched.forEach { t ->
-                // Header: tid  [name]  state
-                threadsSpan.bold("  ${t.tid}  [${t.name}]  ${t.state}\n")
-
-                // Compact sched metrics (only show non-zero values)
-                val hasSchedstat = t.timeslices > 0 || t.runningNs > 0
-                val hasSchedFields = t.waitMax > 0 || t.nrWakeups > 0 ||
-                        t.nrInvoluntarySwitches > 0 || t.nrVoluntarySwitches > 0
-
-                if (hasSchedstat) {
-                    threadsSpan.append("    run=${fmtNs(t.runningNs)}  wait=${fmtNs(t.waitingNs)}  slices=${fmtNum(t.timeslices)}\n")
-                }
-                if (hasSchedFields) {
-                    val sb = StringBuilder("    ")
-                    if (t.waitMax > 0)               sb.append("wait_max=${fmtNs(t.waitMax)}  ")
-                    if (t.nrWakeups > 0)             sb.append("wakeups=${fmtNum(t.nrWakeups)}  ")
-                    if (t.nrMigrations > 0)          sb.append("mig=${fmtNum(t.nrMigrations)}  ")
-                    if (t.nrInvoluntarySwitches > 0) sb.append("inv_sw=${fmtNum(t.nrInvoluntarySwitches)}  ")
-                    if (t.nrVoluntarySwitches > 0)   sb.append("vol_sw=${fmtNum(t.nrVoluntarySwitches)}")
-                    threadsSpan.append(sb.toString().trimEnd()).append("\n")
-                }
-
-                // Raw schedstat line
-                if (t.schedstatRaw.isNotBlank()) {
-                    threadsSpan.color("    schedstat: ${t.schedstatRaw}\n", colorHint)
-                }
-
-                threadsSpan.append("\n")
-            }
-        }
-
         val clipText = buildString {
-            appendLine("=== THREADS ===")
-            appendLine(threadsSpan.toString())
-            appendLine("=== STACK TRACE ===")
-            appendLine(stackTrace.ifBlank { "Not available" })
+            appendLine("=== KOTLIN STACK ===")
+            appendLine(kotlinStackTrace.ifBlank { ctx.getString(R.string.lbl_not_available_short) })
+            appendLine()
+            appendLine("=== GO STACK ===")
+            appendLine(goStackTrace.ifBlank { ctx.getString(R.string.lbl_not_available_short) })
         }
 
         fun makeTabButton(text: String): android.widget.Button {
             return android.widget.Button(ctx, null, android.R.attr.borderlessButtonStyle).apply {
                 this.text = text
                 textSize = 12f
-                layoutParams = android.widget.LinearLayout.LayoutParams(0,
-                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                layoutParams = android.widget.LinearLayout.LayoutParams(
+                    0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
                 isAllCaps = false
             }
         }
 
-        fun makeScrollableSpannable(spannable: android.text.SpannableStringBuilder): android.widget.ScrollView {
-            val tv = android.widget.TextView(ctx).apply {
-                setPadding(pad, pad / 2, pad, pad)
-                setText(spannable, android.widget.TextView.BufferType.SPANNABLE)
-                setTextIsSelectable(true)
-                typeface = android.graphics.Typeface.MONOSPACE
-                textSize = 11.5f
-            }
-            return android.widget.ScrollView(ctx).apply {
-                addView(tv)
-                scrollBarStyle = android.widget.ScrollView.SCROLLBARS_INSIDE_OVERLAY
+        // use recycler as using textview with large stack traces causes OOM and ANR issues
+        fun makeLineRecyclerView(content: String): androidx.recyclerview.widget.RecyclerView {
+            val lines = content.ifBlank { ctx.getString(R.string.lbl_not_available_short) }
+                .split('\n')
+            return androidx.recyclerview.widget.RecyclerView(ctx).apply {
+                layoutManager = androidx.recyclerview.widget.LinearLayoutManager(ctx)
+                setHasFixedSize(false)
+                adapter = object : androidx.recyclerview.widget.RecyclerView.Adapter<
+                        androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
+
+                    override fun getItemCount() = lines.size
+
+                    override fun onCreateViewHolder(
+                        parent: android.view.ViewGroup,
+                        viewType: Int
+                    ): androidx.recyclerview.widget.RecyclerView.ViewHolder {
+                        val tv = android.widget.TextView(ctx).apply {
+                            setPadding(pad, 1, pad, 1)
+                            typeface = android.graphics.Typeface.MONOSPACE
+                            textSize = 11.5f
+                            // deliberately not selectable — avoids ActionMode/touch conflicts
+                            isFocusable = false
+                        }
+                        return object : androidx.recyclerview.widget.RecyclerView.ViewHolder(tv) {}
+                    }
+
+                    override fun onBindViewHolder(
+                        holder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
+                        position: Int
+                    ) {
+                        (holder.itemView as android.widget.TextView).text = lines[position]
+                    }
+                }
             }
         }
 
-        fun makeScrollableText(content: String): android.widget.ScrollView {
-            val tv = android.widget.TextView(ctx).apply {
-                setPadding(pad, pad / 2, pad, pad)
-                text = content.ifBlank { "Not available" }
-                setTextIsSelectable(true)
-                typeface = android.graphics.Typeface.MONOSPACE
-                textSize = 11.5f
-            }
-            return android.widget.ScrollView(ctx).apply {
-                addView(tv)
-                scrollBarStyle = android.widget.ScrollView.SCROLLBARS_INSIDE_OVERLAY
-            }
+        val kotlinRv = makeLineRecyclerView(kotlinStackTrace)
+        val goRv     = makeLineRecyclerView(goStackTrace)
+
+        val tabKotlin = makeTabButton("Kotlin Stack")
+        val tabGo     = makeTabButton("Go Stack")
+
+        fun selectTab(showKotlin: Boolean) {
+            kotlinRv.visibility = if (showKotlin)  View.VISIBLE else View.GONE
+            goRv.visibility     = if (!showKotlin) View.VISIBLE else View.GONE
+            tabKotlin.alpha = if (showKotlin)  1f else 0.45f
+            tabGo.alpha     = if (!showKotlin) 1f else 0.45f
+            if (showKotlin) kotlinRv.scrollToPosition(0)
+            else            goRv.scrollToPosition(0)
         }
 
-        val threadsScrollView    = makeScrollableSpannable(threadsSpan)
-        val stackTraceScrollView = makeScrollableText(stackTrace)
-
-        val tabThreads    = makeTabButton("Threads")
-        val tabStackTrace = makeTabButton("Stack Trace")
-
-        fun selectTab(showThreads: Boolean) {
-            threadsScrollView.visibility    = if (showThreads)  View.VISIBLE else View.GONE
-            stackTraceScrollView.visibility = if (!showThreads) View.VISIBLE else View.GONE
-            tabThreads.alpha    = if (showThreads)  1f else 0.45f
-            tabStackTrace.alpha = if (!showThreads) 1f else 0.45f
-            if (showThreads) threadsScrollView.post    { threadsScrollView.scrollTo(0, 0) }
-            else             stackTraceScrollView.post { stackTraceScrollView.scrollTo(0, 0) }
-        }
-
-        tabThreads.setOnClickListener    { selectTab(true) }
-        tabStackTrace.setOnClickListener { selectTab(false) }
+        tabKotlin.setOnClickListener { selectTab(true) }
+        tabGo.setOnClickListener     { selectTab(false) }
 
         val tabRow = android.widget.LinearLayout(ctx).apply {
             orientation = android.widget.LinearLayout.HORIZONTAL
-            addView(tabThreads)
-            addView(tabStackTrace)
+            addView(tabKotlin)
+            addView(tabGo)
         }
 
         val container = android.widget.LinearLayout(ctx).apply {
             orientation = android.widget.LinearLayout.VERTICAL
             addView(tabRow)
-            addView(threadsScrollView, android.widget.LinearLayout.LayoutParams(
+            addView(kotlinRv, android.widget.LinearLayout.LayoutParams(
                 android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
-            addView(stackTraceScrollView, android.widget.LinearLayout.LayoutParams(
+            addView(goRv, android.widget.LinearLayout.LayoutParams(
                 android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
         }
 
-        // Start on the Threads tab
+        // Start on Kotlin Stack tab
         selectTab(true)
 
         val dialog = MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
@@ -669,7 +640,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun openEventLogs() {
-        val intent = Intent(requireContext(), com.celzero.bravedns.ui.activity.EventsActivity::class.java)
+        val intent = Intent(requireContext(), EventsActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun openConsoleLogs() {
+        val intent = Intent(requireContext(), ConsoleLogActivity::class.java)
         startActivity(intent)
     }
 
@@ -687,8 +663,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     private fun openStatsDialog() {
         io {
             val stat = VpnController.getNetStat()
-            val formatedStat = UIUtils.formatNetStat(stat)
-            val vpnStats = VpnController.vpnStats()
+            val formatedStat = UIUtils.formatNetStat(stat) ?: ""
+            val vpnStats = VpnController.vpnStats() ?: ""
             val stats = formatedStat + vpnStats
             uiCtx {
                 if (!isAdded) return@uiCtx
@@ -697,7 +673,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
                 val tv = android.widget.TextView(ctx).apply {
                     setPadding(pad, pad / 2, pad, pad)
-                    text = stats ?: "No data"
+                    text = stats.ifEmpty { requireContext().getString(R.string.lbl_not_available_short) }
                     setTextIsSelectable(true)
                     typeface = android.graphics.Typeface.MONOSPACE
                     textSize = 11.5f
@@ -724,9 +700,22 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         }
     }
 
+    /** Format nanoseconds into a human-readable string. */
+    private fun fmtNs(ns: Long): String = when {
+        ns <= 0 -> "-"
+        ns < 1_000L -> "$ns ns"
+        ns < 1_000_000L -> "${"%.1f".format(ns / 1_000.0)} µs"
+        ns < 1_000_000_000L -> "${"%.2f".format(ns / 1_000_000.0)} ms"
+        else -> "${"%.3f".format(ns / 1_000_000_000.0)} s"
+    }
+
+    /** Format a long counter; returns "-" for non-positive values. */
+    private fun fmtNum(v: Long): String = if (v <= 0) "-" else "%,d".format(v)
+
     private fun openProcDialog() {
         io {
             // Read everything on IO so the dialog opens quickly.
+            val allThreadsSched = KernelProc.parseSchedAllThreads()
             val status = KernelProc.getStatus(forceRefresh = true)
             val smaps = KernelProc.getSmaps(forceRefresh = true)
             val auxv = KernelProc.getStats(forceRefresh = true)
@@ -734,12 +723,13 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             val formatedMetrics = UIUtils.formatNetMetrics(stat)
             uiCtx {
                 if (!isAdded) return@uiCtx
-                showProcDialog(status, smaps, auxv, formatedMetrics)
+                showProcDialog(allThreadsSched, status, smaps, auxv, formatedMetrics)
             }
         }
     }
 
     private fun showProcDialog(
+        allThreadsSched: List<KernelProc.ThreadSchedInfo>,
         status: String,
         smaps: String,
         auxv: String,
@@ -777,6 +767,43 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             otherSpan.append("\n")
             val stripped = content.substringAfter("\n").trim()
             otherSpan.color("$stripped\n\n", colorHint)
+        }
+
+        // threads and the proc info in the same tab
+        run {
+            val threadCount = allThreadsSched.size
+            otherSpan.bold("  THREADS  ($threadCount total)\n\n")
+
+            if (allThreadsSched.isEmpty()) {
+                otherSpan.color("  /proc/self/task not available or empty\n\n", colorHint)
+            } else {
+                allThreadsSched.forEach { t ->
+                    otherSpan.bold("  ${t.tid}  [${t.name}]  ${t.state}\n")
+
+                    val hasSchedstat = t.timeslices > 0 || t.runningNs > 0
+                    val hasSchedFields = t.waitMax > 0 || t.nrWakeups > 0 ||
+                            t.nrInvoluntarySwitches > 0 || t.nrVoluntarySwitches > 0
+
+                    if (hasSchedstat) {
+                        otherSpan.append(
+                            "    run=${fmtNs(t.runningNs)}  wait=${fmtNs(t.waitingNs)}  slices=${fmtNum(t.timeslices)}\n"
+                        )
+                    }
+                    if (hasSchedFields) {
+                        val sb = StringBuilder("    ")
+                        if (t.waitMax > 0)               sb.append("wait_max=${fmtNs(t.waitMax)}  ")
+                        if (t.nrWakeups > 0)             sb.append("wakeups=${fmtNum(t.nrWakeups)}  ")
+                        if (t.nrMigrations > 0)          sb.append("mig=${fmtNum(t.nrMigrations)}  ")
+                        if (t.nrInvoluntarySwitches > 0) sb.append("inv_sw=${fmtNum(t.nrInvoluntarySwitches)}  ")
+                        if (t.nrVoluntarySwitches > 0)   sb.append("vol_sw=${fmtNum(t.nrVoluntarySwitches)}")
+                        otherSpan.append(sb.toString().trimEnd()).append("\n")
+                    }
+                    if (t.schedstatRaw.isNotBlank()) {
+                        otherSpan.color("    schedstat: ${t.schedstatRaw}\n", colorHint)
+                    }
+                    otherSpan.append("\n")
+                }
+            }
         }
 
         otherSection("STATUS  (/proc/self/status)", status)
@@ -817,7 +844,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         fun makeScrollableText(content: String?): android.widget.ScrollView {
             val tv = android.widget.TextView(ctx).apply {
                 setPadding(pad, pad / 2, pad, pad)
-                text = content ?: "No data"
+                text = content ?: requireContext().getString(R.string.lbl_not_available_short)
                 setTextIsSelectable(true)
                 typeface = android.graphics.Typeface.MONOSPACE
                 textSize = 11.5f
@@ -831,7 +858,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         val procScrollView    = makeScrollableSpannable(otherSpan)
         val metricsScrollView = makeScrollableText(formatedMetrics)
 
-        val tabProc    = makeTabButton("Proc / Mem")
+        val tabProc    = makeTabButton("Threads / Proc / Mem")
         val tabMetrics = makeTabButton("Metrics")
 
         fun selectTab(showProc: Boolean) {
@@ -848,8 +875,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
         val tabRow = android.widget.LinearLayout(ctx).apply {
             orientation = android.widget.LinearLayout.HORIZONTAL
-            addView(tabProc)
             addView(tabMetrics)
+            addView(tabProc)
         }
 
         val container = android.widget.LinearLayout(ctx).apply {
@@ -862,7 +889,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         }
 
         // Start on the Proc / Mem tab
-        selectTab(true)
+        selectTab(false)
 
         val dialog = MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
             .setTitle("Proc Analysis")

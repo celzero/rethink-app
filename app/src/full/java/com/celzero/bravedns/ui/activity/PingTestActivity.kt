@@ -56,7 +56,6 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
 
     companion object {
         private const val TAG = "PingUi"
-        private const val DEFAULT_DOMAINS = "dl.rethinkdns.com,test.windscribe.com"
         private const val MIN_TEST_DURATION_MS = 1500L
     }
 
@@ -88,7 +87,7 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
         }
         // Pre-fill with default domains so user can immediately run the test.
         if (b.reachInput.text.isNullOrEmpty()) {
-            b.reachInput.setText(DEFAULT_DOMAINS)
+            b.reachInput.setText(getString(R.string.lbl_auto))
         }
         showReadyState()
     }
@@ -213,7 +212,7 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
         b.statusIcon.setImageResource(R.drawable.ic_cross_accent)
         b.statusIcon.setColorFilter(ContextCompat.getColor(this, R.color.accentBad))
         b.statusTitle.text = getString(R.string.ping_no_proxy_title)
-        b.statusDescription.text = getString(R.string.ping_no_proxy_desc)
+        b.statusDescription.text = getString(R.string.ping_reach_rpn_disabled)
         b.pingButton.text = getString(R.string.ping_test_again)
         b.pingButton.isEnabled = true
 
@@ -285,13 +284,13 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
         }
 
         val rawInput = b.reachInput.text?.toString()?.trim().orEmpty()
-        val csv = if (rawInput.isEmpty()) DEFAULT_DOMAINS else rawInput
+        val csv = if (rawInput.isEmpty() || rawInput == getString(R.string.lbl_auto)) {
+            ""
+        } else {
+            rawInput
+        }
         val domains = csv.split(",").map { it.trim() }.filter { it.isNotEmpty() }
 
-        if (domains.isEmpty()) {
-            b.reachInputLayout.error = getString(R.string.ping_reach_empty_input)
-            return
-        }
         b.reachInputLayout.error = null
 
         // Dismiss keyboard and clear focus
@@ -309,29 +308,40 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
                 }
 
                 val startTime = System.currentTimeMillis()
-                val results: List<Pair<String, Boolean>> = domains.map { domain ->
-                    domain to VpnController.isRpnReachable(domain)
-                }
-                val latency = System.currentTimeMillis() - startTime
-
-                Logger.d(Logger.LOG_IAB, "$TAG reachability results: $results, latency: ${latency}ms")
-
-                // Honour minimum animation duration for UX
-                val elapsed = System.currentTimeMillis() - testStartTime
-                if (elapsed < MIN_TEST_DURATION_MS) {
-                    delay(MIN_TEST_DURATION_MS - elapsed)
-                }
-
-                val allOk = results.all { it.second }
-                val anyOk = results.any { it.second }
-
-                uiCtx {
-                    when {
-                        allOk  -> showSuccessState(latency)
-                        anyOk  -> showPartialState(latency)
-                        else   -> showFailureState()
+                if (domains.isEmpty()) {
+                    val result = VpnController.testRpnProxy()
+                    uiCtx {
+                        if (result) showSuccessState(System.currentTimeMillis() - startTime)
+                        else showFailureState()
                     }
-                    showResultsCard(results)
+                } else {
+                    val results: List<Pair<String, Boolean>> = domains.map { domain ->
+                        domain to VpnController.isRpnReachable(domain)
+                    }
+                    val latency = System.currentTimeMillis() - startTime
+
+                    Logger.d(
+                        Logger.LOG_IAB,
+                        "$TAG reachability results: $results, latency: ${latency}ms"
+                    )
+
+                    // Honour minimum animation duration for UX
+                    val elapsed = System.currentTimeMillis() - testStartTime
+                    if (elapsed < MIN_TEST_DURATION_MS) {
+                        delay(MIN_TEST_DURATION_MS - elapsed)
+                    }
+
+                    val allOk = results.all { it.second }
+                    val anyOk = results.any { it.second }
+
+                    uiCtx {
+                        when {
+                            allOk -> showSuccessState(latency)
+                            anyOk -> showPartialState(latency)
+                            else -> showFailureState()
+                        }
+                        showResultsCard(results)
+                    }
                 }
             } catch (e: Exception) {
                 Logger.e(Logger.LOG_IAB, "$TAG err during test: ${e.message}", e)

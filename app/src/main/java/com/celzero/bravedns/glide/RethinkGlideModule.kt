@@ -80,23 +80,6 @@ class RethinkGlideModule : AppGlideModule() {
         val client: OkHttpClient = OkHttpClient.Builder()
             .readTimeout(5, TimeUnit.SECONDS)
             .connectTimeout(3, TimeUnit.SECONDS)
-            .addInterceptor { chain ->
-                val response = chain.proceed(chain.request())
-                if (response.code == 404) {
-                    // avoid crashing on 404 by returning a success-like response.
-                    // Glide's OkHttpStreamFetcher (v5.0.5) crashes on 404 with a FileSystemException.
-                    // ref: https://github.com/celzero/rethink-app/issues/1404
-
-                    val rewrittenResponse = response.newBuilder()
-                        .code(200)
-                        .body("".toResponseBody(null))
-                        .build()
-                    // Close the original body first to prevent a resource leak
-                    response.body.close()
-                    return@addInterceptor rewrittenResponse
-                }
-                response
-            }
             .build()
         registry.replace(GlideUrl::class.java, InputStream::class.java, OkHttpUrlLoader.Factory(client))
 

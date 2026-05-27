@@ -210,14 +210,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     }
 
     private fun setupProductTypeToggle() {
-        // In extend mode pre-select ONE_TIME and hide the SUBS tab so the
-        // user focuses on one-time purchase options only.
-        val initialType = if (viewModel.extendMode) {
-            RethinkPlusViewModel.ProductTypeFilter.ONE_TIME
-        } else {
-            RethinkPlusViewModel.ProductTypeFilter.ONE_TIME
-        }
-        updateToggleState(initialType)
+        updateToggleState(RethinkPlusViewModel.ProductTypeFilter.ONE_TIME)
 
         if (!viewModel.extendMode) {
             b.btnSubscription.setOnClickListener {
@@ -351,6 +344,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             purchaseInFlight = false
             cancelProcessingTimeout()
             dismissProcessingBottomSheet()
+            viewModel.onTransactionError()
 
             val response = com.celzero.bravedns.iab.BillingResponse(billingResult.responseCode)
             when {
@@ -417,6 +411,10 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         isResubscribe: Boolean,
         availabilityData: SubscriptionUiState.Available?
     ) {
+        // A transition back to Ready (e.g., Expired/Canceled state restoring the
+        // purchase screen) must clear purchaseInFlight so the buy button is not
+        // silently blocked by a prior failed purchase attempt.
+        purchaseInFlight = false
         hideAllContainers()
         stopShimmer()
 
@@ -569,7 +567,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     }
 
     /**
-     * Pop back to the caller (typically [RpnDashboardFragment]) after an extend-mode purchase.
+     * Pop back to the caller ([RethinkPlusDashboardFragment]) after an extend-mode purchase.
      * The dashboard auto-refreshes on resume via its own state observation, so no extra
      * data-passing is needed.
      */
