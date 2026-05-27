@@ -59,6 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerInParent="true"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:layout_gravity="center"
                 android:layout_marginEnd="20dp"
                 android:padding="5dp"
