@@ -99,12 +99,11 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
     /** Job driving the registration / server-list polling loop. */
     private var serverLoadingJob: Job? = null
-    /** Non-dismissable dialog shown while WIN registers / servers load. */
-    private var serverLoadingDialog: android.app.Dialog? = null
     /** Job driving the RPN reset progress loop. */
     private var rpnResetJob: Job? = null
-    /** Non-dismissable dialog shown while RPN reset is in progress. */
+    /** Dialog shown while RPN reset is in progress. */
     private var rpnResetDialog: android.app.Dialog? = null
+    private var resetDialogDismissedByUser = false
     /**
      * Short-lived job that polls [VpnController.getWinByKey] for each selected server
      * whose WIN tunnel key was null immediately after [initServers] completed.
@@ -149,9 +148,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         /** UI connection states surfaced by [updateConnectionStatus]. */
         private enum class ConnectionUiState { DISCONNECTED, CONNECTING, CONNECTED }
 
-        /** Maximum time the registration loading dialog will wait before giving up. */
+        /** Maximum time the inline registration progress will poll before giving up. */
         private const val LOADING_DIALOG_TIMEOUT_MS = 20_000L
-        /** Interval between each registration / server-list poll within the dialog. */
+        /** Interval between registration / server-list poll iterations. */
         private const val LOADING_DIALOG_POLL_INTERVAL_MS = 1_500L
     }
 
@@ -248,8 +247,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             // Always try to load the server list from cache/DB so the list is visible
             // even when the proxy is stopped (items will be dimmed and non-interactive).
             isWinRegistered = if (rpnActive) VpnController.isWinRegistered() else false
+            val hasTunnel = VpnController.hasTunnel()
             val selectedList = RpnProxyManager.getEnabledConfigs()
-            Logger.v(LOG_TAG_UI, "$TAG; WIN registered: $isWinRegistered, rpnActive: $rpnActive")
+            Logger.v(LOG_TAG_UI, "$TAG; WIN registered: $isWinRegistered, rpnActive: $rpnActive, hasTunnel: $hasTunnel")
 
             val servers = RpnProxyManager.getWinServers()
             Logger.v(LOG_TAG_UI, "$TAG; fetched ${servers.size} servers from RPN")
@@ -273,11 +273,22 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                     }
                     (!isWinRegistered || !hasRealServers) -> {
                         // either registration is pending or the server list hasn't populated yet.
-                        Logger.i(
-                            LOG_TAG_UI,
-                            "$TAG: WIN registered=$isWinRegistered, hasRealServers=$hasRealServers; showing loading dialog"
-                        )
-                        showServerLoadingDialog()
+                        if (!hasTunnel) {
+                            // VPN tunnel is not up
+                            // Show a prompt to start Rethink instead of the loading dialog.
+                            Logger.w(
+                                LOG_TAG_UI,
+                                "$TAG: no VPN tunnel available; showing no-tunnel error"
+                            )
+                            setLoadingState(false)
+                            showErrorState(noTunnel = true)
+                        } else {
+                            Logger.i(
+                                LOG_TAG_UI,
+                                "$TAG: WIN registered=$isWinRegistered, hasRealServers=$hasRealServers; showing loading dialog"
+                            )
+                            showServerLoadingDialog()
+                        }
                     }
                     else -> initServers(servers, selectedList)
                 }
@@ -310,6 +321,14 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                             Logger.w(LOG_TAG_UI, "$TAG.observeRefreshState: NeedsLoading on user-initiated refresh — consuming silently")
                             serverSelectionViewModel.onRefreshConsumed()
                         }
+                        is ServerSelectionViewModel.RefreshState.NoTunnel -> {
+                            // VPN tunnel dropped (or was never up) during the refresh; show
+                            // the "Start Rethink to proceed" error so the user knows what to do.
+                            Logger.w(LOG_TAG_UI, "$TAG.observeRefreshState: NoTunnel — showing no-tunnel error")
+                            serverSelectionViewModel.onRefreshConsumed()
+                            setLoadingState(false)
+                            showErrorState(noTunnel = true)
+                        }
                         is ServerSelectionViewModel.RefreshState.InProgress,
                         is ServerSelectionViewModel.RefreshState.Idle -> {
                             // no ui action needed here; the bottom sheet owns the animation.
@@ -323,12 +342,19 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     /**
      * Observes [ServerSelectionViewModel.resetState] and reacts to the reset lifecycle.
      *
-     * **[ServerSelectionViewModel.ResetState.InProgress]**: If the fragment was recreated
-     * while a reset was running (rotation during the progress dialog), re-show the dialog
-     * and restart the animation loop. The ViewModel's [viewModelScope] job is still alive.
+     * **[ServerSelectionViewModel.ResetState.InProgress]**:
+     * - FABs are disabled to prevent proxy start/stop while reset is running.
+     * - If [resetDialogDismissedByUser] is false (first enter or rotation): show the
+     *   progress dialog.
+     * - If [resetDialogDismissedByUser] is true (user dismissed dialog but reset is
+     *   still running): show the inline progress bar as a non-blocking
+     *   indicator and do NOT re-open the dialog.
      *
-     * **[ServerSelectionViewModel.ResetState.Done]**: Consumes the result, dismisses the
-     * dialog, and delegates UI update to [handleResetResult].
+     * **[ServerSelectionViewModel.ResetState.Done]**: Consume result, dismiss dialog,
+     * hide inline bar, restore FABs, delegate to [handleResetResult].
+     *
+     * **[ServerSelectionViewModel.ResetState.NoTunnel]**: Consume, dismiss, hide bar,
+     * restore FABs, show "Start Rethink" error.
      */
     private fun observeResetState() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -336,21 +362,63 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 serverSelectionViewModel.resetState.collect { state ->
                     when (state) {
                         is ServerSelectionViewModel.ResetState.InProgress -> {
-                            // Handles rotation: if the fragment is recreated while a reset is
-                            // already running, re-show the progress dialog so the user still
-                            // sees feedback.  The ViewModel's coroutine keeps running regardless.
-                            if (rpnResetDialog?.isShowing != true) {
-                                Logger.i(LOG_TAG_UI, "$TAG.observeResetState: InProgress (re-attach after rotation?), showing dialog")
+                            // Always disable FABs while reset is running so the user
+                            // cannot start/stop the proxy mid-operation.
+                            if (isAdded && view != null) {
+                                b.fabStopProxy.isClickable  = false
+                                b.fabStartProxy.isClickable = false
+                            }
+                            if (resetDialogDismissedByUser) {
+                                // User explicitly dismissed the dialog; show inline bar
+                                // as a subtle indicator; the dialog will NOT re-appear.
+                                Logger.i(LOG_TAG_UI, "$TAG.observeResetState: InProgress, dialog dismissed — showing inline bar")
+                                if (isAdded && view != null) {
+                                    b.registrationProgressBar.show()
+                                    // Disable search and action icons while reset is in progress
+                                    setSearchAndActionsEnabled(false)
+                                }
+                            } else if (rpnResetDialog?.isShowing != true) {
+                                // Fresh InProgress (or fragment recreated after rotation):
+                                // show the progress dialog.
+                                Logger.i(LOG_TAG_UI, "$TAG.observeResetState: InProgress, showing reset dialog")
                                 showRpnResetDialog()
                             }
                         }
                         is ServerSelectionViewModel.ResetState.Done -> {
                             Logger.i(LOG_TAG_UI, "$TAG.observeResetState: Done, result=${state.result}")
                             serverSelectionViewModel.onResetConsumed()
+                            resetDialogDismissedByUser = false
                             dismissRpnResetDialog()
+                            if (isAdded && view != null) {
+                                b.registrationProgressBar.hide()
+                                b.fabStopProxy.isClickable  = true
+                                b.fabStartProxy.isClickable = true
+                                // Restore search and action icons now that reset is done
+                                setSearchAndActionsEnabled(true)
+                            }
                             handleResetResult(state.result, state.servers, state.selected)
                         }
-                        is ServerSelectionViewModel.ResetState.Idle -> { /* nothing to do */ }
+                        is ServerSelectionViewModel.ResetState.NoTunnel -> {
+                            Logger.w(LOG_TAG_UI, "$TAG.observeResetState: NoTunnel, showing no-tunnel error")
+                            serverSelectionViewModel.onResetConsumed()
+                            resetDialogDismissedByUser = false
+                            dismissRpnResetDialog()
+                            if (isAdded && view != null) {
+                                b.registrationProgressBar.hide()
+                                b.fabStopProxy.isClickable  = true
+                                b.fabStartProxy.isClickable = true
+                                // Restore search and action icons
+                                setSearchAndActionsEnabled(true)
+                            }
+                            showErrorState(noTunnel = true)
+                        }
+                        is ServerSelectionViewModel.ResetState.Idle -> {
+                            // Ensure FABs are interactive when no reset is active.
+                            if (isAdded && view != null) {
+                                b.fabStopProxy.isClickable  = true
+                                b.fabStartProxy.isClickable = true
+                            }
+                        }
                     }
                 }
             }
@@ -535,6 +603,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             b.selectedServersCard.isVisible = false
             b.emptyStateLayout.isVisible = false
             b.frequentCountriesSection.isVisible = false
+
+            // Disable search bar and action icons while data is loading
+            setSearchAndActionsEnabled(false)
         } else {
             // Stop and hide header shimmer, reveal real content
             b.shimmerHeader.stopShimmer()
@@ -545,7 +616,28 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             b.shimmerServerList.stopShimmer()
             b.shimmerServerList.isVisible = false
             b.rvServers.isVisible = true
+
+            // Re-enable search bar and action icons once data is ready
+            setSearchAndActionsEnabled(true)
         }
+    }
+
+    /**
+     * Enables or disables the search bar and the action icon button (settingsBtn)
+     * that sit beside it.  Both the visual state (alpha) and input state
+     * (isEnabled / isFocusable) are updated so that the views are clearly non-interactive
+     * while the fragment is loading or resetting.
+     */
+    private fun setSearchAndActionsEnabled(enabled: Boolean) {
+        if (!isAdded) return
+        val alpha = if (enabled) 1f else 0.5f
+        b.searchCard.alpha              = alpha
+        b.searchCard.isEnabled          = enabled
+        b.searchBar.isEnabled           = enabled
+        b.searchBar.isFocusable         = enabled
+        b.searchBar.isFocusableInTouchMode = enabled
+        b.settingsBtn.alpha             = alpha
+        b.settingsBtn.isEnabled         = enabled
     }
 
     private fun initServers(servers: List<CountryConfig>, selectedList: Set<CountryConfig> = emptySet()) {
@@ -1073,12 +1165,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         val stoppedAlpha = 0.5f
         b.rvServers.alpha         = stoppedAlpha
         b.rvSelectedServers.alpha = stoppedAlpha
-        b.searchCard.alpha        = stoppedAlpha
-        b.searchCard.isEnabled    = false
-        b.searchBar.isEnabled     = false
-        b.searchBar.isFocusable   = false
-
-        b.settingsBtn.alpha     = stoppedAlpha
+        // Disable search bar and action icons while proxy is stopped
+        setSearchAndActionsEnabled(false)
 
         // Adapters replace click handlers so tapping any server item opens the
         // settings sheet instead of selecting/deselecting or opening detail.
@@ -1105,13 +1193,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
         b.rvServers.alpha              = 1f
         b.rvSelectedServers.alpha      = 1f
-        b.searchCard.alpha             = 1f
-        b.searchCard.isEnabled         = true
-        b.searchBar.isEnabled          = true
-        b.searchBar.isFocusable        = true
-        b.searchBar.isFocusableInTouchMode = true
-
-        b.settingsBtn.alpha      = 1f
+        // Re-enable search bar and action icons when proxy resumes
+        setSearchAndActionsEnabled(true)
 
         selectedAdapter.setProxyStopped(false)
         serverAdapter.setProxyStopped(false)
@@ -1128,6 +1211,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         // refetch WIN registration state and server list on a background thread.
         io {
             isWinRegistered = VpnController.isWinRegistered()
+            val hasTunnel    = VpnController.hasTunnel()
             val servers      = RpnProxyManager.getWinServers()
             val selectedList = RpnProxyManager.getEnabledConfigs()
             val hasRealServers = servers.any { it.id != AUTO_SERVER_ID }
@@ -1135,11 +1219,17 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             uiCtx {
                 if (!isAdded) return@uiCtx
                 if (!isWinRegistered || !hasRealServers) {
-                    // WIN is not yet registered or the server list is not populated
-                    // immediately after proxy start (can happen on first launch after
-                    // reinstall). The polling dialog will keep retrying until both
-                    // conditions are satisfied, then call initServers().
-                    showServerLoadingDialog()
+                    if (!hasTunnel) {
+                        // No tunnel; registration will fail, show "Start Rethink" error.
+                        Logger.w(LOG_TAG_UI, "$TAG.applyProxyRunningUi: no tunnel, showing no-tunnel error")
+                        showErrorState(noTunnel = true)
+                    } else {
+                        // WIN is not yet registered or the server list is not populated
+                        // immediately after proxy start (can happen on first launch after
+                        // reinstall). The polling dialog will keep retrying until both
+                        // conditions are satisfied, then call initServers().
+                        showServerLoadingDialog()
+                    }
                 } else {
                     initServers(servers, selectedList)
                 }
@@ -1216,7 +1306,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         else resources.getQuantityString(R.plurals.server_count, count, count)
     }
 
-    private fun showErrorState() {
+    private fun showErrorState(noTunnel: Boolean = false) {
         if (!isAdded) return
         b.rvServers.isVisible = false
         b.searchCard.isVisible = true
@@ -1227,6 +1317,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.settingsBtn.isVisible = true
         b.statusCard.isVisible = false
 
+        b.serverCountLayout.isVisible = false
         b.selectedServersCard.isVisible = false
         b.emptySelectionCard.isVisible = false
         b.frequentCountriesSection.isVisible = false
@@ -1251,9 +1342,19 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             .setInterpolator(AccelerateDecelerateInterpolator())
             .start()
 
-        b.errorRetryBtn.isEnabled = true
-        b.errorRetryBtn.text = getString(R.string.server_selection_error_retry)
-        b.errorRetryBtn.setOnClickListener { retryLoadingServers() }
+        if (noTunnel) {
+            // The VPN tunnel is not running – registration is impossible.
+            // Show a non-actionable hint so the user knows to start Rethink first.
+            b.errorRetryBtn.isEnabled = false
+            b.errorRetryBtn.isClickable = false
+            b.errorRetryBtn.text = getString(R.string.ssv_toast_start_rethink)
+            b.errorRetryBtn.setOnClickListener(null)
+        } else {
+            b.errorRetryBtn.isEnabled = true
+            b.errorRetryBtn.isClickable = true
+            b.errorRetryBtn.text = getString(R.string.server_selection_error_retry)
+            b.errorRetryBtn.setOnClickListener { retryLoadingServers() }
+        }
     }
 
     private fun hideErrorState() {
@@ -1281,6 +1382,14 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             showToast(getString(R.string.server_selection_tap_to_select))
             return
         }
+
+        // If the VPN tunnel is not up, show the "Start Rethink" prompt instead of spinning forever
+        if (!VpnController.hasTunnel()) {
+            Logger.w(LOG_TAG_UI, "$TAG.retryLoadingServers: no VPN tunnel, showing no-tunnel error")
+            showErrorState(noTunnel = true)
+            return
+        }
+
         b.errorRetryBtn.isEnabled = false
         b.errorRetryBtn.text = getString(R.string.lbl_connecting)
 
@@ -1314,22 +1423,29 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             }
 
             val hasRealServers = servers.any { it.id != AUTO_SERVER_ID }
+            val hasTunnel = VpnController.hasTunnel()
 
             uiCtx {
                 if (!isAdded) return@uiCtx
                 b.errorRetryBtn.isEnabled = true
                 b.errorRetryBtn.text = getString(R.string.server_selection_error_retry)
                 when {
-                    // WIN not yet registered or server list still empty, hand off to the
-                    // polling dialog (same path as setupRpnState / applyProxyRunningUi).
+                    // WIN not yet registered or server list still empty; check tunnel first.
                     (!isWinRegistered || !hasRealServers) && RpnProxyManager.isRpnActive() -> {
-                        Logger.i(
-                            LOG_TAG_UI,
-                            "$TAG.retryLoadingServers: WIN registered=$isWinRegistered, " +
-                                "hasRealServers=$hasRealServers, showing loading dialog"
-                        )
-                        setLoadingState(false)
-                        showServerLoadingDialog()
+                        if (!hasTunnel) {
+                            Logger.w(LOG_TAG_UI, "$TAG.retryLoadingServers: no tunnel, showing no-tunnel error")
+                            setLoadingState(false)
+                            showErrorState(noTunnel = true)
+                        } else {
+                            Logger.i(
+                                LOG_TAG_UI,
+                                "$TAG.retryLoadingServers: WIN registered=$isWinRegistered, " +
+                                    "hasRealServers=$hasRealServers, handing off to registration progress"
+                            )
+                            // showServerLoadingDialog() calls setLoadingState(true) internally
+                            // do NOT call setLoadingState(false) here or the shimmers will flash off.
+                            showServerLoadingDialog()
+                        }
                     }
                     else -> initServers(servers, selectedList)
                 }
@@ -1830,7 +1946,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     }
 
     /**
-     * Shows [ResubscribeBottomSheet] once per session when the subscription is in the
+     * Shows [ManageRpnPurchaseBtmSht] once per session when the subscription is in the
      * **Cancelled** state (isAutoRenewing=false, still active until billing period ends).
      */
     private fun maybeShowResubscribePrompt(sub: SubscriptionStatus?) {
@@ -1855,7 +1971,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         }
 
         resubscribePromptShown = true
-        Logger.i(LOG_TAG_UI, "$TAG.maybeShowResubscribePrompt: showing resubscribe prompt for productId=${purchaseDetail.productId}, planId=${purchaseDetail.planId}")
+        Logger.i(LOG_TAG_UI, "$TAG.maybeShowResubscribePrompt: showing resubscribe prompt for status: ${statusState.name} productId=${purchaseDetail.productId}, planId=${purchaseDetail.planId}")
 
         try {
             ManageRpnPurchaseBtmSht.newInstance()
@@ -1914,72 +2030,45 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     }
 
     /**
-     * Shows a non-dismissable, informative dialog while WIN registration or the
-     * server-list fetch is in progress.
+     * Shows the inline progress bar pinned to the bottom of the hero banner
+     * and starts a background polling loop that waits for WIN registration and the
+     * server-list to become available.
+     *
+     * [setLoadingState] is called immediately so shimmers always cover any potentially
+     * stale server list, giving the user a clear "something is loading" signal regardless
+     * of which code path triggered this call.
      */
     private fun showServerLoadingDialog() {
-        if (serverLoadingDialog?.isShowing == true) {
-            Logger.d(LOG_TAG_UI, "$TAG: loading dialog already showing, skipping duplicate call")
+        if (serverLoadingJob?.isActive == true) {
+            Logger.d(LOG_TAG_UI, "$TAG: registration progress already running, skipping")
             return
         }
-        dismissServerLoadingDialog()
+        dismissServerLoadingDialog() // cancel any stale job
 
-        val dialogView = layoutInflater.inflate(R.layout.dialog_server_loading, null)
-        val tvStatus = dialogView.findViewById<android.widget.TextView>(R.id.tv_server_loading_status)
-        val timeoutBar = dialogView.findViewById<LinearProgressIndicator>(R.id.server_loading_timeout_bar)
-        timeoutBar.max = LOADING_DIALOG_TIMEOUT_MS.toInt()
-        timeoutBar.setProgressCompat(0, false)
+        if (!isAdded) return
 
-        val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setView(dialogView)
-            .setCancelable(false)
-            .create()
-        dialog.setCanceledOnTouchOutside(false)
-        dialog.show()
-        serverLoadingDialog = dialog
+        setLoadingState(true)
+        b.registrationProgressBar.show()
+        // Prevent start/stop proxy FAB taps while registration is in progress.
+        b.fabStopProxy.isClickable  = false
+        b.fabStartProxy.isClickable = false
 
         Logger.i(
             LOG_TAG_UI,
-            "$TAG: showServerLoadingDialog; waiting up to ${LOADING_DIALOG_TIMEOUT_MS / 1000}s"
-        )
-
-        val statusMessages = listOf(
-            getString(R.string.server_loading_dialog_status_checking),
-            getString(R.string.server_loading_dialog_status_connecting),
-            getString(R.string.server_loading_dialog_status_fetching),
-            getString(R.string.server_loading_dialog_status_almost),
+            "$TAG: showRegistrationProgress; waiting up to ${LOADING_DIALOG_TIMEOUT_MS / 1000}s"
         )
 
         serverLoadingJob = lifecycleScope.launch {
             val startTime = System.currentTimeMillis()
-            var msgIdx = 0
 
             while (true) {
                 val elapsed = System.currentTimeMillis() - startTime
                 if (elapsed >= LOADING_DIALOG_TIMEOUT_MS) break
 
-                // Decide which status message to show
-                val statusMsg = when {
-                    elapsed > LOADING_DIALOG_TIMEOUT_MS * 0.75 ->
-                        getString(R.string.server_loading_dialog_status_timeout)
-                    else -> statusMessages[msgIdx % statusMessages.size]
+                // Poll registration status and server list
+                val hasTunnel = withContext(Dispatchers.IO) {
+                    try { VpnController.hasTunnel() } catch (_: Exception) { false }
                 }
-
-                // cross-fade the status text for a polished feel
-                withContext(Dispatchers.Main) {
-                    if (!isAdded) return@withContext
-                    // Animate old text out, swap, animate new text in
-                    tvStatus.animate().alpha(0f).setDuration(120).withEndAction {
-                        if (isAdded) {
-                            tvStatus.text = statusMsg
-                            tvStatus.animate().alpha(0.65f).setDuration(120).start()
-                        }
-                    }.start()
-                    timeoutBar.setProgressCompat(elapsed.coerceAtMost(LOADING_DIALOG_TIMEOUT_MS).toInt(), true)
-                }
-
-
-                // Poll registration status and server list on the IO thread
                 val winRegistered = withContext(Dispatchers.IO) {
                     try { VpnController.isWinRegistered() } catch (_: Exception) { false }
                 }
@@ -1990,21 +2079,29 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
                 Logger.d(
                     LOG_TAG_UI,
-                    "$TAG: loading dialog poll, winRegistered=$winRegistered, " +
+                    "$TAG: registration poll, hasTunnel=$hasTunnel, winRegistered=$winRegistered, " +
                         "realServers=${servers.count { it.id != AUTO_SERVER_ID }}, elapsed=${elapsed}ms"
                 )
 
+                if (!hasTunnel) {
+                    Logger.w(LOG_TAG_UI, "$TAG: registration — VPN tunnel lost, showing no-tunnel error")
+                    withContext(Dispatchers.Main) {
+                        if (!isAdded) return@withContext
+                        dismissServerLoadingDialog()
+                        setLoadingState(false)
+                        showErrorState(noTunnel = true)
+                    }
+                    return@launch
+                }
+
                 if (winRegistered && hasRealServers) {
-                    // Registration complete and servers available, load the list
+                    // Registration complete and servers available, load the list.
                     val selectedList = withContext(Dispatchers.IO) {
                         try { RpnProxyManager.getEnabledConfigs() } catch (_: Exception) { emptySet() }
                     }
                     withContext(Dispatchers.Main) {
                         if (!isAdded) return@withContext
-                        Logger.i(
-                            LOG_TAG_UI,
-                            "$TAG: loading dialog, registration complete (elapsed=${elapsed}ms)"
-                        )
+                        Logger.i(LOG_TAG_UI, "$TAG: registration complete (elapsed=${elapsed}ms)")
                         isWinRegistered = true
                         dismissServerLoadingDialog()
                         initServers(servers, selectedList)
@@ -2013,15 +2110,10 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 }
 
                 delay(LOADING_DIALOG_POLL_INTERVAL_MS)
-                msgIdx++
             }
 
-            // Timed out; dismiss dialog and surface whatever state we have.
-            // If the proxy is not active by now, apply the stopped UI so the FAB is visible.
-            Logger.w(
-                LOG_TAG_UI,
-                "$TAG: loading dialog timed out after ${LOADING_DIALOG_TIMEOUT_MS / 1000}s"
-            )
+            // Timed out; hide the bar and surface whatever state we have.
+            Logger.w(LOG_TAG_UI, "$TAG: registration timed out after ${LOADING_DIALOG_TIMEOUT_MS / 1000}s")
             withContext(Dispatchers.Main) {
                 if (!isAdded) return@withContext
                 dismissServerLoadingDialog()
@@ -2029,6 +2121,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 if (!RpnProxyManager.isRpnActive()) {
                     isProxyStopped = true
                     applyProxyStoppedUi()
+                } else if (!VpnController.hasTunnel()) {
+                    showErrorState(noTunnel = true)
                 } else {
                     showErrorState()
                 }
@@ -2037,16 +2131,19 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     }
 
     /**
-     * Cancels the polling job and safely dismisses the loading dialog.
-     * Safe to call when no dialog is showing.
+     * Cancels the polling job and hides the inline registration progress bar.
+     * Restores FAB interactivity. Safe to call when the bar is not showing.
      */
     private fun dismissServerLoadingDialog() {
         serverLoadingJob?.cancel()
         serverLoadingJob = null
         runCatching {
-            if (serverLoadingDialog?.isShowing == true) serverLoadingDialog?.dismiss()
+            if (isAdded && view != null) {
+                b.registrationProgressBar.hide()
+                b.fabStopProxy.isClickable  = true
+                b.fabStartProxy.isClickable = true
+            }
         }
-        serverLoadingDialog = null
     }
 
     private fun showRpnResetDialog() {
@@ -2070,10 +2167,16 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
         val dialog = MaterialAlertDialogBuilder(requireContext())
             .setView(dialogView)
-            .setCancelable(false)
+            .setCancelable(true)
             .create()
-        dialog.setCanceledOnTouchOutside(false)
+        dialog.setCanceledOnTouchOutside(true)
         dialog.show()
+        dialog.setOnCancelListener {
+            Logger.i(LOG_TAG_UI, "$TAG: reset dialog dismissed by user — switching to inline bar")
+            resetDialogDismissedByUser = true
+            dismissRpnResetDialog()
+            if (isAdded && view != null) b.registrationProgressBar.show()
+        }
         rpnResetDialog = dialog
 
         Logger.i(LOG_TAG_UI, "$TAG: showRpnResetDialog; timeout=${LOADING_DIALOG_TIMEOUT_MS / 1000}s")
