@@ -688,7 +688,7 @@ class VpnServerAdapter(
         }
 
         private fun io(f: suspend () -> Unit) {
-            (context as LifecycleOwner).lifecycleScope.launch(Dispatchers.IO) { f() }
+            b.root.findViewTreeLifecycleOwner()?.lifecycleScope?.launch(Dispatchers.IO) { f() }
         }
 
         private suspend fun uiCtx(f: suspend () -> Unit) {
