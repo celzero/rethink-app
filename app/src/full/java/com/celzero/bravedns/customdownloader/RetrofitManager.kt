@@ -19,13 +19,16 @@ import Logger
 import Logger.LOG_OKHTTP
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Daemons
 import com.celzero.bravedns.util.Utilities
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import okhttp3.Dns
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.ResponseBody.Companion.toResponseBody
 import okhttp3.dnsoverhttps.DnsOverHttps
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import java.net.InetAddress
 import java.util.concurrent.TimeUnit
@@ -51,17 +54,78 @@ class RetrofitManager {
             FALLBACK_DNS
         }
 
-        val logging = HttpLoggingInterceptor { message ->
-            if (DEBUG) {
-                Logger.vv(LOG_OKHTTP, message)
-                // keep storing the logs in a separate file to avoid cluttering the main app logs,
-                // as these logs can be very verbose
-                val time = System.currentTimeMillis()
-                val userReadableTime = Utilities.convertLongToTime(time, Constants.TIME_FORMAT_4)
-                Logger.wireLog("$userReadableTime | $message")
+        // Single-thread dispatcher dedicated to fire-and-forget log I/O so that
+        // log writes never block OkHttp's network threads.
+        private val logScope = CoroutineScope(Daemons.make("RayIdLogger"))
+
+        /**
+         * Ray-ID interceptor: captures Cloudflare's cf-ray header and any "ray" field in the body,
+         * logging them
+         */
+        val rayIdInterceptor = Interceptor { chain ->
+            val request = chain.request()
+            val reqTime = System.currentTimeMillis()
+
+            // Log request line asynchronously
+            logScope.launch {
+                val ts = Utilities.convertLongToTime(reqTime, Constants.TIME_FORMAT_4)
+                val msg = "$ts --> ${request.method} ${request.url}"
+                Logger.d(LOG_OKHTTP, msg)
+                Logger.wireLog(msg)
             }
-        }.apply {
-            level = HttpLoggingInterceptor.Level.BODY
+
+            val response = chain.proceed(request)
+            val respTime = System.currentTimeMillis()
+
+            try {
+                // Capture header value before any body read.
+                val cfRay = response.header("cf-ray")
+                val responseBody = response.body
+
+                if (responseBody != null) {
+                    val contentType = responseBody.contentType()
+                    val bodyString = responseBody.string()
+                    val rayId = Regex("\"ray\"\\s*:\\s*\"([^\"]+)\"")
+                        .find(bodyString)?.groupValues?.get(1)
+
+                    logScope.launch {
+                        val ts = Utilities.convertLongToTime(respTime, Constants.TIME_FORMAT_4)
+                        val prefix = "$ts <-- ${response.code} ${request.method} ${request.url}"
+                        if (cfRay != null) {
+                            val msg = "$prefix | cf-ray: $cfRay"
+                            Logger.d(LOG_OKHTTP, msg)
+                            Logger.wireLog(msg)
+                        }
+                        if (rayId != null) {
+                            val msg = "$prefix | ray: $rayId"
+                            Logger.d(LOG_OKHTTP, msg)
+                            Logger.wireLog(msg)
+                        }
+                        if (cfRay == null && rayId == null) {
+                            // At least log the response line so every request has a closing entry.
+                            val msg = "$prefix | no-ray"
+                            Logger.d(LOG_OKHTTP, msg)
+                            Logger.wireLog(msg)
+                        }
+                    }
+
+                    // Rebuild response body so Retrofit / caller can still read it.
+                    val newBody = bodyString.toResponseBody(contentType)
+                    return@Interceptor response.newBuilder().body(newBody).build()
+                } else {
+                    // No-body; still log cf-ray from headers if present.
+                    logScope.launch {
+                        val ts = Utilities.convertLongToTime(respTime, Constants.TIME_FORMAT_4)
+                        val prefix = "$ts <-- ${response.code} ${request.method} ${request.url}"
+                        val msg = if (cfRay != null) "$prefix | cf-ray: $cfRay" else "$prefix | no-body no-ray"
+                        Logger.d(LOG_OKHTTP, msg)
+                        Logger.wireLog(msg)
+                    }
+                }
+            } catch (e: Exception) {
+                Logger.e(LOG_OKHTTP, "err extracting ray-id from response: ${e.message}", e)
+            }
+            response
         }
 
         fun getBlocklistBaseBuilder(isRinRActive: Boolean): Retrofit.Builder {
@@ -88,7 +152,9 @@ class RetrofitManager {
             b.readTimeout(READ_TIMEOUT_MINUTES, TimeUnit.MINUTES)
             b.writeTimeout(WRITE_TIMEOUT_MINUTES, TimeUnit.MINUTES)
             b.retryOnConnectionFailure(true)
-            if (DEBUG) b.addInterceptor(logging)
+            // Always active: captures cf-ray header and body ray-id; never logs
+            // request headers (cid / did / sessionToken stay out of logs).
+            b.addInterceptor(rayIdInterceptor)
             // If unset, the system-wide default DNS will be used.
             // no need to add custom dns if rinr is not active, as the connections will be routed
             // through the default dns
