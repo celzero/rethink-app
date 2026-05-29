@@ -389,11 +389,14 @@ object BugReportZipper {
     }
 
     suspend fun dumpPrefs(prefs: SharedPreferences, file: File) {
+        val separator = "--------------------------------------------\n"
         val prefsMap = prefs.all
         val prefsDetails = StringBuilder()
         prefsMap.forEach { (key, value) -> prefsDetails.append("\n$key=$value") }
         file.appendText(prefsDetails.toString())
-        val separator = "--------------------------------------------\n"
+        file.appendText(separator)
+        val buildBasic = Intra.build(false)
+        file.appendText(buildBasic)
         file.appendText(separator)
         val build = Intra.build(true)
         file.appendText(build)
