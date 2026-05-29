@@ -62,7 +62,7 @@ object Logger : KoinComponent {
     const val LOG_QR_CODE = "QrCodeFromFileScanner"
     const val LOG_GO_LOGGER = "GoLog"
     const val LOG_GO_LOGGER_V2 = "GoLogV2"
-    const val LOG_GO_LOGGER_SM = "GoLogSM"
+    const val LOG_GO_LOGGER_V1 = "GoLogV1"
     const val LOG_TAG_APP_OPS = "AppOpsService"
     const val LOG_IAB = "InAppBilling"
     const val LOG_FIREBASE = "FirebaseErrorReporting"
@@ -70,7 +70,7 @@ object Logger : KoinComponent {
     const val LOG_OKHTTP = "OkHttp"
 
     const val WIRELOG_FILE_NAME = "wirelogs.txt"
-    const val WIRELOG_MAX_SIZE_BYTES = 5 * 1024 * 1024L // 5 MB
+    const val WIRELOG_MAX_SIZE_BYTES = 3 * 1024 * 1024L // 3 MB
     const val WIRELOG_FOLDER_NAME = "logs"
 
     // github.com/celzero/firestack/blob/bce8de917f/intra/log/logger.go#L76
@@ -213,7 +213,7 @@ object Logger : KoinComponent {
 
     fun goLog(message: String, type: LoggerLevel) {
         // no need to log the go logs, add it to the database
-        dbWrite(LOG_GO_LOGGER, message, type)
+        dbWrite(LOG_GO_LOGGER_V1, message, type)
     }
 
     fun goLog2(message: String, type: LoggerLevel) {
@@ -223,10 +223,10 @@ object Logger : KoinComponent {
 
     fun goLog3(message: String, type: LoggerLevel) {
         // no need to log the go logs, add it to the database
-        dbWrite(LOG_GO_LOGGER_SM, message, type)
+        dbWrite(LOG_GO_LOGGER, message, type)
     }
 
-    fun wireLog(message: String) {
+    suspend fun wireLog(message: String) {
         try {
             val logsDir = File(application.filesDir, WIRELOG_FOLDER_NAME).apply {
                 if (!exists()) mkdirs()
