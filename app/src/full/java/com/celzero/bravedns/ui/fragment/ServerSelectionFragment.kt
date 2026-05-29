@@ -1413,7 +1413,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 emptySet()
             }
             val servers = try {
-                val refreshed = RpnProxyManager.updateWinProxy(userRequest = true)
+                val refreshed = RpnProxyManager.updateWinProxy()
                 if (!refreshed.isNullOrEmpty()) refreshed
                 else RpnProxyManager.getWinServers()
             } catch (t: Throwable) {

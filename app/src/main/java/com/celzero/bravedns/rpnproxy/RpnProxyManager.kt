@@ -95,6 +95,8 @@ object RpnProxyManager : KoinComponent {
     private val winServersCache = mutableListOf<CountryConfig>()
     private val winCacheMutex = Mutex()
 
+    private val winRegistrationMutex = Mutex()
+
     /**
      * Emits a list of [CountryConfig] objects that were selected by the user but are
      * no longer present in the server list returned by the tunnel after an update.
@@ -1023,11 +1025,28 @@ object RpnProxyManager : KoinComponent {
                         return false
                     }
                 }
-                var currBytes = VpnController.registerAndFetchWinConfig(bytes, billingBackendClient.getDeviceId())
-                if (currBytes == null) {
-                    // try registering with null
-                    Logger.w(LOG_TAG_PROXY, "$TAG; win registration failed with existing bytes, trying with no prev bytes")
-                    currBytes = VpnController.registerAndFetchWinConfig(null, billingBackendClient.getDeviceId())
+
+                var wasAlreadyRegisteredByConcurrent = false
+                val currBytes: ByteArray? = winRegistrationMutex.withLock {
+                    if (VpnController.isWinRegistered()) {
+                        Logger.i(LOG_TAG_PROXY, "$TAG; registerProxy: WIN already registered (concurrent-safe check), skipping tunnel call")
+                        wasAlreadyRegisteredByConcurrent = true
+                        null // early-exit sentinel; not treated as failure because flag is set
+                    } else {
+                        var regBytes = VpnController.registerAndFetchWinConfig(bytes, billingBackendClient.getDeviceId())
+                        if (regBytes == null) {
+                            // try registering with prev stored bytes
+                            val prevRegistrationBytes = getWinExistingData()
+                            Logger.w(LOG_TAG_PROXY, "$TAG; win registration failed with existing bytes, trying with prev bytes")
+                            regBytes = VpnController.registerAndFetchWinConfig(prevRegistrationBytes, billingBackendClient.getDeviceId())
+                        }
+                        regBytes
+                    }
+                }
+                if (wasAlreadyRegisteredByConcurrent) {
+                    // A concurrent coroutine finished registration first; this call is a no-op.
+                    Logger.i(LOG_TAG_PROXY, "$TAG; registerProxy: WIN registered by concurrent call, returning true")
+                    return true
                 }
                 val ok = updateWinConfigState(currBytes)
                 // Fetch servers from API and sync to database and cache
@@ -1628,14 +1647,12 @@ object RpnProxyManager : KoinComponent {
     }
 
     /**
-     *
      * Full update pipeline:
      *  1. Ask the tunnel to refresh and return updated WIN state bytes
      *     ([VpnController.updateWin]).
      *  2a. If the tunnel returns bytes → persist them with [updateWinConfigState].
-     *  2b. If the tunnel returns null → fall back to [registerProxy] (full re-register)
-     *     and retry [VpnController.updateWin] once more.  If that also fails return null
-     *     so callers can show an error.
+     *  2b. If the tunnel returns null → fall back to [registerProxy] (full re-register).
+     *     If that also fails return null so callers can show an error.
      *  3. Fetch server locations from the tunnel ([fetchAndConstructWinLocations]).
      *     If empty, retry up to 3 times with 1 s back-off.
      *  4. Sync fetched locations to DB + in-memory cache ([syncWinServers]).
@@ -1650,48 +1667,26 @@ object RpnProxyManager : KoinComponent {
      *                 success, show retry / await next cycle.
      *  - non-empty → full success; contains the refreshed [CountryConfig] list.
      */
-    suspend fun updateWinProxy(userRequest: Boolean): List<CountryConfig>? {
+    suspend fun updateWinProxy(): List<CountryConfig>? {
         Logger.i(LOG_TAG_PROXY, "$TAG; updateWinProxy: starting WIN proxy update")
 
-        val currTs = System.currentTimeMillis()
-        val lastUpdatedTs = VpnController.getWinLastUpdatedTs() ?: 0
-        val fifteenMins = 15 * 60 * 1000
-
-        // do not perform the update, if last update is less than 15 mins and not user req
-        if (currTs - lastUpdatedTs < fifteenMins && !userRequest) {
-            Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: last update was less than 10 mins ago, return curr servers")
-            val currentServers = winCacheMutex.withLock { winServersCache.toList() }
-            return currentServers
-        }
 
         val isRpnRegistered = VpnController.isWinRegistered()
         if (!isRpnRegistered) {
-            Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: WIN not registered, attempting to register")
-            val entitlementBytes = getWinEntitlement()
-            val prevRegistrationBytes = getWinExistingData()
-            val regBytes = try {
-                VpnController.registerAndFetchWinConfig(entitlementBytes, billingBackendClient.getDeviceId())
-                    ?: VpnController.registerAndFetchWinConfig(prevRegistrationBytes, billingBackendClient.getDeviceId())
-            } catch (e: Exception) {
-                Logger.e(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: tunnel registration failed: ${e.message}", e)
-                return null
-            }
-            if (regBytes == null) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: WIN not registered, delegating to registerProxy")
+            val registered = registerProxy(RpnType.WIN)
+            if (!registered) {
                 Logger.e(LOG_TAG_PROXY, "$TAG; updateWinProxy: registration attempt failed, cannot proceed with update")
                 return null
             }
-            val persisted = updateWinConfigState(regBytes)
-            if (!persisted) {
-                Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: failed to persist WIN config state after registration (continuing)")
-             }
+            Logger.i(LOG_TAG_PROXY, "$TAG; updateWinProxy: WIN registered successfully, falling through to server sync")
+            // registerProxy already synced the server list; fall through so enabled
+            // servers are re-added to the tunnel by the loop below.
         } else {
             val bytes: ByteArray? = VpnController.updateWin()
 
             if (bytes == null) {
-                Logger.w(
-                    LOG_TAG_PROXY,
-                    "$TAG; updateWinProxy: updateWin() returned null, attempting re-register"
-                )
+                Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: updateWin() returned null")
                 return null
             }
 

@@ -2430,7 +2430,7 @@ class GoVpnAdapter : KoinComponent {
             return null
         }
         try {
-            if (tunnel.proxies.rpn().win() != null && prevBytes != null) {
+            if (tunnel.proxies.rpn().win() != null) {
                 Logger.i(LOG_TAG_PROXY, "$TAG win(rpn) already registered")
                 return null
             }

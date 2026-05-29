@@ -387,6 +387,9 @@ object InAppBillingHandler : KoinComponent {
                         override fun onBillingServiceDisconnected() {
                             log(mname, "billing service disconnected")
 
+                            storeProductDetails.clear()
+                            productDetails.clear()
+
                             // notify state machine of disconnection
                             billingScope.launch {
                                 try {
@@ -1863,10 +1866,24 @@ object InAppBillingHandler : KoinComponent {
             }
         }
 
-        val queryProductDetail = storeProductDetails.find {
+        var queryProductDetail = storeProductDetails.find {
             it.productDetail.productId == productId &&
                     it.productDetail.productType == ProductType.INAPP &&
                     it.productDetail.planId == planId
+        }
+
+        if (queryProductDetail == null) {
+            log(mname, "one-time product not found in cache (size=${storeProductDetails.size}), fetching on-demand and retrying")
+            try {
+                withTimeoutOrNull(10_000) { queryProductDetails() }
+            } catch (e: Exception) {
+                loge(mname, "on-demand product details fetch failed: ${e.message}", e)
+            }
+            queryProductDetail = storeProductDetails.find {
+                it.productDetail.productId == productId &&
+                        it.productDetail.productType == ProductType.INAPP &&
+                        it.productDetail.planId == planId
+            }
         }
 
         if (queryProductDetail == null) {
@@ -1952,6 +1969,13 @@ object InAppBillingHandler : KoinComponent {
             .setProductDetailsParamsList(paramsList)
             .setObfuscatedAccountId(accountId)
             .build()
+
+        if (!billingClient.isReady) {
+            loge(mname, "billing client no longer ready; aborting launchBillingFlow to avoid ProxyBillingActivity NPE")
+            try { subscriptionStateMachine.purchaseFailed("Billing client disconnected before launch", null) } catch (_: Exception) {}
+            billingListener?.purchasesResult(false, emptyList())
+            return
+        }
 
         val billingResult = billingClient.launchBillingFlow(activity, flowParams)
         val isSuccess = billingResult.responseCode == BillingResponseCode.OK

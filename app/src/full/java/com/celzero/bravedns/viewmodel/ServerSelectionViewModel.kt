@@ -105,7 +105,7 @@ class ServerSelectionViewModel : ViewModel() {
             }
 
             val refreshed: List<CountryConfig> = try {
-                RpnProxyManager.updateWinProxy(userRequest = true) ?: emptyList()
+                RpnProxyManager.updateWinProxy() ?: emptyList()
             } catch (e: Exception) {
                 Logger.e(LOG_TAG_UI, "$TAG.refresh: updateWinProxy error: ${e.message}", e)
                 emptyList()
