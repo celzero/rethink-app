@@ -49,7 +49,7 @@ class BlockFreeDnsModeBottomSheet : BottomSheetDialogFragment() {
 
         companion object {
             fun fromMode(mode: Int): BlockFreeDnsMode =
-                entries.find { it.mode == mode } ?: FALLBACK
+                entries.find { it.mode == mode } ?: AUTO
         }
     }
 
@@ -99,12 +99,7 @@ class BlockFreeDnsModeBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun initView() {
-        // If splitDns is enabled, pre-select AUTO; otherwise use the persisted mode (default FALLBACK).
-        val currentMode = if (persistentState.splitDns) {
-            BlockFreeDnsMode.AUTO
-        } else {
-            BlockFreeDnsMode.fromMode(persistentState.blockFreeDnsMode)
-        }
+        val currentMode = BlockFreeDnsMode.fromMode(persistentState.blockFreeDnsMode)
         updateSelection(currentMode)
     }
 

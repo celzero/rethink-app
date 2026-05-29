@@ -2027,15 +2027,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         Logger.d(LOG_TAG_VPN, "$TAG handleRpnProxies: win(rpn) registered? $isWinRegistered")
         if (!isWinRegistered) {
             val registered = RpnProxyManager.registerProxy(RpnType.WIN)
-            // Schedule the periodic update worker exactly once per WIN registration.
-            // The timer is only truly reset when:
-            //   - RPN is disabled (cancel() is called), then re-enabled, registration runs again.
-            //   - App process is killed and restarted, registration runs again.
             if (registered) {
                 RpnProxyUpdateWorker.schedule(applicationContext)
                 Logger.i(
                     LOG_TAG_VPN,
-                    "$TAG handleRpnProxies: RpnProxyUpdateWorker scheduled after WIN registration"
+                    "$TAG handleRpnProxies: RpnProxyUpdateWorker scheduled (fresh timer) after WIN registration"
                 )
             } else {
                 Logger.e(LOG_TAG_VPN, "$TAG handleRpnProxies: win(rpn) registration failed")
@@ -4141,7 +4137,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     private fun getTransportIdToBypass(id: Pair<String, String>): Pair<String, String> {
         // add already used transport id's as secondary transport id (both tid, tidsec)
-        val secTransport = id.toString()
+        val secTransport = listOf(id.first, id.second)
+            .filter { it.isNotBlank() }
+            .joinToString(",")
 
         val blockFreeMode = BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.fromMode(persistentState.blockFreeDnsMode)
         when (blockFreeMode) {
@@ -4154,10 +4152,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     // in this case, even the trusted queries will be blocked, but it prevents
                     // dns leaks which is more desired behavior when split dns /prevent dns leaks
                     // is enabled.
-                    logd("getTransportIdToBypass: splitDns & auto, returning same id $id")
+                    logd("getTransportIdToBypass: splitDns & auto, returning same id $secTransport")
                     return id
                 } else if (persistentState.preventDnsLeaks) {
-                    logd("getTransportIdToBypass: preventDns & auto, returning same id $id")
+                    logd("getTransportIdToBypass: preventDns & auto, returning same id $secTransport")
                     return id
                 } else {
                     // there are certain cases where the blockfree won't be available, so better
@@ -4716,7 +4714,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     override fun onUpstreamAnswer(smm: DNSSummary, rcvdDnsOpts: DNSOpts, ipcsv: String): DNSOpts = go2kt(upstreamQueryDispatcher) {
         if (ipcsv.isEmpty()) {
-            Logger.i(LOG_TAG_VPN, "onUpstreamAnswer: received null summary for upstream answer")
+            Logger.i(LOG_TAG_VPN, "onUpstreamAnswer: received empty ips for upstream answer, no-op")
             return@go2kt DNSOpts()
         }
 
@@ -4807,7 +4805,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     return@go2kt DNSOpts()
                 }
                 tidcsv = tid.first.split(",").joinToString(",") { appendDnsCacheIfNeeded(it) }
-                tidseccsv = tid.second.split(",").joinToString(",") { appendDnsCacheIfNeeded(it) }
+                tidseccsv = if (tid.second.isEmpty()) "" else tid.second.split(",").joinToString(",") { appendDnsCacheIfNeeded(it) }
+                Logger.vv(LOG_TAG_VPN, "onUpstreamAnswer: bypass rule: $rule, original tid: $id, bypass tid: [$tidcsv, $tidseccsv] connInfo: $connInfo, ipcsv: $ipcsv")
                 pidcsv = rcvdDnsOpts.pidcsv
                 noblock = true
             }
