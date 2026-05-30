@@ -70,7 +70,7 @@ internal constructor(
     // expected per row size is 100 bytes to 500 bytes, so a batch of 40 rows is around 4KB to 20KB
     private val logBatchSize = 40
     // dispatch buffer to consumer if greater than batch size, for console logs
-    private val consoleLogBatchSize = 1024
+    private val consoleLogBatchSize = 4096
 
     // a single thread to run sig and batch co-routines in;
     // to avoid use of mutex/semaphores over shared-state
