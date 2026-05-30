@@ -215,7 +215,7 @@ class VpnServerAdapter(
             b.tvServerIp.visibility = View.GONE
 
             if (group.key.equals(AUTO_SERVER_ID, ignoreCase = true)) {
-                b.infoIcon.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.ic_refresh_white))
+                b.infoIcon.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.ic_refresh))
                 b.infoIcon.visibility = View.VISIBLE
                 // AUTO server: show the vector ic_rpn_auto, hide the emoji text view
                 b.tvFlag.text = ""
