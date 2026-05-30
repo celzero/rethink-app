@@ -53,7 +53,6 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.RethinkBlocklistManager
-import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.AntiCensorshipActivity
 import com.celzero.bravedns.ui.activity.AppLockActivity
@@ -93,7 +92,6 @@ import com.celzero.firestack.intra.DefaultDNS
 import com.celzero.firestack.intra.Intra
 import com.celzero.firestack.intra.Tunnel
 import com.celzero.firestack.settings.Settings
-import go.Seq
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
