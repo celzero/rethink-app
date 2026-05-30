@@ -2052,7 +2052,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         } else {
             if (persistentState.wgGlobalLockdown) {
                 val stat = getString(statusId)
-                val s  = stat.replaceFirst(getString(R.string.status_protected), getString(R.string.firewall_rule_global_lockdown), true)
+                val s  = stat.replaceFirst(getString(R.string.status_protected), getString(R.string.firewall_rule_global_lockdown).lowercase(), true)
                 b.fhsProtectionLevelTxt.setTextColor(fetchTextColor(R.color.accentGood))
                 b.fhsProtectionLevelTxt.text = s
             } else if (vpnState.isEch) {

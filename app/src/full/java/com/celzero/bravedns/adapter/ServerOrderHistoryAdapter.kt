@@ -90,7 +90,7 @@ class ServerOrderHistoryAdapter(private val context: Context) :
                     context, R.color.chipBackgroundColor
                 )
             } else {
-                b.tvTypeBadge.text = context.getString(R.string.server_order_type_onetime)
+                b.tvTypeBadge.text = context.getString(R.string.one_time_label).uppercase(Locale.ROOT)
                 b.tvTypeBadge.backgroundTintList = ContextCompat.getColorStateList(
                     context, R.color.chipBgNeutral
                 )
@@ -250,4 +250,3 @@ class ServerOrderHistoryAdapter(private val context: Context) :
         }
     }
 }
-

@@ -153,7 +153,7 @@ class TourOverlayController(
         tvTitle.text   = activity.getString(step.titleRes)
         tvDesc.text    = activity.getString(step.descRes)
         btnNext.text   = activity.getString(
-            if (step.isLastStep) R.string.tour_btn_finish else R.string.tour_btn_next
+            if (step.isLastStep) R.string.tour_btn_finish else R.string.next
         )
         updateDots(index)
 

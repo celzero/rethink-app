@@ -62,7 +62,7 @@
         android:id="@+id/action_button"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:text="@string/continue_text"
+        android:text="@string/rt_dialog_neutral"
         android:textAllCaps="false"
         android:textSize="16sp"
         android:visibility="visible"

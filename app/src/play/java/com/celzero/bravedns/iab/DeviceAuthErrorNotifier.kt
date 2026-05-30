@@ -98,7 +98,7 @@ object DeviceAuthErrorNotifier {
                 notificationManager.createNotificationChannel(channel)
             }
 
-            val title = context.getString(R.string.device_auth_error_notif_title)
+            val title = context.getString(R.string.device_auth_error_title)
             val body  = context.getString(R.string.device_auth_error_notif_body)
 
             val builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_RPN_ALERTS)

@@ -1886,7 +1886,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
         if (!showDateRow) {
             // Active SUBS: replace date with a clean "managed by Play" hint
-            b.tvExpiryLabel.text = getString(R.string.subscription_label)
+            b.tvExpiryLabel.text = getString(R.string.lbl_plan)
             b.tvExpiryDate.text  = getString(R.string.server_selection_sub_managed_by_play)
             b.tvDaysRemaining.isVisible = false
         } else if (!hasExpiry) {
@@ -1974,8 +1974,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         Logger.i(LOG_TAG_UI, "$TAG.maybeShowResubscribePrompt: showing resubscribe prompt for status: ${statusState.name} productId=${purchaseDetail.productId}, planId=${purchaseDetail.planId}")
 
         try {
-            ManageRpnPurchaseBtmSht.newInstance()
-                .show(childFragmentManager, "resubscribe")
+            ManageRpnPurchaseBtmSht.newInstance().show(childFragmentManager, "resubscribe")
         } catch (e: Exception) {
             Logger.e(LOG_TAG_UI, "$TAG.maybeShowResubscribePrompt: error showing sheet: ${e.message}", e)
             resubscribePromptShown = false  // allow retry on next emission

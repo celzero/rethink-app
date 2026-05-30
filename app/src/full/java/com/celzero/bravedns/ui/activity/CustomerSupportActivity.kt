@@ -25,7 +25,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import com.celzero.bravedns.ui.BaseActivity
 import androidx.core.content.FileProvider
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
@@ -38,10 +37,10 @@ import com.celzero.bravedns.database.SubscriptionStatusDao
 import com.celzero.bravedns.databinding.ActivityCustomerSupportBinding
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
-import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2
 import com.celzero.bravedns.scheduler.BugReportZipper
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
@@ -53,7 +52,6 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.text.ifEmpty
 
 /**
  * CustomerSupportActivity: lets users submit a support request via email.
@@ -123,7 +121,7 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         if (sub == null || sub.purchaseToken.isEmpty()) return
 
         // Purchase token (show first 12 chars)
-        var token = sub.purchaseToken ?: ""
+        var token = sub.purchaseToken
         token = token.length.let { if (it > 12) token.take(12) else token.ifBlank { "" } }
         val accountId = sub.accountId.take(12).ifBlank { return }
         val deviceId = deviceId.take(4).ifBlank { return }
@@ -171,7 +169,7 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
             b.chipActivation.isChecked -> getString(R.string.support_category_activation)
             b.chipConnectivity.isChecked -> getString(R.string.support_category_connectivity)
             b.chipRefund.isChecked -> getString(R.string.support_category_refund)
-            b.chipOther.isChecked -> getString(R.string.support_category_other)
+            b.chipOther.isChecked -> getString(R.string.category_name_others)
             else -> null
         }
     }
@@ -524,6 +522,3 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         return SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(ms))
     }
 }
-
-
-

@@ -528,9 +528,9 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
                 .sortedBy { it.id }
                 .joinToString(", ") { mode ->
                     when (mode) {
-                        RpnProxyManager.DnsMode.PRIVACY  -> getString(R.string.server_settings_dns_privacy)
+                        RpnProxyManager.DnsMode.PRIVACY  -> getString(R.string.rbl_privacy)
                         RpnProxyManager.DnsMode.PARENTAL -> getString(R.string.server_settings_dns_family)
-                        RpnProxyManager.DnsMode.SECURITY -> getString(R.string.server_settings_dns_security)
+                        RpnProxyManager.DnsMode.SECURITY -> getString(R.string.rbl_security)
                         else -> ""
                     }
                 }
@@ -766,7 +766,7 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.rpn_restore_confirm_title))
             .setMessage(getString(R.string.rpn_restore_confirm_message))
-            .setPositiveButton(getString(R.string.rpn_restore_confirm_action)) { dialog, _ ->
+            .setPositiveButton(getString(R.string.brbs_restore_dialog_positive)) { dialog, _ ->
                 dialog.dismiss()
                 dismiss() // dismiss the bottom sheet first
                 listener?.onReset() // then trigger reset in the parent fragment

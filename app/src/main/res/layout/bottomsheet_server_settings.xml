@@ -252,7 +252,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="sans-serif-medium"
-                                    android:text="@string/server_settings_dns_privacy"
+                                    android:text="@string/rbl_privacy"
                                     android:textColor="?attr/primaryTextColor"
                                     android:textSize="14sp"
                                     android:textStyle="bold" />
@@ -350,7 +350,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="sans-serif-medium"
-                                    android:text="@string/server_settings_dns_security"
+                                    android:text="@string/rbl_security"
                                     android:textColor="?attr/primaryTextColor"
                                     android:textSize="14sp"
                                     android:textStyle="bold" />

@@ -107,7 +107,7 @@ class PurchaseProcessingBottomSheet : BottomSheetDialogFragment() {
         binding.messageText.text = message ?: getString(R.string.subscription_activated)
 
         binding.actionButton.isVisible = true
-        binding.actionButton.text = getString(R.string.continue_text)
+        binding.actionButton.text = getString(R.string.rt_dialog_neutral)
         binding.actionButton.setOnClickListener {
             dismiss()
         }
