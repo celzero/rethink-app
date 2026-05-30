@@ -25,6 +25,7 @@ import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import com.celzero.bravedns.ui.BaseActivity
 import androidx.appcompat.widget.AppCompatImageView
@@ -447,7 +448,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
             return
         }
         b.configNameText.visibility = View.VISIBLE
-        b.configNameText.text = config.getName()
+        b.configNameText.setText(config.getName(), TextView.BufferType.NORMAL)
         b.configIdText.text =
             getString(R.string.single_argument_parenthesis, config.getId().toString())
 
