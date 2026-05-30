@@ -188,14 +188,18 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/custom_dialog_dismiss_button"
-                    style="@style/TextAppearance.AppCompat.Subhead"
+                    style="@style/TextAppearance.Material3.BodyLarge"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
                     android:text="@string/lbl_dismiss"
+                    android:padding="10dp"
+                    android:gravity="center"
+                    android:foregroundGravity="center"
+                    android:layout_gravity="center"
+                    android:textColor="?attr/primaryTextColor"
+                    android:alpha="0.7"
                     android:layout_marginEnd="5dp"
-                    android:textColor="?attr/accentGood"
-                    android:textSize="@dimen/large_font_text_view"
                     android:background="@drawable/rectangle_border_background"
                     android:foreground="?android:attr/selectableItemBackground"
                     app:layout_constraintLeft_toLeftOf="parent"
@@ -210,12 +214,16 @@
 
                     <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/custom_dialog_ok_button"
-                        style="@style/TextAppearance.AppCompat.Subhead"
+                        style="@style/TextAppearance.Material3.BodyLarge"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/lbl_save"
-                        android:textColor="?attr/accentGood"
-                        android:textSize="@dimen/large_font_text_view"
+                        android:padding="10dp"
+                        android:gravity="center"
+                        android:foregroundGravity="center"
+                        android:layout_gravity="center"
+                        android:textColor="?attr/colorPrimary"
+                        android:layout_marginEnd="5dp"
                         android:background="@drawable/rectangle_border_background"
                         android:foreground="?android:attr/selectableItemBackground" />
 
