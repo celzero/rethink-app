@@ -35,6 +35,10 @@ class ConsoleLogRepository(private val consoleLogDAO: ConsoleLogDAO) {
         return consoleLogDAO.getLogCount()
     }
 
+    suspend fun getLogsChunked(lastId: Int, limit: Int, offset: Int): List<ConsoleLog> {
+        return consoleLogDAO.getLogsChunked(lastId, limit, offset)
+    }
+
     suspend fun deleteAllLogs() {
         consoleLogDAO.deleteAllLogs()
     }
