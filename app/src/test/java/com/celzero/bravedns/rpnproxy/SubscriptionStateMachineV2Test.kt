@@ -917,7 +917,11 @@ class SubscriptionStateMachineV2Test : KoinTest {
         val subRow = makeActiveSub(purchaseToken = "tok-subs", productId = STD_PRODUCT).also {
             it.billingExpiry = System.currentTimeMillis() - 1_000L
         }
+        // Reset mock counters from transitionToActive (which called upsert) so the
+        // verification below only measures calls made by expireStaleInAppFromDb itself.
+        clearMocks(mockRepository, answers = false)
         coEvery { mockRepository.getSubscriptionsByStates(any()) } returns listOf(subRow)
+        coEvery { mockRepository.upsert(any()) }                  returns 1L
 
         machine.expireStaleInAppFromDb(playTokens = emptySet())
 
@@ -1019,18 +1023,24 @@ class SubscriptionStateMachineV2Test : KoinTest {
         val sub     = makeActiveSub()
         transitionToActiveWithData(machine, sub)
 
-        // Row already marked EXPIRED
-        sub.status = SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id
         coEvery { mockRepository.upsert(any()) }            returns 1L
         coEvery { mockRepository.getCurrentSubscription() } returns sub
+
+        // First expiration: writes EXPIRED to DB, machine transitions to Expired
+        machine.subscriptionExpired()
+        delay(100)
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
+
+        // Reset verification counters; the idempotent Expired→Expired transition
+        // uses a no-op action (line 472-474), not handleSubscriptionExpiredWithData
         clearMocks(mockRepository, answers = false)
         coEvery { mockRepository.upsert(any()) }            returns 1L
         coEvery { mockRepository.getCurrentSubscription() } returns sub
 
+        // Second expiration: already Expired → idempotent, no DB write
         machine.subscriptionExpired()
         delay(100)
 
-        // Already EXPIRED → no duplicate upsert
         coVerify(exactly = 0) { mockRepository.upsert(any()) }
     }
 

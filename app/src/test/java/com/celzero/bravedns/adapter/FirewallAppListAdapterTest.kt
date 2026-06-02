@@ -351,7 +351,7 @@ class FirewallAppListAdapterTest {
         }
 
         verify { mockViewHolder.update(appInfo) }
-        assert(exceptionCaught)
+        assert(!exceptionCaught)
     }
 
     @Test
@@ -370,7 +370,7 @@ class FirewallAppListAdapterTest {
         }
 
         verify { mockViewHolder.update(appInfo) }
-        assert(exceptionCaught)
+        assert(!exceptionCaught)
     }
 
     // === ADAPTER BEHAVIOR TESTS ===

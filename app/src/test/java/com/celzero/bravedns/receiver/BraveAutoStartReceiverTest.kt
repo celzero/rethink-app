@@ -23,11 +23,16 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /**
  * Unit tests for BraveAutoStartReceiver
  * Tests the auto-start logic for VPN on boot and Private Space unlock
  */
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [28])
 class BraveAutoStartReceiverTest {
 
     private lateinit var receiver: BraveAutoStartReceiver
