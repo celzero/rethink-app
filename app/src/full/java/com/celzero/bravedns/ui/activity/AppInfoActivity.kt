@@ -511,10 +511,17 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     private fun updateExcludeProxyStatus(isExcluded: Boolean) {
         io {
             FirewallManager.updateIsProxyExcluded(uid, isExcluded)
-            logEvent(
-                "proxy exclude change",
-                "Proxy exclude status changed for ${appInfo.appName} (${appInfo.uid}), new status: $isExcluded"
-            )
+            if (::appInfo.isInitialized) {
+                logEvent(
+                    "proxy exclude change",
+                    "Proxy exclude status changed for ${appInfo.appName} (${appInfo.uid}), new status: $isExcluded"
+                )
+            } else {
+                logEvent(
+                    "proxy exclude change",
+                    "Proxy exclude status changed for uid: $uid, new status: $isExcluded"
+                )
+            }
         }
     }
 
@@ -532,10 +539,17 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                     updateTempAllowDescription(false, 0)
                 }
             }
-            logEvent(
-                "temp allow change",
-                "Temporary allow status changed for ${appInfo.appName} (${appInfo.uid}), new status: $isAllowed"
-            )
+            if (::appInfo.isInitialized) {
+                logEvent(
+                    "temp allow change",
+                    "Temporary allow status changed for ${appInfo.appName} (${appInfo.uid}), new status: $isAllowed"
+                )
+            } else {
+                logEvent(
+                    "temp allow change",
+                    "Temporary allow status changed for uid: $uid, new status: $isAllowed"
+                )
+            }
         }
     }
 
