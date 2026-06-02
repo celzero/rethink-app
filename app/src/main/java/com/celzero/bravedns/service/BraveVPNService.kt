@@ -144,9 +144,9 @@ import com.celzero.firestack.backend.ServerSummary
 import com.celzero.firestack.backend.Tab
 import com.celzero.firestack.intra.Bridge
 import com.celzero.firestack.intra.Controller
+import com.celzero.firestack.intra.FlowSummary
 import com.celzero.firestack.intra.Mark
 import com.celzero.firestack.intra.PreMark
-import com.celzero.firestack.intra.SocketSummary
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.RemovalCause
@@ -1841,25 +1841,21 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     private fun observeVpnRestartRequests() {
         vpnScope.launch {
             Logger.i(LOG_TAG_VPN, "start restart manager flow")
-            // if the string is same, it will not restart the vpn, so adding ts whereever same
-            // value requires a restart
-            var reasonForEvent = ""
             vpnRestartTrigger
                 .debounce(3000)
                 .collect { reason ->
                     Logger.v(LOG_TAG_VPN, "RESTART; new restart request: $reason")
                     restartVpnWithNewAppConfig(reason)
-                    reasonForEvent = reason
+                    io("eventLogger") {
+                        eventLogger.logHigh(
+                            EventType.VPN_RESTART,
+                            "Vpn Restart",
+                            EventSource.VPN,
+                            userAction = false,
+                            details = "reason: $reason"
+                        )
+                    }
                 }
-            io("eventLogger") {
-                eventLogger.logHigh(
-                    EventType.VPN_RESTART,
-                    "stopped vpn restart manager flow",
-                    EventSource.VPN,
-                    userAction = false,
-                    details = "reason: $reasonForEvent"
-                )
-            }
         }
     }
 
@@ -3077,7 +3073,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 reason += "r: $isRoutesChanged, "
                 reason += "nws: ${curnet?.ipv4Net?.size}/${curnet?.ipv6Net?.size} > new: ${networks.ipv4Net.size}/${networks.ipv6Net.size} ($isBoundNetworksChanged), "
                 reason += "force: $forceRestart, lock: ${curnet?.vpnLockdown}/${networks.vpnLockdown}, "
-                reason += "nwConnect, $reason"
+                reason += "nwConnect;"
                 vpnRestartTrigger.value = reason
                 // not needed as the refresh is done in go, TODO: remove below code later
                 // only after set links and routes, wg can be refreshed
@@ -3199,7 +3195,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
         val routesChanged = !ok4 || !ok6
 
-        logd("tun: has4: $builderHas4, wants4: $tunWants4, vpnHas4: $vpnHas4, has6: $builderHas6, wants6: $tunWants6, vpnHas6: $vpnHas6, routesChanged? $routesChanged, ")
+        logd("tun: has4: $builderHas4, wants4: $tunWants4, vpnHas4: $vpnHas4, has6: $builderHas6, wants6: $tunWants6, vpnHas6: $vpnHas6, routesChanged? $routesChanged")
 
         if (new.useActive) {
             cm.activeNetwork?.let { activ ->
@@ -3676,7 +3672,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 logd("r6: underlay: ${underlay?.useActive}, ${underlay?.ipv6Net?.size}")
                 if (underlay?.useActive != true) {
                     val underlayIpv6 = (underlay?.ipv6Net?.size ?: 0) > 0
-                    return if (!underlayIpv6) {
+                    if (!underlayIpv6) {
                         Logger.i(LOG_TAG_VPN, "r6: No IPv6 networks available")
                         false
                     } else {
@@ -3700,7 +3696,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                         }
                     }
                     Logger.i(LOG_TAG_VPN, "r6: active network not available")
-                    return false
+                    false
                 }
             }
         }
@@ -4647,21 +4643,23 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             return@go2kt
         }
 
-        if (pid.contains(Backend.RpnWin, true) && RpnProxyManager.isRpnActive()) {
-            logd("onProxyAdded: rpn proxy added $pid, handle post addition logics")
-            vpnAdapter?.handleOnRpnAdded(pid)
-        }
-
-        if (pid.contains(ID_WG_BASE, true)) {
-            logd("onProxyAdded: wg proxy added $pid, handle post addition logics")
-            vpnAdapter?.handleOnWgAdded(pid)
-        }
-
         // new proxy added, refresh overlay network pair
         io("onProxyAdded") {
             val nw: OverlayNetworks? = vpnAdapter?.getActiveProxiesIpAndMtu()
             logd("onProxyAdded for proxy $pid: $nw")
             onOverlayNetworkChanged(nw ?: OverlayNetworks())
+        }
+
+        io("handleProxyAdded") {
+            if (pid.contains(Backend.RpnWin, true) && RpnProxyManager.isRpnActive()) {
+                logd("onProxyAdded: rpn proxy added $pid, handle post addition logics")
+                vpnAdapter?.handleOnRpnAdded(pid)
+            }
+
+            if (pid.contains(ID_WG_BASE, true)) {
+                logd("onProxyAdded: wg proxy added $pid, handle post addition logics")
+                vpnAdapter?.handleOnWgAdded(pid)
+            }
         }
     }
 
@@ -4806,9 +4804,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 }
                 tidcsv = tid.first.split(",").joinToString(",") { appendDnsCacheIfNeeded(it) }
                 tidseccsv = if (tid.second.isEmpty()) "" else tid.second.split(",").joinToString(",") { appendDnsCacheIfNeeded(it) }
-                Logger.vv(LOG_TAG_VPN, "onUpstreamAnswer: bypass rule: $rule, original tid: $id, bypass tid: [$tidcsv, $tidseccsv] connInfo: $connInfo, ipcsv: $ipcsv")
-                pidcsv = rcvdDnsOpts.pidcsv
+                // see flow() function for double loopback
+                val doubleLoopback = false
+                val mark = determineProxyDetails(connInfo, doubleLoopback, persistentState.routeRethinkInRethink, forUpstreamAnswer = true)
+                pidcsv = mark.pidcsv
                 noblock = true
+                Logger.vv(LOG_TAG_VPN, "onUpstreamAnswer: bypass rule: $rule, original tid: $id, bypass tid: [$tidcsv, $tidseccsv], pid: $pidcsv connInfo: $connInfo, ipcsv: $ipcsv")
             }
             return@go2kt result
         }
@@ -4831,7 +4832,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     // no need of go2kt here as it is called from go and just performs db operations
     // requires go2kt if there any calls to go functions
-    override fun onSocketClosed(s: SocketSummary?) {
+    override fun postflow(s: FlowSummary?) {
         if (s == null) {
             Logger.i(LOG_TAG_VPN, "received null summary for socket")
             return
@@ -5004,7 +5005,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val dstIpPort = parseIpAndPort(dst)
         Logger.d(LOG_TAG_VPN, "preflow - init: $uid, rcvd: $src & $dst, parsed: $srcIpPort & $dstIpPort")
         val newUid = if (uid == INVALID_UID) { // fetch uid only if it is invalid
-            val ts = elapsedRealtime()
             val resolvedUid = getUid(
                 uid,
                 protocol,
@@ -5074,7 +5074,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         uid = FirewallManager.appId(uid, isPrimaryUser())
         val userId = FirewallManager.userId(uid)
 
-        // generates a random 8-byte value, converts it to hexadecimal, and then
+        // generates a random 6-byte value, converts it to hexadecimal, and then
         // provides the hexadecimal value as a string for connId
         val connId = Utilities.getRandomString(8)
 
@@ -5270,7 +5270,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     // no need of go2kt here as it is called from go and performs db operations with no return value
     // requires go2kt if there any calls to go functions
-    override fun postFlow(m: Mark?) {
+    override fun flowing(m: Mark?) {
         val mark = m
         if (mark == null) {
             Logger.e(LOG_TAG_VPN, "postFlow: received null mark")
@@ -5394,7 +5394,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     private suspend fun determineProxyDetails(
         connTracker: ConnTrackerMetaData,
         doubleLoopback: Boolean,
-        rinr: Boolean
+        rinr: Boolean,
+        forUpstreamAnswer: Boolean = false
     ): Mark {
         var baseOrExit =
             if (doubleLoopback) {
@@ -5418,7 +5419,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val connId = connTracker.connId
         val uid = connTracker.uid
         // add baseOrExit in the end of the list if needed (not true for lockdown)
-        val ssid = underlyingNetworks?.activeSsid ?: underlyingNetworks?.ipv4Net?.firstOrNull { it.ssid != null }?.ssid ?: underlyingNetworks?.ipv6Net?.firstOrNull() { it.ssid != null }?.ssid ?: ""
+        val ssid = underlyingNetworks?.activeSsid ?: underlyingNetworks?.ipv4Net?.firstOrNull { it.ssid != null }?.ssid ?: underlyingNetworks?.ipv6Net?.firstOrNull { it.ssid != null }?.ssid ?: ""
         val usesMobileNw = isIfaceCellular(connTracker.destIP)
 
         val rpnIds = if (RpnProxyManager.isRpnActive()) {
@@ -5438,16 +5439,16 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         if (connTracker.uid == rethinkUid && !rinr) {
             val pid = if (persistentState.autoProxyEnabled) Backend.Auto else Backend.Exit
             logd("flow/inflow: $pid for rethink, $uid, $connId")
-            return persistAndConstructFlowResponse(connTracker, pid, connId, uid)
+            return persistAndConstructFlowResponse(connTracker, pid, connId, uid, forUpstreamAnswer)
         }
 
-        val isGlobalLockdown = persistentState.wgGlobalLockdown && (appConfig.isProxyEnabled() || RpnProxyManager.isRpnActive())
+        val isGlobalLockdown = persistentState.wgGlobalLockdown
         if (FirewallManager.isAppExcludedFromProxy(uid) && !isGlobalLockdown) {
             logd("flow/inflow: app is excluded from proxy, returning Ipn.Base, $connId, $uid")
             if (connTracker.blockedByRule == FirewallRuleset.RULE0.id) {
                 connTracker.blockedByRule = FirewallRuleset.RULE15.id
             }
-            return persistAndConstructFlowResponse(connTracker, baseOrExit, connId, uid)
+            return persistAndConstructFlowResponse(connTracker, baseOrExit, connId, uid, forUpstreamAnswer)
         }
 
         val defProxy = if (rpnIds.isEmpty()) baseOrExit else ""
@@ -5465,7 +5466,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val ids = (rpnIds + wgs).joinToString(",")
 
             logd("flow/inflow: returning $ids for connId: $connId, uid: $uid")
-            return persistAndConstructFlowResponse(connTracker, ids, connId, uid)
+            return persistAndConstructFlowResponse(connTracker, ids, connId, uid, forUpstreamAnswer)
         } else {
             Logger.vv(LOG_TAG_VPN, "flow/inflow: no wg proxy, fall-through")
         }
@@ -5474,7 +5475,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // if no proxy or dns proxy is enabled, return baseOrExit
         if (!appConfig.isProxyEnabled() && !appConfig.isDnsProxyActive() && rpnIds.isEmpty()) {
             logd("flow/inflow: no proxy/dnsproxy enabled, returning Ipn.Base, $connId, $uid")
-            return persistAndConstructFlowResponse(connTracker, baseOrExit, connId, uid)
+            return persistAndConstructFlowResponse(connTracker, baseOrExit, connId, uid, forUpstreamAnswer)
         }
 
         if (appConfig.isOrbotProxyEnabled()) {
@@ -5483,7 +5484,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             if (endpoint?.proxyAppName == packageName) {
                 val pid = if (persistentState.autoProxyEnabled) Backend.Auto else Backend.Exit
                 logd("flow/inflow: orbot $pid for $packageName, $connId, $uid")
-                return persistAndConstructFlowResponse(connTracker, pid, connId, uid)
+                return persistAndConstructFlowResponse(connTracker, pid, connId, uid, forUpstreamAnswer)
             }
 
             val activeId = ProxyManager.getProxyIdForApp(uid)
@@ -5501,7 +5502,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     connTracker,
                     pid,
                     connId,
-                    uid
+                    uid,
+                    forUpstreamAnswer
                 )
             }
         }
@@ -5521,7 +5523,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             if (endpoint?.proxyAppName == packageName) {
                 val pid = if (persistentState.autoProxyEnabled) Backend.Auto else Backend.Exit
                 logd("flow/inflow: socks5 $pid for $packageName, $connId, $uid")
-                return persistAndConstructFlowResponse(connTracker, pid, connId, uid)
+                return persistAndConstructFlowResponse(connTracker, pid, connId, uid, forUpstreamAnswer)
             }
 
             logd("flow/inflow: socks5 proxy for $connId, $uid")
@@ -5534,7 +5536,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 connTracker,
                 pid,
                 connId,
-                uid
+                uid,
+                forUpstreamAnswer
             )
         }
 
@@ -5548,14 +5551,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             if (endpoint?.proxyAppName == packageName) {
                 val pid = if (persistentState.autoProxyEnabled) Backend.Auto else Backend.Exit
                 logd("flow/inflow: http $pid for $packageName, $connId, $uid")
-                return persistAndConstructFlowResponse(connTracker, pid, connId, uid)
+                return persistAndConstructFlowResponse(connTracker, pid, connId, uid, forUpstreamAnswer)
             }
             logd("flow/inflow: http proxy for $connId, $uid")
             return persistAndConstructFlowResponse(
                 connTracker,
                 ProxyManager.ID_HTTP_BASE,
                 connId,
-                uid
+                uid,
+                forUpstreamAnswer
             )
         }
 
@@ -5566,23 +5570,23 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             if (endpoint?.proxyAppName == packageName) {
                 val pid = if (persistentState.autoProxyEnabled) Backend.Auto else Backend.Exit
                 logd("flow/inflow: dns proxy enabled for $packageName, return $pid, $connId, $uid")
-                return persistAndConstructFlowResponse(connTracker, pid, connId, uid)
+                return persistAndConstructFlowResponse(connTracker, pid, connId, uid, forUpstreamAnswer)
             }
         }
 
         if (rpnIds.isNotEmpty()) {
             val id = (rpnIds + listOf(baseOrExit)).joinToString(",")
             logd("flow/inflow: returning $id for connId: $connId, uid: $uid")
-            return persistAndConstructFlowResponse(connTracker, id, connId, uid)
+            return persistAndConstructFlowResponse(connTracker, id, connId, uid, forUpstreamAnswer)
         }
         logd("flow/inflow: no proxies, $baseOrExit, $connId, $uid")
         if (isGlobalLockdown) {
             Logger.vv(LOG_TAG_VPN, "flow/inflow: global lockdown is active, block the traffic for $connId, $uid")
             connTracker.isBlocked = true
             connTracker.blockedByRule = FirewallRuleset.RULE17.id
-            return persistAndConstructFlowResponse(connTracker, Backend.Block, connId, uid)
+            return persistAndConstructFlowResponse(connTracker, Backend.Block, connId, uid, forUpstreamAnswer)
         }
-        return persistAndConstructFlowResponse(connTracker, baseOrExit, connId, uid)
+        return persistAndConstructFlowResponse(connTracker, baseOrExit, connId, uid, forUpstreamAnswer)
     }
 
     fun hasCid(connId: String, uid: Int): Boolean {
@@ -5664,8 +5668,18 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         cm: ConnTrackerMetaData?,
         proxyIds: String,
         connId: String,
-        uid: Int
+        uid: Int,
+        forUpstreamAnswer: Boolean = false
     ): Mark {
+
+        if (forUpstreamAnswer) {
+            val mark = Mark()
+            mark.pidcsv = proxyIds
+            mark.cid = connId
+            mark.uid = uid.toString()
+            logd("inflow: returning mark for upstream answer: $mark for connId: $connId, uid: $uid, cm: $cm")
+            return mark
+        }
 
         // see if this needs to be called every time when flow/inflow is called
         if (RpnProxyManager.isRpnActive()) {
