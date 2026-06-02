@@ -175,7 +175,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                     b.dnsUnicodeHint.text = context.getString(
                         R.string.ci_desc,
                         b.dnsUnicodeHint.text,
-                        "🌀"
+                        "🪃"
                     )
                 }
             }
