@@ -106,7 +106,7 @@ object Utilities {
             val name: InternetDomainName = InternetDomainName.from(fqdn)
             try {
                 name.topPrivateDomain().toString()
-            } catch (e: IllegalStateException) {
+            } catch (_: IllegalStateException) {
                 // The name doesn't end in a recognized TLD.  This can happen for randomly
                 // generated
                 // names, or when new TLDs are introduced.
