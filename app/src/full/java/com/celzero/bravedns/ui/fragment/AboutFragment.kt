@@ -29,6 +29,8 @@ import android.os.Bundle
 import android.os.SystemClock
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+import android.system.Os
+import android.system.OsConstants
 import android.text.method.LinkMovementMethod
 import android.view.GestureDetector
 import android.view.Gravity
@@ -97,6 +99,8 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 import java.io.File
+import java.lang.reflect.Modifier
+import java.util.Properties
 import java.util.concurrent.TimeUnit
 
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, KoinComponent {
@@ -697,6 +701,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                     }.create()
                     .show()
             }
+            printSysEnvAndProps()
         }
     }
 
@@ -1014,6 +1019,62 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
         }
         return tables
+    }
+
+    private fun printSysEnvAndProps() {
+        if (!DEBUG) return
+
+        val environmentMap: Map<String, String> = System.getenv()
+
+        for ((key, value) in environmentMap) {
+            Logger.d("EnvVariables", "$key = $value")
+        }
+
+        val prop: Properties = System.getProperties()
+        for (key in prop.stringPropertyNames()) {
+            val value = prop.getProperty(key)
+            Logger.d("EnvVariables", "$key = $value")
+        }
+
+        printAllSysconfValues()
+    }
+
+    fun printAllSysconfValues() {
+        Logger.d("EnvVariables", "--- STARTING OS SYSCONF DUMP ---")
+
+        // Get all public static fields from OsConstants
+        val fields = OsConstants::class.java.declaredFields
+
+        var successCount = 0
+        var errorCount = 0
+
+        for (field in fields) {
+            // Filter for fields that start with "_SC_" (System Configuration constants)
+            if (field.name.startsWith("_SC_") && Modifier.isStatic(field.modifiers)) {
+                try {
+                    // Ensure the field is accessible and extract its integer value
+                    field.isAccessible = true
+                    val scConstantId = field.get(null) as Int
+
+                    // Query the system configuration using Os.sysconf
+                    val value = Os.sysconf(scConstantId)
+
+                    Logger.i("EnvVariables", "${field.name}: $value")
+                    successCount++
+                } catch (e: Exception) {
+                    // Some constants might not be supported on older kernel versions
+                    Logger.w("EnvVariables", "Failed to read ${field.name}: ${e.localizedMessage}")
+                    errorCount++
+                }
+            } else {
+                Logger.d("EnvVariables", "Skipping non-sysconf field: ${field.name}")
+            }
+        }
+
+        Logger.d(
+            "EnvVariables",
+            "--- DUMP COMPLETE (Success: $successCount, Failed/Unsupported: $errorCount) ---"
+        )
     }
 
     private fun buildTableDump(table: String): String {
