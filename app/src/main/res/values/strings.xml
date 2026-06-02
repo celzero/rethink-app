@@ -2191,7 +2191,6 @@
     <string name="manage_sub_revoking" translatable="false">Revoking…</string>
 
     <!-- Privacy Exposure Warning Card -->
-    <string name="privacy_exposed_title" translatable="false">Your online presence is exposed</string>
     <string name="billing_error_recoverable" translatable="false">A temporary error occurred. Please try again.</string>
     <string name="billing_error_generic" translatable="false">Something went wrong with your purchase. Please try again.</string>
 

@@ -463,9 +463,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
 
         if (state.asorg.isNotEmpty()) {
             b.ispContainer.isVisible = true
-            b.connectionIsp.text =
-                if (state.asorg.length > 20) getString(R.string.truncated_text, state.asorg.take(17))
-                else state.asorg
+            b.connectionIsp.text = state.asorg
         } else {
             b.ispContainer.isVisible = false
         }
