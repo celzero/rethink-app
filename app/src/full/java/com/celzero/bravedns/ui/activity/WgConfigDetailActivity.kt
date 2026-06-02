@@ -766,6 +766,9 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
     private fun openAppsDialog(proxyName: String) {
         val proxyId = ID_WG_BASE + configId
         val appsAdapter = WgIncludeAppsAdapter(this, proxyId, proxyName)
+        // Remove any observers registered by previous openAppsDialog() calls so that stale
+        // adapters from dismissed dialogs do not continue to receive paging data.
+        mappingViewModel.apps.removeObservers(this)
         mappingViewModel.apps.observe(this) { appsAdapter.submitData(lifecycle, it) }
         var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         if (Themes.isFrostTheme(themeId)) {

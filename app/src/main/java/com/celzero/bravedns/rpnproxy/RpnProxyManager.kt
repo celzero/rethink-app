@@ -2449,6 +2449,15 @@ object RpnProxyManager : KoinComponent {
              // Ensure AUTO server exists before syncing
              ensureAutoServerExists()
 
+             // get the current server list before sync so we can find removed servers
+             // and clean up their ProxyApplicationMapping entries.
+             val serversBefore = try {
+                 countryConfigRepo.getAllConfigs()
+             } catch (e: Exception) {
+                 Logger.w(LOG_TAG_PROXY, "$TAG; syncWinServers: could not read pre-sync servers: ${e.message}")
+                 emptyList()
+             }
+
              // Sync to database (this handles insertions, updates, and deletions)
              val syncServerList = if (servers.isEmpty()) {
                  Logger.w(LOG_TAG_PROXY, "$TAG; syncWinServers: empty server list, clearing DB except AUTO")
@@ -2459,6 +2468,18 @@ object RpnProxyManager : KoinComponent {
 
              // Sync to database (AUTO server is protected in the repository method)
              countryConfigRepo.syncServers(syncServerList)
+
+             // clean up proxy-app mappings for every server that was removed from the DB.
+             val newServerKeys = servers.map { it.key }.toSet()
+             val removedServers = serversBefore.filter {
+                 it.id != AUTO_SERVER_ID && !newServerKeys.contains(it.key)
+             }
+             if (removedServers.isNotEmpty()) {
+                 removedServers.forEach { removed ->
+                     ProxyManager.removeProxyId(Backend.RpnWin + removed.key)
+                     Logger.i(LOG_TAG_PROXY, "$TAG; syncWinServers: removed proxy mapping for stale server key=${removed.key}")
+                 }
+             }
 
              // Read back from DB to ensure consistency
              val existingServers = try {
@@ -2476,7 +2497,7 @@ object RpnProxyManager : KoinComponent {
                  }
              }
 
-             Logger.i(LOG_TAG_PROXY, "$TAG; syncWinServers: synced ${servers.size} servers to DB, ${existingServers.size} in cache")
+             Logger.i(LOG_TAG_PROXY, "$TAG; syncWinServers: synced ${servers.size} servers to DB, ${existingServers.size} in cache, ${removedServers.size} proxy mappings cleaned")
          } catch (e: Exception) {
              Logger.e(LOG_TAG_PROXY, "$TAG; syncWinServers: error - ${e.message}", e)
          }

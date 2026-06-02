@@ -73,12 +73,11 @@ class WgIncludeAppsAdapter(
                             oldConnection.uid == newConnection.uid)
                 }
 
-                // return false, when there is difference in excluded status
                 override fun areContentsTheSame(
                     oldConnection: ProxyApplicationMapping,
                     newConnection: ProxyApplicationMapping
                 ): Boolean {
-                    return oldConnection == newConnection
+                    return false
                 }
             }
     }
@@ -92,7 +91,7 @@ class WgIncludeAppsAdapter(
     override fun onBindViewHolder(holder: IncludedAppInfoViewHolder, position: Int) {
         val apps: ProxyApplicationMapping = getItem(position) ?: return
         // Double-check position validity to prevent IndexOutOfBoundsException
-        if (position < 0 || position >= itemCount) {
+        if (position !in 0..<itemCount) {
             Logger.w(LOG_TAG_PROXY, "Invalid position $position for itemCount $itemCount")
             return
         }
@@ -118,7 +117,7 @@ class WgIncludeAppsAdapter(
                 val isProxyExcluded = FirewallManager.isAppExcludedFromProxy(itemUid)
                 val hasInternetPerm = mapping.hasInternetPermission(packageManager)
                 val iconDrawable = getIcon(context, itemPackageName, itemAppName)
-                Logger.d(LOG_TAG_PROXY, "INCLUDE: $isIncludedInCurrent, $isProxyExcluded, $proxyName, $proxyId, $proxyIdsForApp, $isIncludedInCurrent")
+                Logger.d(LOG_TAG_PROXY, "INCLUDE(${mapping.appName}): $isIncludedInCurrent, $isProxyExcluded, $proxyName, $proxyId, $proxyIdsForApp, $isIncludedInCurrent")
                 uiCtx {
                     // Update UI synchronously on the main thread
                     // enable/disable UI based on exclusion
@@ -244,6 +243,7 @@ class WgIncludeAppsAdapter(
                     removeProxyFromApp(mapping.uid, mapping.packageName, proxyId)
                     Logger.i(LOG_TAG_PROXY, "Removed app: ${mapping.uid}, $proxyId, $proxyName")
                 }
+                refresh()
             }
         }
 
@@ -298,10 +298,10 @@ class WgIncludeAppsAdapter(
                                 }
                             }
                         }
+                        refresh()
                     }
                 }
-                .setNeutralButton(context.getString(R.string.ctbs_dialog_negative_btn)) { _: DialogInterface,
-                                                                                          _: Int ->
+                .setNeutralButton(context.getString(R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->
                 }
 
             val alertDialog: AlertDialog = builderSingle.show()

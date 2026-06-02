@@ -486,8 +486,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         selectedSinceTs: Long
     ) {
         val ps = UIUtils.ProxyStatus.entries.find { it.id == statusPair.first }
-        val statusText = buildStatusText(ps, stats, statusPair.second)
-        val statusColor = buildStatusColor(ps, stats)
+        val statusText = buildStatusText(ps, statusPair.second)
+        val statusColor = buildStatusColor(ps)
         b.valueStatus.text = statusText
         b.valueStatus.setTextColor(fetchColor(this, statusColor))
 
@@ -539,7 +539,6 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
     private fun buildStatusText(
         status  : UIUtils.ProxyStatus?,
-        stats   : RouterStats?,
         errMsg  : String?
     ): String {
         if (status == null) {
@@ -560,7 +559,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         return base
     }
 
-    private fun buildStatusColor(status: UIUtils.ProxyStatus?, stats: RouterStats?): Int {
+    private fun buildStatusColor(status: UIUtils.ProxyStatus?): Int {
         return when {
             status == null -> R.attr.primaryLightColorText
             isFailing(status) -> R.attr.chipTextNegative
@@ -639,9 +638,11 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         }
     }
 
-    private fun observeAppCount(proxyId: String) {
-        if (proxyId.isBlank()) return
-        mappingViewModel.getAppCountById(proxyId).observe(this) { count ->
+    private fun observeAppCount(configKey: String) {
+        if (configKey.isBlank()) return
+        // proxyId stored in ProxyApplicationMapping is always Backend.RpnWin + configKey.
+        val pid = Backend.RpnWin + configKey
+        mappingViewModel.getAppCountById(pid).observe(this) { count ->
             // Don't override the "All apps" state when catch-all is active
             if (b.catchAllCheck.isChecked) return@observe
             val c = count ?: 0
@@ -908,9 +909,16 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             Logger.e(LOG_TAG_UI, "openAppsDialog: configKey blank or proxy null")
             return
         }
-        val proxyId = configKey
-        val proxyName = configKey
+        val proxyId = Backend.RpnWin + configKey
+        val cc = countryConfig
+        val proxyName = when {
+            cc != null && cc.city.isNotBlank() -> "${cc.cc} - ${cc.city}"
+            cc != null && cc.name.isNotBlank() -> cc.name
+            else -> configKey
+        }
         val adapter = WgIncludeAppsAdapter(this, proxyId, proxyName)
+        // Remove any observers registered by previous openAppsDialog()
+        mappingViewModel.apps.removeObservers(this)
         mappingViewModel.apps.observe(this) { adapter.submitData(lifecycle, it) }
         var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         if (Themes.isFrostTheme(themeId)) themeId = R.style.App_Dialog_NoDim

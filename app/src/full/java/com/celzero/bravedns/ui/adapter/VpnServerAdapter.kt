@@ -440,7 +440,7 @@ class VpnServerAdapter(
                 val id = group.proxyId()
                 val statusPair = VpnController.getProxyStatusById(id)
                 val stats = VpnController.getProxyStats(id)
-                val apps = ProxyManager.getAppCountForProxy(id)
+                val apps = ProxyManager.getAppCountForProxy(Backend.RpnWin+group.key)
 
                 // Fetch IP metadata for this server (cached by since-timestamp; live fetches
                 // only happen when the tunnel connects for the first time or after a reconnect).
