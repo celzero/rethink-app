@@ -18,9 +18,8 @@ package com.celzero.bravedns.iab
 import Logger
 import Logger.LOG_TAG_UI
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
-import com.google.api.client.json.gson.GsonFactory
-import com.google.api.services.androidpublisher.model.ProductPurchaseV2
-import com.google.api.services.androidpublisher.model.SubscriptionPurchaseV2
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import java.time.Instant
 
 /**
@@ -31,40 +30,25 @@ import java.time.Instant
  * ### Parsing strategy
  *
  * The outer `/g/tx` envelope (`{ success, cid, tx: [...] }`) is navigated via the
- * Gson [com.google.gson.JsonObject] that Retrofit already produces.  The `meta`
- * field inside each `tx` row is a verbatim Google Play purchase object whose
- * concrete type is identified by its `kind` discriminator:
+ * Gson [JsonObject] that Retrofit already produces.  The `meta` field inside each
+ * `tx` row is also a Gson [JsonObject] and is parsed directly using safe field
+ * accessors rather than typed model classes.  This avoids failures caused by
+ * proto3 int64 string-encoding (e.g. `"units": "210"`) or nullable sub-objects
+ * that specific library versions may reject, making the parser robust to server-side
+ * schema evolution.
  *
- * | `kind` value | Java model class |
+ * The `kind` discriminator determines whether the row is a subscription or OTP:
+ *
+ * | `kind` value | Parsed as |
  * |---|---|
- * | `"androidpublisher#productPurchaseV2"` | [ProductPurchaseV2] |
- * | `"androidpublisher#subscriptionPurchaseV2"` | [SubscriptionPurchaseV2] |
- *
- * Both model classes extend [com.google.api.client.json.GenericJson] (itself an
- * `AbstractMap` subclass), so plain Gson cannot deserialize them correctly.
- * [GsonFactory] — the JSON factory bundled with `google-http-client-gson` — is
- * used instead; it knows how to populate `@Key`-annotated fields properly.
- *
- * Artifact:
- * ```
- * implementation("com.google.apis:google-api-services-androidpublisher:v3-rev20260318-2.0.0")
- * ```
- * Reference: https://developer.android.com/google/play/developer-api
+ * | `"androidpublisher#subscriptionPurchaseV2"` | [mapSubscriptionPurchase] |
+ * | anything else | [mapProductPurchase] |
  */
 class ServerOrderHistoryRepository(private val billingBackendClient: BillingBackendClient) {
 
     companion object {
         private const val TAG = "ServerOrderRepo"
         private const val MAX_ORDERS = 20
-
-        /**
-         * Shared [GsonFactory] used to deserialize [ProductPurchaseV2] and
-         * [SubscriptionPurchaseV2].  These model classes extend
-         * [com.google.api.client.json.GenericJson] (an `AbstractMap` subclass), so
-         * plain Gson would try to fill the map instead of the declared fields;
-         * [GsonFactory] handles the `@Key`-annotation mapping correctly.
-         */
-        private val jsonFactory: GsonFactory = GsonFactory.getDefaultInstance()
     }
 
     /** Sealed result type returned to the ViewModel. */
@@ -118,13 +102,68 @@ class ServerOrderHistoryRepository(private val billingBackendClient: BillingBack
     }
 
     /**
+     * Returns the string value of this element, or `null` if it is absent,
+     * JSON-null, or not a primitive.  Never throws.
+     */
+    private fun JsonElement?.safeString(): String? {
+        if (this == null || this.isJsonNull) return null
+        return try { this.asString } catch (_: Exception) { null }
+    }
+
+    /**
+     * Returns the boolean value of this element, or `null` on any failure.
+     * Never throws.
+     */
+    private fun JsonElement?.safeBool(): Boolean? {
+        if (this == null || this.isJsonNull) return null
+        return try { this.asBoolean } catch (_: Exception) { null }
+    }
+
+    /**
+     * Returns the child [JsonObject] for [key], or `null` if absent, JSON-null,
+     * or not an object.  Never throws.
+     */
+    private fun JsonObject?.obj(key: String): JsonObject? {
+        val elem = this?.get(key) ?: return null
+        return if (elem.isJsonObject) elem.asJsonObject else null
+    }
+
+    /**
+     * Returns the first element of the child JSON array for [key] as a
+     * [JsonObject], or `null` if absent, not an array, empty, or if the first
+     * element is not an object.  Never throws.
+     */
+    private fun JsonObject?.firstArrayObj(key: String): JsonObject? {
+        val elem = this?.get(key) ?: return null
+        if (!elem.isJsonArray) return null
+        val first = elem.asJsonArray.firstOrNull() ?: return null
+        return if (first.isJsonObject) first.asJsonObject else null
+    }
+
+    /**
      * Iterates the `tx` array in the `/g/tx` response body and maps each row
      * to a [ServerOrderEntry], deduplicating by purchase token.
+     *
+     * Rows that cannot be parsed are individually skipped and logged so that a
+     * single malformed entry does not suppress the rest.
      */
-    private fun mapTxBody(body: com.google.gson.JsonObject): List<ServerOrderEntry> {
+    private fun mapTxBody(body: JsonObject): List<ServerOrderEntry> {
+        // If the server explicitly signals failure, bail out early.
+        val successElem = body.get("success")
+        if (successElem != null && !successElem.isJsonNull && successElem.safeBool() == false) {
+            Logger.w(LOG_TAG_UI, "$TAG mapTxBody: server returned success=false")
+            return emptyList()
+        }
+
+        val txElem = body.get("tx")
+        if (txElem == null || txElem.isJsonNull || !txElem.isJsonArray) {
+            Logger.w(LOG_TAG_UI, "$TAG mapTxBody: 'tx' array absent or not an array")
+            return emptyList()
+        }
+
         val results = mutableListOf<ServerOrderEntry>()
-        body.getAsJsonArray("tx")?.forEach { elem ->
-            val row = elem?.asJsonObject ?: return@forEach
+        txElem.asJsonArray.forEach { elem ->
+            val row = elem?.takeIf { it.isJsonObject }?.asJsonObject ?: return@forEach
             try {
                 val entry = mapRow(row) ?: return@forEach
                 // Deduplicate by purchaseToken
@@ -132,7 +171,8 @@ class ServerOrderHistoryRepository(private val billingBackendClient: BillingBack
                     results.add(entry)
                 }
             } catch (e: Exception) {
-                Logger.w(LOG_TAG_UI, "$TAG mapRow: ${e.message}")
+                // Log full stacktrace so the root cause is visible in the log.
+                Logger.e(LOG_TAG_UI, "$TAG mapRow error: ${e.message}", e)
             }
         }
         return results
@@ -141,117 +181,62 @@ class ServerOrderHistoryRepository(private val billingBackendClient: BillingBack
     /**
      * Maps a single `tx` row to a [ServerOrderEntry].
      *
-     * The `meta` JSON object is converted to a string and then deserialized by
-     * [GsonFactory] into the appropriate official Google API model class based
-     * on the `kind` field.
+     * All fields are extracted directly from the [JsonObject] using safe
+     * accessors, so no model-class library or strict JSON parser is involved.
+     * This tolerates unexpected nulls, missing fields, and proto3 int64
+     * string-encoding without throwing.
+     *
+     * Returns `null` when mandatory fields (purchase token or metaobject) are
+     * absent, which causes the row to be skipped.
      */
-    private fun mapRow(row: com.google.gson.JsonObject): ServerOrderEntry? {
+    private fun mapRow(row: JsonObject): ServerOrderEntry? {
         // Server field is all-lowercase "purchasetoken"
-        val token = row.get("purchasetoken")?.asString?.takeIf { it.isNotBlank() }
+        val token = row.get("purchasetoken").safeString()?.takeIf { it.isNotBlank() }
             ?: return null
-        val cid = row.get("cid")?.asString ?: ""
+        val cid = row.get("cid").safeString() ?: ""
         // mtime is an ISO-8601 string, e.g. "2026-04-13T22:15:15.976Z"
-        val mtime = isoToMillis(row.get("mtime")?.asString)
-        val meta = row.getAsJsonObject("meta") ?: return null
-
-        val kind = meta.get("kind")?.asString ?: ""
-        // meta.toString() re-serialises the already-parsed Gson JsonObject back to
-        // a JSON string so that GsonFactory can deserialise it into the typed model.
-        val metaJson = meta.toString()
+        val mtime = isoToMillis(row.get("mtime").safeString())
+        val meta = row.obj("meta") ?: return null
+        val kind = meta.get("kind").safeString() ?: ""
 
         return if (kind == ServerOrderEntry.KIND_SUBSCRIPTION) {
-            val sub = jsonFactory.fromString(metaJson, SubscriptionPurchaseV2::class.java)
-            mapSubscriptionPurchase(token, cid, mtime, sub)
+            mapSubscriptionPurchase(token, cid, mtime, meta)
         } else {
-            val otp = jsonFactory.fromString(metaJson, ProductPurchaseV2::class.java)
-            mapProductPurchase(token, cid, mtime, otp)
+            mapProductPurchase(token, cid, mtime, meta)
         }
     }
 
     /**
-     * Maps a [ProductPurchaseV2] (one-time purchase) to [ServerOrderEntry].
+     * Maps a subscription (`androidpublisher#subscriptionPurchaseV2`) meta
+     * [JsonObject] to [ServerOrderEntry].
      *
-     * Field sources ([ProductPurchaseV2] API reference):
-     * - `productId`      ← [ProductPurchaseV2.getProductLineItem]\[0\].productId
-     * - `purchaseTimeMs` ← [ProductPurchaseV2.getPurchaseCompletionTime] (ISO-8601)
-     * - `purchaseState`  ← [ProductPurchaseV2.getPurchaseStateContext].purchaseState
-     *                      (`"PURCHASED"` → 0, `"CANCELLED"` → 1, `"PENDING"` → 2)
-     * - `isTestPurchase` ← [ProductPurchaseV2.getTestPurchaseContext] != null
-     * - `orderId`        ← [ProductPurchaseV2.getOrderId]
-     *
-     * Reference: https://developer.android.com/google/play/developer-api#ProductPurchaseV2
-     */
-    private fun mapProductPurchase(
-        token: String,
-        cid: String,
-        mtime: Long,
-        meta: ProductPurchaseV2,
-    ): ServerOrderEntry {
-        val lineItem   = meta.productLineItem?.firstOrNull()
-        val productId  = lineItem?.productId ?: ""
-        val purchaseMs = isoToMillis(meta.purchaseCompletionTime).takeIf { it > 0L } ?: mtime
-        val planId = lineItem?.productOfferDetails?.purchaseOptionId ?: productId
-
-        // purchaseStateContext.purchaseState is a String in ProductPurchaseV2;
-        // mapped to the legacy Int in ServerOrderEntry (0=purchased, 1=cancelled, 2=pending).
-        val purchaseState: Int? = when (meta.purchaseStateContext?.purchaseState) {
-            "PURCHASED" -> 0
-            "PENDING" -> 2
-            "CANCELLED" -> 1
-            else -> null
-        }
-
-        // testPurchaseContext is non-null when this is a sandbox / test purchase
-        val isTest = meta.testPurchaseContext != null
-
-        return ServerOrderEntry(
-            purchaseToken = token,
-            cid = cid,
-            sku = productId,
-            mtime = mtime,
-            kind = meta.kind ?: "",
-            isSubscription = false,
-            orderId = meta.orderId,
-            startTimeMs = purchaseMs,
-            expiryTimeMs = 0L,
-            purchaseTimeMs = purchaseMs,
-            subscriptionState = null,
-            purchaseState = purchaseState,
-            autoRenewEnabled = false,
-            isTestPurchase = isTest,
-            productId = productId,
-            planId = planId
-        )
-    }
-
-    /**
-     * Maps a [SubscriptionPurchaseV2] (recurring subscription) to [ServerOrderEntry].
-     *
-     * Field sources ([SubscriptionPurchaseV2] API reference):
-     * - `productId`         ← [SubscriptionPurchaseV2.getLineItems]\[0\].productId
-     * - `startTimeMs`       ← [SubscriptionPurchaseV2.getStartTime] (ISO-8601)
-     * - `expiryTimeMs`      ← lineItems\[0\].expiryTime (ISO-8601)
-     * - `subscriptionState` ← [SubscriptionPurchaseV2.getSubscriptionState]
-     * - `autoRenewEnabled`  ← lineItems\[0\].autoRenewingPlan.autoRenewEnabled
-     * - `orderId`           ← [SubscriptionPurchaseV2.getLatestOrderId] (falls back to orderId)
-     * - `isTestPurchase`    ← [SubscriptionPurchaseV2.getTestPurchase] != null
-     *
-     * Reference: https://developer.android.com/google/play/developer-api#SubscriptionPurchaseV2
+     * Fields are read directly from the [JsonObject] tree:
+     * - `orderId`           ← `latestOrderId`
+     * - `startTimeMs`       ← `startTime` (ISO-8601)
+     * - `subscriptionState` ← `subscriptionState`
+     * - `isTestPurchase`    ← `testPurchase` non-null presence
+     * - `productId`         ← `lineItems[0].productId`
+     * - `expiryTimeMs`      ← `lineItems[0].expiryTime` (ISO-8601)
+     * - `planId`            ← `lineItems[0].offerDetails.basePlanId`
+     * - `autoRenewEnabled`  ← `lineItems[0].autoRenewingPlan.autoRenewEnabled`
      */
     private fun mapSubscriptionPurchase(
         token: String,
         cid: String,
         mtime: Long,
-        meta: SubscriptionPurchaseV2,
+        meta: JsonObject,
     ): ServerOrderEntry {
-        val orderId = meta.latestOrderId
-        val startTime = isoToMillis(meta.startTime)
-        val lineItem = meta.lineItems?.firstOrNull()
-        val productId = lineItem?.productId ?: ""
-        val planId = lineItem?.offerDetails?.basePlanId
-        val expiryTime = isoToMillis(lineItem?.expiryTime)
-        val autoRenew = lineItem?.autoRenewingPlan?.autoRenewEnabled ?: false
-        val isTest = meta.testPurchase != null
+        val orderId = meta.get("latestOrderId").safeString()
+        val startTime = isoToMillis(meta.get("startTime").safeString())
+        val subscriptionState = meta.get("subscriptionState").safeString()
+        // testPurchase is null in JSON when not a test; non-null (even {}) indicates test.
+        val isTest = meta.get("testPurchase").let { it != null && !it.isJsonNull }
+
+        val lineItem = meta.firstArrayObj("lineItems")
+        val productId = lineItem?.get("productId").safeString() ?: ""
+        val expiryTime = isoToMillis(lineItem?.get("expiryTime").safeString())
+        val planId = lineItem.obj("offerDetails")?.get("basePlanId").safeString()
+        val autoRenew = lineItem.obj("autoRenewingPlan")?.get("autoRenewEnabled").safeBool() ?: false
 
         return ServerOrderEntry(
             purchaseToken = token,
@@ -264,12 +249,72 @@ class ServerOrderHistoryRepository(private val billingBackendClient: BillingBack
             startTimeMs = startTime,
             expiryTimeMs = expiryTime,
             purchaseTimeMs = startTime,
-            subscriptionState = meta.subscriptionState,
+            subscriptionState = subscriptionState,
             purchaseState = null,
             autoRenewEnabled = autoRenew,
             isTestPurchase = isTest,
             productId = productId,
             planId = planId ?: productId
+        )
+    }
+
+    /**
+     * Maps a one-time-purchase (`androidpublisher#productPurchaseV2` or
+     * `androidpublisher#productPurchase`) meta [JsonObject] to [ServerOrderEntry].
+     *
+     * Fields are read directly from the [JsonObject] tree:
+     * - `orderId`       ← `orderId`
+     * - `purchaseTimeMs`← `purchaseCompletionTime` (ISO-8601); falls back to row `mtime`
+     * - `productId`     ← `productLineItem[0].productId`
+     * - `planId`        ← `productLineItem[0].productOfferDetails.purchaseOptionId`
+     * - `purchaseState` ← `purchaseStateContext.purchaseState`
+     *                    (`"PURCHASED"` → 0, `"CANCELLED"` → 1, `"PENDING"` → 2)
+     * - `isTestPurchase`← `testPurchaseContext` non-null presence
+     */
+    private fun mapProductPurchase(
+        token: String,
+        cid: String,
+        mtime: Long,
+        meta: JsonObject,
+    ): ServerOrderEntry {
+        val kind = meta.get("kind").safeString() ?: ""
+        val orderId = meta.get("orderId").safeString()
+        val purchaseMs = isoToMillis(meta.get("purchaseCompletionTime").safeString())
+            .takeIf { it > 0L } ?: mtime
+        // testPurchaseContext is non-null when this is a sandbox/test purchase
+        val isTest = meta.get("testPurchaseContext").let { it != null && !it.isJsonNull }
+
+        val lineItem = meta.firstArrayObj("productLineItem")
+        val productId = lineItem?.get("productId").safeString() ?: ""
+        val planId = lineItem.obj("productOfferDetails")
+            ?.get("purchaseOptionId").safeString() ?: productId
+
+        val purchaseState: Int? = when (
+            meta.obj("purchaseStateContext")?.get("purchaseState").safeString()
+        ) {
+            "PURCHASED" -> 0
+            "CANCELLED" -> 1
+            "PENDING"   -> 2
+            else        -> null
+        }
+
+        return ServerOrderEntry(
+            purchaseToken = token,
+            cid = cid,
+            sku = productId,
+            mtime = mtime,
+            kind = kind,
+            isSubscription = false,
+            orderId = orderId,
+            startTimeMs = purchaseMs,
+            expiryTimeMs = 0L,
+            purchaseTimeMs = purchaseMs,
+            subscriptionState = null,
+            purchaseState = purchaseState,
+            autoRenewEnabled = false,
+            isTestPurchase = isTest,
+            productId = productId,
+            planId = planId
         )
     }
 
@@ -282,4 +327,3 @@ class ServerOrderHistoryRepository(private val billingBackendClient: BillingBack
         }
     }
 }
-

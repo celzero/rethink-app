@@ -1275,11 +1275,7 @@ class BillingBackendClient(
         tag: String
     ): Interceptor = Interceptor { chain ->
         val original = chain.request()
-        val sessionHdr = original.header(reqHeader)
-
-        if (sessionHdr == null) {
-            return@Interceptor chain.proceed(original)
-        }
+        val sessionHdr = original.header(reqHeader) ?: return@Interceptor chain.proceed(original)
 
         val reqBuilder = original.newBuilder()
         if (sessionHdr == DB_SESSION_UNCONSTRAINED) {

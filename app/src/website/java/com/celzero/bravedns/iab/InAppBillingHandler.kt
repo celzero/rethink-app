@@ -376,7 +376,6 @@ object InAppBillingHandler : KoinComponent {
                                 setupProcessors()
                                 queryBillingConfig()
                                 billingScope.launch (Dispatchers.IO) { queryProductDetails() }
-                                fetchPurchases(listOf(ProductType.SUBS, ProductType.INAPP))
                             } else {
                                 loge(mname, "billing connection failed: ${billingResult.responseCode}, ${billingResult.debugMessage}")
                             }
@@ -387,6 +386,9 @@ object InAppBillingHandler : KoinComponent {
 
                         override fun onBillingServiceDisconnected() {
                             log(mname, "billing service disconnected")
+
+                            storeProductDetails.clear()
+                            productDetails.clear()
 
                             // notify state machine of disconnection
                             billingScope.launch {
@@ -1284,9 +1286,10 @@ object InAppBillingHandler : KoinComponent {
     private fun resolveOneTimeRevokeDays(productId: String): Int = when (productId) {
         ONE_TIME_PRODUCT_2YRS -> REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
         ONE_TIME_PRODUCT_5YRS -> REVOKE_WINDOW_ONE_TIME_5YRS_DAYS
-        ONE_TIME_PRODUCT_ID -> REVOKE_WINDOW_SUBS_MONTHLY_DAYS
+        // Legacy one-time product has the same 2-year access window as ONE_TIME_PRODUCT_2YRS.
+        ONE_TIME_PRODUCT_ID -> REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
         ONE_TIME_TEST_PRODUCT_ID -> REVOKE_WINDOW_SUBS_MONTHLY_DAYS
-        else -> REVOKE_WINDOW_SUBS_MONTHLY_DAYS
+        else -> REVOKE_WINDOW_ONE_TIME_2YRS_DAYS // conservative default for unknown one-time products
     }
 
     private fun Int.toSubscriptionStatusId(): Int = when (this) {
@@ -1402,6 +1405,9 @@ object InAppBillingHandler : KoinComponent {
 
     /**
      * resolves product type from the known product-ID set.
+     *
+     * ONE_TIME_PRODUCT_2YRS ("proxy-yearly-2") and ONE_TIME_PRODUCT_5YRS ("proxy-yearly-5") are
+     * standalone INAPP product IDs distinct from ONE_TIME_PRODUCT_ID ("onetime.tier").
      */
     private fun resolveProductTypeFromKnownIds(productId: String): String {
         val mname = "resolveProductTypeFromKnownIds"
@@ -1860,10 +1866,24 @@ object InAppBillingHandler : KoinComponent {
             }
         }
 
-        val queryProductDetail = storeProductDetails.find {
+        var queryProductDetail = storeProductDetails.find {
             it.productDetail.productId == productId &&
                     it.productDetail.productType == ProductType.INAPP &&
                     it.productDetail.planId == planId
+        }
+
+        if (queryProductDetail == null) {
+            log(mname, "one-time product not found in cache (size=${storeProductDetails.size}), fetching on-demand and retrying")
+            try {
+                withTimeoutOrNull(10_000) { queryProductDetails() }
+            } catch (e: Exception) {
+                loge(mname, "on-demand product details fetch failed: ${e.message}", e)
+            }
+            queryProductDetail = storeProductDetails.find {
+                it.productDetail.productId == productId &&
+                        it.productDetail.productType == ProductType.INAPP &&
+                        it.productDetail.planId == planId
+            }
         }
 
         if (queryProductDetail == null) {
@@ -1949,6 +1969,13 @@ object InAppBillingHandler : KoinComponent {
             .setProductDetailsParamsList(paramsList)
             .setObfuscatedAccountId(accountId)
             .build()
+
+        if (!billingClient.isReady) {
+            loge(mname, "billing client no longer ready; aborting launchBillingFlow to avoid ProxyBillingActivity NPE")
+            try { subscriptionStateMachine.purchaseFailed("Billing client disconnected before launch", null) } catch (_: Exception) {}
+            billingListener?.purchasesResult(false, emptyList())
+            return
+        }
 
         val billingResult = billingClient.launchBillingFlow(activity, flowParams)
         val isSuccess = billingResult.responseCode == BillingResponseCode.OK
