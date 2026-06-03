@@ -201,12 +201,20 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
                     runCatching { RpnProxyManager.stats() }.getOrElse { "unavailable" }
                 } else ""
 
+                val entitlementJson = if (includeStats) {
+                    runCatching {
+                        val details = RpnProxyManager.getEntitlementDetails()
+                        details?.json()?.let { String(it, Charsets.UTF_8) }
+                    }.getOrElse { null }
+                } else null
+
                 val diagContent = buildDiagnosticText(
                     description  = description,
                     category     = category,
                     statuses     = allStatuses,
                     history      = recentHistory,
-                    rpnStats     = rpnStats
+                    rpnStats     = rpnStats,
+                    entitlementJson = entitlementJson
                 )
 
                 val diagFile = writeDiagFile(diagContent)
@@ -240,7 +248,8 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         category: String?,
         statuses: List<SubscriptionStatus>,
         history: List<com.celzero.bravedns.database.SubscriptionStateHistory>,
-        rpnStats: String
+        rpnStats: String,
+        entitlementJson: String? = null
     ): String {
         // Use plain ASCII separators only: Unicode box-drawing characters (===, ---, arrows)
         // get mangled by email clients and devices that mis-detect encoding.
@@ -321,6 +330,14 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
             sb.append(light)
             sb.append(rpnStats)
             sb.append("\n")
+        }
+
+        if (!entitlementJson.isNullOrBlank()) {
+            sb.append(light)
+            sb.append("  ENTITLEMENT JSON\n")
+            sb.append(light)
+            sb.append(entitlementJson)
+            sb.append("\n\n")
         }
 
         sb.append(heavy)
