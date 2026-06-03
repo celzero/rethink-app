@@ -247,15 +247,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     /**
-     * Schedules the guided tour to start 350 ms after the layout settles.
+     * Schedules the guided tour to start 100 ms after the layout settles.
      *
      * The short delay lets the home screen render its cards fully before the
-     * overlay attaches, preventing any visual flash.  If the tour has already
+     * overlay attaches, preventing any visual flash. If the tour has already
      * been completed at the current version, this is a no-op.
      */
     private fun scheduleTourIfNeeded() {
         if (!GuidedTourManager.shouldShowTour(persistentState)) return
-        delay(350L, lifecycleScope) {
+        delay(100L, lifecycleScope) {
             val host = activity ?: return@delay
             if (!isAdded || isDetached) return@delay
             try {

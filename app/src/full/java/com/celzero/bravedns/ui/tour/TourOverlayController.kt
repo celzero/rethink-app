@@ -176,8 +176,13 @@ class TourOverlayController(
             return
         }
 
-        target.doOnLayout { positionOnView(target, step) }
-        if (target.isLaidOut) positionOnView(target, step)
+        target.doOnLayout {
+            target.post {
+                if (isAttached && currentStepIndex == index) {
+                    positionOnView(target, step)
+                }
+            }
+        }
     }
 
     private fun positionOnView(target: View, step: TourStep) {
