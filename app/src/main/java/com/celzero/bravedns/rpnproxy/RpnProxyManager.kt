@@ -52,6 +52,7 @@ import com.celzero.bravedns.util.Constants.Companion.RPN_PROXY_FOLDER_NAME
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.backend.Backend
+import com.celzero.firestack.backend.RpnEntitlement
 import com.celzero.firestack.backend.RpnServers
 import com.celzero.firestack.settings.Settings
 import kotlinx.coroutines.CoroutineScope
@@ -430,6 +431,22 @@ object RpnProxyManager : KoinComponent {
             Logger.w(LOG_TAG_PROXY, "$TAG; error parsing expiry from payload: ${e.message}")
         }
         return null
+    }
+
+    suspend fun getEntitlementDetails(): RpnEntitlement? {
+        val entitlement = getWinEntitlement()
+        if (entitlement == null) {
+            Logger.d(LOG_TAG_PROXY, "$TAG; getEntitlementDetails: null entitlement, querying server for refresh")
+            return null
+        }
+
+        return try {
+            val entitlement = VpnController.getEntitlementDetails(getWinEntitlement(), billingBackendClient.getDeviceId())
+            return entitlement
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; getEntitlementDetails: ${e.message}")
+            null
+        }
     }
 
     suspend fun getIsTestEntitlement(retryAttempt: Int = 0): Boolean {
@@ -1378,12 +1395,17 @@ object RpnProxyManager : KoinComponent {
                             )
                         }
 
-                        // Update state machine with fresh payload
+                        // Update state machine and DB with fresh payload
                         val subsData = subscriptionStateMachine.getSubscriptionData()
                         if (subsData != null) {
                             subsData.subscriptionStatus.developerPayload = updatedPurchase.payload
                             val updatedSubsData = subsData.copy(purchaseDetail = updatedPurchase)
                             subscriptionStateMachine.stateMachine.updateData(updatedSubsData)
+                            subscriptionStatusRepository.updateDeveloperPayload(
+                                subsData.subscriptionStatus.id,
+                                updatedPurchase.payload,
+                                System.currentTimeMillis()
+                            )
                         } else {
                             Logger.w(LOG_TAG_PROXY, "$TAG; processRpnPurchase: subscription data is null, cannot update payload in state machine")
                         }

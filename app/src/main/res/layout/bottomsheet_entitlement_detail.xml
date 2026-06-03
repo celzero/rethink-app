@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/background"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="40dp">
+
+        <View
+            android:id="@+id/drag_handle"
+            android:layout_width="40dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center_horizontal"
+            android:background="?attr/divider" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Entitlement Details"
+            android:textAlignment="center"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="?attr/divider"
+            app:cardBackgroundColor="?attr/background">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <include
+                    android:id="@+id/row_status"
+                    layout="@layout/layout_entitlement_row" />
+
+                <include
+                    android:id="@+id/row_cid"
+                    layout="@layout/layout_entitlement_row" />
+
+                <include
+                    android:id="@+id/row_did"
+                    layout="@layout/layout_entitlement_row" />
+
+                <include
+                    android:id="@+id/row_who"
+                    layout="@layout/layout_entitlement_row" />
+
+                <include
+                    android:id="@+id/row_expiry"
+                    layout="@layout/layout_entitlement_row" />
+
+                <include
+                    android:id="@+id/row_provider"
+                    layout="@layout/layout_entitlement_row" />
+
+                <include
+                    android:id="@+id/row_token"
+                    layout="@layout/layout_entitlement_row" />
+
+                <include
+                    android:id="@+id/row_allow_restore"
+                    layout="@layout/layout_entitlement_row" />
+
+                <include
+                    android:id="@+id/row_test"
+                    layout="@layout/layout_entitlement_row" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_dismiss"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="24dp"
+            android:text="@string/lbl_dismiss"
+            app:cornerRadius="12dp" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

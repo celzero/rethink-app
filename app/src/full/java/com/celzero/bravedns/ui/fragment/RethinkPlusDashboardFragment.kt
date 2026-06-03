@@ -46,6 +46,7 @@ import com.celzero.bravedns.ui.activity.PingTestActivity
 import com.celzero.bravedns.ui.activity.ServerOrderHistoryActivity
 import com.celzero.bravedns.ui.bottomsheet.DeviceAuthErrorBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.DeviceNotRegisteredBottomSheet
+import com.celzero.bravedns.ui.bottomsheet.EntitlementDetailBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.ManageRpnPurchaseBtmSht
 import com.celzero.bravedns.ui.bottomsheet.PurchaseConflictBottomSheet
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
@@ -381,6 +382,9 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
         b.manageSubsRl.setOnClickListener { managePlayStoreSubs() }
         b.serverOrderHistoryRl.setOnClickListener { openServerOrderHistory() }
         b.reportIssueRl.setOnClickListener { CustomerSupportActivity.start(requireContext()) }
+        b.entitlementRl.setOnClickListener {
+            EntitlementDetailBottomSheet.newInstance().show(childFragmentManager, "entitlementDetails")
+        }
         b.renewButton.setOnClickListener {
             safeNavigate(R.id.action_rethinkPlusDashboard_to_rethinkPlus)
         }
