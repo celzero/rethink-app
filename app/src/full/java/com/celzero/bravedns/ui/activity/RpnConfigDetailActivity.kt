@@ -102,6 +102,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
     private var configKey: String = ""
     private var countryConfig: CountryConfig? = null
+    private var winIdentifier: String? = null
 
     /** Coroutine that polls VpnController every [STATS_POLL_MS] ms. */
     private var statsJob: Job? = null
@@ -245,9 +246,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         b.tvHeroCity.text = ""
         b.tvHeroFlag.text = "\uD83C\uDF10" // globe
         b.tvHeroWho.text = ""
-        b.tvHeroWho.visibility = View.GONE
+        winIdentifier = null
         b.chipHeroStats.visibility = View.GONE
-        b.rowHeroRxtx.visibility = View.GONE
 
         // Show inline shimmer for client IPs (stats table is already visible).
         showClientIpShimmer()
@@ -459,12 +459,13 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         }
         val statusPair = VpnController.getProxyStatusById(pid)
         val stats = VpnController.getProxyStats(pid)
-        val who = VpnController.getWinIdentifier()
+        if (winIdentifier.isNullOrEmpty()) {
+            winIdentifier = VpnController.getWinIdentifier()
+        }
+        val who = winIdentifier
         val config = countryConfig
         // Use the time when this server key was selected by the user, not the VPN uptime.
         val selectedSinceTs = RpnProxyManager.getSelectedSinceTs(id)
-
-        resolveClientIps(id)
 
         uiCtx {
             applyStats(statusPair, stats, config, who, selectedSinceTs)
@@ -500,6 +501,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
         val rx = stats?.rx ?: 0L
         val tx = stats?.tx ?: 0L
+        b.valueRx.visibility = View.VISIBLE
+        b.valueTx.visibility = View.VISIBLE
         b.valueRx.text = getString(R.string.symbol_download, Utilities.humanReadableByteCount(rx, true))
         b.valueTx.text = getString(R.string.symbol_upload, Utilities.humanReadableByteCount(tx, true))
         b.rowHeroRxtx.visibility = View.VISIBLE
