@@ -2100,7 +2100,7 @@
 
     <!-- RPN Restore dialog -->
     <string name="rpn_restore_confirm_title" translatable="false">Restore to Defaults</string>
-    <string name="rpn_restore_confirm_message" translatable="false">This will unregister your current session, fetch a fresh entitlement from the server, and re-register your connection. Your server selections will be preserved.</string>
+    <string name="rpn_restore_confirm_message" translatable="false">This will unregister your current session, fetch a fresh entitlement from the server, and re-register your connection. Your server selections will not be preserved.</string>
     <string name="rpn_restore_dialog_title" translatable="false">Restoring connection</string>
     <string name="rpn_restore_dialog_hint" translatable="false">This usually completes in a few seconds. Keep your internet connection active.</string>
     <string name="rpn_restore_dialog_status_unregistering" translatable="false">Unregistering current session…</string>
@@ -2242,7 +2242,6 @@
     <string name="server_settings_permanent_config_desc" translatable="false">Keep the same server configuration across reconnections</string>
     <string name="server_settings_port_dialog_title" translatable="false">Select Connection Port</string>
     <string name="server_selection_sub_expires_today" translatable="false">Expires today</string>
-    <string name="server_selection_sub_managed_by_play" translatable="false">Managed by Google Play</string>
     <string name="server_selection_auto_always_on" translatable="false">AUTO is always connected and cannot be removed</string>
     <string name="server_selection_remove_title" translatable="false">Remove Server</string>
     <string name="server_selection_remove_message" translatable="false">Remove %1$s (%2$s) from your server list?</string>

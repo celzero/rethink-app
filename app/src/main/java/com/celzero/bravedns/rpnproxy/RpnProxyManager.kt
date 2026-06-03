@@ -907,7 +907,7 @@ object RpnProxyManager : KoinComponent {
                             try {
                                 EncryptedFileManager.readByteArray(applicationContext, cfgFile)
                             } catch (e: Exception) {
-                                Logger.e(LOG_TAG_PROXY, "$TAG; load, error reading win state file: ${e.message}", e)
+                                Logger.e(LOG_TAG_PROXY, "$TAG; load, error reading win state file (${cfgFile.absolutePath}): ${e.message}", e)
                                 byteArrayOf()
                             }
                         } else {

@@ -2766,10 +2766,6 @@ object InAppBillingHandler : KoinComponent {
         return subscriptionStateMachine.getCurrentState()
     }
 
-    fun getSubscriptionStateLiveData(): LiveData<SubscriptionStateMachineV2.SubscriptionState> {
-        return subscriptionStateMachine.currentState.asLiveData()
-    }
-
     fun getSubscriptionStateFlow(): StateFlow<SubscriptionStateMachineV2.SubscriptionState> {
         return subscriptionStateMachine.currentState
     }

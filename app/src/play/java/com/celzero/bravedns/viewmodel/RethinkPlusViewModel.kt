@@ -75,9 +75,6 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
     private var pollingJob: Job? = null
     private var pollingStartTime = 0L
 
-    val subscriptionState: LiveData<SubscriptionStateMachineV2.SubscriptionState> =
-        InAppBillingHandler.getSubscriptionStateLiveData()
-
     companion object {
         private const val TAG = "RethinkPlusVM"
         private const val POLLING_INTERVAL_MS = 1500L

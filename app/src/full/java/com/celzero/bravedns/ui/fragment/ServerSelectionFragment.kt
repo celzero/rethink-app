@@ -1853,9 +1853,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             return
         }
 
-        val now           = System.currentTimeMillis()
+        val now = System.currentTimeMillis()
         val billingExpiry = sub.billingExpiry
-        val hasExpiry     = billingExpiry > 0L && billingExpiry != Long.MAX_VALUE
+        val hasExpiry = billingExpiry > 0L && billingExpiry != Long.MAX_VALUE
 
         // Determine product type (one-time vs recurring subscription)
         val isOneTime = sub.productId.contains("onetime", ignoreCase = true) ||
@@ -1885,9 +1885,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         }
 
         if (!showDateRow) {
-            // Active SUBS: replace date with a clean "managed by Play" hint
             b.tvExpiryLabel.text = getString(R.string.lbl_plan)
-            b.tvExpiryDate.text  = getString(R.string.server_selection_sub_managed_by_play)
+            b.tvExpiryDate.text  = sub.planId.capitalizeWords()
             b.tvDaysRemaining.isVisible = false
         } else if (!hasExpiry) {
             // Date row needed but expiry not yet known
