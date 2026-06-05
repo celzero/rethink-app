@@ -297,7 +297,7 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
 
         // Auto-select first product if available
         if (filtered.isNotEmpty()) {
-            val first = filtered.first()
+            val first = filtered.last()
             _selectedProduct.value = Pair(first.productId, first.planId)
         }
     }
