@@ -2047,18 +2047,24 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             val string =
                 getString(statusId)
                     .replaceFirst(getString(R.string.status_protected), message, true)
-            b.fhsProtectionLevelTxt.setTextColor(colorId)
-            b.fhsProtectionLevelTxt.text = string
+            if (persistentState.wgGlobalLockdown) {
+                val s  = string.replaceFirst(getString(R.string.status_protected), getString(R.string.firewall_rule_global_lockdown).lowercase(), true)
+                b.fhsProtectionLevelTxt.setTextColor(colorId)
+                b.fhsProtectionLevelTxt.text = s
+            } else {
+                b.fhsProtectionLevelTxt.setTextColor(colorId)
+                b.fhsProtectionLevelTxt.text = string
+            }
         } else {
             if (persistentState.wgGlobalLockdown) {
                 val stat = getString(statusId)
                 val s  = stat.replaceFirst(getString(R.string.status_protected), getString(R.string.firewall_rule_global_lockdown).lowercase(), true)
-                b.fhsProtectionLevelTxt.setTextColor(fetchTextColor(R.color.accentGood))
+                b.fhsProtectionLevelTxt.setTextColor(colorId)
                 b.fhsProtectionLevelTxt.text = s
             } else if (vpnState.isEch) {
                 val stat = getString(statusId)
                 val s  = stat.replaceFirst(getString(R.string.status_protected), getString(R.string.lbl_ultra_secure), true)
-                b.fhsProtectionLevelTxt.setTextColor(fetchTextColor(R.color.accentGood))
+                b.fhsProtectionLevelTxt.setTextColor(colorId)
                 b.fhsProtectionLevelTxt.text = s
             } else {
                 b.fhsProtectionLevelTxt.setTextColor(colorId)
