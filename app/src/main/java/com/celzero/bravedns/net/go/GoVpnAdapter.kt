@@ -103,6 +103,7 @@ import org.koin.core.component.inject
 import java.io.File
 import java.net.URI
 import java.net.URLEncoder
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -1352,7 +1353,24 @@ class GoVpnAdapter : KoinComponent {
         Logger.i(LOG_TAG_VPN, "$TAG close connection: $connIds, res: $res")
     }
 
+    private suspend fun refreshWgProxy(id: String) {
+        if (!tunnel.isConnected) {
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip refreshing wg")
+            return
+        }
+
+        try {
+            getProxies()?.getProxy(id)?.refresh()
+            Logger.i(LOG_TAG_VPN, "$TAG wg proxy refreshed: $id")
+            logEvent(Severity.LOW, "refresh wg proxy", "refreshed wg proxy with id: $id")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "$TAG err refreshing wg proxy: ${e.message}", e)
+            logEvent(Severity.HIGH, "refresh wg proxy error", "err refreshing wg proxy with id: $id, reason: ${e.message}" )
+        }
+    }
+
     suspend fun refreshOrPauseOrResumeOrReAddProxies(isMobileActive: Boolean, ssid: String) {
+        val avoidReaddingProxies = true
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip refreshing proxies")
             return
@@ -1398,7 +1416,11 @@ class GoVpnAdapter : KoinComponent {
                     // re-adding those proxies seems working, work around for now until the
                     // re-add logic is handled in go-tun
                     // (github.com/celzero/firestack/blob/61187f88c1/intra/ipn/wgproxy.go#L404)
-                    addWgProxy(id, true)
+                    if (avoidReaddingProxies) {
+                        refreshWgProxy(id)
+                    } else {
+                        addWgProxy(id, true)
+                    }
                 }
                 if (stats == Backend.TPU && canResume) {
                     // if the proxy is paused, then resume it
@@ -1407,16 +1429,31 @@ class GoVpnAdapter : KoinComponent {
                     // or ssid change for ssidEnabled wgs
                     val res = resumeWireguard(id)
                     Logger.i(LOG_TAG_VPN, "$TAG resumed proxy: $id, res: $res")
+                    logEvent(
+                        Severity.LOW,
+                        "wireguard proxy resumed",
+                        "Wireguard proxy with id $id resumed"
+                    )
                 } else if (isWireGuardMobileOnly && !isMobileActive && !canResume) {
                     // if the proxy is not paused, then pause it
                     // this is needed when the network is on mobile data
                     // and the wg-config is set to useOnlyOnMetered
                     val res = pauseWireguard(id)
                     Logger.i(LOG_TAG_VPN, "$TAG paused proxy (mobile): $id, res: $res")
+                    logEvent(
+                        Severity.LOW,
+                        "wireguard proxy paused",
+                        "Wireguard proxy with id $id paused, reason: mobile data"
+                    )
                 } else if (useOnlyOnSsid && !ssidMatch && !canResume) {
                     // when the ssidEnabled is set and the ssid does not match
                     val res = pauseWireguard(id)
                     Logger.i(LOG_TAG_VPN, "$TAG paused proxy (ssid): $id, res: $res")
+                    logEvent(
+                        Severity.LOW,
+                        "wireguard proxy paused",
+                        "Wireguard proxy with id $id paused, reason: ssid mismatch"
+                    )
                 }
 
                 if (stats == Backend.TPU && !isWireGuardMobileOnly && !useOnlyOnSsid) {
@@ -1443,11 +1480,28 @@ class GoVpnAdapter : KoinComponent {
                 val rpn = getWinByKey(key)
                 val status = rpn?.status()
                 if (status == Backend.TNT) {
-                    reconnectRpnProxy(key)
+                    if (avoidReaddingProxies) {
+                        refreshRpnProxy(key)
+                        Logger.i(LOG_TAG_VPN, "$TAG refreshed rpn proxy: $key")
+                        logEvent(
+                            Severity.LOW,
+                            "refresh rpn proxy",
+                            "refreshed rpn proxy with key: $key"
+                        )
+                    } else {
+                        reconnectRpnProxy(key)
+                        Logger.i(LOG_TAG_VPN, "$TAG re-added rpn proxy: $key")
+                        logEvent(
+                            Severity.LOW,
+                            "re-add rpn proxy",
+                            "re-added rpn proxy with key: $key"
+                        )
+                    }
                 }
             }
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG err refreshing proxies: ${e.message}", e)
+            logEvent(Severity.HIGH, "refresh proxies error", "err refreshing proxies, reason: ${e.message}")
         }
     }
 
@@ -1468,7 +1522,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun getWireGuardStats(id: String): WireguardManager.WgStats? {
         return try {
-            withTimeoutOrNull(1_500L) {
+            withTimeoutOrNull(1_500L.milliseconds) {
                 val proxy = getProxies()?.getProxy(id)
                 val status = proxy?.status()
 
@@ -1491,7 +1545,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun getRpnStats(id: String): WireguardManager.WgStats? {
         return try {
-            withTimeoutOrNull(1_500L) {
+            withTimeoutOrNull(1_500L.milliseconds) {
                 val rpn = getWinByKey(id)
                 val status = rpn?.status()
 
