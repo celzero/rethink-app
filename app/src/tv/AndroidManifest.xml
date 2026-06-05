@@ -60,6 +60,7 @@
             android:name="com.ezelab.rethinktv.ui.TvHomeActivity"
             android:exported="true"
             android:launchMode="singleTask"
+            android:taskAffinity=""
             android:label="@string/app_name"
             android:icon="@mipmap/ic_launcher"
             android:theme="@style/AppThemeInitial">
