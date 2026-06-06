@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * Generic State Machine Framework inspired by:
- * https://blog.lawrencejones.dev/state-machines/
+ * blog.lawrencejones.dev/state-machines/
  *
  * This framework provides:
  * - Type-safe state transitions

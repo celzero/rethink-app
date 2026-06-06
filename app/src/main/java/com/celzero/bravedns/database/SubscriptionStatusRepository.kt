@@ -196,6 +196,20 @@ class SubscriptionStatusRepository(private val subscriptionStatusDAO: Subscripti
     }
 
     /**
+     * Update developer payload
+     */
+    suspend fun updateDeveloperPayload(id: Int, payload: String, timestamp: Long): Int {
+        return mutex.withLock {
+            try {
+                subscriptionStatusDAO.updateDeveloperPayload(id, payload, timestamp)
+            } catch (e: Exception) {
+                Logger.e(LOG_IAB, "$TAG Error updating developer payload: ${e.message}", e)
+                throw e
+            }
+        }
+    }
+
+    /**
      * Mark expired subscriptions
      */
     suspend fun markExpiredSubscriptions(currentTime: Long): Int {
