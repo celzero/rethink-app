@@ -396,7 +396,7 @@ object WireguardManager : KoinComponent {
             return Pair("", true)
         }
 
-        val lockdown = persistentState.wgGlobalLockdown || config.isLockdown
+        val lockdown = config.isLockdown
 
         if (lockdown && (checkEligibilityBasedOnNw(id, usesMtrdNw) && checkEligibilityBasedOnSsid(id, ssid))) {
             Logger.d(LOG_TAG_PROXY, "lockdown wg for $type => return $idStr")
