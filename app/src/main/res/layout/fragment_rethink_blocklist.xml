@@ -201,11 +201,12 @@
                 android:layout_marginEnd="1dp"
                 android:layout_weight="0.4"
                 android:text="@string/notif_dialog_pause_dialog_negative"
-                android:textColor="?attr/primaryTextColor" />
+                android:textColor="?attr/primaryLightColorText" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/lb_blocklist_apply_btn"
                 style="@style/Widget.Material3.Button.TextButton.Dialog"
+                android:textColor="?attr/accentGood"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
