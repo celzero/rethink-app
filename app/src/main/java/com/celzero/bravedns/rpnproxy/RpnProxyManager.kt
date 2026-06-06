@@ -47,6 +47,7 @@ import com.celzero.bravedns.service.EncryptionException
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.RPN_PROXY_FOLDER_NAME
 import com.celzero.bravedns.util.UIUtils
@@ -2666,6 +2667,7 @@ object RpnProxyManager : KoinComponent {
         usesMtrdNw: Boolean,
         ssid: String
     ): Pair<String, Boolean> {
+        val block = Backend.BlockAll
         if (id.isEmpty()) {
             return Pair("", true)
         }
@@ -2686,6 +2688,22 @@ object RpnProxyManager : KoinComponent {
         }
 
         Logger.vv(LOG_TAG_PROXY, "$TAG; config-details: $config")
+
+        val lockdown = config.lockdown
+
+        if (lockdown && (checkEligibilityBasedOnNw(id, usesMtrdNw) && checkEligibilityBasedOnSsid(id, ssid))) {
+            Logger.d(LOG_TAG_PROXY, "lockdown wg for $type => return ${id}")
+            return Pair(id, false) // no need to proceed further for lockdown
+        }
+
+        // in case of lockdown and not metered network, we need to return block as the
+        // lockdown should not leak the connections via WiFi
+        if (lockdown) {
+            // add IpnBlock instead of the config id, let the connection be blocked in WiFi
+            // regardless of config is active or not
+            Logger.d(LOG_TAG_PROXY, "lockdown wg for $type => return $block")
+            return Pair(block, false) // no need to proceed further for lockdown
+        }
 
         // check if the config is active and if it can be used on this network
         if (config.isEnabled && (checkEligibilityBasedOnNw(
