@@ -31,7 +31,9 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import okhttp3.dnsoverhttps.DnsOverHttps
 import retrofit2.Retrofit
 import java.net.InetAddress
+import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
+import kotlin.enums.enumEntries
 
 class RetrofitManager {
 
@@ -164,63 +166,55 @@ class RetrofitManager {
             return b.build()
         }
 
-        // As of now, quad9 is used as default dns in okhttp client.
+        // Attempts DNS providers in priority order: Quad9 → Cloudflare → Google → System → Fallback.
+        // If a provider fails to construct or resolve, the next is tried transparently at runtime.
         private fun customDns(bootstrapClient: OkHttpClient): Dns? {
-            enumValues<OkHttpDnsType>().forEach {
+            val providers = mutableListOf<Dns>()
+            enumEntries<OkHttpDnsType>().forEach {
                 try {
-                    when (it) {
-                        OkHttpDnsType.DEFAULT -> {
-                            return DnsOverHttps.Builder()
-                                .client(bootstrapClient)
-                                .url("https://dns.quad9.net/dns-query".toHttpUrl())
-                                .bootstrapDnsHosts(
-                                    getByIp("9.9.9.9"),
-                                    getByIp("149.112.112.112"),
-                                    getByIp("2620:fe::9"),
-                                    getByIp("2620:fe::fe")
-                                )
-                                .includeIPv6(true)
-                                .build()
-                        }
-                        OkHttpDnsType.CLOUDFLARE -> {
-                            return DnsOverHttps.Builder()
-                                .client(bootstrapClient)
-                                .url("https://cloudflare-dns.com/dns-query".toHttpUrl())
-                                .bootstrapDnsHosts(
-                                    getByIp("1.1.1.1"),
-                                    getByIp("1.0.0.1"),
-                                    getByIp("2606:4700:4700::1111"),
-                                    getByIp("2606:4700:4700::1001")
-                                )
-                                .includeIPv6(true)
-                                .build()
-                        }
-                        OkHttpDnsType.GOOGLE -> {
-                            return DnsOverHttps.Builder()
-                                .client(bootstrapClient)
-                                .url("https://dns.google/dns-query".toHttpUrl())
-                                .bootstrapDnsHosts(
-                                    getByIp("8.8.8.8"),
-                                    getByIp("8.8.4.4"),
-                                    getByIp("2001:4860:4860:0:0:0:0:8888"),
-                                    getByIp("2001:4860:4860:0:0:0:0:8844")
-                                )
-                                .includeIPv6(true)
-                                .build()
-                        }
-                        OkHttpDnsType.SYSTEM_DNS -> {
-                            return Dns.SYSTEM
-                        }
-                        OkHttpDnsType.FALLBACK_DNS -> {
-                            // todo: return retrieved system dns
-                            return null
-                        }
+                    val dns = when (it) {
+                        OkHttpDnsType.DEFAULT -> DnsOverHttps.Builder()
+                            .client(bootstrapClient)
+                            .url("https://dns.quad9.net/dns-query".toHttpUrl())
+                            .bootstrapDnsHosts(
+                                getByIp("9.9.9.9"),
+                                getByIp("149.112.112.112"),
+                                getByIp("2620:fe::9"),
+                                getByIp("2620:fe::fe")
+                            )
+                            .includeIPv6(true)
+                            .build()
+                        OkHttpDnsType.CLOUDFLARE -> DnsOverHttps.Builder()
+                            .client(bootstrapClient)
+                            .url("https://cloudflare-dns.com/dns-query".toHttpUrl())
+                            .bootstrapDnsHosts(
+                                getByIp("1.1.1.1"),
+                                getByIp("1.0.0.1"),
+                                getByIp("2606:4700:4700::1111"),
+                                getByIp("2606:4700:4700::1001")
+                            )
+                            .includeIPv6(true)
+                            .build()
+                        OkHttpDnsType.GOOGLE -> DnsOverHttps.Builder()
+                            .client(bootstrapClient)
+                            .url("https://dns.google/dns-query".toHttpUrl())
+                            .bootstrapDnsHosts(
+                                getByIp("8.8.8.8"),
+                                getByIp("8.8.4.4"),
+                                getByIp("2001:4860:4860:0:0:0:0:8888"),
+                                getByIp("2001:4860:4860:0:0:0:0:8844")
+                            )
+                            .includeIPv6(true)
+                            .build()
+                        OkHttpDnsType.SYSTEM_DNS -> Dns.SYSTEM
+                        OkHttpDnsType.FALLBACK_DNS -> null
                     }
+                    dns?.let { providers.add(it) }
                 } catch (e: Exception) {
                     Logger.crash(Logger.LOG_TAG_DOWNLOAD, "err; custom dns: ${e.message}", e)
                 }
             }
-            return null
+            return if (providers.isEmpty()) null else FallbackDns(providers)
         }
 
         private fun getByIp(ip: String): InetAddress {
@@ -229,6 +223,23 @@ class RetrofitManager {
             } catch (e: Exception) {
                 Logger.e(Logger.LOG_TAG_DOWNLOAD, "err while getting ip address: ${e.message}", e)
                 throw e
+            }
+        }
+
+        private class FallbackDns(private val providers: List<Dns>) : Dns {
+            override fun lookup(hostname: String): List<InetAddress> {
+                for (provider in providers) {
+                    try {
+                        val result = provider.lookup(hostname)
+                        if (result.isNotEmpty()) {
+                            return result
+                        }
+                    } catch (_: Exception) {
+                    }
+                }
+                throw UnknownHostException(
+                    "All DNS providers failed for $hostname"
+                )
             }
         }
     }
