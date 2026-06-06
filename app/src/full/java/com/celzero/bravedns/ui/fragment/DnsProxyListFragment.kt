@@ -30,6 +30,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DnsProxyEndpointAdapter
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsProxyEndpoint
+import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.DialogSetDnsProxyBinding
 import com.celzero.bravedns.databinding.FragmentDnsProxyListBinding
 import com.celzero.bravedns.service.FirewallManager
@@ -51,6 +52,7 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
     private val b by viewBinding(FragmentDnsProxyListBinding::bind)
 
     private val appConfig by inject<AppConfig>()
+    private val rdb by inject<RefreshDatabase>()
     private val persistentState by inject<PersistentState>()
 
     // DNS Proxy UI Elements
@@ -84,6 +86,8 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
         b.dohFabAddServerIcon.bringToFront()
         b.dohFabAddServerIcon.setOnClickListener {
             io {
+                // initiate the refresh database, so that newly added apps can be listed
+                rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE)
                 val appNames: MutableList<String> = ArrayList()
                 appNames.add(getString(R.string.settings_app_list_default_app))
                 appNames.addAll(FirewallManager.getAllAppNamesSortedByVpnPermission(requireContext()))

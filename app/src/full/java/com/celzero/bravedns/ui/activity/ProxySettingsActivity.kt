@@ -46,6 +46,7 @@ import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.database.ProxyEndpoint.Companion.DEFAULT_PROXY_TYPE
+import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.DialogSetProxyBinding
 import com.celzero.bravedns.databinding.FragmentProxyConfigureBinding
@@ -91,6 +92,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
     private val appConfig by inject<AppConfig>()
     private val orbotHelper by inject<OrbotHelper>()
     private val eventLogger by inject<EventLogger>()
+    private val rdb by inject<RefreshDatabase>()
     private lateinit var animation: Animation
 
     companion object {
@@ -193,6 +195,8 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 return@setOnCheckedChangeListener
             }
             io {
+                // initiate the refresh database, so that newly added apps can be listed
+                rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE)
                 val endpoint = appConfig.getSocks5ProxyDetails()
                 if (endpoint == null) {
                     uiCtx {
@@ -267,6 +271,8 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 return@setOnCheckedChangeListener
             }
             io {
+                // initiate the refresh database, so that newly added apps can be listed
+                rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE)
                 val endpoint =
                     try {
                         appConfig.getHttpProxyDetails()
