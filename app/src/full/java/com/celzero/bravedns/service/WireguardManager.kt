@@ -384,7 +384,7 @@ object WireguardManager : KoinComponent {
 
     // pair - first: proxyId, second - can proceed for next check
     private fun canUseConfig(idStr: String, type: String, usesMtrdNw: Boolean, ssid: String): Pair<String, Boolean> {
-        val block = Backend.BlockAll
+        val block = Backend.Block
         if (idStr.isEmpty()) {
             return Pair("", true)
         }

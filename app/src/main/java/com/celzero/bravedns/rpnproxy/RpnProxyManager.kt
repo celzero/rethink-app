@@ -2667,7 +2667,7 @@ object RpnProxyManager : KoinComponent {
         usesMtrdNw: Boolean,
         ssid: String
     ): Pair<String, Boolean> {
-        val block = Backend.BlockAll
+        val block = Backend.Block
         if (id.isEmpty()) {
             return Pair("", true)
         }
