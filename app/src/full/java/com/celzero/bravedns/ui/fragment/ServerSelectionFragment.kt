@@ -1178,6 +1178,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.errorRetryBtn.isEnabled = false
         b.errorRetryBtn.isClickable = false
         b.errorRetryBtn.setOnClickListener(null)
+        b.errorResetBtn.isEnabled = false
+        b.errorResetBtn.isClickable = false
+        b.errorResetBtn.setOnClickListener(null)
 
         b.serverCountLayout.isVisible = false
 
@@ -1201,6 +1204,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
         b.errorRetryBtn.isEnabled = true
         b.errorRetryBtn.isClickable = true
+        b.errorResetBtn.isEnabled = true
+        b.errorResetBtn.isClickable = true
+
         b.serverCountLayout.isVisible = true
 
         updateConnectionStatus(deriveConnectionUiState())
@@ -1349,11 +1355,33 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             b.errorRetryBtn.isClickable = false
             b.errorRetryBtn.text = getString(R.string.ssv_toast_start_rethink)
             b.errorRetryBtn.setOnClickListener(null)
+            b.errorResetBtn.isEnabled = false
+            b.errorResetBtn.isClickable = false
+            b.errorResetBtn.isVisible = false
+            b.errorResetBtn.setOnClickListener(null)
         } else {
             b.errorRetryBtn.isEnabled = true
             b.errorRetryBtn.isClickable = true
             b.errorRetryBtn.text = getString(R.string.server_selection_error_retry)
+            b.errorResetBtn.isEnabled = true
+            b.errorResetBtn.isClickable = true
             b.errorRetryBtn.setOnClickListener { retryLoadingServers() }
+            b.errorResetBtn.setOnClickListener {
+                serverSelectionViewModel.reset()
+                showRpnResetDialog()
+            }
+
+            // reset button to be shown in error only when there is an error and
+            // VpnController.testRpnProxy() is returned as true
+            b.errorResetBtn.isVisible = false
+            io {
+                val shouldShowReset = VpnController.testRpnProxy()
+                uiCtx {
+                    if (isAdded && b.errorStateContainer.isVisible && !noTunnel) {
+                        b.errorResetBtn.isVisible = shouldShowReset
+                    }
+                }
+            }
         }
     }
 
@@ -1391,6 +1419,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         }
 
         b.errorRetryBtn.isEnabled = false
+        b.errorResetBtn.isEnabled = false
         b.errorRetryBtn.text = getString(R.string.lbl_connecting)
 
         SnackbarHelper.dismiss()
@@ -1428,6 +1457,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             uiCtx {
                 if (!isAdded) return@uiCtx
                 b.errorRetryBtn.isEnabled = true
+                b.errorResetBtn.isEnabled = true
                 b.errorRetryBtn.text = getString(R.string.server_selection_error_retry)
                 when {
                     // WIN not yet registered or server list still empty; check tunnel first.

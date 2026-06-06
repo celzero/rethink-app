@@ -2089,7 +2089,7 @@
     <string name="server_selection_max_reached" translatable="false">Maximum %1$d servers can be selected</string>
     <string name="server_selection_no_servers" translatable="false">No servers found</string>
     <string name="server_selection_no_servers_desc" translatable="false">Try adjusting your search or check back later</string>
-    <string name="server_selection_error_title" translatable="false">Can\'t Reach RPN Servers</string>
+    <string name="server_selection_error_title" translatable="false">Error fetching locations</string>
     <string name="server_selection_error_message" translatable="false">There was a problem fetching server locations. This is usually a temporary issue.</string>
     <string name="server_selection_error_hint" translatable="false">Check your connection or try again in a moment.</string>
     <string name="server_selection_error_retry" translatable="false">Try Again</string>
