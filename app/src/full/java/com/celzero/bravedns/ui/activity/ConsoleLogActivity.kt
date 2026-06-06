@@ -176,6 +176,21 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), androidx
                     }
                 }
             }
+            // Disable RecyclerView's GapWorker-driven item prefetch on this list.
+            // The console log is updated at very high frequency by background logging
+            // coroutines (Paging 3 inserts), and prefetch races with the paging
+            // update path to produce the IndexOutOfBoundsException in ConsoleLogAdapter
+            // reported as #2591 ("v055u: IndexOutOfBoundsException ConsoleLogAdapter").
+            // The existing try/catch above SWALLOWS the exception when it does fire;
+            // this prevents the race that causes it. Trade-off: marginally slower
+            // scroll because the next item is bound on-demand instead of one-frame
+            // ahead. For a debug log view that's a non-issue.
+            //
+            // Note: ConnectionTrackerFragment / DnsLogFragment elsewhere in this app
+            // explicitly enable prefetch (lm.isItemPrefetchEnabled = true). The
+            // console log has a fundamentally higher write rate so the default needs
+            // to differ.
+            (layoutManager as? LinearLayoutManager)?.isItemPrefetchEnabled = false
 
             b.consoleLogList.layoutManager = layoutManager
             recyclerAdapter = ConsoleLogAdapter(this)
