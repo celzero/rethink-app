@@ -126,7 +126,7 @@ class VpnServerAdapter(
     }
 
     companion object {
-        private const val STATS_POLL_MS = 2500L
+        private const val STATS_POLL_MS = 1500L
     }
 
     data class ServerGroup(
