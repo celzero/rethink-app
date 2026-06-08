@@ -2045,13 +2045,6 @@
 
     <string name="payment_processing" translatable="false">Payment processing</string>
     <string name="payment_processing_desc" translatable="false">Your payment is being processed. You’ll get access once it completes.</string>
-
-    <string name="rpn_not_available_desc" translatable="false">There seems to be an issue with RPN availability on your device. Please try again later or contact support.</string>
-
-    <!-- F-Droid build: RPN coming soon -->
-    <string name="rpn_fdroid_coming_soon" translatable="false">RPN Coming Soon</string>
-    <string name="rpn_fdroid_coming_soon_desc" translatable="false">RPN is not yet available on the F-Droid build. Stay tuned for updates!</string>
-
     <string name="rethink_terms" translatable="false">By subscribing to RPN you agree to the &lt;a href="https://rethinkdns.com/terms"&gt;Rethink Terms of Service&lt;/a&gt; and &lt;a href="https://rethinkdns.com/privacy"&gt;Privacy Policy&lt;/a&gt;. Powered by Windscribe</string>
 
     <!-- Subscription UI Strings -->
