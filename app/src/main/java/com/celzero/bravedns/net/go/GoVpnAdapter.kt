@@ -2539,6 +2539,7 @@ class GoVpnAdapter : KoinComponent {
         } else {
             rpnOps.setDNSConfig(dnsConfig)
         }
+        rpnOps.excludeCCs = persistentState.rpnAutoExcludedCcs
         // no need to check for config in AUTO mode
         if (!persistentState.rpnConfigHandlingManual) {
             Logger.v(LOG_TAG_PROXY, "$TAG, using default RpnOps config: $rpnOps")
@@ -2548,7 +2549,6 @@ class GoVpnAdapter : KoinComponent {
         // for now remove the permanent config, always send false
         // persistentState.rpnUsePermanentConfig is not used
         rpnOps.setPermaCreds(false)
-        rpnOps.excludeCCs = persistentState.rpnAutoExcludedCcs
         rpnOps.setRotateCreds(persistentState.rpnAlwaysChangeIdentity)
         rpnOps.setPort(persistentState.rpnPort)
         Logger.v(LOG_TAG_PROXY, "$TAG, using custom RpnOps config: $rpnOps")
