@@ -879,7 +879,6 @@ object RpnProxyManager : KoinComponent {
     suspend fun load(): Int {
         // need to read the filepath from database and load the file
         // there will be an entry in the database for each RPN proxy
-        serverKeyMeta.clear()
         val rp = try {
             db.getAllProxies()
         } catch (e: Exception) {
