@@ -23,6 +23,7 @@ import androidx.work.WorkerParameters
 import com.android.billingclient.api.BillingClient
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.iab.InAppBillingHandler.isListenerRegistered
+import com.celzero.bravedns.database.SubscriptionStatusRepository
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.extractWsObject
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.getExpiryFromPayload
@@ -40,6 +41,7 @@ class SubscriptionCheckWorker(
 
     private val persistentState by inject<PersistentState>()
     private val billingBackendClient by inject<BillingBackendClient>()
+    private val subscriptionStatusRepository by inject<SubscriptionStatusRepository>()
 
     private var attempts = 0
 
@@ -379,6 +381,21 @@ class SubscriptionCheckWorker(
                             Logger.i(LOG_IAB, "$TAG; $mname: server entitlement received, storing " +
                                 "for token=${purchase.purchaseToken.take(8)}")
                             RpnProxyManager.storeWinEntitlement(updated.payload)
+                            // also update the SubscriptionStatus table
+                            val current = subscriptionStatusRepository.getByPurchaseToken(purchase.purchaseToken)
+                            if (current != null) {
+                                subscriptionStatusRepository.updateDeveloperPayload(
+                                    current.id, updated.payload, System.currentTimeMillis()
+                                )
+                                if (updated.expiryTime > 0L && updated.expiryTime != Long.MAX_VALUE) {
+                                    subscriptionStatusRepository.updateBillingExpiry(
+                                        current.id, updated.expiryTime, System.currentTimeMillis()
+                                    )
+                                    subscriptionStatusRepository.updateAccountExpiry(
+                                        current.id, updated.expiryTime, System.currentTimeMillis()
+                                    )
+                                }
+                            }
                         }
                         val serverExpiry = updated.expiryTime
                         if (serverExpiry > 0L && serverExpiry != Long.MAX_VALUE) {
