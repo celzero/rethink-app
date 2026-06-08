@@ -2186,6 +2186,33 @@ class GoVpnAdapter : KoinComponent {
             Intra.logLevel(goLogLevel, consoleLogLevel)
             Logger.i(LOG_TAG_VPN, "$TAG set go-log level: $l1, $l2")
         }
+
+        suspend fun printStack(): String {
+            // where=0: stdout, where=1: console (no bytes returned by Go),
+            // any other value: returns goroutine stacks as bytes.
+            val where = 2
+            return withContext(Dispatchers.IO) {
+                try {
+                    val bytes = Intra.printStack(where)
+                    if (bytes == null || bytes.isEmpty()) {
+                        Logger.w(LOG_TAG_VPN, "$TAG print stack: null or empty")
+                        return@withContext ""
+                    }
+                    // The buffer may be zero-padded at the tail; trim trailing null bytes.
+                    val end = bytes.indexOfLast { it != 0.toByte() }
+                    if (end < 0) {
+                        Logger.w(LOG_TAG_VPN, "$TAG print stack: buffer entirely zero-padded")
+                        return@withContext ""
+                    }
+                    val content = bytes.copyOfRange(0, end + 1)
+                    Logger.i(LOG_TAG_VPN, "$TAG print stack: ${content.size} bytes (buffer=${bytes.size})")
+                    String(content, Charsets.UTF_8)
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_VPN, "$TAG err print stack: ${e.message}")
+                    ""
+                }
+            }
+        }
     }
 
     suspend fun p50(id: String): Long {
@@ -2596,6 +2623,8 @@ class GoVpnAdapter : KoinComponent {
             } else {
                 tunnel.proxies.rpn().win().get(id).refresh()
             }
+            // refresh the dns resolvers regardless of split dns
+            refreshResolvers()
             Logger.i(LOG_TAG_PROXY, "$TAG refreshed rpn proxy $id")
             true
         } catch (e: Exception) {
@@ -3373,33 +3402,6 @@ class GoVpnAdapter : KoinComponent {
             try {
                 Intra.flightRecorder(false)
             } catch (_: Exception) { }
-        }
-    }
-
-    suspend fun printStack(): String {
-        // where=0: stdout, where=1: console (no bytes returned by Go),
-        // any other value: returns goroutine stacks as bytes.
-        val where = 2
-        return withContext(Dispatchers.IO) {
-            try {
-                val bytes = Intra.printStack(where)
-                if (bytes == null || bytes.isEmpty()) {
-                    Logger.w(LOG_TAG_VPN, "$TAG print stack: null or empty")
-                    return@withContext ""
-                }
-                // The buffer may be zero-padded at the tail; trim trailing null bytes.
-                val end = bytes.indexOfLast { it != 0.toByte() }
-                if (end < 0) {
-                    Logger.w(LOG_TAG_VPN, "$TAG print stack: buffer entirely zero-padded")
-                    return@withContext ""
-                }
-                val content = bytes.copyOfRange(0, end + 1)
-                Logger.i(LOG_TAG_VPN, "$TAG print stack: ${content.size} bytes (buffer=${bytes.size})")
-                String(content, Charsets.UTF_8)
-            } catch (e: Exception) {
-                Logger.e(LOG_TAG_VPN, "$TAG err print stack: ${e.message}")
-                ""
-            }
         }
     }
 
