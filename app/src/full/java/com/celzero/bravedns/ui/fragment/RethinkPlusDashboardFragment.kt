@@ -92,6 +92,11 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
     private fun initView() {
         setupToolbar()
         loadSubscriptionBanner()
+        if (DEBUG) {
+            b.entitlementRl.visibility = View.VISIBLE
+        } else {
+            b.entitlementRl.visibility = View.GONE
+        }
     }
 
     private fun applyScrollPadding() {
