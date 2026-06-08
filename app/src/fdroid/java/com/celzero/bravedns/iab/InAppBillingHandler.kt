@@ -51,7 +51,7 @@ object InAppBillingHandler {
     const val PRODUCT_TYPE_SUBS = "subs"
     const val PRODUCT_TYPE_INAPP = "inapp"
 
-    const val UNACK_ESCALATION_THRESHOLD = 1
+    const val UNACK_ESCALATION_THRESHOLD = 3
 
     // LiveData shared by NotificationHandlerActivity / ManagePurchaseFragment
     val serverApiErrorLiveData: MutableLiveData<ServerApiError?> = MutableLiveData(null)

@@ -766,14 +766,6 @@ class SubscriptionStateMachineV2 : KoinComponent {
                     val targetState = deriveStateFromPlay(detail, purchase)
                     Logger.d(LOG_IAB, "$TAG: reconcile token=${purchase.purchaseToken.take(8)}, playExpiry=$playExpiry, targetState=${targetState.name}, currentState=${currentMachineState.name}")
 
-                    // If the machine is already Active, the derived state is Active, and the
-                    // token + expiry in the current DB data match what Play just returned →
-                    // there is nothing to do.  Firing PaymentSuccessful again would call
-                    // handlePaymentSuccessful which (a) re-evaluates the dedup, (b) may write
-                    // spurious history entries on the Expired→Active transition check.
-                    // The dedup inside handlePaymentSuccessful is the safety net; this guard
-                    // is a fast-path skip that prevents even entering that path.
-
                     val isInApp = detail.productType == BillingClient.ProductType.INAPP ||
                         isInAppProduct(detail.productId)
 
@@ -783,50 +775,62 @@ class SubscriptionStateMachineV2 : KoinComponent {
                     val isResubscription = !isInApp && dbStatusIsCancelled && detail.isAutoRenewing
 
                     val tokenUnchanged = currentData?.subscriptionStatus?.purchaseToken == detail.purchaseToken
-                    val effectiveExpiry = if (playExpiry == Long.MAX_VALUE)
-                        currentData?.subscriptionStatus?.billingExpiry ?: 0L
-                    else
-                        playExpiry
+                    val dbExpiry = currentData?.subscriptionStatus?.billingExpiry ?: 0L
+                    val effectiveExpiry = when {
+                        // if play says unknown, use DB
+                        playExpiry == Long.MAX_VALUE -> dbExpiry
+                        // if DB has a future expiry (likely from server), and play's local estimate is older, keep DB
+                        dbExpiry > 0L && playExpiry <= dbExpiry -> dbExpiry
+                        // otherwise use play's estimate (might be a renewal)
+                        else -> playExpiry
+                    }
                     val expiryUnchanged = currentData != null &&
                         currentData.subscriptionStatus.billingExpiry == effectiveExpiry
 
-                    // machine already Active, Play still says Active, token+expiry unchanged.
+                    val currentPayloadHasWs = RpnProxyManager.extractWsObject(currentData?.subscriptionStatus?.developerPayload ?: "") != null
+                    val newPayloadHasWs = RpnProxyManager.extractWsObject(detail.payload) != null
+                    // If current has ws but new doesn't, we consider payload "unchanged" to avoid noisy updates
+                    // that would downgrade the payload.
+                    val payloadUnchanged = if (currentPayloadHasWs && !newPayloadHasWs) true
+                                         else currentData?.subscriptionStatus?.developerPayload == detail.payload
+
+                    // machine already Active, Play still says Active, token+expiry+payload unchanged.
                     val skipAlreadyActive = !isResubscription &&
                         currentMachineState == SubscriptionState.Active &&
                         targetState          == SubscriptionState.Active &&
-                        tokenUnchanged && expiryUnchanged
+                        tokenUnchanged && expiryUnchanged && payloadUnchanged
 
                     val skipAlreadyCancelledValid = !isInApp && !isResubscription &&
                         currentMachineState == SubscriptionState.Active &&
                         targetState          == SubscriptionState.Cancelled &&
                         dbStatusIsCancelled &&
-                        tokenUnchanged && expiryUnchanged
+                        tokenUnchanged && expiryUnchanged && payloadUnchanged
 
                     if (skipAlreadyActive || skipAlreadyCancelledValid) {
                         Logger.d(LOG_IAB, "$TAG: reconcile skip: machine=${currentMachineState.name}, " +
-                            "target=${targetState.name}, token+expiry unchanged" +
+                            "target=${targetState.name}, token+expiry+payload unchanged" +
                             if (skipAlreadyCancelledValid) " (DB already CANCELLED, SUBS)" else "")
                         return@mapNotNull null
                     }
+
+                    val reconciledDetail = detail.copy(expiryTime = effectiveExpiry)
                     if (isResubscription) {
                         Logger.i(LOG_IAB, "$TAG: reconcile: SUBS resubscription detected, DB is CANCELLED but Play isAutoRenewing=true for token=${detail.purchaseToken.take(8)}, proceeding with PaymentSuccessful")
                     }
-
-                    InAppBillingHandler.reconcileCidDidFromPurchase(purchase.accountIdentifiers?.obfuscatedAccountId ?: "")
 
                     val isPlayCancelled = targetState == SubscriptionState.Cancelled
 
                     val event: SubscriptionEvent = when (targetState) {
                         SubscriptionState.PurchasePending,
                         SubscriptionState.PurchaseInitiated ->
-                            SubscriptionEvent.PurchaseCompleted(detail)
+                            SubscriptionEvent.PurchaseCompleted(reconciledDetail)
 
                         SubscriptionState.Active,
                         SubscriptionState.Grace,
                         SubscriptionState.OnHold,
                         SubscriptionState.Paused,
                         SubscriptionState.Cancelled ->
-                            SubscriptionEvent.PaymentSuccessful(detail)
+                            SubscriptionEvent.PaymentSuccessful(reconciledDetail)
 
                         SubscriptionState.Expired  -> SubscriptionEvent.SubscriptionExpired
                         SubscriptionState.Revoked  -> SubscriptionEvent.SubscriptionRevoked
@@ -837,23 +841,46 @@ class SubscriptionStateMachineV2 : KoinComponent {
                         }
                     } ?: return@mapNotNull null
 
-                    ReconcileAction(detail, event, isPlayCancelled)
+                    ReconcileAction(reconciledDetail, event, isPlayCancelled)
                 }
         }
 
+        if (actions.isEmpty()) return
+
+        // Elect the "best" action to drive the state machine data.
+        // Priority: 1. SUBS, 2. Latest Expiry.
+        val bestAction = actions.sortedWith(compareByDescending<ReconcileAction> {
+            it.detail.productType == BillingClient.ProductType.SUBS
+        }.thenByDescending {
+            it.detail.expiryTime
+        }).first()
+
+        Logger.i(LOG_IAB, "$TAG: reconcile: electing best action for state machine: " +
+            "token=${bestAction.detail.purchaseToken.take(8)}, prod=${bestAction.detail.productId}, " +
+            "type=${bestAction.detail.productType}, expiry=${bestAction.detail.expiryTime}")
+
         actions.forEach { action ->
             try {
-                processEventSafely(action.event)
-                // After activating, write CANCELLED status to DB if Play says so.
-                // Wrapped in stateLock to prevent racing with concurrent events that
-                // might overwrite the status (e.g. a renewal PaymentSuccessful).
-                if (action.isPlayCancelled) {
-                    stateLock.withLock {
-                        updateCancelledStatusInDb(action.detail)
+                // If this is the best action, it will drive handlePaymentSuccessful to update
+                // the state machine data. If it's NOT the best action, we just want to ensure
+                // it's synced to the DB, but NOT overwrite the machine's primary data.
+
+                if (action == bestAction) {
+                    processEventSafely(action.event)
+                    // After activating, write CANCELLED status to DB if Play says so.
+                    if (action.isPlayCancelled) {
+                        stateLock.withLock {
+                            updateCancelledStatusInDb(action.detail)
+                        }
+                    }
+                } else {
+                    // Just sync to DB if it's a PaymentSuccessful event.
+                    if (action.event is SubscriptionEvent.PaymentSuccessful) {
+                        handlePaymentSuccessful(action.detail, updateMachineData = false)
                     }
                 }
             } catch (e: Exception) {
-                Logger.e(LOG_IAB, "$TAG: reconcile: error firing ${action.event.name} for token ${action.detail.purchaseToken.take(8)}: ${e.message}", e)
+                Logger.e(LOG_IAB, "$TAG: reconcile: error processing action for token ${action.detail.purchaseToken.take(8)}: ${e.message}", e)
             }
         }
 
@@ -1223,6 +1250,11 @@ class SubscriptionStateMachineV2 : KoinComponent {
                                 "still-valid sub id=${validSub.id}, " +
                                 "token=${validSub.purchaseToken.take(8)}"
                             )
+                            // activate RPN with the elected valid subscription
+                            scope.launch {
+                                try { RpnProxyManager.activateRpn(validPd) }
+                                catch (e: Exception) { Logger.e(LOG_IAB, "$TAG: RPN activate error: ${e.message}", e) }
+                            }
                         } else {
                             Logger.w(
                                 LOG_IAB,
@@ -1563,10 +1595,16 @@ class SubscriptionStateMachineV2 : KoinComponent {
      * [saveStateTransition] in [StateMachineDatabaseSyncService] records history only and
      * never touches the subscription row independently, preventing double-writes and
      * status overwrite races (e.g. CANCELLED overwritten back to ACTIVE).
+     *
+     * @param purchaseDetail   The purchase data from Play.
+     * @param updateMachineData If true (default), updates the state machine's in-memory data pointer.
      */
-    private suspend fun handlePaymentSuccessful(purchaseDetail: PurchaseDetail) {
+    private suspend fun handlePaymentSuccessful(
+        purchaseDetail: PurchaseDetail,
+        updateMachineData: Boolean = true
+    ) {
         try {
-            Logger.i(LOG_IAB, "$TAG: handlePaymentSuccessful: ${purchaseDetail.productId}, token=${purchaseDetail.purchaseToken.take(8)}, planId=${purchaseDetail.planId}, productTitle=${purchaseDetail.productTitle}")
+            Logger.i(LOG_IAB, "$TAG: handlePaymentSuccessful: ${purchaseDetail.productId}, token=${purchaseDetail.purchaseToken.take(8)}, updateData=$updateMachineData")
 
             val existingByToken = subscriptionDb.getByPurchaseToken(purchaseDetail.purchaseToken)
             val existingLatest  = if (existingByToken == null) subscriptionDb.getCurrentSubscription() else null
@@ -1579,21 +1617,34 @@ class SubscriptionStateMachineV2 : KoinComponent {
             val newBillingExpiry = if (billingExpiry == Long.MAX_VALUE) 0L else billingExpiry
             val expiryAlreadyCurrent = existingBillingExpiry > 0L && existingBillingExpiry == newBillingExpiry
 
+            val currentPayloadHasWs = RpnProxyManager.extractWsObject(existing?.developerPayload ?: "") != null
+            val newPayloadHasWs = RpnProxyManager.extractWsObject(purchaseDetail.payload) != null
+            // same as in reconcile: don't downgrade payload
+            val payloadUnchanged = if (currentPayloadHasWs && !newPayloadHasWs) true
+                                 else existing?.developerPayload == purchaseDetail.payload
+
+            val targetStatus = if (purchaseDetail.isAutoRenewing || isInAppProduct(purchaseDetail.productId)) {
+                SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id
+            } else {
+                SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id
+            }
+
             val existingIsCurrent = existing != null &&
                 existing.purchaseToken == purchaseDetail.purchaseToken &&
-                (existing.status == SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id ||
-                 existing.status == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id) &&
+                existing.status == targetStatus &&
                 expiryAlreadyCurrent &&
                 existing.productId == purchaseDetail.productId &&
                 existing.planId == purchaseDetail.planId &&
                 existing.productTitle == purchaseDetail.productTitle &&
-                existing.developerPayload == purchaseDetail.payload
+                payloadUnchanged
 
             if (existingIsCurrent) {
                 val statusName = SubscriptionStatus.SubscriptionState.fromId(existing.status).name
                 Logger.i(LOG_IAB, "$TAG: handlePaymentSuccessful: no-op, all fields current (status=$statusName)")
 
-                stateMachine.updateData(SubscriptionData(existing, purchaseDetail))
+                if (updateMachineData) {
+                    stateMachine.updateData(SubscriptionData(existing, purchaseDetail))
+                }
 
                 if (existing.status == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id) {
                     scope.launch {
@@ -1625,13 +1676,16 @@ class SubscriptionStateMachineV2 : KoinComponent {
                 existing.purchaseToken == purchaseDetail.purchaseToken &&
                 (existing.status == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id ||
                  existing.status == SubscriptionStatus.SubscriptionState.STATE_REVOKED.id) &&
+                !purchaseDetail.isAutoRenewing &&
                 (System.currentTimeMillis() - existing.lastUpdatedTs) < LOCAL_CANCEL_REVOKE_GUARD_MS
             ) {
                 Logger.i(LOG_IAB, "$TAG: handlePaymentSuccessful: preserving local " +
                     "${SubscriptionStatus.SubscriptionState.fromId(existing.status).name} status " +
                     "for token=${purchaseDetail.purchaseToken.take(8)}, Play propagation pending " +
                     "(guard=${LOCAL_CANCEL_REVOKE_GUARD_MS / 60_000}min, isAutoRenewing=${purchaseDetail.isAutoRenewing})")
-                stateMachine.updateData(SubscriptionData(existing, purchaseDetail))
+                if (updateMachineData) {
+                    stateMachine.updateData(SubscriptionData(existing, purchaseDetail))
+                }
                 return
             }
 
@@ -1652,34 +1706,40 @@ class SubscriptionStateMachineV2 : KoinComponent {
             val isInApp = purchaseDetail.productType == BillingClient.ProductType.INAPP ||
                     isInAppProduct(purchaseDetail.productId)
             val existingIsInApp = existing?.productId?.let { isInAppProduct(it) } ?: false
-            val isInAppExtension = isPlanChange && isInApp && existingIsInApp
 
-            if (isPlanChange && !isInAppExtension) {
-                // SUBS plan change or SUBS→INAPP: expire the old row.
+            // Only expire the old row if BOTH are SUBS. INAPP purchases always coexist
+            // with other INAPPs and with SUBS.
+            val shouldExpirePrev = isPlanChange && !isInApp && !existingIsInApp
+
+            if (shouldExpirePrev) {
+                // SUBS plan change: expire the old row.
                 val prev = existing
-                Logger.i(LOG_IAB, "$TAG: plan change: ${prev.productId}/${prev.purchaseToken.take(8)} → ${purchaseDetail.productId}/${purchaseDetail.purchaseToken.take(8)}")
-                prev.status  = SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id
-                prev.lastUpdatedTs = System.currentTimeMillis()
-                subscriptionDb.upsert(prev)
+                Logger.i(LOG_IAB, "$TAG: plan change (SUBS): ${prev?.productId}/${prev?.purchaseToken?.take(8)} → ${purchaseDetail.productId}/${purchaseDetail.purchaseToken.take(8)}")
+                prev?.status  = SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id
+                prev?.lastUpdatedTs = System.currentTimeMillis()
+                prev?.let { subscriptionDb.upsert(it) }
                 dbSyncService.recordHistoryOnly(
-                    subscriptionId = prev.id,
+                    subscriptionId = prev?.id ?: 0,
                     fromStatusId = SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id,
                     toStatusId = SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id,
-                    reason = "Superseded by new purchase: token=${purchaseDetail.purchaseToken.take(8)}, product=${purchaseDetail.productId}"
+                    reason = "Superseded by new SUBS purchase: token=${purchaseDetail.purchaseToken.take(8)}, product=${purchaseDetail.productId}"
                 )
-            } else if (isInAppExtension) {
-                // INAPP extension: log but keep the old row active.
-                Logger.i(LOG_IAB, "$TAG: INAPP extension, keeping old row active: " +
-                    "${existing.productId}/${existing.purchaseToken.take(8)}, " +
+            } else if (isPlanChange) {
+                // INAPP extension or cross-type purchase: log but keep the old row active.
+                Logger.i(LOG_IAB, "$TAG: purchase coexists with old row: " +
+                    "${existing?.productId}/${existing?.purchaseToken?.take(8)}, " +
                     "new: ${purchaseDetail.productId}/${purchaseDetail.purchaseToken.take(8)}")
             }
 
-            val rowToSave: SubscriptionStatus = existingByToken?.also { s -> syncAllFields(s, purchaseDetail, billingExpiry, sessionToken) }
-                ?: SubscriptionStatus().also { s ->
+            val rowToSave: SubscriptionStatus = existingByToken?.also { s ->
+                syncAllFields(s, purchaseDetail, billingExpiry, sessionToken)
+                s.status = targetStatus
+            } ?: SubscriptionStatus().also { s ->
                     syncAllFields(s, purchaseDetail, billingExpiry, sessionToken)
-                    if (isPlanChange && !isInAppExtension) {
-                        s.previousProductId = existing.productId
-                        s.previousPurchaseToken = existing.purchaseToken
+                    s.status = targetStatus
+                    if (shouldExpirePrev) {
+                        s.previousProductId = existing?.productId ?: ""
+                        s.previousPurchaseToken = existing?.purchaseToken ?: ""
                         s.replacedAt = System.currentTimeMillis()
                     }
                 }
@@ -1692,8 +1752,10 @@ class SubscriptionStateMachineV2 : KoinComponent {
             if (rowToSave.id == 0) rowToSave.id = upsertId.toInt()
 
             val currentState = stateMachine.getCurrentState()
-            val subscriptionData = SubscriptionData(rowToSave, purchaseDetail)
-            stateMachine.updateData(subscriptionData)
+            if (updateMachineData) {
+                val subscriptionData = SubscriptionData(rowToSave, purchaseDetail)
+                stateMachine.updateData(subscriptionData)
+            }
 
             // Record history for:
             //  - any status change       (prevStatusId != newStatusId)
@@ -1714,15 +1776,15 @@ class SubscriptionStateMachineV2 : KoinComponent {
                     preExistingStatus == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id
 
             val prevStatusId  = preExistingStatus ?: SubscriptionStatus.SubscriptionState.STATE_INITIAL.id
-            val newStatusId   = SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id
+            val newStatusId   = targetStatus
             val expiryChanged = existingBillingExpiry > 0L &&
                     newBillingExpiry > 0L &&
                     existingBillingExpiry != newBillingExpiry
             if (!isReconcileOfExistingCancelled &&
-                (prevStatusId != newStatusId || (isPlanChange && !isInAppExtension) || expiryChanged)) {
+                (prevStatusId != newStatusId || (shouldExpirePrev) || expiryChanged)) {
                 val historyReason = when {
-                    isInAppExtension -> "INAPP access extended: new token=${purchaseDetail.purchaseToken.take(8)}, product=${purchaseDetail.productId}"
-                    isPlanChange  -> "Plan changed from $prevProductId to ${purchaseDetail.productId}"
+                    isPlanChange && (isInApp || existingIsInApp) -> "Purchase coexists: new token=${purchaseDetail.purchaseToken.take(8)}, product=${purchaseDetail.productId}"
+                    shouldExpirePrev -> "Plan changed from $prevProductId to ${purchaseDetail.productId}"
                     expiryChanged -> "Subscription renewed from ${currentState.name}: billingExpiry $existingBillingExpiry → $newBillingExpiry"
                     else          -> "Payment successful from ${currentState.name}"
                 }
@@ -1750,7 +1812,7 @@ class SubscriptionStateMachineV2 : KoinComponent {
     }
 
     /**
-     * Sync **every** field of [s] from [d] (Play data).
+     * Sync **every** field of [s] from [d] (Play data), EXCEPT the status column.
      *
      * Expiry invariant: only overwrites billingExpiry/accountExpiry when the incoming
      * value is a real positive epoch-millis (not 0 or MAX_VALUE sentinel).
@@ -1779,9 +1841,15 @@ class SubscriptionStateMachineV2 : KoinComponent {
             s.billingExpiry = billingExpiry
             s.accountExpiry = billingExpiry
         }
-        s.sessionToken = sessionToken.ifBlank { s.sessionToken }
-        s.developerPayload = d.payload.ifBlank { s.developerPayload }
-        s.status = SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id
+
+        val newPayloadHasWs = RpnProxyManager.extractWsObject(d.payload) != null
+        val oldPayloadHasWs = RpnProxyManager.extractWsObject(s.developerPayload) != null
+
+        if (newPayloadHasWs || !oldPayloadHasWs) {
+            s.developerPayload = d.payload.ifBlank { s.developerPayload }
+            s.sessionToken = sessionToken.ifBlank { s.sessionToken }
+        }
+
         s.lastUpdatedTs  = System.currentTimeMillis()
         s.windowDays = d.windowDays
         s.orderId = d.orderId
@@ -1918,7 +1986,7 @@ class SubscriptionStateMachineV2 : KoinComponent {
             if (existing != null) {
                 val prevStatus = existing.status
 
-                // Dedup: if already ACTIVE or CANCELLED with same token+product → no write, no history.
+                // Dedup: if already ACTIVE or CANCELLED with same token+product+expiry+payload → no write, no history.
                 //
                 // ACTIVE: common cold-start path; DB is already correct, just restore memory.
                 //
@@ -1929,18 +1997,29 @@ class SubscriptionStateMachineV2 : KoinComponent {
                 //   spurious "Cancelled → Active" history entry that never corresponds to a real
                 //   payment event.  Play reconcile will write the authoritative status seconds
                 //   after startup via updateCancelledStatusInDb / handlePaymentSuccessful.
-                if ((prevStatus == SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id ||
+                val billingExpiry = purchaseDetail.expiryTime
+                val sessionToken  = RpnProxyManager.getSessionTokenFromPayload(purchaseDetail.payload)
+
+                val newBillingExpiry = if (billingExpiry == Long.MAX_VALUE) 0L else billingExpiry
+                val expiryUnchanged = existing.billingExpiry > 0L && existing.billingExpiry == newBillingExpiry
+
+                val currentPayloadHasWs = RpnProxyManager.extractWsObject(existing.developerPayload) != null
+                val newPayloadHasWs = RpnProxyManager.extractWsObject(purchaseDetail.payload) != null
+                // same logic: don't downgrade
+                val payloadUnchanged = if (currentPayloadHasWs && !newPayloadHasWs) true
+                                     else existing.developerPayload == purchaseDetail.payload
+
+                if (expiryUnchanged && payloadUnchanged &&
+                    (prevStatus == SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id ||
                      prevStatus == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id) &&
                     existing.purchaseToken == purchaseDetail.purchaseToken &&
                     existing.productId     == purchaseDetail.productId
                 ) {
-                    Logger.d(LOG_IAB, "$TAG: handleSubscriptionRestored: already ${SubscriptionStatus.SubscriptionState.fromId(prevStatus).name}, memory-only restore")
+                    Logger.d(LOG_IAB, "$TAG: handleSubscriptionRestored: already ${SubscriptionStatus.SubscriptionState.fromId(prevStatus).name} with current data, memory-only restore")
                     stateMachine.updateData(SubscriptionData(existing, purchaseDetail))
                     return
                 }
 
-                val billingExpiry = purchaseDetail.expiryTime
-                val sessionToken  = RpnProxyManager.getSessionTokenFromPayload(purchaseDetail.payload)
                 syncAllFields(existing, purchaseDetail, billingExpiry, sessionToken)
                 val updateResult = subscriptionDb.upsert(existing)
                 if (updateResult > 0) {

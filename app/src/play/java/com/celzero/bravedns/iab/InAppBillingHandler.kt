@@ -19,9 +19,7 @@ import Logger
 import Logger.LOG_IAB
 import android.app.Activity
 import android.content.Context
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClient.BillingResponseCode
 import com.android.billingclient.api.BillingClient.ProductType
@@ -450,7 +448,7 @@ object InAppBillingHandler : KoinComponent {
                                             ?.forEach { purchase ->
                                                 val accountId = purchase.accountIdentifiers?.obfuscatedAccountId
                                                 val storedAccId = getObfuscatedAccountId()
-                                                var isRegistered: Boolean = false
+                                                var isRegistered = false
 
                                                 if (accountId.isNullOrBlank()) {
                                                     loge(mname, "obfuscatedAccountId missing from purchase ${purchase.purchaseToken.take(8)}; skipping registerDevice")
@@ -656,6 +654,13 @@ object InAppBillingHandler : KoinComponent {
                                     serverConfirmedValidTokens.add(sub.purchaseToken)
                                     continue
                                 }
+
+                                // if we got a new valid payload, ensure it's saved in DB and StateMachine
+                                if (updatedDetail.payload.isNotEmpty() && updatedDetail.payload != sub.developerPayload) {
+                                    logd(mname, "INAPP token=${sub.purchaseToken.take(8)}: payload updated from server, syncing...")
+                                    subscriptionStateMachine.paymentSuccessful(updatedDetail)
+                                }
+
                                 val tunnelExpiry: Long = getExpiryFromPayload(updatedDetail.payload) ?: 0L
                                 // billingExpiry is the authoritative local clock for INAPP purchases.
                                 // The VPN session token (tunnelExpiry) can expire weeks or months before
@@ -719,8 +724,7 @@ object InAppBillingHandler : KoinComponent {
                 // which is the expected state after a one-time purchase.
                 val pendingProductId = subscriptionStateMachine.getSubscriptionData()
                     ?.subscriptionStatus?.productId ?: ""
-                val pendingIsInApp = pendingProductId == ONE_TIME_PRODUCT_ID || pendingProductId == ONE_TIME_PRODUCT_2YRS || pendingProductId == ONE_TIME_PRODUCT_5YRS
-                        || pendingProductId == ONE_TIME_TEST_PRODUCT_ID
+                val pendingIsInApp = SubscriptionStateMachineV2.isInAppProduct(pendingProductId)
                 val pendingMatchesQueriedType = when (queriedProductType) {
                     ProductType.INAPP -> pendingIsInApp
                     ProductType.SUBS  -> !pendingIsInApp && pendingProductId.isNotBlank()
@@ -881,7 +885,7 @@ object InAppBillingHandler : KoinComponent {
                 consecutiveEmptySubsQueries = 0
                 try {
                     subscriptionStateMachine.reconcileWithPlayBilling(
-                        purchases          = emptyList<Purchase>(),
+                        purchases = emptyList(),
                         queriedProductType = ProductType.SUBS
                     )
                 } catch (e: Exception) {
@@ -2479,7 +2483,7 @@ object InAppBillingHandler : KoinComponent {
      * Revoke a one-time (INAPP) purchase (full refund within revoke window).
      *
      * Mirrors [revokeSubscription] exactly but uses the correct one-time product SKU.
-     * Calls [ITcpProxy.revokeSubscription] → updates local state → fires
+     * Calls [revokeSubscription] → updates local state → fires
      * [SubscriptionStateMachineV2.subscriptionRevoked].
      *
      * @param accountId    Obfuscated account ID.
@@ -2676,7 +2680,8 @@ object InAppBillingHandler : KoinComponent {
     suspend fun queryEntitlementFromServer(accountId: String, deviceId: String, purchase: PurchaseDetail): PurchaseDetail {
         val mname = this::queryEntitlementFromServer.name
         logd(mname, "delegating to BillingServerRepository, accLen=${accountId.length}")
-        val pt = purchase.purchaseToken.ifEmpty { getLatestPurchaseToken() } ?: run {
+        val pt = purchase.purchaseToken
+        if (pt.isEmpty()) {
             logd(mname, "no purchase token; skipping")
             return purchase
         }
@@ -2756,10 +2761,6 @@ object InAppBillingHandler : KoinComponent {
             )
         }
         return Pair(success, payload)
-    }
-
-    fun getLatestPurchaseToken(): String? {
-        return purchasesLiveData.value?.maxByOrNull { it.purchaseTime }?.purchaseToken
     }
 
     fun getSubscriptionState(): SubscriptionStateMachineV2.SubscriptionState {
