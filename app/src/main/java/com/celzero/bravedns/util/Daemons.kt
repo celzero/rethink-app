@@ -143,7 +143,9 @@ class Factory(tag: String = "d"): ThreadFactory {
             namePrefix + threadNumber.getAndIncrement(),
             0
         )
-        if (t.isDaemon) t.isDaemon = false
+        // this was false before, now setting it to true as we are creating only Daemon threads
+        // through this call
+        t.isDaemon = true
         if (t.priority != Thread.NORM_PRIORITY) t.priority = Thread.NORM_PRIORITY
         return t
     }
