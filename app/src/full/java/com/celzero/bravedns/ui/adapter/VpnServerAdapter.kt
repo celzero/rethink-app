@@ -18,6 +18,7 @@ package com.celzero.bravedns.ui.adapter
 import Logger
 import Logger.LOG_TAG_UI
 import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
 import android.text.format.DateUtils
@@ -54,6 +55,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.Locale
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Adapter for the list of currently-selected (active) VPN servers shown in ServerSelectionFragment
@@ -127,6 +129,7 @@ class VpnServerAdapter(
 
     companion object {
         private const val STATS_POLL_MS = 1500L
+        private const val MIN_REFRESH_ANIM_MS = 1500L
     }
 
     data class ServerGroup(
@@ -310,30 +313,27 @@ class VpnServerAdapter(
         private fun handleInfoIconClick(group: ServerGroup) {
             if (group.key.equals(AUTO_SERVER_ID, ignoreCase = true)) {
                 io {
+                    val startTime = System.currentTimeMillis()
                     var animator: ObjectAnimator? = null
                     uiCtx {
-                        try {
-                            uiCtx {
-                                animator =
-                                    ObjectAnimator.ofFloat(b.infoIcon, "rotation", 0f, 360f).apply {
-                                        duration = 600L
-                                        repeatCount = ObjectAnimator.INFINITE
-                                        interpolator = LinearInterpolator()
-                                        start()
-                                    }
-                            }
-                            VpnController.refreshRpnProxy(Backend.RpnWin)
-                        } finally {
-                            uiCtx {
-                                animator?.cancel()
-                                b.infoIcon.rotation = 0f
-                            }
+                        animator = ObjectAnimator.ofFloat(b.infoIcon, "rotation", 0f, 360f).apply {
+                            duration = 600L
+                            repeatCount = ValueAnimator.INFINITE
+                            interpolator = LinearInterpolator()
+                            start()
                         }
                     }
-                    VpnController.refreshRpnProxy(Backend.RpnWin)
-                    uiCtx {
-                        animator?.cancel()
-                        b.infoIcon.rotation = 0f
+                    try {
+                        VpnController.refreshRpnProxy(Backend.RpnWin)
+                    } finally {
+                        val elapsed = System.currentTimeMillis() - startTime
+                        if (elapsed < MIN_REFRESH_ANIM_MS) {
+                            delay((MIN_REFRESH_ANIM_MS - elapsed).milliseconds)
+                        }
+                        uiCtx {
+                            animator?.cancel()
+                            b.infoIcon.rotation = 0f
+                        }
                     }
                 }
             } else {
