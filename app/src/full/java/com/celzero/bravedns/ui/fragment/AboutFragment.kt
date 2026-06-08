@@ -56,6 +56,7 @@ import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentAboutBinding
+import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.scheduler.BugReportZipper
 import com.celzero.bravedns.scheduler.BugReportZipper.getZipFileName
@@ -494,7 +495,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
     private fun openStackTraceDialog() {
         io {
-            val goStackTrace = VpnController.printStack()
+            val goStackTrace = GoVpnAdapter.printStack()
             val kotlinStackTrace = captureKotlinStackTraces()
             uiCtx {
                 if (!isAdded) return@uiCtx
