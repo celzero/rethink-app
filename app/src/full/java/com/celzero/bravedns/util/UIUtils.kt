@@ -44,6 +44,7 @@ import androidx.core.content.getSystemService
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.doh.Transaction
@@ -258,6 +259,15 @@ object UIUtils {
     }
 
     fun openAndroidAppInfo(context: Context, packageName: String?) {
+        if (packageName?.startsWith(NO_PACKAGE_PREFIX) == true) {
+            Utilities.showToastUiCentered(
+                context,
+                context.getString(R.string.ctbs_app_info_not_available_toast),
+                Toast.LENGTH_SHORT
+            )
+            return
+        }
+
         try {
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
             intent.data = Uri.fromParts("package", packageName, null)
