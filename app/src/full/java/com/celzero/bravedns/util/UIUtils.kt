@@ -50,6 +50,7 @@ import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.DnsLogTracker
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.firestack.backend.Backend
+import com.celzero.firestack.backend.GoMetrics
 import com.celzero.firestack.backend.NetStat
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.radiobutton.MaterialRadioButton
@@ -704,13 +705,14 @@ object UIUtils {
         return stats
     }
 
-    fun formatNetMetrics(stat: NetStat?): String? {
+    fun formatNetMetrics(stat: GoMetrics?): String? {
         if (stat == null) return null
 
         val go = stat.go()?.toString()
-        val go2 = stat.gO2().toString()
+        val c = stat.c
+        val m = stat.m
 
-        var stats = go + go2
+        var stats = go + c + m
         stats = stats.replace("{", "\n")
         stats = stats.replace("}", "\n\n")
         stats = stats.replace(",", "\n")
