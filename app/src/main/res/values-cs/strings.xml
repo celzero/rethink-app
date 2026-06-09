@@ -420,7 +420,6 @@
     <string name="hsf_whats_new_chip_text" translatable="true">Co je nového</string>
     <string name="hsf_exclude_error" translatable="true">Vyloučení není možné v režimu VPN lockdown</string>
     <string name="hsf_proxy_chip_removed_toast" translatable="true">Proxy bylo vypnuto</string>
-    <string name="hsf_proxy_chip_remove_text" translatable="true">Zastavuji…</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Zachytávání paketů zakázáno</string>
     <string name="hsf_whats_new_remove_text" translatable="true">Zavírám…</string>
     <string name="hsf_blocklist_updating_text" translatable="true">Povoluji…</string>

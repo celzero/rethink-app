@@ -464,7 +464,6 @@
     <string name="settings_allow_lan_desc" translatable="true">ரீதிங்கின் விபிஎன் சுரங்கப்பாதையில் இருந்து LAN, லூப் பேக், மல்டிகாச்ட், இணைப்பு-உள்ளூர் வழிகளை விலக்குங்கள்.</string>
     <string name="settings_proxy_header" translatable="true">பதிலாள்</string>
     <string name="settings_default_dns_heading" translatable="true">குறைவடையும் DNS ஐத் தேர்வுசெய்க</string>
-    <string name="hsf_proxy_chip_remove_text" translatable="true">நிறுத்துதல்…</string>
     <string name="fapps_filter_categories_heading" translatable="true">வகைகள்</string>
     <string name="firewall_rule_proxied" translatable="true">பிரதிநிதித்துவம்</string>
     <string name="build__flavor_fdroid" translatable="true">fdroid</string>
@@ -1054,8 +1053,6 @@
     <string name="dc_filtering_heading" translatable="true">வடிகட்டுதல்</string>
     <string name="cd_split_dns_heading" translatable="true">பிளவு டி.என்.எச் (சோதனை)</string>
     <string name="cd_split_dns_desc" translatable="true">ப்ராக்சியின் டிஎன்எச் சேவையகங்களுக்கு ப்ராக்சிட் ஆப்சிலிருந்து முன்னோக்கி டிஎன்எச் வினவல்கள்.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">டி.என்.எச் விதிகளை ஃபயர்வால் விதிகளாக (சோதனை) கருதுங்கள்</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">தீர்மானத்தின் போது டி.என்.எச் தடுப்பது புறக்கணிக்கப்படும்; இணைப்பு நேரத்தில் முடிவு எடுக்கப்படும்.</string>
     <string name="univ_firewall_rule_11" translatable="true">அனைத்து உள்ளக புரவலன் இணைப்புகளையும் தடுக்கவும்</string>
     <string name="firewall_rule_private_dns" translatable="true">தனியார் டி.என்</string>
     <string name="firewall_rule_bypass_proxy" translatable="true">பைபாச் பதிலாள்</string>

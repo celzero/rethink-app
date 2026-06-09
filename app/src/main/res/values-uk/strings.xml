@@ -938,7 +938,6 @@
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">Увімкнути RDNS+</string>
     <string name="hsf_exclude_error" translatable="true">Вимкнути неможливо в режимі \"блокування без VPN\"</string>
     <string name="hsf_proxy_chip_removed_toast" translatable="true">Проксі вилучено</string>
-    <string name="hsf_proxy_chip_remove_text" translatable="true">Припинення…</string>
     <string name="lbl_battery_optimization" translatable="true">Оптимізація акумулятора</string>
     <string name="battery_optimization_dialog_heading" translatable="true">Вимкнути %1$s</string>
     <string name="dc_local_block_desc_1" translatable="true">Виберіть з 195+ блоклистів. Натисніть тут, щоб завантажити або налаштувати їх.</string>
@@ -1080,8 +1079,6 @@
     <string name="dc_filtering_heading" translatable="true">фільтрація</string>
     <string name="cd_split_dns_heading" translatable="true">Розділений DNS (експериментальний)</string>
     <string name="cd_split_dns_desc" translatable="true">Пересилати DNS-запити від проксі-програм на DNS-сервери проксі-сервера.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">Розглядати правила DNS як правила брандмауера (експериментально)</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">Блокування DNS буде обійдено під час вирішення проблеми; рішення буде прийнято під час підключення.</string>
     <string name="univ_firewall_rule_11" translatable="true">Блокувати всі підключення до локального хоста</string>
     <string name="firewall_rule_private_dns" translatable="true">Приватний DNS</string>
     <string name="firewall_rule_bypass_proxy" translatable="true">Обхід проксі-сервера</string>

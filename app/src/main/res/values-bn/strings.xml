@@ -28,7 +28,6 @@
     <string name="settings_socks5_dialog_hint_ip">আইপি ঠিকানা</string>
     <string name="settings_ip_text_ipv6">IPv6</string>
     <string name="settings_selected_theme">বর্তমান থিম: %1$s</string>
-    <string name="hsf_proxy_chip_remove_text">থামানে হচ্ছে…</string>
     <string name="hsf_chip_appearance">থিম: %1$s</string>
     <string name="dc_dns_website_heading">DNS লগে ওয়েবসাইট আইকন দেখান (পরীক্ষামূলক)</string>
     <string name="about_docs">ডক্স পড়ুন</string>

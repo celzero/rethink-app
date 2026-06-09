@@ -63,7 +63,6 @@
     <string name="rethink_max_desc">أكثر من 50 موقعًا ؛ أكثر خصوصية محلل تكراري يعمل على fly.io</string>
     <string name="orbot_status_arg_3">DNS و TCP</string>
     <string name="firewall_status_allow">مسموح</string>
-    <string name="hsf_proxy_chip_remove_text">يتوقف…</string>
     <string name="category_name_others">أخرى</string>
     <string name="firewall_rule_block_udp_ntp">UDP محظور</string>
     <string name="network_log_app_name_unknown">مجهول</string>
@@ -1033,7 +1032,6 @@
     <string name="cd_dns_alg_desc" translatable="true">تعيين عنوان IP فريد لكل طلب DNS.</string>
     <string name="cd_split_dns_heading" translatable="true">تقسيم DNS (تجريبي)</string>
     <string name="cd_split_dns_desc" translatable="true">إعادة توجيه إستعلامات DNS من التطبيقات الوكيلة إلى خوادم DNS الخاصة بالوكيل.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">معاملة قواعد DNS كقواعد جدار الحماية (تجريبي)</string>
     <string name="univ_firewall_rule_11" translatable="true">حظر جميع اتصالات المضيف المحلي</string>
     <string name="fapps_bypass_block_dialog_title" translatable="true">تجاوز التطبيقات</string>
     <string name="fail_open_network_title" translatable="true">لا تتوقف عند فقدان الشبكة</string>
@@ -1053,7 +1051,6 @@
     <string name="hop_add_remove_title" translatable="true">إضافة / إزالة مُرحل</string>
     <string name="dns_record_types_auto_mode_status" translatable="true">تلقائي (كل الأنواع)</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">لا تتحقق من صحة شهادات TLS الخاصة بالخادم (فعِّل هذا الخيار فقط إذا كنت تعرف ما تفعله)</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">سيتم تجاوز حجب الـ DNS أثناء عملية التحليل؛ وسيتم اتخاذ القرار عند وقت الاتصال.</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">حذف جميع قواعد النطاق؟</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">حذف هذه القواعد سيسمح لأي تطبيق بالاتصال بالنطاقات المحظورة حاليًا.</string>
     <string name="app_ip_domain_rules" translatable="true">قواعد عناوين الـ IP / النطاقات لكل تطبيق</string>

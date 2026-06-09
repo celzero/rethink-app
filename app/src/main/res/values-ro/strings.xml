@@ -446,7 +446,6 @@
     <string name="hsf_packet_capture_chip_text" translatable="true">Capturare pachete activă</string>
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">Activează RDNS+</string>
     <string name="hsf_exclude_error" translatable="true">Excluderea nu e posibilă în modul VPN lockdown</string>
-    <string name="hsf_proxy_chip_remove_text" translatable="true">Se oprește…</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Capturarea pachetelor dezactivată</string>
     <string name="hsf_whats_new_remove_text" translatable="true">Se închide…</string>
     <string name="hsf_blocklist_updating_text" translatable="true">Se activează…</string>
@@ -1061,8 +1060,6 @@
     <string name="dc_filtering_heading" translatable="true">filtrare</string>
     <string name="cd_split_dns_heading" translatable="true">DNS ramificat (experimental)</string>
     <string name="cd_split_dns_desc" translatable="true">Redirecționează cererile DNS de la aplicațiile care folosesc proxy către serverele DNS proxy.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">Tratează regulile DNS ca reguli de firewall (experimental)</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">Blocarea prin DNS va fi ocolită pe timpul soluționării; decizia va fi luată la momentul conectării.</string>
     <string name="univ_firewall_rule_11" translatable="true">Blochează toate conexiunile la localhost</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">Elimini toate regulile de domeniu?</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">Eliminarea acestor reguli va permite oricărei aplicații să se conecteze la domeniile blocate în prezent.</string>

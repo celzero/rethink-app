@@ -246,7 +246,6 @@
     <string name="lbl_add">добавить</string>
     <string name="fav_icon">fav_icon</string>
     <string name="conn_track_clear_logs_title">Удалить все сетевые журналы\?</string>
-    <string name="hsf_proxy_chip_remove_text">Остановка…</string>
     <string name="contributors_dialog_title">Авторы</string>
     <string name="dns_crypt_custom_url_remove_dialog_title">Удалить резолвер DNSCrypt\?</string>
     <string name="dns_proxy_remove_dialog_message">Удалить DNS-прокси из сохраненной конфигурации.</string>
@@ -1109,8 +1108,6 @@
     <string name="dc_filtering_heading" translatable="true">Фильтрация</string>
     <string name="cd_split_dns_heading" translatable="true">Разделенный DNS (экспериментальный)</string>
     <string name="cd_split_dns_desc" translatable="true">Перенаправляйте DNS-запросы из прокси-приложений на DNS-серверы прокси-сервера.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">Относитесь к правилам DNS как к правилам брандмауэра (экспериментально)</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">Блокировка DNS будет обойдена во время разрешения; решение будет принято во время подключения.</string>
     <string name="univ_firewall_rule_11" translatable="true">Блокировка всех локальных подключений</string>
     <string name="firewall_rule_private_dns" translatable="true">приватный DNS</string>
     <string name="firewall_rule_bypass_proxy" translatable="true">Обход прокси</string>

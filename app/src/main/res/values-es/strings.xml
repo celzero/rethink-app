@@ -455,7 +455,6 @@
     <string name="hsf_proxy_chip_text">Proxy activo</string>
     <string name="hsf_blocklist_chip_text_no_data">Activar RDNS+</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy eliminado</string>
-    <string name="hsf_proxy_chip_remove_text">Parando…</string>
     <string name="hsf_whats_new_remove_text">Cerrando…</string>
     <string name="hsf_blocklist_updating_text">Activando…</string>
     <string name="hsf_chip_appearance">Tema: %1$s</string>
@@ -1150,8 +1149,6 @@
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Usar el DNS del sistema para dominios no delegados como <i>.lan</i>, <i>.internal</i>, etc.</string>
     <string name="cd_split_dns_heading" translatable="true">DNS dividido (experimental)</string>
     <string name="cd_split_dns_desc" translatable="true">Reenviar las consultas DNS de las aplicaciones proxificadas a los servidores DNS del proxy.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">Tratar las reglas DNS como reglas de cortafuegos (experimental)</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">El bloqueo DNS se omitirá durante la resolución; la decisión se tomará en el momento de la conexión.</string>
     <string name="dns_record_types_auto_mode_status" translatable="true">Automático (Todos los tipos)</string>
     <string name="univ_firewall_rule_11" translatable="true">Bloquear todas las conexiones al host local</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">Eliminar estas reglas permitiría que cualquier aplicación se conecte a los dominios que están bloqueados actualmente.</string>

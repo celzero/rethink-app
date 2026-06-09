@@ -336,7 +336,6 @@
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">Омогући RDNS+</string>
     <string name="hsf_exclude_error" translatable="true">Изузимање није могуће у VPN закључаном моду</string>
     <string name="hsf_proxy_chip_removed_toast" translatable="true">Прокси је уклоњен</string>
-    <string name="hsf_proxy_chip_remove_text" translatable="true">Заустављање…</string>
     <string name="hsf_whats_new_remove_text" translatable="true">Затварање…</string>
     <string name="hsf_chip_appearance" translatable="true">Тема: %1$s</string>
     <string name="hsf_pause_vpn_failure" translatable="true">Није могуће паузирање: Rethink није активан</string>

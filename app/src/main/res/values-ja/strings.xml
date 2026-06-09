@@ -581,7 +581,6 @@
     <string name="dc_rethink_dns_radio" translatable="true">RethinkDNS</string>
     <string name="hsf_whats_new_chip_text" translatable="true">更新情報</string>
     <string name="hsf_proxy_chip_text" translatable="true">プロキシがアクティブ</string>
-    <string name="hsf_proxy_chip_remove_text" translatable="true">停止中…</string>
     <string name="dc_block_heading" translatable="true">ルール</string>
     <string name="dc_custom_dns_radio" translatable="true">その他のDNS</string>
     <string name="about_join_telegram" translatable="true">Telegram</string>

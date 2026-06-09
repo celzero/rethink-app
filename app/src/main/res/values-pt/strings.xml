@@ -233,7 +233,6 @@
     <string name="hsf_blocklist_chip_text_no_data">Ativar RDNS+</string>
     <string name="hsf_exclude_error">Não é possível excluir no modo de VPN bloqueado</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy removido</string>
-    <string name="hsf_proxy_chip_remove_text">A parar…</string>
     <string name="hsf_whats_new_remove_text">A fechar…</string>
     <string name="hsf_chip_appearance">Tema: %1$s</string>
     <string name="hsf_pause_vpn_failure">Não é possível pausa: Rethink não está ativo</string>

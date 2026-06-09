@@ -334,7 +334,6 @@
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">RDNS+ аиаануршәала</string>
     <string name="hsf_exclude_error" translatable="true">VPN-акәыжә аусура ашьҭамла аҿы ашьҭаамбжьылара азымхыҵырҩуа</string>
     <string name="hsf_proxy_chip_removed_toast" translatable="true">Анцәахәы иахккаауа</string>
-    <string name="hsf_proxy_chip_remove_text" translatable="true">Иаххәышьәахәахәа…</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Апаҟа ашьапынтәи еизырхымх шəыцəыцəахара</string>
     <string name="hsf_whats_new_remove_text" translatable="true">Аҟәалоит…</string>
     <string name="hsf_blocklist_updating_text" translatable="true">Активрара…</string>
@@ -1018,8 +1017,6 @@
     <string name="dc_filtering_heading" translatable="true">фильтрациа</string>
     <string name="cd_split_dns_heading" translatable="true">Split DNS (ашәахcharт ашқәа)</string>
     <string name="cd_split_dns_desc" translatable="true">Аԥсшәа:\nАԥсоуп DNS ашәҟәы иахәаԥкны анхацәа рҟны ианызсыжьуа апрокси арҿы апрокси а DNS хылаԥшҩцәа рҟны.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">DNS рашқәа ашәахтә рашәақәа еиԥш ишьақәымзар (аҿыц аԥышәа)</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">А DNS-шьыжьхаракы адҵәыклыхлара аихгара аамҭазы аиххалап; аҟәыжәра ашәахәы аамҭазы адҵәыклыхлара нагӡаҭахоит.</string>
     <string name="univ_firewall_rule_11" translatable="true">Уабыжьым иҟны аҧҵәаны аҿацәқәрақә зегьы рыцхраамла</string>
     <string name="firewall_rule_private_dns" translatable="true">Апачәы DNS</string>
     <string name="firewall_rule_bypass_proxy" translatable="true">ПшьэрыгъэмылIэ Апхъыжь</string>

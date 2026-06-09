@@ -713,7 +713,6 @@
     <string name="hsf_proxy_chip_text" translatable="true">พร็อกซีใช้งานอยู่</string>
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">เปิดใช้งาน RDNS+</string>
     <string name="hsf_exclude_error" translatable="true">ไม่สามารถแยกออกได้ในโหมดล็อคดาวน์ VPN</string>
-    <string name="hsf_proxy_chip_remove_text" translatable="true">กำลังหยุด…</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">ปิดการใช้งานการจับแพ็กเก็ต</string>
     <string name="hsf_whats_new_remove_text" translatable="true">ปิดการขาย…</string>
     <string name="hsf_pause_vpn_failure" translatable="true">หยุดชั่วคราวไม่ได้: คิดใหม่ไม่ได้ใช้งาน</string>

@@ -423,7 +423,6 @@
     <string name="settings_notification_heading">选择通知行为</string>
     <string name="firewall_status_isolate">已隔离</string>
     <string name="hsf_start_btn_state">启动</string>
-    <string name="hsf_proxy_chip_remove_text">停止中……</string>
     <string name="about_version">v%1$s</string>
     <string name="cd_dns_proxy_mode_external">外部</string>
     <string name="cd_dns_proxy_error_text_1">无效 IP 地址</string>
@@ -1107,8 +1106,6 @@
     <string name="dc_filtering_heading" translatable="true">过滤</string>
     <string name="cd_split_dns_heading" translatable="true">DNS 分流（实验性）</string>
     <string name="cd_split_dns_desc" translatable="true">将代理应用的 DNS 请求转发至代理的 DNS 服务器。</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">将 DNS 规则视为防火墙规则（实验性）</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">DNS 将在解析中绕过拦截；决定将在连接时作出。</string>
     <string name="firewall_rule_private_dns" translatable="true">私人 DNS</string>
     <string name="firewall_rule_bypass_proxy" translatable="true">绕行代理</string>
     <string name="firewall_rule_paused_app" translatable="true">应用已暂停</string>
