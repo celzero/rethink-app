@@ -37,8 +37,6 @@ plugins {
 
 allprojects {
     repositories {
-        google()
-        mavenCentral()
 
         def firestackRepo = project.findProperty("firestackRepo") ?: "github"
 
