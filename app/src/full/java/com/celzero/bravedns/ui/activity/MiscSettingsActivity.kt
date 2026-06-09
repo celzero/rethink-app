@@ -73,12 +73,14 @@ import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_REGENERATION_PERIOD_DAYS
 import com.celzero.bravedns.util.BubbleHelper
+import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.SnackbarHelper
+import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.getRandomString
@@ -165,6 +167,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
 
         registerForActivityResult()
         initView()
+        showNewBadgeIfNeeded()
         setupClickListeners()
         setupOnBackPressed()
     }
@@ -172,6 +175,13 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean(KEY_THEME_CHANGE, isThemeChanged)
+    }
+
+    private fun showNewBadgeIfNeeded() {
+        val showBadge = NewSettingsManager.shouldShowBadge(NewSettingsManager.FIREWALL_BUBBLE)
+        if (!showBadge) return
+
+        b.settingsFirewallBubbleTxt.setBadgeDotVisible(this, true)
     }
 
     private fun setupOnBackPressed() {
