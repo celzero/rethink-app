@@ -46,6 +46,7 @@ import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
+import com.celzero.bravedns.scheduler.BugReportZipper.FLIGHT_RECORDER_DIR_NAME
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.BraveVPNService.Companion.NW_ENGINE_NOTIFICATION_ID
 import com.celzero.bravedns.service.EventLogger
@@ -79,6 +80,7 @@ import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.Client
 import com.celzero.firestack.backend.DNSResolver
 import com.celzero.firestack.backend.DNSTransport
+import com.celzero.firestack.backend.GoMetrics
 import com.celzero.firestack.backend.NetStat
 import com.celzero.firestack.backend.Proxies
 import com.celzero.firestack.backend.Proxy
@@ -96,6 +98,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.component.KoinComponent
@@ -104,6 +108,7 @@ import java.io.File
 import java.net.URI
 import java.net.URLEncoder
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -2213,6 +2218,17 @@ class GoVpnAdapter : KoinComponent {
                 }
             }
         }
+
+        fun getGoMetrics(): GoMetrics? {
+            return try {
+                val stat = Intra.goMet()
+                Logger.i(LOG_TAG_VPN, "$TAG net stat: $stat")
+                stat
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_VPN, "$TAG err getting net stat: ${e.message}")
+                null
+            }
+        }
     }
 
     suspend fun p50(id: String): Long {
@@ -3375,33 +3391,66 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
+    private val flightRecorderMutex = Mutex()
     suspend fun performFlightRecording() {
-        if (!DEBUG) return
-        if (!tunnel.isConnected) {
-            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip start flight recorder")
-            return
-        }
-
-        try {
-            Intra.flightRecorder(true)
-            // 10 secs delay before stopping the flight recorder
-            delay(10 * 1000L)
-            val logs = Intra.printFlightRecord(true)
-            // write the logs to a file
+        flightRecorderMutex.withLock {
+            if (!tunnel.isConnected) {
+                Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip start flight recorder")
+                return
+            }
+            val tag = "flight-recorder"
             val fileName = "fltrcdr_${System.currentTimeMillis()}.pprof"
-            val path = context.filesDir.toString() + "/" + "flightrecorder" + "/" + fileName
-            val file = File(path)
-            file.parentFile?.mkdirs()
-            Utilities.writeToFile(file, logs)
-            Logger.i(LOG_TAG_VPN, "$TAG flight recorder logs written to: $path")
-            Intra.flightRecorder(false)
-            Logger.i(LOG_TAG_VPN, "$TAG started flight recorder")
-            logEvent(Severity.LOW, "Flight recorder completed", "Logs written to: $path")
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "$TAG err start flight recorder: ${e.message}")
             try {
+                val started = Intra.flightRecorder(true)
+                Logger.vv(LOG_TAG_VPN, "$TAG $tag started? $started")
+
+                if (!started) {
+                    Logger.w(LOG_TAG_VPN, "$TAG $tag failed to start")
+                    return
+                }
+                delay(10.seconds)
+                // 10 secs delay before stopping the flight recorder
+                val logs = Intra.printFlightRecord(true)
                 Intra.flightRecorder(false)
-            } catch (_: Exception) { }
+                if (logs.isEmpty()) {
+                    Logger.w(LOG_TAG_VPN, "$TAG $tag produced empty logs")
+                    return
+                }
+                Logger.vv(LOG_TAG_VPN, "$TAG: $tag recd recording sz: ${logs.size}")
+                // write the logs to a file
+                val dir = File(context.filesDir, FLIGHT_RECORDER_DIR_NAME)
+                if (!dir.exists() && !dir.mkdirs()) {
+                    Logger.e(
+                        LOG_TAG_VPN,
+                        "$TAG $tag failed creating directory: ${dir.absolutePath}"
+                    )
+                    return
+                }
+
+                // delete the earlier files if any, maintain only current file
+                dir.listFiles()?.filter { it.extension == "pprof" }?.forEach { it.delete() }
+
+                val file = File(dir, fileName)
+                if (!file.exists()) file.createNewFile()
+                Logger.vv(LOG_TAG_VPN, "$TAG: $tag; file path: ${file.absolutePath}")
+
+                Utilities.writeToFile(file, logs)
+                Logger.i(LOG_TAG_VPN, "$TAG: $tag logs written to: ${file.absolutePath}")
+
+                logEvent(
+                    Severity.LOW,
+                    "Flight recorder completed",
+                    "Logs written to: ${file.absolutePath}"
+                )
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_VPN, "$TAG: $tag err: ${e.message}", e)
+            } finally {
+                // just in case the flight recorder is still running
+                try {
+                    Intra.flightRecorder(false)
+                } catch (_: Exception) {
+                }
+            }
         }
     }
 

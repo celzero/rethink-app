@@ -64,6 +64,9 @@ object BugReportZipper {
     private const val MAX_CONSOLE_LOG_LINES = 10_000
     private const val CONSOLE_LOG_ENTRY_NAME = "console_logs.txt"
 
+    // Flight recorder constants
+    const val FLIGHT_RECORDER_DIR_NAME = "flight_recorder"
+
     // Buffer size for ZIP operations
     private const val ZIP_BUFFER_SIZE = 8192
 
@@ -342,6 +345,36 @@ object BugReportZipper {
         } catch (e: Exception) {
             Logger.w(LOG_TAG_BUG_REPORT, "err while dumping console logs, ${e.message}", e)
             false
+        }
+    }
+
+    fun flightRecorderDir(dir: File): File {
+        return File(dir, FLIGHT_RECORDER_DIR_NAME)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun dumpFlightRecorder(baseDir: File, flightDir: File) {
+        try {
+            if (!flightDir.exists()) {
+                Logger.i(LOG_TAG_BUG_REPORT, "flight recorder dir does not exist")
+                return
+            }
+
+            val pprofFiles = flightDir.listFiles()?.filter { it.isFile } ?: emptyList()
+            if (pprofFiles.isEmpty()) {
+                Logger.i(LOG_TAG_BUG_REPORT, "no flight recorder files to export")
+                return
+            }
+
+            val latest = pprofFiles.maxByOrNull { it.lastModified() } ?: return
+            Logger.i(LOG_TAG_BUG_REPORT, "adding flight recorder file to zip: ${latest.name}")
+            rezipAll(baseDir, latest)
+
+            // delete all files inside flight_recorder folder
+            pprofFiles.forEach { it.delete() }
+            Logger.i(LOG_TAG_BUG_REPORT, "deleted ${pprofFiles.size} flight recorder files")
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_BUG_REPORT, "err while dumping flight recorder, ${e.message}", e)
         }
     }
 
