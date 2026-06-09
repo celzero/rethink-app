@@ -41,7 +41,6 @@ import com.celzero.bravedns.iab.BillingListener
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.ProductDetail
 import com.celzero.bravedns.iab.PurchaseDetail
-import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
 import com.celzero.bravedns.ui.bottomsheet.PurchaseProcessingBottomSheet
 import com.celzero.bravedns.ui.dialog.SubscriptionAnimDialog
@@ -70,10 +69,6 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     private var shouldRecheckOnResume: Boolean = false
     // guard against double-taps on the subscribe button while a purchase is in flight.
     private var purchaseInFlight: Boolean = false
-
-    private enum class PurchaseButtonState {
-        PURCHASED, NOT_PURCHASED
-    }
 
     companion object {
         private const val TAG = "R+Ui"
@@ -317,6 +312,14 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             }
         }
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.selectedProduct.collect { selection ->
+                    adapter?.setSelectedProduct(selection?.first, selection?.second)
+                }
+            }
+        }
+
         // when retry() detects the billing client is not ready, the ViewModel cannot reconnect
         // itself (it has no live context). This event tells the Fragment to do it.
         viewLifecycleOwner.lifecycleScope.launch {
@@ -334,9 +337,6 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     private fun setupIab() {
         val owner = viewLifecycleOwner
 
-        viewModel.subscriptionState.observe(owner) { state ->
-            handleSubscriptionState(state)
-        }
 
         // observe billing errors (user cancel, network, etc.) to dismiss the processing sheet
         InAppBillingHandler.transactionErrorLiveData.observe(owner) { billingResult ->
@@ -359,28 +359,6 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
                         billingResult.debugMessage.ifBlank { getString(R.string.billing_error_generic) }
                     )
                 }
-            }
-        }
-    }
-
-    private fun handleSubscriptionState(state: SubscriptionStateMachineV2.SubscriptionState) {
-        Logger.d(LOG_TAG_UI, "$TAG: Observed subscription state: ${state.name}")
-        if (state.hasValidSubscription) {
-            setPurchaseButtonState(PurchaseButtonState.PURCHASED)
-        } else {
-            setPurchaseButtonState(PurchaseButtonState.NOT_PURCHASED)
-        }
-    }
-
-    private fun setPurchaseButtonState(state: PurchaseButtonState) {
-        when (state) {
-            PurchaseButtonState.PURCHASED -> {
-                b.subscribeButton.text = getString(R.string.rpn_purchased_state)
-                b.subscribeButton.isEnabled = false
-            }
-            PurchaseButtonState.NOT_PURCHASED -> {
-                updateSubscribeButtonText(viewModel.selectedProductType.value, isResubscribeState)
-                b.subscribeButton.isEnabled = true
             }
         }
     }
@@ -434,7 +412,15 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         b.subscribeButton.isEnabled = true
 
         if (adapter == null) {
-            adapter = GooglePlaySubsAdapter(this, requireContext(), products, 1, false)
+            val selection = viewModel.selectedProduct.value
+            adapter = GooglePlaySubsAdapter(
+                this,
+                requireContext(),
+                products,
+                selection?.first,
+                selection?.second,
+                false
+            )
             b.subscriptionPlans.adapter = adapter
         } else {
             adapter?.setData(products)
