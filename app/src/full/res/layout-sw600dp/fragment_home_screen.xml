@@ -762,21 +762,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <androidx.appcompat.widget.AppCompatButton
-                            android:id="@+id/home_fragment_pause_icon"
-                            android:layout_width="70dp"
-                            android:layout_height="58dp"
-                            android:layout_gravity="start"
-                            android:background="?android:attr/selectableItemBackground"
-                            android:padding="12dp" />
-
-                        <androidx.appcompat.widget.AppCompatButton
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/fhs_dns_on_off_btn"
                             style="@style/Button.HomeScreen.Main"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:drawableStart="@drawable/ic_pause"
-                            android:drawableEnd="@drawable/ic_arrow_down"
                             android:paddingStart="25dp"
                             android:paddingTop="18dp"
                             android:paddingEnd="25dp"
@@ -785,13 +775,27 @@
                             android:textSize="16sp"
                             android:text="@string/hsf_start_btn_state" />
 
-                        <androidx.appcompat.widget.AppCompatButton
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/home_fragment_pause_icon"
+                            android:layout_width="70dp"
+                            android:layout_height="58dp"
+                            android:layout_gravity="start|center_vertical"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:padding="12dp"
+                            app:icon="@drawable/ic_pause"
+                            app:iconGravity="textStart"
+                            app:iconTint="?attr/primaryTextColor" />
+
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/home_fragment_bottom_sheet_icon"
                             android:layout_width="70dp"
                             android:layout_height="58dp"
-                            android:layout_gravity="end"
+                            android:layout_gravity="end|center_vertical"
                             android:background="?android:attr/selectableItemBackground"
-                            android:padding="12dp" />
+                            android:padding="12dp"
+                            app:icon="@drawable/ic_arrow_down"
+                            app:iconGravity="textStart"
+                            app:iconTint="?attr/primaryTextColor" />
                     </FrameLayout>
                 </com.facebook.shimmer.ShimmerFrameLayout>
 
