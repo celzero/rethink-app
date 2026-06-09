@@ -1,7 +1,10 @@
+import com.android.build.api.variant.FilterConfiguration
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+
 plugins {
     id 'com.android.application'
     id 'com.google.devtools.ksp'
-    id 'kotlin-android'
 }
 
 // apply Google Services and Firebase Crashlytics plugins conditionally
@@ -131,23 +134,27 @@ android {
             'x86'        : 8,
             'x86_64'     : 9
     ]
-    android.applicationVariants.configureEach { variant ->
-        variant.outputs.configureEach { output ->
-            def abi = output.getFilter(com.android.build.OutputFile.ABI)
-            if (abi != null) {
-                // ABI-specific output: assign the correct per-ABI version code
-                // eg for arm64-v8a: 3 * 10000000 + versionCode
-                def v = project.ext.versionCodes.get(abi) * 10000000 + variant.versionCode
-                output.versionCodeOverride = v
-            } else {
-                // universal APK: preserve existing production behaviour (arm64-v8a multiplier)
-                // so installed universal APKs are not treated as a downgrade
-                // when splits are disabled (e.g. alpha builds), firstAbi is null; fall back to
-                // the arm64-v8a multiplier (3) so versionCode arithmetic still works
-                def firstAbi = variant.outputs.first().getFilter(com.android.build.OutputFile.ABI)
-                def multiplier = firstAbi != null ? project.ext.versionCodes.get(firstAbi) : project.ext.versionCodes.get('arm64-v8a')
-                def v = multiplier * 10000000 + variant.versionCode
-                output.versionCodeOverride = v
+
+    androidComponents {
+        onVariants(selector().all()) { variant ->
+            variant.outputs.each { output ->
+                def abi = output.filters.find { it.filterType == FilterConfiguration.FilterType.ABI }?.identifier
+                if (abi != null) {
+                    // ABI-specific output: assign the correct per-ABI version code
+                    // eg for arm64-v8a: 3 * 10000000 + versionCode
+                    def v = project.ext.versionCodes.get(abi) * 10000000 + output.versionCode.get()
+                    output.versionCode.set(v)
+                } else {
+                    // universal APK: preserve existing production behaviour (arm64-v8a multiplier)
+                    // so installed universal APKs are not treated as a downgrade
+                    // when splits are disabled (e.g. alpha builds), firstAbi is null; fall back to
+                    // the arm64-v8a multiplier (3) so versionCode arithmetic still works
+                    def firstAbi = variant.outputs.find { it.filters.any { f -> f.filterType == FilterConfiguration.FilterType.ABI } }
+                            ?.filters?.find { it.filterType == FilterConfiguration.FilterType.ABI }?.identifier
+                    def multiplier = firstAbi != null ? project.ext.versionCodes.get(firstAbi) : project.ext.versionCodes.get('arm64-v8a')
+                    def v = multiplier * 10000000 + output.versionCode.get()
+                    output.versionCode.set(v)
+                }
             }
         }
     }
@@ -209,16 +216,21 @@ android {
             }
         }
     }
-    kotlinOptions {
-        jvmTarget = '17'
-        freeCompilerArgs += [
-            '-Xsuppress-warning=SENSELESS_COMPARISON'
-        ]
+
+    kotlin {
+        compilerOptions {
+            languageVersion = KotlinVersion.KOTLIN_2_3
+            jvmTarget = JvmTarget.JVM_17
+            freeCompilerArgs.addAll([
+                    '-Xsuppress-warning=SENSELESS_COMPARISON'
+            ])
+        }
     }
 
     buildFeatures {
         viewBinding true
         buildConfig true
+        resValues true
     }
 
     compileOptions {
