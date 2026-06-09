@@ -107,7 +107,7 @@
         android:visibility="invisible"
         app:layout_constraintTop_toBottomOf="@id/text_input_layout2" />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/dialog_custom_url_ok_btn"
         style="@style/Widget.Material3.Button.TextButton.Dialog"
         android:layout_width="wrap_content"
@@ -122,7 +122,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_failure_text" />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/dialog_custom_url_cancel_btn"
         style="@style/Widget.Material3.Button.TextButton.Dialog"
         android:layout_width="wrap_content"

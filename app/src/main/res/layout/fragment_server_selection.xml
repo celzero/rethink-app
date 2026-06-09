@@ -840,7 +840,7 @@
         android:insetTop="0dp"
         android:insetBottom="0dp"
         android:text="@string/server_settings_start_rpn"
-        android:textColor="@android:color/white"
+        android:textColor="?attr/homeScreenHeaderTextColor"
         android:visibility="gone"
         app:elevation="8dp"
         app:icon="@drawable/ic_vpn"

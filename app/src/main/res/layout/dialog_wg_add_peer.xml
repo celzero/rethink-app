@@ -186,7 +186,7 @@
                 android:layout_below="@id/peer_input_container"
                 android:orientation="horizontal">
 
-                <androidx.appcompat.widget.AppCompatButton
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/custom_dialog_dismiss_button"
                     style="@style/TextAppearance.Material3.BodyLarge"
                     android:layout_width="0dp"
@@ -212,7 +212,7 @@
                     android:layout_weight="0.5"
                     android:layout_marginStart="5dp">
 
-                    <androidx.appcompat.widget.AppCompatButton
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/custom_dialog_ok_button"
                         style="@style/TextAppearance.Material3.BodyLarge"
                         android:layout_width="match_parent"

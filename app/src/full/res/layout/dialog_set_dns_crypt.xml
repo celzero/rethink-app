@@ -115,7 +115,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <androidx.appcompat.widget.AppCompatButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/dialog_dns_crypt_ok_btn"
         style="@style/Widget.Material3.Button.TextButton.Dialog"
         android:layout_width="wrap_content"
@@ -128,7 +128,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_dns_crypt_scroll" />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/dialog_dns_crypt_cancel_btn"
         style="@style/Widget.Material3.Button.TextButton.Dialog"
         android:layout_width="wrap_content"
