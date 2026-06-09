@@ -569,14 +569,11 @@ dependencies {
     testImplementation 'io.mockk:mockk:1.14.11'
     testImplementation 'io.mockk:mockk-android:1.14.11'
     testImplementation 'androidx.arch.core:core-testing:2.2.0'
-
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0'
     testImplementation 'io.insert-koin:koin-test:4.2.1'
     testImplementation 'io.insert-koin:koin-test-junit4:4.2.1'
     androidTestImplementation 'io.insert-koin:koin-test:4.2.1'
     androidTestImplementation 'io.insert-koin:koin-test-junit4:4.2.1'
-    androidTestImplementation 'io.insert-koin:koin-test:4.1.1'
-    androidTestImplementation 'io.insert-koin:koin-test-junit4:4.1.1'
 
     testImplementation 'androidx.work:work-testing:2.11.2'
     androidTestImplementation 'io.mockk:mockk-android:1.14.11'
