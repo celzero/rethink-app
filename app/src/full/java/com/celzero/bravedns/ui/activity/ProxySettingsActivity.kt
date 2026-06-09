@@ -151,6 +151,10 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
     private fun initView() {
         b.settingsActivityHttpProxyProgress.visibility = View.GONE
 
+        if (Utilities.isFdroidFlavour()) {
+            b.rpnHeader.visibility = View.GONE
+            b.settingsActivityRpnContainer.visibility = View.GONE
+        }
         displayHttpProxyUi()
         displaySocks5Ui()
     }
