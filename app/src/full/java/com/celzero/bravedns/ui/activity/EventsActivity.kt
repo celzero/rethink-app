@@ -20,9 +20,11 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.RotateAnimation
 import android.view.inputmethod.InputMethodManager
 import android.widget.CompoundButton
-import com.celzero.bravedns.ui.BaseActivity
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
@@ -37,9 +39,12 @@ import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.ActivityEventsBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
+import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.util.restoreFrost
 import com.celzero.bravedns.viewmodel.EventsViewModel
@@ -54,6 +59,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.time.Duration.Companion.milliseconds
 
 class EventsActivity : BaseActivity(R.layout.activity_events), SearchView.OnQueryTextListener {
     private val b by viewBinding(ActivityEventsBinding::bind)
@@ -78,6 +84,12 @@ class EventsActivity : BaseActivity(R.layout.activity_events), SearchView.OnQuer
         private const val CHIP_TAG_HIGH = "HIGH"
         private const val CHIP_TAG_CRITICAL = "CRITICAL"
         private const val CHIP_TAG_SOURCE = "SOURCE"
+        private const val REFRESH_TIMEOUT: Long = 4000
+        private const val ANIMATION_DURATION = 750L
+        private const val ANIMATION_REPEAT_COUNT = -1
+        private const val ANIMATION_PIVOT_VALUE = 0.5f
+        private const val ANIMATION_START_DEGREE = 0.0f
+        private const val ANIMATION_END_DEGREE = 360.0f
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -98,6 +110,21 @@ class EventsActivity : BaseActivity(R.layout.activity_events), SearchView.OnQuer
         }
 
         initView()
+        initAnimation()
+    }
+
+    private fun initAnimation() {
+        animation =
+            RotateAnimation(
+                ANIMATION_START_DEGREE,
+                ANIMATION_END_DEGREE,
+                Animation.RELATIVE_TO_SELF,
+                ANIMATION_PIVOT_VALUE,
+                Animation.RELATIVE_TO_SELF,
+                ANIMATION_PIVOT_VALUE,
+            )
+        animation.repeatCount = ANIMATION_REPEAT_COUNT
+        animation.duration = ANIMATION_DURATION
     }
 
     override fun onResume() {
@@ -395,7 +422,7 @@ class EventsActivity : BaseActivity(R.layout.activity_events), SearchView.OnQuer
     private fun setQueryFilter() {
         lifecycleScope.launch {
             searchQuery
-                .debounce(QUERY_TEXT_DELAY)
+                .debounce(QUERY_TEXT_DELAY.milliseconds)
                 .distinctUntilChanged()
                 .collect { query ->
                     filterQuery = query
@@ -415,9 +442,21 @@ class EventsActivity : BaseActivity(R.layout.activity_events), SearchView.OnQuer
         searchQuery.value = query
         return true
     }
-
+    private lateinit var animation: Animation
     private fun refreshEvents() {
-        viewModel.setFilter(filterQuery, filterSources, filterSeverity)
+        ui {
+            b.eventsRefreshIcon.isEnabled = false
+            b.eventsRefreshIcon.animation = animation
+            b.eventsRefreshIcon.startAnimation(animation)
+            viewModel.setFilter(filterQuery, filterSources, filterSeverity)
+            delay(REFRESH_TIMEOUT, lifecycleScope) {
+                if (isFinishing) return@delay
+
+                b.eventsRefreshIcon.isEnabled = true
+                b.eventsRefreshIcon.clearAnimation()
+                showToastUiCentered(this, getString(R.string.dc_refresh_toast), Toast.LENGTH_SHORT)
+            }
+        }
     }
 
     private fun showDeleteDialog() {
@@ -436,6 +475,10 @@ class EventsActivity : BaseActivity(R.layout.activity_events), SearchView.OnQuer
 
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
+    }
+
+    private fun ui(f: suspend () -> Unit) {
+        lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 }
 
