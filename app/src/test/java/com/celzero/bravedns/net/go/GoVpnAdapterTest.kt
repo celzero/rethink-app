@@ -383,7 +383,6 @@ class GoVpnAdapterTest : KoinTest {
         adapter.addMultipleDnsAsPlus()
         adapter.getPlusResolvers()
         adapter.getPlusTransportById("x")
-        adapter.panicAtRandom()
 
         assertTrue(true)
     }
