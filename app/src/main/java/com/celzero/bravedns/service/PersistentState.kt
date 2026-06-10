@@ -82,7 +82,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val TUN_NETWORK_POLICY = "tun_network_handling_policy"
         const val USE_MAX_MTU = "use_max_mtu"
         const val SET_VPN_BUILDER_TO_METERED = "set_vpn_builder_to_metered"
-        const val PANIC_RANDOM = "panic_random"
 
         // SE Proxy for Anti-Censorship
         const val AUTO_PROXY_ENABLED = "auto_proxy_enabled"
@@ -437,9 +436,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // set vpn builder to metered/unmetered
     var setVpnBuilderToMetered by booleanPref("set_vpn_builder_to_metered").withDefault<Boolean>(false)
-
-    // debug settings, panic random
-    var panicRandom by booleanPref("panic_random").withDefault<Boolean>(false)
 
     // global lockdown for wireguard proxy
     var wgGlobalLockdown by booleanPref("wg_global_lockdown").withDefault<Boolean>(false)

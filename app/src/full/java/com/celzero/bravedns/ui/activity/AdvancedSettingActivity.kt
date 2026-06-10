@@ -61,15 +61,12 @@ class AdvancedSettingActivity : BaseActivity(R.layout.activity_advanced_setting)
             b.dvExperimentalSwitch.isChecked = persistentState.nwEngExperimentalFeatures
             b.settingsAutoDialRl.visibility = View.VISIBLE
             b.dvAutoDialSwitch.isChecked = persistentState.autoDialsParallel
-            b.settingsPanicRandRl.visibility = View.VISIBLE
-            b.dvPanicRandSwitch.isChecked = persistentState.panicRandom
             b.settingsResetTourRl.visibility = View.VISIBLE
             b.dvPtModeSwitch.isChecked = persistentState.advSettingForcePTMode
             b.settingsPtModeRl.visibility = View.VISIBLE
         } else {
             b.settingsExperimentalRl.visibility = View.GONE
             b.settingsAutoDialRl.visibility = View.GONE
-            b.settingsPanicRandRl.visibility = View.GONE
             b.settingsResetTourRl.visibility = View.GONE
             b.settingsPtModeRl.visibility = View.GONE
         }
@@ -96,14 +93,6 @@ class AdvancedSettingActivity : BaseActivity(R.layout.activity_advanced_setting)
 
         b.dvAutoDialSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.autoDialsParallel = isChecked
-        }
-
-        b.settingsPanicRandRl.setOnClickListener {
-            b.dvPanicRandSwitch.isChecked = !b.dvPanicRandSwitch.isChecked
-        }
-
-        b.dvPanicRandSwitch.setOnCheckedChangeListener { _, isChecked ->
-            persistentState.panicRandom = isChecked
         }
 
         b.settingsResetTourRl.setOnClickListener {
