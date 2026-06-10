@@ -622,7 +622,7 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
         if (!isSuccess || productList.isEmpty()) {
             _uiState.value = SubscriptionUiState.Error(
                 title = "Products Unavailable",
-                message = "Unable to load subscription plans. Please try again.",
+                message = "Unable to load plans. Please try again.",
                 isRetryable = true
             )
         } else {
