@@ -185,6 +185,7 @@ class GoVpnAdapter : KoinComponent {
         setAutoDialsParallel()
         setAutoMode()
         registerSeProxyIfNeeded()
+        setFloodWgMode()
         if (DEBUG) panicAtRandom(persistentState.panicRandom) else panicAtRandom(false)
         Logger.v(LOG_TAG_VPN, "$TAG initResolverProxiesPcap done")
     }
@@ -2354,7 +2355,8 @@ class GoVpnAdapter : KoinComponent {
     }
 
     suspend fun onLowMemory() {
-        val limitBytes: Long = 512 * 1024 * 1024 // 512MB
+        val limitBytes: Long = 1024 * 1024 * 1024 // 1GB
+        // TODO: slider from 32MB - 1GB (increment by 32MB)
         Intra.lowMem(limitBytes)
         logEvent(Severity.CRITICAL, "low memory", "notified go of low memory with limit: $limitBytes bytes")
         Logger.i(LOG_TAG_VPN, "$TAG low memory, called Intra.lowMem()")
@@ -3064,6 +3066,24 @@ class GoVpnAdapter : KoinComponent {
         // no-op, can be added in future if needed
         // TODO: now the SE is removed, instead if the user has rpn, rpn will be selected
         // automatically
+    }
+
+    suspend fun setFloodWgMode() {
+        if (!tunnel.isConnected) {
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip set flood wg mode")
+            return
+        }
+        try {
+            Intra.floodWireGuard(persistentState.floodWireGuard)
+            Logger.i(LOG_TAG_VPN, "$TAG set flood wg mode: ${persistentState.floodWireGuard}")
+            logEvent(
+                Severity.LOW,
+                "tun: set flood wg mode",
+                "Set flood wg mode to ${persistentState.floodWireGuard}"
+            )
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "$TAG err set flood wg mode: ${e.message}", e)
+        }
     }
 
     suspend fun unregisterSeProxyIfNeeded() {

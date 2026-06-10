@@ -152,6 +152,8 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
 
         b.dvWgLockdownSwitch.isChecked = persistentState.wgGlobalLockdown
 
+        b.dvFloodWgSwitch.isChecked = persistentState.floodWireGuard
+
         b.dvWgSmartPersistentKeepaliveSwitch.isChecked = persistentState.smartPersistentKeepalive
 
         // endpoint independent mapping (eim) / endpoint independent filtering (eif)
@@ -513,6 +515,18 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         b.dvWgLockdownRl.setOnClickListener {
             NewSettingsManager.markSettingSeen(NewSettingsManager.WG_GLOBAL_LOCKDOWN_MODE_SETTING)
             b.dvWgLockdownSwitch.isChecked = !b.dvWgLockdownSwitch.isChecked
+        }
+
+        b.dvFloodWgSwitch.setOnCheckedChangeListener { _, bool ->
+            persistentState.floodWireGuard = bool
+            logEvent(
+                "wg flood mode",
+                "WireGuard flood mode set to: $bool"
+            )
+        }
+
+        b.dvFloodWgRl.setOnClickListener {
+            b.dvFloodWgSwitch.isChecked = !b.dvFloodWgSwitch.isChecked
         }
 
         b.dvWgSmartPersistentKeepaliveSwitch.setOnCheckedChangeListener { _, isChecked ->

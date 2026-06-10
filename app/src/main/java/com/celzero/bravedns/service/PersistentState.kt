@@ -105,6 +105,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         // Any stored version lower than this will cause the tour to re-trigger.
         // v2: added Rethink+ premium nav-item step (step 6) + fixed tour button text contrast.
         const val GUIDED_TOUR_CURRENT_VERSION = 2
+
+        const val FLOOD_WIREGUARD = "flood_wireguard"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -448,6 +450,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var appTestMode by booleanPref("app_test_mode").withDefault<Boolean>(false)
 
     var advSettingForcePTMode by booleanPref("adv_setting_force_pt_mode").withDefault<Boolean>(false)
+
+    var floodWireGuard by booleanPref("flood_wireguard").withDefault(false)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
