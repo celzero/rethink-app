@@ -186,7 +186,6 @@ class GoVpnAdapter : KoinComponent {
         setAutoMode()
         registerSeProxyIfNeeded()
         setFloodWgMode()
-        if (DEBUG) panicAtRandom(persistentState.panicRandom) else panicAtRandom(false)
         Logger.v(LOG_TAG_VPN, "$TAG initResolverProxiesPcap done")
     }
 
@@ -3394,21 +3393,6 @@ class GoVpnAdapter : KoinComponent {
         // fastest is another strategy, which is not used for now (v055n)
         Settings.setPlusStrategy(Settings.PlusFilterSafest)
         return tunnel
-    }
-
-    suspend fun panicAtRandom(shouldPanic: Boolean = persistentState.panicRandom) {
-        if (!tunnel.isConnected) {
-            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip panic at random")
-            return
-        }
-        try {
-            Intra.panicAtRandom(shouldPanic)
-            Logger.i(LOG_TAG_VPN, "$TAG panic at random: $shouldPanic")
-            logEvent(Severity.LOW, "panic at random", "panic at random: $shouldPanic")
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "$TAG err panic at random: ${e.message}")
-            logEvent(Severity.HIGH, "panic at random", "error panic at random: ${e.message}")
-        }
     }
 
     private val flightRecorderMutex = Mutex()
