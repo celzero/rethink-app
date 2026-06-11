@@ -26,6 +26,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.celzero.bravedns.ui.BaseActivity
@@ -56,6 +57,7 @@ import com.celzero.bravedns.util.disableFrostTemporarily
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.util.restoreFrost
 import com.celzero.bravedns.viewmodel.ConsoleLogViewModel
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -271,7 +273,8 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), androidx
             Logger.uiLogLevel = which.toLong()
             GoVpnAdapter.setLogLevel(
                 persistentState.goLoggerLevel.toInt(),
-                Logger.uiLogLevel.toInt()
+                Logger.uiLogLevel.toInt(),
+                persistentState.includeFileTrace
             )
             viewModel.setLogLevel(which.toLong())
             if (which < Logger.LoggerLevel.ERROR.id) {
@@ -279,6 +282,32 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), androidx
             }
             Logger.i(LOG_TAG_BUG_REPORT, "Log level set to ${items[which]}")
         }
+
+        val cb = MaterialCheckBox(this)
+        cb.text = getString(R.string.console_log_include_file_trace)
+        cb.isChecked = persistentState.includeFileTrace
+        cb.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.includeFileTrace = isChecked
+            GoVpnAdapter.setLogLevel(
+                persistentState.goLoggerLevel.toInt(),
+                Logger.uiLogLevel.toInt(),
+                persistentState.includeFileTrace
+            )
+            viewModel.setLogLevel(Logger.uiLogLevel)
+            Logger.i(LOG_TAG_BUG_REPORT, "File trace set to $isChecked")
+        }
+        val density = resources.displayMetrics.density
+        val margin = (20 * density).toInt()
+        val container = LinearLayout(this)
+        val params =
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        params.setMargins(margin, 0, margin, 0)
+        container.addView(cb, params)
+        builder.setView(container)
+
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { dialogInterface, _ ->
             dialogInterface.dismiss()

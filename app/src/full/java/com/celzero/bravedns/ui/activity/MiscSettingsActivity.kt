@@ -89,7 +89,9 @@ import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -655,13 +657,13 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
                 !b.settingsActivityAutoStartSwitch.isChecked
         }
 
-        b.settingsActivityAutoStartSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean
+        b.settingsActivityAutoStartSwitch.setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean
             ->
-            persistentState.prefAutoStartBootUp = b
-            if (b) {
+            persistentState.prefAutoStartBootUp = isChecked
+            if (isChecked) {
                 // Enable experimental-dependent settings when experimental features are enabled
                 if (persistentState.enableStabilityDependentSettings()) {
-                    SnackbarHelper.showStabilityProgram(window.decorView, persistentState)
+                    SnackbarHelper.showStabilityProgram(b.root, persistentState)
                 }
             }
             logEvent("Auto start on boot set to $b")
@@ -789,13 +791,37 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
             }
 
             persistentState.goLoggerLevel = which.toLong()
-            GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel.toInt())
+            GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel.toInt(), includeFileTrace = persistentState.includeFileTrace)
             updateConfigLevel(persistentState.goLoggerLevel)
             val logLevel = if (persistentState.goLoggerLevel.toInt() == GO_LOG_LEVEL_EXTREME) GO_LOG_LEVEL_EXTREME_DISPLAY else persistentState.goLoggerLevel.toInt()
             b.genSettingsGoLogDesc.text = Logger.LoggerLevel.fromId(logLevel)?.name?.lowercase()
                     ?.replaceFirstChar(Char::titlecase)?.replace("_", " ")
             logEvent("Go log level set to ${Logger.LoggerLevel.fromId(logLevel)?.name}")
         }
+
+        val cb = MaterialCheckBox(this)
+        cb.text = getString(R.string.console_log_include_file_trace)
+        cb.isChecked = persistentState.includeFileTrace
+        cb.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.includeFileTrace = isChecked
+            GoVpnAdapter.setLogLevel(
+                persistentState.goLoggerLevel.toInt(),
+                includeFileTrace = persistentState.includeFileTrace
+            )
+            logEvent("File trace set to $isChecked")
+        }
+        val density = resources.displayMetrics.density
+        val margin = (20 * density).toInt()
+        val container = LinearLayout(this)
+        val params =
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        params.setMargins(margin, 0, margin, 0)
+        container.addView(cb, params)
+        alertBuilder.setView(container)
+
         alertBuilder.create().show()
     }
 
