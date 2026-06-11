@@ -49,7 +49,7 @@ import kotlin.system.exitProcess
  */
 class GoCrashFileDescriptorReader(private val context: Context?) {
 
-    fun start2(): File? {
+    fun start2(): Pair<File?, File?>? {
         // create a file and send the file descriptor to the service
         // create an os.file observer for the file
         val file = createCrashFile2()
@@ -57,7 +57,26 @@ class GoCrashFileDescriptorReader(private val context: Context?) {
             Logger.e(LOG_TAG_BUG_REPORT, "$TAG createCrashFile2 returned null")
             return null
         }
+        val fltFile = createFlightRecFile()
+        if (fltFile == null) {
+            Logger.e(LOG_TAG_BUG_REPORT, "$TAG createCrashFile2 flt returned null")
+            return null
+        }
 
+        return Pair(file, fltFile)
+    }
+
+    private fun createFlightRecFile(): File? {
+        if (context == null) {
+            Logger.e(LOG_TAG_BUG_REPORT, "$TAG createCrashFileFd: missing app context")
+            return null
+        }
+        val file = EnhancedBugReport.newFlightRecorderFile(context)
+        if (file == null) {
+            Logger.e(LOG_TAG_BUG_REPORT, "$TAG createCrashFileFd: newFlightRecorderFile returned null")
+            return null
+        }
+        Logger.d(LOG_TAG_BUG_REPORT, "$TAG createCrashFileFd: new file ${file.absolutePath}")
         return file
     }
 
