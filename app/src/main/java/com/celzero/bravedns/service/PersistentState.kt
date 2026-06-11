@@ -106,6 +106,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val GUIDED_TOUR_CURRENT_VERSION = 2
 
         const val FLOOD_WIREGUARD = "flood_wireguard"
+
+        const val SOCKET_BUFFER_SIZE_BYTES = "socket_buffer_size_bytes"
+
+        const val INCLUDE_FILE_TRACE = "include_file_trace"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -448,6 +452,11 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var advSettingForcePTMode by booleanPref("adv_setting_force_pt_mode").withDefault<Boolean>(false)
 
     var floodWireGuard by booleanPref("flood_wireguard").withDefault(false)
+
+    var socketBufferSizeBytes by intPref("socket_buffer_size_bytes").withDefault<Int>(524288) // 512 KB (512 * 1024)
+
+    // include file trace in logs
+    var includeFileTrace by booleanPref(INCLUDE_FILE_TRACE).withDefault<Boolean>(false)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
