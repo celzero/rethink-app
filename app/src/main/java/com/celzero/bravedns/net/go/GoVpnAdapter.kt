@@ -2180,7 +2180,7 @@ class GoVpnAdapter : KoinComponent {
             return ""
         }
 
-        fun setLogLevel(l1: Int, l2: Int = Logger.uiLogLevel.toInt()) {
+        fun setLogLevel(l1: Int, l2: Int = Logger.uiLogLevel.toInt(), includeFileTrace: Boolean) {
             // 0 - very verbose, 1 - verbose, 2 - debug, 3 - info, 4 - warn, 5 - error, 6 - stacktrace, 7 - user, 8 - none
             // from UI, if none is selected, set the log level to 7 (user), usr will send only
             // user notifications
@@ -2188,8 +2188,11 @@ class GoVpnAdapter : KoinComponent {
             // to 8 (none)
             val goLogLevel = if (l1 == 7) 8 else l1
             val consoleLogLevel = if (l2 == 7) 8 else l2
-            Intra.logLevel(goLogLevel, consoleLogLevel)
-            Logger.i(LOG_TAG_VPN, "$TAG set go-log level: $l1, $l2")
+            // depth to include the file trace, 9 - max, 1 - min
+            val depth = if (includeFileTrace) 9 else 1
+            Intra.logLevel(goLogLevel, consoleLogLevel, depth)
+            //Intra.logLevel(goLogLevel, consoleLogLevel)
+            Logger.i(LOG_TAG_VPN, "$TAG set go-log level: $l1, $l2, $depth")
         }
 
         suspend fun printStack(): String {
@@ -2365,7 +2368,8 @@ class GoVpnAdapter : KoinComponent {
         mode: Int = persistentState.dialStrategy,
         retry: Int = persistentState.retryStrategy,
         tcpKeepAlive: Boolean = persistentState.tcpKeepAlive,
-        timeoutSec: Int = persistentState.dialTimeoutSec
+        timeoutSec: Int = persistentState.dialTimeoutSec,
+        bufferSize: Int = persistentState.socketBufferSizeBytes
     ) {
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip set dial strategy")
@@ -2373,15 +2377,15 @@ class GoVpnAdapter : KoinComponent {
             return
         }
         try {
-            Settings.setDialerOpts(mode, retry, timeoutSec, tcpKeepAlive)
+            Settings.setDialerOpts(mode, retry, bufferSize, timeoutSec, tcpKeepAlive)
             Logger.i(
                 LOG_TAG_VPN,
-                "$TAG set dial strategy: $mode, retry: $retry, tcpKeepAlive: $tcpKeepAlive, timeout: $timeoutSec"
+                "$TAG set dial strategy: $mode, retry: $retry, tcpKeepAlive: $tcpKeepAlive, timeout: $timeoutSec, bufSize: $bufferSize"
             )
             logEvent(
                 Severity.LOW,
                 "dial strategy",
-                "set dial strategy to: mode=$mode, retry=$retry, tcpKeepAlive=$tcpKeepAlive, timeout=$timeoutSec"
+                "set dial strategy to: mode=$mode, retry=$retry, tcpKeepAlive=$tcpKeepAlive, timeout=$timeoutSec, bufSize: $bufferSize"
             )
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG err set dial strategy: ${e.message}", e)
@@ -3393,69 +3397,6 @@ class GoVpnAdapter : KoinComponent {
         // fastest is another strategy, which is not used for now (v055n)
         Settings.setPlusStrategy(Settings.PlusFilterSafest)
         return tunnel
-    }
-
-    private val flightRecorderMutex = Mutex()
-    suspend fun performFlightRecording() {
-        flightRecorderMutex.withLock {
-            if (!tunnel.isConnected) {
-                Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip start flight recorder")
-                return
-            }
-            val tag = "flight-recorder"
-            val fileName = "fltrcdr_${System.currentTimeMillis()}.pprof"
-            try {
-                val started = Intra.flightRecorder(true)
-                Logger.vv(LOG_TAG_VPN, "$TAG $tag started? $started")
-
-                if (!started) {
-                    Logger.w(LOG_TAG_VPN, "$TAG $tag failed to start")
-                    return
-                }
-                delay(10.seconds)
-                // 10 secs delay before stopping the flight recorder
-                val logs = Intra.printFlightRecord(true)
-                Intra.flightRecorder(false)
-                if (logs.isEmpty()) {
-                    Logger.w(LOG_TAG_VPN, "$TAG $tag produced empty logs")
-                    return
-                }
-                Logger.vv(LOG_TAG_VPN, "$TAG: $tag recd recording sz: ${logs.size}")
-                // write the logs to a file
-                val dir = File(context.filesDir, FLIGHT_RECORDER_DIR_NAME)
-                if (!dir.exists() && !dir.mkdirs()) {
-                    Logger.e(
-                        LOG_TAG_VPN,
-                        "$TAG $tag failed creating directory: ${dir.absolutePath}"
-                    )
-                    return
-                }
-
-                // delete the earlier files if any, maintain only current file
-                dir.listFiles()?.filter { it.extension == "pprof" }?.forEach { it.delete() }
-
-                val file = File(dir, fileName)
-                if (!file.exists()) file.createNewFile()
-                Logger.vv(LOG_TAG_VPN, "$TAG: $tag; file path: ${file.absolutePath}")
-
-                Utilities.writeToFile(file, logs)
-                Logger.i(LOG_TAG_VPN, "$TAG: $tag logs written to: ${file.absolutePath}")
-
-                logEvent(
-                    Severity.LOW,
-                    "Flight recorder completed",
-                    "Logs written to: ${file.absolutePath}"
-                )
-            } catch (e: Exception) {
-                Logger.e(LOG_TAG_VPN, "$TAG: $tag err: ${e.message}", e)
-            } finally {
-                // just in case the flight recorder is still running
-                try {
-                    Intra.flightRecorder(false)
-                } catch (_: Exception) {
-                }
-            }
-        }
     }
 
     fun tunMtu(): Int {
