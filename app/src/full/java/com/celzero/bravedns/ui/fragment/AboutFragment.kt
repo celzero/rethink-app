@@ -167,12 +167,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         
         b.aboutStats.text = getString(R.string.settings_general_header).replaceFirstChar(Char::titlecase)
 
-        if (DEBUG) {
-            b.aboutFlightRecord.visibility = View.VISIBLE
-        } else {
-            b.aboutFlightRecord.visibility = View.GONE
-        }
-
         b.fhsTitleRethink.setOnClickListener(this)
         b.aboutSponsor.setOnClickListener(this)
         b.aboutManageRpn.setOnClickListener(this)
@@ -206,7 +200,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutStackTrace.setOnClickListener(this)
         b.aboutDbStats.setOnClickListener(this)
         b.tokenTextView.setOnClickListener(this)
-        b.aboutFlightRecord.setOnClickListener(this)
         b.aboutConsoleLogs.setOnClickListener(this)
         b.aboutEventLogs.setOnClickListener(this)
 
@@ -452,9 +445,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.tokenTextView -> {
                 // click is handled in gesture detector
             }
-            b.aboutFlightRecord -> {
-                initiateFlightRecord()
-            }
             b.aboutConsoleLogs -> {
                 openConsoleLogs()
             }
@@ -486,11 +476,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         showToastUiCentered(requireContext(), "Test mode enabled", Toast.LENGTH_SHORT)
         Logger.i(LOG_TAG_UI, "Test mode enabled")
         logEvent(EventType.UI_TOGGLE, "Test mode enabled", "User enabled test mode")
-    }
-
-    private fun initiateFlightRecord() {
-        io { VpnController.performFlightRecording() }
-        Toast.makeText(requireContext(), "Flight recording started", Toast.LENGTH_SHORT).show()
     }
 
     private fun openStackTraceDialog() {
@@ -725,7 +710,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             val status = KernelProc.getStatus(forceRefresh = true)
             val smaps = KernelProc.getSmaps(forceRefresh = true)
             val auxv = KernelProc.getStats(forceRefresh = true)
-            val stat = VpnController.getNetStat()
+            val stat = GoVpnAdapter.getGoMetrics()
             val formatedMetrics = UIUtils.formatNetMetrics(stat)
             uiCtx {
                 if (!isAdded) return@uiCtx
@@ -1031,10 +1016,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             Logger.d("EnvVariables", "$key = $value")
         }
 
-        val prop: Properties = System.getProperties()
-        for (key in prop.stringPropertyNames()) {
-            val value = prop.getProperty(key)
-            Logger.d("EnvVariables", "$key = $value")
+        val accessAllowed = SecurityManager().checkPropertiesAccess()
+        Logger.d("SysProp", "Access allowed? $accessAllowed")
+        val prop: List<String> = System.getProperties().map { it.key.toString() }
+        for (key in prop) {
+            val value = System.getProperty(key)
+            Logger.d("SysProp", "$key = $value")
         }
 
         printAllSysconfValues()

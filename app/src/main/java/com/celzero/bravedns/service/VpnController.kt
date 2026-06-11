@@ -517,10 +517,6 @@ object VpnController : KoinComponent {
         braveVpnService?.screenLock()
     }
 
-    suspend fun performFlightRecording() {
-        braveVpnService?.performFlightRecording()
-    }
-
 
     suspend fun getWinByKey(key: String): Proxy? {
         return braveVpnService?.getWinByKey(key)
