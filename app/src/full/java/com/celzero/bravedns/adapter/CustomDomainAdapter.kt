@@ -53,6 +53,8 @@ import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.ui.bottomsheet.CustomDomainRulesBtmSheet
 import com.celzero.bravedns.ui.bottomsheet.CustomDomainRulesBtmSheet.ToggleBtnUi
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
+import com.celzero.bravedns.util.SnackbarHelper.italic
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -468,7 +470,7 @@ class CustomDomainAdapter(
                     b.customDomainStatusTv.text =
                         context.getString(
                             R.string.ci_desc,
-                            context.getString(R.string.ci_trust_txt),
+                            context.getString(R.string.ci_trust_txt).italic(),
                             time
                         )
                 }
@@ -478,7 +480,7 @@ class CustomDomainAdapter(
                     b.customDomainStatusTv.text =
                         context.getString(
                             R.string.ci_desc,
-                            context.getString(R.string.lbl_blocked),
+                            context.getString(R.string.lbl_blocked).italic(),
                             time
                         )
                 }
@@ -488,7 +490,7 @@ class CustomDomainAdapter(
                     b.customDomainStatusTv.text =
                         context.getString(
                             R.string.ci_desc,
-                            context.getString(R.string.cd_no_rule_txt),
+                            context.getString(R.string.cd_no_rule_txt).italic(),
                             time
                         )
                 }
@@ -579,7 +581,7 @@ class CustomDomainAdapter(
                     b.customDomainStatusTv.text =
                         context.getString(
                             R.string.ci_desc,
-                            context.getString(R.string.ci_trust_rule),
+                            context.getString(R.string.ci_trust_rule).italic(),
                             time
                         )
                 }
@@ -589,7 +591,7 @@ class CustomDomainAdapter(
                     b.customDomainStatusTv.text =
                         context.getString(
                             R.string.ci_desc,
-                            context.getString(R.string.lbl_blocked),
+                            context.getString(R.string.lbl_blocked).italic(),
                             time
                         )
                 }
@@ -599,7 +601,7 @@ class CustomDomainAdapter(
                     b.customDomainStatusTv.text =
                         context.getString(
                             R.string.ci_desc,
-                            context.getString(R.string.cd_no_rule_txt),
+                            context.getString(R.string.cd_no_rule_txt).italic(),
                             time
                         )
                 }
