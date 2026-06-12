@@ -186,6 +186,7 @@ class GoVpnAdapter : KoinComponent {
         setAutoMode()
         registerSeProxyIfNeeded()
         setFloodWgMode()
+        onLowMemory()
         Logger.v(LOG_TAG_VPN, "$TAG initResolverProxiesPcap done")
     }
 
@@ -2357,10 +2358,9 @@ class GoVpnAdapter : KoinComponent {
     }
 
     suspend fun onLowMemory() {
-        val limitBytes: Long = 1024 * 1024 * 1024 // 1GB
-        // TODO: slider from 32MB - 1GB (increment by 32MB)
+        val limitBytes: Long = persistentState.goMaxMemory
         Intra.lowMem(limitBytes)
-        logEvent(Severity.CRITICAL, "low memory", "notified go of low memory with limit: $limitBytes bytes")
+        logEvent(Severity.MEDIUM, "low memory", "set memory limit to ${limitBytes/(1024 * 1024)} MB")
         Logger.i(LOG_TAG_VPN, "$TAG low memory, called Intra.lowMem()")
     }
 

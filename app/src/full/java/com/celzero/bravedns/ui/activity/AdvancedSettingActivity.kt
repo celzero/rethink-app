@@ -15,10 +15,12 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
+import android.widget.SeekBar
 import com.celzero.bravedns.ui.BaseActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -35,6 +37,7 @@ import org.koin.android.ext.android.inject
 class AdvancedSettingActivity : BaseActivity(R.layout.activity_advanced_setting) {
     private val persistentState by inject<PersistentState>()
     private val b by viewBinding(ActivityAdvancedSettingBinding::bind)
+    private val memoryValues = arrayOf(32, 64, 128, 256, 512, 1024)
 
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
@@ -64,11 +67,17 @@ class AdvancedSettingActivity : BaseActivity(R.layout.activity_advanced_setting)
             b.settingsResetTourRl.visibility = View.VISIBLE
             b.dvPtModeSwitch.isChecked = persistentState.advSettingForcePTMode
             b.settingsPtModeRl.visibility = View.VISIBLE
+            b.settingsGoMaxMemoryLl.visibility = View.VISIBLE
+            val maxMemMb = (persistentState.goMaxMemory / (1024 * 1024)).toInt()
+            val index = memoryValues.indexOf(maxMemMb).coerceAtLeast(0)
+            b.goMaxMemorySeekbar.progress = index
+            updateMaxMemoryValueText(memoryValues[index])
         } else {
             b.settingsExperimentalRl.visibility = View.GONE
             b.settingsAutoDialRl.visibility = View.GONE
             b.settingsResetTourRl.visibility = View.GONE
             b.settingsPtModeRl.visibility = View.GONE
+            b.settingsGoMaxMemoryLl.visibility = View.GONE
         }
     }
 
@@ -106,6 +115,34 @@ class AdvancedSettingActivity : BaseActivity(R.layout.activity_advanced_setting)
 
         b.settingsPtModeRl.setOnClickListener {
             b.dvPtModeSwitch.isChecked = !b.dvPtModeSwitch.isChecked
+        }
+
+        b.goMaxMemorySeekbar.setOnSeekBarChangeListener(
+            object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    if (fromUser) {
+                        val maxMemMb = memoryValues[progress]
+                        val maxMemBytes = maxMemMb.toLong() * 1024 * 1024
+                        persistentState.goMaxMemory = maxMemBytes
+                        updateMaxMemoryValueText(maxMemMb)
+                        Logger.i(LOG_TAG_UI, "AdvSetting; goMaxMemory set to $maxMemMb ($maxMemBytes)")
+                    }
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            }
+        )
+    }
+
+    private fun updateMaxMemoryValueText(maxMemMb: Int) {
+        if (maxMemMb >= 1024) {
+            b.goMaxMemoryValueTxt.text =
+                getString(R.string.two_argument_space, (maxMemMb / 1024).toString(), "GB")
+        } else {
+            b.goMaxMemoryValueTxt.text =
+                getString(R.string.two_argument_space, maxMemMb.toString(), "MB")
         }
     }
 

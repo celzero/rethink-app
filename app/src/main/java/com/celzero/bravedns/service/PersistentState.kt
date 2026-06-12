@@ -110,6 +110,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val SOCKET_BUFFER_SIZE_BYTES = "socket_buffer_size_bytes"
 
         const val INCLUDE_FILE_TRACE = "include_file_trace"
+
+        const val GO_MAX_MEMORY = "go_max_memory"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -757,4 +759,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // the version of the guided tour that was last shown; used to re-trigger on UI changes
     var guidedTourVersion by intPref("guided_tour_version").withDefault<Int>(0)
+
+    // maximum memory the go engine can consume in bytes
+    var goMaxMemory by longPref(GO_MAX_MEMORY).withDefault<Long>(1024 * 1024 * 1024L)
 }
