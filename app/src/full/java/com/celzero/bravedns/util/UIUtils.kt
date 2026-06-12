@@ -24,12 +24,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.TypedArray
 import android.graphics.Color
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.text.Html
+import android.text.SpannableString
 import android.text.Spanned
 import android.text.format.DateUtils
+import android.text.style.StyleSpan
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -912,6 +915,20 @@ object SnackbarHelper {
             .joinToString(" ") { word ->
                 word.lowercase().replaceFirstChar { it.uppercase() }
             }
+    }
+
+    /**
+     * Apply a bold typeface to the string.
+     */
+    fun String.italic(): SpannableString {
+        return SpannableString(this).apply {
+            setSpan(
+                StyleSpan(Typeface.ITALIC),
+                0,
+                length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
     }
 
     /**
