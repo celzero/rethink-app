@@ -1,5 +1,6 @@
 package com.celzero.bravedns.ui.bottomsheet
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,8 +8,12 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.BottomsheetPurchaseProcessingBinding
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import org.koin.android.ext.android.inject
 import java.io.Serializable
 
 /**
@@ -23,6 +28,7 @@ class PurchaseProcessingBottomSheet : BottomSheetDialogFragment() {
         { "Binding accessed outside of view lifecycle" }
 
     private var currentState: ProcessingState = ProcessingState.Processing
+    private val persistentState by inject<PersistentState>()
 
     companion object {
         private const val TAG = "PurchaseProcessingBS"
@@ -39,9 +45,16 @@ class PurchaseProcessingBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
+    override fun getTheme(): Int =
+        getBottomSheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
+
+    private fun isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NORMAL, R.style.BottomSheetDialogTheme)
         isCancelable = true
     }
 
@@ -56,6 +69,9 @@ class PurchaseProcessingBottomSheet : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dialog?.window?.let { window ->
+            Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
+        }
 
         val state = if (isAtleastT()) {
             arguments?.getSerializable(ARG_STATE, ProcessingState::class.java)

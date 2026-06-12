@@ -17,6 +17,7 @@ package com.celzero.bravedns.ui.bottomsheet
 
 import Logger
 import Logger.LOG_TAG_UI
+import android.content.res.Configuration
 import android.graphics.Paint
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -38,6 +39,10 @@ import com.celzero.bravedns.iab.InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_D
 import com.celzero.bravedns.iab.InAppBillingHandler.REVOKE_WINDOW_SUBS_YEARLY_DAYS
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
+import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
@@ -48,6 +53,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -59,6 +65,7 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
     private val b get() = checkNotNull(_binding) { "Binding accessed outside of view lifecycle" }
 
     private val viewModel: ManagePurchaseViewModel by viewModel()
+    private val persistentState by inject<PersistentState>()
 
     companion object {
         private const val TAG = "ManageRpnPurchaseBtmSht"
@@ -67,9 +74,12 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
         fun newInstance(): ManageRpnPurchaseBtmSht = ManageRpnPurchaseBtmSht()
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setStyle(STYLE_NORMAL, R.style.BottomSheetDialogTheme)
+    override fun getTheme(): Int =
+        getBottomSheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
+
+    private fun isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
     }
 
     override fun onCreateView(
@@ -83,6 +93,9 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dialog?.window?.let { window ->
+            Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
+        }
         initView()
         setupClickListeners()
 
@@ -213,7 +226,7 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
         state: SubscriptionStateMachineV2.SubscriptionState
     ) {
         // Plan name
-        b.tvSubPlan.text = resolvePlanName(subscriptionData).ifEmpty { getString(R.string.placeholder_dash) }
+        b.tvSubPlan.text = resolvePlanName(subscriptionData).ifEmpty { getString(R.string.placeholder_dash) }.capitalizeWords()
 
         // Status label + colour
         val colorGood = UIUtils.fetchColor(requireContext(), R.attr.accentGood)

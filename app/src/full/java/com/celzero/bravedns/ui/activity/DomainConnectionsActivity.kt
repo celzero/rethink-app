@@ -28,6 +28,7 @@ import com.celzero.bravedns.adapter.DomainConnectionsAdapter
 import com.celzero.bravedns.databinding.ActivityDomainConnectionsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.CustomLinearLayoutManager
+import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.Utilities.isAtleastQ
@@ -70,7 +71,7 @@ class DomainConnectionsActivity : BaseActivity(R.layout.activity_domain_connecti
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
 

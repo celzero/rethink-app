@@ -18,6 +18,7 @@ package com.celzero.bravedns.ui.bottomsheet
 import Logger
 import Logger.LOG_IAB
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -26,8 +27,12 @@ import android.view.ViewGroup
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.BottomsheetDeviceAuthErrorBinding
 import com.celzero.bravedns.iab.ServerApiError
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import androidx.core.net.toUri
+import org.koin.android.ext.android.inject
 
 /**
  * Bottom sheet shown when a `/g/acc` or `/reg` API call returns HTTP 401.
@@ -38,6 +43,8 @@ class DeviceAuthErrorBottomSheet : BottomSheetDialogFragment() {
     private val binding
         get() = checkNotNull(_binding)
         { "Binding accessed outside of view lifecycle" }
+
+    private val persistentState by inject<PersistentState>()
 
     companion object {
         private const val TAG = "DeviceAuthErrorBS"
@@ -64,9 +71,16 @@ class DeviceAuthErrorBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
+    override fun getTheme(): Int =
+        getBottomSheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
+
+    private fun isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NORMAL, R.style.BottomSheetDialogTheme)
         isCancelable = true
     }
 
@@ -81,6 +95,9 @@ class DeviceAuthErrorBottomSheet : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dialog?.window?.let { window ->
+            Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
+        }
 
         val args = requireArguments()
         val accountId = args.getString(ARG_ACCOUNT_ID, "")

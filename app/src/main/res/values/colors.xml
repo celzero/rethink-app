@@ -100,7 +100,7 @@
     <color name="navBarColorLight">#FFFFFF</color>
 
     <color name="accentGoodLight">#005cb2</color>
-    <color name="accentBadLight">#ff1744</color>
+    <color name="accentBadLight">#D12600</color>
     <color name="accentWarningLight">#895601</color>
 
     <color name="backgroundLight">#fafafa</color>

@@ -145,7 +145,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
         if (isAtleastQ()) {
             WindowInsetsControllerCompat(window, window.decorView)
-                .isAppearanceLightNavigationBars = false
+                .isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
 

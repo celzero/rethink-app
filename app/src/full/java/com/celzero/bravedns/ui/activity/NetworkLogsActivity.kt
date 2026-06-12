@@ -37,6 +37,7 @@ import com.celzero.bravedns.ui.fragment.DnsLogFragment
 import com.celzero.bravedns.ui.fragment.RethinkLogFragment
 import com.celzero.bravedns.ui.fragment.WgNwStatsFragment
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
@@ -77,7 +78,7 @@ class NetworkLogsActivity : BaseActivity(R.layout.activity_network_logs) {
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
 

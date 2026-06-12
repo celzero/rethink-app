@@ -15,27 +15,41 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
-import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.BottomsheetEntitlementDetailBinding
 import com.celzero.bravedns.databinding.LayoutEntitlementRowBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
+import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.firestack.backend.RpnEntitlement
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
 
 class EntitlementDetailBottomSheet : BottomSheetDialogFragment() {
     private var _b: BottomsheetEntitlementDetailBinding? = null
     private val b get() = checkNotNull(_b) { "Binding accessed outside of view lifecycle" }
+
+    private val persistentState by inject<PersistentState>()
+
+    override fun getTheme(): Int =
+        getBottomSheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
+
+    private fun isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,7 +62,9 @@ class EntitlementDetailBottomSheet : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setStyle(STYLE_NORMAL, R.style.BottomSheetDialogTheme)
+        dialog?.window?.let { window ->
+            Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
+        }
         initView()
     }
 
