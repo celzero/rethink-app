@@ -51,7 +51,7 @@ object EnhancedBugReport : KoinComponent {
 
     const val PREFIX_FLIGHT_REC = "flt_"
     const val FILE_EXTENSION = ".txt"
-    const val FLIGHT_REC_EXT = "pprof"
+    const val FLIGHT_REC_EXT = ".pprof"
 
     // Total cap across ALL three file types in the tombstone folder.
     // When Firebase is OFF, files accumulate up to this limit before the oldest are deleted.
@@ -394,7 +394,7 @@ object EnhancedBugReport : KoinComponent {
             if (file.createNewFile()) {
                 // Register golog_ / gocrash_ files immediately so reportTombstonesToFirebaseOnStartup
                 // never touches them, regardless of when it runs relative to file creation.
-                if (prefix == PREFIX_GO_LOG || prefix == PREFIX_GO_CRASH) {
+                if (prefix == PREFIX_GO_LOG || prefix == PREFIX_GO_CRASH || prefix == PREFIX_FLIGHT_REC) {
                     markFileAsActive(file.name)
                 }
                 file
