@@ -40,6 +40,7 @@ import android.os.Looper
 import android.provider.Settings
 import android.text.TextUtils
 import android.text.TextUtils.SimpleStringSplitter
+import android.util.LruCache
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
@@ -480,26 +481,68 @@ object Utilities {
         }
     }
 
-    fun getIcon(ctx: Context, packageName: String, appName: String? = null): Drawable? {
-        if (!isValidAppName(appName, packageName)) {
-            return getDefaultIcon(ctx)
-        }
+    object AppIconCache {
+        private const val CACHE_SIZE = 500
 
-        return try {
-            ctx.packageManager.getApplicationIcon(packageName)
-        } catch (e: PackageManager.NameNotFoundException) {
-            // Not adding exception details in logs.
-            Logger.e(LOG_TAG_FIREWALL, "no app icon for $packageName" + e.message)
-            getDefaultIcon(ctx)
+        private val cache =
+            LruCache<String, Drawable.ConstantState>(CACHE_SIZE)
+
+        fun get(
+            context: Context,
+            packageName: String,
+            appName: String? = null
+        ): Drawable? {
+            cache.get(packageName)?.let {
+                return it.newDrawable(context.resources)
+            }
+
+            if (!isValidAppName(appName, packageName)) {
+                return getDefaultIcon(context)
+            }
+
+            val drawable = try {
+                context.applicationContext.packageManager
+                    .getApplicationIcon(packageName)
+            } catch (_: PackageManager.NameNotFoundException) {
+                return getDefaultIcon(context)
+            }
+
+            drawable.constantState?.let {
+                cache.put(packageName, it)
+            }
+
+            return drawable
         }
+    }
+
+    // Backward-compatible wrapper that delegates to AppIconCache.
+    fun getIcon(
+        ctx: Context,
+        packageName: String,
+        appName: String? = null
+    ): Drawable? {
+        return AppIconCache.get(ctx, packageName, appName)
     }
 
     private fun isValidAppName(appName: String?, packageName: String): Boolean {
         return !isNonApp(packageName) && Constants.UNKNOWN_APP != appName
     }
 
+    private var defaultIconState: Drawable.ConstantState? = null
+
     fun getDefaultIcon(context: Context): Drawable? {
-        return AppCompatResources.getDrawable(context, R.drawable.default_app_icon)
+        defaultIconState?.let {
+            return it.newDrawable(context.resources)
+        }
+
+        val drawable = AppCompatResources.getDrawable(
+            context.applicationContext,
+            R.drawable.default_app_icon
+        )
+
+        defaultIconState = drawable?.constantState
+
+        return drawable
     }
 
     @Suppress("TooGenericExceptionCaught")
