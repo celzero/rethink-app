@@ -164,7 +164,7 @@ object BubbleHelper {
         // Use ShortcutInfoCompat for better compatibility
         val shortcut = ShortcutInfoCompat.Builder(context, BUBBLE_SHORTCUT_ID)
             .setShortLabel(context.getString(R.string.firewall_bubble_title))
-            .setLongLabel(context.getString(R.string.firewall_bubble))
+            .setLongLabel(context.getString(R.string.firewall_bubble_title))
             .setIsConversation()
             .setIcon(IconCompat.createWithResource(context, R.drawable.ic_firewall_bubble))
             .setIntent(shortcutIntent)

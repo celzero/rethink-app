@@ -52,7 +52,7 @@
             app:layout_constraintTop_toTopOf="@id/allowed_icon_container"
             app:layout_constraintEnd_toStartOf="@id/allowed_remove_btn" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/allowed_time_remaining"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -77,7 +77,7 @@
             android:text="Remove"
             android:textAllCaps="false"
             android:textSize="12sp"
-            android:textColor="?attr/accentBad"
+            android:textColor="?attr/homeScreenHeaderTextColor"
             app:cornerRadius="17dp"
             app:rippleColor="?attr/colorControlHighlight"
             app:layout_constraintEnd_toEndOf="parent"
