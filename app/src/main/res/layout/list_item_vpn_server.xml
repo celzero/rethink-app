@@ -67,16 +67,16 @@
                 tools:text="United States" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/latency_badge"
+                android:id="@+id/tv_server_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
                 android:layout_marginStart="4dp"
                 android:layout_marginEnd="4dp"
-                android:alpha="0.6"
-                android:fontFamily="sans-serif-medium"
+                android:textColor="?attr/accentGood"
                 android:textSize="11sp"
-                tools:text="1.0 Gbps · 20%"
-                tools:textColor="?attr/chipTextPositive" />
+                tools:text="Active" />
 
         </LinearLayout>
 
@@ -87,6 +87,32 @@
             android:layout_marginTop="2dp"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="5dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_country_code"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="monospace"
+                android:maxLines="1"
+                android:layout_gravity="center"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="12sp"
+                android:alpha="0.85"
+                tools:visibility="visible"
+                tools:text="US" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_cc_sep"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="5dp"
+                android:text="@string/lbl_separator_dot"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="11sp"
+                android:visibility="visible" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_server_ip"
@@ -152,14 +178,13 @@
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_server_status"
+                android:id="@+id/latency_badge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:maxLines="1"
-                android:textColor="?attr/accentGood"
+                android:alpha="0.6"
                 android:textSize="11sp"
-                tools:text="Active" />
+                tools:text="1.0 Gbps · 20%"
+                tools:textColor="?attr/chipTextPositive" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_status_sep"
