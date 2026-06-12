@@ -104,7 +104,7 @@ private const val DIM_AMOUNT_WITH_BLUR = 0.45f
 private const val DIM_AMOUNT_NO_BLUR = 0.0f
 // ~59 % opacity of the dark surface colour — strong frosted tint that
 // significantly reduces background visibility without fully hiding the blur.
-private const val WINDOW_BACKGROUND_ALPHA_WITH_BLUR = 150
+private const val WINDOW_BACKGROUND_ALPHA_WITH_BLUR = 40
 // Nearly-opaque fallback when blur is unavailable (pre-S safety net).
 private const val WINDOW_BACKGROUND_ALPHA_NO_BLUR = 230
 
