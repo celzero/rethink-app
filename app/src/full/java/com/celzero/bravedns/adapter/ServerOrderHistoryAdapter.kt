@@ -16,6 +16,7 @@
 package com.celzero.bravedns.adapter
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -79,27 +80,27 @@ class ServerOrderHistoryAdapter(private val context: Context) :
         private fun bindTypeBadge(entry: ServerOrderEntry) {
             if (entry.isSubscription) {
                 b.tvTypeBadge.text = context.getString(R.string.server_order_type_subscription)
-                b.tvTypeBadge.backgroundTintList = ContextCompat.getColorStateList(
-                    context, R.color.chipBackgroundColor
+                b.tvTypeBadge.backgroundTintList = ColorStateList.valueOf(
+                    UIUtils.fetchColor(context, R.attr.chipBgColorPositive)
                 )
                 b.tvTypeBadge.setTextColor(
                     UIUtils.fetchColor(context, R.attr.chipTextPositive)
                 )
                 b.ivTypeIcon.setImageResource(R.drawable.ic_rethink_plus)
-                b.ivTypeIcon.imageTintList = ContextCompat.getColorStateList(
-                    context, R.color.chipBackgroundColor
+                b.ivTypeIcon.imageTintList = ColorStateList.valueOf(
+                    UIUtils.fetchColor(context, R.attr.chipBgColorPositive)
                 )
             } else {
                 b.tvTypeBadge.text = context.getString(R.string.one_time_label).uppercase(Locale.ROOT)
-                b.tvTypeBadge.backgroundTintList = ContextCompat.getColorStateList(
-                    context, R.color.chipBgNeutral
+                b.tvTypeBadge.backgroundTintList = ColorStateList.valueOf(
+                    UIUtils.fetchColor(context, R.attr.chipBgColorNeutral)
                 )
                 b.tvTypeBadge.setTextColor(
                     UIUtils.fetchColor(context, R.attr.chipTextNeutral)
                 )
                 b.ivTypeIcon.setImageResource(R.drawable.ic_rethink_plus_sparkle)
-                b.ivTypeIcon.imageTintList = ContextCompat.getColorStateList(
-                    context, R.color.chipBgNeutral
+                b.ivTypeIcon.imageTintList = ColorStateList.valueOf(
+                    UIUtils.fetchColor(context, R.attr.chipBgColorNeutral)
                 )
             }
         }
@@ -107,8 +108,8 @@ class ServerOrderHistoryAdapter(private val context: Context) :
         private fun bindStatusChip(entry: ServerOrderEntry) {
             val (label, bgAttr, textAttr) = statusStyle(entry)
             b.tvStatusChip.text = label
-            b.tvStatusChip.backgroundTintList = ContextCompat.getColorStateList(
-                context, bgAttr
+            b.tvStatusChip.backgroundTintList = ColorStateList.valueOf(
+                UIUtils.fetchColor(context, bgAttr)
             )
             b.tvStatusChip.setTextColor(UIUtils.fetchColor(context, textAttr))
         }
@@ -121,27 +122,27 @@ class ServerOrderHistoryAdapter(private val context: Context) :
                 return when (entry.subscriptionState) {
                     ServerOrderEntry.STATE_ACTIVE -> Triple(
                         context.getString(R.string.lbl_active),
-                        R.color.chipBgPositive,
+                        R.attr.chipBgColorPositive,
                         R.attr.chipTextPositive
                     )
                     ServerOrderEntry.STATE_CANCELLED -> Triple(
                         context.getString(R.string.lbl_cancelled),
-                        R.color.chipBgNegative,
+                        R.attr.chipBgColorNegative,
                         R.attr.chipTextNegative
                     )
                     ServerOrderEntry.STATE_EXPIRED -> Triple(
                         context.getString(R.string.lbl_expired),
-                        R.color.chipBgNeutral,
+                        R.attr.chipBgColorNeutral,
                         R.attr.chipTextNeutral
                     )
                     ServerOrderEntry.STATE_PAUSED -> Triple(
                         context.getString(R.string.lbl_paused),
-                        R.color.chipBgNeutral,
+                        R.attr.chipBgColorNeutral,
                         R.attr.chipTextNeutral
                     )
                     ServerOrderEntry.STATE_ON_HOLD -> Triple(
                         context.getString(R.string.server_selection_sub_on_hold),
-                        R.color.chipBgNeutral,
+                        R.attr.chipBgColorNeutral,
                         R.attr.chipTextNeutral
                     )
                     else -> Triple(
@@ -151,7 +152,7 @@ class ServerOrderHistoryAdapter(private val context: Context) :
                             ?.lowercase()
                             ?.replaceFirstChar { it.uppercase() }
                             ?: context.getString(R.string.network_log_app_name_unknown),
-                        R.color.chipBgNeutral,
+                        R.attr.chipBgColorNeutral,
                         R.attr.primaryLightColorText
                     )
                 }
@@ -159,22 +160,22 @@ class ServerOrderHistoryAdapter(private val context: Context) :
                 return when (entry.purchaseState) {
                     ServerOrderEntry.PURCHASE_STATE_PURCHASED -> Triple(
                         context.getString(R.string.rpn_purchased_state),
-                        R.color.chipBgPositive,
+                        R.attr.chipBgColorPositive,
                         R.attr.chipTextPositive
                     )
                     ServerOrderEntry.PURCHASE_STATE_CANCELLED -> Triple(
                         context.getString(R.string.lbl_cancelled),
-                        R.color.chipBgNegative,
+                        R.attr.chipBgColorNegative,
                         R.attr.chipTextNegative
                     )
                     ServerOrderEntry.PURCHASE_STATE_PENDING -> Triple(
                         context.getString(R.string.payment_history_state_pending),
-                        R.color.chipBgNeutral,
+                        R.attr.chipBgColorNeutral,
                         R.attr.chipTextNeutral
                     )
                     else -> Triple(
                         context.getString(R.string.network_log_app_name_unknown),
-                        R.color.chipBgNeutral,
+                        R.attr.chipBgColorNeutral,
                         R.attr.primaryLightColorText
                     )
                 }

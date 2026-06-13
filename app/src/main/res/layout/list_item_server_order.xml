@@ -95,7 +95,7 @@
                     android:fontFamily="sans-serif-medium"
                     android:background="@drawable/rectangle_border_background"
                     android:backgroundTint="?attr/chipBgColorPositive"
-                    android:textColor="?attr/primaryTextColor"
+                    android:textColor="?attr/chipTextPositive"
                     tools:text="Active" />
 
                 <androidx.appcompat.widget.AppCompatTextView
