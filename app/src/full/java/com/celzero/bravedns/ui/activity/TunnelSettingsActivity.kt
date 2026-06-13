@@ -84,15 +84,18 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         private const val ALPHA_ENABLED = 1f
         private const val ALPHA_DISABLED = 0.5f
 
-        // Socket buffer size values in bytes: 512 KB, 1 MB, 2 MB, 4 MB, 8 MB, 16 MB
+        // Socket buffer size values in bytes: 128 KB, 256 KB, 512 KB, 1 MB, 2 MB, 4 MB, 8 MB, 16 MB
         private val SOCKET_BUFFER_SIZES_BYTES = longArrayOf(
-            524288L,    // 512 KB
-            1048576L,   // 1 MB
-            2097152L,   // 2 MB
-            4194304L,   // 4 MB
-            8388608L,   // 8 MB
-            16777216L   // 16 MB
+            128 * 1024L,   // 128 KB
+            256 * 1024L,   // 256 KB
+            512 * 1024L,   // 512 KB
+            1 * 1024 * 1024L,   // 1 MB
+            2 * 1024 * 1024L,   // 2 MB
+            4 * 1024 * 1024L,   // 4 MB
+            8 * 1024 * 1024L,   // 8 MB
+            16 * 1024 * 1024L   // 16 MB
         )
+        private const val FOUR_MB_IN_BYTES = 4 * 1024 * 1024
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -248,17 +251,25 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
     }
 
     private fun socketBufferSizeToProgress(bytes: Int): Int {
-        return SOCKET_BUFFER_SIZES_BYTES.indexOf(bytes.toLong()).coerceIn(0, 5)
+        return SOCKET_BUFFER_SIZES_BYTES.indexOf(bytes.toLong()).coerceIn(0, 7)
     }
 
     private fun progressToSocketBufferSize(progress: Int): Int {
-        return SOCKET_BUFFER_SIZES_BYTES[progress.coerceIn(0, 5)].toInt()
+        return SOCKET_BUFFER_SIZES_BYTES[progress.coerceIn(0, 7)].toInt()
     }
 
     private fun updateSocketBufferSize(progress: Int) {
         val bytes = progressToSocketBufferSize(progress)
         persistentState.socketBufferSizeBytes = bytes
         displaySocketBufferSizeUi(bytes)
+    }
+
+    private fun suggestSocketBufferSize() {
+        if (persistentState.socketBufferSizeBytes < FOUR_MB_IN_BYTES) {
+            val progress = socketBufferSizeToProgress(FOUR_MB_IN_BYTES)
+            b.dvSocketBufferSizeSeekbar.progress = progress
+            updateSocketBufferSize(progress)
+        }
     }
 
     private fun displayAllowBypassUi() {
@@ -600,6 +611,9 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
 
         b.settingsUseMaxMtuSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.useMaxMtu = isChecked
+            if (isChecked) {
+                suggestSocketBufferSize()
+            }
             logEvent(
                 "use jumbo packets",
                 "Use jumbo packets set to: $isChecked"
@@ -764,6 +778,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
             // Enable jumbo packets
             persistentState.useMaxMtu = true
             b.settingsUseMaxMtuSwitch.isChecked = true
+            suggestSocketBufferSize()
 
             // Set IP version to IPv4 & IPv6 (ALWAYSv46)
             persistentState.internetProtocolType = InternetProtocol.ALWAYSv46.id
