@@ -58,7 +58,6 @@ import com.celzero.bravedns.util.Utilities.isNetworkSame
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -72,6 +71,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.time.Duration.Companion.milliseconds
 
 class ConnectionMonitor(private val context: Context, private val networkListener: NetworkListener, private val serializer: CoroutineDispatcher, private val scope: CoroutineScope) : KoinComponent, DiagnosticsManager.DiagnosticsListener {
 
@@ -667,64 +667,54 @@ class ConnectionMonitor(private val context: Context, private val networkListene
      * Force updates the VPN's underlying network based on the preference. Will be initiated when
      * the VPN start is completed. Always called from the main thread
      */
-    suspend fun onVpnStart(context: Context): Boolean  {
-        val deferred = scope.async {
-            val isNewVpn = !::cm.isInitialized
+    suspend fun onVpnStart(context: Context): Boolean {
+        val isNewVpn = !::cm.isInitialized
 
-            if (!isNewVpn) {
-                Logger.w(LOG_TAG_CONNECTION, "connection monitor is already running")
-                return@async false
-            }
-
-            // initialize channel before registering
-            channel = Channel(Channel.CONFLATED)
-            cm = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            wm = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-
-            val networkBehaviour = getConnectionMonitorBehaviour()
-            Logger.i(LOG_TAG_CONNECTION, "new vpn is created force update the network, policy: $networkBehaviour")
-            val success = registerCallbackBasedOnPolicy()
-
-            if (!success) {
-                networkListener.onNetworkRegistrationFailed()
-                return@async false
-            }
-
-            // register for diagnostics manager if the android version is R or above
-            if (isAtleastR()) {
-                registerDiags(context)
-            }
-
-            scope.launch(CoroutineName("nwHdl") + serializer) {
-
-                // Filter out empty strings from probe IPs to avoid unnecessary probe attempts
-                val ips = IpsAndUrlToProbe(
-                    persistentState.pingv4Ips.split(",").map { it.trim() }
-                        .filter { it.isNotEmpty() },
-                    persistentState.pingv6Ips.split(",").map { it.trim() }
-                        .filter { it.isNotEmpty() },
-                    persistentState.pingv4Url.split(",").map { it.trim() }
-                        .filter { it.isNotEmpty() },
-                    persistentState.pingv6Url.split(",").map { it.trim() }
-                        .filter { it.isNotEmpty() }
-                )
-
-                val hdl = NetworkRequestHandler(cm, networkListener, ips, ::sendNetworkChanges)
-                sendNetworkChanges()
-                for (m in channel) {
-                    // process the message in a coroutine context
-                    val deferred = async { hdl.handleMessage(m) }
-                    deferred.await()
-                    // add a delay to avoid processing multiple network changes in quick succession
-                    val duration = getNetworkBehaviourDuration(networkBehaviour)
-                    delay(duration)
-                }
-            }
-
-            return@async isNewVpn
+        if (!isNewVpn) {
+            Logger.w(LOG_TAG_CONNECTION, "connection monitor is already running")
+            return false
         }
 
-        return deferred.await()
+        channel = Channel(Channel.CONFLATED)
+        cm = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        wm = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+
+        val networkBehaviour = getConnectionMonitorBehaviour()
+        Logger.i(LOG_TAG_CONNECTION, "new vpn is created force update the network, policy: $networkBehaviour")
+        val success = registerCallbackBasedOnPolicy()
+
+        if (!success) {
+            networkListener.onNetworkRegistrationFailed()
+            return false
+        }
+
+        if (isAtleastR()) {
+            registerDiags(context)
+        }
+
+        scope.launch(CoroutineName("nwHdl") + serializer) {
+
+            val ips = IpsAndUrlToProbe(
+                persistentState.pingv4Ips.split(",").map { it.trim() }
+                    .filter { it.isNotEmpty() },
+                persistentState.pingv6Ips.split(",").map { it.trim() }
+                    .filter { it.isNotEmpty() },
+                persistentState.pingv4Url.split(",").map { it.trim() }
+                    .filter { it.isNotEmpty() },
+                persistentState.pingv6Url.split(",").map { it.trim() }
+                    .filter { it.isNotEmpty() }
+            )
+
+            val hdl = NetworkRequestHandler(cm, networkListener, ips, ::sendNetworkChanges)
+            sendNetworkChanges()
+            for (m in channel) {
+                hdl.handleMessage(m)
+                val duration = getNetworkBehaviourDuration(networkBehaviour)
+                delay(duration.milliseconds)
+            }
+        }
+
+        return isNewVpn
     }
 
     private fun registerCallbackBasedOnPolicy(): Boolean {
