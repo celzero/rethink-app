@@ -1174,7 +1174,7 @@ abstract class AppDatabase : RoomDatabase() {
                     db.execSQL("CREATE INDEX IF NOT EXISTS index_CountryConfig_isActive ON CountryConfig(isActive)")
                     Logger.i(LOG_TAG_APP_DB, "MIGRATION_28_29: recreated CountryConfig with final schema")
 
-                    // [v32→v37] SubscriptionStatus: audit / billing columns
+                    // SubscriptionStatus: audit / billing columns
                     // Each ALTER is guarded individually so a partial prior run cannot leave
                     // the DB in an inconsistent state.
                     try {
@@ -1195,13 +1195,11 @@ abstract class AppDatabase : RoomDatabase() {
                     try {
                         db.execSQL("ALTER TABLE SubscriptionStatus ADD COLUMN deviceId TEXT NOT NULL DEFAULT ''")
                     } catch (_: Exception) {}
-                    db.execSQL(
-                        "UPDATE SubscriptionStatus SET deviceId = 'pip/identity.json' " +
-                        "WHERE deviceId != '' AND deviceId != 'pip/identity.json'"
-                    )
-                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_28_29: updated SubscriptionStatus columns")
+                    try {
+                        db.execSQL("UPDATE SubscriptionStatus SET deviceId = 'pip/identity.json' WHERE deviceId != '' AND deviceId != 'pip/identity.json'")
+                    } catch (_: Exception) {}
 
-                    // [v38→v39] WgConfigFiles: isLockdown column
+                    // WgConfigFiles: isLockdown column
                     try {
                         db.execSQL("ALTER TABLE WgConfigFiles ADD COLUMN isLockdown INTEGER NOT NULL DEFAULT 0")
                         Logger.i(LOG_TAG_APP_DB, "MIGRATION_28_29: added isLockdown to WgConfigFiles")
