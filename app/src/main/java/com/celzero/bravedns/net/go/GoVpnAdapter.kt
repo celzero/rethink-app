@@ -46,7 +46,6 @@ import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
-import com.celzero.bravedns.scheduler.BugReportZipper.FLIGHT_RECORDER_DIR_NAME
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.BraveVPNService.Companion.NW_ENGINE_NOTIFICATION_ID
 import com.celzero.bravedns.service.EventLogger
@@ -96,10 +95,7 @@ import com.celzero.firestack.intra.Tunnel
 import com.celzero.firestack.settings.Settings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.component.KoinComponent
@@ -108,7 +104,6 @@ import java.io.File
 import java.net.URI
 import java.net.URLEncoder
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
