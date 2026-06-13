@@ -4247,8 +4247,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     // avoid the possibility of dns leak for the trusted queries / app which is set to bypass
     // dns + firewall rule
     private suspend fun getTransportIdForDnsFirewallMode(uid: Int, fqdn: String, srcType: String?, rinr: Boolean): DNSOpts {
-        val splitDns = persistentState.splitDns && (WireguardManager.isAdvancedWgActive() || RpnProxyManager.isRpnActive())
-        val tid = determineDnsTransportIdForDFMode(uid, fqdn, splitDns, rinr, srcType)
+        val tid = determineDnsTransportIdForDFMode(uid, fqdn, rinr, srcType)
         val forceBypassLocalBlocklists = isAppPaused() && isLockdown()
 
         if (uid == rethinkUid && !rinr) {
@@ -4272,11 +4271,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 // using same tid, see #getTransportIdForDnsFirewallMode for details
                 // if any app is bypassed (dns + firewall), then set bypass local blocklist as true
                 Logger.vv(LOG_TAG_VPN, "$TAG; onQuery: no uid, some app is bypassed $fqdn")
-                makeNsOpts(uid, transportIdsAlg(tid, splitDns), fqdn, true, rinr = rinr)
+                makeNsOpts(uid, transportIdsAlg(tid), fqdn, true, rinr = rinr)
             } else if (DomainRulesManager.isDomainTrusted(fqdn)) {
                 // using same tid, see #getTransportIdForDnsFirewallMode for details
                 Logger.vv(LOG_TAG_VPN, "$TAG; onQuery: no uid, univ domain trusted $fqdn")
-                makeNsOpts(uid, transportIdsAlg(tid, splitDns), fqdn, true, rinr = rinr)
+                makeNsOpts(uid, transportIdsAlg(tid), fqdn, true, rinr = rinr)
             } else if (getDomainRule(fqdn, UID_EVERYBODY).first == DomainRulesManager.Status.BLOCK) {
                 // if the domain is blocked by global rule then set as block all (overriding the tid)
                 // app-wise trust is already checked above
@@ -4371,7 +4370,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return Pair(tid, "")
     }
 
-    private suspend fun determineDnsTransportIdForDFMode(uid: Int, domain: String, splitDns: Boolean, rinr: Boolean, srcType: String?): Pair<String, String> {
+    private suspend fun determineDnsTransportIdForDFMode(uid: Int, domain: String, rinr: Boolean, srcType: String?): Pair<String, String> {
         val defaultTid =
             if (appConfig.isSystemDns() || (isAppPaused() && isLockdown())) {
                 // in vpn-lockdown mode+appPause , use system dns if the app is paused to mimic
@@ -4407,9 +4406,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 Pair(tid, "")
             }
         } else {
-            if (!splitDns && (!WireguardManager.oneWireGuardEnabled() && !RpnProxyManager.isRpnActive())) {
-                Logger.d(LOG_TAG_VPN, "(onQuery)no split dns, using $defaultTid")
-                return Pair(defaultTid, "")
+            if (!persistentState.splitDns) {
+                val oneWgId = WireguardManager.getOneWireGuardProxyId()
+                val tid = if (oneWgId != null) {
+                    ID_WG_BASE + oneWgId
+                } else {
+                    defaultTid
+                }
+                Logger.d(LOG_TAG_VPN, "(onQuery)no split dns, using $tid")
+                return Pair(tid, "")
             }
             if (FirewallManager.isAppExcludedFromProxy(uid)) {
                 return if (persistentState.wgGlobalLockdown) {
@@ -4489,13 +4494,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 Backend.RpnWin))
     }
 
-    private fun transportIdsAlg(preferredId: Pair<String, String>, splitDns: Boolean): Pair<String, String> {
+    private fun transportIdsAlg(preferredId: Pair<String, String>): Pair<String, String> {
         if (!persistentState.enableDnsAlg) {
             // if dns alg is not enabled, then return the preferred id as it is, no need to append
             // BlockFree, only alg needs ip address mapping which is why we use BlockFree transport
             return preferredId
         }
-        if (splitDns) {
+        if (persistentState.splitDns) {
             // case when splitDns is true, then tid will already be appended with Fixed
             // so no need to append BlockFree again
             return preferredId // ex: CT+Preferred,Fixed
@@ -4558,8 +4563,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         }
 
         if (FirewallManager.isAppExcludedFromProxy(uid)) {
-            logd("(onQuery-pid) app excluded from proxy, return $defaultProxy")
-            return defaultProxy
+            val pid = if (persistentState.wgGlobalLockdown) {
+                Backend.Block
+            } else {
+                defaultProxy
+            }
+            logd("(onQuery-pid) app excluded from proxy, return $pid, global-lockdown? ${persistentState.wgGlobalLockdown}")
+            return pid
         }
 
         if (appConfig.isDnsProxyActive()) {
@@ -4599,7 +4609,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             )
             val noProxyDetectedInWg = ids.joinToString() == defaultProxy
             if ((ids.isEmpty() || noProxyDetectedInWg) && rpnIds.isEmpty()) {
-                val r = if (persistentState.wgGlobalLockdown) Backend.BlockAll else defaultProxy
+                val r = if (persistentState.wgGlobalLockdown) Backend.Block else defaultProxy
                 Logger.d(LOG_TAG_VPN, "(onQuery-pid)no wg found, return $r")
                 r
             } else {
