@@ -186,6 +186,27 @@ android {
             resValue "string", "app_name", "Rethink(α)"
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        releaseDebug {
+             // for testing release build with debug signing config
+            initWith buildTypes.release
+            minifyEnabled true
+            shrinkResources true
+            signingConfig signingConfigs.debug
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            ndk {
+                // Use SYMBOL_TABLE to reduce symbol file size significantly
+                debugSymbolLevel 'SYMBOL_TABLE'
+                // Only process symbols for the most common ABIs to avoid Crashlytics index errors
+                // This reduces the total symbol data Crashlytics needs to process
+                abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'
+            }
+            if (!deGoogled) {
+                firebaseCrashlytics {
+                    // Enable processing and uploading of native symbols to Firebase servers.
+                    nativeSymbolUploadEnabled true
+                }
+            }
+        }
     }
 
     // fix: injectCrashlyticsBuildIds task has a buffer overflow bug
@@ -327,7 +348,6 @@ dependencies {
 
     fullImplementation 'com.squareup.okhttp3:okhttp:5.3.2'
     fullImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:5.3.2'
-    fullImplementation 'com.squareup.okhttp3:logging-interceptor:5.3.2'
 
     fullImplementation 'com.squareup.retrofit2:retrofit:3.0.0'
     fullImplementation 'com.squareup.retrofit2:converter-gson:3.0.0'
