@@ -76,6 +76,7 @@ import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_4
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
 import com.celzero.bravedns.util.KernelProc
+import com.celzero.bravedns.util.MemoryUtils
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
@@ -101,7 +102,6 @@ import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 import java.io.File
 import java.lang.reflect.Modifier
-import java.util.Properties
 import java.util.concurrent.TimeUnit
 
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, KoinComponent {
@@ -481,16 +481,16 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     private fun openStackTraceDialog() {
         io {
             val goStackTrace = GoVpnAdapter.printStack()
-            val kotlinStackTrace = captureKotlinStackTraces()
+            val jvmStackTrace = captureJVMStackTraces()
             uiCtx {
                 if (!isAdded) return@uiCtx
-                showStackTraceDialog(goStackTrace, kotlinStackTrace)
+                showStackTraceDialog(goStackTrace, jvmStackTrace)
             }
         }
     }
 
     /** Captures the current stack trace of every live JVM/Kotlin thread off the main thread. */
-    private fun captureKotlinStackTraces(): String = buildString {
+    private fun captureJVMStackTraces(): String = buildString {
         Thread.getAllStackTraces().entries
             .sortedBy { it.key.name }
             .forEach { (thread, frames) ->
@@ -512,15 +512,15 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
     private fun showStackTraceDialog(
         goStackTrace: String,
-        kotlinStackTrace: String
+        jvmStackTrace: String
     ) {
         if (!isAdded) return
         val ctx = requireContext()
         val pad = resources.getDimensionPixelSize(R.dimen.dots_margin_bottom)
 
         val clipText = buildString {
-            appendLine("=== KOTLIN STACK ===")
-            appendLine(kotlinStackTrace.ifBlank { ctx.getString(R.string.lbl_not_available_short) })
+            appendLine("=== JVM STACK ===")
+            appendLine(jvmStackTrace.ifBlank { ctx.getString(R.string.lbl_not_available_short) })
             appendLine()
             appendLine("=== GO STACK ===")
             appendLine(goStackTrace.ifBlank { ctx.getString(R.string.lbl_not_available_short) })
@@ -572,44 +572,44 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
         }
 
-        val kotlinRv = makeLineRecyclerView(kotlinStackTrace)
+        val jvmRv = makeLineRecyclerView(jvmStackTrace)
         val goRv     = makeLineRecyclerView(goStackTrace)
 
-        val tabKotlin = makeTabButton("Kotlin Stack")
+        val tabJvm = makeTabButton("JVM Stack")
         val tabGo     = makeTabButton("Go Stack")
 
-        fun selectTab(showKotlin: Boolean) {
-            kotlinRv.visibility = if (showKotlin)  View.VISIBLE else View.GONE
-            goRv.visibility     = if (!showKotlin) View.VISIBLE else View.GONE
-            tabKotlin.alpha = if (showKotlin)  1f else 0.45f
-            tabGo.alpha     = if (!showKotlin) 1f else 0.45f
-            if (showKotlin) kotlinRv.scrollToPosition(0)
+        fun selectTab(showJvm: Boolean) {
+            jvmRv.visibility = if (showJvm)  View.VISIBLE else View.GONE
+            goRv.visibility     = if (!showJvm) View.VISIBLE else View.GONE
+            tabJvm.alpha = if (showJvm)  1f else 0.45f
+            tabGo.alpha     = if (!showJvm) 1f else 0.45f
+            if (showJvm) jvmRv.scrollToPosition(0)
             else            goRv.scrollToPosition(0)
         }
 
-        tabKotlin.setOnClickListener { selectTab(true) }
+        tabJvm.setOnClickListener { selectTab(true) }
         tabGo.setOnClickListener     { selectTab(false) }
 
         val tabRow = android.widget.LinearLayout(ctx).apply {
             orientation = android.widget.LinearLayout.HORIZONTAL
-            addView(tabKotlin)
+            addView(tabJvm)
             addView(tabGo)
         }
 
         val container = android.widget.LinearLayout(ctx).apply {
             orientation = android.widget.LinearLayout.VERTICAL
             addView(tabRow)
-            addView(kotlinRv, android.widget.LinearLayout.LayoutParams(
+            addView(jvmRv, android.widget.LinearLayout.LayoutParams(
                 android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
             addView(goRv, android.widget.LinearLayout.LayoutParams(
                 android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
         }
 
-        // Start on Kotlin Stack tab
+        // Start on JVM Stack tab
         selectTab(true)
 
         val dialog = MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
-            .setTitle("Stack Trace")
+            .setTitle("Stacktrace")
             .setView(container)
             .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
             .setNegativeButton(R.string.dns_info_neutral) { _, _ ->
@@ -712,9 +712,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             val auxv = KernelProc.getStats(forceRefresh = true)
             val stat = GoVpnAdapter.getGoMetrics()
             val formatedMetrics = UIUtils.formatNetMetrics(stat)
+            val memMetrics = MemoryUtils.getMemoryStats(requireContext())
             uiCtx {
                 if (!isAdded) return@uiCtx
-                showProcDialog(allThreadsSched, status, smaps, auxv, formatedMetrics)
+                showProcDialog(allThreadsSched, status, smaps, auxv, formatedMetrics, memMetrics)
             }
         }
     }
@@ -724,7 +725,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         status: String,
         smaps: String,
         auxv: String,
-        formatedMetrics: String?
+        formatedMetrics: String?,
+        memMetrics: String
     ) {
         if (!isAdded) return
         val ctx = requireContext()
@@ -800,6 +802,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         otherSection("STATUS  (/proc/self/status)", status)
         otherSection("SMAPS  (/proc/self/smaps_rollup)", smaps)
         otherSection("AUXV  (/proc/self/auxv)", auxv)
+        otherSection("Memory Metrics", memMetrics)
 
         val clipText = buildString {
             appendLine("=== PROC / MEM ===")
@@ -883,7 +886,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         selectTab(false)
 
         val dialog = MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
-            .setTitle("Proc Analysis")
+            .setTitle("Proc")
             .setView(container)
             .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
             .setNegativeButton(R.string.dns_info_neutral) { _, _ ->
