@@ -226,6 +226,22 @@ class StateMachineDatabaseSyncService : KoinComponent {
             val existing = subscriptionRepository.getByPurchaseToken(purchaseDetail.purchaseToken)
             if (existing != null) {
                 Logger.d(LOG_IAB, "$TAG: savePurchaseDetail: row already exists id=${existing.id}")
+                // update developerPayload and orderId if they are provided in purchaseDetail
+                // but missing in DB. This handles the case where /g/ack returns the payload
+                // but handlePaymentSuccessful hasn't run yet.
+                var needsUpdate = false
+                if (purchaseDetail.payload.isNotEmpty() && existing.developerPayload != purchaseDetail.payload) {
+                    existing.developerPayload = purchaseDetail.payload
+                    needsUpdate = true
+                }
+                if (purchaseDetail.orderId.isNotEmpty() && existing.orderId != purchaseDetail.orderId) {
+                    existing.orderId = purchaseDetail.orderId
+                    needsUpdate = true
+                }
+                if (needsUpdate) {
+                    subscriptionRepository.upsert(existing)
+                    Logger.i(LOG_IAB, "$TAG: savePurchaseDetail: updated existing row id=${existing.id} with new data")
+                }
                 existing.id.toLong()
             } else {
                 val sub = convertPurchaseDetailToSubscriptionStatus(purchaseDetail)
@@ -354,9 +370,7 @@ class StateMachineDatabaseSyncService : KoinComponent {
             } catch (_: Exception) { emptyList() }
 
             val inAppRowsToExpire = rowsBeforeUpdate.filter { sub ->
-                (sub.productId.contains("onetime", ignoreCase = true) ||
-                 sub.productId.contains("inapp",   ignoreCase = true) ||
-                 sub.productId == "test_product") &&
+                SubscriptionStateMachineV2.isInAppProduct(sub.productId) &&
                 sub.billingExpiry > 0L &&
                 sub.billingExpiry != Long.MAX_VALUE &&
                 sub.billingExpiry < now

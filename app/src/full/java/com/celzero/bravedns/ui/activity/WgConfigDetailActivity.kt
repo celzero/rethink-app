@@ -25,6 +25,7 @@ import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import com.celzero.bravedns.ui.BaseActivity
 import androidx.appcompat.widget.AppCompatImageView
@@ -154,7 +155,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
         configId = intent.getIntExtra(WgConfigEditorActivity.INTENT_EXTRA_WG_ID, INVALID_CONF_ID)
@@ -447,7 +448,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
             return
         }
         b.configNameText.visibility = View.VISIBLE
-        b.configNameText.text = config.getName()
+        b.configNameText.setText(config.getName(), TextView.BufferType.NORMAL)
         b.configIdText.text =
             getString(R.string.single_argument_parenthesis, config.getId().toString())
 
@@ -765,6 +766,9 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
     private fun openAppsDialog(proxyName: String) {
         val proxyId = ID_WG_BASE + configId
         val appsAdapter = WgIncludeAppsAdapter(this, proxyId, proxyName)
+        // Remove any observers registered by previous openAppsDialog() calls so that stale
+        // adapters from dismissed dialogs do not continue to receive paging data.
+        mappingViewModel.apps.removeObservers(this)
         mappingViewModel.apps.observe(this) { appsAdapter.submitData(lifecycle, it) }
         var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         if (Themes.isFrostTheme(themeId)) {

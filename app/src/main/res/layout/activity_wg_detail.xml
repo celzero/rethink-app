@@ -25,7 +25,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -41,6 +45,7 @@
                         android:layout_height="wrap_content"
                         android:baselineAligned="false"
                         android:orientation="horizontal"
+                        android:layout_marginTop="5dp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
 
@@ -50,10 +55,11 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:ellipsize="none"
-                            android:inputType="textMultiLine"
-                            android:paddingTop="5dp"
                             android:scrollHorizontally="false"
                             android:singleLine="false"
+                            android:gravity="center_vertical"
+                            android:layout_gravity="center_vertical"
+                            tools:text="My WireGuard Interface Name"
                             android:textAppearance="?attr/textAppearanceHeadline6"
                             android:textColor="?attr/primaryTextColor" />
 
@@ -65,6 +71,7 @@
                             android:layout_marginStart="2dp"
                             android:layout_marginEnd="3dp"
                             android:alpha="0.7"
+                            tools:text="(123)"
                             android:ellipsize="end"
                             android:maxEms="5"
                             android:singleLine="true" />
@@ -424,7 +431,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/actions_card">
+                app:layout_constraintTop_toBottomOf="@id/actions_card"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -554,7 +565,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/other_settings_card">
+                app:layout_constraintTop_toBottomOf="@id/other_settings_card"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"

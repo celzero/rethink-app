@@ -151,62 +151,6 @@
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:id="@+id/settings_panic_rand_rl"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:paddingTop="15dp"
-                    android:paddingBottom="15dp">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/settings_panic_rand_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginEnd="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:padding="10dp"
-                        android:src="@drawable/ic_filter_error" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/dv_panic_rand_switch"
-                        android:layout_toEndOf="@id/settings_panic_rand_icon"
-                        android:orientation="vertical">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/settings_panic_rand_txt"
-                            style="@style/TextAppearance.AppCompat.Subhead"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Randomly Panic"
-                            android:textSize="@dimen/large_font_text_view" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/settings_panic_rand_desc"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
-                            android:text="Enable random panic in tunnel."
-                            android:textSize="@dimen/default_font_text_view" />
-                    </LinearLayout>
-
-                    <com.google.android.material.materialswitch.MaterialSwitch
-                        android:id="@+id/dv_panic_rand_switch"
-                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:padding="10dp" />
-
-                </RelativeLayout>
-
-                <RelativeLayout
                     android:id="@+id/settings_pt_mode_rl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -262,6 +206,77 @@
                         android:padding="10dp" />
 
                 </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/settings_go_max_memory_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/settings_go_max_memory_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginEnd="5dp"
+                            android:layout_marginBottom="5dp"
+                            android:alpha="0.5"
+                            android:padding="10dp"
+                            android:src="@drawable/ic_experimental" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_toEndOf="@id/settings_go_max_memory_icon"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/settings_go_max_memory_txt"
+                                style="@style/TextAppearance.AppCompat.Subhead"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Go Max Memory Limit"
+                                android:textSize="@dimen/large_font_text_view" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/settings_go_max_memory_desc"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="5dp"
+                                android:text="Set the maximum memory the Go engine can consume"
+                                android:textSize="@dimen/default_font_text_view" />
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+                    <androidx.appcompat.widget.AppCompatSeekBar
+                        android:id="@+id/go_max_memory_seekbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="40dp"
+                        android:layout_marginEnd="20dp"
+                        android:max="5"
+                        android:progress="5" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/go_max_memory_value_txt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_marginEnd="25dp"
+                        android:text="1024 MB"
+                        android:textSize="@dimen/default_font_text_view" />
+
+                </LinearLayout>
 
                 <!-- Debug: reset guided tour so it shows again on next launch -->
                 <RelativeLayout

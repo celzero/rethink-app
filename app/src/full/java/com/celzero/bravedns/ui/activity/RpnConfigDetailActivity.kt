@@ -102,6 +102,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
     private var configKey: String = ""
     private var countryConfig: CountryConfig? = null
+    private var winIdentifier: String? = null
 
     /** Coroutine that polls VpnController every [STATS_POLL_MS] ms. */
     private var statsJob: Job? = null
@@ -144,7 +145,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
         if (isAtleastQ()) {
             WindowInsetsControllerCompat(window, window.decorView)
-                .isAppearanceLightNavigationBars = false
+                .isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
 
@@ -245,9 +246,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         b.tvHeroCity.text = ""
         b.tvHeroFlag.text = "\uD83C\uDF10" // globe
         b.tvHeroWho.text = ""
-        b.tvHeroWho.visibility = View.GONE
+        winIdentifier = null
         b.chipHeroStats.visibility = View.GONE
-        b.rowHeroRxtx.visibility = View.GONE
 
         // Show inline shimmer for client IPs (stats table is already visible).
         showClientIpShimmer()
@@ -459,12 +459,13 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         }
         val statusPair = VpnController.getProxyStatusById(pid)
         val stats = VpnController.getProxyStats(pid)
-        val who = VpnController.getWinIdentifier()
+        if (winIdentifier.isNullOrEmpty()) {
+            winIdentifier = VpnController.getWinIdentifier()
+        }
+        val who = winIdentifier
         val config = countryConfig
         // Use the time when this server key was selected by the user, not the VPN uptime.
         val selectedSinceTs = RpnProxyManager.getSelectedSinceTs(id)
-
-        resolveClientIps(id)
 
         uiCtx {
             applyStats(statusPair, stats, config, who, selectedSinceTs)
@@ -486,8 +487,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         selectedSinceTs: Long
     ) {
         val ps = UIUtils.ProxyStatus.entries.find { it.id == statusPair.first }
-        val statusText = buildStatusText(ps, stats, statusPair.second)
-        val statusColor = buildStatusColor(ps, stats)
+        val statusText = buildStatusText(ps, statusPair.second)
+        val statusColor = buildStatusColor(ps)
         b.valueStatus.text = statusText
         b.valueStatus.setTextColor(fetchColor(this, statusColor))
 
@@ -500,6 +501,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
         val rx = stats?.rx ?: 0L
         val tx = stats?.tx ?: 0L
+        b.valueRx.visibility = View.VISIBLE
+        b.valueTx.visibility = View.VISIBLE
         b.valueRx.text = getString(R.string.symbol_download, Utilities.humanReadableByteCount(rx, true))
         b.valueTx.text = getString(R.string.symbol_upload, Utilities.humanReadableByteCount(tx, true))
         b.rowHeroRxtx.visibility = View.VISIBLE
@@ -539,7 +542,6 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
     private fun buildStatusText(
         status  : UIUtils.ProxyStatus?,
-        stats   : RouterStats?,
         errMsg  : String?
     ): String {
         if (status == null) {
@@ -560,7 +562,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         return base
     }
 
-    private fun buildStatusColor(status: UIUtils.ProxyStatus?, stats: RouterStats?): Int {
+    private fun buildStatusColor(status: UIUtils.ProxyStatus?): Int {
         return when {
             status == null -> R.attr.primaryLightColorText
             isFailing(status) -> R.attr.chipTextNegative
@@ -599,14 +601,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     private fun buildLoadSpeedText(loadPct: Int, linkMbps: Int) {
         val healthText: String
         if (loadPct >= 0) {
-            val tier = when {
-                loadPct <= 20 -> getString(R.string.server_load_light)
-                loadPct <= 40 -> getString(R.string.server_load_normal)
-                loadPct <= 60 -> getString(R.string.server_load_busy)
-                loadPct <= 80 -> getString(R.string.server_load_very_busy)
-                else -> getString(R.string.server_load_overloaded)
-            }
-            healthText = "$loadPct% · $tier"
+            healthText = "$loadPct%"
         } else {
             healthText = getString(R.string.lbl_not_available_short)
         }
@@ -639,9 +634,11 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         }
     }
 
-    private fun observeAppCount(proxyId: String) {
-        if (proxyId.isBlank()) return
-        mappingViewModel.getAppCountById(proxyId).observe(this) { count ->
+    private fun observeAppCount(configKey: String) {
+        if (configKey.isBlank()) return
+        // proxyId stored in ProxyApplicationMapping is always Backend.RpnWin + configKey.
+        val pid = Backend.RpnWin + configKey
+        mappingViewModel.getAppCountById(pid).observe(this) { count ->
             // Don't override the "All apps" state when catch-all is active
             if (b.catchAllCheck.isChecked) return@observe
             val c = count ?: 0
@@ -908,9 +905,16 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             Logger.e(LOG_TAG_UI, "openAppsDialog: configKey blank or proxy null")
             return
         }
-        val proxyId = configKey
-        val proxyName = configKey
+        val proxyId = Backend.RpnWin + configKey
+        val cc = countryConfig
+        val proxyName = when {
+            cc != null && cc.city.isNotBlank() -> "${cc.cc} - ${cc.city}"
+            cc != null && cc.name.isNotBlank() -> cc.name
+            else -> configKey
+        }
         val adapter = WgIncludeAppsAdapter(this, proxyId, proxyName)
+        // Remove any observers registered by previous openAppsDialog()
+        mappingViewModel.apps.removeObservers(this)
         mappingViewModel.apps.observe(this) { adapter.submitData(lifecycle, it) }
         var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         if (Themes.isFrostTheme(themeId)) themeId = R.style.App_Dialog_NoDim

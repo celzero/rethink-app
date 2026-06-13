@@ -51,6 +51,8 @@ object InAppBillingHandler {
     const val PRODUCT_TYPE_SUBS = "subs"
     const val PRODUCT_TYPE_INAPP = "inapp"
 
+    const val UNACK_ESCALATION_THRESHOLD = 3
+
     // LiveData shared by NotificationHandlerActivity / ManagePurchaseFragment
     val serverApiErrorLiveData: MutableLiveData<ServerApiError?> = MutableLiveData(null)
 
@@ -145,6 +147,10 @@ object InAppBillingHandler {
         deviceId: String,
         purchase: PurchaseDetail
     ): PurchaseDetail = purchase
+
+    fun getProductType(purchase: com.android.billingclient.api.Purchase, pt: String? = null): String {
+        return PRODUCT_TYPE_SUBS
+    }
 
     /** Returns an empty byte array: F-Droid build has no test purchase payload. */
     fun getTestPurchasePayloadBytes(): ByteArray = ByteArray(0)

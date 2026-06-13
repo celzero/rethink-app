@@ -592,7 +592,6 @@
     <string name="hsf_start_dialog_positive" translatable="true">शुरु करे</string>
     <string name="hsf_whats_new_chip_text" translatable="true">क्या नया है</string>
     <string name="hsf_proxy_chip_text" translatable="true">प्रॉक्सी सक्रिय</string>
-    <string name="hsf_proxy_chip_remove_text" translatable="true">बंद किया जा रहा है…</string>
     <string name="settings_http_proxy_desc" translatable="true">%1$s को फोरवर्ड करना</string>
     <string name="dc_block_heading" translatable="true">नियम</string>
     <string name="dc_other_dns_heading" translatable="true">प्रकार</string>

@@ -23,6 +23,8 @@ import android.content.SharedPreferences
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.celzero.bravedns.BuildConfig
+import com.celzero.bravedns.database.ConsoleLog
+import com.celzero.bravedns.database.ConsoleLogRepository
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.intra.Intra
@@ -55,8 +57,15 @@ object BugReportZipper {
     // ZIP file validation constants
     private const val ZIP_HEADER_SIZE = 4
 
-    // File size limits (10MB in bytes)
-    private const val MAX_ZIP_SIZE_BYTES = 10L * 1024L * 1024L // 10MB
+    // File size limits (10MB in bytes, keep below common email attachment limits)
+    const val MAX_ZIP_SIZE_BYTES = 10L * 1024L * 1024L
+
+    // Console log export limits
+    private const val MAX_CONSOLE_LOG_LINES = 10_000
+    private const val CONSOLE_LOG_ENTRY_NAME = "console_logs.txt"
+
+    // Flight recorder constants
+    const val FLIGHT_RECORDER_DIR_NAME = "flight_recorder"
 
     // Buffer size for ZIP operations
     private const val ZIP_BUFFER_SIZE = 8192
@@ -153,6 +162,10 @@ object BugReportZipper {
 
     fun getZipFileName(dir: File): String {
         return dir.canonicalPath + File.separator + BUG_REPORT_ZIP_FILE_NAME
+    }
+
+    fun consoleLogFile(dir: File): File {
+        return File(dir, CONSOLE_LOG_ENTRY_NAME)
     }
 
     private fun getTempZipFileName(dir: File): String {
@@ -263,6 +276,106 @@ object BugReportZipper {
     fun deleteAll(dir: File) {
         val filePath = dir.canonicalPath + File.separator + BUG_REPORT_DIR_NAME
         Utilities.deleteRecursive(File(filePath))
+    }
+
+    suspend fun dumpConsoleLogs(
+        logDb: ConsoleLogRepository,
+        file: File,
+        maxBytes: Long = MAX_ZIP_SIZE_BYTES,
+    ): Boolean {
+        return try {
+            val totalLogs = logDb.getLogCount()
+            if (totalLogs <= 0) {
+                Logger.i(LOG_TAG_BUG_REPORT, "no console logs to export")
+                return false
+            }
+
+            val startOffset = (totalLogs - MAX_CONSOLE_LOG_LINES).coerceAtLeast(0)
+            val logs = mutableListOf<ConsoleLog>()
+            var offset = startOffset
+            var lastId = 0
+            while (offset < totalLogs) {
+                val chunk = logDb.getLogsChunked(lastId, MAX_CONSOLE_LOG_LINES, offset)
+                lastId = chunk.lastOrNull()?.id ?: lastId
+                if (chunk.isEmpty()) break
+                logs.addAll(chunk)
+                offset += chunk.size
+            }
+
+            if (logs.isEmpty()) {
+                Logger.i(LOG_TAG_BUG_REPORT, "console log export returned no rows")
+                return false
+            }
+
+            val lines = logs.map { log ->
+                val safeMessage = log.message.replace("\n", "\\n").replace("\r", "\\r")
+                "${log.timestamp},${log.level},$safeMessage"
+            }
+
+            val header = "# Console logs (last ${logs.size} of $totalLogs)"
+            val selectedLines = mutableListOf<String>()
+            var usedBytes = header.toByteArray(Charsets.UTF_8).size.toLong() + 1L
+            if (usedBytes > maxBytes) {
+                Logger.w(LOG_TAG_BUG_REPORT, "console log budget too small for header")
+                return false
+            }
+
+            lines.asReversed().forEach { line ->
+                val lineBytes = line.toByteArray(Charsets.UTF_8).size.toLong() + 1L
+                if (usedBytes + lineBytes > maxBytes) return@forEach
+                selectedLines.add(0, line)
+                usedBytes += lineBytes
+            }
+
+            if (selectedLines.isEmpty()) {
+                Logger.i(LOG_TAG_BUG_REPORT, "console log export did not fit")
+                return false
+            }
+
+            file.writeText(buildString {
+                appendLine(header)
+                selectedLines.forEach { appendLine(it) }
+            }, Charsets.UTF_8)
+
+            Logger.i(
+                LOG_TAG_BUG_REPORT,
+                "exported ${selectedLines.size} console logs to ${file.absolutePath} within $maxBytes bytes"
+            )
+            true
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_BUG_REPORT, "err while dumping console logs, ${e.message}", e)
+            false
+        }
+    }
+
+    fun flightRecorderDir(dir: File): File {
+        return File(dir, FLIGHT_RECORDER_DIR_NAME)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun dumpFlightRecorder(baseDir: File, flightDir: File) {
+        try {
+            if (!flightDir.exists()) {
+                Logger.i(LOG_TAG_BUG_REPORT, "flight recorder dir does not exist")
+                return
+            }
+
+            val pprofFiles = flightDir.listFiles()?.filter { it.isFile } ?: emptyList()
+            if (pprofFiles.isEmpty()) {
+                Logger.i(LOG_TAG_BUG_REPORT, "no flight recorder files to export")
+                return
+            }
+
+            val latest = pprofFiles.maxByOrNull { it.lastModified() } ?: return
+            Logger.i(LOG_TAG_BUG_REPORT, "adding flight recorder file to zip: ${latest.name}")
+            rezipAll(baseDir, latest)
+
+            // delete all files inside flight_recorder folder
+            pprofFiles.forEach { it.delete() }
+            Logger.i(LOG_TAG_BUG_REPORT, "deleted ${pprofFiles.size} flight recorder files")
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_BUG_REPORT, "err while dumping flight recorder, ${e.message}", e)
+        }
     }
 
     private fun addNewZipEntry(zo: ZipOutputStream, file: File) {
@@ -389,11 +502,14 @@ object BugReportZipper {
     }
 
     suspend fun dumpPrefs(prefs: SharedPreferences, file: File) {
+        val separator = "--------------------------------------------\n"
         val prefsMap = prefs.all
         val prefsDetails = StringBuilder()
         prefsMap.forEach { (key, value) -> prefsDetails.append("\n$key=$value") }
         file.appendText(prefsDetails.toString())
-        val separator = "--------------------------------------------\n"
+        file.appendText(separator)
+        val buildBasic = Intra.build(false)
+        file.appendText(buildBasic)
         file.appendText(separator)
         val build = Intra.build(true)
         file.appendText(build)

@@ -20,11 +20,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.WindowInsetsControllerCompat
 import com.celzero.bravedns.databinding.BottomSheetBlockFreeDnsModeBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
@@ -49,7 +47,7 @@ class BlockFreeDnsModeBottomSheet : BottomSheetDialogFragment() {
 
         companion object {
             fun fromMode(mode: Int): BlockFreeDnsMode =
-                entries.find { it.mode == mode } ?: FALLBACK
+                entries.find { it.mode == mode } ?: AUTO
         }
     }
 
@@ -59,7 +57,7 @@ class BlockFreeDnsModeBottomSheet : BottomSheetDialogFragment() {
     }
 
     override fun getTheme(): Int =
-        Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        Themes.getBottomSheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -78,11 +76,7 @@ class BlockFreeDnsModeBottomSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.let { window ->
-            if (isAtleastQ()) {
-                val controller = WindowInsetsControllerCompat(window, window.decorView)
-                controller.isAppearanceLightNavigationBars = false
-                window.isNavigationBarContrastEnforced = false
-            }
+            Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
         }
         initView()
         initClickListeners()
@@ -99,12 +93,7 @@ class BlockFreeDnsModeBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun initView() {
-        // If splitDns is enabled, pre-select AUTO; otherwise use the persisted mode (default FALLBACK).
-        val currentMode = if (persistentState.splitDns) {
-            BlockFreeDnsMode.AUTO
-        } else {
-            BlockFreeDnsMode.fromMode(persistentState.blockFreeDnsMode)
-        }
+        val currentMode = BlockFreeDnsMode.fromMode(persistentState.blockFreeDnsMode)
         updateSelection(currentMode)
     }
 

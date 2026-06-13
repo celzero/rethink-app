@@ -46,6 +46,7 @@ import com.celzero.bravedns.ui.activity.PingTestActivity
 import com.celzero.bravedns.ui.activity.ServerOrderHistoryActivity
 import com.celzero.bravedns.ui.bottomsheet.DeviceAuthErrorBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.DeviceNotRegisteredBottomSheet
+import com.celzero.bravedns.ui.bottomsheet.EntitlementDetailBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.ManageRpnPurchaseBtmSht
 import com.celzero.bravedns.ui.bottomsheet.PurchaseConflictBottomSheet
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
@@ -91,6 +92,11 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
     private fun initView() {
         setupToolbar()
         loadSubscriptionBanner()
+        if (DEBUG) {
+            b.entitlementRl.visibility = View.VISIBLE
+        } else {
+            b.entitlementRl.visibility = View.GONE
+        }
     }
 
     private fun applyScrollPadding() {
@@ -111,7 +117,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
     }
 
     private fun setupToolbar() {
-        b.collapsingToolbar.title = getString(R.string.rpn_title)
+        b.collapsingToolbar.title = getString(R.string.proxy_rpn_heading)
     }
 
     /**
@@ -381,6 +387,9 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
         b.manageSubsRl.setOnClickListener { managePlayStoreSubs() }
         b.serverOrderHistoryRl.setOnClickListener { openServerOrderHistory() }
         b.reportIssueRl.setOnClickListener { CustomerSupportActivity.start(requireContext()) }
+        b.entitlementRl.setOnClickListener {
+            EntitlementDetailBottomSheet.newInstance().show(childFragmentManager, "entitlementDetails")
+        }
         b.renewButton.setOnClickListener {
             safeNavigate(R.id.action_rethinkPlusDashboard_to_rethinkPlus)
         }

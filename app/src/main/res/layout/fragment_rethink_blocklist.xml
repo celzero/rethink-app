@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="?attr/background"
     android:orientation="vertical">
 
@@ -193,7 +194,7 @@
             android:layout_alignParentBottom="true"
             android:weightSum="1">
 
-            <androidx.appcompat.widget.AppCompatButton
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/lb_blocklist_cancel_btn"
                 style="@style/Widget.Material3.Button.TextButton.Dialog"
                 android:layout_width="0dp"
@@ -201,11 +202,12 @@
                 android:layout_marginEnd="1dp"
                 android:layout_weight="0.4"
                 android:text="@string/notif_dialog_pause_dialog_negative"
-                android:textColor="?attr/primaryTextColor" />
+                android:textColor="?attr/primaryLightColorText" />
 
-            <androidx.appcompat.widget.AppCompatButton
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/lb_blocklist_apply_btn"
                 style="@style/Widget.Material3.Button.TextButton.Dialog"
+                android:textColor="?attr/accentGood"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
@@ -229,6 +231,7 @@
         android:layout_centerInParent="true"
         android:clickable="true"
         android:focusable="true"
+        tools:visibility="visible"
         android:visibility="gone">
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -275,7 +278,7 @@
                 android:paddingEnd="5dp"
                 android:visibility="gone" />
 
-            <androidx.appcompat.widget.AppCompatButton
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/lb_download_btn"
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
@@ -287,7 +290,7 @@
                 android:textColor="?attr/chipTextColor" />
         </RelativeLayout>
 
-        <androidx.appcompat.widget.AppCompatButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/lb_cancel_download_btn"
             style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="wrap_content"

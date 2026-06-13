@@ -520,7 +520,6 @@
     <string name="hsf_proxy_chip_removed_toast">Įgaliotasis serveris pašalintas</string>
     <string name="dc_dns_leaks_heading">Užkirsti kelią DNS nutekėjimui</string>
     <string name="hsf_whats_new_chip_text">Kas naujo</string>
-    <string name="hsf_proxy_chip_remove_text">Sustabdoma…</string>
     <string name="about_join_telegram">Telegram</string>
     <string name="about_github">Prisidėti GitHub</string>
     <string name="about_docs">Skaityti dokumentaciją</string>

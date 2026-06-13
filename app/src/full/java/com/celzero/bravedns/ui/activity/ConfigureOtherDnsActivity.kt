@@ -87,7 +87,7 @@ class ConfigureOtherDnsActivity : BaseActivity(R.layout.activity_configure_other
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
         dnsType = intent.getIntExtra(DNS_TYPE, dnsType)

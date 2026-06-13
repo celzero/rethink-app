@@ -33,8 +33,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
+import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.DialogWgAppsBinding
 import com.celzero.bravedns.service.ProxyManager
@@ -50,7 +50,7 @@ import org.koin.core.component.inject
 
 class WgIncludeAppsDialog(
     private var activity: Activity,
-    internal var adapter: RecyclerView.Adapter<*>,
+    internal var adapter: WgIncludeAppsAdapter,
     var viewModel: ProxyAppsMappingViewModel,
     themeID: Int,
     private val proxyId: String,
@@ -258,6 +258,7 @@ class WgIncludeAppsDialog(
 
     private fun refreshPagingAdapter() {
         viewModel.setFilter(searchText, filterType, proxyId)
+        adapter.refresh()
     }
 
     private fun clearSearch() {

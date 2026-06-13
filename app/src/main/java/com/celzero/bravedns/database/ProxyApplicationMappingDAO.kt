@@ -55,7 +55,7 @@ interface ProxyApplicationMappingDAO {
     @Query("SELECT * FROM ProxyApplicationMapping WHERE rowid IN (SELECT MIN(rowid) FROM ProxyApplicationMapping WHERE appName LIKE :appName AND proxyId = :proxyId GROUP BY uid, packageName) ORDER BY lower(appName)")
     fun getSelectedAppsMapping(appName: String, proxyId: String): PagingSource<Int, ProxyApplicationMapping>
 
-    @Query("SELECT * FROM ProxyApplicationMapping WHERE rowid IN ( SELECT MIN(rowid) FROM ProxyApplicationMapping WHERE appName LIKE :appName  AND proxyId != :proxyId GROUP BY uid, packageName) ORDER BY lower(appName)")
+    @Query("SELECT * FROM ProxyApplicationMapping WHERE rowid IN ( SELECT MIN(rowid) FROM ProxyApplicationMapping WHERE appName LIKE :appName AND uid NOT IN (SELECT uid FROM ProxyApplicationMapping WHERE proxyId = :proxyId) GROUP BY uid, packageName) ORDER BY lower(appName)")
     fun getUnSelectedAppsMapping(appName: String, proxyId: String): PagingSource<Int, ProxyApplicationMapping>
 
     @Query("select count(packageName) from ProxyApplicationMapping where proxyId = :id")

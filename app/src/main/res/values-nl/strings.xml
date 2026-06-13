@@ -255,7 +255,6 @@
     <string name="dc_entries">%1$s inzendingen 🔗</string>
     <string name="dc_dns_leaks_heading">DNS-lekken voorkomen</string>
     <string name="hsf_start_dialog_positive">Begin</string>
-    <string name="hsf_proxy_chip_remove_text">Aan het stoppen…</string>
     <string name="hsf_pause_vpn_failure">Kan niet pauzeren: RethinkDNS niet actief</string>
     <string name="hsf_proxy_chip_text">Proxy actief</string>
     <string name="dc_block_heading">regels</string>

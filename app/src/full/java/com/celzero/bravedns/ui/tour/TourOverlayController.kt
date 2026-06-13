@@ -153,7 +153,7 @@ class TourOverlayController(
         tvTitle.text   = activity.getString(step.titleRes)
         tvDesc.text    = activity.getString(step.descRes)
         btnNext.text   = activity.getString(
-            if (step.isLastStep) R.string.tour_btn_finish else R.string.tour_btn_next
+            if (step.isLastStep) R.string.tour_btn_finish else R.string.next
         )
         updateDots(index)
 
@@ -176,8 +176,13 @@ class TourOverlayController(
             return
         }
 
-        target.doOnLayout { positionOnView(target, step) }
-        if (target.isLaidOut) positionOnView(target, step)
+        target.doOnLayout {
+            target.post {
+                if (isAttached && currentStepIndex == index) {
+                    positionOnView(target, step)
+                }
+            }
+        }
     }
 
     private fun positionOnView(target: View, step: TourStep) {

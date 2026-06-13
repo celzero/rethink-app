@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.FragmentRethinkPlusBinding
+import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 
 /**
  * F-Droid flavour, Rethink+ is not yet available on F-Droid.
@@ -32,24 +33,18 @@ import com.celzero.bravedns.databinding.FragmentRethinkPlusBinding
 class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
     private val b by viewBinding(FragmentRethinkPlusBinding::bind)
 
-    companion object {
-        private const val TAG = "R+Ui"
-        const val ARG_EXTEND_MODE = "arg_extend_mode"
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         showComingSoon()
     }
 
     private fun showComingSoon() {
-        // Hide all billing-related UI; show only the static "Coming Soon" banner.
-        b.paymentContainer.isVisible      = false
+        // show only the static "Coming Soon" banner.
         b.pendingPurchaseLayout.isVisible = false
 
         // Re-use the not-available layout to surface the coming-soon message.
-        b.notAvailableLayout.isVisible    = true
-        b.titleUnavailable.setText(R.string.rpn_fdroid_coming_soon)
-        b.descUnavailable.setText(R.string.rpn_fdroid_coming_soon_desc)
+        b.notAvailableLayout.isVisible = true
+        val text = getString(R.string.coming_soon_toast)
+        b.titleUnavailable.text = text.capitalizeWords()
     }
 }

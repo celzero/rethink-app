@@ -15,7 +15,10 @@
  */
 package com.celzero.bravedns.util
 
+import android.view.Window
+import androidx.core.view.WindowInsetsControllerCompat
 import com.celzero.bravedns.R
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastS
 
 // Application themes enum
@@ -107,7 +110,7 @@ enum class Themes(val id: Int) {
             }
         }
 
-        fun getBottomsheetCurrentTheme(isDarkThemeOn: Boolean, theme: Int): Int {
+        fun getBottomSheetCurrentTheme(isDarkThemeOn: Boolean, theme: Int): Int {
             // If Frost themes are requested on pre-Android S, fallback to appropriate theme
             if (isFrostTheme(theme) && !isAtleastS()) {
                 return getBottomSheetTheme(TRUE_BLACK.id)
@@ -132,6 +135,32 @@ enum class Themes(val id: Int) {
             } else {
                 getBottomSheetTheme(TRUE_BLACK.id)
             }
+        }
+
+        fun isBottomSheetLightTheme(isDarkThemeOn: Boolean, theme: Int): Boolean {
+            val resolved = getBottomSheetCurrentTheme(isDarkThemeOn, theme)
+            return resolved == R.style.BottomSheetDialogThemeWhite ||
+                resolved == R.style.BottomSheetDialogThemeWhitePlus
+        }
+
+        fun isActivityLightTheme(isDarkThemeOn: Boolean, theme: Int): Boolean {
+            val resolved = getCurrentTheme(isDarkThemeOn, theme)
+            return resolved == R.style.AppThemeWhite ||
+                resolved == R.style.AppThemeWhitePlus
+        }
+
+        fun applyBottomSheetSystemBarAppearance(
+            window: Window,
+            isDarkThemeOn: Boolean,
+            theme: Int
+        ) {
+            if (!isAtleastQ()) return
+            val isLight = isBottomSheetLightTheme(isDarkThemeOn, theme)
+            WindowInsetsControllerCompat(window, window.decorView).apply {
+                isAppearanceLightStatusBars = isLight
+                isAppearanceLightNavigationBars = isLight
+            }
+            window.isNavigationBarContrastEnforced = false
         }
     }
 }

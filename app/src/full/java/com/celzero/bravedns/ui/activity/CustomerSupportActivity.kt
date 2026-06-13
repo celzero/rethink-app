@@ -25,7 +25,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import com.celzero.bravedns.ui.BaseActivity
 import androidx.core.content.FileProvider
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
@@ -38,9 +37,10 @@ import com.celzero.bravedns.database.SubscriptionStatusDao
 import com.celzero.bravedns.databinding.ActivityCustomerSupportBinding
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
-import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2
 import com.celzero.bravedns.scheduler.BugReportZipper
+import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
@@ -52,7 +52,6 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.text.ifEmpty
 
 /**
  * CustomerSupportActivity: lets users submit a support request via email.
@@ -68,7 +67,10 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
     companion object {
         private const val TAG = "CustomerSupportAct"
         private const val MAX_HISTORY_ENTRIES = 50
-        private const val DIAG_FILE_NAME = "rethink_support_diag.txt"
+        private const val DIAG_FILE_NAME = "rpn_support_diag.txt"
+        private const val SUPPORT_ZIP_FILE_NAME = "rpn_support_diagnostics.zip"
+        private const val WIRELOG_ATTACH_LIMIT_BYTES = 1 * 1024 * 1024L  // 1 MB
+        private const val OTHER_ATTACH_THRESHOLD_BYTES = 1 * 1024 * 1024L // cap wirelog at 1 MB if other attachments exceed this
 
         fun start(context: Context) {
             context.startActivity(Intent(context, CustomerSupportActivity::class.java))
@@ -87,7 +89,7 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
 
@@ -119,7 +121,7 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         if (sub == null || sub.purchaseToken.isEmpty()) return
 
         // Purchase token (show first 12 chars)
-        var token = sub.purchaseToken ?: ""
+        var token = sub.purchaseToken
         token = token.length.let { if (it > 12) token.take(12) else token.ifBlank { "" } }
         val accountId = sub.accountId.take(12).ifBlank { return }
         val deviceId = deviceId.take(4).ifBlank { return }
@@ -167,7 +169,7 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
             b.chipActivation.isChecked -> getString(R.string.support_category_activation)
             b.chipConnectivity.isChecked -> getString(R.string.support_category_connectivity)
             b.chipRefund.isChecked -> getString(R.string.support_category_refund)
-            b.chipOther.isChecked -> getString(R.string.support_category_other)
+            b.chipOther.isChecked -> getString(R.string.category_name_others)
             else -> null
         }
     }
@@ -199,21 +201,33 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
                     runCatching { RpnProxyManager.stats() }.getOrElse { "unavailable" }
                 } else ""
 
+                val entitlementJson = if (includeStats) {
+                    runCatching {
+                        val details = RpnProxyManager.getEntitlementDetails()
+                        details?.json()?.let { String(it, Charsets.UTF_8) }
+                    }.getOrElse { null }
+                } else null
+
                 val diagContent = buildDiagnosticText(
                     description  = description,
                     category     = category,
                     statuses     = allStatuses,
                     history      = recentHistory,
-                    rpnStats     = rpnStats
+                    rpnStats     = rpnStats,
+                    entitlementJson = entitlementJson
                 )
 
                 val diagFile = writeDiagFile(diagContent)
+
+                val bugZip = EnhancedBugReport.getTombstoneZipFile(this@CustomerSupportActivity)
+                val wirelogBytes = prepareWirelogAttachment(diagFile?.length() ?: 0L)
+                val supportZip = buildSupportZip(diagFile, wirelogBytes, bugZip)
 
                 val emailBody = buildEmailBody(description, category)
 
                 withContext(Dispatchers.Main) {
                     setLoading(false)
-                    launchEmailIntent(emailBody, diagFile, category)
+                    launchEmailIntent(emailBody, supportZip, category)
                 }
             } catch (e: Exception) {
                 Logger.e(LOG_TAG_UI, "$TAG collectAndSend error: ${e.message}", e)
@@ -234,7 +248,8 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         category: String?,
         statuses: List<SubscriptionStatus>,
         history: List<com.celzero.bravedns.database.SubscriptionStateHistory>,
-        rpnStats: String
+        rpnStats: String,
+        entitlementJson: String? = null
     ): String {
         // Use plain ASCII separators only: Unicode box-drawing characters (===, ---, arrows)
         // get mangled by email clients and devices that mis-detect encoding.
@@ -317,6 +332,14 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
             sb.append("\n")
         }
 
+        if (!entitlementJson.isNullOrBlank()) {
+            sb.append(light)
+            sb.append("  ENTITLEMENT JSON\n")
+            sb.append(light)
+            sb.append(entitlementJson)
+            sb.append("\n\n")
+        }
+
         sb.append(heavy)
         sb.append("  END OF REPORT\n")
         sb.append(heavy)
@@ -353,6 +376,62 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         return sb.toString()
     }
 
+    private fun prepareWirelogAttachment(otherAttachmentsSize: Long): ByteArray? {
+        val srcFile = File(filesDir, "${Logger.WIRELOG_FOLDER_NAME}/${Logger.WIRELOG_FILE_NAME}")
+        if (!srcFile.exists() || srcFile.length() == 0L) return null
+        return try {
+            val maxBytes = if (otherAttachmentsSize > OTHER_ATTACH_THRESHOLD_BYTES) {
+                WIRELOG_ATTACH_LIMIT_BYTES
+            } else {
+                Logger.WIRELOG_MAX_SIZE_BYTES
+            }
+            readTailBytes(srcFile, maxBytes)
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "$TAG prepareWirelogAttachment error: ${e.message}", e)
+            null
+        }
+    }
+
+    private fun readTailBytes(file: File, maxBytes: Long): ByteArray {
+        val size = file.length()
+        val start = maxOf(0L, size - maxBytes)
+        return java.io.RandomAccessFile(file, "r").use { raf ->
+            raf.seek(start)
+            val toRead = (size - start).toInt()
+            val buf = ByteArray(toRead)
+            raf.readFully(buf)
+            buf
+        }
+    }
+
+    private fun buildSupportZip(diagFile: File?, wirelogBytes: ByteArray?, bugZip: File?): File? {
+        if (diagFile == null && wirelogBytes == null && bugZip == null) return null
+        return try {
+            val outFile = File(File(filesDir, "support").also { it.mkdirs() }, SUPPORT_ZIP_FILE_NAME)
+            java.util.zip.ZipOutputStream(outFile.outputStream().buffered()).use { zos ->
+                diagFile?.takeIf { it.exists() }?.let {
+                    zos.putNextEntry(java.util.zip.ZipEntry("diagnostic_report.txt"))
+                    it.inputStream().use { ins -> ins.copyTo(zos) }
+                    zos.closeEntry()
+                }
+                wirelogBytes?.takeIf { it.isNotEmpty() }?.let {
+                    zos.putNextEntry(java.util.zip.ZipEntry("wirelogs.txt"))
+                    zos.write(it)
+                    zos.closeEntry()
+                }
+                bugZip?.takeIf { it.exists() }?.let {
+                    zos.putNextEntry(java.util.zip.ZipEntry("bugreport.zip"))
+                    it.inputStream().use { ins -> ins.copyTo(zos) }
+                    zos.closeEntry()
+                }
+            }
+            outFile
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "$TAG buildSupportZip error: ${e.message}", e)
+            null
+        }
+    }
+
     private fun writeDiagFile(content: String): File? {
         return try {
             val dir = File(filesDir, "support").also { it.mkdirs() }
@@ -381,36 +460,29 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         }
     }
 
-    private fun launchEmailIntent(body: String, diagFile: File?, category: String?) {
+    private fun launchEmailIntent(body: String, supportZip: File?, category: String?) {
         try {
             val subject = buildSubject(category)
             val email = getString(R.string.about_mail_to)
-            val intent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
-                type = "message/rfc822"
-                putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
-                putExtra(Intent.EXTRA_SUBJECT, subject)
-                putExtra(Intent.EXTRA_TEXT, body)
-                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-            }
+            val zipUri = getFileUri(supportZip)
 
-            val uris = ArrayList<Uri>()
-
-            // Diagnostic file attachment
-            getFileUri(diagFile)?.let { uris.add(it) }
-
-            // Existing bug-report zip if available (gives us crash logs etc.)
-            val bugZip = com.celzero.bravedns.scheduler.EnhancedBugReport.getTombstoneZipFile(this)
-            getFileUri(bugZip)?.let { uris.add(it) }
-
-            if (uris.isNotEmpty()) {
-                intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris)
-                // ClipData is required on Android 10+ for multiple Uri grants
-                val clipData = ClipData.newUri(contentResolver, "Support Diagnostics", uris[0])
-                for (i in 1 until uris.size) clipData.addItem(ClipData.Item(uris[i]))
-                intent.clipData = clipData
+            val intent = if (zipUri != null) {
+                Intent(Intent.ACTION_SEND).apply {
+                    type = "message/rfc822"
+                    putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+                    putExtra(Intent.EXTRA_SUBJECT, subject)
+                    putExtra(Intent.EXTRA_TEXT, body)
+                    putExtra(Intent.EXTRA_STREAM, zipUri)
+                    clipData = ClipData.newUri(contentResolver, "Support Diagnostics", zipUri)
+                    flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                }
             } else {
-                // No attachments, fall back to ACTION_SEND (single-part)
-                intent.action = Intent.ACTION_SEND
+                Intent(Intent.ACTION_SEND).apply {
+                    type = "message/rfc822"
+                    putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+                    putExtra(Intent.EXTRA_SUBJECT, subject)
+                    putExtra(Intent.EXTRA_TEXT, body)
+                }
             }
 
             startActivity(
@@ -426,7 +498,7 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         // Subject is kept minimal: no user data or subscription details in the subject line.
         // All diagnostic data lives in the attachment.
         val catPart = if (category != null) " [$category]" else ""
-        return "Rethink Plus Support Request$catPart"
+        return "Rethink Plus Support Request: $catPart"
     }
 
     /** Returns the app version name, falling back to "?" on error. */
@@ -467,6 +539,3 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         return SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(ms))
     }
 }
-
-
-

@@ -47,11 +47,13 @@ import com.celzero.bravedns.service.EncryptionException
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.RPN_PROXY_FOLDER_NAME
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.backend.Backend
+import com.celzero.firestack.backend.RpnEntitlement
 import com.celzero.firestack.backend.RpnServers
 import com.celzero.firestack.settings.Settings
 import kotlinx.coroutines.CoroutineScope
@@ -94,6 +96,8 @@ object RpnProxyManager : KoinComponent {
     // In-memory cache for WIN servers (CountryConfig as unified model).
     private val winServersCache = mutableListOf<CountryConfig>()
     private val winCacheMutex = Mutex()
+
+    private val winRegistrationMutex = Mutex()
 
     /**
      * Emits a list of [CountryConfig] objects that were selected by the user but are
@@ -428,6 +432,22 @@ object RpnProxyManager : KoinComponent {
             Logger.w(LOG_TAG_PROXY, "$TAG; error parsing expiry from payload: ${e.message}")
         }
         return null
+    }
+
+    suspend fun getEntitlementDetails(): RpnEntitlement? {
+        val entitlement = getWinEntitlement()
+        if (entitlement == null) {
+            Logger.d(LOG_TAG_PROXY, "$TAG; getEntitlementDetails: null entitlement, querying server for refresh")
+            return null
+        }
+
+        return try {
+            val entitlement = VpnController.getEntitlementDetails(getWinEntitlement(), billingBackendClient.getDeviceId())
+            return entitlement
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; getEntitlementDetails: ${e.message}")
+            null
+        }
     }
 
     suspend fun getIsTestEntitlement(retryAttempt: Int = 0): Boolean {
@@ -859,7 +879,6 @@ object RpnProxyManager : KoinComponent {
     suspend fun load(): Int {
         // need to read the filepath from database and load the file
         // there will be an entry in the database for each RPN proxy
-        serverKeyMeta.clear()
         val rp = try {
             db.getAllProxies()
         } catch (e: Exception) {
@@ -905,7 +924,7 @@ object RpnProxyManager : KoinComponent {
                             try {
                                 EncryptedFileManager.readByteArray(applicationContext, cfgFile)
                             } catch (e: Exception) {
-                                Logger.e(LOG_TAG_PROXY, "$TAG; load, error reading win state file: ${e.message}", e)
+                                Logger.e(LOG_TAG_PROXY, "$TAG; load, error reading win state file (${cfgFile.absolutePath}): ${e.message}", e)
                                 byteArrayOf()
                             }
                         } else {
@@ -1023,11 +1042,28 @@ object RpnProxyManager : KoinComponent {
                         return false
                     }
                 }
-                var currBytes = VpnController.registerAndFetchWinConfig(bytes, billingBackendClient.getDeviceId())
-                if (currBytes == null) {
-                    // try registering with null
-                    Logger.w(LOG_TAG_PROXY, "$TAG; win registration failed with existing bytes, trying with no prev bytes")
-                    currBytes = VpnController.registerAndFetchWinConfig(null, billingBackendClient.getDeviceId())
+
+                var wasAlreadyRegisteredByConcurrent = false
+                val currBytes: ByteArray? = winRegistrationMutex.withLock {
+                    if (VpnController.isWinRegistered()) {
+                        Logger.i(LOG_TAG_PROXY, "$TAG; registerProxy: WIN already registered (concurrent-safe check), skipping tunnel call")
+                        wasAlreadyRegisteredByConcurrent = true
+                        null // early-exit sentinel; not treated as failure because flag is set
+                    } else {
+                        var regBytes = VpnController.registerAndFetchWinConfig(bytes, billingBackendClient.getDeviceId())
+                        if (regBytes == null) {
+                            // try registering with prev stored bytes
+                            val prevRegistrationBytes = getWinExistingData()
+                            Logger.w(LOG_TAG_PROXY, "$TAG; win registration failed with existing bytes, trying with prev bytes")
+                            regBytes = VpnController.registerAndFetchWinConfig(prevRegistrationBytes, billingBackendClient.getDeviceId())
+                        }
+                        regBytes
+                    }
+                }
+                if (wasAlreadyRegisteredByConcurrent) {
+                    // A concurrent coroutine finished registration first; this call is a no-op.
+                    Logger.i(LOG_TAG_PROXY, "$TAG; registerProxy: WIN registered by concurrent call, returning true")
+                    return true
                 }
                 val ok = updateWinConfigState(currBytes)
                 // Fetch servers from API and sync to database and cache
@@ -1359,12 +1395,17 @@ object RpnProxyManager : KoinComponent {
                             )
                         }
 
-                        // Update state machine with fresh payload
+                        // Update state machine and DB with fresh payload
                         val subsData = subscriptionStateMachine.getSubscriptionData()
                         if (subsData != null) {
                             subsData.subscriptionStatus.developerPayload = updatedPurchase.payload
                             val updatedSubsData = subsData.copy(purchaseDetail = updatedPurchase)
                             subscriptionStateMachine.stateMachine.updateData(updatedSubsData)
+                            subscriptionStatusRepository.updateDeveloperPayload(
+                                subsData.subscriptionStatus.id,
+                                updatedPurchase.payload,
+                                System.currentTimeMillis()
+                            )
                         } else {
                             Logger.w(LOG_TAG_PROXY, "$TAG; processRpnPurchase: subscription data is null, cannot update payload in state machine")
                         }
@@ -1628,14 +1669,12 @@ object RpnProxyManager : KoinComponent {
     }
 
     /**
-     *
      * Full update pipeline:
      *  1. Ask the tunnel to refresh and return updated WIN state bytes
      *     ([VpnController.updateWin]).
      *  2a. If the tunnel returns bytes → persist them with [updateWinConfigState].
-     *  2b. If the tunnel returns null → fall back to [registerProxy] (full re-register)
-     *     and retry [VpnController.updateWin] once more.  If that also fails return null
-     *     so callers can show an error.
+     *  2b. If the tunnel returns null → fall back to [registerProxy] (full re-register).
+     *     If that also fails return null so callers can show an error.
      *  3. Fetch server locations from the tunnel ([fetchAndConstructWinLocations]).
      *     If empty, retry up to 3 times with 1 s back-off.
      *  4. Sync fetched locations to DB + in-memory cache ([syncWinServers]).
@@ -1650,48 +1689,26 @@ object RpnProxyManager : KoinComponent {
      *                 success, show retry / await next cycle.
      *  - non-empty → full success; contains the refreshed [CountryConfig] list.
      */
-    suspend fun updateWinProxy(userRequest: Boolean): List<CountryConfig>? {
+    suspend fun updateWinProxy(): List<CountryConfig>? {
         Logger.i(LOG_TAG_PROXY, "$TAG; updateWinProxy: starting WIN proxy update")
 
-        val currTs = System.currentTimeMillis()
-        val lastUpdatedTs = VpnController.getWinLastUpdatedTs() ?: 0
-        val fifteenMins = 15 * 60 * 1000
-
-        // do not perform the update, if last update is less than 15 mins and not user req
-        if (currTs - lastUpdatedTs < fifteenMins && !userRequest) {
-            Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: last update was less than 10 mins ago, return curr servers")
-            val currentServers = winCacheMutex.withLock { winServersCache.toList() }
-            return currentServers
-        }
 
         val isRpnRegistered = VpnController.isWinRegistered()
         if (!isRpnRegistered) {
-            Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: WIN not registered, attempting to register")
-            val entitlementBytes = getWinEntitlement()
-            val prevRegistrationBytes = getWinExistingData()
-            val regBytes = try {
-                VpnController.registerAndFetchWinConfig(entitlementBytes, billingBackendClient.getDeviceId())
-                    ?: VpnController.registerAndFetchWinConfig(prevRegistrationBytes, billingBackendClient.getDeviceId())
-            } catch (e: Exception) {
-                Logger.e(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: tunnel registration failed: ${e.message}", e)
-                return null
-            }
-            if (regBytes == null) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: WIN not registered, delegating to registerProxy")
+            val registered = registerProxy(RpnType.WIN)
+            if (!registered) {
                 Logger.e(LOG_TAG_PROXY, "$TAG; updateWinProxy: registration attempt failed, cannot proceed with update")
                 return null
             }
-            val persisted = updateWinConfigState(regBytes)
-            if (!persisted) {
-                Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: failed to persist WIN config state after registration (continuing)")
-             }
+            Logger.i(LOG_TAG_PROXY, "$TAG; updateWinProxy: WIN registered successfully, falling through to server sync")
+            // registerProxy already synced the server list; fall through so enabled
+            // servers are re-added to the tunnel by the loop below.
         } else {
             val bytes: ByteArray? = VpnController.updateWin()
 
             if (bytes == null) {
-                Logger.w(
-                    LOG_TAG_PROXY,
-                    "$TAG; updateWinProxy: updateWin() returned null, attempting re-register"
-                )
+                Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: updateWin() returned null")
                 return null
             }
 
@@ -2454,6 +2471,15 @@ object RpnProxyManager : KoinComponent {
              // Ensure AUTO server exists before syncing
              ensureAutoServerExists()
 
+             // get the current server list before sync so we can find removed servers
+             // and clean up their ProxyApplicationMapping entries.
+             val serversBefore = try {
+                 countryConfigRepo.getAllConfigs()
+             } catch (e: Exception) {
+                 Logger.w(LOG_TAG_PROXY, "$TAG; syncWinServers: could not read pre-sync servers: ${e.message}")
+                 emptyList()
+             }
+
              // Sync to database (this handles insertions, updates, and deletions)
              val syncServerList = if (servers.isEmpty()) {
                  Logger.w(LOG_TAG_PROXY, "$TAG; syncWinServers: empty server list, clearing DB except AUTO")
@@ -2464,6 +2490,18 @@ object RpnProxyManager : KoinComponent {
 
              // Sync to database (AUTO server is protected in the repository method)
              countryConfigRepo.syncServers(syncServerList)
+
+             // clean up proxy-app mappings for every server that was removed from the DB.
+             val newServerKeys = servers.map { it.key }.toSet()
+             val removedServers = serversBefore.filter {
+                 it.id != AUTO_SERVER_ID && !newServerKeys.contains(it.key)
+             }
+             if (removedServers.isNotEmpty()) {
+                 removedServers.forEach { removed ->
+                     ProxyManager.removeProxyId(Backend.RpnWin + removed.key)
+                     Logger.i(LOG_TAG_PROXY, "$TAG; syncWinServers: removed proxy mapping for stale server key=${removed.key}")
+                 }
+             }
 
              // Read back from DB to ensure consistency
              val existingServers = try {
@@ -2481,7 +2519,7 @@ object RpnProxyManager : KoinComponent {
                  }
              }
 
-             Logger.i(LOG_TAG_PROXY, "$TAG; syncWinServers: synced ${servers.size} servers to DB, ${existingServers.size} in cache")
+             Logger.i(LOG_TAG_PROXY, "$TAG; syncWinServers: synced ${servers.size} servers to DB, ${existingServers.size} in cache, ${removedServers.size} proxy mappings cleaned")
          } catch (e: Exception) {
              Logger.e(LOG_TAG_PROXY, "$TAG; syncWinServers: error - ${e.message}", e)
          }
@@ -2628,6 +2666,7 @@ object RpnProxyManager : KoinComponent {
         usesMtrdNw: Boolean,
         ssid: String
     ): Pair<String, Boolean> {
+        val block = Backend.Block
         if (id.isEmpty()) {
             return Pair("", true)
         }
@@ -2648,6 +2687,22 @@ object RpnProxyManager : KoinComponent {
         }
 
         Logger.vv(LOG_TAG_PROXY, "$TAG; config-details: $config")
+
+        val lockdown = config.lockdown
+
+        if (lockdown && (checkEligibilityBasedOnNw(id, usesMtrdNw) && checkEligibilityBasedOnSsid(id, ssid))) {
+            Logger.d(LOG_TAG_PROXY, "lockdown wg for $type => return ${id}")
+            return Pair(id, false) // no need to proceed further for lockdown
+        }
+
+        // in case of lockdown and not metered network, we need to return block as the
+        // lockdown should not leak the connections via WiFi
+        if (lockdown) {
+            // add IpnBlock instead of the config id, let the connection be blocked in WiFi
+            // regardless of config is active or not
+            Logger.d(LOG_TAG_PROXY, "lockdown wg for $type => return $block")
+            return Pair(block, false) // no need to proceed further for lockdown
+        }
 
         // check if the config is active and if it can be used on this network
         if (config.isEnabled && (checkEligibilityBasedOnNw(

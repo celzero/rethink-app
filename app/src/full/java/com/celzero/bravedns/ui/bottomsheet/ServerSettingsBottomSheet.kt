@@ -30,7 +30,6 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.Toast
 import androidx.core.graphics.withRotation
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -39,16 +38,19 @@ import com.celzero.bravedns.databinding.BottomsheetServerSettingsBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
+import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.viewmodel.ServerSelectionViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * bottom sheet combining DNS filter settings and new Configuration Handling section.
@@ -70,10 +72,13 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
     private var refreshAnimator: ValueAnimator? = null
     /** Original text of [binding.btnResetRpn] captured in [onViewCreated]; restored when reset finishes. */
     private var originalResetBtnText: CharSequence = ""
+    private var refreshAnimStartTime: Long = 0L
+    private var minRefreshAnimJob: Job? = null
 
     companion object {
         private const val TAG = "ServerSettingsBS"
         private const val ARG_PROXY_STOPPED = "proxy_stopped"
+        private const val MIN_REFRESH_ANIM_MS = 1500L
 
         /**
          * Available port values shown in the port-selection dialog.
@@ -154,7 +159,7 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
                 Configuration.UI_MODE_NIGHT_YES
 
     override fun getTheme(): Int =
-        getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        getBottomSheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -177,11 +182,7 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
 
         // Keep nav bar transparent / dark on Q+
         dialog?.window?.let { window ->
-            if (isAtleastQ()) {
-                val controller = WindowInsetsControllerCompat(window, window.decorView)
-                controller.isAppearanceLightNavigationBars = false
-                window.isNavigationBarContrastEnforced = false
-            }
+            Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
         }
 
         // Snapshot config values before any UI interaction so hasConfigChanged() is accurate.
@@ -221,12 +222,12 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
     }
 
     override fun onDismiss(dialog: android.content.DialogInterface) {
-        // Fire onConfigChanged once if any config value was mutated during this session.
-        // onDismiss fires before onDestroyView, so listener is still non-null here.
         if (hasConfigChanged()) {
             Logger.i(LOG_TAG_UI, "$TAG: config changed on dismiss, notifying listener")
             listener?.onConfigChanged()
         }
+        minRefreshAnimJob?.cancel()
+        minRefreshAnimJob = null
         refreshAnimator?.cancel()
         refreshAnimator = null
         super.onDismiss(dialog)
@@ -243,8 +244,7 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
         refreshAnimator?.cancel()
 
         val raw = binding.refreshBtn.icon
-        val spinning: RotatingDrawable = if (raw is RotatingDrawable) raw
-        else RotatingDrawable(raw ?: return).also { binding.refreshBtn.icon = it }
+        val spinning: RotatingDrawable = raw as? RotatingDrawable ?: RotatingDrawable(raw ?: return).also { binding.refreshBtn.icon = it }
         spinning.rotation = 0f
         refreshAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
             duration = 700L
@@ -281,14 +281,30 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
                 serverSelectionViewModel.refreshState.collect { state ->
                     when (state) {
                         is ServerSelectionViewModel.RefreshState.InProgress -> {
-                            // Re-attach case: sheet opened while a refresh was already running.
                             binding.refreshBtn.isClickable = false
-                            startRefreshAnimation()
+                            if (refreshAnimator == null) {
+                                startRefreshAnimation()
+                                refreshAnimStartTime = System.currentTimeMillis()
+                            }
+                            minRefreshAnimJob?.cancel()
+                            minRefreshAnimJob = viewLifecycleOwner.lifecycleScope.launch {
+                                val remaining = MIN_REFRESH_ANIM_MS - (System.currentTimeMillis() - refreshAnimStartTime)
+                                if (remaining > 0) delay(remaining.milliseconds)
+                                if (isAdded) stopRefreshAnimation()
+                            }
                         }
                         else -> {
-                            // Done, NeedsLoading, or Idle — operation finished; restore button.
-                            binding.refreshBtn.isClickable = !isProxyStopped
-                            stopRefreshAnimation()
+                            minRefreshAnimJob?.cancel()
+                            minRefreshAnimJob = viewLifecycleOwner.lifecycleScope.launch {
+                                val elapsed = System.currentTimeMillis() - refreshAnimStartTime
+                                if (elapsed < MIN_REFRESH_ANIM_MS) {
+                                    delay((MIN_REFRESH_ANIM_MS - elapsed).milliseconds)
+                                }
+                                if (isAdded) {
+                                    binding.refreshBtn.isClickable = !isProxyStopped
+                                    stopRefreshAnimation()
+                                }
+                            }
                         }
                     }
                 }
@@ -335,8 +351,6 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
 
     private fun doRefreshServers() {
         if (isProxyStopped) return
-        // Pre-flight: no VPN tunnel → refresh/registration will fail; show a hint rather than
-        // kicking off a VM coroutine that will immediately emit NoTunnel and return.
         if (!VpnController.hasTunnel()) {
             Logger.w(LOG_TAG_UI, "$TAG.doRefreshServers: no VPN tunnel, showing hint")
             if (isAdded) {
@@ -348,13 +362,11 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
             }
             return
         }
-        // Start animation synchronously here, before the ViewModel coroutine is even scheduled.
-        // This bypasses the StateFlow conflation race: if the IO completes before the Main thread
-        // processes the InProgress emission, the collector skips it — but the animation is
-        // already running because we started it here on the call-site thread.
-        // The ViewModel's internal guard (InProgress check) prevents duplicate refreshes.
-        binding.refreshBtn.isClickable = false
-        startRefreshAnimation()
+        if (refreshAnimator == null) {
+            refreshAnimStartTime = System.currentTimeMillis()
+            binding.refreshBtn.isClickable = false
+            startRefreshAnimation()
+        }
         serverSelectionViewModel.refresh()
     }
 
@@ -528,9 +540,9 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
                 .sortedBy { it.id }
                 .joinToString(", ") { mode ->
                     when (mode) {
-                        RpnProxyManager.DnsMode.PRIVACY  -> getString(R.string.server_settings_dns_privacy)
+                        RpnProxyManager.DnsMode.PRIVACY  -> getString(R.string.rbl_privacy)
                         RpnProxyManager.DnsMode.PARENTAL -> getString(R.string.server_settings_dns_family)
-                        RpnProxyManager.DnsMode.SECURITY -> getString(R.string.server_settings_dns_security)
+                        RpnProxyManager.DnsMode.SECURITY -> getString(R.string.rbl_security)
                         else -> ""
                     }
                 }
@@ -766,7 +778,7 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.rpn_restore_confirm_title))
             .setMessage(getString(R.string.rpn_restore_confirm_message))
-            .setPositiveButton(getString(R.string.rpn_restore_confirm_action)) { dialog, _ ->
+            .setPositiveButton(getString(R.string.brbs_restore_dialog_positive)) { dialog, _ ->
                 dialog.dismiss()
                 dismiss() // dismiss the bottom sheet first
                 listener?.onReset() // then trigger reset in the parent fragment

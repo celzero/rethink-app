@@ -57,16 +57,24 @@ class GoReportingHandler private constructor(private val scope: CoroutineScope, 
 
     init {
         Intra.setupConsole(this)
-        val file = getCrashFile()
-        if (file == null) {
+        val filePair = getCrashFile()
+        val crashFile = filePair?.first
+        if (crashFile == null) {
             Logger.e(LOG_TAG_BUG_REPORT, "$TAG init: failed to create crash file")
         } else {
-            Logger.i(LOG_TAG_BUG_REPORT, "$TAG init: path: ${file.absolutePath}")
-            Intra.setCrashOutput(file.absolutePath)
+            Logger.i(LOG_TAG_BUG_REPORT, "$TAG init: path: ${crashFile.absolutePath}")
+            Intra.setCrashOutput(crashFile.absolutePath)
+        }
+        val frFile = filePair?.second
+        if (frFile == null) {
+            Logger.e(LOG_TAG_BUG_REPORT, "$TAG init: failed to create flight recorder file")
+        } else {
+            Logger.i(LOG_TAG_BUG_REPORT, "$TAG init: path: ${frFile.absolutePath}")
+            Intra.setFlightRecordOutput(frFile.absolutePath)
         }
     }
 
-    fun getCrashFile(): File? {
+    fun getCrashFile(): Pair<File?, File?>? {
         val crashLogFdReader = GoCrashFileDescriptorReader(ctx)
         return crashLogFdReader.start2()
     }

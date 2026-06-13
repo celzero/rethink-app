@@ -114,10 +114,10 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
 
 
     private fun showNewBadgeIfNeeded() {
-        val showBadge = NewSettingsManager.shouldShowBadge(NewSettingsManager.BLOCK_DNS_QTYPE_SETTING)
+        val showBadge = NewSettingsManager.shouldShowBadge(NewSettingsManager.DNS_TO_BYPASS)
         if (!showBadge) return
 
-        b.dcAllowedRecordTypesHeading.setBadgeDotVisible(requireContext(), true)
+        b.dcBlockFreeDnsHeading.setBadgeDotVisible(requireContext(), true)
     }
 
 
@@ -853,9 +853,9 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
     private fun updateBlockFreeDnsUi() {
         val mode = BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.fromMode(persistentState.blockFreeDnsMode)
         b.dcBlockFreeDnsDesc.text = when (mode) {
-            BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.FALLBACK -> getString(R.string.bfdm_status_fallback)
-            BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.GLOBAL -> getString(R.string.bfdm_status_global)
-            BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.AUTO -> getString(R.string.bfdm_status_auto)
+            BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.FALLBACK -> getString(R.string.bfdm_option_fallback_label)
+            BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.GLOBAL -> getString(R.string.bfdm_option_global_label)
+            BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.AUTO -> getString(R.string.bfdm_option_auto_label)
         }
     }
 

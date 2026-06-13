@@ -68,7 +68,7 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
         initView()
@@ -257,7 +257,7 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
                     text = getString(R.string.ping_reach_reachable)
                     setTextColor(UIUtils.fetchColor(this@PingTestActivity, R.attr.accentGood))
                 } else {
-                    text = getString(R.string.ping_reach_unreachable)
+                    text = getString(R.string.ping_failure_title)
                     setTextColor(UIUtils.fetchColor(this@PingTestActivity, R.attr.accentBad))
                 }
             }

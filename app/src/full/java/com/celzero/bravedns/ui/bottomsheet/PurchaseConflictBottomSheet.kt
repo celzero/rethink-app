@@ -17,6 +17,7 @@ package com.celzero.bravedns.ui.bottomsheet
 
 import Logger
 import Logger.LOG_IAB
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,13 +29,16 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.BottomsheetPurchaseConflictBinding
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.ServerApiError
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.CustomerSupportActivity
-import com.celzero.bravedns.util.UIUtils.openUrl
+import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
 
 /**
  * Bottom sheet shown whenever an [com.celzero.bravedns.customdownloader.IBillingServerApi] server
@@ -58,6 +62,8 @@ class PurchaseConflictBottomSheet : BottomSheetDialogFragment() {
 
     /** Called on the main thread when a refund completes (success or failure). */
     var onRefundResult: ((success: Boolean, message: String) -> Unit)? = null
+
+    private val persistentState by inject<PersistentState>()
 
     companion object {
         private const val TAG = "ConflictBS"
@@ -91,9 +97,16 @@ class PurchaseConflictBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
+    override fun getTheme(): Int =
+        getBottomSheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
+
+    private fun isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NORMAL, R.style.BottomSheetDialogTheme)
         isCancelable = true
     }
 
@@ -108,6 +121,9 @@ class PurchaseConflictBottomSheet : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dialog?.window?.let { window ->
+            Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
+        }
         val args = requireArguments()
         val operation = ServerApiError.Operation.valueOf(
             args.getString(ARG_OPERATION, ServerApiError.Operation.CANCEL.name)

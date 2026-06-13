@@ -24,12 +24,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.TypedArray
 import android.graphics.Color
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.text.Html
+import android.text.SpannableString
 import android.text.Spanned
 import android.text.format.DateUtils
+import android.text.style.StyleSpan
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -44,12 +47,14 @@ import androidx.core.content.getSystemService
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.DnsLogTracker
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.firestack.backend.Backend
+import com.celzero.firestack.backend.GoMetrics
 import com.celzero.firestack.backend.NetStat
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.radiobutton.MaterialRadioButton
@@ -257,6 +262,15 @@ object UIUtils {
     }
 
     fun openAndroidAppInfo(context: Context, packageName: String?) {
+        if (packageName?.startsWith(NO_PACKAGE_PREFIX) == true) {
+            Utilities.showToastUiCentered(
+                context,
+                context.getString(R.string.ctbs_app_info_not_available_toast),
+                Toast.LENGTH_SHORT
+            )
+            return
+        }
+
         try {
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
             intent.data = Uri.fromParts("package", packageName, null)
@@ -704,13 +718,14 @@ object UIUtils {
         return stats
     }
 
-    fun formatNetMetrics(stat: NetStat?): String? {
+    fun formatNetMetrics(stat: GoMetrics?): String? {
         if (stat == null) return null
 
         val go = stat.go()?.toString()
-        val go2 = stat.gO2().toString()
+        val c = stat.c
+        val m = stat.m
 
-        var stats = go + go2
+        var stats = go + c + m
         stats = stats.replace("{", "\n")
         stats = stats.replace("}", "\n\n")
         stats = stats.replace(",", "\n")
@@ -900,6 +915,20 @@ object SnackbarHelper {
             .joinToString(" ") { word ->
                 word.lowercase().replaceFirstChar { it.uppercase() }
             }
+    }
+
+    /**
+     * Apply a bold typeface to the string.
+     */
+    fun String.italic(): SpannableString {
+        return SpannableString(this).apply {
+            setSpan(
+                StyleSpan(Typeface.ITALIC),
+                0,
+                length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
     }
 
     /**

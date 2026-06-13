@@ -501,7 +501,6 @@
     <string name="hsf_proxy_chip_text" translatable="true">پروکسی فعال است</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">ضبط بسته غیرفعال است</string>
     <string name="hsf_whats_new_chip_text" translatable="true">جدید چی هست</string>
-    <string name="hsf_proxy_chip_remove_text" translatable="true">متوقف کردن…</string>
     <string name="hsf_packet_capture_chip_text" translatable="true">ضبط بسته فعال است</string>
     <string name="firewall_status_whitelisted" translatable="true">قوانین جهانی فایروال را دور می‌زند</string>
     <string name="ct_bs_app_info_error" translatable="true">اطلاعات برنامه یافت نشد</string>
@@ -676,8 +675,6 @@ href="https://central.sonatype.com/">Sonatype</a><br/> ]]></string>
     <string name="cd_dns_alg_desc" translatable="true">به ازای هر درخواست DNS، یک IP منحصربه‌فرد تخصیص دهید.</string>
     <string name="cd_split_dns_heading" translatable="true">DNS تفکیک‌شده (آزمایشی)</string>
     <string name="cd_split_dns_desc" translatable="true">هدایت پرس‌وجوهای DNS از برنامه‌های تحت پروکسی به سرورهای DNSِ پروکسی.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">برخورد با قواعد DNS به عنوان قواعد فایروال (آزمایشی)</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">مسدودسازی DNS در زمان تحلیل نام دور زده خواهد شد؛ تصمیم در زمان اتصال اتخاذ خواهد شد.</string>
     <string name="ctbs_app_info_not_available_toast" translatable="true">صفحه تنظیمات برنامه یافت نشد</string>
     <string name="ctbs_app_other_apps" translatable="true">%1$s + %2$s برنامهٔ دیگر</string>
     <string name="ctbs_block_other_apps" translatable="true">قواعدی که برای %1$s اعمال می‌شود، برای %2$s برنامه دیگر نیز اعمال خواهد شد.</string>

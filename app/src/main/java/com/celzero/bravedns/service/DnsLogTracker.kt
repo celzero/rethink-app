@@ -40,6 +40,7 @@ import com.celzero.firestack.backend.DNSSummary
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.internal.concurrent.TaskRunner
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
@@ -157,7 +158,7 @@ internal constructor(
 
         // mark the query as blocked if the transaction id is Dnsx.BlockAll, no need to check
         // for blocklist as it is already marked as blocked
-        if (transaction.id == Backend.BlockAll) {
+        if (transaction.id == Backend.BlockAll || transaction.id == Backend.Block) {
             // TODO: rdata should be either empty / 0.0.0.0 / ::0 / -- for block all
             if (transaction.response.isNotEmpty() && transaction.response != UNSPECIFIED_IP_IPV4 && transaction.response != UNSPECIFIED_IP_IPV6 && transaction.response != EMPTY_RESPONSE) {
                 Logger.w(

@@ -89,7 +89,7 @@ class ConsoleLogAdapter(private val context: Context) :
 
                     'E' ->
                         b.logDetail.setTextColor(
-                            UIUtils.fetchColor(context, R.attr.firewallBlockToggleBtnTxt)
+                            UIUtils.fetchColor(context, R.attr.accentBad)
                         )
 
                     else ->

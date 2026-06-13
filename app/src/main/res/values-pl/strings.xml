@@ -283,7 +283,6 @@
     <string name="hsf_proxy_chip_text" translatable="true">Proxy aktywne</string>
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">Włącz RethinkDNS+</string>
     <string name="hsf_exclude_error" translatable="true">Wykluczenie nie jest możliwe w trybie blokady VPN</string>
-    <string name="hsf_proxy_chip_remove_text" translatable="true">Zatrzymywanie…</string>
     <string name="hsf_chip_appearance" translatable="true">Temat: %1$s</string>
     <string name="about_docs" translatable="true">Przeczytaj dokumenty</string>
     <string name="about_privacy_policy" translatable="true">Polityka prywatności</string>

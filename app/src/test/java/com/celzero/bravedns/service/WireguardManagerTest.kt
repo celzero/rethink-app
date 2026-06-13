@@ -528,7 +528,7 @@ class WireguardManagerTest : KoinTest {
         println("🧪 Testing matchesSsidList() - exact match")
 
         // Execute
-        val result = WireguardManager.matchesSsidList("WiFi1##string,WiFi2##string,WiFi3##string", "WiFi2")
+        val result = WireguardManager.matchesSsidList("""[{"name":"WiFi1","type":"equal_exact"},{"name":"WiFi2","type":"equal_exact"},{"name":"WiFi3","type":"equal_exact"}]""", "WiFi2")
 
         // Verify
         assertTrue("Should return true for exact match", result)
@@ -540,7 +540,7 @@ class WireguardManagerTest : KoinTest {
         println("🧪 Testing matchesSsidList() - wildcard prefix match")
 
         // Execute
-        val result = WireguardManager.matchesSsidList("WiFi*##wildcard,TestNet##string", "WiFi123")
+        val result = WireguardManager.matchesSsidList("""[{"name":"WiFi*","type":"equal_wildcard"},{"name":"TestNet","type":"equal_exact"}]""", "WiFi123")
 
         // Verify
         assertTrue("Should return true for wildcard match", result)
@@ -553,10 +553,10 @@ class WireguardManagerTest : KoinTest {
     fun `test matchesSsidList - sad case with no match`() {
         println("🧪 Testing matchesSsidList() - no match")
 
-        // Execute - Use the correct SsidItem format: "name##type"
-        val result = WireguardManager.matchesSsidList("WiFi1##string,WiFi2##string,WiFi3##string", "WiFi4")
+        // Execute
+        val result = WireguardManager.matchesSsidList("""[{"name":"WiFi1","type":"equal_exact"},{"name":"WiFi2","type":"equal_exact"},{"name":"WiFi3","type":"equal_exact"}]""", "WiFi4")
 
-        // Verify - Based on actual implementation, this should return false for no match
+        // Verify
         assertFalse("Should return false for no match", result)
         println("✅ PASSED: matchesSsidList() handled no match correctly")
     }
@@ -566,9 +566,9 @@ class WireguardManagerTest : KoinTest {
         println("🧪 Testing matchesSsidList() - null current ssid")
 
         // Execute - Test with a specific SSID list that won't match empty string
-        val result = WireguardManager.matchesSsidList("WiFi1##string,WiFi2##string", "")
+        val result = WireguardManager.matchesSsidList("""[{"name":"WiFi1","type":"equal_exact"},{"name":"WiFi2","type":"equal_exact"}]""", "")
 
-        // Verify - Based on actual implementation, empty string should not match specific SSIDs
+        // Verify - empty string should not match specific SSIDs
         assertFalse("Should return false for empty current ssid when specific SSIDs are listed", result)
         println("✅ PASSED: matchesSsidList() handled null current ssid correctly")
     }
@@ -577,8 +577,8 @@ class WireguardManagerTest : KoinTest {
     fun `test matchesSsidList - edge case with single wildcard`() {
         println("🧪 Testing matchesSsidList() - single wildcard")
 
-        // Execute - Use the correct wildcard format
-        val result = WireguardManager.matchesSsidList("*##wildcard", "AnySSID")
+        // Execute - universal wildcard matches any SSID
+        val result = WireguardManager.matchesSsidList("""[{"name":"*","type":"equal_wildcard"}]""", "AnySSID")
 
         // Verify
         assertTrue("Should return true for universal wildcard", result)
@@ -589,10 +589,11 @@ class WireguardManagerTest : KoinTest {
     fun `test matchesSsidList - complex case with multiple wildcards`() {
         println("🧪 Testing matchesSsidList() - multiple wildcards")
 
-        // Execute - Use the correct format for mixed string and wildcard types
-        val result1 = WireguardManager.matchesSsidList("Home*##wildcard,Office*##wildcard,Guest##string", "Home123")
-        val result2 = WireguardManager.matchesSsidList("Home*##wildcard,Office*##wildcard,Guest##string", "Office456")
-        val result3 = WireguardManager.matchesSsidList("Home*##wildcard,Office*##wildcard,Guest##string", "Guest")
+        // Execute - mixed equal_wildcard and equal_exact types in JSON format
+        val wL = """[{"name":"Home*","type":"equal_wildcard"},{"name":"Office*","type":"equal_wildcard"},{"name":"Guest","type":"equal_exact"}]"""
+        val result1 = WireguardManager.matchesSsidList(wL, "Home123")
+        val result2 = WireguardManager.matchesSsidList(wL, "Office456")
+        val result3 = WireguardManager.matchesSsidList(wL, "Guest")
 
         // Verify
         assertTrue("Should match first wildcard", result1)
@@ -1352,9 +1353,9 @@ class WireguardManagerTest : KoinTest {
         println("🧪 Testing matchesSsidList() - case sensitivity")
 
         // Execute - Test case insensitive matching for strings
-        val result1 = WireguardManager.matchesSsidList("WiFi1##string", "wifi1")
-        val result2 = WireguardManager.matchesSsidList("WiFi1##string", "WIFI1")
-        val result3 = WireguardManager.matchesSsidList("wifi*##wildcard", "WIFI123")
+        val result1 = WireguardManager.matchesSsidList("""[{"name":"WiFi1","type":"equal_exact"}]""", "wifi1")
+        val result2 = WireguardManager.matchesSsidList("""[{"name":"WiFi1","type":"equal_exact"}]""", "WIFI1")
+        val result3 = WireguardManager.matchesSsidList("""[{"name":"wifi*","type":"equal_wildcard"}]""", "WIFI123")
 
         // Verify
         assertTrue("Should match case insensitively for strings", result1)
@@ -1367,11 +1368,11 @@ class WireguardManagerTest : KoinTest {
     fun `test matchesSsidList - complex wildcard patterns`() {
         println("🧪 Testing matchesSsidList() - complex wildcard patterns")
 
-        // Execute - Test various wildcard patterns
-        val result1 = WireguardManager.matchesSsidList("Test?##wildcard", "Test1")
-        val result2 = WireguardManager.matchesSsidList("Test?##wildcard", "TestAB") // Should not match
-        val result3 = WireguardManager.matchesSsidList("*Test*##wildcard", "MyTestNetwork")
-        val result4 = WireguardManager.matchesSsidList("Home.*.com##wildcard", "Home.wifi.com")
+        // Execute - Test various wildcard patterns in JSON format
+        val result1 = WireguardManager.matchesSsidList("""[{"name":"Test?","type":"equal_wildcard"}]""", "Test1")
+        val result2 = WireguardManager.matchesSsidList("""[{"name":"Test?","type":"equal_wildcard"}]""", "TestAB") // Should not match
+        val result3 = WireguardManager.matchesSsidList("""[{"name":"*Test*","type":"equal_wildcard"}]""", "MyTestNetwork")
+        val result4 = WireguardManager.matchesSsidList("""[{"name":"Home.*.com","type":"equal_wildcard"}]""", "Home.wifi.com")
 
         // Verify
         assertTrue("Should match single character wildcard (?)", result1)

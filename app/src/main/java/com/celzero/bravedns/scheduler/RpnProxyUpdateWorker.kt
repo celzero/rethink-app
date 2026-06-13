@@ -61,7 +61,7 @@ class RpnProxyUpdateWorker(
         const val WORK_NAME = "RpnProxyUpdateWorker"
 
         /** How often the worker fires (and also the initial delay before first run). */
-        const val INTERVAL_MINUTES = 40L
+        const val INTERVAL_MINUTES = 45L
 
         /**
          * Maximum WorkManager retry attempts before the job is marked FAILED.
@@ -97,18 +97,13 @@ class RpnProxyUpdateWorker(
                 .addTag(WORK_NAME)
                 .build()
 
-            // KEEP: if already scheduled, do NOT reset the timer.  The previous policy
-            // (CANCEL_AND_REENQUEUE) was cancelling the existing work and re-enqueuing
-            // a fresh one every time handleWinProxy ran, effectively restarting the
-            // 40-minute countdown and preventing the worker from ever firing on
-            // repeated VPN reconnects.
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 WORK_NAME,
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
                 request
             )
 
-            Logger.i(LOG_TAG_PROXY, "$TAG; scheduled: first run in ${INTERVAL_MINUTES}m, then every ${INTERVAL_MINUTES}m (KEEP policy)")
+            Logger.i(LOG_TAG_PROXY, "$TAG; scheduled: first run in ${INTERVAL_MINUTES}m, then every ${INTERVAL_MINUTES}m (CANCEL_AND_REENQUEUE — fresh timer from registration)")
         }
 
         /** Cancel the periodic worker (e.g. when RPN is disabled). */
@@ -148,7 +143,7 @@ class RpnProxyUpdateWorker(
                 // SubscriptionCheckWorker. Extract this into a shared utility or manager.
                 checkAndRegisterDeviceIfNeeded()
 
-                val updated = RpnProxyManager.updateWinProxy(false)
+                val updated = RpnProxyManager.updateWinProxy()
                 when {
                     updated == null -> {
                         // null → tunnel failure (VpnController.updateWin returned null).

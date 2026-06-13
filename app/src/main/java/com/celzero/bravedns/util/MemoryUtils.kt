@@ -45,10 +45,17 @@ object MemoryUtils {
         // --- App Physical RAM (PSS Breakdown) ---
         val appTotalPss: String,       // Total Physical RAM used by app (The main "RAM Usage" number)
         val appNativeRamUsed: String,  // C++ / Native (often Bitmaps on Android 8+)
+        val appDalvikPss: String,      // Dalvik heap (Java/Kotlin objects)
+        val appOtherPss: String,       // Other PSS (not native or dalvik)
         val appGraphicsRamUsed: String,// OpenGL, Textures, SurfaceFlinger
         val appCodeRamUsed: String,    // .so, .jar, .apk, .dex code memory
         val appStackRamUsed: String,   // Thread stacks
         val appUnknownRamUsed: String, // Other/Unknown (Private Other)
+
+        val appNativePrivateDirty: String, // Native pages modified, cannot be shared
+        val appNativeSharedDirty: String,  // Native pages modified, shared with other processes
+        val appNativeSharedClean: String,  // Native pages unmodified, shared with other processes
+        val appNativeHeapTotal: String,    // Sum of native PSS + private dirty + shared dirty + shared clean
 
         // --- System Wide Stats ---
         val systemTotalRam: String,
@@ -83,8 +90,16 @@ object MemoryUtils {
 
         val totalPssBytes = debugMemInfo.totalPss * 1024L
 
+        val nativePssBytes = debugMemInfo.nativePss * 1024L
+        val dalvikPssBytes = debugMemInfo.dalvikPss * 1024L
+        val otherPssBytes = debugMemInfo.otherPss * 1024L
+
+        val nativePrivateDirtyBytes = debugMemInfo.nativePrivateDirty * 1024L
+        val nativeSharedDirtyBytes = debugMemInfo.nativeSharedDirty * 1024L
+        val nativeSharedCleanBytes = (debugMemInfo.getMemoryStat("summary.shared-clean")?.toLongOrNull() ?: 0L) * BYTES_TO_KB
+        val nativeHeapTotalBytes = nativePssBytes + nativePrivateDirtyBytes + nativeSharedDirtyBytes + nativeSharedCleanBytes
+
         // "summary.native-heap" etc return values in KB
-        val nativePssBytes = (debugMemInfo.getMemoryStat("summary.native-heap")?.toLongOrNull() ?: 0L) * BYTES_TO_KB
         val graphicsPssBytes = (debugMemInfo.getMemoryStat("summary.graphics")?.toLongOrNull() ?: 0L) * BYTES_TO_KB
         val codePssBytes = (debugMemInfo.getMemoryStat("summary.code")?.toLongOrNull() ?: 0L) * BYTES_TO_KB
         val stackPssBytes = (debugMemInfo.getMemoryStat("summary.stack")?.toLongOrNull() ?: 0L) * BYTES_TO_KB
@@ -114,10 +129,16 @@ object MemoryUtils {
 
             appTotalPss = formatBytes(totalPssBytes),
             appNativeRamUsed = formatBytes(nativePssBytes),
+            appDalvikPss = formatBytes(dalvikPssBytes),
+            appOtherPss = formatBytes(otherPssBytes),
             appGraphicsRamUsed = formatBytes(graphicsPssBytes),
             appCodeRamUsed = formatBytes(codePssBytes),
             appStackRamUsed = formatBytes(stackPssBytes),
             appUnknownRamUsed = formatBytes(unknownPssBytes),
+            appNativePrivateDirty = formatBytes(nativePrivateDirtyBytes),
+            appNativeSharedDirty = formatBytes(nativeSharedDirtyBytes),
+            appNativeSharedClean = formatBytes(nativeSharedCleanBytes),
+            appNativeHeapTotal = formatBytes(nativeHeapTotalBytes),
 
             systemTotalRam = formatBytes(systemMemInfo.totalMem),
             systemAvailableRam = formatBytes(systemMemInfo.availMem),
@@ -139,6 +160,12 @@ object MemoryUtils {
         sb.appendLine("App (Physical RAM/PSS):")
         sb.appendLine("   Total Used: ${stats.appTotalPss}")
         sb.appendLine("   Native: ${stats.appNativeRamUsed}")
+        sb.appendLine("     Private Dirty: ${stats.appNativePrivateDirty}")
+        sb.appendLine("     Shared Dirty: ${stats.appNativeSharedDirty}")
+        sb.appendLine("     Shared Clean: ${stats.appNativeSharedClean}")
+        sb.appendLine("     Total: ${stats.appNativeHeapTotal}")
+        sb.appendLine("   Dalvik: ${stats.appDalvikPss}")
+        sb.appendLine("   Other: ${stats.appOtherPss}")
         sb.appendLine("   Graphics: ${stats.appGraphicsRamUsed}")
         sb.appendLine("   Code: ${stats.appCodeRamUsed}")
         sb.appendLine("   Stack/Other: ${stats.appUnknownRamUsed}")

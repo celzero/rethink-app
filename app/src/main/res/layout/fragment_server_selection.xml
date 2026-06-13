@@ -67,6 +67,7 @@
                             android:layout_marginEnd="8dp"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
+                            android:clipChildren="false"
                             android:visibility="visible">
 
                             <LinearLayout
@@ -120,12 +121,15 @@
                                 android:background="@drawable/bg_vpn_status_chip"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal"
-                                android:padding="4dp">
+                                android:clipChildren="false"
+                                android:clipToPadding="false"
+                                android:padding="8dp">
 
                                 <View
                                     android:id="@+id/status_indicator"
                                     android:layout_width="8dp"
                                     android:layout_height="8dp"
+                                    android:layout_marginStart="2dp"
                                     android:layout_marginEnd="6dp"
                                     android:background="@drawable/ic_circle"
                                     android:backgroundTint="?attr/accentGood" />
@@ -628,8 +632,29 @@
                     android:textStyle="bold"
                     app:cornerRadius="26dp"
                     app:elevation="4dp"
+                    app:backgroundTint="?attr/accentBad"
+                    android:textColor="@android:color/white"
+                    app:iconTint="@android:color/white"
+                    app:icon="@drawable/ic_refresh"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/error_reset_btn"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="52dp"
+                    android:paddingStart="28dp"
+                    android:paddingEnd="28dp"
+                    android:text="@string/lbl_reset"
+                    android:textSize="@dimen/large_font_text_view"
+                    android:textStyle="bold"
+                    app:cornerRadius="26dp"
+                    android:layout_marginTop="10dp"
+                    app:elevation="4dp"
                     android:textColor="?attr/accentBad"
                     app:iconTint="?attr/accentBad"
+                    app:strokeColor="?attr/accentBad"
                     app:icon="@drawable/ic_refresh"
                     app:iconGravity="textStart"
                     app:iconPadding="8dp" />
@@ -819,7 +844,7 @@
         android:insetTop="0dp"
         android:insetBottom="0dp"
         android:text="@string/server_settings_start_rpn"
-        android:textColor="@android:color/white"
+        android:textColor="?attr/homeScreenHeaderTextColor"
         android:visibility="gone"
         app:elevation="8dp"
         app:icon="@drawable/ic_vpn"

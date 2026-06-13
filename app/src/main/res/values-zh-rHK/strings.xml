@@ -302,7 +302,6 @@
     <string name="hsf_blocklist_chip_text_no_data">啓用 RDNS+</string>
     <string name="hsf_exclude_error">VPN 閉關模式下冇得排除</string>
     <string name="hsf_proxy_chip_removed_toast">移除咗代理</string>
-    <string name="hsf_proxy_chip_remove_text">停止緊……</string>
     <string name="hsf_whats_new_remove_text">關閉緊……</string>
     <string name="hsf_blocklist_updating_text">啓動緊……</string>
     <string name="hsf_chip_appearance">主題：%1$s</string>

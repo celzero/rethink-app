@@ -29,6 +29,8 @@ import android.os.Bundle
 import android.os.SystemClock
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+import android.system.Os
+import android.system.OsConstants
 import android.text.method.LinkMovementMethod
 import android.view.GestureDetector
 import android.view.Gravity
@@ -54,6 +56,7 @@ import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentAboutBinding
+import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.scheduler.BugReportZipper
 import com.celzero.bravedns.scheduler.BugReportZipper.getZipFileName
@@ -73,6 +76,7 @@ import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_4
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
 import com.celzero.bravedns.util.KernelProc
+import com.celzero.bravedns.util.MemoryUtils
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
@@ -97,6 +101,7 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 import java.io.File
+import java.lang.reflect.Modifier
 import java.util.concurrent.TimeUnit
 
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, KoinComponent {
@@ -162,12 +167,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         
         b.aboutStats.text = getString(R.string.settings_general_header).replaceFirstChar(Char::titlecase)
 
-        if (DEBUG) {
-            b.aboutFlightRecord.visibility = View.VISIBLE
-        } else {
-            b.aboutFlightRecord.visibility = View.GONE
-        }
-
         b.fhsTitleRethink.setOnClickListener(this)
         b.aboutSponsor.setOnClickListener(this)
         b.aboutManageRpn.setOnClickListener(this)
@@ -201,7 +200,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutStackTrace.setOnClickListener(this)
         b.aboutDbStats.setOnClickListener(this)
         b.tokenTextView.setOnClickListener(this)
-        b.aboutFlightRecord.setOnClickListener(this)
         b.aboutConsoleLogs.setOnClickListener(this)
         b.aboutEventLogs.setOnClickListener(this)
 
@@ -447,9 +445,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.tokenTextView -> {
                 // click is handled in gesture detector
             }
-            b.aboutFlightRecord -> {
-                initiateFlightRecord()
-            }
             b.aboutConsoleLogs -> {
                 openConsoleLogs()
             }
@@ -483,24 +478,19 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         logEvent(EventType.UI_TOGGLE, "Test mode enabled", "User enabled test mode")
     }
 
-    private fun initiateFlightRecord() {
-        io { VpnController.performFlightRecording() }
-        Toast.makeText(requireContext(), "Flight recording started", Toast.LENGTH_SHORT).show()
-    }
-
     private fun openStackTraceDialog() {
         io {
-            val goStackTrace = VpnController.printStack()
-            val kotlinStackTrace = captureKotlinStackTraces()
+            val goStackTrace = GoVpnAdapter.printStack()
+            val jvmStackTrace = captureJVMStackTraces()
             uiCtx {
                 if (!isAdded) return@uiCtx
-                showStackTraceDialog(goStackTrace, kotlinStackTrace)
+                showStackTraceDialog(goStackTrace, jvmStackTrace)
             }
         }
     }
 
     /** Captures the current stack trace of every live JVM/Kotlin thread off the main thread. */
-    private fun captureKotlinStackTraces(): String = buildString {
+    private fun captureJVMStackTraces(): String = buildString {
         Thread.getAllStackTraces().entries
             .sortedBy { it.key.name }
             .forEach { (thread, frames) ->
@@ -522,15 +512,15 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
     private fun showStackTraceDialog(
         goStackTrace: String,
-        kotlinStackTrace: String
+        jvmStackTrace: String
     ) {
         if (!isAdded) return
         val ctx = requireContext()
         val pad = resources.getDimensionPixelSize(R.dimen.dots_margin_bottom)
 
         val clipText = buildString {
-            appendLine("=== KOTLIN STACK ===")
-            appendLine(kotlinStackTrace.ifBlank { ctx.getString(R.string.lbl_not_available_short) })
+            appendLine("=== JVM STACK ===")
+            appendLine(jvmStackTrace.ifBlank { ctx.getString(R.string.lbl_not_available_short) })
             appendLine()
             appendLine("=== GO STACK ===")
             appendLine(goStackTrace.ifBlank { ctx.getString(R.string.lbl_not_available_short) })
@@ -582,44 +572,44 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
         }
 
-        val kotlinRv = makeLineRecyclerView(kotlinStackTrace)
+        val jvmRv = makeLineRecyclerView(jvmStackTrace)
         val goRv     = makeLineRecyclerView(goStackTrace)
 
-        val tabKotlin = makeTabButton("Kotlin Stack")
+        val tabJvm = makeTabButton("JVM Stack")
         val tabGo     = makeTabButton("Go Stack")
 
-        fun selectTab(showKotlin: Boolean) {
-            kotlinRv.visibility = if (showKotlin)  View.VISIBLE else View.GONE
-            goRv.visibility     = if (!showKotlin) View.VISIBLE else View.GONE
-            tabKotlin.alpha = if (showKotlin)  1f else 0.45f
-            tabGo.alpha     = if (!showKotlin) 1f else 0.45f
-            if (showKotlin) kotlinRv.scrollToPosition(0)
+        fun selectTab(showJvm: Boolean) {
+            jvmRv.visibility = if (showJvm)  View.VISIBLE else View.GONE
+            goRv.visibility     = if (!showJvm) View.VISIBLE else View.GONE
+            tabJvm.alpha = if (showJvm)  1f else 0.45f
+            tabGo.alpha     = if (!showJvm) 1f else 0.45f
+            if (showJvm) jvmRv.scrollToPosition(0)
             else            goRv.scrollToPosition(0)
         }
 
-        tabKotlin.setOnClickListener { selectTab(true) }
+        tabJvm.setOnClickListener { selectTab(true) }
         tabGo.setOnClickListener     { selectTab(false) }
 
         val tabRow = android.widget.LinearLayout(ctx).apply {
             orientation = android.widget.LinearLayout.HORIZONTAL
-            addView(tabKotlin)
+            addView(tabJvm)
             addView(tabGo)
         }
 
         val container = android.widget.LinearLayout(ctx).apply {
             orientation = android.widget.LinearLayout.VERTICAL
             addView(tabRow)
-            addView(kotlinRv, android.widget.LinearLayout.LayoutParams(
+            addView(jvmRv, android.widget.LinearLayout.LayoutParams(
                 android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
             addView(goRv, android.widget.LinearLayout.LayoutParams(
                 android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
         }
 
-        // Start on Kotlin Stack tab
+        // Start on JVM Stack tab
         selectTab(true)
 
         val dialog = MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
-            .setTitle("Stack Trace")
+            .setTitle("Stacktrace")
             .setView(container)
             .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
             .setNegativeButton(R.string.dns_info_neutral) { _, _ ->
@@ -697,6 +687,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                     }.create()
                     .show()
             }
+            printSysEnvAndProps()
         }
     }
 
@@ -719,11 +710,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             val status = KernelProc.getStatus(forceRefresh = true)
             val smaps = KernelProc.getSmaps(forceRefresh = true)
             val auxv = KernelProc.getStats(forceRefresh = true)
-            val stat = VpnController.getNetStat()
+            val stat = GoVpnAdapter.getGoMetrics()
             val formatedMetrics = UIUtils.formatNetMetrics(stat)
+            val memMetrics = MemoryUtils.getMemoryStats(requireContext())
             uiCtx {
                 if (!isAdded) return@uiCtx
-                showProcDialog(allThreadsSched, status, smaps, auxv, formatedMetrics)
+                showProcDialog(allThreadsSched, status, smaps, auxv, formatedMetrics, memMetrics)
             }
         }
     }
@@ -733,7 +725,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         status: String,
         smaps: String,
         auxv: String,
-        formatedMetrics: String?
+        formatedMetrics: String?,
+        memMetrics: String
     ) {
         if (!isAdded) return
         val ctx = requireContext()
@@ -809,6 +802,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         otherSection("STATUS  (/proc/self/status)", status)
         otherSection("SMAPS  (/proc/self/smaps_rollup)", smaps)
         otherSection("AUXV  (/proc/self/auxv)", auxv)
+        otherSection("Memory Metrics", memMetrics)
 
         val clipText = buildString {
             appendLine("=== PROC / MEM ===")
@@ -892,7 +886,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         selectTab(false)
 
         val dialog = MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
-            .setTitle("Proc Analysis")
+            .setTitle("Proc")
             .setView(container)
             .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
             .setNegativeButton(R.string.dns_info_neutral) { _, _ ->
@@ -1014,6 +1008,64 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
         }
         return tables
+    }
+
+    private fun printSysEnvAndProps() {
+        if (!DEBUG) return
+
+        val environmentMap: Map<String, String> = System.getenv()
+
+        for ((key, value) in environmentMap) {
+            Logger.d("EnvVariables", "$key = $value")
+        }
+
+        val accessAllowed = SecurityManager().checkPropertiesAccess()
+        Logger.d("SysProp", "Access allowed? $accessAllowed")
+        val prop: List<String> = System.getProperties().map { it.key.toString() }
+        for (key in prop) {
+            val value = System.getProperty(key)
+            Logger.d("SysProp", "$key = $value")
+        }
+
+        printAllSysconfValues()
+    }
+
+    fun printAllSysconfValues() {
+        Logger.d("EnvVariables", "--- STARTING OS SYSCONF DUMP ---")
+
+        // Get all public static fields from OsConstants
+        val fields = OsConstants::class.java.declaredFields
+
+        var successCount = 0
+        var errorCount = 0
+
+        for (field in fields) {
+            // Filter for fields that start with "_SC_" (System Configuration constants)
+            if (field.name.startsWith("_SC_") && Modifier.isStatic(field.modifiers)) {
+                try {
+                    // Ensure the field is accessible and extract its integer value
+                    field.isAccessible = true
+                    val scConstantId = field.get(null) as Int
+
+                    // Query the system configuration using Os.sysconf
+                    val value = Os.sysconf(scConstantId)
+
+                    Logger.i("EnvVariables", "${field.name}: $value")
+                    successCount++
+                } catch (e: Exception) {
+                    // Some constants might not be supported on older kernel versions
+                    Logger.w("EnvVariables", "Failed to read ${field.name}: ${e.localizedMessage}")
+                    errorCount++
+                }
+            } else {
+                Logger.d("EnvVariables", "Skipping non-sysconf field: ${field.name}")
+            }
+        }
+
+        Logger.d(
+            "EnvVariables",
+            "--- DUMP COMPLETE (Success: $successCount, Failed/Unsupported: $errorCount) ---"
+        )
     }
 
     private fun buildTableDump(table: String): String {

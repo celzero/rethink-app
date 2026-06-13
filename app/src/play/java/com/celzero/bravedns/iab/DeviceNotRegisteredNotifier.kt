@@ -98,7 +98,7 @@ object DeviceNotRegisteredNotifier {
                 notificationManager.createNotificationChannel(channel)
             }
 
-            val title = context.getString(R.string.device_not_registered_notif_title)
+            val title = context.getString(R.string.device_not_registered_title)
             val body  = context.getString(R.string.device_not_registered_notif_body)
 
             val builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_RPN_ALERTS)

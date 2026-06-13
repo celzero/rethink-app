@@ -197,7 +197,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="@string/subscription_label"
+                            android:text="@string/lbl_plan"
                             android:textColor="?attr/primaryLightColorText"
                             android:textSize="13sp" />
 
@@ -228,7 +228,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="@string/dashboard_activated_label"
+                            android:text="@string/rpn_purchased_state"
                             android:textColor="?attr/primaryLightColorText"
                             android:textSize="13sp" />
 
@@ -541,6 +541,72 @@
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/report_issue_img"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:src="@drawable/ic_right_arrow_white"
+                            android:tint="?attr/primaryLightColorText" />
+                    </RelativeLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:background="?attr/divider" />
+
+                    <RelativeLayout
+                        android:id="@+id/entitlement_rl"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:paddingStart="16dp"
+                        android:paddingTop="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="16dp">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/entitlement_icon"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_centerVertical="true"
+                            android:background="@drawable/ic_circle"
+                            android:backgroundTint="?attr/chipColorBgNormal"
+                            android:padding="8dp"
+                            android:src="@drawable/ic_rethink_plus"
+                            android:tint="?attr/primaryTextColor" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="14dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_toStartOf="@id/entitlement_img"
+                            android:layout_toEndOf="@id/entitlement_icon"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-medium"
+                                android:text="Entitlement"
+                                android:textColor="?attr/primaryTextColor"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="View entitlement details and more"
+                                android:textColor="?attr/primaryLightColorText"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/entitlement_img"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:layout_alignParentEnd="true"

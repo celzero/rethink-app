@@ -202,7 +202,6 @@
     <string name="hsf_exclude_error">Exclusion impossible en mode confinement VPN</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy supprimé</string>
     <string name="hsf_whats_new_remove_text">Fermeture…</string>
-    <string name="hsf_proxy_chip_remove_text">Arrêt…</string>
     <string name="hsf_blocklist_updating_text">Activation…</string>
     <string name="hsf_chip_appearance">Thème : %1$s</string>
     <string name="dc_entries">%1$s entrées »</string>
@@ -1069,8 +1068,6 @@
     <string name="dc_filtering_heading" translatable="true">filtrage</string>
     <string name="cd_split_dns_heading" translatable="true">Séparer le DNS (expérimental)</string>
     <string name="cd_split_dns_desc" translatable="true">Transférer les requêtes DNS des applications proxy vers les serveurs DNS du proxy.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">Traiter les règles DNS comme règles de pare-feu (expérimental)</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">Le blocage DNS sera contourné lors de la résolution ; la décision sera prise au moment de la connexion.</string>
     <string name="univ_firewall_rule_11" translatable="true">Bloquer toutes les connexions locales</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">Supprimer toutes les règles de domaine ?</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">Supprimer ces règles permettrait à n\'importe quelle application de se connecter aux domaines actuellement bloqués.</string>

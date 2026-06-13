@@ -50,6 +50,7 @@ import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.ui.bottomsheet.CustomIpRulesBtmSheet
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
+import com.celzero.bravedns.util.SnackbarHelper.italic
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getCountryCode
@@ -369,7 +370,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                     b.customIpStatusTv.text =
                         context.getString(
                             R.string.ci_desc,
-                            context.getString(R.string.ci_bypass_universal_txt),
+                            context.getString(R.string.ci_bypass_universal_txt).italic(),
                             time
                         )
                 }
@@ -378,7 +379,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                     b.customIpStatusTv.text =
                         context.getString(
                             R.string.ci_desc,
-                            context.getString(R.string.lbl_blocked),
+                            context.getString(R.string.lbl_blocked).italic(),
                             time
                         )
                 }
@@ -387,7 +388,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                     b.customIpStatusTv.text =
                         context.getString(
                             R.string.ci_desc,
-                            context.getString(R.string.ci_no_rule_txt),
+                            context.getString(R.string.ci_no_rule_txt).italic(),
                             time
                         )
                 }
@@ -396,7 +397,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                     b.customIpStatusTv.text =
                         context.getString(
                             R.string.ci_desc,
-                            context.getString(R.string.ci_trust_txt),
+                            context.getString(R.string.ci_trust_txt).italic(),
                             time
                         )
                 }
@@ -516,7 +517,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                     b.customIpStatusTv.text =
                         context.getString(
                             R.string.ci_desc,
-                            context.getString(R.string.ci_bypass_universal_txt),
+                            context.getString(R.string.ci_bypass_universal_txt).italic(),
                             time
                         )
                 }
@@ -525,7 +526,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                     b.customIpStatusTv.text =
                         context.getString(
                             R.string.ci_desc,
-                            context.getString(R.string.lbl_blocked),
+                            context.getString(R.string.lbl_blocked).italic(),
                             time
                         )
                 }
@@ -534,7 +535,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                     b.customIpStatusTv.text =
                         context.getString(
                             R.string.ci_desc,
-                            context.getString(R.string.ci_no_rule_txt),
+                            context.getString(R.string.ci_no_rule_txt).italic(),
                             time
                         )
                 }
@@ -543,7 +544,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                     b.customIpStatusTv.text =
                         context.getString(
                             R.string.ci_desc,
-                            context.getString(R.string.ci_trust_txt),
+                            context.getString(R.string.ci_trust_txt).italic(),
                             time
                         )
                 }

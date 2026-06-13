@@ -19,16 +19,21 @@ import Logger
 import Logger.LOG_OKHTTP
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Daemons
 import com.celzero.bravedns.util.Utilities
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import okhttp3.Dns
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.ResponseBody.Companion.toResponseBody
 import okhttp3.dnsoverhttps.DnsOverHttps
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import java.net.InetAddress
+import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
+import kotlin.enums.enumEntries
 
 class RetrofitManager {
 
@@ -51,17 +56,78 @@ class RetrofitManager {
             FALLBACK_DNS
         }
 
-        val logging = HttpLoggingInterceptor { message ->
-            if (DEBUG) {
-                Logger.vv(LOG_OKHTTP, message)
-                // keep storing the logs in a separate file to avoid cluttering the main app logs,
-                // as these logs can be very verbose
-                val time = System.currentTimeMillis()
-                val userReadableTime = Utilities.convertLongToTime(time, Constants.TIME_FORMAT_4)
-                Logger.wireLog("$userReadableTime | $message")
+        // Single-thread dispatcher dedicated to fire-and-forget log I/O so that
+        // log writes never block OkHttp's network threads.
+        private val logScope = CoroutineScope(Daemons.make("RayIdLogger"))
+
+        /**
+         * Ray-ID interceptor: captures Cloudflare's cf-ray header and any "ray" field in the body,
+         * logging them
+         */
+        val rayIdInterceptor = Interceptor { chain ->
+            val request = chain.request()
+            val reqTime = System.currentTimeMillis()
+
+            // Log request line asynchronously
+            logScope.launch {
+                val ts = Utilities.convertLongToTime(reqTime, Constants.TIME_FORMAT_4)
+                val msg = "$ts --> ${request.method} ${request.url}"
+                Logger.d(LOG_OKHTTP, msg)
+                Logger.wireLog(msg)
             }
-        }.apply {
-            level = HttpLoggingInterceptor.Level.BODY
+
+            val response = chain.proceed(request)
+            val respTime = System.currentTimeMillis()
+
+            try {
+                // Capture header value before any body read.
+                val cfRay = response.header("cf-ray")
+                val responseBody = response.body
+
+                if (responseBody != null) {
+                    val contentType = responseBody.contentType()
+                    val bodyString = responseBody.string()
+                    val rayId = Regex("\"ray\"\\s*:\\s*\"([^\"]+)\"")
+                        .find(bodyString)?.groupValues?.get(1)
+
+                    logScope.launch {
+                        val ts = Utilities.convertLongToTime(respTime, Constants.TIME_FORMAT_4)
+                        val prefix = "$ts <-- ${response.code} ${request.method} ${request.url}"
+                        if (cfRay != null) {
+                            val msg = "$prefix | cf-ray: $cfRay"
+                            Logger.d(LOG_OKHTTP, msg)
+                            Logger.wireLog(msg)
+                        }
+                        if (rayId != null) {
+                            val msg = "$prefix | ray: $rayId"
+                            Logger.d(LOG_OKHTTP, msg)
+                            Logger.wireLog(msg)
+                        }
+                        if (cfRay == null && rayId == null) {
+                            // At least log the response line so every request has a closing entry.
+                            val msg = "$prefix | no-ray"
+                            Logger.d(LOG_OKHTTP, msg)
+                            Logger.wireLog(msg)
+                        }
+                    }
+
+                    // Rebuild response body so Retrofit / caller can still read it.
+                    val newBody = bodyString.toResponseBody(contentType)
+                    return@Interceptor response.newBuilder().body(newBody).build()
+                } else {
+                    // No-body; still log cf-ray from headers if present.
+                    logScope.launch {
+                        val ts = Utilities.convertLongToTime(respTime, Constants.TIME_FORMAT_4)
+                        val prefix = "$ts <-- ${response.code} ${request.method} ${request.url}"
+                        val msg = if (cfRay != null) "$prefix | cf-ray: $cfRay" else "$prefix | no-body no-ray"
+                        Logger.d(LOG_OKHTTP, msg)
+                        Logger.wireLog(msg)
+                    }
+                }
+            } catch (e: Exception) {
+                Logger.e(LOG_OKHTTP, "err extracting ray-id from response: ${e.message}", e)
+            }
+            response
         }
 
         fun getBlocklistBaseBuilder(isRinRActive: Boolean): Retrofit.Builder {
@@ -88,7 +154,9 @@ class RetrofitManager {
             b.readTimeout(READ_TIMEOUT_MINUTES, TimeUnit.MINUTES)
             b.writeTimeout(WRITE_TIMEOUT_MINUTES, TimeUnit.MINUTES)
             b.retryOnConnectionFailure(true)
-            if (DEBUG) b.addInterceptor(logging)
+            // Always active: captures cf-ray header and body ray-id; never logs
+            // request headers (cid / did / sessionToken stay out of logs).
+            b.addInterceptor(rayIdInterceptor)
             // If unset, the system-wide default DNS will be used.
             // no need to add custom dns if rinr is not active, as the connections will be routed
             // through the default dns
@@ -98,63 +166,55 @@ class RetrofitManager {
             return b.build()
         }
 
-        // As of now, quad9 is used as default dns in okhttp client.
+        // Attempts DNS providers in priority order: Quad9 → Cloudflare → Google → System → Fallback.
+        // If a provider fails to construct or resolve, the next is tried transparently at runtime.
         private fun customDns(bootstrapClient: OkHttpClient): Dns? {
-            enumValues<OkHttpDnsType>().forEach {
+            val providers = mutableListOf<Dns>()
+            enumEntries<OkHttpDnsType>().forEach {
                 try {
-                    when (it) {
-                        OkHttpDnsType.DEFAULT -> {
-                            return DnsOverHttps.Builder()
-                                .client(bootstrapClient)
-                                .url("https://dns.quad9.net/dns-query".toHttpUrl())
-                                .bootstrapDnsHosts(
-                                    getByIp("9.9.9.9"),
-                                    getByIp("149.112.112.112"),
-                                    getByIp("2620:fe::9"),
-                                    getByIp("2620:fe::fe")
-                                )
-                                .includeIPv6(true)
-                                .build()
-                        }
-                        OkHttpDnsType.CLOUDFLARE -> {
-                            return DnsOverHttps.Builder()
-                                .client(bootstrapClient)
-                                .url("https://cloudflare-dns.com/dns-query".toHttpUrl())
-                                .bootstrapDnsHosts(
-                                    getByIp("1.1.1.1"),
-                                    getByIp("1.0.0.1"),
-                                    getByIp("2606:4700:4700::1111"),
-                                    getByIp("2606:4700:4700::1001")
-                                )
-                                .includeIPv6(true)
-                                .build()
-                        }
-                        OkHttpDnsType.GOOGLE -> {
-                            return DnsOverHttps.Builder()
-                                .client(bootstrapClient)
-                                .url("https://dns.google/dns-query".toHttpUrl())
-                                .bootstrapDnsHosts(
-                                    getByIp("8.8.8.8"),
-                                    getByIp("8.8.4.4"),
-                                    getByIp("2001:4860:4860:0:0:0:0:8888"),
-                                    getByIp("2001:4860:4860:0:0:0:0:8844")
-                                )
-                                .includeIPv6(true)
-                                .build()
-                        }
-                        OkHttpDnsType.SYSTEM_DNS -> {
-                            return Dns.SYSTEM
-                        }
-                        OkHttpDnsType.FALLBACK_DNS -> {
-                            // todo: return retrieved system dns
-                            return null
-                        }
+                    val dns = when (it) {
+                        OkHttpDnsType.DEFAULT -> DnsOverHttps.Builder()
+                            .client(bootstrapClient)
+                            .url("https://dns.quad9.net/dns-query".toHttpUrl())
+                            .bootstrapDnsHosts(
+                                getByIp("9.9.9.9"),
+                                getByIp("149.112.112.112"),
+                                getByIp("2620:fe::9"),
+                                getByIp("2620:fe::fe")
+                            )
+                            .includeIPv6(true)
+                            .build()
+                        OkHttpDnsType.CLOUDFLARE -> DnsOverHttps.Builder()
+                            .client(bootstrapClient)
+                            .url("https://cloudflare-dns.com/dns-query".toHttpUrl())
+                            .bootstrapDnsHosts(
+                                getByIp("1.1.1.1"),
+                                getByIp("1.0.0.1"),
+                                getByIp("2606:4700:4700::1111"),
+                                getByIp("2606:4700:4700::1001")
+                            )
+                            .includeIPv6(true)
+                            .build()
+                        OkHttpDnsType.GOOGLE -> DnsOverHttps.Builder()
+                            .client(bootstrapClient)
+                            .url("https://dns.google/dns-query".toHttpUrl())
+                            .bootstrapDnsHosts(
+                                getByIp("8.8.8.8"),
+                                getByIp("8.8.4.4"),
+                                getByIp("2001:4860:4860:0:0:0:0:8888"),
+                                getByIp("2001:4860:4860:0:0:0:0:8844")
+                            )
+                            .includeIPv6(true)
+                            .build()
+                        OkHttpDnsType.SYSTEM_DNS -> Dns.SYSTEM
+                        OkHttpDnsType.FALLBACK_DNS -> null
                     }
+                    dns?.let { providers.add(it) }
                 } catch (e: Exception) {
                     Logger.crash(Logger.LOG_TAG_DOWNLOAD, "err; custom dns: ${e.message}", e)
                 }
             }
-            return null
+            return if (providers.isEmpty()) null else FallbackDns(providers)
         }
 
         private fun getByIp(ip: String): InetAddress {
@@ -163,6 +223,23 @@ class RetrofitManager {
             } catch (e: Exception) {
                 Logger.e(Logger.LOG_TAG_DOWNLOAD, "err while getting ip address: ${e.message}", e)
                 throw e
+            }
+        }
+
+        private class FallbackDns(private val providers: List<Dns>) : Dns {
+            override fun lookup(hostname: String): List<InetAddress> {
+                for (provider in providers) {
+                    try {
+                        val result = provider.lookup(hostname)
+                        if (result.isNotEmpty()) {
+                            return result
+                        }
+                    } catch (_: Exception) {
+                    }
+                }
+                throw UnknownHostException(
+                    "All DNS providers failed for $hostname"
+                )
             }
         }
     }

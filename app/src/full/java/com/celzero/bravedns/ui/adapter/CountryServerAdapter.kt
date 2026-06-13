@@ -396,32 +396,26 @@ class CountryServerAdapter(
              *   > 80 → Overloaded
              */
             private fun loadInfo(loadPercent: Int): Pair<String, Int> {
-                val ctx = itemView.context
-                val label: String
                 val attr: Int
 
                 when {
                     loadPercent <= 20 -> {
-                        label = "$loadPercent% · ${ctx.getString(R.string.server_load_light)}"
                         attr  = R.attr.chipTextPositive
                     }
                     loadPercent <= 40 -> {
-                        label = "$loadPercent% · ${ctx.getString(R.string.server_load_normal)}"
                         attr  = R.attr.accentGood
                     }
                     loadPercent <= 60 -> {
-                        label = "$loadPercent% · ${ctx.getString(R.string.server_load_busy)}"
                         attr  = R.attr.chipTextNeutral
                     }
                     loadPercent <= 80 -> {
-                        label = "$loadPercent% · ${ctx.getString(R.string.server_load_very_busy)}"
                         attr  = R.attr.chipTextNegative
                     }
                     else -> {
-                        label = "$loadPercent% · ${ctx.getString(R.string.server_load_overloaded)}"
                         attr  = R.attr.chipTextNegative
                     }
                 }
+                val label = "$loadPercent%"
                 return Pair(label, attr)
             }
         }

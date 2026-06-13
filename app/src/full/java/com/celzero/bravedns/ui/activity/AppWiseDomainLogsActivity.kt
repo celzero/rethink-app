@@ -85,7 +85,7 @@ class AppWiseDomainLogsActivity :
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
         uid = intent.getIntExtra(AppInfoActivity.INTENT_UID, INVALID_UID)

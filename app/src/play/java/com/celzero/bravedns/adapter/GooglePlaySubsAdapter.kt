@@ -40,16 +40,19 @@ class GooglePlaySubsAdapter(
     val listener: SubscriptionChangeListener,
     val context: Context,
     var pds: List<ProductDetail> = emptyList(),
-    pos: Int = 0,
+    productId: String? = null,
+    planId: String? = null,
     var showShimmer: Boolean = true
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    var selectedPos = -1
+    private var selectedProductId: String? = productId
+    private var selectedPlanId: String? = planId
 
     companion object {
         private const val SHIMMER_ITEM_COUNT = 4
         private const val VIEW_TYPE_SHIMMER = 0
         private const val VIEW_TYPE_REAL = 1
+        private const val TAG = "GooglePlaySubsAdapter"
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -70,8 +73,17 @@ class GooglePlaySubsAdapter(
         }
     }
 
-    init {
-        selectedPos = pos
+    fun setSelectedProduct(productId: String?, planId: String?) {
+        val oldId = selectedProductId
+        val oldPlanId = selectedPlanId
+        selectedProductId = productId
+        selectedPlanId = planId
+
+        val oldPos = pds.indexOfFirst { it.productId == oldId && it.planId == oldPlanId }
+        val newPos = pds.indexOfFirst { it.productId == productId && it.planId == planId }
+
+        if (oldPos != -1) notifyItemChanged(oldPos)
+        if (newPos != -1) notifyItemChanged(newPos)
     }
 
     interface SubscriptionChangeListener {
@@ -91,7 +103,7 @@ class GooglePlaySubsAdapter(
     }
 
     fun setData(data: List<ProductDetail>) {
-        Logger.d(LOG_TAG_UI, "setData called with ${data.size} products, showShimmer: $showShimmer -> false")
+        Logger.d(LOG_TAG_UI, "$TAG setData called with ${data.size} products, showShimmer: $showShimmer -> false")
         val oldList = pds
         val wasShimmer = showShimmer
         this.pds = data
@@ -146,7 +158,7 @@ class GooglePlaySubsAdapter(
 
             val displayPrice = discountedPrice.ifEmpty { currentPrice }
             val displayPriceMicros = if (discountedPriceMicros > 0) discountedPriceMicros else currentPriceMicros
-            val isSelected = selectedPos == pos
+            val isSelected = prod.productId == selectedProductId && prod.planId == selectedPlanId
             val isInApp = prod.productType == ProductType.INAPP
 
             // plan duration label
@@ -157,7 +169,7 @@ class GooglePlaySubsAdapter(
                 planTitle
             }
 
-            Logger.d(LOG_TAG_UI, "InAppBilling Binding plan: ${prod.productId}, ${prod.planId}, Title: $planTitle, Price: $displayPrice, FreeTrial: $freeTrialDays days, Yearly: $isYearly, InApp: $isInApp")
+            Logger.d(LOG_TAG_UI, "$TAG InAppBilling Binding plan: ${prod.productId}, ${prod.planId}, Title: $planTitle, Price: $displayPrice, discount: $discountedPrice FreeTrial: $freeTrialDays days, Yearly: $isYearly, InApp: $isInApp")
 
             // Original Price (struck through, below price)
             if (discountedPrice.isNotEmpty() && currentPrice.isNotEmpty()) {
@@ -226,14 +238,18 @@ class GooglePlaySubsAdapter(
             // selection via card stroke only (no radio button)
             applySelectionStyle(isSelected)
 
-            Logger.d(LOG_TAG_UI, "Premium Plan: $planTitle, Price: $displayPrice, Yearly: $isYearly, Selected: $isSelected")
+            Logger.d(LOG_TAG_UI, "$TAG Premium Plan: $planTitle, Price: $displayPrice, Yearly: $isYearly, Selected: $isSelected")
 
             binding.planCard.setOnClickListener {
-                val prev = selectedPos
-                selectedPos = pos
+                val oldId = selectedProductId
+                val oldPlanId = selectedPlanId
+                selectedProductId = prod.productId
+                selectedPlanId = prod.planId
                 listener.onSubscriptionSelected(prod.productId, prod.planId)
                 Logger.d(LOG_IAB, "Selected Plan: ${prod.productId}, ${prod.planId}")
-                if (prev >= 0 && prev < pds.size) notifyItemChanged(prev)
+
+                val oldPos = pds.indexOfFirst { it.productId == oldId && it.planId == oldPlanId }
+                if (oldPos != -1) notifyItemChanged(oldPos)
                 notifyItemChanged(pos)
                 animateSelection()
             }
@@ -279,7 +295,8 @@ class GooglePlaySubsAdapter(
                     String.format(Locale.getDefault(), "%.2f", amount).trimEnd('0').trimEnd('.')
                 }
                 if (numericPart.isNotEmpty()) "$numericPart$formatted" else "$currencyCode $formatted"
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_UI, "$TAG GPPA err formatting micros as currency, ${e.message}")
                 null
             }
         }
@@ -312,7 +329,7 @@ class GooglePlaySubsAdapter(
                 val discounted = discountedPrice.replace(Regex("[^0-9.]"), "").toDoubleOrNull() ?: 0.0
                 if (original > 0 && discounted > 0) ((original - discounted) / original * 100).toInt() else 0
             } catch (e: Exception) {
-                Logger.e(LOG_TAG_UI, "err calculating savings: ${e.message}")
+                Logger.e(LOG_TAG_UI, "$TAG err calculating savings: ${e.message}")
                 0
             }
         }

@@ -18,16 +18,15 @@ package com.celzero.bravedns.service
 import Logger
 import Logger.LOG_TAG_BUG_REPORT
 import android.content.Context
-import android.system.Os
+import android.os.Build
+import android.os.FileObserver
+import android.os.Handler
+import android.os.Looper
+import android.os.Process
+import androidx.annotation.RequiresApi
 import com.celzero.bravedns.scheduler.EnhancedBugReport
-import com.celzero.bravedns.service.GoCrashFileDescriptorReader.Companion.MAX_LINE_BYTES
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import java.io.File
-import java.io.FileDescriptor
-import kotlin.system.exitProcess
 
 /**
  * Reads Go runtime crash logs from a duplicated file descriptor and persists them
@@ -49,15 +48,35 @@ import kotlin.system.exitProcess
  */
 class GoCrashFileDescriptorReader(private val context: Context?) {
 
-    fun start2(): File? {
-        // create a file and send the file descriptor to the service
-        // create an os.file observer for the file
+    fun start2(): Pair<File?, File?>? {
         val file = createCrashFile2()
         if (file == null) {
             Logger.e(LOG_TAG_BUG_REPORT, "$TAG createCrashFile2 returned null")
             return null
         }
+        val fltFile = createFlightRecFile()
+        if (fltFile == null) {
+            Logger.e(LOG_TAG_BUG_REPORT, "$TAG createCrashFile2 flt returned null")
+            return null
+        }
+        if (isAtleastQ()) {
+            startCrashWatcher(file)
+        }
 
+        return Pair(file, fltFile)
+    }
+
+    private fun createFlightRecFile(): File? {
+        if (context == null) {
+            Logger.e(LOG_TAG_BUG_REPORT, "$TAG createCrashFileFd: missing app context")
+            return null
+        }
+        val file = EnhancedBugReport.newFlightRecorderFile(context)
+        if (file == null) {
+            Logger.e(LOG_TAG_BUG_REPORT, "$TAG createCrashFileFd: newFlightRecorderFile returned null")
+            return null
+        }
+        Logger.d(LOG_TAG_BUG_REPORT, "$TAG createCrashFileFd: new file ${file.absolutePath}")
         return file
     }
 
@@ -77,9 +96,59 @@ class GoCrashFileDescriptorReader(private val context: Context?) {
     }
 
 
+    /**
+     * Registers an inotify-based [FileObserver] on the parent directory of [file].
+     *
+     * Watches for [FileObserver.MODIFY] and [FileObserver.CLOSE_WRITE] events, filtering
+     * by filename.  On the first matching event, stops the observer and schedules a
+     * delayed [exitProcess] to let Go finish flushing the crash dump.
+     *
+     * This is event-driven (zero CPU overhead in normal operation) and runs *before*
+     * Go is told about the file path, so the inotify watch is guaranteed to be in
+     * place before Go opens the file.
+     */
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun startCrashWatcher(file: File) {
+        val dir = file.parentFile ?: run {
+            Logger.e(LOG_TAG_BUG_REPORT, "$TAG crashWatcher: parent dir is null for ${file.absolutePath}")
+            return
+        }
+        val fileName = file.name
+
+        crashFileObserver = object : FileObserver(dir, MODIFY or CLOSE_WRITE or MOVED_TO) {
+            override fun onEvent(event: Int, path: String?) {
+                if (path != fileName) return
+                if (event and (MODIFY or CLOSE_WRITE or MOVED_TO) == 0) return
+
+                // Guard against batch-delivered duplicate events: stopWatching()
+                // is asynchronous at the kernel level, so events already queued
+                // in this thread's event loop may fire before the kernel watch
+                // is torn down.
+                val observer = crashFileObserver ?: return
+                crashFileObserver = null
+                observer.stopWatching()
+
+                Logger.w(LOG_TAG_BUG_REPORT, "$TAG crashWatcher: Go crash dump detected, waiting ${EXIT_DELAY_MS}ms before exit")
+
+                Handler(Looper.getMainLooper()).postDelayed({
+                    Process.killProcess(Process.myPid())
+                }, EXIT_DELAY_MS)
+            }
+        }.also { it.startWatching() }
+
+        Logger.d(LOG_TAG_BUG_REPORT, "$TAG crashWatcher: monitoring ${file.absolutePath}")
+    }
+
     companion object {
+        // Stored in companion to prevent GC, the GoCrashFileDescriptorReader instance
+        // that creates this observer is a local variable and gets collected immediately
+        // after start2() returns. If the FileObserver is GC'd, its native weak-reference
+        // callback dies silently.
+        @Volatile
+        private var crashFileObserver: FileObserver? = null
+
         private const val MAX_LINE_BYTES = 4 * 1024
-        //private const val IDLE_TIMEOUT_MS = 3000
+        private const val EXIT_DELAY_MS = 2500L
         private const val TAG = "GoCrashFd"
     }
 }

@@ -154,7 +154,6 @@
     <string name="notif_dialog_pause_dialog_neutral">Tampilkan</string>
     <string name="dc_dns_website_desc">Mengambil ikon situs web dari <i>nextdns.io</i> dan <i>duckduckgo.com</i>. Mengonsumsi ruang penyimpanan hingga 350 mb</string>
     <string name="firewall_status_excluded">dikecualikan dari dns dan firewall</string>
-    <string name="hsf_proxy_chip_remove_text">Menghentikan…</string>
     <string name="bsct_app_info">Info Aplikasi</string>
     <string name="bsct_conn_block_desc_device">%1$s diblokir oleh perangkat</string>
     <string name="network_log_app_name_unknown">Tidak diketahui</string>
@@ -1109,8 +1108,6 @@
     <string name="dc_filtering_heading" translatable="true">penyaringan</string>
     <string name="cd_split_dns_heading" translatable="true">DNS Terpisah (pengujian)</string>
     <string name="cd_split_dns_desc" translatable="true">Meneruskan kueri DNS dari aplikasi yang diproksi ke server DNS proxy.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">Perlakukan aturan DNS sebagai aturan firewall (pengujian)</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">Pemblokiran DNS akan dilewati selama resolusi; keputusan akan dibuat pada saat penyambungan.</string>
     <string name="univ_firewall_rule_11" translatable="true">Blokir semua sambungan host lokal</string>
     <string name="firewall_rule_private_dns" translatable="true">DNS Pribadi</string>
     <string name="firewall_rule_bypass_proxy" translatable="true">Proksi Bypass</string>

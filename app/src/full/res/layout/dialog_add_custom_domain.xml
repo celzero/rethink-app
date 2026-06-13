@@ -126,7 +126,7 @@
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/dacd_input_layout" />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/dacd_block_btn"
         style="@style/Widget.Material3.Button.TextButton.Dialog"
         android:layout_width="wrap_content"
@@ -138,7 +138,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dacd_failure_text" />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/dacd_cancel_btn"
         style="@style/Widget.Material3.Button.TextButton.Dialog"
         android:layout_width="wrap_content"
@@ -151,7 +151,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dacd_failure_text" />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/dacd_trust_btn"
         style="@style/Widget.Material3.Button.TextButton.Dialog"
         android:layout_width="wrap_content"

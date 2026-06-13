@@ -425,7 +425,6 @@
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">RDNS+ engedélyezése</string>
     <string name="hsf_exclude_error" translatable="true">Zárolt VPN módban, a kizárás nem lehetséges</string>
     <string name="hsf_proxy_chip_removed_toast" translatable="true">Proxy eltávolítva</string>
-    <string name="hsf_proxy_chip_remove_text" translatable="true">Leállítás…</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Csomagrögzítés letiltva</string>
     <string name="hsf_whats_new_remove_text" translatable="true">Bezárás…</string>
     <string name="hsf_blocklist_updating_text" translatable="true">Engedélyezés…</string>
@@ -1054,8 +1053,6 @@
     <string name="dc_filtering_heading" translatable="true">szűrés</string>
     <string name="cd_split_dns_heading" translatable="true">Split DNS (kísérleti)</string>
     <string name="cd_split_dns_desc" translatable="true">A proxyn keresztül irányított alkalmazások DNS-lekérdezéseinek továbbítása a proxy DNS-kiszolgálóihoz.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">A DNS-szabályok kezelése tűzfalszabályként (kísérleti)</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">A DNS-blokkolás a feloldás során nem érvényesül; a kapcsolódáskor dől el, hogy engedélyezett-e.</string>
     <string name="univ_firewall_rule_11" translatable="true">Helyi kapcsolatok blokkolása</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">Összes tartományszabály törlése?</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">A szabályok törlésével bármely alkalmazás csatlakozhatna az eddig blokkolt tartományokhoz.</string>

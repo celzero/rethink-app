@@ -427,7 +427,6 @@
     <string name="firewall_status_block_metered" translatable="true">חסום ברשתות מדודות (סלולריות).</string>
     <string name="hsf_vpn_dialog_message" translatable="true">Rethink זקוק להרשאה להגדיר VPN מקומי כדי להצפין את בקשות ה-DNS של המכשיר, לפקח על הרשת ולאכוף כללי חומת אש.\n\nRethink לא אוסף שום מידע ולא מרגל אחרי משתמשים בשום צורה.</string>
     <string name="hsf_vpn_prepare_failure" translatable="true">או שהרשאת VPN חסרה, או שאפליקציה אחרת נמצאת במצב VPN תמיד פועל.</string>
-    <string name="hsf_proxy_chip_remove_text" translatable="true">עוצר…</string>
     <string name="about_settings" translatable="true">מערכת</string>
     <string name="about_settings_app_info" translatable="true">מידע על האפליקציה</string>
     <string name="cd_dns_crypt_relay_heading" translatable="true">ממסר</string>

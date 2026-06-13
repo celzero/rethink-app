@@ -1083,7 +1083,7 @@
                             style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="DNS to bypass" />
+                            android:text="@string/bfdm_heading" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_block_free_dns_desc"
@@ -1091,7 +1091,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="3dp"
-                            android:text="@string/dc_block_free_dns_desc"
+                            android:text=""
                             android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
 

@@ -76,12 +76,7 @@ class FirewallAppListAdapter(
                     oldConnection: AppInfo
                 ): Boolean {
                     return oldConnection.uid == newConnection.uid &&
-                            oldConnection.packageName == newConnection.packageName &&
-                            oldConnection.appName == newConnection.appName
-                            && oldConnection.tombstoneTs == newConnection.tombstoneTs
-                            && oldConnection.isProxyExcluded == newConnection.isProxyExcluded
-                            && oldConnection.firewallStatus == newConnection.firewallStatus
-                            && oldConnection.connectionStatus == newConnection.connectionStatus
+                            oldConnection.packageName == newConnection.packageName
                 }
 
                 override fun areContentsTheSame(
@@ -137,14 +132,6 @@ class FirewallAppListAdapter(
                         b.firewallAppLabelTv.alpha = ALPHA_DISABLED
                         b.firewallAppIconIv.alpha = ALPHA_DISABLED
                     }
-                    if (appInfo.packageName == context.packageName) {
-                        b.firewallAppToggleWifi.visibility = View.GONE
-                        b.firewallAppToggleMobileData.visibility = View.GONE
-                        b.firewallAppToggleOther.text =
-                            context.getString(R.string.firewall_status_allow)
-                        return@uiCtx
-                    }
-
                     b.firewallAppToggleWifi.visibility = View.VISIBLE
                     b.firewallAppToggleMobileData.visibility = View.VISIBLE
                     // strike through the app name if the app is tombstoned

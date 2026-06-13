@@ -1178,6 +1178,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.errorRetryBtn.isEnabled = false
         b.errorRetryBtn.isClickable = false
         b.errorRetryBtn.setOnClickListener(null)
+        b.errorResetBtn.isEnabled = false
+        b.errorResetBtn.isClickable = false
+        b.errorResetBtn.setOnClickListener(null)
 
         b.serverCountLayout.isVisible = false
 
@@ -1201,6 +1204,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
         b.errorRetryBtn.isEnabled = true
         b.errorRetryBtn.isClickable = true
+        b.errorResetBtn.isEnabled = true
+        b.errorResetBtn.isClickable = true
+
         b.serverCountLayout.isVisible = true
 
         updateConnectionStatus(deriveConnectionUiState())
@@ -1349,11 +1355,33 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             b.errorRetryBtn.isClickable = false
             b.errorRetryBtn.text = getString(R.string.ssv_toast_start_rethink)
             b.errorRetryBtn.setOnClickListener(null)
+            b.errorResetBtn.isEnabled = false
+            b.errorResetBtn.isClickable = false
+            b.errorResetBtn.isVisible = false
+            b.errorResetBtn.setOnClickListener(null)
         } else {
             b.errorRetryBtn.isEnabled = true
             b.errorRetryBtn.isClickable = true
             b.errorRetryBtn.text = getString(R.string.server_selection_error_retry)
+            b.errorResetBtn.isEnabled = true
+            b.errorResetBtn.isClickable = true
             b.errorRetryBtn.setOnClickListener { retryLoadingServers() }
+            b.errorResetBtn.setOnClickListener {
+                serverSelectionViewModel.reset()
+                showRpnResetDialog()
+            }
+
+            // reset button to be shown in error only when there is an error and
+            // VpnController.testRpnProxy() is returned as true
+            b.errorResetBtn.isVisible = false
+            io {
+                val shouldShowReset = VpnController.testRpnProxy()
+                uiCtx {
+                    if (isAdded && b.errorStateContainer.isVisible && !noTunnel) {
+                        b.errorResetBtn.isVisible = shouldShowReset
+                    }
+                }
+            }
         }
     }
 
@@ -1391,6 +1419,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         }
 
         b.errorRetryBtn.isEnabled = false
+        b.errorResetBtn.isEnabled = false
         b.errorRetryBtn.text = getString(R.string.lbl_connecting)
 
         SnackbarHelper.dismiss()
@@ -1413,7 +1442,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 emptySet()
             }
             val servers = try {
-                val refreshed = RpnProxyManager.updateWinProxy(userRequest = true)
+                val refreshed = RpnProxyManager.updateWinProxy()
                 if (!refreshed.isNullOrEmpty()) refreshed
                 else RpnProxyManager.getWinServers()
             } catch (t: Throwable) {
@@ -1428,6 +1457,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             uiCtx {
                 if (!isAdded) return@uiCtx
                 b.errorRetryBtn.isEnabled = true
+                b.errorResetBtn.isEnabled = true
                 b.errorRetryBtn.text = getString(R.string.server_selection_error_retry)
                 when {
                     // WIN not yet registered or server list still empty; check tunnel first.
@@ -1853,9 +1883,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             return
         }
 
-        val now           = System.currentTimeMillis()
+        val now = System.currentTimeMillis()
         val billingExpiry = sub.billingExpiry
-        val hasExpiry     = billingExpiry > 0L && billingExpiry != Long.MAX_VALUE
+        val hasExpiry = billingExpiry > 0L && billingExpiry != Long.MAX_VALUE
 
         // Determine product type (one-time vs recurring subscription)
         val isOneTime = sub.productId.contains("onetime", ignoreCase = true) ||
@@ -1885,9 +1915,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         }
 
         if (!showDateRow) {
-            // Active SUBS: replace date with a clean "managed by Play" hint
-            b.tvExpiryLabel.text = getString(R.string.subscription_label)
-            b.tvExpiryDate.text  = getString(R.string.server_selection_sub_managed_by_play)
+            b.tvExpiryLabel.text = getString(R.string.lbl_plan)
+            b.tvExpiryDate.text  = sub.planId.capitalizeWords()
             b.tvDaysRemaining.isVisible = false
         } else if (!hasExpiry) {
             // Date row needed but expiry not yet known
@@ -1974,8 +2003,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         Logger.i(LOG_TAG_UI, "$TAG.maybeShowResubscribePrompt: showing resubscribe prompt for status: ${statusState.name} productId=${purchaseDetail.productId}, planId=${purchaseDetail.planId}")
 
         try {
-            ManageRpnPurchaseBtmSht.newInstance()
-                .show(childFragmentManager, "resubscribe")
+            ManageRpnPurchaseBtmSht.newInstance().show(childFragmentManager, "resubscribe")
         } catch (e: Exception) {
             Logger.e(LOG_TAG_UI, "$TAG.maybeShowResubscribePrompt: error showing sheet: ${e.message}", e)
             resubscribePromptShown = false  // allow retry on next emission

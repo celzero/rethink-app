@@ -46,6 +46,7 @@ import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
+import com.celzero.bravedns.scheduler.BugReportZipper.FLIGHT_RECORDER_DIR_NAME
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.BraveVPNService.Companion.NW_ENGINE_NOTIFICATION_ID
 import com.celzero.bravedns.service.EventLogger
@@ -53,7 +54,6 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.RethinkBlocklistManager
-import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.AntiCensorshipActivity
 import com.celzero.bravedns.ui.activity.AppLockActivity
@@ -80,6 +80,7 @@ import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.Client
 import com.celzero.firestack.backend.DNSResolver
 import com.celzero.firestack.backend.DNSTransport
+import com.celzero.firestack.backend.GoMetrics
 import com.celzero.firestack.backend.NetStat
 import com.celzero.firestack.backend.Proxies
 import com.celzero.firestack.backend.Proxy
@@ -93,11 +94,12 @@ import com.celzero.firestack.intra.DefaultDNS
 import com.celzero.firestack.intra.Intra
 import com.celzero.firestack.intra.Tunnel
 import com.celzero.firestack.settings.Settings
-import go.Seq
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.component.KoinComponent
@@ -105,6 +107,8 @@ import org.koin.core.component.inject
 import java.io.File
 import java.net.URI
 import java.net.URLEncoder
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -181,7 +185,8 @@ class GoVpnAdapter : KoinComponent {
         setAutoDialsParallel()
         setAutoMode()
         registerSeProxyIfNeeded()
-        if (DEBUG) panicAtRandom(persistentState.panicRandom) else panicAtRandom(false)
+        setFloodWgMode()
+        onLowMemory()
         Logger.v(LOG_TAG_VPN, "$TAG initResolverProxiesPcap done")
     }
 
@@ -1354,7 +1359,24 @@ class GoVpnAdapter : KoinComponent {
         Logger.i(LOG_TAG_VPN, "$TAG close connection: $connIds, res: $res")
     }
 
+    private suspend fun refreshWgProxy(id: String) {
+        if (!tunnel.isConnected) {
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip refreshing wg")
+            return
+        }
+
+        try {
+            getProxies()?.getProxy(id)?.refresh()
+            Logger.i(LOG_TAG_VPN, "$TAG wg proxy refreshed: $id")
+            logEvent(Severity.LOW, "refresh wg proxy", "refreshed wg proxy with id: $id")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "$TAG err refreshing wg proxy: ${e.message}", e)
+            logEvent(Severity.HIGH, "refresh wg proxy error", "err refreshing wg proxy with id: $id, reason: ${e.message}" )
+        }
+    }
+
     suspend fun refreshOrPauseOrResumeOrReAddProxies(isMobileActive: Boolean, ssid: String) {
+        val avoidReaddingProxies = true
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip refreshing proxies")
             return
@@ -1400,7 +1422,11 @@ class GoVpnAdapter : KoinComponent {
                     // re-adding those proxies seems working, work around for now until the
                     // re-add logic is handled in go-tun
                     // (github.com/celzero/firestack/blob/61187f88c1/intra/ipn/wgproxy.go#L404)
-                    addWgProxy(id, true)
+                    if (avoidReaddingProxies) {
+                        refreshWgProxy(id)
+                    } else {
+                        addWgProxy(id, true)
+                    }
                 }
                 if (stats == Backend.TPU && canResume) {
                     // if the proxy is paused, then resume it
@@ -1409,16 +1435,31 @@ class GoVpnAdapter : KoinComponent {
                     // or ssid change for ssidEnabled wgs
                     val res = resumeWireguard(id)
                     Logger.i(LOG_TAG_VPN, "$TAG resumed proxy: $id, res: $res")
+                    logEvent(
+                        Severity.LOW,
+                        "wireguard proxy resumed",
+                        "Wireguard proxy with id $id resumed"
+                    )
                 } else if (isWireGuardMobileOnly && !isMobileActive && !canResume) {
                     // if the proxy is not paused, then pause it
                     // this is needed when the network is on mobile data
                     // and the wg-config is set to useOnlyOnMetered
                     val res = pauseWireguard(id)
                     Logger.i(LOG_TAG_VPN, "$TAG paused proxy (mobile): $id, res: $res")
+                    logEvent(
+                        Severity.LOW,
+                        "wireguard proxy paused",
+                        "Wireguard proxy with id $id paused, reason: mobile data"
+                    )
                 } else if (useOnlyOnSsid && !ssidMatch && !canResume) {
                     // when the ssidEnabled is set and the ssid does not match
                     val res = pauseWireguard(id)
                     Logger.i(LOG_TAG_VPN, "$TAG paused proxy (ssid): $id, res: $res")
+                    logEvent(
+                        Severity.LOW,
+                        "wireguard proxy paused",
+                        "Wireguard proxy with id $id paused, reason: ssid mismatch"
+                    )
                 }
 
                 if (stats == Backend.TPU && !isWireGuardMobileOnly && !useOnlyOnSsid) {
@@ -1445,11 +1486,28 @@ class GoVpnAdapter : KoinComponent {
                 val rpn = getWinByKey(key)
                 val status = rpn?.status()
                 if (status == Backend.TNT) {
-                    reconnectRpnProxy(key)
+                    if (avoidReaddingProxies) {
+                        refreshRpnProxy(key)
+                        Logger.i(LOG_TAG_VPN, "$TAG refreshed rpn proxy: $key")
+                        logEvent(
+                            Severity.LOW,
+                            "refresh rpn proxy",
+                            "refreshed rpn proxy with key: $key"
+                        )
+                    } else {
+                        reconnectRpnProxy(key)
+                        Logger.i(LOG_TAG_VPN, "$TAG re-added rpn proxy: $key")
+                        logEvent(
+                            Severity.LOW,
+                            "re-add rpn proxy",
+                            "re-added rpn proxy with key: $key"
+                        )
+                    }
                 }
             }
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG err refreshing proxies: ${e.message}", e)
+            logEvent(Severity.HIGH, "refresh proxies error", "err refreshing proxies, reason: ${e.message}")
         }
     }
 
@@ -1470,7 +1528,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun getWireGuardStats(id: String): WireguardManager.WgStats? {
         return try {
-            withTimeoutOrNull(1_500L) {
+            withTimeoutOrNull(1_500L.milliseconds) {
                 val proxy = getProxies()?.getProxy(id)
                 val status = proxy?.status()
 
@@ -1493,7 +1551,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun getRpnStats(id: String): WireguardManager.WgStats? {
         return try {
-            withTimeoutOrNull(1_500L) {
+            withTimeoutOrNull(1_500L.milliseconds) {
                 val rpn = getWinByKey(id)
                 val status = rpn?.status()
 
@@ -2123,7 +2181,7 @@ class GoVpnAdapter : KoinComponent {
             return ""
         }
 
-        fun setLogLevel(l1: Int, l2: Int = Logger.uiLogLevel.toInt()) {
+        fun setLogLevel(l1: Int, l2: Int = Logger.uiLogLevel.toInt(), includeFileTrace: Boolean) {
             // 0 - very verbose, 1 - verbose, 2 - debug, 3 - info, 4 - warn, 5 - error, 6 - stacktrace, 7 - user, 8 - none
             // from UI, if none is selected, set the log level to 7 (user), usr will send only
             // user notifications
@@ -2131,8 +2189,49 @@ class GoVpnAdapter : KoinComponent {
             // to 8 (none)
             val goLogLevel = if (l1 == 7) 8 else l1
             val consoleLogLevel = if (l2 == 7) 8 else l2
-            Intra.logLevel(goLogLevel, consoleLogLevel)
-            Logger.i(LOG_TAG_VPN, "$TAG set go-log level: $l1, $l2")
+            // depth to include the file trace, 9 - max, 1 - min
+            val depth = if (includeFileTrace) 9 else 1
+            Intra.logLevel(goLogLevel, consoleLogLevel, depth)
+            //Intra.logLevel(goLogLevel, consoleLogLevel)
+            Logger.i(LOG_TAG_VPN, "$TAG set go-log level: $l1, $l2, $depth")
+        }
+
+        suspend fun printStack(): String {
+            // where=0: stdout, where=1: console (no bytes returned by Go),
+            // any other value: returns goroutine stacks as bytes.
+            val where = 2
+            return withContext(Dispatchers.IO) {
+                try {
+                    val bytes = Intra.printStack(where)
+                    if (bytes == null || bytes.isEmpty()) {
+                        Logger.w(LOG_TAG_VPN, "$TAG print stack: null or empty")
+                        return@withContext ""
+                    }
+                    // The buffer may be zero-padded at the tail; trim trailing null bytes.
+                    val end = bytes.indexOfLast { it != 0.toByte() }
+                    if (end < 0) {
+                        Logger.w(LOG_TAG_VPN, "$TAG print stack: buffer entirely zero-padded")
+                        return@withContext ""
+                    }
+                    val content = bytes.copyOfRange(0, end + 1)
+                    Logger.i(LOG_TAG_VPN, "$TAG print stack: ${content.size} bytes (buffer=${bytes.size})")
+                    String(content, Charsets.UTF_8)
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_VPN, "$TAG err print stack: ${e.message}")
+                    ""
+                }
+            }
+        }
+
+        fun getGoMetrics(): GoMetrics? {
+            return try {
+                val stat = Intra.goMet()
+                Logger.i(LOG_TAG_VPN, "$TAG net stat: $stat")
+                stat
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_VPN, "$TAG err getting net stat: ${e.message}")
+                null
+            }
         }
     }
 
@@ -2259,9 +2358,9 @@ class GoVpnAdapter : KoinComponent {
     }
 
     suspend fun onLowMemory() {
-        val limitBytes: Long = 512 * 1024 * 1024 // 512MB
+        val limitBytes: Long = persistentState.goMaxMemory
         Intra.lowMem(limitBytes)
-        logEvent(Severity.CRITICAL, "low memory", "notified go of low memory with limit: $limitBytes bytes")
+        logEvent(Severity.MEDIUM, "low memory", "set memory limit to ${limitBytes/(1024 * 1024)} MB")
         Logger.i(LOG_TAG_VPN, "$TAG low memory, called Intra.lowMem()")
     }
 
@@ -2269,7 +2368,8 @@ class GoVpnAdapter : KoinComponent {
         mode: Int = persistentState.dialStrategy,
         retry: Int = persistentState.retryStrategy,
         tcpKeepAlive: Boolean = persistentState.tcpKeepAlive,
-        timeoutSec: Int = persistentState.dialTimeoutSec
+        timeoutSec: Int = persistentState.dialTimeoutSec,
+        bufferSize: Int = persistentState.socketBufferSizeBytes
     ) {
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip set dial strategy")
@@ -2277,15 +2377,15 @@ class GoVpnAdapter : KoinComponent {
             return
         }
         try {
-            Settings.setDialerOpts(mode, retry, timeoutSec, tcpKeepAlive)
+            Settings.setDialerOpts(mode, retry, bufferSize, timeoutSec, tcpKeepAlive)
             Logger.i(
                 LOG_TAG_VPN,
-                "$TAG set dial strategy: $mode, retry: $retry, tcpKeepAlive: $tcpKeepAlive, timeout: $timeoutSec"
+                "$TAG set dial strategy: $mode, retry: $retry, tcpKeepAlive: $tcpKeepAlive, timeout: $timeoutSec, bufSize: $bufferSize"
             )
             logEvent(
                 Severity.LOW,
                 "dial strategy",
-                "set dial strategy to: mode=$mode, retry=$retry, tcpKeepAlive=$tcpKeepAlive, timeout=$timeoutSec"
+                "set dial strategy to: mode=$mode, retry=$retry, tcpKeepAlive=$tcpKeepAlive, timeout=$timeoutSec, bufSize: $bufferSize"
             )
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG err set dial strategy: ${e.message}", e)
@@ -2430,7 +2530,7 @@ class GoVpnAdapter : KoinComponent {
             return null
         }
         try {
-            if (tunnel.proxies.rpn().win() != null && prevBytes != null) {
+            if (tunnel.proxies.rpn().win() != null) {
                 Logger.i(LOG_TAG_PROXY, "$TAG win(rpn) already registered")
                 return null
             }
@@ -2460,6 +2560,7 @@ class GoVpnAdapter : KoinComponent {
         } else {
             rpnOps.setDNSConfig(dnsConfig)
         }
+        rpnOps.excludeCCs = persistentState.rpnAutoExcludedCcs
         // no need to check for config in AUTO mode
         if (!persistentState.rpnConfigHandlingManual) {
             Logger.v(LOG_TAG_PROXY, "$TAG, using default RpnOps config: $rpnOps")
@@ -2469,7 +2570,6 @@ class GoVpnAdapter : KoinComponent {
         // for now remove the permanent config, always send false
         // persistentState.rpnUsePermanentConfig is not used
         rpnOps.setPermaCreds(false)
-        rpnOps.excludeCCs = persistentState.rpnAutoExcludedCcs
         rpnOps.setRotateCreds(persistentState.rpnAlwaysChangeIdentity)
         rpnOps.setPort(persistentState.rpnPort)
         Logger.v(LOG_TAG_PROXY, "$TAG, using custom RpnOps config: $rpnOps")
@@ -2544,6 +2644,8 @@ class GoVpnAdapter : KoinComponent {
             } else {
                 tunnel.proxies.rpn().win().get(id).refresh()
             }
+            // refresh the dns resolvers regardless of split dns
+            refreshResolvers()
             Logger.i(LOG_TAG_PROXY, "$TAG refreshed rpn proxy $id")
             true
         } catch (e: Exception) {
@@ -2969,6 +3071,24 @@ class GoVpnAdapter : KoinComponent {
         // automatically
     }
 
+    suspend fun setFloodWgMode() {
+        if (!tunnel.isConnected) {
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip set flood wg mode")
+            return
+        }
+        try {
+            Intra.floodWireGuard(persistentState.floodWireGuard)
+            Logger.i(LOG_TAG_VPN, "$TAG set flood wg mode: ${persistentState.floodWireGuard}")
+            logEvent(
+                Severity.LOW,
+                "tun: set flood wg mode",
+                "Set flood wg mode to ${persistentState.floodWireGuard}"
+            )
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "$TAG err set flood wg mode: ${e.message}", e)
+        }
+    }
+
     suspend fun unregisterSeProxyIfNeeded() {
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_PROXY, "$TAG no tunnel, skip unregister se proxy")
@@ -3277,78 +3397,6 @@ class GoVpnAdapter : KoinComponent {
         // fastest is another strategy, which is not used for now (v055n)
         Settings.setPlusStrategy(Settings.PlusFilterSafest)
         return tunnel
-    }
-
-    suspend fun panicAtRandom(shouldPanic: Boolean = persistentState.panicRandom) {
-        if (!tunnel.isConnected) {
-            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip panic at random")
-            return
-        }
-        try {
-            Intra.panicAtRandom(shouldPanic)
-            Logger.i(LOG_TAG_VPN, "$TAG panic at random: $shouldPanic")
-            logEvent(Severity.LOW, "panic at random", "panic at random: $shouldPanic")
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "$TAG err panic at random: ${e.message}")
-            logEvent(Severity.HIGH, "panic at random", "error panic at random: ${e.message}")
-        }
-    }
-
-    suspend fun performFlightRecording() {
-        if (!DEBUG) return
-        if (!tunnel.isConnected) {
-            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip start flight recorder")
-            return
-        }
-
-        try {
-            Intra.flightRecorder(true)
-            // 10 secs delay before stopping the flight recorder
-            delay(10 * 1000L)
-            val logs = Intra.printFlightRecord(true)
-            // write the logs to a file
-            val fileName = "fltrcdr_${System.currentTimeMillis()}.pprof"
-            val path = context.filesDir.toString() + "/" + "flightrecorder" + "/" + fileName
-            val file = File(path)
-            file.parentFile?.mkdirs()
-            Utilities.writeToFile(file, logs)
-            Logger.i(LOG_TAG_VPN, "$TAG flight recorder logs written to: $path")
-            Intra.flightRecorder(false)
-            Logger.i(LOG_TAG_VPN, "$TAG started flight recorder")
-            logEvent(Severity.LOW, "Flight recorder completed", "Logs written to: $path")
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "$TAG err start flight recorder: ${e.message}")
-            try {
-                Intra.flightRecorder(false)
-            } catch (_: Exception) { }
-        }
-    }
-
-    suspend fun printStack(): String {
-        // where=0: stdout, where=1: console (no bytes returned by Go),
-        // any other value: returns goroutine stacks as bytes.
-        val where = 2
-        return withContext(Dispatchers.IO) {
-            try {
-                val bytes = Intra.printStack(where)
-                if (bytes == null || bytes.isEmpty()) {
-                    Logger.w(LOG_TAG_VPN, "$TAG print stack: null or empty")
-                    return@withContext ""
-                }
-                // The buffer may be zero-padded at the tail; trim trailing null bytes.
-                val end = bytes.indexOfLast { it != 0.toByte() }
-                if (end < 0) {
-                    Logger.w(LOG_TAG_VPN, "$TAG print stack: buffer entirely zero-padded")
-                    return@withContext ""
-                }
-                val content = bytes.copyOfRange(0, end + 1)
-                Logger.i(LOG_TAG_VPN, "$TAG print stack: ${content.size} bytes (buffer=${bytes.size})")
-                String(content, Charsets.UTF_8)
-            } catch (e: Exception) {
-                Logger.e(LOG_TAG_VPN, "$TAG err print stack: ${e.message}")
-                ""
-            }
-        }
     }
 
     fun tunMtu(): Int {

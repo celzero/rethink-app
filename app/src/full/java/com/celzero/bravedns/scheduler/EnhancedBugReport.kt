@@ -43,12 +43,15 @@ object EnhancedBugReport : KoinComponent {
 
 
     // GoLogFileDescriptorReader2 → golog_<ts>.txt   (Go runtime log lines)
-    const val PREFIX_GO_LOG    = "golog_"
+    const val PREFIX_GO_LOG = "golog_"
     // GoCrashFileDescriptorReader → gocrash_<ts>.txt (Go runtime panic dump)
-    const val PREFIX_GO_CRASH  = "gocrash_"
+    const val PREFIX_GO_CRASH = "gocrash_"
     // EnhancedBugReport (Kotlin/JVM) → kotlin_<ts>.txt
-    const val PREFIX_KOTLIN    = "kotlin_"
-    const val FILE_EXTENSION   = ".txt"
+    const val PREFIX_KOTLIN = "kotlin_"
+
+    const val PREFIX_FLIGHT_REC = "flt_"
+    const val FILE_EXTENSION = ".txt"
+    const val FLIGHT_REC_EXT = ".pprof"
 
     // Total cap across ALL three file types in the tombstone folder.
     // When Firebase is OFF, files accumulate up to this limit before the oldest are deleted.
@@ -85,6 +88,9 @@ object EnhancedBugReport : KoinComponent {
     /** Returns a new File for a Go crash dump (gocrash_<ts>.txt). */
     fun newGoCrashFile(context: Context): File? =
         newTombstoneFile(context, PREFIX_GO_CRASH)
+
+    fun newFlightRecorderFile(context: Context): File? =
+        newTombstoneFile(context, PREFIX_FLIGHT_REC)
 
     /** Returns a new File for a Kotlin/JVM crash log (kotlin_<ts>.txt). */
     fun newKotlinCrashFile(context: Context): File? =
@@ -382,12 +388,13 @@ object EnhancedBugReport : KoinComponent {
 
     private fun newTombstoneFile(context: Context, prefix: String): File? {
         val folder = tombstoneFolder(context.filesDir) ?: return null
-        val file = File(folder, "$prefix${System.currentTimeMillis()}$FILE_EXTENSION")
+        val extn = if (prefix == PREFIX_FLIGHT_REC) FLIGHT_REC_EXT else FILE_EXTENSION
+        val file = File(folder, "$prefix${System.currentTimeMillis()}$extn")
         return try {
             if (file.createNewFile()) {
                 // Register golog_ / gocrash_ files immediately so reportTombstonesToFirebaseOnStartup
                 // never touches them, regardless of when it runs relative to file creation.
-                if (prefix == PREFIX_GO_LOG || prefix == PREFIX_GO_CRASH) {
+                if (prefix == PREFIX_GO_LOG || prefix == PREFIX_GO_CRASH || prefix == PREFIX_FLIGHT_REC) {
                     markFileAsActive(file.name)
                 }
                 file

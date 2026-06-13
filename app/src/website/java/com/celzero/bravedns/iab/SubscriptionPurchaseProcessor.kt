@@ -258,11 +258,12 @@ internal class SubscriptionPurchaseProcessor(
 
         if (purchase.isAcknowledged) {
             // Fully settled, drive state machine directly, no server call needed.
+            // paymentSuccessful -> handlePaymentSuccessful handles DB upsert
+            // and RPN activation (including its dedup guard).
             logd(mname, "SUBS already acknowledged, notifying state machine")
             try {
                 val pd = buildPurchaseDetail(purchase) ?: return
                 subscriptionStateMachine.paymentSuccessful(pd)
-                withContext(Dispatchers.IO) { activateRpn(pd) }
             } catch (e: Exception) {
                 loge(mname, "error processing acknowledged SUBS: ${e.message}", e)
                 safeNotifyFailed("Error processing acknowledged SUBS: ${e.message}", null)
@@ -307,12 +308,14 @@ internal class SubscriptionPurchaseProcessor(
                 payload = if (ackOk && developerPayload.isNotEmpty()) developerPayload
                 else pd.payload
             )
-            subscriptionStateMachine.completePurchase(pdWithPayload)
 
             if (ackOk) {
                 logd(mname, "SUBS token=${purchase.purchaseToken.take(8)} server ack succeeded")
+                // paymentSuccessful -> handlePaymentSuccessful handles the full DB
+                // upsert, state-machine transition to Active, and RPN activation.
+                // Skip completePurchase to prevent a redundant DB write + the
+                // transient PurchasePending state between the two calls.
                 subscriptionStateMachine.paymentSuccessful(pdWithPayload)
-                withContext(Dispatchers.IO) { activateRpn(pdWithPayload) }
             } else {
                 loge(mname, "SUBS token=${purchase.purchaseToken.take(8)} server ack failed, payload: $developerPayload")
                 subscriptionStateMachine.purchaseFailed(
@@ -349,12 +352,10 @@ internal class SubscriptionPurchaseProcessor(
         return true
     }
 
-    /** Maps a SUBS plan/product id to its revoke-window in days. */
-    private fun resolveRevokeDays(productId: String)= when (productId)  {
-        InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
-        InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_5YRS_DAYS
-        InAppBillingHandler.ONE_TIME_PRODUCT_ID -> InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
-        InAppBillingHandler.ONE_TIME_TEST_PRODUCT_ID -> InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
+    private fun resolveRevokeDays(planId: String): Int = when {
+        planId == InAppBillingHandler.SUBS_PRODUCT_YEARLY -> InAppBillingHandler.REVOKE_WINDOW_SUBS_YEARLY_DAYS
+        planId.contains("yearly", ignoreCase = true) -> InAppBillingHandler.REVOKE_WINDOW_SUBS_YEARLY_DAYS
+        planId.contains("annual", ignoreCase = true) -> InAppBillingHandler.REVOKE_WINDOW_SUBS_YEARLY_DAYS
         else -> InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
     }
 

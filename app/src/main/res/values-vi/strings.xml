@@ -401,7 +401,6 @@
     <string name="hsf_vpn_dialog_message" translatable="true">Rethink cần có quyền thiết lập VPN cục bộ để mã hoá các yêu cầu DNS, triển khai trình giám sát mạng và thực thi các quy tắc tường lửa.\n\nRethink không thu thập thông tin hay theo dõi bạn dưới bất kì hình thức nào.</string>
     <string name="about_mail_bugreport_text" translatable="true">Gửi email này tới : hello@celzero.com</string>
     <string name="about_mail_bugreport_share_title" translatable="true">Chọn nhà cung cấp email</string>
-    <string name="hsf_proxy_chip_remove_text" translatable="true">Đang dừng…</string>
     <string name="hsf_pause_vpn_failure" translatable="true">Không thể dừng: Rethink đang không hoạt động</string>
     <string name="hsf_proxy_chip_removed_toast" translatable="true">Đã xoá proxy</string>
     <string name="about_mail_to" translatable="true">hello@celzero.com</string>
@@ -706,7 +705,6 @@
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Sử dụng DNS hệ thống cho những tên miền không được chuyển giao như <i>.lan</i>, <i>.internal</i>,...</string>
     <string name="cd_split_dns_heading" translatable="true">Tách DNS (thử nghiệm)</string>
     <string name="cd_split_dns_desc" translatable="true">Chuyển hướng yêu cầu DNS từ những ứng dụng có proxy tới máy chủ DNS của proxy.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">Coi quy tắc DNS như quy tắc tường lửa (thử nghiệm)</string>
     <string name="univ_firewall_rule_11" translatable="true">Chặn mọi kết nối máy chủ cục bộ</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">Xóa tất cả Quy tắc Tên miền?</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">Việc xóa những quy tắc trên sẽ cho phép bất kì ứng dụng nào truy cập vào những Tên miền hiện đang bị chặn.</string>
@@ -745,7 +743,6 @@
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Các ứng dụng chuyển tiếp Proxy Vòng lặp ngược</string>
     <string name="settings_theme_dialog_themes_7" translatable="true">Đóng băng</string>
     <string name="dc_filtering_heading" translatable="true">Lọc</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">Bỏ qua chặn DNS khi phân giải tên miền; quy tắc chặn sẽ được áp dụng khi bắt đầu kết nối.</string>
     <string name="firewall_rule_bypass_dns_firewall" translatable="true">Ứng dụng được bỏ qua</string>
     <string name="firewall_rule_block_app_new_install" translatable="true">Ứng dụng mới</string>
     <string name="firewall_rule_block_app_exception" translatable="true">Lỗi</string>

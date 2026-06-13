@@ -20,7 +20,7 @@ import Logger.LOG_TAG_BUG_REPORT
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.database.ConsoleLogDAO
+import com.celzero.bravedns.database.ConsoleLogRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
@@ -36,7 +36,7 @@ import java.util.zip.ZipOutputStream
 class LogExportWorker(context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams), KoinComponent {
 
-    private val consoleLogDao by inject<ConsoleLogDAO>()
+    private val logDb by inject<ConsoleLogRepository>()
 
     companion object {
         private const val CHUNK_SIZE = 5_000
@@ -59,7 +59,7 @@ class LogExportWorker(context: Context, workerParams: WorkerParameters) :
      * This avoids building a single giant StringBuilder in memory, which previously caused
      * GC pauses / OOM when log tables held millions of rows.
      */
-    private fun exportLogsChunked(filePath: String): Boolean {
+    private suspend fun exportLogsChunked(filePath: String): Boolean {
         return try {
             val file = File(filePath)
 
@@ -81,11 +81,11 @@ class LogExportWorker(context: Context, workerParams: WorkerParameters) :
                 val writer = BufferedWriter(OutputStreamWriter(zos, Charsets.UTF_8), 64 * 1024)
                 var offset = 0
                 var totalRows = 0
-
+                var lastId = 0
                 while (true) {
-                    val chunk = consoleLogDao.getLogsChunked(CHUNK_SIZE, offset)
+                    val chunk = logDb.getLogsChunked(lastId, CHUNK_SIZE, offset)
                     if (chunk.isEmpty()) break
-
+                    lastId = chunk.lastOrNull()?.id ?: lastId
                     for (log in chunk) {
                         val safeMessage = log.message.replace("\n", "\\n").replace("\r", "\\r")
                         writer.write(log.timestamp.toString())

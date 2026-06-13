@@ -514,7 +514,6 @@
     <string name="hsf_blocklist_chip_text_no_data">RDNS+ aktivieren</string>
     <string name="hsf_exclude_error">Ausschließen im VPN-Sperrmodus nicht möglich</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy entfernt</string>
-    <string name="hsf_proxy_chip_remove_text">Anhalten…</string>
     <string name="hsf_whats_new_remove_text">Schließen…</string>
     <string name="hsf_blocklist_updating_text">Aktivieren…</string>
     <string name="hsf_chip_appearance">Thema: %1$s</string>
@@ -1078,7 +1077,6 @@
     <string name="settings_biometric_dialog_option_2" translatable="true">Nach 5 Minuten</string>
     <string name="settings_biometric_dialog_option_3" translatable="true">Nach 15 Minuten</string>
     <string name="cd_split_dns_heading" translatable="true">Split DNS (experimentell)</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">DNS-Regeln als Firewall-Regeln behandeln (experimentell)</string>
     <string name="lbl_experimental" translatable="true">(experimentell)</string>
     <string name="lbl_manual" translatable="true">Manuell</string>
     <string name="wireguard_title" translatable="true">Internet mit WireGuard absichern</string>
@@ -1102,7 +1100,6 @@
     <string name="hop_error_toast_msg_3" translatable="true">Deaktiviere den Mobile-only-oder-SSID-Modus, um Relays zu nutzen</string>
     <string name="lbl_fallback" translatable="true">Ausweichlösung</string>
     <string name="dc_filtering_heading" translatable="true">Filterung</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">DNS-Blockierung wird während der Auflösung umgangen; die Entscheidung wird zum Zeitpunkt der Verbindung getroffen.</string>
     <string name="univ_firewall_rule_11" translatable="true">Alle lokalen Host-Verbindungen blockieren</string>
     <string name="firewall_rule_bypass_proxy" translatable="true">Proxy umgehen</string>
     <string name="firewall_rule_paused_app" translatable="true">App angehalten</string>

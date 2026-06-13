@@ -526,7 +526,6 @@
     <string name="dns_mode_info_explanation_new">DNS isteklerini izleyin, engelleyin ve şifreleyin.</string>
     <string name="search_dns_logs"><font size="12">Alan adlarını veya IP\'leri arama</font></string>
     <string name="settings_http_proxy_dialog_title">Özel Sunucu URL\'si</string>
-    <string name="hsf_proxy_chip_remove_text">Durduruluyor…</string>
     <string name="hsf_pause_vpn_failure">Duraklatılamıyor: Rethink etkin değil</string>
     <string name="about_docs">Dokümanları okuyun</string>
     <string name="about_settings_notification">Bildirim ayarları</string>
@@ -1117,8 +1116,6 @@
     <string name="dc_filtering_heading" translatable="true">filtreleme</string>
     <string name="cd_split_dns_heading" translatable="true">Bölünmüş DNS (deneysel)</string>
     <string name="cd_split_dns_desc" translatable="true">Proxy kullanan uygulamaların DNS sorgularını proxy\'nin DNS sunucularına yönlendir.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">DNS kurallarını güvenlik duvarı kuralları olarak işle (deneysel)</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">DNS engellemesi çözümleme sırasında atlanacak; karar bağlantı anında verilecek.</string>
     <string name="univ_firewall_rule_11" translatable="true">Tüm yerel ana bilgisayar bağlantılarını engelle</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">Tüm Alan Adı Kuralları silinsin mi?</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">Bu kuralları silmek, herhangi bir uygulamanın şu anda engellenmiş Alan Adlarına bağlanmasına izin verecektir.</string>

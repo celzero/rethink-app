@@ -83,7 +83,7 @@
         android:clipToPadding="false"
         android:measureWithLargestChild="true">
 
-        <androidx.appcompat.widget.AppCompatButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/daci_cancel_btn"
             style="@style/Widget.Material3.Button.TextButton.Dialog"
             android:layout_width="0dp"
@@ -94,7 +94,7 @@
             android:textColor="?attr/accentGood"
             android:textSize="@dimen/large_font_text_view" />
 
-        <androidx.appcompat.widget.AppCompatButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/daci_trust_btn"
             style="@style/Widget.Material3.Button.TextButton.Dialog"
             android:layout_width="wrap_content"
@@ -103,7 +103,7 @@
             android:textColor="?attr/accentGood"
             android:textSize="@dimen/large_font_text_view" />
 
-        <androidx.appcompat.widget.AppCompatButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/daci_block_btn"
             style="@style/Widget.Material3.Button.TextButton.Dialog"
             android:layout_width="wrap_content"

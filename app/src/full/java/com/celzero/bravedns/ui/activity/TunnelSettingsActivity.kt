@@ -83,6 +83,19 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         // Alpha values for UI elements
         private const val ALPHA_ENABLED = 1f
         private const val ALPHA_DISABLED = 0.5f
+
+        // Socket buffer size values in bytes: 128 KB, 256 KB, 512 KB, 1 MB, 2 MB, 4 MB, 8 MB, 16 MB
+        private val SOCKET_BUFFER_SIZES_BYTES = longArrayOf(
+            128 * 1024L,   // 128 KB
+            256 * 1024L,   // 256 KB
+            512 * 1024L,   // 512 KB
+            1 * 1024 * 1024L,   // 1 MB
+            2 * 1024 * 1024L,   // 2 MB
+            4 * 1024 * 1024L,   // 4 MB
+            8 * 1024 * 1024L,   // 8 MB
+            16 * 1024 * 1024L   // 16 MB
+        )
+        private const val FOUR_MB_IN_BYTES = 4 * 1024 * 1024
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,7 +107,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
 
@@ -152,6 +165,8 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
 
         b.dvWgLockdownSwitch.isChecked = persistentState.wgGlobalLockdown
 
+        b.dvFloodWgSwitch.isChecked = persistentState.floodWireGuard
+
         b.dvWgSmartPersistentKeepaliveSwitch.isChecked = persistentState.smartPersistentKeepalive
 
         // endpoint independent mapping (eim) / endpoint independent filtering (eif)
@@ -168,6 +183,9 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
 
         b.dvTcpKeepAliveSwitch.isChecked = persistentState.tcpKeepAlive
         b.dvTimeoutSeekbar.progress = persistentState.dialTimeoutSec / SECONDS_PER_MINUTE
+
+        b.dvSocketBufferSizeSeekbar.progress = socketBufferSizeToProgress(persistentState.socketBufferSizeBytes)
+        displaySocketBufferSizeUi(persistentState.socketBufferSizeBytes)
 
         b.settingsUseMaxMtuSwitch.isChecked = persistentState.useMaxMtu
 
@@ -218,6 +236,42 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         displayDialerTimeOutUi(inSec)
     }
 
+    private fun displaySocketBufferSizeUi(bytes: Int) {
+        val displayText = formatSocketBufferSize(bytes)
+        b.dvSocketBufferSizeValue.text = displayText
+    }
+
+    private fun formatSocketBufferSize(bytes: Int): String {
+        val kb = bytes / 1024
+        return if (kb >= 1024) {
+            "${kb / 1024} MB"
+        } else {
+            "$kb KB"
+        }
+    }
+
+    private fun socketBufferSizeToProgress(bytes: Int): Int {
+        return SOCKET_BUFFER_SIZES_BYTES.indexOf(bytes.toLong()).coerceIn(0, 7)
+    }
+
+    private fun progressToSocketBufferSize(progress: Int): Int {
+        return SOCKET_BUFFER_SIZES_BYTES[progress.coerceIn(0, 7)].toInt()
+    }
+
+    private fun updateSocketBufferSize(progress: Int) {
+        val bytes = progressToSocketBufferSize(progress)
+        persistentState.socketBufferSizeBytes = bytes
+        displaySocketBufferSizeUi(bytes)
+    }
+
+    private fun suggestSocketBufferSize() {
+        if (persistentState.socketBufferSizeBytes < FOUR_MB_IN_BYTES) {
+            val progress = socketBufferSizeToProgress(FOUR_MB_IN_BYTES)
+            b.dvSocketBufferSizeSeekbar.progress = progress
+            updateSocketBufferSize(progress)
+        }
+    }
+
     private fun displayAllowBypassUi() {
         // allow apps part of the vpn to request networks outside of it, effectively letting it
         // bypass the vpn itself
@@ -246,20 +300,20 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
 
         b.settingsActivityAllNetworkSwitch.setOnCheckedChangeListener {
             _: CompoundButton,
-            b: Boolean ->
-            persistentState.useMultipleNetworks = b
-            if (b) {
+            bool: Boolean ->
+            persistentState.useMultipleNetworks = bool
+            if (bool) {
                 if (persistentState.enableStabilityDependentSettings()) {
-                    SnackbarHelper.showStabilityProgram(window.decorView, persistentState)
+                    SnackbarHelper.showStabilityProgram(b.root, persistentState)
                 }
             }
-            if (!b && persistentState.routeRethinkInRethink) {
+            if (!bool && persistentState.routeRethinkInRethink) {
                 persistentState.routeRethinkInRethink = false
                 displayRethinkInRethinkUi()
             }
             logEvent(
                 "use all networks",
-                "Use all networks for VPN: $b"
+                "Use all networks for VPN: $bool"
             )
         }
 
@@ -515,6 +569,18 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
             b.dvWgLockdownSwitch.isChecked = !b.dvWgLockdownSwitch.isChecked
         }
 
+        b.dvFloodWgSwitch.setOnCheckedChangeListener { _, bool ->
+            persistentState.floodWireGuard = bool
+            logEvent(
+                "wg flood mode",
+                "WireGuard flood mode set to: $bool"
+            )
+        }
+
+        b.dvFloodWgRl.setOnClickListener {
+            b.dvFloodWgSwitch.isChecked = !b.dvFloodWgSwitch.isChecked
+        }
+
         b.dvWgSmartPersistentKeepaliveSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.smartPersistentKeepalive = isChecked
             logEvent(
@@ -545,6 +611,9 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
 
         b.settingsUseMaxMtuSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.useMaxMtu = isChecked
+            if (isChecked) {
+                suggestSocketBufferSize()
+            }
             logEvent(
                 "use jumbo packets",
                 "Use jumbo packets set to: $isChecked"
@@ -581,6 +650,22 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                 // When the user stops dragging the seekbar, update the dialer timeout
                 seekBar?.progress?.let { progress ->
                     updateDialerTimeOut(progress)
+                }
+            }
+        })
+
+        b.dvSocketBufferSizeSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                updateSocketBufferSize(progress)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                Logger.v(LOG_TAG_UI, "Socket buffer size seekbar tracking started")
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                seekBar?.progress?.let { progress ->
+                    updateSocketBufferSize(progress)
                 }
             }
         })
@@ -693,6 +778,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
             // Enable jumbo packets
             persistentState.useMaxMtu = true
             b.settingsUseMaxMtuSwitch.isChecked = true
+            suggestSocketBufferSize()
 
             // Set IP version to IPv4 & IPv6 (ALWAYSv46)
             persistentState.internetProtocolType = InternetProtocol.ALWAYSv46.id

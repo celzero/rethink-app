@@ -73,12 +73,14 @@ import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_REGENERATION_PERIOD_DAYS
 import com.celzero.bravedns.util.BubbleHelper
+import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.SnackbarHelper
+import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.getRandomString
@@ -87,7 +89,9 @@ import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -159,12 +163,13 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
 
         registerForActivityResult()
         initView()
+        showNewBadgeIfNeeded()
         setupClickListeners()
         setupOnBackPressed()
     }
@@ -172,6 +177,13 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean(KEY_THEME_CHANGE, isThemeChanged)
+    }
+
+    private fun showNewBadgeIfNeeded() {
+        val showBadge = NewSettingsManager.shouldShowBadge(NewSettingsManager.FIREWALL_BUBBLE)
+        if (!showBadge) return
+
+        b.settingsFirewallBubbleTxt.setBadgeDotVisible(this, true)
     }
 
     private fun setupOnBackPressed() {
@@ -645,13 +657,13 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
                 !b.settingsActivityAutoStartSwitch.isChecked
         }
 
-        b.settingsActivityAutoStartSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean
+        b.settingsActivityAutoStartSwitch.setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean
             ->
-            persistentState.prefAutoStartBootUp = b
-            if (b) {
+            persistentState.prefAutoStartBootUp = isChecked
+            if (isChecked) {
                 // Enable experimental-dependent settings when experimental features are enabled
                 if (persistentState.enableStabilityDependentSettings()) {
-                    SnackbarHelper.showStabilityProgram(window.decorView, persistentState)
+                    SnackbarHelper.showStabilityProgram(b.root, persistentState)
                 }
             }
             logEvent("Auto start on boot set to $b")
@@ -779,13 +791,37 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
             }
 
             persistentState.goLoggerLevel = which.toLong()
-            GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel.toInt())
+            GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel.toInt(), includeFileTrace = persistentState.includeFileTrace)
             updateConfigLevel(persistentState.goLoggerLevel)
             val logLevel = if (persistentState.goLoggerLevel.toInt() == GO_LOG_LEVEL_EXTREME) GO_LOG_LEVEL_EXTREME_DISPLAY else persistentState.goLoggerLevel.toInt()
             b.genSettingsGoLogDesc.text = Logger.LoggerLevel.fromId(logLevel)?.name?.lowercase()
                     ?.replaceFirstChar(Char::titlecase)?.replace("_", " ")
             logEvent("Go log level set to ${Logger.LoggerLevel.fromId(logLevel)?.name}")
         }
+
+        val cb = MaterialCheckBox(this)
+        cb.text = getString(R.string.console_log_include_file_trace)
+        cb.isChecked = persistentState.includeFileTrace
+        cb.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.includeFileTrace = isChecked
+            GoVpnAdapter.setLogLevel(
+                persistentState.goLoggerLevel.toInt(),
+                includeFileTrace = persistentState.includeFileTrace
+            )
+            logEvent("File trace set to $isChecked")
+        }
+        val density = resources.displayMetrics.density
+        val margin = (20 * density).toInt()
+        val container = LinearLayout(this)
+        val params =
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        params.setMargins(margin, 0, margin, 0)
+        container.addView(cb, params)
+        alertBuilder.setView(container)
+
         alertBuilder.create().show()
     }
 

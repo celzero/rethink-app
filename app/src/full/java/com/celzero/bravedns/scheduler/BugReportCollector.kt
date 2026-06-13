@@ -26,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.celzero.bravedns.database.ConsoleLogRepository
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastO
@@ -38,6 +39,7 @@ class BugReportCollector(val context: Context, workerParameters: WorkerParameter
     CoroutineWorker(context, workerParameters), KoinComponent {
 
     private val persistentState by inject<PersistentState>()
+    private val consoleLogRepo by inject<ConsoleLogRepository>()
 
     companion object {
         private const val LOGCAT_CMD = "logcat"
@@ -60,8 +62,12 @@ class BugReportCollector(val context: Context, workerParameters: WorkerParameter
         // prepare the bugreport directory and file
         val fout = prepare()
         storePrefs(fout)
+        val consoleLogFile = prepareConsoleLogFile(fout)
+        BugReportZipper.dumpConsoleLogs(consoleLogRepo, consoleLogFile)
+        val flightRecDir = BugReportZipper.flightRecorderDir(applicationContext.filesDir)
+        BugReportZipper.dumpFlightRecorder(applicationContext.filesDir, flightRecDir)
         val ts = dumpLogsAndAppExits(fout)
-        addToZip(fout)
+        addToZip(fout, consoleLogFile)
         // Store the last exit reason time stamp
         persistentState.lastAppExitInfoTimestamp =
             persistentState.lastAppExitInfoTimestamp.coerceAtLeast(ts)
@@ -81,6 +87,11 @@ class BugReportCollector(val context: Context, workerParameters: WorkerParameter
         // write all the shared preferences values into the file
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
         BugReportZipper.dumpPrefs(prefs, file)
+    }
+
+    private fun prepareConsoleLogFile(reportFile: File): File {
+        val parent = reportFile.parentFile ?: applicationContext.filesDir
+        return BugReportZipper.consoleLogFile(parent)
     }
 
     private fun dumpLogsAndAppExits(file: File): Long {
@@ -119,9 +130,12 @@ class BugReportCollector(val context: Context, workerParameters: WorkerParameter
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun addToZip(file: File) {
+    private fun addToZip(reportFile: File, consoleLogFile: File) {
         val dir = applicationContext.filesDir
-        BugReportZipper.rezipAll(dir, file)
+        BugReportZipper.rezipAll(dir, reportFile)
+        if (consoleLogFile.exists() && consoleLogFile.length() > 0L) {
+            BugReportZipper.rezipAll(dir, consoleLogFile)
+        }
         BugReportZipper.deleteAll(dir)
     }
 

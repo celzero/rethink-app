@@ -16,7 +16,7 @@
             android:layout_height="match_parent"
             android:padding="12dp"
             android:src="@drawable/ic_firewall_shield"
-            android:contentDescription="@string/firewall_bubble" />
+            android:contentDescription="@string/firewall_bubble_title" />
 
     </com.google.android.material.card.MaterialCardView>
 

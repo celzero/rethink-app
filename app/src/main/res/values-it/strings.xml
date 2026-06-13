@@ -374,7 +374,6 @@
     <string name="hsf_blocklist_chip_text_no_data">Attiva RDNS+</string>
     <string name="hsf_exclude_error">Impossibile escludere in modalità VPN obbligatoria</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy rimosso</string>
-    <string name="hsf_proxy_chip_remove_text">Arresto…</string>
     <string name="hsf_whats_new_remove_text">Chiusura…</string>
     <string name="hsf_blocklist_updating_text">Avvio…</string>
     <string name="hsf_chip_appearance">Tema: %1$s</string>
