@@ -117,7 +117,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
     }
 
     private fun setupToolbar() {
-        b.collapsingToolbar.title = getString(R.string.rpn_title)
+        b.collapsingToolbar.title = getString(R.string.proxy_rpn_heading)
     }
 
     /**
