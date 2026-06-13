@@ -601,14 +601,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     private fun buildLoadSpeedText(loadPct: Int, linkMbps: Int) {
         val healthText: String
         if (loadPct >= 0) {
-            val tier = when {
-                loadPct <= 20 -> getString(R.string.server_load_light)
-                loadPct <= 40 -> getString(R.string.server_load_normal)
-                loadPct <= 60 -> getString(R.string.server_load_busy)
-                loadPct <= 80 -> getString(R.string.server_load_very_busy)
-                else -> getString(R.string.server_load_overloaded)
-            }
-            healthText = "$loadPct% · $tier"
+            healthText = "$loadPct%"
         } else {
             healthText = getString(R.string.lbl_not_available_short)
         }
