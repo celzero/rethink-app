@@ -48,35 +48,16 @@ import java.io.File
  */
 class GoCrashFileDescriptorReader(private val context: Context?) {
 
-    fun start2(): Pair<File?, File?>? {
+    fun start2(): File? {
         val file = createCrashFile2()
         if (file == null) {
             Logger.e(LOG_TAG_BUG_REPORT, "$TAG createCrashFile2 returned null")
-            return null
-        }
-        val fltFile = createFlightRecFile()
-        if (fltFile == null) {
-            Logger.e(LOG_TAG_BUG_REPORT, "$TAG createCrashFile2 flt returned null")
             return null
         }
         if (isAtleastQ()) {
             startCrashWatcher(file)
         }
 
-        return Pair(file, fltFile)
-    }
-
-    private fun createFlightRecFile(): File? {
-        if (context == null) {
-            Logger.e(LOG_TAG_BUG_REPORT, "$TAG createCrashFileFd: missing app context")
-            return null
-        }
-        val file = EnhancedBugReport.newFlightRecorderFile(context)
-        if (file == null) {
-            Logger.e(LOG_TAG_BUG_REPORT, "$TAG createCrashFileFd: newFlightRecorderFile returned null")
-            return null
-        }
-        Logger.d(LOG_TAG_BUG_REPORT, "$TAG createCrashFileFd: new file ${file.absolutePath}")
         return file
     }
 
