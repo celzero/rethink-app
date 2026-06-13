@@ -370,9 +370,7 @@ class StateMachineDatabaseSyncService : KoinComponent {
             } catch (_: Exception) { emptyList() }
 
             val inAppRowsToExpire = rowsBeforeUpdate.filter { sub ->
-                (sub.productId.contains("onetime", ignoreCase = true) ||
-                 sub.productId.contains("inapp",   ignoreCase = true) ||
-                 sub.productId == "test_product") &&
+                SubscriptionStateMachineV2.isInAppProduct(sub.productId) &&
                 sub.billingExpiry > 0L &&
                 sub.billingExpiry != Long.MAX_VALUE &&
                 sub.billingExpiry < now

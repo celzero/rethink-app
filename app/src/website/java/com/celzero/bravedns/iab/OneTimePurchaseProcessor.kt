@@ -317,8 +317,9 @@ internal class OneTimePurchaseProcessor(
                     subscriptionStateMachine.subscriptionExpired()
                     return
                 }
+                // paymentSuccessful -> handlePaymentSuccessful handles DB upsert
+                // and RPN activation (including its dedup guard).
                 subscriptionStateMachine.paymentSuccessful(pd)
-                withContext(Dispatchers.IO) { activateRpn(pd) }
             } catch (e: Exception) {
                 loge(mname, "error processing acknowledged INAPP: ${e.message}", e)
                 safeNotifyFailed("Error processing acknowledged INAPP: ${e.message}", null)
@@ -373,12 +374,14 @@ internal class OneTimePurchaseProcessor(
                 val pdWithPayload = pd.copy(
                     payload = ackResult.developerPayload.ifEmpty { pd.payload }
                 )
-                subscriptionStateMachine.completePurchase(pdWithPayload)
+                // paymentSuccessful -> handlePaymentSuccessful handles the full DB
+                // upsert, state-machine transition to Active, and RPN activation.
+                // Skip completePurchase to prevent a redundant DB write + the
+                // transient PurchasePending state between the two calls.
                 subscriptionStateMachine.paymentSuccessful(pdWithPayload)
                 try { onAckSuccess?.invoke(purchase) } catch (e: Exception) {
                     loge(mname, "onAckSuccess callback failed (non-fatal): ${e.message}", e)
                 }
-                withContext(Dispatchers.IO) { activateRpn(pdWithPayload) }
             }
 
             is AckResult.TransientFailure -> {

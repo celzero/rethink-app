@@ -149,7 +149,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
 
         b.subscribeButton.apply {
             backgroundTintList = android.content.res.ColorStateList.valueOf(accentGood)
-            setTextColor(primaryText)
+            setTextColor(htxtClr)
             iconTint = android.content.res.ColorStateList.valueOf(primaryText)
         }
 

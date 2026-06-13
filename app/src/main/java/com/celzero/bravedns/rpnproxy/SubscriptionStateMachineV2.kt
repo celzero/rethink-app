@@ -1142,7 +1142,13 @@ class SubscriptionStateMachineV2 : KoinComponent {
      *                   Pass an empty set when Play returned an empty INAPP list.
      */
     suspend fun expireStaleInAppFromDb(playTokens: Set<String>) {
-        try {
+        // Track whether all INAPP rows were expired so we can fire
+        // SubscriptionExpired OUTSIDE the stateLock (processEventSafely
+        // acquires stateLock internally and would deadlock if called here).
+        var shouldTransitionToExpired = false
+
+        stateLock.withLock {
+            try {
             val activeStatuses = listOf(
                 SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id,
                 SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id,
@@ -1215,28 +1221,9 @@ class SubscriptionStateMachineV2 : KoinComponent {
             if (expiredCount > 0) {
                 val remainingValid = inAppRows.size - expiredCount
                 if (remainingValid > 0) {
-                    // Some rows were cleaned up from DB but at least one INAPP purchase is still
-                    // active (e.g. user purchased a second/upgraded plan whose token IS present in
-                    // the Play snapshot). The old superseded token is legitimately absent from
-                    // Play; expiring it from DB is correct. However, the state machine MUST NOT
-                    // be transitioned to Expired because the user still has a valid purchase.
                     Logger.i(LOG_IAB, "$TAG: expireStaleInAppFromDb: expired $expiredCount INAPP " +
                         "row(s) but $remainingValid still active — DB cleaned, state unchanged")
 
-                    // After retiring the stale row(s), confirm the state machine's in-memory data
-                    // is pointing to a still-valid subscription, not one of the now-expired ones.
-                    //
-                    // Two scenarios where the pointer can be stale:
-                    //  1. handlePaymentSuccessful hit its dedup guard (all fields already current)
-                    //     and returned early without calling stateMachine.updateData(). The machine's
-                    //     saved subscriptionStatus may still carry the superseded token.
-                    //  2. The empty-INAPP-threshold path ran: processSinglePurchase was never called
-                    //     this cycle so handlePaymentSuccessful never ran at all.
-                    //
-                    // In both cases the valid purchase IS already marked ACTIVE in the DB
-                    // (written by a previous handlePaymentSuccessful call). We just need to update
-                    // the in-memory pointer so the UI, RPN entitlement checks, and
-                    // getEffectivePurchaseDetail() all see the right token for this session.
                     val currentToken =
                         stateMachine.getCurrentData()?.subscriptionStatus?.purchaseToken.orEmpty()
                     if (currentToken.isNotEmpty() && currentToken in expiredTokens) {
@@ -1264,15 +1251,21 @@ class SubscriptionStateMachineV2 : KoinComponent {
                         }
                     }
                 } else {
-                    // All active INAPP rows were expired — no valid purchase remains.
-                    processEventSafely(SubscriptionEvent.SubscriptionExpired)
-                    Logger.i(LOG_IAB, "$TAG: expireStaleInAppFromDb: expired $expiredCount INAPP row(s), state → Expired")
+                    shouldTransitionToExpired = true
                 }
             } else {
                 Logger.d(LOG_IAB, "$TAG: expireStaleInAppFromDb: all INAPP rows still valid")
             }
-        } catch (e: Exception) {
-            Logger.e(LOG_IAB, "$TAG: expireStaleInAppFromDb: ${e.message}", e)
+            } catch (e: Exception) {
+                Logger.e(LOG_IAB, "$TAG: expireStaleInAppFromDb: ${e.message}", e)
+            }
+        } // stateLock.withLock
+
+        // Fire the state-machine transition OUTSIDE the lock to avoid deadlock
+        // (processEventSafely internally acquires stateLock).
+        if (shouldTransitionToExpired) {
+            processEventSafely(SubscriptionEvent.SubscriptionExpired)
+            Logger.i(LOG_IAB, "$TAG: expireStaleInAppFromDb: state → Expired")
         }
     }
 
@@ -1502,7 +1495,7 @@ class SubscriptionStateMachineV2 : KoinComponent {
             }
 
             val isInApp = detail.productType == BillingClient.ProductType.INAPP ||
-                detail.productId.contains("onetime", ignoreCase = true)
+                isInAppProduct(detail.productId)
             if (isInApp) {
                 val now = System.currentTimeMillis()
                 val hasRealExpiry = detail.expiryTime > 0L && detail.expiryTime != Long.MAX_VALUE
@@ -1646,12 +1639,15 @@ class SubscriptionStateMachineV2 : KoinComponent {
                     stateMachine.updateData(SubscriptionData(existing, purchaseDetail))
                 }
 
-                if (existing.status == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id) {
-                    scope.launch {
-                        try { RpnProxyManager.processRpnPurchase(purchaseDetail, existing) }
-                        catch (e: Exception) {
-                            Logger.e(LOG_IAB, "$TAG: RPN ensure-active (cancelled-valid) failed: ${e.message}", e)
-                        }
+                // Always ensure RPN is active when the dedup path fires.
+                // Previously this only ran for CANCELLED, which left a gap:
+                // if the processor (e.g. already-acknowledged INAPP) called
+                // paymentSuccessful but handlePaymentSuccessful returned without
+                // activating RPN, the VPN would not start.
+                scope.launch {
+                    try { RpnProxyManager.processRpnPurchase(purchaseDetail, existing) }
+                    catch (e: Exception) {
+                        Logger.e(LOG_IAB, "$TAG: RPN ensure-active (dedup) failed: ${e.message}", e)
                     }
                 }
                 return
@@ -1672,17 +1668,24 @@ class SubscriptionStateMachineV2 : KoinComponent {
             //    `existing.purchaseToken == purchaseDetail.purchaseToken` equality check
             //    above already ensures this guard never fires for a true resubscription
             //    (different token → falls through to normal payment handling).
+            // After LOCAL_CANCEL_REVOKE_GUARD_MS, Play is expected to have propagated:
+            //  CANCELLED -> Play returns isAutoRenewing=false -> updateCancelledStatusInDb
+            //  REVOKED   -> Play removes the token    -> expireOrphanedSubsFromDb / expireStaleSubsFromDb
+            //
+            // Do NOT gate on !purchaseDetail.isAutoRenewing: after a server-side REVOKE,
+            // Play may still return isAutoRenewing=true for minutes until the revocation
+            // propagates.  The token-equality check above ensures genuine resubscriptions
+            // (which always carry a NEW token) are never blocked by this guard.
             if (existing != null &&
                 existing.purchaseToken == purchaseDetail.purchaseToken &&
                 (existing.status == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id ||
                  existing.status == SubscriptionStatus.SubscriptionState.STATE_REVOKED.id) &&
-                !purchaseDetail.isAutoRenewing &&
                 (System.currentTimeMillis() - existing.lastUpdatedTs) < LOCAL_CANCEL_REVOKE_GUARD_MS
             ) {
                 Logger.i(LOG_IAB, "$TAG: handlePaymentSuccessful: preserving local " +
                     "${SubscriptionStatus.SubscriptionState.fromId(existing.status).name} status " +
                     "for token=${purchaseDetail.purchaseToken.take(8)}, Play propagation pending " +
-                    "(guard=${LOCAL_CANCEL_REVOKE_GUARD_MS / 60_000}min, isAutoRenewing=${purchaseDetail.isAutoRenewing})")
+                    "(guard=${LOCAL_CANCEL_REVOKE_GUARD_MS / 60_000}min)")
                 if (updateMachineData) {
                     stateMachine.updateData(SubscriptionData(existing, purchaseDetail))
                 }
@@ -2111,6 +2114,7 @@ class SubscriptionStateMachineV2 : KoinComponent {
      *
      */
     private suspend fun handleSystemCheckAndDatabaseRestoration() {
+        stateLock.withLock {
         try {
             Logger.i(LOG_IAB, "$TAG: handleSystemCheckAndDatabaseRestoration")
             val dbStateInfo = dbSyncService.loadStateFromDatabase() ?: run {
@@ -2183,6 +2187,7 @@ class SubscriptionStateMachineV2 : KoinComponent {
         } catch (e: Exception) {
             Logger.e(LOG_IAB, "$TAG: handleSystemCheckAndDatabaseRestoration error: ${e.message}", e)
         }
+        } // stateLock.withLock
     }
 
     private suspend fun handleSystemCheck() {

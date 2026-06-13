@@ -258,11 +258,12 @@ internal class SubscriptionPurchaseProcessor(
 
         if (purchase.isAcknowledged) {
             // Fully settled, drive state machine directly, no server call needed.
+            // paymentSuccessful -> handlePaymentSuccessful handles DB upsert
+            // and RPN activation (including its dedup guard).
             logd(mname, "SUBS already acknowledged, notifying state machine")
             try {
                 val pd = buildPurchaseDetail(purchase) ?: return
                 subscriptionStateMachine.paymentSuccessful(pd)
-                withContext(Dispatchers.IO) { activateRpn(pd) }
             } catch (e: Exception) {
                 loge(mname, "error processing acknowledged SUBS: ${e.message}", e)
                 safeNotifyFailed("Error processing acknowledged SUBS: ${e.message}", null)
@@ -307,12 +308,14 @@ internal class SubscriptionPurchaseProcessor(
                 payload = if (ackOk && developerPayload.isNotEmpty()) developerPayload
                 else pd.payload
             )
-            subscriptionStateMachine.completePurchase(pdWithPayload)
 
             if (ackOk) {
                 logd(mname, "SUBS token=${purchase.purchaseToken.take(8)} server ack succeeded")
+                // paymentSuccessful -> handlePaymentSuccessful handles the full DB
+                // upsert, state-machine transition to Active, and RPN activation.
+                // Skip completePurchase to prevent a redundant DB write + the
+                // transient PurchasePending state between the two calls.
                 subscriptionStateMachine.paymentSuccessful(pdWithPayload)
-                withContext(Dispatchers.IO) { activateRpn(pdWithPayload) }
             } else {
                 loge(mname, "SUBS token=${purchase.purchaseToken.take(8)} server ack failed, payload: $developerPayload")
                 subscriptionStateMachine.purchaseFailed(

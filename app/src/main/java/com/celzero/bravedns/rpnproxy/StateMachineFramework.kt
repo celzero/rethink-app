@@ -133,6 +133,14 @@ abstract class StateMachine<S : State, E : Event, D : Any>(
                         try {
                             transition.action(event, _data.value)
                         } catch (actionError: Exception) {
+                            // ACTION FAILED AFTER STATE CHANGE: the action may have
+                            // already committed partial side-effects (DB writes,
+                            // launched coroutines) before throwing.  These persist
+                            // despite the state revert below.  Action authors must
+                            // ensure idempotency or do the risky work last.
+                            Logger.w(LOG_IAB,
+                                "$tag: Action failed after state transition ${currentState.name}->${transition.toState.name}; " +
+                                "reverting to ${currentState.name}.  Partial action side-effects may have persisted: ${actionError.message}")
                             _currentState.value = currentState
                             throw actionError
                         }
