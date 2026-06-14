@@ -153,7 +153,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         }
 
         b.btnContactSupport.apply {
-            setTextColor(lightText)s
+            setTextColor(lightText)
             iconTint = android.content.res.ColorStateList.valueOf(lightText)
         }
 
