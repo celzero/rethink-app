@@ -17,7 +17,6 @@ import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.BraveVPNService.Companion.NW_ENGINE_NOTIFICATION_ID
 import com.celzero.bravedns.service.GoCrashFileDescriptorReader
 import com.celzero.bravedns.service.GoLogFileDescriptorReader
-import com.celzero.bravedns.service.GoMemLogConsumer
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.AppLockActivity
@@ -57,24 +56,16 @@ class GoReportingHandler private constructor(private val scope: CoroutineScope, 
 
     init {
         Intra.setupConsole(this)
-        val filePair = getCrashFile()
-        val crashFile = filePair?.first
+        val crashFile = getCrashFile()
         if (crashFile == null) {
             Logger.e(LOG_TAG_BUG_REPORT, "$TAG init: failed to create crash file")
         } else {
             Logger.i(LOG_TAG_BUG_REPORT, "$TAG init: path: ${crashFile.absolutePath}")
             Intra.setCrashOutput(crashFile.absolutePath)
         }
-        val frFile = filePair?.second
-        if (frFile == null) {
-            Logger.e(LOG_TAG_BUG_REPORT, "$TAG init: failed to create flight recorder file")
-        } else {
-            Logger.i(LOG_TAG_BUG_REPORT, "$TAG init: path: ${frFile.absolutePath}")
-            Intra.setFlightRecordOutput(frFile.absolutePath)
-        }
     }
 
-    fun getCrashFile(): Pair<File?, File?>? {
+    fun getCrashFile(): File? {
         val crashLogFdReader = GoCrashFileDescriptorReader(ctx)
         return crashLogFdReader.start2()
     }
@@ -114,12 +105,12 @@ class GoReportingHandler private constructor(private val scope: CoroutineScope, 
         p0: Long,
         p1: Long,
         p2: Long
-    ): LogConsumer {
+    ): LogConsumer? {
         Logger.i(LOG_TAG_BUG_REPORT, "$TAG logMemFD: fd=$p0, start=$p1, end=$p2")
         // Return a GoMemLogConsumer that will drain the shared-memory buffer Go points us at.
         // Go will call drain(fd, start, end) on the returned consumer each time new data
         // is available, and onClose() when the writer is done.
-        return GoMemLogConsumer(ctx, scope)
+        return null//GoMemLogConsumer(ctx, scope)
     }
 
     private fun showNwEngineNotification(msg: String) {

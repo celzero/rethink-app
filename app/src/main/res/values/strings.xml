@@ -1948,16 +1948,16 @@
     <string name="wg_ssid_match_type_label" translatable="false">Match Type</string>
 
     <string name="settings_firebase_error_reporting_heading" translatable="true">Stability program</string>
-    <string name="settings_firebase_error_reporting_desc" translatable="true">Capture error logs to help improve stability. </string>
+    <string name="settings_firebase_error_reporting_desc" translatable="true">Capture error logs to help improve stability.</string>
 
     <string name="tombstone_app_title" translatable="true">Remember uninstalled apps</string>
     <string name="tombstone_app_desc" translatable="true">When enabled, keep app rules for 7 days.</string>
 
     <string name="firewall_bubble_title" translatable="false">Firewall Bubble</string>
     <string name="firewall_bubble_subtitle" translatable="false">Review blocked apps and allow them temporarily.</string>
-    <string name="firewall_bubble_desc" translatable="false">Show a floating bubble with recently blocked apps.</string>
+    <string name="firewall_bubble_desc" translatable="false">Shows a floating bubble with recently blocked apps.</string>
     <string name="firewall_bubble_channel_name" translatable="false">Firewall Bubble Notifications</string>
-    <string name="firewall_bubble_channel_desc" translatable="false">Shows a bubble notification for blocked apps</string>
+    <string name="firewall_bubble_channel_desc" translatable="false">Shows a bubble notification for recently blocked apps</string>
     <string name="firewall_bubble_text" translatable="false">Tap to view recently blocked apps</string>
     <string name="firewall_bubble_permission_granted_toast" translatable="false">Firewall Bubble enabled</string>
     <string name="firewall_bubble_permission_denied_toast" translatable="false">Permission denied. Firewall Bubble disabled.</string>
@@ -1997,7 +1997,7 @@
     <string name="settings_flood_wg_desc" translatable="true">When enabled, sends additional WireGuard packets to make tunnel traffic harder to identify and block on restrictive networks.</string>
 
     <string name="settings_socket_buffer_size" translatable="false">Socket Buffer Size</string>
-    <string name="settings_socket_buffer_size_desc" translatable="false">Adjust the network buffer size used by Rethink sockets. Larger buffers may improve performance but use more memory.</string>
+    <string name="settings_socket_buffer_size_desc" translatable="false">Adjust the network buffer size used by Rethink sockets. Larger buffers may improve network throughput in some conditions but use more memory.</string>
 
     <string name="settings_smart_persistent_keepalive" translatable="false">Smart Persistent Keepalive</string>
     <string name="settings_smart_persistent_keepalive_desc" translatable="false">Proactively maintains WireGuard tunnel connectivity by sending keep-alive probes only when needed, minimizing reconnection delays on intermittent networks.</string>
@@ -2137,12 +2137,8 @@
     <string name="country_ssid_empty_state" translatable="false">No SSIDs configured yet</string>
     <string name="country_ssid_icon" translatable="false">SSID Icon</string>
 
-    <!-- Server WireGuard Config Detail -->
     <string name="lbl_server_config" translatable="false">Server Configuration</string>
-    <string name="lbl_persistent_keepalive_hint" translatable="false">e.g. 25 (seconds)</string>
     <string name="lbl_not_set" translatable="false">Not set</string>
-    <string name="wg_peer_edit_keepalive_title" translatable="false">Edit Peer Keepalive</string>
-    <string name="wg_peer_edit_keepalive_desc" translatable="false">Modify the persistent keepalive interval for this peer. This determines how often keepalive packets are sent to maintain the connection.</string>
 
     <!-- Peer Count -->
     <plurals name="peer_count">
@@ -2259,7 +2255,7 @@
     <string name="confirm_cancel_title" translatable="false">Cancel Purchase?</string>
     <string name="confirm_cancel_message" translatable="false">Are you sure you want to cancel your purchase? You will lose access to premium features at the end of the current period.</string>
     <string name="confirm_revoke_title" translatable="false">Revoke Purchase?</string>
-    <string name="confirm_revoke_message" translatable="false">Are you sure you want to revoke your purchase? This action will immediately cancel your purchase and refund your payment. You will lose access to premium features right away.</string>
+    <string name="confirm_revoke_message" translatable="false">Are you sure you want to revoke your purchase? This action will immediately cancel your purchase and refund your payment. You will lose access to premium features.</string>
     <string name="subscription_action_failed" translatable="false">Failed to process request. Please try again.</string>
 
     <!-- ManageSubscriptionFragment strings -->
@@ -2268,7 +2264,7 @@
     <!-- Generic plan duration labels (no billing-type qualifier) -->
     <string name="plan_2yr" translatable="false">2-Year</string>
     <string name="plan_5yr" translatable="false">5-Year</string>
-    <string name="revoke_subscription_note" translatable="false">Revoke purchase for a full refund</string>
+    <string name="revoke_subscription_note" translatable="false">Revokes the purchase and issues a full refund to the original payment method.</string>
     <string name="cancel_subscription_note_future" translatable="false">Cancels renewal. Access continues until the end of the current period</string>
 
     <!-- Ping Test Activity -->

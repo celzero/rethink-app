@@ -182,9 +182,6 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
             b.tvDetailExpiry.text = fmt.format(Date(sub.billingExpiry))
         }
 
-        // Renew CTA
-        b.renewButton.isVisible = !state.hasValidSubscription
-
         // Expiring-soon banner - only for active INAPP purchases within 30 days of expiry
         updateExpiringBanner(subscriptionData, state)
     }
@@ -304,7 +301,6 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
                 val deviceId = runCatching { InAppBillingHandler.getObfuscatedDeviceId() }.getOrDefault("")
                 uiCtx {
                     populateBanner(sub, state, deviceId)
-                    handleStateChange(state)
                 }
             }
         }
@@ -356,30 +352,6 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
         sheet.show(childFragmentManager, "conflict409")
     }
 
-
-    private fun handleStateChange(state: SubscriptionStateMachineV2.SubscriptionState) {
-        when (state) {
-            is SubscriptionStateMachineV2.SubscriptionState.Active,
-            is SubscriptionStateMachineV2.SubscriptionState.Grace -> {
-                b.renewButton.isVisible = false
-            }
-            is SubscriptionStateMachineV2.SubscriptionState.Cancelled -> {
-                b.renewButton.isVisible = true
-            }
-            is SubscriptionStateMachineV2.SubscriptionState.Revoked -> {
-                b.renewButton.isVisible = true
-            }
-            is SubscriptionStateMachineV2.SubscriptionState.Expired -> {
-                b.renewButton.isVisible = true
-            }
-            is SubscriptionStateMachineV2.SubscriptionState.Uninitialized,
-            is SubscriptionStateMachineV2.SubscriptionState.Initial -> {
-                // transient, ignore
-            }
-            else -> Logger.d(LOG_TAG_UI, "$TAG state: ${state.javaClass.simpleName}")
-        }
-    }
-
     private fun setupClickListeners() {
         b.pingTestRl.setOnClickListener {
             startActivity(Intent(requireContext(), PingTestActivity::class.java))
@@ -389,9 +361,6 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
         b.reportIssueRl.setOnClickListener { CustomerSupportActivity.start(requireContext()) }
         b.entitlementRl.setOnClickListener {
             EntitlementDetailBottomSheet.newInstance().show(childFragmentManager, "entitlementDetails")
-        }
-        b.renewButton.setOnClickListener {
-            safeNavigate(R.id.action_rethinkPlusDashboard_to_rethinkPlus)
         }
     }
 

@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.adapter
 
+import Logger
 import Logger.LOG_IAB
 import Logger.LOG_TAG_UI
 import android.animation.AnimatorSet

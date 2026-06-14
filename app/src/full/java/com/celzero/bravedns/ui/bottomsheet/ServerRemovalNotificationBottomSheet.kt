@@ -34,7 +34,6 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
-import kotlin.getValue
 
 /**
  * Bottom sheet notification for informing users about removed server locations

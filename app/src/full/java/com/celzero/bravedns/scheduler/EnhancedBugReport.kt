@@ -15,11 +15,13 @@
  */
 package com.celzero.bravedns.scheduler
 
+import Logger
 import Logger.LOG_TAG_BUG_REPORT
 import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import com.celzero.bravedns.scheduler.EnhancedBugReport.MAX_TOTAL_FILES
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.FirebaseErrorReporting
@@ -49,7 +51,6 @@ object EnhancedBugReport : KoinComponent {
     // EnhancedBugReport (Kotlin/JVM) → kotlin_<ts>.txt
     const val PREFIX_KOTLIN = "kotlin_"
 
-    const val PREFIX_FLIGHT_REC = "flt_"
     const val FILE_EXTENSION = ".txt"
     const val FLIGHT_REC_EXT = ".pprof"
 
@@ -88,9 +89,6 @@ object EnhancedBugReport : KoinComponent {
     /** Returns a new File for a Go crash dump (gocrash_<ts>.txt). */
     fun newGoCrashFile(context: Context): File? =
         newTombstoneFile(context, PREFIX_GO_CRASH)
-
-    fun newFlightRecorderFile(context: Context): File? =
-        newTombstoneFile(context, PREFIX_FLIGHT_REC)
 
     /** Returns a new File for a Kotlin/JVM crash log (kotlin_<ts>.txt). */
     fun newKotlinCrashFile(context: Context): File? =
@@ -186,7 +184,7 @@ object EnhancedBugReport : KoinComponent {
 
         // delete all the empty files (but never touch active-session files even if empty)
         allFiles
-            .filter { it.length() == 0L && !activeSessionFileNames.contains(it.name) }
+            .filter { (it.length() == 0L || it.length() == 13L || it.length() == 15L) && !activeSessionFileNames.contains(it.name) }
             .forEach { empty ->
                 val deleted = empty.delete()
                 Log.d(LOG_TAG_BUG_REPORT, "deleted empty tombstone: ${empty.name}, ok=$deleted")
@@ -388,13 +386,12 @@ object EnhancedBugReport : KoinComponent {
 
     private fun newTombstoneFile(context: Context, prefix: String): File? {
         val folder = tombstoneFolder(context.filesDir) ?: return null
-        val extn = if (prefix == PREFIX_FLIGHT_REC) FLIGHT_REC_EXT else FILE_EXTENSION
-        val file = File(folder, "$prefix${System.currentTimeMillis()}$extn")
+        val file = File(folder, "$prefix${System.currentTimeMillis()}$FILE_EXTENSION")
         return try {
             if (file.createNewFile()) {
                 // Register golog_ / gocrash_ files immediately so reportTombstonesToFirebaseOnStartup
                 // never touches them, regardless of when it runs relative to file creation.
-                if (prefix == PREFIX_GO_LOG || prefix == PREFIX_GO_CRASH || prefix == PREFIX_FLIGHT_REC) {
+                if (prefix == PREFIX_GO_LOG || prefix == PREFIX_GO_CRASH) {
                     markFileAsActive(file.name)
                 }
                 file

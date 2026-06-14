@@ -1,5 +1,6 @@
 package com.celzero.bravedns.iab.stripe
 
+import Logger
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

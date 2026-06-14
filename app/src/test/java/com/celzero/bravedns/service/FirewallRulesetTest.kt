@@ -1,8 +1,8 @@
 package com.celzero.bravedns.service
 
-import org.junit.Test
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Test
 
 /**
  * Test for FirewallRuleset enum to ensure proper rule IDs for newly installed apps.

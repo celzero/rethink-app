@@ -18,6 +18,7 @@ package com.celzero.bravedns.database
 import Logger
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.celzero.bravedns.database.SubscriptionStatus.Companion.DEVICE_ID_INDICATOR
 import com.celzero.bravedns.iab.InAppBillingHandler
 
 @Entity(tableName = "SubscriptionStatus")

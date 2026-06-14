@@ -33,9 +33,9 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.backend.Client
 import com.celzero.firestack.backend.DNSTransport
 import com.celzero.firestack.backend.NetStat
+import com.celzero.firestack.backend.Proxy
 import com.celzero.firestack.backend.RDNS
 import com.celzero.firestack.backend.RouterStats
-import com.celzero.firestack.backend.Proxy
 import com.celzero.firestack.backend.RpnEntitlement
 import com.celzero.firestack.intra.Controller
 import kotlinx.coroutines.CoroutineScope
@@ -530,8 +530,8 @@ object VpnController : KoinComponent {
         return braveVpnService?.getWinProxyId()
     }
 
-    suspend fun crashTun() {
-        braveVpnService?.crashTun()
+    suspend fun crashTun(type: Long) {
+        braveVpnService?.crashTun(type)
     }
 
     suspend fun getEntitlementDetails(prevBytes: ByteArray?, deviceId: String): RpnEntitlement? {

@@ -75,23 +75,6 @@
             android:orientation="vertical"
             android:paddingBottom="80dp">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/renew_button"
-                style="@style/Widget.Material3.Button"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                android:text="@string/resubscribe_title"
-                android:textAllCaps="false"
-                android:textSize="15sp"
-                android:visibility="gone"
-                app:cornerRadius="26dp"
-                app:icon="@drawable/ic_rethink_plus"
-                app:iconGravity="textStart"
-                app:iconPadding="8dp" />
-
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/expiring_banner_card"
                 android:layout_width="match_parent"

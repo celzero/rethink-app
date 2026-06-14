@@ -724,8 +724,9 @@ object UIUtils {
         val go = stat.go()?.toString()
         val c = stat.c
         val m = stat.m
+        val l = stat.l
 
-        var stats = go + c + m
+        var stats = go + l + c + m
         stats = stats.replace("{", "\n")
         stats = stats.replace("}", "\n\n")
         stats = stats.replace(",", "\n")

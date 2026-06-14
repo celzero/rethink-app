@@ -29,7 +29,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import com.celzero.bravedns.ui.BaseActivity
 import androidx.core.content.FileProvider
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
@@ -47,6 +46,7 @@ import com.celzero.bravedns.scheduler.BugReportZipper
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.Themes
@@ -68,6 +68,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import java.io.File
+import kotlin.time.Duration.Companion.milliseconds
 
 class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), androidx.appcompat.widget.SearchView.OnQueryTextListener {
 
@@ -83,7 +84,8 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), androidx
         private const val FILE_NAME = "rethink_app_logs_"
         private const val FILE_EXTENSION = ".zip"
         private const val QUERY_TEXT_DELAY: Long = 1000
-        private const val CRASH_CODE = "**CRASH**"
+        private const val CRASH_CODE = "**CRASH0**"
+        private const val DONT_PANIC_CODE = "**CRASH1**"
     }
 
     // Guard against rapid double-taps on share buttons while a job is in-progress
@@ -114,7 +116,7 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), androidx
     private fun setQueryFilter() {
         lifecycleScope.launch {
             searchQuery
-                .debounce(QUERY_TEXT_DELAY)
+                .debounce(QUERY_TEXT_DELAY.milliseconds)
                 .distinctUntilChanged()
                 .collect { query ->
                     viewModel.setFilter(query)
@@ -482,7 +484,13 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), androidx
     @OptIn(FlowPreview::class)
     override fun onQueryTextSubmit(query: String): Boolean {
         if (query == CRASH_CODE) {
-            crashTun()
+            // 0: default, 1: don't panic
+            // 0: will crash, gowtf
+            // 1: won't crash, write to stack trace
+            crashTun(0L)
+            return true
+        } else if (query == DONT_PANIC_CODE) {
+            crashTun(1L)
             return true
         }
         searchQuery.value = query
@@ -492,16 +500,22 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), androidx
     @OptIn(FlowPreview::class)
     override fun onQueryTextChange(query: String): Boolean {
         if (query == CRASH_CODE) {
-            crashTun()
+            // 0: default, 1: don't panic
+            // 0: will crash, gowtf
+            // 1: won't crash, write to stack trace
+            crashTun(0L)
+            return true
+        } else if (query == DONT_PANIC_CODE) {
+            crashTun(1L)
             return true
         }
         searchQuery.value = query
         return true
     }
 
-    private fun crashTun() {
+    private fun crashTun(type: Long) {
         io {
-            VpnController.crashTun()
+            VpnController.crashTun(type)
         }
     }
 }

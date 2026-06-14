@@ -17,6 +17,8 @@ package com.celzero.bravedns.ui.tour
 
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.tour.GuidedTourManager.resetForDebug
+import com.celzero.bravedns.ui.tour.GuidedTourManager.shouldShowTour
 
 /**
  * Singleton that owns the Home-screen guided tour flow.

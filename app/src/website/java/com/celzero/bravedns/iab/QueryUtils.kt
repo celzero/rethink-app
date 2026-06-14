@@ -17,18 +17,11 @@ package com.celzero.bravedns.iab
 
 import Logger
 import Logger.LOG_IAB
-import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.ConsumeParams
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
-import com.android.billingclient.api.QueryProductDetailsParams
 import com.celzero.bravedns.iab.InAppBillingHandler.BestPlan
-import com.celzero.bravedns.iab.InAppBillingHandler.fetchPurchases
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.collections.filter
-import kotlin.collections.find
-import kotlin.coroutines.resume
 
 internal class QueryUtils(private val billingClient: BillingClient) {
     companion object {

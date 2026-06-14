@@ -20,8 +20,10 @@ import Logger.LOG_TAG_BUG_REPORT
 import android.os.ParcelFileDescriptor
 import android.system.Os
 import android.system.OsConstants
+import com.celzero.bravedns.service.FdHelper.fcntlGetInt
+import com.celzero.bravedns.service.FdHelper.fcntlSetInt
+import com.celzero.bravedns.service.FdHelper.makeBlocking
 import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
-import com.celzero.bravedns.util.Utilities.isAtleastU
 import java.io.FileDescriptor
 import java.lang.reflect.Field
 

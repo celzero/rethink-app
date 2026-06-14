@@ -18,7 +18,6 @@ package com.celzero.bravedns.ui.activity
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import com.celzero.bravedns.ui.BaseActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -26,6 +25,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityConfigureOtherDnsBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.fragment.DnsCryptListFragment
 import com.celzero.bravedns.ui.fragment.DnsProxyListFragment
 import com.celzero.bravedns.ui.fragment.DoTListFragment

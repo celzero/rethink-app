@@ -42,6 +42,7 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.viewmodel.ServerSelectionViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -399,6 +400,9 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
         setDnsCheckboxesEnabled(splitEnabled && !isProxyStopped)
 
         binding.splitDnsEnableBtn.setOnClickListener {
+            if (!isAtleastR()) {
+                persistentState.enableDnsAlg = true
+            }
             persistentState.splitDns = true
             binding.splitDnsBanner.animate()
                 .alpha(0f)
