@@ -45,7 +45,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     companion object {
         const val BRAVE_MODE = "brave_mode"
         const val BACKGROUND_MODE = "background_mode"
-        const val ALLOW_BYPASS = "allow_bypass"
         const val LOCAL_BLOCK_LIST = "enable_local_list"
         const val LOCAL_BLOCK_LIST_STAMP = "local_block_list_stamp"
         const val LOCAL_BLOCK_LIST_UPDATE = "local_block_list_downloaded_time"

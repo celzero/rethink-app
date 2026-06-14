@@ -1382,11 +1382,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         }
     }
 
-    private fun canAllowBypass(): Boolean {
-        return persistentState.allowBypass &&
-                !appConfig.isProxyEnabled()
-    }
-
     private suspend fun newBuilder(): Builder {
         var builder = Builder()
         val underlyingNws = getUnderlays()
@@ -1396,12 +1391,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             underlyingNetworks?.vpnLockdown ?: isLockdownEnabled
         } else {
             false
-        }
-        if (!vpnLockdown && !isPlayStoreFlavour() && canAllowBypass()) {
-            Logger.i(LOG_TAG_VPN, "allow apps to bypass vpn on-demand")
-            builder = builder.allowBypass()
-            // TODO: should allowFamily be set?
-            // family must be either AF_INET (for IPv4) or AF_INET6 (for IPv6)
         }
         builder.setUnderlyingNetworks(underlyingNws)
         tunUnderlyingNetworks = underlyingNws?.joinToString()
@@ -2269,16 +2258,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 io("preventDnsLeaks") { setTunMode() }
             }
 
-            PersistentState.ALLOW_BYPASS -> {
-                val reason = "allowBypass: ${persistentState.allowBypass}"
-                vpnRestartTrigger.value = reason
-            }
-
             PersistentState.PROXY_TYPE -> {
                 io("proxy") {
                     handleProxyChange()
-                    // if any proxy is set, then disable builder.allowByPass as false
-                    disableAllowBypassIfNeeded()
                 }
                 notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
             }
@@ -2532,22 +2514,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     private suspend fun setTransparency() {
         Logger.d(LOG_TAG_VPN, "set endpoint independence: ${persistentState.endpointIndependence}")
         vpnAdapter?.setTransparency(persistentState.endpointIndependence)
-    }
-
-    private fun disableAllowBypassIfNeeded() {
-        if (appConfig.isProxyEnabled() && persistentState.allowBypass) {
-            Logger.i(LOG_TAG_VPN, "disabling allowBypass, as proxy is set.")
-            // inform user about the change in allow bypass setting by showing a toast
-            ui {
-                val message =
-                    getString(
-                        R.string.toast_allow_bypass_disabled,
-                        getString(R.string.settings_allow_bypass_heading)
-                    )
-                showToastUiCentered(this, message, Toast.LENGTH_LONG)
-            }
-            persistentState.allowBypass = false
-        }
     }
 
     private suspend fun setRDNS() {
