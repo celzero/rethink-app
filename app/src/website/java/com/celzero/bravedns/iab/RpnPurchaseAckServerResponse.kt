@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.iab
 
+import Logger
 import Logger.LOG_IAB
 import org.json.JSONObject
 

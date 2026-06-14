@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.rpnproxy
 
+import Logger
 import Logger.LOG_IAB
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.Purchase
@@ -28,7 +29,6 @@ import com.celzero.bravedns.iab.InAppBillingHandler.ONE_TIME_TEST_PRODUCT_ID
 import com.celzero.bravedns.iab.InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
 import com.celzero.bravedns.iab.InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_5YRS_DAYS
 import com.celzero.bravedns.iab.InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
-import com.celzero.bravedns.iab.InAppBillingHandler.STD_PRODUCT_ID
 import com.celzero.bravedns.iab.PurchaseDetail
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities

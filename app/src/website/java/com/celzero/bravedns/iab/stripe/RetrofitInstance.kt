@@ -1,6 +1,5 @@
 package com.celzero.bravedns.iab.stripe
 
-import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.customdownloader.RetrofitManager.Companion.okHttpClient
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit

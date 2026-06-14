@@ -24,6 +24,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.BottomsheetDeviceAuthErrorBinding
 import com.celzero.bravedns.iab.ServerApiError
@@ -31,7 +32,6 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import androidx.core.net.toUri
 import org.koin.android.ext.android.inject
 
 /**

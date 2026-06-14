@@ -31,7 +31,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.databinding.BottomsheetManageRpnPurchaseBinding
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
@@ -199,7 +198,7 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
 
     private fun initView() {
         try {
-            val subscriptionData  = RpnProxyManager.getSubscriptionData()
+            val subscriptionData = RpnProxyManager.getSubscriptionData()
             val subscriptionState = RpnProxyManager.getSubscriptionState()
 
             val hasSubscription = subscriptionData != null && subscriptionState.hasValidSubscription
@@ -231,8 +230,8 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
 
         // Status label + colour
         val colorGood = UIUtils.fetchColor(requireContext(), R.attr.accentGood)
-        val colorBad  = UIUtils.fetchColor(requireContext(), R.attr.accentBad)
-        val colorDim  = UIUtils.fetchColor(requireContext(), R.attr.primaryLightColorText)
+        val colorBad = UIUtils.fetchColor(requireContext(), R.attr.accentBad)
+        val colorDim = UIUtils.fetchColor(requireContext(), R.attr.primaryLightColorText)
         val (statusText, statusColor) = when (state.state()) {
             is SubscriptionStateMachineV2.SubscriptionState.Active -> getString(R.string.lbl_active) to colorGood
             is SubscriptionStateMachineV2.SubscriptionState.Grace -> getString(R.string.lbl_grace_period) to colorGood
@@ -258,16 +257,16 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
 
     private fun resolvePlanName(subscriptionData: SubscriptionStateMachineV2.SubscriptionData?): String {
         val productId = subscriptionData?.purchaseDetail?.productId.orEmpty()
-        val planId    = subscriptionData?.purchaseDetail?.planId.orEmpty()
+        val planId = subscriptionData?.purchaseDetail?.planId.orEmpty()
         return when {
-            planId    == InAppBillingHandler.ONE_TIME_PRODUCT_2YRS  -> getString(R.string.plan_2yr)
-            planId    == InAppBillingHandler.ONE_TIME_PRODUCT_5YRS  -> getString(R.string.plan_5yr)
-            planId    == InAppBillingHandler.SUBS_PRODUCT_YEARLY    -> getString(R.string.billing_yearly)
-            planId    == InAppBillingHandler.SUBS_PRODUCT_MONTHLY   -> getString(R.string.monthly_plan)
-            productId == InAppBillingHandler.ONE_TIME_PRODUCT_2YRS  -> getString(R.string.plan_2yr)
-            productId == InAppBillingHandler.ONE_TIME_PRODUCT_5YRS  -> getString(R.string.plan_5yr)
-            productId == InAppBillingHandler.SUBS_PRODUCT_YEARLY    -> getString(R.string.billing_yearly)
-            productId == InAppBillingHandler.SUBS_PRODUCT_MONTHLY   -> getString(R.string.monthly_plan)
+            planId == InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> getString(R.string.plan_2yr)
+            planId == InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> getString(R.string.plan_5yr)
+            planId == InAppBillingHandler.SUBS_PRODUCT_YEARLY -> getString(R.string.billing_yearly)
+            planId == InAppBillingHandler.SUBS_PRODUCT_MONTHLY -> getString(R.string.monthly_plan)
+            productId == InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> getString(R.string.plan_2yr)
+            productId == InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> getString(R.string.plan_5yr)
+            productId == InAppBillingHandler.SUBS_PRODUCT_YEARLY -> getString(R.string.billing_yearly)
+            productId == InAppBillingHandler.SUBS_PRODUCT_MONTHLY -> getString(R.string.monthly_plan)
             else -> subscriptionData?.purchaseDetail?.productTitle?.ifEmpty { productId } ?: productId
         }
     }
@@ -291,11 +290,11 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
                     b.btnConsumePurchase.isVisible = isTestEntitlement
                 }
             }
-            val state            = RpnProxyManager.getSubscriptionState()
+            val state = RpnProxyManager.getSubscriptionState()
             val subscriptionData = RpnProxyManager.getSubscriptionData()
 
-            b.btnCancel.isVisible      = false
-            b.btnRevoke.isVisible      = false
+            b.btnCancel.isVisible = false
+            b.btnRevoke.isVisible = false
             b.btnResubscribe.isVisible = false
             b.cancelNoteCard.isVisible = false
 
@@ -305,7 +304,7 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
             if (!state.state().isActive) {
                 when {
                     state.state().isCancelled && !isInApp -> b.btnResubscribe.isVisible = true
-                    else -> { /* expired / no subscription — nothing to show */ }
+                    else -> { /* expired / no subscription, nothing to show */ }
                 }
                 return
             }
@@ -313,18 +312,18 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
             b.tvManageSubscriptionOnGooglePlay.isVisible = !isInApp
 
             if (canRevoke(subscriptionData)) {
-                b.btnRevoke.isVisible      = true
+                b.btnRevoke.isVisible = true
                 b.cancelNoteCard.isVisible = true
-                b.tvCancelNote.text        = getString(R.string.revoke_subscription_note)
+                b.tvCancelNote.text = getString(R.string.revoke_subscription_note)
             } else if (!isInApp) {
-                b.btnCancel.isVisible      = true
+                b.btnCancel.isVisible = true
                 b.cancelNoteCard.isVisible = true
-                b.tvCancelNote.text        = getString(R.string.cancel_subscription_note_future)
+                b.tvCancelNote.text = getString(R.string.cancel_subscription_note_future)
             }
         } catch (e: Exception) {
             Logger.e(LOG_TAG_UI, "$TAG error showing cancel/revoke button: ${e.message}", e)
-            b.btnCancel.isVisible      = false
-            b.btnRevoke.isVisible      = false
+            b.btnCancel.isVisible = false
+            b.btnRevoke.isVisible = false
             b.cancelNoteCard.isVisible = false
         }
     }
@@ -337,10 +336,10 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
         }
         val planId = subscriptionData.purchaseDetail?.planId.orEmpty()
         val revokeWindowMs = when (planId) {
-            InAppBillingHandler.ONE_TIME_PRODUCT_2YRS  -> REVOKE_WINDOW_ONE_TIME_2YRS_DAYS * ONE_DAY_MS
-            InAppBillingHandler.ONE_TIME_PRODUCT_5YRS  -> REVOKE_WINDOW_ONE_TIME_5YRS_DAYS * ONE_DAY_MS
-            InAppBillingHandler.SUBS_PRODUCT_YEARLY    -> REVOKE_WINDOW_SUBS_YEARLY_DAYS   * ONE_DAY_MS
-            else                                       -> REVOKE_WINDOW_SUBS_MONTHLY_DAYS  * ONE_DAY_MS
+            InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> REVOKE_WINDOW_ONE_TIME_2YRS_DAYS * ONE_DAY_MS
+            InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> REVOKE_WINDOW_ONE_TIME_5YRS_DAYS * ONE_DAY_MS
+            InAppBillingHandler.SUBS_PRODUCT_YEARLY -> REVOKE_WINDOW_SUBS_YEARLY_DAYS   * ONE_DAY_MS
+            else -> REVOKE_WINDOW_SUBS_MONTHLY_DAYS  * ONE_DAY_MS
         }
         return (System.currentTimeMillis() - purchaseTs) < revokeWindowMs
     }
@@ -368,14 +367,14 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
      */
     private fun launchResubscribe() {
         val subscriptionData = RpnProxyManager.getSubscriptionData()
-        val purchaseDetail   = subscriptionData?.purchaseDetail
+        val purchaseDetail = subscriptionData?.purchaseDetail
         if (purchaseDetail == null || purchaseDetail.productId.isBlank() || purchaseDetail.planId.isBlank()) {
             Logger.w(LOG_TAG_UI, "$TAG: cannot resubscribe, missing purchaseDetail")
             showToastUiCentered(requireContext(), getString(R.string.resubscribe_error), Toast.LENGTH_SHORT)
             return
         }
 
-        b.btnResubscribe.isEnabled      = false
+        b.btnResubscribe.isEnabled = false
         b.progressResubscribe.isVisible = true
 
         io {
@@ -391,7 +390,7 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
             } catch (e: Exception) {
                 Logger.e(LOG_TAG_UI, "$TAG: resubscription failed: ${e.message}", e)
                 uiCtx {
-                    b.btnResubscribe.isEnabled      = true
+                    b.btnResubscribe.isEnabled = true
                     b.progressResubscribe.isVisible = false
                     showToastUiCentered(requireContext(), getString(R.string.resubscribe_error), Toast.LENGTH_SHORT)
                 }

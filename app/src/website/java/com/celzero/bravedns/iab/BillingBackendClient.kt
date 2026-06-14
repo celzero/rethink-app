@@ -24,6 +24,7 @@ import com.celzero.bravedns.customdownloader.IBillingServerApi
 import com.celzero.bravedns.customdownloader.IBillingServerApiTest
 import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.customdownloader.SafeResponseConverterFactory
+import com.celzero.bravedns.iab.BillingBackendClient.Companion.DB_SESSION_UNCONSTRAINED
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController

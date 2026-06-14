@@ -15,11 +15,13 @@
  */
 package com.celzero.bravedns.scheduler
 
+import Logger
 import Logger.LOG_TAG_BUG_REPORT
 import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import com.celzero.bravedns.scheduler.EnhancedBugReport.MAX_TOTAL_FILES
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.FirebaseErrorReporting

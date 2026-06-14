@@ -18,15 +18,6 @@ package com.celzero.bravedns.ui.dialog
 import android.app.Activity
 import com.celzero.bravedns.adapter.HopItem
 import com.celzero.bravedns.service.WireguardManager
-import android.app.Dialog
-import android.os.Bundle
-import android.view.Window
-import android.view.WindowManager
-import android.view.animation.Animation
-import android.view.animation.RotateAnimation
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.celzero.bravedns.adapter.WgHopAdapter
-import com.celzero.bravedns.databinding.DialogWgHopBinding
 import com.celzero.bravedns.wireguard.Config
 
 /**

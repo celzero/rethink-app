@@ -30,6 +30,7 @@ import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.BraveVPNService.Companion.NW_ENGINE_NOTIFICATION_ID
+import com.celzero.bravedns.service.GoMemLogConsumer.Companion.SLOT_SIZE
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.Daemons
 import com.celzero.bravedns.util.Themes

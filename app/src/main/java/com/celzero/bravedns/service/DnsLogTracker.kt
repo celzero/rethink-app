@@ -40,7 +40,6 @@ import com.celzero.firestack.backend.DNSSummary
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.internal.concurrent.TaskRunner
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 

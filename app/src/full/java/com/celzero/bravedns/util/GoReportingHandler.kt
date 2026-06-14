@@ -17,7 +17,6 @@ import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.BraveVPNService.Companion.NW_ENGINE_NOTIFICATION_ID
 import com.celzero.bravedns.service.GoCrashFileDescriptorReader
 import com.celzero.bravedns.service.GoLogFileDescriptorReader
-import com.celzero.bravedns.service.GoMemLogConsumer
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.AppLockActivity

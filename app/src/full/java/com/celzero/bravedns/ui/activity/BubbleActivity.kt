@@ -20,7 +20,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
-import com.celzero.bravedns.ui.BaseActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -31,9 +30,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.BubbleAllowedAppsAdapter
 import com.celzero.bravedns.adapter.BubbleBlockedAppsAdapter
 import com.celzero.bravedns.data.AllowedAppInfo
-import com.celzero.bravedns.viewmodel.AllowedAppsBubbleViewModel
 import com.celzero.bravedns.data.BlockedAppInfo
-import com.celzero.bravedns.viewmodel.BlockedAppsBubbleViewModel
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.DnsLogDAO
@@ -41,7 +38,10 @@ import com.celzero.bravedns.databinding.ActivityBubbleBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
+import com.celzero.bravedns.viewmodel.AllowedAppsBubbleViewModel
+import com.celzero.bravedns.viewmodel.BlockedAppsBubbleViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

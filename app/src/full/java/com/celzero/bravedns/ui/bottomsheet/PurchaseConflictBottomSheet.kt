@@ -31,6 +31,7 @@ import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.ServerApiError
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.CustomerSupportActivity
+import com.celzero.bravedns.ui.bottomsheet.PurchaseConflictBottomSheet.Companion.newInstance
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.Utilities.showToastUiCentered

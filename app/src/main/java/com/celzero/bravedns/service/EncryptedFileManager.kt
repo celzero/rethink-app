@@ -25,6 +25,7 @@ import androidx.security.crypto.MasterKey
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
+import com.celzero.bravedns.service.EncryptedFileManager.writeInternal
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
 import com.celzero.bravedns.wireguard.Config
 import org.koin.core.component.KoinComponent
