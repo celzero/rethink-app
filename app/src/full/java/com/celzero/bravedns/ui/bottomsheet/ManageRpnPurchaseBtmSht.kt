@@ -31,6 +31,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.databinding.BottomsheetManageRpnPurchaseBinding
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
@@ -285,7 +286,7 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
     private fun showCancelOrRevokeButton() {
         try {
             io {
-                val isTestEntitlement = RpnProxyManager.getIsTestEntitlement()
+                val isTestEntitlement = RpnProxyManager.getIsTestEntitlement() && persistentState.appTestMode
                 uiCtx {
                     b.btnConsumePurchase.isVisible = isTestEntitlement
                 }
