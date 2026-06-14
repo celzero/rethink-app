@@ -31,6 +31,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.databinding.BottomsheetManageRpnPurchaseBinding
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
@@ -307,6 +308,15 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
                     else -> { /* expired / no subscription, nothing to show */ }
                 }
                 return
+            }
+
+            // When state machine is Active but DB status is STATE_CANCELLED,
+            // the user has cancelled auto-renewal but access is still active.
+            // Show resubscribe alongside revoke/cancel so the user can re-enable.
+            val dbStatus = subscriptionData?.subscriptionStatus?.status
+            val isDbCancelled = dbStatus == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id
+            if (isDbCancelled && !isInApp) {
+                b.btnResubscribe.isVisible = true
             }
 
             b.tvManageSubscriptionOnGooglePlay.isVisible = !isInApp
