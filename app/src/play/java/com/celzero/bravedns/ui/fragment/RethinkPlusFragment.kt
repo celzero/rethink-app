@@ -143,18 +143,17 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
 
         // subscribe button
         val accentGood = UIUtils.fetchColor(ctx, R.attr.accentGood)
-        val primaryText = UIUtils.fetchColor(ctx, R.attr.primaryTextColor)
         val lightText  = UIUtils.fetchColor(ctx, R.attr.primaryLightColorText)
         val htxtClr = UIUtils.fetchColor(ctx, R.attr.homeScreenHeaderTextColor)
 
         b.subscribeButton.apply {
             backgroundTintList = android.content.res.ColorStateList.valueOf(accentGood)
             setTextColor(htxtClr)
-            iconTint = android.content.res.ColorStateList.valueOf(primaryText)
+            iconTint = android.content.res.ColorStateList.valueOf(htxtClr)
         }
 
         b.btnContactSupport.apply {
-            setTextColor(lightText)
+            setTextColor(lightText)s
             iconTint = android.content.res.ColorStateList.valueOf(lightText)
         }
 
