@@ -232,7 +232,8 @@ class SubscriptionStateMachineV2Test : KoinTest {
     }
 
     @Test
-    fun `init with Cancelled DB state and past billingExpiry restores Cancelled in memory`() {
+    fun `init with Cancelled DB state and past billingExpiry transitions to Expired`() {
+        // billing period has ended → subscription is expired
         val sub = makeActiveSub().also {
             it.status       = SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id
             it.billingExpiry = System.currentTimeMillis() - 1_000L
@@ -243,13 +244,16 @@ class SubscriptionStateMachineV2Test : KoinTest {
 
         val machine = createMachine()
 
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Cancelled, machine.getCurrentState())
-        coVerify(exactly = 0) { mockRepository.upsert(any()) }
+        // Cancelled + billingExpiry in the past → Expired
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
+        // handleSubscriptionExpiredWithData writes EXPIRED to DB
+        coVerify(atLeast = 1) { mockRepository.upsert(match { it.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id }) }
     }
 
     @Test
-    fun `init with billingExpiry=0 and Expired DB recommendedState treats as Active`() {
-        // When billingExpiry is 0 (unknown), the machine should not expire — Play will correct.
+    fun `init with billingExpiry=0 and Expired DB recommendedState stays Expired`() {
+        // When the DB row is Expired, respect that regardless of billingExpiry.
+        // Expired+0 was previously resurrected to Active; now it stays Expired.
         val sub = makeActiveSub().also {
             it.status       = SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id
             it.billingExpiry = 0L  // expiry unknown
@@ -260,8 +264,8 @@ class SubscriptionStateMachineV2Test : KoinTest {
 
         val machine = createMachine()
 
-        // billingExpiry=0 → override Expired → Active (Play will reconcile)
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.getCurrentState())
+        // Expired stays Expired — Play reconcile will correct if needed
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
     }
 
     // =========================================================================
@@ -452,10 +456,9 @@ class SubscriptionStateMachineV2Test : KoinTest {
     // =========================================================================
 
     @Test
-    fun `reconcile empty SUBS snapshot expires old non-recently-active rows`() = runBlocking {
+    fun `reconcile empty SUBS snapshot expires stale SUBS rows`() = runBlocking {
         val machine  = createMachine()
         val staleSub = makeActiveSub(purchaseToken = "tok-stale", productId = STD_PRODUCT).also {
-            // Updated 2 days ago — well outside the 24h RECENTLY_ACTIVE_GUARD_MS window
             it.lastUpdatedTs = System.currentTimeMillis() - 2 * 24 * 60 * 60 * 1000L
         }
         coEvery { mockRepository.getSubscriptionsByStates(any()) } returns listOf(staleSub)
@@ -472,10 +475,9 @@ class SubscriptionStateMachineV2Test : KoinTest {
     }
 
     @Test
-    fun `reconcile empty SUBS snapshot skips recently-active row within 24h guard`() = runBlocking {
+    fun `reconcile empty SUBS snapshot expires even recently-active rows`() = runBlocking {
         val machine    = createMachine()
         val recentSub  = makeActiveSub(purchaseToken = "tok-recent", productId = STD_PRODUCT).also {
-            // Updated 10 minutes ago — within RECENTLY_ACTIVE_GUARD_MS (24 hours)
             it.lastUpdatedTs = System.currentTimeMillis() - 10 * 60 * 1000L
         }
         coEvery { mockRepository.getSubscriptionsByStates(any()) } returns listOf(recentSub)
@@ -485,9 +487,11 @@ class SubscriptionStateMachineV2Test : KoinTest {
             queriedProductType = BillingClient.ProductType.SUBS
         )
 
-        // Guard fires: row is NOT expired, state remains Initial
-        coVerify(exactly = 0) { mockRepository.upsert(any()) }
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Initial, machine.getCurrentState())
+        // No guard window: Play is the authority, row is expired
+        coVerify {
+            mockRepository.upsert(match { it.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id })
+        }
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
     }
 
     @Test

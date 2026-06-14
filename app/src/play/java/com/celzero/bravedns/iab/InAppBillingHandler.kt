@@ -683,40 +683,52 @@ object InAppBillingHandler : KoinComponent {
                                     subscriptionStateMachine.paymentSuccessful(updatedDetail)
                                 }
 
-                                val tunnelExpiry: Long = getExpiryFromPayload(updatedDetail.payload) ?: 0L
-                                // billingExpiry is the authoritative local clock for INAPP purchases.
-                                // The VPN session token (tunnelExpiry) can expire weeks or months before
-                                // the billing window ends (e.g. 2 years). Only skip preservation when
-                                // BOTH the session token AND the local billing window are confirmed expired.
-                                // This prevents internet outages or server errors from silently expiring
-                                // an otherwise-valid purchase.
-                                val billingKnownExpired = sub.billingExpiry > 0L &&
-                                        sub.billingExpiry != Long.MAX_VALUE &&
-                                        sub.billingExpiry <= now
-                                logd(mname, "INAPP entitlement for token=${sub.purchaseToken.take(8)}: " +
-                                        "tunnelExpiry=$tunnelExpiry, billingExpiry=${sub.billingExpiry}, " +
-                                        "now=$now, billingKnownExpired=$billingKnownExpired, did=${deviceId.take(8)}")
-                                if (tunnelExpiry > now) {
-                                    // Server returned a fresh, valid session token — definitely preserve.
-                                    logd(mname, "INAPP token=${sub.purchaseToken.take(8)} server-confirmed valid " +
-                                            "(tunnelExpiry=$tunnelExpiry); skipping expire")
-                                    serverConfirmedValidTokens.add(sub.purchaseToken)
-                                } else if (!billingKnownExpired) {
-                                    // Session token has expired (or server/network unavailable) but the
-                                    // local billing window is still open (or unknown).
-                                    // Covers: network errors, 401 (surfaced to UI by queryEntitlementFromServer),
-                                    // 409, server business errors, stale session needing refresh.
-                                    // Billing window is the authority — do NOT expire a valid purchase
-                                    // simply because the server could not be reached.
-                                    logd(mname, "INAPP token=${sub.purchaseToken.take(8)}: tunnelExpiry expired/zero " +
-                                            "but billing window not expired (billingExpiry=${sub.billingExpiry}); " +
-                                            "preserving (fail-safe — internet/server issues must not expire a valid purchase)")
-                                    serverConfirmedValidTokens.add(sub.purchaseToken)
+                                // When the server zeroed both expiryTime and the payload, it has
+                                // authoritatively confirmed the subscription is expired.
+                                // This overrides the local billing window — do NOT preserve.
+                                val serverAuthoritativelyExpired = updatedDetail.expiryTime == 0L &&
+                                    updatedDetail.payload.isEmpty() &&
+                                    sub.billingExpiry > 0L
+                                if (serverAuthoritativelyExpired) {
+                                    logd(mname, "INAPP token=${sub.purchaseToken.take(8)}: server authoritatively " +
+                                        "confirmed expired (expiryTime=0, payload cleared); will expire")
+                                    // token intentionally NOT added to serverConfirmedValidTokens
                                 } else {
-                                    // Both the session token AND the local billing window are expired.
-                                    // Allow expireStaleInAppFromDb to handle via the locallyExpired check.
-                                    logd(mname, "INAPP token=${sub.purchaseToken.take(8)}: tunnelExpiry=$tunnelExpiry " +
-                                            "and billing=${sub.billingExpiry} both expired; will expire")
+                                    val tunnelExpiry: Long = getExpiryFromPayload(updatedDetail.payload) ?: 0L
+                                    // billingExpiry is the authoritative local clock for INAPP purchases.
+                                    // The VPN session token (tunnelExpiry) can expire weeks or months before
+                                    // the billing window ends (e.g. 2 years). Only skip preservation when
+                                    // BOTH the session token AND the local billing window are confirmed expired.
+                                    // This prevents internet outages or server errors from silently expiring
+                                    // an otherwise-valid purchase.
+                                    val billingKnownExpired = sub.billingExpiry > 0L &&
+                                            sub.billingExpiry != Long.MAX_VALUE &&
+                                            sub.billingExpiry <= now
+                                    logd(mname, "INAPP entitlement for token=${sub.purchaseToken.take(8)}: " +
+                                            "tunnelExpiry=$tunnelExpiry, billingExpiry=${sub.billingExpiry}, " +
+                                            "now=$now, billingKnownExpired=$billingKnownExpired, did=${deviceId.take(8)}")
+                                    if (tunnelExpiry > now) {
+                                        // Server returned a fresh, valid session token — definitely preserve.
+                                        logd(mname, "INAPP token=${sub.purchaseToken.take(8)} server-confirmed valid " +
+                                                "(tunnelExpiry=$tunnelExpiry); skipping expire")
+                                        serverConfirmedValidTokens.add(sub.purchaseToken)
+                                    } else if (!billingKnownExpired) {
+                                        // Session token has expired (or server/network unavailable) but the
+                                        // local billing window is still open (or unknown).
+                                        // Covers: network errors, 401 (surfaced to UI by queryEntitlementFromServer),
+                                        // 409, server business errors, stale session needing refresh.
+                                        // Billing window is the authority — do NOT expire a valid purchase
+                                        // simply because the server could not be reached.
+                                        logd(mname, "INAPP token=${sub.purchaseToken.take(8)}: tunnelExpiry expired/zero " +
+                                                "but billing window not expired (billingExpiry=${sub.billingExpiry}); " +
+                                                "preserving (fail-safe — internet/server issues must not expire a valid purchase)")
+                                        serverConfirmedValidTokens.add(sub.purchaseToken)
+                                    } else {
+                                        // Both the session token AND the local billing window are expired.
+                                        // Allow expireStaleInAppFromDb to handle via the locallyExpired check.
+                                        logd(mname, "INAPP token=${sub.purchaseToken.take(8)}: tunnelExpiry=$tunnelExpiry " +
+                                                "and billing=${sub.billingExpiry} both expired; will expire")
+                                    }
                                 }
                             } catch (e: Exception) {
                                 loge(mname, "unexpected error checking INAPP entitlement for id=${sub.id}: ${e.message}", e)
