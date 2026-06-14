@@ -323,11 +323,6 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
     }
 
     private fun removeThisMethod() {
-        // set allowBypass to false for all versions, overriding the user's preference.
-        // the default was true for Play Store and website versions, and false for F-Droid.
-        // when allowBypass is true, some OEMs bypass the VPN service, causing connections
-        // to fail due to the "Block connections without VPN" option.
-        persistentState.allowBypass = false
 
         io {
             appInfoDb.setRethinkToBypassDnsAndFirewall()

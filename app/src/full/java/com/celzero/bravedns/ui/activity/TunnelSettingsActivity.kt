@@ -139,8 +139,6 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         b.dvWgAllowIncomingTxt.text = getString(R.string.two_argument_space, getString(R.string.settings_allow_incoming_wg_packets), getString(R.string.lbl_experimental))
         b.settingsUseMaxMtuHeading.text = getString(R.string.two_argument_space, getString(R.string.settings_jumbo_packets), getString(R.string.lbl_experimental))
 
-        b.settingsActivityAllowBypassProgress.visibility = View.GONE
-        displayAllowBypassUi()
         // use multiple networks
         b.settingsActivityAllNetworkSwitch.isChecked = persistentState.useMultipleNetworks
         // route lan traffic
@@ -272,26 +270,6 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         }
     }
 
-    private fun displayAllowBypassUi() {
-        // allow apps part of the vpn to request networks outside of it, effectively letting it
-        // bypass the vpn itself
-        if (!Utilities.isPlayStoreFlavour()) {
-            b.settingsActivityAllowBypassRl.visibility = View.VISIBLE
-            b.settingsActivityAllowBypassDesc.visibility = View.VISIBLE
-            b.settingsActivityAllowBypassSwitch.visibility = View.VISIBLE
-            b.settingsActivityAllowBypassProgress.visibility = View.GONE
-            b.dividerAllowBypass.visibility = View.VISIBLE
-
-            b.settingsActivityAllowBypassSwitch.isChecked = persistentState.allowBypass
-        } else {
-            b.settingsActivityAllowBypassRl.visibility = View.GONE
-            b.settingsActivityAllowBypassDesc.visibility = View.GONE
-            b.settingsActivityAllowBypassSwitch.visibility = View.GONE
-            b.settingsActivityAllowBypassProgress.visibility = View.GONE
-            b.dividerAllowBypass.visibility = View.GONE
-        }
-    }
-
     private fun setupClickListeners() {
         b.settingsActivityAllNetworkRl.setOnClickListener {
             b.settingsActivityAllNetworkSwitch.isChecked =
@@ -381,32 +359,6 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                 )
                 displayRethinkInRethinkUi()
             }
-        }
-
-        b.settingsActivityAllowBypassRl.setOnClickListener {
-            b.settingsActivityAllowBypassSwitch.isChecked =
-                !b.settingsActivityAllowBypassSwitch.isChecked
-        }
-
-        b.settingsActivityAllowBypassSwitch.setOnCheckedChangeListener {
-            _: CompoundButton,
-            checked: Boolean ->
-            if (Utilities.isPlayStoreFlavour()) return@setOnCheckedChangeListener
-
-            persistentState.allowBypass = checked
-            b.settingsActivityAllowBypassSwitch.isEnabled = false
-            b.settingsActivityAllowBypassSwitch.visibility = View.INVISIBLE
-            b.settingsActivityAllowBypassProgress.visibility = View.VISIBLE
-
-            Utilities.delay(TimeUnit.SECONDS.toMillis(1L), lifecycleScope) {
-                b.settingsActivityAllowBypassSwitch.isEnabled = true
-                b.settingsActivityAllowBypassProgress.visibility = View.GONE
-                b.settingsActivityAllowBypassSwitch.visibility = View.VISIBLE
-            }
-            logEvent(
-                "allow bypass",
-                "Allow bypass VPN: $checked"
-            )
         }
 
         b.settingsActivityLanTrafficRl.setOnClickListener {
@@ -1037,15 +989,11 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         val isLockdown = VpnController.isVpnLockdown()
         if (isLockdown) {
             b.settingsActivityVpnLockdownDesc.visibility = View.VISIBLE
-            b.settingsActivityAllowBypassRl.alpha = ALPHA_DISABLED
             b.settingsActivityExcludeProxyAppsRl.alpha = ALPHA_DISABLED
         } else {
             b.settingsActivityVpnLockdownDesc.visibility = View.GONE
-            b.settingsActivityAllowBypassRl.alpha = ALPHA_ENABLED
             b.settingsActivityExcludeProxyAppsRl.alpha = ALPHA_ENABLED
         }
-        b.settingsActivityAllowBypassSwitch.isEnabled = !isLockdown
-        b.settingsActivityAllowBypassRl.isEnabled = !isLockdown
         b.settingsActivityLanTrafficRl.isEnabled = !isLockdown
         b.settingsActivityExcludeProxyAppsSwitch.isEnabled = !isLockdown
         b.settingsActivityExcludeProxyAppsRl.isEnabled = !isLockdown
