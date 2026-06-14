@@ -1990,7 +1990,7 @@
     <string name="stability_program_snackbar_msg" translatable="true">Stability program enabled</string>
     <string name="stability_program_snackbar_disable" translatable="true">Undo</string>
 
-    <string name="settings_wireguard_lockdown_mode" translatable="false">Proxy Lockdown</string>
+    <string name="settings_wireguard_lockdown_mode" translatable="false">Proxy Lockdown (experimental)</string>
     <string name="settings_wireguard_lockdown_mode_desc" translatable="false">When enabled, all traffic is forced through Proxy or blocked.</string>
 
     <string name="settings_flood_wg" translatable="false">Flood WireGuard</string>
