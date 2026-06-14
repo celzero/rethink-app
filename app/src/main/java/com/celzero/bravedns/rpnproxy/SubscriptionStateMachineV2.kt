@@ -99,6 +99,34 @@ class SubscriptionStateMachineV2 : KoinComponent {
          * converging on the correct state in any edge case.
          */
         private const val LOCAL_CANCEL_REVOKE_GUARD_MS = 5 * 60 * 1000L // 5 minutes
+
+        /**
+         * Returns `true` when the state machine's [SubscriptionData] indicates the
+         * subscription was recently cancelled or revoked locally (within
+         * [LOCAL_CANCEL_REVOKE_GUARD_MS]) and the Play-propagated [PaymentSuccessful]
+         * event carries the same purchase token.
+         *
+         * Used by transition guards to prevent a stale Play reconcile from overwriting
+         * a locally-set CANCELLED / REVOKED status back to ACTIVE. A genuine
+         * resubscription always has a different token and is never blocked.
+         */
+        fun isWithinLocalCancelRevokeGuard(
+            data: SubscriptionData?,
+            event: SubscriptionEvent
+        ): Boolean {
+            if (data == null) return false
+            val sub = data.subscriptionStatus
+            if (sub.status != SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id &&
+                sub.status != SubscriptionStatus.SubscriptionState.STATE_REVOKED.id) {
+                return false
+            }
+            if (event is SubscriptionEvent.PaymentSuccessful) {
+                if (event.purchaseDetail.purchaseToken != sub.purchaseToken) {
+                    return false
+                }
+            }
+            return (System.currentTimeMillis() - sub.lastUpdatedTs) < LOCAL_CANCEL_REVOKE_GUARD_MS
+        }
     }
 
     init {
@@ -399,7 +427,10 @@ class SubscriptionStateMachineV2 : KoinComponent {
                     fromState = SubscriptionState.Cancelled,
                     event = SubscriptionEvent.PaymentSuccessful(createDummyPurchaseDetail()),
                     toState = SubscriptionState.Active,
-                    guard = { event, _ -> event is SubscriptionEvent.PaymentSuccessful },
+                    guard = { event, data ->
+                        event is SubscriptionEvent.PaymentSuccessful &&
+                        !isWithinLocalCancelRevokeGuard(data as? SubscriptionData, event)
+                    },
                     action = { event, _ ->
                         handlePaymentSuccessful((event as SubscriptionEvent.PaymentSuccessful).purchaseDetail)
                     }
@@ -492,7 +523,10 @@ class SubscriptionStateMachineV2 : KoinComponent {
                     fromState = SubscriptionState.Revoked,
                     event = SubscriptionEvent.PaymentSuccessful(createDummyPurchaseDetail()),
                     toState = SubscriptionState.Active,
-                    guard = { event, _ -> event is SubscriptionEvent.PaymentSuccessful },
+                    guard = { event, data ->
+                        event is SubscriptionEvent.PaymentSuccessful &&
+                        !isWithinLocalCancelRevokeGuard(data as? SubscriptionData, event)
+                    },
                     action = { event, _ ->
                         handlePaymentSuccessful((event as SubscriptionEvent.PaymentSuccessful).purchaseDetail)
                     }

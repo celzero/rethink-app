@@ -182,11 +182,6 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
             b.tvDetailExpiry.text = fmt.format(Date(sub.billingExpiry))
         }
 
-        // Renew CTA — show when subscription is expired/revoked, or when DB
-        // status is STATE_CANCELLED (auto-renewal off but access still active).
-        val isDbCancelled = sub?.status == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id
-        b.renewButton.isVisible = !state.hasValidSubscription || isDbCancelled
-
         // Expiring-soon banner - only for active INAPP purchases within 30 days of expiry
         updateExpiringBanner(subscriptionData, state)
     }
@@ -306,7 +301,6 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
                 val deviceId = runCatching { InAppBillingHandler.getObfuscatedDeviceId() }.getOrDefault("")
                 uiCtx {
                     populateBanner(sub, state, deviceId)
-                    handleStateChange(state, sub)
                 }
             }
         }
@@ -358,34 +352,6 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
         sheet.show(childFragmentManager, "conflict409")
     }
 
-
-    private fun handleStateChange(state: SubscriptionStateMachineV2.SubscriptionState, sub: SubscriptionStatus?) {
-        when (state) {
-            is SubscriptionStateMachineV2.SubscriptionState.Active,
-            is SubscriptionStateMachineV2.SubscriptionState.Grace -> {
-                // Show renew button when DB status is STATE_CANCELLED even though
-                // the state machine is still Active (auto-renewal turned off,
-                // access remains until billing period ends).
-                val isDbCancelled = sub?.status == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id
-                b.renewButton.isVisible = isDbCancelled
-            }
-            is SubscriptionStateMachineV2.SubscriptionState.Cancelled -> {
-                b.renewButton.isVisible = true
-            }
-            is SubscriptionStateMachineV2.SubscriptionState.Revoked -> {
-                b.renewButton.isVisible = true
-            }
-            is SubscriptionStateMachineV2.SubscriptionState.Expired -> {
-                b.renewButton.isVisible = true
-            }
-            is SubscriptionStateMachineV2.SubscriptionState.Uninitialized,
-            is SubscriptionStateMachineV2.SubscriptionState.Initial -> {
-                // transient, ignore
-            }
-            else -> Logger.d(LOG_TAG_UI, "$TAG state: ${state.javaClass.simpleName}")
-        }
-    }
-
     private fun setupClickListeners() {
         b.pingTestRl.setOnClickListener {
             startActivity(Intent(requireContext(), PingTestActivity::class.java))
@@ -396,47 +362,12 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
         b.entitlementRl.setOnClickListener {
             EntitlementDetailBottomSheet.newInstance().show(childFragmentManager, "entitlementDetails")
         }
-        b.renewButton.setOnClickListener {
-            launchResubscribe()
-        }
     }
 
     private fun managePlayStoreSubs() {
         if (!isAdded || isStateSaved) return
         if (childFragmentManager.findFragmentByTag("manageRpnPurchase") != null) return
         ManageRpnPurchaseBtmSht.newInstance().show(childFragmentManager, "manageRpnPurchase")
-    }
-
-    /**
-     * Launches the Google Play billing flow to resubscribe to the current plan.
-     * Mirrors [ManageRpnPurchaseBtmSht.launchResubscribe].  Falls back to
-     * navigating to [RethinkPlusFragment] if the purchase detail is unavailable.
-     */
-    private fun launchResubscribe() {
-        val subscriptionData = RpnProxyManager.getSubscriptionData()
-        val purchaseDetail = subscriptionData?.purchaseDetail
-        if (purchaseDetail == null || purchaseDetail.productId.isBlank() || purchaseDetail.planId.isBlank()) {
-            Logger.w(LOG_TAG_UI, "$TAG: cannot resubscribe, missing purchaseDetail — falling back to RethinkPlusFragment")
-            safeNavigate(R.id.action_rethinkPlusDashboard_to_rethinkPlus)
-            return
-        }
-
-        io {
-            try {
-                Logger.i(LOG_TAG_UI, "$TAG: launching resubscription for productId=${purchaseDetail.productId}, planId=${purchaseDetail.planId}")
-                InAppBillingHandler.purchaseSubs(
-                    activity = requireActivity(),
-                    productId = purchaseDetail.productId,
-                    planId = purchaseDetail.planId,
-                    forceResubscribe = true
-                )
-            } catch (e: Exception) {
-                Logger.e(LOG_TAG_UI, "$TAG: resubscription failed: ${e.message}", e)
-                uiCtx {
-                    showToastUiCentered(requireContext(), getString(R.string.resubscribe_error), Toast.LENGTH_SHORT)
-                }
-            }
-        }
     }
 
     private fun openServerOrderHistory() {

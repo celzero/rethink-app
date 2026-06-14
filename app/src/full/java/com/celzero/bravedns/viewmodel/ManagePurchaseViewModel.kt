@@ -128,6 +128,12 @@ class ManagePurchaseViewModel : ViewModel() {
 
                 emit(OperationState.InProgress(isCancel, Step.UPDATING_LOCAL))
 
+                if (isCancel) {
+                    RpnProxyManager.handleUserCancellation()
+                } else {
+                    RpnProxyManager.handleSubscriptionRevoked()
+                }
+
                 emit(OperationState.InProgress(isCancel, Step.REFRESHING))
                 try {
                     InAppBillingHandler.fetchPurchases(

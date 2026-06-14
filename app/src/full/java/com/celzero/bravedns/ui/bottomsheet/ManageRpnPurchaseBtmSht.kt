@@ -41,6 +41,8 @@ import com.celzero.bravedns.iab.InAppBillingHandler.REVOKE_WINDOW_SUBS_YEARLY_DA
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.activity.FragmentHostActivity
+import com.celzero.bravedns.ui.fragment.RethinkPlusFragment
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
@@ -203,11 +205,11 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
             val subscriptionState = RpnProxyManager.getSubscriptionState()
 
             val hasSubscription = subscriptionData != null && subscriptionState.hasValidSubscription
-            val isKnownExpiredOrCancelled = !hasSubscription &&
+            val isKnownExpiredOrCancelledOrRevoked = !hasSubscription &&
                     subscriptionData != null &&
-                    (subscriptionState.state().isExpired || subscriptionState.state().isCancelled)
+                    (subscriptionState.state().isExpired || subscriptionState.state().isCancelled || subscriptionState.state().isRevoked)
 
-            if (!hasSubscription && !isKnownExpiredOrCancelled) {
+            if (!hasSubscription && !isKnownExpiredOrCancelledOrRevoked) {
                 return
             }
 
@@ -238,6 +240,7 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
             is SubscriptionStateMachineV2.SubscriptionState.Grace -> getString(R.string.lbl_grace_period) to colorGood
             is SubscriptionStateMachineV2.SubscriptionState.Cancelled -> getString(R.string.lbl_cancelled) to colorBad
             is SubscriptionStateMachineV2.SubscriptionState.Expired -> getString(R.string.lbl_expired) to colorBad
+            is SubscriptionStateMachineV2.SubscriptionState.Revoked -> getString(R.string.status_revoked) to colorBad
             is SubscriptionStateMachineV2.SubscriptionState.Paused -> getString(R.string.lbl_paused) to colorDim
             else -> getString(R.string.placeholder_dash) to colorDim
         }
@@ -305,6 +308,7 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
             if (!state.state().isActive) {
                 when {
                     state.state().isCancelled && !isInApp -> b.btnResubscribe.isVisible = true
+                    state.state().isRevoked -> b.btnResubscribe.isVisible = true
                     else -> { /* expired / no subscription, nothing to show */ }
                 }
                 return
@@ -376,35 +380,16 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
      * No nested bottom sheet needed — Play shows a targeted resubscribe sheet itself.
      */
     private fun launchResubscribe() {
-        val subscriptionData = RpnProxyManager.getSubscriptionData()
-        val purchaseDetail = subscriptionData?.purchaseDetail
-        if (purchaseDetail == null || purchaseDetail.productId.isBlank() || purchaseDetail.planId.isBlank()) {
-            Logger.w(LOG_TAG_UI, "$TAG: cannot resubscribe, missing purchaseDetail")
+        try {
+            val intent = FragmentHostActivity.createIntent(
+                context = requireContext(),
+                fragmentClass = RethinkPlusFragment::class.java
+            )
+            startActivity(intent)
+            dismissAllowingStateLoss()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "$TAG: navigate to purchase failed: ${e.message}", e)
             showToastUiCentered(requireContext(), getString(R.string.resubscribe_error), Toast.LENGTH_SHORT)
-            return
-        }
-
-        b.btnResubscribe.isEnabled = false
-        b.progressResubscribe.isVisible = true
-
-        io {
-            try {
-                Logger.i(LOG_TAG_UI, "$TAG: launching resubscription for productId=${purchaseDetail.productId}, planId=${purchaseDetail.planId}")
-                InAppBillingHandler.purchaseSubs(
-                    activity = requireActivity(),
-                    productId = purchaseDetail.productId,
-                    planId = purchaseDetail.planId,
-                    forceResubscribe = true
-                )
-                uiCtx { dismissAllowingStateLoss() }
-            } catch (e: Exception) {
-                Logger.e(LOG_TAG_UI, "$TAG: resubscription failed: ${e.message}", e)
-                uiCtx {
-                    b.btnResubscribe.isEnabled = true
-                    b.progressResubscribe.isVisible = false
-                    showToastUiCentered(requireContext(), getString(R.string.resubscribe_error), Toast.LENGTH_SHORT)
-                }
-            }
         }
     }
 
