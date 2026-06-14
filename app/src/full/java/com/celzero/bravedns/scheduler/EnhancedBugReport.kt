@@ -184,7 +184,7 @@ object EnhancedBugReport : KoinComponent {
 
         // delete all the empty files (but never touch active-session files even if empty)
         allFiles
-            .filter { it.length() == 0L && !activeSessionFileNames.contains(it.name) }
+            .filter { (it.length() == 0L || it.length() == 13L || it.length() == 15L) && !activeSessionFileNames.contains(it.name) }
             .forEach { empty ->
                 val deleted = empty.delete()
                 Log.d(LOG_TAG_BUG_REPORT, "deleted empty tombstone: ${empty.name}, ok=$deleted")
