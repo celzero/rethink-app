@@ -530,8 +530,8 @@ object VpnController : KoinComponent {
         return braveVpnService?.getWinProxyId()
     }
 
-    suspend fun crashTun() {
-        braveVpnService?.crashTun()
+    suspend fun crashTun(type: Long) {
+        braveVpnService?.crashTun(type)
     }
 
     suspend fun getEntitlementDetails(prevBytes: ByteArray?, deviceId: String): RpnEntitlement? {

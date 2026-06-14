@@ -3409,16 +3409,16 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    fun crashTun() {
+    fun crashTun(type: Long) {
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip crash tun")
             return
         }
         try {
-            val type = 0L // 0: default, 1: don't panic
+            // 0: default, 1: don't panic
             // 0: will crash, gowtf
             // 1: won't crash, write to stack trace
-            val afterMs: Long = 0L
+            val afterMs = 1000L
             Intra.crash(type, afterMs)
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG err crash tun: ${e.message}", e)

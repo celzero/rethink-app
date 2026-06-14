@@ -6153,8 +6153,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return RpnProxyManager.stats()
     }
 
-    suspend fun crashTun() {
-        vpnAdapter?.crashTun()
+    suspend fun crashTun(type: Long) {
+        vpnAdapter?.crashTun(type)
     }
 
     fun screenUnlock() {
