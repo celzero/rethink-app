@@ -117,7 +117,7 @@ class CoFactory<T>(
     // always recycle the exhausted channel, ie., the channel that is completed all the receives
     private suspend fun recycleChannel(c: Channel<Deferred<T>>) {
         channelsMutex.lock()
-        if (channels.size < 20) {
+        if (channels.size < 40) {
             channels.add(c)
         }
         channelsMutex.unlock()
