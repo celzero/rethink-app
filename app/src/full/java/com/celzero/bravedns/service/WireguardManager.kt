@@ -1327,13 +1327,9 @@ object WireguardManager : KoinComponent {
                 db.deleteConfig(c.id)
                 return@forEach
             }
-            if (!parentDir.exists() && !parentDir.mkdirs()) {
-                Logger.e(LOG_TAG_PROXY, "wg restore failed, unable to create dir: ${parentDir.absolutePath}")
-                db.deleteConfig(c.id)
-                return@forEach
-            }
             val created = runCatching {
                 if (!encryptFile.exists()) {
+                    parentDir.mkdirs()
                     encryptFile.createNewFile()
                 } else {
                     true
