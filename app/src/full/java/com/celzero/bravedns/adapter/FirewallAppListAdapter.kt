@@ -165,7 +165,7 @@ class FirewallAppListAdapter(
 
             // show key icon in drawable right of b.firewallAppDataUsage
             val proxy = ProxyManager.getProxyIdForApp(appInfo.uid)
-            if (proxy.isEmpty() || proxy == ID_NONE) {
+            if (proxy.isEmpty() || (proxy.size == 1 && proxy[0] == ID_NONE)) {
                 return
             }
             b.firewallAppLabelTv.append(context.getString(R.string.symbol_key))

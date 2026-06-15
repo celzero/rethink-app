@@ -97,9 +97,14 @@ object ProxyManager : KoinComponent {
         return a.size
     }
 
-    fun getProxyIdForApp(uid: Int): String {
-        val m = pamSet.find { it.uid == uid }
-        return m?.proxyId ?: ID_NONE
+    fun getProxyIdForApp(uid: Int): List<String> {
+        val pids =
+            pamSet
+                .filter { it.uid == uid }
+                .map { it.proxyId.takeUnless { it.isBlank() } ?: ID_NONE }
+                .distinct()
+                .ifEmpty { listOf(ID_NONE) }
+        return pids
     }
 
     fun trackedApps(): MutableSet<FirewallManager.AppInfoTuple> {
