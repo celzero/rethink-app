@@ -1423,7 +1423,7 @@ class GoVpnAdapter : KoinComponent {
                         addWgProxy(id, true)
                     }
                 }
-                if (canResume) {
+                if (stats == Backend.TPU && canResume) {
                     // if the proxy is paused, then resume it
                     // this is needed when the tunnel is reconnected and the proxies are paused
                     // so resume them, also when there is switch in wg-config for useOnlyOnMetered
@@ -2181,8 +2181,8 @@ class GoVpnAdapter : KoinComponent {
             // to 8 (none)
             val goLogLevel = if (l1 == 7) 8 else l1
             val consoleLogLevel = if (l2 == 7) 8 else l2
-            // depth to include the file trace, 9 - max, 1 - min
-            val depth = if (includeFileTrace) 9 else 1
+            // depth to include the file trace, 9 - max, 0 - min
+            val depth = if (includeFileTrace) 9 else 0
             Intra.logLevel(goLogLevel, consoleLogLevel, depth)
             //Intra.logLevel(goLogLevel, consoleLogLevel)
             Logger.i(LOG_TAG_VPN, "$TAG set go-log level: $l1, $l2, $depth")
