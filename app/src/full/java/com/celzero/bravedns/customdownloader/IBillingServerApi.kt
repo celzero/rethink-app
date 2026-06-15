@@ -65,6 +65,7 @@ interface IBillingServerApi {
     suspend fun registerCustomer(
         @Header("x-rethink-app-cid") accountId: String?,
         @Header("x-rethink-app-did") deviceId: String?,
+        @Query("vcode") vcode: String,
         @Body meta: JsonObject
     ): Response<JsonObject?>?
 
@@ -85,6 +86,7 @@ interface IBillingServerApi {
     suspend fun registerDevice(
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String?,
+        @Query("vcode") vcode: String,
         @Body meta: JsonObject? = null
     ): Response<JsonObject?>?
 
@@ -107,7 +109,8 @@ interface IBillingServerApi {
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
-        @Query("purchaseToken") purchaseToken: String
+        @Query("purchaseToken") purchaseToken: String,
+        @Query("vcode") vcode: String
     ): Response<JsonObject?>?
 
     /*
@@ -128,7 +131,8 @@ interface IBillingServerApi {
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
-        @Query("purchaseToken") purchaseToken: String
+        @Query("purchaseToken") purchaseToken: String,
+        @Query("vcode") vcode: String
     ): Response<JsonObject?>?
 
     /*
@@ -148,6 +152,7 @@ interface IBillingServerApi {
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
         @Query("purchaseToken") purchaseToken: String,
+        @Query("vcode") vcode: String
     ): Response<JsonObject?>?
 
     /*
@@ -168,6 +173,7 @@ interface IBillingServerApi {
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
         @Query("purchaseToken") purchaseToken: String,
+        @Query("vcode") vcode: String
     ): Response<JsonObject?>?
 
 
@@ -190,7 +196,8 @@ interface IBillingServerApi {
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
-        @Query("purchaseToken") purchaseToken: String
+        @Query("purchaseToken") purchaseToken: String,
+        @Query("vcode") vcode: String
     ): Response<JsonObject?>?
 
     /*
@@ -214,6 +221,7 @@ interface IBillingServerApi {
         @Header("x-rethink-app-did") deviceId: String,
         @Query("purchaseToken") purchaseToken: String,
         @Query("tot") total: Int? = null,
-        @Query("active") active: String? = null
+        @Query("active") active: String? = null,
+        @Query("vcode") vcode: String
     ): Response<JsonObject?>?
 }

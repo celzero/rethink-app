@@ -59,10 +59,7 @@ class RetrofitManager {
         // log writes never block OkHttp's network threads.
         private val logScope = CoroutineScope(Daemons.make("RayIdLogger"))
 
-        /**
-         * Ray-ID interceptor: captures Cloudflare's cf-ray header and any "ray" field in the body,
-         * logging them
-         */
+        /** Captures Cloudflare's cf-ray header for request tracing. */
         val rayIdInterceptor = Interceptor { chain ->
             val request = chain.request()
             val reqTime = System.currentTimeMillis()
@@ -80,53 +77,13 @@ class RetrofitManager {
 
             try {
                 val cfRay = response.header("cf-ray")
-                val responseBody = response.body
 
-                if (responseBody != null) {
-                    // Only peek at a small prefix (max 8KB) to avoid OOM on
-                    // large downloads like the blocklist trie. peek() does not
-                    // consume the underlying source, so the caller can still
-                    // read the full body.
-                    val rayId: String? = try {
-                        val bytesToRead = responseBody.contentLength()
-                            .takeIf { it in 1..8192 }
-                            ?: 8192L
-                        val bodyPrefix = responseBody.source()
-                            .peek()
-                            .readUtf8(bytesToRead)
-                        Regex("\"ray\"\\s*:\\s*\"([^\"]+)\"")
-                            .find(bodyPrefix)?.groupValues?.get(1)
-                    } catch (_: Exception) {
-                        null
-                    }
-
-                    logScope.launch {
-                        val ts = Utilities.convertLongToTime(respTime, Constants.TIME_FORMAT_4)
-                        val prefix = "$ts <-- ${response.code} ${request.method} ${request.url}"
-                        if (cfRay != null) {
-                            val msg = "$prefix | cf-ray: $cfRay"
-                            Logger.d(LOG_OKHTTP, msg)
-                            Logger.wireLog(msg)
-                        }
-                        if (rayId != null) {
-                            val msg = "$prefix | ray: $rayId"
-                            Logger.d(LOG_OKHTTP, msg)
-                            Logger.wireLog(msg)
-                        }
-                        if (cfRay == null && rayId == null) {
-                            val msg = "$prefix | no-ray"
-                            Logger.d(LOG_OKHTTP, msg)
-                            Logger.wireLog(msg)
-                        }
-                    }
-                } else {
-                    logScope.launch {
-                        val ts = Utilities.convertLongToTime(respTime, Constants.TIME_FORMAT_4)
-                        val prefix = "$ts <-- ${response.code} ${request.method} ${request.url}"
-                        val msg = if (cfRay != null) "$prefix | cf-ray: $cfRay" else "$prefix | no-body no-ray"
-                        Logger.d(LOG_OKHTTP, msg)
-                        Logger.wireLog(msg)
-                    }
+                logScope.launch {
+                    val ts = Utilities.convertLongToTime(respTime, Constants.TIME_FORMAT_4)
+                    val prefix = "$ts <-- ${response.code} ${request.method} ${request.url}"
+                    val msg = if (cfRay != null) "$prefix | cf-ray: $cfRay" else "$prefix | no-ray"
+                    Logger.d(LOG_OKHTTP, msg)
+                    Logger.wireLog(msg)
                 }
             } catch (e: Exception) {
                 Logger.e(LOG_OKHTTP, "err extracting ray-id from response: ${e.message}", e)
@@ -158,7 +115,7 @@ class RetrofitManager {
             b.readTimeout(READ_TIMEOUT_MINUTES, TimeUnit.MINUTES)
             b.writeTimeout(WRITE_TIMEOUT_MINUTES, TimeUnit.MINUTES)
             b.retryOnConnectionFailure(true)
-            // Always active: captures cf-ray header and body ray-id; never logs
+            // Always active: captures cf-ray header; never logs
             // request headers (cid / did / sessionToken stay out of logs).
             b.addInterceptor(rayIdInterceptor)
             // If unset, the system-wide default DNS will be used.
