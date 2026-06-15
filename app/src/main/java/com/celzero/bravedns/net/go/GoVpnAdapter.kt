@@ -1423,7 +1423,7 @@ class GoVpnAdapter : KoinComponent {
                         addWgProxy(id, true)
                     }
                 }
-                if (stats == Backend.TPU && canResume) {
+                if (canResume) {
                     // if the proxy is paused, then resume it
                     // this is needed when the tunnel is reconnected and the proxies are paused
                     // so resume them, also when there is switch in wg-config for useOnlyOnMetered
@@ -1532,11 +1532,8 @@ class GoVpnAdapter : KoinComponent {
                 val mtu = router?.mtu()
                 val ip4 = router?.iP4()
                 val ip6 = router?.iP6()
-                val client = runCatching { proxy?.client() }.getOrNull()
-                val clientV4 = runCatching { client?.iP4() }.getOrNull()
-                val clientV6 = runCatching { client?.iP6() }.getOrNull()
 
-                WireguardManager.WgStats(stat, mtu, status, ip4, ip6, clientV4, clientV6)
+                WireguardManager.WgStats(stat, mtu, status, ip4, ip6, null, null)
             }
         } catch (e: Exception) {
             Logger.w(LOG_TAG_VPN, "$TAG err getting wg stats($id): ${e.message}")
@@ -1643,7 +1640,7 @@ class GoVpnAdapter : KoinComponent {
                 getRDNSResolver()?.rdnsRemote
             }
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "$TAG err getRDNS($type): ${e.message}", e)
+            Logger.w(LOG_TAG_VPN, "$TAG err getRDNS($type): ${e.message}")
         }
         return null
     }
