@@ -347,6 +347,8 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
                 persistentState.newestLocalBlocklistTimestamp = INIT_TIME_MS
             }
 
+            if (!isAdded) return@ui
+
             updateLocalBlocklistUi()
             showCheckUpdateUi()
             Utilities.showToastUiCentered(
@@ -681,7 +683,9 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun ui(f: suspend () -> Unit) {
-        lifecycleScope.launch(Dispatchers.Main) { f() }
+        lifecycleScope.launch(Dispatchers.Main) {
+            if (!isAdded) f()
+        }
     }
 
     private suspend fun ioCtx(f: suspend () -> Unit) {
