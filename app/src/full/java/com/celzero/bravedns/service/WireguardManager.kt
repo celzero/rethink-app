@@ -1302,62 +1302,82 @@ object WireguardManager : KoinComponent {
     }
 
     suspend fun performRestore() {
-        // during restore process, plain text wg configs are present in the temp dir
-        // move the files to the wireguard directory and load the configs
-        val tempDir = File(applicationContext.filesDir, TEMP_WG_DIR)
-        val dbconfs = db.getWgConfigs()
-        Logger.v(LOG_TAG_PROXY, "temp dir: ${tempDir.listFiles()?.size}, db size: ${dbconfs.size}")
-        dbconfs.forEach { c ->
-            // for each database entry, corresponding file with $id.conf is present in the temp dir
-            // move the file to the wireguard directory with the name available in the database
-            val file = File(tempDir, "${c.id}.conf")
-            if (file.exists()) {
-                Logger.i(LOG_TAG_PROXY, "file exists: ${file.absolutePath}, proceed restore")
-            } else {
-                Logger.i(LOG_TAG_PROXY, "no wg file, delete config: ${file.absolutePath}")
-                db.deleteConfig(c.id)
-                return@forEach
-            }
-            // read the contents of the file and write it to the EncryptedFileManager
-            val bytes = file.readBytes()
-            val encryptFile = File(c.configPath)
-            val parentDir = encryptFile.parentFile
-            if (parentDir == null) {
-                Logger.e(LOG_TAG_PROXY, "wg restore failed, invalid path: ${c.configPath}")
-                db.deleteConfig(c.id)
-                return@forEach
-            }
-            val created = runCatching {
-                if (!encryptFile.exists()) {
-                    parentDir.mkdirs()
-                    encryptFile.createNewFile()
+        try {
+            // during restore process, plain text wg configs are present in the temp dir
+            // move the files to the wireguard directory and load the configs
+            val tempDir = File(applicationContext.filesDir, TEMP_WG_DIR)
+            val dbconfs = db.getWgConfigs()
+            Logger.v(
+                LOG_TAG_PROXY,
+                "temp dir: ${tempDir.listFiles()?.size}, db size: ${dbconfs.size}"
+            )
+            dbconfs.forEach { c ->
+                // for each database entry, corresponding file with $id.conf is present in the temp dir
+                // move the file to the wireguard directory with the name available in the database
+                val file = File(tempDir, "${c.id}.conf")
+                if (file.exists()) {
+                    Logger.i(LOG_TAG_PROXY, "file exists: ${file.absolutePath}, proceed restore")
                 } else {
-                    true
+                    Logger.i(LOG_TAG_PROXY, "no wg file, delete config: ${file.absolutePath}")
+                    db.deleteConfig(c.id)
+                    return@forEach
                 }
-            }.getOrElse { ex ->
-                Logger.w(LOG_TAG_PROXY, "wg restore failed, unable to create file: ${encryptFile.absolutePath}, err: ${ex.message}")
-                db.deleteConfig(c.id)
-                return@forEach
+                // read the contents of the file and write it to the EncryptedFileManager
+                val bytes = file.readBytes()
+                val encryptFile = File(c.configPath)
+                val parentDir = encryptFile.parentFile
+                if (parentDir == null) {
+                    Logger.e(LOG_TAG_PROXY, "wg restore failed, invalid path: ${c.configPath}")
+                    db.deleteConfig(c.id)
+                    return@forEach
+                }
+                val created = runCatching {
+                    if (!encryptFile.exists()) {
+                        parentDir.mkdirs()
+                        encryptFile.createNewFile()
+                    } else {
+                        true
+                    }
+                }.getOrElse { ex ->
+                    Logger.w(
+                        LOG_TAG_PROXY,
+                        "wg restore failed, unable to create file: ${encryptFile.absolutePath}, err: ${ex.message}"
+                    )
+                    db.deleteConfig(c.id)
+                    return@forEach
+                }
+                if (!created) {
+                    Logger.e(
+                        LOG_TAG_PROXY,
+                        "wg restore failed, createNewFile returned false: ${encryptFile.absolutePath}"
+                    )
+                    db.deleteConfig(c.id)
+                    return@forEach
+                }
+                try {
+                    EncryptedFileManager.write(applicationContext, bytes, encryptFile)
+                    Logger.i(LOG_TAG_PROXY, "restored wg config: ${c.id}, ${c.name}")
+                } catch (e: EncryptionException) {
+                    Logger.e(
+                        LOG_TAG_PROXY,
+                        "Critical encryption failure restoring wg config: ${c.id}, ${c.name}",
+                        e
+                    )
+                }
             }
-            if (!created) {
-                Logger.e(LOG_TAG_PROXY, "wg restore failed, createNewFile returned false: ${encryptFile.absolutePath}")
-                db.deleteConfig(c.id)
-                return@forEach
-            }
-            try {
-                EncryptedFileManager.write(applicationContext, bytes, encryptFile)
-                Logger.i(LOG_TAG_PROXY, "restored wg config: ${c.id}, ${c.name}")
-            } catch (e: EncryptionException) {
-                Logger.e(LOG_TAG_PROXY, "Critical encryption failure restoring wg config: ${c.id}, ${c.name}", e)
-            }
-        }
 
-        val isResidueDeleted = Utilities.deleteRecursive(tempDir)
-        if (isResidueDeleted) {
-            Logger.i(LOG_TAG_PROXY, "deleted residue temp wg files: ${tempDir.absolutePath}")
-        } else {
-            Logger.w(LOG_TAG_PROXY, "failed to delete residue temp wg files: ${tempDir.absolutePath}")
-            tempDir.deleteRecursively()
+            val isResidueDeleted = Utilities.deleteRecursive(tempDir)
+            if (isResidueDeleted) {
+                Logger.i(LOG_TAG_PROXY, "deleted residue temp wg files: ${tempDir.absolutePath}")
+            } else {
+                Logger.w(
+                    LOG_TAG_PROXY,
+                    "failed to delete residue temp wg files: ${tempDir.absolutePath}"
+                )
+                tempDir.deleteRecursively()
+            }
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "err restoring wg configs, ${e.message}")
         }
     }
 
