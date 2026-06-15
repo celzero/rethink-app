@@ -27,7 +27,6 @@ import okhttp3.Dns
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.ResponseBody.Companion.toResponseBody
 import okhttp3.dnsoverhttps.DnsOverHttps
 import retrofit2.Retrofit
 import java.net.InetAddress
@@ -80,15 +79,26 @@ class RetrofitManager {
             val respTime = System.currentTimeMillis()
 
             try {
-                // Capture header value before any body read.
                 val cfRay = response.header("cf-ray")
                 val responseBody = response.body
 
                 if (responseBody != null) {
-                    val contentType = responseBody.contentType()
-                    val bodyString = responseBody.string()
-                    val rayId = Regex("\"ray\"\\s*:\\s*\"([^\"]+)\"")
-                        .find(bodyString)?.groupValues?.get(1)
+                    // Only peek at a small prefix (max 8KB) to avoid OOM on
+                    // large downloads like the blocklist trie. peek() does not
+                    // consume the underlying source, so the caller can still
+                    // read the full body.
+                    val rayId: String? = try {
+                        val bytesToRead = responseBody.contentLength()
+                            .takeIf { it in 1..8192 }
+                            ?: 8192L
+                        val bodyPrefix = responseBody.source()
+                            .peek()
+                            .readUtf8(bytesToRead)
+                        Regex("\"ray\"\\s*:\\s*\"([^\"]+)\"")
+                            .find(bodyPrefix)?.groupValues?.get(1)
+                    } catch (_: Exception) {
+                        null
+                    }
 
                     logScope.launch {
                         val ts = Utilities.convertLongToTime(respTime, Constants.TIME_FORMAT_4)
@@ -104,18 +114,12 @@ class RetrofitManager {
                             Logger.wireLog(msg)
                         }
                         if (cfRay == null && rayId == null) {
-                            // At least log the response line so every request has a closing entry.
                             val msg = "$prefix | no-ray"
                             Logger.d(LOG_OKHTTP, msg)
                             Logger.wireLog(msg)
                         }
                     }
-
-                    // Rebuild response body so Retrofit / caller can still read it.
-                    val newBody = bodyString.toResponseBody(contentType)
-                    return@Interceptor response.newBuilder().body(newBody).build()
                 } else {
-                    // No-body; still log cf-ray from headers if present.
                     logScope.launch {
                         val ts = Utilities.convertLongToTime(respTime, Constants.TIME_FORMAT_4)
                         val prefix = "$ts <-- ${response.code} ${request.method} ${request.url}"
