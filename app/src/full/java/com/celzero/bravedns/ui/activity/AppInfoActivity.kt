@@ -199,7 +199,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             return
         }
         b.aadProxyDetails.visibility = View.VISIBLE
-        b.aadProxyDetails.text = getString(R.string.wireguard_apps_proxy_map_desc, proxy)
+        b.aadProxyDetails.text = getString(R.string.wireguard_apps_proxy_map_desc, proxy.filter { it != ID_NONE })
     }
 
     private fun openCustomIpScreen() {
