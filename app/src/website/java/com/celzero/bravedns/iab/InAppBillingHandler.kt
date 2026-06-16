@@ -477,7 +477,7 @@ object InAppBillingHandler : KoinComponent {
                                                     return@forEach
                                                 }
                                                 if (deviceId == null || accountId != storedAccId) {
-                                                    val didResult = billingBackendClient.createOrRegisterDid(accountId)
+                                                    val didResult = billingBackendClient.reconcileDidForCid(accountId)
                                                     if (didResult.errorCode == 401) {
                                                         loge(mname, "createOrRegisterDid 401 for accountId-len=${accountId.length}; showing auth error")
                                                         handleUnauthorized401(ServerApiError.Operation.CUSTOMER, accountId, "")
@@ -1054,16 +1054,13 @@ object InAppBillingHandler : KoinComponent {
             return
         }
 
-        // CID has changed (or DID is missing): re-register this device under the new CID.
-        // Call createOrRegisterDid() directly so we can inspect the error code and surface
-        // 401/409 to the UI — getDeviceId(cid) obscures the error by falling through to the
-        // (now stale) stored DID.
+        // Use the mutex-protected reconcileDidForCid to avoid racing with a
+        // concurrent refreshIdentity() call that may also be creating a DID.
         logd(mname, "reconciling did for new cid=${cid.take(8)}")
-        val didResult = billingBackendClient.createOrRegisterDid(cid)
+        val didResult = billingBackendClient.reconcileDidForCid(cid)
         when {
             didResult.isSuccess -> {
-                logd(mname, "reconcile succeeded; persisting new (cid, did)")
-                secureIdentityStore.save(env, cid, didResult.deviceId)
+                logd(mname, "reconcile succeeded; did persisted by BillingBackendClient (len=${didResult.deviceId.length})")
             }
             didResult.errorCode == 401 -> {
                 loge(mname, "401 unauthorized on device re-registration for cid=${cid.take(8)}; surfacing auth error")
@@ -1499,6 +1496,10 @@ object InAppBillingHandler : KoinComponent {
     }
 
     fun fetchPurchases(productType: List<String>) {
+        if (!isBillingClientSetup()) {
+            loge("fetchPurchases", "billing client not setup, cannot fetch purchases")
+            return
+        }
         billingScope.launch {
             val mname = "fetchPurchases"
             logv(mname, "fetching purchases for types: $productType")
@@ -1524,6 +1525,10 @@ object InAppBillingHandler : KoinComponent {
     }
 
     private fun queryPurchases(pt: String, hasBoth: Boolean) {
+        if (!::billingClient.isInitialized) {
+            loge("queryPurchases", "billingClient not initialized, cannot query purchases for $pt")
+            return
+        }
         val mname = this::queryPurchases.name
         log(mname, "querying purchases for type: $pt, hasBoth: $hasBoth")
 
