@@ -427,32 +427,6 @@ object WireguardManager : KoinComponent {
         return defaultTid == Backend.System || defaultTid == Backend.Plus || defaultTid == Backend.Preferred
     }
 
-    private suspend fun isWireGuardSplitTunnelEnabled(id: String): Boolean {
-        val stats = VpnController.getWireGuardStats(id) ?: return false
-
-        val ip4 = stats.ip4
-        val ip6 = stats.ip6
-        val pt = persistentState.internetProtocolType
-        val chosenProtocol = InternetProtocol.getInternetProtocol(pt)
-        return when (chosenProtocol) {
-            InternetProtocol.IPv4 -> {
-                ip4 != null && ip4
-            }
-
-            InternetProtocol.IPv6 -> {
-                ip6 != null && ip6
-            }
-
-            else -> {
-                (ip4 != null && ip6 != null && ip4 && ip6)
-            }
-        }
-    }
-
-    private suspend fun hasAnyFullTunnelWireGuard(proxies: List<String>): Boolean {
-        return proxies.any { !isWireGuardSplitTunnelEnabled(it) }
-    }
-
     // no need to check for app excluded from proxy here, expected to call this fn after that
     suspend fun getAllPossibleConfigIdsForApp(uid: Int, ip: String, port: Int, domain: String, usesMobileNw: Boolean, ssid: String, default: String): List<String> {
         val lockdown = persistentState.wgGlobalLockdown
@@ -482,10 +456,7 @@ object WireguardManager : KoinComponent {
             proxyIds.add(ID_WG_BASE + id)
             // add default to the list, can route check is done in go-tun
             // let one-wg use wg-dns no need to add the default to the list
-            // as go-tun will not prioritize wg id if default is fast / has less-errors
-            // no need to use default if the one-wg is not split proxy
-            val isSplitProxy = isWireGuardSplitTunnelEnabled(ID_WG_BASE + id)
-            if (default.isNotEmpty() && !isDnsRequest(default) && isSplitProxy) proxyIds.add(default)
+            if (default.isNotEmpty() && !isDnsRequest(default)) proxyIds.add(default)
             Logger.i(LOG_TAG_PROXY, "one-wg enabled, return $proxyIds")
             return proxyIds
         }
@@ -620,10 +591,9 @@ object WireguardManager : KoinComponent {
             conf?.isLockdown ?: false
         }
 
-        val hasFullTunnelWgs = hasAnyFullTunnelWireGuard(proxyIds)
         // add the default proxy to the end, will not be true for lockdown but lockdown is handled
         // above, so no need to check here
-        if (default.isNotEmpty() && !isAnyIdLockdown && !lockdown && !hasFullTunnelWgs) proxyIds.add(default)
+        if (default.isNotEmpty() && !isAnyIdLockdown && !lockdown) proxyIds.add(default)
 
         // the proxyIds list will contain the ip-app specific, domain-app specific, app specific,
         // universal ip, universal domain, catch-all and default configs in the order of priority
@@ -659,7 +629,7 @@ object WireguardManager : KoinComponent {
 
         if (config.ssidEnabled) {
             val ssidItems = SsidItem.parseStorageList(config.ssids)
-            if (ssidItems.isEmpty()) { // treat empty as match all
+            if (ssidItems.isEmpty() && ssid.isNotEmpty()) { // treat empty as match all
                 Logger.d(LOG_TAG_PROXY, "canAdd: ssidEnabled is true, but ssid list is empty, match all")
                 return true
             }
