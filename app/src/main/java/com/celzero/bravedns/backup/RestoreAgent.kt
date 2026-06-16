@@ -16,6 +16,7 @@
 package com.celzero.bravedns.backup
 
 import Logger
+import Logger.LOG_TAG_APP_DB
 import Logger.LOG_TAG_BACKUP_RESTORE
 import android.content.Context
 import android.content.SharedPreferences
@@ -37,8 +38,10 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.unzip
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.LogDatabase
+import com.celzero.bravedns.database.RefreshDatabase.Companion.ACTION_REFRESH_RESTORE
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Utilities
@@ -151,6 +154,11 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             // update app version after the restore process
             updateLatestVersion()
 
+            // restore WireGuard configs before loading managers so encrypted files
+            // exist when WireguardManager.load() runs. otherwise load() marks restored
+            // entries as inactive because the encrypted files haven't been created yet.
+            restoreWireGuardProfilesIfNeeded()
+
             // clean up the temp directory
             deleteRecursive(tempDir)
 
@@ -165,6 +173,10 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         } finally {
             inputStream?.close()
         }
+    }
+
+    private suspend fun restoreWireGuardProfilesIfNeeded() {
+        WireguardManager.restoreProcessRetrieveWireGuardConfigs()
     }
 
     private suspend fun moveRemoteBlocklistFileFromAsset() {
@@ -249,7 +261,6 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             )
         }
 
-        deleteResidue(tempDir)
         return true
     }
 
@@ -394,12 +405,12 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
 
                 if (key == PersistentState.APP_VERSION) {
                     val appVersion = v as Int
-                    if (appVersion >= minVersionSupported) {
-                        Logger.w(
-                            LOG_TAG_BACKUP_RESTORE,
-                            "app version is less than minAppVersion, proceed with restore"
-                        )
-                        return true
+                if (appVersion >= minVersionSupported) {
+                    Logger.d(
+                        LOG_TAG_BACKUP_RESTORE,
+                        "app version satisfies minAppVersion ($minVersionSupported), proceed with restore"
+                    )
+                    return true
                     } else {
                         // no-op
                     }

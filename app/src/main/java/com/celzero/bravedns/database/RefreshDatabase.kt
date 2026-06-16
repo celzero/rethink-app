@@ -221,7 +221,6 @@ internal constructor(
             refreshIPRules(packagesToUpdate)
             // must be called after updateExistingPackagesIfNeeded
             refreshDomainRules(packagesToUpdate)
-            restoreWireGuardProfilesIfNeeded(action == ACTION_REFRESH_RESTORE)
             Logger.i(LOG_TAG_APP_DB, "refresh done")
         } catch (e: RuntimeException) {
             Logger.crash(LOG_TAG_APP_DB, e.message ?: "refresh err", e)
@@ -500,14 +499,6 @@ internal constructor(
             return Utilities.getApplicationInfo(ctx, it) ?: return@forEach
         }
         return null
-    }
-
-    private suspend fun restoreWireGuardProfilesIfNeeded(restore: Boolean) {
-        if (restore) {
-            WireguardManager.restoreProcessRetrieveWireGuardConfigs()
-        } else {
-            Logger.d(LOG_TAG_APP_DB, "not restore, no-op for WireGuard profiles")
-        }
     }
 
     private suspend fun refreshProxyMapping(
