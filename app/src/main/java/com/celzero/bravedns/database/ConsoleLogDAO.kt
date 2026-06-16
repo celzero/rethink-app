@@ -29,7 +29,7 @@ interface ConsoleLogDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBatch(log: List<ConsoleLog>)
 
-    @Query("SELECT * FROM ConsoleLog where id > :lastId ORDER BY id DESC LIMIT :limit OFFSET :offset")
+    @Query("SELECT * FROM ConsoleLog where id > :lastId LIMIT :limit OFFSET :offset")
     suspend fun getLogsChunked(lastId: Int, limit: Int, offset: Int): List<ConsoleLog>
 
     // Paged query filtered by search text AND log level (level <= :maxLevel means show
