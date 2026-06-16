@@ -970,7 +970,7 @@
                     </LinearLayout>
 
                     <com.google.android.material.materialswitch.MaterialSwitch
-                        android:id="@+id/dc_unknown_block__switch"
+                        android:id="@+id/dc_block_unknown_switch"
                         style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

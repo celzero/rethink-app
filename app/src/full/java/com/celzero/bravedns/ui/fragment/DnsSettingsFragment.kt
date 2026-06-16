@@ -52,6 +52,7 @@ import com.celzero.bravedns.ui.bottomsheet.BlockFreeDnsModeBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.DnsRecordTypesBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.LocalBlocklistsBottomSheet
 import com.celzero.bravedns.util.NewSettingsManager
+import com.celzero.bravedns.util.NewSettingsManager.BLOCK_UNKNOWN_IN_DNS
 import com.celzero.bravedns.util.SnackbarHelper
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
@@ -114,10 +115,12 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
 
 
     private fun showNewBadgeIfNeeded() {
-        val showBadge = NewSettingsManager.shouldShowBadge(NewSettingsManager.DNS_TO_BYPASS)
-        if (!showBadge) return
-
-        b.dcBlockFreeDnsHeading.setBadgeDotVisible(requireContext(), true)
+        if (NewSettingsManager.shouldShowBadge(NewSettingsManager.DNS_TO_BYPASS)) {
+            b.dcBlockFreeDnsHeading.setBadgeDotVisible(requireContext(), true)
+        }
+        if (NewSettingsManager.shouldShowBadge(BLOCK_UNKNOWN_IN_DNS)) {
+            b.dcBlockUnknownHeading.setBadgeDotVisible(requireContext(), true)
+        }
     }
 
 
@@ -138,7 +141,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.dcUndelegatedDomainsSwitch.isChecked = persistentState.useSystemDnsForUndelegatedDomains
         b.connectedStatusTitle.text = getConnectedDnsType()
         b.dcUseFallbackToBypassSwitch.isChecked = persistentState.useFallbackDnsToBypass
-        b.dcUnknownBlockSwitch.isChecked = persistentState.blockDnsForUnknownApp
+        b.dcBlockUnknownSwitch.isChecked = persistentState.blockDnsForUnknownApp
         b.dcPreventDnsLeaksSwitch.isChecked = persistentState.preventDnsLeaks
         showSplitDnsUi()
         updateAllowedRecordTypesUi()
