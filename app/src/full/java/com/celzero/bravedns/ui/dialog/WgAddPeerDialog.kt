@@ -121,7 +121,7 @@ class WgAddPeerDialog(
                     val kas = text.toString().toInt()
                     b.keepAliveHint.visibility = View.VISIBLE
                     b.keepAliveHint.text = getDurationInHumanReadableFormat(activity, kas)
-                } catch (e: NumberFormatException) {
+                } catch (_: NumberFormatException) {
                     b.keepAliveHint.visibility = View.GONE
                 }
             } else {
@@ -156,7 +156,7 @@ class WgAddPeerDialog(
                         WireguardManager.addPeer(configId, newPeer)
                     }
                     Utilities.showToastUiCentered(
-                        context,
+                        activity,
                         context.getString(R.string.config_add_success_toast),
                         Toast.LENGTH_SHORT
                     )
@@ -167,8 +167,8 @@ class WgAddPeerDialog(
                 val ex = Logger.throwableToException(e)
                 Logger.e(Logger.LOG_TAG_PROXY, "Error while adding peer", ex)
                 Utilities.showToastUiCentered(
-                    context,
-                    ErrorMessages[context, e],
+                    activity,
+                    ErrorMessages[activity, e],
                     Toast.LENGTH_SHORT
                 )
                 return@setOnClickListener
@@ -178,14 +178,14 @@ class WgAddPeerDialog(
 
     /** Switch the Save button into a loading state: spinner visible, text dimmed. */
     private fun showSaving() {
-        b.customDialogOkButton.text = context.getString(R.string.lbl_saving)
+        b.customDialogOkButton.text = activity.getString(R.string.lbl_saving)
         b.customDialogOkButton.isEnabled = false
         b.customDialogOkProgress.visibility = View.VISIBLE
     }
 
     /** Restore the Save button to its normal, interactive state. */
     private fun resetSaveButton() {
-        b.customDialogOkButton.text = context.getString(R.string.lbl_save)
+        b.customDialogOkButton.text = activity.getString(R.string.lbl_save)
         b.customDialogOkButton.isEnabled = true
         b.customDialogOkProgress.visibility = View.GONE
     }
