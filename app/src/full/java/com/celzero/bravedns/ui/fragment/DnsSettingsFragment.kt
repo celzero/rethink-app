@@ -138,6 +138,8 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.dcUndelegatedDomainsSwitch.isChecked = persistentState.useSystemDnsForUndelegatedDomains
         b.connectedStatusTitle.text = getConnectedDnsType()
         b.dcUseFallbackToBypassSwitch.isChecked = persistentState.useFallbackDnsToBypass
+        b.dcUnknownBlockSwitch.isChecked = persistentState.blockDnsForUnknownApp
+        b.dcPreventDnsLeaksSwitch.isChecked = persistentState.preventDnsLeaks
         showSplitDnsUi()
         updateAllowedRecordTypesUi()
     }

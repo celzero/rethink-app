@@ -761,4 +761,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // maximum memory the go engine can consume in bytes
     var goMaxMemory by longPref(GO_MAX_MEMORY).withDefault<Long>(1024 * 1024 * 1024L)
+
+    var blockDnsForUnknownApp by booleanPref("block_dns_for_unknown_app").withDefault<Boolean>(false)
 }

@@ -645,12 +645,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val startTime = elapsedRealtime()
         val res = if (recdUid != INVALID_UID) {
             recdUid
-        }
-
-        if (VERSION.SDK_INT >= VERSION_CODES.Q) {
-            ioCtx("getUidQ") { connTracer.getUidQ(protocol, srcIp, srcPort, dstIp, dstPort) }
         } else {
-            recdUid // uid must have been retrieved from procfs by the caller
+            if (VERSION.SDK_INT >= VERSION_CODES.Q) {
+                ioCtx("getUidQ") { connTracer.getUidQ(protocol, srcIp, srcPort, dstIp, dstPort) }
+            } else {
+                recdUid // uid must have been retrieved from procfs by the caller
+            }
         }
         Logger.vv(LOG_TAG_VPN, "getUid: execution time: ${elapsedRealtime() - startTime} ms, recdUid: $recdUid, protocol: $protocol, srcIp: $srcIp, srcPort: $srcPort, dstIp: $dstIp, dstPort: $dstPort, result: $res")
         return res
@@ -4096,11 +4096,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     private suspend fun uiCtx(s: String, f: suspend () -> Unit) =
         withContext(CoroutineName(s) + Dispatchers.Main) { f() }
 
-    override fun onQuery(srcType: String?, uidGostr: String?, fqdn: String, qtype: Long): DNSOpts {
+    override fun onQuery(origin: String?, uidGostr: String?, fqdn: String, qtype: Long): DNSOpts {
         val startTime = elapsedRealtime()
         return go2kt(dnsQueryDispatcher) {
             // uid: $uid
-            logd("onQuery: rcvd  query: $fqdn, qtype: $qtype, srcType: $srcType, time: ${elapsedRealtime() - startTime} ms")
+            logd("onQuery: rcvd  query: $fqdn, qtype: $qtype, srcType: $origin, time: ${elapsedRealtime() - startTime} ms")
             val uidStr = uidGostr.orEmpty()
             var result: DNSOpts?
             // TODO: if uid is received, then make sure Rethink uid always returns Default as transport
@@ -4136,7 +4136,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             }
 
             if (appMode.isDnsFirewallMode()) {
-                result = getTransportIdForDnsFirewallMode(uid, fqdn, srcType, rinr = rinr)
+                result = getTransportIdForDnsFirewallMode(uid, fqdn, origin, rinr = rinr)
                 logd("onQuery: getTransportIdForDnsFirewallMode for $fqdn, dnsx: $result, time: ${elapsedRealtime() - startTime} ms")
                 val t = elapsedRealtime()
                 val r = checkUserAllowedDnsQtypes(result, uid, fqdn, qtype, rinr = rinr)
@@ -4829,6 +4829,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 return@go2kt DNSOpts()
             }
 
+            if (appConfig.getBraveMode().isDnsMode()) {
+                // no need to consider universal rules in dns only mode
+                Logger.i(LOG_TAG_VPN, "onUpstreamAnswer: dns only mode, no-op, time: ${elapsedRealtime() - startTime} ms")
+                return@go2kt DNSOpts()
+            }
+
             val uidInt = try {
                 if (smm.uid == Backend.UidSelf) {
                     rethinkUid
@@ -4839,6 +4845,23 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 Logger.e(LOG_TAG_VPN, "onUpstreamAnswer: invalid uid ${smm.uid}, error: ${e.message}, time: ${elapsedRealtime() - startTime} ms")
                 return@go2kt DNSOpts()
             }
+
+            val isTransportDnsFixed = rcvdDnsOpts.tidcsv.contains(Backend.Fixed) || rcvdDnsOpts.tidseccsv.contains(Backend.Fixed)
+            if (isTransportDnsFixed) {
+                return@go2kt DNSOpts()
+            }
+
+            if (uidInt == INVALID_UID && persistentState.blockDnsForUnknownApp) {
+                val id = Pair(rcvdDnsOpts.tidcsv, rcvdDnsOpts.tidseccsv)
+                val result = DNSOpts().apply {
+                    tidcsv = Backend.BlockAll
+                    pidcsv = rcvdDnsOpts.pidcsv
+                    noblock = false
+                    Logger.vv(LOG_TAG_VPN, "onUpstreamAnswer: block dns fir unknown app, original tid: $id, bypass tid: [$tidcsv, $tidseccsv], pid: $pidcsv, ipcsv: $ipcsv, time: ${elapsedRealtime() - startTime} ms")
+                }
+                return@go2kt result
+            }
+
             // taking the first ip from the rdata, can have multiple ips, to check for conn type
             val firstDestIp = ipcsv.split(",").firstOrNull()
             if (firstDestIp.isNullOrEmpty()) {

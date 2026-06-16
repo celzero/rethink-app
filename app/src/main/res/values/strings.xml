@@ -811,6 +811,9 @@
     <string name="dc_proxy_dns_heading" translatable="true">Never proxy DNS</string>
     <string name="dc_proxy_dns_desc" translatable="true">Do not proxy DNS over Always-on WireGuard, SOCKS5, HTTP proxies.</string>
 
+    <string name="dc_block_unknown_heading" translatable="true">Block DNS from Unknown source</string>
+    <string name="dc_block_unknown_desc" translatable="true">Block all DNS requests originating from unknown applications.</string>
+
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Use System DNS for undelegated domains</string>
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Use System DNS for undelgated domains like <i>.lan</i>, <i>.internal</i>, etc.</string>
 
