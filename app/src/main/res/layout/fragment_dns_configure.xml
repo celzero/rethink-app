@@ -949,7 +949,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/dc_unknown_block__switch"
+                        android:layout_toStartOf="@id/dc_block_unknown_switch"
                         android:layout_toEndOf="@id/dc_block_heading_img"
                         android:orientation="vertical">
 
