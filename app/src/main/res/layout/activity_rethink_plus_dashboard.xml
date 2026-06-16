@@ -29,7 +29,6 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:titleEnabled="true">
 
-
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_hero_subtitle"
                 android:layout_width="match_parent"
@@ -37,7 +36,25 @@
                 android:layout_gravity="bottom"
                 android:layout_marginStart="24dp"
                 android:layout_marginEnd="24dp"
-                android:layout_marginBottom="18dp"
+                android:layout_marginBottom="24dp"
+                android:alpha="0.7"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif"
+                android:maxLines="1"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="13sp"
+                app:layout_collapseMode="parallax"
+                app:layout_collapseParallaxMultiplier="0.6"
+                tools:text="RPN Standard · 74b4c00217" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_hero_expiry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginBottom="10dp"
                 android:alpha="0.7"
                 android:ellipsize="end"
                 android:fontFamily="sans-serif"
