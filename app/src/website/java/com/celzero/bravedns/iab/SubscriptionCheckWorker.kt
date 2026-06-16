@@ -64,12 +64,21 @@ class SubscriptionCheckWorker(
                 // validate one-time purchases and consume expired ones
                 validateAndConsumeExpiredOneTimePurchases()
 
+                // reconcile purchase based on entitlement and windscribe expiry
+                reconcilePurchase()
+
                 Result.success()
             } catch (e: Exception) {
                 Logger.e(LOG_IAB, "$TAG; doWork failed: ${e.message}", e)
                 Result.retry()
             }
         }
+    }
+
+    private suspend fun reconcilePurchase() {
+        val mname = "reconcilePurchase"
+        Logger.i(LOG_IAB, "$TAG; $mname: reconcile purchase")
+        InAppBillingHandler.reconcilePurchase()
     }
 
     /**
