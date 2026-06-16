@@ -369,7 +369,7 @@ class GoVpnAdapterTest : KoinTest {
         adapter.getWinByKey("x")
         adapter.getActiveWinKidsProxies()
         adapter.initiateRpnPing("x")
-        adapter.getWinLastUpdatedTs()
+        adapter.getWinExpiryTs()
         adapter.updateWin()
         adapter.stopRpnProxy()
         adapter.unregisterWin()
