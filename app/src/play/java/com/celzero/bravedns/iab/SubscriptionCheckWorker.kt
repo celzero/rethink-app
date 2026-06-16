@@ -21,11 +21,9 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.android.billingclient.api.BillingClient
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.iab.InAppBillingHandler.isListenerRegistered
 import com.celzero.bravedns.database.SubscriptionStatusRepository
+import com.celzero.bravedns.iab.InAppBillingHandler.isListenerRegistered
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
-import com.celzero.bravedns.rpnproxy.RpnProxyManager.extractWsObject
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.getExpiryFromPayload
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
@@ -66,12 +64,21 @@ class SubscriptionCheckWorker(
                 // validate one-time purchases and consume expired ones
                 validateAndConsumeExpiredOneTimePurchases()
 
+                // reconcile purchase based on entitlement and windscribe expiry
+                reconcilePurchase()
+
                 Result.success()
             } catch (e: Exception) {
                 Logger.e(LOG_IAB, "$TAG; doWork failed: ${e.message}", e)
                 Result.retry()
             }
         }
+    }
+
+    private suspend fun reconcilePurchase() {
+        val mname = "reconcilePurchase"
+        Logger.i(LOG_IAB, "$TAG; $mname: reconcile purchase")
+        InAppBillingHandler.reconcilePurchase()
     }
 
     /**
@@ -83,7 +90,7 @@ class SubscriptionCheckWorker(
             val storedAccountId = billingBackendClient.getAccountId()
             val storedDeviceId = billingBackendClient.getDeviceId()
             val isStale = (System.currentTimeMillis() - persistentState.deviceRegistrationTimestamp) >
-                                    REGISTRATION_REFRESH_INTERVAL_MS
+                    REGISTRATION_REFRESH_INTERVAL_MS
 
             val purchase = InAppBillingHandler.getActivePurchasesSnapshot().firstOrNull()
 
@@ -100,11 +107,11 @@ class SubscriptionCheckWorker(
 
             if (authoritativeCid != storedAccountId) {
                 Logger.w(LOG_IAB, "$TAG; $name: cid mismatch (source=$cidSource)," +
-                    "authoritativeCid=${authoritativeCid.take(8)}, storedCid=${storedAccountId.take(8)}")
+                        "authoritativeCid=${authoritativeCid.take(8)}, storedCid=${storedAccountId.take(8)}")
                 val reconciledDeviceId = billingBackendClient.getDeviceId(authoritativeCid)
                 if (reconciledDeviceId.isBlank()) {
                     Logger.e(LOG_IAB, "$TAG; $name: did not returned for cid, " +
-                        "posting device not registered error")
+                            "posting device not registered error")
                     val error = ServerApiError.DeviceNotRegistered(
                         entitlementCid = authoritativeCid,
                         storedCid      = storedAccountId,
@@ -122,7 +129,7 @@ class SubscriptionCheckWorker(
                     return // do not call register device with stale IDs
                 }
                 Logger.i(LOG_IAB, "$TAG; $name: did reconciled under cid " +
-                    "(didLen=${reconciledDeviceId.length}); calling register device")
+                        "(didLen=${reconciledDeviceId.length}); calling register device")
                 dispatchDeviceRegistration(authoritativeCid, reconciledDeviceId, purchase)
                 return
             } else {
@@ -132,7 +139,7 @@ class SubscriptionCheckWorker(
             if (storedDeviceId.isBlank()) {
                 val freshDeviceId = billingBackendClient.getDeviceId()
                 Logger.i(LOG_IAB, "$TAG; $name: no stored did, calling reg device" +
-                    "(freshDeviceLen=${freshDeviceId.length})")
+                        "(freshDeviceLen=${freshDeviceId.length})")
                 dispatchDeviceRegistration(storedAccountId, freshDeviceId, purchase)
                 return
             } else {
@@ -269,7 +276,7 @@ class SubscriptionCheckWorker(
                     processSingleInAppPurchaseForConsume(purchase)
                 } catch (e: Exception) {
                     Logger.e(LOG_IAB, "$TAG; $mname: error processing purchase " +
-                        "token=${purchase.purchaseToken.take(8)}: ${e.message}", e)
+                            "token=${purchase.purchaseToken.take(8)}: ${e.message}", e)
                 }
             }
         } catch (e: Exception) {
@@ -285,14 +292,14 @@ class SubscriptionCheckWorker(
 
         // purchase exists locally (present in snapshot = persisted in DB)
         Logger.d(LOG_IAB, "$TAG; $mname: evaluating token=${purchase.purchaseToken.take(8)}, " +
-            "productId=${purchase.productId}, expiryTime=${purchase.expiryTime}")
+                "productId=${purchase.productId}, expiryTime=${purchase.expiryTime}")
 
         // determine entitlement expiry from the best available source
         val entitlementExpiry = resolveEntitlementExpiry(purchase)
 
         if (entitlementExpiry == null) {
             Logger.d(LOG_IAB, "$TAG; $mname: entitlement expiry unavailable for " +
-                "token=${purchase.purchaseToken.take(8)}, skipping consume")
+                    "token=${purchase.purchaseToken.take(8)}, skipping consume")
             return
         }
 
@@ -302,13 +309,13 @@ class SubscriptionCheckWorker(
 
         if (!isExpired) {
             Logger.d(LOG_IAB, "$TAG; $mname: entitlement NOT expired for " +
-                "token=${purchase.purchaseToken.take(8)}, expiry=$entitlementExpiry, now=$now, skipping")
+                    "token=${purchase.purchaseToken.take(8)}, expiry=$entitlementExpiry, now=$now, skipping")
             return
         }
 
         Logger.i(LOG_IAB, "$TAG; $mname: ALL conditions satisfied for " +
-            "token=${purchase.purchaseToken.take(8)}, productId=${purchase.productId}, " +
-            "expiry=$entitlementExpiry, calling consume API")
+                "token=${purchase.purchaseToken.take(8)}, productId=${purchase.productId}, " +
+                "expiry=$entitlementExpiry, calling consume API")
 
         callConsumeApi(purchase)
     }
@@ -371,7 +378,7 @@ class SubscriptionCheckWorker(
             val deviceId  = billingBackendClient.getDeviceId()
             if (accountId.isNotEmpty() && purchase.purchaseToken.isNotEmpty()) {
                 Logger.d(LOG_IAB, "$TAG; $mname: tunnel unavailable, querying server entitlement " +
-                    "for token=${purchase.purchaseToken.take(8)}")
+                        "for token=${purchase.purchaseToken.take(8)}")
                 when (val result = billingBackendClient.queryEntitlement(
                     accountId, deviceId, purchase, purchase.purchaseToken
                 )) {
@@ -379,7 +386,7 @@ class SubscriptionCheckWorker(
                         val updated = result.purchase
                         if (updated.payload.isNotEmpty()) {
                             Logger.i(LOG_IAB, "$TAG; $mname: server entitlement received, storing " +
-                                "for token=${purchase.purchaseToken.take(8)}")
+                                    "for token=${purchase.purchaseToken.take(8)}")
                             RpnProxyManager.storeWinEntitlement(updated.payload)
                             // also update the SubscriptionStatus table
                             val current = subscriptionStatusRepository.getByPurchaseToken(purchase.purchaseToken)
@@ -400,7 +407,7 @@ class SubscriptionCheckWorker(
                         val serverExpiry = updated.expiryTime
                         if (serverExpiry > 0L && serverExpiry != Long.MAX_VALUE) {
                             Logger.d(LOG_IAB, "$TAG; $mname: using server-queried expiry=$serverExpiry " +
-                                "for token=${purchase.purchaseToken.take(8)}")
+                                    "for token=${purchase.purchaseToken.take(8)}")
                             return serverExpiry
                         }
                     }
@@ -414,24 +421,24 @@ class SubscriptionCheckWorker(
                     }
                     is QueryEntitlementResult.Conflict -> {
                         Logger.w(LOG_IAB, "$TAG; $mname: 409 conflict on entitlement query " +
-                            "for token=${purchase.purchaseToken.take(8)}; skipping expiry resolution")
+                                "for token=${purchase.purchaseToken.take(8)}; skipping expiry resolution")
                     }
                     is QueryEntitlementResult.Failure -> {
                         Logger.w(LOG_IAB, "$TAG; $mname: server business error on entitlement query " +
-                            "for token=${purchase.purchaseToken.take(8)}; skipping expiry resolution (local billing expiry is authority)")
+                                "for token=${purchase.purchaseToken.take(8)}; skipping expiry resolution (local billing expiry is authority)")
                         // If the server included a linkedPurchaseId, the revoked purchase may have been
                         // superseded by an older one that is still valid. Attempt to reactivate it so
                         // the user is not left in a broken state.
                         val linked = result.linkedPurchaseId
                         if (!linked.isNullOrBlank()) {
                             Logger.i(LOG_IAB, "$TAG; $mname: linkedPurchaseId present for " +
-                                "token=${purchase.purchaseToken.take(8)}; attempting reactivation of " +
-                                "linkedToken=${linked.take(8)}")
+                                    "token=${purchase.purchaseToken.take(8)}; attempting reactivation of " +
+                                    "linkedToken=${linked.take(8)}")
                             try {
                                 RpnProxyManager.tryReactivateLinkedPurchase(accountId, deviceId, linked)
                             } catch (e: Exception) {
                                 Logger.e(LOG_IAB, "$TAG; $mname: tryReactivateLinkedPurchase threw for " +
-                                    "linkedToken=${linked.take(8)}: ${e.message}", e)
+                                        "linkedToken=${linked.take(8)}: ${e.message}", e)
                             }
                         }
                     }
@@ -440,14 +447,14 @@ class SubscriptionCheckWorker(
                         // Return a timestamp in the past so the worker treats this purchase
                         // as expired and proceeds with the consume / expiry flow.
                         Logger.w(LOG_IAB, "$TAG; $mname: server confirmed subscription expired " +
-                            "for token=${purchase.purchaseToken.take(8)}; returning expired timestamp")
+                                "for token=${purchase.purchaseToken.take(8)}; returning expired timestamp")
                         return System.currentTimeMillis() - 1L
                     }
                     is QueryEntitlementResult.Transient -> {
                         // Network/transient failure — server was not reached.
                         // Fall through without an expiry; the worker will retry on the next cycle.
                         Logger.w(LOG_IAB, "$TAG; $mname: transient failure (network/timeout) on entitlement query " +
-                            "for token=${purchase.purchaseToken.take(8)}; will retry on next cycle")
+                                "for token=${purchase.purchaseToken.take(8)}; will retry on next cycle")
                     }
                 }
             } else {
@@ -475,7 +482,7 @@ class SubscriptionCheckWorker(
         }
         val sku = purchase.productId.ifBlank { InAppBillingHandler.ONE_TIME_PRODUCT_ID }
         Logger.i(LOG_IAB, "$TAG; $mname: delegating to BillingServerRepository for " +
-            "token=${purchase.purchaseToken.take(8)}, sku=$sku, accLen=${purchase.accountId.length}")
+                "token=${purchase.purchaseToken.take(8)}, sku=$sku, accLen=${purchase.accountId.length}")
         // purchase.deviceId holds only the indicator, always fetch from SecureIdentityStore
         val deviceId = billingBackendClient.getDeviceId()
         val success = billingBackendClient.consumePurchase(purchase.accountId, deviceId, sku, purchase.purchaseToken)

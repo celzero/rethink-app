@@ -40,6 +40,7 @@ import com.celzero.bravedns.iab.PurchaseConflictNotifier
 import com.celzero.bravedns.iab.ServerApiError
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.CustomerSupportActivity
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
 import com.celzero.bravedns.ui.activity.PingTestActivity
@@ -68,15 +69,6 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
         /** Show "expiring soon" banner when fewer than this many days remain for an INAPP purchase. */
         private const val EXPIRING_SOON_THRESHOLD_DAYS = 30L
         private const val ONE_DAY_MS = 24 * 60 * 60 * 1000L
-    }
-
-    private fun safeNavigate(actionId: Int) {
-        try {
-            findNavController().navigate(actionId)
-        } catch (_: IllegalStateException) {
-            Logger.w(LOG_TAG_UI, "$TAG safeNavigate: no NavController (action=$actionId)")
-            requireActivity().finish()
-        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -159,6 +151,18 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
             else -> getString(R.string.rpn_title)
         }
 
+        io {
+            val expiry = VpnController.getWinExpiryTs()
+            val hex = expiry?.toString(16)
+            uiCtx {
+                if (hex == null) {
+                    b.tvHeroExpiry.visibility = View.GONE
+                } else {
+                    b.tvHeroExpiry.visibility = View.VISIBLE
+                    b.tvHeroExpiry.text = hex
+                }
+            }
+        }
         val subscriptionData  = RpnProxyManager.getSubscriptionData()
         val displayPlan = resolvePlanName(subscriptionData)
         b.tvDetailPlan.text = displayPlan

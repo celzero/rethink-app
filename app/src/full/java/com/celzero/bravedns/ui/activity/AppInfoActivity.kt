@@ -194,12 +194,12 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
     private fun displayProxyStatus() {
         val proxy = ProxyManager.getProxyIdForApp(uid)
-        if (proxy.isEmpty() || proxy == ID_NONE) {
+        if (proxy.isEmpty() || (proxy.size == 1 && proxy[0] == ID_NONE)) {
             b.aadProxyDetails.visibility = View.GONE
             return
         }
         b.aadProxyDetails.visibility = View.VISIBLE
-        b.aadProxyDetails.text = getString(R.string.wireguard_apps_proxy_map_desc, proxy)
+        b.aadProxyDetails.text = getString(R.string.wireguard_apps_proxy_map_desc, proxy.filter { it != ID_NONE })
     }
 
     private fun openCustomIpScreen() {

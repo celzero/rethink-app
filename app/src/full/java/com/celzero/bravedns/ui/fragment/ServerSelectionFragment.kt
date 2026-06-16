@@ -75,6 +75,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Fragment for selecting VPN servers from a list.
@@ -2240,7 +2241,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                     )
                 }
 
-                delay(LOADING_DIALOG_POLL_INTERVAL_MS)
+                delay(LOADING_DIALOG_POLL_INTERVAL_MS.milliseconds)
                 msgIdx++
             }
         }

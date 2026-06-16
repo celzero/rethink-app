@@ -90,6 +90,7 @@ interface IBillingServerApiTest {
     suspend fun registerCustomer(
         @Header("x-rethink-app-cid") accountId: String?,
         @Header("x-rethink-app-did") deviceId: String?,
+        @Query("vcode") vcode: String,
         @Query("test") test: String,
         @Body meta: JsonObject
     ): Response<JsonObject?>?
@@ -114,6 +115,7 @@ interface IBillingServerApiTest {
     suspend fun registerDevice(
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String?,
+        @Query("vcode") vcode: String,
         @Query("test") test: String,
         @Body meta: JsonObject? = null
     ): Response<JsonObject?>?
@@ -140,6 +142,7 @@ interface IBillingServerApiTest {
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
         @Query("purchaseToken") purchaseToken: String,
+        @Query("vcode") vcode: String,
         @Query("test") test: String
     ): Response<JsonObject?>?
 
@@ -164,6 +167,7 @@ interface IBillingServerApiTest {
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
         @Query("purchaseToken") purchaseToken: String,
+        @Query("vcode") vcode: String,
         @Query("test") test: String
     ): Response<JsonObject?>?
 
@@ -187,6 +191,7 @@ interface IBillingServerApiTest {
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
         @Query("purchaseToken") purchaseToken: String,
+        @Query("vcode") vcode: String,
         @Query("test") test: String
     ): Response<JsonObject?>?
 
@@ -211,6 +216,7 @@ interface IBillingServerApiTest {
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
         @Query("purchaseToken") purchaseToken: String,
+        @Query("vcode") vcode: String,
         @Query("test") test: String
     ): Response<JsonObject?>?
 
@@ -236,6 +242,7 @@ interface IBillingServerApiTest {
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
         @Query("purchaseToken") purchaseToken: String,
+        @Query("vcode") vcode: String,
         @Query("test") test: String
     ): Response<JsonObject?>?
 
@@ -261,8 +268,9 @@ interface IBillingServerApiTest {
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
         @Query("purchaseToken") purchaseToken: String,
-        @Query("test") test: String,
         @Query("tot") total: Int? = null,
-        @Query("active") active: String? = null
+        @Query("active") active: String? = null,
+        @Query("test") test: String,
+        @Query("vcode") vcode: String
     ): Response<JsonObject?>?
 }

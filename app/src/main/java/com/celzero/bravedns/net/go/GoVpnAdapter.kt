@@ -95,6 +95,7 @@ import com.celzero.firestack.intra.Tunnel
 import com.celzero.firestack.settings.Settings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
@@ -1478,6 +1479,15 @@ class GoVpnAdapter : KoinComponent {
                 } else {
                     it.key
                 }
+                val isWireGuardMobileOnly = it.mobileOnly
+                val canResumeMobileWg = isWireGuardMobileOnly && isMobileActive
+
+                val useOnlyOnSsid = it.ssidBased
+                val configuredSsids = it.ssids
+                val ssidMatch = RpnProxyManager.matchesSsidList(configuredSsids, ssid) && ssid.isNotEmpty()
+                val canResumeSsidWg = useOnlyOnSsid && ssidMatch
+
+                val canResume = canResumeMobileWg || canResumeSsidWg
                 val rpn = getWinByKey(key)
                 val status = rpn?.status()
                 if (status == Backend.TNT) {
@@ -1498,6 +1508,52 @@ class GoVpnAdapter : KoinComponent {
                             "re-added rpn proxy with key: $key"
                         )
                     }
+                }
+
+                if (status == Backend.TPU && canResume) {
+                    // if the proxy is paused, then resume it
+                    // this is needed when the tunnel is reconnected and the proxies are paused
+                    // so resume them, also when there is switch in wg-config for useOnlyOnMetered
+                    // or ssid change for ssidEnabled wgs
+                    val res = rpn.resume()
+                    Logger.i(LOG_TAG_VPN, "$TAG resumed proxy: $key, res: $res")
+                    logEvent(
+                        Severity.LOW,
+                        "rpn proxy resumed",
+                        "rpn proxy with id $key resumed"
+                    )
+                } else if (isWireGuardMobileOnly && !isMobileActive && !canResume) {
+                    // if the proxy is not paused, then pause it
+                    // this is needed when the network is on mobile data
+                    // and the wg-config is set to useOnlyOnMetered
+                    val res = rpn?.pause()
+                    Logger.i(LOG_TAG_VPN, "$TAG paused proxy (mobile): $key, res: $res")
+                    logEvent(
+                        Severity.LOW,
+                        "rpn proxy paused",
+                        "rpn proxy with id $key paused, reason: mobile data"
+                    )
+                } else if (useOnlyOnSsid && !ssidMatch && !canResume) {
+                    // when the ssidEnabled is set and the ssid does not match
+                    val res = rpn?.pause()
+                    Logger.i(LOG_TAG_VPN, "$TAG paused proxy (ssid): $key, res: $res")
+                    logEvent(
+                        Severity.LOW,
+                        "rpn proxy paused",
+                        "rpn proxy with id $key paused, reason: ssid mismatch"
+                    )
+                }
+
+                if (status == Backend.TPU && !isWireGuardMobileOnly && !useOnlyOnSsid) {
+                    // if the proxy is paused, then resume it
+                    // this is needed when the tunnel is reconnected and the proxies are paused
+                    val res = rpn.resume()
+                    logEvent(
+                        Severity.LOW,
+                        "rpn proxy resumed",
+                        "rpn proxy with id $key resumed successfully"
+                    )
+                    Logger.i(LOG_TAG_VPN, "$TAG resumed proxy (non-metered/ssid): $key, res: $res")
                 }
             }
         } catch (e: Exception) {
@@ -1523,7 +1579,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun getWireGuardStats(id: String): WireguardManager.WgStats? {
         return try {
-            withTimeoutOrNull(1_500L.milliseconds) {
+            val deferred = externalScope.async {
                 val proxy = getProxies()?.getProxy(id)
                 val status = proxy?.status()
 
@@ -1532,11 +1588,12 @@ class GoVpnAdapter : KoinComponent {
                 val mtu = router?.mtu()
                 val ip4 = router?.iP4()
                 val ip6 = router?.iP6()
-                val client = runCatching { proxy?.client() }.getOrNull()
-                val clientV4 = runCatching { client?.iP4() }.getOrNull()
-                val clientV6 = runCatching { client?.iP6() }.getOrNull()
 
-                WireguardManager.WgStats(stat, mtu, status, ip4, ip6, clientV4, clientV6)
+                WireguardManager.WgStats(stat, mtu, status, ip4, ip6, null, null)
+            }
+
+            return withTimeoutOrNull(1500.milliseconds) {
+                deferred.await()
             }
         } catch (e: Exception) {
             Logger.w(LOG_TAG_VPN, "$TAG err getting wg stats($id): ${e.message}")
@@ -1546,7 +1603,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun getRpnStats(id: String): WireguardManager.WgStats? {
         return try {
-            withTimeoutOrNull(1_500L.milliseconds) {
+            val deferred = externalScope.async {
                 val rpn = getWinByKey(id)
                 val status = rpn?.status()
 
@@ -1560,6 +1617,10 @@ class GoVpnAdapter : KoinComponent {
                 val clientV6 = runCatching { client?.iP6() }.getOrNull()
 
                 WireguardManager.WgStats(stat, mtu, status, ip4, ip6, clientV4, clientV6)
+            }
+
+            return withTimeoutOrNull(1500.milliseconds) {
+                deferred.await()
             }
         } catch (e: Exception) {
             Logger.w(LOG_TAG_VPN, "$TAG err getting rpn stats($id): ${e.message}")
@@ -1643,7 +1704,7 @@ class GoVpnAdapter : KoinComponent {
                 getRDNSResolver()?.rdnsRemote
             }
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "$TAG err getRDNS($type): ${e.message}", e)
+            Logger.w(LOG_TAG_VPN, "$TAG err getRDNS($type): ${e.message}")
         }
         return null
     }
@@ -1692,7 +1753,8 @@ class GoVpnAdapter : KoinComponent {
         }
 
         val id = if (appConfig.isSmartDnsEnabled()) Backend.Plus else Backend.Preferred
-        val mainDnsOK = getDnsStatus(id) != null
+        val mainDnsStatus = getDnsStatus(id)
+        val mainDnsOK = mainDnsStatus != null && mainDnsStatus != Backend.DEnd
         Logger.i(LOG_TAG_VPN, "preferred/plus set? ${mainDnsOK}, if not set it again")
 
         if (!mainDnsOK) {
@@ -2184,8 +2246,8 @@ class GoVpnAdapter : KoinComponent {
             // to 8 (none)
             val goLogLevel = if (l1 == 7) 8 else l1
             val consoleLogLevel = if (l2 == 7) 8 else l2
-            // depth to include the file trace, 9 - max, 1 - min
-            val depth = if (includeFileTrace) 9 else 1
+            // depth to include the file trace, 9 - max, 0 - min
+            val depth = if (includeFileTrace) 9 else 0
             Intra.logLevel(goLogLevel, consoleLogLevel, depth)
             //Intra.logLevel(goLogLevel, consoleLogLevel)
             Logger.i(LOG_TAG_VPN, "$TAG set go-log level: $l1, $l2, $depth")
@@ -2603,7 +2665,7 @@ class GoVpnAdapter : KoinComponent {
     private suspend fun addRpnProxyDns(id: String) {
         Logger.v(LOG_TAG_VPN, "$TAG addRpnProxyDns, id: $id")
         try {
-            val p = getProxies()?.getProxy(id)
+            val p = tunnel.proxies.rpn().win().get(id)
             if (p == null) {
                 Logger.w(LOG_TAG_VPN, "$TAG addRpnProxyDns; rpn proxy not found for id: $id")
                 return
@@ -2786,15 +2848,15 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    suspend fun getWinLastUpdatedTs(): Long? {
+    suspend fun getWinExpiryTs(): Long? {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_PROXY, "$TAG no tunnel, skip update win(rpn)")
+            Logger.i(LOG_TAG_PROXY, "$TAG no tunnel, skip fetching win(rpn) expires")
             return null
         }
         try {
-            return tunnel.proxies.rpn().win().updated()
+            return tunnel.proxies.rpn().win().expires()
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_PROXY, "$TAG err get win(rpn) last updated ts: ${e.message}")
+            Logger.e(LOG_TAG_PROXY, "$TAG err get win(rpn) expires: ${e.message}")
             return null
         }
     }

@@ -92,7 +92,7 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
                     .build()
             val retrofitInterface = retrofit.create(IBillingServerApi::class.java)
             // TODO: no need of this fn now
-            val response = retrofitInterface.acknowledgePurchase(referenceId, "","", purchaseToken)
+            val response = retrofitInterface.acknowledgePurchase(referenceId, "", "", purchaseToken, persistentState.appVersion.toString())
             Logger.d(
                 Logger.LOG_IAB,
                 "getPaymentStatusFromServer: ${response?.headers()}, ${response?.message()}, ${response?.raw()?.request?.url}"

@@ -16,11 +16,13 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.TcpProxyEndpoint
 import com.celzero.bravedns.database.TcpProxyRepository
 import com.celzero.bravedns.scheduler.PaymentWorker
+import com.celzero.bravedns.rpnproxy.PipKeyManager
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.IpTree
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.withLock
 import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -103,31 +105,7 @@ object TcpProxyHelper : KoinComponent {
     }
 
     init {
-        io { load() }
-    }
-
-    suspend fun load(): Int {
-        tcpProxies.clear()
-        tcpProxies.addAll(db.getTcpProxies())
-        loadTrie()
-        return tcpProxies.size
-    }
-
-    private fun loadTrie() {
-        cfIpTrie = Backend.newIpTree()
-        cfIpAddresses.forEach { cfIpTrie.set(it, "") }
-        Logger.d(LOG_TAG_PROXY, "loadTrie: loading trie for cloudflare ips")
-    }
-
-    fun isCloudflareIp(ip: String): Boolean {
-        // do not check for cloudflare ips for now
-        // return false
-        return try {
-            cfIpTrie.hasAny(ip)
-        } catch (e: Exception) {
-            Logger.w(LOG_TAG_PROXY, "isCloudflareIp: exception while checking ip: $ip")
-            false
-        }
+        // io { load() }
     }
 
     fun getFolderName(): String {
@@ -138,46 +116,68 @@ object TcpProxyHelper : KoinComponent {
     }
 
     private suspend fun publicKeyUsable(retryCount: Int = 0): Boolean {
-        var works = false
-        try {
-            val retrofit =
-                RetrofitManager.getRpnBaseBuilder(persistentState.routeRethinkInRethink)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build()
-            val retrofitInterface = retrofit.create(IBillingServerApi::class.java)
+        // Fast-path: if PipKeyManager (or a previous call of our own) already
+        // cached the response, parse it without acquiring the mutex.
+        val fastCache = PipKeyManager.publicKeyResponseBody
+        if (fastCache != null) {
+            return parsePublicKeyFromCachedResponse(fastCache)
+        }
 
-            val response = retrofitInterface.getPublicKey(persistentState.appVersion.toString())
-            Logger.d(
-                LOG_TAG_PROXY,
-                "new tcp config: ${response?.headers()}, ${response?.message()}, ${response?.raw()?.request?.url}"
-            )
-
-            // response: {"minvcode":"30","pubkey":"{\"key_ops\":[\"verify\"],\"ext\":true,\"kty\":\"RSA\",\"n\":\"zON5Gyeeg1QaV_CoFImhWF9TykAZo5pJm9NWd5IPTiYtlhb0WMpFm_-IotJn7ZCGszhl4NMxMHV8odyRbBhPg440qucudBkm0T460f2Id3HBtzoJVLI0SvOmSqm5kY41Zdkxcb_fkpKm-D6c_RnMsmEHvP7WI-YlK108PIpp5ZBvoY3oOA3yktGAm3uaWkjSsw6FmNq34AL3oMA-5MFER-uAq0faXMo8_yEOVcI6Rik_e8wxe4GSnPpndODApzbGyhlORJQSCWbnO6Va-1yeGgkOQ3RFICXrsyyngQbVVOSg9UcAuICzQSW-nlUNF99l_NdrHAaxHpexSSnfdFJ4IQ\",\"e\":\"AQAB\",\"alg\":\"PS384\"}","status":"ok"}
-
-            if (response?.isSuccessful == true) {
-                val jsonObject = JSONObject(response.body().toString())
-                works = jsonObject.optString(JSON_STATUS, "") == STATUS_OK
-                val minVersionCode = jsonObject.optString(JSON_MIN_VERSION_CODE, "")
-                publicKey = jsonObject.optString(JSON_PUB_KEY, "")
-                val json = JSONObject(publicKey)
-                publicKeyJWK = json.toString().toByteArray(Charsets.UTF_8)
-                Logger.i(
-                    LOG_TAG_PROXY,
-                    "tcp response for ${response.raw().request.url}, works? $works, minVersionCode: $minVersionCode, publicKey: $publicKey"
-                )
-                return works
-            } else {
-                Logger.w(
-                    LOG_TAG_PROXY,
-                    "unsuccessful response for ${response?.raw()?.request?.url}"
-                )
+        // Acquire the shared mutex so we don't fire a duplicate HTTP request
+        // concurrently with PipKeyManager.
+        val works = PipKeyManager.publicKeyFetchMutex.withLock {
+            // Double-check: another caller may have filled the cache while we waited.
+            val cachedBody = PipKeyManager.publicKeyResponseBody
+            if (cachedBody != null) {
+                return@withLock parsePublicKeyFromCachedResponse(cachedBody)
             }
-        } catch (e: Exception) {
-            Logger.e(
-                LOG_TAG_PROXY,
-                "publicKeyUsable: exception while checking public key: ${e.message}",
-                e
-            )
+
+            try {
+                val retrofit =
+                    RetrofitManager.getRpnBaseBuilder(persistentState.routeRethinkInRethink)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build()
+                val retrofitInterface = retrofit.create(IBillingServerApi::class.java)
+
+                val response = retrofitInterface.getPublicKey(persistentState.appVersion.toString())
+                Logger.d(
+                    LOG_TAG_PROXY,
+                    "new tcp config: ${response?.headers()}, ${response?.message()}, ${response?.raw()?.request?.url}"
+                )
+
+                if (response?.isSuccessful == true) {
+                    // Cache the full response body so PipKeyManager can reuse it.
+                    val bodyString = response.body()?.toString() ?: ""
+                    if (bodyString.isNotBlank()) {
+                        PipKeyManager.publicKeyResponseBody = bodyString
+                    }
+
+                    val jsonObject = JSONObject(bodyString)
+                    val minVersionCode = jsonObject.optString(JSON_MIN_VERSION_CODE, "")
+                    publicKey = jsonObject.optString(JSON_PUB_KEY, "")
+                    val json = JSONObject(publicKey)
+                    publicKeyJWK = json.toString().toByteArray(Charsets.UTF_8)
+                    val ok = jsonObject.optString(JSON_STATUS, "") == STATUS_OK
+                    Logger.i(
+                        LOG_TAG_PROXY,
+                        "tcp response for ${response.raw().request.url}, works? $ok, minVersionCode: $minVersionCode, publicKey: $publicKey"
+                    )
+                    return@withLock ok
+                } else {
+                    Logger.w(
+                        LOG_TAG_PROXY,
+                        "unsuccessful response for ${response?.raw()?.request?.url}"
+                    )
+                    return@withLock false
+                }
+            } catch (e: Exception) {
+                Logger.e(
+                    LOG_TAG_PROXY,
+                    "publicKeyUsable: exception while checking public key: ${e.message}",
+                    e
+                )
+                return@withLock false
+            }
         }
 
         return if (isRetryRequired(retryCount) && !works) {
@@ -186,6 +186,29 @@ object TcpProxyHelper : KoinComponent {
         } else {
             Logger.i(Logger.LOG_TAG_DOWNLOAD, "retry count exceeded for publicKeyUsable")
             works
+        }
+    }
+
+    /**
+     * Parses a previously cached public-key response body without a network call.
+     * Only extracts the public key fields needed by [TcpProxyHelper].
+     */
+    private fun parsePublicKeyFromCachedResponse(responseBodyString: String): Boolean {
+        return try {
+            val jsonObject = JSONObject(responseBodyString)
+            val minVersionCode = jsonObject.optString(JSON_MIN_VERSION_CODE, "")
+            publicKey = jsonObject.optString(JSON_PUB_KEY, "")
+            val json = JSONObject(publicKey)
+            publicKeyJWK = json.toString().toByteArray(Charsets.UTF_8)
+            val ok = jsonObject.optString(JSON_STATUS, "") == STATUS_OK
+            Logger.i(
+                LOG_TAG_PROXY,
+                "parsePublicKeyFromCached: works? $ok, minVersionCode: $minVersionCode, publicKey: $publicKey"
+            )
+            ok
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "parsePublicKeyFromCached: exception ${e.message}", e)
+            false
         }
     }
 

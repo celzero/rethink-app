@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.adapter
 
+import Logger
 import Logger.LOG_IAB
 import Logger.LOG_TAG_UI
 import android.animation.AnimatorSet
@@ -202,17 +203,18 @@ class GooglePlaySubsAdapter(
                     binding.price.visibility = View.VISIBLE
                     binding.price.text = displayPrice
                 } else {
-                    binding.price.visibility = View.GONE
+                    binding.price.text = displayPrice
+                    binding.pricePerMonth.visibility = View.GONE
                 }
             } else {
                 // per-month cannot be calculated (unknown purchase duration).
                 // Show at least the full price in the primary field.
-                binding.pricePerMonth.visibility = View.GONE
+                binding.price.visibility = View.GONE
                 if (displayPrice.isNotEmpty()) {
-                    binding.price.visibility = View.VISIBLE
-                    binding.price.text = displayPrice
+                    binding.pricePerMonth.visibility = View.VISIBLE
+                    binding.pricePerMonth.text = displayPrice
                 } else {
-                    binding.price.visibility = View.GONE
+                    binding.pricePerMonth.visibility = View.GONE
                 }
             }
 

@@ -825,13 +825,14 @@ object SnackbarHelper {
         val snackbar = Snackbar.make(bestAnchorFor(view), message, duration)
 
         // Anchor above BottomNavigationView so the snackbar is never hidden behind it.
-        findBottomNavView(view)?.let { navView ->
-            snackbar.anchorView = navView
+        val navView = findBottomNavView(view)
+        navView?.let {
+            snackbar.anchorView = it
         }
 
         // Style the container view.
         val snackView = snackbar.view
-        styleContainer(snackView, view.context)
+        styleContainer(snackView, view.context, navView != null)
 
         // Style the message text.
         val msgTv = snackView.findViewById<TextView>(
@@ -952,14 +953,22 @@ object SnackbarHelper {
      */
     private fun findBottomNavView(view: View): BottomNavigationView? {
         // Walk up to the root first, then search the entire tree from there.
-        val root = view.rootView as? ViewGroup ?: return null
-        return searchForBottomNav(root)
+        val root = view.rootView ?: return null
+        
+        // 1. Try finding by ID directly (most reliable if ID is known)
+        val navView = root.findViewById<BottomNavigationView>(R.id.nav_view)
+        if (navView != null && navView.isShown) {
+            return navView
+        }
+
+        // 2. Fallback to recursive search
+        return (root as? ViewGroup)?.let { searchForBottomNav(it) }
     }
 
     private fun searchForBottomNav(group: ViewGroup): BottomNavigationView? {
         for (i in 0 until group.childCount) {
             val child = group.getChildAt(i)
-            if (child is BottomNavigationView) return child
+            if (child is BottomNavigationView && child.isShown) return child
             if (child is ViewGroup) {
                 val found = searchForBottomNav(child)
                 if (found != null) return found
@@ -972,7 +981,7 @@ object SnackbarHelper {
      * Apply the themed background, elevation, and margins to the Snackbar container.
      *
      */
-    private fun styleContainer(snackView: View, context: Context) {
+    private fun styleContainer(snackView: View, context: Context, isAnchored: Boolean) {
         // First child is always the SnackbarContentLayout.
         val contentView: View = (snackView as? ViewGroup)?.getChildAt(0) ?: snackView
 
@@ -988,7 +997,13 @@ object SnackbarHelper {
 
         // Outer layout margins: float the bar away from screen edges and off the nav bar.
         val hMargin = context.resources.getDimensionPixelSize(R.dimen.snackbar_horizontal_margin)
-        val bMargin = context.resources.getDimensionPixelSize(R.dimen.snackbar_bottom_margin)
+        var bMargin = context.resources.getDimensionPixelSize(R.dimen.snackbar_bottom_margin)
+
+        // if the snackbar is anchored, we need to add more margin to it so it is shown above the
+        // navigation menu to some extent.
+        if (isAnchored) {
+            bMargin *= 2
+        }
 
         val lp = snackView.layoutParams
         when (lp) {

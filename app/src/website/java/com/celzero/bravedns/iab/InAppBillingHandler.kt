@@ -17,6 +17,7 @@ package com.celzero.bravedns.iab
 
 import Logger
 import Logger.LOG_IAB
+import Logger.LOG_TAG_PROXY
 import android.app.Activity
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
@@ -58,10 +59,14 @@ import com.celzero.bravedns.iab.InAppBillingHandler.serverApiErrorLiveData
 import com.celzero.bravedns.iab.InAppBillingHandler.startStateObserver
 import com.celzero.bravedns.iab.InAppBillingHandler.updateUIForState
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.ResetResult
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.getEntitlementDetails
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.getExpiryFromPayload
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.storeWinEntitlement
 import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.google.gson.JsonObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -83,6 +88,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -477,7 +483,7 @@ object InAppBillingHandler : KoinComponent {
                                                     return@forEach
                                                 }
                                                 if (deviceId == null || accountId != storedAccId) {
-                                                    val didResult = billingBackendClient.createOrRegisterDid(accountId)
+                                                    val didResult = billingBackendClient.reconcileDidForCid(accountId)
                                                     if (didResult.errorCode == 401) {
                                                         loge(mname, "createOrRegisterDid 401 for accountId-len=${accountId.length}; showing auth error")
                                                         handleUnauthorized401(ServerApiError.Operation.CUSTOMER, accountId, "")
@@ -1054,16 +1060,13 @@ object InAppBillingHandler : KoinComponent {
             return
         }
 
-        // CID has changed (or DID is missing): re-register this device under the new CID.
-        // Call createOrRegisterDid() directly so we can inspect the error code and surface
-        // 401/409 to the UI — getDeviceId(cid) obscures the error by falling through to the
-        // (now stale) stored DID.
+        // Use the mutex-protected reconcileDidForCid to avoid racing with a
+        // concurrent refreshIdentity() call that may also be creating a DID.
         logd(mname, "reconciling did for new cid=${cid.take(8)}")
-        val didResult = billingBackendClient.createOrRegisterDid(cid)
+        val didResult = billingBackendClient.reconcileDidForCid(cid)
         when {
             didResult.isSuccess -> {
-                logd(mname, "reconcile succeeded; persisting new (cid, did)")
-                secureIdentityStore.save(env, cid, didResult.deviceId)
+                logd(mname, "reconcile succeeded; did persisted by BillingBackendClient (len=${didResult.deviceId.length})")
             }
             didResult.errorCode == 401 -> {
                 loge(mname, "401 unauthorized on device re-registration for cid=${cid.take(8)}; surfacing auth error")
@@ -1076,6 +1079,82 @@ object InAppBillingHandler : KoinComponent {
             else -> {
                 loge(mname, "device re-registration failed (code=${didResult.errorCode}) for cid=${cid.take(8)}; non-fatal")
             }
+        }
+    }
+
+    suspend fun reconcilePurchase() {
+        val mname = this::reconcilePurchase.name
+        val thresholdToCheckWinExpiryTs: Long = TimeUnit.DAYS.toMillis(10) // 10 days in ms
+        // time when the entitlement reconciliation should be considered CONST
+        val expiryDifferenceTs: Long = TimeUnit.DAYS.toMillis(30) // 30 days in ms
+
+        val activePurchase = getActivePurchasesSnapshot()
+        // reconcile only when entitlement expiry is ahead of windscribe expiry by at least
+        // thresholdToCheckWinExpiryTs. Smaller differences are ignored by the server
+        val entitlement = getEntitlementDetails()
+        val entitlementExpiry = entitlement?.expiry()
+
+        if (activePurchase.isEmpty()) return
+
+        if (entitlementExpiry == null) {
+            logd(mname, "missing entitlement expiry, skipping reconcile")
+            return
+        }
+
+        val windscribeExpiry = VpnController.getWinExpiryTs()
+
+        if (windscribeExpiry == null) {
+            logd(mname, "missing entitlement or win expiry, skipping reconcile")
+            return
+        }
+
+        if (windscribeExpiry > entitlementExpiry) {
+            logd(mname, "win expiry is ahead of entitlement expiry, skipping reconcile")
+            return
+        }
+
+        // if the value of the win expiry is less than 30 days then start checking
+        val now = System.currentTimeMillis()
+        if (windscribeExpiry - now > expiryDifferenceTs) {
+            logd(mname, "win expiry is beyond threshold, skipping reconcile")
+            return
+        }
+
+        if (entitlementExpiry - windscribeExpiry < thresholdToCheckWinExpiryTs) {
+            logd(mname, "expiry gap is below reconciliation threshold, skipping reconcile")
+            return
+        }
+
+        // fetch entitlement and reconcile with the purchase
+        val purchaseDtl = subscriptionStateMachine.getSubscriptionData()?.purchaseDetail
+        if (purchaseDtl == null) {
+            loge(mname, "missing purchase detail, skipping reconcile")
+            return
+        }
+
+        // windscribe entitlement can be less than what the expiry which user has purchased
+        // (entitlement expiry), if the value of the win expiry is less than 30
+        // [thresholdToCheckWinExpiryTs] days then start checking for the windscribe expiry
+        val newPurchaseDtl = queryEntitlementFromServer(getObfuscatedAccountId(), getObfuscatedDeviceId(), purchaseDtl)
+        try {
+            storeWinEntitlement(newPurchaseDtl.payload)
+            log(mname, "new entitlement updated")
+        } catch (e: Exception) {
+            loge(mname, "storeWinEntitlement failed: ${e.message}", e)
+            return
+        }
+
+        // Update state machine with fresh payload (non-fatal)
+        try {
+            val subsData = subscriptionStateMachine.getSubscriptionData()
+            if (subsData != null) {
+                subsData.subscriptionStatus.developerPayload = newPurchaseDtl.payload
+                val updatedSubsData = subsData.copy(purchaseDetail = newPurchaseDtl)
+                subscriptionStateMachine.stateMachine.updateData(updatedSubsData)
+                log(mname, "state machine payload updated")
+            }
+        } catch (e: Exception) {
+            loge(mname, "state machine update failed (non-fatal): ${e.message}")
         }
     }
 
@@ -1499,6 +1578,10 @@ object InAppBillingHandler : KoinComponent {
     }
 
     fun fetchPurchases(productType: List<String>) {
+        if (!isBillingClientSetup()) {
+            loge("fetchPurchases", "billing client not setup, cannot fetch purchases")
+            return
+        }
         billingScope.launch {
             val mname = "fetchPurchases"
             logv(mname, "fetching purchases for types: $productType")
@@ -1524,6 +1607,10 @@ object InAppBillingHandler : KoinComponent {
     }
 
     private fun queryPurchases(pt: String, hasBoth: Boolean) {
+        if (!::billingClient.isInitialized) {
+            loge("queryPurchases", "billingClient not initialized, cannot query purchases for $pt")
+            return
+        }
         val mname = this::queryPurchases.name
         log(mname, "querying purchases for type: $pt, hasBoth: $hasBoth")
 

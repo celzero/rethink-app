@@ -75,8 +75,8 @@ import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
-import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.time.Duration.Companion.milliseconds
 
 object RpnProxyManager : KoinComponent {
     private val applicationContext: Context by inject()
@@ -426,10 +426,7 @@ object RpnProxyManager : KoinComponent {
         try {
             val ws = extractWsObject(payload) ?: return null
             val ent = VpnController.getEntitlementDetails(ws, billingBackendClient.getDeviceId())
-            val expiryStr = ent?.expiry()
-            if (expiryStr.isNullOrEmpty()) return null
-            // 2028-05-09T05:01:46.547Z, sample
-            val timestamp: Long = Instant.parse(expiryStr).toEpochMilli()
+            val timestamp = ent?.expiry()
             Logger.i(LOG_TAG_PROXY, "$TAG; expiry parsed from payload: $timestamp")
             return timestamp
         } catch (e: Exception) {
@@ -1105,7 +1102,7 @@ object RpnProxyManager : KoinComponent {
                 }
                 break
             }
-            delay(1000L)
+            delay(1000L.milliseconds)
         }
     }
 
@@ -2599,7 +2596,7 @@ object RpnProxyManager : KoinComponent {
                         proxyIds.add(block)
                     } else if (appProxyPair.first.isNotEmpty()) {
                         var id = appProxyPair.first
-                        if (id == AUTO_SERVER_ID) {
+                        if (id.contains(AUTO_SERVER_ID)) {
                             id = VpnController.getWinByKey("")?.id() ?: block
                             proxyIds.add(id)
                         } else {
@@ -2612,7 +2609,7 @@ object RpnProxyManager : KoinComponent {
                 if (appProxyPair.first.isNotEmpty()) {
                     // add eligible app-specific config in the order we see them
                     var id = appProxyPair.first
-                    if (id == AUTO_SERVER_ID) {
+                    if (id.contains(AUTO_SERVER_ID)) {
                         id = VpnController.getWinByKey("")?.id() ?: block
                         proxyIds.add(id)
                     } else {
@@ -2641,15 +2638,15 @@ object RpnProxyManager : KoinComponent {
                             checkEligibilityBasedOnSsid(it.id, ssid)) &&
                     !proxyIds.contains(configId)
                 ) {
-                    val key = if (it.id == AUTO_SERVER_ID) {
+                    val id = if (configId.contains(AUTO_SERVER_ID)) {
                         VpnController.getWinByKey("")?.id() ?: block
                     } else {
                         configId
                     }
-                    proxyIds.add(key)
+                    proxyIds.add(id)
                     Logger.i(
                         LOG_TAG_PROXY,
-                        "$TAG catch-all config is active: ${it.id}, ${it.name} => add $key"
+                        "$TAG catch-all config is active: ${it.id}, ${it.name} => add $id"
                     )
                 }
             } catch (e: Exception) {
@@ -2677,7 +2674,8 @@ object RpnProxyManager : KoinComponent {
         val actualId = id.substringAfter(Backend.RpnWin)
 
         val config = winCacheMutex.withLock {
-            winServersCache.find { it.id == actualId || it.key == actualId }
+            if (actualId == Backend.RpnWin || actualId == AUTO_SERVER_ID) winServersCache.find { it.id == AUTO_SERVER_ID }
+            else winServersCache.find { it.id == id || it.id == actualId || it.key == id || it.key == actualId }
         }
 
         if (config == null) {
@@ -2735,7 +2733,8 @@ object RpnProxyManager : KoinComponent {
 
         val actualId = id.substringAfter(Backend.RpnWin)
         val config = winCacheMutex.withLock {
-            winServersCache.find { it.id == id || it.id == actualId || it.key == id || it.key == actualId }
+            if (actualId == Backend.RpnWin || actualId == AUTO_SERVER_ID) winServersCache.find { it.id == AUTO_SERVER_ID }
+            else winServersCache.find { it.id == id || it.id == actualId || it.key == id || it.key == actualId }
         }
 
         if (config == null) {
@@ -2760,6 +2759,7 @@ object RpnProxyManager : KoinComponent {
 
         val actualId = id.substringAfter(Backend.RpnWin)
         val config = winCacheMutex.withLock {
+            if (actualId == Backend.RpnWin || actualId == AUTO_SERVER_ID) winServersCache.find { it.id == AUTO_SERVER_ID }
             winServersCache.find { it.id == id || it.id == actualId || it.key == id || it.key == actualId }
         }
 
@@ -2771,7 +2771,7 @@ object RpnProxyManager : KoinComponent {
         if (config.ssidBased) {
             val ssids = "" //config.ssidList
             val ssidItems = SsidItem.parseStorageList(ssids)
-            if (ssidItems.isEmpty()) { // treat empty as match all
+            if (ssidItems.isEmpty() && ssid.isNotEmpty()) { // treat empty as match all
                 Logger.d(
                     LOG_TAG_PROXY,
                     "checkEligibilityBasedOnSsid: ssidEnabled is true, but ssid list is empty, match all"

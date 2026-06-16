@@ -30,11 +30,13 @@ object NewSettingsManager: KoinComponent {
     const val WG_GLOBAL_LOCKDOWN_MODE_SETTING = "WG_GLOBAL_LOCKDOWN_MODE_SETTING"
     const val DNS_TO_BYPASS = "DNS_TO_BYPASS"
     const val FIREWALL_BUBBLE = "FIREWALL_BUBBLE"
+    const val BLOCK_UNKNOWN_IN_DNS = "BLOCK_UNKNOWN_IN_DNS"
 
     private val newSettingsList = listOf (
         WG_GLOBAL_LOCKDOWN_MODE_SETTING,
         DNS_TO_BYPASS,
-        FIREWALL_BUBBLE
+        FIREWALL_BUBBLE,
+        BLOCK_UNKNOWN_IN_DNS
     )
 
     init {

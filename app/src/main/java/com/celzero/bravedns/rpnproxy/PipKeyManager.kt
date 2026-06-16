@@ -24,6 +24,8 @@ import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.customdownloader.SafeResponseConverterFactory
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.viewmodel.SubscriptionUiState
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -83,6 +85,14 @@ object PipKeyManager : KoinComponent {
     // Store availability data to preserve it across states
     private var availabilityData: SubscriptionUiState.Available? = null
     private var recentFailureError = ""
+
+    /**
+     * Shared mutex and cached response body for the `/p/{appVersion}` endpoint,
+     * used by both [PipKeyManager] and [TcpProxyHelper] to prevent duplicate HTTP
+     * calls when both request the public key concurrently.
+     */
+    @Volatile var publicKeyResponseBody: String? = null
+    val publicKeyFetchMutex = Mutex()
 
     // see if the rpn can be activated, the url will let us know if the status is ok
     // if rpn needs to be suspended, then make use of this method
@@ -145,109 +155,144 @@ object PipKeyManager : KoinComponent {
     /**
      * Checks if the public key is usable by making a network request.
      * Retries if necessary, up to a maximum number of attempts.
+     *
+     * Uses a shared mutex ([publicKeyFetchMutex]) so that concurrent callers
+     * (this manager and [TcpProxyHelper]) never fire duplicate `GET /p/{appVersion}`
+     * requests.  The first caller fetches and caches the full response body;
+     * subsequent callers parse the cached body without a network call.
+     *
      * @param retryCount The current retry count.
      * @param shouldPersistResult Whether to persist the result of the public key check.
      * @return True if the public key is usable, false otherwise.
      */
     private suspend fun publicKeyUsable(context: Context, retryCount: Int = 0, shouldPersistResult: Boolean): Pair<Boolean, String> {
-        var works = false
+        // Fast-path: if a previous caller already cached the response, parse it
+        // without even acquiring the mutex.
+        val fastCache = publicKeyResponseBody
+        if (fastCache != null) {
+            return parsePublicKeyResponseLocked(fastCache)
+        }
+
+        // Acquire the shared mutex so TcpProxyHelper and PipKeyManager never
+        // fire duplicate HTTP requests at the same time.
+        val result = publicKeyFetchMutex.withLock {
+            // Double-check: another caller may have filled the cache while we waited.
+            val cachedBody = publicKeyResponseBody
+            if (cachedBody != null) {
+                return@withLock parsePublicKeyResponseLocked(cachedBody)
+            }
+
+            var works = false
+            try {
+                val lenientGson = com.google.gson.GsonBuilder().setLenient().create()
+                val retrofit =
+                    RetrofitManager.getRpnBaseBuilder(persistentState.routeRethinkInRethink)
+                        .addConverterFactory(SafeResponseConverterFactory())
+                        .addConverterFactory(GsonConverterFactory.create(lenientGson))
+                        .build()
+                val retrofitInterface = retrofit.create(IBillingServerApi::class.java)
+
+                val response = retrofitInterface.getPublicKey(persistentState.appVersion.toString())
+
+                if (response?.isSuccessful == false) {
+                    Logger.w(
+                        LOG_TAG_PROXY,
+                        "$TAG publicKeyUsable: response is not successful, code: ${response.code()}, message: ${response.message()}"
+                    )
+                    return@withLock null // signal retry
+                }
+
+                val responseBody = response?.body()
+
+                if (responseBody == null) {
+                    Logger.w(LOG_TAG_PROXY, "$TAG publicKeyUsable: response body is null")
+                    return@withLock null // signal retry
+                }
+
+                // Cache the full response body so TcpProxyHelper (or a second
+                // PipKeyManager call within the same process lifetime) can reuse it.
+                publicKeyResponseBody = responseBody.toString()
+
+                Logger.v(LOG_TAG_PROXY, "$TAG publicKeyUsable: response body size: ${responseBody.size()}")
+                // responseBody is already a JsonObject, no need to parse again
+                val status = responseBody.get("status")?.asString ?: ""
+                works = status == STATUS_OK
+                val minVersionCode = responseBody.get("minvcode")?.asString?.toIntOrNull()
+                val publicKey = responseBody.get("pubkey")?.asString ?: ""
+
+                if (minVersionCode == null || minVersionCode > persistentState.appVersion) {
+                    Logger.w(
+                        LOG_TAG_PROXY,
+                        "$TAG publicKeyUsable: minvcode $minVersionCode is less than app version ${persistentState.appVersion}"
+                    )
+                    isRethinkPlusAvailableForDevice = false
+                    recentFailureError = ERR_UNSUPPORTED_VERSION
+                    return@withLock Pair(false, recentFailureError)
+                }
+
+                availabilityData = processAvailabilityData(responseBody.toString())
+
+                Logger.i(LOG_TAG_PROXY, "$TAG publicKeyUsable: minvcode: $minVersionCode, pub-key: ${publicKey.length}, status: $status")
+                recentFailureError = ""
+                isRethinkPlusAvailableForDevice = works
+                return@withLock Pair(works, availabilityData.toString())
+            } catch (e: UnknownHostException) {
+                Logger.w(LOG_TAG_PROXY, "$TAG err; no internet connection: ${e.message}")
+                recentFailureError = ERR_INTERNET_UNAVAILABLE
+                isRethinkPlusAvailableForDevice = false
+                return@withLock null // signal retry
+            } catch (e: ConnectException) {
+                Logger.w(LOG_TAG_PROXY, "$TAG err; connection failed: ${e.message}")
+                recentFailureError = ERR_INTERNET_UNAVAILABLE
+                isRethinkPlusAvailableForDevice = false
+                return@withLock null // signal retry
+            } catch (e: SocketTimeoutException) {
+                Logger.w(LOG_TAG_PROXY, "$TAG err; connection timed out: ${e.message}")
+                recentFailureError = ERR_INTERNET_UNAVAILABLE
+                isRethinkPlusAvailableForDevice = false
+                return@withLock null // signal retry
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_PROXY, "$TAG err; public key usable: ${e.message}")
+                return@withLock null // signal retry
+            }
+        }
+
+        // Retry outside the mutex so the recursive re-entry can re-acquire it.
+        if (result == null && isRetryRequired(retryCount)) {
+            Logger.i(LOG_TAG_PROXY, "$TAG retrying publicKeyUsable for $retryCount")
+            return publicKeyUsable(context, retryCount + 1, shouldPersistResult)
+        }
+
+        Logger.i(LOG_TAG_PROXY, "$TAG retry count exceeded for publicKeyUsable")
+        recentFailureError = ERR_NOT_AVAILABLE
+        isRethinkPlusAvailableForDevice = false
+        return result ?: Pair(false, ERR_NOT_AVAILABLE)
+    }
+
+    /**
+     * Parses a previously cached public-key response body without a network call.
+     * Mirrors the parsing logic from [publicKeyUsable].
+     */
+    private fun parsePublicKeyResponseLocked(responseBodyString: String): Pair<Boolean, String> {
         try {
-            val lenientGson = com.google.gson.GsonBuilder().setLenient().create()
-            val retrofit =
-                RetrofitManager.getRpnBaseBuilder(persistentState.routeRethinkInRethink)
-                    .addConverterFactory(SafeResponseConverterFactory())
-                    .addConverterFactory(GsonConverterFactory.create(lenientGson))
-                    .build()
-            /**
-             * for response: see [IBillingServerApi.getPublicKey]
-             */
-            val retrofitInterface = retrofit.create(IBillingServerApi::class.java)
-
-            val response = retrofitInterface.getPublicKey(persistentState.appVersion.toString())
-
-            if (response?.isSuccessful == false) {
-                Logger.w(
-                    LOG_TAG_PROXY,
-                    "$TAG publicKeyUsable: response is not successful, code: ${response.code()}, message: ${response.message()}"
-                )
-                return Pair(false, ERR_NOT_AVAILABLE)
-            }
-
-            val responseBody = response?.body()
-
-            if (responseBody == null) {
-                Logger.w(LOG_TAG_PROXY, "$TAG publicKeyUsable: response body is null")
-                return Pair(false, ERR_NOT_AVAILABLE)
-            }
-
-            Logger.v(LOG_TAG_PROXY, "$TAG publicKeyUsable: response body size: ${responseBody.size()}")
-            // responseBody is already a JsonObject, no need to parse again
-            val status = responseBody.get("status")?.asString ?: ""
-            works = status == STATUS_OK
-            val minVersionCode = responseBody.get("minvcode")?.asString?.toIntOrNull()
-            val publicKey = responseBody.get("pubkey")?.asString ?: ""
+            val json = JSONObject(responseBodyString)
+            val status = json.optString("status", "")
+            val works = status == STATUS_OK
+            val minVersionCode = json.optString("minvcode")?.toIntOrNull()
 
             if (minVersionCode == null || minVersionCode > persistentState.appVersion) {
-                Logger.w(
-                    LOG_TAG_PROXY,
-                    "$TAG publicKeyUsable: minvcode $minVersionCode is less than app version ${persistentState.appVersion}"
-                )
                 isRethinkPlusAvailableForDevice = false
                 recentFailureError = ERR_UNSUPPORTED_VERSION
                 return Pair(false, recentFailureError)
             }
 
-            availabilityData = processAvailabilityData(responseBody.toString())
-
-           /* if (shouldPersistResult) {
-                val pubKeyBytes = getPubKeyAsJsonBytes(publicKey)
-                if (pubKeyBytes == null || pubKeyBytes.isEmpty()) {
-                    Logger.w(LOG_TAG_PROXY, "$TAG failed to parse public key from response")
-                    recentFailureError = ERR_NOT_AVAILABLE
-                    isRethinkPlusAvailableForDevice = false
-                    return Pair(false, ERR_NOT_AVAILABLE)
-                }
-                val message = fetchPipMsg(context)?.asGostr()?.tos() ?: ""
-                val keyState = generateAndSaveKeyState(context, pubKeyBytes, message)
-                if (keyState == null) {
-                    Logger.w(LOG_TAG_PROXY, "$TAG failed to generate key state from public key")
-                    recentFailureError = ERR_NOT_AVAILABLE
-                    isRethinkPlusAvailableForDevice = false
-                    return Pair(false, recentFailureError)
-                }
-            }*/
-
-            Logger.i(LOG_TAG_PROXY, "$TAG publicKeyUsable: minvcode: $minVersionCode, pub-key: ${publicKey.length}, status: $status")
+            availabilityData = processAvailabilityData(responseBodyString)
             recentFailureError = ""
             isRethinkPlusAvailableForDevice = works
             return Pair(works, availabilityData.toString())
-        } catch (e: UnknownHostException) {
-            Logger.w(LOG_TAG_PROXY, "$TAG err; no internet connection: ${e.message}")
-            recentFailureError = ERR_INTERNET_UNAVAILABLE
-            isRethinkPlusAvailableForDevice = false
-            return Pair(false, ERR_INTERNET_UNAVAILABLE)
-        } catch (e: ConnectException) {
-            Logger.w(LOG_TAG_PROXY, "$TAG err; connection failed: ${e.message}")
-            recentFailureError = ERR_INTERNET_UNAVAILABLE
-            isRethinkPlusAvailableForDevice = false
-            return Pair(false, ERR_INTERNET_UNAVAILABLE)
-        } catch (e: SocketTimeoutException) {
-            Logger.w(LOG_TAG_PROXY, "$TAG err; connection timed out: ${e.message}")
-            recentFailureError = ERR_INTERNET_UNAVAILABLE
-            isRethinkPlusAvailableForDevice = false
-            return Pair(false, ERR_INTERNET_UNAVAILABLE)
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_PROXY, "$TAG err; public key usable: ${e.message}")
-        }
-
-        return if (isRetryRequired(retryCount) && !works) {
-            Logger.i(LOG_TAG_PROXY, "$TAG retrying publicKeyUsable for $retryCount")
-            publicKeyUsable(context, retryCount + 1, shouldPersistResult)
-        } else {
-            Logger.i(LOG_TAG_PROXY, "$TAG retry count exceeded for publicKeyUsable")
-            recentFailureError = ERR_NOT_AVAILABLE
-            isRethinkPlusAvailableForDevice = false
-            Pair(false, ERR_NOT_AVAILABLE)
+            Logger.e(LOG_TAG_PROXY, "$TAG err parsing cached public-key response: ${e.message}")
+            return Pair(false, ERR_NOT_AVAILABLE)
         }
     }
 
