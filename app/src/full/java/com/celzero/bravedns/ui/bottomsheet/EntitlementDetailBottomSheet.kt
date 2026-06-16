@@ -29,6 +29,7 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.firestack.backend.RpnEntitlement
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -103,7 +104,7 @@ class EntitlementDetailBottomSheet : BottomSheetDialogFragment() {
         setupRow(b.rowCid, "Client ID (CID)", entitlement.cid().take(12))
         setupRow(b.rowDid, "Device ID (DID)", entitlement.did().take(4))
         setupRow(b.rowWho, "Identifier (WHO)", who)
-        setupRow(b.rowExpiry, "Expiry", entitlement.expiry())
+        setupRow(b.rowExpiry, "Expiry", UIUtils.formatToRelativeTime(requireContext(), entitlement.expiry()))
         setupRow(b.rowProvider, "Provider ID", entitlement.providerID())
         setupRow(b.rowToken, "Token", entitlement.token())
         setupRow(b.rowAllowRestore, "Allow Restore", entitlement.allowRestore().toString().capitalizeWords())
