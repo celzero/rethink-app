@@ -19,6 +19,7 @@ import Logger
 import Logger.LOG_TAG_DNS
 import Logger.LOG_TAG_FIREWALL
 import android.content.Context
+import android.os.SystemClock.elapsedRealtime
 import android.util.Patterns
 import androidx.lifecycle.LiveData
 import com.celzero.bravedns.R
@@ -172,22 +173,27 @@ object DomainRulesManager : KoinComponent {
     }
 
     fun status(d: String, uid: Int): Status {
+        val st = elapsedRealtime()
         val domain = d.lowercase(Locale.ROOT)
         // check if the domain is added in custom domain list
-        when (getDomainRule(domain, uid)) {
+        when (val rule = getDomainRule(domain, uid)) {
             Status.TRUST -> {
+                Logger.d(LOG_TAG_DNS, "DomainRulesManager.getDomainRule($domain, uid=$uid) exact-trusted, time: ${elapsedRealtime() - st} ms")
                 return Status.TRUST
             }
             Status.BLOCK -> {
+                Logger.d(LOG_TAG_DNS, "DomainRulesManager.getDomainRule($domain, uid=$uid) exact-blocked, time: ${elapsedRealtime() - st} ms")
                 return Status.BLOCK
             }
             Status.NONE -> {
-                // fall-through
+                Logger.d(LOG_TAG_DNS, "DomainRulesManager.getDomainRule($domain, uid=$uid) exact-none, time: ${elapsedRealtime() - st} ms")
             }
         }
 
         // check if the received domain is matching with the custom wildcard
-        return matchesWildcard(domain, uid)
+        val wc = matchesWildcard(domain, uid)
+        Logger.d(LOG_TAG_DNS, "DomainRulesManager.matchesWildcard($domain, uid=$uid) status=$wc, time: ${elapsedRealtime() - st} ms")
+        return wc
     }
 
     private fun matchesWildcard(domain: String, uid: Int): Status {
@@ -257,11 +263,15 @@ object DomainRulesManager : KoinComponent {
     }
 
     fun isDomainTrusted(d: String?): Boolean {
+        val st = elapsedRealtime()
         if (d.isNullOrEmpty()) {
+            Logger.d(LOG_TAG_DNS, "DomainRulesManager.isDomainTrusted(empty) for $d, time: ${elapsedRealtime() - st} ms")
             return false
         }
         val domain = d.lowercase(Locale.ROOT)
-        return trustedTrie.hasAny(domain)
+        val res = trustedTrie.hasAny(domain)
+        Logger.d(LOG_TAG_DNS, "DomainRulesManager.isDomainTrusted($domain) result=$res, time: ${elapsedRealtime() - st} ms")
+        return res
     }
 
     suspend fun trust(cd: CustomDomain) {
