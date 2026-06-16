@@ -54,6 +54,7 @@ import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.DnsLogTracker
 import com.celzero.bravedns.util.Constants.Companion.BUILD_TYPE_ALPHA
+import com.celzero.bravedns.util.Constants.Companion.EMPTY_PACKAGE_NAME
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_WEBSITE
@@ -86,6 +87,7 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlin.math.ln
 import kotlin.math.pow
+import kotlin.time.Duration.Companion.milliseconds
 
 @Suppress("TooManyFunctions", "LargeClass")
 object Utilities {
@@ -536,7 +538,7 @@ object Utilities {
         }
 
         val drawable = AppCompatResources.getDrawable(
-            context.applicationContext,
+            context,
             R.drawable.default_app_icon
         )
 
@@ -548,7 +550,7 @@ object Utilities {
     @Suppress("TooGenericExceptionCaught")
     fun delay(ms: Long, scope: LifecycleCoroutineScope, updateUi: () -> Unit) {
         scope.launch {
-            kotlinx.coroutines.delay(ms)
+            kotlinx.coroutines.delay(ms.milliseconds)
             try {
                 updateUi()
             } catch (e: Exception) { // Catches any exception from user-provided updateUi lambda
