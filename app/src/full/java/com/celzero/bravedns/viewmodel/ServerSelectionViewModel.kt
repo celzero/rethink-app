@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * ViewModel for [com.celzero.bravedns.ui.fragment.ServerSelectionFragment] and its child
@@ -185,7 +186,7 @@ class ServerSelectionViewModel : ViewModel() {
 
             val result = withContext(Dispatchers.IO) {
                 try {
-                    withTimeoutOrNull(RESET_TIMEOUT_MS) {
+                    withTimeoutOrNull(RESET_TIMEOUT_MS.milliseconds) {
                         RpnProxyManager.resetAndRefetchRpn()
                     } ?: run {
                         Logger.w(LOG_TAG_UI, "$TAG.reset: timed out after ${RESET_TIMEOUT_MS / 1000}s")

@@ -291,27 +291,5 @@ class EventLogger(private val eventDao: EventDao) {
         }
     }
 
-    /**
-     * Shuts down the event logger.
-     * This should be called when the app is closing to ensure all pending log operations complete.
-     * After calling this, the EventLogger should not be used anymore.
-     */
-    fun shutdown() {
-        try {
-            // Cancel all pending operations
-            scope.launch {
-                Logger.i(LOG_TAG, "EventLogger shutting down")
-            }
-
-            // Give pending operations a moment to complete
-            Thread.sleep(100)
-
-            // Close the dispatcher
-            dispatcher.close()
-            Logger.i(LOG_TAG, "EventLogger shutdown complete")
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG, "Error during shutdown: ${e.message}", e)
-        }
-    }
 }
 
