@@ -90,8 +90,8 @@ interface IBillingServerApiTest {
     suspend fun registerCustomer(
         @Header("x-rethink-app-cid") accountId: String?,
         @Header("x-rethink-app-did") deviceId: String?,
-        @Query("test") test: String,
         @Query("vcode") vcode: String,
+        @Query("test") test: String,
         @Body meta: JsonObject
     ): Response<JsonObject?>?
 
@@ -115,8 +115,8 @@ interface IBillingServerApiTest {
     suspend fun registerDevice(
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String?,
-        @Query("test") test: String,
         @Query("vcode") vcode: String,
+        @Query("test") test: String,
         @Body meta: JsonObject? = null
     ): Response<JsonObject?>?
 
