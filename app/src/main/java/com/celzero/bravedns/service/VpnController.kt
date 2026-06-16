@@ -397,8 +397,8 @@ object VpnController : KoinComponent {
         braveVpnService?.onRpnOptsChange()
     }
 
-    suspend fun getWinLastUpdatedTs(): Long? {
-        return braveVpnService?.getWinLastUpdatedTs()
+    suspend fun getWinExpiryTs(): Long? {
+        return braveVpnService?.getWinExpiryTs()
     }
 
     suspend fun isWinRegistered(): Boolean {
