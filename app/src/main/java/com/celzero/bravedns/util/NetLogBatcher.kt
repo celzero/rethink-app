@@ -92,14 +92,22 @@ class NetLogBatcher<T, V>(
     private suspend fun consumeAdd() =
         withContext(Dispatchers.IO + ncons) {
             for (y in buffersCh) {
-                processor(y)
+                try {
+                    processor(y)
+                } catch (e: Exception) {
+                    Log.e(LOG_BATCH_LOGGER, "$tag; consumeAdd error: ${e.message}")
+                }
             }
         }
 
     private suspend fun consumeUpdate() =
         withContext(Dispatchers.IO + ncons) {
             for (y in updatesCh) {
-                updator(y)
+                try {
+                    updator(y)
+                } catch (e: Exception) {
+                    Log.e(LOG_BATCH_LOGGER, "$tag; consumeUpdate error: ${e.message}")
+                }
             }
         }
 
