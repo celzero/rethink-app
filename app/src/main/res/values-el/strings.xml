@@ -143,9 +143,7 @@
     <string name="always_on_dialog_stop_heading" translatable="true">Πάντα ενεργοποιημένο VPN</string>
     <string name="always_on_dialog_stop_message" translatable="true">Το Always-on VPN είναι ενεργοποιημένο για το Rethink. Είστε σίγουροι ότι θέλετε να σταματήσετε το Rethink ούτως ή άλλως;</string>
     <string name="private_dns_dialog_heading" translatable="true">Απενεργοποιήστε το Private DNS</string>
-    <string name="private_dns_dialog_desc" translatable="true">Οι ρυθμίσεις DNS του Rethink παρακάμπτονται από το Private DNS του Android.
-\n
-\nΓια να χρησιμοποιήσετε το DNS του Rethink μεταβείτε στις Ρυθμίσεις του Android και απενεργοποιήστε το \"Private DNS\".</string>
+    <string name="private_dns_dialog_desc" translatable="true">Οι ρυθμίσεις DNS του Rethink παρακάμπτονται από το Private DNS του Android. \n \nΓια να χρησιμοποιήσετε το DNS του Rethink μεταβείτε στις Ρυθμίσεις του Android και απενεργοποιήστε το \"Private DNS\".</string>
     <string name="private_dns_dialog_positive" translatable="true">Μεταβείτε στις Ρυθμίσεις</string>
     <string name="firewall_act_universal_tab" translatable="true">καθολικό</string>
     <string name="doh_custom_url_remove_dialog_title" translatable="true">Διαγραφή τελικού σημείου DoH;</string>

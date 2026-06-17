@@ -177,9 +177,7 @@
     <string name="bsct_conn_desc_allowed" translatable="true">разрешено на %1$s %2$s</string>
     <string name="bsct_conn_desc_blocked" translatable="true">блокирани на %1$s %2$s</string>
     <string name="always_on_dialog_lockdown_stop_message" translatable="true">RethinkDNS работи с VPN в режим <i>Lockdown</i>. Спирането му ще доведе до загуба на интернет свързаност на този потребителски профил. Искате ли все пак да продължите?</string>
-    <string name="private_dns_dialog_desc" translatable="true">DNS настройките на Rethink са заменени от Private DNS на Android.
-\n
-\nЗа да използвате DNS на Rethink, отидете в Настройки на Android и изключете \"Private DNS\".</string>
+    <string name="private_dns_dialog_desc" translatable="true">DNS настройките на Rethink са заменени от Private DNS на Android. \n \nЗа да използвате DNS на Rethink, отидете в Настройки на Android и изключете \"Private DNS\".</string>
     <string name="doh_custom_url_remove_success" translatable="true">Крайната точка е изтрита.</string>
     <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Услугата за достъпност RethinkDNS е спряна или се е сринала. <i><b>Влезте в Настройки и Насилствено спрете</b></i> RethinkDNS и го стартирайте отново, за да използвате <i>Блокирайте всяко приложение, което не се използва</i> функция.
 \n

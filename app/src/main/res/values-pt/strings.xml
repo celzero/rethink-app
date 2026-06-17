@@ -11,7 +11,7 @@
     <string name="status_protected_with_tor_private_dns">protegido com tor e dns privado</string>
     <string name="slide_2_desc">Rethink é a forma mais fácil de monitorizar a atividade da rede, contornar a censura da Internet e bloquear, com a firewall, as aplicações no seu dispositivo Android.</string>
     <string name="slide_1_title">Código livre e aberto</string>
-    <string name="slide_1_desc">Rethink é um programa de código aberto apoiado pelo programa Mozilla Builders MVP.</string>
+    <string name="slide_1_desc">Rethink é um software de código aberto apoiado pelo programa Mozilla Builders MVP da FOSS United Foundation.</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Aviso: Rethink foi desativado</string>
     <string name="exclude">excluir</string>
     <string name="pause_mode_notification_title">Pausado! As aplicações bloqueadas continuarão a ser controladas.</string>
@@ -102,13 +102,13 @@
     <string name="settings_theme_dialog_themes_1">Definido pelo sistema</string>
     <string name="settings_theme_dialog_themes_4">Preto profundo</string>
     <string name="settings_notification_dialog_option_1">\nPausar/Parar (predefinição):\n\nMostra dois botões, para pausar ou parar Rethink rapidamente.</string>
-    <string name="dc_other_dns_heading">tipo</string>
+    <string name="dc_other_dns_heading">Tipo</string>
     <string name="settings_ip_text_ipv4">IPv4</string>
     <string name="settings_notification_dialog_option_2">\nDNS / DNS + Firewall:\nMostra dois botões para mudar rapidamente entre o modo DNS para poupar bateria e o modo normal DNS + Firewall.</string>
     <string name="hsf_vpn_dialog_message">Rethink necessita da sua permissão para criar uma VPN local para cifrar os pedidos DNS, implementar um monitor de rede e impor as regras da firewall.
 \n
 \nRethink não recolhe informações nem monitoriza as suas atividades.</string>
-    <string name="dc_block_heading">regras</string>
+    <string name="dc_block_heading">Regras</string>
     <string name="settings_ip_text_ipv6">IPv6</string>
     <string name="firewall_status_excluded">excluída de dns e da firewall</string>
     <string name="firewall_card_text_inactive">Ativar modo firewall.</string>
@@ -121,7 +121,7 @@
     <string name="next">Seguinte</string>
     <string name="slide_2_title">Boas-vindas</string>
     <string name="allow">permitir</string>
-    <string name="block">bloquear</string>
+    <string name="block">Bloquear</string>
     <string name="firewall_mode_notification_title">Protegido! Conectado à Firewall.</string>
     <string name="status_protected_with_socks5">protegido com proxy socks</string>
     <string name="status_protected_with_http">protegido com proxy http</string>
@@ -239,7 +239,7 @@
     <string name="hybrid_mode_info_title">DNS + Firewall</string>
     <string name="conn_track_clear_logs_message">Isto elimina os registos da rede mas não as regras de firewall. Esta operação não é reversível. Continuar?</string>
     <string name="info_dialog_url_copy_toast_msg">URL copiado</string>
-    <string name="bypass_universal">contorno universal</string>
+    <string name="bypass_universal">Ignorar todos</string>
     <string name="app_name">RethinkDNS</string>
     <string name="title_about">Acerca</string>
     <string name="orbot_bs_status_trying_connect">A configurar Orbot…</string>
@@ -250,7 +250,7 @@
     <string name="txt_home">Início</string>
     <string name="brave_dns_connect_mode_change_firewall">Escolha o modo.</string>
     <string name="brave_dns_connect_mode_change_dns">Escolha o modo.</string>
-    <string name="firewall_act_universal_tab">universal</string>
+    <string name="firewall_act_universal_tab">Universal</string>
     <string name="orbot_app_issue">Não foi possível iniciar Orbot. Está instalado?</string>
     <string name="settings_socks5_vpn_disabled_error">Inicie Rethink para continuar.</string>
     <string name="settings_https_disabled_error">Ligado ao %1$s. Desligue-o para continuar.</string>
@@ -270,7 +270,7 @@
     <string name="orbot">Orbot</string>
     <string name="settings_ip_network_desc">Escolha entre as versões do protocolo de Internet.</string>
     <string name="settings_ptrans_desc">Converter tráfego IPv6 para IPv4 no dispositivo. Ative se estiver conectado a uma rede apenas com IPv4.</string>
-    <string name="settings_proxy_header">proxy</string>
+    <string name="settings_proxy_header">Proxy</string>
     <string name="orbot_bs_status_3">A encaminhar %1$s para Orbot, proxy HTTP também definido.</string>
     <string name="settings_orbot_disabled_error">Desative o proxy HTTP(S) e/ou SOCKS5 para continuar com a configuração do Tor-as-a-proxy.</string>
     <string name="title_settings">Definições</string>
@@ -282,7 +282,7 @@
     <string name="settings_https_desc">Encaminhar ligações para o \'endpoint\' HTTP(S) CONNECT.</string>
     <string name="orbot_http">Proxy HTTP</string>
     <string name="orbot_stop_dialog_message">Rethink parou de encaminhar ligações para Orbot, mas Orbot pode estar a ser executado em segundo plano.</string>
-    <string name="orbot_explanation">Orbot é uma aplicação proxy gratuita que permite que outras aplicações utilizem a Internet de forma mais <u>segura</u>. \nOrbot usa o <u>Tor</u> para cifrar o tráfego na Internet, ajudando a <u>evitar a censura</u> e a proteger contra várias formas de <u>vigilância na rede</u> que ameaçam a liberdade e a privacidade das pessoas. \n<u>Proxy TCP</u>: Rethink <i>encaminha para Orbot</i> apenas as ligações TCP das aplicações incluídas. \n<u>Proxy HTTP</u>: Rethink <i>configura</i> um proxy HTTP, mas não força as aplicações a usar. Normalmente os navegadores como o Chrome e o Firefox usam. As aplicações que usem o proxy HTTP(S) ignorarão as regras de firewall e de DNS.</string>
+    <string name="orbot_explanation">Orbot é uma app de proxy gratuito que permite que outras apps usem a internet com mais &lt;u&gt;segurança&lt;/u&gt;. \nOrbot usa o &lt;u&gt;Tor&lt;/u&gt; para criptografar o seu tráfego de internet, o que o ajuda a &lt;u&gt;ignorar a censura&lt;/u&gt; e a defender-se contra formas de &lt;u&gt;vigilância de rede&lt;/u&gt; que ameaçam a liberdade e a privacidade pessoais. \n&lt;u&gt;Proxy TCP&lt;/u&gt;: Rethink encaminha apenas conexões TCP de apps &lt;i&gt;incluídas&lt;/i&gt; para Orbot. \n&lt;u&gt;Proxy HTTP&lt;/u&gt;: Rethink &lt;i&gt;estabelece&lt;/i&gt; o túnel HTTP CONNECT para Orbot e encaminha apenas conexões TCP de apps &lt;i&gt;incluídas&lt;/i&gt;.</string>
     <string name="settings_custom_downloader_heading">Utilizar gestor de descargas da aplicação</string>
     <string name="orbot_both_desc">Todas as anteriores.</string>
     <string name="orbot_none">Nenhuma (padrão)</string>
@@ -297,7 +297,7 @@
     <string name="orbot_bs_status_4">Configuração Tor-as-a-Proxy (Orbot) com um toque.</string>
     <string name="orbot_stop_dialog_negative">Parar Orbot</string>
     <string name="settings_orbot_heading">Configurar Orbot</string>
-    <string name="settings_general_header">geral</string>
+    <string name="settings_general_header">Geral</string>
     <string name="settings_import_export_heading">Backup e restauro</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="settings_ip_network_heading">Escolha a versão do IP</string>
@@ -336,10 +336,10 @@
     <string name="about_bug_no_log_dialog_message">Não foi possível obter os registos de falhas. Deseja reportar manualmente o seu erro?</string>
     <string name="about_email">Envie um e-mail</string>
     <string name="about_privacy_policy">Política de privacidade</string>
-    <string name="about_app">aplicação</string>
+    <string name="about_app">App</string>
     <string name="about_settings_app_info">Info da aplicação</string>
     <string name="about_settings_notification">Definições de notificação</string>
-    <string name="about_mozilla">Rethink é apoiado por Mozilla Builders, FOSS United Foundation, OSOM Products Inc.</string>
+    <string name="about_mozilla">O Rethink conta com o apoio da Mozilla Builders, da FOSS United Foundation e do FLOSS/fund.</string>
     <string name="about_app_update_check">Procurar atualizações</string>
     <string name="about_mail_subject">[Rethink]:</string>
     <string name="about_mail_bugreport_share_title">Selecione a aplicação de e-mail</string>
@@ -359,14 +359,14 @@
     <string name="about_bug_report">Reportar erros</string>
     <string name="about_bug_no_log_dialog_title">Relatório de erros</string>
     <string name="about_bug_no_log_dialog_positive_btn">Enviar e-mail</string>
-    <string name="about_web">ligações</string>
+    <string name="about_web">Ligações</string>
     <string name="about_website">Visitar rethinkdns.com</string>
     <string name="about_github">Contribuir no GitHub</string>
     <string name="about_faq">FAQ</string>
     <string name="about_docs">Documentação</string>
     <string name="about_connect">contactos</string>
     <string name="about_sponsor_link_text">Patrocinador</string>
-    <string name="about_settings">sistema</string>
+    <string name="about_settings">Sistema</string>
     <string name="about_settings_vpn_profile">Perfil VPN</string>
     <string name="about_whats_new">Novidades da versão %1$s</string>
     <string name="about_twitter">Siga-nos no Twitter</string>
@@ -396,7 +396,7 @@
     <string name="error_loading_log_file">Erro ao carregar o ficheiro de registo</string>
     <string name="collecting_logs_progress_text">A obter…</string>
     <string name="contributors_dialog_title">Autores</string>
-    <string name="contributors_list">O &lt;i&gt;Rethink Open Source Project&lt;/i&gt; deve a existência a estes voluntários que dedicam inúmeras horas no desenvolvimento.&lt;br/&gt; &lt;br/&gt;🛡️ Android app &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Mygod&gt;Mygod&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Network engine &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Lanius-collaris&gt;Lanius-collaris&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Resolver &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Community mods &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TronSlayer&gt;Andersen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Geo-IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Translations &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 Icons &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Build servers &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list"><![CDATA[O <i>Rethink Open Source Project</i> deve a existência a estes voluntários que dedicam inúmeras horas no desenvolvimento.<br/> <br/>🛡️ Android app <br/> <a href=https://github.com/BayLee4>BayLee4</a><br/> <a href=https://github.com/Ch4t4r>Ch4t4r</a><br/> <a href=https://github.com/HrBDev>HrBDev</a><br/> <a href=https://github.com/hussainmohd-a>hussainmohd-a</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/markwmuller>markwmuller</a><br/> <a href=https://github.com/Mygod>Mygod</a><br/> <a href=https://github.com/Uldiniad>Uldiniad</a><br/> <a href=https://github.com/Poussinou>Poussinou</a><br/> <a href=https://github.com/pjosingh>pjosingh</a><br/> <br/>🚂 Network engine <br/> <a href=https://github.com/alalamav>alalamav</a><br/> <a href=https://github.com/bemasc>bemasc</a><br/> <a href=https://github.com/dmcardle>dmcardle</a><br/> <a href=https://github.com/fortuna>fortuna</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/Lanius-collaris>Lanius-collaris</a><br/> <a href=https://github.com/PeterDaveHello>PeterDaveHello</a><br/> <a href=https://github.com/santhosh-ponnusamy>santhosh-ponnusamy</a><br/> <a href=https://github.com/SeanBurford>SeanBurford</a><br/> <br/>📚 Resolver <br/> <a href=https://github.com/ahmed-tasaly>ahmed-tasaly</a><br/> <a href=https://github.com/amithm7>amithm7</a><br/> <a href=https://github.com/arfshl>arfshl</a><br/> <a href=https://github.com/badmojr>badmojr</a><br/> <a href=https://github.com/bongochong>bongochong</a><br/> <a href=https://github.com/elliotwutingfeng>elliotwutingfeng</a><br/> <a href=https://github.com/georgyo>georgyo</a><br/> <a href=https://github.com/GiddyGoatGaming>GiddyGoatGaming</a><br/> <a href=https://github.com/Harish-Narayan>Harish-Narayan</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/JakeChampion>JakeChampion</a><br/> <a href=https://github.com/MasterKia>MasterKia</a><br/> <a href=https://github.com/mtxadmin>mtxadmin</a><br/> <a href=https://github.com/neneeen>neneeen</a><br/> <a href=https://github.com/PeterDaveHello>PeterDaveHello</a><br/> <a href=https://github.com/santhosh-ponnusamy>santhosh-ponnusamy</a><br/> <a href=https://github.com/shruuub>shruuub</a><br/> <a href=https://github.com/shuvashish76>shuvashish76</a><br/> <br/>⚜ Community mods <br/> <a href=https://t.me/amithm7>amithm7</a><br/> <a href=https://t.me/TronSlayer>Andersen</a><br/> <a href=https://t.me/ppatra>ppatra</a><br/> <a href=https://t.me/InFamous23>InFamous23</a><br/> <a href=https://t.me/TheTr1ckst3r>TheTr1ckst3r</a><br/> <a href=https://t.me/Ch4t4r>Ch4t4r</a><br/> <a href=https://t.me/Billi_ance>Billi_ance</a><br/> <a href=https://t.me/kaliangel>kaliangel</a><br/> <a href=https://github.com/PoneyClairDeLune>PoneyClairDeLune</a><br/> <br/>📌 Geo-IP <br/> <a href=https://db-ip.com>db-ip.com</a><br/> <br/>❇ Translations <br/> <a href=https://weblate.org/en/>Weblate</a><br/> <br/>🦆 Icons <br/> <a href=https://github.com/celzero/rethink-app/issues/346>Icons</a><br/> <br/>📦 Build servers <br/> <a href=https://jitpack.io/>JitPack</a><br/> <a href=https://github.com/>GitHub</a><br/>]]></string>
     <string name="cd_custom_dns_proxy_name_default">Proxy</string>
     <string name="cd_custom_dns_proxy_default_ip">127.0.0.1</string>
     <string name="cd_dns_proxy_error_text_1">Endereço IP inválido</string>
@@ -409,7 +409,7 @@
     <string name="dns_btm_sheet_dialog_message"><Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s lista(s) de bloqueio</h3>%3$s.<br/><br/>]]></Data></string>
     <string name="univ_firewall_rule_1">Bloquear todas as aplicações se o dispositivo estiver bloqueado</string>
     <string name="dns_btm_record_type">Tipo de pedido: %1$s</string>
-    <string name="firewall_rule_block_ip_univ_desc">Uma regra de firewall, definida pelo utilizador, bloqueou o <i>IP/Porta de destino</i>.<br/><br/> Para alterar, aceda ao separador <i>Universal</i>.</string>
+    <string name="firewall_rule_block_ip_univ_desc"><![CDATA[Uma regra de firewall, definida pelo utilizador, bloqueou o <i>IP/Porta de destino</i>.<br/><br/> Para alterar, aceda ao separador <i>Universal</i>.]]></string>
     <string name="univ_firewall_rule_8">Bloquear tráfego na porta 80 (HTTP inseguro)</string>
     <string name="dns_proxy_connection_failure_lockdown">Se excluir %1$s para %2$s no modo bloqueado, pode causar problemas de conectividade com a Internet.</string>
     <string name="firewall_rule_block_app_desc"><![CDATA[Uma regra de firewall definida pelo utilizador bloqueou esta <i>aplicação</i>.<br/><br/> Para alterar, aceda ao separador <i>Todas as Aplicações.]]></string>
@@ -457,7 +457,7 @@
     <string name="dns_info_neutral">Copiar</string>
     <string name="fapps_metered_block_dialog_message">Bloquear ligações em redes limitadas (móveis) para as aplicações <i>da lista</i>\?</string>
     <string name="firewall_rule_block_udp_ntp">UDP bloqueado</string>
-    <string name="firewall_rule_trusted_ip_desc">Esta ligação foi permitida porque o <i>IP de destino</i> está configurado com um IP de confiança.<br/><br/>Para alterar, aceda ao ecrã <i>Firewall por aplicação </i>.</string>
+    <string name="firewall_rule_trusted_ip_desc"><![CDATA[Esta ligação foi permitida porque o <i>IP de destino</i> está configurado com um IP de confiança.<br/><br/>Para alterar, aceda ao ecrã <i>Firewall por aplicação </i>.]]></string>
     <string name="dns_proxy_dialog_message">Nome da aplicação: %1$s
 \n
 \nEndereço IP: %2$s
@@ -472,18 +472,18 @@
     <string name="update_complete_snack_message">Nova versão descarregada.</string>
     <string name="settings_local_blocklist_in_use">%1$s listas de bloqueio usadas</string>
     <string name="pause_desc">Nota: as %1$s aplicações bloqueadas continuarão a ser protegidas por firewall.</string>
-    <string name="firewall_rule_block_app_mobile_desc">Uma regra de firewall, definida pelo utilizador, bloqueou <i>esta aplicação</i> de se ligar a uma rede <i>limitada</i>.<br/><br/> Para alterar, aceda ao separador <i>Todas as aplicações</i>.</string>
+    <string name="firewall_rule_block_app_mobile_desc"><![CDATA[Uma regra de firewall, definida pelo utilizador, bloqueou <i>esta aplicação</i> de se ligar a uma rede <i>limitada</i>.<br/><br/> Para alterar, aceda ao separador <i>Todas as aplicações</i>.]]></string>
     <string name="firewall_rule_trusted_ip">IP de confiança</string>
     <string name="firewall_rule_new_app_desc"><![CDATA[Esta aplicação fez uma ligação pela <i>primeira</i> vez.<br/><br/> Para alterar, aceda ao separador <i>Universal</i>.]]></string>
-    <string name="firewall_rule_block_udp_ntp_desc">Uma regra de firewall, definida pelo utilizador, bloqueou esta ligação <i>UDP</i>.<br/><br/> Para alterar, aceda ao separador <i>Universal</i>.</string>
-    <string name="firewall_rule_bypass_universal_ip_desc">Esta ligação foi permitida porque o &lt;i&gt;IP de destino&lt;/i&gt; está configurado para ignorar todas as regras universais de firewall.&lt;br/&gt;&lt;br/&gt; Para alterar, aceda às &lt;i&gt;Regras de IP&lt;i&gt; no separador &lt;i&gt;Universal&lt;/i&gt;.</string>
-    <string name="firewall_rule_foreground_desc">Esta ligação foi protegida por firewall porque a aplicação de origem <i>não estava em primeiro plano</i>.<br/><br/>Para alterar este comportamento, aceda ao separador <i>Universal</i>.</string>
-    <string name="firewall_rule_block_dns_bypass_desc">Esta ligação foi bloqueada porque a <i>aplicação de origem</i> ignorou o DNS preferencial do utilizador.<br/><br/>Para alterar este comportamento, aceda ao separador <i>Universal</i>.</string>
-    <string name="firewall_rule_block_http_desc">Esta ligação foi bloqueada porque, provavelmente, usava <i>HTTP inseguro</i>.<br/><br/> Para alterar, aceda ao separador <i>Universal</i>.</string>
-    <string name="firewall_rule_device_lock_desc">Esta ligação foi protegida por firewall porque o <i>dispositivo estava bloqueado</i> nesse momento.<br/><br/> Para alterar este comportamento, aceda ao separador <i>Universal</i>.</string>
-    <string name="firewall_rule_global_lockdown_desc">Esta ligação foi bloqueada porque o bloqueio universal está ativo.<br/><br/> Para alterar, aceda ao separador <i>Universal</i>.</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc">Esta ligação foi permitida porque a <i>aplicação de origem</i> está configurada para <i>ignorar as regras universais da firewall</i>.<br/><br/>Para alterar, aceda ao ecrã <i>Firewall por aplicação</i>.</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc">Esta ligação DNS foi feita via proxy e encaminhada para o terminal DNS preferido do utilizador.<br/><br/> Para alterar, desative <i>Prevenir fugas de DNS</i> no ecrã <i>Configurar</i> do DNS.</string>
+    <string name="firewall_rule_block_udp_ntp_desc"><![CDATA[Uma regra de firewall, definida pelo utilizador, bloqueou esta ligação <i>UDP</i>.<br/><br/> Para alterar, aceda ao separador <i>Universal</i>.]]></string>
+    <string name="firewall_rule_bypass_universal_ip_desc"><![CDATA[Esta ligação foi permitida porque o <i>IP de destino</i> está configurado para ignorar todas as regras universais de firewall.<br/><br/> Para alterar, aceda às <i>Regras de IP<i> no separador <i>Universal</i>.]]></string>
+    <string name="firewall_rule_foreground_desc"><![CDATA[Esta ligação foi protegida por firewall porque a aplicação de origem <i>não estava em primeiro plano</i>.<br/><br/>Para alterar este comportamento, aceda ao separador <i>Universal</i>.]]></string>
+    <string name="firewall_rule_block_dns_bypass_desc"><![CDATA[Esta ligação foi bloqueada porque a <i>aplicação de origem</i> ignorou o DNS preferencial do utilizador.<br/><br/>Para alterar este comportamento, aceda ao separador <i>Universal</i>.]]></string>
+    <string name="firewall_rule_block_http_desc"><![CDATA[Esta ligação foi bloqueada porque, provavelmente, usava <i>HTTP inseguro</i>.<br/><br/> Para alterar, aceda ao separador <i>Universal</i>.]]></string>
+    <string name="firewall_rule_device_lock_desc"><![CDATA[Esta ligação foi protegida por firewall porque o <i>dispositivo estava bloqueado</i> nesse momento.<br/><br/> Para alterar este comportamento, aceda ao separador <i>Universal</i>.]]></string>
+    <string name="firewall_rule_global_lockdown_desc"><![CDATA[Esta ligação foi bloqueada porque o bloqueio universal está ativo.<br/><br/> Para alterar, aceda ao separador <i>Universal</i>.]]></string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc"><![CDATA[Esta ligação foi permitida porque a <i>aplicação de origem</i> está configurada para <i>ignorar as regras universais da firewall</i>.<br/><br/>Para alterar, aceda ao ecrã <i>Firewall por aplicação</i>.]]></string>
+    <string name="firewall_rule_exempt_dns_proxied_desc"><![CDATA[Esta ligação DNS foi feita via proxy e encaminhada para o terminal DNS preferido do utilizador.<br/><br/> Para alterar, desative <i>Prevenir fugas de DNS</i> no ecrã <i>Configurar</i> do DNS.]]></string>
     <string name="new_app_notification_action_toast_allow">Ligação de rede permitida para a aplicação</string>
     <string name="cd_dns_crypt_title">resolvedores</string>
     <string name="cd_custom_doh_dialog_title">URL do servidor personalizado</string>
@@ -502,7 +502,7 @@
     <string name="cd_dns_crypt_resolver_heading">Resolver</string>
     <string name="cd_dns_crypt_relay_heading">Relay</string>
     <string name="cd_dns_crypt_dialog_stamp">Carimbo</string>
-    <string name="lbl_add">adicionar</string>
+    <string name="lbl_add">Adicionar</string>
     <string name="cd_dns_crypt_error_text_1">O carimbo não pode ficar vazio</string>
     <string name="cd_doh_dialog_heading">Adicionar DNS Over HTTPS</string>
     <string name="cd_dnscrypt_relay_heading">Relays</string>
@@ -516,7 +516,7 @@
     <string name="dns_btm_sheet_chip_no_answer">Sem resposta</string>
     <string name="dns_btm_resolved_crypt">resolvido <u>anonimamente</u> %1$s por %2$s através de %3$s</string>
     <string name="dns_btm_resolved_doh">resolvido %1$s por %2$s</string>
-    <string name="dns_btm_latency_ms">%1$s ms</string>
+    <string name="dns_btm_latency_ms">%1$sms</string>
     <string name="hs_download_positive_default">ok</string>
     <string name="hs_download_positive_play_store">Atualização completa</string>
     <string name="hs_download_positive_website">Visitar site</string>
@@ -603,12 +603,12 @@
     <string name="firewall_rule_block_http">HTTP inseguro</string>
     <string name="firewall_rule_global_lockdown">Confinado</string>
     <string name="firewall_rule_no_rule_desc">Esta ligação não coincide com quaisquer regras da firewall.</string>
-    <string name="firewall_rule_block_app_unmetered_desc">Uma regra de firewall, definida pelo utilizador, bloqueou <i>esta aplicação</i> de se ligar a uma rede <i>ilimitada</i>.<br/><br/> Para alterar, aceda ao separador <i>Todas as aplicações</i>.</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc">Uma regra universal de firewall, definida pelo utilizador, bloqueou <i>esta aplicação</i> de se ligar a uma rede <i>limitada</i>.<br/><br/> Para alterar, aceda ao separador <i>Todas as aplicações</i>.</string>
-    <string name="firewall_rule_isolate_desc">Uma regra de firewall, definida pelo utilizador, bloqueou <i>esta aplicação</i> de se ligar a um IP diferente de um <i>IP ignorado</i>.<br/><br/> Para alterar, aceda ao separador <i>Todas as aplicações</i>.</string>
-    <string name="firewall_rule_block_ip_desc">Uma regra de firewall, definida pelo utilizador, bloqueou o <i>IP de destino</i>.<br/><br/> Para alterar, aceda ao separador <i>Firewall por aplicação</i>.</string>
-    <string name="firewall_rule_unknown_desc">Esta ligação foi protegida por firewall porque não foi possível determinar a <i>aplicação de origem</i>.<br/><br/>Para alterar este comportamento, aceda ao separador <i>Universal</i>.</string>
-    <string name="firewall_rule_exempt_orbot_setup_desc">Esta ligação foi permitida porque a configuração <i>Tor-as-a-proxy com um toque</i> via Orbot estava a decorrer.</string>
+    <string name="firewall_rule_block_app_unmetered_desc"><![CDATA[Uma regra de firewall, definida pelo utilizador, bloqueou <i>esta aplicação</i> de se ligar a uma rede <i>ilimitada</i>.<br/><br/> Para alterar, aceda ao separador <i>Todas as aplicações</i>.]]></string>
+    <string name="firewall_rule_block_app_univ_mobile_desc"><![CDATA[Uma regra universal de firewall, definida pelo utilizador, bloqueou <i>esta aplicação</i> de se ligar a uma rede <i>limitada</i>.<br/><br/> Para alterar, aceda ao separador <i>Todas as aplicações</i>.]]></string>
+    <string name="firewall_rule_isolate_desc"><![CDATA[Uma regra de firewall, definida pelo utilizador, bloqueou <i>esta aplicação</i> de se ligar a um IP diferente de um <i>IP ignorado</i>.<br/><br/> Para alterar, aceda ao separador <i>Todas as aplicações</i>.]]></string>
+    <string name="firewall_rule_block_ip_desc"><![CDATA[Uma regra de firewall, definida pelo utilizador, bloqueou o <i>IP de destino</i>.<br/><br/> Para alterar, aceda ao separador <i>Firewall por aplicação</i>.]]></string>
+    <string name="firewall_rule_unknown_desc"><![CDATA[Esta ligação foi protegida por firewall porque não foi possível determinar a <i>aplicação de origem</i>.<br/><br/>Para alterar este comportamento, aceda ao separador <i>Universal</i>.]]></string>
+    <string name="firewall_rule_exempt_orbot_setup_desc"><![CDATA[Esta ligação foi permitida porque a configuração <i>Tor-as-a-proxy com um toque</i> via Orbot estava a decorrer.]]></string>
     <string name="new_app_bulk_notification_title">Atenção</string>
     <string name="new_app_bulk_notification_content">Rethink bloqueou %1$s novas aplicações. Toque para ver ou alterar.</string>
     <string name="new_app_notification_content">Rethink bloqueou a aplicação instalada recentemente: %1$s.</string>
@@ -654,7 +654,7 @@
     <string name="ada_noapp_dialog_title">Nenhuma aplicação</string>
     <string name="ada_noapp_dialog_message">Falta a informação da aplicação. Talvez esta aplicação tenha sido desinstalada\?</string>
     <string name="ada_noapp_dialog_positive">OK</string>
-    <string name="ada_firewall_status">Esta aplicação <b><i>%1$s</i></b>.</string>
+    <string name="ada_firewall_status"><![CDATA[Esta aplicação <b><i>%1$s</i></b>.]]></string>
     <string name="ada_ip_connection_count">Conectado a %1$s endereços IP</string>
     <string name="ada_ip_connection_count_zero">Endereços IP: 0</string>
     <string name="ada_app_status_block">bloqueada</string>
@@ -683,15 +683,15 @@
     <string name="rt_download_start">A descarregar listas de bloqueio…</string>
     <string name="rt_chip_check_update">Procurar atualizações</string>
     <string name="rt_re_download">Descarregar novamente as listas de bloqueio</string>
-    <string name="rt_list_simple_btn_txt">simples</string>
-    <string name="lbl_advanced">avançado</string>
+    <string name="rt_list_simple_btn_txt">Simples</string>
+    <string name="lbl_advanced">Avançado</string>
     <string name="rt_filter_parent_selected">Selecionado</string>
     <string name="rt_download_desc">Descarregar listas de bloqueio (cerca de 60 MB) para usar esta funcionalidade.</string>
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="radio_max_btn">🪂 Max</string>
     <string name="rt_filter_hint">A mostrar <u>todas</u> as listas de bloqueio</string>
-    <string name="rt_filter_desc">A mostrar <u>%1$s</u> listas de bloqueio</string>
-    <string name="rt_filter_desc_subgroups">A mostrar <u>%1$s</u>listas de bloqueio do grupo: %2$s e do subgrupo: %3$s</string>
+    <string name="rt_filter_desc"><![CDATA[A mostrar <u>%1$s</u> listas de bloqueio]]></string>
+    <string name="rt_filter_desc_subgroups"><![CDATA[A mostrar <u>%1$s</u>listas de bloqueio do grupo: %2$s e do subgrupo: %3$s]]></string>
     <string name="rethink_max_desc">Mais de 50 localizações; mais privado; resolvedor recursivo em fly.io</string>
     <string name="bsrf_sub_group_heading">Subgrupo</string>
     <string name="bsrf_clear_filter">Limpar</string>
@@ -729,9 +729,7 @@
     <string name="lbbs_update_check">Procurar atualizações</string>
     <string name="private_dns_dialog_positive">Ir para as definições</string>
     <string name="private_dns_dialog_heading">Desativar DNS privado</string>
-    <string name="private_dns_dialog_desc">As definições de DNS do Rethink são substituídas pelas do DNS privado Android.
-\n
-\nPara usar o DNS Rethink, aceda às definições do sistema e desative a opção \"DNS privado\".</string>
+    <string name="private_dns_dialog_desc">As definições de DNS do Rethink são substituídas pelas do DNS privado Android. \n \nPara usar o DNS Rethink, aceda às definições do sistema e desative a opção \"DNS privado\".</string>
     <string name="ci_trust_initial">CO</string>
     <string name="ci_trust_txt">Confiável</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Bloquear sites com conteúdo adulto, pirataria, jogos de azar, encontros online e redes sociais.</string>
@@ -778,8 +776,8 @@
     <string name="ssv_see_more">Mostrar tudo</string>
     <string name="lbl_allowed" translatable="true">Permitida</string>
     <string name="lbl_disabled" translatable="true">Desativada</string>
-    <string name="firewall_rule_block_domain_desc" translatable="true">Uma regra de firewall, definida pelo utilizador, bloqueou o <i>domínio</i>.<br/><br/>Para alterar, aceda ao ecrã <i>Firewall por aplicação</i>.</string>
-    <string name="firewall_rule_trusted_domain_desc" translatable="true">Esta ligação foi permitida porque o <i>domínio</i> está definido como confiável.<br/><br/>Para alterar, aceda ao ecrã <i>Firewall por aplicação</i>.</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[Uma regra de firewall, definida pelo utilizador, bloqueou o <i>domínio</i>.<br/><br/>Para alterar, aceda ao ecrã <i>Firewall por aplicação</i>.]]></string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[Esta ligação foi permitida porque o <i>domínio</i> está definido como confiável.<br/><br/>Para alterar, aceda ao ecrã <i>Firewall por aplicação</i>.]]></string>
     <string name="bsdl_block_desc" translatable="true">Bloquear, confiar <u>neste domínio</u></string>
     <string name="lbl_cancel" translatable="true">Cancelar</string>
     <string name="lbl_apply" translatable="true">Aplicar</string>
@@ -808,9 +806,9 @@
     <string name="firewall_rule_bypass_dns_firewall" translatable="true">Aplicação ignorada</string>
     <string name="firewall_rule_dns_blocked" translatable="true">DNS bloqueado</string>
     <string name="firewall_rule_domain_blocked_univ" translatable="true">Domínio (universal)</string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Esta ligação foi permitida porque a <i>aplicação de origem </i> está definida para <i>ignorar DNS e firewall </i>.<br/><br/>Para alterar, aceda ao ecrã <i>Firewall por aplicação</i>.</string>
-    <string name="firewall_rule_dns_blocked_desc" translatable="true">Esta ligação foi bloqueada porque o <i>domínio</i> está bloqueado pelo DNS preferido do utilizador.<br/><br/>Para alterar este comportamento, aceda ao separador <i>Configurar DNS</i>.</string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Esta ligação foi permitida porque o <i>domínio</i> está definido como confiável nas regras universais de domínio.<br/><br/>Para alterar este comportamento, aceda ao separador <i>Configurar DNS</i>.</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[Esta ligação foi permitida porque a <i>aplicação de origem </i> está definida para <i>ignorar DNS e firewall </i>.<br/><br/>Para alterar, aceda ao ecrã <i>Firewall por aplicação</i>.]]></string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[Esta ligação foi bloqueada porque o <i>domínio</i> está bloqueado pelo DNS preferido do utilizador.<br/><br/>Para alterar este comportamento, aceda ao separador <i>Configurar DNS</i>.]]></string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[Esta ligação foi permitida porque o <i>domínio</i> está definido como confiável nas regras universais de domínio.<br/><br/>Para alterar este comportamento, aceda ao separador <i>Configurar DNS</i>.]]></string>
     <string name="dc_setting_dns_cache_desc" translatable="true">Solicitações unificadas, respostas em cache, tratamento de erros resiliente</string>
     <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">Desativado (padrão)</string>
@@ -833,7 +831,7 @@
     <string name="settings_default_dns_heading" translatable="true">Escolha o DNS de recurso</string>
     <string name="firewall_card_universal_rules" translatable="true">%1$s regras universais</string>
     <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Ignorar DNS universal e regras de firewall para as aplicações <i>da lista</i>\?</string>
-    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Esta ligação foi bloqueada porque o <i>domínio</i> está definido como bloqueado pelas regras universais.<br/><br/>Para alterar este comportamento, aceda ao separador <i>Configurar DNS</i>.</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[Esta ligação foi bloqueada porque o <i>domínio</i> está definido como bloqueado pelas regras universais.<br/><br/>Para alterar este comportamento, aceda ao separador <i>Configurar DNS</i>.]]></string>
     <string name="dc_setting_dns_cache_heading" translatable="true">Reforço de DNS</string>
     <string name="lbl_qr_code" translatable="true">Código QR</string>
     <string name="lbl_import" translatable="true">Importar</string>
@@ -842,7 +840,7 @@
     <string name="lbl_random" translatable="true">(aleatório)</string>
     <string name="lbl_very" translatable="true">muito</string>
     <string name="lbl_maybe_blocked" translatable="true">Talvez bloqueada</string>
-    <string name="lbl_network" translatable="true">rede</string>
+    <string name="lbl_network" translatable="true">Rede</string>
     <string name="lbl_create" translatable="true">Criar</string>
     <string name="lbl_wireguard" translatable="true">WireGuard</string>
     <string name="lbl_addresses" translatable="true">Endereços</string>
@@ -855,7 +853,7 @@
     <string name="lbl_inactive" translatable="true">Inativo</string>
     <string name="lbl_fast" translatable="true">rápido</string>
     <string name="lbl_slow" translatable="true">lento</string>
-    <string name="lbl_app_wise" translatable="true">por aplicação</string>
+    <string name="lbl_app_wise" translatable="true">Por app</string>
     <string name="lbl_sec" translatable="true">seg</string>
     <string name="lbl_min" translatable="true">min</string>
     <string name="lbl_last" translatable="true">Último</string>
@@ -887,7 +885,7 @@
     <string name="lbl_insecure" translatable="true">(inseguro)</string>
     <string name="lbl_optional" translatable="true">(opcional)</string>
     <string name="lbl_persistent_keepalive" translatable="true">Continuação persistente</string>
-    <string name="lbl_save" translatable="true">guardar</string>
+    <string name="lbl_save" translatable="true">Gravar</string>
     <string name="search_proxy_add_apps" translatable="true">Pesquisar aplicações por nome</string>
     <string name="public_key_copy_toast_msg" translatable="true">Chave pública copiada.</string>
     <string name="lbl_overall" translatable="true">Em geral</string>
@@ -911,7 +909,7 @@
     <string name="settings_rinr_dialog_desc" translatable="true">Também ativa a definição <!--settings_network_all_networks--> %1$s. Deseja continuar?</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">Não validar certificados TLS do servidor (ative apenas se souber o que está a fazer)</string>
     <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">Ignorar regras de DNS e de firewall.</string>
-    <string name="firewall_rule_proxied_desc" translatable="true">Esta ligação foi reencaminhada para o proxy preferido pelo utilizador.<br/><br/>Para alterar, aceda a <i>Proxy</i> no ecrã <i>Configurar</i>.</string>
+    <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[Esta ligação foi reencaminhada para o proxy preferido pelo utilizador.<br/><br/>Para alterar, aceda a <i>Proxy</i> no ecrã <i>Configurar</i>.]]></string>
     <string name="bypass_dns_firewall_tooltip">%1$s apenas funciona com o DNS Rethink</string>
     <string name="bad_config_reason_invalid_key" translatable="true">Chave inválida</string>
     <string name="bad_config_reason_invalid_number" translatable="true">Número inválido</string>
@@ -1017,6 +1015,110 @@
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> pode resultar em perda de conetividade. Altere a definição para permitir que o Rethink utilize dados e outros recursos quando estiver em segundo plano.</string>
     <string name="exclude_apps_from_proxy">Ignorar a aplicação de todos os proxies</string>
     <string name="exclude_apps_from_proxy_failure_toast">Esta aplicação contorna os proxies</string>
-    <string name="lbl_notification" translatable="true">notificação</string>
+    <string name="lbl_notification" translatable="true">Notificação</string>
     <string name="memory_notification_text">O Rethink está com pouca memória. As ações do sistema podem ser limitadas.</string>
+    <string name="lbl_saving" translatable="true">A gravar…</string>
+    <string name="lbl_plan" translatable="true">Plano</string>
+    <string name="lbl_expires_on" translatable="true">Expira em</string>
+    <string name="lbl_cancelled" translatable="true">Cancelado</string>
+    <string name="lbl_expired" translatable="true">Expirado</string>
+    <string name="lbl_grace_period" translatable="true">Período de tolerância</string>
+    <string name="lbl_paused" translatable="true">Pausado</string>
+    <string name="lbl_service_providers" translatable="true">Provedores de serviços</string>
+    <string name="lbl_hop" translatable="true">Relés</string>
+    <string name="lbl_manual" translatable="true">Manual</string>
+    <string name="lbl_default" translatable="true">Predefinição</string>
+    <string name="lbl_action" translatable="true">Ação</string>
+    <string name="lbl_connect" translatable="true">Conectar</string>
+    <string name="lbl_criteria" translatable="true">Criteria</string>
+    <string name="wireguard_title" translatable="true">Internet segura com WireGuard</string>
+    <string name="wireguard_desc" translatable="true">Criptografe o seu tráfego de internet com o WireGuard. Escolha rotas diferentes para apps diferentes.</string>
+    <string name="firewall_title" translatable="true">Proteja o seu Android com Firewall</string>
+    <string name="firewall_desc" translatable="true">Controlo o uso da internet por app; restrinja conexões com base na atividade da app ou da rede.</string>
+    <string name="dns_title" translatable="true">Bloqueie anúncios e malware com DNS</string>
+    <string name="dns_desc" translatable="true">Escolha entre mais que 190 listas para bloquear anúncios, rastreadores e malware.</string>
+    <string name="status_no_network" translatable="true">sem rede</string>
+    <string name="conn_track_clear_rule_logs_title" translatable="true">Apagar logs para esta regra?</string>
+    <string name="conn_track_clear_rule_logs_message" translatable="true">Isto apagará apenas os logs de rede da regra de firewall visualizada no momento. Esta operação não é reversível. Deseja prosseguir?</string>
+    <string name="settings_mobile_metered_heading" translatable="true">Redes móveis de medidores</string>
+    <string name="settings_mobile_metered_desc" translatable="true">Trate apenas as redes móveis como medidas e as demais como não medidas.</string>
+    <string name="settings_theme_dialog_themes_5" translatable="true">Luz Plus</string>
+    <string name="settings_theme_dialog_themes_6" translatable="true">Escuro Plus</string>
+    <string name="settings_theme_dialog_themes_7" translatable="true">Geada</string>
+    <string name="settings_biometric_dialog_heading" translatable="true">Autenticação Biométrica</string>
+    <string name="settings_biometric_dialog_option_0" translatable="true">Nenhum</string>
+    <string name="settings_biometric_dialog_option_1" translatable="true">Imediatamente</string>
+    <string name="settings_biometric_dialog_option_2" translatable="true">Após 5 minutos</string>
+    <string name="settings_biometric_dialog_option_3" translatable="true">Depois de 15 minutos</string>
+    <string name="sponser_dialog_usage_msg" translatable="true">Usa o Rethink há <b>%1$s dias</b>, o que representa um custo de uso de <b>$%2$s</b>. Consideraria patrocinar para sustentar o seu desenvolvimento?</string>
+    <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Use DNS do sistema para domínios não delegados</string>
+    <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Use o DNS do sistema para domínios não controlados, como <i>.lan</i>, <i>.internal</i>, etc.</string>
+    <string name="dc_filtering_heading" translatable="true">Filtragem</string>
+    <string name="cd_split_dns_heading" translatable="true">DNS dividido (experimental)</string>
+    <string name="cd_split_dns_desc" translatable="true">Encaminhe consultas DNS de apps proxy para os servidores DNS do proxy.</string>
+    <string name="dns_record_types_auto_mode_status" translatable="true">Automático (todos os tipos)</string>
+    <string name="univ_firewall_rule_11" translatable="true">Bloquear todas as conexões de host local</string>
+    <string name="univ_delete_domain_dialog_title" translatable="true">Apagar todas as regras de domínio?</string>
+    <string name="univ_delete_domain_dialog_message" translatable="true">Apagar essas regras permitirá que qualquer aplicação conecte aos domínios atualmente bloqueados.</string>
+    <string name="firewall_rule_private_dns" translatable="true">DNS privado</string>
+    <string name="firewall_rule_bypass_proxy" translatable="true">Ignorar proxy</string>
+    <string name="firewall_rule_paused_app" translatable="true">App pausada</string>
+    <string name="firewall_rule_lockdown_wg" translatable="true">Proxy de bloqueio</string>
+    <string name="firewall_rule_proxy_error" translatable="true">Erro de proxy</string>
+    <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[Esta conexão procura um servidor de <i>DNS privado</i> que não existe.]]></string>
+    <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[Esta conexão foi permitida porque o <i>app de origem</i> está configurado para <i>ignorar as regras de proxy</i>.<br><br>Para alterar isso, vá para o ecrã <i>Firewall específico por app</i>.]]></string>
+    <string name="firewall_rule_paused_app_desc" translatable="true"><![CDATA[Esta conexão foi permitida porque a <i>app</i> está em estado de <i>pausa</i>.]]></string>
+    <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[Esta conexão foi bloqueada porque o WireGuard está em modo de <i>lockdown</i>.<br><br> Para alterar, vá para o ecrã <i>WireGuard</i>.]]></string>
+    <string name="config_delete_all_dialog_title" translatable="true">Apagar tudo</string>
+    <string name="wireguard_disable_failure_relay" translatable="true">\"Relay WireGuard\" não pode ser desativado</string>
+    <string name="config_invalid_desc" translatable="true">Configuração WireGuard Inválida</string>
+    <string name="console_log_title" translatable="true">Registos de Apps</string>
+    <string name="console_log_desc" translatable="true">Os registos podem conter informações sensíveis.</string>
+    <string name="endpoint_independent_mapping_desc" translatable="true">Quando ativado, os sockets UDP mantêm um endereço e uma porta fixos para todos os destinos.</string>
+    <string name="anti_censorship_title" translatable="true">Anticensura</string>
+    <string name="anti_censorship_desc" translatable="true">Escolha entre várias técnicas Anticensura.</string>
+    <string name="tcp_keep_alive_desc" translatable="true">Feche rapidamente sockets TCP sem atividade recente.</string>
+    <string name="ac_title" translatable="true">anticensura</string>
+    <string name="ac_desc" translatable="true">Ferramentas anticensura podem garantir liberdade na internet, mas podem não funcionar em todos os lugares. Só foram testadas em conexões sem proxy.</string>
+    <string name="ac_never_split_desc" translatable="true">Não altere os pacotes.</string>
+    <string name="ac_split_auto_desc" translatable="true">Altere os pacotes conforme necessário.</string>
+    <string name="ac_split_tcp" translatable="true">TCP</string>
+    <string name="ac_split_tcp_desc" translatable="true">Altere os pacotes TCP.</string>
+    <string name="ac_split_tls" translatable="true">TCP/TLS</string>
+    <string name="ac_split_tls_desc" translatable="true">Altere os pacotes TCP ou TLS.</string>
+    <string name="ac_retry_options_title" translatable="true">estratégia</string>
+    <string name="ac_retry_options_never_desc" translatable="true">Em caso de falha, nunca tente novamente técnicas anticensura.</string>
+    <string name="ac_retry_options_with_split_desc" translatable="true">Aplicar técnicas anticensura quando necessário.</string>
+    <string name="lbl_always" translatable="true">Sempre</string>
+    <string name="ac_retry_options_after_split_desc" translatable="true">Sempre aplicar técnicas anticensura.</string>
+    <string name="ac_toast_retry_disabled" translatable="true">Escolher qualquer opção anticensura para definir a estratégia.</string>
+    <string name="adv_set_dial_timeout_desc" translatable="true">Fechar conexões TCP e UDP inativas após este período.</string>
+    <string name="no_stats_available" translatable="true">Sem estatísticas</string>
+    <string name="about_terms_of_service" translatable="true">Termos de Serviço</string>
+    <string name="download_ip_info_title" translatable="true">Mostrar informações do provedor</string>
+    <string name="adv_taster_desc" translatable="true">Configurar apps que podem iniciar ou encerrar o Rethink.</string>
+    <string name="load_more" translatable="true">Carregar Tudo</string>
+    <string name="close_conns_dialog_title" translatable="true">Fechar conexões</string>
+    <string name="local_blocklist_delete_desc" translatable="true">Apagar listas de bloqueio no dispositivo?</string>
+    <string name="fail_open_network_desc" translatable="true">Quando ativado, Rethink interrompe todos os dados quando não há conectividade disponível, como no <i>Modo Avião</i>.</string>
+    <string name="about_license" translatable="true">Licenciado sob a Apache-2.0</string>
+    <string name="close_all" translatable="true">Fechar tudo</string>
+    <string name="processing_dialog_title" translatable="true">A processar</string>
+    <string name="processing_dialog_desc" translatable="true">Aguarde enquanto processamos a sua solicitação.</string>
+    <string name="vpn_policy_relaxed" translatable="true">Relaxado</string>
+    <string name="vpn_policy_fixed" translatable="true">Conservativo</string>
+    <string name="title_database_dump" translatable="true">Base de dados</string>
+    <string name="copied_clipboard" translatable="true">Copiado</string>
+    <string name="wg_setting_ssid_title" translatable="true">Apenas Wi-Fi</string>
+    <string name="ssid_permission_error_action" translatable="true">Conceder permissão</string>
+    <string name="ssid_location_error_action" translatable="true">Ativar localização</string>
+    <string name="wg_ssid_delete_confirmation" translatable="true">Apagar %1$s?</string>
+    <string name="settings_firebase_error_reporting_desc" translatable="true">Capturar registos de erros para ajudar a melhorar a estabilidade.</string>
+    <string name="tombstone_app_desc" translatable="true">Quando ativado, manter regras da app por 7 dias.</string>
+    <string name="lockdown_download_enable_inapp" translatable="true">Ativar descarregador</string>
+    <string name="stability_program_snackbar_msg" translatable="true">Programa de estabilidade ativado. Relatórios de falhas ajudam a melhorar recursos experimentais.</string>
+    <string name="stability_program_snackbar_disable" translatable="true">Desativar</string>
+    <string name="rpn_purchased_state" translatable="true">Comprado</string>
+    <string name="tour_step_counter">%1$d de %2$d</string>
+    <string name="tour_btn_finish">Entendi</string>
 </resources>

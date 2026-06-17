@@ -35,9 +35,7 @@
 \nRethink ne collecte aucune information et ne vous espionne en aucune façon.</string>
     <string name="dns_firewall_mode_info_explanation_new">Tout ce qui précède + contournez la censure sur Internet.</string>
     <string name="dns_mode_info_explanation_new">Surveillez, bloquez et chiffrez les requêtes DNS.</string>
-    <string name="alert_firewall_accessibility_regrant_explanation">Le service d’accessibilité de Rethink s’est arrêté ou a dysfonctionné. <i><b>Allez dans Paramètres puis forcer l’arrêt</b></i> de Rethink et redémarrez-le pour utiliser la fonctionnalité <i>Bloquer les applications non utilisées.</i>
-\n
-\nRethink utilise le service d’accessibilité pour savoir quelles sont les applications en cours d’utilisation (avant-plan) et celles qui ne le sont pas (arrière-plan).</string>
+    <string name="alert_firewall_accessibility_regrant_explanation">Le service d’accessibilité de Rethink s’est arrêté ou a dysfonctionné. <i><b>Allez dans Paramètres puis forcez l’arrêt</b></i> de Rethink et redémarrez-le pour utiliser la fonctionnalité <i>Bloquer les applications non utilisées</i>.\n\nRethink utilise le service d’accessibilité pour savoir quelles sont les applications en cours d’utilisation (avant-plan) et celles qui ne le sont pas (arrière-plan).</string>
     <string name="bsct_conn_block_desc_device">bloquée %1$s sur l’appareil</string>
     <string name="bsct_block_ip">Bloquer, tolérer <u>cette IP</u> pour <u>cette appli</u></string>
     <string name="always_on_dialog">L’option \"VPN permanent\" est déjà activée sur cet appareil. Pour lancer RethinkDNS, allez dans les paramètres de l’application et désactivez \"VPN permanent\".</string>
@@ -57,7 +55,7 @@
     <string name="always_on_dialog_heading">Désactiver le VPN permanent</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">Connecté via RethinkDNS et pare-feu</string>
     <string name="alert_firewall_accessibility_exception">Échec de l’ouverture des paramètres d’accessibilité. Réessayez plus tard !</string>
-    <string name="bsct_conn_block_desc">bloquée %1$s par%2$s</string>
+    <string name="bsct_conn_block_desc">bloquée %1$s par %2$s</string>
     <string name="always_on_dialog_positive_btn">Aller dans les paramètres d’Android</string>
     <string name="always_on_dialog_stop_heading">VPN permanent</string>
     <string name="exclude">exclure</string>
@@ -111,7 +109,7 @@
     <string name="settings_ptrans_desc">Traduit le trafic sortant IPv6 en IPv4 sur l’appareil. Activez cette option si vous êtes connecté à un réseau uniquement IPv4.</string>
     <string name="settings_allow_bypass_desc">Autorisez les applications requérantes à accéder à tous les réseaux disponibles. Ces applications peuvent contourner le tunnel VPN de Rethink à la demande. Certaines applications de conférence audio/vidéo comme Zoom et Meet peuvent en avoir besoin pour fonctionner correctement.</string>
     <string name="settings_lock_down_mode_desc">Certaines options sont désactivées lorsque le VPN est en mode de verrouillage. <u>Voir les paramètres VPN</u>.</string>
-    <string name="settings_https_desc">Transférer les connexions vers le point de connexion HTTP(S).</string>
+    <string name="settings_https_desc">Rediriger les connexions vers le point de terminaison HTTP(S) via la méthode CONNECT.</string>
     <string name="orbot_http_desc">Établit un tunnel HTTP CONNECT vers Orbot.</string>
     <string name="orbot_bs_status_2">Le proxy HTTP est défini.</string>
     <string name="orbot_stop_dialog_title">Intervention manuelle requise</string>
@@ -121,9 +119,7 @@
     <string name="orbot_install_dialog_title">Installer Orbot \?</string>
     <string name="orbot_install_dialog_message">Orbot apporte les caractéristiques et les fonctionnalités de Tor à Android.</string>
     <string name="settings_theme_desc">Thème sombre/clair</string>
-    <string name="settings_notification_dialog_option_2">"
-\nDNS / DNS + Pare-feu :
-\nAffiche deux boutons permettant de passer rapidement du mode DNS qui économise la batterie, au mode normal DNS + Pare-feu."</string>
+    <string name="settings_notification_dialog_option_2">\nDNS / DNS + Pare-feu :\n\nAffiche deux boutons permettant de passer rapidement du mode DNS qui économise la batterie, au mode normal DNS + Pare-feu.</string>
     <string name="settings_selected_theme">Thème actuel : %1$s</string>
     <string name="settings_import_export_heading">Sauvegarder &amp; Restaurer</string>
     <string name="settings_dns_proxy_dialog_port_number">Numéro de port</string>
@@ -172,13 +168,8 @@
     <string name="settings_notification_desc2">DNS / DNS + Pare-feu</string>
     <string name="dc_local_block_heading">Listes de blocage embarquées sur l’appareil</string>
     <string name="settings_notification_desc3">Aucun</string>
-    <string name="settings_notification_dialog_option_1">"
-\nPause / Arrêt (par défaut) :
-\nAffiche deux boutons, pour mettre rapidement en pause et arrêter Rethink."</string>
-    <string name="settings_notification_dialog_option_3">"
-\nAucun :
-\nN’affiche aucun bouton.
-\n"</string>
+    <string name="settings_notification_dialog_option_1">\nPause / Arrêt (par défaut) :\n\nAffiche deux boutons, pour mettre rapidement en pause et arrêter Rethink.</string>
+    <string name="settings_notification_dialog_option_3">\nAucun :\n\nN’affiche aucun bouton.\n</string>
     <string name="firewall_status_excluded">exclue du DNS et du pare-feu</string>
     <string name="dc_custom_dns_radio">Autres DNS</string>
     <string name="settings_protocol_translation_dns_inactive">Passez en mode DNS/DNS+Pare-feu pour activer ce paramètre</string>
@@ -220,7 +211,7 @@
     <string name="info_dialog_rethink_toast_msg">Copié en tant qu’URL RDNS+ DNS over HTTPS</string>
     <string name="brbs_restore_dialog_message">Restaure les paramètres de l’application ainsi que les journaux réseau et DNS à partir d’un fichier de sauvegarde. Cela va redémarrer l’application.</string>
     <string name="brbs_restore_dialog_failure_message">Impossible de restaurer. Essayez à nouveau \?</string>
-    <string name="contributors_list">Le &lt;i&gt;projet libre et open source Rethink&lt;/i&gt; doit son existence à ces bénévoles qui consacrent d’innombrables heures à son développement.&lt;br/&gt; &lt;br/&gt;🛡️ Application Android &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Moteur réseau &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Résolveur &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Modérateurs de la communauté &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Géo-localisation IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Traductions &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 Icônes &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Serveurs de compilation &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list"><![CDATA[Le <i>projet libre et open source Rethink</i> doit son existence à ces bénévoles qui consacrent d’innombrables heures à son développement.<br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>🛡️ Application Android <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/anthonyryan1">Anthony Ryan</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/BayLee4">BayLee4</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/Ch4t4r">Ch4t4r</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/samthesamman">CodingAttack</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/HrBDev">HrBDev</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/hussainmohd-a">hussainmohd-a</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ignoramous">ignoramous</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ironveil">ironveil</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/markwmuller">markwmuller</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/mohammaduvez">Mohammaduvez</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/Mygod">Mygod</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/Poussinou">Poussinou</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/pjosingh">pjosingh</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/RohitSurwase">RohitSurwase</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ShantanuVichare">Shantanu</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/Uldiniad">Uldiniad</a><br/> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/yurtpage">yurtpage</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>🚂 Moteur réseau <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/alalamav">alalamav</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/bemasc">bemasc</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/dmcardle">dmcardle</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/fortuna">fortuna</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ignoramous">ignoramous</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/SeanBurford">SeanBurford</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>📚 Résolveur <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/amithm7">amithm7</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/arfshl">arfshl</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/badmojr">badmojr</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/bongochong">bongochong</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/elliotwutingfeng">elliotwutingfeng</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/georgyo">georgyo</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/GiddyGoatGaming">GiddyGoatGaming</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/Harish-Narayan">Harish-Narayan</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ignoramous">ignoramous</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/JakeChampion">JakeChampion</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/MasterKia">MasterKia</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/mtxadmin">mtxadmin</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/neneeen">neneeen</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/shruuub">shruuub</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/shuvashish76">shuvashish76</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>⚜ Modérateurs de la communauté <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/amithm7">amithm7</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/TronSlayer">Andersen</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/ppatra">ppatra</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 <a href="https://t.me/InFamous23">InFamous23</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/TheTr1ckst3r">TheTr1ckst3r</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/Ch4t4r">Ch4t4r</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/Billi_ance">Billi_ance</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/kaliangel">kaliangel</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>📌 Géo-localisation IP <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IPinfo Lite</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>❇ Traductions <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://weblate.org/en/">Weblate</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>🦆 Icônes <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/celzero/rethink-app/issues/346">Icons</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>📦 Serveurs de compilation <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://jitpack.io/">JitPack</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/">GitHub</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://central.sonatype.com/">Sonatype</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020]]></string>
     <string name="orbot_explanation">Orbot est une application proxy gratuite qui permet à d’autres applications d’utiliser Internet de manière plus <u>sûre</u> .
 \nOrbot utilise <u>Tor</u> pour chiffrer votre trafic Internet, ce qui vous aide à <u>contourner la censure</u> et à vous défendre contre les formes de <u>surveillance du réseau</u> qui menacent les libertés individuelles et la vie privée.
 \n<u>Proxy TCP</u> : Rethink transmet à Orbot les connexions TCP de toutes les applications sauf celles qui sont exclues.
@@ -312,7 +303,7 @@
     <string name="dns_log_dialog_positive">Supprimer les journaux</string>
     <string name="settings_http_proxy_dialog_title">URL du serveur personnalisé</string>
     <string name="dns_btm_resolved_doh_no_server">résolu %1$s</string>
-    <string name="univ_view_blocked_ip">règles IP &amp; Port</string>
+    <string name="univ_view_blocked_ip">Règles IP &amp; Port</string>
     <string name="univ_accessibility_dialog_negative">Refuser</string>
     <string name="fapps_firewall_filter_excluded">Exclues</string>
     <string name="dns_proxy_toast_parameter">Proxy DNS</string>
@@ -357,12 +348,12 @@
     <string name="rt_chip_check_update">Vérifier MàJ</string>
     <string name="brbs_restore_desc">Restaure à partir d’un fichier de sauvegarde</string>
     <string name="firewall_rule_exempt_orbot_setup">Configuration Orbot</string>
-    <string name="dns_btm_sheet_dialog_ips"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_ips"><Data><![CDATA[ %1$s %2$s <br/>]]></Data></string>
     <string name="blocklist_update_check_not_required">Les listes de blocage sont déjà à la dernière version.</string>
     <string name="download_update_dialog_message_ok">Vous êtes déjà sur la dernière version.</string>
     <string name="info_dialog_url_copy_toast_msg">URL copiée</string>
     <string name="settings_ip_network_desc">Choisissez entre les versions du protocole Internet.</string>
-    <string name="settings_https_heading">Configuration du proxy HTTP(S) de connexion</string>
+    <string name="settings_https_heading">Configuration du proxy HTTP(S) via CONNECT</string>
     <string name="orbot_install_dialog_neutral">site Web</string>
     <string name="settings_orbot_header">Orbot ❯</string>
     <string name="orbot_bs_status_1">Transfert de %1$s connexions à Orbot.</string>
@@ -392,7 +383,7 @@
     <string name="about_settings">système</string>
     <string name="univ_firewall_dialog_title">Supprimer la règle IP \?</string>
     <string name="blocklist_update_check_failure">Un problème est survenu. Essayez à nouveau plus tard !</string>
-    <string name="http_proxy_dialog_heading">Définir le proxy HTTP(S) de connection</string>
+    <string name="http_proxy_dialog_heading">Définir le proxy HTTP(S) via CONNECT</string>
     <string name="app_mode_dns_low_battery">DNS (économise la batterie)</string>
     <string name="settings_ip_text_ipv46">Auto</string>
     <string name="apps_icon_content_desc">Icône de l’application</string>
@@ -438,7 +429,7 @@
     <string name="univ_accessibility_dialog_positive">Accorder</string>
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
     <string name="fapps_unmetered_unblock_dialog_message">Autoriser les connexions sur réseau sans abonnement (Wi-Fi) pour les applications <i>listées</i> \?</string>
-    <string name="ada_app_status_block_md">est bloquées sur les réseaux avec abonnement (mobile)</string>
+    <string name="ada_app_status_block_md">est bloquée sur les réseaux avec abonnement (mobile)</string>
     <string name="pause_desc">Remarque : %1$s applications bloquées continueront à être bloquées par le pare-feu.</string>
     <string name="firewall_rule_unknown">Source inconnue</string>
     <string name="category_name_sys_apps">Applications système</string>
@@ -476,7 +467,7 @@
     <string name="brbs_backup_dialog_message">Sauvegarde les paramètres de l’application ainsi que les journaux réseau et DNS dans un fichier. Cela redémarre le VPN.</string>
     <string name="brbs_restore_dialog_failure_title">Échec de la restauration</string>
     <string name="cd_dns_crypt_error_text_1">Le stamp ne peut être vide</string>
-    <string name="dns_btm_sheet_dialog_message"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s liste(s) de blocage</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_message"><Data><![CDATA[ <h3><u><font size="8">%1$s</font></u> : %2$s liste(s) de blocage</h3>%3$s.<br/><br/>]]></Data></string>
     <string name="settings_dns_proxy_dialog_app_desc">L’application sélectionnée sera exclue du VPN pour lui permettre d’établir des connexions par proxy pour votre compte.</string>
     <string name="always_on_dialog_neutral">Paramètres</string>
     <string name="dns_crypt_relay_remove_dialog_message">Supprimer le relais DNSCrypt de la configuration enregistrée.</string>
@@ -518,7 +509,7 @@
     <string name="coming_soon_toast">Prochainement</string>
     <string name="firewall_rule_block_app">Appli bloquée</string>
     <string name="notif_channel_proxy_failure">Alertes du proxy</string>
-    <string name="cd_dialog_edittext_hint">Entrez %1$s</string>
+    <string name="cd_dialog_edittext_hint">Entrez un %1$s</string>
     <string name="ci_dialog_desc">Autoriser (ajout d’exception) ou bloquer l’adresse IP, le sous-réseau IP (plage), le port. Exemple : 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
     <string name="ci_dialog_added_success">IP ajoutée à la liste</string>
     <string name="ci_bypass_universal_initial">EG</string>
@@ -592,7 +583,7 @@
     <string name="about_settings_notification">Paramètres de notification</string>
     <string name="hsf_start_dialog_positive">Commencer</string>
     <string name="univ_firewall_rule_4">Bloquer l’UDP sauf pour le DNS et le NTP</string>
-    <string name="univ_view_blocked_ip_desc">Gérer les règles globales de blocage ou d’exception des deomaines, IP / ports.</string>
+    <string name="univ_view_blocked_ip_desc">Gérer les règles globales de blocage ou d’exception des domaines, IP / ports.</string>
     <string name="ada_app_unmetered">Sans abonnement</string>
     <string name="rules_load_failure_desc">Aucune règle de pare-feu trouvée</string>
     <string name="copy_clipboard_label">URL</string>
@@ -617,7 +608,7 @@
     <string name="cd_dns_proxy_mode_internal">Interne</string>
     <string name="cd_doh_dialog_resolver_url">URL du résolveur</string>
     <string name="dns_btm_record_type">Type de requête : %1$s</string>
-    <string name="firewall_status_block_metered">bloqué sur les réseaux avec facturation à l\'usage (mobiles)</string>
+    <string name="firewall_status_block_metered">bloquée sur les réseaux avec facturation à l\'usage (mobiles)</string>
     <string name="fapps_filter_parent_system">Système</string>
     <string name="fapps_unmetered_block_dialog_title">Bloquer sur réseau sans abonnement</string>
     <string name="fapps_metered_unblock_dialog_title">Autoriser sur réseau avec abonnement</string>
@@ -645,7 +636,7 @@
     <string name="about_version">v%1$s</string>
     <string name="contributors_dialog_title">Auteurs</string>
     <string name="settings_notification_dialog_title">Choisir l’action de notification</string>
-    <string name="firewall_status_block_unmetered">bloqué sur les réseaux sans abonnement (Wi-Fi)</string>
+    <string name="firewall_status_block_unmetered">bloquée sur les réseaux sans abonnement (Wi-Fi)</string>
     <string name="ada_noapp_dialog_message">Les informations sur l’application sont introuvables. Peut-être qu\'elle a été désinstallée \?</string>
     <string name="univ_ip_delete_individual_toast">%1$s supprimé.</string>
     <string name="fapps_filter_clear_btn">Effacer</string>
@@ -673,7 +664,7 @@
     <string name="dns_btm_sheet_chip_no_answer">Sans réponse</string>
     <string name="dns_btm_resolved_crypt">résolu <u>anonymement</u> %1$s par %2$s via %3$s</string>
     <string name="univ_firewall_rule_2">Bloquer les applications non utilisées</string>
-    <string name="network_log_app_name_unknown">Inconnu</string>
+    <string name="network_log_app_name_unknown">Inconnus</string>
     <string name="univ_firewall_rule_9">Bloquer sur les réseaux avec facturation à l\'usage (mobiles)</string>
     <string name="update_complete_action_snack">REDÉMARRER</string>
     <string name="pause_text">en pause</string>
@@ -733,9 +724,7 @@
     <string name="rt_filter_parent_selected">Sélectionnées</string>
     <string name="rt_filter_hint">Affichage de <u>toutes</u> les listes de blocage</string>
     <string name="private_dns_dialog_heading">Désactiver le DNS privé</string>
-    <string name="private_dns_dialog_desc">Les paramètres DNS de Rethink sont écrasés par le DNS privé d’Android.
-\n
-\nPour utiliser le DNS de Rethink, allez dans les paramètres d’Android et désactivez le \"DNS privé\".</string>
+    <string name="private_dns_dialog_desc">Les paramètres DNS de Rethink sont écrasés par le DNS privé d’Android. \n \nPour utiliser le DNS de Rethink, allez dans les paramètres d’Android et désactivez le \"DNS privé\".</string>
     <string name="private_dns_dialog_positive">Aller dans les paramètres d’Android</string>
     <string name="ci_trust_txt">Exception aux règles de l’appli</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Effacer les journaux</string>
@@ -794,14 +783,14 @@
     <string name="lbl_wildcard" translatable="true">Caractère joker</string>
     <string name="lbl_domain_rules" translatable="true">Règles de domaines</string>
     <string name="firewall_rule_trusted_domain" translatable="true">Domaine de confiance (Appli)</string>
-    <string name="cd_no_rules_text" translatable="true">Aucune règles de domaine.</string>
+    <string name="cd_no_rules_text" translatable="true">Aucune règle de domaine.</string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[Cette connexion a été autorisée car <i>le domaine</i> est autorisé.<br/><br/> Pour modifier cela, accédez à l’écran <i>Pare-feu de l’application</i>.]]></string>
     <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[Une règle de pare-feu définie par l’utilisateur a bloqué le <i>domaine</i>.<br/><br/> Pour la modifier, accédez à l’écran <i>Pare-feu de l’application</i>.]]></string>
     <string name="bsdl_block_desc" translatable="true">Bloquer, tolérer <u>ce domaine</u></string>
     <string name="lbl_rules" translatable="true">règles</string>
     <string name="lbl_configure" translatable="true">Configurer</string>
     <string name="lbl_logs" translatable="true">journaux</string>
-    <string name="bypass_dns_firewall" translatable="true">contourner dns &amp; firewall</string>
+    <string name="bypass_dns_firewall" translatable="true">Contourner le DNS et le pare-feu</string>
     <string name="bsct_block_domain" translatable="true">Bloquer, faire confiance à <u> ce domaine</u> pour <u>cette application</u></string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Impossible de configurer les proxies lorsque le VPN fonctionne en mode DNS uniquement.</string>
     <string name="settings_general_customize" translatable="true">personnaliser</string>
@@ -840,7 +829,7 @@
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[Cette connexion a été bloquée parce que le domaine <i/> est défini comme étant de confiance dans les règles du domaine universel.<br/><br/> Pour modifier ce comportement, allez sur l\'onglet <i>Configure DNS</i>.]]></string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">contournera les règles universelles de DNS et de pare-feu</string>
     <string name="lbl_network" translatable="true">réseau</string>
-    <string name="lbl_maybe_blocked" translatable="true">Peut-être bloqué</string>
+    <string name="lbl_maybe_blocked" translatable="true">Peut-être bloqués</string>
     <string name="bypass_dns_firewall_tooltip">%1$s fonctionne uniquement avec le DNS de Rethink</string>
     <string name="settings_allow_lan_heading" translatable="true">Ne pas acheminer les IP privées (expérimental)</string>
     <string name="settings_allow_lan_desc" translatable="true">Exclure les routes LAN, loopback, multicast, link-local du tunnel VPN de Rethink.</string>
@@ -851,14 +840,14 @@
     <string name="bad_config_reason_invalid_number" translatable="true">Numéro invalide</string>
     <string name="lbl_wireguard" translatable="true">WireGuard</string>
     <string name="parse_error_integer" translatable="true">nombre</string>
-    <string name="key_length_explanation_binary" translatable="true">: Les clés WireGuard doivent être de 32 octets</string>
-    <string name="key_length_explanation_hex" translatable="true">: Les clés hexagonales WireGuard doivent être de 64 caractères (32 octets)</string>
+    <string name="key_length_explanation_binary" translatable="true">: les clés WireGuard doivent être de 32 octets</string>
+    <string name="key_length_explanation_hex" translatable="true">: les clés hexagonales WireGuard doivent être de 64 caractères (32 octets)</string>
     <string name="public_key_copy_toast_msg" translatable="true">Clé publique copiée.</string>
     <string name="bad_config_reason_unknown_attribute" translatable="true">Attribut inconnu</string>
     <string name="lbl_delete" translatable="true">Supprimer</string>
     <string name="lbl_qr_code" translatable="true">QR Code</string>
     <string name="bad_config_reason_missing_attribute" translatable="true">Attribut manquant</string>
-    <string name="key_length_explanation_base64" translatable="true">: Les clés WireGuard base64 doivent être de 44 caractères (32 octets)</string>
+    <string name="key_length_explanation_base64" translatable="true">: les clés WireGuard base64 doivent être de 44 caractères (32 octets)</string>
     <string name="lbl_generated" translatable="true">(généré)</string>
     <string name="bad_config_reason_missing_section" translatable="true">Section manquante</string>
     <string name="lbl_slow" translatable="true">lent</string>
@@ -866,9 +855,9 @@
     <string name="lbl_day" translatable="true">jour</string>
     <string name="lbl_fast" translatable="true">rapide</string>
     <string name="search_proxy_add_apps" translatable="true">Rechercher des applications par nom</string>
-    <string name="lbl_inactive" translatable="true">Inactif</string>
+    <string name="lbl_inactive" translatable="true">Inactifs</string>
     <string name="lbl_addresses" translatable="true">Adresses</string>
-    <string name="lbl_active" translatable="true">Actif</string>
+    <string name="lbl_active" translatable="true">Actif(s)</string>
     <string name="lbl_dns_servers" translatable="true">Serveurs DNS</string>
     <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">Pays les plus contactés</string>
     <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">Pays les plus bloqués</string>
@@ -884,12 +873,12 @@
     <string name="lbl_very" translatable="true">très</string>
     <string name="lbl_select_all" translatable="true">Tout sélectionner</string>
     <string name="lbl_create" translatable="true">Créer</string>
-    <string name="http_proxy_dialog_desc" translatable="true">Configuration de l\'URL de forme, &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt;. Exemple: http://proxy.example.com:8080/</string>
+    <string name="http_proxy_dialog_desc" translatable="true">Configuration d\'une l’URL de forme, &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt;. Exemple: http://proxy.example.com:8080/</string>
     <string name="status_protected_with_wg_private_dns" translatable="true">Protégé par Wireguard &amp; DNS privé</string>
     <string name="bad_config_reason_syntax_error" translatable="true">Erreur de syntaxe</string>
     <string name="lbl_listen_port" translatable="true">Port d\'écoute</string>
     <string name="lbl_random" translatable="true">(aléatoire)</string>
-    <string name="bad_config_explanation_pka" translatable="true">: Doit être positif et pas plus de 65535</string>
+    <string name="bad_config_explanation_pka" translatable="true">: doit être positif et pas plus de 65535</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">Ne pas validez les certificats TLS du serveur (uniquement si vous savez ce que vous faites)</string>
     <string name="crypt_adguard_desc" translatable="true">Protège votre appareil des logiciels malveillants et plus encore.</string>
     <string name="wireguard_description" translatable="true">WireGuard comme proxy.</string>
@@ -899,7 +888,7 @@
     <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[Cette connexion a été transmise à Proxy <br/><br/> Pour changer, allez à <i>Proxy</i> de l\'écran <i>Configure</i>.]]></string>
     <string name="lbl_allowed_ips" translatable="true">IP autorisées</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
-    <string name="lbl_http" translatable="true">HTTP</string>
+    <string name="lbl_http" translatable="true">HTTP(S)</string>
     <string name="add_remove_apps" translatable="true">Ajouter/Supprimer (%1$s applications)</string>
     <string name="bad_extension_error" translatable="true">Le fichier doit être .conf ou .zip</string>
     <string name="lbl_mtu" translatable="true">MTU</string>
@@ -921,15 +910,15 @@
     <string name="import_error" translatable="true">Impossible d\'importer un tunnel : %s</string>
     <string name="new_warp_invalid_config_toast" translatable="true">Configuration WARP invalide</string>
     <string name="app_ip_domain_rules_desc" translatable="true">Modifier par application IP / Règles de domaine.</string>
-    <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
+    <string name="lbl_http_socks5" translatable="true">HTTP(S) &amp; SOCKS5</string>
     <string name="wireguard_disclaimer">Le DNS est transmis à %1$s, ICMP (ex : ping) est envoyé au réseau sous-jacent.</string>
-    <string name="bad_config_explanation_positive_number" translatable="true">: Doit être positif</string>
+    <string name="bad_config_explanation_positive_number" translatable="true">: doit être positif</string>
     <string name="wireguard_no_config_msg">Pas de VPN WireGuard. Ajoutez-en pour commencer.</string>
     <string name="new_warp_error_toast" translatable="true">Impossible de récupérer la configuration WARP</string>
     <string name="bad_config_context" translatable="true">%1$s\'s %2$s</string>
     <string name="settings_go_log_heading" translatable="true">Niveau de journalisation</string>
     <string name="lbl_auto" translatable="true">(auto)</string>
-    <string name="bad_config_explanation_udp_port" translatable="true">: Doit être un numéro de port UDP valide</string>
+    <string name="bad_config_explanation_udp_port" translatable="true">: doit être un numéro de port UDP valide</string>
     <string name="google_dns_desc" translatable="true">Ne bloque aucune demande DNS. Utilisez le paramètre DNS de Google.</string>
     <string name="unknown_error" translatable="true">Erreur inconnue</string>
     <string name="crypt_relay_sweden" translatable="true">Relais DNS anonyme hébergé en Suède fourni par https://cryptostrom.is/.</string>
@@ -1009,27 +998,27 @@
     <string name="dc_proxy_dns_desc" translatable="true">Ne pas faire passer le DNS par les proxys Always-on WireGuard, SOCKS5 et HTTP.</string>
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s est désactivé car les proxys sont actifs</string>
     <string name="lbl_unselected" translatable="true">Désélectionné</string>
-    <string name="settings_connectivity_checks" translatable="true">Effectuer des vérifications de connectivité</string>
-    <string name="settings_connectivity_checks_desc" translatable="true">Des contrôles de connectivité sont envoyés pour vérifier la joignabilité.</string>
+    <string name="settings_connectivity_checks" translatable="true">Effectuer des tests de connectivité</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">Des tests de connectivité sont envoyés pour vérifier l’accessibilité.</string>
     <string name="lbl_battery_optimization" translatable="true">Optimisation de la batterie</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> peut entraîner une perte de connectivité. Modifiez le paramètre pour permettre à Rethink d\'utiliser les données et d\'autres ressources en arrière-plan.</string>
     <string name="lbl_idle" translatable="true">Au repos</string>
     <string name="lbl_split" translatable="true">Séparer</string>
     <string name="lbl_on_device" translatable="true">sur l\'appareil</string>
-    <string name="dc_proxy_dns_heading" translatable="true">Ne jamais utiliser de proxy pour DNS</string>
-    <string name="settings_exclude_proxy_apps_heading" translatable="true">Applications de transit proxy</string>
-    <string name="settings_exclude_proxy_apps_desc" translatable="true">Lorsque désactivé, exclut les applications de redirecteur proxy (SOCKS5, HTTP, DNS) du tunnel VPN de Rethink.</string>
-    <string name="exclude_apps_from_proxy">Contourner l\'application de tous les proxys</string>
-    <string name="exclude_apps_from_proxy_failure_toast">Cette application contourne tous les proxys</string>
+    <string name="dc_proxy_dns_heading" translatable="true">Ne jamais utiliser de proxy pour le DNS</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">Applications de redirection proxy en loopback</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">Lorsque désactivée, les applications de redirection proxy (SOCKS5, HTTP, DNS) sont exclues du tunnel VPN de Rethink.</string>
+    <string name="exclude_apps_from_proxy">Ignorer tous les proxys pour cette application</string>
+    <string name="exclude_apps_from_proxy_failure_toast">Cette application ignore tous les proxys</string>
     <string name="lbl_notification" translatable="true">notification</string>
-    <string name="memory_notification_text">Rethink connaît une mémoire insuffisante. Les actions du système peuvent être limitées.</string>
+    <string name="memory_notification_text">Rethink manque de mémoire. Les actions du système peuvent être limitées.</string>
     <string name="lbl_test" translatable="true">test</string>
     <string name="settings_jumbo_packets" translatable="true">Amplificateur de bande passante</string>
     <string name="settings_jumbo_packets_desc" translatable="true">Utilise des <i>paquets jumbo</i> dans le tunnel VPN de Rethink.</string>
     <string name="settings_tunnel_metered" translatable="true">Toujours mesuré</string>
-    <string name="settings_tunnel_metered_desc" translatable="true">Marquez le tunnel VPN comme mesuré afin d\'indiquer aux applications de consommer moins de données. Attention : cela peut entraîner la mise en pause des téléchargements et chargements volumineux, tels que les sauvegardes.</string>
+    <string name="settings_tunnel_metered_desc" translatable="true">Marquez le tunnel VPN comme mesuré afin d\'indiquer aux applications de consommer moins de données. Attention : cela peut entraîner la mise en pause des téléchargements et chargements volumineux, tels que les sauvegardes.</string>
     <string name="stability_program_toast" translatable="true">Inscrit au <i>programme de stabilité</i> pour les <i>fonctionnalités expérimentales</i>.</string>
-    <string name="lbl_protos" translatable="true">protos</string>
+    <string name="lbl_protos" translatable="true">protocoles</string>
     <string name="lbl_experimental" translatable="true">(expérimental)</string>
     <string name="lbl_service_providers" translatable="true">Fournisseurs de service</string>
     <string name="lbl_hop" translatable="true">Relais</string>
@@ -1039,7 +1028,7 @@
     <string name="settings_biometric_dialog_option_1" translatable="true">Immédiatement</string>
     <string name="ac_split_tcp" translatable="true">TCP</string>
     <string name="lbl_always" translatable="true">Toujours</string>
-    <string name="adv_set_dial_timeout_title" translatable="true">Délai d\'inactivité :</string>
+    <string name="adv_set_dial_timeout_title" translatable="true">Délai d\'inactivité</string>
     <string name="about_terms_of_service" translatable="true">Conditions d\'utilisation</string>
     <string name="adv_taster_title" translatable="true">Automatisation</string>
     <string name="close_all" translatable="true">Fermer tout</string>
@@ -1051,7 +1040,7 @@
     <string name="wireguard_title" translatable="true">Sécuriser Internet avec WireGuard</string>
     <string name="wireguard_desc" translatable="true">Chiffrer votre trafic Internet avec WireGuard. Choisir différentes routes pour différentes applications.</string>
     <string name="firewall_title" translatable="true">Protéger votre Android avec Pare-feu</string>
-    <string name="firewall_desc" translatable="true">Contrôler l\'usage d\'Internet d\'une application; restreindre les connexions en fonction de l\'application ou de l\'activité réseau.</string>
+    <string name="firewall_desc" translatable="true">Contrôler l\'usage d\'Internet d\'une application ; restreindre les connexions en fonction de l\'application ou de l\'activité réseau.</string>
     <string name="dns_title" translatable="true">Bloquer Pubs &amp; Logiciels Malveillants avec DNS</string>
     <string name="dns_desc" translatable="true">Choisir depuis 190+ listes pour stopper pubs, traqueurs, et logiciels malveillants.</string>
     <string name="status_no_network" translatable="true">pas de réseau</string>
@@ -1072,7 +1061,7 @@
     <string name="univ_delete_domain_dialog_title" translatable="true">Supprimer toutes les règles de domaine ?</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">Supprimer ces règles permettrait à n\'importe quelle application de se connecter aux domaines actuellement bloqués.</string>
     <string name="firewall_rule_private_dns" translatable="true">DNS privé</string>
-    <string name="firewall_rule_bypass_proxy" translatable="true">Contourner le Proxy</string>
+    <string name="firewall_rule_bypass_proxy" translatable="true">Proxy ignoré</string>
     <string name="firewall_rule_paused_app" translatable="true">Application en pause</string>
     <string name="firewall_rule_lockdown_wg" translatable="true">Proxy de verrouillage</string>
     <string name="firewall_rule_proxy_error" translatable="true">Erreur de Proxy</string>
@@ -1177,8 +1166,23 @@
     <string name="lockdown_download_message" translatable="true"><i>Le gestionnaire de téléchargement</i> intégré d\'Android peut rencontrer des problèmes lorsque le VPN est en mode <i>Verrouillage</i>. Souhaitez-vous activer le gestionnaire de téléchargement de Rethink à la place ?</string>
     <string name="lockdown_download_enable_inapp" translatable="true">Activer le téléchargeur</string>
     <string name="lbl_action" translatable="true">Action</string>
-    <string name="settings_theme_dialog_themes_5" translatable="true">Light Plus</string>
-    <string name="settings_theme_dialog_themes_6" translatable="true">Dark Plus</string>
-    <string name="settings_theme_dialog_themes_7" translatable="true">Frost</string>
+    <string name="settings_theme_dialog_themes_5" translatable="true">Plus clair</string>
+    <string name="settings_theme_dialog_themes_6" translatable="true">Plus sombre</string>
+    <string name="settings_theme_dialog_themes_7" translatable="true">Givre</string>
     <string name="dns_record_types_auto_mode_status" translatable="true">Auto (Tous types)</string>
+    <string name="stability_program_snackbar_msg" translatable="true">Le mode stabilité est activé. Les rapports d\'erreurs contribuent à l\'amélioration des fonctionnalités expérimentales.</string>
+    <string name="stability_program_snackbar_disable" translatable="true">Désactiver</string>
+    <plurals name="server_count">
+        <item quantity="one">%1$d serveur</item>
+        <item quantity="many">%1$d serveurs</item>
+        <item quantity="other">%1$d serveurs</item>
+    </plurals>
+    <plurals name="peer_count">
+        <item quantity="one">%d pair</item>
+        <item quantity="many">%d pairs</item>
+        <item quantity="other">%d pairs</item>
+    </plurals>
+    <string name="tour_step_counter">%1$d sur %2$d</string>
+    <string name="tour_btn_finish">J\'ai compris</string>
+    <string name="tour_btn_skip">Passer la visite guidée</string>
 </resources>

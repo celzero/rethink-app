@@ -285,10 +285,10 @@
     <string name="fapps_metered_unblock_dialog_title">Leisti matuojamuose</string>
     <string name="fapps_metered_block_dialog_title">Blokuoti matuojamuose</string>
     <string name="fapps_firewall_filter_hint">Taikyti nematuojamų / matuojamų tinklų taisykles išvardytoms programėlėms</string>
-    <string name="fapps_firewall_filter_desc">Rodomos <u>%1$s</u> %2$s programėlės</string>
+    <string name="fapps_firewall_filter_desc"><![CDATA[Rodomos <u>%1$s</u> %2$s programėlės]]></string>
     <string name="fapps_unmetered_unblock_dialog_title">Leisti nematuojamuose tinkluose</string>
     <string name="fapps_unmetered_block_dialog_title">Blokuoti nematuojamuose tinkluose</string>
-    <string name="fapps_firewall_filter_desc_category">Rodomos <u>%1$s</u> %2$s programėlės kategorijose: %3$s</string>
+    <string name="fapps_firewall_filter_desc_category"><![CDATA[Rodomos <u>%1$s</u> %2$s programėlės kategorijose: %3$s]]></string>
     <string name="unicode_warning_sign">⚠</string>
     <string name="unicode_question_sign">❔</string>
     <string name="fav_icon">fav_icon</string>
@@ -323,16 +323,16 @@
     <string name="firewall_rule_block_http">Nesaugus HTTP</string>
     <string name="firewall_rule_global_lockdown">Visiškas užrakinimas</string>
     <string name="firewall_rule_no_rule_desc">Ryšys neatitiko jokių ugniasienės taisyklių.</string>
-    <string name="firewall_rule_block_app_desc">Naudotojo nustatyta ugniasienės taisyklė užblokavo šią <i>programėlę</i>.<br/><br/> Norėdami pakeisti, eikite į skirtuką <i>Visos programėlės</i>.</string>
-    <string name="firewall_rule_new_app_desc">Ši programėlė užmezgė ryšį <i>pirmą</i> kartą.<br/><br/> Norėdami pakeisti, eikite į <i>Universaliosios</i> skirtuką.</string>
-    <string name="firewall_rule_block_ip_univ_desc">Naudotojo nustatyta ugniasienės taisyklė užblokavo <i>paskirties IP / prievadą</i>.<br/><br/> Norėdami pakeisti, eikite į <i>Universaliosios</i> skirtuką.</string>
-    <string name="firewall_rule_device_lock_desc">Šis ryšys buvo apsaugotas ugniasiene, nes <i>įrenginys tuo metu buvo užrakintas</i>.<br/><br/> Norėdami pakeisti šį veiksmą, eikite į <i>Universaliosios</i> skirtuką.</string>
-    <string name="firewall_rule_foreground_desc">Šis ryšys buvo apsaugotas ugniasiene, nes šaltinio programėlė <i>nebuvo pirmame plane</i>.<br/><br/> Norėdami pakeisti šį veiksmą, eikite į skirtuką <i>Universaliosios</i>.</string>
-    <string name="firewall_rule_unknown_desc">Šis ryšys buvo apsaugotas ugniasiene, nes nepavyko nustatyti <i>šaltinio programėlės</i>.<br/><br/> Norėdami pakeisti šį veiksmą, eikite į skirtuką <i>Universaliosios</i>.</string>
-    <string name="firewall_rule_block_udp_ntp_desc">Naudotojo nustatyta ugniasienės taisyklė užblokavo šį <i>UDP</i> ryšį.<br/><br/> Norėdami pakeisti, eikite į <i>Universaliosios</i> skirtuką.</string>
-    <string name="firewall_rule_block_dns_bypass_desc">Šis ryšys buvo užblokuotas, nes <i>šaltinio programėlė</i> apėjo naudotojo pageidaujamą DNS.<br/><br/> Norėdami pakeisti šį veiksmą, eikite į <i>Universaliosios</i> skirtuką.</string>
-    <string name="firewall_rule_exempt_orbot_setup_desc">Šis ryšys buvo leidžiamas, nes buvo vykdomas <i>Tor kaip įgaliotasis serveris vienu paspaudimu</i> nustatymas per Orbot.</string>
-    <string name="firewall_rule_block_http_desc">Šis ryšys buvo užblokuotas, nes tikriausiai buvo naudojamas <i>nesaugus HTTP</i>.<br/><br/> Norėdami pakeisti, eikite į <i>Universaliosios</i> skirtuką.</string>
+    <string name="firewall_rule_block_app_desc"><![CDATA[Naudotojo nustatyta ugniasienės taisyklė užblokavo šią <i>programėlę</i>.<br/><br/> Norėdami pakeisti, eikite į skirtuką <i>Visos programėlės</i>.]]></string>
+    <string name="firewall_rule_new_app_desc"><![CDATA[Ši programėlė užmezgė ryšį <i>pirmą</i> kartą.<br/><br/> Norėdami pakeisti, eikite į <i>Universaliosios</i> skirtuką.]]></string>
+    <string name="firewall_rule_block_ip_univ_desc"><![CDATA[Naudotojo nustatyta ugniasienės taisyklė užblokavo <i>paskirties IP / prievadą</i>.<br/><br/> Norėdami pakeisti, eikite į <i>Universaliosios</i> skirtuką.]]></string>
+    <string name="firewall_rule_device_lock_desc"><![CDATA[Šis ryšys buvo apsaugotas ugniasiene, nes <i>įrenginys tuo metu buvo užrakintas</i>.<br/><br/> Norėdami pakeisti šį veiksmą, eikite į <i>Universaliosios</i> skirtuką.]]></string>
+    <string name="firewall_rule_foreground_desc"><![CDATA[Šis ryšys buvo apsaugotas ugniasiene, nes šaltinio programėlė <i>nebuvo pirmame plane</i>.<br/><br/> Norėdami pakeisti šį veiksmą, eikite į skirtuką <i>Universaliosios</i>.]]></string>
+    <string name="firewall_rule_unknown_desc"><![CDATA[Šis ryšys buvo apsaugotas ugniasiene, nes nepavyko nustatyti <i>šaltinio programėlės</i>.<br/><br/> Norėdami pakeisti šį veiksmą, eikite į skirtuką <i>Universaliosios</i>.]]></string>
+    <string name="firewall_rule_block_udp_ntp_desc"><![CDATA[Naudotojo nustatyta ugniasienės taisyklė užblokavo šį <i>UDP</i> ryšį.<br/><br/> Norėdami pakeisti, eikite į <i>Universaliosios</i> skirtuką.]]></string>
+    <string name="firewall_rule_block_dns_bypass_desc"><![CDATA[Šis ryšys buvo užblokuotas, nes <i>šaltinio programėlė</i> apėjo naudotojo pageidaujamą DNS.<br/><br/> Norėdami pakeisti šį veiksmą, eikite į <i>Universaliosios</i> skirtuką.]]></string>
+    <string name="firewall_rule_exempt_orbot_setup_desc"><![CDATA[Šis ryšys buvo leidžiamas, nes buvo vykdomas <i>Tor kaip įgaliotasis serveris vienu paspaudimu</i> nustatymas per Orbot.]]></string>
+    <string name="firewall_rule_block_http_desc"><![CDATA[Šis ryšys buvo užblokuotas, nes tikriausiai buvo naudojamas <i>nesaugus HTTP</i>.<br/><br/> Norėdami pakeisti, eikite į <i>Universaliosios</i> skirtuką.]]></string>
     <string name="new_app_notification_content">RethinkDNS užblokavo neseniai įdiegtą programėlę %1$s.</string>
     <string name="new_app_notification_action_deny">Blokuoti toliau</string>
     <string name="new_app_notification_action_toast_allow">Programėlei leidžiamas tinklo ryšys</string>
@@ -367,7 +367,7 @@
     <string name="ci_bypass_universal_initial">AU</string>
     <string name="ada_noapp_dialog_message">Programėlės informacija nurodytai programėlei nerasta.</string>
     <string name="ada_noapp_dialog_positive">Gerai</string>
-    <string name="ada_firewall_status">Ši programėlė <b><i>%1$s</i></b>.</string>
+    <string name="ada_firewall_status"><![CDATA[Ši programėlė <b><i>%1$s</i></b>.]]></string>
     <string name="ada_ip_connection_count">Prisijungta prie %1$s IP adreso (-ų)</string>
     <string name="ada_ip_connection_count_zero">0 IP adresų</string>
     <string name="ada_app_status_allow">yra leidžiama</string>
@@ -557,7 +557,7 @@
     <string name="error_loading_log_file">Klaida įkeliant žurnalo failą</string>
     <string name="contributors_dialog_title">Autoriai</string>
     <string name="collecting_logs_progress_text">Užfiksuojama…</string>
-    <string name="contributors_list">Už tai, kad projektas &lt;i&gt;Rethink Open Source Project&lt;/i&gt; egzistuoja, esame dėkingi šiems savanoriams, kurie jo kūrimui skiria daugybę valandų.&lt;br/&gt; &lt;br/&gt; &lt;br/&gt; &lt;br/&gt;🛡️ Android programėlė &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Tinklo variklis &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Sprendiklis &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Bendruomenės modifikacijos &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 IP geografinės vietos duomenų bazė &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list"><![CDATA[Už tai, kad projektas <i>Rethink Open Source Project</i> egzistuoja, esame dėkingi šiems savanoriams, kurie jo kūrimui skiria daugybę valandų.<br/> <br/> <br/> <br/>🛡️ Android programėlė <br/> <a href=https://github.com/BayLee4>BayLee4</a><br/> <a href=https://github.com/Ch4t4r>Ch4t4r</a><br/> <a href=https://github.com/HrBDev>HrBDev</a><br/> <a href=https://github.com/hussainmohd-a>hussainmohd-a</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/markwmuller>markwmuller</a><br/> <a href=https://github.com/Poussinou>Poussinou</a><br/> <a href=https://github.com/pjosingh>pjosingh</a><br/> <br/>🚂 Tinklo variklis <br/> <a href=https://github.com/alalamav>alalamav</a><br/> <a href=https://github.com/bemasc>bemasc</a><br/> <a href=https://github.com/dmcardle>dmcardle</a><br/> <a href=https://github.com/fortuna>fortuna</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/PeterDaveHello>PeterDaveHello</a> <a href=https://github.com/santhosh-ponnusamy>santhosh-ponnusamy</a><br/><br/> <a href=https://github.com/SeanBurford>SeanBurford</a><br/> <br/>📚 Sprendiklis <br/> <a href=https://github.com/ahmed-tasaly>ahmed-tasaly</a><br/> <a href=https://github.com/amithm7>amithm7</a><br/> <a href=https://github.com/arfshl>arfshl</a><br/> <a href=https://github.com/badmojr>badmojr</a><br/> <a href=https://github.com/bongochong>bongochong</a><br/> <a href=https://github.com/elliotwutingfeng>elliotwutingfeng</a><br/> <a href=https://github.com/georgyo>georgyo</a><br/> <a href=https://github.com/harish83a>harish83a</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/MasterKia>MasterKia</a><br/> <a href=https://github.com/mtxadmin>mtxadmin</a><br/> <a href=https://github.com/neneeen>neneeen</a><br/> <a href=https://github.com/PeterDaveHello>PeterDaveHello</a><br/> <a href=https://github.com/santhosh-ponnusamy>santhosh-ponnusamy</a><br/> <a href=https://github.com/shruuub>shruuub</a><br/> <a href=https://github.com/shuvashish76>shuvashish76</a><br/> <br/>⚜ Bendruomenės modifikacijos <br/> <a href=https://t.me/amithm7>amithm7</a><br/> <a href=https://t.me/ppatra>ppatra</a><br/> <a href=https://t.me/InFamous23>InFamous23</a><br/> <a href=https://t.me/TheTr1ckst3r>TheTr1ckst3r</a><br/> <a href=https://t.me/Ch4t4r>Ch4t4r</a><br/> <a href=https://t.me/Billi_ance>Billi_ance</a><br/> <a href=https://t.me/kaliangel>kaliangel</a><br/> <a href=https://github.com/PoneyClairDeLune>PoneyClairDeLune</a><br/> <br/>📌 IP geografinės vietos duomenų bazė <br/> <a href=https://db-ip.com>db-ip.com</a><br/>]]></string>
     <string name="cd_custom_dns_proxy_name_default">Įgaliotasis serveris</string>
     <string name="cd_dns_proxy_error_text_1">Neteisingas IP adresas</string>
     <string name="cd_custom_dns_proxy_name">Įgaliotasis serveris %1$s</string>
@@ -588,8 +588,8 @@
     <string name="firewall_rule_block_app">Programėlė užblokuota</string>
     <string name="firewall_rule_block_unmetered">Nematuojami (WiFi)</string>
     <string name="firewall_rule_block_dns_bypass">DNS apeinamas</string>
-    <string name="firewall_rule_block_app_unmetered_desc">Naudotojo nustatyta ugniasienės taisyklė užblokavo šią <i>programėlę</i>, kai buvo bandoma prisijungti prie <i>Nematuojamo</i> tinklo.<br/><br/> Norėdami pakeisti, eikite į skirtuką <i>Visos programėlės</i>.</string>
-    <string name="firewall_rule_block_app_mobile_desc">Naudotojo nustatyta ugniasienės taisyklė užblokavo šią <i>programėlę</i>, kai buvo bandoma prisijungti prie <i>Matuojamo</i> tinklo.<br/><br/> Norėdami pakeisti, eikite į skirtuką <i>Visos programėlės</i>.</string>
+    <string name="firewall_rule_block_app_unmetered_desc"><![CDATA[Naudotojo nustatyta ugniasienės taisyklė užblokavo šią <i>programėlę</i>, kai buvo bandoma prisijungti prie <i>Nematuojamo</i> tinklo.<br/><br/> Norėdami pakeisti, eikite į skirtuką <i>Visos programėlės</i>.]]></string>
+    <string name="firewall_rule_block_app_mobile_desc"><![CDATA[Naudotojo nustatyta ugniasienės taisyklė užblokavo šią <i>programėlę</i>, kai buvo bandoma prisijungti prie <i>Matuojamo</i> tinklo.<br/><br/> Norėdami pakeisti, eikite į skirtuką <i>Visos programėlės</i>.]]></string>
     <string name="fapps_filter_filter_heading">Tipas</string>
     <string name="fapps_filter_parent_installed">Įdiegta</string>
     <string name="dns_proxy_toast_parameter">DNS įgaliotasis serveris</string>
@@ -607,13 +607,13 @@
 \n2. Įjungtas nustatymas <i>Naudoti visus prieinamus tinklus</i>.</string>
     <string name="firewall_rule_unknown">Šaltinis nežinomas</string>
     <string name="firewall_rule_foreground">Programėlė nenaudojama</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc">Naudotojo nustatyta universali ugniasienės taisyklė užblokavo šią <i>programėlę</i>, kai buvo bandoma prisijungti prie <i>Matuojamo</i> (mobiliojo) tinklo.<br/><br/> Norėdami pakeisti, eikite į <i>Universaliosios</i> skirtuką.</string>
-    <string name="firewall_rule_isolate_desc">Naudotojo nustatyta ugniasienės taisyklė užblokavo šią <i>programėlę</i> prisijungiant prie kitų nei <i>apeinamų IP adresų</i>.<br/><br/> Norėdami pakeisti, eikite į skirtuką <i>Visos programėlės</i>.</string>
-    <string name="firewall_rule_trusted_ip_desc">Šis ryšys buvo leidžiamas, nes <i>paskirties IP</i> nustatytas apeiti visas konkrečiai programėlei taikomas taisykles.<br/><br/> Norėdami pakeisti, eikite į <i>konkrečios programėlės ugniasienės</i> langą.</string>
-    <string name="firewall_rule_bypass_universal_ip_desc">Šis ryšys buvo leidžiamas, nes &lt;i&gt;paskirties IP&lt;/i&gt; nustatytas apeiti visas universalias ugniasienės taisykles.&lt;br/&gt;&lt;br/&gt; Norėdami pakeisti, eikite į &lt;i&gt;IP taisyklės&lt;i&gt; &lt;i&gt;Universaliosios&lt;/i&gt; skirtuką.</string>
-    <string name="firewall_rule_block_ip_desc">Naudotojo nustatyta ugniasienės taisyklė užblokavo <i>paskirties IP</i>.<br/><br/> Norėdami pakeisti, eikite į <i>konkrečios programėlės ugniasienės</i> langą.</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc">Šis ryšys buvo leidžiamas, nes <i>šaltinio programėlė</i> nustatyta kaip <i>apeinanti universaliąsias</i> ugniasienės taisykles.<br/><br/> Norėdami pakeisti, eikite į <i>konkrečios programėlės ugniasienės</i> langą.</string>
-    <string name="firewall_rule_global_lockdown_desc">Šis ryšys buvo užblokuotas, nes nustatytas universalus visiškas užrakinimas.<br/><br/> Norėdami pakeisti, eikite į skirtuką <i>Universaliosios</i>.</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc"><![CDATA[Naudotojo nustatyta universali ugniasienės taisyklė užblokavo šią <i>programėlę</i>, kai buvo bandoma prisijungti prie <i>Matuojamo</i> (mobiliojo) tinklo.<br/><br/> Norėdami pakeisti, eikite į <i>Universaliosios</i> skirtuką.]]></string>
+    <string name="firewall_rule_isolate_desc"><![CDATA[Naudotojo nustatyta ugniasienės taisyklė užblokavo šią <i>programėlę</i> prisijungiant prie kitų nei <i>apeinamų IP adresų</i>.<br/><br/> Norėdami pakeisti, eikite į skirtuką <i>Visos programėlės</i>.]]></string>
+    <string name="firewall_rule_trusted_ip_desc"><![CDATA[Šis ryšys buvo leidžiamas, nes <i>paskirties IP</i> nustatytas apeiti visas konkrečiai programėlei taikomas taisykles.<br/><br/> Norėdami pakeisti, eikite į <i>konkrečios programėlės ugniasienės</i> langą.]]></string>
+    <string name="firewall_rule_bypass_universal_ip_desc"><![CDATA[Šis ryšys buvo leidžiamas, nes <i>paskirties IP</i> nustatytas apeiti visas universalias ugniasienės taisykles.<br/><br/> Norėdami pakeisti, eikite į <i>IP taisyklės<i> <i>Universaliosios</i> skirtuką.]]></string>
+    <string name="firewall_rule_block_ip_desc"><![CDATA[Naudotojo nustatyta ugniasienės taisyklė užblokavo <i>paskirties IP</i>.<br/><br/> Norėdami pakeisti, eikite į <i>konkrečios programėlės ugniasienės</i> langą.]]></string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc"><![CDATA[Šis ryšys buvo leidžiamas, nes <i>šaltinio programėlė</i> nustatyta kaip <i>apeinanti universaliąsias</i> ugniasienės taisykles.<br/><br/> Norėdami pakeisti, eikite į <i>konkrečios programėlės ugniasienės</i> langą.]]></string>
+    <string name="firewall_rule_global_lockdown_desc"><![CDATA[Šis ryšys buvo užblokuotas, nes nustatytas universalus visiškas užrakinimas.<br/><br/> Norėdami pakeisti, eikite į skirtuką <i>Universaliosios</i>.]]></string>
     <string name="new_app_bulk_notification_title">Dėmesio</string>
     <string name="notif_channel_desc_proxy_failure">Įspėti apie įgaliotojo serverio klaidas ir anomalijas</string>
     <string name="category_name_sys_components">Sistemos komponentai</string>
@@ -703,7 +703,7 @@
     <string name="firewall_rule_bypass_universal_ip">Apeinamas IP</string>
     <string name="firewall_rule_exempt_app_bypass_univ">Apeinanti programėlė</string>
     <string name="firewall_rule_exempt_dns_proxied">DNS per įgaliotąjį serverį</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc">Šis DNS ryšys buvo atliktas naudojant įgaliotąjį serverį ir persiųstas į naudotojo pageidaujamą DNS galinį punktą.<br/><br/> Norėdami pakeisti, išjunkite <i>Užkirsti kelią DNS nutekėjimui</i> DNS <i>Konfigūravimas</i> ekrane.</string>
+    <string name="firewall_rule_exempt_dns_proxied_desc"><![CDATA[Šis DNS ryšys buvo atliktas naudojant įgaliotąjį serverį ir persiųstas į naudotojo pageidaujamą DNS galinį punktą.<br/><br/> Norėdami pakeisti, išjunkite <i>Užkirsti kelią DNS nutekėjimui</i> DNS <i>Konfigūravimas</i> ekrane.]]></string>
     <string name="notif_dialog_pause_dialog_message">Programėlė pristabdyta, kad atnaujintumėte, pasirinkite tęsti</string>
     <string name="ci_bypass_universal_txt">Apeiti universaliąsias</string>
     <string name="ci_blocked_initial">B</string>
@@ -715,8 +715,8 @@
     <string name="bsdl_blocked_desc">%1$s užblokuota pagal %2$s</string>
     <string name="rethink_sky_desc">Daugiau nei 280 vietų; geresnis veikimo laikas; stub sprendiklis veikia cloudflare.com</string>
     <string name="rethink_max_desc">Daugiau nei 50 vietovių; daugiau privatumo; rekursyvus sprendiklis veikia fly.io</string>
-    <string name="rt_filter_desc">Rodomi <u>%1$s</u> blokavimo sąrašai</string>
-    <string name="rt_filter_desc_subgroups">Rodomi <u>%1$s</u> blokavimo sąrašai grupėje: %2$s ir pogrupyje: %3$s</string>
+    <string name="rt_filter_desc"><![CDATA[Rodomi <u>%1$s</u> blokavimo sąrašai]]></string>
+    <string name="rt_filter_desc_subgroups"><![CDATA[Rodomi <u>%1$s</u> blokavimo sąrašai grupėje: %2$s ir pogrupyje: %3$s]]></string>
     <string name="hsf_notification_permission_failure">Įjunkite pranešimų leidimą nustatymų ekrane</string>
     <string name="about_privacy_policy">Privatumo politika</string>
     <string name="about_app_translate">Vertimai</string>

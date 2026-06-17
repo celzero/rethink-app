@@ -37,7 +37,7 @@
     <string name="dns_proxy_app" translatable="true">แอป</string>
     <string name="fapps_unmetered_unblock_dialog_title" translatable="true">อนุญาตให้ใช้แบบไม่มีมิเตอร์</string>
     <string name="other_dns_list_tab2" translatable="true">การเข้ารหัส DNS</string>
-    <string name="firewall_rule_global_lockdown_desc" translatable="true">This connection was blocked because universal lockdown is set.<br/><br/> To change go to <i>Universal</i> tab.</string>
+    <string name="firewall_rule_global_lockdown_desc" translatable="true"><![CDATA[This connection was blocked because universal lockdown is set.<br/><br/> To change go to <i>Universal</i> tab.]]></string>
     <string name="category_name_installed" translatable="true">แอปที่ติดตั้ง</string>
     <string name="ci_dialog_title" translatable="true">เพิ่มกฎ IP / พอร์ต</string>
     <string name="ci_trust_initial" translatable="true">T</string>
@@ -86,8 +86,8 @@
     <string name="cd_custom_doh_dialog_title" translatable="true">ตัวแก้ปัญหา</string>
     <string name="dns_btm_sheet_dialog_message" translatable="true"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s blocklist(s)</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
     <string name="dns_proxy_name" translatable="true">ชื่อพร็อกซี</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true">A user-set universal firewall rule blocked this <i>app</i> when trying to connect on <i>Metered</i> (Mobile) network.<br/><br/> To change go to <i>Universal</i> tab.</string>
-    <string name="firewall_rule_isolate_desc" translatable="true">A user-set firewall rule blocked this <i>app</i> connecting to other than <i>bypassed IPs</i>.<br/><br/> To change go to <i>All Apps</i> tab.</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true"><![CDATA[A user-set universal firewall rule blocked this <i>app</i> when trying to connect on <i>Metered</i> (Mobile) network.<br/><br/> To change go to <i>Universal</i> tab.]]></string>
+    <string name="firewall_rule_isolate_desc" translatable="true"><![CDATA[A user-set firewall rule blocked this <i>app</i> connecting to other than <i>bypassed IPs</i>.<br/><br/> To change go to <i>All Apps</i> tab.]]></string>
     <string name="new_app_notification_action_deny" translatable="true">บล็อคต่อไป</string>
     <string name="ci_blocked_initial" translatable="true">B</string>
     <string name="ci_no_rule_initial" translatable="true">N</string>
@@ -228,17 +228,17 @@
     <string name="firewall_rule_block_app_new_install" translatable="true">แอปใหม่</string>
     <string name="firewall_rule_block_app_exception" translatable="true">ข้อผิดพลาด</string>
     <string name="firewall_rule_exempt_app_bypass_univ" translatable="true">แอปที่ถูกข้ามไป</string>
-    <string name="firewall_rule_new_app_desc" translatable="true">แอป นี้สร้างการเชื่อมต่อเป็นครั้งแรก <br/><br/> หากต้องการเปลี่ยน ให้ไปที่แท็บ<i>สากล</i></string>
+    <string name="firewall_rule_new_app_desc" translatable="true"><![CDATA[แอป นี้สร้างการเชื่อมต่อเป็นครั้งแรก <br/><br/> หากต้องการเปลี่ยน ให้ไปที่แท็บ<i>สากล</i>]]></string>
     <string name="firewall_rule_dns_blocked" translatable="true">DNS ถูกบล็อค</string>
-    <string name="firewall_rule_trusted_ip_desc" translatable="true">This connection was allowed because the <i>destination IP</i> is set as Trusted IP.<br/><br/> To change go to <i>App-specific Firewall</i> screen.</string>
-    <string name="firewall_rule_bypass_universal_ip_desc" translatable="true">This connection was allowed because the &lt;i&gt;destination IP&lt;/i&gt; is set to bypass all universal firewall rules.&lt;br/&gt;&lt;br/&gt; To change go to &lt;i&gt;IP Rules&lt;i&gt; in &lt;i&gt;Universal&lt;/i&gt; tab.</string>
-    <string name="firewall_rule_device_lock_desc" translatable="true">This connection was firewalled because <i>device was locked</i> at the time.<br/><br/> To change this behaviour go to <i>Universal</i> tab.</string>
-    <string name="firewall_rule_foreground_desc" translatable="true">This connection was firewalled because the source app was <i>not in the foreground</i>.<br/><br/> To change this behaviour go to <i>Universal</i> tab.</string>
-    <string name="firewall_rule_block_udp_ntp_desc" translatable="true">A user-set firewall rule blocked this <i>UDP</i> connection.<br/><br/> To change go to <i>Universal</i> tab.</string>
-    <string name="firewall_rule_block_domain_desc" translatable="true">A user-set firewall rule blocked the <i>domain</i>.<br/><br/> To change go to <i>App-specific Firewall</i> screen.</string>
-    <string name="firewall_rule_trusted_domain_desc" translatable="true">This connection was allowed because the <i>domain</i> is set as Trusted domain.<br/><br/> To change go to <i>App-specific Firewall</i> screen.</string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">This connection was allowed because the <i>domain</i> is set as trusted in Universal domain rules.<br/><br/> To change this behaviour go to <i>Configure DNS</i> tab.</string>
-    <string name="firewall_rule_proxied_desc" translatable="true">This connection was forwarded to user-preferred Proxy.<br/><br/> To change go to <i>Proxy</i> from <i>Configure</i> screen.</string>
+    <string name="firewall_rule_trusted_ip_desc" translatable="true"><![CDATA[This connection was allowed because the <i>destination IP</i> is set as Trusted IP.<br/><br/> To change go to <i>App-specific Firewall</i> screen.]]></string>
+    <string name="firewall_rule_bypass_universal_ip_desc" translatable="true"><![CDATA[This connection was allowed because the <i>destination IP</i> is set to bypass all universal firewall rules.<br/><br/> To change go to <i>IP Rules<i> in <i>Universal</i> tab.]]></string>
+    <string name="firewall_rule_device_lock_desc" translatable="true"><![CDATA[This connection was firewalled because <i>device was locked</i> at the time.<br/><br/> To change this behaviour go to <i>Universal</i> tab.]]></string>
+    <string name="firewall_rule_foreground_desc" translatable="true"><![CDATA[This connection was firewalled because the source app was <i>not in the foreground</i>.<br/><br/> To change this behaviour go to <i>Universal</i> tab.]]></string>
+    <string name="firewall_rule_block_udp_ntp_desc" translatable="true"><![CDATA[A user-set firewall rule blocked this <i>UDP</i> connection.<br/><br/> To change go to <i>Universal</i> tab.]]></string>
+    <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[A user-set firewall rule blocked the <i>domain</i>.<br/><br/> To change go to <i>App-specific Firewall</i> screen.]]></string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[This connection was allowed because the <i>domain</i> is set as Trusted domain.<br/><br/> To change go to <i>App-specific Firewall</i> screen.]]></string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[This connection was allowed because the <i>domain</i> is set as trusted in Universal domain rules.<br/><br/> To change this behaviour go to <i>Configure DNS</i> tab.]]></string>
+    <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[This connection was forwarded to user-preferred Proxy.<br/><br/> To change go to <i>Proxy</i> from <i>Configure</i> screen.]]></string>
     <string name="new_app_bulk_notification_title" translatable="true">ความสนใจ</string>
     <string name="new_app_notification_action_toast_allow" translatable="true">การเชื่อมต่อเครือข่ายได้รับอนุญาตสำหรับแอป</string>
     <string name="new_app_bulk_notification_content" translatable="true">Rethink บล็อกแอปใหม่ %1$s แตะเพื่อดูหรือแก้ไข</string>
@@ -354,7 +354,7 @@
     <string name="firewall_rule_block_http" translatable="true">HTTP ที่ไม่ปลอดภัย</string>
     <string name="firewall_rule_domain_blocked_univ" translatable="true">โดเมน (มหาวิทยาลัย)</string>
     <string name="firewall_rule_domain_trusted_univ" translatable="true">โดเมนที่เชื่อถือได้ (Univ)</string>
-    <string name="firewall_rule_block_app_unmetered_desc" translatable="true">A user-set firewall rule blocked this <i>app</i> when trying to connect on <i>Unmetered</i> network.<br/><br/> To change go to <i>All Apps</i> tab.</string>
+    <string name="firewall_rule_block_app_unmetered_desc" translatable="true"><![CDATA[A user-set firewall rule blocked this <i>app</i> when trying to connect on <i>Unmetered</i> network.<br/><br/> To change go to <i>All Apps</i> tab.]]></string>
     <string name="bypass_universal" translatable="true">บายพาสสากล</string>
     <string name="isolate" translatable="true">แยกตัว</string>
     <string name="untracked" translatable="true">ไม่ได้ติดตาม</string>
@@ -404,7 +404,7 @@
     <string name="settings_notification_desc3" translatable="true">ไม่มี</string>
     <string name="settings_notification_dialog_title" translatable="true">เลือกการดำเนินการแจ้งเตือน</string>
     <string name="settings_default_dns_heading" translatable="true">เลือก DNS สำรอง</string>
-    <string name="firewall_rule_block_http_desc" translatable="true">This connection was blocked because it likely used <i>insecure HTTP</i>.<br/><br/> To change go to <i>Universal</i> tab.</string>
+    <string name="firewall_rule_block_http_desc" translatable="true"><![CDATA[This connection was blocked because it likely used <i>insecure HTTP</i>.<br/><br/> To change go to <i>Universal</i> tab.]]></string>
     <string name="ci_block" translatable="true">ปิดกั้น</string>
     <string name="ci_trust_rule" translatable="true">เชื่อมั่น</string>
     <string name="ada_ip_connection_count_zero" translatable="true">0 ที่อยู่ IP</string>
@@ -559,14 +559,14 @@
     <string name="firewall_rule_block_app" translatable="true">แอปถูกบล็อค</string>
     <string name="firewall_rule_device_lock" translatable="true">อุปกรณ์ถูกล็อค</string>
     <string name="firewall_rule_foreground" translatable="true">แอปไม่ได้ใช้งาน</string>
-    <string name="firewall_rule_exempt_orbot_setup_desc" translatable="true">This connection was allowed because <i>one-click Tor-as-a-proxy</i> setup via Orbot was in progress.</string>
+    <string name="firewall_rule_exempt_orbot_setup_desc" translatable="true"><![CDATA[This connection was allowed because <i>one-click Tor-as-a-proxy</i> setup via Orbot was in progress.]]></string>
     <string name="notif_channel_firewall_alerts" translatable="true">การแจ้งเตือนไฟร์วอลล์</string>
-    <string name="ada_firewall_status" translatable="true">แอปนี้ <b><i>%1$s</i></b>.</string>
+    <string name="ada_firewall_status" translatable="true"><![CDATA[แอปนี้ <b><i>%1$s</i></b>.]]></string>
     <string name="ada_ip_connection_count" translatable="true">เชื่อมต่อกับที่อยู่ IP %1$s</string>
     <string name="ada_app_unmetered" translatable="true">ไร้มิเตอร์</string>
     <string name="rbl_privacy" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">ความเป็นส่วนตัว</string>
     <string name="rt_download" translatable="true">ดาวน์โหลดรายการบล็อค</string>
-    <string name="rt_filter_desc_subgroups" translatable="true">กำลังแสดง <u>%1$s</u> รายการบล็อกในกลุ่ม: %2$s และกลุ่มย่อย: %3$s</string>
+    <string name="rt_filter_desc_subgroups" translatable="true"><![CDATA[กำลังแสดง <u>%1$s</u> รายการบล็อกในกลุ่ม: %2$s และกลุ่มย่อย: %3$s]]></string>
     <string name="brbs_backup_dialog_message" translatable="true">สำรองข้อมูลการตั้งค่าแอป เครือข่าย และบันทึก DNS ลงในไฟล์ การดำเนินการนี้จะเริ่ม VPN ใหม่</string>
     <string name="brbs_backup_dialog_positive" translatable="true">การสำรองข้อมูล</string>
     <string name="lbbs_configure" translatable="true">การกำหนดค่า</string>
@@ -786,7 +786,7 @@
     <string name="fapps_unblock_dialog_title" translatable="true">อนุญาตแอป</string>
     <string name="fapps_unblock_dialog_message" translatable="true">อนุญาตการเชื่อมต่อสำหรับแอปที่<i>อยู่ในรายการ</i>หรือไม่?</string>
     <string name="fapps_isolate_block_dialog_title" translatable="true">แยกแอป</string>
-    <string name="fapps_firewall_filter_desc_category" translatable="true">กำลังแสดงแอป <u>%1$s</u> %2$s รายการในหมวดหมู่: %3$s</string>
+    <string name="fapps_firewall_filter_desc_category" translatable="true"><![CDATA[กำลังแสดงแอป <u>%1$s</u> %2$s รายการในหมวดหมู่: %3$s]]></string>
     <string name="rules_load_failure_heading" translatable="true">บันทึก</string>
     <string name="network_log_app_name_unknown" translatable="true">ไม่ทราบ</string>
     <string name="system_dns_connection_failure" translatable="true">ไม่สามารถระบุเซิร์ฟเวอร์ DNS ปัจจุบันได้</string>
@@ -807,15 +807,15 @@
     <string name="firewall_rule_trusted_domain" translatable="true">โดเมนที่เชื่อถือได้ (แอป)</string>
     <string name="firewall_rule_proxied" translatable="true">พร็อกซี</string>
     <string name="firewall_rule_no_rule_desc" translatable="true">ไม่มีกฎไฟร์วอลล์ที่ตรงกับการเชื่อมต่อนี้</string>
-    <string name="firewall_rule_block_app_desc" translatable="true">กฎไฟร์วอลล์ที่ผู้ใช้ตั้งไว้บล็อกแอปนี้&lt;i&gt;.&lt;br/&gt;&lt;br/&gt; หากต้องการเปลี่ยน ให้ไปที่แท็บ&lt;i&gt;แอปทั้งหมด&lt;/i&gt;</string>
-    <string name="firewall_rule_block_ip_univ_desc" translatable="true">A user-set firewall rule blocked the <i>destination IP / Port</i>.<br/><br/> To change go to <i>Universal</i> tab.</string>
-    <string name="firewall_rule_block_ip_desc" translatable="true">A user-set firewall rule blocked the <i>destination IP</i>.<br/><br/> To change go to <i>App-specific Firewall</i> screen.</string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">This connection was allowed because the <i>source app</i> is set to <i>bypass dns and firewall</i> rules.<br/><br/> To change go to <i>App-specific Firewall</i> screen.</string>
-    <string name="firewall_rule_dns_blocked_desc" translatable="true">This connection was blocked because the <i>domain</i> is blocked by user-preferred DNS.<br/><br/> To change this behaviour go to <i>Configure DNS</i> tab.</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true">This DNS connection was proxied and forwarded to user-preferred DNS endpoint.<br/><br/> To change disable <i>Prevent DNS leaks</i> from DNS <i>Configure</i> screen.</string>
+    <string name="firewall_rule_block_app_desc" translatable="true"><![CDATA[กฎไฟร์วอลล์ที่ผู้ใช้ตั้งไว้บล็อกแอปนี้<i>.<br/><br/> หากต้องการเปลี่ยน ให้ไปที่แท็บ<i>แอปทั้งหมด</i>]]></string>
+    <string name="firewall_rule_block_ip_univ_desc" translatable="true"><![CDATA[A user-set firewall rule blocked the <i>destination IP / Port</i>.<br/><br/> To change go to <i>Universal</i> tab.]]></string>
+    <string name="firewall_rule_block_ip_desc" translatable="true"><![CDATA[A user-set firewall rule blocked the <i>destination IP</i>.<br/><br/> To change go to <i>App-specific Firewall</i> screen.]]></string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[This connection was allowed because the <i>source app</i> is set to <i>bypass dns and firewall</i> rules.<br/><br/> To change go to <i>App-specific Firewall</i> screen.]]></string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[This connection was blocked because the <i>domain</i> is blocked by user-preferred DNS.<br/><br/> To change this behaviour go to <i>Configure DNS</i> tab.]]></string>
+    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true"><![CDATA[This DNS connection was proxied and forwarded to user-preferred DNS endpoint.<br/><br/> To change disable <i>Prevent DNS leaks</i> from DNS <i>Configure</i> screen.]]></string>
     <string name="notif_dialog_pause_dialog_positive" translatable="true">ประวัติย่อ</string>
     <string name="notif_channel_desc_firewall_alerts" translatable="true">การแจ้งเตือนเกี่ยวกับข้อผิดพลาดและสิ่งผิดปกติของไฟร์วอลล์</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true">This connection was allowed because the <i>source app</i> is set to <i>bypass universal</i> firewall rules.<br/><br/> To change go to <i>App-specific Firewall</i> screen.</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true"><![CDATA[This connection was allowed because the <i>source app</i> is set to <i>bypass universal</i> firewall rules.<br/><br/> To change go to <i>App-specific Firewall</i> screen.]]></string>
     <string name="category_name_others" translatable="true">อื่น</string>
     <string name="build__flavor_play_store" translatable="true">เล่น</string>
     <string name="category_name_non_app_sys" translatable="true">การบริการระบบ</string>
@@ -926,9 +926,7 @@
 \n<u>#5</u>: บล็อกการเชื่อมต่อเมื่อไม่รู้จักแอปต้นทาง (ไฟร์วอลล์สากล)
 \n<u>#6</u>: บล็อกการรับส่งข้อมูล UDP ทั้งหมด ยกเว้น DNS (ไฟร์วอลล์สากล)
 \n<u>#7</u>: บล็อกการเชื่อมต่อเมื่อข้าม DNS (ไฟร์วอลล์สากล)</string>
-    <string name="private_dns_dialog_desc" translatable="true">การตั้งค่า DNS ของ Rethink จะถูกแทนที่ด้วย DNS ส่วนตัวของ Android
-\n
-\nหากต้องการใช้ DNS ของ Rethink ให้ไปที่การตั้งค่า Android แล้วปิด \"DNS ส่วนตัว\"</string>
+    <string name="private_dns_dialog_desc" translatable="true">การตั้งค่า DNS ของ Rethink จะถูกแทนที่ด้วย DNS ส่วนตัวของ Android \n \nหากต้องการใช้ DNS ของ Rethink ให้ไปที่การตั้งค่า Android แล้วปิด \"DNS ส่วนตัว\"</string>
     <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink ใช้บริการการเข้าถึงเพื่อติดตามว่าแอปใดใช้งานอยู่ (เบื้องหน้า) และแอปใดไม่ได้ใช้งาน (เบื้องหลัง)
 \n
 \nRethink ไม่รวบรวมข้อมูลหรือสอดส่องคุณในทางใดทางหนึ่ง</string>
@@ -963,7 +961,7 @@
     <string name="dc_custom_block_heading" translatable="true">กฎของโดเมน</string>
     <string name="about_bravedns_whoarewe" translatable="true">Rethink คือโครงการโอเพ่นซอร์สฟรีที่นำโดยอดีตวิศวกรจาก Amazon, IBM และ Scientific Games</string>
     <string name="about_bug_no_log_dialog_message" translatable="true">ไม่สามารถดึงข้อมูลบันทึกข้อผิดพลาดได้ คุณต้องการรายงานข้อผิดพลาดด้วยตนเองหรือไม่?</string>
-    <string name="rt_filter_desc" translatable="true">กำลังแสดง <u>%1$s</u> รายการบล็อค</string>
+    <string name="rt_filter_desc" translatable="true"><![CDATA[กำลังแสดง <u>%1$s</u> รายการบล็อค]]></string>
     <string name="about_mail_bugreport_subject" translatable="true">[คิดใหม่]: รายงานจุดบกพร่อง</string>
     <string name="private_dns_error" translatable="true">ไม่สามารถเปิดหน้าจอ DNS ส่วนตัวได้</string>
     <string name="cd_dns_crypt_resolver_heading" translatable="true">แก้ปัญหา</string>
@@ -977,13 +975,13 @@
     <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">ข้ามกฎ DNS และไฟร์วอลล์สากลสำหรับแอปที่แสดงรายการไว้หรือไม่?</string>
     <string name="fapps_firewall_filter_hint" translatable="true">กำลังแสดงแอปทั้งหมด</string>
     <string name="settings_local_blocklist_in_use" translatable="true">%1$s รายการบล็อคที่ใช้งานอยู่</string>
-    <string name="fapps_firewall_filter_desc" translatable="true">กำลังแสดงแอป <u>%1$s</u> %2$s</string>
+    <string name="fapps_firewall_filter_desc" translatable="true"><![CDATA[กำลังแสดงแอป <u>%1$s</u> %2$s]]></string>
     <string name="fapps_firewall_filter_excluded" translatable="true">ไม่รวม</string>
     <string name="bad_config_reason_invalid_value" translatable="true">ค่าไม่ถูกต้อง</string>
-    <string name="firewall_rule_block_app_mobile_desc" translatable="true">A user-set firewall rule blocked this <i>app</i> when trying to connect on <i>Metered</i> network.<br/><br/> To change go to <i>All Apps</i> tab.</string>
-    <string name="firewall_rule_block_dns_bypass_desc" translatable="true">This connection was blocked because the <i>source app</i> bypassed user-preferred DNS.<br/><br/> To change this behaviour go to <i>Universal</i> tab.</string>
-    <string name="firewall_rule_unknown_desc" translatable="true">This connection was firewalled because the <i>source app</i> could not be determined.<br/><br/> To change this behaviour go to <i>Universal</i> tab.</string>
-    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">This connection was blocked because the <i>domain</i> is set as blocked in Universal domain rules.<br/><br/> To change this behaviour go to <i>Configure DNS</i> tab.</string>
+    <string name="firewall_rule_block_app_mobile_desc" translatable="true"><![CDATA[A user-set firewall rule blocked this <i>app</i> when trying to connect on <i>Metered</i> network.<br/><br/> To change go to <i>All Apps</i> tab.]]></string>
+    <string name="firewall_rule_block_dns_bypass_desc" translatable="true"><![CDATA[This connection was blocked because the <i>source app</i> bypassed user-preferred DNS.<br/><br/> To change this behaviour go to <i>Universal</i> tab.]]></string>
+    <string name="firewall_rule_unknown_desc" translatable="true"><![CDATA[This connection was firewalled because the <i>source app</i> could not be determined.<br/><br/> To change this behaviour go to <i>Universal</i> tab.]]></string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[This connection was blocked because the <i>domain</i> is set as blocked in Universal domain rules.<br/><br/> To change this behaviour go to <i>Configure DNS</i> tab.]]></string>
     <string name="notif_dialog_pause_dialog_message" translatable="true">แอปพลิเคชันอยู่ในสถานะหยุดชั่วคราว ให้ดำเนินการต่อเพื่อดำเนินการต่อ</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">การเชื่อมต่อและแอปทั้งหมดที่ไม่ได้ถูกกำหนดเส้นทางโดย WireGuard VPN อื่น ๆ จะถูกกำหนดเส้นทางโดย VPN นี้</string>
     <string name="routing_remaining_apps" translatable="true">การกำหนดเส้นทางแอปที่เหลือ</string>
@@ -994,5 +992,6 @@
     <string name="cleanbrowsing_family_dns_desc" translatable="true">ตัวกรองครอบครัวจะบล็อกการเข้าถึงเว็บไซต์สำหรับผู้ใหญ่ ลามกอนาจาร และเนื้อหาที่ไม่เหมาะสมทั้งหมด นอกจากนี้ยังบล็อกโดเมนพร็อกซีและ VPN ที่อาจใช้เพื่อข้ามตัวกรองของเราได้ เว็บไซต์ที่มีเนื้อหาผสม (เช่น Reddit) ก็ถูกบล็อกเช่นกัน Google, Bing และ Youtube ถูกตั้งค่าเป็นโหมดปลอดภัย</string>
     <string name="cleanbrowsing_adult_dns_desc" translatable="true">ตัวกรองสำหรับผู้ใหญ่จะบล็อกการเข้าถึงเว็บไซต์สำหรับผู้ใหญ่ ลามกอนาจาร และเนื้อหาที่ไม่เหมาะสมทั้งหมด ไม่บล็อกพร็อกซีหรือ VPN หรือเว็บไซต์ที่มีเนื้อหาผสมกัน อนุญาตให้ใช้เว็บไซต์เช่น Reddit ส่วน Google และ Bing จะตั้งค่าเป็นโหมดปลอดภัย</string>
     <string name="quad9_dns_desc" translatable="true">Quad9 กำหนดเส้นทางการสอบถาม DNS ของคุณผ่านเครือข่ายเซิร์ฟเวอร์ที่ปลอดภัยทั่วโลก</string>
-    <string name="contributors_list" translatable="true">"โครงการ &lt;i&gt;Rethink Open Source&lt;/i&gt; ดำรงอยู่ได้เพราะอาสาสมัครเหล่านี้ที่อุทิศเวลาอันมีค่ามากมายให้กับการพัฒนา&lt;br/&gt; &lt;br/&gt;🛡️ แอป Android &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Mygod&gt;Mygod&lt;/a&gt;&lt;br/&gt; &lt;a  href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 เครื่องมือเครือข่าย &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Lanius-collaris&gt;Lanius-collaris&lt;/a&gt;&lt;br/&gt;  &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 แก้ไข &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly &gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a  href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a  href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ ผู้ดูแลระบบชุมชน &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TronSlayer&gt;Andersen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a  href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt; 📌 Geo-IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ การแปล &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 ไอคอน &lt;br/&gt; &lt;a  href=https://github.com/celzero/rethink-app/issues/346&gt;ไอคอน&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 สร้างเซิร์ฟเวอร์ &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;"</string>
+    <string name="contributors_list" translatable="true"><![CDATA["\"โครงการ <i>Rethink Open Source</i> ดำรงอยู่ได้เพราะอาสาสมัครเหล่านี้ที่อุทิศเวลาอันมีค่ามากมายให้กับการพัฒนา<br/> <br/>🛡️ แอป Android <br/> <a href=https://github.com/BayLee4>BayLee4</a><br/> <a href=https://github.com/Ch4t4r>Ch4t4r</a><br/> <a href=https://github.com/HrBDev>HrBDev</a><br/> <a href=https://github.com/hussainmohd-a>hussainmohd-a</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/markwmuller>markwmuller</a><br/> <a href=https://github.com/Mygod>Mygod</a><br/> <a  href=https://github.com/Uldiniad>Uldiniad</a><br/> <a href=https://github.com/Poussinou>Poussinou</a><br/> <a href=https://github.com/pjosingh>pjosingh</a><br/> <br/>🚂 เครื่องมือเครือข่าย <br/> <a href=https://github.com/alalamav>alalamav</a><br/> <a href=https://github.com/bemasc>bemasc</a><br/> <a href=https://github.com/dmcardle>dmcardle</a><br/> <a href=https://github.com/fortuna>fortuna</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/Lanius-collaris>Lanius-collaris</a><br/>  <a href=https://github.com/PeterDaveHello>PeterDaveHello</a><br/> <a href=https://github.com/santhosh-ponnusamy>santhosh-ponnusamy</a><br/> <a href=https://github.com/SeanBurford>SeanBurford</a><br/> <br/>📚 แก้ไข <br/> <a href=https://github.com/ahmed-tasaly >ahmed-tasaly</a><br/> <a href=https://github.com/amithm7>amithm7</a><br/> <a href=https://github.com/arfshl>arfshl</a><br/> <a href=https://github.com/badmojr>badmojr</a><br/> <a href=https://github.com/bongochong>bongochong</a><br/> <a  href=https://github.com/elliotwutingfeng>elliotwutingfeng</a><br/> <a href=https://github.com/georgyo>georgyo</a><br/> <a href=https://github.com/GiddyGoatGaming>GiddyGoatGaming</a><br/> <a href=https://github.com/Harish-Narayan>Harish-Narayan</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/JakeChampion>JakeChampion</a><br/> <a href=https://github.com/MasterKia>MasterKia</a><br/> <a href=https://github.com/mtxadmin>mtxadmin</a><br/> <a href=https://github.com/neneeen>neneeen</a><br/> <a  href=https://github.com/PeterDaveHello>PeterDaveHello</a><br/> <a href=https://github.com/santhosh-ponnusamy>santhosh-ponnusamy</a><br/> <a href=https://github.com/shruuub>shruuub</a><br/> <a href=https://github.com/shuvashish76>shuvashish76</a><br/> <br/>⚜ ผู้ดูแลระบบชุมชน <br/> <a href=https://t.me/amithm7>amithm7</a><br/> <a href=https://t.me/TronSlayer>Andersen</a><br/> <a href=https://t.me/ppatra>ppatra</a><br/> <a href=https://t.me/InFamous23>InFamous23</a><br/> <a  href=https://t.me/TheTr1ckst3r>TheTr1ckst3r</a><br/> <a href=https://t.me/Ch4t4r>Ch4t4r</a><br/> <a href=https://t.me/Billi_ance>Billi_ance</a><br/> <a href=https://t.me/kaliangel>kaliangel</a><br/> <a href=https://github.com/PoneyClairDeLune>PoneyClairDeLune</a><br/> <br/> 📌 Geo-IP <br/> <a href=https://db-ip.com>db-ip.com</a><br/> <br/>❇ การแปล <br/> <a href=https://weblate.org/en/>Weblate</a><br/> <br/>🦆 ไอคอน <br/> <a  href=https://github.com/celzero/rethink-app/issues/346>ไอคอน</a><br/> <br/>📦 สร้างเซิร์ฟเวอร์ <br/> <a href=https://jitpack.io/>JitPack</a><br/> <a href=https://github.com/>GitHub</a><br/>\""]]></string>
+    <string name="lbl_test" translatable="true">ทดสอบ</string>
 </resources>

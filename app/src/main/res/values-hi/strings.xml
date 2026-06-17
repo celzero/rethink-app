@@ -135,9 +135,7 @@
     <string name="bsct_conn_block_desc_device" translatable="true">डिवाइस पर %1$s ब्लॉक किया गया</string>
     <string name="always_on_dialog_heading" translatable="true">हमेशा-ऑन वीपीएन अक्षम करे</string>
     <string name="always_on_dialog_positive_btn" translatable="true">सेटिंग्स में जाए</string>
-    <string name="private_dns_dialog_desc" translatable="true">रीथिंक की डीएनएस सेटिंग्स एंड्रॉइड के प्राइवेट डीएनएस द्वारा ओवरराइड की गई हैं।
-\n
-\nरीथिंक के डीएनएस का उपयोग करने के लिए एंड्रॉइड सेटिंग्स पर जाएं और \"निजी डीएनएस\" को बंद करें।</string>
+    <string name="private_dns_dialog_desc" translatable="true">रीथिंक की डीएनएस सेटिंग्स एंड्रॉइड के प्राइवेट डीएनएस द्वारा ओवरराइड की गई हैं। \n \nरीथिंक के डीएनएस का उपयोग करने के लिए एंड्रॉइड सेटिंग्स पर जाएं और \"निजी डीएनएस\" को बंद करें।</string>
     <string name="private_dns_dialog_positive" translatable="true">सेटिंग्स में जाए</string>
     <string name="firewall_act_network_monitor_tab" translatable="true">नेटवर्क</string>
     <string name="univ_firewall_dialog_message" translatable="true">इस नियम को हटाने से कोई भी ऐप इस आईपी से जुड़ सकेगा। क्या आप आगे बढ़ना चाहते हैं\?</string>
@@ -294,7 +292,7 @@
     <string name="fapps_metered_block_dialog_title" translatable="true">मीटर पर ब्लॉक</string>
     <string name="fapps_metered_block_dialog_message" translatable="true"><i>सूचीबद्ध</i> ऐप्स के लिए मीटर्ड (मोबाइल) नेटवर्क पर कनेक्शन ब्लॉक करें\?</string>
     <string name="fapps_metered_unblock_dialog_message" translatable="true"><i>सूचीबद्ध</i> ऐप्स के लिए मीटर्ड (मोबाइल) नेटवर्क पर कनेक्शन की अनुमति दें\?</string>
-    <string name="fapps_firewall_filter_desc_category" translatable="true">श्रेणियों में <u>%1$s</u> %2$s ऐप दिखा रहा है: %3$s</string>
+    <string name="fapps_firewall_filter_desc_category" translatable="true"><![CDATA[श्रेणियों में <u>%1$s</u> %2$s ऐप दिखा रहा है: %3$s]]></string>
     <string name="rules_load_failure_desc" translatable="true">कोई फ़ायरवॉल नियम नहीं मिला</string>
     <string name="dns_proxy_connection_failure_lockdown" translatable="true">%1$s के लिए %2$s को लॉकडाउन मोड में छोड़ने से इंटरनेट कनेक्टिविटी की समस्या हो सकती है।</string>
     <string name="copy_clipboard_label" translatable="true">यूआरएल</string>
@@ -329,7 +327,7 @@
     <string name="ci_dialog_edittext_hint" translatable="true">आईपी पता, सबनेट, या पोर्ट</string>
     <string name="ci_no_rule" translatable="true">कोई नियम नहीं</string>
     <string name="ci_no_rule_txt" translatable="true">कोई नियम नहीं</string>
-    <string name="ada_firewall_status" translatable="true">यह ऐप <b><i>%1$s</i></b>।</string>
+    <string name="ada_firewall_status" translatable="true"><![CDATA[यह ऐप <b><i>%1$s</i></b>।]]></string>
     <string name="ada_ip_connection_count_zero" translatable="true">0 आईपी पता</string>
     <string name="ada_ip_connection_count" translatable="true">%1$s आईपी पते से जुड़ा है</string>
     <string name="ada_app_status_exclude" translatable="true">डीएनएस और फ़ायरवॉल से निकाल रखा गया है</string>
@@ -463,8 +461,8 @@
     <string name="firewall_rule_block_app_exception" translatable="true">त्रुटि</string>
     <string name="firewall_rule_block_ip" translatable="true">आईपी / पोर्ट (ऐप)</string>
     <string name="firewall_rule_trusted_ip" translatable="true">विश्वसनीय आईपी</string>
-    <string name="firewall_rule_trusted_ip_desc" translatable="true">इस कनेक्शन की अनुमति दी गई थी क्योंकि <i>गंतव्य आईपी</i> विश्वसनीय आईपी के रूप में सेट है।<br/><br/> बदलने के लिए <i>ऐप-विशिष्ट फ़ायरवॉल</i> स्क्रीन पर जाएं।</string>
-    <string name="firewall_rule_block_ip_univ_desc" translatable="true">एक उपयोगकर्ता-सेट फ़ायरवॉल नियम ने <i>गंतव्य आईपी / पोर्ट</i> को अवरुद्ध कर दिया। <br/> <br/> बदलने के लिए <i>यूनीवर्सल</i> टैब पर जाएं।</string>
+    <string name="firewall_rule_trusted_ip_desc" translatable="true"><![CDATA[इस कनेक्शन की अनुमति दी गई थी क्योंकि <i>गंतव्य आईपी</i> विश्वसनीय आईपी के रूप में सेट है।<br/><br/> बदलने के लिए <i>ऐप-विशिष्ट फ़ायरवॉल</i> स्क्रीन पर जाएं।]]></string>
+    <string name="firewall_rule_block_ip_univ_desc" translatable="true"><![CDATA[एक उपयोगकर्ता-सेट फ़ायरवॉल नियम ने <i>गंतव्य आईपी / पोर्ट</i> को अवरुद्ध कर दिया। <br/> <br/> बदलने के लिए <i>यूनीवर्सल</i> टैब पर जाएं।]]></string>
     <string name="new_app_notification_content" translatable="true">रीथिंक ने हाल ही में इंस्टॉल किए गए ऐप %1$s को ब्लॉक कर दिया है।</string>
     <string name="notif_dialog_pause_dialog_positive" translatable="true">दुबारा आरंभ करना</string>
     <string name="build__flavor_website" translatable="true">वेबसाइट</string>
@@ -540,7 +538,7 @@
     <string name="ada_app_unmetered" translatable="true">बिना मीटर</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen" translatable="true">लॉग साफ़ करें</string>
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen" translatable="true">अटेंशनवेयर, स्पाईवेयर, स्केरवेयर को ब्लॉक करें।</string>
-    <string name="rt_filter_desc" translatable="true"><u>%1$s</u> ब्लॉकलिस्ट दिखा रहा है</string>
+    <string name="rt_filter_desc" translatable="true"><![CDATA[<u>%1$s</u> ब्लॉकलिस्ट दिखा रहा है]]></string>
     <string name="brbs_restore_dialog_positive" translatable="true">रीस्टोर</string>
     <string name="brbs_backup_dialog_failure_title" translatable="true">बैकअप असफल</string>
     <string name="settings_enable_logs_desc" translatable="true">डिवाइस पर डीएनएस और फ़ायरवॉल लॉग स्टोर करें।</string>
@@ -648,7 +646,7 @@
     <string name="cd_dns_crypt_dialog_heading" translatable="true">डीएनएसक्रिप्ट रिज़ॉल्वर या रीले जोड़ें</string>
     <string name="fapps_isolate_block_dialog_title" translatable="true">ऐप्स को अलग करें</string>
     <string name="fapps_firewall_filter_hint" translatable="true">सारे ऐप्स दिखा रहे है</string>
-    <string name="fapps_firewall_filter_desc" translatable="true"><u>%1$s</u> %2$s ऐप्स दिखा रहा है</string>
+    <string name="fapps_firewall_filter_desc" translatable="true"><![CDATA[<u>%1$s</u> %2$s ऐप्स दिखा रहा है]]></string>
     <string name="orbot_toast_parameter" translatable="true">टॉर-एक-प्रॉक्सी-के-रूप-में</string>
     <string name="settings_local_blocklist_dialog_positive" translatable="true">डाउनलोड</string>
     <string name="coming_soon_toast" translatable="true">जल्द आ रहा है</string>
@@ -661,8 +659,8 @@
     <string name="firewall_rule_trusted_domain" translatable="true">विश्वसनिय डोमेन (ऐप)</string>
     <string name="firewall_rule_block_domain" translatable="true">डोमेन (ऐप)</string>
     <string name="firewall_rule_no_rule_desc" translatable="true">कोई फ़ायरवॉल नियम इस कनेक्शन से मेल नहीं खाता।</string>
-    <string name="firewall_rule_block_app_desc" translatable="true">एक उपयोगकर्ता-सेट फ़ायरवॉल नियम ने इस <i>ऐप</i> को अवरुद्ध कर दिया है। <br/> <br/> बदलने के लिए <i>सब ऐप्स</i> टैब पर जाएं।</string>
-    <string name="firewall_rule_new_app_desc" translatable="true">इस ऐप ने <i>पहली</i> बार कनेक्शन बनाया। <br/> <br/> बदलने के लिए <i>यूनीवर्सल</i> टैब पर जाएं।</string>
+    <string name="firewall_rule_block_app_desc" translatable="true"><![CDATA[एक उपयोगकर्ता-सेट फ़ायरवॉल नियम ने इस <i>ऐप</i> को अवरुद्ध कर दिया है। <br/> <br/> बदलने के लिए <i>सब ऐप्स</i> टैब पर जाएं।]]></string>
+    <string name="firewall_rule_new_app_desc" translatable="true"><![CDATA[इस ऐप ने <i>पहली</i> बार कनेक्शन बनाया। <br/> <br/> बदलने के लिए <i>यूनीवर्सल</i> टैब पर जाएं।]]></string>
     <string name="fapps_exclude_block_dialog_message" translatable="true"><i>सूचीबद्ध</i> ऐप्स को डीएनएस और फ़ायरवॉल से निकाले\?</string>
     <string name="fapps_isolate_block_dialog_message" translatable="true">अलग करें <i>सूचीबद्ध</i> ऐप्स\?</string>
     <string name="fapps_info_bypass_msg" translatable="true">यूनीवर्सल फ़ायरवॉल नियमों को बायपास करें।</string>
@@ -675,9 +673,9 @@
     <string name="notif_channel_proxy_failure" translatable="true">प्रॉक्सी अलर्ट</string>
     <string name="notif_channel_download" translatable="true">डाउनलोड अलर्ट</string>
     <string name="cd_toast_deleted" translatable="true">कस्टम सूची से डोमेन हटा दिया गया</string>
-    <string name="firewall_rule_block_udp_ntp_desc" translatable="true">एक उपयोगकर्ता-सेट फ़ायरवॉल नियम ने इस <i>यूडीपी</i> कनेक्शन को ब्लॉक कर दिया है।<br/><br/> बदलने के लिए <i>यूनीवर्सल</i> टैब पर जाएं।</string>
-    <string name="firewall_rule_global_lockdown_desc" translatable="true">यूनीवर्सल लॉकडाउन सेट होने के कारण इस कनेक्शन को ब्लॉक कर दिया गया था।<br/><br/> बदलने के लिए <i>यूनीवर्सल</i> टैब पर जाएं।</string>
-    <string name="firewall_rule_block_app_unmetered_desc" translatable="true"><i>अनमीटर्ड</i> नेटवर्क पर कनेक्ट करने का प्रयास करते समय एक उपयोगकर्ता-सेट फ़ायरवॉल नियम ने इस <i>ऐप</i> को अवरुद्ध कर दिया। <br/> <br/> बदलने के लिए <i>सभी ऐप्स</i> टैब पर जाएं।</string>
+    <string name="firewall_rule_block_udp_ntp_desc" translatable="true"><![CDATA[एक उपयोगकर्ता-सेट फ़ायरवॉल नियम ने इस <i>यूडीपी</i> कनेक्शन को ब्लॉक कर दिया है।<br/><br/> बदलने के लिए <i>यूनीवर्सल</i> टैब पर जाएं।]]></string>
+    <string name="firewall_rule_global_lockdown_desc" translatable="true"><![CDATA[यूनीवर्सल लॉकडाउन सेट होने के कारण इस कनेक्शन को ब्लॉक कर दिया गया था।<br/><br/> बदलने के लिए <i>यूनीवर्सल</i> टैब पर जाएं।]]></string>
+    <string name="firewall_rule_block_app_unmetered_desc" translatable="true"><![CDATA[<i>अनमीटर्ड</i> नेटवर्क पर कनेक्ट करने का प्रयास करते समय एक उपयोगकर्ता-सेट फ़ायरवॉल नियम ने इस <i>ऐप</i> को अवरुद्ध कर दिया। <br/> <br/> बदलने के लिए <i>सभी ऐप्स</i> टैब पर जाएं।]]></string>
     <string name="cd_remove_dialog_title" translatable="true">डोमेन हटाएं\?</string>
     <string name="cd_no_rule_initial" translatable="true">एन</string>
     <string name="cd_no_rule_txt" translatable="true">कोई नियम नहीं</string>
@@ -721,37 +719,37 @@
     <string name="settings_local_blocklist_version" translatable="true">संस्करण: %1$s</string>
     <string name="accessibility_notification_content" translatable="true">रीथिंक सुलभता सेवा बंद या क्रैश हो गई है। अब बैकग्राउंड वाले ऐप्स को ब्लॉक नहीं किया जा रहा है। पुन: सक्षम करने के लिए टैप करें।</string>
     <string name="hs_btm_sheet_lock_down" translatable="true">वीपीएन के <i>लॉकडाउन</i> होने पर मोड नहीं बदल सकते। <u>वीपीएन सेटिंग संपादित करने</u> के लिए टैप करें।</string>
-    <string name="firewall_rule_device_lock_desc" translatable="true">इस कनेक्शन को फ़ायरवॉल किया गया था क्योंकि <i>डिवाइस लॉक था</i> उस समय।<br/><br/> इस व्यवहार को बदलने के लिए <i>यूनीवर्सल</i> टैब पर जाएं।</string>
-    <string name="firewall_rule_foreground_desc" translatable="true">यह कनेक्शन फ़ायरवॉल किया गया था क्योंकि स्रोत ऐप <i>फोरग्राउंड में नहीं था</i>। <br/> <br/> इस व्यवहार को बदलने के लिए <i>यूनीवर्सल</i> टैब पर जाएं।</string>
+    <string name="firewall_rule_device_lock_desc" translatable="true"><![CDATA[इस कनेक्शन को फ़ायरवॉल किया गया था क्योंकि <i>डिवाइस लॉक था</i> उस समय।<br/><br/> इस व्यवहार को बदलने के लिए <i>यूनीवर्सल</i> टैब पर जाएं।]]></string>
+    <string name="firewall_rule_foreground_desc" translatable="true"><![CDATA[यह कनेक्शन फ़ायरवॉल किया गया था क्योंकि स्रोत ऐप <i>फोरग्राउंड में नहीं था</i>। <br/> <br/> इस व्यवहार को बदलने के लिए <i>यूनीवर्सल</i> टैब पर जाएं।]]></string>
     <string name="fapps_unblock_dialog_message" translatable="true"><i>सूचीबद्ध</i> ऐप्स के लिए कनेक्शन की अनुमति दें\?</string>
-    <string name="firewall_rule_block_domain_desc" translatable="true">एक उपयोगकर्ता-सेट फ़ायरवॉल नियम ने <i>डोमेन</i> को अवरुद्ध कर दिया। <br/> <br/> बदलने के लिए <i>ऐप-विशिष्ट फ़ायरवॉल</i> स्क्रीन पर जाएं।</string>
-    <string name="firewall_rule_block_http_desc" translatable="true">इस कनेक्शन को अवरुद्ध कर दिया गया था क्योंकि यह संभवतः <i>असुरक्षित एचटीटीपी</i> का उपयोग करता था।<br/><br/> बदलने के लिए <i>यूनीवर्सल</i> टैब पर जाएं।</string>
-    <string name="firewall_rule_trusted_domain_desc" translatable="true">इस कनेक्शन की अनुमति दी गई थी क्योंकि <i>डोमेन</i> विश्वसनीय डोमेन के रूप में सेट है। <br/> <br/> बदलने के लिए <i>ऐप-विशिष्ट फ़ायरवॉल</i> स्क्रीन पर जाएं।</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[एक उपयोगकर्ता-सेट फ़ायरवॉल नियम ने <i>डोमेन</i> को अवरुद्ध कर दिया। <br/> <br/> बदलने के लिए <i>ऐप-विशिष्ट फ़ायरवॉल</i> स्क्रीन पर जाएं।]]></string>
+    <string name="firewall_rule_block_http_desc" translatable="true"><![CDATA[इस कनेक्शन को अवरुद्ध कर दिया गया था क्योंकि यह संभवतः <i>असुरक्षित एचटीटीपी</i> का उपयोग करता था।<br/><br/> बदलने के लिए <i>यूनीवर्सल</i> टैब पर जाएं।]]></string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[इस कनेक्शन की अनुमति दी गई थी क्योंकि <i>डोमेन</i> विश्वसनीय डोमेन के रूप में सेट है। <br/> <br/> बदलने के लिए <i>ऐप-विशिष्ट फ़ायरवॉल</i> स्क्रीन पर जाएं।]]></string>
     <string name="settings_lock_down_mode_desc" translatable="true">जब वीपीएन लॉकडाउन में हो तो कुछ चीज़ो अक्षम हो जाते है। <u>वीपीएन सेटिंग देखें</u>।</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true">इस कनेक्शन की अनुमति दी गई थी क्योंकि <i>स्रोत ऐप</i> <i>फ़ायरवॉल नियमों को बायपास करने के लिए</i> सेट है। <br/> <br/> बदलने के लिए <i>ऐप-विशिष्ट फ़ायरवॉल</i> स्क्रीन पर जाएं।</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true">यह डीएनएस कनेक्शन प्रॉक्सी किया गया था और उपयोगकर्ता-पसंदीदा डीएनएस एंडपॉइंट पर फोरवर्ड किया गया था। <br/> <br/> अक्षम करने के लिए <i>डीएनएस लीक को रोकें</i> डीएनएस <i>कॉन्फ़िगर करें</i> स्क्रीन से।</string>
-    <string name="contributors_list" translatable="true">&lt;i&gt;रीथिंक ओपन सोर्स प्रोजेक्ट&lt;/i&gt; अपने अस्तित्व का श्रेय इन स्वयंसेवकों को देता है जो इसके विकास पर अनगिनत घंटे समर्पित करते हैं।&lt;br/&gt; &lt;br/&gt;🛡️ Android ऐप &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Mygod&gt;Mygod&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 नेटवर्क इंजन &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Lanius-collaris&gt;Lanius-collaris&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 रिज़ॉल्वर &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ समुदाय मॉड्स &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TronSlayer&gt;एंडरसन&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 जियो-आईपी &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ अनुवाद &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 चिह्न &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;चिह्न&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 सर्वर बनाएँ &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true"><![CDATA[इस कनेक्शन की अनुमति दी गई थी क्योंकि <i>स्रोत ऐप</i> <i>फ़ायरवॉल नियमों को बायपास करने के लिए</i> सेट है। <br/> <br/> बदलने के लिए <i>ऐप-विशिष्ट फ़ायरवॉल</i> स्क्रीन पर जाएं।]]></string>
+    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true"><![CDATA[यह डीएनएस कनेक्शन प्रॉक्सी किया गया था और उपयोगकर्ता-पसंदीदा डीएनएस एंडपॉइंट पर फोरवर्ड किया गया था। <br/> <br/> अक्षम करने के लिए <i>डीएनएस लीक को रोकें</i> डीएनएस <i>कॉन्फ़िगर करें</i> स्क्रीन से।]]></string>
+    <string name="contributors_list" translatable="true"><![CDATA[<i>रीथिंक ओपन सोर्स प्रोजेक्ट</i> अपने अस्तित्व का श्रेय इन स्वयंसेवकों को देता है जो इसके विकास पर अनगिनत घंटे समर्पित करते हैं।<br/> <br/>🛡️ Android ऐप <br/> <a href=https://github.com/BayLee4>BayLee4</a><br/> <a href=https://github.com/Ch4t4r>Ch4t4r</a><br/> <a href=https://github.com/HrBDev>HrBDev</a><br/> <a href=https://github.com/hussainmohd-a>hussainmohd-a</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/markwmuller>markwmuller</a><br/> <a href=https://github.com/Mygod>Mygod</a><br/> <a href=https://github.com/Uldiniad>Uldiniad</a><br/> <a href=https://github.com/Poussinou>Poussinou</a><br/> <a href=https://github.com/pjosingh>pjosingh</a><br/> <br/>🚂 नेटवर्क इंजन <br/> <a href=https://github.com/alalamav>alalamav</a><br/> <a href=https://github.com/bemasc>bemasc</a><br/> <a href=https://github.com/dmcardle>dmcardle</a><br/> <a href=https://github.com/fortuna>fortuna</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/Lanius-collaris>Lanius-collaris</a><br/> <a href=https://github.com/PeterDaveHello>PeterDaveHello</a><br/> <a href=https://github.com/santhosh-ponnusamy>santhosh-ponnusamy</a><br/> <a href=https://github.com/SeanBurford>SeanBurford</a><br/> <br/>📚 रिज़ॉल्वर <br/> <a href=https://github.com/ahmed-tasaly>ahmed-tasaly</a><br/> <a href=https://github.com/amithm7>amithm7</a><br/> <a href=https://github.com/arfshl>arfshl</a><br/> <a href=https://github.com/badmojr>badmojr</a><br/> <a href=https://github.com/bongochong>bongochong</a><br/> <a href=https://github.com/elliotwutingfeng>elliotwutingfeng</a><br/> <a href=https://github.com/georgyo>georgyo</a><br/> <a href=https://github.com/GiddyGoatGaming>GiddyGoatGaming</a><br/> <a href=https://github.com/Harish-Narayan>Harish-Narayan</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/JakeChampion>JakeChampion</a><br/> <a href=https://github.com/MasterKia>MasterKia</a><br/> <a href=https://github.com/mtxadmin>mtxadmin</a><br/> <a href=https://github.com/neneeen>neneeen</a><br/> <a href=https://github.com/PeterDaveHello>PeterDaveHello</a><br/> <a href=https://github.com/santhosh-ponnusamy>santhosh-ponnusamy</a><br/> <a href=https://github.com/shruuub>shruuub</a><br/> <a href=https://github.com/shuvashish76>shuvashish76</a><br/> <br/>⚜ समुदाय मॉड्स <br/> <a href=https://t.me/amithm7>amithm7</a><br/> <a href=https://t.me/TronSlayer>एंडरसन</a><br/> <a href=https://t.me/ppatra>ppatra</a><br/> <a href=https://t.me/InFamous23>InFamous23</a><br/> <a href=https://t.me/TheTr1ckst3r>TheTr1ckst3r</a><br/> <a href=https://t.me/Ch4t4r>Ch4t4r</a><br/> <a href=https://t.me/Billi_ance>Billi_ance</a><br/> <a href=https://t.me/kaliangel>kaliangel</a><br/> <a href=https://github.com/PoneyClairDeLune>PoneyClairDeLune</a><br/> <br/>📌 जियो-आईपी <br/> <a href=https://db-ip.com>db-ip.com</a><br/> <br/>❇ अनुवाद <br/> <a href=https://weblate.org/en/>Weblate</a><br/> <br/>🦆 चिह्न <br/> <a href=https://github.com/celzero/rethink-app/issues/346>चिह्न</a><br/> <br/>📦 सर्वर बनाएँ <br/> <a href=https://jitpack.io/>JitPack</a><br/> <a href=https://github.com/>GitHub</a><br/>]]></string>
     <string name="cd_dialog_desc" translatable="true">वैकल्पिक वाइल्डकार्ड वाला URL या डोमेन नाम: *.test.com, test.com/test</string>
-    <string name="firewall_rule_block_ip_desc" translatable="true">एक उपयोगकर्ता-सेट फ़ायरवॉल नियम ने <i>गंतव्य आईपी</i> को अवरुद्ध कर दिया। <br/> <br/> बदलने के लिए <i>ऐप-विशिष्ट फ़ायरवॉल</i> स्क्रीन पर जाएं।</string>
+    <string name="firewall_rule_block_ip_desc" translatable="true"><![CDATA[एक उपयोगकर्ता-सेट फ़ायरवॉल नियम ने <i>गंतव्य आईपी</i> को अवरुद्ध कर दिया। <br/> <br/> बदलने के लिए <i>ऐप-विशिष्ट फ़ायरवॉल</i> स्क्रीन पर जाएं।]]></string>
     <string name="cd_toast_added" translatable="true">डोमेन सफलतापूर्वक जोड़ा गया</string>
     <string name="cd_remove_dialog_message" translatable="true">सहेजे गए कॉन्फ़िगरेशन से डोमेन हटाएं।</string>
     <string name="cd_no_rules_text" translatable="true">कोई डोमेन नियम नहीं।</string>
-    <string name="firewall_rule_exempt_orbot_setup_desc" translatable="true">इस कनेक्शन की अनुमति दी गई थी क्योंकि <i>ऑर्बोट के माध्यम से एक-क्लिक टॉर-एज-ए-प्रॉक्सी</i> सेटअप प्रगति पर था।</string>
+    <string name="firewall_rule_exempt_orbot_setup_desc" translatable="true"><![CDATA[इस कनेक्शन की अनुमति दी गई थी क्योंकि <i>ऑर्बोट के माध्यम से एक-क्लिक टॉर-एज-ए-प्रॉक्सी</i> सेटअप प्रगति पर था।]]></string>
     <string name="ada_noapp_dialog_title" translatable="true">ऐसा कोई ऐप नही</string>
     <string name="ada_noapp_dialog_message" translatable="true">ऐप जानकारी लापता। शायद इसे अनइंस्टाल कर दिया गया\?</string>
     <string name="ada_app_status_block_md" translatable="true">को मीटर्ड (मोबाइल) नेटवर्क पर अवरुद्ध किया है</string>
     <string name="bsdl_block_desc" translatable="true">अवरोधित करें, विश्वास करे <u>इस डोमेन पर </u></string>
-    <string name="firewall_rule_bypass_universal_ip_desc" translatable="true">इस कनेक्शन की अनुमति दी गई थी क्योंकि <i>गंतव्य आईपी</i> सभी यूनीवर्सल फ़ायरवॉल नियमों को बायपास करने के लिए सेट है।<br/><br/> बदलने के लिए <i>आईपी नियम</i> में जाए जो <i>यूनीवर्सल</i> टैब में है।</string>
-    <string name="firewall_rule_block_app_mobile_desc" translatable="true"><i>अनमीटर्ड</i> नेटवर्क पर कनेक्ट करने का प्रयास करते समय एक उपयोगकर्ता-सेट फ़ायरवॉल नियम ने इस <i>ऐप</i> को अवरुद्ध कर दिया। <br/> <br/> बदलने के लिए <i>सभी ऐप्स</i> टैब पर जाएं।</string>
+    <string name="firewall_rule_bypass_universal_ip_desc" translatable="true"><![CDATA[इस कनेक्शन की अनुमति दी गई थी क्योंकि <i>गंतव्य आईपी</i> सभी यूनीवर्सल फ़ायरवॉल नियमों को बायपास करने के लिए सेट है।<br/><br/> बदलने के लिए <i>आईपी नियम</i> में जाए जो <i>यूनीवर्सल</i> टैब में है।]]></string>
+    <string name="firewall_rule_block_app_mobile_desc" translatable="true"><![CDATA[<i>अनमीटर्ड</i> नेटवर्क पर कनेक्ट करने का प्रयास करते समय एक उपयोगकर्ता-सेट फ़ायरवॉल नियम ने इस <i>ऐप</i> को अवरुद्ध कर दिया। <br/> <br/> बदलने के लिए <i>सभी ऐप्स</i> टैब पर जाएं।]]></string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen" translatable="true">इस एप्लिकेशन से संबंधित सभी लॉग साफ़ करें।</string>
-    <string name="firewall_rule_unknown_desc" translatable="true">यह कनेक्शन फ़ायरवॉल किया गया था क्योंकि <i>स्रोत ऐप</i> निर्धारित नहीं किया जा सका। <br/> <br/> इस व्यवहार को बदलने के लिए <i>यूनीवर्सल</i> टैब पर जाएं।</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true"><i>मीटर्ड</i> (मोबाइल) नेटवर्क पर कनेक्ट करने का प्रयास करते समय एक उपयोगकर्ता-सेट यूनिवर्सल फ़ायरवॉल नियम ने इस <i>ऐप</i> को अवरुद्ध कर दिया। <br/> <br/> बदलने के लिए <i>यूनीवर्सल</i> टैब पर जाएं।</string>
+    <string name="firewall_rule_unknown_desc" translatable="true"><![CDATA[यह कनेक्शन फ़ायरवॉल किया गया था क्योंकि <i>स्रोत ऐप</i> निर्धारित नहीं किया जा सका। <br/> <br/> इस व्यवहार को बदलने के लिए <i>यूनीवर्सल</i> टैब पर जाएं।]]></string>
+    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true"><![CDATA[<i>मीटर्ड</i> (मोबाइल) नेटवर्क पर कनेक्ट करने का प्रयास करते समय एक उपयोगकर्ता-सेट यूनिवर्सल फ़ायरवॉल नियम ने इस <i>ऐप</i> को अवरुद्ध कर दिया। <br/> <br/> बदलने के लिए <i>यूनीवर्सल</i> टैब पर जाएं।]]></string>
     <string name="bsac_title_desc" translatable="true">नियम केवल इस ऐप पर लागू होते हैं।</string>
     <string name="rt_download_desc" translatable="true">इस सुविधा का उपयोग करने के लिए ब्लॉकलिस्ट (लगभग 60एमबी) डाउनलोड करें।</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen" translatable="true">वयस्क और पायरेटेड सामग्री, ऑनलाइन जुआ और डेटिंग, और सोशल मीडिया को ब्लॉक करें।</string>
     <string name="radio_sky_btn" translatable="true">⛅ स्काई</string>
     <string name="rt_re_download" translatable="true">ब्लॉकलिस्ट फिर से डाउनलोड करें</string>
-    <string name="rt_filter_desc_subgroups" translatable="true">समूह: %2$s और उपसमूह: %3$s में <u>%1$s</u> ब्लॉकलिस्ट दिखा रहा है</string>
+    <string name="rt_filter_desc_subgroups" translatable="true"><![CDATA[समूह: %2$s और उपसमूह: %3$s में <u>%1$s</u> ब्लॉकलिस्ट दिखा रहा है]]></string>
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">आगे बढ़ने के लिए रीथिंक प्रारंभ करें</string>
     <string name="brbs_title" translatable="true">बैकअप और रीस्टोर</string>
     <string name="brbs_backup_dialog_failure_message" translatable="true">बैकअप नहीं हो सका। पुनः प्रयास करें\?</string>
@@ -761,8 +759,8 @@
     <string name="brbs_backup_dialog_failure_positive" translatable="true">बैकअप रीट्राए करें</string>
     <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">सबसे ज्यादा अनुमती प्राप्त ऐप्स</string>
     <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">सबसे ज्यादा अवरुद्ध डोमेन</string>
-    <string name="firewall_rule_isolate_desc" translatable="true">एक उपयोगकर्ता-सेट फ़ायरवॉल नियम ने इस <i>ऐप</i> को <i>बायपासड आईपी</i> के अलावा अन्य से कनेक्ट करने से रोक दिया है। <br/> <br/> बदलने के लिए <i>सभी ऐप्स</i> टैब पर जाएं।</string>
-    <string name="firewall_rule_block_dns_bypass_desc" translatable="true">यह कनेक्शन अवरुद्ध कर दिया गया था क्योंकि <i>स्रोत ऐप</i> ने उपयोगकर्ता-पसंदीदा डीएनएस को दरकिनार कर दिया था।<br/><br/> इस व्यवहार को बदलने के लिए <i>यूनीवर्सल</i> टैब पर जाएं।</string>
+    <string name="firewall_rule_isolate_desc" translatable="true"><![CDATA[एक उपयोगकर्ता-सेट फ़ायरवॉल नियम ने इस <i>ऐप</i> को <i>बायपासड आईपी</i> के अलावा अन्य से कनेक्ट करने से रोक दिया है। <br/> <br/> बदलने के लिए <i>सभी ऐप्स</i> टैब पर जाएं।]]></string>
+    <string name="firewall_rule_block_dns_bypass_desc" translatable="true"><![CDATA[यह कनेक्शन अवरुद्ध कर दिया गया था क्योंकि <i>स्रोत ऐप</i> ने उपयोगकर्ता-पसंदीदा डीएनएस को दरकिनार कर दिया था।<br/><br/> इस व्यवहार को बदलने के लिए <i>यूनीवर्सल</i> टैब पर जाएं।]]></string>
     <string name="whats_new_version_update" translatable="true">&lt;b&gt;पैनिक न करें 2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. नया: उपयोगकर्ता बग रिपोर्ट में नेटवर्क इंजन की त्रुटियों को कैप्चर करें।&lt;br/&gt; 2. नया: अप्रतिनियुक्त डोमेन नामों के लिए सिस्टम DNS का उपयोग करें यदि DNS लीक को रोकें चालू है।&lt;br/&gt; 3. सुधार: डुअल-स्टैक (IPv4 + IPv6) वायरगार्ड कनेक्टिविटी।&lt;br/&gt; 4. सुधार: जब नेटवर्क इंजन अनुत्तरदायी हो तो UI तत्वों को ब्लॉक करने से बचें।&lt;br/&gt; 5. फिक्स: उन्नत DNS फ़िल्टरिंग चालू होने पर कनेक्शन टाइमआउट।&lt;br/&gt; 6. फिक्स: डोमेन नामों के साथ वायरगार्ड पीयर एंडपॉइंट नेटवर्क परिवर्तनों पर लटके रहते हैं।&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;इस ऐप का अनुवाद करने में सहायता करें&lt;/a&gt;</string>
     <string name="lbl_rules" translatable="true">नियम</string>
     <string name="lbl_configure" translatable="true">कॉन्फ़िगर</string>
@@ -775,7 +773,7 @@
     <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">बायपास करें ऐप्स</string>
     <string name="firewall_rule_domain_blocked_univ" translatable="true">डोमेन (यूनिव)</string>
     <string name="firewall_rule_domain_trusted_univ" translatable="true">विश्वसनिय डोमेन (यूनिव)</string>
-    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">ये कनेक्शन ब्लॉक किया गया क्योकिं <i>डोमेन</i> ब्लॉक है यूनीवर्सल डोमेन नियमों के द्वारा। <br/><br/> बदलने के लिए जाए <i>डीएनएस कन्फिगर</i> टैब पे।</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[ये कनेक्शन ब्लॉक किया गया क्योकिं <i>डोमेन</i> ब्लॉक है यूनीवर्सल डोमेन नियमों के द्वारा। <br/><br/> बदलने के लिए जाए <i>डीएनएस कन्फिगर</i> टैब पे।]]></string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">डीएनएस और फायरवॉल को बायपास करे</string>
     <string name="dc_setting_dns_cache_heading" translatable="true">DNS बूस्टर</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">रिक्वेस्ट को साथ में रखे, रिस्पोन्स को कैशे करे, त्रुटि को बढ़िया संभाले</string>
@@ -801,9 +799,9 @@
     <string name="cd_dns_alg_desc" translatable="true">हर डीएनएस मांग पे खास आइपी असाइन करे</string>
     <string name="firewall_rule_bypass_dns_firewall" translatable="true">बायपास किए ऐप्स</string>
     <string name="firewall_rule_dns_blocked" translatable="true">डीएनएस ब्लॉक्ड</string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">इस कनेक्शन की इजाज़त दी गई क्योकीं <i>स्त्रोत ऐप</i> सेट किया गया है <i>डीएनएस और फायरवॉल नियमों को बायपास करने के लिए</i>।<br/><br/> बदलने के लिए जाए <i>ऐप-विशेष फायरवॉल</i> सक्रिन पे।</string>
-    <string name="firewall_rule_dns_blocked_desc" translatable="true">ये कनेक्शन ब्लॉक किया गया क्योकिं <i>डोमेन</i> ब्लॉक है यूज़र पसंदीदा डीएनएस के द्वारा। <br/><br/> बदलने के लिए जाए <i>डीएनएस कन्फिगर</i> टैब पे।</string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">ये कनेक्शन अनुमति प्राप्त किया क्योकिं <i>डोमेन</i> विश्वसनिय है यूनीवर्सल डोमेन नियमों में। <br/><br/> बदलने के लिए जाए <i>डीएनएस कन्फिगर</i> टैब पे।</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[इस कनेक्शन की इजाज़त दी गई क्योकीं <i>स्त्रोत ऐप</i> सेट किया गया है <i>डीएनएस और फायरवॉल नियमों को बायपास करने के लिए</i>।<br/><br/> बदलने के लिए जाए <i>ऐप-विशेष फायरवॉल</i> सक्रिन पे।]]></string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[ये कनेक्शन ब्लॉक किया गया क्योकिं <i>डोमेन</i> ब्लॉक है यूज़र पसंदीदा डीएनएस के द्वारा। <br/><br/> बदलने के लिए जाए <i>डीएनएस कन्फिगर</i> टैब पे।]]></string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[ये कनेक्शन अनुमति प्राप्त किया क्योकिं <i>डोमेन</i> विश्वसनिय है यूनीवर्सल डोमेन नियमों में। <br/><br/> बदलने के लिए जाए <i>डीएनएस कन्फिगर</i> टैब पे।]]></string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">यूनीवर्सल डीएनएस और फायरवॉल नियमों को बायपास करेगा</string>
     <string name="brbs_backup_restore_desc" translatable="true">सभी ऐप संस्करणों पर काम नहीं करता</string>
     <string name="lbl_maybe_blocked" translatable="true">शायद ब्लॉक किया</string>
@@ -943,7 +941,7 @@
     <string name="crypt_relay_us" translatable="true">https://cryptostrom.is/ स्वीडन द्वारा प्रदान किया गया अनाम डीएनएस रिले।</string>
     <string name="crypt_relay_singapore" translatable="true">सिंगापुर में होस्ट किया गया अनाम DNS रिले।</string>
     <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">सर्वाधिक अवरुद्ध देश</string>
-    <string name="firewall_rule_proxied_desc" translatable="true">यह कनेक्शन उपयोगकर्ता-पसंदीदा प्रॉक्सी को अग्रेषित किया गया था।<br/><br/> परिवर्तन करने के लिए <i>कॉन्फ़िगर</i> स्क्रीन से <i>प्रॉक्सी</i> पर जाएं।</string>
+    <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[यह कनेक्शन उपयोगकर्ता-पसंदीदा प्रॉक्सी को अग्रेषित किया गया था।<br/><br/> परिवर्तन करने के लिए <i>कॉन्फ़िगर</i> स्क्रीन से <i>प्रॉक्सी</i> पर जाएं।]]></string>
     <string name="cd_toast_edit" translatable="true">संपादित</string>
     <string name="lbl_unselected" translatable="true">अचयनित किया गया</string>
     <string name="key_length_explanation_binary" translatable="true">वायरगार्ड कुंजी 32 बाइट्स होना चाहिए</string>

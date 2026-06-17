@@ -227,74 +227,7 @@
     <string name="settings_app_notification_a13_heading" translatable="true">Сповіщення застосунку</string>
     <string name="notification_screen_error" translatable="true">Не вдалося запустити екран сповіщень застосунку.</string>
     <string name="settings_custom_downloader_heading" translatable="true">Використовувати вбудований завантажувач</string>
-    <string name="contributors_list" translatable="true"><![CDATA[The <i>Проект «Переосмислити відкритий код» завдячує своїм існуванням цим волонтерам, які присвячують незліченну кількість годин його розробці.<br/>
-                                              <br/>🛡️ Android app <br/>
-                                              <a href="https://github.com/anthonyryan1">Anthony Ryan</a> /
-                                              <a href="https://github.com/BayLee4">BayLee4</a> /
-                                              <a href="https://github.com/Ch4t4r">Ch4t4r</a> /
-                                              <a href="https://github.com/samthesamman">CodingAttack</a> /
-                                              <a href="https://github.com/HrBDev">HrBDev</a> /
-                                              <a href="https://github.com/hussainmohd-a">hussainmohd-a</a> /
-                                              <a href="https://github.com/ignoramous">ignoramous</a> /
-                                              <a href="https://github.com/ironveil">ironveil</a> /
-                                              <a href="https://github.com/markwmuller">markwmuller</a> /
-                                              <a href="https://github.com/mohammaduvez">Mohammaduvez</a> /
-                                              <a href="https://github.com/Mygod">Mygod</a> /
-                                              <a href="https://github.com/Poussinou">Poussinou</a> /
-                                              <a href="https://github.com/pjosingh">pjosingh</a> /
-                                              <a href="https://github.com/RohitSurwase">RohitSurwase</a> /
-                                              <a href="https://github.com/ShantanuVichare">Shantanu</a> /
-                                              <a href="https://github.com/Uldiniad">Uldiniad</a><br/> /
-                                              <a href="https://github.com/yurtpage">yurtpage</a><br/>
-                                              <br/>🚂 Network engine <br/>
-                                              <a href="https://github.com/alalamav">alalamav</a> /
-                                              <a href="https://github.com/bemasc">bemasc</a> /
-                                              <a href="https://github.com/dmcardle">dmcardle</a> /
-                                              <a href="https://github.com/fortuna">fortuna</a> /
-                                              <a href="https://github.com/ignoramous">ignoramous</a> /
-                                              <a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /
-                                              <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
-                                              <a href="https://github.com/SeanBurford">SeanBurford</a><br/>
-                                              <br/>📚 Resolver <br/>
-                                              <a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a> /
-                                              <a href="https://github.com/amithm7">amithm7</a> /
-                                              <a href="https://github.com/arfshl">arfshl</a> /
-                                              <a href="https://github.com/badmojr">badmojr</a> /
-                                              <a href="https://github.com/bongochong">bongochong</a> /
-                                              <a href="https://github.com/elliotwutingfeng">elliotwutingfeng</a> /
-                                              <a href="https://github.com/georgyo">georgyo</a> /
-                                              <a href="https://github.com/GiddyGoatGaming">GiddyGoatGaming</a> /
-                                              <a href="https://github.com/Harish-Narayan">Harish-Narayan</a> /
-                                              <a href="https://github.com/ignoramous">ignoramous</a> /
-                                              <a href="https://github.com/JakeChampion">JakeChampion</a> /
-                                              <a href="https://github.com/MasterKia">MasterKia</a> /
-                                              <a href="https://github.com/mtxadmin">mtxadmin</a> /
-                                              <a href="https://github.com/neneeen">neneeen</a> /
-                                              <a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /
-                                              <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
-                                              <a href="https://github.com/shruuub">shruuub</a> /
-                                              <a href="https://github.com/shuvashish76">shuvashish76</a><br/>
-                                              <br/>⚜ Community mods <br/>
-                                              <a href="https://t.me/amithm7">amithm7</a> /
-                                              <a href="https://t.me/TronSlayer">Andersen</a> /
-                                              <a href="https://t.me/ppatra">ppatra</a> /
-                                               <a href="https://t.me/InFamous23">InFamous23</a> /
-                                              <a href="https://t.me/TheTr1ckst3r">TheTr1ckst3r</a> /
-                                              <a href="https://t.me/Ch4t4r">Ch4t4r</a> /
-                                              <a href="https://t.me/Billi_ance">Billi_ance</a> /
-                                              <a href="https://t.me/kaliangel">kaliangel</a> /
-                                              <a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>
-                                              <br/>📌 Geo-IP <br/>
-                                              <a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IPinfo Lite</a><br/>
-                                              <br/>❇ Translations <br/>
-                                              <a href="https://weblate.org/en/">Weblate</a><br/>
-                                              <br/>🦆 Icons <br/>
-                                              <a href="https://github.com/celzero/rethink-app/issues/346">Icons</a><br/>
-                                              <br/>📦 Build servers <br/>
-                                              <a href="https://jitpack.io/">JitPack</a> /
-                                              <a href="https://github.com/">GitHub</a> /
-                                              <a href="https://central.sonatype.com/">Sonatype</a><br/>
-                                              ]]></string>
+    <string name="contributors_list" translatable="true"><![CDATA["The <i>Проект «Переосмислити відкритий код» завдячує своїм існуванням цим волонтерам, які присвячують незліченну кількість годин його розробці.<br/>\n                                              <br/>🛡️ Android app <br/>\n                                              <a href=\"https://github.com/anthonyryan1\">Anthony Ryan</a> /\n                                              <a href=\"https://github.com/BayLee4\">BayLee4</a> /\n                                              <a href=\"https://github.com/Ch4t4r\">Ch4t4r</a> /\n                                              <a href=\"https://github.com/samthesamman\">CodingAttack</a> /\n                                              <a href=\"https://github.com/HrBDev\">HrBDev</a> /\n                                              <a href=\"https://github.com/hussainmohd-a\">hussainmohd-a</a> /\n                                              <a href=\"https://github.com/ignoramous\">ignoramous</a> /\n                                              <a href=\"https://github.com/ironveil\">ironveil</a> /\n                                              <a href=\"https://github.com/markwmuller\">markwmuller</a> /\n                                              <a href=\"https://github.com/mohammaduvez\">Mohammaduvez</a> /\n                                              <a href=\"https://github.com/Mygod\">Mygod</a> /\n                                              <a href=\"https://github.com/Poussinou\">Poussinou</a> /\n                                              <a href=\"https://github.com/pjosingh\">pjosingh</a> /\n                                              <a href=\"https://github.com/RohitSurwase\">RohitSurwase</a> /\n                                              <a href=\"https://github.com/ShantanuVichare\">Shantanu</a> /\n                                              <a href=\"https://github.com/Uldiniad\">Uldiniad</a><br/> /\n                                              <a href=\"https://github.com/yurtpage\">yurtpage</a><br/>\n                                              <br/>🚂 Network engine <br/>\n                                              <a href=\"https://github.com/alalamav\">alalamav</a> /\n                                              <a href=\"https://github.com/bemasc\">bemasc</a> /\n                                              <a href=\"https://github.com/dmcardle\">dmcardle</a> /\n                                              <a href=\"https://github.com/fortuna\">fortuna</a> /\n                                              <a href=\"https://github.com/ignoramous\">ignoramous</a> /\n                                              <a href=\"https://github.com/PeterDaveHello\">PeterDaveHello</a> /\n                                              <a href=\"https://github.com/santhosh-ponnusamy\">santhosh-ponnusamy</a> /\n                                              <a href=\"https://github.com/SeanBurford\">SeanBurford</a><br/>\n                                              <br/>📚 Resolver <br/>\n                                              <a href=\"https://github.com/ahmed-tasaly\">ahmed-tasaly</a> /\n                                              <a href=\"https://github.com/amithm7\">amithm7</a> /\n                                              <a href=\"https://github.com/arfshl\">arfshl</a> /\n                                              <a href=\"https://github.com/badmojr\">badmojr</a> /\n                                              <a href=\"https://github.com/bongochong\">bongochong</a> /\n                                              <a href=\"https://github.com/elliotwutingfeng\">elliotwutingfeng</a> /\n                                              <a href=\"https://github.com/georgyo\">georgyo</a> /\n                                              <a href=\"https://github.com/GiddyGoatGaming\">GiddyGoatGaming</a> /\n                                              <a href=\"https://github.com/Harish-Narayan\">Harish-Narayan</a> /\n                                              <a href=\"https://github.com/ignoramous\">ignoramous</a> /\n                                              <a href=\"https://github.com/JakeChampion\">JakeChampion</a> /\n                                              <a href=\"https://github.com/MasterKia\">MasterKia</a> /\n                                              <a href=\"https://github.com/mtxadmin\">mtxadmin</a> /\n                                              <a href=\"https://github.com/neneeen\">neneeen</a> /\n                                              <a href=\"https://github.com/PeterDaveHello\">PeterDaveHello</a> /\n                                              <a href=\"https://github.com/santhosh-ponnusamy\">santhosh-ponnusamy</a> /\n                                              <a href=\"https://github.com/shruuub\">shruuub</a> /\n                                              <a href=\"https://github.com/shuvashish76\">shuvashish76</a><br/>\n                                              <br/>⚜ Community mods <br/>\n                                              <a href=\"https://t.me/amithm7\">amithm7</a> /\n                                              <a href=\"https://t.me/TronSlayer\">Andersen</a> /\n                                              <a href=\"https://t.me/ppatra\">ppatra</a> /\n                                               <a href=\"https://t.me/InFamous23\">InFamous23</a> /\n                                              <a href=\"https://t.me/TheTr1ckst3r\">TheTr1ckst3r</a> /\n                                              <a href=\"https://t.me/Ch4t4r\">Ch4t4r</a> /\n                                              <a href=\"https://t.me/Billi_ance\">Billi_ance</a> /\n                                              <a href=\"https://t.me/kaliangel\">kaliangel</a> /\n                                              <a href=\"https://github.com/PoneyClairDeLune\">PoneyClairDeLune</a><br/>\n                                              <br/>📌 Geo-IP <br/>\n                                              <a href=\"https://db-ip.com\">db-ip.com</a> / <a href=\"https://ipinfo.io/lite\">IPinfo Lite</a><br/>\n                                              <br/>❇ Translations <br/>\n                                              <a href=\"https://weblate.org/en/\">Weblate</a><br/>\n                                              <br/>🦆 Icons <br/>\n                                              <a href=\"https://github.com/celzero/rethink-app/issues/346\">Icons</a><br/>\n                                              <br/>📦 Build servers <br/>\n                                              <a href=\"https://jitpack.io/\">JitPack</a> /\n                                              <a href=\"https://github.com/\">GitHub</a> /\n                                              <a href=\"https://central.sonatype.com/\">Sonatype</a><br/>\n                                              "]]></string>
     <string name="univ_firewall_rule_2" translatable="true">Блокувати застосунки, які не використовуються</string>
     <string name="univ_firewall_rule_3" translatable="true">Блокувати, якщо джерело застосунку невідоме</string>
     <string name="fapps_info_dialog_message" translatable="true">Блокуйте підключення застосунків до Інтернету. Обмеження доступу до Інтернету допомагає запобігти невиправданому використанню даних, а також заощадити заряд акумулятора.</string>
@@ -318,9 +251,7 @@
     <string name="always_on_dialog_heading" translatable="true">Вимкнути Постійно ввімкнений VPN</string>
     <string name="always_on_dialog_positive_btn" translatable="true">Перейти до налаштуваннях</string>
     <string name="always_on_dialog_stop_heading" translatable="true">Постійно ввімкнений VPN</string>
-    <string name="private_dns_dialog_desc" translatable="true">Налаштування DNS Rethink перевизначаються приватними DNS Android.
-\n
-\nЩоб використовувати DNS Rethink, перейдіть до налаштувань Android і вимкніть \"Приватний DNS\".</string>
+    <string name="private_dns_dialog_desc" translatable="true">Налаштування DNS Rethink перевизначаються приватними DNS Android. \n \nЩоб використовувати DNS Rethink, перейдіть до налаштувань Android і вимкніть \"Приватний DNS\".</string>
     <string name="univ_firewall_dialog_title" translatable="true">Видалити правило IP\?</string>
     <string name="doh_custom_url_remove_success" translatable="true">Кінцева точка видалена.</string>
     <string name="lbl_rules" translatable="true">правила</string>

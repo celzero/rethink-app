@@ -133,9 +133,7 @@
     <string name="always_on_dialog_positive" translatable="true">Zastaviť</string>
     <string name="always_on_dialog_neutral" translatable="true">Nastavenia</string>
     <string name="private_dns_dialog_heading" translatable="true">Vypni Súkromné DNS</string>
-    <string name="private_dns_dialog_desc" translatable="true">Nastavenia Rethink DNS sú prepísané súkromným DNS systému Android.
-\n
-\nAk chcete použiť Rethink DNS, prejdite do nastavení systému Android a vypnite možnosť „Súkromné DNS“.</string>
+    <string name="private_dns_dialog_desc" translatable="true">Nastavenia Rethink DNS sú prepísané súkromným DNS systému Android. \n \nAk chcete použiť Rethink DNS, prejdite do nastavení systému Android a vypnite možnosť „Súkromné DNS“.</string>
     <string name="private_dns_dialog_positive" translatable="true">Chodte do Nastavení</string>
     <string name="firewall_act_universal_tab" translatable="true">univerzálny</string>
     <string name="firewall_act_network_monitor_tab" translatable="true">Sieť</string>
