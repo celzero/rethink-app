@@ -656,9 +656,7 @@
     <string name="lbl_optional" translatable="true">(optioneel)</string>
     <string name="lbl_allowed_ips" translatable="true">Toegestane IPs</string>
     <string name="lbl_save" translatable="true">opslaan</string>
-    <string name="private_dns_dialog_desc" translatable="true">De DNS instellingen van Rethink worden overgenomen door Android\'s Privé DNS.
-\n
-\nOm Rethink\'s DNS te gebruiken moet je in de Android Instellingen \"Privé DNS\" uitschakelen.</string>
+    <string name="private_dns_dialog_desc" translatable="true">De DNS instellingen van Rethink worden overgenomen door Android\'s Privé DNS. \n \nOm Rethink\'s DNS te gebruiken moet je in de Android Instellingen \"Privé DNS\" uitschakelen.</string>
     <string name="local_blocklist_redownload" translatable="true">Up-to-date!</string>
     <string name="hs_biometeric_feature_not_supported" translatable="true">Biometrische authenticatie is niet ondersteund of uitgeschakeld op dit apparaat</string>
     <string name="about_connect" translatable="true">contact</string>
