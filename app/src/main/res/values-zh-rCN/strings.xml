@@ -53,8 +53,8 @@
     <string name="univ_firewall_rule_9">拦截于计费网络（移动数据）</string>
     <string name="fapps_unmetered_unblock_dialog_message">允许 <i>所列</i> 应用的不按流量计费 （WiFi）网络连接吗？</string>
     <string name="firewall_rule_unknown">未知应用</string>
-    <string name="firewall_rule_block_ip_univ_desc"><![CDATA[一项用户定义的全局防火墙规则拦截了此<i>目标 IP / 端口</i>。<br/><br/>若需更改，请移步<i>全局</i>选项卡。]]></string>
-    <string name="firewall_rule_global_lockdown_desc"><![CDATA[此连接因全局闭关模式而被拦截。<br/><br/>若需更改，请至<i>全局</i>选项卡。]]></string>
+    <string name="firewall_rule_block_ip_univ_desc"><![CDATA[一项用户定义的全局防火墙规则拦截了此<i>目标 IP / 端口</i>。<br><br>若需更改，请移步<i>全局</i>选项卡。]]></string>
+    <string name="firewall_rule_global_lockdown_desc"><![CDATA[此连接因全局闭关模式而被拦截。<br><br>若需更改，请至<i>全局</i>选项卡。]]></string>
     <string name="category_name_sys_components">系统组件</string>
     <string name="cd_dialog_error_invalid_wildcard">无效通配符、 URL 或域名</string>
     <string name="ci_no_rule">无规则</string>
@@ -280,7 +280,7 @@
     <string name="univ_accessibility_dialog_negative">拒绝</string>
     <string name="dns_proxy_name">代理名称</string>
     <string name="fapps_metered_unblock_dialog_message">允许 <i>所列</i> 应用的按流量计费（移动）网络连接吗？</string>
-    <string name="firewall_rule_block_udp_ntp_desc"><![CDATA[一项用户定义的防火墙规则拦截了此 <i>UDP</i> 连接。<br/><br/>若需更改，请移步<i>全局</i>选项卡。]]></string>
+    <string name="firewall_rule_block_udp_ntp_desc"><![CDATA[一项用户定义的防火墙规则拦截了此 <i>UDP</i> 连接。<br><br>若需更改，请移步<i>全局</i>选项卡。]]></string>
     <string name="new_app_notification_action_toast_deny">拦截应用网络连接</string>
     <string name="ada_app_bypass_univ">无条件放行</string>
     <string name="rethink_sky_desc">逾 280 处地点；更长的在线时间；于 cloudflare.com 上运行的中间解析服务</string>
@@ -372,7 +372,7 @@
     <string name="dns_btm_resolved_doh_no_server">已解析 %1$s</string>
     <string name="fapps_firewall_filter_excluded">已排除</string>
     <string name="fapps_unmetered_block_dialog_title">于非计费网络拦截</string>
-    <string name="firewall_rule_block_dns_bypass_desc"><![CDATA[此连接因<i>来源应用</i>绕过了用户设置的 DNS 而被拦截。<br/><br/>若需变更此行为，请移步<i>全局</i>选项卡。]]></string>
+    <string name="firewall_rule_block_dns_bypass_desc"><![CDATA[此连接因<i>来源应用</i>绕过了用户设置的 DNS 而被拦截。<br><br>若需变更此行为，请移步<i>全局</i>选项卡。]]></string>
     <string name="notif_channel_desc_proxy_failure">在代理错误或异常时提醒我</string>
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="ci_dialog_added_success">已将 IP 加入列表</string>
@@ -402,7 +402,7 @@
     <string name="fapps_firewall_filter_isolate">已隔离</string>
     <string name="network_log_app_name_unnamed">未命名（ %1$s ）</string>
     <string name="dns_proxy_connection_failure_lockdown">为 %2$s 而在闭关模式下排除 %1$s 可导致网络问题。</string>
-    <string name="firewall_rule_foreground_desc"><![CDATA[此连接因来源应用<i>未处于前台</i>而被拦截。<br/><br/>若需变更此行为，请至<i>全局</i>选项卡。]]></string>
+    <string name="firewall_rule_foreground_desc"><![CDATA[此连接因来源应用<i>未处于前台</i>而被拦截。<br><br>若需变更此行为，请至<i>全局</i>选项卡。]]></string>
     <string name="new_app_bulk_notification_content">Rethink 拦截了 %1$s 款新应用。轻触以查看或更改。</string>
     <string name="new_app_notification_action_toast_allow">放行应用网络连接</string>
     <string name="ada_noapp_dialog_positive">确认</string>
@@ -432,7 +432,7 @@
     <string name="fapps_unmetered_block_dialog_message">拦截 <i>所列</i> 应用的不按流量计费（WiFi）网络连接吗？</string>
     <string name="network_log_app_name_unknown">未知</string>
     <string name="firewall_rule_exempt_dns_proxied">已代理 DNS</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc"><![CDATA[此连接因<i>来源应用</i>被设为<i>全局放行</i>而放行。<br/><br/>若需更改，请移步<i>分应用防火墙</i>屏。]]></string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc"><![CDATA[此连接因<i>来源应用</i>被设为<i>全局放行</i>而放行。<br><br>若需更改，请移步<i>分应用防火墙</i>屏。]]></string>
     <string name="new_app_notification_action_deny">继续拦截</string>
     <string name="build__flavor_website">网站</string>
     <string name="cd_toast_added">域名已添加</string>
@@ -461,7 +461,7 @@
     <string name="firewall_rule_no_rule">无规则</string>
     <string name="firewall_rule_exempt_app_bypass_univ">已绕行应用</string>
     <string name="firewall_rule_global_lockdown">闭关模式</string>
-    <string name="firewall_rule_isolate_desc"><![CDATA[一项用户定义的防火墙规则在此<i>应用</i>尝试连接至<i>已绕行 IP </i>外的地址时将其拦截。<br/><br/>若需更改，请移步<i>所有应用</i>选项卡。]]></string>
+    <string name="firewall_rule_isolate_desc"><![CDATA[一项用户定义的防火墙规则在此<i>应用</i>尝试连接至<i>已绕行 IP </i>外的地址时将其拦截。<br><br>若需更改，请移步<i>所有应用</i>选项卡。]]></string>
     <string name="notif_dialog_pause_dialog_negative">舍弃</string>
     <string name="notif_channel_desc_vpn_notification">在 Rethink 启用且在后台时提醒我</string>
     <string name="notif_channel_desc_vpn_failure">在 Rethink 被 Android 或其他 VPN 应用停止时提醒我</string>
@@ -491,8 +491,8 @@
     <string name="other_dns_list_tab3">Dns Proxy</string>
     <string name="firewall_rule_block_dns_bypass">已绕过 DNS</string>
     <string name="firewall_rule_no_rule_desc">此连接无匹配的防火墙规则。</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc"><![CDATA[此 DNS 连接已代理并转发至用户选择的 DNS 端点。<br/><br/>若需更改，请移步 DNS <i>配置</i>屏，并停用<i>防止 DNS 泄漏</i>。]]></string>
-    <string name="firewall_rule_block_http_desc"><![CDATA[此连接被拦截因为它可能使用了 <i>不安全的 HTTP</i>。<br/><br/> 要更改，请转到<i>全局</i> 选项卡。]]></string>
+    <string name="firewall_rule_exempt_dns_proxied_desc"><![CDATA[此 DNS 连接已代理并转发至用户选择的 DNS 端点。<br><br>若需更改，请移步 DNS <i>配置</i>屏，并停用<i>防止 DNS 泄漏</i>。]]></string>
+    <string name="firewall_rule_block_http_desc"><![CDATA[此连接被拦截因为它可能使用了 <i>不安全的 HTTP</i>。<br><br> 要更改，请转到<i>全局</i> 选项卡。]]></string>
     <string name="notif_dialog_pause_dialog_positive">恢复</string>
     <string name="cd_dialog_desc">一个 URL 或域名，可带有通配符，如 *.test.com 或 test.com/test</string>
     <string name="ci_no_rule_initial">无</string>
@@ -636,7 +636,7 @@
     <string name="settings_notification_dialog_option_2">\nDNS / DNS + 防火墙：\n显示两个按钮来快速在省电的 DNS 模式和普通的 DNS + 防火墙模式间切换。</string>
     <string name="contributors_list"><![CDATA[<i>Rethink 开源项目</i> 的存在归功于这些贡献了无数时间在其开发工作上的志愿者们。<br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>🛡️ Android 应用 <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/anthonyryan1">Anthony Ryan</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/BayLee4">BayLee4</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/Ch4t4r">Ch4t4r</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/samthesamman">CodingAttack</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/HrBDev">HrBDev</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/hussainmohd-a">hussainmohd-a</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ignoramous">ignoramous</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ironveil">ironveil</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/markwmuller">markwmuller</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/mohammaduvez">Mohammaduvez</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/Mygod">Mygod</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/Poussinou">Poussinou</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/pjosingh">pjosingh</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/RohitSurwase">RohitSurwase</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ShantanuVichare">Shantanu</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/Uldiniad">Uldiniad</a><br/> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/yurtpage">yurtpage</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>🚂 网络引擎 <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/alalamav">alalamav</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/bemasc">bemasc</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/dmcardle">dmcardle</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/fortuna">fortuna</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ignoramous">ignoramous</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/SeanBurford">SeanBurford</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>📚 解析器 <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/amithm7">amithm7</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/arfshl">arfshl</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/badmojr">badmojr</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/bongochong">bongochong</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/elliotwutingfeng">elliotwutingfeng</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/georgyo">georgyo</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/GiddyGoatGaming">GiddyGoatGaming</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/Harish-Narayan">Harish-Narayan</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ignoramous">ignoramous</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/JakeChampion">JakeChampion</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/MasterKia">MasterKia</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/mtxadmin">mtxadmin</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/neneeen">neneeen</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/shruuub">shruuub</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/shuvashish76">shuvashish76</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>⚜ 社区协管 <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/amithm7">amithm7</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/TronSlayer">Andersen</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/ppatra">ppatra</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 <a href="https://t.me/InFamous23">InFamous23</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/TheTr1ckst3r">TheTr1ckst3r</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/Ch4t4r">Ch4t4r</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/Billi_ance">Billi_ance</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/kaliangel">kaliangel</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>📌 Geo-IP 库<br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IPinfo Lite</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>❇ 翻译 <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://weblate.org/en/">Weblate</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>🦆 图标 <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/celzero/rethink-app/issues/346">Icons</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>📦 构建服务器 <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://jitpack.io/">JitPack</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/">GitHub</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://central.sonatype.com/">Sonatype</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020]]></string>
     <string name="hs_download_positive_default">确定</string>
-    <string name="firewall_rule_block_app_unmetered_desc"><![CDATA[一项用户定义的防火墙规则在此<i>应用</i>尝试连接至<i>非计费网络</i>时将其拦截。<br/><br/>若需更改，请移步<i>所有应用</i>选项卡。]]></string>
+    <string name="firewall_rule_block_app_unmetered_desc"><![CDATA[一项用户定义的防火墙规则在此<i>应用</i>尝试连接至<i>非计费网络</i>时将其拦截。<br><br>若需更改，请移步<i>所有应用</i>选项卡。]]></string>
     <string name="settings_protocol_translation_dns_inactive">切换至 DNS 或 DNS + 防火墙模式以启用此设置</string>
     <string name="firewall_card_text_active">拦截 %1$s
 \n绕过 %2$s
@@ -653,9 +653,9 @@
     <string name="rules_load_failure_heading">注意</string>
     <string name="rules_load_failure_desc">未找到防火墙规则</string>
     <string name="settings_local_blocklist_in_use">正使用 %1$s 个屏蔽名单</string>
-    <string name="firewall_rule_new_app_desc"><![CDATA[此应用是<i>首次</i>连接。<br/><br/>若需更改，请移步<i>全局</i>选项卡。]]></string>
-    <string name="firewall_rule_block_app_univ_mobile_desc"><![CDATA[一项用户定义的全局防火墙规则在此<i>应用</i>尝试连接至<i>计费网络</i>（移动数据）时将其拦截。<br/><br/>若需更改，请移步<i>全局</i>选项卡。]]></string>
-    <string name="firewall_rule_block_ip_desc"><![CDATA[一项用户定义的全局防火墙规则拦截了此<i>目标 IP </i><br/><br/>若需更改，请移步<i>分应用防火墙</i>屏。]]></string>
+    <string name="firewall_rule_new_app_desc"><![CDATA[此应用是<i>首次</i>连接。<br><br>若需更改，请移步<i>全局</i>选项卡。]]></string>
+    <string name="firewall_rule_block_app_univ_mobile_desc"><![CDATA[一项用户定义的全局防火墙规则在此<i>应用</i>尝试连接至<i>计费网络</i>（移动数据）时将其拦截。<br><br>若需更改，请移步<i>全局</i>选项卡。]]></string>
+    <string name="firewall_rule_block_ip_desc"><![CDATA[一项用户定义的全局防火墙规则拦截了此<i>目标 IP </i><br><br>若需更改，请移步<i>分应用防火墙</i>屏。]]></string>
     <string name="dc_local_block_enabled">已启用</string>
     <string name="rules_load_failure_reload">刷新</string>
     <string name="hs_btm_sheet_lock_down">无法在 VPN 处于<i>锁定模式</i>时更换模式。轻触以&lt;u&gt;编辑 VPN 设置&lt;/u&gt;。</string>
@@ -667,10 +667,10 @@
     <string name="accessibility_notification_content">Rethink 的无障碍服务已停止或崩溃。现已不再拦截后台应用。轻触以重新启用。</string>
     <string name="firewall_rule_univ_block_metered">计费网络（全局）</string>
     <string name="firewall_rule_block_app_desc"><![CDATA[一项用户定义的防火墙规则拦截了此<i>应用</i>。<br/><br/>若需更改，请移步<i>所有应用</i>选项卡。]]></string>
-    <string name="firewall_rule_block_app_mobile_desc"><![CDATA[一项用户定义的防火墙规则在此<i>应用</i>尝试连接至<i>计费网络</i>时将其拦截。<br/><br/>若需更改，请移步<i>所有应用</i>选项卡。]]></string>
-    <string name="firewall_rule_device_lock_desc"><![CDATA[此连接因<i>设备被锁定</i>而被拦截。<br/><br/>若需变更此行为，请至<i>全局</i>选项卡。]]></string>
-    <string name="firewall_rule_trusted_ip_desc"><![CDATA[此连接因此<i>目标 IP</i> 被设置为已信任 IP 而被放行。<br/><br/>若需更改，请移步<i>分应用防火墙</i>屏。]]></string>
-    <string name="firewall_rule_unknown_desc"><![CDATA[此连接因无法确定<i>来源应用</i>而被拦截。<br/><br/>若需变更此行为，请至<i>全局</i>选项卡。]]></string>
+    <string name="firewall_rule_block_app_mobile_desc"><![CDATA[一项用户定义的防火墙规则在此<i>应用</i>尝试连接至<i>计费网络</i>时将其拦截。<br><br>若需更改，请移步<i>所有应用</i>选项卡。]]></string>
+    <string name="firewall_rule_device_lock_desc"><![CDATA[此连接因<i>设备被锁定</i>而被拦截。<br><br>若需变更此行为，请至<i>全局</i>选项卡。]]></string>
+    <string name="firewall_rule_trusted_ip_desc"><![CDATA[此连接因此<i>目标 IP</i> 被设置为已信任 IP 而被放行。<br><br>若需更改，请移步<i>分应用防火墙</i>屏。]]></string>
+    <string name="firewall_rule_unknown_desc"><![CDATA[此连接因无法确定<i>来源应用</i>而被拦截。<br><br>若需变更此行为，请至<i>全局</i>选项卡。]]></string>
     <string name="ada_app_unmetered">非计费网络</string>
     <string name="firewall_rule_bypass_universal_ip_desc"><![CDATA[此连接因此<i>目标 IP</i> 被设置为绕过所有全局规则而被放行。<br/><br/>若需更改，请移步<i>全局</i>选项卡。]]></string>
     <string name="notif_channel_desc_firewall_alerts">在防火墙错误与异常时提醒我</string>
@@ -782,8 +782,8 @@
     <string name="cd_no_rules_text" translatable="true">无域名规则。</string>
     <string name="firewall_rule_trusted_domain" translatable="true">信任域名（应用）</string>
     <string name="firewall_rule_block_domain" translatable="true">域名（应用）</string>
-    <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[此连接因此<i>域名</i>被设置为信任域名而被放行。<br/><br/>若需更改，请移步<i>分应用防火墙</i>屏。]]></string>
-    <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[一项用户定义的全局防火墙规则拦截了此<i>域名</i>。<br/><br/>若需更改，请移步<i>分应用防火墙</i>屏。]]></string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[此连接因此<i>域名</i>被设置为信任域名而被放行。<br><br>若需更改，请移步<i>分应用防火墙</i>屏。]]></string>
+    <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[一项用户定义的全局防火墙规则拦截了此<i>域名</i>。<br><br>若需更改，请移步<i>分应用防火墙</i>屏。]]></string>
     <string name="bsdl_block_desc" translatable="true">拦截、信任<u>此域名</u></string>
     <string name="bypass_dns_firewall" translatable="true">绕行 DNS 与防火墙</string>
     <string name="firewall_card_universal_rules" translatable="true">%1$s 项全局规则</string>
@@ -818,10 +818,10 @@
     <string name="firewall_rule_bypass_dns_firewall" translatable="true">已绕行应用</string>
     <string name="firewall_rule_domain_blocked_univ" translatable="true">域名（全局）</string>
     <string name="firewall_rule_domain_trusted_univ" translatable="true">信任域名（全局）</string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[此连接因<i>来源应用</i><i>绕行 DNS 及防火墙</i>规则而被放行。<br/><br/>若需更改，请移步<i>分应用防火墙</i>屏幕。]]></string>
-    <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[此连接被拦截因为<i>域名</i> 被用户的首选 DNS 更改。<br/><br/> 要更改此行为，请转到 <i>配置 DNS</i> 选项卡。]]></string>
-    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[此连接因<i>域名</i>被全局域名规则拦截而被拦截。<br/><br/>若需变更此行为，请移步 <i>DNS 配置</i>选项卡。]]></string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[此连接因<i>域名</i>被全局域名规则信任而被放行。<br/><br/>若需变更此行为，请移步 <i>DNS 配置</i>选项卡。]]></string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[此连接因<i>来源应用</i><i>绕行 DNS 及防火墙</i>规则而被放行。<br><br>若需更改，请移步<i>分应用防火墙</i>屏幕。]]></string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[此连接被拦截因为<i>域名</i> 被用户的首选 DNS 更改。<br><br> 要更改此行为，请转到 <i>配置 DNS</i> 选项卡。]]></string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[此连接因<i>域名</i>被全局域名规则拦截而被拦截。<br><br>若需变更此行为，请移步 <i>DNS 配置</i>选项卡。]]></string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[此连接因<i>域名</i>被全局域名规则信任而被放行。<br><br>若需变更此行为，请移步 <i>DNS 配置</i>选项卡。]]></string>
     <string name="dc_setting_dns_cache_heading" translatable="true">DNS 加速器</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">合并请求，缓存响应，弹性应对错误</string>
     <string name="ada_app_firewall" translatable="true">防火墙</string>
@@ -844,7 +844,7 @@
     <string name="univ_firewall_heading" translatable="true">全局防火墙规则</string>
     <string name="app_ip_domain_rules" translatable="true">分应用 IP / 域名规则</string>
     <string name="app_ip_domain_rules_desc" translatable="true">修改分应用的 IP / 域名规则。</string>
-    <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[此连接已代理并转发至用戶选择的代理。<br/><br/> 若需更改，请移步<i>配置</i>屏下的<i>代理</i>。]]></string>
+    <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[此连接已代理并转发至用戶选择的代理。<br><br> 若需更改，请移步<i>配置</i>屏下的<i>代理</i>。]]></string>
     <string name="key_length_explanation_base64" translatable="true">： WireGuard Base64 密钥必须为 44 字符（ 32 字节）</string>
     <string name="illegal_filename_error" translatable="true">非法文件名“%s”</string>
     <string name="add_peer" translatable="true">添加对等端点</string>
@@ -1050,7 +1050,7 @@
     <string name="univ_delete_domain_dialog_title" translatable="true">是否删除所有域名规则？</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">删除这些规则后会允许任何应用连接这些当前被拦截的域名。</string>
     <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[此连接正在寻找一个不存在的<i>私人 DNS</i> 服务器。]]></string>
-    <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[此连接因<i>应用</i>设为<i>绕过代理</i>规则而被放行。<br/><br/>若需更改，请移步<i>分应用防火墙</i>屏。]]></string>
+    <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[此连接因<i>应用</i>设为<i>绕过代理</i>规则而被放行。<br><br>若需更改，请移步<i>分应用防火墙</i>屏。]]></string>
     <string name="lbl_default" translatable="true">默认</string>
     <string name="lbl_action" translatable="true">操作</string>
     <string name="lbl_connect" translatable="true">连接</string>
@@ -1085,8 +1085,8 @@
     <string name="lbl_criteria" translatable="true">筛选条件</string>
     <string name="settings_theme_dialog_themes_7" translatable="true">霜白</string>
     <string name="firewall_rule_paused_app_desc" translatable="true"><![CDATA[该连接被允许因 <i>应用</i> 处于 <i>暂停</i> 状态。]]></string>
-    <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[此连接被拦截因 WireGuard 处于 <i>锁定</i> 模式。<br/><br/>要更改请转到 <i>WireGuard</i> 屏。]]></string>
-    <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[此连接被拦截因没有选择为应用所选的 <i>代理</i> 。<br/><br/> 要更改请从 <i>配置</i> 屏转到 <i>代理</i>。]]></string>
+    <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[此连接被拦截因 WireGuard 处于 <i>锁定</i> 模式。<br><br>要更改请转到 <i>WireGuard</i> 屏。]]></string>
+    <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[此连接被拦截因没有选择为应用所选的 <i>代理</i> 。<br><br> 要更改请从 <i>配置</i> 屏转到 <i>代理</i>。]]></string>
     <string name="wireguard_disable_failure_relay" translatable="true">哎，这个 WireGuard 中继功能关不掉啦~</string>
     <string name="endpoint_independent_mapping_title" translatable="true">不挑设备的端口映射</string>
     <string name="endpoint_independent_mapping_desc" translatable="true">开了这个之后UDP 套接字会给所有目标地址都固定用同一个地址和端口。</string>
@@ -1168,4 +1168,18 @@
     <string name="smart_dns" translatable="true">智能 DNS</string>
     <string name="smart_dns_desc" translatable="true"><i>智能 DNS</i> 会随机使用以下任意一个 DNS 解析器：</string>
     <string name="title_database_dump" translatable="true">数据库</string>
+    <string name="stability_program_snackbar_msg" translatable="true">启用了稳定性项目。崩溃报告帮助改进实验性功能。</string>
+    <string name="stability_program_snackbar_disable" translatable="true">禁用</string>
+    <string name="server_selection_selected_count">%1$s / %2$s</string>
+    <plurals name="server_count">
+        <item quantity="other">%1$d 台服务器</item>
+    </plurals>
+    <plurals name="peer_count">
+        <item quantity="other">%d 个对端</item>
+    </plurals>
+    <string name="rethink_plus_purchased_state" translatable="true">已购买</string>
+    <string name="tour_step_counter">%2$d 个步骤中的第 %1$d 个</string>
+    <string name="tour_btn_next">下一步</string>
+    <string name="tour_btn_finish">好的</string>
+    <string name="tour_btn_skip">跳过向导</string>
 </resources>
