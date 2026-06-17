@@ -345,9 +345,7 @@
     <string name="apps_card_ips_count">%1$s aturan IP &amp; Port</string>
     <string name="dns_connected_rethink_plus">Terhubung. %1$s daftar blokir yang digunakan</string>
     <string name="fapps_firewall_filter_desc_category"><![CDATA[Menampilkan <u>%1$s</u> %2$s aplikasi dalam kategori: %3$s]]></string>
-    <string name="alert_firewall_accessibility_regrant_explanation">Layanan aksesibilitas Rethink terhenti atau mengalami kegagalan. <i><b>Masuk ke Pengaturan dan Hentikan Paksa</b></i> dan mulai ulang untuk menggunakan fitur<i>Blokir aplikasi apapun yang tidak digunakan</i>.
-\n
-\nRethink menggunakan layanan aksesibilitas untuk mengawasi aplikasi yang sedang digunakan (latar depan) dan aplikasi yang tidak digunakan (latar belakang).</string>
+    <string name="alert_firewall_accessibility_regrant_explanation">Layanan aksesibilitas Rethink terhenti atau mengalami kegagalan. <i><b>Masuk ke Pengaturan dan Hentikan Paksa</b></i> dan mulai ulang untuk menggunakan fitur <i>Blokir aplikasi apapun yang tidak digunakan</i>.\n\nRethink menggunakan layanan aksesibilitas untuk mengawasi aplikasi yang sedang digunakan (latar depan) dan aplikasi yang tidak digunakan (latar belakang).</string>
     <string name="firewall_act_universal_tab">universal</string>
     <string name="cd_dialog_error_invalid_domain">URL atau nama domain tidak valid</string>
     <string name="settings_socks5_dialog_hint_username">Nama pengguna (tidak wajib)</string>
@@ -399,7 +397,7 @@
     <string name="firewall_status_whitelisted">Aturan firewall universal dilewati (di-bypass)</string>
     <string name="vpn_profile_error">Tidak dapat membuka konfigurasi profil VPN.</string>
     <string name="settings_socks_forwarding_desc">Meneruskan ke %1$s:%2$s, %3$s</string>
-    <string name="refresh_complete"><!-- use dc_refresh_toast -->Sinkronisasi ulang daftar aplikasi selesai.</string>
+    <string name="refresh_complete"><!-- use dc_refresh_toast --> Sinkronisasi ulang daftar aplikasi selesai.</string>
     <string name="app_mode_dns_firewall">DNS dan Firewall (bawaan)</string>
     <string name="settings_socks5_vpn_disabled_error">Mulai Rethink untuk melanjutkan.</string>
     <string name="settings_http_proxy_desc">Meneruskan ke %1$s</string>
@@ -659,8 +657,8 @@
     <string name="settings_allow_bypass_desc">Izinkan aplikasi yang meminta untuk mengakses semua jaringan yang tersedia. Aplikasi ini dapat mem-bypass terowongan VPN Rethink sesuai permintaan. Beberapa aplikasi konferensi audio/video seperti Zoom dan Meet mungkin memerlukan ini agar berfungsi dengan baik.</string>
     <string name="settings_https_desc">Meneruskan koneksi ke titik akhir KONEKSI HTTP(S) .</string>
     <string name="orbot_none_desc">Tidak satu pun dari yang di atas.</string>
-    <string name="show_logs_disabled_dns_message">Pencatatan permintaan DNS telah dinonaktifkan. Untuk mengaktifkan kembali, pergi ke<i>Pengaturan</i> dan nyalakan <i>Aktifkan logging di perangkat.</i></string>
-    <string name="show_logs_disabled_network_message">Pencatatan koneksi telah dinonaktifkan. Untuk mengaktifkan kembali, pergi ke<i>Pengaturan</i> dan nyalakan <i>Aktifkan logging di perangkat.</i></string>
+    <string name="show_logs_disabled_dns_message">Pencatatan permintaan DNS telah dinonaktifkan. Untuk mengaktifkan kembali, pergi ke <i>Pengaturan</i> dan nyalakan <i>Aktifkan logging di perangkat.</i></string>
+    <string name="show_logs_disabled_network_message">Pencatatan koneksi telah dinonaktifkan. Untuk mengaktifkan kembali, pergi ke <i>Pengaturan</i> dan nyalakan <i>Aktifkan logging di perangkat.</i></string>
     <string name="settings_custom_downloader_desc">Jika dinonaktifkan, <i>Pengelola Unduhan</i> bawaan Android digunakan</string>
     <string name="settings_theme_dialog_themes_4">Hitam Pekat</string>
     <string name="dns_card_latency_active">%1$sms</string>
@@ -921,7 +919,7 @@
     <string name="lbl_optional" translatable="true">(opsional)</string>
     <string name="lbl_allowed_ips" translatable="true">IP yang diizinkan</string>
     <string name="lbl_save" translatable="true">simpan</string>
-    <string name="status_protected_with_wg_private_dns" translatable="true">Dilindungi oleh WireGuard &amp; DNS Privat</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">dilindungi oleh wireguard &amp; dns privat</string>
     <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
     <string name="lbl_qr_code" translatable="true">Kode QR</string>
     <string name="lbl_import" translatable="true">Impor</string>
