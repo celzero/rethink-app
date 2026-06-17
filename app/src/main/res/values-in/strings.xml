@@ -584,9 +584,7 @@
     <string name="brbs_restore_dialog_positive">Pulihkan</string>
     <string name="brbs_restore_dialog_title">Pulihkan cadangan</string>
     <string name="brbs_restore_dialog_failure_title">Pemulihan gagal</string>
-    <string name="private_dns_dialog_desc">Pengaturan DNS Rethink ditimpa oleh DNS Pribadi Android.
-\n
-\nUntuk menggunakan DNS Rethink, buka Pengaturan Android dan matikan \"DNS Pribadi\".</string>
+    <string name="private_dns_dialog_desc">Pengaturan DNS Rethink ditimpa oleh DNS Pribadi Android. \n \nUntuk menggunakan DNS Rethink, buka Pengaturan Android dan matikan \"DNS Pribadi\".</string>
     <string name="untracked">tidak terlacak</string>
     <string name="private_dns_dialog_heading">Matikan DNS Pribadi</string>
     <string name="private_dns_dialog_positive">Masuk ke Pengaturan</string>
