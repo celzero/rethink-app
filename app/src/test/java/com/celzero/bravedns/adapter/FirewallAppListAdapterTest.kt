@@ -125,7 +125,7 @@ class FirewallAppListAdapterTest {
         coEvery { FirewallManager.getAppNamesByUid(any()) } returns listOf("TestApp")
         coEvery { FirewallManager.updateFirewallStatus(any(), any(), any()) } just Runs
 
-        every { ProxyManager.getProxyIdForApp(any()) } returns ProxyManager.ID_NONE
+        every { ProxyManager.getProxyIdForApp(any()) } returns listOf(ProxyManager.ID_NONE)
         every { eventLogger.log(any(), any(), any(), any()) } just Runs
 
         adapter = FirewallAppListAdapter(context, lifecycleOwner, eventLogger)
@@ -227,7 +227,7 @@ class FirewallAppListAdapterTest {
     @Test
     fun `test proxy manager integration`() = testScope.runTest {
         val expectedProxyId = "test_proxy_id"
-        every { ProxyManager.getProxyIdForApp(any()) } returns expectedProxyId
+        every { ProxyManager.getProxyIdForApp(any()) } returns listOf(expectedProxyId)
 
         val appInfo = createTestAppInfo(uid = 5678, isProxyExcluded = false)
         mockViewHolder.update(appInfo)
