@@ -1692,7 +1692,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
     override fun onServerGroupRemoved(group: VpnServerAdapter.ServerGroup) {
         // AUTO is always kept connected
-        if (group.key == AUTO_SERVER_ID || group.servers.any { it.id == AUTO_SERVER_ID }) {
+        if (group.key.equals(AUTO_SERVER_ID, true) || group.servers.any { it.id.equals(AUTO_SERVER_ID, true) }) {
             showToast(getString(R.string.server_selection_auto_always_on))
             return
         }
@@ -1777,7 +1777,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         var visibleCount = 0
         for (cc in topCcs) {
             if (cc in selectedCcs) continue
-            val rep = allServers.firstOrNull { it.cc == cc && it.id != AUTO_SERVER_ID } ?: continue
+            val rep = allServers.firstOrNull { it.cc == cc && !it.id.equals(AUTO_SERVER_ID, true) } ?: continue
             chipGroup.addView(buildFrequentChip(rep))
             visibleCount++
         }
@@ -2104,12 +2104,12 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 val servers = withContext(Dispatchers.IO) {
                     try { RpnProxyManager.getWinServers() } catch (_: Exception) { emptyList() }
                 }
-                val hasRealServers = servers.any { it.id != AUTO_SERVER_ID }
+                val hasRealServers = servers.any { !it.id.equals(AUTO_SERVER_ID, true) }
 
                 Logger.d(
                     LOG_TAG_UI,
                     "$TAG: registration poll, hasTunnel=$hasTunnel, winRegistered=$winRegistered, " +
-                        "realServers=${servers.count { it.id != AUTO_SERVER_ID }}, elapsed=${elapsed}ms"
+                        "realServers=${servers.count { !it.id.equals(AUTO_SERVER_ID, true) }}, elapsed=${elapsed}ms"
                 )
 
                 if (!hasTunnel) {
