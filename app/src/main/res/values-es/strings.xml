@@ -1054,7 +1054,7 @@
     <string name="catch_all_wg_dialog_title" translatable="true">Siempre activo</string>
     <string name="routing_remaining_apps" translatable="true">Enrutamiento de las aplicaciones restantes</string>
     <string name="settings_rinr_dialog_title" translatable="true">Bucle invertido (experimental)</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">También activa el ajuste <!--settings_network_all_networks--> de %1$s. ¿Quiere proceder?</string>
+    <string name="settings_rinr_dialog_desc" translatable="true">También activa el ajuste<!--settings_network_all_networks--> %1$s. ¿Quiere proceder?</string>
     <string name="wg_apps_dialog_title_exclude" translatable="true">Excluye %1$s aplicaciones</string>
     <string name="wireguard_disable_title" translatable="true">Detener WireGuard</string>
     <string name="lbl_remaining_apps" translatable="true">Aplicaciones restantes</string>
@@ -1156,10 +1156,10 @@
     <string name="firewall_rule_lockdown_wg" translatable="true">Proxy en modo bloqueo</string>
     <string name="firewall_rule_proxy_error" translatable="true">Error de proxy</string>
     <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[Esta conexión está buscando un servidor de <i>DNS privado</i> que no existe.]]></string>
-    <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[Se permitió esta conexión porque la <i>aplicación de origen</i> está configurada para<i>omitir las reglas del proxy</i>.<br/><br/> Para cambiarlo vaya a la pantalla<i>Cortafuegos específico de la aplicación</i>.]]></string>
-    <string name="firewall_rule_paused_app_desc" translatable="true"><![CDATA[Se permitió esta conexión porque la <i>aplicación</i> está en estado<i>pausado</i>.]]></string>
-    <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[Esta conexión fue bloqueada porque WireGuard está en modo <i>bloqueo</i>.<br/><br/> Para cambiarlo vaya a la pantalla<i>WireGuard</i>.]]></string>
-    <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[Esta conexión fue bloqueada porque el <i>proxy</i> seleccionado para la aplicación no está elegido.<br/><br/> Para cambiarlo vaya a<i>Proxy</i> desde la pantalla<i>Configurar</i>.]]></string>
+    <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[Se permitió esta conexión porque la <i>aplicación de origen</i> está configurada para <i>omitir las reglas del proxy</i>.<br/><br/> Para cambiarlo vaya a la pantalla <i>Cortafuegos específico de la aplicación</i>.]]></string>
+    <string name="firewall_rule_paused_app_desc" translatable="true"><![CDATA[Se permitió esta conexión porque la <i>aplicación</i> está en estado <i>pausado</i>.]]></string>
+    <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[Esta conexión fue bloqueada porque WireGuard está en modo <i>bloqueo</i>.<br/><br/> Para cambiarlo vaya a la pantalla <i>WireGuard</i>.]]></string>
+    <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[Esta conexión fue bloqueada porque el <i>proxy</i> seleccionado para la aplicación no está elegido.<br/><br/> Para cambiarlo vaya a <i>Proxy</i> desde la pantalla <i>Configurar</i>.]]></string>
     <string name="wireguard_disable_failure_relay" translatable="true">\"Relay WireGuard\" no se puede desactivar</string>
     <string name="console_log_title" translatable="true">Registros de la aplicación</string>
     <string name="do_not_randomize_listen_port_title" translatable="true">No aleatorizar el puerto de escucha de WireGuard</string>
@@ -1192,7 +1192,7 @@
     <string name="hop_add_remove_title" translatable="true">Añadir / eliminar retransmisión</string>
     <string name="bypasses_network_restrictions" translatable="true">Las comprobaciones de alcance omiten todas las restricciones de red. En modo <i>Auto</i>, Rethink usa aleatoriamente IPs y nombres de host conectados previamente.</string>
     <string name="adv_tasker_dialog_edit_hint" translatable="true">Introduzca el nombre del paquete (ejemplo: net.dinglisch.android.taskerm)</string>
-    <string name="download_ip_info_desc" translatable="true">Obtiene detalles del proveedor de servicios para sitios web desde <i>rethinkdns.com</i>, con tecnología de<i>%1$s</i></string>
+    <string name="download_ip_info_desc" translatable="true">Obtiene detalles del proveedor de servicios para sitios web desde <i>rethinkdns.com</i>, con tecnología de <i>%1$s</i></string>
     <string name="top_active_conns" translatable="true">principales conexiones activas</string>
     <string name="load_more" translatable="true">Cargar todo</string>
     <string name="local_blocklist_delete_desc" translatable="true">¿Eliminar las listas de bloqueo en el dispositivo?</string>
@@ -1233,11 +1233,11 @@
     <string name="settings_locale_dialog_default" translatable="true">Predeterminado del sistema</string>
     <string name="settings_allow_incoming_wg_packets" translatable="true">WireGuard P2P</string>
     <string name="settings_allow_incoming_wg_packets_desc" translatable="true">Cuando está activado, permite conexiones entrantes iniciadas por pares de WireGuard.</string>
-    <string name="lockdown_download_message" translatable="true">El <i>Gestor de descargas</i> integrado de Android puede fallar porque la VPN está en modo<i>Bloqueo</i>. ¿Activar en su lugar el descargador de Rethink?</string>
+    <string name="lockdown_download_message" translatable="true">El <i>Gestor de descargas</i> integrado de Android puede fallar porque la VPN está en modo <i>Bloqueo</i>. ¿Activar en su lugar el descargador de Rethink?</string>
     <string name="lockdown_download_enable_inapp" translatable="true">Activar descargador</string>
     <string name="settings_jumbo_packets" translatable="true">Impulsor de ancho de banda</string>
     <string name="settings_jumbo_packets_desc" translatable="true">Usa <i>paquetes jumbo</i> dentro del túnel VPN de Rethink.</string>
     <string name="settings_tunnel_metered" translatable="true">Siempre medido</string>
     <string name="settings_tunnel_metered_desc" translatable="true">Marcar el túnel VPN de Rethink como medido para indicar a las aplicaciones que consuman menos datos. Precaución: esto puede hacer que algunas aplicaciones pausen cargas y descargas grandes, como copias de seguridad.</string>
-    <string name="stability_program_toast" translatable="true">Inscrito en el <i>programa de estabilidad</i> para<i>funciones experimentales</i>.</string>
+    <string name="stability_program_toast" translatable="true">Inscrito en el <i>programa de estabilidad</i> para <i>funciones experimentales</i>.</string>
 </resources>
