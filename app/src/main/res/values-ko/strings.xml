@@ -1125,14 +1125,12 @@
     <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[이 연결은 사용자 선호 프록시로 포워딩되었습니다.<br/><br/> 변경하려면 <i>설정</i> 화면에서 <i>프록시</i>로 이동하세요.]]></string>
     <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[이 연결은 <i>소스 앱</i>에 <i>프록시 우회</i> 규칙이 설정되었기 때문에 허용되었습니다.<br/><br/> 변경하려면 <i>앱별 방화벽</i> 화면으로 이동하세요.]]></string>
     <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[이 연결은 앱에 대한 <i>프록시</i>가 선택되지 않았기 때문에 차단되었습니다.<br/><br/> 변경하려면 <i>설정</i> 화면에서 <i>프록시</i>로 이동합니다.]]></string>
-    <string name="server_selection_selected_count">%1$s / %2$s</string>
     <plurals name="server_count">
         <item quantity="other">서버 %1$d개</item>
     </plurals>
     <plurals name="peer_count">
         <item quantity="other">피어 %d개</item>
     </plurals>
-    <string name="rethink_plus_purchased_state" translatable="true">구매함</string>
     <string name="tour_step_counter">%1$d / %2$d</string>
     <string name="tour_btn_next">다음</string>
     <string name="tour_btn_finish">확인</string>

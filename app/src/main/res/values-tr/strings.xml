@@ -1184,7 +1184,6 @@
     <string name="dns_record_types_auto_mode_status" translatable="true">Oto (Tüm tipler)</string>
     <string name="stability_program_snackbar_msg" translatable="true">Stabilite programı etkinleştirildi. Çökme raporları, deneysel özelliklerin geliştirilmesine yardım eder.</string>
     <string name="stability_program_snackbar_disable" translatable="true">Kapat</string>
-    <string name="server_selection_selected_count">%1$s / %2$s</string>
     <plurals name="server_count">
         <item quantity="one">%1$d sunucu</item>
         <item quantity="other">%1$d sunucu</item>
@@ -1193,7 +1192,6 @@
         <item quantity="one">%d eş</item>
         <item quantity="other">%d eş</item>
     </plurals>
-    <string name="rethink_plus_purchased_state" translatable="true">Satın alındı</string>
     <string name="tour_step_counter">%1$d / %2$d</string>
     <string name="tour_btn_next">İleri</string>
     <string name="tour_btn_finish">Anladım</string>

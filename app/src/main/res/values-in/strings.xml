@@ -1250,14 +1250,12 @@
     <string name="cd_allowed_dns_record_types_desc" translatable="true">Pilih jenis catatan sumber daya DNS yang diizinkan.</string>
     <string name="dns_record_types_auto_mode_status" translatable="true">Otomatis (Semua jenis)</string>
     <string name="stability_program_snackbar_disable" translatable="true">Nonaktifkan</string>
-    <string name="server_selection_selected_count">%1$s / %2$s</string>
     <plurals name="server_count">
         <item quantity="other">%1$d server</item>
     </plurals>
     <plurals name="peer_count">
         <item quantity="other">%d rekan</item>
     </plurals>
-    <string name="rethink_plus_purchased_state" translatable="true">Dibeli</string>
     <string name="tour_step_counter">%1$d dari %2$d</string>
     <string name="tour_btn_next">Berikutnya</string>
     <string name="tour_btn_finish">Mengerti</string>

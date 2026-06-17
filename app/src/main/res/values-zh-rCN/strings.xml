@@ -1170,14 +1170,12 @@
     <string name="title_database_dump" translatable="true">数据库</string>
     <string name="stability_program_snackbar_msg" translatable="true">启用了稳定性项目。崩溃报告帮助改进实验性功能。</string>
     <string name="stability_program_snackbar_disable" translatable="true">禁用</string>
-    <string name="server_selection_selected_count">%1$s / %2$s</string>
     <plurals name="server_count">
         <item quantity="other">%1$d 台服务器</item>
     </plurals>
     <plurals name="peer_count">
         <item quantity="other">%d 个对端</item>
     </plurals>
-    <string name="rethink_plus_purchased_state" translatable="true">已购买</string>
     <string name="tour_step_counter">%2$d 个步骤中的第 %1$d 个</string>
     <string name="tour_btn_next">下一步</string>
     <string name="tour_btn_finish">好的</string>

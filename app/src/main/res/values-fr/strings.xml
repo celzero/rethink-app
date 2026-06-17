@@ -1172,7 +1172,6 @@
     <string name="dns_record_types_auto_mode_status" translatable="true">Auto (Tous types)</string>
     <string name="stability_program_snackbar_msg" translatable="true">Le mode stabilité est activé. Les rapports d\'erreurs contribuent à l\'amélioration des fonctionnalités expérimentales.</string>
     <string name="stability_program_snackbar_disable" translatable="true">Désactiver</string>
-    <string name="server_selection_selected_count">%1$s / %2$s</string>
     <plurals name="server_count">
         <item quantity="one">%1$d serveur</item>
         <item quantity="many">%1$d serveurs</item>
@@ -1183,7 +1182,6 @@
         <item quantity="many">%d pairs</item>
         <item quantity="other">%d pairs</item>
     </plurals>
-    <string name="rethink_plus_purchased_state" translatable="true">Acheté</string>
     <string name="tour_step_counter">%1$d sur %2$d</string>
     <string name="tour_btn_next">Suivant</string>
     <string name="tour_btn_finish">J\'ai compris</string>

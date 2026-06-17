@@ -1189,5 +1189,4 @@
     <string name="dns_record_types_auto_mode_status" translatable="true">Auto (toate tipurile)</string>
     <string name="stability_program_snackbar_msg" translatable="true">Programul de stabilitate activat. Rapoartele de erori ajută la îmbunătățirea funcționalităților experimentale.</string>
     <string name="stability_program_snackbar_disable" translatable="true">Dezactivează</string>
-    <string name="server_selection_selected_count">%1$s / %2$s</string>
 </resources>
