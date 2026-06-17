@@ -24,7 +24,7 @@
     <string name="finish">Termina</string>
     <string name="slide_2_title">Benvenuto/a</string>
     <string name="slide_2_desc">Rethink è il modo più semplice per monitorare l\'attività di rete, aggirare la censura di Internet e attivare un firewall per le app del tuo dispositivo Android.</string>
-    <string name="slide_1_title">"Gratuito e  con sorgente pubblica"</string>
+    <string name="slide_1_title">Gratuito e con sorgente pubblica</string>
     <string name="slide_1_desc">Rethink è un software con sorgente pubblica sostenuto dal programma Mozilla Builders MVP.</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="allow">consenti</string>
@@ -276,7 +276,7 @@
     <string name="fav_icon">fav_icon</string>
     <string name="unicode_warning_sign">⚠</string>
     <string name="socks5_proxy_toast_parameter">Proxy SOCKS5</string>
-    <string name="firewall_rule_trusted_ip_desc"><![CDATA[Questa connessione è stata consentita perché l\'<i>IP di destinazione</i> è stato autorizzato.<br/><br/> Per modificare, vai alla schermata <i>del firewall specifica per l\'app</i>.]]></string>
+    <string name="firewall_rule_trusted_ip_desc"><![CDATA[Questa connessione è stata consentita perché l\'<i>IP di destinazione</i> è stato autorizzato.<br><br> Per modificare, vai alla schermata <i>del firewall specifica per l\'app</i>.]]></string>
     <string name="notif_dialog_pause_dialog_title">App in pausa!</string>
     <string name="notif_channel_desc_proxy_failure">Ti avvisa su errori e anomalie del Proxy</string>
     <string name="notif_channel_desc_vpn_notification">Ti informa quando Rethink è attivo e in esecuzione in background</string>
@@ -334,16 +334,9 @@
     <string name="settings_notification_desc2">DNS / DNS + Firewall</string>
     <string name="settings_notification_desc3">Nessuno</string>
     <string name="settings_notification_dialog_title">Scegli azioni da notifica</string>
-    <string name="settings_notification_dialog_option_1">"
-\nPausa / Arresta (predefinito):
-\nMostra due pulsanti, per mettere rapidamente in pausa o arrestare Rethink."</string>
-    <string name="settings_notification_dialog_option_2">"
-\nDNS / DNS + Firewall:
-\nMostra due pulsanti per passare rapidamente dalla modalità DNS a risparmio di batteria alla modalità DNS + Firewall."</string>
-    <string name="settings_notification_dialog_option_3">"
-\nNessuno:
-\nNon mostra alcun pulsante.
-\n"</string>
+    <string name="settings_notification_dialog_option_1">\nPausa / Arresta (predefinito):\n\nMostra due pulsanti, per mettere rapidamente in pausa o arrestare Rethink.</string>
+    <string name="settings_notification_dialog_option_2">\nDNS / DNS + Firewall:\nMostra due pulsanti per passare rapidamente dalla modalità DNS a risparmio di batteria alla modalità DNS + Firewall.</string>
+    <string name="settings_notification_dialog_option_3">\nNessuno:\nNon mostra alcun pulsante.\n</string>
     <string name="settings_selected_theme">Tema corrente: %1$s</string>
     <string name="apps_icon_content_desc">Icona dell\'app</string>
     <string name="firewall_status_isolate">isolato</string>
@@ -471,8 +464,8 @@
     <string name="ctbs_app_info_not_available_toast">Pagina delle impostazioni dell\'app non trovata</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s altre app</string>
     <string name="ctbs_block_other_apps">Le regole applicate a %1$s saranno applicate anche a %2$s altre applicazioni</string>
-    <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s liste dei filtri&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
-    <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
+    <string name="dns_btm_sheet_dialog_message"><Data><![CDATA[ <h3><![CDATA[ <h3><u><font size="8">%1$s</font></u>;%2$s liste filtri</h3>%3$s<br/><br/>]]></Data></string>
+    <string name="dns_btm_sheet_dialog_ips"><Data><![CDATA[ %1$s %2$s <br/>]]></Data></string>
     <string name="dns_btm_sheet_chip">+%1$s altri IP</string>
     <string name="dns_btm_sheet_chip_no_answer">Nessuna risposta</string>
     <string name="dns_btm_resolved_crypt">risolto <u>anonimamente</u> %1$s da %2$s tramite %3$s</string>
@@ -577,20 +570,20 @@
     <string name="firewall_rule_block_http">HTTP non sicuro</string>
     <string name="firewall_rule_global_lockdown">Quarantena</string>
     <string name="firewall_rule_no_rule_desc">Nessuna regola del firewall coincide con questa connessione.</string>
-    <string name="firewall_rule_block_app_desc"><![CDATA[Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>app</i>.<br/><br/> Per modificarla, vai a <i>Tutte le app</i>.]]></string>
-    <string name="firewall_rule_new_app_desc"><![CDATA[Quest\'app si è connessa per la <i>prima</i> volta.<br/><br/> Per modificare vai a <i>Regole Universali</i>.]]></string>
-    <string name="firewall_rule_block_app_unmetered_desc"><![CDATA[Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>app</i> dal connettersi alla rete <i>Non a consumo</i>.<br/><br/> Per modificarla, vai a <i>Tutte le app</i>.]]></string>
-    <string name="firewall_rule_block_app_mobile_desc"><![CDATA[Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>app</i> dal connettersi alla rete <i>A consumo</i>.<br/><br/> Per modificarla, vai a <i>Tutte le app</i>.]]></string>
-    <string name="firewall_rule_isolate_desc"><![CDATA[Una regola del firewall impostata dall\'utente consente a quest\'<i>app</i> di connettersi solo a <i>IP che aggirano il firewall</i>.<br/><br/> Per modificarla, vai a <i>Tutte le app</i>.]]></string>
-    <string name="firewall_rule_block_app_univ_mobile_desc"><![CDATA[Una regola universale del firewall impostata dall\'utente ha bloccato quest\'<i>app</i> dal connettersi alla rete <i>A consumo (dati mobili)</i>.<br/><br/> Per modificarla, vai a <i>Tutte le app</i>.]]></string>
-    <string name="firewall_rule_block_ip_univ_desc"><![CDATA[Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>IP / Porta di destinazione</i>.<br/><br/> Per modificarla, vai a <i>Regole Universali</i>.]]></string>
-    <string name="firewall_rule_block_ip_desc"><![CDATA[Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>IP di destinazione</i>.<br/><br/> Per modificarla, vai a alla <i>schermata dell\'app specifica nel Firewall</i>.]]></string>
+    <string name="firewall_rule_block_app_desc"><![CDATA[Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>app</i>.<br><br> Per modificarla, vai a <i>Tutte le app</i>.]]></string>
+    <string name="firewall_rule_new_app_desc"><![CDATA[Quest\'app si è connessa per la <i>prima</i> volta.<br><br> Per modificare vai a <i>Regole Universali</i>.]]></string>
+    <string name="firewall_rule_block_app_unmetered_desc"><![CDATA[Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>app</i> dal connettersi alla rete <i>Non a consumo</i>.<br><br> Per modificarla, vai a <i>Tutte le app</i>.]]></string>
+    <string name="firewall_rule_block_app_mobile_desc"><![CDATA[Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>app</i> dal connettersi alla rete <i>A consumo</i>.<br><br> Per modificarla, vai a <i>Tutte le app</i>.]]></string>
+    <string name="firewall_rule_isolate_desc"><![CDATA[Una regola del firewall impostata dall\'utente consente a quest\'<i>app</i> di connettersi solo a <i>IP che aggirano il firewall</i>.<br><br> Per modificarla, vai a <i>Tutte le app</i>.]]></string>
+    <string name="firewall_rule_block_app_univ_mobile_desc"><![CDATA[Una regola universale del firewall impostata dall\'utente ha bloccato quest\'<i>app</i> dal connettersi alla rete <i>A consumo (dati mobili)</i>.<br><br> Per modificarla, vai a <i>Tutte le app</i>.]]></string>
+    <string name="firewall_rule_block_ip_univ_desc"><![CDATA[Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>IP / Porta di destinazione</i>.<br><br> Per modificarla, vai a <i>Regole Universali</i>.]]></string>
+    <string name="firewall_rule_block_ip_desc"><![CDATA[Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>IP di destinazione</i>.<br><br> Per modificarla, vai a alla <i>schermata dell\'app specifica nel Firewall</i>.]]></string>
     <string name="firewall_rule_bypass_universal_ip_desc"><![CDATA[Questa connessione è stata consentita perché l\'<i>IP di destinazione</i> è impostato in modo da aggirare tutte le regole universali del firewall.<br/><br/> Per modificare, vai a <i>Regole IP<i> dalla scheda <i>Regole Universali</i>.]]></string>
-    <string name="firewall_rule_device_lock_desc"><![CDATA[Questa connessione è stata bloccata perché <i>il dispositivo era bloccato</i> in quel momento.<br/><br/> Per modificare questa impostazione, vai a <i>Regole Universali</i>.]]></string>
-    <string name="firewall_rule_unknown_desc"><![CDATA[Questa connessione è stata bloccata perché non è stato possibile determinarne <i>l\'app d\'origine</i>.<br/><br/> Per modificare questa impostazione, vai a <i>Regole Universali</i>.]]></string>
-    <string name="firewall_rule_foreground_desc"><![CDATA[Questa connessione è stata bloccata perché l\'app d\'origine <i>non era in primo piano</i>.<br/><br/> Per modificare questa impostazione, vai a <i>Regole Universali</i>.]]></string>
-    <string name="firewall_rule_block_udp_ntp_desc"><![CDATA[Una regola del firewall impostata dall\'utente ha bloccato questa connessione <i>UDP</i>.<br/><br/> Per modificarla, vai a <i>Regole Universali</i>.]]></string>
-    <string name="firewall_rule_block_dns_bypass_desc"><![CDATA[Questa connessione è stata bloccata perché <i>l\'app d\'origine</i> ha aggirato il DNS scelto dall\'utente.<br/><br/> Per modificare questa impostazione, vai a <i>Regole Universali</i>.]]></string>
+    <string name="firewall_rule_device_lock_desc"><![CDATA[Questa connessione è stata bloccata perché <i>il dispositivo era bloccato</i> in quel momento.<br><br> Per modificare questa impostazione, vai a <i>Regole Universali</i>.]]></string>
+    <string name="firewall_rule_unknown_desc"><![CDATA[Questa connessione è stata bloccata perché non è stato possibile determinarne <i>l\'app d\'origine</i>.<br><br> Per modificare questa impostazione, vai a <i>Regole Universali</i>.]]></string>
+    <string name="firewall_rule_foreground_desc"><![CDATA[Questa connessione è stata bloccata perché l\'app d\'origine <i>non era in primo piano</i>.<br><br> Per modificare questa impostazione, vai a <i>Regole Universali</i>.]]></string>
+    <string name="firewall_rule_block_udp_ntp_desc"><![CDATA[Una regola del firewall impostata dall\'utente ha bloccato questa connessione <i>UDP</i>.<br><br> Per modificarla, vai a <i>Regole Universali</i>.]]></string>
+    <string name="firewall_rule_block_dns_bypass_desc"><![CDATA[Questa connessione è stata bloccata perché <i>l\'app d\'origine</i> ha aggirato il DNS scelto dall\'utente.<br><br> Per modificare questa impostazione, vai a <i>Regole Universali</i>.]]></string>
     <string name="firewall_rule_exempt_app_bypass_univ_desc"><![CDATA[Questa connessione è stata consentita perché l\'<i>app d\'origine</i> è impostata su <i>aggirare le regole universali del firewall</i>.<br/><br/> Per modificarla, vai a alla <i>schermata dell\'app specifica nel Firewall</i>.]]></string>
     <string name="firewall_rule_exempt_dns_proxied_desc"><![CDATA[Questa connessione DNS è stata reindirizzata all\'endpoint DNS scelto dall\'utente.<br/><br/> Per modificare, disabilita <i>Previeni aggiramenti del DNS</i> dalla schermata <i>Configura</i> del DNS.]]></string>
     <string name="firewall_rule_exempt_orbot_setup_desc"><![CDATA[Questa connessione è stata consentita perché era in corso la configurazione in un click di <i> Tor-come-proxy</i> tramite Orbot.]]></string>
@@ -836,16 +829,16 @@
     <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Bypassare regole universale di DNS e firewall per le applicazioni <i>elencate</i>\?</string>
     <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[Questa connessione è stata bloccata perché il <i>dominio</i> è impostato come bloccato nelle regole del dominio universale.<br/><br/> Per modificare questo comportamento, accedere alla scheda <i>Configura DNS</i>.]]></string>
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[Questa connessione è stata consentita perché il <i>dominio</i> è impostato come attendibile nelle regole del dominio universale.<br/><br/> Per modificare questo comportamento, andare alla scheda <i>Configura DNS</i>.]]></string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[Questa connessione è stata consentita perché l\'<i>app d\'origine</i> è impostata su <i>aggira DNS e firewall</i>.<br/><br/> Per modificarla, vai a alla schermata <i>Firewall specifico per app</i>.]]></string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[Questa connessione è stata consentita perché l\'<i>app d\'origine</i> è impostata su <i>aggira DNS e firewall</i>.<br><br> Per modificarla, vai a alla schermata <i>Firewall specifico per app</i>.]]></string>
     <string name="brbs_backup_restore_desc" translatable="true">Non funziona per tutte le versioni dell\'app o per tutti i dispositivi</string>
     <string name="bsct_block_domain" translatable="true">Blocca, autorizza <u>domini</u> per <u>questa app</u></string>
     <string name="lbl_import" translatable="true">Importa</string>
     <string name="lbl_allowed_ips" translatable="true">IP consentiti</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
     <string name="lbl_http" translatable="true">HTTP</string>
-    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="lbl_wireguard" translatable="true"></string>
     <string name="lbl_mtu" translatable="true">MTU</string>
-    <string name="lbl_sec" translatable="true">sec</string>
+    <string name="lbl_sec" translatable="true"></string>
     <string name="lbl_hour" translatable="true">hr</string>
     <string name="lbl_persistent_keepalive" translatable="true">Mantenimento persistente</string>
     <string name="lbl_save" translatable="true">salva</string>
@@ -903,7 +896,7 @@
     <string name="lbl_anonymous" translatable="true">anonimo</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">Eliminare l\'endpoint DoT?</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Protetto! Collegato a DNS + Firewall + Proxy.</string>
-    <string name="lbl_peer" translatable="true">Peer</string>
+    <string name="lbl_peer" translatable="true"></string>
     <string name="settings_connectivity_checks" translatable="true">Esegui controlli di connettività</string>
     <string name="orbot_no_app_toast" translatable="true">Aggiungi almeno un\'app per abilitare Orbot</string>
     <string name="settings_rinr_heading" translatable="true">Loopback (sperimentale)</string>
@@ -930,4 +923,100 @@
     <string name="cd_deleted_toast" translatable="true">Cancellate tutte le regole di dominio</string>
     <string name="cd_toast_edit" translatable="true">Modificato</string>
     <string name="adv_taster_title" translatable="true">Automazione</string>
+    <string name="status_no_network" translatable="true">rete assente</string>
+    <string name="console_log_desc" translatable="true">I log possono contenere informazioni sensibili</string>
+    <string name="do_not_randomize_listen_port_title" translatable="true">Non scegliere una porta di ascolto wireguard casuale</string>
+    <string name="do_not_randomize_listen_port_desc" translatable="true">Mantieni le porte di ascolto wireguard fisse (senza scelta casuale) in modalità avanzata</string>
+    <string name="endpoint_independent_mapping_title" translatable="true">Mappaing endpoint indipendente</string>
+    <string name="endpoint_independent_mapping_desc" translatable="true">Quando attivato i socket UDP mantengono indirizzo e porta fissi per tutte le destinazioni</string>
+    <string name="anti_censorship_title" translatable="true">Anti censura</string>
+    <string name="anti_censorship_desc" translatable="true">Scegliere tra varie tecniche anti censura</string>
+    <string name="tcp_keep_alive_title" translatable="true">TCP keep alive più breve</string>
+    <string name="tcp_keep_alive_desc" translatable="true">Chiudere rapidamente i socket TCP senza attività recenti</string>
+    <string name="ac_title" translatable="true">Anti censura</string>
+    <string name="ac_desc" translatable="true">Gli Strumenti anti censura possono consentire la libertà su internet ma non possono funzionare ovunque. Tentati solo su connessioni senza proxy.</string>
+    <string name="ac_never_split_desc" translatable="true">Non modificare i pacchetti.</string>
+    <string name="ac_split_auto_desc" translatable="true">Alterare i pacchetti secondo necessità.</string>
+    <string name="ac_split_tcp" translatable="true">TCP</string>
+    <string name="ac_split_tcp_desc" translatable="true">Altera i pacchetti TCP.</string>
+    <string name="ac_split_tls" translatable="true">TCP/TLS</string>
+    <string name="ac_split_tls_desc" translatable="true">Altera pacchetti TCP o TLS.</string>
+    <string name="ac_desync" translatable="true">Desync</string>
+    <string name="ac_desync_desc" translatable="true">Invia pacchetti esca secondo necessità.</string>
+    <string name="ac_retry_options_title" translatable="true">Strategia</string>
+    <string name="ac_retry_options_desc" translatable="true">Imposta il modo in cui riprovare le connessioni censurate.</string>
+    <string name="ac_retry_options_never_desc" translatable="true">Se fallisce non ritentare mai le tecniche anti censura.</string>
+    <string name="ac_retry_options_with_split_desc" translatable="true">Applica le tecniche anti censura quando necessario.</string>
+    <string name="lbl_always" translatable="true">Sempre</string>
+    <string name="ac_retry_options_after_split_desc" translatable="true">Applica sempre le tecniche anti censura.</string>
+    <string name="ac_toast_retry_disabled" translatable="true">Scegli un\'opzione anti censura per definire la strategia.</string>
+    <string name="exclude_no_package_err_toast" translatable="true">Escludere app richiede un nome di pacchetto .</string>
+    <string name="hop_error_toast_msg_1" translatable="true">Impossibile trasmettere, già %1$</string>
+    <string name="hop_error_toast_msg_2" translatable="true">Nessun relay wireguard; per favore aggiungerne altri.</string>
+    <string name="mode_change_error_proxy_enabled" translatable="true">Impossibile cambiare modalità quando sono in uso i proxy toccare &lt;u&gt;modifica impostazioni proxy&lt;/u&gt;.</string>
+    <string name="blocklist_not_available_toast" translatable="true">Per aggionarnare le liste di blocco, scaricare l\'ultima versione dell\'app.</string>
+    <string name="lbl_ultra_secure" translatable="true">ultra sicuro</string>
+    <string name="adv_set_dial_timeout_title" translatable="true">Tempo di inattività</string>
+    <string name="adv_set_dial_timeout_desc" translatable="true">Chiude socket TCP e UDP dopo questa durata.</string>
+    <string name="no_stats_available" translatable="true">Nessuna statistica</string>
+    <string name="hop_failure_toast" translatable="true">Errore di trasmissione: %1$s -&gt; %2$s</string>
+    <string name="wg_setting_use_on_mobile" translatable="true">Solo dati mobili</string>
+    <string name="wg_setting_use_on_mobile_desc" translatable="true">Usa questa VPN wireguard con i dati mobili.</string>
+    <string name="hop_add_remove_title" translatable="true">Aggiungi / Rimuovi Relay</string>
+    <string name="about_terms_of_service" translatable="true">Termini di servizio</string>
+    <string name="most_contacted_asn" translatable="true">Provider più contattati</string>
+    <string name="most_blocked_asn" translatable="true">Provider più bloccati</string>
+    <string name="adv_tasker_dialog_msg" translatable="true">Inserire i nomi dei pacchetti (separati da virgole) a cui è consentito l\'avvio o l\'arresto di Rethink.</string>
+    <string name="download_ip_info_title" translatable="true">Mostra informazioni provider</string>
+    <string name="lbl_plan" translatable="true">Piano</string>
+    <string name="lbl_expires_on" translatable="true">Scade il</string>
+    <string name="lbl_cancelled" translatable="true">Cancellato</string>
+    <string name="lbl_expired" translatable="true">Scaduto</string>
+    <string name="lbl_grace_period" translatable="true">Periodo di prova</string>
+    <string name="lbl_paused" translatable="true">Pausa</string>
+    <string name="lbl_test" translatable="true">test</string>
+    <string name="lbl_experimental" translatable="true">(sperimentale)</string>
+    <string name="lbl_service_providers" translatable="true">Fornitori di servizi</string>
+    <string name="lbl_hop" translatable="true"></string>
+    <string name="lbl_manual" translatable="true">Manuale</string>
+    <string name="lbl_action" translatable="true">Azione</string>
+    <string name="lbl_connect" translatable="true">Connette</string>
+    <string name="lbl_criteria" translatable="true">Criterio</string>
+    <string name="lbl_protos" translatable="true">protocolli</string>
+    <string name="lbl_fallback" translatable="true">fallback</string>
+    <string name="lbl_default" translatable="true">default</string>
+    <string name="memory_notification_text">Rethink ha poca memoria. Le azioni di sistema potrebbero essere limitate.</string>
+    <string name="wireguard_title" translatable="true">Internet sicuro con WireGuard</string>
+    <string name="wireguard_desc" translatable="true">Crittografa il tuo traffico internet con WireGuard. Scegli percorsi differenti per diverse applicazione.</string>
+    <string name="firewall_title" translatable="true">Proteggi il tuo Android con il Firewall</string>
+    <string name="firewall_desc" translatable="true">Controlla come le app usano internet; restringi le connessioni basandoti sulle attività delle app o della rete.</string>
+    <string name="dns_title" translatable="true">Blocca Pubblicità e Malware con il DNS</string>
+    <string name="dns_desc" translatable="true">Scegli tra più di 190 liste per bloccare pubblicità, tracciatori, e malware.</string>
+    <string name="conn_track_clear_rule_logs_title" translatable="true">Cancellare storico per questa regola?</string>
+    <string name="conn_track_clear_rule_logs_message" translatable="true">Questo cancellerà lo storico di rete solo per la regola del firewall corrente. Questa operazione non è reversibile. Vuoi procedere?</string>
+    <string name="settings_mobile_metered_heading" translatable="true">Contatore reti mobili</string>
+    <string name="settings_mobile_metered_desc" translatable="true">Tratta solo le reti mobili come a consumo, il resto come non a consumo.</string>
+    <string name="settings_theme_dialog_themes_5" translatable="true"></string>
+    <string name="settings_theme_dialog_themes_7" translatable="true">Congelato</string>
+    <string name="settings_biometric_dialog_heading" translatable="true">Autenticazione biometrica</string>
+    <string name="settings_biometric_dialog_option_0" translatable="true">Nessuno</string>
+    <string name="settings_biometric_dialog_option_1" translatable="true">Immediatamente</string>
+    <string name="settings_biometric_dialog_option_2" translatable="true">Dopo 5 minuti</string>
+    <string name="settings_biometric_dialog_option_3" translatable="true">Dopo 15 minuti</string>
+    <string name="sponser_dialog_usage_msg" translatable="true">Stai usando Rethink da <b>%1$s giorni</b>, che si traduce in un costo di <b>%2$s</b>. Vorresti considerare la sponsorizzazione per sostenere il suo sviluppo?</string>
+    <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Usa il DNS di sistema per i domini locali</string>
+    <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Usa DNS di sistema per domini locali come<i>.lan</i>,<i>.internal</i>, etc.</string>
+    <string name="dc_filtering_heading" translatable="true">filtraggio</string>
+    <string name="cd_split_dns_heading" translatable="true">Dividi DNS (sperimentale)</string>
+    <string name="cd_split_dns_desc" translatable="true">Inoltra le richieste DNS dalle app con proxy ai server DNS del proxy.</string>
+    <string name="dns_record_types_auto_mode_status" translatable="true">Automatico (Tutti i tipi)</string>
+    <string name="univ_firewall_rule_11" translatable="true">Blocca tutte le connessioni local host</string>
+    <string name="univ_delete_domain_dialog_title" translatable="true">Cancellare tutte le regole di dominio?</string>
+    <string name="univ_delete_domain_dialog_message" translatable="true">Cancellare quelle regole potrebbe permettere a qualunque applicazione di connettersi ai domini attualmente bloccati.</string>
+    <string name="firewall_rule_private_dns" translatable="true">DNS privato</string>
+    <string name="firewall_rule_paused_app" translatable="true">App in pausa</string>
+    <string name="firewall_rule_proxy_error" translatable="true">Errore proxy</string>
+    <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[Questa connessione sta cercando un server <i>DNS privato</i> che non esiste.]]></string>
+    <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[Questa connessione è stata accettata perchè l\'<i>app sorgente</i> è impostata per <i>bypassare il proxy</i><br><br>Per modificare andare sulla schermata <i>Firewall specifico per app</i>.]]></string>
+    <string name="firewall_rule_paused_app_desc" translatable="true"><![CDATA[Questa connessione è stata consentita perchè l\'<i>app</i> è in modalità <i>pausa</i>.]]></string>
 </resources>
