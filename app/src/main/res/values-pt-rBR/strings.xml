@@ -212,7 +212,7 @@
     <string name="ci_no_rule_initial">N</string>
     <string name="ada_app_status_block_wifi">bloqueada em redes Wi-Fi</string>
     <string name="ada_app_status_allow">está permitido</string>
-    <string name="ada_ip_no_connection">Nenhum registro de rede para este aplicativo.</string>
+    <string name="ada_ip_no_connection">Não há registros de rede para esta categoria de aplicativo.</string>
     <string name="ada_app_status_block_md">bloqueada em redes móveis</string>
     <string name="ada_app_status_whitelist">irá ignorar as regras universais de firewall</string>
     <string name="notif_download_content_title">Download da lista de bloqueio no dispositivo</string>
@@ -717,7 +717,7 @@
     <string name="ada_ip_connection_count_zero">Endereços IP: 0</string>
     <string name="ada_app_status_block">está bloqueado</string>
     <string name="ada_app_status_exclude">está excluído do dns e firewall</string>
-    <string name="ada_app_status_isolate">está isolado; somente IPs confiáveis são permitidos</string>
+    <string name="ada_app_status_isolate">está isolado; apenas IPs e domínios confiáveis são permitidos</string>
     <string name="ada_app_status_unknown">é desconhecido</string>
     <string name="ada_network_log_title">registro de rede para este aplicativo</string>
     <string name="ada_app_metered">Rede móvel</string>
@@ -1124,4 +1124,83 @@
     <string name="settings_theme_dialog_themes_7" translatable="true">Geada</string>
     <string name="dns_record_types_auto_mode_status" translatable="true">Automático (todos os tipos)</string>
     <string name="firewall_rule_proxy_error" translatable="true">Erro de proxy</string>
+    <string name="lbl_paused" translatable="true">Pausado</string>
+    <string name="lbl_cancelled" translatable="true">Cancelado</string>
+    <string name="lbl_expired" translatable="true">Expirado</string>
+    <string name="lbl_expires_on" translatable="true">Expira em</string>
+    <string name="lbl_grace_period" translatable="true">Período de tolerância</string>
+    <string name="lbl_plan" translatable="true">Plano</string>
+    <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[Esta conexão está procurando um servidor de <i>DNS privado</i> que não existe.]]></string>
+    <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[Esta conexão foi permitida porque o <i>aplicativo de origem</i> está configurado para <i>ignorar as regras de proxy</i>.<br><br>Para alterar isso, vá para a tela <i>Firewall específico por aplicativo</i>.]]></string>
+    <string name="firewall_rule_paused_app_desc" translatable="true"><![CDATA[Esta conexão foi permitida porque o <i>aplicativo</i> está em estado de <i>pausa</i>.]]></string>
+    <string name="wireguard_disable_failure_relay" translatable="true">\"Relay WireGuard\" não pode ser desativado</string>
+    <string name="config_invalid_desc" translatable="true">Configuração WireGuard Inválida</string>
+    <string name="console_log_title" translatable="true">Registros de aplicativos</string>
+    <string name="console_log_desc" translatable="true">Os registros podem conter informações sensíveis.</string>
+    <string name="endpoint_independent_mapping_desc" translatable="true">Quando habilitado, os sockets UDP mantêm um endereço e uma porta fixos para todos os destinos.</string>
+    <string name="anti_censorship_title" translatable="true">Anticensura</string>
+    <string name="anti_censorship_desc" translatable="true">Escolha entre várias técnicas Anticensura.</string>
+    <string name="tcp_keep_alive_desc" translatable="true">Feche rapidamente sockets TCP sem atividade recente.</string>
+    <string name="ac_title" translatable="true">anticensura</string>
+    <string name="ac_desc" translatable="true">Ferramentas anticensura podem garantir liberdade na internet, mas podem não funcionar em todos os lugares. Só foram testadas em conexões sem proxy.</string>
+    <string name="ac_never_split_desc" translatable="true">Não altere os pacotes.</string>
+    <string name="ac_split_auto_desc" translatable="true">Altere os pacotes conforme necessário.</string>
+    <string name="ac_split_tcp" translatable="true">TCP</string>
+    <string name="ac_split_tcp_desc" translatable="true">Altere os pacotes TCP.</string>
+    <string name="ac_split_tls" translatable="true">TCP/TLS</string>
+    <string name="ac_split_tls_desc" translatable="true">Altere os pacotes TCP ou TLS.</string>
+    <string name="ac_desync" translatable="true">Desincronizar</string>
+    <string name="ac_desync_desc" translatable="true">Envie pacotes decoy conforme necessário.</string>
+    <string name="ac_retry_options_title" translatable="true">estratégia</string>
+    <string name="ac_retry_options_desc" translatable="true">Defina como as tentativas de reconexão funcionam para conexões censuradas.</string>
+    <string name="ac_retry_options_never_desc" translatable="true">Em caso de falha, nunca tente novamente técnicas anticensura.</string>
+    <string name="ac_retry_options_with_split_desc" translatable="true">Aplique técnicas anticensura quando necessário.</string>
+    <string name="lbl_always" translatable="true">Sempre</string>
+    <string name="ac_retry_options_after_split_desc" translatable="true">Sempre aplicar técnicas anticensura.</string>
+    <string name="ac_toast_retry_disabled" translatable="true">Escolha qualquer opção anticensura para definir a estratégia.</string>
+    <string name="lbl_ultra_secure" translatable="true">Ultra seguro</string>
+    <string name="adv_set_dial_timeout_title" translatable="true">Tempo limite de inatividade</string>
+    <string name="adv_set_dial_timeout_desc" translatable="true">Feche conexões TCP e UDP inativas após este período.</string>
+    <string name="no_stats_available" translatable="true">Sem estatísticas</string>
+    <string name="about_terms_of_service" translatable="true">Termos de Serviço</string>
+    <string name="adv_taster_title" translatable="true">Automação</string>
+    <string name="adv_taster_desc" translatable="true">Configure aplicativos que podem iniciar ou encerrar o Rethink.</string>
+    <string name="top_active_conns" translatable="true">Principais conexões ativas</string>
+    <string name="load_more" translatable="true">Carregar tudo</string>
+    <string name="close_conns_dialog_title" translatable="true">Fechar conexões</string>
+    <string name="close_conns_dialog_desc" translatable="true">Feche todas as conexões para%1$s?</string>
+    <string name="local_blocklist_delete_desc" translatable="true">Excluir listas de bloqueio no dispositivo?</string>
+    <string name="fail_open_network_title" translatable="true">Interromper na perda de conexão</string>
+    <string name="fail_open_network_desc" translatable="true">Quando habilitado, Rethink interrompe todos os dados quando não há conectividade disponível, como no <i>Modo Avião</i>.</string>
+    <string name="about_license" translatable="true">Licenciado sob a Apache-2.0</string>
+    <string name="close_all" translatable="true">Fechar tudo</string>
+    <string name="smart_dns" translatable="true">DNS inteligente</string>
+    <string name="processing_dialog_desc" translatable="true">Aguarde enquanto processamos sua solicitação.</string>
+    <string name="smart_dns_desc" translatable="true"><i>DNS inteligente</i> usa aleatoriamente qualquer um destes resolvedores DNS</string>
+    <string name="wg_mobile_only_hop_err" translatable="true">O modo somente móvel não é compatível com Relés</string>
+    <string name="tour_btn_skip">Pular tour</string>
+    <string name="hop_failure_toast" translatable="true">Erro de retransmissão: %1$s -&gt; %2$s</string>
+    <string name="adv_tasker_dialog_edit_hint" translatable="true">Insira o nome do pacote (exemplo: net.dinglisch.android.taskerm)</string>
+    <string name="download_ip_info_title" translatable="true">Mostrar informações do provedor</string>
+    <string name="processing_dialog_title" translatable="true">Processando</string>
+    <string name="vpn_policy_auto_desc" translatable="true">Reage a alterações importantes na rede e na conectividade.</string>
+    <string name="ssid_location_error_action" translatable="true">Habilitar localização</string>
+    <string name="wg_ssid_delete_confirmation" translatable="true">Excluir %1$s?</string>
+    <string name="settings_firebase_error_reporting_desc" translatable="true">Capturar registros de erros para ajudar a melhorar a estabilidade.</string>
+    <string name="tombstone_app_desc" translatable="true">Quando habilitado, manter regras do aplicativo por 7 dias.</string>
+    <string name="settings_allow_incoming_wg_packets" translatable="true">WireGuard P2P</string>
+    <string name="settings_allow_incoming_wg_packets_desc" translatable="true">Quando habilitado, permitir conexões de entrada iniciadas por peers WireGuard.</string>
+    <string name="settings_jumbo_packets" translatable="true">Acelerador de largura de banda</string>
+    <string name="stability_program_toast" translatable="true">Inscrito no <i>programa de estabilidade</i> para <i>recursos experimentais</i>.</string>
+    <string name="stability_program_snackbar_msg" translatable="true">Programa de estabilidade habilitado. Relatórios de falhas ajudam a melhorar recursos experimentais.</string>
+    <plurals name="peer_count">
+        <item quantity="one">%d peer</item>
+        <item quantity="many">%d peers</item>
+        <item quantity="other">%d peers</item>
+    </plurals>
+    <string name="rpn_purchased_state" translatable="true">Adquirido</string>
+    <string name="tour_btn_next">Próximo</string>
+    <string name="tour_btn_finish"></string>
+    <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[Esta conexão foi bloqueada porque o WireGuard está em modo de <i>lockdown</i>.<br><br> Para alterar, vá para a tela <i>WireGuard</i>.]]></string>
+    <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[Esta conexão foi bloqueada porque o <i>proxy</i> selecionado para o aplicativo não foi escolhido.<br><br> Para alterar, vá em <i>Proxy</i> na tela <i>Configurar</i>.]]></string>
 </resources>
