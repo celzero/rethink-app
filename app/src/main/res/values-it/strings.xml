@@ -714,9 +714,7 @@
     <string name="about_privacy_policy">Leggi l\'informativa sulla privacy</string>
     <string name="private_dns_error">Impossibile avviare schermata DNS privato.</string>
     <string name="private_dns_dialog_heading">Disattiva DNS privato</string>
-    <string name="private_dns_dialog_desc">Le impostazioni DNS di Rethink sono sovrascritte dal DNS privato di Android.
-\n
-\nPer utilizzare il DNS di Rethink vai nelle Impostazioni di Android e disattiva \"DNS privato\".</string>
+    <string name="private_dns_dialog_desc">Le impostazioni DNS di Rethink sono sovrascritte dal DNS privato di Android. \n \nPer utilizzare il DNS di Rethink vai nelle Impostazioni di Android e disattiva \"DNS privato\".</string>
     <string name="private_dns_dialog_positive">Vai alle Impostazioni</string>
     <string name="relative_time_today">Oggi</string>
     <string name="relative_time_yesterday">Ieri</string>
