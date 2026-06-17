@@ -790,9 +790,7 @@
     <string name="intent_launch_error">Não foi possível abrir %1$s</string>
     <string name="firewall_rule_block_univ_ip">IP / Porta (Universal)</string>
     <string name="private_dns_dialog_heading">Desativar DNS Privado</string>
-    <string name="private_dns_dialog_desc">As configurações de DNS do Rethink são substituídas pelo \"DNS Privado\" do Android.
-\n
-\nPara usar o DNS do Rethink, acesse as configurações no seu dispositivo Android e desative a opção \"DNS Privado\".</string>
+    <string name="private_dns_dialog_desc">As configurações de DNS do Rethink são substituídas pelo \"DNS Privado\" do Android. \n \nPara usar o DNS do Rethink, acesse as configurações no seu dispositivo Android e desative a opção \"DNS Privado\".</string>
     <string name="private_dns_error">Não foi possível iniciar a tela de DNS Privado.</string>
     <string name="private_dns_dialog_positive">Ir para as configurações</string>
     <string name="lbl_apply" translatable="true">Aplicar</string>
