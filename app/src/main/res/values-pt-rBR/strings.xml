@@ -37,75 +37,7 @@
     <string name="vpn_profile_error">Não foi possível iniciar o perfil VPN.</string>
     <string name="cd_dns_proxy_mode_external">Externo</string>
     <string name="cd_dns_crypt_dialog_title">Adicionar resolvedor ou relé DNSCrypt</string>
-    <string name="contributors_list"><![CDATA[O <i>Projeto Rethink Open Source</i> deve sua existência a esses voluntários que dedicam inúmeras horas ao seu desenvolvimento.<br/>
-<br/>🛡️ Aplicativo Android <br/>
-<a href="https://github.com/anthonyryan1">Anthony Ryan</a> /
-<a href="https://github.com/BayLee4">BayLee4</a> /
-<a href="https://github.com/Ch4t4r">Ch4t4r</a> /
-<a href="https://github.com/samthesamman">CodingAttack</a> /
-<a href="https://github.com/HrBDev">HrBDev</a> /
-<a href="https://github.com/hussainmohd-a">hussainmohd-a</a> /
-<a href="https://github.com/ignoramous">ignorante</a> / 
-<a href="https://github.com/ironveil">véu de ferro</a> / 
-<a href="https://github.com/markwmuller">markwmuller</a> / 
-<a href="https://github.com/mohammaduvez">Mohammaduvez</a> / 
-<a href="https://github.com/Mygod">Meu Deus</a> / 
-<a href="https://github.com/Poussinou">Poussinou</a> / 
-<a href="https://github.com/pjosingh">pjosingh</a> / 
-<a href="https://github.com/RohitSurwase">RohitSurwase</a> / 
-<a href="https://github.com/ShantanuVichare">Shantanu</a> /
-<a href="https://github.com/Uldiniad">Uldiniad</a><br/> /
-<a href="https://github.com/yurtpage">yurtpage</a><br/>
-<br/>🚂 Motor de rede <br/>
-<a href="https://github.com/alalamav">alalamav</a> /
-<a href="https://github.com/bemasc">bemasc</a> /
-<a href="https://github.com/dmcardle">dmcardle</a> /
-<a href="https://github.com/fortuna">fortuna</a> /
-<a href="https://github.com/ignoramous">ignoramous</a> /
-<a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /
-<a <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
-<a href="https://github.com/SeanBurford">SeanBurford</a><br/>
-<br/>📚 Resolver <br/>
-<a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a> /
-<a href="https://github.com/amithm7">amithm7</a> /
-<a href="https://github.com/arfshl">arfshl</a> /
-<a href="https://github.com/badmojr">badmojr</a> /
-<a href="https://github.com/bongochong">bongochong</a> /
-<a href="https://github.com/elliotwutingfeng">elliotwutingfeng</a> /
-<a <a href="https://github.com/georgyo">georgyo</a> /
-<a href="https://github.com/GiddyGoatGaming">GiddyGoatGaming</a> /
-<a href="https://github.com/Harish-Narayan">Harish-Narayan</a> /
-<a href="https://github.com/ignoramous">ignoramous</a> /
-<a href="https://github.com/JakeChampion">JakeChampion</a> /
-<a href="https://github.com/MasterKia">MasterKia</a> /
-<a href="https://github.com/mtxadmin">mtxadmin</a> /
-<a href="https://github.com/neneeen">neneeen</a> /
-
-<a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /
-<a <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
-<a href="https://github.com/shruuub">shruuub</a> /
-<a href="https://github.com/shuvashish76">shuvashish76</a><br/>
-<br/>⚜ Moderadores da comunidade <br/>
-<a href="https://t.me/amithm7">amithm7</a> /
-<a href="https://t.me/TronSlayer">Andersen</a> /
-<a href="https://t.me/ppatra">ppatra</a> /
-<a href="https://t.me/InFamous23">InFamous23</a> /
-<a href="https://t.me/TheTr1ckst3r">TheTr1ckst3r</a> /
-<a href="https://t.me/Ch4t4r">Ch4t4r</a> /
-<a href="https://t.me/Billi_ance">Billi_ance</a> /
-<a href="https://t.me/kaliangel">kaliangel</a> /
-<a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>
-<br/>📌 Geo-IP <br/>
-<a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IPinfo Lite</a><br/>
-<br/>❇ Traduções <br/>
-<a href="https://weblate.org/en/">Weblate</a><br/>
-<br/>🦆 Ícones <br/>
-<a href="https://github.com/celzero/rethink-app/issues/346">Ícones</a><br/>
-<br/>📦 Servidores de compilação <br/>
-<a href="https://jitpack.io/">JitPack</a> /
-<a href="https://github.com/">GitHub</a> /
-<a href="https://central.sonatype.com/">Sonatype</a><br/>
-]]></string>
+    <string name="contributors_list"><![CDATA[O <i>Projeto Rethink Open Source</i> deve sua existência a esses voluntários que dedicam inúmeras horas ao seu desenvolvimento.<br/>\n<br/>🛡️ Aplicativo Android <br/>\n<a href=\"https://github.com/anthonyryan1\">Anthony Ryan</a> /\n<a href=\"https://github.com/BayLee4\">BayLee4</a> /\n<a href=\"https://github.com/Ch4t4r\">Ch4t4r</a> /\n<a href=\"https://github.com/samthesamman\">CodingAttack</a> /\n<a href=\"https://github.com/HrBDev\">HrBDev</a> /\n<a href=\"https://github.com/hussainmohd-a\">hussainmohd-a</a> /\n<a href=\"https://github.com/ignoramous\">ignorante</a> / \n<a href=\"https://github.com/ironveil\">véu de ferro</a> / \n<a href=\"https://github.com/markwmuller\">markwmuller</a> / \n<a href=\"https://github.com/mohammaduvez\">Mohammaduvez</a> / \n<a href=\"https://github.com/Mygod\">Meu Deus</a> / \n<a href=\"https://github.com/Poussinou\">Poussinou</a> / \n<a href=\"https://github.com/pjosingh\">pjosingh</a> / \n<a href=\"https://github.com/RohitSurwase\">RohitSurwase</a> / \n<a href=\"https://github.com/ShantanuVichare\">Shantanu</a> /\n<a href=\"https://github.com/Uldiniad\">Uldiniad</a><br/> /\n<a href=\"https://github.com/yurtpage\">yurtpage</a><br/>\n<br/>🚂 Motor de rede <br/>\n<a href=\"https://github.com/alalamav\">alalamav</a> /\n<a href=\"https://github.com/bemasc\">bemasc</a> /\n<a href=\"https://github.com/dmcardle\">dmcardle</a> /\n<a href=\"https://github.com/fortuna\">fortuna</a> /\n<a href=\"https://github.com/ignoramous\">ignoramous</a> /\n<a href=\"https://github.com/PeterDaveHello\">PeterDaveHello</a> /\n<a <a href=\"https://github.com/santhosh-ponnusamy\">santhosh-ponnusamy</a> /\n<a href=\"https://github.com/SeanBurford\">SeanBurford</a><br/>\n<br/>📚 Resolver <br/>\n<a href=\"https://github.com/ahmed-tasaly\">ahmed-tasaly</a> /\n<a href=\"https://github.com/amithm7\">amithm7</a> /\n<a href=\"https://github.com/arfshl\">arfshl</a> /\n<a href=\"https://github.com/badmojr\">badmojr</a> /\n<a href=\"https://github.com/bongochong\">bongochong</a> /\n<a href=\"https://github.com/elliotwutingfeng\">elliotwutingfeng</a> /\n<a <a href=\"https://github.com/georgyo\">georgyo</a> /\n<a href=\"https://github.com/GiddyGoatGaming\">GiddyGoatGaming</a> /\n<a href=\"https://github.com/Harish-Narayan\">Harish-Narayan</a> /\n<a href=\"https://github.com/ignoramous\">ignoramous</a> /\n<a href=\"https://github.com/JakeChampion\">JakeChampion</a> /\n<a href=\"https://github.com/MasterKia\">MasterKia</a> /\n<a href=\"https://github.com/mtxadmin\">mtxadmin</a> /\n<a href=\"https://github.com/neneeen\">neneeen</a> /\n\n<a href=\"https://github.com/PeterDaveHello\">PeterDaveHello</a> /\n<a <a href=\"https://github.com/santhosh-ponnusamy\">santhosh-ponnusamy</a> /\n<a href=\"https://github.com/shruuub\">shruuub</a> /\n<a href=\"https://github.com/shuvashish76\">shuvashish76</a><br/>\n<br/>⚜ Moderadores da comunidade <br/>\n<a href=\"https://t.me/amithm7\">amithm7</a> /\n<a href=\"https://t.me/TronSlayer\">Andersen</a> /\n<a href=\"https://t.me/ppatra\">ppatra</a> /\n<a href=\"https://t.me/InFamous23\">InFamous23</a> /\n<a href=\"https://t.me/TheTr1ckst3r\">TheTr1ckst3r</a> /\n<a href=\"https://t.me/Ch4t4r\">Ch4t4r</a> /\n<a href=\"https://t.me/Billi_ance\">Billi_ance</a> /\n<a href=\"https://t.me/kaliangel\">kaliangel</a> /\n<a href=\"https://github.com/PoneyClairDeLune\">PoneyClairDeLune</a><br/>\n<br/>📌 Geo-IP <br/>\n<a href=\"https://db-ip.com\">db-ip.com</a> / <a href=\"https://ipinfo.io/lite\">IPinfo Lite</a><br/>\n<br/>❇ Traduções <br/>\n<a href=\"https://weblate.org/en/\">Weblate</a><br/>\n<br/>🦆 Ícones <br/>\n<a href=\"https://github.com/celzero/rethink-app/issues/346\">Ícones</a><br/>\n<br/>📦 Servidores de compilação <br/>\n<a href=\"https://jitpack.io/\">JitPack</a> /\n<a href=\"https://github.com/\">GitHub</a> /\n<a href=\"https://central.sonatype.com/\">Sonatype</a><br/>\n]]></string>
     <string name="firewall_status_excluded">excluído do dns e firewall</string>
     <string name="cd_custom_dns_proxy_name">Proxy %1$s</string>
     <string name="cd_custom_dns_proxy_default_ip">127.0.0.1</string>
