@@ -15,4 +15,12 @@
     <string name="lbl_dns_servers" translatable="true">DNS-servrar</string>
     <string name="lbl_ip_rules" translatable="true">IP-regler</string>
     <string name="lbl_domain_rules" translatable="true">Domänregler</string>
+    <string name="lbl_qr_code" translatable="true">QR-kod</string>
+    <string name="lbl_disabled" translatable="true">Inaktiverad</string>
+    <string name="lbl_domain" translatable="true">Domän</string>
+    <string name="lbl_wildcard" translatable="true">Jokertecken</string>
+    <string name="lbl_public_key" translatable="true">Publik Nyckel</string>
+    <string name="lbl_delete" translatable="true">Radera</string>
+    <string name="lbl_proceed" translatable="true">Fortsätt</string>
+    <string name="lbl_private_key" translatable="true">Privat nyckel</string>
 </resources>
