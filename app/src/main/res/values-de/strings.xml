@@ -960,7 +960,7 @@
     <string name="firewall_rule_proxied" translatable="true">via Proxy</string>
     <string name="one_wg_apps_added" translatable="true">Weiterleitung aller Anwendungen</string>
     <string name="import_error" translatable="true">Tunnel kann nicht importiert werden: %s</string>
-    <string name="toast_allow_bypass_disabled" translatable="true">%1$s ist deaktiviert, wenn Proxies aktiv sind</string>
+    <string name="toast_allow_bypass_disabled" translatable="true">%1$s ist deaktiviert, da Proxis aktiv sind</string>
     <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[Diese Verbindung wurde an den vom Benutzer bevorzugten Proxy weitergeleitet.<br/><br/> Um dies zu ändern, gehe auf dem Bildschirm <i>Konfigurieren</i> zu <i>Proxy</i>.]]></string>
     <string name="cd_dialog_edit_title" translatable="true">Domainregel bearbeiten</string>
     <string name="parse_error_reason" translatable="true">Kann %1$s “%2$s” nicht analysieren</string>
