@@ -17,8 +17,8 @@
     <string name="slide_2_desc">Rethink ist das einfachste Mittel, um Netzwerkaktivitäten zu überwachen, Internetzensur zu umgehen und Apps auf deinem Android-Gerät mit einer Firewall einzudämmen.</string>
     <string name="slide_1_desc">Rethink ist eine Open-Source-Software, die vom Mozilla Builders MVP-Programm und der FOSS United Foundation unterstützt wird.</string>
     <string name="rdns_plus">RDNS Plus</string>
-    <string name="block">blockieren</string>
-    <string name="untracked">ungetrackt</string>
+    <string name="block">Blockieren</string>
+    <string name="untracked">Ungetrackt</string>
     <string name="dns_mode_notification_title">Geschützt! Verbunden mit schnellem und sicherem DNS.</string>
     <string name="firewall_mode_notification_title">Geschützt! Verbunden mit der Firewall.</string>
     <string name="hybrid_mode_notification_title">Geschützt! Verbunden mit DNS + Firewall.</string>
@@ -199,11 +199,11 @@
     <string name="orbot_stop_dialog_negative">Orbot stoppen</string>
     <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
     <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
-    <string name="allow">erlauben</string>
+    <string name="allow">Erlauben</string>
     <string name="settings_allow_bypass_heading">Netzwerk-Sichtbarkeit aktivieren</string>
     <string name="settings_title_desc">Ein hochgradig anpassbares DNS und Firewall</string>
     <string name="slide_2_title">Willkommen</string>
-    <string name="exclude">ausschließen</string>
+    <string name="exclude">Ausschließen</string>
     <string name="bsct_app_info">App-Informationen</string>
     <string name="settings_orbot_install_desc">Tippe hier, um Orbot zu installieren</string>
     <string name="settings_socks5_vpn_disabled_error">Starte Rethink, um fortzufahren.</string>
@@ -213,7 +213,7 @@
     <string name="settings_https_heading">HTTP(S) CONNECT-Proxy einrichten</string>
     <string name="orbot_http">HTTP Proxy</string>
     <string name="orbot_bs_status_1">Weiterleitung von %1$s Verbindungen an Orbot.</string>
-    <string name="isolate">isolieren</string>
+    <string name="isolate">Isolieren</string>
     <string name="always_on_dialog_neutral">Einstellungen</string>
     <string name="settings_app_notification_a13_heading">App-Benachrichtigung</string>
     <string name="settings_theme_heading">Erscheinungsbild</string>
@@ -226,7 +226,7 @@
     <string name="settings_dns_proxy_dialog_app">App</string>
     <string name="settings_dns_proxy_dialog_username">Benutzername</string>
     <string name="settings_dns_proxy_dialog_password">Passwort</string>
-    <string name="settings_dns_proxy_dialog_positive_btn">festlegen</string>
+    <string name="settings_dns_proxy_dialog_positive_btn">Festlegen</string>
     <string name="settings_socks5_dialog_hint_username">Benutzername (optional)</string>
     <string name="settings_socks5_dialog_hint_port">Port</string>
     <string name="settings_notification_desc3">Keine</string>
@@ -322,7 +322,7 @@
     <string name="settings_check_update_heading">Nach App-Updates suchen</string>
     <string name="settings_custom_downloader_desc">Wenn deaktiviert, wird der in Android integrierte <i>Download Manager</i> verwendet</string>
     <string name="settings_import_export_heading">Sichern und Wiederherstellen</string>
-    <string name="bypass_universal">Pauschale Umgehung</string>
+    <string name="bypass_universal">Universelle Umgehung</string>
     <string name="alert_firewall_accessibility_exception">Öffnen der Einstellungen für Barrierefreiheit fehlgeschlagen. Versuche es später erneut!</string>
     <string name="firewall_act_universal_tab">Universell</string>
     <string name="new_app_bulk_notification_title">Achtung</string>
@@ -423,7 +423,7 @@
     <string name="cd_remove_dialog_message">Lösche die Domain aus den gespeicherten Konfiguration.</string>
     <string name="ci_dialog_desc">IP-Adresse, IP-Subnetz (Bereich), Port zulassen (umgehen) oder sperren. Beispiel: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80,[10.1.0.0/16]:80, *.*:80</string>
     <string name="ada_app_status_exclude">ist von DNS und Firewall ausgeschlossen</string>
-    <string name="ada_firewall_title">Firewall-Regeln für diese Anwendung</string>
+    <string name="ada_firewall_title">Firewall-Regeln für diese App</string>
     <string name="bsdl_blocked_desc">blockiert %1$s durch %2$s</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Sperre Inhalte für Erwachsene und Raubkopien, Online-Glücksspiele und -Dating sowie soziale Medien.</string>
     <string name="rt_dialog_message">Möchtest du neu konfigurierte Blocklisten anwenden?</string>
@@ -456,7 +456,7 @@
     <string name="ci_trust_initial">T</string>
     <string name="ci_trust_txt">Vertrauenswürdig</string>
     <string name="ada_app_status_block_md">ist in gebührenpflichtigen (mobilen) Netzen gesperrt</string>
-    <string name="ada_network_log_title">Netzwerkprotokoll für diese Anwendung</string>
+    <string name="ada_network_log_title">Netzwerkprotokoll für diese App</string>
     <string name="ada_app_metered">Getaktet</string>
     <string name="ada_app_unmetered">Ungetaktet</string>
     <string name="ada_app_bypass_univ">Universelle Umgehung</string>
@@ -472,8 +472,8 @@
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">Attentionware, Spyware und Scareware blockieren.</string>
     <string name="rbl_security" description="The text appears as part of the blocklist setup screen as categories or headlines">Sicherheit</string>
     <string name="rt_dialog_title">Änderungen speichern</string>
-    <string name="rt_list_simple_btn_txt">einfach</string>
-    <string name="lbl_advanced">fortgeschritten</string>
+    <string name="rt_list_simple_btn_txt">Einfach</string>
+    <string name="lbl_advanced">Fortgeschritten</string>
     <string name="rt_filter_parent_selected">Ausgewählt</string>
     <string name="dc_local_block_enabled">Aktiviert</string>
     <string name="lbbs_configure">Konfigurieren</string>
@@ -556,7 +556,7 @@
     <string name="cd_dns_crypt_dialog_name">Name</string>
     <string name="cd_dns_crypt_dialog_stamp">Stamp</string>
     <string name="cd_dns_crypt_dialog_desc">Beschreibung (optional)</string>
-    <string name="lbl_add">hinzufügen</string>
+    <string name="lbl_add">Hinzufügen</string>
     <string name="cd_dns_crypt_error_text_1">Stamp kann nicht leer sein</string>
     <string name="cd_doh_dialog_heading">DNS über HTTPS hinzufügen</string>
     <string name="cd_doh_dialog_resolver_name">Resolver-Name</string>
@@ -731,19 +731,19 @@
     <string name="fapps_firewall_filter_desc_category"><![CDATA[<u>%1$s</u> %2$s Apps in Kategorien werden angezeigt: %3$s]]></string>
     <string name="unicode_warning_sign">⚠</string>
     <string name="ci_trust_rule">Vertrauen</string>
-    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">meistblockierte Apps</string>
-    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">meisterlaubte Apps</string>
-    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">meist kontaktierte IPs</string>
-    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">meist blockierte IPs</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">Meist blockierte Apps</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">Meist erlaubte Apps</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">Meist kontaktierte IPs</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">Meist blockierte IPs</string>
     <string name="ssv_see_more">Alle anzeigen</string>
     <string name="fapps_bypass_block_dialog_message">Universelle Firewall-Regeln für <i>aufgelistete</i> Apps umgehen\?</string>
-    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">meist kontaktierte Domains</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">Meist kontaktierte Domains</string>
     <string name="settings_locale_desc">Bevorzugte Sprache wählen</string>
     <string name="settings_locale_dialog_title">Bevorzugte Sprache wählen</string>
     <string name="hs_biometeric_title">Rethink entsperren</string>
     <string name="hs_biometeric_desc">Biometrische Authentifizierung zum Entsperren von Rethink verwenden</string>
     <string name="hs_biometeric_failed">Biometrische Authentifizierung fehlgeschlagen</string>
-    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">meistblockierte Domains</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">Meist blockierte Domains</string>
     <string name="fapps_unblock_dialog_title">Anwendungen zulassen</string>
     <string name="fapps_info_isolate_msg">Alle außer vertrauenswürdigen IPs blockieren.</string>
     <string name="fapps_info_bypass_msg">Universelle Firewall-Regeln umgehen.</string>
@@ -775,7 +775,7 @@
     <string name="cd_no_rules_text" translatable="true">Keine Domain-Regeln.</string>
     <string name="bsdl_block_desc" translatable="true">Blockieren, <u>dieser Domäne</u> vertrauen</string>
     <string name="bypass_dns_firewall" translatable="true">DNS &amp; Firewall umgehen</string>
-    <string name="settings_general_customize" translatable="true">anpassen</string>
+    <string name="settings_general_customize" translatable="true">Anpassen</string>
     <string name="settings_default_dns_heading" translatable="true">Ausweich-DNS auswählen</string>
     <string name="settings_pcap_heading" translatable="true">Paketerfassung</string>
     <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
@@ -866,7 +866,7 @@
     <string name="crypt_relay_singapore" translatable="true">Anonymisiertes DNS-Relay, gehostet in Singapur.</string>
     <string name="lbl_hour" translatable="true">Std</string>
     <string name="wireguard_enabled_failure">Schalte andere aktive Proxys aus, um WireGuard zu aktivieren</string>
-    <string name="lbl_save" translatable="true">speichern</string>
+    <string name="lbl_save" translatable="true">Speichern</string>
     <string name="cd_deleted_toast" translatable="true">Alle Domain-Regeln gelöscht</string>
     <string name="lbl_optional" translatable="true">(optional)</string>
     <string name="settings_go_log_desc" translatable="true">Für Fehlersuchzwecke</string>
@@ -887,8 +887,8 @@
     <string name="unknown_error" translatable="true">Unbekannter Fehler</string>
     <string name="search_proxy_add_apps" translatable="true">Apps nach Namen suchen</string>
     <string name="include_all_app_wg_dialog_title">Alle Apps einbeziehen</string>
-    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">meist kontaktierte Länder</string>
-    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">meistblockierte Länder</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">Meist kontaktierte Länder</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">Meist blockierte Länder</string>
     <string name="status_protected_with_wg" translatable="true">geschützt mit WireGuard</string>
     <string name="config_add_success_toast">Konfiguration hinzugefügt</string>
     <string name="key_contents_error" translatable="true">Falsche Zeichen im Schlüssel</string>
@@ -1083,8 +1083,8 @@
     <string name="hop_add_remove_title" translatable="true">Relay hinzufügen / entfernen</string>
     <string name="about_terms_of_service" translatable="true">Nutzungsbedingungen</string>
     <string name="bypasses_network_restrictions" translatable="true">Erreichbarkeitsprüfungen umgehen alle Netzwerkbeschränkungen. Im <i>Auto</i>-Modus verwendet Rethink zufällig zuvor verbundene IPs und Hostnamen.</string>
-    <string name="most_contacted_asn" translatable="true">meist kontaktierte Anbieter</string>
-    <string name="most_blocked_asn" translatable="true">meist blockierte Anbieter</string>
+    <string name="most_contacted_asn" translatable="true">Meist kontaktierte Anbieter</string>
+    <string name="most_blocked_asn" translatable="true">Meist blockierte Anbieter</string>
     <string name="adv_tasker_dialog_msg" translatable="true">Paketnamen eingeben (kommagetrennt), die Rethink starten oder stoppen dürfen.</string>
     <string name="adv_tasker_dialog_instructions" translatable="true">Anleitung:\nErforderliche Extras in der Broadcast-Nachricht:\n • Schlüssel: sender\n • Wert: Der Paketname der aufrufenden App\n\n Beispiel: key:sender value:com.termux\n\n Unterstützte Aktionen:\n • VPN starten – com.celzero.bravedns.intent.action.VPN_START\n • VPN stoppen – com.celzero.bravedns.intent.action.VPN_STOP</string>
     <string name="adv_tasker_dialog_edit_hint" translatable="true">Paketnamen eingeben (Beispiel: net.dinglisch.android.taskerm)</string>
@@ -1129,7 +1129,7 @@
     <string name="vpn_policy_fixed" translatable="true">Konservativ</string>
     <string name="vpn_policy_fixed_desc" translatable="true">Reagiert nur minimal auf Netzwerkänderungen.</string>
     <string name="wg_setting_ssid_title" translatable="true">Nur WLAN</string>
-    <string name="wg_setting_ssid_desc" translatable="true">Dieses WireGuard-VPN nur aktivieren, wenn eine Verbindung zu WLAN oder bestimmten WLAN-Kennungen (%1$s) besteht.</string>
+    <string name="wg_setting_ssid_desc" translatable="true">Dieses WireGuard-VPN nur aktivieren, wenn eine Verbindung zu WLAN oder zu einer der angegebenen WLAN-Kennungen (%1$s) besteht.</string>
     <string name="ssid_permission_explanation" translatable="true">Rethink benötigt Standortberechtigungen, um auf WLAN-Kennungen (%1$s) zugreifen zu können.</string>
     <string name="location_enable_explanation" translatable="true">Aktiviere den Standortdienst, um auf WLAN-Kennungen (%1$s) zugreifen zu können.</string>
     <string name="ssid_location_error" translatable="true">Standortdienst aktivieren</string>
@@ -1154,8 +1154,37 @@
     <string name="lockdown_download_enable_inapp" translatable="true">Downloader aktivieren</string>
     <string name="settings_jumbo_packets_desc" translatable="true">Verwendet <i>Jumbo-Pakete</i> innerhalb des VPN-Tunnels von Rethink.</string>
     <string name="settings_tunnel_metered" translatable="true">Immer getaktet</string>
-    <string name="settings_tunnel_metered_desc" translatable="true">Markiere den VPN-Tunnel als getaktet, um Apps anzuweisen, weniger Daten zu verbrauchen. Achtung: Dies kann dazu führen, dass Apps große Uploads und Downloads, wie z. B. Backups, unterbrechen.</string>
+    <string name="settings_tunnel_metered_desc" translatable="true">Markiere den VPN-Tunnel als getaktet, um Apps zu ermutigen, weniger Daten zu verbrauchen. Achtung: Dies kann dazu führen, dass Apps große Uploads und Downloads, wie z. B. Backups, unterbrechen.</string>
     <string name="stability_program_toast" translatable="true">Für das <i>Stabilitätsprogramm</i> für <i>experimentelle Funktionen</i> angemeldet.</string>
     <string name="dns_record_types_auto_mode_status" translatable="true">Automatisch (Alle Arten)</string>
-    <string name="lbl_expires_on" translatable="true">Läuft ab am</string>
+    <string name="lbl_expires_on" translatable="true">Gültig bis</string>
+    <string name="lbl_saving" translatable="true">Wird gespeichert…</string>
+    <string name="lbl_plan" translatable="true">Plan</string>
+    <string name="lbl_cancelled" translatable="true">Abgebrochen</string>
+    <string name="lbl_expired" translatable="true">Abgelaufen</string>
+    <string name="lbl_paused" translatable="true">Pausiert</string>
+    <string name="config_delete_all_dialog_desc" translatable="true">Bist du sicher, dass du ALLE WireGuard VPN-Konfigurationen löschen möchtest? Das ist IRREVERSIBEL.</string>
+    <string name="config_delete_all_dialog_title" translatable="true">Alle löschen</string>
+    <string name="stability_program_snackbar_msg" translatable="true">Stabilitätsprogramm aktiviert</string>
+    <string name="stability_program_snackbar_disable" translatable="true">Rückgängig</string>
+    <string name="settings_flood_wg_desc" translatable="true">Wenn aktiviert, werden zusätzliche WireGuard-Pakete gesendet, um die Identifizierung und Blockierung des Tunnelverkehrs in restriktiven Netzwerken zu erschweren.</string>
+    <plurals name="server_count">
+        <item quantity="one">%1$d Server</item>
+        <item quantity="other">%1$d Server</item>
+    </plurals>
+    <plurals name="peer_count">
+        <item quantity="one">%d Peer</item>
+        <item quantity="other">%d Peers</item>
+    </plurals>
+    <string name="rpn_purchased_state" translatable="true">Erworben</string>
+    <string name="tour_step_counter">%1$d von %2$d</string>
+    <string name="tour_btn_finish">Verstanden</string>
+    <string name="tour_btn_skip">Tour überspringen</string>
+    <string name="fs_configure_apps_desc" translatable="true">Firewallregeln und Netzwerkrichtlinien pro App</string>
+    <string name="fs_configure_network_desc" translatable="true">VPN-Tunnelmodus und Netzwerkeinstellungen</string>
+    <string name="fs_configure_proxy_desc" translatable="true">WireGuard, SOCKS5 und HTTP-Proxy-Routing</string>
+    <string name="fs_configure_others_desc" translatable="true">Aussehen, Benachrichtigungen und mehr</string>
+    <string name="fs_configure_advanced_desc" translatable="true">Entwicklertools und Diagnose</string>
+    <string name="fs_configure_logs_desc" translatable="true">Überprüfe DNS-Abfragen und Verbindungsprotokolle</string>
+    <string name="lbl_grace_period" translatable="true">Gnadenfrist</string>
 </resources>
