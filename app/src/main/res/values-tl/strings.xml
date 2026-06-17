@@ -93,9 +93,7 @@
     <string name="alert_firewall_accessibility_exception" translatable="true">Pagkabigo sa pagbukas ng Settings ng Accessibility. Subukan muli mamaya!</string>
     <string name="always_on_dialog_neutral" translatable="true">Mga Settings</string>
     <string name="private_dns_dialog_heading" translatable="true">I-off ang Pribadong DNS</string>
-    <string name="private_dns_dialog_desc" translatable="true">Ang mga setting ng DNS ng Rethink ay na-override ng Pribadong DNS ng Android.
-\n
-\nPara gamitin ang Rethink\'s DNS pumunta sa Android Settings at i-off ang \"Private DNS.\"</string>
+    <string name="private_dns_dialog_desc" translatable="true">Ang mga setting ng DNS ng Rethink ay na-override ng Pribadong DNS ng Android. \n \nPara gamitin ang Rethink\'s DNS pumunta sa Android Settings at i-off ang \"Private DNS.\"</string>
     <string name="private_dns_dialog_positive" translatable="true">Pumunta sa Mga Setting</string>
     <string name="firewall_act_network_monitor_tab" translatable="true">Network</string>
     <string name="dns_act_configure_tab" translatable="true">I-configure</string>
