@@ -499,7 +499,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             isEnabled && isActive -> {
                 io {
                     val selectedConfigs = RpnProxyManager.getSelectedCCs()
-                    val ccs = selectedConfigs.map { if (it.city == AUTO_SERVER_ID) it.city.capitalizeWords() else it.city.capitalizeWords() + ":" + it.cc.uppercase() }
+                    val ccs = selectedConfigs.map { if (it.city.equals(AUTO_SERVER_ID, true)) it.city.capitalizeWords() else it.city.capitalizeWords() + ":" + it.cc.uppercase() }
                     val desc =
                         if (selectedConfigs.isNotEmpty()) {
                             val countryList =

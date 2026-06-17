@@ -28,7 +28,6 @@ import com.celzero.bravedns.database.WgConfigFilesRepository
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.WireguardManager.load
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
-import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
@@ -43,6 +42,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.io.ByteArrayInputStream
 import java.io.File
 import java.util.concurrent.CopyOnWriteArraySet
 
@@ -106,7 +106,8 @@ object WireguardManager : KoinComponent {
         mappings.forEach {
             val path = it.configPath
             val config = try {
-                EncryptedFileManager.readWireguardConfig(applicationContext, path)
+                val bytes = EncryptedFileManager.readByteArray(applicationContext, File(path))
+                Config.parse(ByteArrayInputStream(bytes))
             } catch (e: EncryptionException) {
                 when (e) {
                     is EncryptionException.IOError -> {
@@ -126,6 +127,9 @@ object WireguardManager : KoinComponent {
                         return@forEach
                     }
                 }
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_PROXY, "Config parse failure for wg config: $path", e)
+                return@forEach
             }
             if (config == null) {
                 Logger.e(LOG_TAG_PROXY, "err loading wg config: $path, invalid config")
@@ -384,7 +388,7 @@ object WireguardManager : KoinComponent {
     }
 
     // pair - first: proxyId, second - can proceed for next check
-    private fun canUseConfig(idStr: String, type: String, usesMtrdNw: Boolean, ssid: String): Pair<String, Boolean> {
+    private fun canUseConfig(idStr: String, type: String, usesMobileNw: Boolean, ssid: String): Pair<String, Boolean> {
         val block = Backend.Block
         if (idStr.isEmpty()) {
             return Pair("", true)
@@ -399,7 +403,7 @@ object WireguardManager : KoinComponent {
 
         val lockdown = config.isLockdown
 
-        if (lockdown && (checkEligibilityBasedOnNw(id, usesMtrdNw) && checkEligibilityBasedOnSsid(id, ssid))) {
+        if (lockdown && (checkEligibilityBasedOnNw(id, usesMobileNw) || checkEligibilityBasedOnSsid(id, ssid, usesMobileNw))) {
             Logger.d(LOG_TAG_PROXY, "lockdown wg for $type => return $idStr")
             return Pair(idStr, false) // no need to proceed further for lockdown
         }
@@ -414,12 +418,12 @@ object WireguardManager : KoinComponent {
         }
 
         // check if the config is active and if it can be used on this network
-        if (config.isActive && (checkEligibilityBasedOnNw(id, usesMtrdNw) && checkEligibilityBasedOnSsid(id, ssid))) {
+        if (config.isActive && (checkEligibilityBasedOnNw(id, usesMobileNw) || checkEligibilityBasedOnSsid(id, ssid, usesMobileNw))) {
             Logger.d(LOG_TAG_PROXY, "active wg for $type => add $idStr")
             return Pair(idStr, true)
         }
 
-        Logger.v(LOG_TAG_PROXY, "wg for $type not active or not eligible nw, return empty, for id: $idStr, usesMtrdNw: $usesMtrdNw, ssid: $ssid")
+        Logger.v(LOG_TAG_PROXY, "wg for $type not active or not eligible nw, return empty, for id: $idStr, usesMtrdNw: $usesMobileNw, ssid: $ssid")
         return Pair("", true)
     }
 
@@ -565,7 +569,7 @@ object WireguardManager : KoinComponent {
         // if catch-all config is enabled, then add the config id to the list
         val cac = mappings.filter { it.isActive && it.isCatchAll }
         cac.forEach {
-            if ((checkEligibilityBasedOnNw(it.id, usesMobileNw) && checkEligibilityBasedOnSsid(it.id, ssid)) &&
+            if ((checkEligibilityBasedOnNw(it.id, usesMobileNw) || checkEligibilityBasedOnSsid(it.id, ssid, usesMobileNw)) &&
                 !proxyIds.contains(ID_WG_BASE + it.id)
             ) {
                 proxyIds.add(ID_WG_BASE + it.id)
@@ -611,19 +615,24 @@ object WireguardManager : KoinComponent {
             return false
         }
 
-        if (config.useOnlyOnMetered && !usesMobileNw) {
-            Logger.i(LOG_TAG_PROXY, "canAdd: useOnlyOnMetered is true, but not metered nw")
-            return false
+        if (config.useOnlyOnMetered && usesMobileNw) {
+            Logger.i(LOG_TAG_PROXY, "canAdd: useOnlyOnMetered is true, and metered nw, return true")
+            return true
         }
 
-        Logger.d(LOG_TAG_PROXY, "canAdd: eligible for metered nw: $usesMobileNw")
+        Logger.d(LOG_TAG_PROXY, "canAdd: not eligible for metered nw: $usesMobileNw, mobile-only? ${config.useOnlyOnMetered}")
         return true
     }
 
-    private fun checkEligibilityBasedOnSsid(id: Int, ssid: String): Boolean {
+    private fun checkEligibilityBasedOnSsid(id: Int, ssid: String, usesMobileNw: Boolean): Boolean {
         val config = mappings.find { it.id == id }
         if (config == null) {
             Logger.e(LOG_TAG_PROXY, "canAdd: wg not found, id: $id, ${mappings.size}")
+            return false
+        }
+
+        if (usesMobileNw && ssid.isEmpty()) {
+            Logger.i(LOG_TAG_PROXY, "canAdd: mobile nw, return false")
             return false
         }
 
@@ -1265,10 +1274,11 @@ object WireguardManager : KoinComponent {
 
     suspend fun restoreProcessRetrieveWireGuardConfigs() {
         val count = db.getWgConfigs().size
-        Logger.i(LOG_TAG_PROXY, "restored wg entries count: $count")
+        Logger.i(LOG_TAG_PROXY, "restoreProcessRetrieveWireGuardConfigs: db wg entries count: $count")
         clearLoadedConfigs()
         performRestore()
-        load(forceRefresh = true)
+        val loadedCount = load(forceRefresh = true)
+        Logger.i(LOG_TAG_PROXY, "restoreProcessRetrieveWireGuardConfigs: completed, loaded $loadedCount configs")
     }
 
     suspend fun performRestore() {
@@ -1277,27 +1287,52 @@ object WireguardManager : KoinComponent {
             // move the files to the wireguard directory and load the configs
             val tempDir = File(applicationContext.filesDir, TEMP_WG_DIR)
             val dbconfs = db.getWgConfigs()
-            Logger.v(
+
+            val tempFiles = tempDir.listFiles()?.filter { it.name.endsWith(".conf") } ?: emptyList()
+            Logger.i(
                 LOG_TAG_PROXY,
-                "temp dir: ${tempDir.listFiles()?.size}, db size: ${dbconfs.size}"
+                "performRestore: temp dir .conf files: ${tempFiles.size} (${tempFiles.joinToString { it.name }}), db size: ${dbconfs.size}"
             )
+
+            if (tempFiles.isEmpty() && dbconfs.isEmpty()) {
+                Logger.i(LOG_TAG_PROXY, "performRestore: no temp files and no db entries, nothing to restore")
+                return
+            }
+
+            if (tempFiles.isEmpty()) {
+                Logger.w(LOG_TAG_PROXY, "performRestore: db has ${dbconfs.size} entries but no temp .conf files found, cannot restore")
+                return
+            }
+
+            if (dbconfs.isEmpty()) {
+                Logger.w(
+                    LOG_TAG_PROXY,
+                    "performRestore: ${tempFiles.size} temp .conf files found but db has 0 entries. Files cannot be restored without db metadata. Preserving temp files for manual recovery."
+                )
+                return
+            }
+
+            val restoredIds = mutableSetOf<Int>()
+            val unmatchedFiles = mutableListOf<String>()
+
             dbconfs.forEach { c ->
                 // for each database entry, corresponding file with $id.conf is present in the temp dir
                 // move the file to the wireguard directory with the name available in the database
                 val file = File(tempDir, "${c.id}.conf")
                 if (file.exists()) {
-                    Logger.i(LOG_TAG_PROXY, "file exists: ${file.absolutePath}, proceed restore")
+                    Logger.i(LOG_TAG_PROXY, "performRestore: file exists: ${file.absolutePath} (${file.length()} bytes), proceed restore for config ${c.id}/${c.name}")
                 } else {
-                    Logger.i(LOG_TAG_PROXY, "no wg file, delete config: ${file.absolutePath}")
+                    Logger.w(LOG_TAG_PROXY, "performRestore: no matching wg file for db entry ${c.id}/${c.name}, expected: ${file.absolutePath}, deleting config entry")
                     db.deleteConfig(c.id)
                     return@forEach
                 }
                 // read the contents of the file and write it to the EncryptedFileManager
                 val bytes = file.readBytes()
+                Logger.i(LOG_TAG_PROXY, "performRestore: read ${bytes.size} bytes from ${file.name}")
                 val encryptFile = File(c.configPath)
                 val parentDir = encryptFile.parentFile
                 if (parentDir == null) {
-                    Logger.e(LOG_TAG_PROXY, "wg restore failed, invalid path: ${c.configPath}")
+                    Logger.e(LOG_TAG_PROXY, "performRestore: wg restore failed, invalid path: ${c.configPath}")
                     db.deleteConfig(c.id)
                     return@forEach
                 }
@@ -1311,7 +1346,7 @@ object WireguardManager : KoinComponent {
                 }.getOrElse { ex ->
                     Logger.w(
                         LOG_TAG_PROXY,
-                        "wg restore failed, unable to create file: ${encryptFile.absolutePath}, err: ${ex.message}"
+                        "performRestore: wg restore failed, unable to create file: ${encryptFile.absolutePath}, err: ${ex.message}"
                     )
                     db.deleteConfig(c.id)
                     return@forEach
@@ -1319,23 +1354,42 @@ object WireguardManager : KoinComponent {
                 if (!created) {
                     Logger.e(
                         LOG_TAG_PROXY,
-                        "wg restore failed, createNewFile returned false: ${encryptFile.absolutePath}"
+                        "performRestore: wg restore failed, createNewFile returned false: ${encryptFile.absolutePath}"
                     )
                     db.deleteConfig(c.id)
                     return@forEach
                 }
                 try {
                     EncryptedFileManager.write(applicationContext, bytes, encryptFile)
-                    Logger.i(LOG_TAG_PROXY, "restored wg config: ${c.id}, ${c.name}")
+                    restoredIds.add(c.id)
+                    Logger.i(LOG_TAG_PROXY, "performRestore: restored wg config: ${c.id}, ${c.name} -> ${encryptFile.absolutePath}")
                 } catch (e: EncryptionException) {
                     Logger.e(
                         LOG_TAG_PROXY,
-                        "Critical encryption failure restoring wg config: ${c.id}, ${c.name}",
+                        "performRestore: Critical encryption failure restoring wg config: ${c.id}, ${c.name}",
                         e
                     )
                 }
             }
 
+            // identify files that were not matched to any db entry
+            tempFiles.forEach { tf ->
+                val id = tf.nameWithoutExtension.toIntOrNull()
+                if (id == null || id !in restoredIds) {
+                    unmatchedFiles.add(tf.name)
+                }
+            }
+
+            if (unmatchedFiles.isNotEmpty()) {
+                Logger.w(
+                    LOG_TAG_PROXY,
+                    "performRestore: ${unmatchedFiles.size} temp .conf files unmatched to any db entry: ${unmatchedFiles.joinToString()}. Preserving temp dir for manual recovery."
+                )
+                // do not delete temp dir — unmatched files may be needed
+                return
+            }
+
+            Logger.i(LOG_TAG_PROXY, "performRestore: successfully restored ${restoredIds.size} configs, cleaning up temp dir")
             val isResidueDeleted = Utilities.deleteRecursive(tempDir)
             if (isResidueDeleted) {
                 Logger.i(LOG_TAG_PROXY, "deleted residue temp wg files: ${tempDir.absolutePath}")
@@ -1347,7 +1401,7 @@ object WireguardManager : KoinComponent {
                 tempDir.deleteRecursively()
             }
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_PROXY, "err restoring wg configs, ${e.message}")
+            Logger.e(LOG_TAG_PROXY, "performRestore: err restoring wg configs, ${e.message}", e)
         }
     }
 
