@@ -145,6 +145,12 @@ internal constructor(
             latestRefreshTime = current
             val pm = ctx.packageManager ?: return
 
+            // during restore action, re-encrypt wg config files from temp_wireguard/ before
+            // loading managers so that WireguardManager.load() finds the encrypted files.
+            if (action == ACTION_REFRESH_RESTORE) {
+                WireguardManager.restoreProcessRetrieveWireGuardConfigs()
+            }
+
             // make sure to maintain the order of the below calls
             val fm = FirewallManager.load()
             val ipm = IpRulesManager.load()

@@ -42,7 +42,6 @@ import com.celzero.bravedns.database.LogDatabase
 import com.celzero.bravedns.database.RefreshDatabase.Companion.ACTION_REFRESH_RESTORE
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
-import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Utilities
@@ -155,13 +154,13 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             // update app version after the restore process
             updateLatestVersion()
 
-            // restore WireGuard configs before loading managers so encrypted files
-            // exist when WireguardManager.load() runs. otherwise load() marks restored
-            // entries as inactive because the encrypted files haven't been created yet.
-            restoreWireGuardProfilesIfNeeded()
-
             // clean up the temp directory
             deleteRecursive(tempDir)
+
+            // WG configs are restored during RefreshDatabase.ACTION_REFRESH_RESTORE
+            // which runs after app restart with fresh Room connections.
+            // The caller (HomeScreenActivity.observeRestoreWorker) triggers the
+            // restart after this worker returns success.
 
             return true
         } catch (e: Exception) {
@@ -174,10 +173,6 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         } finally {
             inputStream?.close()
         }
-    }
-
-    private suspend fun restoreWireGuardProfilesIfNeeded() {
-        WireguardManager.restoreProcessRetrieveWireGuardConfigs()
     }
 
     private suspend fun moveRemoteBlocklistFileFromAsset() {
@@ -206,34 +201,32 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     }
 
     private fun handleDatabaseInit() {
-        // After restoreDatabaseFile replaced the database files on disk with the backup,
-        // the previously open database connections (if any) are now stale and must be
-        // reopened so Room applies any pending migrations against the restored files.
-        Logger.i(LOG_TAG_BACKUP_RESTORE, "reopening databases after restore")
-        logDatabase.openHelper.writableDatabase
-        appDatabase.openHelper.writableDatabase
-        Logger.i(LOG_TAG_BACKUP_RESTORE, "databases reopened after restore, version: ${appDatabase.openHelper.readableDatabase.version}")
+        // get writable database for logs
+        if (!logDatabase.isOpen) {
+            Logger.i(
+                LOG_TAG_BACKUP_RESTORE,
+                "log database is not open, perform writableDatabase operation"
+            )
+            logDatabase.openHelper.writableDatabase
+        } else {
+            // no-op
+        }
+
+        // get writable database for app
+        if (!appDatabase.isOpen) {
+            Logger.i(
+                LOG_TAG_BACKUP_RESTORE,
+                "app database is not open, perform writableDatabase operation"
+            )
+            appDatabase.openHelper.writableDatabase
+        } else {
+            // no-op
+        }
     }
 
     // Restore database file stored at tempDir/nameOfFileToRestore.
     private fun restoreDatabaseFile(tempDir: File): Boolean {
-        // Checkpoint and close databases before replacing the files on disk.
-        // If we don't close, Room's open file descriptors keep pointing to the
-        // old inodes and queries return stale data, causing WG entries to appear
-        // as zero even though the restored database file contains them.
-        Logger.i(LOG_TAG_BACKUP_RESTORE, "checkpoint and close databases before file copy")
-        appDatabase.checkPoint()
-        logDatabase.checkPoint()
-        try {
-            if (appDatabase.isOpen) appDatabase.close()
-        } catch (e: Exception) {
-            Logger.w(LOG_TAG_BACKUP_RESTORE, "close appDatabase err: ${e.message}")
-        }
-        try {
-            if (logDatabase.isOpen) logDatabase.close()
-        } catch (e: Exception) {
-            Logger.w(LOG_TAG_BACKUP_RESTORE, "close logDatabase err: ${e.message}")
-        }
+        checkPoint()
 
         Logger.d(LOG_TAG_BACKUP_RESTORE, "begin restore database to temp dir: ${tempDir.path}")
 
@@ -273,6 +266,13 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         }
 
         return true
+    }
+
+    private fun checkPoint() {
+        Logger.i(LOG_TAG_BACKUP_RESTORE, "database checkpoint() during restore process")
+        appDatabase.checkPoint()
+        logDatabase.checkPoint()
+        return
     }
 
     private fun restoreWireGuardFiles(dir: File): Boolean {
