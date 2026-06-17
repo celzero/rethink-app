@@ -1,2 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="lbl_action_required" translatable="true">Åtgärd behövs</string>
+    <string name="lbl_rules" translatable="true">Regler</string>
+    <string name="lbl_configure" translatable="true">Konfigurera</string>
+    <string name="lbl_logs" translatable="true">Loggar</string>
+    <string name="lbl_network" translatable="true">nätverk</string>
+    <string name="lbl_create" translatable="true">Skapa</string>
+    <string name="lbl_import" translatable="true">Importera</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="lbl_allowed" translatable="true">Tillåten</string>
+    <string name="lbl_maybe_blocked" translatable="true">Kanske Blockerad</string>
+    <string name="lbl_blocked" translatable="true">Blockerad</string>
+    <string name="lbl_addresses" translatable="true">Adresser</string>
+    <string name="lbl_dns_servers" translatable="true">DNS-servrar</string>
+    <string name="lbl_ip_rules" translatable="true">IP-regler</string>
+    <string name="lbl_domain_rules" translatable="true">Domänregler</string>
+</resources>
