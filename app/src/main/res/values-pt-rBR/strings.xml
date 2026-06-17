@@ -1199,7 +1199,6 @@
         <item quantity="other">%d peers</item>
     </plurals>
     <string name="rpn_purchased_state" translatable="true">Adquirido</string>
-    <string name="tour_btn_next">Próximo</string>
     <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[Esta conexão foi bloqueada porque o WireGuard está em modo de <i>lockdown</i>.<br><br> Para alterar, vá para a tela <i>WireGuard</i>.]]></string>
     <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[Esta conexão foi bloqueada porque o <i>proxy</i> selecionado para o aplicativo não foi escolhido.<br><br> Para alterar, vá em <i>Proxy</i> na tela <i>Configurar</i>.]]></string>
 </resources>

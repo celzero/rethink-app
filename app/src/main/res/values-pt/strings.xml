@@ -1120,6 +1120,5 @@
     <string name="stability_program_snackbar_disable" translatable="true">Desativar</string>
     <string name="rpn_purchased_state" translatable="true">Comprado</string>
     <string name="tour_step_counter">%1$d de %2$d</string>
-    <string name="tour_btn_next">Próximo</string>
     <string name="tour_btn_finish">Entendi</string>
 </resources>

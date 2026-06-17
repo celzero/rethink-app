@@ -1184,7 +1184,6 @@
         <item quantity="other">%d pares</item>
     </plurals>
     <string name="tour_step_counter">%1$d de %2$d</string>
-    <string name="tour_btn_next">Siguiente</string>
     <string name="tour_btn_finish">Entendido</string>
     <string name="tour_btn_skip">Saltar recorrido</string>
     <string name="lbl_saving" translatable="true">Guardando…</string>

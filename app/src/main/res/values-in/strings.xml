@@ -1188,7 +1188,6 @@
         <item quantity="other">%d rekan</item>
     </plurals>
     <string name="tour_step_counter">%1$d dari %2$d</string>
-    <string name="tour_btn_next">Berikutnya</string>
     <string name="tour_btn_finish">Mengerti</string>
     <string name="tour_btn_skip">Lewati tur</string>
     <string name="lbl_plan" translatable="true">Paket</string>

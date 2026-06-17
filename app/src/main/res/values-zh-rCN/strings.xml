@@ -1177,7 +1177,6 @@
         <item quantity="other">%d 个对端</item>
     </plurals>
     <string name="tour_step_counter">%2$d 个步骤中的第 %1$d 个</string>
-    <string name="tour_btn_next">下一步</string>
     <string name="tour_btn_finish">好的</string>
     <string name="tour_btn_skip">跳过向导</string>
     <string name="lbl_plan" translatable="true">套餐</string>

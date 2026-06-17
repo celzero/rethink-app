@@ -1143,7 +1143,6 @@
     </plurals>
     <string name="rpn_purchased_state" translatable="true">Achiziționat</string>
     <string name="tour_step_counter">%1$d din %2$d</string>
-    <string name="tour_btn_next">Următor</string>
     <string name="tour_btn_finish">Am înțeles</string>
     <string name="tour_btn_skip">Sari peste tur</string>
     <string name="fs_configure_apps_desc" translatable="true">Reguli firewall per aplicație și politica de rețea</string>
