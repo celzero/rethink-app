@@ -956,7 +956,7 @@
     <string name="lbl_last" translatable="true">Ostatni</string>
     <string name="lbl_starting" translatable="true">Startowanie</string>
     <string name="wireguard_apps_proxy_map_desc" translatable="true">część %1$s</string>
-    <string name="orbot_no_app_toast" translatable="true">"Dodaj przynajmiej jedną aplikację by włączyć  Orbot"</string>
+    <string name="orbot_no_app_toast" translatable="true">Dodaj przynajmiej jedną aplikację by włączyć Orbot</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Przekierowywanie własnych połączeń Rethink\'a przez tunel. Jeśli nie wiesz co robisz, wyłącz to.</string>
     <string name="cd_dialog_edit_title" translatable="true">Edytuj zasadę domeny</string>
     <string name="cd_toast_edit" translatable="true">Edytowane</string>
@@ -983,4 +983,11 @@
     <string name="failed_using_default" translatable="true">Niepowodzenie: użycie zapasowego DNS</string>
     <string name="wireguard_disable_message" translatable="true">Zatrzymać aktywne VPNy WireGuard?</string>
     <string name="exclude_apps_from_proxy_failure_toast">Ta apka omija proxy</string>
+    <string name="lbl_saving" translatable="true">Zapisywanie…</string>
+    <string name="lbl_expires_on" translatable="true">Wygasa dnia</string>
+    <string name="lbl_cancelled" translatable="true">Anulowane</string>
+    <string name="lbl_expired" translatable="true">Wygasło</string>
+    <string name="lbl_paused" translatable="true">Zatrzymany</string>
+    <string name="lbl_test" translatable="true">Test</string>
+    <string name="lbl_experimental" translatable="true">funkcja testowa</string>
 </resources>
