@@ -388,9 +388,7 @@
     <string name="dns_crypt_relay_remove_success">Repetidor DNSCrypt borrado.</string>
     <string name="always_on_dialog_positive_btn">Ir a los ajustes</string>
     <string name="private_dns_dialog_heading">Desactivar DNS privado</string>
-    <string name="private_dns_dialog_desc">La configuración DNS de Rethink es anulada por el DNS Privado de Android.
-\n
-\nPara usar el DNS de Rethink, ve a Ajustes de Android y desactiva \"DNS Privado\".</string>
+    <string name="private_dns_dialog_desc">La configuración DNS de Rethink es anulada por el DNS Privado de Android. \n \nPara usar el DNS de Rethink, ve a Ajustes de Android y desactiva \"DNS Privado\".</string>
     <string name="private_dns_dialog_positive">Ir a los ajustes</string>
     <string name="doh_custom_url_remove_dialog_message">Borra el punto de acceso de DNS sobre Https de la configuración guardada.</string>
     <string name="dns_proxy_remove_dialog_title">¿Borrar el proxy DNS\?</string>
