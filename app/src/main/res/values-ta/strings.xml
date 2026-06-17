@@ -147,9 +147,9 @@
     <string name="rules_load_failure_reload" translatable="true">ஏற்றவும்</string>
     <string name="network_log_app_name_unknown" translatable="true">தெரியவில்லை</string>
     <string name="socks5_proxy_toast_parameter" translatable="true">சாக்ச் 5 பதிலாள்</string>
-    <string name="firewall_rule_block_app_unmetered_desc" translatable="true">&lt;!</string>
-    <string name="firewall_rule_block_http_desc" translatable="true">&lt;!</string>
-    <string name="firewall_rule_unknown_desc" translatable="true">&lt;!</string>
+    <string name="firewall_rule_block_app_unmetered_desc" translatable="true"><![CDATA[<!]]></string>
+    <string name="firewall_rule_block_http_desc" translatable="true"><![CDATA[<!]]></string>
+    <string name="firewall_rule_unknown_desc" translatable="true"><![CDATA[<!]]></string>
     <string name="notif_channel_proxy_failure" translatable="true">பதிலாள் எச்சரிக்கைகள்</string>
     <string name="ada_noapp_dialog_title" translatable="true">அத்தகைய பயன்பாடு இல்லை</string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">யுனிவர்சல் டிஎன்எச் மற்றும் ஃபயர்வால் விதிகளை புறக்கணிக்கும்</string>
@@ -268,7 +268,7 @@
     <string name="cloudflare_dns_desc" translatable="true">எந்த டிஎன்எச் கோரிக்கைகளையும் தடுக்காது. கிளவுட்ஃப்ளேர் 1.1.1.1 டிஎன்எச் எண்ட்பாயிண்ட் பயன்படுத்தவும்.</string>
     <string name="cloudflare_family_dns_desc" translatable="true">தீம்பொருள் மற்றும் வயதுவந்த உள்ளடக்கத்தைத் தடுக்கிறது. கிளவுட்ஃப்ளேரின் 1.1.1.3 டிஎன்எச் எண்ட்பாயிண்ட் பயன்படுத்துகிறது.</string>
     <string name="quad9_dns_desc" translatable="true">உலகெங்கிலும் உள்ள சேவையகங்களின் பாதுகாப்பான பிணையம் மூலம் உங்கள் டிஎன்எச் வினவல்களை குவாட் 9 வழிவகுக்கிறது.</string>
-    <string name="firewall_rule_dns_blocked_desc" translatable="true">&lt;!</string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[<!]]></string>
     <string name="new_app_bulk_notification_title" translatable="true">கவனம்</string>
     <string name="new_app_bulk_notification_content" translatable="true">ரீடிங்க் தடுக்கப்பட்டது %1$s புதிய பயன்பாடுகள். பார்க்க அல்லது மாற்ற தட்டவும்.</string>
     <string name="new_app_notification_action_deny" translatable="true">தொடர்ந்து தடுத்திரு</string>
@@ -402,9 +402,9 @@
     <string name="firewall_rule_domain_blocked_univ" translatable="true">டொமைன் (யூனிவ்)</string>
     <string name="firewall_rule_domain_trusted_univ" translatable="true">நம்பகமான டொமைன் (யூனிவ்)</string>
     <string name="firewall_rule_no_rule_desc" translatable="true">இந்த இணைப்புடன் எந்த ஃபயர்வால் விதிகளும் பொருந்தவில்லை.</string>
-    <string name="firewall_rule_isolate_desc" translatable="true">&lt;!</string>
-    <string name="firewall_rule_block_ip_univ_desc" translatable="true">&lt;!</string>
-    <string name="firewall_rule_block_domain_desc" translatable="true">&lt;!</string>
+    <string name="firewall_rule_isolate_desc" translatable="true"><![CDATA[<!]]></string>
+    <string name="firewall_rule_block_ip_univ_desc" translatable="true"><![CDATA[<!]]></string>
+    <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[<!]]></string>
     <string name="lbl_action_required" translatable="true">நடவடிக்கை தேவை</string>
     <string name="lbl_configure" translatable="true">உள்ளமைக்கவும்</string>
     <string name="lbl_logs" translatable="true">பதிவுகள்</string>
@@ -445,7 +445,7 @@
     <string name="pause_text" translatable="true">இடைநிறுத்தப்பட்டது</string>
     <string name="hs_btm_sheet_lock_down" translatable="true">VPN &lt;i&gt; பூட்டுதல் &lt;/i&gt; ஆக இருக்கும்போது முறைகளை மாற்ற முடியாது. VPN அமைப்புகளைத் திருத்து &amp; lt;/u &amp; gt ;.</string>
     <string name="firewall_rule_trusted_ip" translatable="true">நம்பகமான ஐபி</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true">&lt;!</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true"><![CDATA[<!]]></string>
     <string name="build__flavor_website" translatable="true">இணையதளம்</string>
     <string name="ci_dialog_added_success" translatable="true">பட்டியலில் ஐபி சேர்க்கப்பட்டது</string>
     <string name="ci_no_rules_text" translatable="true">ஐபி அல்லது துறைமுகம் விதிகள் இல்லை.</string>
@@ -537,9 +537,9 @@
     <string name="fapps_info_unmetered_msg" translatable="true">அளவிடப்படாத (வைஃபை) நெட்வொர்க்கில் அனுமதிக்கவும் / தடுக்கவும்.</string>
     <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">பைபாச் பயன்பாடுகள்</string>
     <string name="firewall_rule_block_app_new_install" translatable="true">புதிய பயன்பாடு</string>
-    <string name="firewall_rule_device_lock_desc" translatable="true">&lt;!</string>
+    <string name="firewall_rule_device_lock_desc" translatable="true"><![CDATA[<!]]></string>
     <string name="firewall_rule_global_lockdown_desc" translatable="true">உலகளாவிய பூட்டுதல் அமைக்கப்பட்டிருப்பதால் இந்த இணைப்பு தடுக்கப்பட்டது.</string>
-    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">&lt;!</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[<!]]></string>
     <string name="notif_dialog_pause_dialog_positive" translatable="true">தற்குறிப்பு</string>
     <string name="notif_channel_desc_proxy_failure" translatable="true">பதிலாள் பிழைகள் மற்றும் முரண்பாடுகள் குறித்து எச்சரிக்கை</string>
     <string name="category_name_non_app_sys" translatable="true">கணினி சேவைகள்</string>
@@ -691,11 +691,11 @@
     <string name="firewall_rule_trusted_domain" translatable="true">நம்பகமான டொமைன் (பயன்பாடு)</string>
     <string name="firewall_rule_block_app_desc" translatable="true"><![CDATA[ஒரு பயனர்-செட் ஃபயர்வால் விதி இதைத் தடுத்தது <i> பயன்பாடு </i>.<br/><br/>To change go to <i>All Apps</i> tab.]]></string>
     <string name="firewall_rule_new_app_desc" translatable="true"><![CDATA[இந்த பயன்பாடு <i> முதல் </i> நேரத்திற்கான இணைப்பை ஏற்படுத்தியது.]]></string>
-    <string name="firewall_rule_block_app_mobile_desc" translatable="true">&lt;!</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true">&lt;!</string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">&lt;!</string>
-    <string name="firewall_rule_block_ip_desc" translatable="true">&lt;!</string>
-    <string name="firewall_rule_trusted_ip_desc" translatable="true">&lt;! [சி.டி.ஏ.டி.ஏ [இந்த இணைப்பு அனுமதிக்கப்பட்டது, ஏனெனில் &lt;i&gt; இலக்கு ஐபி &lt;/i&gt; நம்பகமான ஐபி என அமைக்கப்பட்டுள்ளது.</string>
+    <string name="firewall_rule_block_app_mobile_desc" translatable="true"><![CDATA[<!]]></string>
+    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true"><![CDATA[<!]]></string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[<!]]></string>
+    <string name="firewall_rule_block_ip_desc" translatable="true"><![CDATA[<!]]></string>
+    <string name="firewall_rule_trusted_ip_desc" translatable="true"><![CDATA[<! [சி.டி.ஏ.டி.ஏ [இந்த இணைப்பு அனுமதிக்கப்பட்டது, ஏனெனில் <i> இலக்கு ஐபி </i> நம்பகமான ஐபி என அமைக்கப்பட்டுள்ளது.]]></string>
     <string name="lbl_apply" translatable="true">இடு</string>
     <string name="lbl_allowed" translatable="true">அனுமதிக்கப்படுகிறது</string>
     <string name="lbl_blocked" translatable="true">தடுக்கப்பட்டது</string>
@@ -795,13 +795,13 @@
     <string name="settings_notification_desc2" translatable="true">டி.என்.எச் / டி.என்.எச் + ஃபயர்வால்</string>
     <string name="settings_notification_desc3" translatable="true">எதுவுமில்லை</string>
     <string name="settings_notification_dialog_option_1" translatable="true">\nஇடைநிறுத்தம் / நிறுத்தம் (இயல்புநிலை)\n இரண்டு பொத்தான்களைக் காட்டுகிறது, விரைவாக இடைநிறுத்தவும், மறுபரிசீலனை செய்யவும்.</string>
-    <string name="firewall_rule_foreground_desc" translatable="true">&lt;!</string>
-    <string name="firewall_rule_block_udp_ntp_desc" translatable="true">&lt;!</string>
-    <string name="firewall_rule_block_dns_bypass_desc" translatable="true">&lt;!</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true">&lt;!</string>
-    <string name="firewall_rule_exempt_orbot_setup_desc" translatable="true">&lt;!</string>
+    <string name="firewall_rule_foreground_desc" translatable="true"><![CDATA[<!]]></string>
+    <string name="firewall_rule_block_udp_ntp_desc" translatable="true"><![CDATA[<!]]></string>
+    <string name="firewall_rule_block_dns_bypass_desc" translatable="true"><![CDATA[<!]]></string>
+    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true"><![CDATA[<!]]></string>
+    <string name="firewall_rule_exempt_orbot_setup_desc" translatable="true"><![CDATA[<!]]></string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[இந்த இணைப்பு அனுமதிக்கப்பட்டது, ஏனெனில் <i> டொமைன் </i> நம்பகமான களமாக அமைக்கப்பட்டுள்ளது.]]></string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">&lt;!</string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[<!]]></string>
     <string name="firewall_rule_proxied_desc" translatable="true">இந்த இணைப்பு பயனர்-வழங்கப்பட்ட பதிலாள்.</string>
     <string name="notif_dialog_pause_dialog_neutral" translatable="true">காட்டு</string>
     <string name="ci_trust_initial" translatable="true">டி</string>
@@ -844,8 +844,8 @@
     <string name="radio_sky_btn" translatable="true">⛅ வானம்</string>
     <string name="radio_max_btn" translatable="true">. அதிகபட்சம்</string>
     <string name="rt_filter_hint" translatable="true"><u> அனைத்தையும் </u> பிளாக்லிச்ட்களைக் காட்டுகிறது</string>
-    <string name="rt_filter_desc" translatable="true">&lt;!</string>
-    <string name="rt_filter_desc_subgroups" translatable="true">&lt;!</string>
+    <string name="rt_filter_desc" translatable="true"><![CDATA[<!]]></string>
+    <string name="rt_filter_desc_subgroups" translatable="true"><![CDATA[<!]]></string>
     <string name="rethink_sky_desc" translatable="true">280+ இடங்கள்; அதிக நேரம்; Cloudflare.com இல் இயங்கும் முளை RISOLVER</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">ஒருங்கிணைப்பு கோரிக்கைகள், கேச் பதில்கள், நெகிழக்கூடிய பிழை கையாளுதல்</string>
     <string name="dc_refresh_toast" translatable="true">முழுமையானது</string>
@@ -999,9 +999,9 @@
     <string name="firewall_rule_paused_app" translatable="true">பயன்பாடு இடைநிறுத்தப்பட்டது</string>
     <string name="firewall_rule_lockdown_wg" translatable="true">பூட்டுதல் பதிலாள்</string>
     <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[இந்த இணைப்பு ஒரு <i> தனியார் டி.என்.எச் </i> சேவையகத்தைத் தேடுகிறது.]]></string>
-    <string name="firewall_rule_bypass_proxy_desc" translatable="true">&lt;!</string>
-    <string name="firewall_rule_paused_app_desc" translatable="true">&lt;!</string>
-    <string name="firewall_rule_lockdown_wg_desc" translatable="true">&lt;!</string>
+    <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[<!]]></string>
+    <string name="firewall_rule_paused_app_desc" translatable="true"><![CDATA[<!]]></string>
+    <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[<!]]></string>
     <string name="wireguard_disable_failure_relay" translatable="true">\"ரிலே வயர் கார்ட்\" அணைக்க முடியாது</string>
     <string name="config_invalid_desc" translatable="true">தவறான வயர்கார்ட் உள்ளமைவு</string>
     <string name="console_log_title" translatable="true">பயன்பாட்டு பதிவுகள்</string>
