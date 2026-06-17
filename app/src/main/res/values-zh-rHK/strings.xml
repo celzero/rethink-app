@@ -735,9 +735,7 @@
     <string name="ci_trust_txt">信任</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">清除日誌</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">攔截成人、盜版內容，線上賭博、約會同社交媒體。</string>
-    <string name="private_dns_dialog_desc">Rethink 嘅 DNS 設定被 Android 嘅私人 DNS 冚咗。
-\n
-\n要用 Rethink 嘅 DNS，請去 Android 設定度熄咗「私人 DNS」佢。</string>
+    <string name="private_dns_dialog_desc">Rethink 嘅 DNS 設定被 Android 嘅私人 DNS 冚咗。 \n \n要用 Rethink 嘅 DNS，請去 Android 設定度熄咗「私人 DNS」佢。</string>
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">攔截惡意軟件、勒索軟件、加密軟件、釣魚同其他威脅。</string>
     <string name="ci_trust_initial">信</string>
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">攔截吸睛軟件、間諜軟件同恐嚇軟件。</string>
