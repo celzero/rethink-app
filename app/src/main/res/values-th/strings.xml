@@ -926,9 +926,7 @@
 \n<u>#5</u>: บล็อกการเชื่อมต่อเมื่อไม่รู้จักแอปต้นทาง (ไฟร์วอลล์สากล)
 \n<u>#6</u>: บล็อกการรับส่งข้อมูล UDP ทั้งหมด ยกเว้น DNS (ไฟร์วอลล์สากล)
 \n<u>#7</u>: บล็อกการเชื่อมต่อเมื่อข้าม DNS (ไฟร์วอลล์สากล)</string>
-    <string name="private_dns_dialog_desc" translatable="true">การตั้งค่า DNS ของ Rethink จะถูกแทนที่ด้วย DNS ส่วนตัวของ Android
-\n
-\nหากต้องการใช้ DNS ของ Rethink ให้ไปที่การตั้งค่า Android แล้วปิด \"DNS ส่วนตัว\"</string>
+    <string name="private_dns_dialog_desc" translatable="true">การตั้งค่า DNS ของ Rethink จะถูกแทนที่ด้วย DNS ส่วนตัวของ Android \n \nหากต้องการใช้ DNS ของ Rethink ให้ไปที่การตั้งค่า Android แล้วปิด \"DNS ส่วนตัว\"</string>
     <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink ใช้บริการการเข้าถึงเพื่อติดตามว่าแอปใดใช้งานอยู่ (เบื้องหน้า) และแอปใดไม่ได้ใช้งาน (เบื้องหลัง)
 \n
 \nRethink ไม่รวบรวมข้อมูลหรือสอดส่องคุณในทางใดทางหนึ่ง</string>
