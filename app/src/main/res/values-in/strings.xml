@@ -584,7 +584,7 @@
     <string name="brbs_restore_dialog_positive">Pulihkan</string>
     <string name="brbs_restore_dialog_title">Pulihkan cadangan</string>
     <string name="brbs_restore_dialog_failure_title">Pemulihan gagal</string>
-    <string name="private_dns_dialog_desc">Pengaturan DNS Rethink ditimpa oleh DNS Pribadi Android. \n \nUntuk menggunakan DNS Rethink, buka Pengaturan Android dan matikan \"DNS Pribadi\".</string>
+    <string name="private_dns_dialog_desc">Pengaturan DNS Rethink diganti oleh DNS Pribadi Android.\n\nUntuk menggunakan DNS Rethink, buka Pengaturan Android dan nonaktifkan DNS Pribadi.</string>
     <string name="untracked">tidak terlacak</string>
     <string name="private_dns_dialog_heading">Matikan DNS Pribadi</string>
     <string name="private_dns_dialog_positive">Masuk ke Pengaturan</string>
@@ -1249,4 +1249,25 @@
     <string name="cd_allowed_dns_record_types_heading" translatable="true">Jenis catatan DNS yang diizinkan</string>
     <string name="cd_allowed_dns_record_types_desc" translatable="true">Pilih jenis catatan sumber daya DNS yang diizinkan.</string>
     <string name="dns_record_types_auto_mode_status" translatable="true">Otomatis (Semua jenis)</string>
+    <string name="stability_program_snackbar_disable" translatable="true">Nonaktifkan</string>
+    <string name="server_selection_selected_count">%1$s / %2$s</string>
+    <plurals name="server_count">
+        <item quantity="other">%1$d server</item>
+    </plurals>
+    <plurals name="peer_count">
+        <item quantity="other">%d rekan</item>
+    </plurals>
+    <string name="rethink_plus_purchased_state" translatable="true">Dibeli</string>
+    <string name="tour_step_counter">%1$d dari %2$d</string>
+    <string name="tour_btn_next">Berikutnya</string>
+    <string name="tour_btn_finish">Mengerti</string>
+    <string name="tour_btn_skip">Lewati tur</string>
+    <string name="lbl_plan" translatable="true">Paket</string>
+    <string name="lbl_expires_on" translatable="true">Kedaluwarsa pada</string>
+    <string name="lbl_cancelled" translatable="true">Dibatalkan</string>
+    <string name="lbl_expired" translatable="true">Kedaluwarsa</string>
+    <string name="lbl_grace_period" translatable="true">Masa Tenggang</string>
+    <string name="lbl_paused" translatable="true">Dijeda</string>
+    <string name="stability_program_snackbar_msg" translatable="true">Program stabilitas diaktifkan. Laporan kerusakan membantu meningkatkan fitur eksperimental.</string>
+    <string name="rpn_purchased_state" translatable="true">Dibeli</string>
 </resources>
