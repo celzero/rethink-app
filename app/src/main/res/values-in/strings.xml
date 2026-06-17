@@ -79,12 +79,12 @@
     <string name="brave_dns_connect_mode_change_firewall">Pilih Mode.</string>
     <string name="settings_title_desc">DNS dan Firewall yang sangat mudah disesuaikan</string>
     <string name="status_protected_with_tor_private_dns">terlindungi dengan tor &amp; dns pribadi</string>
-    <string name="block">blokir</string>
+    <string name="block">Blokir</string>
     <string name="title_settings">Pengaturan</string>
     <string name="status_dns_error">dns mengalami gangguan</string>
     <string name="title_about">Tentang</string>
     <string name="about_title_desc">Mendeteksi dan menangkal ancaman-ancaman keamanan jaringan</string>
-    <string name="allow">izinkan</string>
+    <string name="allow">Izinkan</string>
     <string name="dns_mode_notification_title">Terlindungi! Terhubung dengan DNS Cepat dan Aman.</string>
     <string name="firewall_mode_notification_title">Terlindungi! Terhubung dengan Firewall.</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Peringatan: Rethink telah dihentikan</string>
@@ -99,7 +99,7 @@
     <string name="conn_track_clear_logs_message">Hanya menghapus riwayat catatan jaringan, tidak dengan aturan-aturan firewall. Tindakan ini tidak dapat dibatalkan. Apakah Anda ingin melanjutkan\?</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">tidak terlindungi</string>
     <string name="about_website">Kunjungi rethinkdns.com</string>
-    <string name="lbl_add">tambah</string>
+    <string name="lbl_add">Tambah</string>
     <string name="settings_local_blocklist_version">Versi: v%1$s</string>
     <string name="firewall_rule_no_rule">Tanpa Aturan</string>
     <string name="hsf_chip_appearance">Tema %1$s</string>
@@ -171,14 +171,14 @@
     <string name="firewall_rule_device_lock">Perangkat Terkunci</string>
     <string name="firewall_rule_no_rule_desc">Tidak ada aturan firewall sesuai koneksi ini.</string>
     <string name="new_app_notification_action_deny">Tetap memblok</string>
-    <string name="about_web">tautan</string>
+    <string name="about_web">Tautan</string>
     <string name="about_whats_new">Yang baru di versi %1$s</string>
     <string name="app_name">RethinkDNS</string>
     <string name="unicode_question_sign">❔</string>
     <string name="fav_icon">ikon_fav</string>
     <string name="firewall_rule_unknown">Sumber Tidak Diketahui</string>
     <string name="category_name_installed">Aplikasi yang Terpasang</string>
-    <string name="about_app">aplikasi</string>
+    <string name="about_app">Aplikasi</string>
     <string name="about_mail_to">hello@celzero.com</string>
     <string name="about_version_install_source">v%1$s (%2$s)</string>
     <string name="apps_icon_content_desc">Ikon Aplikasi</string>
@@ -195,12 +195,12 @@
     <string name="hybrid_mode_info_title">DNS + Firewall</string>
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="new_app_notification_action_toast_deny">Koneksi jaringan app diabaikan</string>
-    <string name="dc_other_dns_heading">tipe</string>
+    <string name="dc_other_dns_heading">Jenis</string>
     <string name="about_mail_bugreport_text">Kirimkan email ke : hello@celzero.com</string>
     <string name="cd_custom_doh_url_name_default">DoH</string>
     <string name="unicode_warning_sign">⚠</string>
     <string name="new_app_bulk_notification_title">Perhatian</string>
-    <string name="about_settings">sistem</string>
+    <string name="about_settings">Sistem</string>
     <string name="about_github_link">https://github.com/celzero/rethink-app</string>
     <string name="about_website_link">https://www.rethinkdns.com/</string>
     <string name="settings_protocol_translation_dns_inactive">Beralih ke mode DNS/DNS+Firewall untuk mengaktifkan pengaturan ini</string>
@@ -243,7 +243,7 @@
     <string name="cd_dns_crypt_relay_heading">Jembatan Penghubung</string>
     <string name="univ_firewall_rule_7">Blokir IPv4 melalui IPv6 (eksperimental)</string>
     <string name="settings_socks5_dialog_hint_port">Port</string>
-    <string name="rt_list_simple_btn_txt">simpel</string>
+    <string name="rt_list_simple_btn_txt">Sederhana</string>
     <string name="dns_proxy_desc_no_app">%1$s:%2$s</string>
     <string name="about_docs">Baca documentasi</string>
     <string name="rt_download_start">Mengunduh daftar-daftar blokir…</string>
@@ -274,7 +274,7 @@
     <string name="ci_dialog_error_invalid_ip">Alamat IP, subnet atau port tidak sah.</string>
     <string name="local_blocklist_download_desc">Unduh daftar blokir (sekitar 60MB) untuk menggunakan fitur ini\?</string>
     <string name="dc_local_block_desc_1">Pilih dari 195+ daftar blokir. Klik di sini untuk mengunduh atau mengatur daftar blokir.</string>
-    <string name="settings_general_header">umum</string>
+    <string name="settings_general_header">Umum</string>
     <string name="settings_dns_proxy_dialog_password">Kata sandi</string>
     <string name="hsf_blocklist_updating_text">Mengaktifkan…</string>
     <string name="settings_socks5_desc">Meneruskan koneksi ke titik akhir SOCKS5.</string>
@@ -346,12 +346,12 @@
     <string name="dns_connected_rethink_plus">Terhubung. %1$s daftar blokir yang digunakan</string>
     <string name="fapps_firewall_filter_desc_category"><![CDATA[Menampilkan <u>%1$s</u> %2$s aplikasi dalam kategori: %3$s]]></string>
     <string name="alert_firewall_accessibility_regrant_explanation">Layanan aksesibilitas Rethink terhenti atau mengalami kegagalan. <i><b>Masuk ke Pengaturan dan Hentikan Paksa</b></i> dan mulai ulang untuk menggunakan fitur <i>Blokir aplikasi apapun yang tidak digunakan</i>.\n\nRethink menggunakan layanan aksesibilitas untuk mengawasi aplikasi yang sedang digunakan (latar depan) dan aplikasi yang tidak digunakan (latar belakang).</string>
-    <string name="firewall_act_universal_tab">universal</string>
+    <string name="firewall_act_universal_tab">Universal</string>
     <string name="cd_dialog_error_invalid_domain">URL atau nama domain tidak valid</string>
     <string name="settings_socks5_dialog_hint_username">Nama pengguna (tidak wajib)</string>
     <string name="settings_theme_dialog_themes_3">Gelap</string>
     <string name="lbl_proceed">Lanjutkan</string>
-    <string name="bypass_universal">memintas (bypass) aturan secara universal</string>
+    <string name="bypass_universal">Lewati Universal</string>
     <string name="dns_crypt_relay_remove_dialog_title">Hapus Jembatan Penghubung (Relay) DNSCrypt\?</string>
     <string name="univ_ip_delete_individual_toast">%1$s telah dihapus.</string>
     <string name="univ_delete_firewall_dialog_message">Menghapus aturan ini akan memungkinkan aplikasi apa pun untuk terhubung ke IP yang saat ini diblokir ini.</string>
@@ -366,7 +366,7 @@
     <string name="notif_download_content_text">Sedang mengunduh…</string>
     <string name="settings_dns_proxy_dialog_port_number">Nomor Port</string>
     <string name="brbs_backup_dialog_positive">Cadangkan</string>
-    <string name="settings_dns_proxy_dialog_positive_btn">atur</string>
+    <string name="settings_dns_proxy_dialog_positive_btn">Tetapkan</string>
     <string name="settings_ip_text_ipv4">IPv4</string>
     <string name="firewall_card_text_inactive">Aktifkan mode firewall.</string>
     <string name="univ_ip_delete_dialog_positive">Hapus semua</string>
@@ -391,7 +391,7 @@
     <string name="dns_proxy_dialog_message_no_app">Alamat IP: %1$s
 \n
 \nNomor port: %2$s</string>
-    <string name="dc_block_heading">aturan-aturan</string>
+    <string name="dc_block_heading">Aturan</string>
     <string name="settings_http_proxy_error_text4">Koneksi ke host gagal. Coba lagi.</string>
     <string name="new_app_notification_content">Rethink memblokir aplikasi yang baru dipasang, %1$s.</string>
     <string name="firewall_status_whitelisted">Aturan firewall universal dilewati (di-bypass)</string>
@@ -401,7 +401,7 @@
     <string name="app_mode_dns_firewall">DNS dan Firewall (bawaan)</string>
     <string name="settings_socks5_vpn_disabled_error">Mulai Rethink untuk melanjutkan.</string>
     <string name="settings_http_proxy_desc">Meneruskan ke %1$s</string>
-    <string name="about_connect">kontak</string>
+    <string name="about_connect">Kontak</string>
     <string name="cd_dns_proxy_mode_internal">Dalam</string>
     <string name="settings_https_heading">Atur KONEKSI Proksi HTTP(S)</string>
     <string name="settings_http_proxy_toast_success">Proksi HTTP telah diatur</string>
@@ -460,7 +460,7 @@
     <string name="ci_delete">hapus</string>
     <string name="orbot_bs_status_3">Meneruskan %1$s ke Orbot, Proksi HTTP telah diatur.</string>
     <string name="status_protected_with_http">terproteksi dengan proksi http</string>
-    <string name="settings_proxy_header">proksi</string>
+    <string name="settings_proxy_header">Proksi</string>
     <string name="dns_proxy_dialog_message">Nama aplikasi: %1$s
 \n
 \nAlamat IP: %2$s
@@ -515,7 +515,7 @@
     <string name="fapps_metered_block_dialog_title">Blokir jaringan yang terukur</string>
     <string name="ada_app_status_block_md">Diblokir pada jaringan yang terukur (Data Seluler)</string>
     <string name="cd_dns_crypt_dialog_heading">Tambahkan Penyelesai (Resolver) atau Jembatan-Penghubung (Relay) DNSCrypt</string>
-    <string name="ada_network_log_title">log jaringan untuk aplikasi ini</string>
+    <string name="ada_network_log_title">Log jaringan untuk aplikasi ini</string>
     <string name="cd_doh_dialog_resolver_name">Nama Server Penyelesai</string>
     <string name="rt_chip_update_available">Pembaruan tersedia</string>
     <string name="ada_app_unmetered">Tidak Terukur</string>
@@ -523,7 +523,7 @@
     <string name="firewall_status_block_metered">Diblokir pada jaringan yang terukur (Data Seluler)</string>
     <string name="firewall_rule_trusted_ip">IP Tepercaya</string>
     <string name="brbs_backup_dialog_title">Buat cadangan</string>
-    <string name="cd_dns_crypt_title">server penyelesai</string>
+    <string name="cd_dns_crypt_title">Resolver</string>
     <string name="firewall_rule_univ_block_metered">Terukur (Universal)</string>
     <string name="fapps_unmetered_block_dialog_title">Blokir jaringan yang tidak terukur</string>
     <string name="firewall_rule_block_metered">Terukur (Data Selular)</string>
@@ -689,7 +689,7 @@
     <string name="cd_dialog_error_invalid_wildcard">URL Wildcard atau nama domain tidak valid</string>
     <string name="ci_blocked_initial">B</string>
     <string name="ci_no_rule_initial">N</string>
-    <string name="ada_firewall_title">aturan firewall untuk aplikasi ini</string>
+    <string name="ada_firewall_title">Aturan firewall untuk aplikasi ini</string>
     <string name="hsf_start_dialog_message">Anda selangkah lagi menuju sistem Android yang aman dan terlindungi: Melihat aktivitas jaringan secara instan, memblokir situs web, IP, dan aplikasi yang tidak diinginkan.</string>
     <string name="about_bravedns_explantion">Rethink memiliki cara termudah untuk memantau aktivitas aplikasi, menghindari sensor internet, dan aplikasi firewall di perangkat Android Anda.</string>
     <string name="hs_download_positive_default">oke</string>
@@ -707,7 +707,7 @@
     <string name="ci_bypass_universal">Pintaskan (Bypass) secara Universal</string>
     <string name="ada_app_bypass_univ">Pintaskan (Bypass) secara Universal</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Hapus semua log yang terkait dengan aplikasi ini.</string>
-    <string name="lbl_advanced">lanjutan</string>
+    <string name="lbl_advanced">Lanjutan</string>
     <string name="rt_filter_desc_subgroups"><![CDATA[Menampilkan daftar blokir <u>%1$s</u> dalam grup: %2$s dan subgrup: %3$s]]></string>
     <string name="bsrf_sub_group_heading">Subgrup</string>
     <string name="settings_dns_proxy_dialog_app_desc">Aplikasi yang dipilih akan dikecualikan dari VPN untuk memungkinkannya membuat koneksi proksi atas nama Anda.</string>
@@ -727,74 +727,7 @@
     <string name="firewall_rule_exempt_dns_proxied_desc"><![CDATA[Koneksi DNS ini telah diproksi dan diteruskan ke titik akhir DNS yang dipilih pengguna.<br/><br/> Untuk mengubah atau menonaktifkan <i>Mencegah kebocoran DNS</i> dari layar <i>Konfigurasi</i> DNS.]]></string>
     <string name="firewall_rule_exempt_orbot_setup_desc"><![CDATA[Koneksi ini diizinkan karena pengaturan <i>one-click Tor-as-a-proxy</i> melalui Orbot sedang berlangsung.]]></string>
     <string name="cd_blocked_initial">B</string>
-    <string name="contributors_list"><![CDATA[<i>Rethink Open Source Project</i> bergantung pada para sukarelawan yang menghabiskan waktu berjam-jam untuk pengembangan proyek ini.<br/>
-                                              <br/>🛡️ Aplikasi Android <br/>
-                                              <a href="https://github.com/anthonyryan1">Anthony Ryan</a> /
-                                              <a href="https://github.com/BayLee4">BayLee4</a> /
-                                              <a href="https://github.com/Ch4t4r">Ch4t4r</a> /
-                                              <a href="https://github.com/samthesamman">CodingAttack</a> /
-                                              <a href="https://github.com/HrBDev">HrBDev</a> /
-                                              <a href="https://github.com/hussainmohd-a">hussainmohd-a</a> /
-                                              <a href="https://github.com/ignoramous">ignoramous</a> /
-                                              <a href="https://github.com/ironveil">ironveil</a> /
-                                              <a href="https://github.com/markwmuller">markwmuller</a> /
-                                              <a href="https://github.com/mohammaduvez">Mohammaduvez</a> /
-                                              <a href="https://github.com/Mygod">Mygod</a> /
-                                              <a href="https://github.com/Poussinou">Poussinou</a> /
-                                              <a href="https://github.com/pjosingh">pjosingh</a> /
-                                              <a href="https://github.com/RohitSurwase">RohitSurwase</a> /
-                                              <a href="https://github.com/ShantanuVichare">Shantanu</a> /
-                                              <a href="https://github.com/Uldiniad">Uldiniad</a><br/> /
-                                              <a href="https://github.com/yurtpage">yurtpage</a><br/>
-                                              <br/>🚂 Network engine <br/>
-                                              <a href="https://github.com/alalamav">alalamav</a> /
-                                              <a href="https://github.com/bemasc">bemasc</a> /
-                                              <a href="https://github.com/dmcardle">dmcardle</a> /
-                                              <a href="https://github.com/fortuna">fortuna</a> /
-                                              <a href="https://github.com/ignoramous">ignoramous</a> /
-                                              <a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /
-                                              <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
-                                              <a href="https://github.com/SeanBurford">SeanBurford</a><br/>
-                                              <br/>📚 Resolver <br/>
-                                              <a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a> /
-                                              <a href="https://github.com/amithm7">amithm7</a> /
-                                              <a href="https://github.com/arfshl">arfshl</a> /
-                                              <a href="https://github.com/badmojr">badmojr</a> /
-                                              <a href="https://github.com/bongochong">bongochong</a> /
-                                              <a href="https://github.com/elliotwutingfeng">elliotwutingfeng</a> /
-                                              <a href="https://github.com/georgyo">georgyo</a> /
-                                              <a href="https://github.com/GiddyGoatGaming">GiddyGoatGaming</a> /
-                                              <a href="https://github.com/Harish-Narayan">Harish-Narayan</a> /
-                                              <a href="https://github.com/ignoramous">ignoramous</a> /
-                                              <a href="https://github.com/JakeChampion">JakeChampion</a> /
-                                              <a href="https://github.com/MasterKia">MasterKia</a> /
-                                              <a href="https://github.com/mtxadmin">mtxadmin</a> /
-                                              <a href="https://github.com/neneeen">neneeen</a> /
-                                              <a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /
-                                              <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
-                                              <a href="https://github.com/shruuub">shruuub</a> /
-                                              <a href="https://github.com/shuvashish76">shuvashish76</a><br/>
-                                              <br/>⚜ Komunitas mods <br/>
-                                              <a href="https://t.me/amithm7">amithm7</a> /
-                                              <a href="https://t.me/TronSlayer">Andersen</a> /
-                                              <a href="https://t.me/ppatra">ppatra</a> /
-                                               <a href="https://t.me/InFamous23">InFamous23</a> /
-                                              <a href="https://t.me/TheTr1ckst3r">TheTr1ckst3r</a> /
-                                              <a href="https://t.me/Ch4t4r">Ch4t4r</a> /
-                                              <a href="https://t.me/Billi_ance">Billi_ance</a> /
-                                              <a href="https://t.me/kaliangel">kaliangel</a> /
-                                              <a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>
-                                              <br/>📌 Geo-IP <br/>
-                                              <a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IPinfo Lite</a><br/>
-                                              <br/>❇ Penerjemahan <br/>
-                                              <a href="https://weblate.org/en/">Weblate</a><br/>
-                                              <br/>🦆 Icons <br/>
-                                              <a href="https://github.com/celzero/rethink-app/issues/346">Icons</a><br/>
-                                              <br/>📦 Build servers <br/>
-                                              <a href="https://jitpack.io/">JitPack</a> /
-                                              <a href="https://github.com/">GitHub</a> /
-                                              <a href="https://central.sonatype.com/">Sonatype</a><br/>
-                                              ]]></string>
+    <string name="contributors_list"><![CDATA[<i>Rethink Open Source Project</i> bergantung pada para sukarelawan yang menghabiskan waktu berjam-jam untuk pengembangan proyek ini.<br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>🛡️ Aplikasi Android <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/anthonyryan1">Anthony Ryan</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/BayLee4">BayLee4</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/Ch4t4r">Ch4t4r</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/samthesamman">CodingAttack</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/HrBDev">HrBDev</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/hussainmohd-a">hussainmohd-a</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ignoramous">ignoramous</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ironveil">ironveil</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/markwmuller">markwmuller</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/mohammaduvez">Mohammaduvez</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/Mygod">Mygod</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/Poussinou">Poussinou</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/pjosingh">pjosingh</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/RohitSurwase">RohitSurwase</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ShantanuVichare">Shantanu</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/Uldiniad">Uldiniad</a><br/> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/yurtpage">yurtpage</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>🚂 Network engine <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/alalamav">alalamav</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/bemasc">bemasc</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/dmcardle">dmcardle</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/fortuna">fortuna</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ignoramous">ignoramous</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/SeanBurford">SeanBurford</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>📚 Resolver <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/amithm7">amithm7</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/arfshl">arfshl</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/badmojr">badmojr</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/bongochong">bongochong</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/elliotwutingfeng">elliotwutingfeng</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/georgyo">georgyo</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/GiddyGoatGaming">GiddyGoatGaming</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/Harish-Narayan">Harish-Narayan</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ignoramous">ignoramous</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/JakeChampion">JakeChampion</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/MasterKia">MasterKia</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/mtxadmin">mtxadmin</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/neneeen">neneeen</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/shruuub">shruuub</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/shuvashish76">shuvashish76</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>⚜ Komunitas mods <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/amithm7">amithm7</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/TronSlayer">Andersen</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/ppatra">ppatra</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 <a href="https://t.me/InFamous23">InFamous23</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/TheTr1ckst3r">TheTr1ckst3r</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/Ch4t4r">Ch4t4r</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/Billi_ance">Billi_ance</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/kaliangel">kaliangel</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>📌 Geo-IP <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IPinfo Lite</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>❇ Penerjemahan <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://weblate.org/en/">Weblate</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>🦆 Icons <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/celzero/rethink-app/issues/346">Icons</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<br/>📦 Build servers <br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://jitpack.io/">JitPack</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/">GitHub</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://central.sonatype.com/">Sonatype</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020]]></string>
     <string name="title_statistics">Statistik</string>
     <string name="settings_biometeric_heading">Aktifkan penguncian aplikasi</string>
     <string name="hs_biometeric_failed">Otentikasi biometrik gagal</string>
@@ -803,8 +736,8 @@
     <string name="fapps_info_unmetered_msg">Izinkan / Blokir pada jaringan yang tidak terukur (WiFi).</string>
     <string name="fapps_isolate_block_dialog_title">Mengisolasi aplikasi</string>
     <string name="ci_trust_initial">T</string>
-    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">IP yang paling banyak terhubung</string>
-    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">domain yang paling banyak terhubung</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">IP Paling Sering Dihubungi</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">Domain Paling Sering Dihubungi</string>
     <string name="settings_locale_heading">Ganti Bahasa</string>
     <string name="settings_biometric_desc">Amankan aplikasi ini menggunakan kunci layar Anda</string>
     <string name="settings_locale_desc">Pilih bahasa pilihan Anda</string>
@@ -818,10 +751,10 @@
     <string name="fapps_info_metered_msg">Izinkan / Blokir pada jaringan terukur (Data Seluler).</string>
     <string name="fapps_bypass_block_dialog_message">Lewati (Bypass) aturan firewall universal untuk aplikasi yang <i>terdaftar</i> \?</string>
     <string name="fapps_info_exclude_msg">Kecualikan dari keduanya, DNS + Firewall.</string>
-    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">aplikasi yang paling banyak diblokir</string>
-    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">aplikasi yang paling banyak diizinkan</string>
-    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">domain yang paling banyak diblokir</string>
-    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">IP yang paling banyak diblokir</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">Aplikasi Paling Sering Diblokir</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">Aplikasi Paling Sering Diizinkan</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">Domain Paling Sering Diblokir</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">IP Paling Sering Diblokir</string>
     <string name="fapps_info_isolate_msg">Blokir semua kecuali IP tepercaya.</string>
     <string name="fapps_unblock_dialog_title">Izinkan aplikasi</string>
     <string name="fapps_unblock_dialog_message">Izinkan koneksi untuk aplikasi yang <i>terdaftar</i>\?</string>
@@ -853,10 +786,10 @@
     <string name="bsdl_block_desc" translatable="true">Blokir, percayai <u>domain ini</u></string>
     <string name="lbl_rules" translatable="true">aturan</string>
     <string name="lbl_configure" translatable="true">Konfigurasikan</string>
-    <string name="lbl_logs" translatable="true">catatan</string>
+    <string name="lbl_logs" translatable="true">Log</string>
     <string name="bypass_dns_firewall" translatable="true">lewati (bypass) dns &amp; firewall</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Tidak dapat menyiapkan proksi ketika VPN berjalan dalam mode hanya DNS.</string>
-    <string name="settings_general_customize" translatable="true">sesuaikan</string>
+    <string name="settings_general_customize" translatable="true">Sesuaikan</string>
     <string name="settings_pcap_dialog_option_2" translatable="true">Keluaran ke Logcat</string>
     <string name="settings_pcap_dialog_option_3" translatable="true">Keluaran ke folder Unduhan</string>
     <string name="settings_pcap_heading" translatable="true">Penangkapan paket</string>
@@ -889,7 +822,7 @@
     <string name="firewall_rule_domain_blocked_univ" translatable="true">Domain (Universal)</string>
     <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[Koneksi ini diblokir karena <i>domain</i> diblokir oleh DNS yang dipilih pengguna.<br/><br/> Untuk mengubah perilaku ini, buka tab <i>Konfigurasi DNS</i>.]]></string>
     <string name="lbl_maybe_blocked" translatable="true">Mungkin Diblokir</string>
-    <string name="lbl_network" translatable="true">jaringan</string>
+    <string name="lbl_network" translatable="true">Jaringan</string>
     <string name="settings_allow_lan_heading" translatable="true">Jangan merutekan IP Pribadi (eksperimental)</string>
     <string name="settings_allow_lan_desc" translatable="true">Kecualikan rute LAN, loopback, multicast, dan link-lokal dari terowongan VPN Rethink.</string>
     <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Abaikan DNS &amp; aturan firewall untuk aplikasi <i>tercantum</i>\?</string>
@@ -913,12 +846,12 @@
     <string name="lbl_sec" translatable="true">dtk</string>
     <string name="lbl_min" translatable="true">menit</string>
     <string name="lbl_hour" translatable="true">jam</string>
-    <string name="lbl_app_wise" translatable="true">per aplikasi</string>
+    <string name="lbl_app_wise" translatable="true">Per Aplikasi</string>
     <string name="lbl_preshared_key" translatable="true">Kunci Yang Dibagikan Sebelumnya</string>
     <string name="lbl_insecure" translatable="true">(tidak aman)</string>
     <string name="lbl_optional" translatable="true">(opsional)</string>
     <string name="lbl_allowed_ips" translatable="true">IP yang diizinkan</string>
-    <string name="lbl_save" translatable="true">simpan</string>
+    <string name="lbl_save" translatable="true">Simpan</string>
     <string name="status_protected_with_wg_private_dns" translatable="true">dilindungi oleh wireguard &amp; dns privat</string>
     <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
     <string name="lbl_qr_code" translatable="true">Kode QR</string>
@@ -984,9 +917,9 @@
     <string name="unknown_error" translatable="true">Kesalahan tidak diketahui</string>
     <string name="crypt_relay_sweden" translatable="true">Relay DNS anonim yang dihosting di Swedia disediakan oleh https://cryptostrom.is/.</string>
     <string name="include_all_app_wg_dialog_title">Sertakan semua aplikasi</string>
-    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">Negara yang paling banyak dihubungi</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">Negara Paling Sering Dihubungi</string>
     <string name="cloudflare_dns_desc" translatable="true">Tidak memblokir permintaan DNS apapun. Menggunakan titik akhir DNS Cloudflare 1.1.1.1.</string>
-    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">Negara yang paling banyak diblokir</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">Negara Paling Sering Diblokir</string>
     <string name="config_add_success_toast">Selesai</string>
     <string name="key_contents_error" translatable="true">Karakter buruk dalam kunci</string>
     <string name="crypt_relay_us" translatable="true">Relay DNS anonim yang dihosting di AS - Los Angeles, CA disediakan oleh https://cryptostrom.is/.</string>
@@ -1074,9 +1007,9 @@
     <string name="settings_exclude_proxy_apps_desc" translatable="true">Ketika dimatikan, kecualikan aplikasi penerus proksi (SOCKS5, HTTP, DNS) dari terowongan VPN Rethink.</string>
     <string name="exclude_apps_from_proxy">Lewati aplikasi dari semua proksi</string>
     <string name="exclude_apps_from_proxy_failure_toast">Aplikasi ini melewati proksi</string>
-    <string name="lbl_notification" translatable="true">pemberitahuan</string>
+    <string name="lbl_notification" translatable="true">Notifikasi</string>
     <string name="memory_notification_text">Rethink mengalami memori rendah. Tindakan sistem mungkin terbatas.</string>
-    <string name="lbl_test" translatable="true">uji coba</string>
+    <string name="lbl_test" translatable="true">Uji</string>
     <string name="lbl_protos" translatable="true">proto</string>
     <string name="lbl_experimental" translatable="true">(pengujian)</string>
     <string name="lbl_service_providers" translatable="true">Penyedia Layanan</string>
@@ -1101,7 +1034,7 @@
     <string name="sponser_dialog_usage_msg" translatable="true">Anda telah menggunakan Rethink selama <b>%1$s hari</b>, yang berarti Anda harus mengeluarkan biaya penggunaan sebesar <b>$%2$s</b>. Apakah Anda akan mempertimbangkan untuk mensponsori untuk mempertahankan pengembangannya?</string>
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Gunakan DNS Sistem untuk domain yang tidak didelegasikan</string>
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Gunakan DNS Sistem untuk domain yang tidak didelegasikan seperti <i>.lan</i>, <i>.internal</i>, dll.</string>
-    <string name="dc_filtering_heading" translatable="true">penyaringan</string>
+    <string name="dc_filtering_heading" translatable="true">Penyaringan</string>
     <string name="cd_split_dns_heading" translatable="true">DNS Terpisah (pengujian)</string>
     <string name="cd_split_dns_desc" translatable="true">Meneruskan kueri DNS dari aplikasi yang diproksi ke server DNS proxy.</string>
     <string name="univ_firewall_rule_11" translatable="true">Blokir semua sambungan host lokal</string>
@@ -1142,7 +1075,7 @@
     <string name="adv_set_dial_timeout_desc" translatable="true">Tutup soket TCP dan UDP yang tidak aktif setelah durasi ini.</string>
     <string name="about_terms_of_service" translatable="true">Ketentuan Layanan</string>
     <string name="bypasses_network_restrictions" translatable="true">Pemeriksaan jangkauan melewati semua batasan jaringan. Dalam mode <i>Otomatis</i>, Rethink secara acak menggunakan IP dan nama host yang terhubung sebelumnya.</string>
-    <string name="most_contacted_asn" translatable="true">penyedia yang paling banyak dihubungi</string>
+    <string name="most_contacted_asn" translatable="true">Penyedia Paling Sering Dihubungi</string>
     <string name="adv_tasker_dialog_msg" translatable="true">Masukkan nama paket (dipisahkan koma) yang diizinkan untuk memulai atau menghentikan Rethink.</string>
     <string name="adv_tasker_dialog_instructions" translatable="true">Instruksi:\nTambahan yang diperlukan dalam siaran:\n• Kunci: pengirim\n• Nilai: Nama paket aplikasi pemanggil\n\nContoh: kunci:pengirim nilai:com.termux\n\nTindakan yang didukung:\n• Mulai VPN – com.celzero.bravedns.intent.action.VPN_START\n• Hentikan VPN – com.celzero.bravedns.intent.action.VPN_STOP</string>
     <string name="adv_tasker_dialog_edit_hint" translatable="true">Masukkan nama paket (contoh: net.dinglisch.android.taskerm)</string>
@@ -1187,9 +1120,9 @@
     <string name="wg_setting_use_on_mobile" translatable="true">Hanya seluler</string>
     <string name="wg_setting_use_on_mobile_desc" translatable="true">Gunakan VPN WireGuard ini melalui data seluler.</string>
     <string name="hop_add_remove_title" translatable="true">Tambahkan / Hapus Relay</string>
-    <string name="most_blocked_asn" translatable="true">penyedia yang paling banyak diblokir</string>
+    <string name="most_blocked_asn" translatable="true">Penyedia Paling Sering Diblokir</string>
     <string name="download_ip_info_title" translatable="true">Tampilkan informasi penyedia</string>
-    <string name="top_active_conns" translatable="true">koneksi aktif teratas</string>
+    <string name="top_active_conns" translatable="true">Koneksi Aktif Teratas</string>
     <string name="wg_mobile_only_hop_err" translatable="true">Mode khusus seluler tidak didukung untuk Relay</string>
     <string name="hop_error_toast_msg_1" translatable="true">Tidak bisa relay, sudah %1$s</string>
     <string name="hop_failure_toast" translatable="true">Kesalahan relay: %1$s -&gt; %2$s</string>
@@ -1266,4 +1199,13 @@
     <string name="lbl_paused" translatable="true">Dijeda</string>
     <string name="stability_program_snackbar_msg" translatable="true">Program stabilitas diaktifkan. Laporan kerusakan membantu meningkatkan fitur eksperimental.</string>
     <string name="rpn_purchased_state" translatable="true">Dibeli</string>
+    <string name="lbl_saving" translatable="true">Menyimpan…</string>
+    <string name="config_delete_all_dialog_desc" translatable="true">Apakah Anda yakin ingin menghapus SEMUA konfigurasi VPN WireGuard? Tindakan ini TIDAK DAPAT DIBATALKAN.</string>
+    <string name="config_delete_all_dialog_title" translatable="true">Hapus Semua</string>
+    <string name="fs_configure_apps_desc" translatable="true">Aturan firewall per aplikasi dan kebijakan jaringan</string>
+    <string name="fs_configure_network_desc" translatable="true">Mode terowongan VPN dan preferensi jaringan</string>
+    <string name="fs_configure_proxy_desc" translatable="true">Perutean proksi WireGuard, SOCKS5, dan HTTP</string>
+    <string name="fs_configure_others_desc" translatable="true">Tampilan, notifikasi, dan lainnya</string>
+    <string name="fs_configure_advanced_desc" translatable="true">Alat pengembang dan diagnostik</string>
+    <string name="fs_configure_logs_desc" translatable="true">Tinjau kueri DNS dan log koneksi</string>
 </resources>
