@@ -17,6 +17,7 @@ package com.celzero.bravedns.ui.bottomsheet
 
 import Logger
 import Logger.LOG_TAG_DNS
+import Logger.LOG_TAG_UI
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Configuration
@@ -79,6 +80,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     companion object {
         // Alpha values for button states
         private const val BUTTON_ALPHA_DISABLED = 0.5f
+        private const val TAG = "LocalBlocklistsBottomSheet"
     }
 
     override fun getTheme(): Int =
@@ -126,6 +128,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         dialog?.window?.let { window ->
             Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
         }
+        Logger.i(LOG_TAG_DNS, "$TAG; onViewCreated")
         updateLocalBlocklistUi()
         init()
         initializeObservers()
@@ -166,7 +169,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
 
     private fun initializeObservers() {
         appDownloadManager.downloadRequired.observe(viewLifecycleOwner) {
-            Logger.i(LOG_TAG_DNS, "Check for blocklist update, status: $it")
+            Logger.i(LOG_TAG_DNS, "$TAG; Check for blocklist update, status: $it")
             if (it == null) return@observe
 
             handleDownloadStatus(it)
@@ -424,10 +427,12 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
 
     private fun updateLocalBlocklistUi() {
         if (Utilities.isPlayStoreFlavour()) {
+            Logger.i(LOG_TAG_UI, "$TAG; play flavour, no need to proceed")
             return
         }
 
         if (persistentState.blocklistEnabled) {
+            Logger.v(LOG_TAG_UI, "$TAG; blocklist enabled")
             enableBlocklistUi()
             return
         }
@@ -512,6 +517,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun enableBlocklist() {
+        Logger.v(LOG_TAG_UI, "Enabling blocklists")
         if (persistentState.blocklistEnabled) {
             removeBraveDnsLocal()
             updateLocalBlocklistUi()
@@ -684,7 +690,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
 
     private fun ui(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.Main) {
-            if (!isAdded) f()
+            if (isAdded) f()
         }
     }
 
