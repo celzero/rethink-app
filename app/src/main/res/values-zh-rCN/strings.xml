@@ -1196,4 +1196,6 @@
     <string name="fs_configure_advanced_desc" translatable="true">开发者工具和诊断</string>
     <string name="fs_configure_logs_desc" translatable="true">查看 DNS 查询和连接日志</string>
     <string name="settings_flood_wg_desc" translatable="true">启用后，发送额外的 WireGuard 包增加在受限网络中识别和拦截隧道流量难度。</string>
+    <string name="dc_block_unknown_heading" translatable="true">阻止来自未知来源的 DNS</string>
+    <string name="dc_block_unknown_desc" translatable="true">阻止所有源自未知应用程序的 DNS 请求。</string>
 </resources>
