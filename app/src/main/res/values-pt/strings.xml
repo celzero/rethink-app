@@ -729,9 +729,7 @@
     <string name="lbbs_update_check">Procurar atualizações</string>
     <string name="private_dns_dialog_positive">Ir para as definições</string>
     <string name="private_dns_dialog_heading">Desativar DNS privado</string>
-    <string name="private_dns_dialog_desc">As definições de DNS do Rethink são substituídas pelas do DNS privado Android.
-\n
-\nPara usar o DNS Rethink, aceda às definições do sistema e desative a opção \"DNS privado\".</string>
+    <string name="private_dns_dialog_desc">As definições de DNS do Rethink são substituídas pelas do DNS privado Android. \n \nPara usar o DNS Rethink, aceda às definições do sistema e desative a opção \"DNS privado\".</string>
     <string name="ci_trust_initial">CO</string>
     <string name="ci_trust_txt">Confiável</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Bloquear sites com conteúdo adulto, pirataria, jogos de azar, encontros online e redes sociais.</string>
