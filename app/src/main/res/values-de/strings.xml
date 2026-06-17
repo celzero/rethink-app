@@ -104,7 +104,7 @@
     <string name="always_on_dialog_heading">Always-On VPN deaktivieren</string>
     <string name="always_on_dialog">\"Always-On VPN\" ist auf diesem Gerät aktiviert. Um Rethink zu starten, öffne bitte die Systemeinstellungen des Geräts und deaktiviere \"Always-on VPN\".</string>
     <string name="private_dns_dialog_heading">Private DNS ausschalten</string>
-    <string name="private_dns_dialog_desc">Die DNS-Einstellungen von Rethink werden von Android\'s Private DNS außer Kraft gesetzt.\n\nUm Rethink\'s DNS zu verwenden, gehe zu den Android-Einstellungen und deaktiviere \"Privates DNS\".</string>
+    <string name="private_dns_dialog_desc">Die DNS-Einstellungen von Rethink werden von Androids Private DNS außer Kraft gesetzt.\n\nUm Rethinks DNS zu verwenden, gehe zu den Android-Einstellungen und deaktiviere \"Privates DNS\".</string>
     <string name="dns_crypt_relay_remove_dialog_message">DNSCrypt-Relay aus der gespeicherten Konfiguration löschen.</string>
     <string name="local_blocklist_download">Blocklisten herunterladen</string>
     <string name="settings_lock_down_mode_desc">Gewisse Optionen sind deaktiviert, wenn das VPN im Lockdown-Modus läuft. <u>Siehe VPN-Einstellungen</u>.</string>
@@ -124,7 +124,7 @@
     <string name="orbot_explanation">Orbot ist eine kostenlose Proxy-App, die es anderen Apps ermöglicht, das Internet <u>sicherer</u> zu nutzen.\nOrbot verwendet <u>Tor</u>, um deinen Internetverkehr zu verschlüsseln, was dir dabei hilft, <u>Zensur zu umgehen</u> und dich gegen Formen der <u>Netzwerküberwachung</u> zu verteidigen, die die persönliche Freiheit und Privatsphäre bedrohen.\n<u>TCP Proxy</u>: Rethink leitet nur TCP-Verbindungen von <i>eingeschlossenen</i> Apps an Orbot weiter.\n<u>HTTP Proxy</u>: Rethink <i>stellt</i> einen HTTP CONNECT-Tunnel zu Orbot <i>her</i> und leitet nur TCP-Verbindungen von <i>eingeschlossenen</i> Apps weiter.</string>
     <string name="orbot_install_dialog_title">Orbot installieren\?</string>
     <string name="settings_orbot_desc">Orbot im nicht-VPN-Modus mit HTTPS/SOCKS5.</string>
-    <string name="private_dns_dialog_positive">Einstellungen öffnen</string>
+    <string name="private_dns_dialog_positive">Gehe zu den Einstellungen</string>
     <string name="univ_firewall_dialog_title">IP-Regel löschen\?</string>
     <string name="univ_firewall_dialog_message">Das Löschen dieser Regel würde jeder Anwendung erlauben, sich mit dieser IP zu verbinden. Möchtest du fortfahren?</string>
     <string name="blocklist_update_check_failure">Ein Fehler ist aufgetreten. Versuche es später noch einmal!</string>
