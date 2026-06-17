@@ -1180,4 +1180,11 @@
     <string name="tour_btn_next">下一步</string>
     <string name="tour_btn_finish">好的</string>
     <string name="tour_btn_skip">跳过向导</string>
+    <string name="lbl_plan" translatable="true">套餐</string>
+    <string name="lbl_expires_on" translatable="true">到期日</string>
+    <string name="lbl_cancelled" translatable="true">已取消</string>
+    <string name="lbl_expired" translatable="true">已过期</string>
+    <string name="lbl_grace_period" translatable="true">宽限期</string>
+    <string name="lbl_paused" translatable="true">已暂停</string>
+    <string name="rpn_purchased_state" translatable="true">已购买</string>
 </resources>
