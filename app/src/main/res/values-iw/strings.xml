@@ -322,9 +322,7 @@
     <string name="local_blocklist_redownload_desc" translatable="true">רשימות חסימות במכשיר כבר נמצאות בגרסה האחרונה v%1$s.</string>
     <string name="blocklist_update_check_failure" translatable="true">משהו השתבש. נסה שוב מאוחר יותר!</string>
     <string name="always_on_dialog_stop_message" translatable="true">VPN שתמיד מופעל מאופשר עבור Rethink. האם אתה בטוח שאתה רוצה להפסיק את Rethink בכל זאת?</string>
-    <string name="private_dns_dialog_desc" translatable="true">הגדרות ה-DNS של Rethink מוחלפות על ידי ה-DNS הפרטי של אנדרואיד.
-\n
-\nכדי להשתמש ב-DNS של Rethink עבור להגדרות אנדרואיד וכבה \"DNS פרטי\".</string>
+    <string name="private_dns_dialog_desc" translatable="true">הגדרות ה-DNS של Rethink מוחלפות על ידי ה-DNS הפרטי של אנדרואיד. \n \nכדי להשתמש ב-DNS של Rethink עבור להגדרות אנדרואיד וכבה \"DNS פרטי\".</string>
     <string name="univ_firewall_dialog_title" translatable="true">למחוק את כלל ה-IP?</string>
     <string name="dns_proxy_remove_dialog_title" translatable="true">למחוק פרוקסי DNS?</string>
     <string name="dns_proxy_remove_dialog_message" translatable="true">מחק את הDNS פרוקסי מהתצורה השמורה.</string>
