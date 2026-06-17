@@ -474,7 +474,7 @@
     <string name="dns_log_dialog_positive">লগ মুছুন</string>
     <string name="dns_btm_record_type">প্রশ্নের ধরন: %1$s</string>
     <string name="cd_dns_crypt_dialog_desc">বর্ণনা (ঐচ্ছিক)</string>
-    <string name="contributors_list">&lt;i&gt;Rethink Open Source Project&lt;/i&gt; এই স্বেচ্ছাসেবকদের কাছে এর অস্তিত্বকে ঋণী করে যারা এর বিকাশে অগণিত ঘন্টা ব্যয় করে।&lt;br/&gt; &lt;br/&gt;🛡️ Android অ্যাপ &lt;br/&gt; &lt;a href=https://github .com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev &gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt; a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 নেটওয়ার্ক ইঞ্জিন &lt;br/&gt; &lt;a href=https://github. com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt; dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a &lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford &gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 সমাধানকারী &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href= =https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https:// /github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com /elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a &lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt; ⚜ কমিউনিটি মোড &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https: //t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t. me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt; কালিয়াঞ্জেল&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list"><![CDATA[<i>Rethink Open Source Project</i> এই স্বেচ্ছাসেবকদের কাছে এর অস্তিত্বকে ঋণী করে যারা এর বিকাশে অগণিত ঘন্টা ব্যয় করে।<br/> <br/>🛡️ Android অ্যাপ <br/> <a href=https://github .com/BayLee4>BayLee4</a><br/> <a href=https://github.com/Ch4t4r>Ch4t4r</a><br/> <a href=https://github.com/HrBDev >HrBDev</a><br/> <a href=https://github.com/hussainmohd-a>hussainmohd-a</a><br/> <a href=https://github.com/ignoramous <a href=https://github.com/markwmuller>markwmuller</a><br/> <a href=https://github.com/Poussinou>Poussinou</a><br/> <a href=https://github.com/markwmuller> a><br/> <a href=https://github.com/pjosingh>pjosingh</a><br/> <br/>🚂 নেটওয়ার্ক ইঞ্জিন <br/> <a href=https://github. com/alalamav>alalamav</a><br/> <a href=https://github.com/bemasc>bemasc</a><br/> <a href=https://github.com/dmcardle> dmcardle</a><br/> <a href=https://github.com/fortuna>fortuna</a><br/> <a href=https://github.com/ignoramous>ignoramous</a <br/> <a href=https://github.com/PeterDaveHello>PeterDaveHello</a><br/> <a href=https://github.com/SeanBurford >SeanBurford</a><br/> <br/>📚 সমাধানকারী <br/> <a href=https://github.com/ahmed-tasaly>ahmed-tasaly</a><br/> <a href= =https://github.com/amithm7>amithm7</a><br/> <a href=https://github.com/arfshl>arfshl</a><br/> <a href=https:// /github.com/badmojr>badmojr</a><br/> <a href=https://github.com/bongochong>bongochong</a><br/> <a href=https://github.com /elliotwutingfeng>elliotwutingfeng</a><br/> <a href=https://github.com/georgyo>georgyo</a><br/> <a href=https://github.com/harish83a>harish83a </a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/MasterKia>MasterKia</a> <br/> <a href=https://github.com/mtxadmin>mtxadmin</a><br/> <a href=https://github.com/neneeen>neneeen</a><br/> <a href=https://github.com/PeterDaveHello>PeterDaveHello</a><br/> <a href=https://github.com/santhosh-ponnusamy>santhosh-ponnusamy</a><br/> <a href=https://github.com/shruuub>shruuub</a><br/> <a href=https://github.com/shuvashish76>shuvashish76</a><br/> <br/> ⚜ কমিউনিটি মোড <br/> <a href=https://t.me/amithm7>amithm7</a><br/> <a href=https://t.me/ppatra>ppatra</a><br/> <a href=https: //t.me/InFamous23>InFamous23</a><br/> <a href=https://t.me/TheTr1ckst3r>TheTr1ckst3r</a><br/> <a href=https://t. me/Ch4t4r>Ch4t4r</a><br/> <a href=https://t.me/Billi_ance>Billi_ance</a><br/> <a href=https://t.me/kaliangel> কালিয়াঞ্জেল</a><br/> <a href=https://github.com/PoneyClairDeLune>PoneyClairDeLune</a><br/>]]></string>
     <string name="cd_dns_crypt_relay_name">DNSRelay %1$s</string>
     <string name="cd_dns_proxy_mode_external">বাহ্যিক</string>
     <string name="cd_dns_crypt_relay_heading">রিলে</string>
@@ -490,7 +490,7 @@
     <string name="dns_proxy_dialog_message_no_app">আইপি ঠিকানা: %1$s
 \n
 \nপোর্ট নম্বর: %2$s</string>
-    <string name="firewall_rule_block_app_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i>কে ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>সমস্ত অ্যাপস</i> ট্যাবে যান।</string>
+    <string name="firewall_rule_block_app_desc"><![CDATA[একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i>কে ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>সমস্ত অ্যাপস</i> ট্যাবে যান।]]></string>
     <string name="ada_app_unmetered">মিটারবিহীন</string>
     <string name="notif_channel_firewall_alerts">ফায়ারওয়াল সতর্কতা</string>
     <string name="category_name_others">অন্যান্য</string>
@@ -503,7 +503,7 @@
     <string name="firewall_rule_block_app_exception">ত্রুটি</string>
     <string name="firewall_rule_block_ip">আইপি / পোর্ট</string>
     <string name="firewall_rule_block_dns_bypass">DNS বাইপাস</string>
-    <string name="firewall_rule_global_lockdown_desc">এই সংযোগটি অবরুদ্ধ করা হয়েছে কারণ সর্বজনীন লকডাউন সেট করা হয়েছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান।</string>
+    <string name="firewall_rule_global_lockdown_desc"><![CDATA[এই সংযোগটি অবরুদ্ধ করা হয়েছে কারণ সর্বজনীন লকডাউন সেট করা হয়েছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান।]]></string>
     <string name="ci_bypass_universal">বাইপাস সার্বজনীন</string>
     <string name="dc_dns_crypt">DNSCrypt</string>
     <string name="dc_dns_proxy">DNS প্রক্সি</string>
@@ -513,8 +513,8 @@
     <string name="brbs_restore_dialog_failure_message">পুনরুদ্ধার করা যায়নি। আবার চেষ্টা করুন\?</string>
     <string name="copy_clipboard_label">ইউআরএল (URL)</string>
     <string name="firewall_rule_exempt_orbot_setup">অরবোট সেটআপ</string>
-    <string name="firewall_rule_bypass_universal_ip_desc">এই সংযোগের অনুমতি দেওয়া হয়েছিল কারণ &lt;i&gt;গন্তব্য আইপি&lt;/i&gt; সমস্ত সার্বজনীন ফায়ারওয়াল নিয়মগুলিকে বাইপাস করতে সেট করা হয়েছে৷&lt;br/&gt;&lt;br/&gt; পরিবর্তন করতে &lt;i&gt;ইউনিভার্সাল&lt;-এ &lt;i&gt;আইপি নিয়মে&lt;i&gt; যান &lt;/i&gt; ট্যাব।</string>
-    <string name="firewall_rule_device_lock_desc">এই সংযোগটি ফায়ারওয়াল করা হয়েছিল কারণ <i>ডিভাইসটি সেই সময়ে লক করা ছিল</i>।</string>
+    <string name="firewall_rule_bypass_universal_ip_desc"><![CDATA[এই সংযোগের অনুমতি দেওয়া হয়েছিল কারণ <i>গন্তব্য আইপি</i> সমস্ত সার্বজনীন ফায়ারওয়াল নিয়মগুলিকে বাইপাস করতে সেট করা হয়েছে৷<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল<-এ <i>আইপি নিয়মে<i> যান </i> ট্যাব।]]></string>
+    <string name="firewall_rule_device_lock_desc"><![CDATA[এই সংযোগটি ফায়ারওয়াল করা হয়েছিল কারণ <i>ডিভাইসটি সেই সময়ে লক করা ছিল</i>।]]></string>
     <string name="notif_channel_desc_proxy_failure">প্রক্সি ত্রুটি এবং অসঙ্গতির বিষয়ে সতর্কতা</string>
     <string name="network_dns">সিস্টেম DNS</string>
     <string name="lbbs_update_check">হালনাগাদ আছে কিনা দেখো</string>
@@ -544,15 +544,15 @@
     <string name="brbs_backup_dialog_failure_title">ব্যাকআপ ব্যর্থ হয়েছে</string>
     <string name="network_log_app_name_unknown">অজ্ঞাত</string>
     <string name="firewall_rule_block_http">অনিরাপদ HTTP</string>
-    <string name="firewall_rule_block_app_unmetered_desc"><i>আনমিটারড</i> নেটওয়ার্কে সংযোগ করার চেষ্টা করার সময় একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i> ব্লক করে।</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc">এই সংযোগের অনুমতি দেওয়া হয়েছিল কারণ <i>সোর্স অ্যাপ</i> সেট করা হয়েছে <i>বাইপাস ইউনিভার্সাল</i> ফায়ারওয়াল নিয়মে।</string>
+    <string name="firewall_rule_block_app_unmetered_desc"><![CDATA[<i>আনমিটারড</i> নেটওয়ার্কে সংযোগ করার চেষ্টা করার সময় একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i> ব্লক করে।]]></string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc"><![CDATA[এই সংযোগের অনুমতি দেওয়া হয়েছিল কারণ <i>সোর্স অ্যাপ</i> সেট করা হয়েছে <i>বাইপাস ইউনিভার্সাল</i> ফায়ারওয়াল নিয়মে।]]></string>
     <string name="notif_dialog_pause_dialog_message">বিরতি অবস্থায় আবেদন, চালিয়ে যেতে পুনরায় শুরু করুন</string>
     <string name="brbs_backup_dialog_message">একটি ফাইলে অ্যাপ সেটিংস, নেটওয়ার্ক এবং ডিএনএস লগ ব্যাক আপ করে। এটি VPN পুনরায় চালু করবে।</string>
     <string name="other_dns_list_tab2">ডিএনস্ক্রিপ্ট</string>
     <string name="firewall_rule_block_udp_ntp">UDP অবরুদ্ধ</string>
     <string name="firewall_rule_global_lockdown">তালাবদ্ধ</string>
     <string name="firewall_rule_no_rule_desc">কোন ফায়ারওয়াল নিয়ম এই সংযোগ মেলে না.</string>
-    <string name="firewall_rule_foreground_desc">এই সংযোগটি ফায়ারওয়াল করা হয়েছে কারণ সোর্স অ্যাপটি <i>ফোরগ্রাউন্ডে ছিল না</i>।</string>
+    <string name="firewall_rule_foreground_desc"><![CDATA[এই সংযোগটি ফায়ারওয়াল করা হয়েছে কারণ সোর্স অ্যাপটি <i>ফোরগ্রাউন্ডে ছিল না</i>।]]></string>
     <string name="notif_dialog_pause_dialog_positive">পুনরারম্ভ</string>
     <string name="notif_channel_desc_vpn_notification">RethinkDNS সক্রিয় এবং ব্যাকগ্রাউন্ডে চলমান থাকলে তা জানান</string>
     <string name="cd_remove_dialog_message">সংরক্ষিত কনফিগারেশন থেকে ডোমেন মুছুন।</string>
@@ -581,10 +581,10 @@
     <string name="system_dns_connection_failure">বর্তমান DNS সার্ভার নির্ধারণ করা যাচ্ছে না</string>
     <string name="other_dns_list_tab3">ডিএনএস প্রক্সি</string>
     <string name="firewall_rule_univ_block_metered">মিটারযুক্ত (সর্বজনীন)</string>
-    <string name="firewall_rule_new_app_desc">এই অ্যাপটি <i>প্রথম</i> বারের জন্য সংযোগ তৈরি করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান।</string>
-    <string name="firewall_rule_block_app_mobile_desc"><i>Metered</i> নেটওয়ার্কে সংযোগ করার চেষ্টা করার সময় একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i> ব্লক করে।</string>
-    <string name="firewall_rule_isolate_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i>কে <i>বাইপাস করা IPs</i> ব্যতীত অন্যের সাথে সংযোগ ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>সমস্ত অ্যাপস</i> ট্যাবে যান।</string>
-    <string name="firewall_rule_block_http_desc">এই সংযোগটি ব্লক করা হয়েছে কারণ এটি সম্ভবত <i>অনিরাপদ HTTP</i> ব্যবহার করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান৷</string>
+    <string name="firewall_rule_new_app_desc"><![CDATA[এই অ্যাপটি <i>প্রথম</i> বারের জন্য সংযোগ তৈরি করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান।]]></string>
+    <string name="firewall_rule_block_app_mobile_desc"><![CDATA[<i>Metered</i> নেটওয়ার্কে সংযোগ করার চেষ্টা করার সময় একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i> ব্লক করে।]]></string>
+    <string name="firewall_rule_isolate_desc"><![CDATA[একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i>কে <i>বাইপাস করা IPs</i> ব্যতীত অন্যের সাথে সংযোগ ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>সমস্ত অ্যাপস</i> ট্যাবে যান।]]></string>
+    <string name="firewall_rule_block_http_desc"><![CDATA[এই সংযোগটি ব্লক করা হয়েছে কারণ এটি সম্ভবত <i>অনিরাপদ HTTP</i> ব্যবহার করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান৷]]></string>
     <string name="notif_channel_vpn_failure">নিষ্ক্রিয় VPN</string>
     <string name="notif_channel_download">সতর্কতা ডাউনলোড করুন</string>
     <string name="ci_no_rule_initial">এন</string>
@@ -611,7 +611,7 @@
     <string name="settings_local_blocklist_version">ভার্সন: v%1$s</string>
     <string name="firewall_rule_block_app_new_install">নতুন অ্যাপ</string>
     <string name="firewall_rule_device_lock">ডিভাইস লক করা হয়েছে</string>
-    <string name="firewall_rule_block_dns_bypass_desc">এই সংযোগটি ব্লক করা হয়েছে কারণ <i>সোর্স অ্যাপ</i> ব্যবহারকারী-পছন্দের DNS বাইপাস করেছে।</string>
+    <string name="firewall_rule_block_dns_bypass_desc"><![CDATA[এই সংযোগটি ব্লক করা হয়েছে কারণ <i>সোর্স অ্যাপ</i> ব্যবহারকারী-পছন্দের DNS বাইপাস করেছে।]]></string>
     <string name="new_app_notification_content">RethinkDNS ব্লক করা হয়েছে সম্প্রতি ইনস্টল করা অ্যাপ, %1$s।</string>
     <string name="notif_channel_vpn_notification">সক্রিয় ভিপিএন</string>
     <string name="notif_channed_desc_download">অন-ডিভাইস ব্লকলিস্টের জন্য ডাউনলোডের অগ্রগতি সম্পর্কে সতর্কতা</string>
@@ -619,7 +619,7 @@
     <string name="cd_blocked_initial">নীল</string>
     <string name="ci_no_rule_txt">কোন নিয়ম নেই</string>
     <string name="ada_noapp_dialog_positive">ঠিক আছে</string>
-    <string name="ada_firewall_status">এই অ্যাপটি <b><i>%1$s</i></b>।</string>
+    <string name="ada_firewall_status"><![CDATA[এই অ্যাপটি <b><i>%1$s</i></b>।]]></string>
     <string name="brbs_title">ব্যাকআপ এবং পুনরুদ্ধার করুন</string>
     <string name="brbs_restore_dialog_failure_positive">পুনরুদ্ধার পুনরায় চেষ্টা করুন</string>
     <string name="notif_channel_proxy_failure">প্রক্সি সতর্কতা</string>
@@ -632,7 +632,7 @@
     <string name="dns_proxy_connection_failure_lockdown">লকডাউন মোডে %2$s-এর জন্য %1$s বাদ দিলে ইন্টারনেট সংযোগ সমস্যা হতে পারে।</string>
     <string name="accessibility_failure_toast">RethinkDNS অ্যাক্সেসিবিলিটি পরিষেবা বন্ধ বা ক্র্যাশ হয়েছে৷ ব্যাকগ্রাউন্ডেড অ্যাপসকে আর ব্লক করা হচ্ছে না।</string>
     <string name="firewall_rule_exempt_dns_proxied">DNS প্রক্সিযুক্ত</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc">এই DNS সংযোগটি প্রক্সি করা হয়েছিল এবং ব্যবহারকারী-পছন্দের DNS এন্ডপয়েন্টে ফরোয়ার্ড করা হয়েছিল।</string>
+    <string name="firewall_rule_exempt_dns_proxied_desc"><![CDATA[এই DNS সংযোগটি প্রক্সি করা হয়েছিল এবং ব্যবহারকারী-পছন্দের DNS এন্ডপয়েন্টে ফরোয়ার্ড করা হয়েছিল।]]></string>
     <string name="notif_dialog_pause_dialog_negative">বাতিল</string>
     <string name="notif_channel_desc_firewall_alerts">ফায়ারওয়াল ত্রুটি এবং অসঙ্গতির বিষয়ে সতর্কতা</string>
     <string name="ci_dialog_error_invalid_ip">অবৈধ IP ঠিকানা, সাবনেট বা পোর্ট।</string>
@@ -647,8 +647,8 @@
     <string name="rt_download_desc">এই বৈশিষ্ট্যটি ব্যবহার করতে ব্লকলিস্ট ডাউনলোড করুন (প্রায় 60MB)।</string>
     <string name="settings_local_blocklist_in_use">%1$s ব্লকলিস্ট ব্যবহার করা হচ্ছে</string>
     <string name="firewall_rule_block_unmetered">মিটারবিহীন (ওয়াইফাই)</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc"><i>Metered</i> (মোবাইল) নেটওয়ার্কে সংযোগ করার চেষ্টা করার সময় একটি ব্যবহারকারী-সেট ইউনিভার্সাল ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i> ব্লক করে। ট্যাব</string>
-    <string name="firewall_rule_block_udp_ntp_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>UDP</i> সংযোগ ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান।</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc"><![CDATA[<i>Metered</i> (মোবাইল) নেটওয়ার্কে সংযোগ করার চেষ্টা করার সময় একটি ব্যবহারকারী-সেট ইউনিভার্সাল ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i> ব্লক করে। ট্যাব]]></string>
+    <string name="firewall_rule_block_udp_ntp_desc"><![CDATA[একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>UDP</i> সংযোগ ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান।]]></string>
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="ci_delete">মুছে ফেলা</string>
     <string name="ada_noapp_dialog_message">নির্দিষ্ট অ্যাপ্লিকেশনের জন্য অ্যাপ্লিকেশন তথ্য পাওয়া যায় নি.</string>
@@ -661,8 +661,8 @@
     <string name="accessibility_notification_content">RethinkDNS অ্যাক্সেসিবিলিটি পরিষেবা বন্ধ বা ক্র্যাশ হয়েছে৷ ব্যাকগ্রাউন্ডেড অ্যাপসকে আর ব্লক করা হচ্ছে না। পুনরায় সক্ষম করতে আলতো চাপুন৷</string>
     <string name="firewall_rule_block_app">অ্যাপ ব্লক করা হয়েছে</string>
     <string name="firewall_rule_foreground">অ্যাপ ব্যবহারে নেই</string>
-    <string name="firewall_rule_block_ip_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম <i>গন্তব্য আইপি</i> ব্লক করেছে।</string>
-    <string name="firewall_rule_exempt_orbot_setup_desc">এই সংযোগের অনুমতি দেওয়া হয়েছিল কারণ <i>এক-ক্লিক Tor-as-a-proxy</i> অরবোটের মাধ্যমে সেটআপ প্রক্রিয়াধীন ছিল৷</string>
+    <string name="firewall_rule_block_ip_desc"><![CDATA[একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম <i>গন্তব্য আইপি</i> ব্লক করেছে।]]></string>
+    <string name="firewall_rule_exempt_orbot_setup_desc"><![CDATA[এই সংযোগের অনুমতি দেওয়া হয়েছিল কারণ <i>এক-ক্লিক Tor-as-a-proxy</i> অরবোটের মাধ্যমে সেটআপ প্রক্রিয়াধীন ছিল৷]]></string>
     <string name="new_app_bulk_notification_title">মনোযোগ</string>
     <string name="new_app_notification_action_toast_allow">অ্যাপের জন্য নেটওয়ার্ক সংযোগ অনুমোদিত</string>
     <string name="notif_dialog_pause_dialog_neutral">দেখান</string>
@@ -675,7 +675,7 @@
     <string name="firewall_rule_isolate">লকডাউন (অ্যাপ)</string>
     <string name="firewall_rule_unknown">উৎস অজানা</string>
     <string name="firewall_rule_exempt_app_bypass_univ">বাইপাস অ্যাপ</string>
-    <string name="firewall_rule_unknown_desc">এই সংযোগটি ফায়ারওয়াল করা হয়েছে কারণ <i>সোর্স অ্যাপ</i> নির্ধারণ করা যায়নি।</string>
+    <string name="firewall_rule_unknown_desc"><![CDATA[এই সংযোগটি ফায়ারওয়াল করা হয়েছে কারণ <i>সোর্স অ্যাপ</i> নির্ধারণ করা যায়নি।]]></string>
     <string name="notif_dialog_pause_dialog_title">অ্যাপ পজ করা হয়েছে!</string>
     <string name="category_name_sys_components">সিস্টেম উপাদান</string>
     <string name="cd_dialog_error_invalid_wildcard">অবৈধ ওয়াইল্ডকার্ড।</string>
@@ -685,14 +685,14 @@
     <string name="orbot_toast_parameter">টর-এ-এ-প্রক্সি</string>
     <string name="update_complete_action_snack">আবার শুরু</string>
     <string name="firewall_rule_trusted_ip">বাইপাসড আইপি (অ্যাপ)</string>
-    <string name="firewall_rule_block_ip_univ_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম <i>গন্তব্য আইপি / পোর্ট</i>কে ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান</string>
-    <string name="firewall_rule_trusted_ip_desc">এই সংযোগের অনুমতি দেওয়া হয়েছিল কারণ <i>গন্তব্য IP</i> অ্যাপ-নির্দিষ্ট নিয়মগুলিকে বাইপাস করার জন্য সেট করা হয়েছে।<br/><br/> পরিবর্তন করতে <i>অ্যাপ-নির্দিষ্ট ফায়ারওয়াল</i> স্ক্রিনে যান।</string>
+    <string name="firewall_rule_block_ip_univ_desc"><![CDATA[একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম <i>গন্তব্য আইপি / পোর্ট</i>কে ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান]]></string>
+    <string name="firewall_rule_trusted_ip_desc"><![CDATA[এই সংযোগের অনুমতি দেওয়া হয়েছিল কারণ <i>গন্তব্য IP</i> অ্যাপ-নির্দিষ্ট নিয়মগুলিকে বাইপাস করার জন্য সেট করা হয়েছে।<br/><br/> পরিবর্তন করতে <i>অ্যাপ-নির্দিষ্ট ফায়ারওয়াল</i> স্ক্রিনে যান।]]></string>
     <string name="notif_channel_desc_vpn_failure">Android বা অন্য VPN অ্যাপ দ্বারা RethinkDNS বন্ধ করা হলে জানান</string>
     <string name="lbbs_heading">185+ ব্লকলিস্ট কনফিগার করুন</string>
     <string name="brbs_restore_complete_toast">পুনরুদ্ধার সম্পন্ন হয়েছে, অ্যাপ পুনরায় চালু হচ্ছে…</string>
     <string name="brbs_backup_complete_toast">ব্যাকআপ সম্পন্ন</string>
     <string name="fapps_firewall_filter_hint">তালিকাভুক্ত অ্যাপে আনমিটারড/মিটারড নিয়ম প্রয়োগ করুন</string>
-    <string name="fapps_firewall_filter_desc"><u>%1$s</u> %2$s অ্যাপ দেখানো হচ্ছে</string>
+    <string name="fapps_firewall_filter_desc"><![CDATA[<u>%1$s</u> %2$s অ্যাপ দেখানো হচ্ছে]]></string>
     <string name="fapps_info_dialog_positive_btn">ঠিক আছে</string>
     <string name="fapps_firewall_filter_excluded">ছাঁটা</string>
     <string name="fapps_firewall_filter_isolate">তালাবদ্ধ</string>
@@ -706,7 +706,7 @@
     <string name="fapps_firewall_filter_bypass_universal">বাইপাস</string>
     <string name="fapps_unmetered_block_dialog_message"><i>তালিকাভুক্ত</i> অ্যাপের জন্য মিটারবিহীন (ওয়াইফাই) নেটওয়ার্কে সংযোগ ব্লক করবেন\?</string>
     <string name="fapps_metered_block_dialog_title">মিটারে ব্লক</string>
-    <string name="fapps_firewall_filter_desc_category">বিভাগে দেখানো হচ্ছে <u>%1$s</u> %2$s অ্যাপগুলি: %3$s</string>
+    <string name="fapps_firewall_filter_desc_category"><![CDATA[বিভাগে দেখানো হচ্ছে <u>%1$s</u> %2$s অ্যাপগুলি: %3$s]]></string>
     <string name="fav_icon">fav_icon</string>
     <string name="fapps_unmetered_block_dialog_title">আনমিটারে ব্লক করুন</string>
     <string name="fapps_metered_unblock_dialog_title">মিটারে অনুমতি দিন</string>

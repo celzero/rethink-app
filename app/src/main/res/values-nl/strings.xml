@@ -317,7 +317,7 @@
 \nIP-adres: %2$s
 \n
 \nPoortnummer: %3$s</string>
-    <string name="fapps_firewall_filter_desc_category">Toont <u>%1$s</u> %2$s apps in categorieën: %3$s</string>
+    <string name="fapps_firewall_filter_desc_category"><![CDATA[Toont <u>%1$s</u> %2$s apps in categorieën: %3$s]]></string>
     <string name="fapps_filter_clear_btn">Wissen</string>
     <string name="rules_load_failure_reload">herladen</string>
     <string name="fapps_info_dialog_positive_btn">Oke</string>
@@ -345,10 +345,10 @@
     <string name="firewall_rule_block_ip">IP / Poort (App)</string>
     <string name="firewall_rule_no_rule_desc">Geen firewall regels kwamen overeen met deze verbinding.</string>
     <string name="firewall_rule_block_http">Onveilige HTTP</string>
-    <string name="firewall_rule_new_app_desc">Deze app maakte verbinding voor de <i>eerste keer</i>.<br/><br/> Om te veranderen ga naar <i>Universele</i> tab.</string>
+    <string name="firewall_rule_new_app_desc"><![CDATA[Deze app maakte verbinding voor de <i>eerste keer</i>.<br/><br/> Om te veranderen ga naar <i>Universele</i> tab.]]></string>
     <string name="dc_dns_leaks_desc">Indien ingeschakeld, vangt RethinkDNS alle pakketten op poort 53 op en stuurt deze door naar een door de gebruiker ingesteld DNS eindpunt</string>
-    <string name="firewall_rule_isolate_desc">Een door de gebruiker ingestelde firewallregel blokkeerde deze <i>app</i> door verbinding te maken met andere dan <i>omzeilde IP\'s</i>.<br/><br/> Om te wijzigen ga naar <i>All Apps</i> tab.</string>
-    <string name="firewall_rule_global_lockdown_desc">Deze verbinding is geblokkeerd omdat universele lockdown is ingesteld.<br/><br/> Om dit te veranderen ga naar <i>tabblad Universal</i>.</string>
+    <string name="firewall_rule_isolate_desc"><![CDATA[Een door de gebruiker ingestelde firewallregel blokkeerde deze <i>app</i> door verbinding te maken met andere dan <i>omzeilde IP\'s</i>.<br/><br/> Om te wijzigen ga naar <i>All Apps</i> tab.]]></string>
+    <string name="firewall_rule_global_lockdown_desc"><![CDATA[Deze verbinding is geblokkeerd omdat universele lockdown is ingesteld.<br/><br/> Om dit te veranderen ga naar <i>tabblad Universal</i>.]]></string>
     <string name="ada_app_status_isolate">staat in lockdown modus</string>
     <string name="ada_app_isolate">Lockdown</string>
     <string name="settings_orbot_notification_content">Fout bij het starten van Tor-as-a-Proxy. Open de Orbot-app om deze handmatig te starten.</string>
@@ -455,7 +455,7 @@
     <string name="fapps_firewall_filter_bypass_universal">Omzeild</string>
     <string name="fapps_firewall_filter_excluded">Uitgesloten</string>
     <string name="fapps_firewall_filter_isolate">lockdown</string>
-    <string name="fapps_firewall_filter_desc">Het tonen van <u>%1$s</u> %2$s apps</string>
+    <string name="fapps_firewall_filter_desc"><![CDATA[Het tonen van <u>%1$s</u> %2$s apps]]></string>
     <string name="unicode_warning_sign">⚠</string>
     <string name="unicode_question_sign">❔</string>
     <string name="rules_load_failure_heading">Notitie</string>
@@ -476,7 +476,7 @@
     <string name="firewall_rule_unknown">Bron Onbekend</string>
     <string name="firewall_rule_block_dns_bypass">DNS omzeild</string>
     <string name="firewall_rule_exempt_app_bypass_univ">Omzeilde app</string>
-    <string name="firewall_rule_block_app_desc">Een door de gebruiker ingestelde firewallregel blokkeerde deze <i>app</i>.<br/><br/> Om te wijzigen ga naar <i>All Apps</i> tab.</string>
+    <string name="firewall_rule_block_app_desc"><![CDATA[Een door de gebruiker ingestelde firewallregel blokkeerde deze <i>app</i>.<br/><br/> Om te wijzigen ga naar <i>All Apps</i> tab.]]></string>
     <string name="firewall_rule_global_lockdown">Lockdown</string>
     <string name="settings_ptrans_desc">Vertaal uitgaand IPv6-verkeer naar IPv4 op het apparaat. Inschakelen als u verbonden bent met een netwerk dat alleen uit IPv4 bestaat.</string>
     <string name="settings_allow_bypass_desc">Sta toe dat aanvragende apps de RethinkDNS firewall on-demand omzeilen. Sommige audio/video conferentie apps zoals Zoom en WhatsApp kunnen een on-demand bypass nodig hebben om goed te functioneren.</string>
