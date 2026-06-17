@@ -141,6 +141,7 @@
     <string name="two_argument" translatable="false">%1$s / %2$s</string>
     <string name="two_argument_dot" translatable="false">%1$s · %2$s</string>
     <string name="two_argument_parenthesis" translatable="false">%1$s (%2$s)</string>
+    <string name="two_argument_comma" translatable="false">%1$s, %2$s</string>
     <string name="three_argument" translatable="false">%1$s %2$s %3$s</string>
     <string name="three_argument_colon" translatable="false">%1$s:%2$s:%3$s</string>
     <string name="symbol_heavy" translatable="false">🐘</string>

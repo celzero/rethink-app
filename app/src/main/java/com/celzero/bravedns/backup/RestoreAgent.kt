@@ -26,6 +26,7 @@ import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_WG_DIR
 import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_RESTORE_URI
 import com.celzero.bravedns.backup.BackupHelper.Companion.METADATA_FILENAME
 import com.celzero.bravedns.backup.BackupHelper.Companion.SHARED_PREFS_BACKUP_FILE_NAME
@@ -185,44 +186,54 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             persistentState.remoteBlocklistTimestamp >
             Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP
         ) {
-            RethinkBlocklistManager.readJson(
-                context,
-                RethinkBlocklistManager.DownloadType.REMOTE,
-                persistentState.remoteBlocklistTimestamp
-            )
-            return
+            try {
+                RethinkBlocklistManager.readJson(
+                    context,
+                    RethinkBlocklistManager.DownloadType.REMOTE,
+                    persistentState.remoteBlocklistTimestamp
+                )
+                return
+            } catch (_: IOException) {
+                Logger.w(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "remote blocklist file not found locally (timestamp: ${persistentState.remoteBlocklistTimestamp}), falling back to packaged asset"
+                )
+                // fall through to use the packaged asset version
+            }
         }
 
         RemoteFileTagUtil.moveFileToLocalDir(context.applicationContext, persistentState)
     }
 
     private fun handleDatabaseInit() {
-        // get writable database for logs
-        if (!logDatabase.isOpen) {
-            Logger.i(
-                LOG_TAG_BACKUP_RESTORE,
-                "log database is not open, perform writableDatabase operation"
-            )
-            logDatabase.openHelper.writableDatabase
-        } else {
-            // no-op
-        }
-
-        // get writable database for app
-        if (!appDatabase.isOpen) {
-            Logger.i(
-                LOG_TAG_BACKUP_RESTORE,
-                "app database is not open, perform writableDatabase operation"
-            )
-            appDatabase.openHelper.writableDatabase
-        } else {
-            // no-op
-        }
+        // After restoreDatabaseFile replaced the database files on disk with the backup,
+        // the previously open database connections (if any) are now stale and must be
+        // reopened so Room applies any pending migrations against the restored files.
+        Logger.i(LOG_TAG_BACKUP_RESTORE, "reopening databases after restore")
+        logDatabase.openHelper.writableDatabase
+        appDatabase.openHelper.writableDatabase
+        Logger.i(LOG_TAG_BACKUP_RESTORE, "databases reopened after restore, version: ${appDatabase.openHelper.readableDatabase.version}")
     }
 
     // Restore database file stored at tempDir/nameOfFileToRestore.
     private fun restoreDatabaseFile(tempDir: File): Boolean {
-        checkPoint()
+        // Checkpoint and close databases before replacing the files on disk.
+        // If we don't close, Room's open file descriptors keep pointing to the
+        // old inodes and queries return stale data, causing WG entries to appear
+        // as zero even though the restored database file contains them.
+        Logger.i(LOG_TAG_BACKUP_RESTORE, "checkpoint and close databases before file copy")
+        appDatabase.checkPoint()
+        logDatabase.checkPoint()
+        try {
+            if (appDatabase.isOpen) appDatabase.close()
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "close appDatabase err: ${e.message}")
+        }
+        try {
+            if (logDatabase.isOpen) logDatabase.close()
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "close logDatabase err: ${e.message}")
+        }
 
         Logger.d(LOG_TAG_BACKUP_RESTORE, "begin restore database to temp dir: ${tempDir.path}")
 
@@ -285,19 +296,32 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             return false
         }
 
-        // read the wireguard files from the temp dir and write it to the wireguard folder
-        val files = dir.listFiles()
-        if (files == null) {
-            Logger.w(LOG_TAG_BACKUP_RESTORE, "files to restore is empty, path: ${dir.path}")
-            return false
-        }
-        files.forEach { file ->
-            // if file name ends with .conf, then copy it to the wireguard folder
-            if (!file.name.endsWith(".conf")) {
-                Logger.d(LOG_TAG_BACKUP_RESTORE, "not wg file, file name: ${file.name}")
-                return@forEach
-            }
+        var totalCopied = 0
 
+        // collect .conf files from the root of the temp dir
+        val confFiles = mutableListOf<File>()
+        dir.listFiles()?.forEach { file ->
+            if (file.name.endsWith(".conf")) {
+                confFiles.add(file)
+            } else {
+                Logger.d(LOG_TAG_BACKUP_RESTORE, "not wg file, file name: ${file.name}")
+            }
+        }
+
+        // also scan the wireguard/ subdirectory (where backup saves wg files)
+        val backupWgSubDir = File(dir, BACKUP_WG_DIR)
+        if (backupWgSubDir.exists() && backupWgSubDir.isDirectory) {
+            Logger.i(LOG_TAG_BACKUP_RESTORE, "scanning wireguard/ subdirectory for .conf files")
+            backupWgSubDir.listFiles()?.forEach { file ->
+                if (file.name.endsWith(".conf") && !confFiles.any { it.name == file.name }) {
+                    confFiles.add(file)
+                }
+            }
+        }
+
+        Logger.i(LOG_TAG_BACKUP_RESTORE, "found ${confFiles.size} .conf files to restore")
+
+        confFiles.forEach { file ->
             val currentWgFile = File(tempWgDir, file.name)
             if (!Utilities.copy(file.path, currentWgFile.path)) {
                 Logger.w(
@@ -311,8 +335,10 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
                     LOG_TAG_BACKUP_RESTORE,
                     "wireguard file: ${file.name} backed up from ${file.path} to ${currentWgFile.path}"
                 )
+                totalCopied++
             }
         }
+        Logger.i(LOG_TAG_BACKUP_RESTORE, "copied $totalCopied wireguard files to temp_wireguard")
         return true
     }
 
@@ -336,13 +362,6 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         val pInfo: PackageInfo? =
             Utilities.getPackageMetadata(context.packageManager, context.packageName)
         return pInfo?.versionCode ?: 0
-    }
-
-    private fun checkPoint() {
-        Logger.i(LOG_TAG_BACKUP_RESTORE, "database checkpoint() during restore process")
-        appDatabase.checkPoint()
-        logDatabase.checkPoint()
-        return
     }
 
     private fun validateMetadata(tempDirectory: String?): Boolean {
