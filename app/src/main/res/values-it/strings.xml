@@ -836,9 +836,7 @@
     <string name="lbl_allowed_ips" translatable="true">IP consentiti</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
     <string name="lbl_http" translatable="true">HTTP</string>
-    <string name="lbl_wireguard" translatable="true"></string>
     <string name="lbl_mtu" translatable="true">MTU</string>
-    <string name="lbl_sec" translatable="true"></string>
     <string name="lbl_hour" translatable="true">hr</string>
     <string name="lbl_persistent_keepalive" translatable="true">Mantenimento persistente</string>
     <string name="lbl_save" translatable="true">salva</string>
@@ -896,7 +894,6 @@
     <string name="lbl_anonymous" translatable="true">anonimo</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">Eliminare l\'endpoint DoT?</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Protetto! Collegato a DNS + Firewall + Proxy.</string>
-    <string name="lbl_peer" translatable="true"></string>
     <string name="settings_connectivity_checks" translatable="true">Esegui controlli di connettività</string>
     <string name="orbot_no_app_toast" translatable="true">Aggiungi almeno un\'app per abilitare Orbot</string>
     <string name="settings_rinr_heading" translatable="true">Loopback (sperimentale)</string>
@@ -977,7 +974,6 @@
     <string name="lbl_test" translatable="true">test</string>
     <string name="lbl_experimental" translatable="true">(sperimentale)</string>
     <string name="lbl_service_providers" translatable="true">Fornitori di servizi</string>
-    <string name="lbl_hop" translatable="true"></string>
     <string name="lbl_manual" translatable="true">Manuale</string>
     <string name="lbl_action" translatable="true">Azione</string>
     <string name="lbl_connect" translatable="true">Connette</string>
@@ -996,7 +992,6 @@
     <string name="conn_track_clear_rule_logs_message" translatable="true">Questo cancellerà lo storico di rete solo per la regola del firewall corrente. Questa operazione non è reversibile. Vuoi procedere?</string>
     <string name="settings_mobile_metered_heading" translatable="true">Contatore reti mobili</string>
     <string name="settings_mobile_metered_desc" translatable="true">Tratta solo le reti mobili come a consumo, il resto come non a consumo.</string>
-    <string name="settings_theme_dialog_themes_5" translatable="true"></string>
     <string name="settings_theme_dialog_themes_7" translatable="true">Congelato</string>
     <string name="settings_biometric_dialog_heading" translatable="true">Autenticazione biometrica</string>
     <string name="settings_biometric_dialog_option_0" translatable="true">Nessuno</string>
