@@ -318,9 +318,7 @@
     <string name="always_on_dialog_heading" translatable="true">Вимкнути Постійно ввімкнений VPN</string>
     <string name="always_on_dialog_positive_btn" translatable="true">Перейти до налаштуваннях</string>
     <string name="always_on_dialog_stop_heading" translatable="true">Постійно ввімкнений VPN</string>
-    <string name="private_dns_dialog_desc" translatable="true">Налаштування DNS Rethink перевизначаються приватними DNS Android.
-\n
-\nЩоб використовувати DNS Rethink, перейдіть до налаштувань Android і вимкніть \"Приватний DNS\".</string>
+    <string name="private_dns_dialog_desc" translatable="true">Налаштування DNS Rethink перевизначаються приватними DNS Android. \n \nЩоб використовувати DNS Rethink, перейдіть до налаштувань Android і вимкніть \"Приватний DNS\".</string>
     <string name="univ_firewall_dialog_title" translatable="true">Видалити правило IP\?</string>
     <string name="doh_custom_url_remove_success" translatable="true">Кінцева точка видалена.</string>
     <string name="lbl_rules" translatable="true">правила</string>
