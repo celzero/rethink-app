@@ -792,9 +792,7 @@
     <string name="ctbs_block_other_apps">Правила, применяемые для %1$s, будут применимы и для %2$s других приложений</string>
     <string name="private_dns_dialog_positive">Перейти в настройки</string>
     <string name="private_dns_dialog_heading">Отключить приватный DNS</string>
-    <string name="private_dns_dialog_desc">Настройки Rethink DNS переопределяются настройками персонального DNS в Android.
-\n
-\nДля использования DNS Rethink, перейдите в настройки Android и отключите персональный DNS в разделе Сеть и интернет.</string>
+    <string name="private_dns_dialog_desc">Настройки Rethink DNS переопределяются настройками персонального DNS в Android. \n \nДля использования DNS Rethink, перейдите в настройки Android и отключите персональный DNS в разделе Сеть и интернет.</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Очистить все журналы, связанные с этим приложением.</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Блокировка пиратского и контента для взрослых, азартных игр, онлайн знакомств, а также социальных сетей.</string>
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Блокировка вредоносного ПО, фишинга, программ-вымогателей, криптософта и прочих угроз.</string>
