@@ -123,9 +123,7 @@
     <string name="dns_crypt_url_remove_dialog_message" translatable="true">برطرف کننده DNSCrypt را از پیکربندی ذخیره شده حذف کنید.</string>
     <string name="dns_crypt_relay_remove_dialog_message" translatable="true">رله DNSCrypt را از پیکربندی ذخیره شده حذف کنید.</string>
     <string name="private_dns_dialog_heading" translatable="true">DNS خصوصی را خاموش کنید</string>
-    <string name="private_dns_dialog_desc" translatable="true">تنظیمات DNS Rethink توسط DNSخصوصی اندروید لغو شده است.
-\n
-\nبرای استفاده از DNS Rethink به تنظیمات اندروید بروید و \"DNS خصوصی\" را خاموش کنید.</string>
+    <string name="private_dns_dialog_desc" translatable="true">تنظیمات DNS Rethink توسط DNSخصوصی اندروید لغو شده است. \n \nبرای استفاده از DNS Rethink به تنظیمات اندروید بروید و \"DNS خصوصی\" را خاموش کنید.</string>
     <string name="private_dns_dialog_positive" translatable="true">برو به تنظیمات</string>
     <string name="firewall_act_network_monitor_tab" translatable="true">شبکه</string>
     <string name="dns_act_configure_tab" translatable="true">پیکربندی</string>
