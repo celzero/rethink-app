@@ -538,7 +538,7 @@
     <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">பைபாச் பயன்பாடுகள்</string>
     <string name="firewall_rule_block_app_new_install" translatable="true">புதிய பயன்பாடு</string>
     <string name="firewall_rule_device_lock_desc" translatable="true"><![CDATA[<!]]></string>
-    <string name="firewall_rule_global_lockdown_desc" translatable="true">உலகளாவிய பூட்டுதல் அமைக்கப்பட்டிருப்பதால் இந்த இணைப்பு தடுக்கப்பட்டது.</string>
+    <string name="firewall_rule_global_lockdown_desc" translatable="true"><![CDATA[உலகளாவிய பூட்டுதல் அமைக்கப்பட்டிருப்பதால் இந்த இணைப்பு தடுக்கப்பட்டது.]]></string>
     <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[<!]]></string>
     <string name="notif_dialog_pause_dialog_positive" translatable="true">தற்குறிப்பு</string>
     <string name="notif_channel_desc_proxy_failure" translatable="true">பதிலாள் பிழைகள் மற்றும் முரண்பாடுகள் குறித்து எச்சரிக்கை</string>
@@ -802,7 +802,7 @@
     <string name="firewall_rule_exempt_orbot_setup_desc" translatable="true"><![CDATA[<!]]></string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[இந்த இணைப்பு அனுமதிக்கப்பட்டது, ஏனெனில் <i> டொமைன் </i> நம்பகமான களமாக அமைக்கப்பட்டுள்ளது.]]></string>
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[<!]]></string>
-    <string name="firewall_rule_proxied_desc" translatable="true">இந்த இணைப்பு பயனர்-வழங்கப்பட்ட பதிலாள்.</string>
+    <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[இந்த இணைப்பு பயனர்-வழங்கப்பட்ட பதிலாள்.]]></string>
     <string name="notif_dialog_pause_dialog_neutral" translatable="true">காட்டு</string>
     <string name="ci_trust_initial" translatable="true">டி</string>
     <string name="notif_channel_vpn_notification" translatable="true">செயலில் VPN</string>
