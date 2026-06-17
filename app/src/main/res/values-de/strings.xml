@@ -1157,4 +1157,5 @@
     <string name="settings_tunnel_metered_desc" translatable="true">Markiere den VPN-Tunnel als getaktet, um Apps anzuweisen, weniger Daten zu verbrauchen. Achtung: Dies kann dazu führen, dass Apps große Uploads und Downloads, wie z. B. Backups, unterbrechen.</string>
     <string name="stability_program_toast" translatable="true">Für das <i>Stabilitätsprogramm</i> für <i>experimentelle Funktionen</i> angemeldet.</string>
     <string name="dns_record_types_auto_mode_status" translatable="true">Automatisch (Alle Arten)</string>
+    <string name="lbl_expires_on" translatable="true">Läuft ab am</string>
 </resources>
