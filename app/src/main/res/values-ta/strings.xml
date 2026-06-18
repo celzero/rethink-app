@@ -241,7 +241,6 @@
     <string name="dns_proxy_remove_dialog_title" translatable="true">டிஎன்எச் ப்ராக்சியை நீக்கவா?</string>
     <string name="relative_time_today" translatable="true">இன்று</string>
     <string name="settings_ip_network_desc" translatable="true">இணைய நெறிமுறை பதிப்புகளுக்கு இடையே தேர்வு செய்யவும்.</string>
-    <string name="settings_rinr_dialog_title" translatable="true">லூப் பேக் (சோதனை)</string>
     <string name="settings_http_proxy_desc" translatable="true">%1$s க்கு பகிர்தல்</string>
     <string name="hsf_stop_btn_state" translatable="true">நிறுத்து</string>
     <string name="hsf_whats_new_chip_text" translatable="true">புதியது என்ன</string>
@@ -835,7 +834,6 @@
     <string name="app_mode_choose" translatable="true">பயன்முறையைத் தேர்வுசெய்க</string>
     <string name="firewall_rule_bypass_universal_ip_desc" translatable="true"><![CDATA[இந்த இணைப்பு அனுமதிக்கப்பட்டது, ஏனெனில் <i> இலக்கு ஐபி </i> அனைத்து உலகளாவிய ஃபயர்வால் விதிகளையும் புறக்கணிக்க அமைக்கப்பட்டுள்ளது. /i&gt; தாவல்.]]></string>
     <string name="settings_rinr_desc_enabled" translatable="true">ரூட்டிங் ரீதிங்கின் சொந்த போக்குவரத்தை சுரங்கப்பாதை வழியாக. நீங்கள் என்ன செய்கிறீர்கள் என்று உங்களுக்குத் தெரியாவிட்டால், அதை அணைக்கவும்.</string>
-    <string name="settings_rinr_dialog_desc" translatable="true"><!--settings_network_all_networks--> %1$s அமைப்பையும் இயக்குகிறது. நீங்கள் தொடர விரும்புகிறீர்களா?</string>
     <string name="settings_http_proxy_error_text1" translatable="true">துறைமுகம் வீச்சு 1024–65535 முதல் இருக்க வேண்டும்</string>
     <string name="settings_http_proxy_error_text2" translatable="true">தவறான துறைமுகம்</string>
     <string name="settings_dns_proxy_dialog_hostname" translatable="true">புரவலன்பெயர்</string>

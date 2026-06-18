@@ -580,7 +580,6 @@
     <string name="settings_custom_downloader_desc" translatable="true">Якщо вимкнено, використовуватиметься вбудований <i>Менеджер завантажень</i> Android</string>
     <string name="settings_https_disabled_error" translatable="true">Підключено до %1$s. Вимкніть, щоб продовжити.</string>
     <string name="settings_network_all_networks_desc" translatable="true">Коли ввімкнено, Rethink використовуватиме всі доступні мережі для підключення до Інтернету. Якщо вимкнено, він використовуватиме ту мережу, яка вважається <i>активною</i> операційною системою Android.</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Зворотний цикл (експериментально)</string>
     <string name="settings_socks5_disabled_error" translatable="true">Підключено до %1$s. Вимкніть, щоб продовжити.</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">Постійне повідомлення</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">Зробити повідомлення постійним</string>
@@ -647,7 +646,6 @@
     <string name="about_mail_to_string" translatable="true">Посилання mailTO:</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Застосунки переадресації проксі-серверів зі зворотним зв\'язком</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">Коли цей параметр вимкнено, супроводження застосунків до проксі-серверів (SОСКS5, НТТР, DNS) виключається з VPN-тунелів Rethink\'s.</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Також вмикає<!--settings_network_all_networks--> %1$s налаштування. Ви бажаєте продовжити?</string>
     <string name="settings_ip_dialog_ipv4" translatable="true">IPv4 (стандарт)</string>
     <string name="settings_socks5_dialog_hint_port" translatable="true">Порт</string>
     <string name="settings_selected_theme" translatable="true">Поточна тема: %1$s</string>

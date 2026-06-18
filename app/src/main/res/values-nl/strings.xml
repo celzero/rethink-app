@@ -544,7 +544,6 @@
     <string name="status_protected_with_wg_private_dns" translatable="true">beschermd met wireguard &amp; privé dns</string>
     <string name="dns_crypt_relay_remove_success" translatable="true">DNSCrypt Relay verwijderd.</string>
     <string name="settings_general_customize" translatable="true">aanpassen</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Loopback (experimenteel)</string>
     <string name="settings_locale_dialog_neutral" translatable="true">Help ons mee de app te vertalen</string>
     <string name="settings_biometeric_heading" translatable="true">App-vergrendeling inschakelen</string>
     <string name="settings_default_dns_heading" translatable="true">Kies een terugval DNS</string>

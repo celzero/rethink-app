@@ -990,8 +990,6 @@
     <string name="settings_rinr_heading" translatable="true">回送（實驗性）</string>
     <string name="settings_rinr_desc_enabled" translatable="true">將 Rethink 自身嘅流量路由入隧道。如果您不清楚您喺度做緊乜嘢，請唔好啓用。</string>
     <string name="settings_rinr_desc_disabled" translatable="true">將 Rethink 自身嘅流量（例如下載攔截清單、連線檢查同 DNS 連接）路由入隧道。</string>
-    <string name="settings_rinr_dialog_title" translatable="true">回送（實驗性）</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">咁樣會同時啓用「<!--settings_network_all_networks--> %1$s」設定。您係咪想繼續？</string>
     <string name="cd_dialog_edit_title" translatable="true">改網域規則</string>
     <string name="cd_toast_edit" translatable="true">改咗</string>
     <string name="one_wg_apps_added" translatable="true">路由緊所有應用程式</string>

@@ -891,7 +891,6 @@
     <string name="orbot_no_app_toast" translatable="true">Orbot को सक्षम करने के लिए कम से कम एक ऐप जोड़ें</string>
     <string name="settings_rinr_heading" translatable="true">लूपबैक (प्रायोगिक)</string>
     <string name="settings_rinr_desc_disabled" translatable="true">रीथिंक के अपने ट्रैफ़िक को, जैसे ब्लॉकलिस्ट डाउनलोड, कनेक्टिविटी जांच, डीएनएस कनेक्शन, वापस सुरंग में रूट करें।</string>
-    <string name="settings_rinr_dialog_title" translatable="true">लूपबैक (प्रयोगात्मक)</string>
     <string name="battery_optimization_dialog_heading" translatable="true">%1$sबंद करें</string>
     <string name="dc_proxy_dns_heading" translatable="true">कभी भी DNS प्रॉक्सी न करें</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">सर्वर TLS प्रमाणपत्रों को मान्य न करें (केवल तभी सक्षम करें जब आपको पता हो कि आप क्या कर रहे हैं)</string>
@@ -972,7 +971,6 @@
     <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">सर्वाधिक संपर्क वाले देश</string>
     <string name="no_configs_error" translatable="true">कोई कॉन्फ़िगरेशन नहीं मिला</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">लगातार अधिसूचना</string>
-    <string name="settings_rinr_dialog_desc" translatable="true"><!--settings_network_all_networks-->%1$s सेटिंग भी सक्षम करता है। क्या आप आगे बढ़ना चाहते हैं?</string>
     <string name="bad_config_reason_unknown_section" translatable="true">अज्ञात अनुभाग</string>
     <string name="config_add_success_toast" translatable="true">संपन्न</string>
     <string name="one_wg_apps_added" translatable="true">सभी ऐप्स को मार्गनिर्देशित करना</string>

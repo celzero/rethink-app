@@ -1000,8 +1000,6 @@
     <string name="settings_exclude_proxy_apps_heading" translatable="true">تطبيقات إعادة توجيه الوكيل الحلقي</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">عند تعطيله، يتم استبعاد تطبيقات إعادة التوجيه بالوكيل (SOCKS5، HTTP، DNS) من نفق VPN الخاص بـ Rethink.</string>
     <string name="settings_rinr_desc_disabled" translatable="true">إعادة النظر في حركة المرور الخاصة بـ Rethink، مثل تنزيلات القائمة المحظورة، وفحوصات الاتصال، واتصالات DNS، مرة أخرى إلى النفق.</string>
-    <string name="settings_rinr_dialog_title" translatable="true">حلقة استرجاعية (تجريبية)</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">أيضا يقوم بتفعيل الاعداد<!--settings_network_all_networks--> %1$s. هل تريد الاستمرار؟</string>
     <string name="settings_theme_dialog_themes_5" translatable="true">فاتح بلس</string>
     <string name="settings_theme_dialog_themes_6" translatable="true">داكن بلس</string>
     <string name="settings_default_dns_desc" translatable="true">في الحالات النادرة التي لا يمكن فيها التأكد من DNS المفضل للمستخدم، يتم استخدام DNS الاحتياطي.</string>

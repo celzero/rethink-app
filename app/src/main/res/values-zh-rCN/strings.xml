@@ -1033,7 +1033,6 @@
     <string name="settings_rinr_heading" translatable="true">环回（实验性）</string>
     <string name="settings_rinr_desc_enabled" translatable="true">将 Rethink 自身的流量路由入隧道。若您不了解您在做什么，请不要启用。</string>
     <string name="settings_rinr_desc_disabled" translatable="true">将如下载屏蔽名单、连接检查与 DNS 连接等的 Rethink 自身流量路由回隧道。</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">这会同时启用“<!--settings_network_all_networks--> %1$s”设置。您是否想要继续？</string>
     <string name="one_wg_apps_added" translatable="true">正在路由所有应用</string>
     <string name="one_wg_dialog_desc" translatable="true">包括 DNS 在内的来自所有应用的流量将被单个活跃的 WireGuard VPN 路由。其他活跃的 WireGuard VPN 将被停止。</string>
     <string name="catch_all_wg_dialog_title" translatable="true">永久连接</string>
@@ -1048,7 +1047,6 @@
     <string name="dot_custom_url_remove_dialog_message" translatable="true">于已保存的配置中删除此 DNS over TLS 端点。</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">使通知变得持久</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">持续通知</string>
-    <string name="settings_rinr_dialog_title" translatable="true">环回（实验性）</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">是否删除 DoT 端点？</string>
     <string name="orbot_no_app_toast" translatable="true">添加至少一个应用以应用 Orbot</string>
     <string name="cd_dialog_edit_title" translatable="true">编辑域名规则</string>

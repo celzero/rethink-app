@@ -228,7 +228,6 @@
     <string name="settings_app_notification_a13_desc" translatable="true">Povolte oprávnění pro oznámení aplikace</string>
     <string name="settings_theme_heading" translatable="true">Vzhled</string>
     <string name="settings_rinr_heading" translatable="true">Loopback (experimentální)</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Loopback (experimentální)</string>
     <string name="settings_default_dns_heading" translatable="true">Vybrat záložní DNS</string>
     <string name="hsf_start_dialog_positive" translatable="true">Spustit</string>
     <string name="about_mail_subject" translatable="true">[Rethink]:</string>
@@ -345,7 +344,6 @@
     <string name="settings_go_log_heading" translatable="true">Úroveň logů</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Směřovat vlastní provoz Rethink (stahování blokovacích seznamů, kontroly připojení, DNS) zpět do tunelu.</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Rethink směřuje vlastní provoz přes tunel. Pokud nevíte, co děláte, raději to vypněte.</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Tím se také povolí<!--settings_network_all_networks--> %1$s. Chcete pokračovat?</string>
     <string name="settings_http_proxy_desc" translatable="true">Přesměrování na %1$s</string>
     <string name="settings_dns_proxy_dialog_header" translatable="true">Nastavit SOCKS5 Proxy</string>
     <string name="settings_http_proxy_dialog_title" translatable="true">Vlastní URL serveru</string>

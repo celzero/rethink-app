@@ -394,8 +394,6 @@
     <string name="settings_http_proxy_dialog_title" translatable="true">כתובת שרת מותאם אישית</string>
     <string name="settings_http_proxy_toast_success" translatable="true">פרוקסי HTTP קבועה</string>
     <string name="settings_rinr_heading" translatable="true">לולאה חוזרת (ניסיוני)</string>
-    <string name="settings_rinr_dialog_title" translatable="true">לולאה חוזרת (ניסיוני)</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">גם מאפשר <!--settings_network_all_networks-->%1$s. האם אתה רוצה להמשיך?</string>
     <string name="settings_dns_proxy_dialog_port_number" translatable="true">מספר פִּתְחָה</string>
     <string name="settings_http_proxy_error_text2" translatable="true">פִּתְחָה לא תקפה</string>
     <string name="settings_http_proxy_error_text3" translatable="true">שם המארח ריק</string>

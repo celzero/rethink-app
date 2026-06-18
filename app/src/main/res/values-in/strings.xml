@@ -1037,8 +1037,6 @@
     <string name="orbot_no_app_toast" translatable="true">Tambahkan setidaknya satu aplikasi untuk mengaktifkan Orbot</string>
     <string name="settings_rinr_heading" translatable="true">Putar Balik (eksperimental)</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Rutekan Lalu lintas Rethink sendiri, seperti unduhan daftar blokir, pemeriksaan konektivitas, koneksi DNS, kembali ke tunnel.</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Putar Balik (eksperimental)</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Ini juga akan mengaktifkan pengaturan<!--settings_network_all_networks--> %1$s. Apakah Anda ingin melanjutkan?</string>
     <string name="cd_dialog_edit_title" translatable="true">Edit aturan domain</string>
     <string name="cd_toast_edit" translatable="true">Disunting</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Rutekan lalu lintas mandiri dari rethink melalui terowongan. Kecuali Anda tahu apa yang Anda lakukan, matikan.</string>

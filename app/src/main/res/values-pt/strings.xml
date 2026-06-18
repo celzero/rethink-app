@@ -908,7 +908,6 @@
     <string name="settings_go_log_heading" translatable="true">Nível de registo</string>
     <string name="logs_card_duration" translatable="true">desde %1$s</string>
     <string name="logs_disclaimer" translatable="true">A mostrar os primeiros 20 000 caracteres</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Também ativa a definição <!--settings_network_all_networks--> %1$s. Deseja continuar?</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">Não validar certificados TLS do servidor (ative apenas se souber o que está a fazer)</string>
     <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">Ignorar regras de DNS e de firewall.</string>
     <string name="firewall_rule_proxied_desc" translatable="true">Esta ligação foi reencaminhada para o proxy preferido pelo utilizador.<br/><br/>Para alterar, aceda a <i>Proxy</i> no ecrã <i>Configurar</i>.</string>
@@ -968,7 +967,6 @@
     <string name="cd_dialog_edit_title" translatable="true">Editar regra de domínio</string>
     <string name="lbl_peer" translatable="true">Peer</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">Eliminar \'endpoint\' DoT?</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Loopback (experimental)</string>
     <string name="wireguard_apps_proxy_map_desc" translatable="true">parte de %1$s</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">Notificação persistente</string>
     <string name="settings_rinr_heading" translatable="true">Loopback (experimental)</string>
