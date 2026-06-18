@@ -126,9 +126,12 @@ class CustomIpRulesBtmSheet :
         val uid = ci.uid
         io {
             if (uid == UID_EVERYBODY) {
-                b.customIpAppNameTv.text = getString(R.string.firewall_act_universal_tab).replaceFirstChar(Char::titlecase)
-                b.customIpAppIconCv.visibility = View.GONE
-                updateFlagIfAvailable(ci)
+                uiCtx {
+                    b.customIpAppNameTv.text =
+                        getString(R.string.firewall_act_universal_tab).replaceFirstChar(Char::titlecase)
+                    b.customIpAppIconCv.visibility = View.GONE
+                    updateFlagIfAvailable(ci)
+                }
             } else {
                 val appNames = FirewallManager.getAppNamesByUid(ci.uid)
                 val appName = getAppName(ci.uid, appNames)
