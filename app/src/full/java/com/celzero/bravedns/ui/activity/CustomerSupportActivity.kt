@@ -40,10 +40,14 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.scheduler.BugReportZipper
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.BaseActivity
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.celzero.firestack.backend.Rpn
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -204,7 +208,20 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
                 val entitlementJson = if (includeStats) {
                     runCatching {
                         val details = RpnProxyManager.getEntitlementDetails()
-                        details?.json()?.let { String(it, Charsets.UTF_8) }
+                        if (details == null) {
+                            "unavailable"
+                        } else {
+                            val sb = StringBuilder()
+                            sb.append("cid: " + details.cid()?.take(12))
+                            sb.append("did: " + details.did().take(4))
+                            sb.append("expiry: " + Utilities.convertLongToTime(details.expiry(),
+                                Constants.TIME_FORMAT_4))
+                            sb.append("providerId: " + details.providerID())
+                            sb.append("token: " + details.token().take(16))
+                            sb.append("test: " + details.test())
+                            sb.append("allowRestore: " + details.allowRestore())
+                            sb.toString()
+                        }
                     }.getOrElse { null }
                 } else null
 
