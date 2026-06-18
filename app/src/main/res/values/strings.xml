@@ -2106,7 +2106,7 @@
     <string name="server_loading_dialog_status_timeout" translatable="false">Taking a bit longer than expected…</string>
 
     <!-- RPN Restore dialog -->
-    <string name="rpn_restore_confirm_title" translatable="false">Restore to Defaults</string>
+    <string name="rpn_restore_confirm_title" translatable="false">Restore Defaults</string>
     <string name="rpn_restore_confirm_message" translatable="false">This will unregister your current session, fetch a fresh entitlement from the server, and re-register your connection. Your server selections will not be preserved.</string>
     <string name="rpn_restore_dialog_title" translatable="false">Restoring connection</string>
     <string name="rpn_restore_dialog_hint" translatable="false">This usually completes in a few seconds. Keep your internet connection active.</string>

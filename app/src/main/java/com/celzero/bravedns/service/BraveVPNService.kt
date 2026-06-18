@@ -4841,17 +4841,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // no-op
     }
 
-    override fun onUpstreamAnswer(smm: DNSSummary, rcvdDnsOpts: DNSOpts, ipcsv: String): DNSOpts {
+    override fun onUpstreamAnswer(connId: String, smm: DNSSummary, rcvdDnsOpts: DNSOpts, ipcsv: String): DNSOpts {
         val startTime = elapsedRealtime()
         return go2kt(upstreamQueryDispatcher) {
             if (ipcsv.isEmpty()) {
-                Logger.i(LOG_TAG_VPN, "onUpstreamAnswer: received empty ips for upstream answer, no-op, time: ${elapsedRealtime() - startTime} ms")
                 return@go2kt DNSOpts()
             }
 
             if (appConfig.getBraveMode().isDnsMode()) {
                 // no need to consider universal rules in dns only mode
-                Logger.i(LOG_TAG_VPN, "onUpstreamAnswer: dns only mode, no-op, time: ${elapsedRealtime() - startTime} ms")
                 return@go2kt DNSOpts()
             }
 
@@ -4862,7 +4860,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     smm.uid.toInt()
                 }
             } catch (e: NumberFormatException) {
-                Logger.e(LOG_TAG_VPN, "onUpstreamAnswer: invalid uid ${smm.uid}, error: ${e.message}, time: ${elapsedRealtime() - startTime} ms")
+                Logger.e(LOG_TAG_VPN, "onUpstreamAnswer: $connId invalid uid ${smm.uid}, error: ${e.message}, time: ${elapsedRealtime() - startTime} ms")
                 return@go2kt DNSOpts()
             }
 
@@ -4878,7 +4876,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     tidcsv = Backend.BlockAll
                     pidcsv = rcvdDnsOpts.pidcsv
                     noblock = false
-                    Logger.vv(LOG_TAG_VPN, "onUpstreamAnswer: block dns fir unknown app, original tid: $id, bypass tid: [$tidcsv, $tidseccsv], pid: $pidcsv, ipcsv: $ipcsv, time: ${elapsedRealtime() - startTime} ms")
+                    Logger.vv(LOG_TAG_VPN, "onUpstreamAnswer: $connId block dns for unknown app, original tid: $id, bypass tid: [$tidcsv, $tidseccsv], pid: $pidcsv, ipcsv: $ipcsv, time: ${elapsedRealtime() - startTime} ms")
                 }
                 return@go2kt result
             }
@@ -4886,7 +4884,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // taking the first ip from the rdata, can have multiple ips, to check for conn type
             val firstDestIp = ipcsv.split(",").firstOrNull()
             if (firstDestIp.isNullOrEmpty()) {
-                Logger.e(LOG_TAG_VPN, "onUpstreamAnswer: empty rdata for ${smm.qName}, ipcsv: $ipcsv uid: $uidInt, time: ${elapsedRealtime() - startTime} ms")
+                Logger.e(LOG_TAG_VPN, "onUpstreamAnswer: $connId empty rdata for ${smm.qName}, ipcsv: $ipcsv uid: $uidInt, time: ${elapsedRealtime() - startTime} ms")
                 return@go2kt DNSOpts()
             }
             val userId = FirewallManager.userId(uidInt)
@@ -4923,11 +4921,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 connId,
                 connType
             )
-            logd("onUpstreamAnswer: connInfo: $connInfo, domain: $domain, anyRealIpBlocked: $anyRealIpBlocked, isSplApp: $isSplApp, rinr: $rinr, time: ${elapsedRealtime() - startTime} ms")
+            logd("onUpstreamAnswer: $connId connInfo: $connInfo, domain: $domain, anyRealIpBlocked: $anyRealIpBlocked, isSplApp: $isSplApp, rinr: $rinr, time: ${elapsedRealtime() - startTime} ms")
             val rule = firewall(connInfo, domain, anyRealIpBlocked, isSplApp, rinr)
             val blocked = FirewallRuleset.ground(rule)
             if (blocked) {
-                logd("onUpstreamAnswer: blocked by firewall, rule: $rule, connInfo: $connInfo, ipcsv: $ipcsv, time: ${elapsedRealtime() - startTime} ms")
+                logd("onUpstreamAnswer: $connId blocked by firewall, rule: $rule, connInfo: $connInfo, ipcsv: $ipcsv, time: ${elapsedRealtime() - startTime} ms")
                 return@go2kt DNSOpts().apply {
                     tidcsv = Backend.BlockAll
                     pidcsv = rcvdDnsOpts.pidcsv
@@ -4942,7 +4940,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val isAppIsolated = FirewallManager.appStatus(uidInt).isIsolate()
             val isDmnOrIpTrusted = rule == FirewallRuleset.RULE2F || rule == FirewallRuleset.RULE2B
             if (isAppIsolated && isDmnOrIpTrusted) {
-                logd("onUpstreamAnswer: app is isolate and domain/ip is trusted, treat as allowed, rule: $rule, connInfo: $connInfo, ipcsv: $ipcsv, time: ${elapsedRealtime() - startTime} ms")
+                logd("onUpstreamAnswer: $connId app is isolate and domain/ip is trusted, treat as allowed, rule: $rule, connInfo: $connInfo, ipcsv: $ipcsv, time: ${elapsedRealtime() - startTime} ms")
                 return@go2kt DNSOpts()
             }
             val isBypass = FirewallRuleset.isBypassRule(rule)
@@ -4955,7 +4953,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     val id = Pair(rcvdDnsOpts.tidcsv, rcvdDnsOpts.tidseccsv)
                     val tid = getTransportIdToBypass(id)
                     if (tid == id) {
-                        logd("onUpstreamAnswer: no bypass transport needed, rule: $rule, time: ${elapsedRealtime() - startTime} ms")
+                        logd("onUpstreamAnswer: $connId no bypass transport needed, rule: $rule, time: ${elapsedRealtime() - startTime} ms")
                         return@go2kt DNSOpts()
                     }
                     tidcsv = tid.first.split(",").joinToString(",") { appendDnsCacheIfNeeded(it) }
@@ -4965,13 +4963,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     val mark = determineProxyDetails(connInfo, doubleLoopback, persistentState.routeRethinkInRethink, forUpstreamAnswer = true)
                     pidcsv = mark.pidcsv
                     noblock = true
-                    Logger.vv(LOG_TAG_VPN, "onUpstreamAnswer: bypass rule: $rule, original tid: $id, bypass tid: [$tidcsv, $tidseccsv], pid: $pidcsv connInfo: $connInfo, ipcsv: $ipcsv, time: ${elapsedRealtime() - startTime} ms")
+                    Logger.vv(LOG_TAG_VPN, "onUpstreamAnswer: $connId bypass rule: $rule, original tid: $id, bypass tid: [$tidcsv, $tidseccsv], pid: $pidcsv connInfo: $connInfo, ipcsv: $ipcsv, time: ${elapsedRealtime() - startTime} ms")
                 }
                 return@go2kt result
             }
 
-            if (DEBUG) logd("onUpstreamAnswer: $smm, ipcsv: $ipcsv")
-            logd("onUpstreamAnswer: no action needed, default DNSOpts, time: ${elapsedRealtime() - startTime} ms")
+            if (DEBUG) logd("onUpstreamAnswer: $connId $smm, ipcsv: $ipcsv")
+            logd("onUpstreamAnswer: $connId no action needed, default DNSOpts, time: ${elapsedRealtime() - startTime} ms")
             return@go2kt DNSOpts()
         }
     }

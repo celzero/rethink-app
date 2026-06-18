@@ -21,6 +21,7 @@ import android.app.Activity
 import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.JSON_LATEST
 import com.celzero.bravedns.util.Constants.Companion.JSON_UPDATE
@@ -44,7 +45,7 @@ class NonStoreAppUpdater(
         listener: AppUpdater.InstallStateListener
     ) {
         Logger.i(LOG_TAG_APP_UPDATE, "Beginning update check")
-        val url = baseUrl + BuildConfig.VERSION_CODE
+        val url = baseUrl + persistentState.appVersion.toString()
 
         val client = RetrofitManager.okHttpClient(persistentState.routeRethinkInRethink)
         val request = Request.Builder().url(url).build()

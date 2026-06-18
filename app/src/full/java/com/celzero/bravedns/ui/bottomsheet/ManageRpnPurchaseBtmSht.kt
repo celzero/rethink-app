@@ -348,6 +348,12 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
             Logger.w(LOG_TAG_UI, "$TAG purchase time is invalid, cannot determine revocation eligibility")
             return false
         }
+        // show the revoke only for active subscriptions
+        val status = subscriptionData.subscriptionStatus.status
+        if (status != SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id ||
+            status == SubscriptionStatus.SubscriptionState.STATE_PURCHASED.id) {
+            return false
+        }
         val planId = subscriptionData.purchaseDetail?.planId.orEmpty()
         val revokeWindowMs = when (planId) {
             InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> REVOKE_WINDOW_ONE_TIME_2YRS_DAYS * ONE_DAY_MS
@@ -375,20 +381,31 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
     }
 
     /**
-     * Launches the Google Play billing flow for the current plan.
+     * Launches the Google Play resubscribe flow for the current plan.
      * Used when the subscription is Canceled (auto-renewal off, still active).
-     * No nested bottom sheet needed — Play shows a targeted resubscribe sheet itself.
+     * Opens the Play subscription management page directly — Play shows a targeted
+     * resubscribe sheet itself.
      */
     private fun launchResubscribe() {
         try {
-            val intent = FragmentHostActivity.createIntent(
-                context = requireContext(),
-                fragmentClass = RethinkPlusFragment::class.java
-            )
-            startActivity(intent)
-            dismissAllowingStateLoss()
+            val productId = RpnProxyManager.getRpnProductId()
+            if (productId.isNotEmpty()) {
+                val link = InAppBillingHandler.PLAY_SUBS_LINK
+                    .replace("$1", productId)
+                    .replace("$2", requireContext().packageName)
+                openUrl(requireContext(), link)
+                dismissAllowingStateLoss()
+            } else {
+                // Fallback: navigate to RethinkPlusFragment for plan selection
+                val intent = FragmentHostActivity.createIntent(
+                    context = requireContext(),
+                    fragmentClass = RethinkPlusFragment::class.java
+                )
+                startActivity(intent)
+                dismissAllowingStateLoss()
+            }
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_UI, "$TAG: navigate to purchase failed: ${e.message}", e)
+            Logger.e(LOG_TAG_UI, "$TAG: navigate to resubscribe failed: ${e.message}", e)
             showToastUiCentered(requireContext(), getString(R.string.resubscribe_error), Toast.LENGTH_SHORT)
         }
     }
