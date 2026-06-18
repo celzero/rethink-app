@@ -22,6 +22,7 @@ import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.IpInfo
 import com.celzero.bravedns.database.IpInfoRepository
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
 import com.google.gson.Gson
@@ -44,8 +45,8 @@ object IpInfoDownloader: KoinComponent {
     private val db by inject<IpInfoRepository>()
 
     private const val TAG = "IpInfoDownloader"
-    private var retryAfterTimestamp = 0L
-    private var retryAttemptCount = 0
+    @Volatile private var retryAfterTimestamp = 0L
+    @Volatile private var retryAttemptCount = 0
     private const val HTTP_TOO_MANY_REQUEST_CODE = 429
     private const val COOL_DOWN_PERIOD_MILLIS: Long = 1 * 60 * 60 * 1000 // 1 hour
     private const val SECONDS_PER_MINUTE = 60
@@ -59,18 +60,37 @@ object IpInfoDownloader: KoinComponent {
     // for the same IP driven by rapid onSocketClosed() callbacks.
     private val inFlightIps: MutableSet<String> = ConcurrentHashMap.newKeySet()
 
-    // Cached OkHttpClient, reused across all requests to avoid spawning a separate
-    // thread-pool per call (the original cause of pthread OOM).
-    @Volatile private var cachedHttpClient: OkHttpClient? = null
-    @Volatile private var cachedIsRinRActive: Boolean? = null
+    private data class HttpClientEntry(
+        val client: OkHttpClient,
+        val isRinRActive: Boolean
+    )
+
+    private data class RetrofitCacheEntry(
+        val retrofit: Retrofit,
+        val isRinRActive: Boolean
+    )
+
+    @Volatile private var httpClientCache: HttpClientEntry? = null
+    @Volatile private var retrofitCache: RetrofitCacheEntry? = null
 
     private fun getOrCreateHttpClient(isRinRActive: Boolean): OkHttpClient {
-        val existing = cachedHttpClient
-        if (existing != null && cachedIsRinRActive == isRinRActive) return existing
+        val cached = httpClientCache
+        if (cached != null && cached.isRinRActive == isRinRActive) return cached.client
         val newClient = RetrofitManager.okHttpClient(isRinRActive)
-        cachedHttpClient = newClient
-        cachedIsRinRActive = isRinRActive
+        httpClientCache = HttpClientEntry(newClient, isRinRActive)
         return newClient
+    }
+
+    private fun getOrCreateRetrofit(httpClient: OkHttpClient, isRinRActive: Boolean): Retrofit {
+        val cached = retrofitCache
+        if (cached != null && cached.isRinRActive == isRinRActive) return cached.retrofit
+        val newRetrofit = Retrofit.Builder()
+            .baseUrl(Constants.IP_INFO_BASE_URL)
+            .client(httpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        retrofitCache = RetrofitCacheEntry(newRetrofit, isRinRActive)
+        return newRetrofit
     }
 
     suspend fun fetchIpInfoIfRequired(ipToLookup: String) {
@@ -133,14 +153,12 @@ object IpInfoDownloader: KoinComponent {
             return false
         }
 
-        // Reuse a cached OkHttpClient rather than creating a new one (and its thread pools)
-        // on every call. A fresh client per call was the root cause of pthread OOM errors.
-        val httpClient = getOrCreateHttpClient(persistentState.routeRethinkInRethink)
-        val retrofitInstance = Retrofit.Builder()
-            .baseUrl(com.celzero.bravedns.util.Constants.IP_INFO_BASE_URL)
-            .client(httpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+        // Reuse cached OkHttpClient and Retrofit instances rather than creating new
+        // ones (and their thread pools) on every call. A fresh client per call was
+        // the root cause of pthread OOM errors.
+        val isRinRActive = persistentState.routeRethinkInRethink
+        val httpClient = getOrCreateHttpClient(isRinRActive)
+        val retrofitInstance = getOrCreateRetrofit(httpClient, isRinRActive)
 
         val ipInfoDownloadApi = retrofitInstance.create(IIpInfoDownload::class.java)
 
