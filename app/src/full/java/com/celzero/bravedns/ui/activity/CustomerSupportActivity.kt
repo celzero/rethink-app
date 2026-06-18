@@ -212,14 +212,14 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
                             "unavailable"
                         } else {
                             val sb = StringBuilder()
-                            sb.append("cid: " + details.cid()?.take(12))
-                            sb.append("did: " + details.did().take(4))
+                            sb.append("cid: " + details.cid()?.take(12) + "\n")
+                            sb.append("did: " + details.did().take(4) + "\n")
                             sb.append("expiry: " + Utilities.convertLongToTime(details.expiry(),
-                                Constants.TIME_FORMAT_4))
-                            sb.append("providerId: " + details.providerID())
-                            sb.append("token: " + details.token().take(16))
-                            sb.append("test: " + details.test())
-                            sb.append("allowRestore: " + details.allowRestore())
+                                Constants.TIME_FORMAT_4) + "\n")
+                            sb.append("providerId: " + details.providerID() + "\n")
+                            sb.append("token: " + details.token().take(16) + "\n")
+                            sb.append("test: " + details.test() + "\n")
+                            sb.append("allowRestore: " + details.allowRestore() + "\n\n")
                             sb.toString()
                         }
                     }.getOrElse { null }

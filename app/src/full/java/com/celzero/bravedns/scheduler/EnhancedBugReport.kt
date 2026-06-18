@@ -153,7 +153,7 @@ object EnhancedBugReport : KoinComponent {
     fun getTombstoneZipFile(context: Context): File? {
         return try {
             val f = File(context.filesDir, TOMBSTONE_ZIP_FILE_NAME)
-            if (f.exists() && f.length() > 0) f else null
+            if (f.exists() && (f.length() > 0 && f.length() != 13L && f.length() != 15L)) f else null
         } catch (e: Exception) {
             Log.e(LOG_TAG_BUG_REPORT, "err getting zip: ${e.message}")
             null
