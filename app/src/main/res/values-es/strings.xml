@@ -1053,8 +1053,6 @@
     <string name="one_wg_apps_added" translatable="true">Enrutar todas las aplicaciones</string>
     <string name="catch_all_wg_dialog_title" translatable="true">Siempre activo</string>
     <string name="routing_remaining_apps" translatable="true">Enrutamiento de las aplicaciones restantes</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Bucle invertido (experimental)</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">También activa el ajuste <!--settings_network_all_networks--> de %1$s. ¿Quiere proceder?</string>
     <string name="wg_apps_dialog_title_exclude" translatable="true">Excluye %1$s aplicaciones</string>
     <string name="wireguard_disable_title" translatable="true">Detener WireGuard</string>
     <string name="lbl_remaining_apps" translatable="true">Aplicaciones restantes</string>

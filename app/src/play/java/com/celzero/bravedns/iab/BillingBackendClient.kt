@@ -24,6 +24,7 @@ import com.celzero.bravedns.customdownloader.IBillingServerApi
 import com.celzero.bravedns.customdownloader.IBillingServerApiTest
 import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.customdownloader.SafeResponseConverterFactory
+import com.celzero.bravedns.iab.BillingBackendClient.Companion.DB_SESSION_UNCONSTRAINED
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
@@ -307,7 +308,7 @@ class BillingBackendClient(
             val vcode = persistentState.appVersion.toString()
             Logger.v(LOG_IAB, "$TAG $mname [${env.label}]: calling /d/acc, cidHeader=${if (cidHeader != null) "present(len=${cidHeader.length})" else "absent"}")
             val response = if (persistentState.appTestMode) {
-                buildTestApi().registerCustomer(cidHeader, "", vcode, test = "", meta)
+                buildTestApi().registerCustomer(cidHeader, "",  vcode, test = "", meta)
             } else {
                 buildProductionApi().registerCustomer(cidHeader, "", vcode, meta)
             }
@@ -684,8 +685,8 @@ class BillingBackendClient(
         executeAckWithRetry(mname) { handle ->
             val vcode = persistentState.appVersion.toString()
             when (handle) {
-                is ApiHandle.Production -> handle.api.acknowledgePurchase(accountId, deviceId, vcode, sku, pt)
-                is ApiHandle.Test -> handle.api.acknowledgePurchase(accountId, deviceId, vcode, sku, pt, test = "")
+                is ApiHandle.Production -> handle.api.acknowledgePurchase(accountId, deviceId, sku, pt, vcode)
+                is ApiHandle.Test -> handle.api.acknowledgePurchase(accountId, deviceId, sku, pt, vcode, test = "")
             }
         }
     }
@@ -840,8 +841,8 @@ class BillingBackendClient(
             val handle = resolveApi()
             val vcode = persistentState.appVersion.toString()
             val response = when (handle) {
-                is ApiHandle.Production -> handle.api.queryEntitlement(accountId, deviceId, vcode, sku, encodedPt)
-                is ApiHandle.Test -> handle.api.queryEntitlement(accountId, deviceId, vcode, sku, encodedPt, test = "")
+                is ApiHandle.Production -> handle.api.queryEntitlement(accountId, deviceId, sku, encodedPt, vcode)
+                is ApiHandle.Test -> handle.api.queryEntitlement(accountId, deviceId, sku, encodedPt, vcode, test = "")
             }
             if (response == null) {
                 // Null response = server unreachable / transport error → transient.
@@ -924,8 +925,8 @@ class BillingBackendClient(
             val vcode = persistentState.appVersion.toString()
             Logger.d(LOG_IAB, "$TAG $mname [${handle.envLabel}]: accLen=${accountId.length}, devLen=${deviceId.length}, sku=$sku")
             val response = when (handle) {
-                is ApiHandle.Production -> handle.api.cancelPurchase(accountId, deviceId, vcode, sku, purchaseToken)
-                is ApiHandle.Test -> handle.api.cancelSubscription(accountId, deviceId, vcode, sku, purchaseToken, test = "")
+                is ApiHandle.Production -> handle.api.cancelPurchase(accountId, deviceId, sku, purchaseToken, vcode)
+                is ApiHandle.Test -> handle.api.cancelSubscription(accountId, deviceId, sku, purchaseToken, vcode, test = "")
             } ?: return@withContext Pair(false, "No response")
             when {
                 response.code() == 401 -> {
@@ -964,8 +965,8 @@ class BillingBackendClient(
             val handle = resolveApi()
             val vcode = persistentState.appVersion.toString()
             val response = when (handle) {
-                is ApiHandle.Production -> handle.api.revokeSubscription(accountId, deviceId, vcode, sku, purchaseToken)
-                is ApiHandle.Test -> handle.api.revokeSubscription(accountId, deviceId, vcode, sku, purchaseToken, test = "")
+                is ApiHandle.Production -> handle.api.revokeSubscription(accountId, deviceId, sku, purchaseToken, vcode)
+                is ApiHandle.Test -> handle.api.revokeSubscription(accountId, deviceId, sku, purchaseToken, vcode, test = "")
             } ?: return@withContext Pair(false, "No response")
             when {
                 response.code() == 401 -> {
@@ -1022,17 +1023,17 @@ class BillingBackendClient(
                 is ApiHandle.Production -> handle.api.getPurchaseHistory(
                     accountId = accountId,
                     deviceId = deviceId,
-                    vcode = vcode,
                     purchaseToken = purchaseToken,
                     total = total,
+                    vcode = vcode
                 )
                 is ApiHandle.Test -> handle.api.getPurchaseHistory(
                     accountId = accountId,
                     deviceId = deviceId,
-                    vcode = vcode,
                     purchaseToken = purchaseToken,
-                    test = "",
                     total = total,
+                    vcode = vcode,
+                    test = "",
                 )
             }
             when {
@@ -1085,8 +1086,8 @@ class BillingBackendClient(
             val handle = resolveApi()
             val vcode = persistentState.appVersion.toString()
             val response = when (handle) {
-                is ApiHandle.Production -> handle.api.consumePurchase(accountId, deviceId, vcode, sku, encodedToken)
-                is ApiHandle.Test       -> handle.api.consumePurchase(accountId, deviceId, vcode, sku, encodedToken, test = "")
+                is ApiHandle.Production -> handle.api.consumePurchase(accountId, deviceId, sku, encodedToken, vcode)
+                is ApiHandle.Test -> handle.api.consumePurchase(accountId, deviceId, sku, encodedToken, vcode, test = "")
             }
             if (response == null) {
                 Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: null response")

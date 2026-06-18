@@ -652,7 +652,6 @@
     <string name="settings_autostart_bootup_heading" translatable="true">เริ่มการทำงานอัตโนมัติเมื่อเปิดเครื่อง (ทดลอง)</string>
     <string name="settings_network_all_networks" translatable="true">ใช้เครือข่ายที่มีอยู่ทั้งหมด (ทดลอง)</string>
     <string name="settings_rinr_desc_enabled" translatable="true">การกำหนดเส้นทางการรับส่งข้อมูลของ Rethink ผ่านอุโมงค์ เว้นแต่คุณจะรู้ว่ากำลังทำอะไรอยู่ ให้ปิดมัน</string>
-    <string name="settings_rinr_dialog_title" translatable="true">ลูปแบ็ก (ทดลอง)</string>
     <string name="settings_theme_heading" translatable="true">รูปร่าง</string>
     <string name="settings_http_proxy_error_text1" translatable="true">ช่วงพอร์ตควรอยู่ระหว่าง 1024–65535</string>
     <string name="settings_http_proxy_error_text2" translatable="true">พอร์ตไม่ถูกต้อง</string>
@@ -952,7 +951,6 @@
 \n&lt;u&gt;TCP Proxy&lt;/u&gt;: Rethink ส่งต่อเฉพาะการเชื่อมต่อ TCP ของแอป &lt;i&gt;ที่รวมอยู่&lt;/i&gt; ไปยัง Orbot
 \n&lt;u&gt;HTTP Proxy&lt;/u&gt;: Rethink &lt;i&gt;สร้าง&lt;/i&gt;อุโมงค์ HTTP CONNECT ไปยัง Orbot และส่งต่อเฉพาะการเชื่อมต่อ TCP ของแอป &lt;i&gt;ที่รวมอยู่&lt;/i&gt;</string>
     <string name="settings_import_export_heading" translatable="true">การสำรองข้อมูลและกู้คืน</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">เปิดใช้งานการตั้งค่า <!--settings_network_all_networks--> %1$s ด้วย คุณต้องการดำเนินการต่อหรือไม่?</string>
     <string name="settings_dns_proxy_dialog_header" translatable="true">ตั้งค่าพร็อกซี SOCKS5</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">Off (default)</string>
     <string name="firewall_status_block_unmetered" translatable="true">ถูกบล็อคบนเครือข่ายแบบไม่มีการวัดปริมาณ (wifi)</string>

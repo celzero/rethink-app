@@ -645,7 +645,6 @@
     <string name="settings_rinr_heading" translatable="true">Lặp lại (thử nghiệm)</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Dẫn kết nối của chính Rethink, như tải xuống danh sách chặn, kiểm tra kết nối, kết nối DNS, lại vào trong đường hầm.</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Đang dẫn kết nối của chính Rethink vào trong đường hầm. Trừ khi bạn biết mình đang làm gì, hãy tắt nó đi.</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Sẽ đồng thời kích hoạt cài đặt <!--settings_network_all_networks--> %1$s. Bạn có chắc là muốn tiếp tục?</string>
     <string name="cd_dns_crypt_resolver_heading" translatable="true">Trình phân giải</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">Không xác thực chứng chỉ TLS máy chủ (chỉ bật nếu bạn biết mình đang làm gì)</string>
     <string name="cd_dns_crypt_error_text_1" translatable="true">Tem không được phép rỗng</string>
@@ -672,7 +671,6 @@
     <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Bỏ qua ứng dụng</string>
     <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Bỏ qua các quy tắc tường lửa &amp; DNS chung cho các ứng dụng <i>được liệt kê </i>\?</string>
     <string name="fapps_isolate_block_dialog_message" translatable="true">Cô lập các ứng dụng <i>được liệt kê </i>\?</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Loopback (thử nghiệm)</string>
     <string name="fapps_isolate_block_dialog_title" translatable="true">Cô lập ứng dụng</string>
     <string name="fapps_firewall_filter_desc" translatable="true"><![CDATA[Đang hiển thị <u>%1$s</u> %2$s ứng dụng]]></string>
     <string name="fapps_firewall_filter_desc_category" translatable="true"><![CDATA[Đang hiển thị <u>%1$s</u> %2$s ứng dụng trong các danh mục: %3$s]]></string>

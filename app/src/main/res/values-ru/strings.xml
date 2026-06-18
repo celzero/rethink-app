@@ -1050,8 +1050,6 @@
     <string name="settings_rinr_heading" translatable="true">Loopback (экспериментальный)</string>
     <string name="settings_connectivity_checks_desc" translatable="true">Проверки подключений отправляются для определения достижимости.</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Маршрутизация собственного трафика через туннель. Если вы не знаете что делаете, выключите его.</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Также включает настройку <!--settings_network_all_networks--> %1$s Вы хотите продолжить?</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Loopback (экспериментальный)</string>
     <string name="cd_dialog_edit_title" translatable="true">Изменить правило домена</string>
     <string name="one_wg_apps_added" translatable="true">Маршрутизация всех приложений</string>
     <string name="cd_toast_edit" translatable="true">Отредактировано</string>

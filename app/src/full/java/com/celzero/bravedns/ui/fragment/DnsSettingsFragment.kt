@@ -340,7 +340,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         if (WireguardManager.oneWireGuardEnabled()) {
             b.connectedStatusTitleUrl.text =
                 resources.getString(R.string.configure_dns_connected_dns_proxy_status)
-            b.connectedStatusTitle.text = resources.getString(R.string.lbl_wireguard)
+            b.connectedStatusTitle.text = resources.getString(R.string.two_argument_comma, getString(R.string.lbl_wireguard), connectedDns)
             updateLatency()
             return
         }
@@ -418,11 +418,10 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             b.wireguardRb.isChecked = true
             b.wireguardRb.isChecked = true
             b.wireguardRb.isEnabled = true
-            disableAllDns()
-            return
+        } else {
+            b.wireguardRb.visibility = View.GONE
         }
 
-        b.wireguardRb.visibility = View.GONE
         if (isSmartDns()) {
             b.smartDnsRb.isChecked = true
             b.rethinkPlusDnsRb.isChecked = false
@@ -451,21 +450,11 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         }
     }
 
-    private fun disableAllDns() {
+    private fun uncheckAllDns() {
         b.rethinkPlusDnsRb.isChecked = false
         b.customDnsRb.isChecked = false
         b.networkDnsRb.isChecked = false
         b.smartDnsRb.isChecked = false
-
-        b.rethinkPlusDnsRb.isEnabled = false
-        b.customDnsRb.isEnabled = false
-        b.networkDnsRb.isEnabled = false
-        b.smartDnsRb.isEnabled = false
-
-        b.rethinkPlusDnsRb.isClickable = false
-        b.customDnsRb.isClickable = false
-        b.networkDnsRb.isClickable = false
-        b.smartDnsRb.isClickable = false
     }
 
     private fun getConnectedDnsType(): String {
@@ -721,6 +710,16 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.dcBlockFreeDnsRl.setOnClickListener {
             showBlockFreeDnsModeBottomSheet()
         }
+
+        b.dcBlockUnknownSwitch.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.blockDnsForUnknownApp = isChecked
+            logEvent(
+                "block unknown apps? $isChecked",
+                "User changed block unknown apps setting to $isChecked"
+            )
+        }
+
+        b.dcBlockUnknownHeading.setOnClickListener { b.dcBlockUnknownSwitch.isChecked = !b.dcBlockUnknownSwitch.isChecked }
     }
 
     private fun showBlockFreeDnsModeBottomSheet() {

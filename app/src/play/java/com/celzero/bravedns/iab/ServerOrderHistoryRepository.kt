@@ -17,6 +17,7 @@ package com.celzero.bravedns.iab
 
 import Logger
 import Logger.LOG_TAG_UI
+import com.celzero.bravedns.iab.ServerOrderHistoryRepository.Companion.MAX_ORDERS
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject

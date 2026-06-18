@@ -25,6 +25,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
@@ -61,6 +62,7 @@ import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.InAppMessageProvider
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
@@ -94,15 +96,16 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.milliseconds
 
 class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
     private val persistentState by inject<PersistentState>()
-    private val appInfoDb by inject<AppInfoRepository>()
     private val appUpdateManager by inject<AppUpdater>()
     private val inAppMessageProvider by inject<InAppMessageProvider>()
     private val rdb by inject<RefreshDatabase>()
@@ -296,6 +299,11 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
                     Toast.LENGTH_SHORT
                 )
                 workManager.pruneWork()
+                // restart the app so that Room gets fresh SQLite connections
+                lifecycleScope.launch {
+                    delay(1000.milliseconds)
+                    restartApp()
+                }
             } else if (
                 WorkInfo.State.CANCELLED == workInfo.state ||
                 WorkInfo.State.FAILED == workInfo.state
@@ -313,6 +321,15 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
         }
     }
 
+    private fun restartApp() {
+        val pm: PackageManager = packageManager
+        val intent = pm.getLaunchIntentForPackage(packageName) ?: return
+        val mainIntent = Intent.makeRestartActivityTask(intent.component)
+        mainIntent.putExtra(INTENT_RESTART_APP, true)
+        startActivity(mainIntent)
+        Runtime.getRuntime().exit(0)
+    }
+
     private fun observeAppState() {
         VpnController.connectionStatus.observe(this) {
             if (it == BraveVPNService.State.PAUSED) {
@@ -324,9 +341,10 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
 
     private fun removeThisMethod() {
 
+        val rethinkUid = Utilities.getApplicationInfo(this, this.packageName)?.uid
         io {
-            appInfoDb.setRethinkToBypassDnsAndFirewall()
-            appInfoDb.setRethinkToBypassProxy(true)
+            if (rethinkUid != null) FirewallManager.exemptRethinkApp(rethinkUid)
+            else Logger.e(LOG_TAG_UI, "HomeScreen Rethink UID is null")
         }
 
         // change the persistent state for defaultDnsUrl, if its google.com (only for v055d)

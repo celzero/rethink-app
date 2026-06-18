@@ -121,29 +121,29 @@ abstract class StateMachine<S : State, E : Event, D : Any>(
                         // Update data if provided
                         newData?.let { _data.value = it }
 
-                        // Transition state BEFORE running the action so that:
-                        // 1. If the action writes to DB, the in-memory state already
-                        //    matches the DB state no desync window.
-                        // 2. If the action reads the current state (e.g. for logging),
-                        //    it sees the new state, which is correct.
-                        // If the action throws, we revert to the previous state below.
-                        _currentState.value = transition.toState
-
-                        // Execute action (may write to DB, call RPN, etc.)
+                        // Execute action BEFORE transitioning state so that:
+                        // 1. External observers (collectors on currentState) always
+                        //    find machine data that has been fully populated by the
+                        //    action (DB writes, updateData calls, etc.).
+                        // 2. If the action reads stateMachine.getCurrentState(),
+                        //    it sees the previous state this is fine for logging
+                        //    and avoids a stale-data window for observers.
+                        // If the action throws, we do NOT transition state at all.
                         try {
                             transition.action(event, _data.value)
                         } catch (actionError: Exception) {
-                            // ACTION FAILED AFTER STATE CHANGE: the action may have
-                            // already committed partial side-effects (DB writes,
-                            // launched coroutines) before throwing.  These persist
-                            // despite the state revert below.  Action authors must
-                            // ensure idempotency or do the risky work last.
+                            // The action may have already committed partial side-effects
+                            // (DB writes, launched coroutines) before throwing.  These
+                            // persist despite the state not changing.  Action authors
+                            // must ensure idempotency or do the risky work last.
                             Logger.w(LOG_IAB,
-                                "$tag: Action failed after state transition ${currentState.name}->${transition.toState.name}; " +
-                                "reverting to ${currentState.name}.  Partial action side-effects may have persisted: ${actionError.message}")
-                            _currentState.value = currentState
+                                "$tag: Action failed, aborting transition ${currentState.name}->${transition.toState.name}; " +
+                                "state unchanged.  Partial action side-effects may have persisted: ${actionError.message}")
                             throw actionError
                         }
+
+                        // Action succeeded, now transition state.
+                        _currentState.value = transition.toState
 
                         // Record successful transition
                         recordTransition(

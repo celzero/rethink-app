@@ -1053,8 +1053,6 @@
     <string name="routing_remaining_apps" translatable="true">Encaminhando aplicativos restantes</string>
     <string name="remaining_apps_dialog_title" translatable="true">Incluir aplicativos restantes</string>
     <string name="wireguard_apps_proxy_map_desc" translatable="true">parte de %1$s</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Loopback (experimental)</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Também ativa a configuração de<!--settings_network_all_networks--> %1$s. Continuar?</string>
     <string name="one_wg_apps_added" translatable="true">Encaminhar todos os aplicativos</string>
     <string name="wg_apps_dialog_title_include" translatable="true">Incluir %1$s aplicativo(s)</string>
     <string name="wg_apps_dialog_title_exclude" translatable="true">Excluir %1$s aplicativo(s)</string>

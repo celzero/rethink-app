@@ -913,8 +913,6 @@
     <string name="lbl_unselected" translatable="true">Non selezionato</string>
     <string name="app_ip_domain_rules_desc" translatable="true">Modificare le regole IP/Dominio per applicazione.</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Instrada il traffico di Rethink, come i download delle liste di blocco, i controlli di connettività e le connessioni DNS, nel tunnel.</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Loopback (sperimentale)</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Attiva anche l\'impostazione<!--settings_network_all_networks--> %1$s. Vuoi procedere?</string>
     <string name="battery_optimization_dialog_heading" translatable="true">Disabilita %1$s</string>
     <string name="dc_proxy_dns_heading" translatable="true">Mai fare proxy DNS</string>
     <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">Bypassa le regole del DNS e del firewall.</string>

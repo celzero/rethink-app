@@ -974,7 +974,6 @@
     <string name="dot_custom_url_remove_dialog_title" translatable="true">Supprimer le point de terminaison DoT ?</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">Supprimer le point de terminaison DNS over TLS de la configuration enregistrée.</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Acheminez le propre trafic de Rethink, comme les téléchargements de listes de blocage, les vérifications de connectivité, les connexions DNS, dans le tunnel.</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Loopback (expérimental)</string>
     <string name="cd_toast_edit" translatable="true">Modifié</string>
     <string name="one_wg_apps_added" translatable="true">Routage de toutes les applications</string>
     <string name="lbl_cache" translatable="true">Cache</string>
@@ -989,7 +988,6 @@
     <string name="catch_all_wg_dialog_title" translatable="true">Toujours en marche</string>
     <string name="routing_remaining_apps" translatable="true">Routage des applications restantes</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Routage du trafic propre à Rethink à travers le tunnel. À moins que vous sachiez ce que vous faites, désactivez cette fonction.</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Active également le réglage <!--settings_network_all_networks--> %1$s. Voulez-vous poursuivre ?</string>
     <string name="one_wg_dialog_desc" translatable="true">Toutes les connexions de toutes les applications, y compris les DNS, seront acheminées vers un seul VPN WireGuard actif. Les autres VPN actifs de WireGuard, s\'il y en a, seront arrêtés.</string>
     <string name="cd_dialog_edit_title" translatable="true">Modifier la règle du domaine</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">Toutes les connexions et applications qui ne sont pas acheminées par d\'autres VPN de WireGuard seront acheminées par celui-ci.</string>

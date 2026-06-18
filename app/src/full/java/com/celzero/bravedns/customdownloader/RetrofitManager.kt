@@ -121,7 +121,7 @@ class RetrofitManager {
             // If unset, the system-wide default DNS will be used.
             // no need to add custom dns if rinr is not active, as the connections will be routed
             // through the default dns
-            if (isRinRActive) {
+            if (!isRinRActive) {
                 customDns(b.build())?.let { b.dns(it) }
             }
             return b.build()

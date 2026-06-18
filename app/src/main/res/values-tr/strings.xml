@@ -1039,7 +1039,6 @@
     <string name="settings_app_notification_persistent_heading" translatable="true">Kalıcı bildirim</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">Bildirimi kalıcı yap</string>
     <string name="settings_rinr_heading" translatable="true">Döngü (deneysel)</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Döngü (deneysel)</string>
     <string name="cd_toast_edit" translatable="true">Düzenlendi</string>
     <string name="lbl_remaining_apps" translatable="true">Kalan uygulamalar</string>
     <string name="one_wg_apps_added" translatable="true">Bütün uygulamalar yönlendiriliyor</string>
@@ -1051,7 +1050,6 @@
     <string name="failed_using_default" translatable="true">Başarısız oldu: yedek DNS kullanılıyor</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Blok listesi indirmeleri, bağlantı kontrolleri, DNS bağlantıları gibi Rethink\'in kendi trafiğini tünele geri yönlendirin.</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Rethink\'in kendi trafiğini tünel üzerinden yönlendirmek. Ne yaptığınızı bilmiyorsanız, kapatın.</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Ayrıca <!--settings_network_all_networks--> %1$s ayarını da etkinleştirir. Devam etmek istiyor musunuz?</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">Diğer WireGuard VPN\'ler tarafından yönlendirilmeyen tüm bağlantılar ve uygulamalar bu VPN tarafından yönlendirilecektir.</string>
     <string name="one_wg_dialog_desc" translatable="true">DNS dahil olmak üzere tüm uygulamalardan gelen tüm bağlantılar tek bir aktif WireGuard VPN\'e yönlendirilecektir. Varsa diğer aktif WireGuard VPN\'ler durdurulacaktır.</string>
     <string name="wireguard_apps_proxy_map_desc" translatable="true">%1$s in bölümü</string>

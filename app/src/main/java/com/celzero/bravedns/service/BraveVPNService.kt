@@ -4419,7 +4419,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return Pair(tid, "")
     }
 
-    private suspend fun determineDnsTransportIdForDFMode(uid: Int, domain: String, rinr: Boolean, srcType: String?): Pair<String, String> {
+    private suspend fun determineDnsTransportIdForDFMode(uid: Int, domain: String, rinr: Boolean, origin: String?): Pair<String, String> {
         val defaultTid =
             if (appConfig.isSystemDns() || (isAppPaused() && isLockdown())) {
                 // in vpn-lockdown mode+appPause , use system dns if the app is paused to mimic
@@ -4438,23 +4438,45 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             return Pair(defaultTid, "")
         }
 
-        val isSrcInternal = srcType.equals(Backend.OriginInternal)
+        val isOriginInternal = origin.equals(Backend.OriginInternal)
 
-        if ((uid == INVALID_UID || uid == AndroidUidConfig.ANDROID.uid || uid == AndroidUidConfig.DNS.uid) && !isSrcInternal) {
-            val oneWgId = WireguardManager.getOneWireGuardProxyId()
-            val tid = if (oneWgId != null) {
-                ID_WG_BASE + oneWgId
+        if ((uid == INVALID_UID || uid == AndroidUidConfig.ANDROID.uid || uid == AndroidUidConfig.DNS.uid) && !isOriginInternal) {
+            var tid = defaultTid
+            if (FirewallManager.isAppExcludedFromProxy(uid)) {
+                tid = if (persistentState.wgGlobalLockdown && uid != rethinkUid) {
+                    logd("(onQuery)app excluded from proxy but global lockdown, return ${Backend.BlockAll}")
+                    Backend.BlockAll
+                } else {
+                    logd("(onQuery)app excluded from proxy, return $defaultTid")
+                    defaultTid
+                }
             } else {
-                defaultTid
+                val oneWgId = WireguardManager.getOneWireGuardProxyId()
+                tid = if (oneWgId != null) {
+                    ID_WG_BASE + oneWgId
+                } else {
+                    tid
+                }
             }
             return if (persistentState.splitDns) {
                 // in case of split dns, append Fixed to the tid when there is no uid
                 // this synthesizes A/AAAA from a single fixed IP
+                logd("(onQuery)split dns for uid: $uid, returning $tid,Fixed")
                 Pair(tid, Backend.Fixed)
             } else {
+                logd("(onQuery)no split dns for uid: $uid, returning $tid")
                 Pair(tid, "")
             }
         } else {
+            if (FirewallManager.isAppExcludedFromProxy(uid)) {
+                return if (persistentState.wgGlobalLockdown && uid != rethinkUid) {
+                    logd("(onQuery)app excluded from proxy but global lockdown, return ${Backend.BlockAll}")
+                    Pair(Backend.BlockAll, "")
+                } else {
+                    logd("(onQuery)app excluded from proxy, return $defaultTid")
+                    Pair(defaultTid, "")
+                }
+            }
             if (!persistentState.splitDns) {
                 val oneWgId = WireguardManager.getOneWireGuardProxyId()
                 val tid = if (oneWgId != null) {
@@ -4465,28 +4487,24 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 Logger.d(LOG_TAG_VPN, "(onQuery)no split dns, using $tid")
                 return Pair(tid, "")
             }
-            if (FirewallManager.isAppExcludedFromProxy(uid)) {
-                return if (persistentState.wgGlobalLockdown) {
-                    logd("(onQuery)app excluded from proxy but global lockdown, return ${Backend.BlockAll}")
-                    Pair(Backend.BlockAll, "")
-                } else {
-                    logd("(onQuery)app excluded from proxy, return $defaultTid")
-                    Pair(defaultTid, "")
-                }
-            }
             val usesCellularNw = isIfaceCellular("")
             // only when there is an uid, we need to calculate wireguard ids
             // gives all the possible wgs for the app regardless of usesMobileNetwork
             val ssid = getUnderlyingSsid().orEmpty()
             val rpnIds = if (RpnProxyManager.isRpnActive()) RpnProxyManager.getAllPossibleConfigIdsForApp(uid, ip = "", port = 0, domain, usesCellularNw, ssid) else emptyList()
             val wgIds = WireguardManager.getAllPossibleConfigIdsForApp(uid, ip = "", port = 0, domain, usesCellularNw, ssid, "")
-            val updatedRpnIds = rpnIds.map { if (it == Backend.Block) Backend.BlockAll else it }
-            val updatedWgIds = wgIds.map { if (it == Backend.Block) Backend.BlockAll else it }
+            val updatedRpnIds = rpnIds.map { if (it == Backend.Block) Backend.BlockAll else it }.distinct()
+            val updatedWgIds = wgIds.map { if (it == Backend.Block) Backend.BlockAll else it }.distinct()
 
             Logger.v(LOG_TAG_VPN, "(onQuery)wg ids($updatedWgIds), rpn id($updatedRpnIds) found for uid: $uid")
             val rpnOrWgOrDefaultTid = if (updatedWgIds.isEmpty() && updatedRpnIds.isEmpty()) {
-                Logger.d(LOG_TAG_VPN, "(onQuery-pid)no wg/rpn found, return $defaultTid")
-                defaultTid
+                if (persistentState.wgGlobalLockdown && uid != rethinkUid) {
+                    logd("(onQuery)no wg/rpn found but global lockdown, return ${Backend.BlockAll}")
+                    Backend.BlockAll
+                } else {
+                    Logger.d(LOG_TAG_VPN, "(onQuery-pid)no wg/rpn found, return $defaultTid")
+                    defaultTid
+                }
             } else {
                 val wgRpnIds = (updatedRpnIds + updatedWgIds).joinToString(",")
                 Logger.d(LOG_TAG_VPN, "(onQuery-pid)wg/rpn ids($wgRpnIds) found for uid: $uid")
@@ -4607,12 +4625,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         }
 
         if (FirewallManager.isAppExcludedFromProxy(uid)) {
-            val pid = if (persistentState.wgGlobalLockdown) {
+            val pid = if (persistentState.wgGlobalLockdown && uid != rethinkUid) {
+                logd("(onQuery-pid)app excluded from proxy but global lockdown, return ${Backend.Block}")
                 Backend.Block
             } else {
+                logd("(onQuery-pid)app excluded from proxy, return $defaultProxy")
                 defaultProxy
             }
-            logd("(onQuery-pid) app excluded from proxy, return $pid, global-lockdown? ${persistentState.wgGlobalLockdown}")
             return pid
         }
 
@@ -4655,8 +4674,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 if (rpnIds.isNotEmpty()) "" else defaultProxy // no need add default proxy in case if rpn id's available
             )
             val noProxyDetectedInWg = ids.joinToString() == defaultProxy
+            val isGlobalLockdown = persistentState.wgGlobalLockdown && uid != rethinkUid
             if ((ids.isEmpty() || noProxyDetectedInWg) && rpnIds.isEmpty()) {
-                val r = if (persistentState.wgGlobalLockdown) Backend.Block else defaultProxy
+                val r = if (isGlobalLockdown) Backend.Block else defaultProxy
                 Logger.d(LOG_TAG_VPN, "(onQuery-pid)no wg found, return $r")
                 r
             } else {
@@ -4848,6 +4868,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
             val isTransportDnsFixed = rcvdDnsOpts.tidcsv.contains(Backend.Fixed) || rcvdDnsOpts.tidseccsv.contains(Backend.Fixed)
             if (isTransportDnsFixed) {
+                // no need to perform any firewall check on fixed transport
                 return@go2kt DNSOpts()
             }
 
@@ -5586,7 +5607,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         } else {
             emptyList()
         }
-        logd("flow/inflow: rpn-active? ${RpnProxyManager.isRpnActive()} && $DEBUG, rpids: $rpnIds for $connId, $uid, ${connTracker.query}, ${connTracker.destIP}")
+        logd("flow/inflow: rpn-active? ${RpnProxyManager.isRpnActive()}, rpn-ids: $rpnIds for $connId, $uid, ${connTracker.query}, ${connTracker.destIP}")
 
         if (connTracker.uid == rethinkUid && !rinr) {
             val pid = if (persistentState.autoProxyEnabled) Backend.Auto else Backend.Exit
@@ -5594,7 +5615,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             return persistAndConstructFlowResponse(connTracker, pid, connId, uid, forUpstreamAnswer)
         }
 
-        val isGlobalLockdown = persistentState.wgGlobalLockdown
+        val isGlobalLockdown = persistentState.wgGlobalLockdown && uid != rethinkUid
         if (FirewallManager.isAppExcludedFromProxy(uid)) {
             if (isGlobalLockdown) {
                 logd("flow/inflow: app excluded from proxy, but lockdown is enabled, so block, $connId, $uid, ${connTracker.query}, ${connTracker.destIP}")

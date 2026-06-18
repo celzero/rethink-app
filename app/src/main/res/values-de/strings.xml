@@ -1006,8 +1006,6 @@
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Geschützt! Verbunden mit DNS + Firewall + Proxy.</string>
     <string name="lbl_peer" translatable="true">Peer</string>
     <string name="settings_rinr_heading" translatable="true">Loopback (experimentell)</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Loopback (experimentell)</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Aktiviert auch die<!--settings_network_all_networks--> %1$s Einstellung. Fortfahren?</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">Dauerhafte Benachrichtigung</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">Die Benachrichtigung dauerhaft anzeigen</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Rethinks eigenen Netzwerkverkehr, wie z.B. Blocklisten-Downloads, Verbindungschecks oder DNS-Verbindungen in den Tunnel zurückleiten.</string>

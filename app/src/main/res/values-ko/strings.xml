@@ -185,8 +185,6 @@
     <string name="settings_theme_heading" translatable="true">외관</string>
     <string name="settings_theme_desc" translatable="true">어두운/밝은 테마</string>
     <string name="settings_go_log_heading" translatable="true">로그 수준</string>
-    <string name="settings_rinr_dialog_title" translatable="true">루프백 (실험적)</string>
-    <string name="settings_rinr_dialog_desc" translatable="true"><!--settings_network_all_networks-->%1$s설정도 활성화합니다. 계속 하시겠습니까?</string>
     <string name="settings_http_proxy_desc" translatable="true">%1$s로 포워딩하는 중</string>
     <string name="settings_http_proxy_dialog_title" translatable="true">사용자 지정 서버 URL</string>
     <string name="about_website" translatable="true">rethinkdns.com 방문하기</string>

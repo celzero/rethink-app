@@ -632,7 +632,7 @@ object RpnProxyManager : KoinComponent {
             // between the DB write and the cache rebuild inside syncWinServers().
             winCacheMutex.withLock {
                 winServersCache.forEach { server ->
-                    if (server.id != AUTO_SERVER_ID) {
+                    if (!server.id.equals(AUTO_SERVER_ID, true)) {
                         server.isEnabled = false
                         server.isFavourite = false
                     }
@@ -1116,7 +1116,7 @@ object RpnProxyManager : KoinComponent {
     suspend fun getWinServers(): List<CountryConfig> {
         // Return cached list only if it contains real (non-AUTO) servers.
         winCacheMutex.withLock {
-            val realCached = winServersCache.filter { it.id != AUTO_SERVER_ID }
+            val realCached = winServersCache.filter { !it.id.equals(AUTO_SERVER_ID, true) }
             if (realCached.isNotEmpty()) {
                 Logger.v(LOG_TAG_PROXY, "$TAG; returning cached win servers, size: ${winServersCache.size} (real=${realCached.size})")
                 return winServersCache.toList()
@@ -1125,7 +1125,7 @@ object RpnProxyManager : KoinComponent {
 
         // Try DB, same rule: only use it when real (non-AUTO) rows exist.
         val dbServers = countryConfigRepo.getAllConfigs()
-        val realDbServers = dbServers.filter { it.id != AUTO_SERVER_ID }
+        val realDbServers = dbServers.filter { !it.id.equals(AUTO_SERVER_ID, true) }
         if (realDbServers.isNotEmpty()) {
             winCacheMutex.withLock {
                 winServersCache.clear()
@@ -1762,7 +1762,7 @@ object RpnProxyManager : KoinComponent {
 
         // Read enabled configs from the freshly-synced cache so we never re-add stale keys.
         val enabledConfigs = winCacheMutex.withLock {
-            winServersCache.filter { it.isEnabled && it.id != AUTO_SERVER_ID }.toList()
+            winServersCache.filter { it.isEnabled && !it.id.equals(AUTO_SERVER_ID, true) }.toList()
         }
 
         for (config in enabledConfigs) {
@@ -1799,7 +1799,7 @@ object RpnProxyManager : KoinComponent {
             // display country names / flags in ServerRemovalNotificationBottomSheet.
             val removedConfigs = try {
                 countryConfigRepo.getAllConfigs()
-                    .filter { removedSelectedIds.contains(it.id) && it.id != AUTO_SERVER_ID }
+                    .filter { removedSelectedIds.contains(it.id) && !it.id.equals(AUTO_SERVER_ID, true) }
             } catch (e: Exception) {
                 Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: could not resolve removed configs: ${e.message}")
                 emptyList()
@@ -2255,6 +2255,10 @@ object RpnProxyManager : KoinComponent {
                 }
             }
         }
+
+        if (config.isEnabled) {
+            VpnController.refreshOrPauseOrResumeOrReAddProxies()
+        }
     }
 
     suspend fun setSsidEnabledForWinServer(key: String, ssidEnabled: Boolean) {
@@ -2292,6 +2296,10 @@ object RpnProxyManager : KoinComponent {
                     w.ssidBased = oldValue
                 }
             }
+        }
+
+        if (config.isEnabled) {
+            VpnController.refreshOrPauseOrResumeOrReAddProxies()
         }
     }
 
@@ -2354,7 +2362,7 @@ object RpnProxyManager : KoinComponent {
      */
     suspend fun ensureAutoServerExists() {
         try {
-            val autoServer = countryConfigRepo.getById(AUTO_SERVER_ID)
+            val autoServer = countryConfigRepo.getById(AUTO_SERVER_ID) ?: countryConfigRepo.getById(AUTO_SERVER_ID.lowercase())
             if (autoServer == null) {
                 Logger.i(LOG_TAG_PROXY, "$TAG; ensureAutoServerExists: AUTO server not found, creating...")
                 val newAutoServer = createAutoServer()
@@ -2368,7 +2376,7 @@ object RpnProxyManager : KoinComponent {
                 Logger.v(LOG_TAG_PROXY, "$TAG; ensureAutoServerExists: AUTO server already exists")
                 // Ensure it's in the cache
                 winCacheMutex.withLock {
-                    if (winServersCache.none { it.id == AUTO_SERVER_ID }) {
+                    if (winServersCache.none { it.id.equals(AUTO_SERVER_ID, true) }) {
                         winServersCache.add(autoServer)
                     }
                 }
@@ -2416,15 +2424,15 @@ object RpnProxyManager : KoinComponent {
     suspend fun getAutoServer(): CountryConfig? {
         return try {
             val cached = winCacheMutex.withLock {
-                winServersCache.find { it.id == AUTO_SERVER_ID }
+                winServersCache.find { it.id.equals(AUTO_SERVER_ID, true) }
             }
             if (cached != null) return cached
 
-            val fromDb = countryConfigRepo.getById(AUTO_SERVER_ID)
+            val fromDb = countryConfigRepo.getById(AUTO_SERVER_ID) ?: countryConfigRepo.getById(AUTO_SERVER_ID.lowercase())
             if (fromDb != null) {
                 // Opportunistically warm the cache so subsequent calls hit the fast path.
                 winCacheMutex.withLock {
-                    if (winServersCache.none { it.id == AUTO_SERVER_ID }) {
+                    if (winServersCache.none { it.id.equals(AUTO_SERVER_ID, true) }) {
                         winServersCache.add(fromDb)
                     }
                 }
@@ -2435,8 +2443,8 @@ object RpnProxyManager : KoinComponent {
             ensureAutoServerExists()
 
             winCacheMutex.withLock {
-                winServersCache.find { it.id == AUTO_SERVER_ID }
-            } ?: countryConfigRepo.getById(AUTO_SERVER_ID)
+                winServersCache.find { it.id.equals(AUTO_SERVER_ID, true) }
+            } ?: countryConfigRepo.getById(AUTO_SERVER_ID) ?: countryConfigRepo.getById(AUTO_SERVER_ID.lowercase())
         } catch (e: Exception) {
             Logger.e(LOG_TAG_PROXY, "$TAG; getAutoServer: err: ${e.message}", e)
             null
@@ -2547,7 +2555,7 @@ object RpnProxyManager : KoinComponent {
              syncWinServers(newServers)
 
              // Find the actual removed server objects for notification
-             val removedServers = existingServers.filter { removedSelectedIds.contains(it.id) && it.id != AUTO_SERVER_ID }
+             val removedServers = existingServers.filter { removedSelectedIds.contains(it.id) && it.id.equals(AUTO_SERVER_ID, true) }
 
              Logger.i(LOG_TAG_PROXY, "$TAG; refreshWinServers: refreshed ${newServers.size} servers, ${removedServers.size} selected servers removed")
              // Return the cache populated by syncWinServers (read from DB) instead of the
@@ -2573,6 +2581,7 @@ object RpnProxyManager : KoinComponent {
         val block = Backend.Block
         val proxyIds: MutableList<String> = mutableListOf()
 
+        Logger.vv(LOG_TAG_PROXY, "$TAG; getAllPossibleConfigIdsForApp: init $uid, $ip, $port, $domain, $usesMobileNw, $ssid")
         // collect all proxy-ids for this uid
         val allProxyIdsForApp = try {
             ProxyManager.getProxyIdsForApp(uid)
@@ -2596,7 +2605,7 @@ object RpnProxyManager : KoinComponent {
                         proxyIds.add(block)
                     } else if (appProxyPair.first.isNotEmpty()) {
                         var id = appProxyPair.first
-                        if (id.contains(AUTO_SERVER_ID)) {
+                        if (id.contains(AUTO_SERVER_ID, true)) {
                             id = VpnController.getWinByKey("")?.id() ?: block
                             proxyIds.add(id)
                         } else {
@@ -2609,7 +2618,7 @@ object RpnProxyManager : KoinComponent {
                 if (appProxyPair.first.isNotEmpty()) {
                     // add eligible app-specific config in the order we see them
                     var id = appProxyPair.first
-                    if (id.contains(AUTO_SERVER_ID)) {
+                    if (id.contains(AUTO_SERVER_ID, true)) {
                         id = VpnController.getWinByKey("")?.id() ?: block
                         proxyIds.add(id)
                     } else {
@@ -2634,11 +2643,11 @@ object RpnProxyManager : KoinComponent {
         cac.forEach {
             try {
                 val configId = Backend.RpnWin + it.key
-                if ((checkEligibilityBasedOnNw(it.id, usesMobileNw) &&
-                            checkEligibilityBasedOnSsid(it.id, ssid)) &&
+                if ((checkEligibilityBasedOnNw(it.id, usesMobileNw) ||
+                            checkEligibilityBasedOnSsid(it.id, ssid, usesMobileNw)) &&
                     !proxyIds.contains(configId)
                 ) {
-                    val id = if (configId.contains(AUTO_SERVER_ID)) {
+                    val id = if (configId.contains(AUTO_SERVER_ID, true)) {
                         VpnController.getWinByKey("")?.id() ?: block
                     } else {
                         configId
@@ -2664,7 +2673,7 @@ object RpnProxyManager : KoinComponent {
     private suspend fun canUseConfig(
         id: String,
         type: String,
-        usesMtrdNw: Boolean,
+        usesMobileNw: Boolean,
         ssid: String
     ): Pair<String, Boolean> {
         val block = Backend.Block
@@ -2674,17 +2683,12 @@ object RpnProxyManager : KoinComponent {
         val actualId = id.substringAfter(Backend.RpnWin)
 
         val config = winCacheMutex.withLock {
-            if (actualId == Backend.RpnWin || actualId == AUTO_SERVER_ID) winServersCache.find { it.id == AUTO_SERVER_ID }
+            if (actualId == Backend.RpnWin || actualId.equals(AUTO_SERVER_ID, true)) winServersCache.find { it.id.equals(AUTO_SERVER_ID, true) }
             else winServersCache.find { it.id == id || it.id == actualId || it.key == id || it.key == actualId }
         }
 
         if (config == null) {
-            Logger.d(LOG_TAG_PROXY, "$TAG; config null($actualId) no need to proceed, return empty")
-            winCacheMutex.withLock {
-                winServersCache.forEach {
-                    Logger.d(LOG_TAG_PROXY, "$TAG; cached wg: ${it.id}, ${it.key}, active: ${it.isEnabled}, lockdown: ${it.lockdown}")
-                }
-            }
+            Logger.e(LOG_TAG_PROXY, "$TAG; config null($actualId) no need to proceed, return empty")
             return Pair("", true)
         }
 
@@ -2692,8 +2696,8 @@ object RpnProxyManager : KoinComponent {
 
         val lockdown = config.lockdown
 
-        if (lockdown && (checkEligibilityBasedOnNw(id, usesMtrdNw) && checkEligibilityBasedOnSsid(id, ssid))) {
-            Logger.d(LOG_TAG_PROXY, "lockdown wg for $type => return ${id}")
+        if (lockdown && (checkEligibilityBasedOnNw(id, usesMobileNw) || checkEligibilityBasedOnSsid(id, ssid, usesMobileNw))) {
+            Logger.d(LOG_TAG_PROXY, "$TAG; lockdown wg for $type => return $id")
             return Pair(id, false) // no need to proceed further for lockdown
         }
 
@@ -2702,15 +2706,15 @@ object RpnProxyManager : KoinComponent {
         if (lockdown) {
             // add IpnBlock instead of the config id, let the connection be blocked in WiFi
             // regardless of config is active or not
-            Logger.d(LOG_TAG_PROXY, "lockdown wg for $type => return $block")
+            Logger.d(LOG_TAG_PROXY, "$TAG; lockdown wg for $type => return $block")
             return Pair(block, false) // no need to proceed further for lockdown
         }
 
         // check if the config is active and if it can be used on this network
         if (config.isEnabled && (checkEligibilityBasedOnNw(
                 id,
-                usesMtrdNw
-            ) && checkEligibilityBasedOnSsid(id, ssid))
+                usesMobileNw
+            ) || checkEligibilityBasedOnSsid(id, ssid, usesMobileNw))
         ) {
             Logger.d(LOG_TAG_PROXY, "$TAG active wg for $type => add $id")
             return Pair(id, true)
@@ -2718,7 +2722,7 @@ object RpnProxyManager : KoinComponent {
 
         Logger.v(
             LOG_TAG_PROXY,
-            "$TAG wg for $type not active or not eligible nw, return empty, for id: $id, usesMtrdNw: $usesMtrdNw, ssid: $ssid"
+            "$TAG wg for $type not active or not eligible nw, return empty, for id: $id, usesMobileNw: $usesMobileNw, ssid: $ssid"
         )
         return Pair("", true)
     }
@@ -2733,7 +2737,7 @@ object RpnProxyManager : KoinComponent {
 
         val actualId = id.substringAfter(Backend.RpnWin)
         val config = winCacheMutex.withLock {
-            if (actualId == Backend.RpnWin || actualId == AUTO_SERVER_ID) winServersCache.find { it.id == AUTO_SERVER_ID }
+            if (actualId == Backend.RpnWin || actualId.equals(AUTO_SERVER_ID, true)) winServersCache.find { it.id.equals(AUTO_SERVER_ID, true) }
             else winServersCache.find { it.id == id || it.id == actualId || it.key == id || it.key == actualId }
         }
 
@@ -2742,16 +2746,16 @@ object RpnProxyManager : KoinComponent {
             return false
         }
 
-        if (config.mobileOnly && !usesMobileNw) {
-            Logger.i(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnNw: mobileOnly is true for ${config.key}, but not mobile nw")
-            return false
+        if (config.mobileOnly && usesMobileNw) {
+            Logger.i(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnNw: mobileOnly is true for ${config.key}, but mobile nw, return true")
+            return true
         }
 
-        Logger.d(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnNw: eligible for mobile nw: $usesMobileNw, key: ${config.key}")
-        return true
+        Logger.d(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnNw: not eligible for mobile nw: $usesMobileNw, mobile-only: ${config.mobileOnly}, key: ${config.key}")
+        return false
     }
 
-    private suspend fun checkEligibilityBasedOnSsid(id: String, ssid: String): Boolean {
+    private suspend fun checkEligibilityBasedOnSsid(id: String, ssid: String, usesMobileNw: Boolean): Boolean {
         if (id.isEmpty()) {
             Logger.w(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnSsid: id is empty")
             return false
@@ -2759,7 +2763,7 @@ object RpnProxyManager : KoinComponent {
 
         val actualId = id.substringAfter(Backend.RpnWin)
         val config = winCacheMutex.withLock {
-            if (actualId == Backend.RpnWin || actualId == AUTO_SERVER_ID) winServersCache.find { it.id == AUTO_SERVER_ID }
+            if (actualId == Backend.RpnWin || actualId.equals(AUTO_SERVER_ID, true)) winServersCache.find { it.id.equals(AUTO_SERVER_ID, true) }
             winServersCache.find { it.id == id || it.id == actualId || it.key == id || it.key == actualId }
         }
 
@@ -2768,13 +2772,17 @@ object RpnProxyManager : KoinComponent {
             return false
         }
 
+        if (usesMobileNw && ssid.isEmpty()) {
+            Logger.i(LOG_TAG_PROXY, "canAdd: mobile nw, return false")
+            return false
+        }
+
         if (config.ssidBased) {
-            val ssids = "" //config.ssidList
-            val ssidItems = SsidItem.parseStorageList(ssids)
+            val ssidItems = SsidItem.parseStorageList(config.ssids)
             if (ssidItems.isEmpty() && ssid.isNotEmpty()) { // treat empty as match all
                 Logger.d(
                     LOG_TAG_PROXY,
-                    "checkEligibilityBasedOnSsid: ssidEnabled is true, but ssid list is empty, match all"
+                    "$TAG; checkEligibilityBasedOnSsid: ssidEnabled is true, but ssid list is empty, match all"
                 )
                 return true
             }
@@ -2793,7 +2801,7 @@ object RpnProxyManager : KoinComponent {
             }
 
             if (notEqualMatch) {
-                Logger.d(LOG_TAG_PROXY, "checkEligibilityBasedOnSsid: ssid matched in NOT_EQUAL items, return false")
+                Logger.d(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnSsid: ssid matched in NOT_EQUAL items, return false")
                 return false
             }
 
@@ -2802,7 +2810,7 @@ object RpnProxyManager : KoinComponent {
             if (equalItems.isEmpty() && notEqualItems.isNotEmpty()) {
                 Logger.d(
                     LOG_TAG_PROXY,
-                    "checkEligibilityBasedOnSsid: only NOT_EQUAL items present and none matched, return true"
+                    "$TAG; checkEligibilityBasedOnSsid: only NOT_EQUAL items present and none matched, return true"
                 )
                 return true
             }
@@ -2821,12 +2829,12 @@ object RpnProxyManager : KoinComponent {
             }
 
             if (!equalMatch) {
-                Logger.d(LOG_TAG_PROXY, "checkEligibilityBasedOnSsid: ssid did not match in EQUAL items, return false")
+                Logger.d(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnSsid: ssid did not match in EQUAL items, return false")
                 return false
             }
         }
 
-        Logger.d(LOG_TAG_PROXY, "checkEligibilityBasedOnSsid: eligible for ssid: $ssid")
+        Logger.d(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnSsid: eligible for ssid: $ssid")
         return true
     }
 
@@ -2974,11 +2982,9 @@ object RpnProxyManager : KoinComponent {
             val keyExists = winCacheMutex.withLock { winServersCache.any { it.key == key } }
             if (keyExists) {
                 try {
-                    if (ssidBased) {
+                    if (oldValue != ssidBased) {
                         VpnController.notifyConnectionMonitor(enforcePolicyChange = true)
                     }
-                    // Refresh proxies to immediately pause/resume based on new SSID setting
-                    VpnController.refreshOrPauseOrResumeOrReAddProxies()
                 } catch (e: Exception) {
                     Logger.e(LOG_TAG_PROXY, "$TAG; updateSsidBased: failed to refresh proxies: ${e.message}", e)
                     // Don't revert DB change if only the VPN controller refresh failed
@@ -2994,6 +3000,11 @@ object RpnProxyManager : KoinComponent {
                     winServersCache.add(cachedConfig.copy(ssidBased = oldValue))
                 }
             }
+        }
+
+        if (config.isEnabled) {
+            // Refresh proxies to immediately pause/resume based on new SSID setting
+            VpnController.refreshOrPauseOrResumeOrReAddProxies()
         }
     }
 
@@ -3044,7 +3055,6 @@ object RpnProxyManager : KoinComponent {
             if (keyExists && isSsidBased) {
                 try {
                     VpnController.notifyConnectionMonitor(enforcePolicyChange = true)
-                    VpnController.refreshOrPauseOrResumeOrReAddProxies()
                 } catch (e: Exception) {
                     Logger.e(LOG_TAG_PROXY, "$TAG; updateSsids: failed to refresh proxies: ${e.message}", e)
                     // Don't revert DB change if only the VPN controller refresh failed
@@ -3060,6 +3070,11 @@ object RpnProxyManager : KoinComponent {
                     winServersCache.add(cachedConfig.copy(ssids = oldSsids))
                 }
             }
+        }
+
+        if (config.isEnabled) {
+            // refresh proxies to immediately pause/resume based on new SSID setting
+            VpnController.refreshOrPauseOrResumeOrReAddProxies()
         }
     }
 

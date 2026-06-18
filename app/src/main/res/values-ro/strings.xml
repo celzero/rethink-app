@@ -407,8 +407,6 @@
     <string name="settings_go_log_desc" translatable="true">În scop de depanare</string>
     <string name="settings_rinr_heading" translatable="true">Loopback (experimental)</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Direcționează traficul propriu al Rethink prin tunel. Dacă nu te pricepi, lasă-l \"Închis\".</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Loopback (experimental)</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Asta va activa și setarea <!--settings_network_all_networks--> %1$s. Vrei să continui?</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">Faceți notificarea permanentă</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Direcționează traficul propriu al Rethink (descărcarea listelor de blocat, verificările de conectivitate, conexiunile DNS) înapoi în tunel.</string>
     <string name="settings_http_proxy_desc" translatable="true">Trimitere la %1$s</string>

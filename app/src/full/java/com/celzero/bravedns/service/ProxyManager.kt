@@ -211,7 +211,7 @@ object ProxyManager : KoinComponent {
         // check if all entries already have the correct uid
         if (m.all { it.uid == uid }) return
 
-        db.deleteAppByPkgName(packageName)
+        db.updateUidForApp(uid, packageName)
 
         // Sync the in-memory cache: replace all old-uid tuples with new-uid tuples.
         val newTuples = m.map { ProxyAppMapTuple(uid, packageName, it.proxyId) }.toSet()

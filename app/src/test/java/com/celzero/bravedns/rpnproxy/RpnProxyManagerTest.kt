@@ -905,7 +905,7 @@ class RpnProxyManagerTest : KoinTest {
 
     @Test
     fun `getExpiryFromPayload valid payload returns timestamp`() = runTest {
-        val futureIso = "2028-05-09T05:01:46.547Z"
+        val futureIso = System.currentTimeMillis() + 10 * 60 * 60 * 1000
         val payload = """{"ws":{"sessiontoken":"tok1","expiry":"$futureIso"}}"""
 
         coEvery { VpnController.getEntitlementDetails(any(), any()) } returns mockk {

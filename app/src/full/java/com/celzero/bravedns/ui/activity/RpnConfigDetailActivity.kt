@@ -673,7 +673,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                         b.appsLabel.setTextColor(fetchColor(this, R.attr.primaryTextColor))
                         b.appsLabel.text = getString(R.string.lbl_all_apps)
                     }
-                    if (config.id == AUTO_SERVER_ID) {
+                    if (config.id.equals(AUTO_SERVER_ID, true)) {
                         // Hide hop settings for AUTO since it will be the src for all other
                         // configs
                         b.hopRl.visibility = View.GONE

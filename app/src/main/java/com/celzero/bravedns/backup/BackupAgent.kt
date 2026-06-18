@@ -38,6 +38,8 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.getFileNameFromPath
 import com.celzero.bravedns.backup.BackupHelper.Companion.getRethinkDatabase
 import com.celzero.bravedns.backup.BackupHelper.Companion.getTempDir
 import com.celzero.bravedns.backup.BackupHelper.Companion.startVpn
+import com.celzero.bravedns.database.AppDatabase
+import com.celzero.bravedns.database.LogDatabase
 import com.celzero.bravedns.service.EncryptedFileManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
@@ -64,6 +66,8 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
 
     var filesPathToZip: MutableList<String> = ArrayList()
     private val persistentState by inject<PersistentState>()
+    private val appDatabase by inject<AppDatabase>()
+    private val logDatabase by inject<LogDatabase>()
 
     companion object {
         const val TAG = "BackupExport"
@@ -112,6 +116,12 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
                 )
                 return false
             }
+
+            // checkpoint databases to flush WAL entries into the main database file
+            // so the backup includes all committed data, not just what's in the db file
+            appDatabase.checkPoint()
+            logDatabase.checkPoint()
+            Logger.i(LOG_TAG_BACKUP_RESTORE, "database checkpoint completed before backup")
 
             processCompleted = saveDatabasesToFile(tempDir.path)
 

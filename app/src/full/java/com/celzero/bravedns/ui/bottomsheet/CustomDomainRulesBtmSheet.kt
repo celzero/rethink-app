@@ -120,8 +120,10 @@ class CustomDomainRulesBtmSheet :
         val uid = cd.uid
         io {
             if (uid == UID_EVERYBODY) {
-                b.customDomainAppNameTv.text =
-                    getString(R.string.firewall_act_universal_tab).replaceFirstChar(Char::titlecase)
+                uiCtx {
+                    b.customDomainAppNameTv.text =
+                        getString(R.string.firewall_act_universal_tab).replaceFirstChar(Char::titlecase)
+                }
             } else {
                 val appNames = FirewallManager.getAppNamesByUid(cd.uid)
                 val appName = getAppName(cd.uid, appNames)

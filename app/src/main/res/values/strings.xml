@@ -141,6 +141,7 @@
     <string name="two_argument" translatable="false">%1$s / %2$s</string>
     <string name="two_argument_dot" translatable="false">%1$s · %2$s</string>
     <string name="two_argument_parenthesis" translatable="false">%1$s (%2$s)</string>
+    <string name="two_argument_comma" translatable="false">%1$s, %2$s</string>
     <string name="three_argument" translatable="false">%1$s %2$s %3$s</string>
     <string name="three_argument_colon" translatable="false">%1$s:%2$s:%3$s</string>
     <string name="symbol_heavy" translatable="false">🐘</string>
@@ -603,8 +604,9 @@
     <string name="settings_rinr_desc_disabled" translatable="true">Route Rethink\'s own traffic, like blocklist downloads, connectivity checks, DNS connections, back into the tunnel.</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Routing Rethink\'s own traffic through the tunnel. Unless you know what you\'re doing, turn it off.</string>
 
-    <string name="settings_rinr_dialog_title" translatable="true">Loopback (experimental)</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Also enables<!--settings_network_all_networks--> %1$s setting. Do you want to proceed?</string>
+    <string name="settings_rinr_btmsht_title" translatable="true">Loopback (experimental)</string>
+    <string name="settings_rinr_btmsht_desc" translatable="true">In Loopback mode, Rethink can reroute its own network traffic. This means, Rethink can apply IP and domain rules, universal firewall rules, and proxying rules on Rethink\'s traffic as if it were any other regular app. Even so Loopback offers more control, the resulting behavior may not always desirable.\n\n\nIt is recommended to exempt Rethink from firewall, DNS, and proxying rules. Doing so doesn\'t affect network monitoring or logging, but just the rules.\n\n\nIn Loopback mode, Proxy Lockdown will not be enforced, for now.</string>
+    <string name="settings_rinr_exempt_btn" translatable="true">Exempt Rethink</string>
 
     <string name="settings_gologger_dialog_option_0" translatable="false">Very verbose</string>
     <string name="settings_gologger_dialog_option_1" translatable="false">Verbose</string>

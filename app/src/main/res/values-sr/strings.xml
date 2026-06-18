@@ -244,7 +244,6 @@
     <string name="settings_go_log_desc" translatable="true">За исправљање грешака</string>
     <string name="settings_rinr_heading" translatable="true">Повратна петља (експериментално)</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Рутирај Rethink-ов саобраћај кроз тунел. Осим ако знаш шта радиш, искључи ово.</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Повратна петља (експериментално)</string>
     <string name="orbot_no_app_toast" translatable="true">Додај најмање једну апликацију да би сте омогућили Orbot</string>
     <string name="settings_orbot_heading" translatable="true">Подеси Orbot</string>
     <string name="settings_orbot_desc" translatable="true">Orbot у не-vpn моду са HTTPS/SOCKS5.</string>
@@ -792,7 +791,6 @@
     <string name="settings_network_all_networks_desc" translatable="true">Када је омогућено, Rethink користи све доступне мреже да се повеже на интернет. У супротном, користи ону означену као <i>активну</i> од стране Андроида.</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">Учини обавештење сталним</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Рутирај Rethink-ов саобраћај, попут преузимања блоклисти, провере повезивости, DNS конекција, назад у тунел.</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Такоше омогућава <!--settings_network_all_networks-->%1$s подешавање. Да ли желите да наставите?</string>
     <string name="settings_dns_proxy_dialog_port_number" translatable="true">Број порта</string>
     <string name="settings_socks_forwarding_desc_no_app" translatable="true">Прослеђује се на %1$s:%2$s</string>
     <string name="settings_theme_dialog_themes_2" translatable="true">Светла</string>
