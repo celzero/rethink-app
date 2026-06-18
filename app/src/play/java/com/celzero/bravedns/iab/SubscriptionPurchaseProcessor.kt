@@ -22,8 +22,6 @@ import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date

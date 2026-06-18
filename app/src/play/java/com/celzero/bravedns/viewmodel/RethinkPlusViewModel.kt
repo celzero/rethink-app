@@ -19,14 +19,12 @@ import Logger
 import Logger.LOG_IAB
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.android.billingclient.api.BillingClient.ProductType
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.ProductDetail
 import com.celzero.bravedns.rpnproxy.PipKeyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
-import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -41,7 +39,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 /**
  * ViewModel for Rethink Plus subscription management

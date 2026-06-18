@@ -693,11 +693,11 @@ object InAppBillingHandler : KoinComponent {
                                 // authoritatively confirmed the subscription is expired.
                                 // This overrides the local billing window — do NOT preserve.
                                 val serverAuthoritativelyExpired = updatedDetail.expiryTime == 0L &&
-                                        updatedDetail.payload.isEmpty() &&
-                                        sub.billingExpiry > 0L
+                                    updatedDetail.payload.isEmpty() &&
+                                    sub.billingExpiry > 0L
                                 if (serverAuthoritativelyExpired) {
                                     logd(mname, "INAPP token=${sub.purchaseToken.take(8)}: server authoritatively " +
-                                            "confirmed expired (expiryTime=0, payload cleared); will expire")
+                                        "confirmed expired (expiryTime=0, payload cleared); will expire")
                                     // token intentionally NOT added to serverConfirmedValidTokens
                                 } else {
                                     val tunnelExpiry: Long = getExpiryFromPayload(updatedDetail.payload) ?: 0L
@@ -708,15 +708,15 @@ object InAppBillingHandler : KoinComponent {
                                     // This prevents internet outages or server errors from silently expiring
                                     // an otherwise-valid purchase.
                                     val billingKnownExpired = sub.billingExpiry > 0L &&
-                                            sub.billingExpiry != Long.MAX_VALUE &&
-                                            sub.billingExpiry <= now
+                                        sub.billingExpiry != Long.MAX_VALUE &&
+                                        sub.billingExpiry <= now
                                     logd(mname, "INAPP entitlement for token=${sub.purchaseToken.take(8)}: " +
-                                            "tunnelExpiry=$tunnelExpiry, billingExpiry=${sub.billingExpiry}, " +
-                                            "now=$now, billingKnownExpired=$billingKnownExpired, did=${deviceId.take(8)}")
+                                        "tunnelExpiry=$tunnelExpiry, billingExpiry=${sub.billingExpiry}, " +
+                                        "now=$now, billingKnownExpired=$billingKnownExpired, did=${deviceId.take(8)}")
                                     if (tunnelExpiry > now) {
                                         // Server returned a fresh, valid session token — definitely preserve.
                                         logd(mname, "INAPP token=${sub.purchaseToken.take(8)} server-confirmed valid " +
-                                                "(tunnelExpiry=$tunnelExpiry); skipping expire")
+                                            "(tunnelExpiry=$tunnelExpiry); skipping expire")
                                         serverConfirmedValidTokens.add(sub.purchaseToken)
                                     } else if (!billingKnownExpired) {
                                         // Session token has expired (or server/network unavailable) but the
@@ -726,14 +726,14 @@ object InAppBillingHandler : KoinComponent {
                                         // Billing window is the authority — do NOT expire a valid purchase
                                         // simply because the server could not be reached.
                                         logd(mname, "INAPP token=${sub.purchaseToken.take(8)}: tunnelExpiry expired/zero " +
-                                                "but billing window not expired (billingExpiry=${sub.billingExpiry}); " +
-                                                "preserving (fail-safe — internet/server issues must not expire a valid purchase)")
+                                            "but billing window not expired (billingExpiry=${sub.billingExpiry}); " +
+                                            "preserving (fail-safe — internet/server issues must not expire a valid purchase)")
                                         serverConfirmedValidTokens.add(sub.purchaseToken)
                                     } else {
                                         // Both the session token AND the local billing window are expired.
                                         // Allow expireStaleInAppFromDb to handle via the locallyExpired check.
                                         logd(mname, "INAPP token=${sub.purchaseToken.take(8)}: tunnelExpiry=$tunnelExpiry " +
-                                                "and billing=${sub.billingExpiry} both expired; will expire")
+                                            "and billing=${sub.billingExpiry} both expired; will expire")
                                     }
                                 }
                             } catch (e: Exception) {
@@ -778,7 +778,7 @@ object InAppBillingHandler : KoinComponent {
                     )
                 } else {
                     logd(mname, "PurchasePending is for a different product type than $queriedProductType " +
-                            "(pendingProduct=$pendingProductId), skipping failure")
+                        "(pendingProduct=$pendingProductId), skipping failure")
                 }
             }
             return
@@ -941,8 +941,8 @@ object InAppBillingHandler : KoinComponent {
             consecutiveEmptySubsQueries++
             if (consecutiveEmptySubsQueries >= EMPTY_QUERY_THRESHOLD) {
                 logd(mname, "No SUBS in purchase list despite SUBS query;" +
-                        "threshold reached ($consecutiveEmptySubsQueries/$EMPTY_QUERY_THRESHOLD), " +
-                        "expiring stale SUBS DB rows")
+                    "threshold reached ($consecutiveEmptySubsQueries/$EMPTY_QUERY_THRESHOLD), " +
+                    "expiring stale SUBS DB rows")
                 consecutiveEmptySubsQueries = 0
                 try {
                     subscriptionStateMachine.reconcileWithPlayBilling(
@@ -954,7 +954,7 @@ object InAppBillingHandler : KoinComponent {
                 }
             } else {
                 logd(mname, "No SUBS in purchase list despite SUBS query;" +
-                        "ignoring (consecutive=$consecutiveEmptySubsQueries/$EMPTY_QUERY_THRESHOLD)")
+                    "ignoring (consecutive=$consecutiveEmptySubsQueries/$EMPTY_QUERY_THRESHOLD)")
             }
         }
 
@@ -1563,7 +1563,7 @@ object InAppBillingHandler : KoinComponent {
             }
             else -> {
                 loge(mname, "unknown productId=$productId, defaulting to SUBS; " +
-                        "add this product ID to resolveProductTypeFromKnownIds()")
+                    "add this product ID to resolveProductTypeFromKnownIds()")
                 ProductType.SUBS // by default assume as subs; should not happen
             }
         }
@@ -1688,62 +1688,62 @@ object InAppBillingHandler : KoinComponent {
             val inAppResult = kotlinx.coroutines.CompletableDeferred<List<ProductDetails>>()
             val subsResult  = kotlinx.coroutines.CompletableDeferred<List<ProductDetails>>()
 
-            val inAppParams = QueryProductDetailsParams.newBuilder()
-                .setProductList(
-                    listOf(
-                        QueryProductDetailsParams.Product.newBuilder()
-                            .setProductId(ONE_TIME_PRODUCT_ID)
-                            .setProductType(ProductType.INAPP)
-                            .build()
-                    )
-                ).build()
+        val inAppParams = QueryProductDetailsParams.newBuilder()
+            .setProductList(
+                listOf(
+                    QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(ONE_TIME_PRODUCT_ID)
+                        .setProductType(ProductType.INAPP)
+                        .build()
+                )
+            ).build()
 
-            logd(mname, "launching INAPP product query")
-            billingClient.queryProductDetailsAsync(inAppParams) { br, result ->
-                logd(mname, "INAPP result: code=${br.responseCode}, items=${result.productDetailsList.size}")
-                if (br.responseCode == BillingResponseCode.OK) {
-                    inAppResult.complete(result.productDetailsList)
-                } else {
-                    loge(mname, "INAPP query failed: ${br.responseCode}, ${br.debugMessage}")
-                    inAppResult.complete(emptyList()) // complete with empty so SUBS still runs
-                }
+        logd(mname, "launching INAPP product query")
+        billingClient.queryProductDetailsAsync(inAppParams) { br, result ->
+            logd(mname, "INAPP result: code=${br.responseCode}, items=${result.productDetailsList.size}")
+            if (br.responseCode == BillingResponseCode.OK) {
+                inAppResult.complete(result.productDetailsList)
+            } else {
+                loge(mname, "INAPP query failed: ${br.responseCode}, ${br.debugMessage}")
+                inAppResult.complete(emptyList()) // complete with empty so SUBS still runs
             }
+        }
 
-            val subsParams = QueryProductDetailsParams.newBuilder()
-                .setProductList(
-                    listOf(
-                        QueryProductDetailsParams.Product.newBuilder()
-                            .setProductId(STD_PRODUCT_ID)
-                            .setProductType(ProductType.SUBS)
-                            .build()
-                    )
-                ).build()
+        val subsParams = QueryProductDetailsParams.newBuilder()
+            .setProductList(
+                listOf(
+                    QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(STD_PRODUCT_ID)
+                        .setProductType(ProductType.SUBS)
+                        .build()
+                )
+            ).build()
 
-            logd(mname, "launching SUBS product query")
-            billingClient.queryProductDetailsAsync(subsParams) { br, result ->
-                logd(mname, "SUBS result: code=${br.responseCode}, items=${result.productDetailsList.size}")
-                if (br.responseCode == BillingResponseCode.OK) {
-                    subsResult.complete(result.productDetailsList)
-                } else {
-                    loge(mname, "SUBS query failed: ${br.responseCode}, ${br.debugMessage}")
-                    subsResult.complete(emptyList())
-                }
+        logd(mname, "launching SUBS product query")
+        billingClient.queryProductDetailsAsync(subsParams) { br, result ->
+            logd(mname, "SUBS result: code=${br.responseCode}, items=${result.productDetailsList.size}")
+            if (br.responseCode == BillingResponseCode.OK) {
+                subsResult.complete(result.productDetailsList)
+            } else {
+                loge(mname, "SUBS query failed: ${br.responseCode}, ${br.debugMessage}")
+                subsResult.complete(emptyList())
             }
+        }
 
-            // await for both the results before merging them
-            val inAppList = inAppResult.await()
-            val subsList  = subsResult.await()
+        // await for both the results before merging them
+        val inAppList = inAppResult.await()
+        val subsList  = subsResult.await()
 
-            if (inAppList.isNotEmpty()) processProductList(inAppList)
-            if (subsList.isNotEmpty())  processProductList(subsList)
+        if (inAppList.isNotEmpty()) processProductList(inAppList)
+        if (subsList.isNotEmpty())  processProductList(subsList)
 
 
-            val merged = productDetails.toList()
-            logd(mname, "product query complete: ${merged.size} total products (inApp=${inAppList.size}, subs=${subsList.size})")
-            withContext(Dispatchers.Main) {
-                productDetailsLiveData.postValue(merged)
-                billingListener?.productResult(merged.isNotEmpty(), merged)
-            }
+        val merged = productDetails.toList()
+        logd(mname, "product query complete: ${merged.size} total products (inApp=${inAppList.size}, subs=${subsList.size})")
+        withContext(Dispatchers.Main) {
+            productDetailsLiveData.postValue(merged)
+            billingListener?.productResult(merged.isNotEmpty(), merged)
+        }
         } // productCacheMutex.withLock
     }
 
@@ -1942,8 +1942,8 @@ object InAppBillingHandler : KoinComponent {
         log(mname, "looking for product: $productId, plan: $planId")
         var pd = storeProductDetails.find {
             it.productDetail.productId == productId &&
-                    it.productDetail.planId == planId &&
-                    it.productDetail.productType == ProductType.SUBS
+            it.productDetail.planId == planId &&
+            it.productDetail.productType == ProductType.SUBS
         }
 
         // storeProductDetails may be empty when purchaseSubs is reached without the RethinkPlus
@@ -1958,8 +1958,8 @@ object InAppBillingHandler : KoinComponent {
             }
             pd = storeProductDetails.find {
                 it.productDetail.productId == productId &&
-                        it.productDetail.planId == planId &&
-                        it.productDetail.productType == ProductType.SUBS
+                it.productDetail.planId == planId &&
+                it.productDetail.productType == ProductType.SUBS
             }
         }
 
