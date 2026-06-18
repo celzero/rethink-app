@@ -940,6 +940,18 @@ object FirewallManager : KoinComponent {
         }
     }
 
+    suspend fun exemptRethinkApp(rethinkUid: Int) {
+        mutex.withLock {
+            appInfos.get(rethinkUid).forEach {
+                it.connectionStatus = ConnectionStatus.ALLOW.id
+                it.firewallStatus = FirewallStatus.BYPASS_DNS_FIREWALL.id
+                it.isProxyExcluded = true
+                it.modifiedTs = System.currentTimeMillis()
+            }
+        }
+        db.updateProxyExcluded(rethinkUid, true)
+    }
+
     suspend fun isAppExcludedFromProxy(uid: Int): Boolean {
         return getAppInfoByUid(uid)?.isProxyExcluded ?: false
     }

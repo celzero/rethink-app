@@ -62,6 +62,7 @@ import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.InAppMessageProvider
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
@@ -105,7 +106,6 @@ import kotlin.time.Duration.Companion.milliseconds
 
 class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
     private val persistentState by inject<PersistentState>()
-    private val appInfoDb by inject<AppInfoRepository>()
     private val appUpdateManager by inject<AppUpdater>()
     private val inAppMessageProvider by inject<InAppMessageProvider>()
     private val rdb by inject<RefreshDatabase>()
@@ -341,9 +341,10 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
 
     private fun removeThisMethod() {
 
+        val rethinkUid = Utilities.getApplicationInfo(this, this.packageName)?.uid
         io {
-            appInfoDb.setRethinkToBypassDnsAndFirewall()
-            appInfoDb.setRethinkToBypassProxy(true)
+            if (rethinkUid != null) FirewallManager.exemptRethinkApp(rethinkUid)
+            else Logger.e(LOG_TAG_UI, "HomeScreen Rethink UID is null")
         }
 
         // change the persistent state for defaultDnsUrl, if its google.com (only for v055d)

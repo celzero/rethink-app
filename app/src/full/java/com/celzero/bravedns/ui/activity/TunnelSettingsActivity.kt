@@ -33,14 +33,17 @@ import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.ActivityTunnelSettingsBinding
 import com.celzero.bravedns.service.EventLogger
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.BaseActivity
+import com.celzero.bravedns.ui.bottomsheet.RethinkInRethinkWarningBottomSheet
 import com.celzero.bravedns.ui.dialog.NetworkReachabilityDialog
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.InternetProtocol
@@ -54,6 +57,8 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.util.concurrent.TimeUnit
 
@@ -312,50 +317,34 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         }
 
         b.settingsRInRSwitch.setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
-            // show a dialog to enable use multiple networks if the user selects yes
-            // rinr will not work without multiple networks
-            // reason: ConnectivityManager.activeNetwork returns VPN network when rinr is enabled
-            if (isChecked && !persistentState.useMultipleNetworks) {
-                val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
-                alertBuilder.setTitle(getString(R.string.settings_rinr_dialog_title))
-                val msg =
-                    getString(
-                        R.string.settings_rinr_dialog_desc,
-                        getString(R.string.settings_network_all_networks)
-                    )
-                alertBuilder.setMessage(msg)
-                alertBuilder.setCancelable(false)
-                alertBuilder.setPositiveButton(getString(R.string.lbl_proceed)) { dialog, _ ->
-                    dialog.dismiss()
-                    b.settingsActivityAllNetworkSwitch.isChecked = true
-                    persistentState.useMultipleNetworks = true
+            if (isChecked) {
+                val sheet = RethinkInRethinkWarningBottomSheet()
+                sheet.onProceed = {
+                    if (!persistentState.useMultipleNetworks) {
+                        b.settingsActivityAllNetworkSwitch.isChecked = true
+                        persistentState.useMultipleNetworks = true
+                    }
                     persistentState.routeRethinkInRethink = true
+                    logEvent(
+                        "rinr enabled",
+                        "Rethink in Rethink enabled"
+                    )
                     displayRethinkInRethinkUi()
-                    logEvent(
-                        "use all networks",
-                        "Use all networks for VPN: true"
-                    )
-                }
-                alertBuilder.setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ ->
-                    dialog.dismiss()
-                    b.settingsRInRSwitch.isChecked = false
-                    logEvent(
-                        "rinr disabled",
-                        "Rethink in Rethink disabled by user"
-                    )
-                }
-                val dialog = alertBuilder.create()
-                dialog.show()
-            } else {
-                persistentState.routeRethinkInRethink = isChecked
-                if (isChecked) {
-                    if (persistentState.enableStabilityDependentSettings()) {
-                        SnackbarHelper.showStabilityProgram(b.root, persistentState)
+                    val rethinkUid = Utilities.getApplicationInfo(this, this.packageName)?.uid
+                    io {
+                        if (rethinkUid != null) FirewallManager.exemptRethinkApp(rethinkUid)
+                        else Logger.e(LOG_TAG_UI, "TunSetting Rethink UID is null")
                     }
                 }
+                sheet.onCancel = {
+                    b.settingsRInRSwitch.isChecked = false
+                }
+                sheet.show(supportFragmentManager, "rinrWarning")
+            } else {
+                persistentState.routeRethinkInRethink = false
                 logEvent(
                     "rinr toggled",
-                    "Rethink in Rethink set to: $isChecked"
+                    "Rethink in Rethink set to: false"
                 )
                 displayRethinkInRethinkUi()
             }
@@ -852,10 +841,24 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         if (persistentState.routeRethinkInRethink) {
             b.genRInRDesc.text = getString(R.string.settings_rinr_desc_enabled)
             disableBandwidthBoosterUi()
+            disableProxyLockdownUi()
         } else {
             b.genRInRDesc.text = getString(R.string.settings_rinr_desc_disabled)
             enableBandwidthBoosterUi()
+            enableProxyLockdownUi()
         }
+    }
+
+    private fun disableProxyLockdownUi() {
+        b.dvWgLockdownRl.alpha = ALPHA_DISABLED
+        b.dvWgLockdownSwitch.isEnabled = false
+        b.dvWgLockdownRl.isEnabled = false
+    }
+
+    private fun enableProxyLockdownUi() {
+        b.dvWgLockdownRl.alpha = ALPHA_ENABLED
+        b.dvWgLockdownSwitch.isEnabled = true
+        b.dvWgLockdownRl.isEnabled = true
     }
 
     private fun disableBandwidthBoosterUi() {
@@ -1001,6 +1004,10 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
 
     private fun logEvent(msg: String, details: String) {
         eventLogger.log(EventType.TUN_ESTABLISHED, Severity.LOW, msg, EventSource.UI, false, details)
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
     private fun enableAfterDelay(ms: Long, vararg views: View) {

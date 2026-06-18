@@ -27,6 +27,7 @@ import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.database.WgConfigFilesRepository
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.WireguardManager.load
+import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.Config
@@ -433,7 +434,6 @@ object WireguardManager : KoinComponent {
 
     // no need to check for app excluded from proxy here, expected to call this fn after that
     suspend fun getAllPossibleConfigIdsForApp(uid: Int, ip: String, port: Int, domain: String, usesMobileNw: Boolean, ssid: String, default: String): List<String> {
-        val lockdown = persistentState.wgGlobalLockdown
         val block = Backend.Block
         val proxyIds: MutableList<String> = mutableListOf()
 
@@ -595,9 +595,8 @@ object WireguardManager : KoinComponent {
             conf?.isLockdown ?: false
         }
 
-        // add the default proxy to the end, will not be true for lockdown but lockdown is handled
-        // above, so no need to check here
-        if (default.isNotEmpty() && !isAnyIdLockdown && !lockdown) proxyIds.add(default)
+        // add the default proxy to the end, will not be true for any id is set to lockdown
+        if (default.isNotEmpty() && !isAnyIdLockdown) proxyIds.add(default)
 
         // the proxyIds list will contain the ip-app specific, domain-app specific, app specific,
         // universal ip, universal domain, catch-all and default configs in the order of priority
