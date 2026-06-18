@@ -1878,6 +1878,7 @@ object RpnProxyManager : KoinComponent {
             }
 
             val file = File(folder, fileName)
+            if (file.exists()) file.delete()
             val ok = try {
                 EncryptedFileManager.write(applicationContext, byteArray, file)
             } catch (e: Exception) {

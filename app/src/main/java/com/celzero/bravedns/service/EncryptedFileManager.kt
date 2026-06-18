@@ -247,6 +247,7 @@ object EncryptedFileManager : KoinComponent {
     fun write(ctx: Context, data: ByteArray, file: File): Boolean {
         try {
             Logger.d(LOG_TAG, "write into $file")
+            if (file.exists()) file.delete()
             return writeInternal(ctx, data, file)
         } catch (e: Exception) {
             // Check if this is a recoverable keyset-corruption error.
