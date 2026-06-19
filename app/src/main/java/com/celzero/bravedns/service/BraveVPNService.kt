@@ -6108,8 +6108,17 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     }
 
     override fun onRevoke() {
-        Logger.i(LOG_TAG_VPN, "onRevoke, stop vpn adapter")
-        signalStopService("revoked", false)
+        // System invokes onRevoke when the user takes an explicit action that
+        // disables this VPN: (a) toggles RethinkDNS off in Android Settings →
+        // Network & internet → VPN, (b) selects a different VPN app, or
+        // (c) switches Always-On VPN to a different app. In every one of those
+        // cases the user IS deliberately stopping us — not a crash, not a
+        // transient error. Treat as user-initiated so signalStopService can
+        // clear "VPN should be running" persistent state; otherwise the
+        // autostart receiver relaunches us on the next boot / unlock /
+        // package-replace because activationRequested is still true.
+        Logger.i(LOG_TAG_VPN, "onRevoke, treating as user-initiated stop")
+        signalStopService("revoked", userInitiated = true)
     }
 
     suspend fun getSystemDns(): String {
