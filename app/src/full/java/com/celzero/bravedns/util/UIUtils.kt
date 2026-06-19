@@ -46,6 +46,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
 import com.celzero.bravedns.database.DnsLog
@@ -868,6 +870,19 @@ object SnackbarHelper {
             }
         })
 
+        ViewCompat.setOnApplyWindowInsetsListener(snackView) { v, insets ->
+            val navBarHeight = insets
+                .getInsets(WindowInsetsCompat.Type.navigationBars())
+                .bottom
+
+            (v.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
+                lp.bottomMargin += navBarHeight + 80
+                v.layoutParams = lp
+            }
+
+            insets
+        }
+
         current = snackbar
         lastMessage = message
         lastShownAt = now
@@ -897,7 +912,7 @@ object SnackbarHelper {
         show(
             view = view,
             message = message,
-            duration = Snackbar.LENGTH_INDEFINITE,
+            duration = Snackbar.LENGTH_LONG,
             actionLabel = actionLabel,
             action = {
                 persistentState.firebaseErrorReportingEnabled = false
