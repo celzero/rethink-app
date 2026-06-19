@@ -3479,9 +3479,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
         Logger.w(LOG_TAG_VPN, "Destroying VPN service")
 
-        // stop foreground service will take care of stopping the service for both
-        // version >= 24 and < 24
-        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_DETACH)
+        // Use STOP_FOREGROUND_REMOVE so the persistent VPN-active notification clears
+        // when the service ends. STOP_FOREGROUND_DETACH only strips the service's
+        // foreground status while leaving the notification visible — which causes
+        // a stale "RethinkDNS protected" notification to linger after the user has
+        // stopped the VPN, until the user manually swipes it away or the service is
+        // re-created. REMOVE is the right semantics for "we're done, clean up."
+        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
     }
 
     private fun startPauseTimer() {
