@@ -1,5 +1,5 @@
-rootProject.name='Bravedns'
-include ':app',':tun2socks'
+rootProject.name = "Bravedns"
+include(":app", ":tun2socks")
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -7,6 +7,5 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-
     }
 }
