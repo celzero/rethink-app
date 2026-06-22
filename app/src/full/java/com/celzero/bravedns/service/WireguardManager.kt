@@ -427,10 +427,6 @@ object WireguardManager : KoinComponent {
         return Pair("", true)
     }
 
-    private fun isDnsRequest(defaultTid: String): Boolean {
-        return defaultTid == Backend.System || defaultTid == Backend.Plus || defaultTid == Backend.Preferred
-    }
-
     // no need to check for app excluded from proxy here, expected to call this fn after that
     suspend fun getAllPossibleConfigIdsForApp(uid: Int, ip: String, port: Int, domain: String, usesMobileNw: Boolean, ssid: String, default: String): List<String> {
         val block = Backend.Block
@@ -459,7 +455,7 @@ object WireguardManager : KoinComponent {
             proxyIds.add(ID_WG_BASE + id)
             // add default to the list, can route check is done in go-tun
             // let one-wg use wg-dns no need to add the default to the list
-            if (default.isNotEmpty() && !isDnsRequest(default)) proxyIds.add(default)
+            if (default.isNotEmpty()) proxyIds.add(default)
             Logger.i(LOG_TAG_PROXY, "one-wg enabled, return $proxyIds")
             return proxyIds
         }
