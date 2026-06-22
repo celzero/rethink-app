@@ -164,6 +164,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import java.io.IOException
@@ -308,9 +310,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     private var rethinkUid: Int = INVALID_UID
 
+    private val activeCidsMutex = Mutex()
     // used to store the conn-ids that are allowed and active, to show in network logs
     // as active connections. removed when the connection is closed (onSummary)
     private val activeCids = Collections.newSetFromMap(ConcurrentHashMap<CidKey, Boolean>())
+
+    // used to handle app observer to exclude apps from the tunnel
+    private val excludeAppsMutex = Mutex()
 
     // used to store the ConnTrackerMetaData that has multiple proxy ids associated with it
     // waiting for the connection to be established, the call from postFlow/socketClosed will
@@ -327,6 +333,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     // this is used to close the connections when the device is locked
     // list will exclude bypassed apps, domains and ip rules
     private val activeClosableCids = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
+    private val activeClosableCidsMutex = Mutex()
 
     // data class to store the connection summary
     data class CidKey(val cid: String, val uid: Int)
@@ -1634,35 +1641,36 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     private fun makeAppInfoObserver(): Observer<Collection<AppInfo>> {
         return Observer { t ->
-            try {
-                var latestExcludedApps: Set<String>
-                // adding synchronized block, found a case of concurrent modification
-                // exception that happened once when trying to filter the received object (t).
-                // creating a copy of the received value in a synchronized block.
-                synchronized(t) {
-                    val copy: List<AppInfo> = mutableListOf<AppInfo>().apply { addAll(t) }
-                    latestExcludedApps =
-                        copy
-                            .filter {
-                                it.firewallStatus == FirewallManager.FirewallStatus.EXCLUDE.id
-                            }
-                            .map(AppInfo::packageName)
-                            .toSet()
+            io("appObsrver") {
+                try {
+                    var latestExcludedApps: Set<String>
+                    // replace synchronized block with mutex
+                    excludeAppsMutex.withLock {
+                        val copy: List<AppInfo> = mutableListOf<AppInfo>().apply { addAll(t) }
+                        latestExcludedApps =
+                            copy
+                                .filter {
+                                    it.firewallStatus == FirewallManager.FirewallStatus.EXCLUDE.id
+                                }
+                                .map(AppInfo::packageName)
+                                .toSet()
+                    }
+
+                    if (Sets.symmetricDifference(excludedApps, latestExcludedApps).isEmpty())
+                        return@io
+
+                    Logger.i(LOG_TAG_VPN, "excluded-apps list changed, restart vpn")
+
+                    val reason =
+                        "excludeApps: ${latestExcludedApps.size} apps, at: ${elapsedRealtime()}"
+                    vpnRestartTrigger.value = reason
+                } catch (e: Exception) { // NoSuchElementException, ConcurrentModification
+                    Logger.e(
+                        LOG_TAG_VPN,
+                        "error retrieving value from appInfos observer ${e.message}",
+                        e
+                    )
                 }
-
-                if (Sets.symmetricDifference(excludedApps, latestExcludedApps).isEmpty())
-                    return@Observer
-
-                Logger.i(LOG_TAG_VPN, "excluded-apps list changed, restart vpn")
-
-                val reason = "excludeApps: ${latestExcludedApps.size} apps, at: ${elapsedRealtime()}"
-                vpnRestartTrigger.value = reason
-            } catch (e: Exception) { // NoSuchElementException, ConcurrentModification
-                Logger.e(
-                    LOG_TAG_VPN,
-                    "error retrieving value from appInfos observer ${e.message}",
-                    e
-                )
             }
         }
     }
@@ -4845,9 +4853,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // no-op
     }
 
-    override fun onUpstreamAnswer(smm: DNSSummary, rcvdDnsOpts: DNSOpts, ipcsv: String): DNSOpts {
+    override fun onUpstreamAnswer(id: String, smm: DNSSummary, rcvdDnsOpts: DNSOpts, ipcsv: String): DNSOpts {
         val startTime = elapsedRealtime()
         return go2kt(upstreamQueryDispatcher) {
+            Logger.vv(LOG_TAG_VPN, "onUpstreamAnswer: init, $id, sum: $smm, ipcsv: $ipcsv, opts: $rcvdDnsOpts")
             if (ipcsv.isEmpty()) {
                 return@go2kt DNSOpts()
             }
@@ -5098,11 +5107,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 key = CidKey(connectionSummary.connId, uid)
                 netLogTracker.updateIpSummary(connectionSummary)
             }
-            synchronized(activeCids) {
-                activeCids.remove(key)
-            }
-            synchronized(activeClosableCids) {
-                activeClosableCids.remove(connectionSummary.connId)
+            io("activeCids") {
+                activeCidsMutex.withLock {
+                    activeCids.remove(key)
+                }
+                activeClosableCidsMutex.withLock {
+                    activeClosableCids.remove(connectionSummary.connId)
+                }
             }
             io("dlIpInfo") {
                 IpInfoDownloader.fetchIpInfoIfRequired(s.target)
@@ -5331,7 +5342,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     // add to trackedCids, so that the connection can be removed from the list when the
                     // connection is closed (onSocketClosed), use: ui to show the active connections
                     val key = CidKey(cm.connId, uid)
-                    synchronized(activeCids) {
+                    activeCidsMutex.withLock {
                         activeCids.add(key)
                     }
                     if (persistentState.autoProxyEnabled) {
@@ -5364,7 +5375,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // add to trackedCids, so that the connection can be removed from the list when the
         // connection is closed (onSocketClosed), use: ui to show the active connections
         val key = CidKey(cm.connId, uid)
-        synchronized(activeCids) {
+        activeCidsMutex.withLock {
             activeCids.add(key)
         }
 
@@ -5431,7 +5442,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // add to trackedCids, so that the connection can be removed from the list when the
             // connection is closed (onSocketClosed), use: ui to show the active connections
             val key = CidKey(cm.connId, uid)
-            synchronized(activeCids) {
+            activeCidsMutex.withLock {
                 activeCids.add(key)
             }
 
@@ -5778,11 +5789,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return persistAndConstructFlowResponse(connTracker, baseOrExit, connId, uid, forUpstreamAnswer)
     }
 
-    fun hasCid(connId: String, uid: Int): Boolean {
+    suspend fun hasCid(connId: String, uid: Int): Boolean {
         // get app id from uid
         val uid0 = FirewallManager.appId(uid, isPrimaryUser())
         val key = CidKey(connId, uid0)
-        synchronized(activeCids) {
+        activeCidsMutex.withLock {
             return activeCids.contains(key)
         }
     }
@@ -5971,7 +5982,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return
     }
 
-    private fun addCidToTrackedCidsToCloseIfNeeded(cid: String, rule: FirewallRuleset) {
+    private suspend fun addCidToTrackedCidsToCloseIfNeeded(cid: String, rule: FirewallRuleset) {
         // no need to track the blocked connections, as they will be closed
         if (FirewallRuleset.ground(rule)) {
             return
@@ -5983,7 +5994,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         }
 
         Logger.v(LOG_TAG_VPN, "firewall-rule $rule, adding to trackedCids to close, $cid")
-        synchronized(activeClosableCids) {
+        activeClosableCidsMutex.withLock {
             activeClosableCids.add(cid)
         }
     }
@@ -5991,7 +6002,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     // this method is called when the device is locked, so no need to check for device lock here
     private fun closeTrackedConnsOnDeviceLock() {
         io("devLockCloseConns") {
-            val cidsToClose: List<String> = synchronized(activeClosableCids) {
+            val cidsToClose: List<String> = activeClosableCidsMutex.withLock {
                 if (activeClosableCids.isEmpty()) emptyList<String>()
 
                 val snapshot = activeClosableCids.toList()

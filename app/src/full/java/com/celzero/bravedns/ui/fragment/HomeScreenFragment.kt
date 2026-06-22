@@ -109,6 +109,8 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import java.util.Locale
@@ -129,6 +131,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private lateinit var notificationPermissionResult: ActivityResultLauncher<String>
 
     private val batteryPermissionHelper = BatteryPermissionHelper.getInstance()
+
+    private val appRulesMutex = Mutex()
 
     companion object {
         private const val TAG = "HSFragment"
@@ -1279,57 +1283,63 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      */
     private fun observeAppStates() {
         FirewallManager.getApplistObserver().observe(viewLifecycleOwner) {
-            try {
-                val copy: Collection<AppInfo>
-                // adding synchronized block, found a case of concurrent modification
-                // exception that happened once when trying to filter the received object (t).
-                // creating a copy of the received value in a synchronized block.
-                synchronized(it) { copy = mutableListOf<AppInfo>().apply { addAll(it) }.toList() }
-                val blockedCount =
-                    copy.count { a ->
-                        a.connectionStatus != FirewallManager.ConnectionStatus.ALLOW.id
+            io {
+                try {
+                    val copy: Collection<AppInfo>
+                    // replace synchronized block to mutex
+                    appRulesMutex.withLock {
+                        copy = mutableListOf<AppInfo>().apply { addAll(it) }.toList()
                     }
-                val bypassCount =
-                    copy.count { a ->
-                        a.firewallStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL.id ||
-                                a.firewallStatus ==
-                                FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL.id
+                    val blockedCount =
+                        copy.count { a ->
+                            a.connectionStatus != FirewallManager.ConnectionStatus.ALLOW.id
+                        }
+                    val bypassCount =
+                        copy.count { a ->
+                            a.firewallStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL.id ||
+                                    a.firewallStatus ==
+                                    FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL.id
+                        }
+                    val excludedCount =
+                        copy.count { a ->
+                            a.firewallStatus == FirewallManager.FirewallStatus.EXCLUDE.id
+                        }
+                    val isolatedCount =
+                        copy.count { a ->
+                            a.firewallStatus == FirewallManager.FirewallStatus.ISOLATE.id
+                        }
+                    val allApps = copy.count()
+                    val allowedApps =
+                        allApps - (blockedCount + bypassCount + excludedCount + isolatedCount)
+                    uiCtx {
+                        if (!isAdded) return@uiCtx
+
+                        b.fhsCardAllowedApps.visibility = View.VISIBLE
+                        b.fhsCardAppsStatusRl.visibility = View.VISIBLE
+                        b.fhsCardAllowedApps.text = allowedApps.toString()
+                        b.fhsCardAppsAllApps.text = allApps.toString()
+                        b.fhsCardAppsBlockedCount.text = blockedCount.toString()
+                        b.fhsCardAppsBypassCount.text = bypassCount.toString()
+                        b.fhsCardAppsExcludeCount.text = excludedCount.toString()
+                        b.fhsCardAppsIsolatedCount.text = isolatedCount.toString()
+                        b.fhsCardApps.text =
+                            getString(
+                                R.string.firewall_card_text_active,
+                                blockedCount.toString(),
+                                bypassCount.toString(),
+                                excludedCount.toString(),
+                                isolatedCount.toString()
+                            )
+                        b.fhsCardApps.visibility = View.GONE
+                        b.fhsCardAllowedApps.isSelected = true
                     }
-                val excludedCount =
-                    copy.count { a ->
-                        a.firewallStatus == FirewallManager.FirewallStatus.EXCLUDE.id
-                    }
-                val isolatedCount =
-                    copy.count { a ->
-                        a.firewallStatus == FirewallManager.FirewallStatus.ISOLATE.id
-                    }
-                val allApps = copy.count()
-                val allowedApps =
-                    allApps - (blockedCount + bypassCount + excludedCount + isolatedCount)
-                b.fhsCardAllowedApps.visibility = View.VISIBLE
-                b.fhsCardAppsStatusRl.visibility = View.VISIBLE
-                b.fhsCardAllowedApps.text = allowedApps.toString()
-                b.fhsCardAppsAllApps.text = allApps.toString()
-                b.fhsCardAppsBlockedCount.text = blockedCount.toString()
-                b.fhsCardAppsBypassCount.text = bypassCount.toString()
-                b.fhsCardAppsExcludeCount.text = excludedCount.toString()
-                b.fhsCardAppsIsolatedCount.text = isolatedCount.toString()
-                b.fhsCardApps.text =
-                    getString(
-                        R.string.firewall_card_text_active,
-                        blockedCount.toString(),
-                        bypassCount.toString(),
-                        excludedCount.toString(),
-                        isolatedCount.toString()
+                } catch (e: Exception) { // NoSuchElementException, ConcurrentModification
+                    Logger.e(
+                        LOG_TAG_VPN,
+                        "error retrieving value from appInfos observer ${e.message}",
+                        e
                     )
-                b.fhsCardApps.visibility = View.GONE
-                b.fhsCardAllowedApps.isSelected = true
-            } catch (e: Exception) { // NoSuchElementException, ConcurrentModification
-                Logger.e(
-                    LOG_TAG_VPN,
-                    "error retrieving value from appInfos observer ${e.message}",
-                    e
-                )
+                }
             }
         }
     }

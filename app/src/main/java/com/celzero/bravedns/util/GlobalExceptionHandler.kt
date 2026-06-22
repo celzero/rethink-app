@@ -21,6 +21,10 @@ import android.content.Context
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.lang.ref.WeakReference
@@ -36,6 +40,7 @@ class GlobalExceptionHandler private constructor(
 ) : Thread.UncaughtExceptionHandler, KoinComponent {
 
     private val contextRef: WeakReference<Context>? = contextRef?.let { WeakReference(it) }
+    val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val persistentState by inject<PersistentState>()
     companion object {
         private var instance: GlobalExceptionHandler? = null
@@ -141,31 +146,36 @@ class GlobalExceptionHandler private constructor(
      * Attempt to write logs to file with fallback options when context is unavailable
      */
     private fun writeLogsToFileWithFallback(msg: String) {
-        try {
-            // First try: get context from WeakReference
-            val context = contextRef?.get()
-            if (context != null) {
-                val token = persistentState.firebaseUserToken
-                EnhancedBugReport.writeLogsToFile(context, token,msg)
-                Logger.i(LOG_TAG_APP, "crash logs written to file successfully")
-                return
-            }
-
-            // Fallback: log warning and ensure the crash info is at least logged
-            Logger.w(LOG_TAG_APP, "context is null or has been garbage collected during crash handling")
-            Logger.w(LOG_TAG_APP, "attempting to preserve crash info in system logs")
-
-            // Additional fallback: try to write to standard error as last resort
+        scope.launch {
             try {
-                System.err.println("=== CRITICAL CRASH INFO (Context Unavailable) ===")
-                System.err.println(msg)
-                System.err.println("=== END CRITICAL CRASH INFO ===")
-            } catch (e: Exception) {
-                Logger.e(LOG_TAG_APP, "failed to write crash info to stderr", e)
-            }
+                // First try: get context from WeakReference
+                val context = contextRef?.get()
+                if (context != null) {
+                    val token = persistentState.firebaseUserToken
+                    EnhancedBugReport.writeLogsToFile(context, token, msg)
+                    Logger.i(LOG_TAG_APP, "crash logs written to file successfully")
+                    return@launch
+                }
 
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_APP, "err in writeLogsToFileWithFallback", e)
+                // Fallback: log warning and ensure the crash info is at least logged
+                Logger.w(
+                    LOG_TAG_APP,
+                    "context is null or has been garbage collected during crash handling"
+                )
+                Logger.w(LOG_TAG_APP, "attempting to preserve crash info in system logs")
+
+                // Additional fallback: try to write to standard error as last resort
+                try {
+                    System.err.println("=== CRITICAL CRASH INFO (Context Unavailable) ===")
+                    System.err.println(msg)
+                    System.err.println("=== END CRITICAL CRASH INFO ===")
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_APP, "failed to write crash info to stderr", e)
+                }
+
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_APP, "err in writeLogsToFileWithFallback", e)
+            }
         }
     }
 }

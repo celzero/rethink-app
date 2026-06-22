@@ -26,6 +26,9 @@ import com.celzero.firestack.backend.LogConsumer
 import com.celzero.firestack.intra.Console
 import com.celzero.firestack.intra.Intra
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
@@ -77,19 +80,21 @@ class GoReportingHandler private constructor(private val scope: CoroutineScope, 
 
         if (msg.isEmpty()) return
 
-        val l = Logger.LoggerLevel.fromId(level) ?: Logger.LoggerLevel.NONE
-        if (l.stacktrace()) {
-            // disable crash logging for now
-            if (false) Logger.crash(LOG_GO_LOGGER, msg) // write to in-mem db
-            if (!isFdroidFlavour()) CrashReporter.recordGoCrash(msg)
-            val token = if (isFdroidFlavour()) "fdroid" else persistentState.firebaseUserToken
-            EnhancedBugReport.writeLogsToFile(ctx, token, msg)
-        } else if (l.user()) {
-            showNwEngineNotification(msg)
-            // consider all the notifications from go as failure and stop the service
-            VpnController.stop("goNotif", ctx, userInitiated = false)
-        } else {
-            Logger.goLog(msg, l)
+        scope.launch {
+            val l = Logger.LoggerLevel.fromId(level) ?: Logger.LoggerLevel.NONE
+            if (l.stacktrace()) {
+                // disable crash logging for now
+                if (false) Logger.crash(LOG_GO_LOGGER, msg) // write to in-mem db
+                if (!isFdroidFlavour()) CrashReporter.recordGoCrash(msg)
+                val token = if (isFdroidFlavour()) "fdroid" else persistentState.firebaseUserToken
+                EnhancedBugReport.writeLogsToFile(ctx, token, msg)
+            } else if (l.user()) {
+                showNwEngineNotification(msg)
+                // consider all the notifications from go as failure and stop the service
+                VpnController.stop("goNotif", ctx, userInitiated = false)
+            } else {
+                Logger.goLog(msg, l)
+            }
         }
     }
 
