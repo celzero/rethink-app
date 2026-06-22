@@ -163,6 +163,7 @@ class AppLockActivity : BaseActivity(R.layout.activity_app_lock) {
     private fun startHomeActivity() {
         Logger.v(LOG_TAG_UI, "$TAG starting home activity")
         val intent = Intent(this, HomeScreenActivity::class.java).apply {
+            putExtras(intent)
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
         startActivity(intent)

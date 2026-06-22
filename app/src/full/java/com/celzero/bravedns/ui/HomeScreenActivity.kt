@@ -200,8 +200,10 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
             intent.scheme?.equals(INTENT_SCHEME) == true &&
             intent.data?.path?.contains(BACKUP_FILE_EXTN) == true
         ) {
+            Logger.i(LOG_TAG_UI, "handleIntent: backup intent")
             handleRestoreProcess(intent.data)
         } else if (intent.scheme?.equals(INTENT_SCHEME) == true) {
+            Logger.i(LOG_TAG_UI, "handleIntent: restore intent")
             showToastUiCentered(
                 this,
                 getString(R.string.brbs_restore_no_uri_toast),
