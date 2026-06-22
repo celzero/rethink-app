@@ -779,13 +779,13 @@ class ProxyManagerTest : KoinTest {
 
     @Test
     fun `getProxyIdForApp returns ID_NONE when app not tracked`() {
-        assertEquals(ProxyManager.ID_NONE, ProxyManager.getProxyIdForApp(uid1))
+        assertEquals(listOf(ProxyManager.ID_NONE), ProxyManager.getProxyIdForApp(uid1))
     }
 
     @Test
     fun `getProxyIdForApp returns first matching proxyId from pamSet`() {
         loadMappings(pam(uid1, pkg1, wgProxyId0))
-        assertEquals(wgProxyId0, ProxyManager.getProxyIdForApp(uid1))
+        assertEquals(listOf(wgProxyId0), ProxyManager.getProxyIdForApp(uid1))
     }
 
     // ========================================================================

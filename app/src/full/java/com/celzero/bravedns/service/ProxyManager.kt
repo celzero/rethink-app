@@ -211,7 +211,8 @@ object ProxyManager : KoinComponent {
         // check if all entries already have the correct uid
         if (m.all { it.uid == uid }) return
 
-        db.updateUidForApp(uid, packageName)
+        val oldUid = m.first().uid
+        db.updateUidForApp(oldUid, uid, packageName)
 
         // Sync the in-memory cache: replace all old-uid tuples with new-uid tuples.
         val newTuples = m.map { ProxyAppMapTuple(uid, packageName, it.proxyId) }.toSet()

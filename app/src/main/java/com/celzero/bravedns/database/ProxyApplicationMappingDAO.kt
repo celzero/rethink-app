@@ -71,30 +71,11 @@ interface ProxyApplicationMappingDAO {
     @Query("select count(packageName) from ProxyApplicationMapping where proxyId != :id")
     fun getUnselectedAppsCountLiveData(id: String): LiveData<Int>
 
-    @Query(
-        "update ProxyApplicationMapping set proxyId = :cfgId, proxyName = :cfgName where uid = :uid"
-    )
-    fun updateProxyIdForApp(uid: Int, cfgId: String, cfgName: String)
-
-    @Query("update ProxyApplicationMapping set proxyId = '', proxyName = '' where proxyId = :cfgId")
-    fun removeAllAppsForProxy(cfgId: String)
-
-    @Query("update ProxyApplicationMapping set proxyId = '', proxyName = '' where proxyId = 'wg%'")
-    fun removeAllWgProxies()
-
-    @Query("update ProxyApplicationMapping set proxyId = :cfgId, proxyName = :cfgName")
-    fun updateProxyForAllApps(cfgId: String, cfgName: String = "")
-
     @Query("update ProxyApplicationMapping set proxyName = :proxyName where proxyId = :proxyId")
     fun updateProxyNameForProxyId(proxyId: String, proxyName: String)
 
-    @Query(
-        "update ProxyApplicationMapping set proxyId = :cfgId, proxyName = :cfgName where proxyId = ''"
-    )
-    fun updateProxyForUnselectedApps(cfgId: String, cfgName: String = "")
-
-    @Query("update ProxyApplicationMapping set uid = :uid where packageName = :packageName")
-    fun updateUidForApp(uid: Int, packageName: String)
+    @Query("update ProxyApplicationMapping set uid = :newUid where packageName = :packageName and uid = :oldUid")
+    fun updateUidForApp(oldUid: Int, newUid: Int, packageName: String)
 
     @Query("update ProxyApplicationMapping set uid = :newUid where uid = :oldUid")
     fun tombstoneApp(oldUid: Int, newUid: Int)
