@@ -962,22 +962,6 @@ internal constructor(
         return ctx.getString(FirewallManager.CategoryConstants.INSTALLED.nameResId)
     }
 
-    suspend fun cleanupTombstone() {
-        // delete all the tombstoned apps which are older than current time
-        val tombstoneApps = FirewallManager.getTombstoneApps()
-        tombstoneApps.forEach { appInfo ->
-            // remove all the rules
-            IpRulesManager.deleteRulesByUid(appInfo.uid)
-            DomainRulesManager.deleteRulesByUid(appInfo.uid)
-            ProxyManager.deleteAppByPkgName(appInfo.packageName)
-            deletePackage(appInfo.uid, appInfo.packageName)
-            Logger.i(
-                LOG_TAG_APP_DB,
-                "cleanupTombstone: deleted app: ${appInfo.packageName}, uid: ${appInfo.uid}, ts: ${appInfo.tombstoneTs}"
-            )
-        }
-    }
-
     @RequiresApi(Build.VERSION_CODES.O)
     private fun appInfoCategory(ai: ApplicationInfo): String {
         val cat = ApplicationInfo.getCategoryTitle(ctx, ai.category)

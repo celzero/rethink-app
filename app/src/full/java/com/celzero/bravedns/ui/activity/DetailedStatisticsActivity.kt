@@ -23,6 +23,7 @@ import android.view.View
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingData
+import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.SummaryStatisticsAdapter
@@ -32,7 +33,6 @@ import com.celzero.bravedns.databinding.ActivityDetailedStatisticsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment
-import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
@@ -124,7 +124,7 @@ class DetailedStatisticsActivity : BaseActivity(R.layout.activity_detailed_stati
     ) {
 
         b.dsaRecycler.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(this)
+        val layoutManager = LinearLayoutManager(this)
         b.dsaRecycler.layoutManager = layoutManager
 
         val recyclerAdapter = SummaryStatisticsAdapter(this, persistentState, appConfig, type)

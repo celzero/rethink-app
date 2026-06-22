@@ -27,7 +27,6 @@ import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.database.WgConfigFilesRepository
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.WireguardManager.load
-import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.Config
@@ -104,7 +103,7 @@ object WireguardManager : KoinComponent {
         lastAddedConfigId = db.getLastAddedConfigId()
         val m = db.getWgConfigs().map { it.toImmutable() }
         mappings = CopyOnWriteArraySet(m)
-        mappings.forEach {
+        for (it in mappings) {
             val path = it.configPath
             val config = try {
                 val bytes = EncryptedFileManager.readByteArray(applicationContext, File(path))
@@ -121,16 +120,16 @@ object WireguardManager : KoinComponent {
                             db.disableConfig(it.id)
                             VpnController.removeWireGuardProxy(it.id)
                         }
-                        return@forEach
+                        continue
                     }
                     else -> {
                         Logger.e(LOG_TAG_PROXY, "Critical encryption failure for wg config: $path, deleting config", e)
-                        return@forEach
+                        continue
                     }
                 }
             } catch (e: Exception) {
                 Logger.e(LOG_TAG_PROXY, "Config parse failure for wg config: $path", e)
-                return@forEach
+                continue
             }
             if (config == null) {
                 Logger.e(LOG_TAG_PROXY, "err loading wg config: $path, invalid config")
@@ -139,7 +138,7 @@ object WireguardManager : KoinComponent {
                 if ((it.id == WARP_ID && it.name == WARP_NAME) || (it.id == SEC_WARP_ID && it.name == SEC_WARP_NAME)) {
                     deleteConfig(it.id)
                 }
-                return@forEach
+                continue
             }
             if (configs.none { i -> i.getId() == it.id }) {
                 val c =
@@ -404,7 +403,7 @@ object WireguardManager : KoinComponent {
 
         val lockdown = config.isLockdown
 
-        if (lockdown && (checkEligibilityBasedOnNw(id, usesMobileNw) || checkEligibilityBasedOnSsid(id, ssid, usesMobileNw))) {
+        if (lockdown && isEligibleForNetwork(id, usesMobileNw, ssid, config.useOnlyOnMetered, config.ssidEnabled)) {
             Logger.d(LOG_TAG_PROXY, "lockdown wg for $type => return $idStr")
             return Pair(idStr, false) // no need to proceed further for lockdown
         }
@@ -419,17 +418,13 @@ object WireguardManager : KoinComponent {
         }
 
         // check if the config is active and if it can be used on this network
-        if (config.isActive && (checkEligibilityBasedOnNw(id, usesMobileNw) || checkEligibilityBasedOnSsid(id, ssid, usesMobileNw))) {
+        if (config.isActive && isEligibleForNetwork(id, usesMobileNw, ssid, config.useOnlyOnMetered, config.ssidEnabled)) {
             Logger.d(LOG_TAG_PROXY, "active wg for $type => add $idStr")
             return Pair(idStr, true)
         }
 
         Logger.v(LOG_TAG_PROXY, "wg for $type not active or not eligible nw, return empty, for id: $idStr, usesMtrdNw: $usesMobileNw, ssid: $ssid")
         return Pair("", true)
-    }
-
-    private fun isDnsRequest(defaultTid: String): Boolean {
-        return defaultTid == Backend.System || defaultTid == Backend.Plus || defaultTid == Backend.Preferred
     }
 
     // no need to check for app excluded from proxy here, expected to call this fn after that
@@ -460,7 +455,7 @@ object WireguardManager : KoinComponent {
             proxyIds.add(ID_WG_BASE + id)
             // add default to the list, can route check is done in go-tun
             // let one-wg use wg-dns no need to add the default to the list
-            if (default.isNotEmpty() && !isDnsRequest(default)) proxyIds.add(default)
+            if (default.isNotEmpty()) proxyIds.add(default)
             Logger.i(LOG_TAG_PROXY, "one-wg enabled, return $proxyIds")
             return proxyIds
         }
@@ -569,7 +564,7 @@ object WireguardManager : KoinComponent {
         // if catch-all config is enabled, then add the config id to the list
         val cac = mappings.filter { it.isActive && it.isCatchAll }
         cac.forEach {
-            if ((checkEligibilityBasedOnNw(it.id, usesMobileNw) || checkEligibilityBasedOnSsid(it.id, ssid, usesMobileNw)) &&
+            if (isEligibleForNetwork(it.id, usesMobileNw, ssid, it.useOnlyOnMetered, it.ssidEnabled) &&
                 !proxyIds.contains(ID_WG_BASE + it.id)
             ) {
                 proxyIds.add(ID_WG_BASE + it.id)
@@ -605,89 +600,23 @@ object WireguardManager : KoinComponent {
         return proxyIds
     }
 
-    // only when config is set to use on mobile network and current network is not mobile
-    // then return false, all other cases return true
-    private fun checkEligibilityBasedOnNw(id: Int, usesMobileNw: Boolean): Boolean {
-        val config = mappings.find { it.id == id }
-        if (config == null) {
-            Logger.e(LOG_TAG_PROXY, "canAdd: wg not found, id: $id, ${mappings.size}")
-            return false
-        }
+    private fun isEligibleForNetwork(id: Int, usesMobileNw: Boolean, ssid: String, mobileOnlySetting: Boolean, ssidEnabled: Boolean): Boolean {
+        if (!mobileOnlySetting && !ssidEnabled) return true
 
-        if (config.useOnlyOnMetered && usesMobileNw) {
-            Logger.i(LOG_TAG_PROXY, "canAdd: useOnlyOnMetered is true, and metered nw, return true")
-            return true
-        }
-
-        Logger.d(LOG_TAG_PROXY, "canAdd: not eligible for metered nw: $usesMobileNw, mobile-only? ${config.useOnlyOnMetered}")
-        return true
+        val passMobileOnly = mobileOnlySetting && (usesMobileNw && ssid.isEmpty())
+        val passSsid = ssidEnabled && !usesMobileNw && matchesSsidListForConfig(id, ssid)
+        return passMobileOnly || passSsid
     }
 
-    private fun checkEligibilityBasedOnSsid(id: Int, ssid: String, usesMobileNw: Boolean): Boolean {
+    // returns true if the current ssid is allowed by the SSID list configured for the wireguard.
+    // When the config is not found, returns false (fail-closed).
+    private fun matchesSsidListForConfig(id: Int, ssid: String): Boolean {
         val config = mappings.find { it.id == id }
         if (config == null) {
-            Logger.e(LOG_TAG_PROXY, "canAdd: wg not found, id: $id, ${mappings.size}")
+            Logger.e(LOG_TAG_PROXY, "matchesSsidListForConfig: wg not found, id: $id, ${mappings.size}")
             return false
         }
-
-        if (usesMobileNw && ssid.isEmpty()) {
-            Logger.i(LOG_TAG_PROXY, "canAdd: mobile nw, return false")
-            return false
-        }
-
-        if (config.ssidEnabled) {
-            val ssidItems = SsidItem.parseStorageList(config.ssids)
-            if (ssidItems.isEmpty() && ssid.isNotEmpty()) { // treat empty as match all
-                Logger.d(LOG_TAG_PROXY, "canAdd: ssidEnabled is true, but ssid list is empty, match all")
-                return true
-            }
-
-            val notEqualItems = ssidItems.filter { !it.type.isEqual }
-            val notEqualMatch = notEqualItems.any { ssidItem ->
-                when {
-                    ssidItem.type.isExact -> {
-                        ssidItem.name.equals(ssid, ignoreCase = true)
-                    }
-
-                    else -> { // wildcard
-                        matchesWildcard(ssidItem.name, ssid)
-                    }
-                }
-            }
-
-            if (notEqualMatch) {
-                Logger.d(LOG_TAG_PROXY, "canAdd: ssid matched in NOT_EQUAL items, return false")
-                return false
-            }
-
-            val equalItems = ssidItems.filter { it.type.isEqual }
-            // If there are only NOT_EQUAL items and none matched, return true
-            if (equalItems.isEmpty() && notEqualItems.isNotEmpty()) {
-                Logger.d(LOG_TAG_PROXY, "canAdd: only NOT_EQUAL items present and none matched, return true")
-                return true
-            }
-
-            // Check EQUAL items (exact or wildcard)
-            val equalMatch = equalItems.any { ssidItem ->
-                when {
-                    ssidItem.type.isExact -> {
-                        ssidItem.name.equals(ssid, ignoreCase = true)
-                    }
-
-                    else -> { // wildcard
-                        matchesWildcard(ssidItem.name, ssid)
-                    }
-                }
-            }
-
-            if (!equalMatch) {
-                Logger.d(LOG_TAG_PROXY, "canAdd: ssid did not match in EQUAL items, return false")
-                return false
-            }
-        }
-
-        Logger.d(LOG_TAG_PROXY, "canAdd: eligible for ssid: $ssid")
-        return true
+        return matchesSsidList(config.ssids, ssid)
     }
 
     private fun matchesWildcard(pattern: String, text: String): Boolean {

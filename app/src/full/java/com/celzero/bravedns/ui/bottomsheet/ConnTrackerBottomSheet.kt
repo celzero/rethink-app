@@ -312,21 +312,26 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             b.connectionMessage.text = info?.message
         }
 
-        val currentInfo = info
-        if (currentInfo != null && VpnController.hasCid(currentInfo.connId, currentInfo.uid)) {
-            b.bsConnConnDuration.text =
-                getString(
-                    R.string.two_argument_space,
-                    getString(R.string.lbl_active),
-                    getString(R.string.symbol_green_circle)
-                )
-        } else {
-            b.bsConnConnDuration.text =
-                getString(
-                    R.string.two_argument_space,
-                    getString(R.string.symbol_hyphen),
-                    getString(R.string.symbol_clock)
-                )
+        io {
+            val currentInfo = info
+            val hasCid = currentInfo != null && VpnController.hasCid(currentInfo.connId, currentInfo.uid)
+            uiCtx {
+                if (hasCid) {
+                    b.bsConnConnDuration.text =
+                        getString(
+                            R.string.two_argument_space,
+                            getString(R.string.lbl_active),
+                            getString(R.string.symbol_green_circle)
+                        )
+                } else {
+                    b.bsConnConnDuration.text =
+                        getString(
+                            R.string.two_argument_space,
+                            getString(R.string.symbol_hyphen),
+                            getString(R.string.symbol_clock)
+                        )
+                }
+            }
         }
 
         val connType = ConnectionTracker.ConnType.get(info?.connType)
@@ -779,5 +784,5 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
     private fun io(f: suspend () -> Unit) = lifecycleScope.launch(Dispatchers.IO) { f() }
 
-    private suspend fun uiCtx(f: suspend () -> Unit) = withContext(Dispatchers.Main) { f() }
+    private suspend fun uiCtx(f: suspend () -> Unit) = withContext(Dispatchers.Main) { if (isAdded) f() }
 }

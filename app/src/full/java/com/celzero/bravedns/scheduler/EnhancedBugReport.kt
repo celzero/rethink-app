@@ -28,6 +28,8 @@ import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.Utilities
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -73,6 +75,8 @@ object EnhancedBugReport : KoinComponent {
      */
     private val activeSessionFileNames = CopyOnWriteArraySet<String>()
 
+    private val mutex = Mutex()
+
     /**
      * Marks [fileName] as belonging to the current session.
      * Called immediately after file creation, before handing the file to any reader.
@@ -94,23 +98,25 @@ object EnhancedBugReport : KoinComponent {
     fun newKotlinCrashFile(context: Context): File? =
         newTombstoneFile(context, PREFIX_KOTLIN)
 
-    @Synchronized
-    fun writeLogsToFile(context: Context?, token: String, logs: String) {
-        if (context == null) {
-            Log.e(LOG_TAG_BUG_REPORT, "context is null, cannot write logs to file")
-            return
-        }
-        try {
-            val file = newKotlinCrashFile(context) ?: run {
-                Log.e(LOG_TAG_BUG_REPORT, "failed to create kotlin crash file")
+    suspend fun writeLogsToFile(context: Context?, token: String, logs: String) {
+        return mutex.withLock {
+            if (context == null) {
+                Log.e(LOG_TAG_BUG_REPORT, "context is null, cannot write logs to file")
                 return
             }
-            val time = Utilities.convertLongToTime(System.currentTimeMillis(), Constants.TIME_FORMAT_3)
-            file.writeText("$time\nToken: $token\n$logs\n", Charset.defaultCharset())
-            Log.i(LOG_TAG_BUG_REPORT, "kotlin crash written: ${file.name} (${file.length()} B)")
-            enforceMaxFiles(context, justWritten = file)
-        } catch (e: Exception) {
-            Log.e(LOG_TAG_BUG_REPORT, "err writing kotlin crash: ${e.message}", e)
+            try {
+                val file = newKotlinCrashFile(context) ?: run {
+                    Log.e(LOG_TAG_BUG_REPORT, "failed to create kotlin crash file")
+                    return
+                }
+                val time =
+                    Utilities.convertLongToTime(System.currentTimeMillis(), Constants.TIME_FORMAT_3)
+                file.writeText("$time\nToken: $token\n$logs\n", Charset.defaultCharset())
+                Log.i(LOG_TAG_BUG_REPORT, "kotlin crash written: ${file.name} (${file.length()} B)")
+                enforceMaxFiles(context, justWritten = file)
+            } catch (e: Exception) {
+                Log.e(LOG_TAG_BUG_REPORT, "err writing kotlin crash: ${e.message}", e)
+            }
         }
     }
 

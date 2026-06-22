@@ -30,6 +30,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.filter
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -61,7 +62,6 @@ import com.celzero.bravedns.util.Constants.Companion.DEAD_PACK
 import com.celzero.bravedns.util.Constants.Companion.DEFAULT_RDNS_REMOTE_DNS_NAMES
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_STAMP_VERSION
-import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
@@ -716,7 +716,7 @@ class RethinkBlocklistFragment :
 
     private fun setLocalSimpleViewAdapter() {
         localSimpleViewAdapter = LocalSimpleViewAdapter(requireContext())
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.lbSimpleRecyclerPacks.layoutManager = layoutManager
 
         localBlocklistPacksMapViewModel.simpleTags.observe(viewLifecycleOwner) {
@@ -729,7 +729,7 @@ class RethinkBlocklistFragment :
 
     private fun setRemoteSimpleViewAdapter() {
         remoteSimpleViewAdapter = RemoteSimpleViewAdapter(requireContext())
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.lbSimpleRecyclerPacks.layoutManager = layoutManager
 
         remoteBlocklistPacksMapViewModel.simpleTags.observe(viewLifecycleOwner) {
@@ -803,7 +803,7 @@ class RethinkBlocklistFragment :
         if (advanceRemoteViewAdapter != null) return
 
         advanceRemoteViewAdapter = RemoteAdvancedViewAdapter(requireContext())
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.lbAdvancedRecycler.layoutManager = layoutManager
 
         remoteFileTagViewModel.remoteFileTags.observe(viewLifecycleOwner) {
@@ -824,7 +824,7 @@ class RethinkBlocklistFragment :
         if (advanceLocalViewAdapter != null) return
 
         advanceLocalViewAdapter = LocalAdvancedViewAdapter(requireContext())
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.lbAdvancedRecycler.layoutManager = layoutManager
 
         localFileTagViewModel.localFiletags.observe(viewLifecycleOwner) {

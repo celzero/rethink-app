@@ -188,7 +188,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
                     persistentState.remoteBlocklistTimestamp
                 )
                 return
-            } catch (_: IOException) {
+            } catch (_: Exception) {
                 Logger.w(
                     LOG_TAG_BACKUP_RESTORE,
                     "remote blocklist file not found locally (timestamp: ${persistentState.remoteBlocklistTimestamp}), falling back to packaged asset"
@@ -487,6 +487,11 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             val pref: Map<String, *> = input.readObject() as Map<String, *>
 
             for (e in pref.entries) {
+                if (!shouldRestorePref(e.key)) {
+                    Logger.i(LOG_TAG_BACKUP_RESTORE, "Skipping security pref: ${e.key}")
+                    continue
+                }
+                Logger.i(LOG_TAG_BACKUP_RESTORE, "Restoring shared pref: ${e.key}")
                 val v: Any? = e.value
                 val key: String = e.key
 
@@ -519,5 +524,11 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
                 // no-op
             }
         }
+    }
+
+    private fun shouldRestorePref(key: String): Boolean {
+        return !key.contains("androidx.security", ignoreCase = true) &&
+                !key.contains("keyset", ignoreCase = true) &&
+                !key.contains("master_key", ignoreCase = true)
     }
 }

@@ -176,7 +176,7 @@ class Peer private constructor(builder: Builder) {
      *
      * @return the `Peer` represented as a series of "key=value" lines
      */
-    fun toWgUserspaceString(isAmz: Boolean): String {
+    suspend fun toWgUserspaceString(isAmz: Boolean): String {
         val sb = StringBuilder()
         // The order here is important: public_key signifies the beginning of a new peer.
         sb.append("public_key=").append(publicKey.hex()).append('\n')

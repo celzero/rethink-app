@@ -55,7 +55,6 @@ private constructor(val host: String, private val isResolved: Boolean, val port:
     fun getResolved(): Optional<InetEndpoint> {
         if (isResolved) return Optional.of(this)
         synchronized(lock) {
-
             // TODO(zx2c4): Implement a real timeout mechanism using DNS TTL
             if (Duration.between(lastResolution, Instant.now()).toMinutes() > 1) {
                 try {

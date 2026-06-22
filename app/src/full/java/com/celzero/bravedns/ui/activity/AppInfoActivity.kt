@@ -1065,6 +1065,8 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (!isFinishing) f()
+        }
     }
 }

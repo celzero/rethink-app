@@ -64,8 +64,6 @@ class BugReportCollector(val context: Context, workerParameters: WorkerParameter
         storePrefs(fout)
         val consoleLogFile = prepareConsoleLogFile(fout)
         BugReportZipper.dumpConsoleLogs(consoleLogRepo, consoleLogFile)
-        val flightRecDir = BugReportZipper.flightRecorderDir(applicationContext.filesDir)
-        BugReportZipper.dumpFlightRecorder(applicationContext.filesDir, flightRecDir)
         val ts = dumpLogsAndAppExits(fout)
         addToZip(fout, consoleLogFile)
         // Store the last exit reason time stamp

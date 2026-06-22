@@ -27,6 +27,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppWiseIpsAdapter
 import com.celzero.bravedns.adapter.DomainRulesBtmSheetAdapter
@@ -42,7 +43,6 @@ import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
@@ -207,7 +207,7 @@ class AppIpRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmSheet
         val list = domains.split(",").toTypedArray()
 
         b.bsacDomainList.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.bsacDomainList.layoutManager = layoutManager
 
         val recyclerAdapter = DomainRulesBtmSheetAdapter(requireContext(), uid, list)

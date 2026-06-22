@@ -47,32 +47,12 @@ class ProxyAppMappingRepository(
         return proxyApplicationMappingDAO.getWgAppMapping() ?: emptyList()
     }
 
-    suspend fun updateProxyIdForApp(uid: Int, proxyId: String, proxyName: String) {
-        proxyApplicationMappingDAO.updateProxyIdForApp(uid, proxyId, proxyName)
-    }
-
-    suspend fun removeAllAppsForProxy(proxyId: String) {
-        proxyApplicationMappingDAO.removeAllAppsForProxy(proxyId)
-    }
-
-    suspend fun removeAllWgProxies() {
-        proxyApplicationMappingDAO.removeAllWgProxies()
-    }
-
-    suspend fun updateProxyForAllApps(proxyId: String, proxyName: String) {
-        proxyApplicationMappingDAO.updateProxyForAllApps(proxyId, proxyName)
-    }
-
     suspend fun updateProxyNameForProxyId(proxyId: String, proxyName: String) {
         proxyApplicationMappingDAO.updateProxyNameForProxyId(proxyId, proxyName)
     }
 
-    suspend fun updateProxyForUnselectedApps(proxyId: String, proxyName: String) {
-        return proxyApplicationMappingDAO.updateProxyForUnselectedApps(proxyId, proxyName)
-    }
-
-    suspend fun updateUidForApp(uid: Int, packageName: String) {
-        proxyApplicationMappingDAO.updateUidForApp(uid, packageName)
+    suspend fun updateUidForApp(oldUid: Int, newUid: Int, packageName: String) {
+        proxyApplicationMappingDAO.updateUidForApp(oldUid, newUid, packageName)
     }
 
     suspend fun tombstoneApp(oldUid: Int, newUid: Int) {

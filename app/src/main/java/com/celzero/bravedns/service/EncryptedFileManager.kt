@@ -33,6 +33,7 @@ import java.io.FileNotFoundException
 import java.nio.charset.StandardCharsets
 import java.security.GeneralSecurityException
 import javax.crypto.AEADBadTagException
+import androidx.core.content.edit
 
 /**
  * Critical encryption exceptions that indicate unrecoverable keystore failures.
@@ -70,6 +71,12 @@ sealed class EncryptionException(message: String, cause: Throwable? = null) : Ex
 
 object EncryptedFileManager : KoinComponent {
     private const val LOG_TAG = "EncryptedFileManager"
+
+    // Constants for clearing Tink keyset stored in SharedPreferences.
+    // These match the package-private constants in androidx.security.crypto.EncryptedFile
+    // (KEYSET_PREF_NAME and KEYSET_ALIAS) used via AndroidKeysetManager.
+    private const val TINK_KEYSET_PREF_NAME = "__androidx_security_crypto_encrypted_file_pref__"
+    private const val TINK_KEYSET_KEY = "__androidx_security_crypto_encrypted_file_keyset__"
 
     // Inject EventLogger for critical failure logging
     private val eventLogger by inject<EventLogger>()
@@ -125,6 +132,30 @@ object EncryptedFileManager : KoinComponent {
     }
 
     /**
+     * Clears the corrupted Tink keyset from SharedPreferences so that subsequent
+     * [write] operations can succeed with a freshly generated keyset.
+     *
+     * After clearing, all existing encrypted files become permanently unreadable
+     * because they were encrypted with the old (now-discarded) keyset. Callers must
+     * regenerate their data from authoritative sources (backend, Play billing, etc.).
+     */
+    private fun destroyCorruptedKeyset(ctx: Context) {
+        try {
+            val prefs = ctx.applicationContext.getSharedPreferences(
+                TINK_KEYSET_PREF_NAME,
+                Context.MODE_PRIVATE
+            )
+            if (prefs.contains(TINK_KEYSET_KEY)) {
+                prefs.edit { remove(TINK_KEYSET_KEY) }
+                Logger.w(LOG_TAG, "Cleared corrupted Tink keyset from SharedPreferences; " +
+                        "future writes will create a fresh keyset, existing encrypted files are unrecoverable")
+            }
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG, "Failed to clear corrupted Tink keyset", e)
+        }
+    }
+
+    /**
      * Reads encrypted file as a String.
      *
      * @throws EncryptionException for any encryption/decryption failures
@@ -172,6 +203,7 @@ object EncryptedFileManager : KoinComponent {
             if (isKeysetCorruption(e)) {
                 Logger.w(LOG_TAG, "Keyset corruption detected during read of ${file.absolutePath}, " +
                         "clearing corrupted state for future writes", e)
+                destroyCorruptedKeyset(ctx)
             }
             throw handleCriticalException(e, "Read file", file.absolutePath)
         }
@@ -255,6 +287,7 @@ object EncryptedFileManager : KoinComponent {
             if (isKeysetCorruption(e)) {
                 Logger.w(LOG_TAG, "Keyset corruption detected for ${file.absolutePath}, " +
                         "clearing corrupted state and retrying write", e)
+                destroyCorruptedKeyset(ctx)
                 try {
                     return writeInternal(ctx, data, file)
                 } catch (retryEx: Exception) {
