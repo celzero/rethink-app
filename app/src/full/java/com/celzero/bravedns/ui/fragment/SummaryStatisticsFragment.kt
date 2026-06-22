@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -30,7 +31,6 @@ import com.celzero.bravedns.data.DataUsageSummary
 import com.celzero.bravedns.databinding.FragmentSummaryStatisticsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.DetailedStatisticsActivity
-import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
@@ -358,7 +358,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     private fun showTopActiveApps() {
         b.fssActiveAppsRecyclerView.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.fssActiveAppsRecyclerView.layoutManager = layoutManager
 
         val recyclerAdapter =
@@ -393,7 +393,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     private fun showAppNetworkActivity() {
         b.fssAppNetworkActivityRecyclerView.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.fssAppNetworkActivityRecyclerView.layoutManager = layoutManager
 
         val recyclerAdapter =
@@ -428,7 +428,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     private fun showBlockedApps() {
         b.fssAppBlockedRecyclerView.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.fssAppBlockedRecyclerView.layoutManager = layoutManager
 
         val recyclerAdapter =
@@ -463,7 +463,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     private fun showMostConnectedASN() {
         b.fssAsnAllowedRecyclerView.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.fssAsnAllowedRecyclerView.layoutManager = layoutManager
 
         contactedAsnAdapter =
@@ -501,7 +501,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     private fun showMostBlockedASN() {
         b.fssAsnBlockedRecyclerView.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.fssAsnBlockedRecyclerView.layoutManager = layoutManager
 
         blockedAsnAdapter =
@@ -544,7 +544,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
 
         b.fssContactedDomainRecyclerView.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.fssContactedDomainRecyclerView.layoutManager = layoutManager
 
         contactedDomainsAdapter =
@@ -587,7 +587,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             return
         }
         b.fssBlockedDomainRecyclerView.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.fssBlockedDomainRecyclerView.layoutManager = layoutManager
 
         blockedDomainsAdapter =
@@ -630,7 +630,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
 
         b.fssContactedIpsRecyclerView.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.fssContactedIpsRecyclerView.layoutManager = layoutManager
 
         contactedIpsAdapter = SummaryStatisticsAdapter(
@@ -672,7 +672,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
 
         b.fssBlockedIpsRecyclerView.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.fssBlockedIpsRecyclerView.layoutManager = layoutManager
 
         blockedIpsAdapter = SummaryStatisticsAdapter(
@@ -714,7 +714,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
 
         b.fssContactedCountriesRecyclerView.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.fssContactedCountriesRecyclerView.layoutManager = layoutManager
 
         contactedCountriesAdapter =

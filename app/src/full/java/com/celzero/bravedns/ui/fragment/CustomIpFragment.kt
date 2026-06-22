@@ -29,6 +29,7 @@ import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -44,7 +45,6 @@ import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
-import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -160,7 +160,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
     }
 
     private fun setupRecyclerView() {
-        layoutManager = CustomLinearLayoutManager(requireContext())
+        layoutManager = LinearLayoutManager(requireContext())
         b.cipRecycler.layoutManager = layoutManager
         b.cipRecycler.setHasFixedSize(true)
         if (rules == CustomRulesActivity.RULES.APP_SPECIFIC_RULES) {
