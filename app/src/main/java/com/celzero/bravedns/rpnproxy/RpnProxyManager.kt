@@ -52,6 +52,7 @@ import com.celzero.bravedns.service.EncryptionException
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.RPN_PROXY_FOLDER_NAME
 import com.celzero.bravedns.util.UIUtils
@@ -1360,8 +1361,8 @@ object RpnProxyManager : KoinComponent {
         //   (b) DB developerPayload is also not usable, OR accountExpiry hasn't been confirmed
         //       from the server yet (0 = never queried, or lags > 10 days behind billingExpiry).
         val needsFreshEntitlement = !existingPayloadValid && !dbPayloadValid
-            || (accExpiry == 0L && billingExpiry > 0L)
-            || (billingExpiry > 0L && billingExpiry != Long.MAX_VALUE && accExpiry < billingExpiry - tenDaysMs)
+                || (accExpiry == 0L && billingExpiry > 0L)
+                || (billingExpiry > 0L && billingExpiry != Long.MAX_VALUE && accExpiry < billingExpiry - tenDaysMs)
 
         var effectivePurchase = purchase
 
@@ -2644,8 +2645,7 @@ object RpnProxyManager : KoinComponent {
         cac.forEach {
             try {
                 val configId = Backend.RpnWin + it.key
-                if ((checkEligibilityBasedOnNw(it.id, usesMobileNw) ||
-                            checkEligibilityBasedOnSsid(it.id, ssid, usesMobileNw)) &&
+                if (isEligibleForNetwork(it.id, usesMobileNw, ssid, it.mobileOnly, it.ssidBased) &&
                     !proxyIds.contains(configId)
                 ) {
                     val id = if (configId.contains(AUTO_SERVER_ID, true)) {
@@ -2669,6 +2669,28 @@ object RpnProxyManager : KoinComponent {
         // the go-tun will check the routing based on the order of the list
         Logger.i(LOG_TAG_PROXY, "$TAG returning proxy ids for $uid, $ip, $port, $domain: $proxyIds")
         return proxyIds
+    }
+
+    private suspend fun isEligibleForNetwork(id: String, usesMobileNw: Boolean, ssid: String, mobileOnlySetting: Boolean, ssidEnabled: Boolean): Boolean {
+        if (!mobileOnlySetting && !ssidEnabled) return true
+
+        val passMobileOnly = mobileOnlySetting && (usesMobileNw && ssid.isEmpty())
+        val passSsid = ssidEnabled && !usesMobileNw && matchesSsidListForConfig(id, ssid)
+        return passMobileOnly || passSsid
+    }
+
+    // returns true if the current ssid is allowed by the SSID list configured for the wireguard.
+    // when the config is not found, returns false (fail-closed).
+    private suspend fun matchesSsidListForConfig(id: String, ssid: String): Boolean {
+        val config = winCacheMutex.withLock {
+            if (id == Backend.RpnWin || id.equals(AUTO_SERVER_ID, true)) winServersCache.find { it.id.equals(AUTO_SERVER_ID, true) }
+            else winServersCache.find { it.id == id || it.key == id }
+        }
+        if (config == null) {
+            Logger.e(LOG_TAG_PROXY, "matchesSsidListForConfig: config is null for id: $id")
+            return false
+        }
+        return matchesSsidList(config.ssids, ssid)
     }
 
     private suspend fun canUseConfig(
@@ -2697,7 +2719,7 @@ object RpnProxyManager : KoinComponent {
 
         val lockdown = config.lockdown
 
-        if (lockdown && (checkEligibilityBasedOnNw(id, usesMobileNw) || checkEligibilityBasedOnSsid(id, ssid, usesMobileNw))) {
+        if (lockdown && isEligibleForNetwork(id, usesMobileNw, ssid, config.mobileOnly, config.ssidBased)) {
             Logger.d(LOG_TAG_PROXY, "$TAG; lockdown wg for $type => return $id")
             return Pair(id, false) // no need to proceed further for lockdown
         }
@@ -2712,11 +2734,7 @@ object RpnProxyManager : KoinComponent {
         }
 
         // check if the config is active and if it can be used on this network
-        if (config.isEnabled && (checkEligibilityBasedOnNw(
-                id,
-                usesMobileNw
-            ) || checkEligibilityBasedOnSsid(id, ssid, usesMobileNw))
-        ) {
+        if (config.isEnabled && isEligibleForNetwork(id, usesMobileNw, ssid, config.mobileOnly, config.ssidBased)) {
             Logger.d(LOG_TAG_PROXY, "$TAG active wg for $type => add $id")
             return Pair(id, true)
         }
@@ -2726,117 +2744,6 @@ object RpnProxyManager : KoinComponent {
             "$TAG wg for $type not active or not eligible nw, return empty, for id: $id, usesMobileNw: $usesMobileNw, ssid: $ssid"
         )
         return Pair("", true)
-    }
-
-    // only when config is set to use on mobile network and current network is not mobile
-    // then return false, all other cases return true
-    private suspend fun checkEligibilityBasedOnNw(id: String, usesMobileNw: Boolean): Boolean {
-        if (id.isEmpty()) {
-            Logger.w(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnNw: id is empty")
-            return false
-        }
-
-        val actualId = id.substringAfter(Backend.RpnWin)
-        val config = winCacheMutex.withLock {
-            if (actualId == Backend.RpnWin || actualId.equals(AUTO_SERVER_ID, true)) winServersCache.find { it.id.equals(AUTO_SERVER_ID, true) }
-            else winServersCache.find { it.id == id || it.id == actualId || it.key == id || it.key == actualId }
-        }
-
-        if (config == null) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnNw: wg not found, id: $id, actualId: $actualId, cache size: ${winServersCache.size}")
-            return false
-        }
-
-        if (config.mobileOnly && usesMobileNw) {
-            Logger.i(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnNw: mobileOnly is true for ${config.key}, but mobile nw, return true")
-            return true
-        }
-
-        Logger.d(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnNw: not eligible for mobile nw: $usesMobileNw, mobile-only: ${config.mobileOnly}, key: ${config.key}")
-        return false
-    }
-
-    private suspend fun checkEligibilityBasedOnSsid(id: String, ssid: String, usesMobileNw: Boolean): Boolean {
-        if (id.isEmpty()) {
-            Logger.w(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnSsid: id is empty")
-            return false
-        }
-
-        val actualId = id.substringAfter(Backend.RpnWin)
-        val config = winCacheMutex.withLock {
-            if (actualId == Backend.RpnWin || actualId.equals(AUTO_SERVER_ID, true)) winServersCache.find { it.id.equals(AUTO_SERVER_ID, true) }
-            winServersCache.find { it.id == id || it.id == actualId || it.key == id || it.key == actualId }
-        }
-
-        if (config == null) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnSsid: wg not found, id: $id, actualId: $actualId, cache size: ${winServersCache.size}")
-            return false
-        }
-
-        if (usesMobileNw && ssid.isEmpty()) {
-            Logger.i(LOG_TAG_PROXY, "canAdd: mobile nw, return false")
-            return false
-        }
-
-        if (config.ssidBased) {
-            val ssidItems = SsidItem.parseStorageList(config.ssids)
-            if (ssidItems.isEmpty() && ssid.isNotEmpty()) { // treat empty as match all
-                Logger.d(
-                    LOG_TAG_PROXY,
-                    "$TAG; checkEligibilityBasedOnSsid: ssidEnabled is true, but ssid list is empty, match all"
-                )
-                return true
-            }
-
-            val notEqualItems = ssidItems.filter { !it.type.isEqual }
-            val notEqualMatch = notEqualItems.any { ssidItem ->
-                when {
-                    ssidItem.type.isExact -> {
-                        ssidItem.name.equals(ssid, ignoreCase = true)
-                    }
-
-                    else -> { // wildcard
-                        matchesWildcard(ssidItem.name, ssid)
-                    }
-                }
-            }
-
-            if (notEqualMatch) {
-                Logger.d(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnSsid: ssid matched in NOT_EQUAL items, return false")
-                return false
-            }
-
-            val equalItems = ssidItems.filter { it.type.isEqual }
-            // If there are only NOT_EQUAL items and none matched, return true
-            if (equalItems.isEmpty() && notEqualItems.isNotEmpty()) {
-                Logger.d(
-                    LOG_TAG_PROXY,
-                    "$TAG; checkEligibilityBasedOnSsid: only NOT_EQUAL items present and none matched, return true"
-                )
-                return true
-            }
-
-            // Check EQUAL items (exact or wildcard)
-            val equalMatch = equalItems.any { ssidItem ->
-                when {
-                    ssidItem.type.isExact -> {
-                        ssidItem.name.equals(ssid, ignoreCase = true)
-                    }
-
-                    else -> { // wildcard
-                        matchesWildcard(ssidItem.name, ssid)
-                    }
-                }
-            }
-
-            if (!equalMatch) {
-                Logger.d(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnSsid: ssid did not match in EQUAL items, return false")
-                return false
-            }
-        }
-
-        Logger.d(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnSsid: eligible for ssid: $ssid")
-        return true
     }
 
     private fun matchesWildcard(pattern: String, text: String): Boolean {
