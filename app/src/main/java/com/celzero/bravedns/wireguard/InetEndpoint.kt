@@ -18,8 +18,6 @@
  */
 package com.celzero.bravedns.wireguard
 
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import java.net.Inet4Address
 import java.net.InetAddress
 import java.net.URI
@@ -38,7 +36,6 @@ import java.util.regex.Pattern
 class InetEndpoint
 private constructor(val host: String, private val isResolved: Boolean, val port: Int) {
     private val lock = Any()
-    private val mutex = Mutex()
     private var lastResolution = Instant.EPOCH
     private var resolved: InetEndpoint? = null
 
@@ -55,10 +52,9 @@ private constructor(val host: String, private val isResolved: Boolean, val port:
      *
      * @return the resolved endpoint, or [Optional.empty]
      */
-    suspend fun getResolved(): Optional<InetEndpoint> {
+    fun getResolved(): Optional<InetEndpoint> {
         if (isResolved) return Optional.of(this)
-        mutex.withLock {
-
+        synchronized(lock) {
             // TODO(zx2c4): Implement a real timeout mechanism using DNS TTL
             if (Duration.between(lastResolution, Instant.now()).toMinutes() > 1) {
                 try {

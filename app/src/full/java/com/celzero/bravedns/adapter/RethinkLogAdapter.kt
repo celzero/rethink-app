@@ -26,6 +26,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
@@ -238,135 +239,140 @@ class RethinkLogAdapter(private val context: Context) :
         }
 
         private fun displaySummaryDetails(log: RethinkLog) {
-            val connType = ConnectionTracker.ConnType.get(log.connType)
-            b.connectionDataUsage.text = ""
-            b.connectionDelay.text = ""
-            if (
-                log.duration == 0 &&
-                log.downloadBytes == 0L &&
-                log.uploadBytes == 0L &&
-                log.message.isEmpty()
-            ) {
-                var hasMinSummary = false
-                if (VpnController.hasCid(log.connId, log.uid)) {
-                    b.connectionSummaryLl.visibility = View.VISIBLE
-                    b.connectionDataUsage.text = context.getString(R.string.lbl_active)
-                    b.connectionDuration.text = context.getString(R.string.symbol_green_circle)
-                    b.connectionDelay.text = ""
-                    hasMinSummary = true
-                } else {
+            io {
+                val connType = ConnectionTracker.ConnType.get(log.connType)
+                val hasCid = VpnController.hasCid(log.connId, log.uid)
+                uiCtx {
                     b.connectionDataUsage.text = ""
-                    b.connectionDuration.text =""
-                }
-                if (connType.isMetered()) {
-                    b.connectionDelay.text = context.getString(R.string.symbol_currency)
-                    hasMinSummary = true
-                } else {
                     b.connectionDelay.text = ""
-                }
+                    if (
+                        log.duration == 0 &&
+                        log.downloadBytes == 0L &&
+                        log.uploadBytes == 0L &&
+                        log.message.isEmpty()
+                    ) {
+                        var hasMinSummary = false
+                        if (hasCid) {
+                            b.connectionSummaryLl.visibility = View.VISIBLE
+                            b.connectionDataUsage.text = context.getString(R.string.lbl_active)
+                            b.connectionDuration.text = context.getString(R.string.symbol_green_circle)
+                            b.connectionDelay.text = ""
+                            hasMinSummary = true
+                        } else {
+                            b.connectionDataUsage.text = ""
+                            b.connectionDuration.text =""
+                        }
+                        if (connType.isMetered()) {
+                            b.connectionDelay.text = context.getString(R.string.symbol_currency)
+                            hasMinSummary = true
+                        } else {
+                            b.connectionDelay.text = ""
+                        }
 
-                if (isRpnProxy(log.rpid)) {
+                        if (isRpnProxy(log.rpid)) {
+                            b.connectionSummaryLl.visibility = View.VISIBLE
+                            b.connectionDelay.text =
+                                context.getString(
+                                    R.string.ci_desc,
+                                    b.connectionDelay.text,
+                                    context.getString(R.string.symbol_sparkle)
+                                )
+                        } else if (isConnectionProxied(log.blockedByRule, log.proxyDetails)) {
+                            b.connectionSummaryLl.visibility = View.VISIBLE
+                            b.connectionDelay.text =
+                                context.getString(
+                                    R.string.ci_desc,
+                                    b.connectionDelay.text,
+                                    context.getString(R.string.symbol_key)
+                                )
+                            hasMinSummary = true
+                        }
+                        if (!hasMinSummary) {
+                            b.connectionSummaryLl.visibility = View.GONE
+                        }
+                        return@uiCtx
+                    }
+
                     b.connectionSummaryLl.visibility = View.VISIBLE
-                    b.connectionDelay.text =
+                    val duration = getDurationInHumanReadableFormat(context, log.duration)
+                    b.connectionDuration.text = context.getString(R.string.single_argument, duration)
+                    // add unicode for download and upload
+                    val download =
                         context.getString(
-                            R.string.ci_desc,
-                            b.connectionDelay.text,
-                            context.getString(R.string.symbol_sparkle)
+                            R.string.symbol_download,
+                            Utilities.humanReadableByteCount(log.downloadBytes, true)
                         )
-                } else if (isConnectionProxied(log.blockedByRule, log.proxyDetails)) {
-                    b.connectionSummaryLl.visibility = View.VISIBLE
-                    b.connectionDelay.text =
+                    val upload =
                         context.getString(
-                            R.string.ci_desc,
-                            b.connectionDelay.text,
-                            context.getString(R.string.symbol_key)
+                            R.string.symbol_upload,
+                            Utilities.humanReadableByteCount(log.uploadBytes, true)
                         )
-                    hasMinSummary = true
+                    b.connectionDataUsage.text = context.getString(R.string.two_argument, upload, download)
+                    b.connectionDelay.text = ""
+                    if (connType.isMetered()) {
+                        b.connectionDelay.text =
+                            context.getString(
+                                R.string.ci_desc,
+                                b.connectionDelay.text,
+                                context.getString(R.string.symbol_currency)
+                            )
+                    }
+                    if (isConnectionHeavier(log)) {
+                        b.connectionDelay.text =
+                            context.getString(
+                                R.string.ci_desc,
+                                b.connectionDelay.text,
+                                context.getString(R.string.symbol_heavy)
+                            )
+                    }
+                    if (isConnectionSlower(log)) {
+                        b.connectionDelay.text =
+                            context.getString(
+                                R.string.ci_desc,
+                                b.connectionDelay.text,
+                                context.getString(R.string.symbol_turtle)
+                            )
+                    }
+                    // bunny in case rpid as present, key in case of proxy
+                    // bunny and key indicate conn is proxied, so its enough to show one of them
+                    if (isRpnProxy(log.rpid)) {
+                        b.connectionSummaryLl.visibility = View.VISIBLE
+                        b.connectionDelay.text =
+                            context.getString(
+                                R.string.ci_desc,
+                                b.connectionDelay.text,
+                                context.getString(R.string.symbol_sparkle)
+                            )
+                    } else if (containsRelayProxy(log.rpid)) {
+                        b.connectionDelay.text =
+                            context.getString(
+                                R.string.ci_desc,
+                                b.connectionDelay.text,
+                                context.getString(R.string.symbol_bunny)
+                            )
+                    } else if (isConnectionProxied(log.blockedByRule, log.proxyDetails)) {
+                        b.connectionDelay.text =
+                            context.getString(
+                                R.string.ci_desc,
+                                b.connectionDelay.text,
+                                context.getString(R.string.symbol_key)
+                            )
+                    }
+
+                    // rtt -> show rocket if less than 20ms, treat it as rtt
+                    if (isRoundTripShorter(log.synack, log.isBlocked)) {
+                        b.connectionDelay.text =
+                            context.getString(
+                                R.string.ci_desc,
+                                b.connectionDelay.text,
+                                context.getString(R.string.symbol_rocket)
+                            )
+                    }
+
+                    if (b.connectionDelay.text.isEmpty() && b.connectionDataUsage.text.isEmpty()) {
+                        b.connectionSummaryLl.visibility = View.GONE
+                    }
                 }
-                if (!hasMinSummary) {
-                    b.connectionSummaryLl.visibility = View.GONE
-                }
-                return
-            }
-
-            b.connectionSummaryLl.visibility = View.VISIBLE
-            val duration = getDurationInHumanReadableFormat(context, log.duration)
-            b.connectionDuration.text = context.getString(R.string.single_argument, duration)
-            // add unicode for download and upload
-            val download =
-                context.getString(
-                    R.string.symbol_download,
-                    Utilities.humanReadableByteCount(log.downloadBytes, true)
-                )
-            val upload =
-                context.getString(
-                    R.string.symbol_upload,
-                    Utilities.humanReadableByteCount(log.uploadBytes, true)
-                )
-            b.connectionDataUsage.text = context.getString(R.string.two_argument, upload, download)
-            b.connectionDelay.text = ""
-            if (connType.isMetered()) {
-                b.connectionDelay.text =
-                    context.getString(
-                        R.string.ci_desc,
-                        b.connectionDelay.text,
-                        context.getString(R.string.symbol_currency)
-                    )
-            }
-            if (isConnectionHeavier(log)) {
-                b.connectionDelay.text =
-                    context.getString(
-                        R.string.ci_desc,
-                        b.connectionDelay.text,
-                        context.getString(R.string.symbol_heavy)
-                    )
-            }
-            if (isConnectionSlower(log)) {
-                b.connectionDelay.text =
-                    context.getString(
-                        R.string.ci_desc,
-                        b.connectionDelay.text,
-                        context.getString(R.string.symbol_turtle)
-                    )
-            }
-            // bunny in case rpid as present, key in case of proxy
-            // bunny and key indicate conn is proxied, so its enough to show one of them
-            if (isRpnProxy(log.rpid)) {
-                b.connectionSummaryLl.visibility = View.VISIBLE
-                b.connectionDelay.text =
-                    context.getString(
-                        R.string.ci_desc,
-                        b.connectionDelay.text,
-                        context.getString(R.string.symbol_sparkle)
-                    )
-            } else if (containsRelayProxy(log.rpid)) {
-                b.connectionDelay.text =
-                    context.getString(
-                        R.string.ci_desc,
-                        b.connectionDelay.text,
-                        context.getString(R.string.symbol_bunny)
-                    )
-            } else if (isConnectionProxied(log.blockedByRule, log.proxyDetails)) {
-                b.connectionDelay.text =
-                    context.getString(
-                        R.string.ci_desc,
-                        b.connectionDelay.text,
-                        context.getString(R.string.symbol_key)
-                    )
-            }
-
-            // rtt -> show rocket if less than 20ms, treat it as rtt
-            if (isRoundTripShorter(log.synack, log.isBlocked)) {
-                b.connectionDelay.text =
-                    context.getString(
-                        R.string.ci_desc,
-                        b.connectionDelay.text,
-                        context.getString(R.string.symbol_rocket)
-                    )
-            }
-
-            if (b.connectionDelay.text.isEmpty() && b.connectionDataUsage.text.isEmpty()) {
-                b.connectionSummaryLl.visibility = View.GONE
             }
         }
 
@@ -409,10 +415,20 @@ class RethinkLogAdapter(private val context: Context) :
     }
 
     private fun io(f: suspend () -> Unit) {
-        (context as LifecycleOwner).lifecycleScope.launch(Dispatchers.IO) { f() }
+        val owner = context as? LifecycleOwner ?: return
+
+        owner.lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        val owner = context as? LifecycleOwner ?: return
+
+        withContext(Dispatchers.Main.immediate) {
+            if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                return@withContext
+            }
+
+            f()
+        }
     }
 }

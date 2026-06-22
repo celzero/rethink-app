@@ -328,7 +328,7 @@ object VpnController : KoinComponent {
         return t
     }
 
-    fun hasCid(cid: String, uid: Int): Boolean {
+    suspend fun hasCid(cid: String, uid: Int): Boolean {
         return braveVpnService?.hasCid(cid, uid) ?: false
     }
 

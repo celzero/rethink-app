@@ -283,21 +283,26 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun updateConnectionStatus(logInfo: RethinkLog) {
-        if (VpnController.hasCid(logInfo.connId, logInfo.uid)) {
-            b.connectionMessageLl.visibility = View.VISIBLE
-            b.bsConnConnDuration.text =
-                getString(
-                    R.string.two_argument_space,
-                    getString(R.string.lbl_active),
-                    getString(R.string.symbol_green_circle)
-                )
-        } else {
-            b.bsConnConnDuration.text =
-                getString(
-                    R.string.two_argument_space,
-                    getString(R.string.symbol_hyphen),
-                    getString(R.string.symbol_clock)
-                )
+        io {
+            val hasCid = VpnController.hasCid(logInfo.connId, logInfo.uid)
+            uiCtx {
+                if (hasCid) {
+                    b.connectionMessageLl.visibility = View.VISIBLE
+                    b.bsConnConnDuration.text =
+                        getString(
+                            R.string.two_argument_space,
+                            getString(R.string.lbl_active),
+                            getString(R.string.symbol_green_circle)
+                        )
+                } else {
+                    b.bsConnConnDuration.text =
+                        getString(
+                            R.string.two_argument_space,
+                            getString(R.string.symbol_hyphen),
+                            getString(R.string.symbol_clock)
+                        )
+                }
+            }
         }
     }
 
@@ -426,6 +431,6 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) { if (isAdded) f() }
     }
 }
