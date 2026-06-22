@@ -1193,7 +1193,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     private fun isIfaceCellular(dst: String): Boolean {
         if (dst.isEmpty()) {
             val isActiveCellular = isActiveIfaceCellular()
-            Logger.e(LOG_TAG_VPN, "empty destination ip, active cellular? $isActiveCellular")
+            Logger.vv(LOG_TAG_VPN, "empty destination ip, active cellular? $isActiveCellular")
             return isActiveCellular
         }
         val dest = IPAddressString(dst)
