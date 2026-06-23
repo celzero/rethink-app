@@ -38,10 +38,18 @@ interface DnsLogDAO {
     @Query("select * from DNSLogs order by id desc LIMIT $MAX_LOGS")
     fun getAllDnsLogs(): PagingSource<Int, DnsLog>
 
+    @Query("select * from DNSLogs where uid = :uid order by id desc LIMIT $MAX_LOGS")
+    fun getAllDnsLogs(uid: Int): PagingSource<Int, DnsLog>
+
     @Query(
         "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString or appName like :searchString) order by id desc LIMIT $MAX_LOGS"
     )
     fun getDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
+
+    @Query(
+        "select * from DNSLogs where uid = :uid and (queryStr like :searchString or responseIps like :searchString or appName like :searchString) order by id desc LIMIT $MAX_LOGS"
+    )
+    fun getDnsLogsByName(searchString: String, uid: Int): PagingSource<Int, DnsLog>
 
     @Query("select * from DNSLogs where proxyId like :wgDnsId order by id desc LIMIT $MAX_LOGS")
     fun getDnsLogsForWireGuard(wgDnsId: String): PagingSource<Int, DnsLog>

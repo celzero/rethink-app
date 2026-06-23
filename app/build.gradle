@@ -2,6 +2,10 @@ plugins {
     id 'com.android.application'
     id 'com.google.devtools.ksp'
     id 'kotlin-android'
+    // rethink-tv fork: Compose Compiler plugin for the `tv` flavor's
+    // Compose-for-TV UI. Safe to apply project-wide — phone variants
+    // contain no @Composable and the plugin then no-ops.
+    id 'org.jetbrains.kotlin.plugin.compose'
 }
 
 // apply Google Services and Firebase Crashlytics plugins conditionally
@@ -240,6 +244,11 @@ android {
     buildFeatures {
         viewBinding true
         buildConfig true
+        // rethink-tv fork: Compose UI for the `tv` flavor. Project-wide so
+        // the Compose Compiler picks up @Composable declarations under
+        // `app/src/tv/`. Phone variants have no @Composable code so this
+        // costs nothing at compile time.
+        compose true
     }
 
     compileOptions {
@@ -279,9 +288,83 @@ android {
             versionName = gitVersion
             vectorDrawables.useSupportLibrary = true
         }
+        // Android TV flavor (rethink-tv fork addition).
+        // Peer of `full` in the releaseType dimension. Inherits the entire
+        // upstream `app/src/full/` source set (java + res + manifest) so the
+        // engine and shared `app/src/main/` code compile unchanged. Phase 2
+        // intentionally reuses upstream's phone UI to validate the build /
+        // distribution pipeline; the dedicated Compose-for-TV navigation host
+        // is introduced in a subsequent phase (`tv-ux-dashboard`). The TV
+        // override surface lives in `app/src/tv/` and is layered on top of
+        // `full/` via the `sourceSets` block below. See README for the fork
+        // notice and `docs/` for the upstream-sync workflow.
+        tv {
+            dimension "releaseType"
+            applicationIdSuffix ".tv"
+            versionCode = getVersionCode()
+            versionName = gitVersion
+            vectorDrawables.useSupportLibrary = true
+        }
+    }
+
+    // The `tv` flavor inherits the entire `full` source set so that engine /
+    // service / view-model classes upstream keeps in `app/src/full/` (which
+    // shared `app/src/main/` code references via constants like `ID_WG_BASE`)
+    // are visible to the `tv` variants. The `app/src/tv/` source set then
+    // layers TV-specific resources (e.g. `strings.xml` to rename the app to
+    // "Rethink TV") and a TV launcher Activity on top via the standard
+    // Android resource / manifest overlay rules. `src/tv/AndroidManifest.xml`
+    // is the flavor's primary manifest — see that file for the rationale
+    // (it currently mirrors full's manifest and adds the TV launcher).
+    sourceSets {
+        tv {
+            java.srcDirs += ['src/full/java']
+            res.srcDirs += ['src/full/res']
+        }
     }
     lint {
         abortOnError true
+    }
+
+    // ------------------------------------------------------------------
+    // rethink-tv fork: env-var-based signing for the `release` build type
+    // when used to ship TV builds via GitHub Actions.
+    //
+    // When the CI workflow `.github/workflows/android-tv-release.yml`
+    // injects the `TV_RELEASE_KS_*` secrets, we:
+    //   1. create a `tvRelease` signing config that reads those env vars
+    //      (same shape as upstream's `alpha` signing config — see line 101
+    //      of this file)
+    //   2. attach it to the `release` build type so that
+    //      `assembleFdroidTvRelease` produces a signed APK suitable for
+    //      attaching to a GitHub Release.
+    //
+    // When the env vars are NOT set (local builds, `🫣 Android CI`, the
+    // `📺 Android TV CI` debug job, manual unsigned-release dry runs):
+    //   - upstream's existing `keystore.properties`-based `config` signing
+    //     config remains the only signing config that touches `release`,
+    //     preserving 100% upstream behaviour for phone builds.
+    //
+    // This block intentionally does not modify upstream's existing signing
+    // configs or build types — it only conditionally appends.
+    // ------------------------------------------------------------------
+    def tvKsAlias = System.getenv("TV_RELEASE_KS_ALIAS")
+    def tvKsPassphrase = System.getenv("TV_RELEASE_KS_PASSPHRASE")
+    def tvKsFile = System.getenv("TV_RELEASE_KS_FILE")
+    def tvKsStorePassphrase = System.getenv("TV_RELEASE_KS_STORE_PASSPHRASE")
+    if (tvKsAlias && tvKsPassphrase && tvKsFile && tvKsStorePassphrase) {
+        signingConfigs {
+            tvRelease {
+                keyAlias tvKsAlias
+                keyPassword tvKsPassphrase
+                storeFile file(tvKsFile)
+                storePassword tvKsStorePassphrase
+            }
+        }
+        buildTypes.release.signingConfig = signingConfigs.tvRelease
+        println("rethink-tv: TV_RELEASE_KS_* env vars detected; 'release' build type will be signed with signingConfigs.tvRelease")
+    } else {
+        println("rethink-tv: TV_RELEASE_KS_* env vars NOT set; 'release' builds will be unsigned (upstream default)")
     }
 }
 
@@ -424,6 +507,105 @@ dependencies {
     fullImplementation 'androidx.navigation:navigation-ui-ktx:2.9.6'
 
     fullImplementation 'androidx.biometric:biometric:1.1.0'
+
+    // ------------------------------------------------------------------
+    // rethink-tv fork: Android TV flavor (`tv`) dependencies.
+    // The `tv` flavor's source set inherits `app/src/full/` (configured in
+    // the `android.sourceSets` block above), so it needs the same UI /
+    // runtime dependencies that `fullImplementation` provides. This block
+    // mirrors them as `tvImplementation` declarations. It is intentionally
+    // append-only and does not modify upstream's existing declarations,
+    // keeping the upstream-sync diff minimal.
+    //
+    // Note: `firestackDependency()` is NOT mirrored here because firestack
+    // is scoped by `releaseChannel` (play / fdroid / website) above, and
+    // the `tv` flavor lives in the orthogonal `releaseType` dimension —
+    // each combined variant (e.g. `fdroidTv`) already picks up firestack
+    // via `fdroidImplementation`. Mirroring here would double-add it.
+    // ------------------------------------------------------------------
+    tvImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20'
+    tvImplementation 'androidx.appcompat:appcompat:1.7.1'
+    tvImplementation 'androidx.core:core-ktx:1.17.0'
+    tvImplementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+    tvImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    tvImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2'
+    tvImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2'
+    tvImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4'
+    tvImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.9.4'
+    tvImplementation 'androidx.fragment:fragment-ktx:1.8.9'
+    tvImplementation 'androidx.viewpager2:viewpager2:1.1.0'
+    tvImplementation 'com.squareup.okhttp3:okhttp:5.3.2'
+    tvImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:5.3.2'
+    tvImplementation 'com.squareup.okhttp3:logging-interceptor:5.3.2'
+    tvImplementation 'com.squareup.retrofit2:retrofit:3.0.0'
+    tvImplementation 'com.squareup.retrofit2:converter-gson:3.0.0'
+    tvImplementation('com.github.bumptech.glide:glide:5.0.5') {
+        exclude group: 'glide-parent'
+    }
+    tvImplementation('com.github.bumptech.glide:okhttp3-integration:5.0.5') {
+        exclude group: 'glide-parent'
+    }
+    kspTv 'com.github.bumptech.glide:compiler:5.0.5'
+    tvImplementation 'com.facebook.shimmer:shimmer:0.5.0'
+    tvImplementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.9'
+    tvImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
+    tvImplementation 'androidx.navigation:navigation-fragment-ktx:2.9.6'
+    tvImplementation 'androidx.navigation:navigation-ui-ktx:2.9.6'
+    tvImplementation 'androidx.biometric:biometric:1.1.0'
+    tvImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+    tvImplementation 'com.simplecityapps:recyclerview-fastscroll:2.0.1'
+    tvImplementation 'nl.dionsegijn:konfetti-xml:2.0.5'
+
+    // ------------------------------------------------------------------
+    // rethink-tv fork: Compose-for-TV stack for the `tv` flavor.
+    // The Compose Compiler plugin (applied project-wide so a single
+    // `id 'org.jetbrains.kotlin.plugin.compose'` covers every variant)
+    // performs a classpath check at compile time on every applied variant,
+    // including phone variants that contain zero @Composable code. To
+    // satisfy that check without pulling the full UI stack into phone
+    // builds, we expose only the BOM and the runtime artifact to all
+    // variants; the rest (ui, foundation, material3, tv-material,
+    // navigation-compose, etc.) stays scoped to `tvImplementation`.
+    // Cost to phone variants: ~250 KB of unused Compose runtime classes,
+    // which never get loaded because phone code never invokes @Composable.
+    // ------------------------------------------------------------------
+    implementation platform('androidx.compose:compose-bom:2024.12.01')
+    implementation 'androidx.compose.runtime:runtime'
+
+    tvImplementation platform('androidx.compose:compose-bom:2024.12.01')
+    tvImplementation 'androidx.compose.ui:ui'
+    tvImplementation 'androidx.compose.ui:ui-tooling-preview'
+    tvImplementation 'androidx.compose.foundation:foundation'
+    tvImplementation 'androidx.compose.runtime:runtime-livedata'
+    tvImplementation 'androidx.compose.material3:material3'
+    // TV-styled Material 3 components (focusable Surface / Button /
+    // Card with the focus borders Android TV users expect).
+    tvImplementation 'androidx.tv:tv-material:1.0.0'
+    tvImplementation 'androidx.activity:activity-compose:1.9.3'
+    tvImplementation 'androidx.lifecycle:lifecycle-runtime-compose:2.8.7'
+    tvImplementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7'
+    // Koin's Compose extensions (`koinInject` / `koinViewModel`) so the TV
+    // UI can pull `PersistentState` and other injected singletons without
+    // hand-wiring KoinComponent into every Composable.
+    tvImplementation 'io.insert-koin:koin-androidx-compose:4.1.1'
+    // Compose Navigation drives the TV NavHost. Used in tandem with the
+    // tv-material NavigationDrawer to host every TV destination
+    // (Home / DNS / Firewall / Apps / Proxy / Logs / Stats / Settings)
+    // inside a single Activity, avoiding new <activity> declarations in
+    // the TV-flavor manifest.
+    tvImplementation 'androidx.navigation:navigation-compose:2.8.5'
+    // Material Icons Extended supplies the leanback iconography
+    // (Shield, Dns, Apps, Hub, Article, Insights, Settings, Home) that
+    // the TV nav rail needs. Scoped to `tvImplementation` so phone
+    // variants never pull the ~3 MB icon font.
+    tvImplementation 'androidx.compose.material:material-icons-extended'
+    // Paging-Compose provides `collectAsLazyPagingItems()` and the
+    // `items()` overload that consume PagingSource directly — the Logs
+    // destination feeds it ConnectionTrackerDAO.getConnectionTrackerByName()
+    // verbatim, so we don't have to recreate the upstream paging
+    // pipeline. Scoped to tvImplementation; phone variants use their
+    // existing Fragment + Paging-Runtime adapter.
+    tvImplementation 'androidx.paging:paging-compose:3.3.5'
 
     playImplementation 'com.google.android.play:app-update:2.1.0'
     playImplementation 'com.google.android.play:app-update-ktx:2.1.0'
