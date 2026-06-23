@@ -7,7 +7,13 @@ import java.io.FileInputStream
 plugins {
     id("com.android.application")
     id("com.google.devtools.ksp")
+    // rethink-tv fork: Compose Compiler plugin for the `tv` flavor's
+    // Compose-for-TV UI. Safe to apply project-wide — phone variants
+    // contain no @Composable and the plugin then no-ops.
     id("org.jetbrains.kotlin.plugin.compose")
+    // To generate a BOM in CycloneDX format:
+    // ./gradlew cyclonedxBom
+    // id("org.cyclonedx.bom") version "3.2.4"
 }
 
 // apply Google Services and Firebase Crashlytics plugins conditionally
@@ -25,11 +31,14 @@ val isFdroidBuildServer = !fdroidBuildServer.isNullOrEmpty() && fdroidBuildServe
 val deGoogled = !apkBuild || fdroidBuild || isFdroidBuildServer || alphaBuild
 val shouldSplit = !alphaBuild
 
-// Pass -PwebsiteDegoogled=true for fdroid builds signed for website distribution.
+// Pass -PwebsiteDegoogled=true when building the fdroid flavor with our own keys.
+// Official F-Droid builds omit this flag and will be labeled as "fdroid".
 val isWebsiteDegoogled = providers.gradleProperty("websiteDegoogled")
     .orNull?.toBoolean() ?: false
 
-// Supply google-services.json from the adjacent private firebase directory for local builds.
+// Add google-services.json only for play/website builds.
+// local dev: copy from the sibling ../firebase/{debug,release} directory (gitignored, outside repo).
+// CI: the secret is written to app/src/google-services.json by GitHub Actions, so no local copy is needed.
 if (!deGoogled) {
     val isRelease = gradle.startParameter.taskNames.any { it.contains("release", ignoreCase = true) }
     val buildTypeName = if (isRelease) "release" else "debug"
@@ -71,9 +80,9 @@ println("gradle alphaBuild? $alphaBuild, should split? $shouldSplit")
 if (!deGoogled) {
     apply(plugin = "com.google.gms.google-services")
     apply(plugin = "com.google.firebase.crashlytics")
-    println("app firebase plugins applied")
+    logger.info("app firebase plugins applied")
 } else {
-    println("app firebase plugins SKIPPED")
+    logger.info("app firebase plugins SKIPPED")
 }
 
 val keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -172,10 +181,10 @@ android {
     splits {
         abi {
             if (!shouldSplit) {
-                println("universal apk only (splits disabled)")
+                logger.info("universal apk only (splits disabled)")
                 isEnable = false
             } else {
-                println("split apks and universal apk (splits enabled)")
+                logger.info("split apks and universal apk (splits enabled)")
                 isEnable = true
                 reset()
                 // comma-separated list of ABIs to generate apks for
@@ -295,6 +304,7 @@ android {
         }
         create("fdroid") {
             dimension = "releaseChannel"
+            // true only when built with -PwebsiteDegoogled=true (our own keys).
             buildConfigField("boolean", "IS_WEBSITE_DEGOOGLD_BUILD", isWebsiteDegoogled.toString())
         }
         create("website") {
