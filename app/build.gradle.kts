@@ -24,17 +24,17 @@ val isFdroidBuildServer = !fdroidBuildServer.isNullOrEmpty() && fdroidBuildServe
 val deGoogled = !apkBuild || fdroidBuild || isFdroidBuildServer
 val shouldSplit = !alphaBuild
 
-println("app-task names: '$taskNames'")
-println("gradle deGoogled? $deGoogled (fdroidBuild: $fdroidBuild, fdroidBuildServer: $isFdroidBuildServer, apkBuild: $apkBuild)")
-println("gradle alphaBuild? $alphaBuild, should split? $shouldSplit")
+logger.info("app-task names: '$taskNames'")
+logger.info("gradle deGoogled? $deGoogled (fdroidBuild: $fdroidBuild, fdroidBuildServer: $isFdroidBuildServer, apkBuild: $apkBuild)")
+logger.info("gradle alphaBuild? $alphaBuild, should split? $shouldSplit")
 
 // don't apply firebase plugins for fdroid CLI builds
 if (!deGoogled) {
     apply(plugin = "com.google.gms.google-services")
     apply(plugin = "com.google.firebase.crashlytics")
-    println("app firebase plugins applied")
+    logger.info("app firebase plugins applied")
 } else {
-    println("app firebase plugins SKIPPED")
+    logger.info("app firebase plugins SKIPPED")
 }
 
 val keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -124,10 +124,10 @@ android {
     splits {
         abi {
             if (!shouldSplit) {
-                println("universal apk only (splits disabled)")
+                logger.info("universal apk only (splits disabled)")
                 isEnable = false
             } else {
-                println("split apks and universal apk (splits enabled)")
+                logger.info("split apks and universal apk (splits enabled)")
                 isEnable = true
                 reset()
                 // comma-separated list of ABIs to generate apks for
