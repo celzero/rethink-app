@@ -15,24 +15,28 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.liveData
+import androidx.paging.cachedIn
 import com.celzero.bravedns.database.Event
 import com.celzero.bravedns.database.EventDao
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.Severity
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.update
 
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class EventsViewModel(private val eventDao: EventDao) : ViewModel() {
 
-    private val filteredQuery = MutableLiveData<String>()
-    private val filteredSeverity = MutableLiveData<Severity?>()
-    private val filteredSources = MutableLiveData<Set<EventSource>>()
+    private val _filterQuery = MutableStateFlow("")
+    private val _filterSeverity = MutableStateFlow<Severity?>(null)
+    private val _filterSources = MutableStateFlow<Set<EventSource>>(emptySet())
 
     companion object {
         private const val PAGE_SIZE = 50
@@ -46,26 +50,22 @@ class EventsViewModel(private val eventDao: EventDao) : ViewModel() {
 
     private var filterType: TopLevelFilter = TopLevelFilter.ALL
 
-    init {
-        filteredQuery.value = ""
-        filteredSeverity.value = null
-        filteredSources.value = emptySet()
-    }
+    val eventsFlow: kotlinx.coroutines.flow.Flow<PagingData<Event>> =
+        kotlinx.coroutines.flow.combine(
+            _filterQuery,
+            _filterSeverity,
+            _filterSources
+        ) { query, severity, sources ->
+            Triple(query, severity, sources)
+        }.flatMapLatest { (query, severity, sources) ->
+            getEventsPagingData(query, severity, sources)
+        }.cachedIn(viewModelScope)
 
-    val eventsList: LiveData<PagingData<Event>> =
-        filteredQuery.switchMap { query ->
-            filteredSeverity.switchMap { severity ->
-                filteredSources.switchMap { sources ->
-                    getEventsLiveData(query, severity, sources)
-                }
-            }
-        }
-
-    private fun getEventsLiveData(
+    private fun getEventsPagingData(
         query: String,
         severity: Severity?,
         sources: Set<EventSource>
-    ): LiveData<PagingData<Event>> {
+    ): kotlinx.coroutines.flow.Flow<PagingData<Event>> {
         return Pager<Int, Event>(
             config = PagingConfig(
                 pageSize = PAGE_SIZE,
@@ -99,13 +99,13 @@ class EventsViewModel(private val eventDao: EventDao) : ViewModel() {
                     }
                 }
             }
-        ).liveData
+        ).flow
     }
 
     fun setFilter(query: String, sources: Set<EventSource>, severity: Severity?) {
-        filteredSources.value = sources
-        filteredSeverity.value = severity
-        filteredQuery.value = "%$query%"
+        _filterSources.value = sources
+        _filterSeverity.value = severity
+        _filterQuery.value = query
     }
 
     fun setFilterType(type: TopLevelFilter) {
@@ -117,15 +117,15 @@ class EventsViewModel(private val eventDao: EventDao) : ViewModel() {
     }
 
     fun getCurrentSeverity(): Severity? {
-        return filteredSeverity.value
+        return _filterSeverity.value
     }
 
     fun getCurrentSources(): Set<EventSource> {
-        return filteredSources.value ?: emptySet()
+        return _filterSources.value
     }
 
     fun getCurrentQuery(): String {
-        return filteredQuery.value ?: ""
+        return _filterQuery.value
     }
 }
 

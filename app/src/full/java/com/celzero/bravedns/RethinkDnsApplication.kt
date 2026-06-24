@@ -20,14 +20,13 @@ import Logger.LOG_TAG_SCHEDULER
 import android.app.Application
 import android.content.pm.ApplicationInfo
 import android.os.StrictMode
-import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.GlobalExceptionHandler
-import com.celzero.bravedns.util.GoReportingHandler
+import io.github.aakira.napier.DebugAntilog
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
@@ -52,22 +51,17 @@ class RethinkDnsApplication : Application() {
             koin.loadModules(AppModules)
         }
 
-        val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+        if (DEBUG) {
+            Napier.base(DebugAntilog())
+        }
 
         // Initialize global exception handler
         GlobalExceptionHandler.initialize(this)
         FirebaseErrorReporting.initialize()
-        GoReportingHandler.initialize(appScope, this)
-
-        // On every app start, report any tombstone files from the previous session
-        val appCtx = this
-        appScope.launch(Dispatchers.IO) {
-            EnhancedBugReport.reportTombstonesToFirebaseOnStartup(appCtx)
-        }
 
         turnOnStrictMode()
 
-        appScope.launch {
+        CoroutineScope(SupervisorJob()).launch {
             scheduleJobs()
         }
     }
@@ -75,7 +69,7 @@ class RethinkDnsApplication : Application() {
     private suspend fun scheduleJobs() {
         Logger.d(LOG_TAG_SCHEDULER, "Schedule job")
         get<WorkScheduler>().scheduleAppExitInfoCollectionJob()
-        // database refresh to keep app data up to date
+        // database refresh is used in both headless and main project
         get<ScheduleManager>().scheduleDatabaseRefreshJob()
         get<WorkScheduler>().scheduleDataUsageJob()
         get<WorkScheduler>().schedulePurgeConnectionsLog()

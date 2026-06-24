@@ -44,6 +44,7 @@ import com.google.gson.JsonObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.IOException
@@ -316,35 +317,35 @@ object RethinkBlocklistManager : KoinComponent {
     }
 
     suspend fun updateFiletagRemote(remote: RethinkRemoteFileTag) {
-        remoteFileTagRepository.update(remote)
+        withContext(Dispatchers.IO) { remoteFileTagRepository.update(remote) }
     }
 
     suspend fun updateFiletagLocal(local: RethinkLocalFileTag) {
-        localFileTagRepository.update(local)
+        withContext(Dispatchers.IO) { localFileTagRepository.update(local) }
     }
 
     suspend fun updateFiletagsRemote(values: Set<Int>, isSelected: Int) {
-        remoteFileTagRepository.updateTags(values, isSelected)
+        withContext(Dispatchers.IO) { remoteFileTagRepository.updateTags(values, isSelected) }
     }
 
     suspend fun updateFiletagsLocal(values: Set<Int>, isSelected: Int) {
-        localFileTagRepository.updateTags(values, isSelected)
+        withContext(Dispatchers.IO) { localFileTagRepository.updateTags(values, isSelected) }
     }
 
     suspend fun getSelectedFileTagsLocal(): List<Int> {
-        return localFileTagRepository.getSelectedTags()
+        return withContext(Dispatchers.IO) { localFileTagRepository.getSelectedTags() }
     }
 
     suspend fun getSelectedFileTagsRemote(): List<Int> {
-        return remoteFileTagRepository.getSelectedTags()
+        return withContext(Dispatchers.IO) { remoteFileTagRepository.getSelectedTags() }
     }
 
     suspend fun clearTagsSelectionRemote() {
-        remoteFileTagRepository.clearSelectedTags()
+        withContext(Dispatchers.IO) { remoteFileTagRepository.clearSelectedTags() }
     }
 
     suspend fun clearTagsSelectionLocal() {
-        localFileTagRepository.clearSelectedTags()
+        withContext(Dispatchers.IO) { localFileTagRepository.clearSelectedTags() }
     }
 
     fun cpSelectFileTag(localFileTags: RethinkLocalFileTag): Int {

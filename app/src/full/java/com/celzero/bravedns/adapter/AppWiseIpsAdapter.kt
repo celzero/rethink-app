@@ -15,216 +15,120 @@
  */
 package com.celzero.bravedns.adapter
 
-import Logger
-import Logger.LOG_TAG_UI
+
 import android.content.Context
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleOwner
-import androidx.paging.PagingDataAdapter
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConnection
-import com.celzero.bravedns.databinding.ListItemAppIpDetailsBinding
 import com.celzero.bravedns.service.IpRulesManager
-import com.celzero.bravedns.ui.bottomsheet.AppIpRulesBottomSheet
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.removeBeginningTrailingCommas
+import io.github.aakira.napier.Napier
 import kotlin.math.log2
 
-class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner, val uid: Int, val isAsn: Boolean = false) :
-    PagingDataAdapter<AppConnection, AppWiseIpsAdapter.ConnectionDetailsViewHolder>(DIFF_CALLBACK),
-    AppIpRulesBottomSheet.OnBottomSheetDialogFragmentDismiss {
 
-    private var maxValue: Int = 0
-    private var minPercentage: Int = INITIAL_MIN_PERCENTAGE
-
-    companion object {
-        private val DIFF_CALLBACK =
-            object : DiffUtil.ItemCallback<AppConnection>() {
-                override fun areItemsTheSame(old: AppConnection, new: AppConnection) = old == new
-
-                override fun areContentsTheSame(old: AppConnection, new: AppConnection) = old == new
-            }
-        private const val TAG = "AppWiseIpsAdapter"
-        private const val INITIAL_MIN_PERCENTAGE = 100
-        private const val PERCENTAGE_MULTIPLIER = 100
+private fun calculatePercentage(c: Double, maxValue: Int): Pair<Int, Int> {
+    val value = (log2(c) * 100).toInt()
+    val newMaxValue = if (value > maxValue) value else maxValue
+    return if (newMaxValue == 0) {
+        0 to 0
+    } else {
+        val percentage = (value * 100 / newMaxValue)
+        percentage to newMaxValue
     }
+}
 
-    private lateinit var adapter: AppWiseIpsAdapter
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConnectionDetailsViewHolder {
-        val itemBinding =
-            ListItemAppIpDetailsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        adapter = this
-        return ConnectionDetailsViewHolder(itemBinding)
-    }
-
-    override fun onBindViewHolder(holder: ConnectionDetailsViewHolder, position: Int) {
-        val appConnection: AppConnection = getItem(position) ?: return
-        // updates the app-wise connections from network log to AppInfo screen
-        holder.update(appConnection)
-    }
-
-    private fun calculatePercentage(c: Double): Int {
-        val value = (log2(c) * PERCENTAGE_MULTIPLIER).toInt()
-        // maxValue will be based on the count returned by db query (order by count desc)
-        if (value > maxValue) {
-            maxValue = value
-        }
-        return if (maxValue == 0) {
-            0
+@Composable
+fun IpRow(
+    conn: AppConnection,
+    isAsn: Boolean,
+    refreshToken: Int,
+    onIpClick: (AppConnection) -> Unit
+) {
+    val countText = conn.count.toString()
+    val flagText =
+        if (isAsn) {
+            val cc = Utilities.getFlag(conn.flag)
+            if (cc.isEmpty()) "--" else cc
         } else {
-            val percentage = (value * PERCENTAGE_MULTIPLIER / maxValue)
-            // minPercentage is used to show the progress bar when the percentage is 0
-            if (percentage < minPercentage && percentage != 0) {
-                minPercentage = percentage
-            }
-            percentage
+            conn.flag
         }
+    val titleText = if (isAsn) conn.appOrDnsName else conn.ipAddress
+    val secondaryText =
+        if (isAsn) conn.ipAddress else conn.appOrDnsName?.let { beautifyDomainString(it) }
+
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable { onIpClick(conn) }
+                .padding(horizontal = 8.dp, vertical = 6.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(text = flagText, style = MaterialTheme.typography.titleMedium)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = titleText.orEmpty(), style = MaterialTheme.typography.titleMedium)
+                if (!secondaryText.isNullOrEmpty()) {
+                    Text(text = secondaryText, style = MaterialTheme.typography.bodySmall)
+                }
+                if (!isAsn) {
+                    IpProgress(conn, refreshToken)
+                }
+            }
+            Text(text = countText, style = MaterialTheme.typography.labelLarge)
+        }
+        Spacer(modifier = Modifier.fillMaxWidth())
     }
+}
 
-    inner class ConnectionDetailsViewHolder(private val b: ListItemAppIpDetailsBinding) :
-        RecyclerView.ViewHolder(b.root) {
-        fun update(conn: AppConnection) {
-            displayTransactionDetails(conn)
-            setupClickListeners(conn)
-        }
-
-        private fun setupClickListeners(conn: AppConnection) {
-            b.acdContainer.setOnClickListener {
-                // open bottom sheet to apply domain/ip rules
-                openBottomSheet(conn)
-            }
-        }
-
-        private fun openBottomSheet(conn: AppConnection) {
-            if (context !is AppCompatActivity) {
-                Logger.w(LOG_TAG_UI, "$TAG err opening the app conn bottom sheet")
-                return
-            }
-
-            if (isAsn) {
-                return
-            }
-
-            Logger.vv(LOG_TAG_UI, "$TAG open bottom sheet for uid: $uid, ip: ${conn.ipAddress}, domain: ${conn.appOrDnsName}")
-            val bottomSheetFragment = AppIpRulesBottomSheet()
-            // Fix: free-form window crash
-            // all BottomSheetDialogFragment classes created must have a public, no-arg constructor.
-            // the best practice is to simply never define any constructors at all.
-            // so sending the data using Bundles
-            val bundle = Bundle()
-            bundle.putInt(AppIpRulesBottomSheet.UID, uid)
-            bundle.putString(AppIpRulesBottomSheet.IP_ADDRESS, conn.ipAddress)
-            bundle.putString(
-                AppIpRulesBottomSheet.DOMAINS,
-                beautifyDomainString(conn.appOrDnsName.orEmpty())
-            )
-            bottomSheetFragment.arguments = bundle
-            // Fix: Validate position before passing to avoid IndexOutOfBoundsException
-            val currentPosition = absoluteAdapterPosition
-            if (currentPosition != RecyclerView.NO_POSITION) {
-                bottomSheetFragment.dismissListener(adapter, currentPosition)
-            } else {
-                // Position is invalid, pass -1 to indicate refresh should be used
-                Logger.w(LOG_TAG_UI, "$TAG invalid adapter position when opening bottom sheet")
-                bottomSheetFragment.dismissListener(adapter, RecyclerView.NO_POSITION)
-            }
-            bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
-        }
-
-        private fun displayTransactionDetails(conn: AppConnection) {
-            b.acdCount.text = conn.count.toString()
-            if (isAsn) {
-                b.acdIpAddress.text = conn.appOrDnsName
-                b.acdDomainName.text = conn.ipAddress
-                // in case of ASN, flag consists of country code, extract flag from it
-                val cc = Utilities.getFlag(conn.flag)
-                if (cc.isEmpty()) {
-                    b.acdFlag.text = "--"
-                } else {
-                    b.acdFlag.text = cc
-                }
-                b.acdDownArrowIv.visibility = View.INVISIBLE
-            } else {
-                b.acdFlag.text = conn.flag
-                b.acdIpAddress.text = conn.ipAddress
-                if (!conn.appOrDnsName.isNullOrEmpty()) {
-                    b.acdDomainName.visibility = View.VISIBLE
-                    b.acdDomainName.text = beautifyDomainString(conn.appOrDnsName)
-                } else {
-                    b.acdDomainName.visibility = View.GONE
-                }
-                b.acdDownArrowIv.visibility = View.VISIBLE
-            }
-            updateStatusUi(conn)
-        }
-
-        private fun beautifyDomainString(d: String): String {
-            // replace two commas in the string to one
-            // add space after all the commas
-            return removeBeginningTrailingCommas(d).replace(",,", ",").replace(",", ", ")
-        }
-
-        private fun updateStatusUi(conn: AppConnection) {
-            val status = IpRulesManager.getMostSpecificRuleMatch(conn.uid, conn.ipAddress)
-            when (status) {
-                IpRulesManager.IpRuleStatus.NONE -> {
-                    b.progress.setIndicatorColor(
-                        UIUtils.fetchToggleBtnColors(context, R.color.chipTextNeutral)
-                    )
-                }
-                IpRulesManager.IpRuleStatus.BLOCK -> {
-                    b.progress.setIndicatorColor(
-                        UIUtils.fetchToggleBtnColors(context, R.color.accentBad)
-                    )
-                }
-                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
-                    b.progress.setIndicatorColor(
-                        UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
-                    )
-                }
-                IpRulesManager.IpRuleStatus.TRUST -> {
-                    b.progress.setIndicatorColor(
-                        UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
-                    )
-                }
-            }
-
-            var p = calculatePercentage(conn.count.toDouble())
-            if (p == 0) {
-                p = minPercentage / 2
-            }
-
-            if (Utilities.isAtleastN()) {
-                b.progress.setProgress(p, true)
-            } else {
-                b.progress.progress = p
-            }
-        }
+@Composable
+private fun IpProgress(conn: AppConnection, refresh: Int) {
+    if (refresh == Int.MIN_VALUE) {
+        return
     }
+    val context = LocalContext.current
+    val status = IpRulesManager.getMostSpecificRuleMatch(conn.uid, conn.ipAddress)
+    val color =
+        when (status) {
+            IpRulesManager.IpRuleStatus.NONE ->
+                MaterialTheme.colorScheme.onSurfaceVariant
+            IpRulesManager.IpRuleStatus.BLOCK ->
+                MaterialTheme.colorScheme.error
+            IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL ->
+                MaterialTheme.colorScheme.tertiary
+            IpRulesManager.IpRuleStatus.TRUST ->
+                MaterialTheme.colorScheme.tertiary
+        }    // In a paging/lazy list, this is hard to maintain without a global state.
+    // For now, using a local calculation or simplified version.
+    val p = (log2(conn.count.toDouble()) * 100).toInt()
+    val progress = if (p <= 0) 0.1f else (p / 500f).coerceAtMost(1f)
 
-    override fun notifyDataset(position: Int) {
-        // Fix: IndexOutOfBoundsException - validate position before notifying
-        // PagingDataAdapter manages its own data, so we need to be careful with manual notifications
-        try {
-            if (position >= 0 && position < itemCount) {
-                notifyItemChanged(position)
-            } else {
-                // Position is invalid, refresh the entire dataset instead
-                Logger.w(LOG_TAG_UI, "$TAG invalid position: $position, itemCount: $itemCount, refreshing adapter")
-                refresh()
-            }
-        } catch (e: Exception) {
-            // If notification fails, refresh the adapter to ensure consistency
-            Logger.e(LOG_TAG_UI, "$TAG error notifying position $position: ${e.message}", e)
-            refresh()
-        }
-    }
+    LinearProgressIndicator(
+        progress = { progress },
+        color = color,
+        trackColor = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+private fun beautifyDomainString(d: String): String {
+    return removeBeginningTrailingCommas(d).replace(",,", ",").replace(",", ", ")
 }

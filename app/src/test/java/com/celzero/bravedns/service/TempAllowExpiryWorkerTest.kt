@@ -16,9 +16,6 @@
 package com.celzero.bravedns.service
 
 import android.content.Context
-import androidx.work.WorkManager
-import com.celzero.bravedns.database.AppInfoRepository
-import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -27,63 +24,39 @@ import io.mockk.verify
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.dsl.module
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
-import org.robolectric.annotation.Config
 
-@RunWith(RobolectricTestRunner::class)
-@Config(sdk = [28])
 class TempAllowExpiryWorkerTest {
 
     private lateinit var context: Context
-    private val repo: AppInfoRepository = mockk()
 
     @Before
     fun setup() {
-        clearAllMocks()
-        context = RuntimeEnvironment.getApplication()
-        try {
-            stopKoin()
-        } catch (_: Exception) {
-        }
-        startKoin { modules(module { single { repo } }) }
+        context = mockk(relaxed = true)
     }
 
     @After
     fun tearDown() {
-        try {
-            stopKoin()
-        } catch (_: Exception) {
-        }
+        runCatching { unmockkObject(androidx.work.WorkManager) }
     }
 
     @Test
-    fun `scheduleNext cancels unique work when repo returns null`() {
-        every { repo.getNearestTempAllowExpiryBlocking(any()) } returns null
+    fun `cancel cancels unique work`() {
+        mockkObject(androidx.work.WorkManager)
+        val wm = mockk<androidx.work.WorkManager>(relaxed = true)
+        every { androidx.work.WorkManager.getInstance(any()) } returns wm
 
-        mockkObject(WorkManager.Companion)
-        val wm = mockk<WorkManager>(relaxed = true)
-        every { WorkManager.getInstance(context) } returns wm
-
-        TempAllowExpiryWorker.scheduleNext(context)
+        TempAllowExpiryWorker.cancel(context)
 
         verify { wm.cancelUniqueWork("fw_temp_allow_expiry") }
-        unmockkObject(WorkManager.Companion)
     }
 
     @Test
-    fun `scheduleNext enqueues work when repo returns future expiry`() {
-        every { repo.getNearestTempAllowExpiryBlocking(any()) } returns System.currentTimeMillis() + 60_000L
+    fun `enqueueAt enqueues unique work request`() {
+        mockkObject(androidx.work.WorkManager)
+        val wm = mockk<androidx.work.WorkManager>(relaxed = true)
+        every { androidx.work.WorkManager.getInstance(any()) } returns wm
 
-        mockkObject(WorkManager.Companion)
-        val wm = mockk<WorkManager>(relaxed = true)
-        every { WorkManager.getInstance(context) } returns wm
-
-        TempAllowExpiryWorker.scheduleNext(context)
+        TempAllowExpiryWorker.enqueueAt(context, System.currentTimeMillis() + 60_000L)
 
         verify {
             wm.enqueueUniqueWork(
@@ -92,6 +65,5 @@ class TempAllowExpiryWorkerTest {
                 any<androidx.work.OneTimeWorkRequest>()
             )
         }
-        unmockkObject(WorkManager.Companion)
     }
 }

@@ -16,16 +16,15 @@
 package com.celzero.bravedns.ui
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
 
 /**
  * Minimal test activity for dialog instrumentation tests.
  * This activity has no dependencies and provides a stable context for showing dialogs.
  */
-class TestDialogActivity : AppCompatActivity() {
+class TestDialogActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // No setContentView needed - we just need a valid activity context for dialogs
     }
 }
-

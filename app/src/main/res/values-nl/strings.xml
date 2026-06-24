@@ -68,7 +68,7 @@
     <string name="orbot_stop_dialog_message">RethinkDNS is gestopt met het doorsturen van verbindingen naar Orbot, maar Orbot draait misschien op de achtergrond.</string>
     <string name="settings_http_proxy_error_text2">Ongeldige poort</string>
     <string name="settings_dns_proxy_dialog_header">SOCKS5 (TCP) proxy instellen</string>
-    <string name="settings_vpn_heading">vpn</string>
+    <string name="settings_vpn_heading">VPN</string>
     <string name="connection_http3">HTTP3</string>
     <string name="always_on_dialog_heading">VPN altijd aan uitschakelen</string>
     <string name="always_on_dialog_stop_heading">Altijd VPN</string>
@@ -93,7 +93,7 @@
     <string name="info_dialog_rethink_toast_msg">Gekopieerd als RDNS+ DNS-over-HTTPS URL</string>
     <string name="settings_enable_logs_desc">Sla DNS- en firewall-logs lokaal op het apparaat op.</string>
     <string name="app_mode_choose">Kies de modus</string>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name" translatable="false">Re-Rethink</string>
     <string name="app_name_small_case">rethink</string>
     <string name="title_settings">Instellingen</string>
     <string name="pause_title_desc">een dutje doen…</string>
@@ -110,7 +110,7 @@
     <string name="status_protected_with_socks5">beschermd met socks proxy</string>
     <string name="status_protected_with_http">beschermd met http proxy</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">niet beschermd</string>
-    <string name="dns_explanation_dns_connected">Verbonden met RethinkDNS</string>
+    <string name="dns_explanation_dns_connected">Verbonden met Re-RethinkDNS</string>
     <string name="dns_explanation_firewall_connected">Verbonden met Firewall</string>
     <string name="notification_action_dns_firewall_mode">DNS + Firewall</string>
     <string name="dns_mode_info_title">DNS</string>
@@ -257,16 +257,16 @@
     <string name="hsf_start_dialog_positive">Begin</string>
     <string name="hsf_pause_vpn_failure">Kan niet pauzeren: RethinkDNS niet actief</string>
     <string name="hsf_proxy_chip_text">Proxy actief</string>
-    <string name="dc_block_heading">regels</string>
+    <string name="dc_block_heading">Regels</string>
     <string name="dc_custom_dns_radio">Andere DNS</string>
-    <string name="dc_rethink_dns_radio">RethinkDNS</string>
+    <string name="dc_rethink_dns_radio">Re-RethinkDNS</string>
     <string name="dc_local_block_heading">Blokkeringslijsten op het apparaat</string>
     <string name="dc_dns_website_desc">Haalt website iconen op van <i>duckduckgo.com</i>. Verbruikt tot 350 mb aan schijfruimte</string>
     <string name="univ_firewall_rule_5">Blokkeren wanneer DNS wordt omzeild</string>
     <string name="dc_check_update_desc">Controleer eenmaal per <i>drie</i> dagen of de blocklist is bijgewerkt</string>
     <string name="about_bravedns_explantion">RethinkDNS is de eenvoudigste manier om de activiteit van apps te controleren, internetcensuur te omzeilen en apps op uw Android-toestel te firewarden.</string>
-    <string name="about_app">app</string>
-    <string name="about_settings">systeem</string>
+    <string name="about_app">App</string>
+    <string name="about_settings">Systeem</string>
     <string name="about_bravedns_whoarewe">RethinkDNS is een gratis en open-source project, geleid door ex-ingenieurs van Amazon, IBM en Scientific Games.</string>
     <string name="about_privacy_policy">Privacybeleid</string>
     <string name="about_settings_app_info">App-informatie</string>
@@ -319,7 +319,7 @@
 \nPoortnummer: %3$s</string>
     <string name="fapps_firewall_filter_desc_category">Toont <u>%1$s</u> %2$s apps in categorieën: %3$s</string>
     <string name="fapps_filter_clear_btn">Wissen</string>
-    <string name="rules_load_failure_reload">herladen</string>
+    <string name="rules_load_failure_reload">Herladen</string>
     <string name="fapps_info_dialog_positive_btn">Oke</string>
     <string name="fav_icon">fav_icon</string>
     <string name="network_log_app_name_unknown">Onbekend</string>
@@ -410,7 +410,7 @@
     <string name="about_bug_report_dialog_positive_btn">Verzend e-mail</string>
     <string name="about_bug_no_log_dialog_message">Kon geen crash logs ophalen. Wilt u uw bug handmatig rapporteren\?</string>
     <string name="about_bug_no_log_dialog_positive_btn">Verzend e-mail</string>
-    <string name="about_web">links</string>
+    <string name="about_web">Links</string>
     <string name="about_website">Bezoek rethinkdns.com</string>
     <string name="about_github">Bijdragen op GitHub</string>
     <string name="about_faq">Bekijk FAQ\'s</string>
@@ -511,7 +511,7 @@
     <string name="lbl_disabled" translatable="true">Uitgeschakeld</string>
     <string name="lbl_domain" translatable="true">Domein</string>
     <string name="lbl_maybe_blocked" translatable="true">Misschien geblokkeerd</string>
-    <string name="lbl_rules" translatable="true">regels</string>
+    <string name="lbl_rules" translatable="true">Regels</string>
     <string name="lbl_configure" translatable="true">Configureren</string>
     <string name="lbl_network" translatable="true">netwerk</string>
     <string name="lbl_qr_code" translatable="true">QR Code</string>
@@ -577,7 +577,7 @@
     <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
     <string name="hsf_whats_new_remove_text" translatable="true">Sluiten…</string>
     <string name="hsf_blocklist_updating_text" translatable="true">Aanzetten…</string>
-    <string name="dc_other_dns_heading" translatable="true">type</string>
+    <string name="dc_other_dns_heading" translatable="true">Type</string>
     <string name="bypass_universal" translatable="true">Omzeil Universeel</string>
     <string name="build__flavor_website" translatable="true">website</string>
     <string name="cd_toast_added" translatable="true">Domein succesvol toegevoegd</string>
@@ -660,7 +660,7 @@
 \nOm Rethink\'s DNS te gebruiken moet je in de Android Instellingen \"Privé DNS\" uitschakelen.</string>
     <string name="local_blocklist_redownload" translatable="true">Up-to-date!</string>
     <string name="hs_biometeric_feature_not_supported" translatable="true">Biometrische authenticatie is niet ondersteund of uitgeschakeld op dit apparaat</string>
-    <string name="about_connect" translatable="true">contact</string>
+    <string name="about_connect" translatable="true">Contact</string>
     <string name="about_dialog_neutral_button" translatable="true">Functies voorstellen</string>
     <string name="logs_disclaimer" translatable="true">De eerste 20.000 karakters laten zien</string>
     <string name="ci_dialog_added_success" translatable="true">IP toegevoegd aan de lijst</string>

@@ -15,11 +15,18 @@
  */
 package com.celzero.bravedns.viewmodel
 
+import com.celzero.bravedns.ui.compose.home.HomeScreenViewModel
+import com.celzero.bravedns.ui.compose.dns.DnsSettingsViewModel
+import com.celzero.bravedns.ui.compose.about.AboutViewModel
+import org.koin.android.ext.koin.androidApplication
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 object ViewModelModule {
-    private val modelModules = module {
+    private val viewModelModule = module {
+        viewModel { HomeScreenViewModel(get(), get()) }
+        viewModel { DnsSettingsViewModel(get(), get(), get()) }
+        viewModel { AboutViewModel(get(), get(), get()) }
         viewModel { ConnectionTrackerViewModel(get()) }
         viewModel { DnsCryptEndpointViewModel(get()) }
         viewModel { DnsCryptRelayEndpointViewModel(get()) }
@@ -40,20 +47,16 @@ object ViewModelModule {
         viewModel { RemoteBlocklistPacksMapViewModel(get()) }
         viewModel { ProxyAppsMappingViewModel(get()) }
         viewModel { WgConfigViewModel(get()) }
+        viewModel { CheckoutViewModel(androidApplication(), get()) }
         viewModel { DoTEndpointViewModel(get()) }
         viewModel { ODoHEndpointViewModel(get()) }
-        viewModel { BlockFreeDnsViewModel(get(), get(), get(), get(), get(), get()) }
         viewModel { RethinkLogViewModel(get()) }
         viewModel { AlertsViewModel(get(), get()) }
         viewModel { ConsoleLogViewModel(get()) }
         viewModel { DomainConnectionsViewModel(get()) }
         viewModel { WgNwActivityViewModel(get()) }
         viewModel { EventsViewModel(get()) }
-        viewModel { PurchaseHistoryViewModel(get()) }
-        viewModel { ManagePurchaseViewModel() }
-        viewModel { ServerOrderHistoryViewModel(get()) }
-        viewModel { ServerSelectionViewModel() }
     }
 
-    val modules = listOf(modelModules)
+    val modules = listOf(viewModelModule)
 }

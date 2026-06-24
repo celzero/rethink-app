@@ -3,7 +3,7 @@
     <string name="txt_home">Hjem</string>
     <string name="block">blokker</string>
     <string name="slide_2_title">Velkommen</string>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name" translatable="false">Re-Rethink</string>
     <string name="title_settings">Innstillinger</string>
     <string name="title_about">Om</string>
     <string name="pause_title_desc">tar en lur …</string>

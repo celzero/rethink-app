@@ -25,14 +25,14 @@ import androidx.paging.cachedIn
 import androidx.paging.liveData
 import com.celzero.bravedns.data.FileTag
 import com.celzero.bravedns.database.RethinkLocalFileTagDao
-import com.celzero.bravedns.ui.fragment.RethinkBlocklistFragment
+import com.celzero.bravedns.ui.rethink.RethinkBlocklistState
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class RethinkLocalFileTagViewModel(private val rethinkLocalDao: RethinkLocalFileTagDao) :
     ViewModel() {
 
-    private val list: MutableLiveData<String> = MutableLiveData()
-    private var blocklistFilter: RethinkBlocklistFragment.Filters? = null
+    private var list: MutableLiveData<String> = MutableLiveData()
+    private var blocklistFilter: RethinkBlocklistState.Filters? = null
 
     init {
         list.value = ""
@@ -74,7 +74,7 @@ class RethinkLocalFileTagViewModel(private val rethinkLocalDao: RethinkLocalFile
     private fun getSelectedFilter(): MutableSet<Int> {
         if (
             blocklistFilter?.filterSelected ==
-                RethinkBlocklistFragment.BlocklistSelectionFilter.SELECTED
+                RethinkBlocklistState.BlocklistSelectionFilter.SELECTED
         ) {
             return mutableSetOf(1)
         }
@@ -89,7 +89,7 @@ class RethinkLocalFileTagViewModel(private val rethinkLocalDao: RethinkLocalFile
         list.value = searchText
     }
 
-    fun setFilter(filter: RethinkBlocklistFragment.Filters) {
+    fun setFilter(filter: RethinkBlocklistState.Filters) {
         this.blocklistFilter = filter
         list.value = filter.query
     }

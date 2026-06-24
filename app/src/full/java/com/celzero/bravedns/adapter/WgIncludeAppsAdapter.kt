@@ -15,307 +15,178 @@
  */
 package com.celzero.bravedns.adapter
 
-import Logger
-import Logger.LOG_TAG_PROXY
-import android.content.Context
-import android.content.DialogInterface
-import android.content.pm.PackageManager
+
 import android.graphics.drawable.Drawable
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
-import androidx.paging.PagingDataAdapter
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.celzero.bravedns.R
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import com.celzero.bravedns.database.ProxyApplicationMapping
-import com.celzero.bravedns.databinding.ListItemWgIncludeAppsBinding
 import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.service.ProxyManager.addProxyToApp
-import com.celzero.bravedns.service.ProxyManager.removeProxyFromApp
-import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.getIcon
-import com.celzero.bravedns.util.Utilities.showToastUiCentered
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.celzero.bravedns.ui.compose.rememberDrawablePainter
+import com.celzero.bravedns.ui.compose.theme.CardPosition
+import com.celzero.bravedns.ui.compose.theme.Dimensions
+import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class WgIncludeAppsAdapter(
-    private val context: Context,
-    private val proxyId: String,
-    private val proxyName: String
-) :
-    PagingDataAdapter<ProxyApplicationMapping, WgIncludeAppsAdapter.IncludedAppInfoViewHolder>(
-        DIFF_CALLBACK
+@Composable
+fun IncludeAppRow(
+    mapping: ProxyApplicationMapping,
+    proxyId: String,
+    position: CardPosition = CardPosition.Single,
+    onInterfaceUpdate: (ProxyApplicationMapping, Boolean) -> Unit
+) {
+    val context = LocalContext.current
+    val packageManager = context.packageManager
+    var isProxyExcluded by remember(mapping.uid, mapping.packageName) { mutableStateOf(false) }
+    var hasInternetPerm by remember(mapping.uid, mapping.packageName) { mutableStateOf(true) }
+    var iconDrawable by remember(mapping.uid, mapping.packageName) { mutableStateOf<Drawable?>(null) }
+    var isIncluded by
+        remember(mapping.uid, mapping.packageName, mapping.proxyId) {
+            mutableStateOf(false)
+        }
+
+    LaunchedEffect(mapping.uid, mapping.proxyId, mapping.packageName) {
+        isProxyExcluded = withContext(Dispatchers.IO) {
+            FirewallManager.isAppExcludedFromProxy(mapping.uid)
+        }
+        hasInternetPerm = mapping.hasInternetPermission(packageManager)
+        iconDrawable = withContext(Dispatchers.IO) {
+            getIcon(context, mapping.packageName, mapping.appName)
+        }
+
+        isIncluded = mapping.proxyId == proxyId && mapping.proxyId.isNotEmpty() && !isProxyExcluded
+    }
+
+    val isClickable = !isProxyExcluded
+    val containerColor =
+        when {
+            isProxyExcluded -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.35f)
+            isIncluded -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.72f)
+            else -> MaterialTheme.colorScheme.surfaceContainerLow
+        }
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.97f else 1f,
+        animationSpec = spring(stiffness = Spring.StiffnessMedium),
+        label = "includeRowScale"
+    )
+    val contentAlpha = if (hasInternetPerm && !isProxyExcluded) 1f else 0.5f
+    val titleColor =
+        when {
+            isIncluded -> MaterialTheme.colorScheme.onPrimaryContainer
+            else -> MaterialTheme.colorScheme.onSurface
+        }
+    val shape = shapeFor(position)
+
+    Surface(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .scale(scale)
+                .clip(shape)
+                .padding(
+                    top = if (position == CardPosition.Middle || position == CardPosition.Last) 2.dp else 0.dp
+                ),
+        shape = shape,
+        color = containerColor
     ) {
-    private val packageManager: PackageManager = context.packageManager
-
-    companion object {
-
-        private val DIFF_CALLBACK =
-            object : DiffUtil.ItemCallback<ProxyApplicationMapping>() {
-
-                // Unique identifier should be based on uid and packageName only
-                // since the same app can appear in multiple proxy mappings
-                override fun areItemsTheSame(
-                    oldConnection: ProxyApplicationMapping,
-                    newConnection: ProxyApplicationMapping
-                ): Boolean {
-                    return (oldConnection.proxyId == newConnection.proxyId &&
-                            oldConnection.uid == newConnection.uid)
-                }
-
-                override fun areContentsTheSame(
-                    oldConnection: ProxyApplicationMapping,
-                    newConnection: ProxyApplicationMapping
-                ): Boolean {
-                    return false
-                }
-            }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IncludedAppInfoViewHolder {
-        val itemBinding =
-            ListItemWgIncludeAppsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return IncludedAppInfoViewHolder(itemBinding)
-    }
-
-    override fun onBindViewHolder(holder: IncludedAppInfoViewHolder, position: Int) {
-        val apps: ProxyApplicationMapping = getItem(position) ?: return
-        // Double-check position validity to prevent IndexOutOfBoundsException
-        if (position !in 0..<itemCount) {
-            Logger.w(LOG_TAG_PROXY, "Invalid position $position for itemCount $itemCount")
-            return
-        }
-        holder.update(apps)
-    }
-
-    inner class IncludedAppInfoViewHolder(private val b: ListItemWgIncludeAppsBinding) :
-        RecyclerView.ViewHolder(b.root) {
-
-        fun update(mapping: ProxyApplicationMapping) {
-            // capture item identity before async operations to prevent incorrect UI updates
-            // when ViewHolder is recycled for a different item during fast scrolling
-            val itemUid = mapping.uid
-            val itemPackageName = mapping.packageName
-            val itemAppName = mapping.appName
-            val itemProxyId = proxyId
-
-            io {
-                // all proxies assigned to this uid and package
-                val proxyIdsForApp =
-                    ProxyManager.getProxyIdsForApp(mapping.uid, mapping.packageName)
-                val isIncludedInCurrent = proxyIdsForApp.contains(itemProxyId)
-                val isProxyExcluded = FirewallManager.isAppExcludedFromProxy(itemUid)
-                val hasInternetPerm = mapping.hasInternetPermission(packageManager)
-                val iconDrawable = getIcon(context, itemPackageName, itemAppName)
-                Logger.d(LOG_TAG_PROXY, "INCLUDE(${mapping.appName}): $isIncludedInCurrent, $isProxyExcluded, $proxyName, $proxyId, $proxyIdsForApp, $isIncludedInCurrent")
-                uiCtx {
-                    // Update UI synchronously on the main thread
-                    // enable/disable UI based on exclusion
-                    // is still valid and bound to the same item
-                    if (bindingAdapterPosition == RecyclerView.NO_POSITION) {
-                        Logger.w(
-                            LOG_TAG_PROXY,
-                            "ViewHolder recycled, skipping UI update for uid: $itemUid"
-                        )
-                        return@uiCtx
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .toggleable(
+                        value = isIncluded,
+                        enabled = isClickable,
+                        role = Role.Checkbox,
+                        interactionSource = interactionSource,
+                        indication = null
+                    ) { checked ->
+                        if (checked == isIncluded || !isClickable) return@toggleable
+                        isIncluded = checked
+                        onInterfaceUpdate(mapping, checked)
                     }
-
-                    // double-check
-                    val currentItem = getItem(bindingAdapterPosition)
-                    if (currentItem?.uid != itemUid) {
-                        Logger.w(
-                            LOG_TAG_PROXY,
-                            "ViewHolder rebound to different item, skipping update for uid: $itemUid"
-                        )
-                        return@uiCtx
-                    }
-
-                    if (isProxyExcluded) {
-                        b.wgIncludeAppListContainer.isEnabled = false
-                        b.wgIncludeAppListCheckbox.isChecked = false
-                        b.wgIncludeCard.isClickable = false
-                        b.wgIncludeCard.isFocusable = false
-                        b.wgIncludeAppListCheckbox.isClickable = false
-                        b.wgIncludeAppListCheckbox.isFocusable = false
-                    } else {
-                        b.wgIncludeAppListContainer.isEnabled = true
-                        b.wgIncludeCard.isClickable = true
-                        b.wgIncludeCard.isFocusable = true
-                        b.wgIncludeAppListCheckbox.isClickable = true
-                        b.wgIncludeAppListCheckbox.isFocusable = true
-                    }
-
-                    b.wgIncludeAppListApkLabelTv.text = itemAppName
-                    b.wgIncludeAppListApkLabelTv.alpha = if (hasInternetPerm) 1.0f else 0.4f
-
-                    // checkbox state purely based on membership in this proxyId
-                    b.wgIncludeAppListCheckbox.isChecked = isIncludedInCurrent && !isProxyExcluded
-                    setCardBackground(isIncludedInCurrent && !isProxyExcluded)
-
-                    // description text logic: show only other proxies (exclude current proxyId)
-                    setupClickListeners(mapping, isProxyExcluded)
-                    displayIcon(iconDrawable)
-                }
-            }
-        }
-
-        private fun setupClickListeners(mapping: ProxyApplicationMapping, isProxyExcluded: Boolean) {
-            b.wgIncludeCard.setOnClickListener {
-                val isIncluded = !b.wgIncludeAppListCheckbox.isChecked
-                b.wgIncludeAppListCheckbox.isChecked = isIncluded
-                Logger.i(
-                    LOG_TAG_PROXY,
-                    "wgIncludeAppListContainer- ${mapping.appName}, $isIncluded"
-                )
-                updateInterfaceDetails(mapping, isIncluded && !isProxyExcluded)
-            }
-
-            b.wgIncludeAppListCheckbox.setOnCheckedChangeListener(null)
-            b.wgIncludeAppListCheckbox.setOnClickListener {
-                val isIncluded = b.wgIncludeAppListCheckbox.isChecked
-                Logger.i(
-                    LOG_TAG_PROXY,
-                    "wgIncludeAppListCheckbox- ${mapping.appName}, $isIncluded"
-                )
-                updateInterfaceDetails(mapping, isIncluded && !isProxyExcluded)
-            }
-        }
-
-        private fun displayIcon(drawable: Drawable?) {
-            Glide.with(context)
-                .load(drawable)
-                .error(getDefaultIcon(context))
-                .into(b.wgIncludeAppListApkIconIv)
-        }
-
-        private fun setCardBackground(isSelected: Boolean) {
-            if (isSelected) {
-                b.wgIncludeCard.setCardBackgroundColor(
-                    UIUtils.fetchColor(context, R.attr.selectedCardBg)
-                )
-            } else {
-                b.wgIncludeCard.setCardBackgroundColor(
-                    UIUtils.fetchColor(context, R.attr.background)
-                )
-            }
-        }
-
-        private fun updateInterfaceDetails(mapping: ProxyApplicationMapping, include: Boolean) {
-            io {
-                // apps that share this packageName but may have multiple uids (multi-user)
-                val appUidList = FirewallManager.getAppNamesByUid(mapping.uid)
-                if (FirewallManager.isAppExcludedFromProxy(mapping.uid)) {
-                    uiCtx {
-                        showToastUiCentered(
-                            context,
-                            context.getString(R.string.exclude_apps_from_proxy_failure_toast),
-                            Toast.LENGTH_LONG
-                        )
-                    }
-                    return@io
-                }
-                uiCtx {
-                    if (appUidList.count() > 1) {
-                        showDialog(appUidList, mapping, include)
-                    } else {
-                        updateProxyIdForApp(mapping, include)
-                    }
-                }
-            }
-        }
-
-        private fun updateProxyIdForApp(mapping: ProxyApplicationMapping, include: Boolean) {
-            io {
-                if (include) {
-                    addProxyToApp(mapping.uid, mapping.packageName, proxyId, proxyName)
-                    Logger.i(LOG_TAG_PROXY, "Included app: ${mapping.uid}, $proxyId, $proxyName")
-                } else {
-                    removeProxyFromApp(mapping.uid, mapping.packageName, proxyId)
-                    Logger.i(LOG_TAG_PROXY, "Removed app: ${mapping.uid}, $proxyId, $proxyName")
-                }
-                refresh()
-            }
-        }
-
-        private fun showDialog(
-            packageList: List<String>,
-            mapping: ProxyApplicationMapping,
-            included: Boolean
+                    .padding(horizontal = Dimensions.spacingMd, vertical = 9.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            val positiveTxt: String
-
-            val builderSingle = MaterialAlertDialogBuilder(context)
-
-            builderSingle.setIcon(R.drawable.ic_firewall_exclude_on)
-
-            val count = packageList.count()
-            val title =
-                if (included) {
-                    positiveTxt = context.getString(R.string.lbl_include)
-                    context.getString(R.string.wg_apps_dialog_title_include, count.toString())
-                } else {
-                    positiveTxt = context.getString(R.string.lbl_remove)
-                    context.getString(R.string.wg_apps_dialog_title_exclude, count.toString())
-                }
-
-            builderSingle.setTitle(title)
-            val arrayAdapter =
-                ArrayAdapter<String>(context, android.R.layout.simple_list_item_activated_1)
-            arrayAdapter.addAll(packageList)
-            builderSingle.setCancelable(false)
-
-            // show list just for information, we operate on all uids for this package
-            builderSingle.setItems(packageList.toTypedArray(), null)
-
-            builderSingle
-                .setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
-                    // apply change to all UIDs that share this package name
-                    io {
-                        val packageNames: List<String> =
-                            FirewallManager.getPackageNamesByUid(mapping.uid)
-                        packageNames.forEach { pkgName: String ->
-                            val appInfo = FirewallManager.getAppInfoByPackage(pkgName)
-                            if (appInfo != null) {
-                                if (included) {
-                                    addProxyToApp(
-                                        appInfo.uid,
-                                        appInfo.packageName,
-                                        proxyId,
-                                        proxyName
-                                    )
-                                } else {
-                                    removeProxyFromApp(appInfo.uid, appInfo.packageName, proxyId)
-                                }
-                            }
-                        }
-                        refresh()
-                    }
-                }
-                .setNeutralButton(context.getString(R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->
-                }
-
-            val alertDialog: AlertDialog = builderSingle.show()
-            alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
-            alertDialog.setCancelable(false)
+            val iconPainter =
+                rememberDrawablePainter(iconDrawable)
+                    ?: rememberDrawablePainter(getDefaultIcon(context))
+            iconPainter?.let { painter ->
+                Image(
+                    painter = painter,
+                    contentDescription = null,
+                    modifier =
+                        Modifier
+                            .size(36.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                )
+            }
+            Text(
+                text = mapping.appName,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = titleColor.copy(alpha = contentAlpha),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+            Checkbox(
+                checked = isIncluded,
+                enabled = isClickable,
+                onCheckedChange = null
+            )
         }
     }
+}
 
-    private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
-    }
-
-
-    private fun io(f: suspend () -> Unit) {
-        (context as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+private fun shapeFor(position: CardPosition): RoundedCornerShape {
+    return when (position) {
+        CardPosition.Single -> RoundedCornerShape(18.dp)
+        CardPosition.First -> RoundedCornerShape(
+            topStart = 18.dp,
+            topEnd = 18.dp,
+            bottomStart = 10.dp,
+            bottomEnd = 10.dp
+        )
+        CardPosition.Middle -> RoundedCornerShape(10.dp)
+        CardPosition.Last -> RoundedCornerShape(
+            topStart = 10.dp,
+            topEnd = 10.dp,
+            bottomStart = 18.dp,
+            bottomEnd = 18.dp
+        )
     }
 }

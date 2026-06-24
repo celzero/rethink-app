@@ -1,11 +1,9 @@
 <resources>
-    <string name="app_name" translatable="false">Rethink</string>
+    <string name="app_name" translatable="false">Re-Rethink</string>
     <string name="app_name_small_case" translatable="false">rethink</string>
-    <string name="app_name_alpha" translatable="false">RETHINK α</string>
     <string name="title_about" translatable="true">About</string>
     <string name="title_settings" translatable="true">Settings</string>
     <string name="title_statistics" translatable="true">Stats</string>
-    <string name="title_proc" translatable="false">Proc</string>
     <string name="pause_title_desc" translatable="true">taking a nap…</string>
     <string name="settings_title_desc" translatable="true">A highly customizable DNS and Firewall</string>
     <string name="about_title_desc" translatable="true">Detect and block network security threats</string>
@@ -24,6 +22,7 @@
     <string name="lbl_cancel" translatable="true">Cancel</string>
     <string name="lbl_apply" translatable="true">Apply</string>
     <string name="lbl_dismiss" translatable="true">Dismiss</string>
+    <string name="lbl_done" translatable="true">Done</string>
     <string name="lbl_all" translatable="true">All</string>
     <string name="lbl_allowed" translatable="true">Allowed</string>
     <string name="lbl_maybe_blocked" translatable="true">Maybe Blocked</string>
@@ -32,7 +31,7 @@
     <string name="lbl_domain" translatable="true">Domain</string>
     <string name="lbl_wildcard" translatable="true">Wildcard</string>
     <string name="lbl_action_required" translatable="true">Action Required</string>
-    <string name="lbl_rules" translatable="true">rules</string>
+    <string name="lbl_rules" translatable="true">Rules</string>
     <string name="lbl_configure" translatable="true">Configure</string>
     <string name="lbl_logs" translatable="true">Logs</string>
     <string name="lbl_network" translatable="true">Network</string>
@@ -47,6 +46,10 @@
     <string name="lbl_ip_rules" translatable="true">IP Rules</string>
     <string name="lbl_domain_rules" translatable="true">Domain Rules</string>
     <string name="lbl_delete" translatable="true">Delete</string>
+    <string name="cd_filter" translatable="true">Filter</string>
+    <string name="cd_refresh" translatable="true">Refresh</string>
+    <string name="cd_generate_keys" translatable="true">Generate keys</string>
+    <string name="cd_copy_public_key" translatable="true">Copy public key</string>
     <string name="lbl_proceed" translatable="true">Proceed</string>
     <string name="lbl_private_key" translatable="true">Private key</string>
     <string name="lbl_generated" translatable="true">(generated)</string>
@@ -55,11 +58,47 @@
     <string name="lbl_mtu" translatable="true">MTU</string>
     <string name="lbl_auto" translatable="true">(auto)</string>
     <string name="lbl_include" translatable="true">Include</string>
-    <string name="lbl_select_all" translatable="true">select all</string>
+    <string name="lbl_select_all" translatable="true">Select All</string>
+    <string name="lbl_unselect_all" translatable="true">Unselect All</string>
     <string name="lbl_active" translatable="true">Active</string>
     <string name="lbl_inactive" translatable="true">Inactive</string>
-    <string name="lbl_checking" translatable="false">Checking…</string>
-    <string name="lbl_connecting" translatable="false">Connecting…</string>
+    <string name="rpn_availability_title" translatable="true">RPN availability</string>
+    <string name="rpn_availability_desc" translatable="true">Live status of reachable RPN locations.</string>
+    <string name="custom_rules_desc" translatable="true">Create custom IP and domain firewall rules.</string>
+    <string name="location_selector_title" translatable="true">All locations</string>
+    <string name="location_selector_max" translatable="true">(Max %1$d)</string>
+    <string name="location_selector_server" translatable="true">server</string>
+    <string name="location_selector_servers" translatable="true">servers</string>
+    <string name="location_selector_servers_available" translatable="true">%1$d servers available</string>
+    <string name="location_selector_max_toast" translatable="true">Maximum 5 servers can be selected</string>
+    <string name="location_selector_min_toast" translatable="true">At least one server should be selected</string>
+    <string name="ping_ip_port_title" translatable="true">IP and port</string>
+    <string name="ping_host_port_title" translatable="true">Host and port</string>
+    <string name="ping_strength_title" translatable="true">Strength</string>
+    <string name="checkout_app_name" translatable="true">TCP Proxy</string>
+    <string name="checkout_proxy_desc" translatable="true">Fast proxy servers combined with affordability. Ideal solution for individuals. A reliable and secure way to access the internet anonymously.</string>
+    <string name="checkout_choose_plan" translatable="true">Choose a plan</string>
+    <string name="checkout_plan_1m_title" translatable="true">1 Month / 1.99</string>
+    <string name="checkout_plan_1m_subtitle" translatable="true">( 1.99 / month )</string>
+    <string name="checkout_plan_3m_title" translatable="true">3 Months / 3.99</string>
+    <string name="checkout_plan_3m_subtitle" translatable="true">( 1.33 / month )</string>
+    <string name="checkout_plan_6m_title" translatable="true">6 Months / 5.99</string>
+    <string name="checkout_plan_6m_subtitle" translatable="true">( 0.99 / month )</string>
+    <string name="checkout_purchase" translatable="true">purchase</string>
+    <string name="checkout_restore" translatable="true">Restore Purchase</string>
+    <string name="checkout_terms_title" translatable="true">Terms and Conditions</string>
+    <string name="checkout_terms_body" translatable="true">Rethink DNS + Firewall are anti-surveillance tools first and foremost: It is absolutely against our ethos, then, to track users of our apps and services, or sell any information whatsoever to any third-party in any form, pseudo-anonymized, de-anonymized, anonymized, aggregated, or otherwise. We do not collect, sell, license, share any data (personally identifiable or otherwise) from the Rethink DNS + Firewall Android app. The code is open source so you may inspect it yourself or deploy to your servers.\nPersonally identifiable information: Any data that can be traced back to the user including (but not limited to) a combination of IP addresses, name, device-id, advertisement-id, and location.\n\nNon personally identifiable information: Aggregated (summarized) data and anonymized data scrubbed off any personally identifiable information.\nCollect: Data stored by Rethink.\nSell: Data sold to third parties.\nLicense: Restricted access to data collected by Rethink to third parties.\nShare: Data shared with third parties.\nAggregate: Data combined with other data to form a summary of information.\nAnonymize: Data scrubbed off any personally identifiable information.\nDe-anonymize: Data scrubbed off any personally identifiable information.\nShare: Permanent access to data collected by Rethink to third parties.\n\nWe do not collect, sell, license, share any data (personally identifiable or otherwise) from the Rethink DNS + Firewall Android app. The code is open source so you may inspect it yourself or deploy to your servers.</string>
+    <string name="checkout_payment_success_title" translatable="true">Payment Successful</string>
+    <string name="checkout_payment_success_message" translatable="true">Your payment was successful. You can now enjoy the proxy features of Rethink.</string>
+    <string name="checkout_payment_success_button" translatable="true">continue</string>
+    <string name="checkout_payment_awaiting_title" translatable="true">Awaiting payment</string>
+    <string name="checkout_payment_awaiting_message" translatable="true">Please wait while we process your payment. This may take a few seconds.</string>
+    <string name="checkout_payment_failed_title" translatable="true">Payment Failed</string>
+    <string name="checkout_payment_failed_message" translatable="true">Your payment failed. Please try again.</string>
+    <string name="checkout_payment_failed_button" translatable="true">try again</string>
+    <string name="checkout_banner_icon_desc" translatable="true">TCP Proxy icon</string>
+    <string name="vpn_not_active_dialog_title" translatable="true">VPN not active</string>
+    <string name="vpn_not_active_dialog_desc" translatable="true">Rethink VPN is not active. Start it to run the test.</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
     <string name="lbl_http" translatable="true">HTTP</string>
     <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
@@ -71,6 +110,12 @@
     <string name="lbl_sec" translatable="true">sec</string>
     <string name="lbl_min" translatable="true">min</string>
     <string name="lbl_hour" translatable="true">hr</string>
+    <string name="lbl_countries" translatable="true">Countries</string>
+    <string name="events_severity_low" translatable="true">Low</string>
+    <string name="events_severity_medium" translatable="true">Medium</string>
+    <string name="events_severity_high" translatable="true">High</string>
+    <string name="events_severity_critical" translatable="true">Critical</string>
+    <string name="events_filter_source" translatable="true">Source</string>
     <string name="lbl_day" translatable="true">day</string>
     <string name="lbl_preshared_key" translatable="true">Preshared key</string>
     <string name="lbl_insecure" translatable="true"> (insecure)</string>
@@ -78,17 +123,10 @@
     <string name="lbl_persistent_keepalive" translatable="true">Persistent keepalive</string>
     <string name="lbl_allowed_ips" translatable="true">Allowed IPs</string>
     <string name="lbl_save" translatable="true">Save</string>
-    <string name="lbl_saving" translatable="true">Saving…</string>
     <string name="lbl_dot" translatable="false">DoT</string>
     <string name="lbl_odoh" translatable="false">ODoH</string>
     <string name="lbl_cache" translatable="true">Cache</string>
     <string name="lbl_status" translatable="true">Status</string>
-    <string name="lbl_plan" translatable="true">Plan</string>
-    <string name="lbl_expires_on" translatable="true">Valid until</string>
-    <string name="lbl_cancelled" translatable="true">Cancelled</string>
-    <string name="lbl_expired" translatable="true">Expired</string>
-    <string name="lbl_grace_period" translatable="true">Grace Period</string>
-    <string name="lbl_paused" translatable="true">Paused</string>
     <string name="lbl_remove" translatable="true">Remove</string>
     <string name="lbl_last" translatable="true">Last</string>
     <string name="lbl_dot_abbr" translatable="false">DNS-over-TLS</string>
@@ -100,6 +138,9 @@
     <string name="lbl_rdns" translatable="false">RDNS</string>
     <string name="lbl_starting" translatable="true">Starting</string>
     <string name="lbl_overall" translatable="true">Overall</string>
+    <string name="lbl_upload" translatable="true">Upload</string>
+    <string name="lbl_info" translatable="true">Info</string>
+    <string name="lbl_mobile_data" translatable="true">Data</string>
     <string name="lbl_stopped" translatable="true">Stopped</string>
     <string name="lbl_idle" translatable="true">Idle</string>
     <string name="lbl_private" translatable="true">private</string>
@@ -110,11 +151,11 @@
     <string name="lbl_on_device" translatable="true">on-device</string>
     <string name="lbl_ip" translatable="false">IP</string>
     <string name="lbl_unselected" translatable="true">Unselected</string>
-    <string name="lbl_notification" translatable="true">Notification</string>
+    <string name="lbl_notification" translatable="true">notification</string>
     <string name="lbl_mastodon" translatable="false">Mastodon</string>
     <string name="lbl_matrix" translatable="false">Matrix</string>
     <string name="lbl_reddit" translatable="false">Reddit</string>
-    <string name="lbl_test" translatable="true">Test</string>
+    <string name="lbl_test" translatable="true">test</string>
     <string name="lbl_protos" translatable="true">protos</string>
     <string name="lbl_experimental" translatable="true">(experimental)</string>
     <string name="lbl_service_providers" translatable="true">Service Providers</string>
@@ -127,7 +168,6 @@
     <string name="lbl_action" translatable="true">Action</string>
     <string name="lbl_connect" translatable="true">Connect</string>
     <string name="lbl_criteria" translatable="true">Criteria</string>
-    <string name="lbl_all_apps" translatable="false">All Apps</string>
 
     <string name="memory_notification_text">Rethink is experiencing low memory. System actions may be limited.</string>
 
@@ -139,9 +179,6 @@
     <string name="two_argument_space" translatable="false">%1$s %2$s</string>
     <string name="two_argument_colon" translatable="false">%1$s: %2$s</string>
     <string name="two_argument" translatable="false">%1$s / %2$s</string>
-    <string name="two_argument_dot" translatable="false">%1$s · %2$s</string>
-    <string name="two_argument_parenthesis" translatable="false">%1$s (%2$s)</string>
-    <string name="two_argument_comma" translatable="false">%1$s, %2$s</string>
     <string name="three_argument" translatable="false">%1$s %2$s %3$s</string>
     <string name="three_argument_colon" translatable="false">%1$s:%2$s:%3$s</string>
     <string name="symbol_heavy" translatable="false">🐘</string>
@@ -202,17 +239,17 @@
         <item>Block (unmetered)</item>
         <item>Block (metered)</item>
         <item>Isolate</item>
-        <item>Bypass DNS and Firewall</item>
+        <item>Bypass DNS &amp; Firewall</item>
         <item>Bypass Universal</item>
         <item>Exclude</item>
     </string-array>
 
-    <string name="allow" translatable="true">Allow</string>
-    <string name="block" translatable="true">Block</string>
+    <string name="allow" translatable="true">allow</string>
+    <string name="block" translatable="true">block</string>
     <string name="bypass_universal" translatable="true">Bypass Universal</string>
-    <string name="exclude" translatable="true">Exclude</string>
-    <string name="isolate" translatable="true">Isolate</string>
-    <string name="untracked" translatable="true">Untracked</string>
+    <string name="exclude" translatable="true">exclude</string>
+    <string name="isolate" translatable="true">isolate</string>
+    <string name="untracked" translatable="true">untracked</string>
     <string name="bypass_dns_firewall" translatable="true">Bypass DNS &amp; Firewall</string>
 
     <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">
@@ -274,6 +311,7 @@
     <string name="status_protected_with_proxy_private_dns" translatable="true">protected with proxy &amp; private dns</string>
 
     <string name="status_protected_with_socks5_private_dns" translatable="true">protected with socks5 &amp; private dns</string>
+
     <string name="status_protected_with_http_private_dns" translatable="true">protected with http proxy &amp; private dns</string>
 
     <string name="status_protected_with_socks5" translatable="true">protected with socks proxy</string>
@@ -282,7 +320,6 @@
 
     <string name="status_protected_with_proxy" translatable="true">protected with proxy</string>
 
-    <string name="status_protected_with_rpn" translatable="false">protected with rpn</string>
     <string name="status_protected_with_wg" translatable="true">protected with wireguard</string>
 
     <string name="status_protected_with_wg_private_dns" translatable="true">protected with wireguard &amp; private dns</string>
@@ -295,7 +332,7 @@
     not protected
     </string>
 
-    <string name="dns_explanation_dns_connected" translatable="true">Connected to RethinkDNS</string>
+    <string name="dns_explanation_dns_connected" translatable="true">Connected to Re-RethinkDNS</string>
     <string name="dns_explanation_firewall_connected" translatable="true">Connected to Firewall</string>
 
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">
@@ -374,7 +411,7 @@
     <string name="always_on_dialog_neutral" translatable="true">Settings</string>
 
     <string name="private_dns_dialog_heading" translatable="true">Turn off Private DNS</string>
-    <string name="private_dns_dialog_desc" translatable="true">Rethink\'s DNS settings are overridden by Android\'s Private DNS.\n\nTo use Rethink\'s DNS go to Android Settings and turn off "Private DNS".</string>
+    <string name="private_dns_dialog_desc" translatable="true">Rethink\'s DNS settings are overridden by Android\'s Private DNS.\n\nTo use Rethink\'s DNS go to Android Settings and turn off \"Private DNS\".</string>
     <string name="private_dns_dialog_positive" translatable="true">Go to Settings</string>
 
     <string name="firewall_act_universal_tab" translatable="true">Universal</string>
@@ -445,7 +482,8 @@
     <string name="search_universal_ips" translatable="true"><font size="12">Search IPs</font></string>
     <string name="search_custom_domains" translatable="true"><font size="12">Search domain names</font></string>
     <string name="search_rethinkplus_file_tag" translatable="true"><font size="12">Search blocklists</font></string>
-    <string name="search_proxy_add_apps" translatable="true">Search apps by name</string>
+    <string name="search_proxy_add_apps" translatable="true">Search apps</string>
+    <string name="search_apps_count_placeholder" translatable="true">Search %1$d apps</string>
 
     <string name="app_mode_dns_low_battery" translatable="true">DNS (battery saver)</string>
     <string name="app_mode_dns" translatable="true">DNS</string>
@@ -453,7 +491,7 @@
     <string name="app_mode_dns_firewall" translatable="true">DNS and Firewall (default)</string>
     <string name="app_mode_wireguard" translatable="true">VPN</string>
 
-    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="settings_vpn_heading" translatable="true">VPN</string>
 
     <string name="info_dialog_copy_toast_msg" translatable="true">IP address copied.</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">URL copied</string>
@@ -462,6 +500,36 @@
 
     <string name="settings_enable_logs_desc" translatable="true">Store DNS and Firewall logs locally on-device.</string>
     <string name="settings_enable_logs" translatable="true">Enable on-device logging</string>
+    <string name="logs_disabled_summary" translatable="true">Logging is disabled. Enable on-device logging in Settings.</string>
+    <string name="lbl_no_logs" translatable="true">No logs yet.</string>
+    <string name="dns_log_clear_logs_title" translatable="true">Delete all logs?</string>
+    <string name="dns_log_clear_logs_message" translatable="true">This deletes on-device logs. This operation is not reversible. Do you want to proceed?</string>
+    <string name="lbl_rethink" translatable="true">Rethink</string>
+    <string name="lbl_loading" translatable="true">Loading...</string>
+    <string name="cd_more" translatable="true">More options</string>
+    <string name="lbl_view" translatable="true">View</string>
+    <string name="orbot_install_dialog_error" translatable="true">Unable to open Orbot install page.</string>
+    <string name="settings_dns_proxy_invalid_port" translatable="true">Invalid port.</string>
+    <string name="settings_dns_proxy_invalid_ip" translatable="true">Invalid IP address.</string>
+    <string name="settings_udp_block" translatable="true">Block UDP (except DNS)</string>
+    <string name="settings_exclude_apps_in_proxy" translatable="true">Exclude proxy apps</string>
+    <string name="settings_exclude_apps_in_proxy_desc" translatable="true">Exclude apps that act as proxy providers.</string>
+    <string name="settings_protocol_translation" translatable="true">Protocol translation</string>
+    <string name="settings_protocol_translation_desc" translatable="true">Translate UDP traffic to TCP when needed.</string>
+    <string name="settings_ping_ips" translatable="true">Ping IPs</string>
+    <string name="settings_treat_mobile_metered" translatable="true">Treat mobile data as metered</string>
+    <string name="settings_treat_mobile_metered_desc" translatable="true">Apply metered network behavior to mobile data.</string>
+    <string name="settings_wg_listen_port" translatable="true">WireGuard listen port</string>
+    <string name="settings_wg_listen_port_desc" translatable="true">Allow setting a custom listen port.</string>
+    <string name="settings_wg_lockdown" translatable="true">WireGuard lockdown</string>
+    <string name="settings_wg_lockdown_desc" translatable="true">Restrict traffic to the WireGuard interface only.</string>
+    <string name="settings_endpoint_independence" translatable="true">Endpoint-independent mapping</string>
+    <string name="settings_endpoint_independence_desc" translatable="true">Prefer endpoint-independent NAT behavior.</string>
+    <string name="settings_tcp_keep_alive" translatable="true">TCP keep-alive</string>
+    <string name="settings_tcp_keep_alive_desc" translatable="true">Keep idle TCP connections alive.</string>
+    <string name="settings_vpn_builder_metered" translatable="true">Use metered VPN</string>
+    <string name="settings_vpn_builder_metered_desc" translatable="true">Treat the VPN connection as metered.</string>
+    <string name="settings_dial_timeout" translatable="true">Dial timeout</string>
 
     <string name="app_mode_choose" translatable="true">Choose mode</string>
 
@@ -493,6 +561,7 @@
 
     <string name="settings_allow_lan_heading" translatable="true">Do not route Private IPs (experimental)</string>
     <string name="settings_allow_lan_desc" translatable="true">Exclude LAN, loopback, multicast, link-local routes from Rethink\'s VPN tunnel.</string>
+
 
     <string name="settings_mobile_metered_heading" translatable="true">Meter mobile networks</string>
     <string name="settings_mobile_metered_desc" translatable="true">Only treat mobile networks as metered, rest as unmetered.</string>
@@ -596,6 +665,21 @@
 
     <string name="settings_theme_heading" translatable="true">Appearance</string>
     <string name="settings_theme_desc" translatable="true">Dark/light theme</string>
+    <string name="settings_theme_color_heading" translatable="true">Color style</string>
+    <string name="settings_theme_color_desc" translatable="true">Choose a color style for the app.</string>
+    <string name="settings_theme_color_dynamic_unavailable" translatable="true">Dynamic color is unavailable on this device.</string>
+    <string name="settings_theme_color_auto" translatable="true">Auto</string>
+    <string name="settings_theme_color_dynamic" translatable="true">Dynamic</string>
+    <string name="settings_theme_color_coral" translatable="true">Coral</string>
+    <string name="settings_theme_color_rose" translatable="true">Rose</string>
+    <string name="settings_theme_color_teal" translatable="true">Teal</string>
+    <string name="settings_theme_color_blue" translatable="true">Blue</string>
+    <string name="settings_theme_color_purple" translatable="true">Purple</string>
+    <string name="settings_theme_color_orange" translatable="true">Orange</string>
+    <string name="settings_theme_color_green" translatable="true">Green</string>
+    <string name="settings_theme_color_amber" translatable="true">Amber</string>
+    <string name="settings_theme_color_cyan" translatable="true">Cyan</string>
+    <string name="settings_theme_color_indigo" translatable="true">Indigo</string>
 
     <string name="settings_go_log_heading" translatable="true">Log level</string>
     <string name="settings_go_log_desc" translatable="true">For debugging purposes</string>
@@ -604,9 +688,8 @@
     <string name="settings_rinr_desc_disabled" translatable="true">Route Rethink\'s own traffic, like blocklist downloads, connectivity checks, DNS connections, back into the tunnel.</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Routing Rethink\'s own traffic through the tunnel. Unless you know what you\'re doing, turn it off.</string>
 
-    <string name="settings_rinr_btmsht_title" translatable="true">Loopback (experimental)</string>
-    <string name="settings_rinr_btmsht_desc" translatable="true">In Loopback mode, Rethink can reroute its own network traffic. This means, Rethink can apply IP and domain rules, universal firewall rules, and proxying rules on Rethink\'s traffic as if it were any other regular app. Even so Loopback offers more control, the resulting behavior may not always desirable.\n\n\nIt is recommended to exempt Rethink from firewall, DNS, and proxying rules. Doing so doesn\'t affect network monitoring or logging, but just the rules.\n\n\nIn Loopback mode, Proxy Lockdown will not be enforced, for now.</string>
-    <string name="settings_rinr_exempt_btn" translatable="true">Exempt Rethink</string>
+    <string name="settings_rinr_dialog_title" translatable="true">Loopback (experimental)</string>
+    <string name="settings_rinr_dialog_desc" translatable="true">Also enables<!--settings_network_all_networks--> %1$s setting. Do you want to proceed?</string>
 
     <string name="settings_gologger_dialog_option_0" translatable="false">Very verbose</string>
     <string name="settings_gologger_dialog_option_1" translatable="false">Verbose</string>
@@ -631,7 +714,7 @@
     <string name="settings_dns_proxy_dialog_port_number" translatable="true">Port Number</string>
     <string name="settings_dns_proxy_dialog_username" translatable="true">Username</string>
     <string name="settings_dns_proxy_dialog_password" translatable="true">Password</string>
-    <string name="settings_dns_proxy_dialog_positive_btn" translatable="true">Set</string>
+    <string name="settings_dns_proxy_dialog_positive_btn" translatable="true">set</string>
     <string name="settings_dns_proxy_dialog_app_desc" translatable="false">The selected app will be excluded from the VPN to let it proxy connections on your behalf.</string>
 
     <string name="settings_app_list_default_app" translatable="true">None</string>
@@ -646,7 +729,7 @@
     <string name="settings_socks5_dialog_hint_password" translatable="true">Password (optional)</string>
 
     <string name="settings_theme_dialog_title" translatable="true">Appearance</string>
-    <string name="settings_theme_dialog_themes_1" translatable="true">Set by System</string>
+    <string name="settings_theme_dialog_themes_1" translatable="true">System</string>
     <string name="settings_theme_dialog_themes_2" translatable="true">Light</string>
     <string name="settings_theme_dialog_themes_3" translatable="true">Dark</string>
     <string name="settings_theme_dialog_themes_4" translatable="true">True Black</string>
@@ -770,6 +853,7 @@
     <string name="hsf_exclude_error" translatable="true">Exclude not possible in VPN lockdown mode</string>
 
     <string name="hsf_proxy_chip_removed_toast" translatable="true">Proxy removed</string>
+    <string name="hsf_proxy_chip_remove_text" translatable="true">Stopping…</string>
 
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Packet capture disabled</string>
 
@@ -790,6 +874,10 @@
 
     <string name="dc_block_heading" translatable="true">Rules</string>
     <string name="dc_other_dns_heading" translatable="true">Type</string>
+    <string name="dns_mode_system_desc" translatable="true">Use the DNS server configured by the system.</string>
+    <string name="dns_mode_other_desc" translatable="true">Use a user-selected DNS server.</string>
+    <string name="dns_mode_rethink_desc" translatable="true">Use Rethink DNS with in-app blocklists and policies.</string>
+    <string name="dns_mode_smart_desc" translatable="true"><i>Smart DNS</i> picks from a rotating set of resolvers.</string>
 
     <string name="dc_custom_dns_radio" translatable="true">Other DNS</string>
     <string name="dc_rethink_dns_radio" translatable="true">Rethink DNS</string>
@@ -809,12 +897,10 @@
 
     <string name="dc_check_update_heading" translatable="true">Prompt on blocklist updates</string>
     <string name="dc_check_update_desc" translatable="true">Check for blocklist updates once every <i>three</i> days</string>
+    <string name="dc_check_update_desc_compact" translatable="true">Check for updates every three days.</string>
 
     <string name="dc_proxy_dns_heading" translatable="true">Never proxy DNS</string>
     <string name="dc_proxy_dns_desc" translatable="true">Do not proxy DNS over Always-on WireGuard, SOCKS5, HTTP proxies.</string>
-
-    <string name="dc_block_unknown_heading" translatable="true">Block DNS from Unknown source</string>
-    <string name="dc_block_unknown_desc" translatable="true">Block all DNS requests originating from unknown applications.</string>
 
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Use System DNS for undelegated domains</string>
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Use System DNS for undelgated domains like <i>.lan</i>, <i>.internal</i>, etc.</string>
@@ -836,7 +922,7 @@
     <!-- Bug Report Files Bottom Sheet -->
     <string name="bug_report_files_desc" translatable="false">Select the files you want to include in the bug report email</string>
     <string name="bug_report_deselect_all" translatable="false">Deselect All</string>
-    <string name="bug_report_no_files_selected" translatable="false">Select at least one file</string>
+    <string name="bug_report_no_files_selected" translatable="false">Please select at least one file</string>
     <string name="bug_report_creating_zip" translatable="false">Creating archive…</string>
     <string name="bug_report_file_not_found" translatable="false">File not found</string>
     <string name="bug_report_error_opening_file" translatable="false">Cannot open this file type</string>
@@ -866,11 +952,11 @@
     <string name="about_app_contributors" translatable="true">Authors</string>
     <string name="about_app_translate" translatable="true">Translate</string>
     <string name="about_dialog_positive_button" translatable="true">Let\'s Go</string>
-    <string name="about_mail_to" translatable="true">hello@celzero.com</string>
+    <string name="about_mail_to" translatable="true">bernaferrari2@gmail.com</string>
     <string name="about_mail_to_string" translatable="true">mailto:</string>
     <string name="about_mail_subject" translatable="true">[Rethink]:</string>
     <string name="about_mail_bugreport_subject" translatable="true">[Rethink]: Bug report</string>
-    <string name="about_mail_bugreport_text" translatable="true">Send this email to : hello@celzero.com</string>
+    <string name="about_mail_bugreport_text" translatable="true">Send this email to : bernaferrari2@gmail.com</string>
     <string name="about_mail_bugreport_share_title" translatable="true">Select email provider</string>
     <string name="about_telegram_link" translatable="false">https://telegram.me/rethinkdns</string>
     <string name="about_docs_link" translatable="false">https://docs.rethinkdns.com/</string>
@@ -888,7 +974,7 @@
     <string name="about_mastodom_handle" translatable="false">https://mastodon.social/@rdns</string>
     <string name="about_reddit_handle" translatable="false">https://www.reddit.com/r/rethinkdns</string>
     <string name="about_matrix_handle" translatable="false">https://matrix.to/#/!jrTSpJiEkFNNBMhSaE:matrix.org</string>
-    <string name="about_version" translatable="false">%1$s</string>
+    <string name="about_version" translatable="false">%1$s</string> <!-- remove this string name="about_version" translatable="false">v%1$s</string> -->
     <string name="about_version_install_source" translatable="false">%1$s (%2$s)</string>
     <string name="about_dialog_neutral_button" translatable="true">Suggest features</string>
 
@@ -909,10 +995,8 @@
                                               <br/>🛡️ Android app <br/>
                                               <a href="https://github.com/anthonyryan1">Anthony Ryan</a> /
                                               <a href="https://github.com/BayLee4">BayLee4</a> /
-                                              <a href="https://github.com/Coding-Young">Coding-Young</a> /
                                               <a href="https://github.com/Ch4t4r">Ch4t4r</a> /
                                               <a href="https://github.com/samthesamman">CodingAttack</a> /
-                                              <a href="https://github.com/dsremo">dsremo</a> /
                                               <a href="https://github.com/HrBDev">HrBDev</a> /
                                               <a href="https://github.com/hussainmohd-a">hussainmohd-a</a> /
                                               <a href="https://github.com/ignoramous">ignoramous</a> /
@@ -923,12 +1007,9 @@
                                               <a href="https://github.com/Poussinou">Poussinou</a> /
                                               <a href="https://github.com/pjosingh">pjosingh</a> /
                                               <a href="https://github.com/RohitSurwase">RohitSurwase</a> /
-                                              <a href="https://github.com/rootshel">rootshel</a> /
                                               <a href="https://github.com/ShantanuVichare">Shantanu</a> /
-                                              <a href="https://github.com/Uldiniad">Uldiniad</a> /
-                                              <a href="https://github.com/VASHvic">VASHvic</a> /
-                                              <a href="https://github.com/yurtpage">yurtpage</a> /
-                                              <a href="https://github.com/WhoIsDevelop">WhoIsDevelop</a><br/>
+                                              <a href="https://github.com/Uldiniad">Uldiniad</a><br/> /
+                                              <a href="https://github.com/yurtpage">yurtpage</a><br/>
                                               <br/>🚂 Network engine <br/>
                                               <a href="https://github.com/alalamav">alalamav</a> /
                                               <a href="https://github.com/bemasc">bemasc</a> /
@@ -979,7 +1060,7 @@
                                               <a href="https://central.sonatype.com/">Sonatype</a><br/>
                                               ]]></string>
     <!-- Configure DNS Fragment string == cd -->
-    <string name="cd_dns_crypt_title" translatable="true">Resolvers</string>
+    <string name="cd_dns_crypt_title" translatable="true">resolvers</string>
     <string name="cd_custom_doh_dialog_title" translatable="true">Custom Server URL</string>
     <string name="cd_custom_doh_url_name_default" translatable="true">DoH</string>
     <string name="cd_custom_doh_url_name" translatable="true">DoH %1$s</string>
@@ -1018,6 +1099,9 @@
 
     <string name="cd_split_dns_heading" translatable="true">Split DNS (experimental)</string>
     <string name="cd_split_dns_desc" translatable="true">Forward DNS queries from proxied apps to the proxy\'s DNS servers.</string>
+
+    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">Treat DNS rules as firewall rules (experimental)</string>
+    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">DNS blocking will be bypassed during resolution; the decision will be made at connection time.</string>
 
     <string name="cd_allowed_dns_record_types_heading" translatable="false">Allowed DNS record types</string>
     <string name="cd_allowed_dns_record_types_desc" translatable="false">Select which DNS resource record types to allow.</string>
@@ -1063,6 +1147,7 @@
     <string name="hs_download_positive_website" translatable="true">Visit website</string>
 
     <string name="hs_download_negative_default" translatable="true">Remind me later</string>
+
 
     <!-- Universal Firewall-->
     <string name="univ_firewall_rule_1" translatable="true">Block all apps when device is locked</string>
@@ -1155,6 +1240,7 @@
     <string name="fapps_bypass_block_dialog_title" translatable="true">Bypass apps</string>
     <string name="fapps_bypass_block_dialog_message" translatable="true">Bypass Universal firewall rules for <i>listed</i> apps?</string>
 
+
     <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Bypass apps</string>
     <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Bypass universal DNS &amp; firewall rules for <i>listed</i> apps?</string>
 
@@ -1183,7 +1269,7 @@
     <!-- BraveVPN service rules failure -->
     <string name="rules_load_failure_heading" translatable="true">Note</string>
     <string name="rules_load_failure_desc" translatable="true">No firewall rules found</string>
-    <string name="rules_load_failure_reload" translatable="true">reload</string>
+    <string name="rules_load_failure_reload" translatable="true">Reload</string>
 
     <string name="network_log_app_name_unknown" translatable="true">Unknown</string>
     <string name="network_log_app_name_unnamed" translatable="true">Unnamed (%1$s)</string>
@@ -1320,14 +1406,13 @@
     <string name="notif_channel_firewall_alerts" translatable="true">Firewall Alerts</string>
     <string name="notif_channel_proxy_failure" translatable="true">Proxy Alerts</string>
     <string name="notif_channel_download" translatable="true">Download Alerts</string>
-    <string name="notif_channel_rpn" translatable="false">RPN Alerts</string>
 
     <string name="notif_channel_desc_vpn_notification" translatable="true">Inform when Rethink is active and running in the background</string>
     <string name="notif_channel_desc_vpn_failure" translatable="true">Inform when Rethink is stopped by Android or by another VPN app</string>
     <string name="notif_channel_desc_firewall_alerts" translatable="true">Alert on Firewall errors and anomalies</string>
     <string name="notif_channel_desc_proxy_failure" translatable="true">Alert on Proxy errors and anomalies</string>
     <string name="notif_channed_desc_download" translatable="true">Alert on Download Progress for On-device blocklists</string>
-    <string name="notif_channel_desc_rpn" translatable="false">Alert on RPN errors and anomalies</string>
+    <string name="alerts_empty_state" translatable="true">Alerts are not available yet.</string>
 
     <!-- Category constants -->
     <string name="category_name_sys_components" translatable="true">System Components</string>
@@ -1413,9 +1498,9 @@
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">will bypass universal dns &amp; firewall rules</string>
     <string name="ada_app_status_unknown" translatable="true">is unknown</string>
 
-    <string name="ada_firewall_title" translatable="true">Firewall rules for this app</string>
+    <string name="ada_firewall_title" translatable="true">firewall rules for this app</string>
 
-    <string name="ada_network_log_title" translatable="true">Network log for this app</string>
+    <string name="ada_network_log_title" translatable="true">network log for this app</string>
 
     <string name="ada_app_firewall" translatable="true">Firewall</string>
     <string name="ada_app_metered" translatable="true">Metered</string>
@@ -1481,7 +1566,9 @@
     <string name="rt_chip_check_update" translatable="true">Check for update</string>
     <string name="rt_re_download" translatable="true">Re-download blocklists</string>
 
-    <string name="rt_list_simple_btn_txt" translatable="true">Simple</string>
+    <string name="rt_list_simple_btn_txt" translatable="true">simple</string>
+    <string name="lbl_protection" translatable="true">Protection</string>
+    <string name="lbl_system" translatable="true">System</string>
     <string name="lbl_advanced" translatable="true">Advanced</string>
 
     <string name="rt_filter_parent_selected" translatable="true">Selected</string>
@@ -1517,13 +1604,40 @@
 
     <!-- local blocklist bottom sheet -->
     <string name="lbbs_enabled" translatable="true">Enabled</string>
+    <string name="lbbs_state_header" translatable="true">Blocklist state</string>
+    <string name="lbbs_toggle_off" translatable="true">Disable blocklists</string>
+    <string name="lbbs_toggle_on" translatable="true">Enable blocklists</string>
+    <string name="lbbs_toggle_desc" translatable="true">Turn on to use on-device blocklists for DNS filtering.</string>
+    <string name="lbbs_actions_header" translatable="true">Blocklist actions</string>
     <string name="lbbs_configure" translatable="true">Configure</string>
     <string name="lbbs_copy" translatable="true">Copy as RDNS+ URL</string>
     <string name="lbbs_search" translatable="true">Search domains in blocklists</string>
+    <string name="lbbs_maintenance_header" translatable="true">Maintenance</string>
     <string name="lbbs_update_check" translatable="true">Check for update</string>
     <string name="lbbs_redownload" translatable="true">Redownload blocklists</string>
     <string name="lbbs_download" translatable="true">Update blocklists</string>
     <string name="lbbs_heading" translatable="true">Configure 195+ blocklists</string>
+
+    <!-- Compose settings search -->
+    <string name="configure_search_close" translatable="true">Close search</string>
+    <string name="configure_search_open" translatable="true">Open search</string>
+    <string name="configure_search_hint" translatable="true">Search settings</string>
+    <string name="configure_search_empty_title" translatable="true">No matches</string>
+    <string name="configure_search_empty_subtitle" translatable="true">Try searching by name, section, or keyword.</string>
+
+    <!-- App list -->
+    <string name="fapps_empty_title" translatable="true">No apps found</string>
+    <string name="fapps_empty_subtitle" translatable="true">No apps match your current filters.</string>
+
+    <!-- Logs -->
+    <string name="logs_search_network_hint" translatable="true">Search apps, IPs, domains</string>
+    <string name="logs_search_dns_hint" translatable="true">Search domain names or IPs</string>
+    <string name="logs_search_count_placeholder" translatable="true">Search %1$d logs</string>
+
+    <!-- Wireguard -->
+    <string name="wireguard_fab_more_actions" translatable="true">More actions</string>
+    <string name="wireguard_fab_expanded" translatable="true">More actions, expanded</string>
+    <string name="wireguard_fab_collapsed" translatable="true">More actions, collapsed</string>
 
     <!-- backup / restore bottom sheet -->
     <string name="brbs_title" translatable="true">Backup &amp; restore</string>
@@ -1551,23 +1665,23 @@
 
     <string name="brbs_restore_complete_toast" translatable="true">Restore completed, restarting app…</string>
     <string name="brbs_backup_complete_toast" translatable="true">Backup completed</string>
-    <string name="brbs_restore_invalid_file" translatable="false">Invalid backup file. Please select a %1$s backup file for this build.</string>
     <string name="brbs_restore_no_uri_toast" translatable="true">Restore failed; try again</string>
 
     <!-- Rethink simple view -->
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category" translatable="true">%1$s blocklists</string>
 
     <!-- Summary statistics view-->
-    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">Most Allowed Apps</string>
-    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">Most Blocked Apps</string>
-    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">Most Contacted Domains</string>
-    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">Most Contacted Countries</string>
-    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">Most Blocked Domains</string>
-    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">Most Contacted IPs</string>
-    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">Most Blocked IPs</string>
-    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">Most Blocked Countries</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">Most allowed apps</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">Most blocked apps</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">Most contacted domains</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">Most contacted countries</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">Most blocked domains</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">Most contacted ips</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">Most blocked ips</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">Most blocked countries</string>
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Start Rethink to proceed</string>
     <string name="ssv_see_more" translatable="true">Show All</string>
+    <string name="ssv_see_less" translatable="true">Show Less</string>
 
     <!-- wireguard -->
     <string name="bad_config_reason_invalid_key" translatable="true">Invalid key</string>
@@ -1624,8 +1738,6 @@
     <string name="catch_all_wg_dialog_title" translatable="true">Always-on</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">All connections and apps not routed by other WireGuard VPNs will be routed by this one.</string>
 
-    <string name="lockdown_wg_dialog_desc" translatable="false">Selected apps will only be routed through this WireGuard VPN, regardless of whether the VPN is active or disabled.</string>
-
     <string name="one_wg_error_toast" translatable="true">To switch to Advanced, stop WireGuard in Simple mode</string>
 
     <string name="add_remove_apps" translatable="true">Add / Remove (%1$s apps)</string>
@@ -1635,9 +1747,6 @@
     <string name="config_delete_dialog_desc" translatable="true">Are you sure you want to delete this WireGuard VPN configuration?</string>
     <string name="config_delete_dialog_title" translatable="true">Delete</string>
     <string name="config_add_success_toast" translatable="true">Done</string>
-
-    <string name="config_delete_all_dialog_desc" translatable="true">Are you sure you want to delete ALL WireGuard VPN configurations? This is IRREVERSIBLE.</string>
-    <string name="config_delete_all_dialog_title" translatable="true">Delete All</string>
 
     <string name="include_all_app_wg_dialog_title" translatable="true">Include all apps</string>
     <string name="include_all_app_wg_dialog_desc" translatable="true">Use this WireGuard VPN for all apps?</string>
@@ -1704,7 +1813,7 @@
     <string name="anti_censorship_title" translatable="true">Anti-censorship</string>
     <string name="anti_censorship_desc" translatable="true">Choose from various Anti-censorship technique.</string>
 
-    <string name="tcp_keep_alive_title" translatable="true">Shorter TCP keepalive</string>
+    <string name="tcp_keep_alive_title" translatable="true">Shorter TCP keep alive</string>
     <string name="tcp_keep_alive_desc" translatable="true">Quickly close TCP sockets with no recent activity.</string>
 
     <!-- anti-censorship -->
@@ -1727,7 +1836,16 @@
     <string name="ac_tcp_proxy" translatable="false">Hybrid</string>
     <string name="ac_tcp_proxy_desc" translatable="false">Also uses proxy as necessary.</string>
 
-    <string name="ac_retry_options_title" translatable="true">strategy</string>
+    <!-- TCP Proxy Screen -->
+    <string name="tcp_proxy_warp_active_error" translatable="true">Warp is active. Please disable it first.</string>
+    <string name="tcp_proxy_no_apps_error" translatable="true">Please add at least one app to enable Rethink Proxy.</string>
+    <string name="tcp_proxy_rethink_proxy_title" translatable="true">Rethink\'s Proxy</string>
+    <string name="tcp_proxy_enable_udp_relay" translatable="true">Enable UDP Relay</string>
+    <string name="tcp_proxy_cloudflare_warp_title" translatable="true">Cloudflare WARP</string>
+    <string name="tcp_proxy_cloudflare_warp_desc" translatable="true">Modern, fast, and secure way to connect to a VPN server. Secure all your internet traffic with an ultra-secure, lightning-quick VPN service that lets you connect with the WireGuard protocol.</string>
+    <string name="something_went_wrong" translatable="true">Something went wrong</string>
+
+    <string name="ac_retry_options_title" translatable="true">Strategy</string>
     <string name="ac_retry_options_desc" translatable="true">Set how retries work for censored connections.</string>
 
     <string name="ac_retry_options_never_desc" translatable="true">On failure, never retry anti-censorship techniques.</string>
@@ -1755,7 +1873,7 @@
     <string name="adv_set_dial_timeout_desc" translatable="true">Close idle TCP and UDP sockets after this duration.</string>
 
     <string name="adv_set_experimental_title" translatable="false">Experimental</string>
-    <string name="adv_set_experimental_desc" translatable="false">Experimental features in network engine.</string>
+    <string name="adv_set_experimental_desc" translatable="false">Experimental features in the Network Engine.</string>
 
     <string name="select_wg_proxy_desc" translatable="false">Select WireGuard proxy</string>
 
@@ -1777,8 +1895,8 @@
 
     <string name="bypasses_network_restrictions" translatable="true">Reachability checks bypass all network restrictions. In <i>Auto</i> mode, Rethink randomly uses previously connected IPs and hostnames.</string>
 
-    <string name="most_contacted_asn" translatable="true">Most Contacted Providers</string>
-    <string name="most_blocked_asn" translatable="true">Most Blocked Providers</string>
+    <string name="most_contacted_asn" translatable="true">Most contacted providers</string>
+    <string name="most_blocked_asn" translatable="true">Most blocked providers</string>
 
     <string name="adv_tasker_dialog_msg" translatable="true">Enter package names (comma-separated) allowed to start or stop Rethink.</string>
     <string name="adv_tasker_dialog_instructions" translatable="true">Instructions:\n
@@ -1803,7 +1921,7 @@
     <string name="adv_taster_title" translatable="true">Automation</string>
     <string name="adv_taster_desc" translatable="true">Configure apps that can start or stop Rethink.</string>
 
-    <string name="top_active_conns" translatable="true">Top Active Connections</string>
+    <string name="top_active_conns" translatable="true">Top active connections</string>
 
     <string name="load_more" translatable="true">Load All</string>
     <string name="close_conns_dialog_title" translatable="true">Close Connections</string>
@@ -1824,6 +1942,7 @@
     <string name="processing_dialog_desc" translatable="true">Please wait while we process your request.</string>
 
     <string name="smart_dns_desc" translatable="true"><i>Smart DNS</i> randomly uses any among these DNS resolvers:</string>
+
 
     <string name="custom_rules_proxy_title" translatable="false">Proxy rules</string>
     <string name="custom_rules_proxy_desc" translatable="false">Select a proxy to use for this rule.</string>
@@ -1921,18 +2040,28 @@
     <string name="alert_message_ip_domain_blocked" translatable="true">Rethink is blocking a connection</string>
     <string name="alert_actions_ip_domain_blocked" translatable="true">View</string>
     <string name="alert_solution_ip_domain_blocked" translatable="true">Rethink is blocking a connection</string>-->
-
     <string name="title_database_dump" translatable="true">Database</string>
+    <string name="database_inspector_search_hint" translatable="true">Search tables</string>
+    <string name="database_inspector_no_tables" translatable="true">No database tables available.</string>
+    <string name="database_inspector_tables_title" translatable="true">Tables</string>
+    <string name="database_inspector_selected" translatable="true">Selected</string>
+    <string name="database_inspector_select_table" translatable="true">Select a table to inspect.</string>
+    <string name="database_inspector_rows" translatable="true">%1$s rows</string>
+    <string name="database_inspector_columns" translatable="true">%1$s columns</string>
+    <string name="database_inspector_refresh" translatable="true">Refresh</string>
+    <string name="database_inspector_copying" translatable="true">Copying…</string>
+    <string name="database_inspector_copy_full" translatable="true">Copy full dump</string>
+    <string name="database_inspector_preview_truncated" translatable="true">Preview truncated. Copy full dump to see complete output.</string>
     <string name="copied_clipboard" translatable="true">Copied</string>
 
     <string name="lbl_ssids" translatable="false">SSIDs</string>
     <string name="lbl_ssid" translatable="false">SSID</string>
 
     <string name="wg_setting_ssid_title" translatable="true">Wi‑Fi only</string>
-    <string name="wg_setting_ssid_desc" translatable="true">Enable this WireGuard VPN only when connected to Wi-Fi or to one of the specified WiFi identifiers (%1$s).</string>
+    <string name="wg_setting_ssid_desc" translatable="true">Enable this WireGuard VPN only when connected to Wi-Fi or specified WiFi identifiers (%1$s).</string>
     <string name="ssid_permission_explanation" translatable="true">Rethink needs location permission to access Wi‑Fi identifiers (%1$s).</string>
-    <string name="location_enable_explanation" translatable="true">To access Wi‑Fi identifiers (%1$s), turn on Location Services.</string>
-    <string name="ssid_location_error" translatable="true">Enable Location Services</string>
+    <string name="location_enable_explanation" translatable="true">To access Wi‑Fi identifiers (%1$s), turn on Location service.</string>
+    <string name="ssid_location_error" translatable="true">Enable Location service</string>
     <string name="ssid_permission_error_action" translatable="true">Grant permission</string>
     <string name="ssid_location_error_action" translatable="true">Enable location</string>
     <string name="wg_ssid_and_mobile_err" translatable="true">Cannot use both "%1$s" and "%2$s"</string>
@@ -1945,31 +2074,26 @@
     <string name="wg_ssid_type_wildcard" translatable="true">Matches partially</string>
     <string name="wg_ssid_invalid_error" translatable="true">Wi-Fi identifiers (%1$s) must be 32 characters or less.</string>
     <string name="wg_ssid_delete_confirmation" translatable="true">Delete "%1$s"?</string>
-    <string name="wg_ssid_add_button" translatable="false">Add SSID</string>
-    <string name="wg_ssid_empty_error" translatable="false">SSID name cannot be empty</string>
-    <string name="wg_ssid_duplicate_error" translatable="false">SSID already exists in the list</string>
-    <string name="wg_ssid_delete_title" translatable="false">Delete SSID</string>
-    <string name="wg_ssid_condition_label" translatable="false">Action</string>
-    <string name="wg_ssid_match_type_label" translatable="false">Match Type</string>
 
     <string name="settings_firebase_error_reporting_heading" translatable="true">Stability program</string>
-    <string name="settings_firebase_error_reporting_desc" translatable="true">Capture error logs to help improve stability.</string>
+    <string name="settings_firebase_error_reporting_desc" translatable="true">Capture error logs to help improve stability. </string>
 
     <string name="tombstone_app_title" translatable="true">Remember uninstalled apps</string>
     <string name="tombstone_app_desc" translatable="true">When enabled, keep app rules for 7 days.</string>
 
     <string name="firewall_bubble_title" translatable="false">Firewall Bubble</string>
     <string name="firewall_bubble_subtitle" translatable="false">Review blocked apps and allow them temporarily.</string>
-    <string name="firewall_bubble_desc" translatable="false">Shows a floating bubble with recently blocked apps.</string>
+    <string name="firewall_bubble_desc" translatable="false">Show a floating bubble with recently blocked apps.</string>
+    <string name="firewall_bubble" translatable="false">Firewall Bubble</string>
     <string name="firewall_bubble_channel_name" translatable="false">Firewall Bubble Notifications</string>
-    <string name="firewall_bubble_channel_desc" translatable="false">Shows a bubble notification for recently blocked apps</string>
-    <string name="firewall_bubble_text" translatable="false">Tap to view recently blocked apps</string>
+    <string name="firewall_bubble_channel_desc" translatable="false">Shows bubble notification for blocked apps</string>
+    <string name="firewall_bubble_text" translatable="false">Tap to see recently blocked apps</string>
     <string name="firewall_bubble_permission_granted_toast" translatable="false">Firewall Bubble enabled</string>
     <string name="firewall_bubble_permission_denied_toast" translatable="false">Permission denied. Firewall Bubble disabled.</string>
 
     <string name="bubble_activity_title" translatable="false">Recently Blocked Apps</string>
     <string name="bubble_empty_state_title" translatable="false">No Blocked Apps</string>
-    <string name="bubble_empty_state_desc" translatable="false">Apps blocked by the firewall will appear here.</string>
+    <string name="bubble_empty_state_desc" translatable="false">Apps blocked by the firewall will appear here</string>
     <string name="bubble_allow_btn" translatable="false">Allow (15 min)</string>
     <string name="bubble_blocked_count" translatable="false">%d blocked</string>
     <string name="bubble_time_just_now" translatable="false">Just now</string>
@@ -1977,10 +2101,11 @@
     <string name="bubble_time_hours_ago" translatable="false">%d hr ago</string>
 
     <string name="bubble_allowed_title" translatable="false">Temporarily Allowed Apps</string>
+    <string name="bubble_loading" translatable="false">Loading…</string>
     <string name="settings_locale_dialog_default" translatable="true">System default</string>
 
     <string name="settings_allow_incoming_wg_packets" translatable="true">WireGuard P2P</string>
-    <string name="settings_allow_incoming_wg_packets_desc" translatable="true">When enabled, allows incoming connections initiated by WireGuard peers.</string>
+    <string name="settings_allow_incoming_wg_packets_desc" translatable="true">When enabled, allow incoming connections initiated by WireGuard peers.</string>
 
     <string name="lockdown_download_message" translatable="true">Android\'s built-in <i>Download Manager</i> may fail as VPN is in <i>Lockdown</i> mode. Enable Rethink\'s downloader instead?</string>
     <string name="lockdown_download_enable_inapp" translatable="true">Enable Downloader</string>
@@ -1989,516 +2114,93 @@
     <string name="settings_jumbo_packets_desc" translatable="true">Uses <i>jumbo packets</i> within Rethink\'s VPN tunnel.</string>
 
     <string name="settings_tunnel_metered" translatable="true">Always metered</string>
-    <string name="settings_tunnel_metered_desc" translatable="true">Mark Rethink\'s VPN tunnel as metered to encourage apps to use less data. Caution: This may cause apps to pause large uploads &amp; downloads, like backups.</string>
+    <string name="settings_tunnel_metered_desc" translatable="true">Mark Rethink\'s VPN tunnel as metered to instruct apps to consume less data. Caution: This may cause apps to pause large uploads &amp; downloads, like backups.</string>
 
     <string name="stability_program_toast" translatable="true">Enrolled to the <i>stability program</i> for <i>experimental features</i>.</string>
-    <string name="stability_program_snackbar_msg" translatable="true">Stability program enabled</string>
-    <string name="stability_program_snackbar_disable" translatable="true">Undo</string>
 
-    <string name="settings_wireguard_lockdown_mode" translatable="false">Proxy Lockdown (experimental)</string>
-    <string name="settings_wireguard_lockdown_mode_desc" translatable="false">When enabled, all traffic is forced through Proxy or blocked.</string>
-
-    <string name="settings_flood_wg" translatable="false">Flood WireGuard</string>
-    <string name="settings_flood_wg_desc" translatable="true">When enabled, sends additional WireGuard packets to make tunnel traffic harder to identify and block on restrictive networks.</string>
-
-    <string name="settings_socket_buffer_size" translatable="false">Socket Buffer Size</string>
-    <string name="settings_socket_buffer_size_desc" translatable="false">Adjust the network buffer size used by Rethink sockets. Larger buffers may improve network throughput in some conditions but use more memory.</string>
-
-    <string name="settings_smart_persistent_keepalive" translatable="false">Smart Persistent Keepalive</string>
-    <string name="settings_smart_persistent_keepalive_desc" translatable="false">Proactively maintains WireGuard tunnel connectivity by sending keep-alive probes only when needed, minimizing reconnection delays on intermittent networks.</string>
+    <string name="settings_wireguard_lockdown_mode" translatable="false">WireGuard Lockdown</string>
+    <string name="settings_wireguard_lockdown_mode_desc" translatable="false">When enabled, all traffic is forced through WireGuard VPN.</string>
 
     <!-- Event Logs -->
     <string name="event_logs_title" translatable="false">Event Logs</string>
     <string name="event_logs_subtitle" translatable="false">View internal system &amp; debug events</string>
+    <string name="event_details" translatable="false">Details</string>
     <string name="no_events_recorded" translatable="false">No events recorded yet</string>
-    <string name="no_events_desc" translatable="false">Event logs will appear here once the app starts recording system activity</string>
+    <string name="no_events_desc" translatable="false">Event logs will appear here once the app starts recording system activities</string>
+    <string name="total_events_count" translatable="false">Total Events: %1$d</string>
     <string name="delete_all_events" translatable="false">Delete All Events</string>
     <string name="delete_all_events_confirmation" translatable="false">Are you sure you want to delete all event logs? This action cannot be undone.</string>
 
-    <!-- Custom Interface IPs -->
-    <string name="custom_lan_ip_title" translatable="false">Custom Interface IPs for VPN</string>
-    <string name="custom_lan_ip_desc" translatable="false">Override default VPN Interface gateway, router, and DNS addresses.</string>
-    <string name="custom_lan_ip_auto_desc" translatable="false">Use automatically assigned VPN Interface IPs.</string>
-    <string name="custom_lan_ip_manual_desc" translatable="false">Manually configure Interface IPs for gateway, router, and DNS.</string>
+    <!-- Custom LAN IPs -->
+    <string name="custom_lan_ip_title" translatable="false">Custom LAN IPs for VPN</string>
+    <string name="custom_lan_ip_desc" translatable="false">Override default VPN LAN gateway, router, and DNS addresses.</string>
+    <string name="custom_lan_ip_auto_desc" translatable="false">Use automatically assigned VPN LAN IPs.</string>
+    <string name="custom_lan_ip_manual_desc" translatable="false">Manually configure LAN IPs for gateway, router, and DNS.</string>
+    <string name="custom_lan_ip_mode_auto" translatable="false">AUTO</string>
+    <string name="custom_lan_ip_mode_manual" translatable="false">MANUAL</string>
     <string name="custom_lan_ip_gateway" translatable="false">Gateway</string>
     <string name="custom_lan_ip_router" translatable="false">Router</string>
     <string name="lbl_reset" translatable="false">Reset</string>
     <string name="lbl_prefix" translatable="false">Prefix</string>
-    <string name="custom_lan_ip_saved_auto" translatable="false">Using automatic Interface IP configuration.</string>
-    <string name="custom_lan_ip_saved_manual" translatable="false">Custom Interface IPs saved</string>
-    <string name="custom_lan_ip_save_error" translatable="false">Could not save custom interface IPs</string>
-    <string name="custom_lan_ip_open_error" translatable="false">Could not open the Custom Interface IPs dialog</string>
+    <string name="custom_lan_ip_saved_auto" translatable="false">Using automatic LAN IP configuration</string>
+    <string name="custom_lan_ip_saved_manual" translatable="false">Custom LAN IPs saved</string>
+    <string name="custom_lan_ip_save_error" translatable="false">Could not save custom LAN IPs</string>
+    <string name="custom_lan_ip_open_error" translatable="false">Could not open Custom LAN IPs dialog</string>
     <string name="custom_lan_ip_validation_error" translatable="false">Invalid IP addresses. Ensure:\n• IPv4 must be private (10.x.x.x, 172.16-31.x.x, or 192.168.x.x)\n• IPv6 must be unique local (fc00::/7)\n• Both IP and prefix must be provided together</string>
-    <string name="vpn_not_active_dialog_title" translatable="false">VPN not active</string>
-    <string name="vpn_not_active_dialog_desc" translatable="false">Rethink is not started. Please start to use this feature.</string>
 
-    <string name="rpn_title" translatable="false">RPN</string>
-
-    <string name="rpn_troubleshoot_title" translatable="false">troubleshoot</string>
-
-    <string name="rpn_perform_test" translatable="false">Run test</string>
-    <string name="rpn_test_desc" translatable="false">Test your connection to RPN proxies.</string>
-
-    <string name="rpn_report_issue" translatable="false">Report issue</string>
-    <string name="rpn_report_desc" translatable="false">Report an issue with RPN.</string>
-
-    <string name="payment_history_title" translatable="false">Device Order History</string>
-
-    <string name="manage_purchase_title" translatable="false">Manage Purchase</string>
-
-    <string name="contact_support_title" translatable="false">Contact Support</string>
-
-    <string name="subscribe_title" translatable="false">Subscribe</string>
-
-    <string name="resubscribe_title" translatable="false">Resubscribe</string>
-
-    <!-- Resubscribe bottom sheet -->
-    <string name="resubscribe_error" translatable="false">Failed to launch resubscription. Please try again.</string>
-
-    <string name="error_loading_manage_subscription" translatable="false">Error loading purchase details</string>
-
-    <string name="payment_processing" translatable="false">Payment processing</string>
-    <string name="payment_processing_desc" translatable="false">Your payment is being processed. You’ll get access once it completes.</string>
-    <string name="rethink_terms" translatable="false">By subscribing to RPN you agree to the &lt;a href="https://rethinkdns.com/terms"&gt;Rethink Terms of Service&lt;/a&gt; and &lt;a href="https://rethinkdns.com/privacy"&gt;Privacy Policy&lt;/a&gt;. Powered by Windscribe</string>
-
-    <!-- Subscription UI Strings -->
-    <string name="premium_subtitle" translatable="false">Enhanced privacy, speed, and security</string>
-    <string name="choose_plan" translatable="false">Choose Your Plan</string>
-    <string name="choose_plan_subtitle" translatable="false">Select the plan that works best for you.</string>
-    <string name="subscribe_now" translatable="false">Subscribe Now</string>
-    <string name="purchase_now" translatable="false">Purchase Now</string>
-    <string name="one_time_label" translatable="false">One-Time</string>
-    <string name="monthly_plan" translatable="false">Monthly</string>
-    <string name="price_placeholder" translatable="false">$0.00</string>
-    <string name="original_price" translatable="false">Was %1$s</string>
-    <string name="billing_info" translatable="false">Cancel anytime</string>
-    <string name="save_percentage" translatable="false">Save %1$s</string>
-    <string name="select_plan_first" translatable="false">Please select a plan first</string>
-    <string name="subscription_activated" translatable="false">Your purchase is now active!</string>
-
-    <!-- Purchase Processing Bottom Sheet Strings -->
-    <string name="processing_purchase" translatable="false">Processing Purchase</string>
-    <string name="please_wait_processing" translatable="false">Please wait while we process your purchase…</string>
-    <string name="verifying_purchase" translatable="false">Verifying Purchase</string>
-    <string name="verifying_with_play_store" translatable="false">Verifying with Google Play Store…</string>
-    <string name="purchase_successful" translatable="false">Purchase Successful!</string>
-    <string name="purchase_failed" translatable="false">Purchase Failed</string>
-    <string name="something_went_wrong" translatable="false">Something went wrong. Please try again.</string>
-    <string name="close" translatable="false">Close</string>
-    <string name="retry" translatable="false">Retry</string>
-    <string name="error_message" translatable="false">Unable to load plans</string>
-
-    <!-- Server Selection Screen -->
-    <string name="server_selection_title" translatable="false">Choose Countries</string>
-    <string name="server_selection_search_hint" translatable="false">Search countries or locations…</string>
-    <string name="server_selection_clear_search" translatable="false">Clear search</string>
-    <string name="server_selection_max_info" translatable="false">Select up to 5 servers</string>
-    <string name="server_selection_max_reached" translatable="false">Maximum %1$d servers can be selected</string>
-    <string name="server_selection_no_servers" translatable="false">No servers found</string>
-    <string name="server_selection_no_servers_desc" translatable="false">Try adjusting your search or check back later.</string>
-    <string name="server_selection_error_title" translatable="false">Error fetching locations</string>
-    <string name="server_selection_error_message" translatable="false">There was a problem fetching server locations. This is usually a temporary issue.</string>
-    <string name="server_selection_error_hint" translatable="false">Check your connection or try again in a moment.</string>
-    <string name="server_selection_error_retry" translatable="false">Try Again</string>
-    <string name="server_selection_proxy_unavailable" translatable="false">Could not load server locations. Proxy may not be ready yet.</string>
-
-    <!-- RPN reset progress dialog (dialog_server_loading layout) -->
-    <string name="server_loading_dialog_status_timeout" translatable="false">Taking a bit longer than expected…</string>
-
-    <!-- RPN Restore dialog -->
-    <string name="rpn_restore_confirm_title" translatable="false">Restore Defaults</string>
-    <string name="rpn_restore_confirm_message" translatable="false">This will unregister your current session, fetch a fresh entitlement from the server, and re-register your connection. Your server selections will not be preserved.</string>
-    <string name="rpn_restore_dialog_title" translatable="false">Restoring connection</string>
-    <string name="rpn_restore_dialog_hint" translatable="false">This usually completes in a few seconds. Keep your internet connection active.</string>
-    <string name="rpn_restore_dialog_status_unregistering" translatable="false">Unregistering current session…</string>
-    <string name="rpn_restore_dialog_status_fetching" translatable="false">Fetching fresh entitlement…</string>
-    <string name="rpn_restore_dialog_status_registering" translatable="false">Registering with tunnel…</string>
-    <string name="rpn_restore_dialog_status_refreshing" translatable="false">Refreshing server list…</string>
-    <string name="rpn_restore_success" translatable="false">RPN restored successfully</string>
-    <string name="rpn_restore_failure" translatable="false">Restore failed: %s</string>
-    <!-- Short label shown on the reset button while a reset is running in the background -->
-    <string name="rpn_restore_in_progress_btn" translatable="false">Restoring…</string>
-
-    <string name="loading" translatable="false">Loading…</string>
-    <string name="server_selection_tap_to_select" translatable="false">Start RPN to proceed</string>
-
-    <string name="vpn_status_disconnected" translatable="false">Disconnected</string>
-
-    <plurals name="server_count">
-        <item quantity="one">%1$d server</item>
-        <item quantity="other">%1$d servers</item>
-    </plurals>
-
-    <!-- Server Removal Notification -->
-    <string name="server_removal_title" translatable="false">Server Location Removed</string>
-    <string name="server_removal_subtitle" translatable="false">This server location is no longer available.</string>
-    <string name="server_removed" translatable="false">Removed</string>
-
-    <!-- Country SSID Dialog -->
-    <string name="country_ssid_dialog_title" translatable="false">WiFi Settings for %1$s</string>
-    <string name="country_ssid_dialog_description" translatable="false">%1$s to %2$s when connected to %3$s that %4$s match the list below</string>
-    <string name="country_ssid_add_new" translatable="false">Add New SSID</string>
-    <string name="country_ssid_configured_list" translatable="false">Configured SSIDs</string>
-    <string name="country_ssid_empty_state" translatable="false">No SSIDs configured yet</string>
-    <string name="country_ssid_icon" translatable="false">SSID Icon</string>
-
-    <string name="lbl_server_config" translatable="false">Server Configuration</string>
-    <string name="lbl_not_set" translatable="false">Not set</string>
-
-    <!-- Peer Count -->
-    <plurals name="peer_count">
-        <item quantity="one">%d peer</item>
-        <item quantity="other">%d peers</item>
-    </plurals>
-
-    <string name="hint_seconds" translatable="false">Seconds</string>
-
-    <!-- Settings -->
-
-    <string name="lbl_quick_actions" translatable="false">Quick Actions</string>
-
-    <string name="subscription_processing_timeout" translatable="false">Purchase processing is taking longer than expected. Please check your internet connection and try again.</string>
-
-    <!-- Customer Support Activity -->
-    <string name="support_section_describe" translatable="false">Describe Your Issue</string>
-    <string name="support_section_attachments" translatable="false">Diagnostic Data</string>
-    <string name="support_issue_category_label" translatable="false">What is your issue about?</string>
-    <string name="support_category_payment" translatable="false">Payment</string>
-    <string name="support_category_activation" translatable="false">Activation</string>
-    <string name="support_category_connectivity" translatable="false">Connectivity</string>
-    <string name="support_category_refund" translatable="false">Refund</string>
-    <string name="support_description_hint" translatable="false">Describe the issue you\'re experiencing…</string>
-    <string name="support_attachments_desc" translatable="false">The following data will be included as an attachment. Toggle off anything you don\'t want to share.</string>
-    <string name="support_attach_sub_status" translatable="false">Purchase Status</string>
-    <string name="support_attach_sub_status_desc" translatable="false">All purchase records</string>
-    <string name="support_attach_history" translatable="false">State History</string>
-    <string name="support_attach_history_desc" translatable="false">The last 50 purchase state transitions.</string>
-    <string name="support_attach_vpn_stats" translatable="false">VPN / Proxy Stats</string>
-    <string name="support_attach_vpn_stats_desc" translatable="false">RPN proxy connection statistics</string>
-    <string name="support_privacy_note" translatable="false">Your email will be sent to hello@celzero.com. We only use this data to investigate your issue and never share it with third parties.</string>
-    <string name="support_btn_send" translatable="false">Send to Support</string>
-    <string name="support_btn_sending" translatable="false">Collecting data…</string>
-    <string name="support_loading_data" translatable="false">Collecting diagnostic data…</string>
-    <string name="support_email_chooser_title" translatable="false">Send support email via…</string>
-    <string name="support_error_empty_description" translatable="false">Please describe your issue or select a category</string>
-    <string name="support_error_collect" translatable="false">Failed to collect diagnostic data. Please try again.</string>
-    <string name="support_error_email" translatable="false">Could not open email app. Please email hello@celzero.com directly.</string>
-
-    <!-- Dashboard subscription banner labels -->
-    <string name="dashboard_expiry_label" translatable="false">Valid until</string>
-    <string name="manage_subscription_desc" translatable="false">Cancel, revoke or manage your plan</string>
-
-    <!-- Manage Subscription loading overlay -->
-    <string name="manage_sub_cancelling" translatable="false">Cancelling…</string>
-    <string name="manage_sub_revoking" translatable="false">Revoking…</string>
-
-    <!-- Privacy Exposure Warning Card -->
-    <string name="billing_error_recoverable" translatable="false">A temporary error occurred. Please try again.</string>
-    <string name="billing_error_generic" translatable="false">Something went wrong with your purchase. Please try again.</string>
-
-    <!-- Subscription banner strings -->
-    <string name="server_selection_sub_on_hold" translatable="false">On Hold</string>
-    <string name="server_selection_sub_ends_on" translatable="false">Ends on</string>
-    <string name="server_selection_sub_expired_on" translatable="false">Expired on</string>
-    <string name="server_selection_sub_days_left" translatable="false">%1$dd left</string>
-
-    <!-- ServerSelectionFragment proxy / DNS strings -->
-    <string name="server_settings_title" translatable="false">Server Settings</string>
-    <string name="server_settings_dns_section" translatable="false">DNS Filter</string>
-    <string name="server_settings_dns_family" translatable="false">Family</string>
-    <string name="server_settings_dns_desc_includes" translatable="false">Includes %1$s</string>
-    <string name="server_settings_dns_no_filters" translatable="false">No filters</string>
-    <string name="server_settings_refresh_servers" translatable="false">Refresh Servers</string>
-    <string name="server_settings_stop_proxies" translatable="false">Stop RPN</string>
-    <string name="server_settings_start_rpn" translatable="false">Start RPN</string>
-    <string name="server_settings_open" translatable="false">Open server settings</string>
-    <string name="server_settings_split_dns_disabled" translatable="false">Split DNS is disabled. Enable it to use DNS filtering on your VPN servers.</string>
-    <string name="server_settings_enable_split_dns" translatable="false">Enable Split DNS</string>
-    <string name="server_settings_proxy_stopped" translatable="false">Proxy Stopped</string>
-
-    <!-- Auto Exclude Countries bottom sheet -->
-    <string name="auto_exclude_cc_title" translatable="false">Exclude Countries</string>
-    <string name="auto_exclude_cc_subtitle" translatable="false">Selected countries will be skipped during AUTO server selection</string>
-    <string name="auto_exclude_cc_row_title" translatable="false">Excluded Countries for AUTO</string>
-    <string name="auto_exclude_cc_none" translatable="false">None excluded</string>
-    <string name="auto_exclude_cc_count" translatable="false">%d countries excluded</string>
-    <string name="auto_exclude_cc_min_info" translatable="false">At least %d countries must remain available for AUTO selection</string>
-    <string name="auto_exclude_cc_limit_reached" translatable="false">Limit reached, at least %d countries must remain available</string>
-    <string name="auto_exclude_cc_no_servers" translatable="false">No countries available</string>
-    <string name="auto_exclude_cc_loading" translatable="false">Loading countries…</string>
-    <string name="auto_exclude_cc_search_hint" translatable="false">Search countries…</string>
-
-    <!-- Server settings bottom sheet -->
-    <string name="server_settings_sheet_subtitle" translatable="false">Configure VPN server preferences</string>
-    <string name="server_settings_config_handling_section" translatable="false">Configuration Handling</string>
-    <string name="server_settings_config_handling_desc" translatable="false">Choose how connection settings should be managed</string>
-    <string name="server_settings_config_mode_auto" translatable="false">AUTO</string>
-    <string name="server_settings_config_mode_manual" translatable="false">MANUAL</string>
-    <string name="server_settings_config_auto_hint" translatable="false">The app automatically selects the port, identity, and configuration</string>
-    <string name="server_settings_config_manual_hint" translatable="false">Manually control the identity, port, and configuration mode</string>
-    <string name="server_settings_identity_title" translatable="false">Always Change Identity</string>
-    <string name="server_settings_identity_desc" translatable="false">Request a new server identity for each connection attempt</string>
-    <string name="server_settings_port_title" translatable="false">Connection Port</string>
-    <string name="server_settings_port_desc" translatable="false">Port used for tunnel server connections</string>
-    <string name="server_settings_permanent_config_title" translatable="false">Permanent Configuration</string>
-    <string name="server_settings_permanent_config_desc" translatable="false">Keep the same server configuration across reconnections</string>
-    <string name="server_settings_port_dialog_title" translatable="false">Select Connection Port</string>
-    <string name="server_selection_sub_expires_today" translatable="false">Valid until today</string>
-    <string name="server_selection_auto_always_on" translatable="false">AUTO is always connected and cannot be removed</string>
-    <string name="server_selection_remove_title" translatable="false">Remove Server</string>
-    <string name="server_selection_remove_message" translatable="false">Remove %1$s (%2$s) from your server list?</string>
-    <string name="server_selection_frequent_label" translatable="false">Frequent</string>
-    <string name="server_favourite_added" translatable="false">%1$s added to favourites</string>
-    <string name="server_favourite_removed" translatable="false">%1$s removed from favourites</string>
-    <string name="lbl_not_available_short" translatable="false">N/A</string>
-
-    <!-- Manage Subscription Strings -->
-    <string name="cancel_subscription" translatable="false">Cancel Purchase</string>
-    <string name="revoke_subscription" translatable="false">Revoke Purchase</string>
-    <string name="cancel_subscription_note" translatable="false">Note: You can revoke your purchase for a full refund. Cancelling will stop future charges, but you can continue using your purchase until the end of the current period.</string>
-    <string name="manage_on_google_play" translatable="false">Manage on Google Play</string>
-    <string name="confirm_cancel_title" translatable="false">Cancel Purchase?</string>
-    <string name="confirm_cancel_message" translatable="false">Are you sure you want to cancel your purchase? You will lose access to premium features at the end of the current period.</string>
-    <string name="confirm_revoke_title" translatable="false">Revoke Purchase?</string>
-    <string name="confirm_revoke_message" translatable="false">Are you sure you want to revoke your purchase? This action will immediately cancel your purchase and refund your payment. You will lose access to premium features.</string>
-    <string name="subscription_action_failed" translatable="false">Failed to process request. Please try again.</string>
-
-    <!-- ManageSubscriptionFragment strings -->
-    <string name="status_revoked" translatable="false">Revoked</string>
-    <string name="billing_yearly" translatable="false">Yearly</string>
-    <!-- Generic plan duration labels (no billing-type qualifier) -->
-    <string name="plan_2yr" translatable="false">2-Year</string>
-    <string name="plan_5yr" translatable="false">5-Year</string>
-    <string name="revoke_subscription_note" translatable="false">Revokes the purchase and issues a full refund to the original payment method.</string>
-    <string name="cancel_subscription_note_future" translatable="false">Cancels renewal. Access continues until the end of the current period</string>
-
-    <!-- Ping Test Activity -->
-    <string name="ping_test_title" translatable="false">Connection Test</string>
-    <string name="ping_test_button" translatable="false">Run Test</string>
-    <string name="ping_ready_title" translatable="false">Ready to Test</string>
-    <string name="ping_ready_desc" translatable="false">Enter domains below and tap Run Test.</string>
-    <string name="ping_testing_title" translatable="false">Testing…</string>
-    <string name="ping_testing_desc" translatable="false">Checking reachability through the proxy.</string>
-    <string name="ping_success_title" translatable="false">All Reachable</string>
-    <string name="ping_success_desc" translatable="false">Every target is reachable through your RPN proxy.</string>
-    <string name="ping_partial_title" translatable="false">Partial Connectivity</string>
-    <string name="ping_partial_desc" translatable="false">Some targets are unreachable through the proxy.</string>
-    <string name="ping_failure_title" translatable="false">Unreachable</string>
-    <string name="ping_failure_desc" translatable="false">None of the targets could be reached. Check your RPN proxy.</string>
-    <string name="ping_no_proxy_title" translatable="false">No Active Proxy</string>
-    <string name="ping_status_failed" translatable="false">Failed</string>
-    <string name="ping_test_again" translatable="false">Run Again</string>
-    <string name="ping_reach_hint" translatable="false">Domains or IPs, comma-separated</string>
-    <string name="ping_reach_reachable" translatable="false">Reachable</string>
-    <string name="ping_reach_rpn_disabled" translatable="false">Enable RPN to run this test.</string>
-    <string name="ping_total_latency" translatable="false">%1$dms</string>
-
-    <!-- Purchase History Screen -->
-    <string name="payment_history_summary_title" translatable="false">All Transactions</string>
-    <string name="payment_history_summary_subtitle" translatable="false">A complete record of every purchase and state change</string>
-    <string name="payment_history_empty_title" translatable="false">No history yet</string>
-    <string name="payment_history_empty_subtitle" translatable="false">Purchase transactions and state changes will appear here</string>
-    <string name="payment_history_error" translatable="false">Failed to load purchase history</string>
-    <string name="payment_history_open_error" translatable="false">Could not open purchase history</string>
-    <string name="payment_history_transition_fmt" translatable="false">%1$s → %2$s</string>
-    <string name="payment_history_state_pending" translatable="false">Pending</string>
-
-    <!-- ServerOrderHistoryActivity, server-side purchase order history -->
-    <string name="server_order_title" translatable="false">Order History</string>
-    <string name="server_order_summary_title" translatable="false">Server Orders</string>
-    <string name="server_order_summary_subtitle" translatable="false">Purchase records fetched live from the server</string>
-    <string name="server_order_empty_title" translatable="false">No orders found</string>
-    <string name="server_order_empty_subtitle" translatable="false">No purchase records were found for this account</string>
-    <string name="server_order_empty_no_credentials" translatable="false">No active subscription found. Please subscribe to view order history.</string>
-    <string name="server_order_type_subscription" translatable="false">SUBS</string>
-    <string name="server_order_started_fmt" translatable="false">Started %1$s</string>
-    <string name="server_order_expires_fmt" translatable="false">Until %1$s</string>
-    <string name="server_order_auto_renew" translatable="false">Renews %1$s</string>
-    <string name="server_order_id_fmt" translatable="false">Order: %1$s</string>
-    <string name="server_order_desc" translatable="false">View orders fetched from server</string>
-    <string name="server_order_open_error" translatable="false">Could not open order history</string>
-
-    <!-- ProxySettingsActivity RPN section -->
-    <string name="proxy_rpn_heading" translatable="false">Rethink Proxy Network</string>
-    <string name="proxy_rpn_desc_inactive" translatable="false">Subscribe to route traffic through Rethink servers</string>
-
-    <!-- ServerWgConfigDetailActivity live stats card -->
-    <string name="lbl_last_handshake" translatable="false">Last Handshake</string>
-    <string name="lbl_errors" translatable="false">Errors</string>
-    <string name="lbl_client_ipv4" translatable="false">Client IPv4</string>
-    <string name="lbl_client_ipv6" translatable="false">Client IPv6</string>
-    <string name="lbl_never" translatable="false">Never</string>
-
-    <!-- Emoji icons used in the privacy exposure card -->
-    <string name="emoji_eye" translatable="false">👁️</string>
-    <string name="emoji_pin" translatable="false">📍</string>
-    <string name="emoji_antenna" translatable="false">📡</string>
-    <string name="emoji_shield" translatable="false">🛡️</string>
-
-    <!-- GooglePlaySubsAdapter billing text & trial -->
-    <string name="billing_no_recurring" translatable="false">No recurring charges</string>
-    <string name="billing_monthly_cancel" translatable="false">Billed monthly</string>
-    <string name="billing_annually_cancel" translatable="false">Billed annually</string>
-    <string name="billing_sub_cancel" translatable="false">Recurring \u2022 Cancel anytime</string>
-    <string name="trial_days_format" translatable="false">%1$d days free trial</string>
-
-    <!-- RethinkPlusDashboardFragment hero banner -->
-    <string name="hero_plan_and_account" translatable="false">%1$s • %2$s</string>
-    <string name="placeholder_dash" translatable="false">\u2014</string>
-
-    <!-- RethinkPlusFragment connection info -->
-    <string name="connection_location_with_colo" translatable="false">%1$s \u2022 %2$s</string>
-    <string name="truncated_text" translatable="false">%1$s\u2026</string>
-
-    <!-- Separator / utility -->
-    <string name="lbl_separator_dot" translatable="false">\u2022</string>
-
-    <string name="rpn_purchased_state" translatable="true">Purchased</string>
-
-    <!-- ManageSubscriptionFragment no-subscription empty state -->
-    <string name="progress_step_validating" translatable="false">Validating purchase</string>
-    <string name="progress_step_contacting_server" translatable="false">Contacting server</string>
-    <string name="progress_step_updating" translatable="false">Updating local state</string>
-    <string name="progress_step_refreshing" translatable="false">Refreshing billing status</string>
-    <string name="progress_do_not_close" translatable="false">Please do not close the app</string>
-
-    <!-- One-time purchase expiry strings -->
-    <string name="inapp_expiry_soon" translatable="false">⚠ Your access valid until in %1$d day(s).</string>
-    <string name="inapp_expiry_extend_hint" translatable="false">Buy more access time now so there\'s no interruption.</string>
-    <string name="inapp_extend_access_btn" translatable="false">Extend Access</string>
-
-    <!-- Extend-mode banner shown at top of RethinkPlusFragment when user is extending -->
-    <string name="extend_mode_banner_title" translatable="false">Extending Your Access</string>
-    <string name="extend_mode_banner_desc" translatable="false">Your new purchase adds to your remaining time. Access continues uninterrupted.</string>
-
-    <!-- Extend-mode purchase success celebration -->
-    <string name="extend_purchase_activated" translatable="false">Access Extended!</string>
-    <string name="extend_purchase_success_message" translatable="false">Your access has been extended. Enjoy uninterrupted privacy!</string>
-
-    <!-- Normal subscription success celebration -->
-    <string name="subscription_congrats_title" translatable="false">Welcome to RPN!</string>
-    <string name="subscription_congrats_desc" translatable="false">Your subscription is now active. Enjoy enhanced privacy and security!</string>
-
-    <!-- Per-month price breakdown for one-time plans (e.g. "₹141 / mo") -->
-    <string name="price_per_month_format" translatable="false">%s / mo</string>
-
-    <!-- Purchase conflict (HTTP 409) bottom sheet -->
-    <string name="conflict_title_cancel" translatable="false">Purchase Conflict</string>
-    <string name="conflict_title_revoke" translatable="false">Refund Conflict</string>
-    <string name="conflict_title_ack" translatable="false">Purchase Already Acknowledged</string>
-    <string name="conflict_title_consume" translatable="false">Purchase Already Consumed</string>
-    <string name="conflict_title_device" translatable="false">Device Already Registered</string>
-    <string name="conflict_title_customer" translatable="false">Customer Registration</string>
-
-    <string name="conflict_desc_cancel" translatable="false">Your purchase appears to be in a conflicting state on the server. You can request a refund to resolve this, or manage it directly on Google Play.</string>
-    <string name="conflict_desc_revoke" translatable="false">A refund request for this purchase is already in progress or the purchase is in a conflicting state. You can try again or manage it on Google Play.</string>
-    <string name="conflict_desc_ack" translatable="false">This purchase was already acknowledged on the server. No action is needed, your purchase should be active. If you see an issue, contact support.</string>
-    <string name="conflict_desc_consume" translatable="false">This purchase has already been consumed. If you believe this is an error, please contact support.</string>
-    <string name="conflict_desc_device" translatable="false">This device is already registered with the server. No action is needed. If access is not working, try again or contact support.</string>
-    <string name="conflict_desc_customer" translatable="false">Customer registration failure. Please contact support.</string>
-
-    <string name="conflict_btn_refund" translatable="false">Request Refund</string>
-    <string name="conflict_btn_refund_retry" translatable="false">Retry Refund</string>
-
-    <string name="conflict_detail_http_code" translatable="false">HTTP Code</string>
-
-    <string name="conflict_refund_success" translatable="false">Refund requested successfully. Your purchase has been revoked.</string>
-    <string name="conflict_refund_failed" translatable="false">Refund request failed: %1$s</string>
-
-    <!-- 409 background notification (no UI available) -->
-    <string name="conflict_notif_title" translatable="false">Action Required: Purchase Conflict</string>
-    <string name="conflict_notif_body" translatable="false">A server conflict was detected with your purchase. Tap to review and request a refund.</string>
-
-    <!-- Bottom sheet shown when /g/device or /customer returns 401 Unauthorized -->
-    <string name="device_auth_error_title" translatable="false">Device Authorization Failed</string>
-    <string name="device_auth_error_desc" translatable="false">Your device could not be authorized by the Rethink server. This may be due to an account issue. Please contact customer support with the details below so we can resolve this quickly.</string>
-    <string name="device_auth_error_http_code" translatable="false">HTTP 401: Unauthorized</string>
-    <string name="device_auth_error_account_id_label" translatable="false">Account ID</string>
-    <string name="device_auth_error_device_id_label" translatable="false">Device ID</string>
-    <string name="device_auth_error_device_id_partial" translatable="false">partial</string>
-    <string name="device_auth_error_id_unavailable" translatable="false">-</string>
-    <string name="device_auth_error_btn_email" translatable="false">Email Customer Support</string>
-    <!-- Pre-filled email content -->
-    <string name="device_auth_error_email_body_greeting" translatable="false">Hello Rethink Support,</string>
-    <string name="device_auth_error_email_body_details" translatable="false">I am experiencing a device authorization issue (HTTP 401). My account details are:</string>
-    <string name="device_auth_error_email_body_closing" translatable="false">Help me resolve this.</string>
-
-    <!-- Device Not Registered bottom sheet -->
-    <string name="device_not_registered_title" translatable="false">Device Not Registered</string>
-    <string name="device_not_registered_badge" translatable="false">Account ID Mismatch</string>
-    <string name="device_not_registered_desc" translatable="false">Your device could not be registered under the account linked to your active subscription. The account ID from Google Play (shown below) could not be resolved to a device on our server. Please contact support with the details below.</string>
-    <string name="device_not_registered_entitlement_cid_label" translatable="false">Subscription Account ID (Google Play)</string>
-    <string name="device_not_registered_master_badge" translatable="false">master</string>
-    <string name="device_not_registered_what_this_means" translatable="false">What this means</string>
-    <string name="device_not_registered_what_this_means_desc" translatable="false">Your subscription is active on Google Play but your device could not be linked to it on the Rethink server. This can happen after restoring from a backup or switching devices. Our support team can resolve this quickly once you provide the account details above.</string>
-    <string name="device_not_registered_email_subject" translatable="false">Device Not Registered: Rethink DNS</string>
-    <string name="device_not_registered_email_body_details" translatable="false">I have an active subscription but my device cannot be registered. The account details are:</string>
-
-    <!-- Device-not-registered system notification -->
-    <string name="device_not_registered_notif_body" translatable="false">Your device could not be linked to your active subscription. Tap to review and contact support.</string>
-    <string name="device_auth_error_notif_body" translatable="false">Your device could not be authorized by the Rethink server (HTTP 401). Tap to view details and contact support.</string>
-
-    <!-- Step counter chip label: "Step 1 of 5" -->
-    <string name="tour_step_counter">%1$d of %2$d</string>
-
-    <!-- Action buttons -->
-    <string name="tour_btn_finish">Got it</string>
-    <string name="tour_btn_skip">Skip Tour</string>
-
-    <!-- Debug-only strings (never translated) -->
-    <string name="tour_debug_reset_title" translatable="false">Reset Guided Tour</string>
-    <string name="tour_debug_reset_desc" translatable="false">Show the guided tour again on next launch.</string>
-    <string name="tour_debug_reset_done" translatable="false">Tour reset, will show again on next launch ✓</string>
-
-    <!-- Step 1: VPN / Protection Toggle -->
-    <string name="tour_step_vpn_title" translatable="false">Your Privacy Shield</string>
-    <string name="tour_step_vpn_desc" translatable="false">This button starts and stops Rethink\'s VPN tunnel. When active, all app traffic is routed through your chosen DNS and firewall rules - nothing leaves unguarded.</string>
-
-    <!-- Step 2: DNS Card -->
-    <string name="tour_step_dns_title" translatable="false">DNS &amp; Blocklists</string>
-    <string name="tour_step_dns_desc" translatable="false">Configure your DNS resolver and activate on-device blocklists. Block ads, trackers, and malware domains before any connection is made.</string>
-
-    <!-- Step 3: Firewall Card -->
-    <string name="tour_step_firewall_title" translatable="false">Per-App Firewall</string>
-    <string name="tour_step_firewall_desc" translatable="false">Decide which apps can reach the internet, which are isolated, and which are blocked entirely even when the VPN is off.</string>
-
-    <!-- Step 4: Proxy Card -->
-    <string name="tour_step_proxy_title" translatable="false">Proxy &amp; Routing</string>
-    <string name="tour_step_proxy_desc" translatable="false">Chain a WireGuard, SOCKS5, or HTTP proxy to shape exactly how your traffic exits. Combine with DNS for full control.</string>
-
-    <!-- Step 5: Logs Card -->
-    <string name="tour_step_logs_title" translatable="false">Connection Logs</string>
-    <string name="tour_step_logs_desc" translatable="false">Every DNS query and network connection is logged here. Review what your apps are doing and block anything suspicious with one tap.</string>
-
-    <!-- Duration labels for one-time purchase plan cards -->
-    <plurals name="duration_years" translatable="false">
-        <item quantity="one">%d Year</item>
-        <item quantity="other">%d Years</item>
-    </plurals>
-
-    <!-- Rethink+ step -->
-    <string name="tour_step_rpn_desc" translatable="false">Unlock advanced privacy features with RPN: hide your real IP with rotating exits, access anti-censorship servers, and route traffic through private proxy networks for total control.</string>
-    <!-- Label shown in the golden badge strip inside the tooltip card -->
-    <string name="tour_premium_badge_label" translatable="false">Premium Feature</string>
-
-    <!-- Configure fragment card subtitles -->
-    <string name="fs_configure_apps_desc" translatable="true">Per-app firewall rules and network policy</string>
-    <string name="fs_configure_network_desc" translatable="true">VPN tunnel mode and network preferences</string>
-    <string name="fs_configure_proxy_desc" translatable="true">WireGuard, SOCKS5, and HTTP proxy routing</string>
-    <string name="fs_configure_others_desc" translatable="true">Appearance, notifications, and more</string>
-    <string name="fs_configure_advanced_desc" translatable="true">Developer tools and diagnostics</string>
-    <string name="fs_configure_logs_desc" translatable="true">Review DNS queries and connection logs</string>
-
-    <!-- DNS bypass mode bottom sheet -->
-    <string name="bfdm_heading" translatable="false">DNS to bypass</string>
-    <string name="bfdm_desc" translatable="false">Select the DNS to use for trusted and bypassed apps and domains</string>
-    <string name="bfdm_option_fallback_label" translatable="false">Use fallback DNS</string>
-    <string name="bfdm_option_fallback_desc" translatable="false">Use the fallback DNS for trusted and bypassed connections</string>
-    <string name="bfdm_option_global_label" translatable="false">Use Global DNS</string>
-    <string name="bfdm_option_global_desc" translatable="false">Use the globally configured DNS for trusted and bypassed connections</string>
-    <string name="bfdm_option_auto_label" translatable="false">Automatic</string>
-    <string name="bfdm_option_auto_desc" translatable="false">Automatically select DNS based on other settings</string>
-
-    <string name="console_log_include_file_trace" translatable="false">Include file trace in logs</string>
-
+    <!-- Home Screen Labels -->
+    <string name="lbl_start" translatable="true">Start</string>
+    <string name="lbl_stop" translatable="true">Stop</string>
+    <string name="lbl_dns" translatable="true">DNS</string>
+    <string name="lbl_download" translatable="true">Download</string>
+    <string name="lbl_connections" translatable="true">Connections</string>
+    <string name="lbl_firewall" translatable="true">Firewall</string>
+    <string name="lbl_proxy" translatable="true">Proxy</string>
+    <string name="lbl_apps" translatable="true">Apps</string>
+    <string name="lbl_bypassed" translatable="true">Bypassed</string>
+    <string name="lbl_isolated" translatable="true">Isolated</string>
+    <string name="lbl_excluded" translatable="true">Excluded</string>
+    <string name="lbl_total" translatable="true">Total</string>
+    <string name="lbl_universal_rules" translatable="true">Universal Rules</string>
+    <string name="dns_detail_latency" translatable="true">Latency</string>
+    <string name="lbl_connected" translatable="true">Connected</string>
+    <string name="cd_navigate_back" translatable="true">Navigate back</string>
+    <string name="cd_clear_search" translatable="true">Clear search</string>
+    <string name="proxy_host_label" translatable="true">Host</string>
+    <string name="proxy_port_label" translatable="true">Port</string>
+    <string name="proxy_username_optional_label" translatable="true">Username (optional)</string>
+    <string name="proxy_password_optional_label" translatable="true">Password (optional)</string>
+    <string name="rpn_no_countries_title" translatable="true">No countries available</string>
+    <string name="rpn_no_countries_desc" translatable="true">No countries available for RPN right now. Try again later.</string>
+    <string name="rpn_proxy_details_title" translatable="true">Proxy details</string>
+    <string name="rpn_no_proxy_found_title" translatable="true">No proxy found</string>
+    <string name="rpn_no_proxy_found_desc" translatable="true">Proxy information is missing for this proxy. Ensure the proxy is configured and try again.</string>
+    <string name="rpn_select_apps_for_proxy" translatable="true">Select apps for proxy</string>
+    <string name="rpn_proxy_apps_info_toast" translatable="true">Apps part of other proxy or excluded from proxy will be listed here.</string>
+    <string name="rpn_proxy_apps" translatable="true">Apps</string>
+    <string name="rpn_proxy_domains" translatable="true">Domains</string>
+    <string name="rpn_proxy_ips" translatable="true">IPs</string>
+    <string name="rpn_proxy_name" translatable="true">Proxy name</string>
+    <string name="rpn_proxy_who" translatable="true">Who</string>
+    <string name="rpn_proxy_error" translatable="true">Error</string>
+    <string name="rpn_proxy_country" translatable="true">Country</string>
+    <string name="rpn_proxy_latency" translatable="true">Latency</string>
+    <string name="rpn_proxy_last_connected" translatable="true">Last connected</string>
+    <string name="rpn_proxy_status" translatable="true">Status</string>
+    <string name="rpn_proxy_connected" translatable="true">Connected</string>
+    <string name="log_detail_ip_address" translatable="true">IP Address</string>
+    <string name="log_detail_port" translatable="true">Port</string>
+    <string name="log_detail_protocol" translatable="true">Protocol</string>
+    <string name="log_detail_app_name" translatable="true">App Name</string>
+    <string name="log_detail_response" translatable="true">Response</string>
+    <string name="response_ip_label" translatable="true">Response IP</string>
+    <string name="resolver_label" translatable="true">Resolver</string>
+    <string name="time_window_one_hour_short" translatable="true">1h</string>
+    <string name="time_window_twenty_four_hours_short" translatable="true">24h</string>
+    <string name="time_window_seven_days_short" translatable="true">7d</string>
+    <string name="summary_connections_count" translatable="true">Connections: %1$d</string>
+    <string name="rpn_proxy_placeholder_who" translatable="true">who_or_service_email@domain.com</string>
+    <string name="rpn_proxy_placeholder_latency" translatable="true">37 ms</string>
+    <string name="rpn_proxy_placeholder_last_connected" translatable="true">2 min ago</string>
+    <string name="checkout_unavailable_desc" translatable="true">Checkout is unavailable in this build.</string>
 </resources>

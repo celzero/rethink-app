@@ -1,0 +1,3 @@
+[submodule "tun2socks"]
+	path = tun2socks
+	url = https://github.com/celzero/outline-go-tun2socks

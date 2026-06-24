@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name" translatable="false">Re-Rethink</string>
     <string name="app_name_small_case">rethink</string>
     <string name="title_about">關於</string>
     <string name="title_settings">設定</string>
@@ -106,7 +106,7 @@
     <string name="app_mode_firewall">防火牆</string>
     <string name="app_mode_dns_firewall">DNS 與防火牆（預設）</string>
     <string name="app_mode_wireguard">VPN</string>
-    <string name="settings_vpn_heading">vpn</string>
+    <string name="settings_vpn_heading">VPN</string>
     <string name="info_dialog_copy_toast_msg">已複製 IP 位址。</string>
     <string name="info_dialog_url_copy_toast_msg">已複製 URL</string>
     <string name="info_dialog_rethink_toast_msg">已作為 RDNS+ DNS-over-HTTPS URL 複製</string>
@@ -153,7 +153,7 @@
     <string name="block">攔截</string>
     <string name="alert_permission_accessibility">權限 - 無障礙設定</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">已連線至 RethinkDNS 與防火牆</string>
-    <string name="dns_explanation_dns_connected">已連線至 RethinkDNS</string>
+    <string name="dns_explanation_dns_connected">已連線至 Re-RethinkDNS</string>
     <string name="status_protected_with_http_private_dns">已由 HTTP 代理與私人 DNS 保護</string>
     <string name="status_protected_with_socks5">已由 SOCKS5 代理保護</string>
     <string name="status_protected_with_http">已由 HTTP 代理保護</string>

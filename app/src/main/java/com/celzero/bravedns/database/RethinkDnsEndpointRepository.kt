@@ -17,70 +17,78 @@
 package com.celzero.bravedns.database
 
 import androidx.room.Transaction
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class RethinkDnsEndpointRepository(private val rethinkDnsEndpointDao: RethinkDnsEndpointDao) {
 
     @Transaction
     suspend fun update(rethinkDnsEndpoint: RethinkDnsEndpoint) {
-        rethinkDnsEndpointDao.removeConnectionStatus()
-        rethinkDnsEndpointDao.update(rethinkDnsEndpoint)
+        withContext(Dispatchers.IO) {
+            rethinkDnsEndpointDao.removeConnectionStatus()
+            rethinkDnsEndpointDao.update(rethinkDnsEndpoint)
+        }
     }
 
     suspend fun insertWithReplace(rethinkDnsEndpoint: RethinkDnsEndpoint) {
-        rethinkDnsEndpointDao.insertReplace(rethinkDnsEndpoint)
+        withContext(Dispatchers.IO) { rethinkDnsEndpointDao.insertReplace(rethinkDnsEndpoint) }
     }
 
     suspend fun removeConnectionStatus() {
-        rethinkDnsEndpointDao.removeConnectionStatus()
+        withContext(Dispatchers.IO) { rethinkDnsEndpointDao.removeConnectionStatus() }
     }
 
     suspend fun removeAppWiseDns(uid: Int) {
-        rethinkDnsEndpointDao.removeAppWiseDns(uid)
+        withContext(Dispatchers.IO) { rethinkDnsEndpointDao.removeAppWiseDns(uid) }
     }
 
     suspend fun isAppWiseDnsEnabled(uid: Int): Boolean {
-        return rethinkDnsEndpointDao.isAppWiseDnsEnabled(uid) ?: false
+        return withContext(Dispatchers.IO) { rethinkDnsEndpointDao.isAppWiseDnsEnabled(uid) ?: false }
     }
 
     suspend fun getConnectedEndpoint(): RethinkDnsEndpoint? {
-        return rethinkDnsEndpointDao.getConnectedEndpoint()
+        return withContext(Dispatchers.IO) { rethinkDnsEndpointDao.getConnectedEndpoint() }
     }
 
     suspend fun getDefaultRethinkEndpoint(): RethinkDnsEndpoint? {
-        return rethinkDnsEndpointDao.getDefaultRethinkEndpoint()
+        return withContext(Dispatchers.IO) { rethinkDnsEndpointDao.getDefaultRethinkEndpoint() }
     }
 
     suspend fun updateConnectionDefault() {
-        rethinkDnsEndpointDao.removeConnectionStatus()
-        rethinkDnsEndpointDao.updateConnectionDefault()
+        withContext(Dispatchers.IO) {
+            rethinkDnsEndpointDao.removeConnectionStatus()
+            rethinkDnsEndpointDao.updateConnectionDefault()
+        }
     }
 
     suspend fun setRethinkPlus() {
-        rethinkDnsEndpointDao.removeConnectionStatus()
-        rethinkDnsEndpointDao.setRethinkPlus()
+        withContext(Dispatchers.IO) {
+            rethinkDnsEndpointDao.removeConnectionStatus()
+            rethinkDnsEndpointDao.setRethinkPlus()
+        }
     }
 
     suspend fun getCount(): Int {
-        return rethinkDnsEndpointDao.getCount()
+        return withContext(Dispatchers.IO) { rethinkDnsEndpointDao.getCount() }
     }
 
     suspend fun updatePlusBlocklistCount(count: Int) {
-        rethinkDnsEndpointDao.updatePlusBlocklistCount(count)
+        withContext(Dispatchers.IO) { rethinkDnsEndpointDao.updatePlusBlocklistCount(count) }
     }
 
     suspend fun updateEndpoint(name: String, url: String, count: Int) {
-        rethinkDnsEndpointDao.updateEndpoint(name, url, count)
+        withContext(Dispatchers.IO) { rethinkDnsEndpointDao.updateEndpoint(name, url, count) }
     }
 
     suspend fun getRethinkPlusEndpoint(): RethinkDnsEndpoint? {
-        return rethinkDnsEndpointDao.getRethinkPlusEndpoint()
+        return withContext(Dispatchers.IO) { rethinkDnsEndpointDao.getRethinkPlusEndpoint() }
     }
 
     suspend fun switchToMax() {
-        rethinkDnsEndpointDao.switchToMax()
+        withContext(Dispatchers.IO) { rethinkDnsEndpointDao.switchToMax() }
     }
 
     suspend fun switchToSky() {
-        rethinkDnsEndpointDao.switchToSky()
+        withContext(Dispatchers.IO) { rethinkDnsEndpointDao.switchToSky() }
     }
 }

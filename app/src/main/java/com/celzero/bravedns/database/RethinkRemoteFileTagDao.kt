@@ -94,7 +94,8 @@ interface RethinkRemoteFileTagDao {
     )
     fun fileTags(): List<FileTag>
 
-    @Query("Update RethinkRemoteFileTag set isSelected = 0") fun clearSelectedTags()
+    @Query("Update RethinkRemoteFileTag set isSelected = 0")
+    suspend fun clearSelectedTags()
 
     @Query("select value from RethinkRemoteFileTag where isSelected = 1")
     fun getSelectedTags(): List<Int>
