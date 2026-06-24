@@ -63,7 +63,7 @@
     <string name="bsct_conn_block_desc_device" translatable="true">%1$s נחסם על המכשיר</string>
     <string name="bsct_conn_desc_allowed" translatable="true">מותר ב-%1$s %2$s</string>
     <string name="bsct_conn_desc_blocked" translatable="true">חסום ב-%1$s %2$s</string>
-    <string name="dns_explanation_dns_connected" translatable="true">מחובר ל-RethinkDNS</string>
+    <string name="dns_explanation_dns_connected" translatable="true">מחובר ל-Re-RethinkDNS</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">מחובר ל-RethinkDNS ולחומת האש</string>
     <string name="notification_action_resume_vpn" translatable="true">המשך</string>
     <string name="notification_action_dns_mode" translatable="true">DNS</string>
@@ -85,7 +85,7 @@
     <string name="app_mode_firewall" translatable="true">חומת אש</string>
     <string name="app_mode_dns_firewall" translatable="true">DNS וחומת אש (ברירת מחדל)</string>
     <string name="app_mode_wireguard" translatable="true">VPN</string>
-    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="settings_vpn_heading" translatable="true">VPN</string>
     <string name="info_dialog_copy_toast_msg" translatable="true">כתובת ה-IP הועתקה.</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">כתובת האתר הועתקה</string>
     <string name="app_mode_choose" translatable="true">בחר מצב</string>

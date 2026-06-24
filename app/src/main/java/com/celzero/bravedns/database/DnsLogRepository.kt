@@ -39,6 +39,18 @@ class DnsLogRepository(private val dnsLogDAO: DnsLogDAO) {
         return dnsLogDAO.logsCount()
     }
 
+    suspend fun getAllLoggedAppsWithCount(): List<LogAppCount> {
+        return dnsLogDAO.getAllLoggedAppsWithCount()
+    }
+
+    suspend fun getAllowedLoggedAppsWithCount(): List<LogAppCount> {
+        return dnsLogDAO.getAllowedLoggedAppsWithCount()
+    }
+
+    suspend fun getBlockedLoggedAppsWithCount(): List<LogAppCount> {
+        return dnsLogDAO.getBlockedLoggedAppsWithCount()
+    }
+
     fun getLeastLoggedTime(): Long {
         return dnsLogDAO.getLeastLoggedTime()
     }

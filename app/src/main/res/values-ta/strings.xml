@@ -8,7 +8,7 @@
     <string name="settings_title_desc">மிகவும் தனிப்பயனாக்கக்கூடிய டிஎன்எச் மற்றும் ஃபயர்வால்</string>
     <string name="dns_mode_info_title">டிஎன்எச்</string>
     <string name="always_on_dialog_neutral">அமைப்புகள்</string>
-    <string name="app_name">"மறுபரிசீலனை  டிஎன்எஸ்"</string>
+    <string name="app_name" translatable="false">Re-Rethink</string>
     <string name="app_name_small_case">மறுபரிசீலனை</string>
     <string name="title_about">பற்றி</string>
     <string name="title_settings">அமைப்புகள்</string>
@@ -826,7 +826,7 @@
     <string name="app_mode_firewall" translatable="true">ஃபயர்வால்</string>
     <string name="app_mode_dns_firewall" translatable="true">டி.என்.எச் மற்றும் ஃபயர்வால் (இயல்புநிலை)</string>
     <string name="app_mode_wireguard" translatable="true">Vpn</string>
-    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="settings_vpn_heading" translatable="true">VPN</string>
     <string name="public_key_copy_toast_msg" translatable="true">பொது விசை நகலெடுக்கப்பட்டது.</string>
     <string name="info_dialog_rethink_toast_msg" translatable="true">Rdns+ dns-over-https முகவரி ஆக நகலெடுக்கப்பட்டது</string>
     <string name="settings_enable_logs_desc" translatable="true">டி.என்.எச் மற்றும் ஃபயர்வால் பதிவுகளை உள்நாட்டில் சாதனத்தில் சேமிக்கவும்.</string>

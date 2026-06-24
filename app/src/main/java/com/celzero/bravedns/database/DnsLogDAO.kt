@@ -94,6 +94,21 @@ interface DnsLogDAO {
 
     @Query("select count(id) from DNSLogs") fun logsCount(): LiveData<Long>
 
+    @Query(
+        "SELECT appName AS appName, packageName AS packageName, COUNT(id) AS count FROM DNSLogs WHERE TRIM(appName) != '' GROUP BY appName, packageName ORDER BY count DESC"
+    )
+    suspend fun getAllLoggedAppsWithCount(): List<LogAppCount>
+
+    @Query(
+        "SELECT appName AS appName, packageName AS packageName, COUNT(id) AS count FROM DNSLogs WHERE isBlocked = 0 AND blockLists = '' AND TRIM(appName) != '' GROUP BY appName, packageName ORDER BY count DESC"
+    )
+    suspend fun getAllowedLoggedAppsWithCount(): List<LogAppCount>
+
+    @Query(
+        "SELECT appName AS appName, packageName AS packageName, COUNT(id) AS count FROM DNSLogs WHERE isBlocked = 1 AND TRIM(appName) != '' GROUP BY appName, packageName ORDER BY count DESC"
+    )
+    suspend fun getBlockedLoggedAppsWithCount(): List<LogAppCount>
+
     @Query("select time from DNSLogs where id = (select min(id) from DNSLogs)")
     fun getLeastLoggedTime(): Long
 

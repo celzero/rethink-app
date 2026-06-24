@@ -181,7 +181,7 @@
     <string name="app_mode_dns_low_battery" translatable="true">DNS (чувар батерије)</string>
     <string name="app_mode_firewall" translatable="true">Заштитни зид</string>
     <string name="app_mode_dns_firewall" translatable="true">DNS и заштитни зид (подразумевано)</string>
-    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="settings_vpn_heading" translatable="true">VPN</string>
     <string name="info_dialog_copy_toast_msg" translatable="true">IP адреса је ископирана.</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">URL је ископиран</string>
     <string name="public_key_copy_toast_msg" translatable="true">Јавни кључ је ископиран.</string>
@@ -339,8 +339,8 @@
     <string name="hsf_chip_appearance" translatable="true">Тема: %1$s</string>
     <string name="hsf_pause_vpn_failure" translatable="true">Није могуће паузирање: Rethink није активан</string>
     <string name="lbl_battery_optimization" translatable="true">Оптимизација батерије</string>
-    <string name="dc_block_heading" translatable="true">правила</string>
-    <string name="dc_other_dns_heading" translatable="true">врста</string>
+    <string name="dc_block_heading" translatable="true">Правила</string>
+    <string name="dc_other_dns_heading" translatable="true">Врста</string>
     <string name="dc_custom_dns_radio" translatable="true">Други DNS</string>
     <string name="dc_rethink_dns_radio" translatable="true">Rethink DNS</string>
     <string name="dc_entries" translatable="true">%1$s уноси »</string>
@@ -363,16 +363,16 @@
     <string name="about_bug_report_dialog_positive_btn" translatable="true">Пошаљи е-поруку</string>
     <string name="about_bug_no_log_dialog_title" translatable="true">Извештај о грешки</string>
     <string name="about_bug_no_log_dialog_message" translatable="true">Није успело сакупљање записа о грешки. Да ли желите да ручно пријавите ваш проблем?</string>
-    <string name="about_web" translatable="true">везе</string>
+    <string name="about_web" translatable="true">Везе</string>
     <string name="about_website" translatable="true">Посети rethinkdns.com</string>
     <string name="about_github" translatable="true">Допринеси на GitHub-у</string>
     <string name="about_faq" translatable="true">Погледај ЧПП</string>
     <string name="about_docs" translatable="true">Прочитај документацију</string>
     <string name="about_privacy_policy" translatable="true">Прочитај полису приватности</string>
     <string name="about_sponsor_link_text" translatable="true">Спонзориши</string>
-    <string name="about_app" translatable="true">апликација</string>
+    <string name="about_app" translatable="true">Апликација</string>
     <string name="about_email" translatable="true">Пошаљи нам е-поруку</string>
-    <string name="about_settings" translatable="true">системске</string>
+    <string name="about_settings" translatable="true">Системске</string>
     <string name="about_settings_app_info" translatable="true">Информације о апликацији</string>
     <string name="about_settings_vpn_profile" translatable="true">VPN профил</string>
     <string name="about_settings_notification" translatable="true">Подешавања обавештења</string>
@@ -665,13 +665,13 @@
     <string name="brbs_backup_complete_toast" translatable="true">Прављење копије је завршено</string>
     <string name="brbs_restore_no_uri_toast" translatable="true">Враћање није успело; покушај поново</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category" translatable="true">%1$s блок листи</string>
-    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">нејвише дозвољених апликација</string>
-    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">највише блокираних апликација</string>
-    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">највише контактираних домена</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">Нејвише дозвољених апликација</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">Највише блокираних апликација</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">Највише контактираних домена</string>
     <string name="rethink_sky_desc" translatable="true">280+ локација; висока поузданост; разрешивач се извршава на cloudflare.com</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">Спаја захтеве, кешира одговоре, отпорно решавање грешака</string>
-    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">највише контактираних ip-јева</string>
-    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">највише блокираних земаља</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">Највише контактираних ip-јева</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">Највише блокираних земаља</string>
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Покрени Rethink за наставак</string>
     <string name="ssv_see_more" translatable="true">Прикажи све</string>
     <string name="bad_config_reason_invalid_key" translatable="true">Неисправан кључ</string>
@@ -817,7 +817,7 @@
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> може резултирати у губитку конекције. Промените подешавање да би сте дозволили Rethink-у да користи податке и друге ресурсе када је у позадини.</string>
     <string name="about_bravedns_explantion" translatable="true">Rethink је најлакши начин за надгледање активности апликације, заобилажења цензуре интернетам, и блокирање интернета апликацијама на вашем Андроид уређају.</string>
     <string name="about_bug_no_log_dialog_positive_btn" translatable="true">Пошаљи е-поруку</string>
-    <string name="about_connect" translatable="true">контактирај</string>
+    <string name="about_connect" translatable="true">Контактирај</string>
     <string name="app_info_error" translatable="true">Није било могуће покренути информације о апликацији.</string>
     <string name="cd_dnscrypt_relay_heading" translatable="true">Релеји</string>
     <string name="notification_screen_error" translatable="true">Није било могуће покренути екран са обавештењем апликације.</string>
@@ -936,10 +936,10 @@
     <string name="brbs_backup_dialog_failure_message" translatable="true">Ниј могуће направити копију. Покушати поново?</string>
     <string name="brbs_restore_complete_toast" translatable="true">Враћање завршено, поновно покретање апликације…</string>
     <string name="brbs_restore_dialog_failure_positive" translatable="true">Поново покушај враћање</string>
-    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">највипе контактираних земаља</string>
-    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">највише блокираних ip-јева</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">Највипе контактираних земаља</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">Највише блокираних ip-јева</string>
     <string name="bad_config_reason_unknown_attribute" translatable="true">Непознати атрибут</string>
-    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">највише блокираних домена</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">Највише блокираних домена</string>
     <string name="bad_config_reason_invalid_value" translatable="true">Неисправна вредност</string>
     <string name="bad_config_reason_missing_attribute" translatable="true">Недостаје атрибут</string>
     <string name="bad_config_reason_syntax_error" translatable="true">Грешка у синтакси</string>

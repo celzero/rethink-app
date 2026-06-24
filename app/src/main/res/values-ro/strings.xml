@@ -89,7 +89,7 @@
     <string name="lbl_domain" translatable="true">Domeniu</string>
     <string name="lbl_wildcard" translatable="true">Metacaracter</string>
     <string name="lbl_action_required" translatable="true">Actiune ceruta</string>
-    <string name="lbl_rules" translatable="true">reguli</string>
+    <string name="lbl_rules" translatable="true">Reguli</string>
     <string name="lbl_configure" translatable="true">Configureaza</string>
     <string name="lbl_logs" translatable="true">jurnale</string>
     <string name="lbl_network" translatable="true">retea</string>
@@ -200,7 +200,7 @@
     <string name="status_protected_with_wg_private_dns" translatable="true">protejat cu WireGuard și DNS privat</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">DNS-ul privat este activat</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">neprotejat</string>
-    <string name="dns_explanation_dns_connected" translatable="true">Conectat la RethinkDNS</string>
+    <string name="dns_explanation_dns_connected" translatable="true">Conectat la Re-RethinkDNS</string>
     <string name="dns_explanation_firewall_connected" translatable="true">Conectat la Firewall</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">Conectat la RethinkDNS și Firewall</string>
     <string name="universal_firewall_explanation" translatable="true">Aplică regulile Firewall-ului la toate aplicațiile în funcție de evenimentele de pe dispozitiv; de exemplu, protejează când dispozitivul este blocat sau când o anumită aplicație nu rulează.</string>
@@ -246,7 +246,7 @@
     <string name="app_mode_dns_low_battery" translatable="true">DNS (economizor baterie)</string>
     <string name="app_mode_dns_firewall" translatable="true">DNS și Firewall (prestabilit)</string>
     <string name="app_mode_wireguard" translatable="true">VPN</string>
-    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="settings_vpn_heading" translatable="true">VPN</string>
     <string name="info_dialog_copy_toast_msg" translatable="true">Adresă IP copiată.</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">URL copiat</string>
     <string name="public_key_copy_toast_msg" translatable="true">Cheie publică copiată.</string>
@@ -450,8 +450,8 @@
     <string name="hsf_chip_appearance" translatable="true">Tema: %1$s</string>
     <string name="lbl_battery_optimization" translatable="true">Optimizare baterie</string>
     <string name="battery_optimization_dialog_heading" translatable="true">Dezactivare %1$s</string>
-    <string name="dc_block_heading" translatable="true">reguli</string>
-    <string name="dc_other_dns_heading" translatable="true">tip</string>
+    <string name="dc_block_heading" translatable="true">Reguli</string>
+    <string name="dc_other_dns_heading" translatable="true">Tip</string>
     <string name="dc_custom_dns_radio" translatable="true">Alte DNS</string>
     <string name="dc_rethink_dns_radio" translatable="true">Rethink DNS</string>
     <string name="dc_entries" translatable="true">%1$s intrări »</string>
@@ -470,13 +470,13 @@
     <string name="about_join_telegram" translatable="true">Telegram</string>
     <string name="about_bug_no_log_dialog_title" translatable="true">Raport bug</string>
     <string name="about_bug_no_log_dialog_positive_btn" translatable="true">Trimite e-mail</string>
-    <string name="about_web" translatable="true">link-uri</string>
+    <string name="about_web" translatable="true">Link-uri</string>
     <string name="about_website" translatable="true">Vizitează rethinkdns.com</string>
     <string name="about_github" translatable="true">Contribuie pe GitHub</string>
     <string name="about_docs" translatable="true">Vezi documentația</string>
     <string name="about_privacy_policy" translatable="true">Vezi Politica de confidențialitate</string>
     <string name="about_sponsor_link_text" translatable="true">Sponsor</string>
-    <string name="about_app" translatable="true">aplicatia</string>
+    <string name="about_app" translatable="true">Aplicatia</string>
     <string name="about_email" translatable="true">Scrie-ne</string>
     <string name="about_settings_app_info" translatable="true">Informații aplicație</string>
     <string name="about_settings_vpn_profile" translatable="true">Profil VPN</string>
@@ -519,8 +519,8 @@
     <string name="about_bug_report_dialog_positive_btn" translatable="true">Trimite e-mail</string>
     <string name="about_bug_no_log_dialog_message" translatable="true">Nu am reușit să colectez jurnalele de erori. Dorești să raportezi manual un bug?</string>
     <string name="about_faq" translatable="true">Vezi Întrebări Frecvente</string>
-    <string name="about_connect" translatable="true">contact</string>
-    <string name="about_settings" translatable="true">sistem</string>
+    <string name="about_connect" translatable="true">Contact</string>
+    <string name="about_settings" translatable="true">Sistem</string>
     <string name="about_app_contributors" translatable="true">Autori</string>
     <string name="about_dialog_positive_button" translatable="true">Să începem</string>
     <string name="about_mail_bugreport_text" translatable="true">Trimite acest e-mail la: hello@celzero.com</string>
@@ -727,7 +727,7 @@
     <string name="fapps_metered_block_dialog_message" translatable="true">Blochezi conexiunile în rețelele contorizate (mobile) pentru aplicațiile <i>din listă</i>\?</string>
     <string name="fapps_bypass_block_dialog_title" translatable="true">Aplicații cu ocolire</string>
     <string name="rules_load_failure_desc" translatable="true">Nu ai fost găsite reguli pentru Firewall</string>
-    <string name="rules_load_failure_reload" translatable="true">reîncărcare</string>
+    <string name="rules_load_failure_reload" translatable="true">Reîncărcare</string>
     <string name="network_log_app_name_unnamed" translatable="true">Fără nume (%1$s)</string>
     <string name="dns_crypt_connection_failure" translatable="true">Eroare de conectare la serverul DNSCrypt.</string>
     <string name="dns_proxy_connection_failure" translatable="true">Eroare de conectare la serverul DNS Proxy.</string>
@@ -965,14 +965,14 @@
     <string name="brbs_backup_complete_toast" translatable="true">Copie de rezervă reușită</string>
     <string name="brbs_restore_no_uri_toast" translatable="true">Restaurare nereușită, încearcă din nou</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category" translatable="true">%1$s liste de blocat</string>
-    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">cele mai contactate tari</string>
-    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">cele mai contactate domenii</string>
-    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">cele mai blocate aplicatii</string>
-    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">cele mai permise aplicatii</string>
-    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">cele mai blocate domenii</string>
-    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">cele mai contactate IP-uri</string>
-    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">cele mai blocate IP-uri</string>
-    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">cele mai blocate tari</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">Cele mai contactate tari</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">Cele mai contactate domenii</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">Cele mai blocate aplicatii</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">Cele mai permise aplicatii</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">Cele mai blocate domenii</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">Cele mai contactate IP-uri</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">Cele mai blocate IP-uri</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">Cele mai blocate tari</string>
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Pornește Rethink pentru a începe</string>
     <string name="bad_config_reason_invalid_value" translatable="true">Valoarea nu e validă</string>
     <string name="bad_config_reason_invalid_number" translatable="true">Numărul nu e valid</string>
@@ -1055,7 +1055,7 @@
     <string name="sponser_dialog_usage_msg" translatable="true">Ai utilizat Rethink de <b>%1$s days</b>, care înseamnă un cost de utilizare de <b>$%2$s</b>. Consideri oportună o sponsorizare pentru susținerea dezvoltării sale?</string>
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Utilizează DNS de sistem pentru domenii nedelegate</string>
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Utilizează DNS de sistem pentru domenii nedelegate precum <i>.lan</i>, <i>.internal</i>, etc.</string>
-    <string name="dc_filtering_heading" translatable="true">filtrare</string>
+    <string name="dc_filtering_heading" translatable="true">Filtrare</string>
     <string name="cd_split_dns_heading" translatable="true">DNS ramificat (experimental)</string>
     <string name="cd_split_dns_desc" translatable="true">Redirecționează cererile DNS de la aplicațiile care folosesc proxy către serverele DNS proxy.</string>
     <string name="univ_firewall_rule_11" translatable="true">Blochează toate conexiunile la localhost</string>
@@ -1114,8 +1114,8 @@
     <string name="hop_add_remove_title" translatable="true">Adaugă / Elimină releu</string>
     <string name="about_terms_of_service" translatable="true">Termeni serviciu</string>
     <string name="bypasses_network_restrictions" translatable="true">Verificările de accesibilitate ocolesc toate restricțiile de rețea. În modul <i>Auto</i>, Rethink utilizează la întâmplare IP-uri și nume-gazdă conectate anterior.</string>
-    <string name="most_contacted_asn" translatable="true">cei mai contactați ISP</string>
-    <string name="most_blocked_asn" translatable="true">cei mai blocați ISP</string>
+    <string name="most_contacted_asn" translatable="true">Cei mai contactați ISP</string>
+    <string name="most_blocked_asn" translatable="true">Cei mai blocați ISP</string>
     <string name="adv_tasker_dialog_msg" translatable="true">Introdu numele pachetelor (separate prin virgulă) admise să pornească sau să oprească Rethink.</string>
     <string name="adv_tasker_dialog_instructions" translatable="true">Instructiuni:\n Extras cerute la transmitere:\n • Key: expeditor\n • Value: Numele de pachet al aplicației solicitante\n\n Exemplu: key:expeditor value:com.termux\n\n Acțiuni suportate:\n • Start VPN – com.celzero.bravedns.intent.action.VPN_START\n • Stop VPN – com.celzero.bravedns.intent.action.VPN_STOP</string>
     <string name="adv_tasker_dialog_edit_hint" translatable="true">Introdu numele de pachet (example: net.dinglisch.android.taskerm)</string>
@@ -1123,7 +1123,7 @@
     <string name="download_ip_info_desc" translatable="true">Oferă detalii ISP-ului pentru website-uri de la <i>rethinkdns.com</i>, cu sprijinul <i>%1$s</i></string>
     <string name="adv_taster_title" translatable="true">Automatizare</string>
     <string name="adv_taster_desc" translatable="true">Configurează aplicațiile care pot porni sau opri Rethink.</string>
-    <string name="top_active_conns" translatable="true">top conexiuni active</string>
+    <string name="top_active_conns" translatable="true">Top conexiuni active</string>
     <string name="load_more" translatable="true">Încarcă tot</string>
     <string name="close_conns_dialog_title" translatable="true">Închide conexiunile</string>
     <string name="close_conns_dialog_desc" translatable="true">Închizi toate conexiunile pentru %1$s?</string>

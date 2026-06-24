@@ -15,401 +15,155 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import Logger
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.activity.addCallback
+import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.recyclerview.widget.LinearLayoutManager
-import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.BubbleAllowedAppsAdapter
-import com.celzero.bravedns.adapter.BubbleBlockedAppsAdapter
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.celzero.bravedns.data.AllowedAppInfo
 import com.celzero.bravedns.data.BlockedAppInfo
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.DnsLogDAO
-import com.celzero.bravedns.databinding.ActivityBubbleBinding
 import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.BaseActivity
-import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
+import com.celzero.bravedns.ui.compose.bubble.BubbleScreen
+import com.celzero.bravedns.ui.compose.theme.RethinkTheme
 import com.celzero.bravedns.viewmodel.AllowedAppsBubbleViewModel
 import com.celzero.bravedns.viewmodel.BlockedAppsBubbleViewModel
-import kotlinx.coroutines.CancellationException
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 /**
- * BubbleActivity - Content activity for Android Bubble notifications
- *
- * This activity is launched by Android's Bubble API (Android 10+) when a user
- * interacts with a bubble notification. It displays recently blocked apps with
- * quick actions to temporarily allow them.
- *
- * The bubble is created via NotificationCompat.BubbleMetadata in BubbleHelper.
- * This activity provides the content that appears when the bubble is expanded.
- *
- * Based on: https://developer.android.com/develop/ui/views/notifications/bubbles
- *
- * Key features:
- * - Shows list of recently blocked apps
- * - Quick action to temporarily allow apps for 15 minutes
- * - Material Design 3 UI
- * - Works with Android's system bubble framework (not custom overlays)
+ * BubbleActivity - Content activity for Android Bubble notifications.
  */
-class BubbleActivity : BaseActivity(R.layout.activity_bubble) {
-    private val b by viewBinding(ActivityBubbleBinding::bind)
-
-    private val persistentState by inject<PersistentState>()
+// TODO-refactor: Consider migrating to navigation component
+class BubbleActivity : AppCompatActivity() {
     private val connectionTrackerDAO by inject<ConnectionTrackerDAO>()
     private val appInfoRepository by inject<AppInfoRepository>()
     private val dnsLogDAO by inject<DnsLogDAO>()
 
-    private lateinit var blockedAdapter: BubbleBlockedAppsAdapter
-    private lateinit var allowedAdapter: BubbleAllowedAppsAdapter
-
-    private var blockedCollectJob: kotlinx.coroutines.Job? = null
-    private var allowedCollectJob: kotlinx.coroutines.Job? = null
-
-    private var recyclerDecorationsAdded: Boolean = false
+    private var vpnOn by mutableStateOf(false)
+    private var refreshKey by mutableIntStateOf(0)
 
     companion object {
         private const val TAG = "BubbleActivity"
         private const val PAGE_SIZE = 20
-        private const val TEMP_ALLOW_DURATION_MINUTES = 15
-        private const val MILLIS_PER_MINUTE = 60
-        private const val MILLIS_PER_SECOND = 1000
-        private const val ITEM_SPACING_DP = 4
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
 
-        Logger.d(TAG, "BubbleActivity onCreate, taskId: $taskId")
+        Napier.d("$TAG onCreate, taskId: $taskId")
 
-        // Handle back button press - minimize instead of close
-        onBackPressedDispatcher.addCallback(this) {
-            // Move to background, don't finish the activity
-            moveTaskToBack(true)
+        setContent {
+            RethinkTheme {
+                val allowedFlow = remember(vpnOn, refreshKey) { allowedAppsFlow() }
+                val blockedFlow = remember(vpnOn, refreshKey) { blockedAppsFlow() }
+                val allowedItems = allowedFlow.collectAsLazyPagingItems()
+                val blockedItems = blockedFlow.collectAsLazyPagingItems()
+
+                BubbleScreen(
+                    vpnOn = vpnOn,
+                    allowedItems = allowedItems,
+                    blockedItems = blockedItems,
+                    onAllowApp = { app, onRefresh -> allowApp(app, onRefresh) },
+                    onRemoveAllowed = { app, onRefresh -> removeAllowedApp(app, onRefresh) }
+                )
+            }
         }
+
+        onBackPressedDispatcher.addCallback(this) { moveTaskToBack(true) }
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        Logger.d(TAG, "BubbleActivity onNewIntent - bubble clicked again")
-        // Don't do anything special - just let onResume handle the refresh
+        Napier.d("$TAG onNewIntent - bubble clicked again")
     }
 
     override fun onResume() {
         super.onResume()
-
-        // If VPN is off, don't load anything / don't start collectors.
-        if (!VpnController.hasTunnel()) {
-            Logger.i(TAG, "VPN is off; not loading bubble lists")
-            stopCollectors()
-            showVpnOffState()
-            return
-        }
-
-        showContentState()
-        setupRecyclerViews()
-        setupLoadStateListeners()
-
-        // Start collectors once per resume; cancel previous collectors if any.
-        startAllowedCollector()
-        startBlockedCollector()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        // Don't stop the service when activity is minimized
-        // The bubble notification should remain visible
-        Logger.d(TAG, "BubbleActivity stopped (minimized)")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        // Don't stop the service when activity is destroyed
-        // The service manages its own lifecycle based on the toggle setting
-        Logger.d(TAG, "BubbleActivity destroyed")
-    }
-
-
-    private fun isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and
-                android.content.res.Configuration.UI_MODE_NIGHT_MASK ==
-                android.content.res.Configuration.UI_MODE_NIGHT_YES
-    }
-
-
-    private fun startAllowedCollector() {
-        allowedCollectJob?.cancel()
-        allowedCollectJob = lifecycleScope.launch {
-            try {
-                val now = System.currentTimeMillis()
-
-                val allowedAppsPager = Pager(
-                    config = PagingConfig(
-                        pageSize = PAGE_SIZE,
-                        enablePlaceholders = false
-                    ),
-                    pagingSourceFactory = {
-                        AllowedAppsBubbleViewModel(appInfoRepository, now)
-                    }
-                ).flow.cachedIn(lifecycleScope)
-
-                allowedAppsPager.collect { pagingData ->
-                    if (!isFinishing && !isDestroyed) {
-                        allowedAdapter.submitData(lifecycle, pagingData)
-                    }
-                }
-            } catch (_: CancellationException) {
-                Logger.d(TAG, "Allowed apps loading cancelled (activity destroyed)")
-            } catch (e: Exception) {
-                Logger.e(TAG, "err loading allowed apps: ${e.message}", e)
-                if (!isFinishing && !isDestroyed) {
-                    b.bubbleAllowedAppsLl.visibility = View.GONE
-                }
-            }
+        vpnOn = VpnController.hasTunnel()
+        refreshKey++
+        if (!vpnOn) {
+            Napier.i("$TAG VPN is off; showing empty state")
         }
     }
 
-    private fun startBlockedCollector() {
-        blockedCollectJob?.cancel()
-        blockedCollectJob = lifecycleScope.launch {
-            try {
-                val now = System.currentTimeMillis()
-                val last15Mins = now - (TEMP_ALLOW_DURATION_MINUTES * MILLIS_PER_MINUTE * MILLIS_PER_SECOND)
-
-                val tempAllowedApps = withContext(Dispatchers.IO) {
-                    appInfoRepository.getAllTempAllowedApps(now)
-                }
-                val tempAllowedUids = tempAllowedApps.map { it.uid }.toSet()
-
-                val blockedAppsPager = Pager(
-                    config = PagingConfig(
-                        pageSize = PAGE_SIZE,
-                        enablePlaceholders = false
-                    ),
-                    pagingSourceFactory = {
-                        BlockedAppsBubbleViewModel(
-                            connectionTrackerDAO,
-                            dnsLogDAO,
-                            appInfoRepository,
-                            last15Mins,
-                            tempAllowedUids
-                        )
-                    }
-                ).flow.cachedIn(lifecycleScope)
-
-                blockedAppsPager.collect { pagingData ->
-                    if (!isFinishing && !isDestroyed) {
-                        blockedAdapter.submitData(lifecycle, pagingData)
-                    }
-                }
-
-            } catch (_: CancellationException) {
-                Logger.d(TAG, "Blocked apps loading cancelled (activity destroyed)")
-            } catch (e: Exception) {
-                Logger.e(TAG, "err loading blocked apps: ${e.message}", e)
-                if (!isFinishing && !isDestroyed) {
-                    b.bubbleProgressCard.visibility = View.GONE
-                    b.bubbleProgressBar.visibility = View.GONE
-                    b.bubbleEmptyState.visibility = View.VISIBLE
-                    b.bubbleRecyclerView.visibility = View.GONE
-                }
-            }
-        }
-    }
-
-    private fun allowApp(blockedApp: BlockedAppInfo) {
-        // Optimistic UI update: remove right away from blocked list for fast feedback.
-        // PagingDataAdapter doesn't support direct removal; we force a refresh after DB update,
-        // but also hide the row by refreshing immediately.
+    private fun allowApp(blockedApp: BlockedAppInfo, onRefresh: () -> Unit) {
         lifecycleScope.launch {
             try {
-                Logger.i(TAG, "Temporarily allowing app for 15 minutes: ${blockedApp.appName} (uid: ${blockedApp.uid})")
+                Napier.i("Temporarily allowing app for 15 minutes: ${blockedApp.appName} (uid: ${blockedApp.uid})")
 
-                withContext<Unit>(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
                     FirewallManager.updateTempAllow(blockedApp.uid, true)
                 }
 
-                if (!isFinishing && !isDestroyed) {
-                    // Refresh BOTH lists: remove from blocked and show in allowed.
-                    blockedAdapter.refresh()
-                    allowedAdapter.refresh()
-                }
-
-                Logger.i(TAG, "App temporarily allowed successfully for 15 minutes")
+                onRefresh()
+                Napier.i("App temporarily allowed successfully for 15 minutes")
             } catch (e: Exception) {
-                Logger.e(TAG, "err allowing app: ${e.message}", e)
+                Napier.e("err allowing app: ${e.message}")
             }
         }
     }
 
-    private fun removeAllowedApp(allowedApp: AllowedAppInfo) {
+    private fun removeAllowedApp(allowedApp: AllowedAppInfo, onRefresh: () -> Unit) {
         lifecycleScope.launch {
             try {
-                Logger.i(TAG, "Removing temp allow for app: ${allowedApp.appName} (uid: ${allowedApp.uid})")
+                Napier.i("Removing temp allow for app: ${allowedApp.appName} (uid: ${allowedApp.uid})")
 
                 withContext(Dispatchers.IO) {
-                    // Clear temp allow status
                     appInfoRepository.clearTempAllowByUid(allowedApp.uid)
                 }
 
-                if (!isFinishing && !isDestroyed) {
-                    // Refresh BOTH lists: remove from allowed and allow it to appear again in blocked.
-                    allowedAdapter.refresh()
-                    blockedAdapter.refresh()
-                }
-
-                Logger.i(TAG, "Temp allow removed successfully")
+                onRefresh()
+                Napier.i("Temp allow removed successfully")
             } catch (e: Exception) {
-                Logger.e(TAG, "err removing allowed app: ${e.message}", e)
+                Napier.e("err removing allowed app: ${e.message}")
             }
         }
     }
 
-    private fun setupRecyclerViews() {
-        // Setup blocked apps RecyclerView
-        blockedAdapter = BubbleBlockedAppsAdapter { blockedApp ->
-            allowApp(blockedApp)
-        }
-        b.bubbleRecyclerView.apply {
-            layoutManager = LinearLayoutManager(this@BubbleActivity)
-            adapter = blockedAdapter
-            if (!recyclerDecorationsAdded) {
-                addItemDecoration(object :
-                    androidx.recyclerview.widget.RecyclerView.ItemDecoration() {
-                    override fun getItemOffsets(
-                        outRect: android.graphics.Rect,
-                        view: View,
-                        parent: androidx.recyclerview.widget.RecyclerView,
-                        state: androidx.recyclerview.widget.RecyclerView.State
-                    ) {
-                        outRect.bottom = ITEM_SPACING_DP // 4dp
-                    }
-                })
-            }
-        }
-
-        // Setup allowed apps RecyclerView
-        allowedAdapter = BubbleAllowedAppsAdapter { allowedApp ->
-            removeAllowedApp(allowedApp)
-        }
-        b.bubbleAllowedRecyclerView.apply {
-            layoutManager = LinearLayoutManager(this@BubbleActivity)
-            adapter = allowedAdapter
-            if (!recyclerDecorationsAdded) {
-                addItemDecoration(object :
-                    androidx.recyclerview.widget.RecyclerView.ItemDecoration() {
-                    override fun getItemOffsets(
-                        outRect: android.graphics.Rect,
-                        view: View,
-                        parent: androidx.recyclerview.widget.RecyclerView,
-                        state: androidx.recyclerview.widget.RecyclerView.State
-                    ) {
-                        outRect.bottom = ITEM_SPACING_DP // 4dp
-                    }
-                })
-                recyclerDecorationsAdded = true
-            }
-        }
+    private fun allowedAppsFlow(): Flow<PagingData<AllowedAppInfo>> {
+        if (!vpnOn) return flowOf(PagingData.empty())
+        val now = System.currentTimeMillis()
+        return Pager(
+            config = PagingConfig(pageSize = PAGE_SIZE, enablePlaceholders = false),
+            pagingSourceFactory = { AllowedAppsBubbleViewModel(appInfoRepository, now) }
+        ).flow.cachedIn(lifecycleScope)
     }
 
-    private fun setupLoadStateListeners() {
-        // Set up load state listener for allowed apps
-        allowedAdapter.addLoadStateListener { loadState ->
-            if (!isFinishing && !isDestroyed) {
-                // Check if data is loaded (not loading and no errors)
-                val isLoaded = loadState.refresh is androidx.paging.LoadState.NotLoading
-
-                if (isLoaded) {
-                    // Show/hide allowed apps card based on item count
-                    val itemCount = allowedAdapter.itemCount
-                    if (itemCount == 0) {
-                        b.bubbleAllowedAppsLl.visibility = View.GONE
-                    } else {
-                        b.bubbleAllowedAppsLl.visibility = View.VISIBLE
-                        b.bubbleAllowedCount.text = itemCount.toString()
-                    }
-                }
+    private fun blockedAppsFlow(): Flow<PagingData<BlockedAppInfo>> {
+        if (!vpnOn) return flowOf(PagingData.empty())
+        val now = System.currentTimeMillis()
+        val last15Mins = now - (15 * 60 * 1000)
+        return Pager(
+            config = PagingConfig(pageSize = PAGE_SIZE, enablePlaceholders = false),
+            pagingSourceFactory = {
+                BlockedAppsBubbleViewModel(
+                    connectionTrackerDAO,
+                    dnsLogDAO,
+                    appInfoRepository,
+                    last15Mins,
+                    emptySet()
+                )
             }
-        }
-
-        // Set up load state listener for blocked apps
-        blockedAdapter.addLoadStateListener { loadState ->
-            if (!isFinishing && !isDestroyed) {
-                val isLoading = loadState.refresh is androidx.paging.LoadState.Loading
-                val isError = loadState.refresh is androidx.paging.LoadState.Error
-                val isLoaded = loadState.refresh is androidx.paging.LoadState.NotLoading
-
-                when {
-                    isLoading -> {
-                        // Show loading state
-                        b.bubbleProgressCard.visibility = View.VISIBLE
-                        b.bubbleProgressBar.visibility = View.VISIBLE
-                        b.bubbleEmptyState.visibility = View.GONE
-                        b.bubbleRecyclerView.visibility = View.GONE
-                    }
-                    isError -> {
-                        // Show error/empty state
-                        b.bubbleProgressCard.visibility = View.GONE
-                        b.bubbleProgressBar.visibility = View.GONE
-                        b.bubbleEmptyState.visibility = View.VISIBLE
-                        b.bubbleRecyclerView.visibility = View.GONE
-                    }
-                    isLoaded -> {
-                        // Hide loading, show content or empty state based on item count
-                        b.bubbleProgressCard.visibility = View.GONE
-                        b.bubbleProgressBar.visibility = View.GONE
-
-                        val itemCount = blockedAdapter.itemCount
-                        if (itemCount == 0) {
-                            b.bubbleEmptyState.visibility = View.VISIBLE
-                            b.bubbleRecyclerView.visibility = View.GONE
-                        } else {
-                            b.bubbleEmptyState.visibility = View.GONE
-                            b.bubbleRecyclerView.visibility = View.VISIBLE
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun showVpnOffState() {
-        // Avoid loading spinners if VPN isn't running.
-        runCatching {
-            b.bubbleProgressCard.visibility = View.GONE
-            b.bubbleProgressBar.visibility = View.GONE
-            b.bubbleAllowedAppsLl.visibility = View.GONE
-            b.bubbleRecyclerView.visibility = View.GONE
-            b.bubbleEmptyState.visibility = View.VISIBLE
-            b.bubbleEmptyTitle.setText(R.string.bubble_empty_state_title)
-        }
-    }
-
-    private fun showContentState() {
-        runCatching {
-            b.bubbleEmptyState.visibility = View.GONE
-        }
-    }
-
-    private fun stopCollectors() {
-        blockedCollectJob?.cancel()
-        blockedCollectJob = null
-        allowedCollectJob?.cancel()
-        allowedCollectJob = null
+        ).flow.cachedIn(lifecycleScope)
     }
 }

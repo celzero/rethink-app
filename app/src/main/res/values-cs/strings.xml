@@ -3,7 +3,7 @@
     <string name="title_about" translatable="true">O aplikaci</string>
     <string name="title_settings" translatable="true">Nastavení</string>
     <string name="title_statistics" translatable="true">Statistiky</string>
-    <string name="lbl_rules" translatable="true">pravidla</string>
+    <string name="lbl_rules" translatable="true">Pravidla</string>
     <string name="lbl_configure" translatable="true">Konfigurovat</string>
     <string name="lbl_logs" translatable="true">záznamy</string>
     <string name="lbl_network" translatable="true">síť</string>
@@ -130,7 +130,7 @@
     <string name="failed_using_default" translatable="true">Selhalo: používá se záložní DNS</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">Připojeno k RethinkDNS a Firewallu</string>
     <string name="firewall_mode_info_explanation_new" translatable="true">Monitorujte síťovou aktivitu a firewallujte jakoukoli aplikaci nebo IP adresu.</string>
-    <string name="dns_explanation_dns_connected" translatable="true">Připojeno k RethinkDNS</string>
+    <string name="dns_explanation_dns_connected" translatable="true">Připojeno k Re-RethinkDNS</string>
     <string name="brave_dns_connect_mode_change_firewall" translatable="true">Vyberte mód.</string>
     <string name="apps_info_title" translatable="true">Aplikace</string>
     <string name="hybrid_mode_info_title" translatable="true">DNS + Firewall</string>
@@ -185,7 +185,7 @@
     <string name="settings_notification_desc3" translatable="true">Žádné</string>
     <string name="hsf_start_btn_state" translatable="true">spustit</string>
     <string name="about_bug_no_log_dialog_message" translatable="true">Nepodařilo se získat crash logy. Chcete chybu nahlásit ručně?</string>
-    <string name="about_web" translatable="true">odkazy</string>
+    <string name="about_web" translatable="true">Odkazy</string>
     <string name="about_website" translatable="true">Navštívit rethinkdns.com</string>
     <string name="dns_query_latency" translatable="true">%1$sms</string>
     <string name="fapps_firewall_filter_bypass_universal" translatable="true">Obcházeno</string>
@@ -277,7 +277,7 @@
     <string name="app_mode_firewall" translatable="true">Firewall</string>
     <string name="app_mode_dns_firewall" translatable="true">DNS a Firewall (výchozí)</string>
     <string name="app_mode_wireguard" translatable="true">VPN</string>
-    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="settings_vpn_heading" translatable="true">VPN</string>
     <string name="info_dialog_copy_toast_msg" translatable="true">IP adresa zkopírována.</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">URL zkopírována</string>
     <string name="public_key_copy_toast_msg" translatable="true">Veřejný klíč zkopírován.</string>
@@ -426,8 +426,8 @@
     <string name="lbl_battery_optimization" translatable="true">Optimalizace baterie</string>
     <string name="battery_optimization_dialog_heading" translatable="true">Vypnout %1$s</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> může vést ke ztrátě konektivity. Změňte nastavení, abyste Rethinku povolili používat data a další prostředky na pozadí.</string>
-    <string name="dc_block_heading" translatable="true">pravidla</string>
-    <string name="dc_other_dns_heading" translatable="true">typ</string>
+    <string name="dc_block_heading" translatable="true">Pravidla</string>
+    <string name="dc_other_dns_heading" translatable="true">Typ</string>
     <string name="dc_custom_dns_radio" translatable="true">Jiné DNS</string>
     <string name="dc_rethink_dns_radio" translatable="true">Rethink DNS</string>
     <string name="dc_local_block_heading" translatable="true">Blokovací seznamy v zařízení</string>
@@ -453,7 +453,7 @@
     <string name="about_faq" translatable="true">Zobrazit FAQ</string>
     <string name="about_docs" translatable="true">Přečíst dokumentaci</string>
     <string name="about_privacy_policy" translatable="true">Přečíst zásady ochrany soukromí</string>
-    <string name="about_connect" translatable="true">kontakt</string>
+    <string name="about_connect" translatable="true">Kontakt</string>
     <string name="about_settings_vpn_profile" translatable="true">VPN profil</string>
     <string name="about_settings_notification" translatable="true">Nastavení oznámení</string>
     <string name="about_twitter" translatable="true">Sledujte nás na Twitteru</string>
@@ -552,7 +552,7 @@
     <string name="fapps_isolate_block_dialog_message" translatable="true">Izolovat <i>vybrané</i> aplikace?</string>
     <string name="fapps_firewall_filter_hint" translatable="true">Zobrazuji všechny aplikace</string>
     <string name="rules_load_failure_desc" translatable="true">Nebyla nalezena žádná firewallová pravidla</string>
-    <string name="rules_load_failure_reload" translatable="true">znovu načíst</string>
+    <string name="rules_load_failure_reload" translatable="true">Znovu načíst</string>
     <string name="network_log_app_name_unknown" translatable="true">Neznámé</string>
     <string name="network_log_app_name_unnamed" translatable="true">Nepojmenováno (%1$s)</string>
     <string name="dns_crypt_connection_failure" translatable="true">Chyba při připojování k DNSCrypt serveru.</string>
@@ -699,14 +699,14 @@
     <string name="brbs_restore_dialog_failure_title" translatable="true">Obnovení se nezdařilo</string>
     <string name="brbs_restore_dialog_failure_message" translatable="true">Nelze provést obnovu. Zkusit znovu?</string>
     <string name="brbs_backup_complete_toast" translatable="true">Záloha dokončena</string>
-    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">nejčastěji povolované aplikace</string>
-    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">nejčastěji blokované aplikace</string>
-    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">nejčastěji navštěvované domény</string>
-    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">nejčastěji kontaktované země</string>
-    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">nejčastěji blokované domény</string>
-    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">nejčastěji kontaktované IP</string>
-    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">nejčastěji blokované IP</string>
-    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">nejčastěji blokované země</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">Nejčastěji povolované aplikace</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">Nejčastěji blokované aplikace</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">Nejčastěji navštěvované domény</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">Nejčastěji kontaktované země</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">Nejčastěji blokované domény</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">Nejčastěji kontaktované IP</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">Nejčastěji blokované IP</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">Nejčastěji blokované země</string>
     <string name="ssv_see_more" translatable="true">Zobrazit vše</string>
     <string name="bad_config_reason_invalid_key" translatable="true">Neplatný klíč</string>
     <string name="bad_config_reason_unknown_attribute" translatable="true">Neznámý atribut</string>
@@ -785,7 +785,7 @@
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">Povolit RDNS+</string>
     <string name="about_sponsor_link_text" translatable="true">Sponzorovat</string>
     <string name="about_email" translatable="true">Napište nám e-mail</string>
-    <string name="about_settings" translatable="true">systém</string>
+    <string name="about_settings" translatable="true">Systém</string>
     <string name="about_settings_app_info" translatable="true">Info o aplikaci</string>
     <string name="cd_dns_proxy_mode_internal" translatable="true">Interní</string>
     <string name="cd_dns_proxy_mode_external" translatable="true">Externí</string>
@@ -853,7 +853,7 @@
     <string name="brbs_backup_title" translatable="true">Záloha</string>
     <string name="orbot" translatable="true">Orbot</string>
     <string name="dns_card_latency_active" translatable="true">%1$sms</string>
-    <string name="about_app" translatable="true">aplikace</string>
+    <string name="about_app" translatable="true">Aplikace</string>
     <string name="rules_load_failure_heading" translatable="true">Poznámka</string>
     <string name="exclude_apps_from_proxy">Obcházet aplikaci pro všechny proxy</string>
     <string name="exclude_apps_from_proxy_failure_toast">Tato aplikace již obchází proxy</string>

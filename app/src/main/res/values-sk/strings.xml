@@ -13,7 +13,7 @@
     <string name="lbl_domain" translatable="true">Doména</string>
     <string name="lbl_wildcard" translatable="true">Divoká karta (*)</string>
     <string name="lbl_action_required" translatable="true">Vyžaduje sa akcia</string>
-    <string name="lbl_rules" translatable="true">pravidlá</string>
+    <string name="lbl_rules" translatable="true">Pravidlá</string>
     <string name="lbl_configure" translatable="true">Nastaviť</string>
     <string name="lbl_logs" translatable="true">bezpečnostné záznamy</string>
     <string name="lbl_network" translatable="true">sieť</string>
@@ -93,7 +93,7 @@
     <string name="status_protected_with_wg" translatable="true">chránený s Wireguardom</string>
     <string name="status_protected_with_wg_private_dns" translatable="true">chránený s Wireguardom a súkromným DNS</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">súkromne DNS je zapnuté</string>
-    <string name="dns_explanation_dns_connected" translatable="true">Pripojený s RethinkDNS</string>
+    <string name="dns_explanation_dns_connected" translatable="true">Pripojený s Re-RethinkDNS</string>
     <string name="dns_explanation_firewall_connected" translatable="true">Pripojený s Firewalom</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">Pripojený s RethinkDNS a Firewalom</string>
     <string name="notification_action_resume_vpn" translatable="true">POKRAČOVAŤ</string>
@@ -226,7 +226,7 @@
     <string name="app_mode_firewall" translatable="true">Firewall</string>
     <string name="app_mode_dns_firewall" translatable="true">DNS a Firewall (predvolené)</string>
     <string name="app_mode_wireguard" translatable="true">VPN</string>
-    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="settings_vpn_heading" translatable="true">VPN</string>
     <string name="info_dialog_copy_toast_msg" translatable="true">IP adresa skopírovaná.</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">URL skopírované</string>
     <string name="public_key_copy_toast_msg" translatable="true">Verejný kľúč skopírovaný.</string>

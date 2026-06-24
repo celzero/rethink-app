@@ -40,7 +40,7 @@ import com.celzero.bravedns.database.ProxyEndpoint.Companion.DEFAULT_PROXY_TYPE
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.ui.activity.AppLockActivity
+import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.HTTP_PROXY_PORT
 import com.celzero.bravedns.util.Constants.Companion.SOCKS_DEFAULT_PORT
 import com.celzero.bravedns.util.Utilities.getActivityPendingIntent
@@ -174,12 +174,12 @@ class OrbotHelper(
             // link.
             return Intent(
                 Intent.ACTION_VIEW,
-                context.resources.getString(R.string.orbot_download_link_website).toUri()
+                context.getString(R.string.orbot_download_link_website).toUri()
             )
         } else {
             return Intent(
                 Intent.ACTION_VIEW,
-                context.resources.getString(R.string.orbot_download_link_website).toUri()
+                context.getString(R.string.orbot_download_link_website).toUri()
             )
         }
     }
@@ -279,7 +279,7 @@ class OrbotHelper(
         val pendingIntent =
             getActivityPendingIntent(
                 context,
-                Intent(context, AppLockActivity::class.java),
+                Intent(context, HomeScreenActivity::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
                 mutable = false
             )
@@ -287,7 +287,7 @@ class OrbotHelper(
         var builder: NotificationCompat.Builder
         if (isAtleastO()) {
             val name: CharSequence = context.getString(R.string.notif_channel_proxy_failure)
-            val description = context.resources.getString(R.string.notif_channel_desc_proxy_failure)
+            val description = context.getString(R.string.notif_channel_desc_proxy_failure)
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(NOTIF_CHANNEL_ID_PROXY_ALERTS, name, importance)
             channel.description = description
@@ -298,8 +298,8 @@ class OrbotHelper(
             builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_PROXY_ALERTS)
         }
 
-        val contentTitle = context.resources.getString(R.string.lbl_action_required)
-        val contentText = context.resources.getString(R.string.settings_orbot_notification_content)
+        val contentTitle = context.getString(R.string.lbl_action_required)
+        val contentText = context.getString(R.string.settings_orbot_notification_content)
         builder
             .setSmallIcon(R.drawable.ic_notification_icon)
             .setContentTitle(contentTitle)
@@ -312,7 +312,7 @@ class OrbotHelper(
         val notificationAction: NotificationCompat.Action =
             NotificationCompat.Action(
                 0,
-                context.resources.getString(R.string.settings_orbot_notification_action),
+                context.getString(R.string.settings_orbot_notification_action),
                 openIntent
             )
         builder.addAction(notificationAction)

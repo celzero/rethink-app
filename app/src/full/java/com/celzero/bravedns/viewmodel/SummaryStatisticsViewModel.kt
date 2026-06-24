@@ -15,34 +15,40 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.liveData
+import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.data.DataUsageSummary
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.StatsSummaryDao
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SummaryStatisticsViewModel(
     private val connectionTrackerDAO: ConnectionTrackerDAO,
     private val statsDao: StatsSummaryDao
 ) : ViewModel() {
-    private val topActiveConns: MutableLiveData<Long> = MutableLiveData()
-    private val networkActivity: MutableLiveData<String> = MutableLiveData()
-    private val asn: MutableLiveData<String> = MutableLiveData()
-    private val countryActivities: MutableLiveData<String> = MutableLiveData()
-    private val domains: MutableLiveData<String> = MutableLiveData()
-    private val ips: MutableLiveData<String> = MutableLiveData()
-    private var timeCategory: TimeCategory = TimeCategory.ONE_HOUR
-    private val startTime: MutableLiveData<Long> = MutableLiveData()
-    private var loadMoreClicked: Boolean = false
+    private val _uiState = MutableStateFlow(SummaryStatisticsUiState())
+    val uiState: StateFlow<SummaryStatisticsUiState> = _uiState.asStateFlow()
+
+    private val startTime = MutableStateFlow(System.currentTimeMillis() - ONE_HOUR_MILLIS)
+    private val topActiveConnsTick = MutableStateFlow(VpnController.uptimeMs())
+    private val refreshTick = MutableStateFlow(0L)
 
     companion object {
         private const val ONE_HOUR_MILLIS = 1 * 60 * 60 * 1000L
@@ -60,148 +66,140 @@ class SummaryStatisticsViewModel(
         }
     }
 
+    data class SummaryStatisticsUiState(
+        val timeCategory: TimeCategory = TimeCategory.ONE_HOUR,
+        val dataUsage: DataUsageSummary = DataUsageSummary(0, 0, 0, 0)
+    )
+
+
     init {
-        // set from and to time to current and 1 hr before
-        startTime.value = System.currentTimeMillis() - ONE_HOUR_MILLIS
-        topActiveConns.value = VpnController.uptimeMs()
-        networkActivity.value = ""
-        asn.value = ""
-    }
-
-    fun getTimeCategory(): TimeCategory {
-        return timeCategory
-    }
-
-    fun setLoadMoreClicked(b: Boolean) {
-        loadMoreClicked = b
-        // initialise the live data to trigger the switchMap
-        domains.value = ""
-        countryActivities.value = ""
-        ips.value = ""
+        updateDataUsage()
     }
 
     fun timeCategoryChanged(tc: TimeCategory) {
-        timeCategory = tc
-        when (tc) {
-            TimeCategory.ONE_HOUR -> {
-                startTime.value = System.currentTimeMillis() - ONE_HOUR_MILLIS
-            }
-            TimeCategory.TWENTY_FOUR_HOUR -> {
-                startTime.value = System.currentTimeMillis() - ONE_DAY_MILLIS
-            }
-            TimeCategory.SEVEN_DAYS -> {
-                startTime.value = System.currentTimeMillis() - ONE_WEEK_MILLIS
-            }
+        val st = when (tc) {
+            TimeCategory.ONE_HOUR -> System.currentTimeMillis() - ONE_HOUR_MILLIS
+            TimeCategory.TWENTY_FOUR_HOUR -> System.currentTimeMillis() - ONE_DAY_MILLIS
+            TimeCategory.SEVEN_DAYS -> System.currentTimeMillis() - ONE_WEEK_MILLIS
         }
-        networkActivity.value = ""
-        asn.value = ""
-        if (loadMoreClicked) {
-            countryActivities.value = ""
-            ips.value = ""
-            domains.value = ""
+        startTime.value = st
+        _uiState.update { it.copy(timeCategory = tc) }
+        refreshTick.update { it + 1 }
+        updateDataUsage()
+    }
+
+    private fun updateDataUsage() {
+        viewModelScope.launch {
+            val to = startTime.value
+            val usage = withContext(Dispatchers.IO) {
+                connectionTrackerDAO.getTotalUsages(to, ConnectionTracker.ConnType.METERED.value)
+            }
+            _uiState.update { it.copy(dataUsage = usage) }
         }
     }
 
-    val getTopActiveConns =
-        topActiveConns.switchMap {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val getTopActiveConns: Flow<PagingData<AppConnection>> =
+        topActiveConnsTick.flatMapLatest { it ->
             val to = System.currentTimeMillis() - it
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                 statsDao.getTopActiveConns(to)
             }
-                .liveData
+                .flow
                 .cachedIn(viewModelScope)
         }
 
-    val getAllowedAppNetworkActivity =
-        networkActivity.switchMap { _ ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val getAllowedAppNetworkActivity: Flow<PagingData<AppConnection>> =
+        refreshTick.flatMapLatest { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    // use dnsQuery as appName
-                    val to = startTime.value ?: 0L
-                    statsDao.getMostAllowedApps(to)
-                }
-                .liveData
+                statsDao.getMostAllowedApps(startTime.value)
+            }
+                .flow
                 .cachedIn(viewModelScope)
         }
 
-    val getBlockedAppNetworkActivity =
-        networkActivity.switchMap { _ ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val getBlockedAppNetworkActivity: Flow<PagingData<AppConnection>> =
+        refreshTick.flatMapLatest { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    // use dnsQuery as appName
-                    val to = startTime.value ?: 0L
-                    statsDao.getMostBlockedApps(to)
-                }
-                .liveData
+                statsDao.getMostBlockedApps(startTime.value)
+            }
+                .flow
                 .cachedIn(viewModelScope)
         }
 
-    val getMostConnectedASN =
-        asn.switchMap { _ ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val getMostConnectedASN: Flow<PagingData<AppConnection>> =
+        refreshTick.flatMapLatest { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    val to = startTime.value ?: 0L
-                    statsDao.getMostConnectedASN(to)
-                }
-                .liveData
+                statsDao.getMostConnectedASN(startTime.value)
+            }
+                .flow
                 .cachedIn(viewModelScope)
         }
 
-    val getMostBlockedASN =
-        asn.switchMap { _ ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val getMostBlockedASN: Flow<PagingData<AppConnection>> =
+        refreshTick.flatMapLatest { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    val to = startTime.value ?: 0L
-                    statsDao.getMostBlockedASN(to)
-                }
-                .liveData
+                statsDao.getMostBlockedASN(startTime.value)
+            }
+                .flow
                 .cachedIn(viewModelScope)
         }
 
-    val mbd = domains.switchMap {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val mbd: Flow<PagingData<AppConnection>> = refreshTick.flatMapLatest { _ ->
         Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-            val to = startTime.value ?: 0L
-            statsDao.getMostBlockedDomains(to)
+            statsDao.getMostBlockedDomains(startTime.value)
         }
-        .liveData
+        .flow
         .cachedIn(viewModelScope)
     }
 
-    val mcd = domains.switchMap {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val mcd: Flow<PagingData<AppConnection>> = refreshTick.flatMapLatest { _ ->
         Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-            val to = startTime.value ?: 0L
-            statsDao.getMostContactedDomains(to)
+            statsDao.getMostContactedDomains(startTime.value)
         }
-        .liveData
+        .flow
         .cachedIn(viewModelScope)
     }
 
-    val getMostContactedIps = ips.switchMap { _ ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val getMostContactedIps: Flow<PagingData<AppConnection>> = refreshTick.flatMapLatest { _ ->
         Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-            val to = startTime.value ?: 0L
-            connectionTrackerDAO.getMostContactedIps(to)
+            connectionTrackerDAO.getMostContactedIps(startTime.value)
         }
-        .liveData
+        .flow
         .cachedIn(viewModelScope)
     }
 
-    val getMostBlockedIps = ips.switchMap { _ ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val getMostBlockedIps: Flow<PagingData<AppConnection>> = refreshTick.flatMapLatest { _ ->
         Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-            val to = startTime.value ?: 0L
-            connectionTrackerDAO.getMostBlockedIps(to)
+            connectionTrackerDAO.getMostBlockedIps(startTime.value)
         }
-        .liveData
+        .flow
         .cachedIn(viewModelScope)
     }
 
-    val getMostContactedCountries =
-        countryActivities.switchMap { _ ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val getMostContactedCountries: Flow<PagingData<AppConnection>> =
+        refreshTick.flatMapLatest { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    val to = startTime.value ?: 0L
-                    statsDao.getMostContactedCountries(to)
-                }
-                .liveData
+                statsDao.getMostContactedCountries(startTime.value)
+            }
+                .flow
                 .cachedIn(viewModelScope)
         }
 
-    suspend fun totalUsage(): DataUsageSummary {
-        val to = startTime.value ?: 0L
-        return connectionTrackerDAO.getTotalUsages(to, ConnectionTracker.ConnType.METERED.value)
+    suspend fun getTopAppsForCountry(flag: String, limit: Int = 5): List<AppConnection> {
+        if (flag.isBlank()) return emptyList()
+        val to = startTime.value
+        return withContext(Dispatchers.IO) {
+            statsDao.getFlagDetailsLimited(flag = flag, to = to, limit = limit)
+        }
     }
 }

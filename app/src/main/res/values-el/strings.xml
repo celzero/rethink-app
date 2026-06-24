@@ -118,7 +118,7 @@
     <string name="status_protected_with_wg_private_dns" translatable="true">προστατεύεται με wireguard &amp; private dns</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">το private dns είναι ενεργοποιημένο</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">δεν προστατεύεται</string>
-    <string name="dns_explanation_dns_connected" translatable="true">Συνδέθηκε με το RethinkDNS</string>
+    <string name="dns_explanation_dns_connected" translatable="true">Συνδέθηκε με το Re-RethinkDNS</string>
     <string name="dns_explanation_firewall_connected" translatable="true">Συνδέθηκε με τείχος προστασίας</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">Συνδέθηκε στο RethinkDNS και το Firewall</string>
     <string name="universal_firewall_explanation" translatable="true">Εφαρμόστε κανόνες τείχους προστασίας σε όλες τις εφαρμογές βάσει συμβάντων της συσκευής, για παράδειγμα, τείχος προστασίας όταν η συσκευή είναι κλειδωμένη ή όταν μια συγκεκριμένη εφαρμογή δεν χρησιμοποιείται.</string>

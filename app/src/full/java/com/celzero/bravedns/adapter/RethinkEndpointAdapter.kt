@@ -16,208 +16,99 @@
 
 package com.celzero.bravedns.adapter
 
-import Logger
-import Logger.LOG_TAG_DNS
 import android.content.Context
-import android.content.DialogInterface
-import android.content.Intent
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.findViewTreeLifecycleOwner
-import androidx.lifecycle.lifecycleScope
-import androidx.paging.PagingDataAdapter
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RethinkDnsEndpoint
-import com.celzero.bravedns.databinding.RethinkEndpointListItemBinding
-import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
-import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.ui.compose.theme.RethinkMultiActionDialog
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
-import com.celzero.firestack.backend.Backend
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.celzero.bravedns.ui.compose.dns.ConfigureRethinkScreenType
 
-class RethinkEndpointAdapter(private val context: Context, private val appConfig: AppConfig) :
-    PagingDataAdapter<RethinkDnsEndpoint, RethinkEndpointAdapter.RethinkEndpointViewHolder>(
-        DIFF_CALLBACK
-    ) {
+private const val TAG = "RethinkEndpointAdapter"
 
-    var lifecycleOwner: LifecycleOwner? = null
+private sealed class RethinkDialogState {
+    data class Info(val endpoint: RethinkDnsEndpoint) : RethinkDialogState()
+}
 
-    companion object {
-        private const val ONE_SEC = 1000L
-        private const val TAG = "RethinkEndpointAdapter"
-        private val DIFF_CALLBACK =
-            object : DiffUtil.ItemCallback<RethinkDnsEndpoint>() {
-                override fun areItemsTheSame(
-                    oldConnection: RethinkDnsEndpoint,
-                    newConnection: RethinkDnsEndpoint
-                ): Boolean {
-                    return (oldConnection.url == newConnection.url &&
-                            oldConnection.isActive == newConnection.isActive)
-                }
-
-                override fun areContentsTheSame(
-                    oldConnection: RethinkDnsEndpoint,
-                    newConnection: RethinkDnsEndpoint
-                ): Boolean {
-                    return (oldConnection.url == newConnection.url &&
-                            oldConnection.isActive != newConnection.isActive)
-                }
-            }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RethinkEndpointViewHolder {
-        val itemBinding =
-            RethinkEndpointListItemBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
-        lifecycleOwner = parent.findViewTreeLifecycleOwner()
-        return RethinkEndpointViewHolder(itemBinding)
-    }
-
-    override fun onBindViewHolder(holder: RethinkEndpointViewHolder, position: Int) {
-        val doHEndpoint: RethinkDnsEndpoint = getItem(position) ?: return
-        holder.update(doHEndpoint)
-    }
-
-    inner class RethinkEndpointViewHolder(private val b: RethinkEndpointListItemBinding) :
-        RecyclerView.ViewHolder(b.root) {
-        private var statusCheckJob: Job? = null
-
-        fun update(endpoint: RethinkDnsEndpoint) {
-            displayDetails(endpoint)
-            setupClickListeners(endpoint)
-        }
-
-        private fun setupClickListeners(endpoint: RethinkDnsEndpoint) {
-            b.root.setOnClickListener { updateConnection(endpoint) }
-            b.rethinkEndpointListActionImage.setOnClickListener { showDohMetadataDialog(endpoint) }
-            b.rethinkEndpointListCheckImage.setOnClickListener { updateConnection(endpoint) }
-        }
-
-        private fun displayDetails(endpoint: RethinkDnsEndpoint) {
-            b.rethinkEndpointListUrlName.text = endpoint.name
-            b.rethinkEndpointListCheckImage.isChecked = endpoint.isActive
-
-            // Shows either the info/delete icon for the DoH entries.
-            showIcon(endpoint)
-
-            if (endpoint.isActive && VpnController.hasTunnel() && !appConfig.isSmartDnsEnabled()) {
-                keepSelectedStatusUpdated(endpoint)
-            } else if (endpoint.isActive) {
-                b.rethinkEndpointListUrlExplanation.text =
-                    context.getString(R.string.rt_filter_parent_selected)
-            } else {
-                b.rethinkEndpointListUrlExplanation.text = ""
-            }
-        }
-
-        private fun keepSelectedStatusUpdated(endpoint: RethinkDnsEndpoint) {
-            statusCheckJob = io {
-                while (true) {
-                    updateBlocklistStatusText(endpoint)
-                    delay(ONE_SEC)
-                }
-            }
-        }
-
-        private suspend fun updateBlocklistStatusText(endpoint: RethinkDnsEndpoint) {
-            // if the view is not active then cancel the job
-            if (
-                lifecycleOwner
-                    ?.lifecycle
-                    ?.currentState
-                    ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false ||
-                bindingAdapterPosition == RecyclerView.NO_POSITION
-            ) {
-                statusCheckJob?.cancel()
-                return
-            }
-
-            updateDnsStatus(endpoint)
-        }
-
-        private suspend fun updateDnsStatus(endpoint: RethinkDnsEndpoint) {
-            val state = VpnController.getDnsStatus(Backend.Preferred)
-            val status = UIUtils.getDnsStatusStringRes(state)
-            uiCtx {
-                // show the status as it is if it is not connected
+@Composable
+fun RethinkEndpointRow(
+    endpoint: RethinkDnsEndpoint,
+    appConfig: AppConfig,
+    onEditConfiguration: (ConfigureRethinkScreenType, String, String) -> Unit = { _, _, _ -> }
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val explanation =
+        rememberDnsStatusExplanation(
+            key = "${endpoint.url}:${endpoint.blocklistCount}",
+            isSelected = endpoint.isActive,
+            smartDnsEnabled = appConfig.isSmartDnsEnabled(),
+            tag = TAG,
+            statusTextMapper = { ctx, status ->
                 if (status != R.string.dns_connected) {
-                    b.rethinkEndpointListUrlExplanation.text =
-                        context.getString(status).replaceFirstChar(Char::titlecase)
-                    return@uiCtx
-                }
-
-                if (endpoint.blocklistCount > 0) {
-                    b.rethinkEndpointListUrlExplanation.text =
-                        context.getString(
-                            R.string.dns_connected_rethink_plus,
-                            endpoint.blocklistCount.toString()
-                        )
+                    ctx.getString(status).replaceFirstChar(Char::titlecase)
+                } else if (endpoint.blocklistCount > 0) {
+                    ctx.getString(
+                        R.string.dns_connected_rethink_plus,
+                        endpoint.blocklistCount.toString()
+                    )
                 } else {
-                    b.rethinkEndpointListUrlExplanation.text = context.getString(status)
+                    ctx.getString(status)
                 }
             }
+        )
+    var dialogState by remember(endpoint.url) { mutableStateOf<RethinkDialogState?>(null) }
 
-        }
-
-        private fun showIcon(endpoint: RethinkDnsEndpoint) {
-            if (endpoint.isEditable(context)) {
-                b.rethinkEndpointListActionImage.setImageDrawable(
-                    ContextCompat.getDrawable(context, R.drawable.ic_edit_icon)
-                )
-            } else {
-                b.rethinkEndpointListActionImage.setImageDrawable(
-                    ContextCompat.getDrawable(context, R.drawable.ic_info)
-                )
-            }
-        }
-
-        private fun updateConnection(endpoint: RethinkDnsEndpoint) {
-            Logger.d(
-                LOG_TAG_DNS,
-                "$TAG rdns update; ${endpoint.name}, ${endpoint.url}, ${endpoint.isActive}"
-            )
-
-            io {
+    DnsEndpointRow(
+        title = endpoint.name,
+        supporting = explanation.ifEmpty { null },
+        selected = endpoint.isActive,
+        action = if (endpoint.isEditable(context)) DnsRowAction.Edit else DnsRowAction.Info,
+        selection = DnsRowSelection.Radio,
+        onActionClick = { dialogState = RethinkDialogState.Info(endpoint) },
+        onSelectionChange = {
+            launchDnsEndpointSelectionUpdate(scope, context, TAG) {
                 endpoint.isActive = true
                 appConfig.handleRethinkChanges(endpoint)
             }
         }
+    )
 
-        private fun showDohMetadataDialog(endpoint: RethinkDnsEndpoint) {
-            val builder = MaterialAlertDialogBuilder(context, R.style.App_Dialog_NoDim)
-            builder.setTitle(endpoint.name)
-            builder.setMessage(endpoint.url + "\n\n" + endpoint.desc)
-            builder.setCancelable(true)
-            if (endpoint.isEditable(context)) {
-                builder.setPositiveButton(context.getString(R.string.rt_edit_dialog_positive)) { _, _ ->
-                    openEditConfiguration(endpoint)
-                }
+    dialogState?.let { state ->
+        val info = state as RethinkDialogState.Info
+        val editEnabled = info.endpoint.isEditable(context)
+        val positiveText =
+            if (editEnabled) {
+                context.getString(R.string.rt_edit_dialog_positive)
             } else {
-                builder.setPositiveButton(context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
-                    dialogInterface.dismiss()
-                }
+                context.getString(R.string.dns_info_positive)
             }
-            builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
+        RethinkMultiActionDialog(
+            onDismissRequest = { dialogState = null },
+            title = info.endpoint.name,
+            message = info.endpoint.url + "\n\n" + info.endpoint.desc,
+            primaryText = positiveText,
+            onPrimary = {
+                dialogState = null
+                if (editEnabled) {
+                    openEditConfiguration(context, endpoint, onEditConfiguration)
+                }
+            },
+            secondaryText = context.getString(R.string.dns_info_neutral),
+            onSecondary = {
                 clipboardCopy(
                     context,
-                    endpoint.url,
+                    info.endpoint.url,
                     context.getString(R.string.copy_clipboard_label)
                 )
                 Utilities.showToastUiCentered(
@@ -226,36 +117,23 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
                     Toast.LENGTH_SHORT
                 )
             }
-            builder.create().show()
-        }
-
-        private fun openEditConfiguration(endpoint: RethinkDnsEndpoint) {
-
-            if (!VpnController.hasTunnel()) {
-                Utilities.showToastUiCentered(
-                    context,
-                    context.getString(R.string.ssv_toast_start_rethink),
-                    Toast.LENGTH_SHORT
-                )
-                return
-            }
-
-            val intent = Intent(context, ConfigureRethinkBasicActivity::class.java)
-            intent.putExtra(
-                ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_TYPE,
-                RethinkBlocklistManager.RethinkBlocklistType.REMOTE
-            )
-            intent.putExtra(ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_NAME, endpoint.name)
-            intent.putExtra(ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_URL, endpoint.url)
-            context.startActivity(intent)
-        }
-
-        private suspend fun uiCtx(f: suspend () -> Unit) {
-            withContext(Dispatchers.Main) { f() }
-        }
-
-        private fun io(f: suspend () -> Unit): Job? {
-            return lifecycleOwner?.lifecycleScope?.launch { withContext(Dispatchers.IO) { f() } }
-        }
+        )
     }
+}
+
+private fun openEditConfiguration(
+    context: Context,
+    endpoint: RethinkDnsEndpoint,
+    onEditConfiguration: (ConfigureRethinkScreenType, String, String) -> Unit
+) {
+    if (!VpnController.hasTunnel()) {
+        Utilities.showToastUiCentered(
+            context,
+            context.getString(R.string.ssv_toast_start_rethink),
+            Toast.LENGTH_SHORT
+        )
+        return
+    }
+
+    onEditConfiguration(ConfigureRethinkScreenType.REMOTE, endpoint.name, endpoint.url)
 }

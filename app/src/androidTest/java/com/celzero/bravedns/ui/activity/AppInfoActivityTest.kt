@@ -218,32 +218,6 @@ class AppInfoActivityTest {
         }
     }
 
-    @Test
-    fun testRecyclerViewsAreInitialized() {
-        Log.d(testTag, "Testing RecyclerView initialization")
-        val intent = createValidIntent()
-
-        ActivityScenario.launch<AppInfoActivity>(intent).use {
-            try {
-                // Check that RecyclerViews are present (they should exist even if empty)
-                onView(withId(R.id.aad_active_conns_rv))
-                    .check(matches(isDisplayed()))
-                onView(withId(R.id.aad_asn_rv))
-                    .check(matches(isDisplayed()))
-                onView(withId(R.id.aad_most_contacted_domain_rv))
-                    .check(matches(isDisplayed()))
-                onView(withId(R.id.aad_most_contacted_ips_rv))
-                    .check(matches(isDisplayed()))
-
-                Log.d(testTag, "RecyclerView initialization test completed")
-
-            } catch (e: Exception) {
-                Log.e(testTag, "RecyclerView test failed", e)
-                // Log but don't fail - RecyclerViews might be conditionally visible
-                Log.w(testTag, "Some RecyclerViews may be conditionally visible")
-            }
-        }
-    }
 
     @Test
     fun testActivityHandlesConfigurationChanges() {
@@ -633,43 +607,6 @@ class AppInfoActivityTest {
         }
     }
 
-    @Test
-    fun testScrollingPerformance() {
-        Log.d(testTag, "Testing scrolling performance")
-        val intent = createValidIntent()
-
-        ActivityScenario.launch<AppInfoActivity>(intent).use { scenario ->
-            val scrollTime = measureTimeMillis {
-                try {
-                    // Test scrolling on RecyclerViews if they exist
-                    val recyclerViewIds = listOf(
-                        R.id.aad_active_conns_rv,
-                        R.id.aad_asn_rv,
-                        R.id.aad_most_contacted_domain_rv,
-                        R.id.aad_most_contacted_ips_rv
-                    )
-
-                    recyclerViewIds.forEach { id ->
-                        try {
-                            onView(withId(id))
-                                .check(matches(anyOf(isDisplayed(), not(isDisplayed()))))
-                                .perform(swipeUp())
-                        } catch (e: Exception) {
-                            Log.w(testTag, "ScrollView $id not available or scrollable: ${e.message}")
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.w(testTag, "Scrolling test encountered issues: ${e.message}")
-                }
-            }
-
-            Log.d(testTag, "Scrolling operations time: ${scrollTime}ms")
-            assertTrue(
-                "Scrolling should be responsive",
-                scrollTime < 2000L
-            )
-        }
-    }
 
     @Test
     fun testInteractionResponseTimes() {

@@ -24,6 +24,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.celzero.bravedns.data.DataUsage
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AppInfoDAO {
@@ -64,6 +65,11 @@ interface AppInfoDAO {
     fun tombstoneApp(oldUid: Int, newUid: Int, tombstoneTs: Long, modifiedTs: Long)
 
     @Query("select * from AppInfo order by appCategory, uid") fun getAllAppDetails(): List<AppInfo>
+    @Query("select * from AppInfo order by lower(appName), uid, packageName")
+    fun getAllAppDetailsFlow(): Flow<List<AppInfo>>
+
+    @Query("select count(*) from AppInfo")
+    suspend fun getAppCount(): Int
 
     @Query(
         "select * from AppInfo where isSystemApp = 1 and (appName like :search or uid like :search or packageName like :search) and (firewallStatus in (:firewall) or isProxyExcluded in (:isProxyExcluded)) and connectionStatus in (:connectionStatus) order by lower(appName)"
@@ -129,24 +135,26 @@ interface AppInfoDAO {
     ): PagingSource<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where (appName like :search or uid like :search or packageName like :search) and appCategory in (:cat) and isSystemApp in (:appType) and firewallStatus in (:firewall) and connectionStatus in (:connectionStatus) order by lower(appName)"
+        "select * from AppInfo where (appName like :search or uid like :search or packageName like :search) and appCategory in (:cat) and isSystemApp in (:appType) and (firewallStatus in (:firewall) or isProxyExcluded in (:isProxyExcluded)) and connectionStatus in (:connectionStatus) order by lower(appName)"
     )
     fun getFilteredApps(
         search: String,
         cat: Set<String>,
         firewall: Set<Int>,
         appType: Set<Int>,
-        connectionStatus: Set<Int>
+        connectionStatus: Set<Int>,
+        isProxyExcluded: Set<Int>
     ): List<AppInfo>
 
     @Query(
-        "select * from AppInfo where (appName like :search or uid like :search or packageName like :search) and isSystemApp in (:appType) and firewallStatus in (:firewall) and connectionStatus in (:connectionStatus) order by lower(appName)"
+        "select * from AppInfo where (appName like :search or uid like :search or packageName like :search) and isSystemApp in (:appType) and (firewallStatus in (:firewall) or isProxyExcluded in (:isProxyExcluded)) and connectionStatus in (:connectionStatus) order by lower(appName)"
     )
     fun getFilteredApps(
         search: String,
         firewall: Set<Int>,
         appType: Set<Int>,
-        connectionStatus: Set<Int>
+        connectionStatus: Set<Int>,
+        isProxyExcluded: Set<Int>
     ): List<AppInfo>
 
     @Query(
@@ -177,7 +185,7 @@ interface AppInfoDAO {
     @Query("update AppInfo set isProxyExcluded = :bypass where packageName = 'com.celzero.bravedns'")
     fun setRethinkToBypassProxy(bypass: Boolean)
 
-    @Query("update AppInfo set firewallStatus = 7 and connectionStatus = 3 where packageName = 'com.celzero.bravedns'")
+    @Query("update AppInfo set firewallStatus = 7, connectionStatus = 3 where packageName = 'com.celzero.bravedns'")
     fun setRethinkToBypassDnsAndFirewall()
 
     @Query("select * from AppInfo where tempAllowEnabled = 1 and tempAllowExpiryTime > 0")

@@ -47,8 +47,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.ui.NotificationHandlerActivity
-import com.celzero.bravedns.ui.activity.AppLockActivity
+import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
@@ -686,7 +685,7 @@ internal constructor(
             ctx.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
         Logger.d(LOG_TAG_VPN, "Number of new apps: $appSize, show notification")
 
-        val intent = Intent(ctx, NotificationHandlerActivity::class.java)
+        val intent = Intent(ctx, HomeScreenActivity::class.java)
         intent.putExtra(
             Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME,
             Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE
@@ -698,7 +697,7 @@ internal constructor(
         var builder: NotificationCompat.Builder
         if (isAtleastO()) {
             val name: CharSequence = ctx.getString(R.string.notif_channel_firewall_alerts)
-            val description = ctx.resources.getString(R.string.notif_channel_desc_firewall_alerts)
+            val description = ctx.getString(R.string.notif_channel_desc_firewall_alerts)
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, name, importance)
             channel.description = description
@@ -708,9 +707,9 @@ internal constructor(
             builder = NotificationCompat.Builder(ctx, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
         }
 
-        val contentTitle: String = ctx.resources.getString(R.string.new_app_bulk_notification_title)
+        val contentTitle: String = ctx.getString(R.string.new_app_bulk_notification_title)
         val contentText: String =
-            ctx.resources.getString(R.string.new_app_bulk_notification_content, appSize.toString())
+            ctx.getString(R.string.new_app_bulk_notification_content, appSize.toString())
 
         builder
             .setSmallIcon(R.drawable.ic_notification_icon)
@@ -766,7 +765,7 @@ internal constructor(
             ctx.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
         Logger.d(LOG_TAG_VPN, "New app installed: $appName, show notification")
 
-        val intent = Intent(ctx, NotificationHandlerActivity::class.java)
+        val intent = Intent(ctx, HomeScreenActivity::class.java)
         intent.putExtra(
             Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME,
             Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE
@@ -784,7 +783,7 @@ internal constructor(
         val builder: NotificationCompat.Builder
         if (isAtleastO()) {
             val name: CharSequence = ctx.getString(R.string.notif_channel_firewall_alerts)
-            val description = ctx.resources.getString(R.string.notif_channel_desc_firewall_alerts)
+            val description = ctx.getString(R.string.notif_channel_desc_firewall_alerts)
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, name, importance)
             channel.description = description
@@ -794,9 +793,9 @@ internal constructor(
             builder = NotificationCompat.Builder(ctx, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
         }
 
-        val contentTitle: String = ctx.resources.getString(R.string.lbl_action_required)
+        val contentTitle: String = ctx.getString(R.string.lbl_action_required)
         val contentText: String =
-            ctx.resources.getString(R.string.new_app_notification_content, appName)
+            ctx.getString(R.string.new_app_notification_content, appName)
 
         builder
             .setSmallIcon(R.drawable.ic_notification_icon)
@@ -825,13 +824,13 @@ internal constructor(
         val notificationAction: NotificationCompat.Action =
             NotificationCompat.Action(
                 0,
-                ctx.resources.getString(R.string.allow).uppercase(),
+                ctx.getString(R.string.allow).uppercase(),
                 openIntent1
             )
         val notificationAction2: NotificationCompat.Action =
             NotificationCompat.Action(
                 0,
-                ctx.resources.getString(R.string.new_app_notification_action_deny).uppercase(),
+                ctx.getString(R.string.new_app_notification_action_deny).uppercase(),
                 openIntent2
             )
         builder.addAction(notificationAction)
@@ -850,7 +849,7 @@ internal constructor(
             return
         }
 
-        val intent = Intent(ctx, AppLockActivity::class.java)
+        val intent = Intent(ctx, HomeScreenActivity::class.java)
         val nm = ctx.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
         val pendingIntent =
             getActivityPendingIntent(
@@ -861,7 +860,7 @@ internal constructor(
             )
         if (isAtleastO()) {
             val name: CharSequence = ctx.getString(R.string.notif_channel_firewall_alerts)
-            val description = ctx.resources.getString(R.string.notif_channel_desc_firewall_alerts)
+            val description = ctx.getString(R.string.notif_channel_desc_firewall_alerts)
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, name, importance)
             channel.description = description
@@ -870,8 +869,8 @@ internal constructor(
         var builder: NotificationCompat.Builder =
             NotificationCompat.Builder(ctx, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
 
-        val contentTitle = ctx.resources.getString(R.string.rules_load_failure_heading)
-        val contentText = ctx.resources.getString(R.string.rules_load_failure_desc)
+        val contentTitle = ctx.getString(R.string.rules_load_failure_heading)
+        val contentText = ctx.getString(R.string.rules_load_failure_desc)
         builder
             .setSmallIcon(R.drawable.ic_notification_icon)
             .setContentTitle(contentTitle)
@@ -884,7 +883,7 @@ internal constructor(
         val notificationAction: NotificationCompat.Action =
             NotificationCompat.Action(
                 0,
-                ctx.resources.getString(R.string.rules_load_failure_reload),
+                ctx.getString(R.string.rules_load_failure_reload),
                 openIntent
             )
         builder.addAction(notificationAction)

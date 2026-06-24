@@ -16,7 +16,7 @@
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Koruma ayarını değiştirmek için dokunun</string>
     <string name="dns_mode_notification_title">Korunuyor! Hızlı ve Güvenli DNS\'e Bağlandı.</string>
     <string name="firewall_mode_notification_title">Korunuyor! Güvenlik Duvarına Bağlandı.</string>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name" translatable="false">Re-Rethink</string>
     <string name="hybrid_mode_notification_title">Korunuyor! DNS ve Güvenlik Duvarına Bağlandı.</string>
     <string name="title_settings">Ayarlar</string>
     <string name="about_title_desc">Ağ güvenliği tehditlerini tespit edin ve engelleyin</string>
@@ -91,7 +91,7 @@
     <string name="settings_socks5_dialog_hint_port">Bağlantı noktası</string>
     <string name="settings_ip_dialog_title">IP sürümünü seçin</string>
     <string name="hsf_blocklist_updating_text">Etkinleştiriliyor…</string>
-    <string name="about_connect">iletişim</string>
+    <string name="about_connect">Iletişim</string>
     <string name="about_whats_new">Yenilikler %1$s</string>
     <string name="about_mail_bugreport_share_title">E-posta sağlayıcısını seçin</string>
     <string name="cd_dns_crypt_dialog_heading">DNSCrypt Çözümleyici veya Aktarıcı Ekleme</string>
@@ -164,7 +164,7 @@
     <string name="about_bug_report_dialog_positive_btn">E-posta gönder</string>
     <string name="contributors_dialog_title">Katkıda bulunanlar</string>
     <string name="dns_connected_rethink_plus">Bağlandı. %1$s kullanımdaki blok listeleri</string>
-    <string name="rules_load_failure_reload">yeniden yükle</string>
+    <string name="rules_load_failure_reload">Yeniden yükle</string>
     <string name="firewall_rule_block_ip">IP / Bağlantı Noktası (Uygulama)</string>
     <string name="firewall_rule_unknown">Kaynak Bilinmiyor</string>
     <string name="firewall_rule_block_dns_bypass">DNS Bypass Edildi</string>
@@ -249,7 +249,7 @@
     <string name="settings_selected_theme">Şu anki tema: %1$s</string>
     <string name="hsf_whats_new_chip_text">Yenilikler</string>
     <string name="about_bug_no_log_dialog_positive_btn">E-posta gönder</string>
-    <string name="about_app">app, uygulama</string>
+    <string name="about_app">App, uygulama</string>
     <string name="vpn_profile_error">VPN profili başlatılamadı.</string>
     <string name="dns_btm_sheet_chip">+%1$s Diğer IP\'ler</string>
     <string name="fapps_firewall_filter_excluded">Hariç tutulan</string>
@@ -395,7 +395,7 @@
     <string name="dns_proxy_remove_dialog_title">DNS Vekil Sunucusu silinsin mi\?</string>
     <string name="search_firewall_network_log"><font size="12">Uygulamaları, IP\'leri, alan adlarını arayın</font></string>
     <string name="app_mode_wireguard">VPN</string>
-    <string name="settings_vpn_heading">vpn</string>
+    <string name="settings_vpn_heading">VPN</string>
     <string name="settings_https_disabled_error">%1$s\'a bağlandı. Devam etmek için kapatın.</string>
     <string name="settings_dns_proxy_dialog_hostname">Sunucu adı</string>
     <string name="settings_app_list_default_app">Hiçbiri</string>
@@ -484,7 +484,7 @@
     <string name="firewall_status_isolate">izole edilmiş</string>
     <string name="lbl_proceed">Devam Et</string>
     <string name="about_website">rethinkdns.com adresini ziyaret edin</string>
-    <string name="about_settings">sistem</string>
+    <string name="about_settings">Sistem</string>
     <string name="cd_custom_dns_proxy_title">Özel DNS Proxy</string>
     <string name="cd_dns_proxy_mode_external">Harici</string>
     <string name="cd_dns_proxy_error_text_2">Port aralığı 1024-65535 arasında olmalıdır</string>
@@ -508,7 +508,7 @@
     <string name="settings_ip_text_ipv46">Otomatik</string>
     <string name="settings_notification_desc3">Hiçbiri</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy kaldırıldı</string>
-    <string name="dc_block_heading">kurallar</string>
+    <string name="dc_block_heading">Kurallar</string>
     <string name="dc_check_update_heading">Blok listesi güncellemeleri hakkında bilgi istemi</string>
     <string name="about_join_telegram">Telegram</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s diğer uygulama(lar)</string>
@@ -577,7 +577,7 @@
     <string name="blocklist_update_check_failure">Bir şeyler ters gitti. Daha sonra tekrar deneyin!</string>
     <string name="dns_crypt_url_remove_success">DNSCrypt çözümleyici silindi.</string>
     <string name="local_blocklist_download_desc">Bu özelliği kullanmak için gereken engelleme listeleri (~60MB) indirilsin mi\?</string>
-    <string name="dc_other_dns_heading">tür</string>
+    <string name="dc_other_dns_heading">Tür</string>
     <string name="settings_allow_bypass_desc">İsteyen uygulamaların bütün kullanılabilir ağlara bağlanmasına izin verin. Bu uygulamalar Rethink’in VPN tünelini isteğe bağlı olarak atlayabilir. Zoom ve Meet gibi bazı sesli/görüntülü konferans uygulamalarının düzgün çalışması için gerekebilir.</string>
     <string name="download_update_dialog_message">Uygulamanın yeni sürümü web sitesinden indirilebilir. Devam etmek istiyor musunuz\?</string>
     <string name="download_update_dialog_message_ok">Zaten en son sürümü kullanıyorsunuz.</string>
@@ -678,7 +678,7 @@
                                               ]]></string>
     <string name="cd_custom_doh_dialog_title">Özel Sunucu URL\'si</string>
     <string name="dc_check_update_desc">Her <i>üç</i> günde bir blok listesi güncellemelerini kontrol edin</string>
-    <string name="about_web">bağlantılar</string>
+    <string name="about_web">Bağlantılar</string>
     <string name="about_bug_report">Hata raporu</string>
     <string name="collecting_logs_progress_text">Yakalanıyor…</string>
     <string name="rbl_privacy">Gizlilik</string>
@@ -801,7 +801,7 @@
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">Dikkat yazılımlarını, casus yazılımları, korkutucu yazılımları engelleyin.</string>
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Kötü amaçlı yazılımları, fidye yazılımlarını, kripto yazılımlarını, kimlik avcılarını ve diğer tehditleri engelleyin.</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s engel listesi</string>
-    <string name="lbl_rules" translatable="true">kurallar</string>
+    <string name="lbl_rules" translatable="true">Kurallar</string>
     <string name="bsct_block_domain" translatable="true">Engelle, <u>bu uygulama</u> için <u>alan adlarına</u> güven</string>
     <string name="lbl_maybe_blocked" translatable="true">Belki Engellendi</string>
     <string name="lbl_configure" translatable="true">Yapılandır</string>
@@ -896,7 +896,7 @@
     <string name="cd_dns_alg_heading" translatable="true">Gelişmiş DNS filtreleme (deneysel)</string>
     <string name="lbl_qr_code" translatable="true">QR kod</string>
     <string name="bypass_dns_firewall_tooltip">%1$s yalnızca Rethink\'in DNS\'si ile çalışır</string>
-    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">en çok i̇leti̇şi̇me geçi̇len i̇p\'ler</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">En çok i̇leti̇şi̇me geçi̇len i̇p\'ler</string>
     <string name="fapps_info_isolate_msg" translatable="true">Güvenilir IP\'ler hariç tümünü engelleyin.</string>
     <string name="app_ip_domain_rules_desc" translatable="true">Uygulama başına IP / Etki alanı kurallarını değiştirin.</string>
     <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
@@ -905,7 +905,7 @@
     <string name="key_length_explanation_base64" translatable="true">: WireGuard base64 anahtarları 44 karakter (32 bayt) olmalıdır</string>
     <string name="fapps_info_bypass_msg" translatable="true">Evrensel güvenlik duvarı kurallarını atlayın.</string>
     <string name="wireguard_disclaimer">DNS %1$s adresine yönlendirildi.</string>
-    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">en çok engellenen IP\'ler</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">En çok engellenen IP\'ler</string>
     <string name="fapps_info_unmetered_msg" translatable="true">Ölçülmemiş (WiFi) ağda İzin Ver / Engelle.</string>
     <string name="hs_biometeric_feature_not_supported" translatable="true">Biyometrik kimlik doğrulama bu cihazda desteklenmiyor veya devre dışı bırakılmış</string>
     <string name="fapps_exclude_block_dialog_title" translatable="true">Uygulamaları hariç tut</string>
@@ -931,7 +931,7 @@
     <string name="ada_app_firewall" translatable="true">Güvenlik Duvarı</string>
     <string name="logs_card_dns_count" translatable="true">%1$s sorgular</string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[Bu bağlantıya izin verildi çünkü <i>alan adı</i> Güvenilir alan adı olarak ayarlandı. Değiştirmek için <i>Uygulamaya Özel Güvenlik Duvarı</i> ekranına gidin.]]></string>
-    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">en çok iletişim kurulan alan adları</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">En çok iletişim kurulan alan adları</string>
     <string name="lbl_day" translatable="true">gün</string>
     <string name="lbl_fast" translatable="true">hızlı</string>
     <string name="unknown_error" translatable="true">Bilinmeyen hata</string>
@@ -946,9 +946,9 @@
     <string name="fapps_isolate_block_dialog_message" translatable="true"><i>listelenen</i> uygulamalarını izole edin\?</string>
     <string name="include_all_app_wg_dialog_title">Tüm uygulamaları dahil et</string>
     <string name="lbl_dns_servers" translatable="true">DNS Sunucuları</string>
-    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">en çok iletişim kurulan ülkeler</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">En çok iletişim kurulan ülkeler</string>
     <string name="cloudflare_dns_desc" translatable="true">Herhangi bir DNS isteğini engellemez. Cloudflare\'in 1.1.1.1 DNS uç noktasını kullanır.</string>
-    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">en çok engellenen ülkeler</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">En çok engellenen ülkeler</string>
     <string name="lbl_app_wise" translatable="true">uygulama başına</string>
     <string name="bsdl_block_desc" translatable="true">Engelle, <u>bu alan adına</u> güven</string>
     <string name="firewall_rule_domain_blocked_univ" translatable="true">Alan adı (Univ)</string>
@@ -986,7 +986,7 @@
     <string name="firewall_rule_block_domain" translatable="true">Alan adı (Uygulama)</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">Kapalı (varsayılan)</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">VPN yalnızca DNS modunda çalışırken proxy\'ler kurulamıyor.</string>
-    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">en çok engellenen alan adları</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">En çok engellenen alan adları</string>
     <string name="lbl_select_all" translatable="true">tümünü seç</string>
     <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[Bu bağlantı engellendi çünkü <i>alan adı</i> kullanıcının tercih ettiği DNS tarafından engellendi. Bu davranışı değiştirmek için <i>DNS Yapılandır</i> sekmesine gidin.]]></string>
     <string name="cleanbrowsing_adult_dns_desc" translatable="true">Yetişkin filtresi, tüm yetişkin, pornografik ve açık sitelere erişimi engeller. Proxy veya VPN\'leri, karışık içerikli siteleri engellemez. Reddit gibi sitelere izin verir. Google ve Bing Güvenli Mod\'a ayarlanmıştır.</string>
@@ -1111,7 +1111,7 @@
     <string name="sponser_dialog_usage_msg" translatable="true">Rethink\'i <b>%1$s gündür</b> kullanıyorsunuz, bu da <b>$%2$s</b> kullanım maliyetine denk geliyor. Gelişimini sürdürmek için sponsor olmayı düşünür müsünüz?</string>
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Yetkisiz alanlar için Sistem DNS\'i kullan</string>
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true"><i>.lan</i>, <i>.internal</i> gibi yetkisiz alanlar için Sistem DNS\'i kullan.</string>
-    <string name="dc_filtering_heading" translatable="true">filtreleme</string>
+    <string name="dc_filtering_heading" translatable="true">Filtreleme</string>
     <string name="cd_split_dns_heading" translatable="true">Bölünmüş DNS (deneysel)</string>
     <string name="cd_split_dns_desc" translatable="true">Proxy kullanan uygulamaların DNS sorgularını proxy\'nin DNS sunucularına yönlendir.</string>
     <string name="univ_firewall_rule_11" translatable="true">Tüm yerel ana bilgisayar bağlantılarını engelle</string>
@@ -1172,8 +1172,8 @@
     <string name="hop_add_remove_title" translatable="true">Aktarım Ekle / Kaldır</string>
     <string name="about_terms_of_service" translatable="true">Hizmet Şartları</string>
     <string name="bypasses_network_restrictions" translatable="true">Erişilebilirlik kontrolleri tüm ağ kısıtlamalarını atlar. <i>Otomatik</i> modda, Rethink daha önce bağlandığı IP\'leri ve ana bilgisayar adlarını rastgele kullanır.</string>
-    <string name="most_contacted_asn" translatable="true">en çok iletişime geçilen sağlayıcılar</string>
-    <string name="most_blocked_asn" translatable="true">en çok engellenen sağlayıcılar</string>
+    <string name="most_contacted_asn" translatable="true">En çok iletişime geçilen sağlayıcılar</string>
+    <string name="most_blocked_asn" translatable="true">En çok engellenen sağlayıcılar</string>
     <string name="adv_tasker_dialog_msg" translatable="true">Rethink\'i başlatmasına veya durdurmasına izin verilen paket adlarını girin (virgülle ayrılmış).</string>
     <string name="adv_tasker_dialog_instructions" translatable="true">Talimatlar:\n Yayında gerekli ekstralar:\n • Anahtar: sender\n • Değer: Çağıran uygulamanın paket adı\n\nÖrnek: anahtar:sender değer:com.termux\n\n Desteklenen eylemler:\n • VPN Başlat – com.celzero.bravedns.intent.action.VPN_START\n • VPN Durdur – com.celzero.bravedns.intent.action.VPN_STOP</string>
     <string name="adv_tasker_dialog_edit_hint" translatable="true">Paket adını girin (örnek: net.dinglisch.android.taskerm)</string>
@@ -1181,7 +1181,7 @@
     <string name="download_ip_info_desc" translatable="true">Web siteleri için hizmet sağlayıcı bilgilerini <i>rethinkdns.com</i>\'dan alır, <i>%1$s</i> tarafından desteklenir</string>
     <string name="adv_taster_title" translatable="true">Otomasyon</string>
     <string name="adv_taster_desc" translatable="true">Rethink\'i başlatabilecek veya durdurabilecek uygulamaları yapılandırın.</string>
-    <string name="top_active_conns" translatable="true">en aktif bağlantılar</string>
+    <string name="top_active_conns" translatable="true">En aktif bağlantılar</string>
     <string name="load_more" translatable="true">Tümünü Yükle</string>
     <string name="close_conns_dialog_title" translatable="true">Bağlantıları Kapat</string>
     <string name="close_conns_dialog_desc" translatable="true">%1$s için tüm bağlantıları kapatmak ister misiniz?</string>

@@ -12,7 +12,7 @@
     <string name="block">blocca</string>
     <string name="status_app_error">errore dell\'app</string>
     <string name="status_dns_error">errore del dns</string>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name" translatable="false">Re-Rethink</string>
     <string name="app_name_small_case">rethink</string>
     <string name="title_about">Info</string>
     <string name="title_settings">Impostazioni</string>
@@ -39,7 +39,7 @@
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">in attesa</string>
     <string name="status_protected_with_tor">protetto con tor</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">non protetto</string>
-    <string name="dns_explanation_dns_connected">Connesso a RethinkDNS</string>
+    <string name="dns_explanation_dns_connected">Connesso a Re-RethinkDNS</string>
     <string name="notification_action_resume_vpn">RIATTIVA</string>
     <string name="notification_action_pause_vpn">PAUSA</string>
     <string name="notification_action_stop_vpn">DISATTIVA</string>
@@ -117,7 +117,7 @@
     <string name="app_mode_firewall">Firewall</string>
     <string name="app_mode_dns_firewall">DNS e Firewall (predefinito)</string>
     <string name="app_mode_wireguard">VPN</string>
-    <string name="settings_vpn_heading">vpn</string>
+    <string name="settings_vpn_heading">VPN</string>
     <string name="info_dialog_copy_toast_msg">Indirizzo IP copiato.</string>
     <string name="info_dialog_url_copy_toast_msg">URL copiato</string>
     <string name="info_dialog_rethink_toast_msg">Copiato come URL RDNS+ DNS-over-HTTPS</string>
@@ -378,8 +378,8 @@
     <string name="hsf_blocklist_updating_text">Avvio…</string>
     <string name="hsf_chip_appearance">Tema: %1$s</string>
     <string name="hsf_pause_vpn_failure">Impossibile mettere in pausa: Rethink non è attivo</string>
-    <string name="dc_block_heading">regole</string>
-    <string name="dc_other_dns_heading">tipo</string>
+    <string name="dc_block_heading">Regole</string>
+    <string name="dc_other_dns_heading">Tipo</string>
     <string name="dc_custom_dns_radio">Altro DNS</string>
     <string name="dc_rethink_dns_radio">Rethink DNS</string>
     <string name="dc_entries">%1$s elementi »</string>
@@ -402,17 +402,17 @@
     <string name="about_bug_no_log_dialog_title">Segnala bug</string>
     <string name="about_bug_no_log_dialog_message">Impossibile reperire il registro degli arresti anomali. Vuoi segnalare il tuo bug manualmente\?</string>
     <string name="about_bug_no_log_dialog_positive_btn">Invia email</string>
-    <string name="about_web">collegamenti</string>
+    <string name="about_web">Collegamenti</string>
     <string name="about_website">Visita rethinkdns.com</string>
     <string name="about_github">Contribuisci su GitHub</string>
     <string name="about_faq">Visualizza le domande frequenti</string>
     <string name="about_docs">Leggi la documentazione</string>
-    <string name="about_connect">contatti</string>
+    <string name="about_connect">Contatti</string>
     <string name="about_mozilla">Rethink fa parte del programma Mozilla Builders MVP, FOSS United Foundation, OSOM Products Inc.</string>
     <string name="about_sponsor_link_text">Sostienici</string>
-    <string name="about_app">app</string>
+    <string name="about_app">App</string>
     <string name="about_email">Scrivici una email</string>
-    <string name="about_settings">sistema</string>
+    <string name="about_settings">Sistema</string>
     <string name="about_settings_app_info">Info applicazione</string>
     <string name="about_settings_vpn_profile">Profilo VPN</string>
     <string name="about_settings_notification">Impostazioni notifiche</string>
@@ -532,7 +532,7 @@
     <string name="fapps_firewall_filter_desc_category"><u>%1$s</u> %2$s app elencate delle categorie: %3$s</string>
     <string name="rules_load_failure_heading">Nota</string>
     <string name="rules_load_failure_desc">Nessuna regola del firewall trovata</string>
-    <string name="rules_load_failure_reload">ricarica</string>
+    <string name="rules_load_failure_reload">Ricarica</string>
     <string name="network_log_app_name_unknown">Sconosciuto</string>
     <string name="network_log_app_name_unnamed">Senza nome (%1$s)</string>
     <string name="dns_proxy_connection_failure">Errore di connessione al server DNS Proxy.</string>
@@ -769,13 +769,13 @@
     <string name="fapps_bypass_block_dialog_title">Aggira app</string>
     <string name="fapps_exclude_block_dialog_title">Escludi app</string>
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">IP più contattati</string>
-    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">app più bloccate</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">App più bloccate</string>
     <string name="fapps_exclude_block_dialog_message">Escludere le applicazioni <i>elencate</i> da DNS e Firewall\?</string>
     <string name="fapps_isolate_block_dialog_title">Isola app</string>
     <string name="fapps_isolate_block_dialog_message">Isolare le applicazioni <i>elencate</i>\?</string>
-    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">app più consentite</string>
-    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">domini più contattati</string>
-    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">domini più bloccati</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">App più consentite</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">Domini più contattati</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">Domini più bloccati</string>
     <string name="ssv_see_more">Mostra tutto</string>
     <string name="lbl_cancel" translatable="true">Annulla</string>
     <string name="lbl_apply" translatable="true">Applica</string>
@@ -798,7 +798,7 @@
     <string name="firewall_rule_dns_blocked_desc" translatable="true">Questa connessione è stata bloccata perché il dominio <i/> è bloccato dal DNS preferito dall\'utente.<br/><br/> Per modificare questo comportamento, accedere alla scheda <i>Configura DNS</i>.</string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">Aggira DNS e firewall</string>
     <string name="lbl_maybe_blocked" translatable="true">Forse bloccato</string>
-    <string name="lbl_rules" translatable="true">regole</string>
+    <string name="lbl_rules" translatable="true">Regole</string>
     <string name="lbl_network" translatable="true">rete</string>
     <string name="bypass_dns_firewall" translatable="true">bypassare dns e firewall</string>
     <string name="settings_allow_lan_heading" translatable="true">Non instradare IP privati (sperimentale)</string>

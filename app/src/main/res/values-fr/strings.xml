@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name" translatable="false">Re-Rethink</string>
     <string name="app_name_small_case">rethink</string>
     <string name="title_about">À propos</string>
     <string name="title_settings">Paramètres</string>
@@ -25,7 +25,7 @@
     <string name="status_protected_with_proxy_private_dns">protégé par proxy &amp; DNS privé</string>
     <string name="status_protected_with_http_private_dns">protégé par proxy HTTP &amp; DNS privé</string>
     <string name="status_protected_with_socks5_private_dns">protégé par proxy SOCKS5 &amp; DNS privé</string>
-    <string name="dns_explanation_dns_connected">Connecté via RethinkDNS</string>
+    <string name="dns_explanation_dns_connected">Connecté via Re-RethinkDNS</string>
     <string name="dns_explanation_firewall_connected">Connecté via pare-feu</string>
     <string name="universal_firewall_explanation">Appliquer des règles de pare-feu à toutes les applications en fonction des événements survenant sur l’appareil, par exemple, lorsque l’appareil est verrouillé ou lorsqu’une application particulière n’est pas utilisée.</string>
     <string name="notification_action_dns_mode">DNS</string>
@@ -206,7 +206,7 @@
     <string name="hsf_chip_appearance">Thème : %1$s</string>
     <string name="dc_entries">%1$s entrées »</string>
     <string name="dc_rethink_dns_radio">Rethink DNS</string>
-    <string name="dc_other_dns_heading">type</string>
+    <string name="dc_other_dns_heading">Type</string>
     <string name="firewall_rule_block_app_unmetered_desc"><![CDATA[Une règle de pare-feu définie par l’utilisateur a bloqué cette <i>application</i> lors de la tentative de connexion sur un réseau <i>Sans abonnement</i>.<br/><br/> Pour la modifier, allez dans l’onglet <i>Toutes les applications</i>.]]></string>
     <string name="fapps_info_dialog_message">Empêchez les applications de se connecter à l’Internet. Limiter l’accès à Internet permet d’éviter une utilisation injustifiée des données et d’économiser la batterie.</string>
     <string name="dns_proxy_connection_failure_lockdown">L’exclusion de %1$s pour %2$s en mode confinement peut provoquer des problèmes de connectivité à Internet.</string>
@@ -232,7 +232,7 @@
     <string name="fapps_filter_filter_heading">Type</string>
     <string name="fapps_filter_categories_heading">Catégories</string>
     <string name="fapps_firewall_filter_desc"><![CDATA[Affichage des applis <u>%1$s</u> %2$s]]></string>
-    <string name="about_connect">contact</string>
+    <string name="about_connect">Contact</string>
     <string name="download_update_dialog_message_ok_title">À jour !</string>
     <string name="settings_selected_ip_desc">%1$s</string>
     <string name="settings_allow_bypass_heading">Activer la visibilité du réseau</string>
@@ -389,14 +389,14 @@
     <string name="notif_dialog_pause_dialog_title">Application en pause !</string>
     <string name="dc_rethink_dns">DNS Rethink</string>
     <string name="fapps_firewall_filter_hint">Montrer toutes les apps</string>
-    <string name="about_settings">système</string>
+    <string name="about_settings">Système</string>
     <string name="univ_firewall_dialog_title">Supprimer la règle IP \?</string>
     <string name="blocklist_update_check_failure">Un problème est survenu. Essayez à nouveau plus tard !</string>
     <string name="http_proxy_dialog_heading">Définir le proxy HTTP(S) de connection</string>
     <string name="app_mode_dns_low_battery">DNS (économise la batterie)</string>
     <string name="settings_ip_text_ipv46">Auto</string>
     <string name="apps_icon_content_desc">Icône de l’application</string>
-    <string name="dc_block_heading">règles</string>
+    <string name="dc_block_heading">Règles</string>
     <string name="about_mozilla_alumni_link">https://builders.mozilla.community/alumni.html</string>
     <string name="cd_dns_crypt_name">DNSCrypt %1$s</string>
     <string name="cd_dns_crypt_relay_name">Relais DNS %1$s</string>
@@ -445,7 +445,7 @@
     <string name="ada_firewall_status"><![CDATA[Cette application <b><i>%1$s</i></b>.]]></string>
     <string name="brbs_restore_dialog_failure_positive">Retenter la restauration</string>
     <string name="brbs_restore_complete_toast">Restauration terminée, redémarrage de l’application…</string>
-    <string name="about_app">app</string>
+    <string name="about_app">App</string>
     <string name="hs_download_positive_play_store">Mise à jour complète</string>
     <string name="notif_channel_vpn_failure">VPN inactif</string>
     <string name="cd_no_rule_initial">N</string>
@@ -548,7 +548,7 @@
     <string name="ada_app_status_block_wifi">est bloquée sur les réseaux sans abonnement (Wi-Fi)</string>
     <string name="fapps_firewall_filter_desc_category"><![CDATA[Affichage des applis <u>%1$s</u> %2$s dans les catégories : %3$s]]></string>
     <string name="unicode_warning_sign">⚠</string>
-    <string name="rules_load_failure_reload">recharger</string>
+    <string name="rules_load_failure_reload">Recharger</string>
     <string name="firewall_rule_block_dns_bypass">DNS contourné</string>
     <string name="firewall_rule_no_rule_desc">Aucune règle de pare-feu ne s’applique à cette connexion.</string>
     <string name="rt_download_start">Téléchargement des listes de blocage…</string>
@@ -636,7 +636,7 @@
     <string name="brbs_restore_dialog_positive">Restaurer</string>
     <string name="cd_dialog_desc">Une URL ou un nom de domaine avec un joker optionnel : *.test.com, test.com/test</string>
     <string name="dns_proxy_remove_dialog_message">Supprimer le proxy DNS de la configuration sauvegardée.</string>
-    <string name="settings_vpn_heading">vpn</string>
+    <string name="settings_vpn_heading">VPN</string>
     <string name="settings_socks5_desc">Transférer les connexions vers le point de terminaison SOCKS5.</string>
     <string name="orbot_stop_dialog_negative">Arrêter Orbot</string>
     <string name="dc_dns_website_heading">Afficher l’icône du site web dans les logs DNS (expérimental)</string>
@@ -705,7 +705,7 @@
     <string name="settings_theme_heading">Apparence</string>
     <string name="firewall_status_unknown">inconnu</string>
     <string name="hsf_vpn_dialog_header">Attention !</string>
-    <string name="about_web">liens</string>
+    <string name="about_web">Liens</string>
     <string name="about_mail_to">hello@celzero.com</string>
     <string name="settings_local_blocklist_in_use">%1$s listes de blocage en cours d’utilisation</string>
     <string name="settings_local_blocklist_version">Version : v%1$s</string>
@@ -770,14 +770,14 @@
     <string name="fapps_isolate_block_dialog_message">Confiner les applications <i>listées</i> \?</string>
     <string name="fapps_isolate_block_dialog_title">Confiner</string>
     <string name="ci_trust_rule">Faire confiance</string>
-    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">applications les plus bloquées</string>
-    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">domaines les plus contactés</string>
-    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">domaines les plus bloqués</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">Applications les plus bloquées</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">Domaines les plus contactés</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">Domaines les plus bloqués</string>
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">IP les plus contactées</string>
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app">Lancer Rethink pour procéder</string>
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">IP les plus bloquées</string>
     <string name="hs_biometeric_feature_not_supported">L\'authentification biométrique n\'est pas prise en charge ou est désactivée sur cet appareil</string>
-    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">applications les plus autorisées</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">Applications les plus autorisées</string>
     <string name="hs_biometeric_error">Erreur lors de l\'authentification biométrique</string>
     <string name="ssv_see_more">Tout afficher</string>
     <string name="firewall_rule_block_domain" translatable="true">Domaine (Appli)</string>
@@ -798,7 +798,7 @@
     <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[Cette connexion a été autorisée car <i>le domaine</i> est autorisé.<br/><br/> Pour modifier cela, accédez à l’écran <i>Pare-feu de l’application</i>.]]></string>
     <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[Une règle de pare-feu définie par l’utilisateur a bloqué le <i>domaine</i>.<br/><br/> Pour la modifier, accédez à l’écran <i>Pare-feu de l’application</i>.]]></string>
     <string name="bsdl_block_desc" translatable="true">Bloquer, tolérer <u>ce domaine</u></string>
-    <string name="lbl_rules" translatable="true">règles</string>
+    <string name="lbl_rules" translatable="true">Règles</string>
     <string name="lbl_configure" translatable="true">Configurer</string>
     <string name="lbl_logs" translatable="true">journaux</string>
     <string name="bypass_dns_firewall" translatable="true">contourner dns &amp; firewall</string>
@@ -1063,7 +1063,7 @@
     <string name="sponser_dialog_usage_msg" translatable="true">Vous utilisez Rethink depuis <b>%1$s jours</b>, ce qui correspond à un coût d\'utilisation de <b>$%2$s</b>. Envisageriez-vous de devenir sponsor afin de soutenir son développement ?</string>
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Utiliser le système DNS pour les domaines non délégués</string>
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Utilisez le système DNS pour les domaines non délégués tels que <i>.lan</i>, <i>.internal</i>, etc.</string>
-    <string name="dc_filtering_heading" translatable="true">filtrage</string>
+    <string name="dc_filtering_heading" translatable="true">Filtrage</string>
     <string name="cd_split_dns_heading" translatable="true">Séparer le DNS (expérimental)</string>
     <string name="cd_split_dns_desc" translatable="true">Transférer les requêtes DNS des applications proxy vers les serveurs DNS du proxy.</string>
     <string name="univ_firewall_rule_11" translatable="true">Bloquer toutes les connexions locales</string>
@@ -1120,15 +1120,15 @@
     <string name="wg_setting_use_on_mobile_desc" translatable="true">Utiliser ce VPN WireGuard via les données mobiles.</string>
     <string name="hop_add_remove_title" translatable="true">Ajouter/Supprimer un relais</string>
     <string name="bypasses_network_restrictions" translatable="true">Les tests d\'accessibilité contournent toutes les restrictions réseau. En mode <i>Auto</i>, Rethink utilise aléatoirement les adresses IP et les noms d\'hôte précédemment utilisés.</string>
-    <string name="most_contacted_asn" translatable="true">fournisseurs les plus contactés</string>
-    <string name="most_blocked_asn" translatable="true">fournisseurs les plus bloqués</string>
+    <string name="most_contacted_asn" translatable="true">Fournisseurs les plus contactés</string>
+    <string name="most_blocked_asn" translatable="true">Fournisseurs les plus bloqués</string>
     <string name="adv_tasker_dialog_msg" translatable="true">Saisir les noms des paquets (séparés par des virgules) autorisés à démarrer ou à arrêter Rethink.</string>
     <string name="adv_tasker_dialog_instructions" translatable="true">Instructions :\nÉléments requis pour la diffusion :\n• Clé : sender\n• Valeur : Nom du package de l’application appelante\n\nExemple : key : sender value : com.termux\n\nActions prises en charge :\n• Démarrer le VPN : com.celzero.bravedns.intent.action.VPN_START\n• Arrêter le VPN : com.celzero.bravedns.intent.action.VPN_STOP</string>
     <string name="adv_tasker_dialog_edit_hint" translatable="true">Saisir le nom du package (exemple : net.dinglisch.android.taskerm)</string>
     <string name="download_ip_info_title" translatable="true">Afficher les informations du fournisseur</string>
     <string name="download_ip_info_desc" translatable="true">Récupère les informations du fournisseur de services pour les sites web depuis <i>rethinkdns.com</i>, propulsé par <i>%1$s</i></string>
     <string name="adv_taster_desc" translatable="true">Configurer les applications qui peuvent démarrer ou arrêter Rethink.</string>
-    <string name="top_active_conns" translatable="true">connexions actives principales</string>
+    <string name="top_active_conns" translatable="true">Connexions actives principales</string>
     <string name="load_more" translatable="true">Tout charger</string>
     <string name="close_conns_dialog_title" translatable="true">Fermer les connexions</string>
     <string name="close_conns_dialog_desc" translatable="true">Fermer toutes les connexions pour %1$s ?</string>

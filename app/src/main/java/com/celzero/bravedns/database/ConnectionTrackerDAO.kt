@@ -84,6 +84,17 @@ interface ConnectionTrackerDAO {
     )
     fun getConnectionTrackerByName(query: String): PagingSource<Int, ConnectionTracker>
 
+    @Query("select * from ConnectionTracker where blockedByRule in (:filter) order by id desc LIMIT $MAX_LOGS")
+    fun getConnectionsFiltered(filter: Set<String>): PagingSource<Int, ConnectionTracker>
+
+    @Query(
+        "select * from ConnectionTracker where (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query or proxyDetails like :query or connId like :query) and blockedByRule in (:filter) order by id desc LIMIT $MAX_LOGS"
+    )
+    fun getConnectionsFiltered(
+        query: String,
+        filter: Set<String>
+    ): PagingSource<Int, ConnectionTracker>
+
     @Query("select * from ConnectionTracker where isBlocked = 1 order by id desc LIMIT $MAX_LOGS")
     fun getBlockedConnections(): PagingSource<Int, ConnectionTracker>
 
@@ -186,6 +197,36 @@ interface ConnectionTrackerDAO {
     fun getAllBlockedIps(to: Long): PagingSource<Int, AppConnection>
 
     @Query("select count(id) from ConnectionTracker") fun logsCount(): LiveData<Long>
+
+    @Query(
+        "SELECT appName AS appName, packageName AS packageName, COUNT(id) AS count FROM ConnectionTracker WHERE TRIM(appName) != '' GROUP BY appName, packageName ORDER BY count DESC"
+    )
+    suspend fun getAllLoggedAppsWithCount(): List<LogAppCount>
+
+    @Query(
+        "SELECT appName AS appName, packageName AS packageName, COUNT(id) AS count FROM ConnectionTracker WHERE blockedByRule in (:rules) AND TRIM(appName) != '' GROUP BY appName, packageName ORDER BY count DESC"
+    )
+    suspend fun getAllLoggedAppsWithCountFiltered(rules: Set<String>): List<LogAppCount>
+
+    @Query(
+        "SELECT appName AS appName, packageName AS packageName, COUNT(id) AS count FROM ConnectionTracker WHERE isBlocked = 0 AND TRIM(appName) != '' GROUP BY appName, packageName ORDER BY count DESC"
+    )
+    suspend fun getAllowedLoggedAppsWithCount(): List<LogAppCount>
+
+    @Query(
+        "SELECT appName AS appName, packageName AS packageName, COUNT(id) AS count FROM ConnectionTracker WHERE isBlocked = 0 AND blockedByRule in (:rules) AND TRIM(appName) != '' GROUP BY appName, packageName ORDER BY count DESC"
+    )
+    suspend fun getAllowedLoggedAppsWithCountFiltered(rules: Set<String>): List<LogAppCount>
+
+    @Query(
+        "SELECT appName AS appName, packageName AS packageName, COUNT(id) AS count FROM ConnectionTracker WHERE isBlocked = 1 AND TRIM(appName) != '' GROUP BY appName, packageName ORDER BY count DESC"
+    )
+    suspend fun getBlockedLoggedAppsWithCount(): List<LogAppCount>
+
+    @Query(
+        "SELECT appName AS appName, packageName AS packageName, COUNT(id) AS count FROM ConnectionTracker WHERE isBlocked = 1 AND blockedByRule in (:rules) AND TRIM(appName) != '' GROUP BY appName, packageName ORDER BY count DESC"
+    )
+    suspend fun getBlockedLoggedAppsWithCountFiltered(rules: Set<String>): List<LogAppCount>
 
     @Query(
         "select timeStamp from ConnectionTracker where id = (select min(id) from ConnectionTracker)"

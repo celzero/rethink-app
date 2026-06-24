@@ -15,35 +15,36 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.liveData
+import com.celzero.bravedns.data.AppConnection
+import com.celzero.bravedns.data.SummaryStatisticsType
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.StatsSummaryDao
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment
 import com.celzero.bravedns.util.Constants
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 
 class DetailedStatisticsViewModel(
     private val connectionTrackerDAO: ConnectionTrackerDAO,
     private val statsDao: StatsSummaryDao
 ) : ViewModel() {
-    private val allActiveConns: MutableLiveData<Long> = MutableLiveData()
-    private val allowedNetworkActivity: MutableLiveData<String> = MutableLiveData()
-    private val blockedNetworkActivity: MutableLiveData<String> = MutableLiveData()
-    private val allowedAsn: MutableLiveData<String> = MutableLiveData()
-    private val blockedAsn: MutableLiveData<String> = MutableLiveData()
-    private val allowedDomains: MutableLiveData<String> = MutableLiveData()
-    private val blockedDomains: MutableLiveData<String> = MutableLiveData()
-    private val allowedIps: MutableLiveData<String> = MutableLiveData()
-    private val blockedIps: MutableLiveData<String> = MutableLiveData()
-    private val allowedCountries: MutableLiveData<String> = MutableLiveData()
-    private val startTime: MutableLiveData<Long> = MutableLiveData()
+    private val _allActiveConns: MutableStateFlow<Long> = MutableStateFlow(0L)
+    private val _allowedNetworkActivity: MutableStateFlow<String> = MutableStateFlow("")
+    private val _blockedNetworkActivity: MutableStateFlow<String> = MutableStateFlow("")
+    private val _allowedAsn: MutableStateFlow<String> = MutableStateFlow("")
+    private val _blockedAsn: MutableStateFlow<String> = MutableStateFlow("")
+    private val _allowedDomains: MutableStateFlow<String> = MutableStateFlow("")
+    private val _blockedDomains: MutableStateFlow<String> = MutableStateFlow("")
+    private val _allowedIps: MutableStateFlow<String> = MutableStateFlow("")
+    private val _blockedIps: MutableStateFlow<String> = MutableStateFlow("")
+    private val _allowedCountries: MutableStateFlow<String> = MutableStateFlow("")
+    private val _startTime: MutableStateFlow<Long> = MutableStateFlow(0L)
 
     companion object {
         private const val ONE_HOUR_MILLIS = 1 * 60 * 60 * 1000L
@@ -51,37 +52,37 @@ class DetailedStatisticsViewModel(
         private const val ONE_WEEK_MILLIS = 7 * ONE_DAY_MILLIS
     }
 
-    fun setData(type: SummaryStatisticsFragment.SummaryStatisticsType) {
+    fun setData(type: SummaryStatisticsType) {
         when (type) {
-            SummaryStatisticsFragment.SummaryStatisticsType.TOP_ACTIVE_CONNS -> {
-                allActiveConns.value = VpnController.uptimeMs()
+            SummaryStatisticsType.TOP_ACTIVE_CONNS -> {
+                _allActiveConns.value = VpnController.uptimeMs()
             }
-            SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONNECTED_APPS -> {
-                allowedNetworkActivity.value = ""
+            SummaryStatisticsType.MOST_CONNECTED_APPS -> {
+                _allowedNetworkActivity.value = ""
             }
-            SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_APPS -> {
-                blockedNetworkActivity.value = ""
+            SummaryStatisticsType.MOST_BLOCKED_APPS -> {
+                _blockedNetworkActivity.value = ""
             }
-            SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONNECTED_ASN -> {
-                allowedAsn.value = ""
+            SummaryStatisticsType.MOST_CONNECTED_ASN -> {
+                _allowedAsn.value = ""
             }
-            SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_ASN -> {
-                blockedAsn.value = ""
+            SummaryStatisticsType.MOST_BLOCKED_ASN -> {
+                _blockedAsn.value = ""
             }
-            SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
-                allowedDomains.value = ""
+            SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
+                _allowedDomains.value = ""
             }
-            SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
-                blockedDomains.value = ""
+            SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
+                _blockedDomains.value = ""
             }
-            SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_IPS -> {
-                allowedIps.value = ""
+            SummaryStatisticsType.MOST_CONTACTED_IPS -> {
+                _allowedIps.value = ""
             }
-            SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_IPS -> {
-                blockedIps.value = ""
+            SummaryStatisticsType.MOST_BLOCKED_IPS -> {
+                _blockedIps.value = ""
             }
-            SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
-                allowedCountries.value = ""
+            SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
+                _allowedCountries.value = ""
             }
         }
     }
@@ -89,108 +90,114 @@ class DetailedStatisticsViewModel(
     fun timeCategoryChanged(timeCategory: SummaryStatisticsViewModel.TimeCategory) {
         when (timeCategory) {
             SummaryStatisticsViewModel.TimeCategory.ONE_HOUR -> {
-                startTime.value = System.currentTimeMillis() - ONE_HOUR_MILLIS
+                _startTime.value = System.currentTimeMillis() - ONE_HOUR_MILLIS
             }
             SummaryStatisticsViewModel.TimeCategory.TWENTY_FOUR_HOUR -> {
-                startTime.value = System.currentTimeMillis() - ONE_DAY_MILLIS
+                _startTime.value = System.currentTimeMillis() - ONE_DAY_MILLIS
             }
             SummaryStatisticsViewModel.TimeCategory.SEVEN_DAYS -> {
-                startTime.value = System.currentTimeMillis() - ONE_WEEK_MILLIS
+                _startTime.value = System.currentTimeMillis() - ONE_WEEK_MILLIS
             }
         }
     }
 
-    val getAllActiveConns =
-        allActiveConns.switchMap {
-            val to = System.currentTimeMillis() - it
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val getAllActiveConns: Flow<PagingData<AppConnection>> =
+        _allActiveConns.flatMapLatest { uptime ->
+            val to = System.currentTimeMillis() - uptime
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    statsDao.getAllActiveConns(to)
-                }
-                .liveData
-                .cachedIn(viewModelScope)
+                statsDao.getAllActiveConns(to)
+            }.flow.cachedIn(viewModelScope)
         }
 
-    val getAllAllowedAppNetworkActivity =
-        allowedNetworkActivity.switchMap { _ ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val getAllAllowedAppNetworkActivity: Flow<PagingData<AppConnection>> =
+        combine(_allowedNetworkActivity, _startTime) { _, start ->
+            start
+        }.flatMapLatest { start ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    val to = startTime.value ?: 0L
-                    statsDao.getAllAllowedApps(to)
-                }
-                .liveData
-                .cachedIn(viewModelScope)
+                statsDao.getAllAllowedApps(start)
+            }.flow.cachedIn(viewModelScope)
         }
 
-    val getAllAllowedAsn =
-        allowedAsn.switchMap { _ ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val getAllAllowedAsn: Flow<PagingData<AppConnection>> =
+        combine(_allowedAsn, _startTime) { _, start ->
+            start
+        }.flatMapLatest { start ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    val to = startTime.value ?: 0L
-                    statsDao.getAllConnectedASN(to)
-                }
-                .liveData
-                .cachedIn(viewModelScope)
+                statsDao.getAllConnectedASN(start)
+            }.flow.cachedIn(viewModelScope)
         }
 
-    val getAllBlockedAsn =
-        blockedAsn.switchMap { _ ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val getAllBlockedAsn: Flow<PagingData<AppConnection>> =
+        combine(_blockedAsn, _startTime) { _, start ->
+            start
+        }.flatMapLatest { start ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    val to = startTime.value ?: 0L
-                    statsDao.getAllBlockedASN(to)
-                }
-                .liveData
-                .cachedIn(viewModelScope)
+                statsDao.getAllBlockedASN(start)
+            }.flow.cachedIn(viewModelScope)
         }
 
-    val getAllBlockedAppNetworkActivity =
-        blockedNetworkActivity.switchMap { _ ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val getAllBlockedAppNetworkActivity: Flow<PagingData<AppConnection>> =
+        combine(_blockedNetworkActivity, _startTime) { _, start ->
+            start
+        }.flatMapLatest { start ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    val to = startTime.value ?: 0L
-                    statsDao.getAllBlockedApps(to)
-                }
-                .liveData
-                .cachedIn(viewModelScope)
+                statsDao.getAllBlockedApps(start)
+            }.flow.cachedIn(viewModelScope)
         }
 
-    val getAllBlockedDomains = blockedDomains.switchMap {
-        Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-            val to = startTime.value ?: 0L
-            statsDao.getAllBlockedDomains(to)
-        }.liveData.cachedIn(viewModelScope)
-    }
-
-    val getAllContactedDomains = allowedDomains.switchMap {
-        Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-            val to = startTime.value ?: 0L
-            statsDao.getAllContactedDomains(to)
-        }.liveData.cachedIn(viewModelScope)
-    }
-
-    val getAllContactedIps =
-        allowedIps.switchMap { _ ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val getAllBlockedDomains: Flow<PagingData<AppConnection>> =
+        combine(_blockedDomains, _startTime) { _, start ->
+            start
+        }.flatMapLatest { start ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    val to = startTime.value ?: 0L
-                    connectionTrackerDAO.getAllContactedIps(to)
-                }
-                .liveData
-                .cachedIn(viewModelScope)
+                statsDao.getAllBlockedDomains(start)
+            }.flow.cachedIn(viewModelScope)
         }
 
-    val getAllBlockedIps =
-        blockedIps.switchMap { _ ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val getAllContactedDomains: Flow<PagingData<AppConnection>> =
+        combine(_allowedDomains, _startTime) { _, start ->
+            start
+        }.flatMapLatest { start ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    val to = startTime.value ?: 0L
-                    connectionTrackerDAO.getAllBlockedIps(to)
-                }
-                .liveData
-                .cachedIn(viewModelScope)
+                statsDao.getAllContactedDomains(start)
+            }.flow.cachedIn(viewModelScope)
         }
 
-    val getAllContactedCountries =
-        allowedCountries.switchMap { _ ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val getAllContactedIps: Flow<PagingData<AppConnection>> =
+        combine(_allowedIps, _startTime) { _, start ->
+            start
+        }.flatMapLatest { start ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    val to = startTime.value ?: 0L
-                    statsDao.getAllContactedCountries(to)
-                }
-                .liveData
-                .cachedIn(viewModelScope)
+                connectionTrackerDAO.getAllContactedIps(start)
+            }.flow.cachedIn(viewModelScope)
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val getAllBlockedIps: Flow<PagingData<AppConnection>> =
+        combine(_blockedIps, _startTime) { _, start ->
+            start
+        }.flatMapLatest { start ->
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                connectionTrackerDAO.getAllBlockedIps(start)
+            }.flow.cachedIn(viewModelScope)
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val getAllContactedCountries: Flow<PagingData<AppConnection>> =
+        combine(_allowedCountries, _startTime) { _, start ->
+            start
+        }.flatMapLatest { start ->
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                statsDao.getAllContactedCountries(start)
+            }.flow.cachedIn(viewModelScope)
         }
 }
+

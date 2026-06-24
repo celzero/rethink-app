@@ -1,0 +1,56 @@
+build:
+  maxIssues: 0
+  weights:
+    complexity: 2
+    LongParameterList: 1
+    comments: 0
+
+config:
+  validation: true
+  warningsAsErrors: false
+
+complexity:
+  LongMethod:
+    active: false
+  LargeClass:
+    active: false
+  LongParameterList:
+    functionThreshold: 20
+    constructorThreshold: 25
+
+style:
+  MagicNumber:
+    active: false
+  MaxLineLength:
+    active: false
+  WildcardImport:
+    active: false
+  ReturnCount:
+    active: false
+
+exceptions:
+  SwallowedException:
+    active: true
+  PrintStackTrace:
+    active: true
+  TooGenericExceptionCaught:
+    active: true
+    exceptionNames:
+      - Error
+      - Exception
+      - Throwable
+      - RuntimeException
+      - NullPointerException
+  TooGenericExceptionThrown:
+    active: true
+    exceptionNames:
+      - Error
+      - Exception
+      - Throwable
+      - RuntimeException
+
+potential-bugs:
+  UnsafeCallOnNullableType:
+    active: true
+  CastNullableToNonNullableType:
+    active: true

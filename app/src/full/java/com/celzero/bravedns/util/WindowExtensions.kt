@@ -21,24 +21,16 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Build
-import android.util.TypedValue
 import android.view.View
-import android.view.Window
 import android.view.WindowManager
 import androidx.annotation.ColorInt
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.toDrawable
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
 import com.celzero.bravedns.R
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isAtleastS
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import java.util.WeakHashMap
 import java.util.function.Consumer
 
 /** Utility extension functions to configure Activity/Dialog/BottomSheet window appearance generically. */
@@ -58,16 +50,13 @@ fun AppCompatActivity.handleFrostEffectIfNeeded(themeId: Int) {
     if (isAtleastS()) {
         window.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
         setupWindowBlurListener(windowBackgroundDrawable)
-        // Apply the current system blur state immediately so the first draw is
-        // already correct (the attach-listener fires later and handles transitions).
         val enabled = windowManager.isCrossWindowBlurEnabled
         Logger.v(LOG_TAG_UI, "Blur enabled by system? $enabled")
-        updateWindowForBlurs(windowBackgroundDrawable, enabled)
     } else {
         Logger.v(LOG_TAG_UI, "Blurs not supported, below Android S")
-        updateWindowForBlurs(windowBackgroundDrawable, blursEnabled = false)
+        updateWindowForBlurs(windowBackgroundDrawable, blursEnabled = false /* blursEnabled */)
     }
-    // FLAG_DIM_BEHIND is managed inside updateWindowForBlurs, not set unconditionally here.
+    window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
 }
 
 @RequiresApi(Build.VERSION_CODES.S)
@@ -90,56 +79,26 @@ private fun AppCompatActivity.setupWindowBlurListener(windowBackgroundDrawable: 
     )
 }
 
-// Blur radius in dp for density-independent blur strength across devices.
-// Converted to px at point of use. 150dp is the platform maximum; 120dp
-// gives a strong frosted blur while leaving some headroom.
-private const val BACKGROUND_BLUR_RADIUS_DP = 120f
-private const val BLUR_BEHIND_RADIUS_DP = 120f
-// Stronger dim to reduce background visibility while still letting the blur
-// show through. 0.7f was too aggressive; 0.45f strikes a balance between
-// obscuring background content and retaining the glass aesthetic.
-private const val DIM_AMOUNT_WITH_BLUR = 0.45f
-// Frost theme is only selectable on S+, so the no-blur path is a safeguard only.
-// No dim is applied; the nearly-opaque window background acts as the backdrop.
-private const val DIM_AMOUNT_NO_BLUR = 0.0f
-// ~59 % opacity of the dark surface colour — strong frosted tint that
-// significantly reduces background visibility without fully hiding the blur.
-private const val WINDOW_BACKGROUND_ALPHA_WITH_BLUR = 40
-// Nearly-opaque fallback when blur is unavailable (pre-S safety net).
-private const val WINDOW_BACKGROUND_ALPHA_NO_BLUR = 230
+private const val BACKGROUND_BLUR_RADIUS = 80
+private const val BLUR_BEHIND_RADIUS = 80
+private const val DIM_AMOUNT_WITH_BLUR = 0.7f
+private const val DIM_AMOUNT_NO_BLUR = 1f
+private const val WINDOW_BACKGROUND_ALPHA_WITH_BLUR = 55
+private const val WINDOW_BACKGROUND_ALPHA_NO_BLUR = 255
 
 private fun AppCompatActivity.updateWindowForBlurs(
     windowBackgroundDrawable: Drawable?,
     blursEnabled: Boolean,
 ) {
-    // Adjust the frosted-glass tint overlay: low opacity when the blur is doing its job,
-    // nearly-opaque as a solid fallback when blur is unavailable.
     windowBackgroundDrawable?.alpha =
         if (blursEnabled) WINDOW_BACKGROUND_ALPHA_WITH_BLUR
         else WINDOW_BACKGROUND_ALPHA_NO_BLUR
 
-    // Manage FLAG_DIM_BEHIND together with the dim amount so they are always in sync.
-    // A subtle compositor dim complements the frosted overlay; no dim is needed in the
-    // fallback path because the opaque window background handles separation.
-    if (blursEnabled) {
-        window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-        window.setDimAmount(DIM_AMOUNT_WITH_BLUR)
-    } else {
-        window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-        window.setDimAmount(DIM_AMOUNT_NO_BLUR)
-    }
-
+    window.setDimAmount(if (blursEnabled) DIM_AMOUNT_WITH_BLUR else DIM_AMOUNT_NO_BLUR)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        // Convert dp blur radii to px for density-independent blur strength.
-        val dm = resources.displayMetrics
-        val bgBlurPx = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, BACKGROUND_BLUR_RADIUS_DP, dm
-        ).toInt()
-        val behindBlurPx = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, BLUR_BEHIND_RADIUS_DP, dm
-        ).toInt()
-        window.setBackgroundBlurRadius(bgBlurPx)
-        window.attributes.blurBehindRadius = behindBlurPx
+        // Set the window background blur and blur behind radii
+        window.setBackgroundBlurRadius(BACKGROUND_BLUR_RADIUS)
+        window.attributes.blurBehindRadius = BLUR_BEHIND_RADIUS
         window.attributes = window.attributes
     }
 }
@@ -155,47 +114,15 @@ fun Dialog.useTransparentNoDimBackground(
     window?.setBackgroundDrawable(color.toDrawable())
 }
 
-fun AppCompatDialog.useTransparentNoDimBackground(
-    @ColorInt color: Int = Color.TRANSPARENT
-) {
-    (this as Dialog?)?.useTransparentNoDimBackground(color)
-}
-
-fun BottomSheetDialog.useTransparentNoDimBackground(
-    @ColorInt color: Int = Color.TRANSPARENT
-) {
-    (this as Dialog?)?.useTransparentNoDimBackground(color)
-}
-
-/** Allow calling the helper directly on a DialogFragment/BottomSheetDialogFragment. */
-fun DialogFragment?.useTransparentNoDimBackground(
-    @ColorInt color: Int = Color.TRANSPARENT
-) {
-    this?.dialog?.useTransparentNoDimBackground(color)
-}
-
-fun BottomSheetDialogFragment?.useTransparentNoDimBackground(
-    @ColorInt color: Int = Color.TRANSPARENT
-) {
-    this?.dialog?.useTransparentNoDimBackground(color)
-}
-
-// Keyed by Window (one per Activity instance) so concurrent activities never
-// stomp each other's saved state. WeakHashMap prevents leaks when activities finish.
-private val frostStateByWindow = WeakHashMap<Window, Boolean>()
+private var frostWasEnabled = false
 
 fun AppCompatActivity.disableFrostTemporarily() {
-    val blurWasEnabled =
-        window.attributes.flags and WindowManager.LayoutParams.FLAG_BLUR_BEHIND != 0
-    // Persist per-window so that a second activity's call never overwrites this one's state.
-    frostStateByWindow[window] = blurWasEnabled
+    frostWasEnabled = window.attributes.flags and WindowManager.LayoutParams.FLAG_BLUR_BEHIND != 0
 
-    if (blurWasEnabled) {
+    if (frostWasEnabled) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             window.setBackgroundBlurRadius(0)
             window.attributes.blurBehindRadius = 0
-            // Commit the attribute change to WindowManager (was missing in the original).
-            window.attributes = window.attributes
         }
         window.clearFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
         window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
@@ -205,17 +132,7 @@ fun AppCompatActivity.disableFrostTemporarily() {
 }
 
 fun AppCompatActivity.restoreFrost(themeId: Int) {
-    if (frostStateByWindow[window] != true) return
-    frostStateByWindow.remove(window)
+    if (!frostWasEnabled) return
+
     handleFrostEffectIfNeeded(themeId)
-}
-
-fun Fragment.disableFrostTemporarily() {
-    val activity = activity as? AppCompatActivity ?: return
-    activity.disableFrostTemporarily()
-}
-
-fun Fragment.restoreFrost(themeId: Int) {
-    val activity = activity as? AppCompatActivity ?: return
-    activity.restoreFrost(themeId)
 }
