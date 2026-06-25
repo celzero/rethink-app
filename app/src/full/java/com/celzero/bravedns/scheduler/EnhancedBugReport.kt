@@ -215,8 +215,7 @@ object EnhancedBugReport : KoinComponent {
 
         if (previousSessionFiles.isEmpty()) return
 
-        val firebaseEnabled = FirebaseErrorReporting.isAvailable() &&
-            persistentState.firebaseErrorReportingEnabled
+        val firebaseEnabled = persistentState.firebaseErrorReportingEnabled
 
         if (firebaseEnabled) {
             reportFilesToFirebase(previousSessionFiles)
