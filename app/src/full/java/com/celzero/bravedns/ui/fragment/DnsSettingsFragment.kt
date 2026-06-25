@@ -275,17 +275,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             } else {
                 Backend.Preferred
             }
-            val dnsId = if (WireguardManager.oneWireGuardEnabled()) {
-                val id = WireguardManager.getOneWireGuardProxyId()
-                if (id == null) {
-                    prefId
-                } else {
-                    "${ProxyManager.ID_WG_BASE}${id}"
-                }
-            } else {
-                prefId
-            }
-            val p50 = VpnController.p50(dnsId)
+            val p50 = VpnController.p50(prefId)
             if (p50 <= 0L) return@io
 
             uiCtx {
@@ -337,14 +327,6 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
 
     private fun updateConnectedStatus(connectedDns: String) {
         var dnsType = resources.getString(R.string.configure_dns_connected_dns_proxy_status)
-        if (WireguardManager.oneWireGuardEnabled()) {
-            b.connectedStatusTitleUrl.text =
-                resources.getString(R.string.configure_dns_connected_dns_proxy_status)
-            b.connectedStatusTitle.text = resources.getString(R.string.two_argument_comma, getString(R.string.lbl_wireguard), connectedDns)
-            updateLatency()
-            return
-        }
-
         var dns = connectedDns
         if (persistentState.splitDns && WireguardManager.isAdvancedWgActive()) {
             dns += ", " + resources.getString(R.string.lbl_wireguard)
@@ -413,15 +395,6 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
     }
 
     private fun updateSelectedDns() {
-        if (WireguardManager.oneWireGuardEnabled()) {
-            b.wireguardRb.visibility = View.VISIBLE
-            b.wireguardRb.isChecked = true
-            b.wireguardRb.isChecked = true
-            b.wireguardRb.isEnabled = true
-        } else {
-            b.wireguardRb.visibility = View.GONE
-        }
-
         if (isSmartDns()) {
             b.smartDnsRb.isChecked = true
             b.rethinkPlusDnsRb.isChecked = false
@@ -448,13 +421,6 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             b.smartDnsRb.isChecked = false
             b.customDnsRb.isChecked = true
         }
-    }
-
-    private fun uncheckAllDns() {
-        b.rethinkPlusDnsRb.isChecked = false
-        b.customDnsRb.isChecked = false
-        b.networkDnsRb.isChecked = false
-        b.smartDnsRb.isChecked = false
     }
 
     private fun getConnectedDnsType(): String {
