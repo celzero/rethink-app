@@ -791,6 +791,8 @@
     <string name="dc_block_heading" translatable="true">Rules</string>
     <string name="dc_other_dns_heading" translatable="true">Type</string>
 
+    <string name="dc_global_heading" translatable="true">Global</string>
+
     <string name="dc_custom_dns_radio" translatable="true">Other DNS</string>
     <string name="dc_rethink_dns_radio" translatable="true">Rethink DNS</string>
 
@@ -2490,7 +2492,7 @@
     <string name="fs_configure_logs_desc" translatable="true">Review DNS queries and connection logs</string>
 
     <!-- DNS bypass mode bottom sheet -->
-    <string name="bfdm_heading" translatable="false">DNS to bypass</string>
+    <string name="bfdm_heading" translatable="false">DNS for bypass</string>
     <string name="bfdm_desc" translatable="false">Select the DNS to use for trusted and bypassed apps and domains</string>
     <string name="bfdm_option_fallback_label" translatable="false">Use fallback DNS</string>
     <string name="bfdm_option_fallback_desc" translatable="false">Use the fallback DNS for trusted and bypassed connections</string>
