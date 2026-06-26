@@ -42,7 +42,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 /**
  * SSID Dialog for Country-based VPN configurations
  */
-class CountrySsidDialog(
+class RpnSsidDialog(
     private val activity: Activity,
     private val themeId: Int,
     private val countryCode: String,
@@ -56,7 +56,7 @@ class CountrySsidDialog(
     private val ssidItems = mutableListOf<SsidItem>()
 
     companion object {
-        private const val TAG = "CountrySsidDialog"
+        private const val TAG = "RpnSsidDialog"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
