@@ -15,7 +15,10 @@ limitations under the License.
 */
 package com.celzero.bravedns.database
 
+import Logger
+import Logger.LOG_TAG_APP_DB
 import android.database.Cursor
+import android.database.sqlite.SQLiteConstraintException
 import com.celzero.bravedns.data.DataUsage
 
 class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
@@ -37,13 +40,17 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
     suspend fun updateUid(oldUid: Int, newUid: Int, pkg: String): Int {
         val isExist = appInfoDAO.isUidPkgExist(newUid, pkg) != null
         if (isExist) {
-            // already app is present with the new uid, so no need to update
-            // in that case, old uid with same pkg should be deleted as we intend to update the uid
             appInfoDAO.deletePackage(oldUid, pkg)
             return 0
         }
         val modifiedTs = System.currentTimeMillis()
-        return appInfoDAO.updateUid(oldUid, pkg, newUid, modifiedTs)
+        return try {
+            appInfoDAO.updateUid(oldUid, pkg, newUid, modifiedTs)
+        } catch (_: SQLiteConstraintException) {
+            Logger.w(LOG_TAG_APP_DB, "updateUid constraint violation; old=($oldUid,$pkg) -> new=$newUid; deleting stale old entry")
+            appInfoDAO.deletePackage(oldUid, pkg)
+            0
+        }
     }
 
     suspend fun deleteByPackageName(packageNames: List<String>) {
@@ -56,6 +63,10 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         } else {
             appInfoDAO.deletePackage(uid, packageName)
         }
+    }
+
+    suspend fun deleteAll() {
+        appInfoDAO.deleteAll()
     }
 
     suspend fun tombstoneApp(oldUid: Int, newUid: Int, packageName: String?, tombstoneTs: Long) {

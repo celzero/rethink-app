@@ -158,7 +158,7 @@ class ProxyManagerTest : KoinTest {
         coJustRun { mockDb.deleteMapping(any(), any(), any()) }
         coJustRun { mockDb.deleteApp(any(), any()) }
         coJustRun { mockDb.deleteAppByPkgName(any()) }
-        coJustRun { mockDb.updateUidForApp(any(), any()) }
+        coJustRun { mockDb.updateUidForApp(any(), any(), any()) }
         coJustRun { mockDb.tombstoneApp(any(), any()) }
         coJustRun { mockDb.deleteAll() }
         coJustRun { mockDb.updateProxyNameForProxyId(any(), any()) }
@@ -636,14 +636,14 @@ class ProxyManagerTest : KoinTest {
 
         assertTrue(ProxyManager.trackedApps().any { it.uid == newUid && it.packageName == pkg1 })
         assertFalse(ProxyManager.trackedApps().any { it.uid == uid1 })
-        coVerify(exactly = 1) { mockDb.updateUidForApp(newUid, pkg1) }
+        coVerify(exactly = 1) { mockDb.updateUidForApp(uid1, newUid, pkg1) }
     }
 
     @Test
     fun `updateApp is no-op when uid has not changed`() = runBlocking {
         loadMappings(pam(uid1, pkg1, ""))
         ProxyManager.updateApp(uid1, pkg1)
-        coVerify(exactly = 0) { mockDb.updateUidForApp(any(), any()) }
+        coVerify(exactly = 0) { mockDb.updateUidForApp(any(), any(), any()) }
     }
 
     // ========================================================================

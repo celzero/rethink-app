@@ -22,6 +22,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 
 @Dao
@@ -74,11 +75,29 @@ interface ProxyApplicationMappingDAO {
     @Query("update ProxyApplicationMapping set proxyName = :proxyName where proxyId = :proxyId")
     fun updateProxyNameForProxyId(proxyId: String, proxyName: String)
 
+    @Transaction
+    fun updateUidForApp(oldUid: Int, newUid: Int, packageName: String) {
+        deleteConflictingMappingsForUidUpdate(newUid, packageName, oldUid)
+        updateUidForAppInternal(oldUid, newUid, packageName)
+    }
+
+    @Query("delete from ProxyApplicationMapping where uid = :newUid and packageName = :packageName and proxyId in (select proxyId from ProxyApplicationMapping where uid = :oldUid and packageName = :packageName)")
+    fun deleteConflictingMappingsForUidUpdate(newUid: Int, packageName: String, oldUid: Int)
+
     @Query("update ProxyApplicationMapping set uid = :newUid where packageName = :packageName and uid = :oldUid")
-    fun updateUidForApp(oldUid: Int, newUid: Int, packageName: String)
+    fun updateUidForAppInternal(oldUid: Int, newUid: Int, packageName: String)
+
+    @Transaction
+    fun tombstoneApp(oldUid: Int, newUid: Int) {
+        deleteConflictingMappingsForTombstone(newUid, oldUid)
+        tombstoneAppInternal(oldUid, newUid)
+    }
+
+    @Query("delete from ProxyApplicationMapping where uid = :newUid and exists (select 1 from ProxyApplicationMapping as pam2 where pam2.uid = :oldUid and pam2.packageName = ProxyApplicationMapping.packageName and pam2.proxyId = ProxyApplicationMapping.proxyId)")
+    fun deleteConflictingMappingsForTombstone(newUid: Int, oldUid: Int)
 
     @Query("update ProxyApplicationMapping set uid = :newUid where uid = :oldUid")
-    fun tombstoneApp(oldUid: Int, newUid: Int)
+    fun tombstoneAppInternal(oldUid: Int, newUid: Int)
 
     @Query("select * from ProxyApplicationMapping where uid = :uid and packageName = :packageName")
     fun getProxiesForApp(uid: Int, packageName: String): List<ProxyApplicationMapping>

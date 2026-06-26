@@ -201,20 +201,24 @@ object ProxyManager : KoinComponent {
     }
 
     suspend fun updateApp(uid: Int, packageName: String) {
-        // update the uid for the app in the database and the cache
         val m = pamSet.filter { it.packageName == packageName }.toSet()
         if (m.isEmpty()) {
             Logger.e(LOG_TAG_PROXY, "updateApp: map not found for $packageName")
             return
         }
 
-        // check if all entries already have the correct uid
         if (m.all { it.uid == uid }) return
 
         val oldUid = m.first().uid
+
+        m.forEach { entry ->
+            if (pamSet.any { it.uid == uid && it.packageName == packageName && it.proxyId == entry.proxyId && it != entry }) {
+                db.deleteMapping(uid, packageName, entry.proxyId)
+            }
+        }
+
         db.updateUidForApp(oldUid, uid, packageName)
 
-        // Sync the in-memory cache: replace all old-uid tuples with new-uid tuples.
         val newTuples = m.map { ProxyAppMapTuple(uid, packageName, it.proxyId) }.toSet()
         pamSet.removeAll(m)
         pamSet.addAll(newTuples)
@@ -290,18 +294,22 @@ object ProxyManager : KoinComponent {
     }
 
     suspend fun tombstoneApp(oldUid: Int) {
-        // tombstone the app in the database and reload the cache
-        val newUid = if (oldUid > 0) -1 * oldUid else oldUid // negative uid to indicate tombstone app
+        val newUid = if (oldUid > 0) -1 * oldUid else oldUid
         if (newUid == oldUid) {
             Logger.w(LOG_TAG_PROXY, "no change in uid, not tombstoning: $oldUid")
             return
         }
         val entries = pamSet.filter { it.uid == oldUid }
-        entries.forEach { tuple ->
-            db.deleteMapping(newUid, tuple.packageName, tuple.proxyId)
+        try {
+            entries.forEach { tuple ->
+                db.deleteMapping(newUid, tuple.packageName, tuple.proxyId)
+            }
+            db.tombstoneApp(oldUid, newUid)
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "tombstoneApp failed for oldUid=$oldUid; reloading cache", e)
+            load()
+            return
         }
-        db.tombstoneApp(oldUid, newUid)
-        // reload the cache
         load()
         Logger.i(LOG_TAG_PROXY, "tombstoning app for mapping: $oldUid, $newUid, entries: ${entries.size}")
     }
