@@ -1412,7 +1412,7 @@ class GoVpnAdapter : KoinComponent {
                 )
                 val stats = getProxyStatusById(id).first
                 if (stats == null || stats == Backend.TNT) {
-                    Logger.w(LOG_TAG_VPN, "$TAG proxy stats for $id is null or tnt, $stats, re-adding")
+                    Logger.w(LOG_TAG_VPN, "$TAG proxy stats for $id is null or tnt, $stats, re-adding? $avoidReaddingProxies")
                     // there are cases where the proxy needs to be re-added, so pingOrReAddProxy
                     // case: some of the wg proxies are added to tunnel but erring out, so
                     // re-adding those proxies seems working, work around for now until the
