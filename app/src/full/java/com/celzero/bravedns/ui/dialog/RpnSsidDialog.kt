@@ -34,7 +34,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.SsidAdapter
 import com.celzero.bravedns.data.SsidItem
-import com.celzero.bravedns.databinding.DialogCountrySsidPremiumBinding
+import com.celzero.bravedns.databinding.DialogRpnSsidBinding
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -51,7 +51,7 @@ class CountrySsidDialog(
     private val onSave: (String) -> Unit
 ) : Dialog(activity, themeId) {
 
-    private lateinit var b: DialogCountrySsidPremiumBinding
+    private lateinit var b: DialogRpnSsidBinding
     private lateinit var ssidAdapter: SsidAdapter
     private val ssidItems = mutableListOf<SsidItem>()
 
@@ -63,7 +63,7 @@ class CountrySsidDialog(
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
 
-        b = DialogCountrySsidPremiumBinding.inflate(layoutInflater)
+        b = DialogRpnSsidBinding.inflate(layoutInflater)
         setContentView(b.root)
         setCancelable(false)
         setupDialog()
