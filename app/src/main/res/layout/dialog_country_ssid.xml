@@ -291,9 +291,9 @@
                 app:layout_constraintTop_toBottomOf="@id/list_section_title">
 
                 <ImageView
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:alpha="0.3"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:alpha="0.2"
                     android:contentDescription="@string/country_ssid_empty_state"
                     android:src="@drawable/ic_info"
                     tools:ignore="UseAppTint" />

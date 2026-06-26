@@ -216,7 +216,7 @@ class CountrySsidDialog(
             b.addSsidBtn.isClickable = isNotEmpty
 
             if (isNotEmpty) {
-                b.addSsidBtn.setTextColor(UIUtils.fetchColor(context, R.attr.accentGood))
+                b.addSsidBtn.setTextColor(UIUtils.fetchColor(context, R.attr.primaryTextColor))
             } else {
                 b.addSsidBtn.setTextColor(UIUtils.fetchColor(context, R.attr.primaryLightColorText))
             }
@@ -235,7 +235,7 @@ class CountrySsidDialog(
         val ssidName = b.ssidEditText.text.toString().trim()
         if (ssidName.isEmpty()) {
             Utilities.showToastUiCentered(
-                context,
+                activity,
                 context.getString(R.string.wg_ssid_empty_error),
                 Toast.LENGTH_SHORT
             )
@@ -245,7 +245,7 @@ class CountrySsidDialog(
         // Check for duplicate
         if (ssidItems.any { it.name.equals(ssidName, ignoreCase = true) }) {
             Utilities.showToastUiCentered(
-                context,
+                activity,
                 context.getString(R.string.wg_ssid_duplicate_error),
                 Toast.LENGTH_SHORT
             )
