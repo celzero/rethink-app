@@ -2036,27 +2036,34 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         }
 
+        // flag whether to show the with "Private DNS/RPN/WireGuard/Proxy" on failing cases, as it
+        // is misunderstood by some of the users
+        val showAddlInfoOnError = false
+
         if (statusId == R.string.status_no_internet || statusId == R.string.status_failing) {
             val message = getString(statusId)
             colorId = fetchTextColor(R.color.accentBad)
-            if (RpnProxyManager.isRpnActive()) {
-                statusId = R.string.status_protected_with_rpn
-            } else if (appConfig.isCustomSocks5Enabled() && appConfig.isCustomHttpProxyEnabled()) {
-                statusId = R.string.status_protected_with_proxy
-            } else if (appConfig.isCustomSocks5Enabled()) {
-                statusId = R.string.status_protected_with_socks5
-            } else if (appConfig.isCustomHttpProxyEnabled()) {
-                statusId = R.string.status_protected_with_http
-            } else if (appConfig.isWireGuardEnabled()) {
-                statusId = R.string.status_protected_with_wg
-            } else if (isPrivateDnsActive(requireContext())) {
-                statusId = R.string.status_protected_with_private_dns
+            var string = message
+            if (showAddlInfoOnError) {
+                if (RpnProxyManager.isRpnActive()) {
+                    statusId = R.string.status_protected_with_rpn
+                } else if (appConfig.isCustomSocks5Enabled() && appConfig.isCustomHttpProxyEnabled()) {
+                    statusId = R.string.status_protected_with_proxy
+                } else if (appConfig.isCustomSocks5Enabled()) {
+                    statusId = R.string.status_protected_with_socks5
+                } else if (appConfig.isCustomHttpProxyEnabled()) {
+                    statusId = R.string.status_protected_with_http
+                } else if (appConfig.isWireGuardEnabled()) {
+                    statusId = R.string.status_protected_with_wg
+                } else if (isPrivateDnsActive(requireContext())) {
+                    statusId = R.string.status_protected_with_private_dns
+                }
+                // replace the string "protected" with appropriate string
+                // FIXME: spilt the string literals to separate strings
+                string =
+                    getString(statusId)
+                        .replaceFirst(getString(R.string.status_protected), message, true)
             }
-            // replace the string "protected" with appropriate string
-            // FIXME: spilt the string literals to separate strings
-            val string =
-                getString(statusId)
-                    .replaceFirst(getString(R.string.status_protected), message, true)
             if (persistentState.wgGlobalLockdown) {
                 val s  = string.replaceFirst(getString(R.string.status_protected), getString(R.string.firewall_rule_global_lockdown).lowercase(), true)
                 b.fhsProtectionLevelTxt.setTextColor(colorId)
