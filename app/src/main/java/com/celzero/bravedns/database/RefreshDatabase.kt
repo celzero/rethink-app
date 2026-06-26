@@ -457,13 +457,6 @@ internal constructor(
         val ai = maybeFetchAppInfo(uid)
         val pkg = ai?.packageName ?: ""
 
-        val existing = if (pkg.isNotEmpty()) FirewallManager.getAppInfoByPackage(pkg) else null
-        if (existing != null && existing.uid != uid) {
-            Logger.i(LOG_TAG_APP_DB, "insertApp: pkg $pkg changed uid ${existing.uid} -> $uid; forcing refresh")
-            refresh(ACTION_REFRESH_FORCE)
-            return
-        }
-
         val tombstone = FirewallManager.isTombstone(pkg)
         Logger.i(LOG_TAG_APP_DB, "insert app; uid: $uid, pkg: $pkg, tombstone? $tombstone")
         if (tombstone) {
