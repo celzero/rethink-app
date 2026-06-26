@@ -19,6 +19,11 @@ def isFdroidBuildServer = fdroidBuildServer != null && !fdroidBuildServer.isEmpt
 def deGoogled = !apkBuild || fdroidBuild || isFdroidBuildServer
 def shouldSplit = !alphaBuild
 
+// Pass -PwebsiteDegoogled=true when building the fdroid flavor with our own keys.
+// Official F-Droid builds omit this flag and will be labeled as "fdroid".
+def isWebsiteDegoogled = project.hasProperty("websiteDegoogled") &&
+        project.property("websiteDegoogled").toString().toBoolean()
+
 println("app-task names: '$taskNames'")
 println("gradle deGoogled? $deGoogled (fdroidBuild: $fdroidBuild, fdroidBuildServer: $isFdroidBuildServer, apkBuild: $apkBuild)")
 println("gradle alphaBuild? $alphaBuild, should split? $shouldSplit")
@@ -88,6 +93,8 @@ android {
         minSdkVersion(23)
         targetSdkVersion 35
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        // Defaults to false; the fdroid flavor overrides it via -PwebsiteDegoogled=true.
+        buildConfigField "boolean", "IS_WEBSITE_DEGOOGLD_BUILD", "false"
     }
 
     signingConfigs {
@@ -266,6 +273,8 @@ android {
         }
         fdroid {
             dimension "releaseChannel"
+            // true only when built with -PwebsiteDegoogled=true (our own keys).
+            buildConfigField "boolean", "IS_WEBSITE_DEGOOGLD_BUILD", String.valueOf(isWebsiteDegoogled)
         }
         website {
             dimension "releaseChannel"

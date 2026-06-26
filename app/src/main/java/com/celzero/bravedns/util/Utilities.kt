@@ -622,6 +622,10 @@ object Utilities {
         return BuildConfig.FLAVOR_releaseChannel == FLAVOR_PLAY
     }
 
+    fun isWebsiteDegoogledFlavour(): Boolean {
+        return isFdroidFlavour() && BuildConfig.IS_WEBSITE_DEGOOGLD_BUILD
+    }
+
 
     /** Returns true when the app is built with the "alpha" build type. */
     fun isAlphaBuild(): Boolean {
