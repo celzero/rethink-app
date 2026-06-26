@@ -39,6 +39,8 @@ import com.celzero.firestack.backend.RouterStats
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -65,10 +67,9 @@ object WireguardManager : KoinComponent {
     // contains parsed wg configs
     private val configs: CopyOnWriteArraySet<Config> = CopyOnWriteArraySet()
 
-    // Set to true once load() has completed its first run. Used by the UI to distinguish
-    // "no active configs" from "configs not loaded yet" so the proxy card never shows
-    // "Inactive" during the async initialization window at app launch.
-    @Volatile private var loadComplete: Boolean = false
+    // mutex for the migration so that concurrent load() calls
+    // do not race while decrypting and overwriting the same files
+    private val migrationMutex = Mutex()
 
     // retrieve last added config id
     private var lastAddedConfigId = 0
@@ -93,40 +94,38 @@ object WireguardManager : KoinComponent {
     }
 
     suspend fun load(forceRefresh: Boolean): Int {
+        // migration: old encrypted wg configs to plain text files.
+        // must run before any config read so that the rest of this always uses plaintext files
+        migrateEncryptedConfigsIfNeeded()
+
         if (!forceRefresh && configs.isNotEmpty()) {
             Logger.i(LOG_TAG_PROXY, "configs already loaded; returning...")
             return configs.size
         }
         // go through all files in the wireguard directory and load them
-        // parse the files as those are encrypted
+        // parse the files as those are now plain text
         // increment the id by 1, as the first config id is 0
         lastAddedConfigId = db.getLastAddedConfigId()
         val m = db.getWgConfigs().map { it.toImmutable() }
         mappings = CopyOnWriteArraySet(m)
         for (it in mappings) {
             val path = it.configPath
-            val config = try {
-                val bytes = EncryptedFileManager.readByteArray(applicationContext, File(path))
-                Config.parse(ByteArrayInputStream(bytes))
-            } catch (e: EncryptionException) {
-                when (e) {
-                    is EncryptionException.IOError -> {
-                        // Missing or unreadable file; keep db entry but mark inactive to avoid crash/loop.
-                        Logger.w(LOG_TAG_PROXY, "wg config missing/unreadable: $path (${e.message})")
-                        if (it.isActive) {
-                            val inactive = it.copy(isActive = false, oneWireGuard = false)
-                            mappings.remove(it)
-                            mappings.add(inactive)
-                            db.disableConfig(it.id)
-                            VpnController.removeWireGuardProxy(it.id)
-                        }
-                        continue
-                    }
-                    else -> {
-                        Logger.e(LOG_TAG_PROXY, "Critical encryption failure for wg config: $path, deleting config", e)
-                        continue
-                    }
+            // Convert any remaining encrypted files (e.g., after a downgrade/upgrade cycle)
+            // to plaintext before parsing. Missing or undecryptable files are marked inactive.
+            if (!ensurePlaintextConfigFile(path)) {
+                Logger.w(LOG_TAG_PROXY, "wg config missing or undecryptable: $path")
+                if (it.isActive) {
+                    val inactive = it.copy(isActive = false, oneWireGuard = false)
+                    mappings.remove(it)
+                    mappings.add(inactive)
+                    db.disableConfig(it.id)
+                    VpnController.removeWireGuardProxy(it.id)
                 }
+                continue
+            }
+            val config = try {
+                val bytes = WireguardConfigFileManager.read(File(path))
+                Config.parse(ByteArrayInputStream(bytes))
             } catch (e: Exception) {
                 Logger.e(LOG_TAG_PROXY, "Config parse failure for wg config: $path", e)
                 continue
@@ -152,16 +151,111 @@ object WireguardManager : KoinComponent {
                 configs.add(c)
             }
         }
-        loadComplete = true
         return configs.size
     }
 
     /**
-     * Returns true once the initial [load] has finished. The UI uses this to distinguish
-     * "WireGuard configs are genuinely empty" from "configs haven't been loaded from DB yet"
-     * so the proxy card never flashes "Inactive" during the async initialisation window.
+     * migration that converts encrypted wg config files created by older app versions into plain
+     * text files. files already containing a valid Interface section are skipped,
+     * completion is tracked by [PersistentState.wireguardPlainFileMigrationDone].
+     * TODO: better way to find whether the file is encrypted other than reading like this
+     * but adding this as it is one time thing
+     *
+     * if a file cannot be decrypted (keystore invalidated, corrupted keyset, etc.) the
+     * config is marked inactive in the database and removed from the tunnel so the app
+     * continues to work. The encrypted file is deleted to prevent repeated failures.
      */
-    fun isLoaded(): Boolean = loadComplete
+    private suspend fun migrateEncryptedConfigsIfNeeded() {
+        if (persistentState.wireguardPlainFileMigrationDone) {
+            return
+        }
+
+        migrationMutex.withLock {
+            // Double-check after acquiring the lock; another caller may have finished migration.
+            if (persistentState.wireguardPlainFileMigrationDone) {
+                return@withLock
+            }
+
+            Logger.i(LOG_TAG_PROXY, "migrate: starting encrypted wg config migration")
+            val configs = db.getWgConfigs()
+            var migratedCount = 0
+            var failedCount = 0
+
+            configs.forEach { entry ->
+                val file = File(entry.configPath)
+                if (!file.exists()) {
+                    Logger.w(LOG_TAG_PROXY, "migrate: file missing for config ${entry.id}: ${entry.configPath}")
+                    return@forEach
+                }
+
+                if (WireguardConfigFileManager.isPlaintextConfig(file)) {
+                    Logger.v(LOG_TAG_PROXY, "migrate: config ${entry.id} is already plaintext")
+                    return@forEach
+                }
+
+                try {
+                    val bytes = EncryptedFileManager.readByteArray(applicationContext, file)
+                    file.writeBytes(bytes)
+                    migratedCount++
+                    Logger.i(LOG_TAG_PROXY, "migrate: converted encrypted config ${entry.id} to plaintext")
+                } catch (e: EncryptionException) {
+                    failedCount++
+                    Logger.e(LOG_TAG_PROXY, "migrate: failed to decrypt config ${entry.id}, marking inactive", e)
+                    if (entry.isActive) {
+                        db.disableConfig(entry.id)
+                        VpnController.removeWireGuardProxy(entry.id)
+                    }
+                    // rmv the unreadable encrypted file so further loads will not retry it.
+                    if (file.exists() && !file.delete()) {
+                        Logger.w(LOG_TAG_PROXY, "migrate: could not delete unreadable file ${file.absolutePath}")
+                    }
+                } catch (e: Exception) {
+                    failedCount++
+                    Logger.e(LOG_TAG_PROXY, "migrate: unexpected error for config ${entry.id}, marking inactive", e)
+                    if (entry.isActive) {
+                        db.disableConfig(entry.id)
+                        VpnController.removeWireGuardProxy(entry.id)
+                    }
+                    // rmv the unreadable file so further loads will not retry it.
+                    if (file.exists() && !file.delete()) {
+                        Logger.w(LOG_TAG_PROXY, "migrate: could not delete unreadable file ${file.absolutePath}")
+                    }
+                }
+            }
+
+            persistentState.wireguardPlainFileMigrationDone = true
+            Logger.i(LOG_TAG_PROXY, "migrate: wg config migration complete: migrated=$migratedCount, failed=$failedCount")
+        }
+    }
+
+    /**
+     * Ensures the file at [path] is a plaintext WireGuard config.
+     *
+     * If the file exists but is not plaintext (e.g., created by an older app version after a
+     * downgrade/upgrade cycle), it is decrypted in place using [EncryptedFileManager].
+     *
+     * @return true if the file exists and is plaintext (either originally or after decryption),
+     *         false if the file is missing or could not be decrypted.
+     */
+    private suspend fun ensurePlaintextConfigFile(path: String): Boolean {
+        val file = File(path)
+        if (!file.exists()) return false
+        if (WireguardConfigFileManager.isPlaintextConfig(file)) return true
+
+        return try {
+            Logger.i(LOG_TAG_PROXY, "found encrypted wg config at $path, decrypting in place")
+            val bytes = EncryptedFileManager.readByteArray(applicationContext, file)
+            file.writeBytes(bytes)
+            Logger.i(LOG_TAG_PROXY, "decrypted wg config in place: $path")
+            true
+        } catch (e: EncryptionException) {
+            Logger.e(LOG_TAG_PROXY, "failed to decrypt wg config at $path", e)
+            false
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "unexpected error decrypting wg config at $path", e)
+            false
+        }
+    }
 
     // remove this post v055o,  sometimes the db update does not delete the entry, so adding this
     // as precaution.
@@ -182,7 +276,6 @@ object WireguardManager : KoinComponent {
     private fun clearLoadedConfigs() {
         configs.clear()
         mappings.clear()
-        loadComplete = false
     }
 
     fun getConfigById(id: Int): Config? {
@@ -780,9 +873,7 @@ object WireguardManager : KoinComponent {
         withContext(Dispatchers.IO) {
             val fileName = getConfigFileName(id)
             val file = File(getConfigFilePath(), fileName)
-            if (file.exists()) {
-                file.delete()
-            }
+            WireguardConfigFileManager.delete(file)
             // delete the config from the database
             db.deleteConfig(id)
             val proxyId = ID_WG_BASE + id
@@ -1064,14 +1155,14 @@ object WireguardManager : KoinComponent {
     }
 
     private suspend fun writeConfigAndUpdateDb(cfg: Config, serverResponse: String = "") {
-        // write the contents to the encrypted file
+        // write the contents to a plain text file
         val parsedCfg = cfg.toWgQuickString()
         val fileName = getConfigFileName(cfg.getId())
         try {
-            EncryptedFileManager.writeWireguardConfig(applicationContext, parsedCfg, fileName)
-        } catch (e: EncryptionException) {
-            // Critical encryption failure - cannot save config
-            Logger.e(LOG_TAG_PROXY, "Critical encryption failure writing wg config: ${cfg.getId()}", e)
+            WireguardConfigFileManager.write(applicationContext, parsedCfg, fileName)
+        } catch (e: java.io.IOException) {
+            // I/O failure - cannot save config
+            Logger.e(LOG_TAG_PROXY, "I/O failure writing wg config: ${cfg.getId()}", e)
             throw e // Bubble up to caller
         }
         val path = getConfigFilePath() + fileName
@@ -1254,27 +1345,27 @@ object WireguardManager : KoinComponent {
                     db.deleteConfig(c.id)
                     return@forEach
                 }
-                // read the contents of the file and write it to the EncryptedFileManager
+                // read the contents of the temp file and write it to the wireguard directory as a plain file
                 val bytes = file.readBytes()
                 Logger.i(LOG_TAG_PROXY, "performRestore: read ${bytes.size} bytes from ${file.name}")
-                val encryptFile = File(c.configPath)
-                val parentDir = encryptFile.parentFile
+                val targetFile = File(c.configPath)
+                val parentDir = targetFile.parentFile
                 if (parentDir == null) {
                     Logger.e(LOG_TAG_PROXY, "performRestore: wg restore failed, invalid path: ${c.configPath}")
                     db.deleteConfig(c.id)
                     return@forEach
                 }
                 val created = runCatching {
-                    if (!encryptFile.exists()) {
+                    if (!targetFile.exists()) {
                         parentDir.mkdirs()
-                        encryptFile.createNewFile()
+                        targetFile.createNewFile()
                     } else {
                         true
                     }
                 }.getOrElse { ex ->
                     Logger.w(
                         LOG_TAG_PROXY,
-                        "performRestore: wg restore failed, unable to create file: ${encryptFile.absolutePath}, err: ${ex.message}"
+                        "performRestore: wg restore failed, unable to create file: ${targetFile.absolutePath}, err: ${ex.message}"
                     )
                     db.deleteConfig(c.id)
                     return@forEach
@@ -1282,19 +1373,19 @@ object WireguardManager : KoinComponent {
                 if (!created) {
                     Logger.e(
                         LOG_TAG_PROXY,
-                        "performRestore: wg restore failed, createNewFile returned false: ${encryptFile.absolutePath}"
+                        "performRestore: wg restore failed, createNewFile returned false: ${targetFile.absolutePath}"
                     )
                     db.deleteConfig(c.id)
                     return@forEach
                 }
                 try {
-                    EncryptedFileManager.write(applicationContext, bytes, encryptFile)
+                    targetFile.writeBytes(bytes)
                     restoredIds.add(c.id)
-                    Logger.i(LOG_TAG_PROXY, "performRestore: restored wg config: ${c.id}, ${c.name} -> ${encryptFile.absolutePath}")
-                } catch (e: EncryptionException) {
+                    Logger.i(LOG_TAG_PROXY, "performRestore: restored wg config: ${c.id}, ${c.name} -> ${targetFile.absolutePath}")
+                } catch (e: java.io.IOException) {
                     Logger.e(
                         LOG_TAG_PROXY,
-                        "performRestore: Critical encryption failure restoring wg config: ${c.id}, ${c.name}",
+                        "performRestore: I/O failure restoring wg config: ${c.id}, ${c.name}",
                         e
                     )
                 }
@@ -1313,7 +1404,7 @@ object WireguardManager : KoinComponent {
                     LOG_TAG_PROXY,
                     "performRestore: ${unmatchedFiles.size} temp .conf files unmatched to any db entry: ${unmatchedFiles.joinToString()}. Preserving temp dir for manual recovery."
                 )
-                // do not delete temp dir — unmatched files may be needed
+                // do not delete temp dir, unmatched files may be needed
                 return
             }
 

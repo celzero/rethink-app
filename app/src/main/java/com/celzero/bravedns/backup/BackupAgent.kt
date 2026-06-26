@@ -40,7 +40,6 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.getTempDir
 import com.celzero.bravedns.backup.BackupHelper.Companion.startVpn
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.LogDatabase
-import com.celzero.bravedns.service.EncryptedFileManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Utilities
@@ -182,11 +181,15 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
             val mappings = WireguardManager.getAllMappings()
             mappings.forEach { m ->
                 val file = File(m.configPath)
-                val content = EncryptedFileManager.read(context, file)
+                if (!file.exists()) {
+                    Logger.w(LOG_TAG_BACKUP_RESTORE, "wg config file missing for ${m.id}, ${m.configPath}")
+                    return@forEach
+                }
+                val content = file.readText(Charsets.UTF_8)
                 if (content.isNotEmpty()) {
                     val tmpWgFile = File(dir, "${m.id}.conf")
-                    tmpWgFile.writer().use {
-                        writer -> writer.write(content)
+                    tmpWgFile.writer().use { writer ->
+                        writer.write(content)
                         writer.flush()
                     }
                     filesPathToZip.add(tmpWgFile.absolutePath)
