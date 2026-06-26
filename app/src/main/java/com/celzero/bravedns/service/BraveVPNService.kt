@@ -411,20 +411,24 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val startTime = elapsedRealtime()
         val rinr = persistentState.routeRethinkInRethink
         val curnet = underlyingNetworks
+        val exiting = who == Backend.Exit
+        val proxying = ProxyManager.isAnyUserSetProxy(who)
+        var doNotProtect = !exiting
+        val ignoreProxy = true
 
-        logd("bind: who: $who, addr: $addrPort, fd: $fid, rinr? $rinr")
-        if (rinr) {
-            val isRethinkBypassedFromProxy = FirewallManager.getAppInfoByUid(rethinkUid)?.isProxyExcluded ?: false
-            if (!isRethinkBypassedFromProxy) {
-                // let user set proxy proceed to protect & bind, as rethink is not bypassing proxies
-                if (!ProxyManager.isAnyUserSetProxy(who) && who != Backend.Exit) {
+        logd("bind: who: $who, addr: $addrPort, fd: $fid, rinr? $rinr, exit? $exiting, proxying? $proxying")
+        if (doNotProtect && rinr) {
+            if (!ignoreProxy) { // remove this setting when needed
+                val doProxyRethink =
+                    !(FirewallManager.getAppInfoByUid(rethinkUid)?.isProxyExcluded ?: false)
+                if (doProxyRethink) {
+                    // let user set proxy proceed to protect & bind, as rethink is not bypassing proxies
                     // do not proceed if rethink is bypassed and proxyId(who) is not user-set proxy
                     // or Exit, this includes Base or any other go related proxies
-                    Logger.vv(LOG_TAG_VPN, "bind: rinr, bypassed rethink, who: $who, fd: $fid, addr: $addrPort")
-                    Logger.vv(LOG_TAG_VPN, "bindAny: execution time: ${elapsedRealtime() - startTime} ms (rinr skip)")
-                    return
+                    doNotProtect = !proxying
                 }
-            } else if (who != Backend.Exit) {
+            }
+            if (doNotProtect) {
                 // do not proceed if rethink within rethink is enabled and proxyId(who) is not exit
                 Logger.vv(LOG_TAG_VPN, "bind: rinr, within rethink, who: $who, fd: $fid, addr: $addrPort")
                 Logger.vv(LOG_TAG_VPN, "bindAny: execution time: ${elapsedRealtime() - startTime} ms (rinr skip exit)")
@@ -618,19 +622,24 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         }
 
         val rinr = persistentState.routeRethinkInRethink
-        logd("protect: $who, fd: $fd, rinr? $rinr")
-        if (rinr) {
-            val isRethinkBypassedFromProxy = FirewallManager.getAppInfoByUid(rethinkUid)?.isProxyExcluded ?: false
-            if (!isRethinkBypassedFromProxy) {
-                // let user set proxy proceed to protect & bind, as rethink is not bypassing proxies
-                if (!ProxyManager.isAnyUserSetProxy(who) && who != Backend.Exit) {
+        val exiting = who == Backend.Exit
+        val proxying = ProxyManager.isAnyUserSetProxy(who)
+        var doNotProtect = !exiting
+        val ignoreProxy = true
+
+        logd("bind: who: $who, addr: fd: $fd, rinr? $rinr, exit? $exiting, proxying? $proxying")
+        if (doNotProtect && rinr) {
+            if (!ignoreProxy) { // remove this setting when needed
+                val doProxyRethink =
+                    !(FirewallManager.getAppInfoByUid(rethinkUid)?.isProxyExcluded ?: false)
+                if (doProxyRethink) {
+                    // let user set proxy proceed to protect & bind, as rethink is not bypassing proxies
                     // do not proceed if rethink is bypassed and proxyId(who) is not user-set proxy
                     // or Exit, this includes Base or any other go related proxies
-                    Logger.vv(LOG_TAG_VPN, "protect: rinr, bypassed rethink, who: $who, fd: $fd")
-                    Logger.vv(LOG_TAG_VPN, "protect (who): execution time: ${elapsedRealtime() - startTime} ms (rinr skip)")
-                    return@go2kt
+                    doNotProtect = !proxying
                 }
-            } else if (who != Backend.Exit) {
+            }
+            if (doNotProtect) {
                 // do not proceed if rethink within rethink is enabled and proxyId(who) is not exit
                 Logger.vv(LOG_TAG_VPN, "protect: rinr, within rethink, who: $who, fd: $fd")
                 Logger.vv(LOG_TAG_VPN, "protect (who): execution time: ${elapsedRealtime() - startTime} ms (rinr skip exit)")

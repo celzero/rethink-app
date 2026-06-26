@@ -383,9 +383,7 @@ dependencies {
 
     // add ":debug" suffix to the dependency to include debug symbols
     download firestackDependency()
-    websiteImplementation firestackDependency()
-    fdroidImplementation firestackDependency()
-    playImplementation firestackDependency()
+    implementation firestackDependency()
 
     // Work manager
     implementation('androidx.work:work-runtime-ktx:2.11.2') {
