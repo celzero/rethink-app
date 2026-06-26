@@ -2417,8 +2417,9 @@ class GoVpnAdapter : KoinComponent {
     suspend fun onLowMemory() {
         val limitBytes: Long = persistentState.goMaxMemory
         Intra.lowMem(limitBytes)
-        logEvent(Severity.MEDIUM, "low memory", "set memory limit to ${limitBytes/(1024 * 1024)} MB")
-        Logger.i(LOG_TAG_VPN, "$TAG low memory, called Intra.lowMem()")
+        val limitMb = {limitBytes/(1024 * 1024)}
+        logEvent(Severity.MEDIUM, "low memory", "set memory limit to $limitMb MB")
+        Logger.i(LOG_TAG_VPN, "$TAG set Intra.lowMem() limit to $limitMb MB")
     }
 
     suspend fun setDialStrategy(
