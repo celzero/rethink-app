@@ -678,10 +678,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         domains: String?,
         anyRealIpBlocked: Boolean = false,
         isSplApp: Boolean,
-        rinr: Boolean
+        rinr: Boolean,
+        forUpstreamAnswer: Boolean = false
     ): FirewallRuleset {
         val startTime = elapsedRealtime()
         val connId = connInfo.connId
+        val skipUnknownAppRule = forUpstreamAnswer && !persistentState.splitDns
         val res = try {
             if (connInfo.uid == rethinkUid && !rinr) {
                 logd("firewall($connId): rethink uid, $rethinkUid, not processing firewall rules")
@@ -698,7 +700,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 return FirewallRuleset.RULE9B
             }
 
-            if (unknownAppBlocked(uid)) {
+            if (unknownAppBlocked(uid) && !skipUnknownAppRule) {
                 logd("firewall($connId): unknown app blocked, $uid")
                 return FirewallRuleset.RULE5
             }
@@ -804,7 +806,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     return FirewallRuleset.RULE2G
                 }
 
-                if (dnsProxied(connInfo.destPort)) {
+                if (dnsProxied(connInfo.destPort) && !forUpstreamAnswer) {
                     logd("firewall($connId): bypass universal, dns proxied, $uid")
                     return FirewallRuleset.RULE9
                 } else {
@@ -884,7 +886,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 return FirewallRuleset.RULE11
             }
 
-            if (httpBlocked(connInfo.destPort)) {
+            // no need to check for http for dns queries
+            if (!forUpstreamAnswer && httpBlocked(connInfo.destPort)) {
                 logd("firewall($connId): http blocked, $uid")
                 return FirewallRuleset.RULE10
             }
@@ -895,7 +898,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 return FirewallRuleset.RULE3
             }
 
-            if (udpBlocked(uid, connInfo.protocol, connInfo.destPort)) {
+            // no need to check for udp block for dns queries
+            if (!forUpstreamAnswer && udpBlocked(uid, connInfo.protocol, connInfo.destPort)) {
                 logd("firewall($connId): udp blocked, $uid")
                 return FirewallRuleset.RULE6
             }
@@ -905,14 +909,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 return FirewallRuleset.RULE4
             }
 
-            // if all packets on port 53 needs to be trapped
-            if (dnsProxied(connInfo.destPort)) {
+            // if all packets on port 53 needs to be trapped, no need to check for dns queries
+            if (!forUpstreamAnswer && dnsProxied(connInfo.destPort)) {
                 logd("firewall($connId): dns proxied, $uid")
                 return FirewallRuleset.RULE9
             }
 
             // if connInfo.query is empty, then it is not resolved by user set dns
-            if (dnsBypassed(connInfo.query)) {
+            // not true in case of dns queries, skip this check
+            if (!forUpstreamAnswer && dnsBypassed(connInfo.query)) {
                 logd("firewall($connId): dns bypassed, $uid")
                 return FirewallRuleset.RULE7
             }
@@ -4913,7 +4918,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // decision based on qname, dest ip and uid.
             val srcIp = ""
             val srcPort = 0
-            val dstPort = 53
+            val dstPort = 0
             val protocol = KnownPorts.DNS_PORT
             val blocklists = smm.blocklists
             val connId = "" // no need of connId as only firewall decision is taken here
@@ -4943,7 +4948,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 connType
             )
             logd("onUpstreamAnswer: connInfo: $connInfo, domain: $domain, anyRealIpBlocked: $anyRealIpBlocked, isSplApp: $isSplApp, rinr: $rinr, time: ${elapsedRealtime() - startTime} ms")
-            val rule = firewall(connInfo, domain, anyRealIpBlocked, isSplApp, rinr)
+            val rule = firewall(connInfo, domain, anyRealIpBlocked, isSplApp, rinr, forUpstreamAnswer = true)
             val blocked = FirewallRuleset.ground(rule)
             if (blocked) {
                 logd("onUpstreamAnswer: blocked by firewall, rule: $rule, connInfo: $connInfo, ipcsv: $ipcsv, time: ${elapsedRealtime() - startTime} ms")
