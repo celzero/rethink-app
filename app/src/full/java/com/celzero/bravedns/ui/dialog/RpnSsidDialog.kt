@@ -34,7 +34,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.SsidAdapter
 import com.celzero.bravedns.data.SsidItem
-import com.celzero.bravedns.databinding.DialogCountrySsidPremiumBinding
+import com.celzero.bravedns.databinding.DialogRpnSsidBinding
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -42,7 +42,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 /**
  * SSID Dialog for Country-based VPN configurations
  */
-class CountrySsidDialog(
+class RpnSsidDialog(
     private val activity: Activity,
     private val themeId: Int,
     private val countryCode: String,
@@ -51,19 +51,19 @@ class CountrySsidDialog(
     private val onSave: (String) -> Unit
 ) : Dialog(activity, themeId) {
 
-    private lateinit var b: DialogCountrySsidPremiumBinding
+    private lateinit var b: DialogRpnSsidBinding
     private lateinit var ssidAdapter: SsidAdapter
     private val ssidItems = mutableListOf<SsidItem>()
 
     companion object {
-        private const val TAG = "CountrySsidDialog"
+        private const val TAG = "RpnSsidDialog"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
 
-        b = DialogCountrySsidPremiumBinding.inflate(layoutInflater)
+        b = DialogRpnSsidBinding.inflate(layoutInflater)
         setContentView(b.root)
         setCancelable(false)
         setupDialog()
@@ -216,7 +216,7 @@ class CountrySsidDialog(
             b.addSsidBtn.isClickable = isNotEmpty
 
             if (isNotEmpty) {
-                b.addSsidBtn.setTextColor(UIUtils.fetchColor(context, R.attr.accentGood))
+                b.addSsidBtn.setTextColor(UIUtils.fetchColor(context, R.attr.primaryTextColor))
             } else {
                 b.addSsidBtn.setTextColor(UIUtils.fetchColor(context, R.attr.primaryLightColorText))
             }
@@ -235,7 +235,7 @@ class CountrySsidDialog(
         val ssidName = b.ssidEditText.text.toString().trim()
         if (ssidName.isEmpty()) {
             Utilities.showToastUiCentered(
-                context,
+                activity,
                 context.getString(R.string.wg_ssid_empty_error),
                 Toast.LENGTH_SHORT
             )
@@ -245,7 +245,7 @@ class CountrySsidDialog(
         // Check for duplicate
         if (ssidItems.any { it.name.equals(ssidName, ignoreCase = true) }) {
             Utilities.showToastUiCentered(
-                context,
+                activity,
                 context.getString(R.string.wg_ssid_duplicate_error),
                 Toast.LENGTH_SHORT
             )

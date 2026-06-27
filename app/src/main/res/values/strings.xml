@@ -791,6 +791,8 @@
     <string name="dc_block_heading" translatable="true">Rules</string>
     <string name="dc_other_dns_heading" translatable="true">Type</string>
 
+    <string name="dc_global_heading" translatable="true">Global</string>
+
     <string name="dc_custom_dns_radio" translatable="true">Other DNS</string>
     <string name="dc_rethink_dns_radio" translatable="true">Rethink DNS</string>
 
@@ -1185,6 +1187,11 @@
     <string name="rules_load_failure_desc" translatable="true">No firewall rules found</string>
     <string name="rules_load_failure_reload" translatable="true">reload</string>
 
+    <string name="db_corruption_notif_title" translatable="false">Database Error</string>
+    <string name="db_corruption_notif_desc" translatable="false">The app database appears to be corrupted. Rebuilding the database will restore functionality but may reset some app settings to default.</string>
+    <string name="db_corruption_action_clear" translatable="false">Clear &amp; Rebuild</string>
+    <string name="db_corruption_action_dismiss" translatable="false">Dismiss</string>
+
     <string name="network_log_app_name_unknown" translatable="true">Unknown</string>
     <string name="network_log_app_name_unnamed" translatable="true">Unnamed (%1$s)</string>
 
@@ -1340,6 +1347,7 @@
     <string name="build__flavor_website" translatable="true">website</string>
     <string name="build__flavor_play_store" translatable="true">play</string>
     <string name="build__flavor_fdroid" translatable="true">fdroid</string>
+    <string name="build_flavor_website_degoogled" translatable="true">website-degoogled</string>
 
     <!-- custom domain -->
     <string name="cd_toast_deleted" translatable="true">Domain removed from custom list</string>
@@ -2490,7 +2498,7 @@
     <string name="fs_configure_logs_desc" translatable="true">Review DNS queries and connection logs</string>
 
     <!-- DNS bypass mode bottom sheet -->
-    <string name="bfdm_heading" translatable="false">DNS to bypass</string>
+    <string name="bfdm_heading" translatable="false">DNS for bypass</string>
     <string name="bfdm_desc" translatable="false">Select the DNS to use for trusted and bypassed apps and domains</string>
     <string name="bfdm_option_fallback_label" translatable="false">Use fallback DNS</string>
     <string name="bfdm_option_fallback_desc" translatable="false">Use the fallback DNS for trusted and bypassed connections</string>

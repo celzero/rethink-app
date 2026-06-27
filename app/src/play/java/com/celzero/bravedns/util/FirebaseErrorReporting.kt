@@ -37,10 +37,6 @@ object FirebaseErrorReporting : KoinComponent {
      * Initialize Firebase Crashlytics if available and enabled
      */
     fun initialize() {
-        if (!isAvailable()) {
-            Logger.w(LOG_FIREBASE, "crashlytics not available in this build variant")
-            return
-        }
         if (!persistentState.firebaseErrorReportingEnabled) {
             Logger.i(LOG_FIREBASE, "crashlytics disabled in settings")
             return
@@ -84,21 +80,10 @@ object FirebaseErrorReporting : KoinComponent {
     }
 
     /**
-     * Check if Firebase Crashlytics is available in current build variant
-     */
-    fun isAvailable(): Boolean {
-        return try {
-            FirebaseCrashlytics.getInstance() != null
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-    /**
      * Log a custom message to Firebase Crashlytics
      */
     fun log(message: String) {
-        if (!isAvailable() || !persistentState.firebaseErrorReportingEnabled) return
+        if (!persistentState.firebaseErrorReportingEnabled) return
 
         try {
             val crashlytics = FirebaseCrashlytics.getInstance()
@@ -112,7 +97,7 @@ object FirebaseErrorReporting : KoinComponent {
      * Record a non-fatal exception to Firebase Crashlytics
      */
     fun recordException(throwable: Throwable) {
-        if (!isAvailable() || !persistentState.firebaseErrorReportingEnabled) return
+        if (!persistentState.firebaseErrorReportingEnabled) return
 
         try {
             val crashlytics = FirebaseCrashlytics.getInstance()
@@ -126,7 +111,7 @@ object FirebaseErrorReporting : KoinComponent {
      * Set user ID for Firebase Crashlytics
      */
     fun setUserId(userId: String) {
-        if (!isAvailable() || !persistentState.firebaseErrorReportingEnabled) return
+        if (!persistentState.firebaseErrorReportingEnabled) return
 
         try {
             val crashlytics = FirebaseCrashlytics.getInstance()
@@ -140,7 +125,7 @@ object FirebaseErrorReporting : KoinComponent {
      * Set custom key-value pairs for Firebase Crashlytics
      */
     fun setCustomKey(key: String, value: String) {
-        if (!isAvailable() || !persistentState.firebaseErrorReportingEnabled) return
+        if (!persistentState.firebaseErrorReportingEnabled) return
 
         try {
             val crashlytics = FirebaseCrashlytics.getInstance()

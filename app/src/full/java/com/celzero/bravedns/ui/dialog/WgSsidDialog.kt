@@ -66,6 +66,7 @@ class WgSsidDialog(
         )
 
         window?.setGravity(Gravity.CENTER)
+        window?.setBackgroundDrawableResource(android.R.color.transparent)
         ViewCompat.setOnApplyWindowInsetsListener(b.root) { view, insets ->
             val sysInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(0, sysInsets.top, 0, sysInsets.bottom)
@@ -127,6 +128,7 @@ class WgSsidDialog(
         ssidItems.clear()
         ssidItems.addAll(parsedSsids)
         ssidAdapter.notifyDataSetChanged()
+        updateEmptyState()
     }
 
     private fun setupClickListeners() {
@@ -199,26 +201,24 @@ class WgSsidDialog(
         if (ssidName.isNullOrBlank()) {
             Utilities.showToastUiCentered(
                 activity,
+                activity.getString(R.string.wg_ssid_empty_error),
+                Toast.LENGTH_SHORT
+            )
+            return
+        }
+
+        if (!isValidSsidName(ssidName)) {
+            Utilities.showToastUiCentered(
+                activity,
                 activity.getString(R.string.wg_ssid_invalid_error, activity.getString(R.string.lbl_ssids)),
                 Toast.LENGTH_SHORT
             )
             return
         }
 
-        // Validate SSID name
-        if (!isValidSsidName(ssidName)) {
-            Utilities.showToastUiCentered(
-                activity,
-                activity.getString(R.string.config_add_success_toast),
-                Toast.LENGTH_SHORT
-            )
-            return
-        }
-
-        // Determine the selected type based on both radio groups
         val isEqual = b.radioEqual.isChecked
         val isExact = b.radioExact.isChecked
-        
+
         val selectedType = when {
             isEqual && isExact -> SsidItem.SsidType.EQUAL_EXACT
             isEqual && !isExact -> SsidItem.SsidType.EQUAL_WILDCARD
@@ -226,35 +226,26 @@ class WgSsidDialog(
             else -> SsidItem.SsidType.NOTEQUAL_WILDCARD
         }
 
-        val newSsidItem = SsidItem(ssidName, selectedType)
-
-        // Check if same name and type already exists
-        val existingWithSameType = ssidItems.find { 
-            it.name.equals(ssidName, ignoreCase = true) && it.type == selectedType 
-        }
-        
-        if (existingWithSameType != null) {
-            // Same name and type already exists, just clear input
+        if (ssidAdapter.getSsidItems().any {
+            it.name.equals(ssidName, ignoreCase = true) && it.type == selectedType
+        }) {
             b.ssidEditText.text?.clear()
             resetToDefaultSelection()
             return
         }
 
-        // Check if same name exists with different type
-        val existingWithDifferentType = ssidItems.find { 
-            it.name.equals(ssidName, ignoreCase = true) && it.type != selectedType 
+        val existingWithDifferentType = ssidAdapter.getSsidItems().find {
+            it.name.equals(ssidName, ignoreCase = true) && it.type != selectedType
         }
-        
+
         if (existingWithDifferentType != null) {
-            // Remove the existing one and add the new one (update)
             ssidAdapter.removeSsidItem(existingWithDifferentType)
         }
 
-        ssidAdapter.addSsidItem(newSsidItem)
+        ssidAdapter.addSsidItem(SsidItem(ssidName, selectedType))
         b.ssidEditText.text?.clear()
-
-        // Reset to default selection
         resetToDefaultSelection()
+        updateEmptyState()
     }
 
     private fun resetToDefaultSelection() {
@@ -270,18 +261,29 @@ class WgSsidDialog(
 
     private fun showDeleteConfirmation(ssidItem: SsidItem) {
         val builder = MaterialAlertDialogBuilder(activity, R.style.App_Dialog_NoDim)
-        builder.setTitle(activity.getString(R.string.lbl_delete))
+        builder.setTitle(activity.getString(R.string.wg_ssid_delete_title))
         builder.setMessage(
             activity.getString(R.string.two_argument_space, activity.getString(R.string.lbl_delete), ssidItem.name)
         )
         builder.setCancelable(true)
         builder.setPositiveButton(activity.getString(R.string.lbl_delete)) { _, _ ->
             ssidAdapter.removeSsidItem(ssidItem)
+            updateEmptyState()
         }
         builder.setNegativeButton(activity.getString(R.string.lbl_cancel)) { _, _ ->
             // no-op
         }
         builder.create().show()
+    }
+
+    private fun updateEmptyState() {
+        if (ssidAdapter.getSsidItems().isEmpty()) {
+            b.emptyStateView.visibility = android.view.View.VISIBLE
+            b.ssidRecyclerView.visibility = android.view.View.GONE
+        } else {
+            b.emptyStateView.visibility = android.view.View.GONE
+            b.ssidRecyclerView.visibility = android.view.View.VISIBLE
+        }
     }
 
     private fun saveSsids() {

@@ -22,6 +22,7 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.UIUtils.getAccentColor
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
+import com.celzero.bravedns.util.Utilities.isWebsiteDegoogledFlavour
 import com.celzero.firestack.backend.LogConsumer
 import com.celzero.firestack.intra.Console
 import com.celzero.firestack.intra.Intra
@@ -86,7 +87,9 @@ class GoReportingHandler private constructor(private val scope: CoroutineScope, 
                 // disable crash logging for now
                 if (false) Logger.crash(LOG_GO_LOGGER, msg) // write to in-mem db
                 if (!isFdroidFlavour()) CrashReporter.recordGoCrash(msg)
-                val token = if (isFdroidFlavour()) "fdroid" else persistentState.firebaseUserToken
+                val token = if (isWebsiteDegoogledFlavour()) "website-degoogled"
+                            else if (isFdroidFlavour()) "fdroid"
+                            else persistentState.firebaseUserToken
                 EnhancedBugReport.writeLogsToFile(ctx, token, msg)
             } else if (l.user()) {
                 showNwEngineNotification(msg)

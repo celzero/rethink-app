@@ -90,6 +90,7 @@ import com.celzero.bravedns.util.Utilities.getRandomString
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
+import com.celzero.bravedns.util.Utilities.isWebsiteDegoogledFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.disableFrostTemporarily
 import com.celzero.bravedns.util.restoreFrost
@@ -329,6 +330,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun getDownloadSource(): String {
+        if (isWebsiteDegoogledFlavour()) return getString(R.string.build_flavor_website_degoogled)
+
         if (isFdroidFlavour()) return getString(R.string.build__flavor_fdroid)
 
         if (isPlayStoreFlavour()) return getString(R.string.build__flavor_play_store)

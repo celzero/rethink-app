@@ -126,7 +126,7 @@ object EnhancedBugReport : KoinComponent {
             val zipFile = File(context.filesDir, TOMBSTONE_ZIP_FILE_NAME)
             val folder = tombstoneFolder(context.filesDir) ?: return
             val files = folder.listFiles { f ->
-                f.isFile && f.length() > 0          // skip empty files
+                f.isFile() && f.length() > 0L
             } ?: return
 
             Log.d(LOG_TAG_BUG_REPORT, "zipping ${files.size} non-empty tombstone file(s)")
@@ -159,7 +159,7 @@ object EnhancedBugReport : KoinComponent {
     fun getTombstoneZipFile(context: Context): File? {
         return try {
             val f = File(context.filesDir, TOMBSTONE_ZIP_FILE_NAME)
-            if (f.exists() && (f.length() > 0 && f.length() != 13L && f.length() != 15L)) f else null
+            if (f.exists() && f.length() > 0) f else null
         } catch (e: Exception) {
             Log.e(LOG_TAG_BUG_REPORT, "err getting zip: ${e.message}")
             null
@@ -190,7 +190,7 @@ object EnhancedBugReport : KoinComponent {
 
         // delete all the empty files (but never touch active-session files even if empty)
         allFiles
-            .filter { (it.length() == 0L || it.length() == 13L || it.length() == 15L) && !activeSessionFileNames.contains(it.name) }
+            .filter { it.length() == 0L && !activeSessionFileNames.contains(it.name) }
             .forEach { empty ->
                 val deleted = empty.delete()
                 Log.d(LOG_TAG_BUG_REPORT, "deleted empty tombstone: ${empty.name}, ok=$deleted")
@@ -215,8 +215,7 @@ object EnhancedBugReport : KoinComponent {
 
         if (previousSessionFiles.isEmpty()) return
 
-        val firebaseEnabled = FirebaseErrorReporting.isAvailable() &&
-            persistentState.firebaseErrorReportingEnabled
+        val firebaseEnabled = persistentState.firebaseErrorReportingEnabled
 
         if (firebaseEnabled) {
             reportFilesToFirebase(previousSessionFiles)
@@ -321,12 +320,6 @@ object EnhancedBugReport : KoinComponent {
                 else -> "CrashLog"
             }
             Logger.d(LOG_TAG_BUG_REPORT, "err-rpting: sending $type ${file.name} (${content.length} chars)")
-            if (content.length == 13 || content.length == 15) { // "writeLine("Init GoLog->")"
-                // no need to report this content, just send true so that this file can get
-                // deleted
-                Logger.vv(LOG_TAG_BUG_REPORT, "err-rpting: skipping $type ${file.name} (${content.length} chars)")
-                return true
-            }
             // add 2 kb in the exception, rest to be added in corresponding log calls
             val messagePreview = content.take(2 * 1024)
             val ex = RuntimeException("[$type] ${file.name}\n$messagePreview")

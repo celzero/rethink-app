@@ -1412,7 +1412,7 @@ class GoVpnAdapter : KoinComponent {
                 )
                 val stats = getProxyStatusById(id).first
                 if (stats == null || stats == Backend.TNT) {
-                    Logger.w(LOG_TAG_VPN, "$TAG proxy stats for $id is null or tnt, $stats, re-adding")
+                    Logger.w(LOG_TAG_VPN, "$TAG proxy stats for $id is null or tnt, $stats, re-adding? $avoidReaddingProxies")
                     // there are cases where the proxy needs to be re-added, so pingOrReAddProxy
                     // case: some of the wg proxies are added to tunnel but erring out, so
                     // re-adding those proxies seems working, work around for now until the
@@ -2417,8 +2417,9 @@ class GoVpnAdapter : KoinComponent {
     suspend fun onLowMemory() {
         val limitBytes: Long = persistentState.goMaxMemory
         Intra.lowMem(limitBytes)
-        logEvent(Severity.MEDIUM, "low memory", "set memory limit to ${limitBytes/(1024 * 1024)} MB")
-        Logger.i(LOG_TAG_VPN, "$TAG low memory, called Intra.lowMem()")
+        val limitMb = {limitBytes/(1024 * 1024)}
+        logEvent(Severity.MEDIUM, "low memory", "set memory limit to $limitMb MB")
+        Logger.i(LOG_TAG_VPN, "$TAG set Intra.lowMem() limit to $limitMb MB")
     }
 
     suspend fun setDialStrategy(

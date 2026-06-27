@@ -93,6 +93,13 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
 
                 modifyAppFirewallSettings(context, uid, FirewallManager.ConnectionStatus.BOTH)
             }
+            Constants.NOTIF_ACTION_DB_CORRUPTED_CLEAR -> {
+                manager.cancel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, RefreshDatabase.NOTIF_ID_DB_CORRUPTION)
+                io { rdb.clearCoreTablesAndRebuild() }
+            }
+            Constants.NOTIF_ACTION_DB_CORRUPTED_DISMISS -> {
+                manager.cancel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, RefreshDatabase.NOTIF_ID_DB_CORRUPTION)
+            }
         }
     }
 

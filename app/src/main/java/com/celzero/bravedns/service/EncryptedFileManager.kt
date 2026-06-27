@@ -25,7 +25,6 @@ import androidx.security.crypto.MasterKey
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
-import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
@@ -207,28 +206,6 @@ object EncryptedFileManager : KoinComponent {
             }
             throw handleCriticalException(e, "Read file", file.absolutePath)
         }
-    }
-
-    /**
-     * Writes WireGuard config to encrypted file.
-     *
-     * @throws EncryptionException for any encryption failures
-     */
-    @Throws(EncryptionException::class)
-    fun writeWireguardConfig(ctx: Context, cfg: String, fileName: String) {
-        val dir =
-            File(
-                ctx.filesDir.canonicalPath +
-                    File.separator +
-                    WIREGUARD_FOLDER_NAME +
-                    File.separator
-            )
-        if (!dir.exists()) {
-            dir.mkdirs()
-        }
-        val fileToWrite = File(dir, fileName)
-        val bytes = cfg.toByteArray(StandardCharsets.UTF_8)
-        write(ctx, bytes, fileToWrite)
     }
 
     /**

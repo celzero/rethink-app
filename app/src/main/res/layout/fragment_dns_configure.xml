@@ -28,7 +28,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@id/dc_refresh"
                 android:padding="5dp"
-                android:text="@string/dc_other_dns_heading"
+                android:text="@string/dc_global_heading"
                 android:textColor="?attr/colorPrimary" />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -56,20 +56,6 @@
                 android:orientation="vertical"
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp">
-
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/wireguard_rb"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:enabled="false"
-                    android:minHeight="48dp"
-                    android:padding="10dp"
-                    android:text="@string/lbl_wireguard"
-                    android:visibility="gone" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"

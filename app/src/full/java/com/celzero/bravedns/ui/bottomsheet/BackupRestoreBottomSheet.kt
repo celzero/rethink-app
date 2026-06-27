@@ -137,6 +137,8 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun getDownloadSource(): String {
+        if (Utilities.isWebsiteDegoogledFlavour()) return getString(R.string.build_flavor_website_degoogled)
+
         if (Utilities.isFdroidFlavour()) return getString(R.string.build__flavor_fdroid)
 
         if (Utilities.isPlayStoreFlavour()) return getString(R.string.build__flavor_play_store)

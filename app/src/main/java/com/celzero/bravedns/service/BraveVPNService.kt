@@ -411,20 +411,24 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val startTime = elapsedRealtime()
         val rinr = persistentState.routeRethinkInRethink
         val curnet = underlyingNetworks
+        val exiting = who == Backend.Exit
+        val proxying = ProxyManager.isAnyUserSetProxy(who)
+        var doNotProtect = !exiting
+        val ignoreProxy = true
 
-        logd("bind: who: $who, addr: $addrPort, fd: $fid, rinr? $rinr")
-        if (rinr) {
-            val isRethinkBypassedFromProxy = FirewallManager.getAppInfoByUid(rethinkUid)?.isProxyExcluded ?: false
-            if (!isRethinkBypassedFromProxy) {
-                // let user set proxy proceed to protect & bind, as rethink is not bypassing proxies
-                if (!ProxyManager.isAnyUserSetProxy(who) && who != Backend.Exit) {
+        logd("bind: who: $who, addr: $addrPort, fd: $fid, rinr? $rinr, exit? $exiting, proxying? $proxying")
+        if (doNotProtect && rinr) {
+            if (!ignoreProxy) { // remove this setting when needed
+                val doProxyRethink =
+                    !(FirewallManager.getAppInfoByUid(rethinkUid)?.isProxyExcluded ?: false)
+                if (doProxyRethink) {
+                    // let user set proxy proceed to protect & bind, as rethink is not bypassing proxies
                     // do not proceed if rethink is bypassed and proxyId(who) is not user-set proxy
                     // or Exit, this includes Base or any other go related proxies
-                    Logger.vv(LOG_TAG_VPN, "bind: rinr, bypassed rethink, who: $who, fd: $fid, addr: $addrPort")
-                    Logger.vv(LOG_TAG_VPN, "bindAny: execution time: ${elapsedRealtime() - startTime} ms (rinr skip)")
-                    return
+                    doNotProtect = !proxying
                 }
-            } else if (who != Backend.Exit) {
+            }
+            if (doNotProtect) {
                 // do not proceed if rethink within rethink is enabled and proxyId(who) is not exit
                 Logger.vv(LOG_TAG_VPN, "bind: rinr, within rethink, who: $who, fd: $fid, addr: $addrPort")
                 Logger.vv(LOG_TAG_VPN, "bindAny: execution time: ${elapsedRealtime() - startTime} ms (rinr skip exit)")
@@ -618,19 +622,24 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         }
 
         val rinr = persistentState.routeRethinkInRethink
-        logd("protect: $who, fd: $fd, rinr? $rinr")
-        if (rinr) {
-            val isRethinkBypassedFromProxy = FirewallManager.getAppInfoByUid(rethinkUid)?.isProxyExcluded ?: false
-            if (!isRethinkBypassedFromProxy) {
-                // let user set proxy proceed to protect & bind, as rethink is not bypassing proxies
-                if (!ProxyManager.isAnyUserSetProxy(who) && who != Backend.Exit) {
+        val exiting = who == Backend.Exit
+        val proxying = ProxyManager.isAnyUserSetProxy(who)
+        var doNotProtect = !exiting
+        val ignoreProxy = true
+
+        logd("bind: who: $who, addr: fd: $fd, rinr? $rinr, exit? $exiting, proxying? $proxying")
+        if (doNotProtect && rinr) {
+            if (!ignoreProxy) { // remove this setting when needed
+                val doProxyRethink =
+                    !(FirewallManager.getAppInfoByUid(rethinkUid)?.isProxyExcluded ?: false)
+                if (doProxyRethink) {
+                    // let user set proxy proceed to protect & bind, as rethink is not bypassing proxies
                     // do not proceed if rethink is bypassed and proxyId(who) is not user-set proxy
                     // or Exit, this includes Base or any other go related proxies
-                    Logger.vv(LOG_TAG_VPN, "protect: rinr, bypassed rethink, who: $who, fd: $fd")
-                    Logger.vv(LOG_TAG_VPN, "protect (who): execution time: ${elapsedRealtime() - startTime} ms (rinr skip)")
-                    return@go2kt
+                    doNotProtect = !proxying
                 }
-            } else if (who != Backend.Exit) {
+            }
+            if (doNotProtect) {
                 // do not proceed if rethink within rethink is enabled and proxyId(who) is not exit
                 Logger.vv(LOG_TAG_VPN, "protect: rinr, within rethink, who: $who, fd: $fd")
                 Logger.vv(LOG_TAG_VPN, "protect (who): execution time: ${elapsedRealtime() - startTime} ms (rinr skip exit)")
@@ -669,10 +678,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         domains: String?,
         anyRealIpBlocked: Boolean = false,
         isSplApp: Boolean,
-        rinr: Boolean
+        rinr: Boolean,
+        forUpstreamAnswer: Boolean = false
     ): FirewallRuleset {
         val startTime = elapsedRealtime()
         val connId = connInfo.connId
+        val skipUnknownAppRule = forUpstreamAnswer && !persistentState.splitDns
         val res = try {
             if (connInfo.uid == rethinkUid && !rinr) {
                 logd("firewall($connId): rethink uid, $rethinkUid, not processing firewall rules")
@@ -689,7 +700,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 return FirewallRuleset.RULE9B
             }
 
-            if (unknownAppBlocked(uid)) {
+            if (unknownAppBlocked(uid) && !skipUnknownAppRule) {
                 logd("firewall($connId): unknown app blocked, $uid")
                 return FirewallRuleset.RULE5
             }
@@ -795,7 +806,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     return FirewallRuleset.RULE2G
                 }
 
-                if (dnsProxied(connInfo.destPort)) {
+                if (dnsProxied(connInfo.destPort) && !forUpstreamAnswer) {
                     logd("firewall($connId): bypass universal, dns proxied, $uid")
                     return FirewallRuleset.RULE9
                 } else {
@@ -875,7 +886,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 return FirewallRuleset.RULE11
             }
 
-            if (httpBlocked(connInfo.destPort)) {
+            // no need to check for http for dns queries
+            if (!forUpstreamAnswer && httpBlocked(connInfo.destPort)) {
                 logd("firewall($connId): http blocked, $uid")
                 return FirewallRuleset.RULE10
             }
@@ -886,7 +898,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 return FirewallRuleset.RULE3
             }
 
-            if (udpBlocked(uid, connInfo.protocol, connInfo.destPort)) {
+            // no need to check for udp block for dns queries
+            if (!forUpstreamAnswer && udpBlocked(uid, connInfo.protocol, connInfo.destPort)) {
                 logd("firewall($connId): udp blocked, $uid")
                 return FirewallRuleset.RULE6
             }
@@ -896,14 +909,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 return FirewallRuleset.RULE4
             }
 
-            // if all packets on port 53 needs to be trapped
-            if (dnsProxied(connInfo.destPort)) {
+            // if all packets on port 53 needs to be trapped, no need to check for dns queries
+            if (!forUpstreamAnswer && dnsProxied(connInfo.destPort)) {
                 logd("firewall($connId): dns proxied, $uid")
                 return FirewallRuleset.RULE9
             }
 
             // if connInfo.query is empty, then it is not resolved by user set dns
-            if (dnsBypassed(connInfo.query)) {
+            // not true in case of dns queries, skip this check
+            if (!forUpstreamAnswer && dnsBypassed(connInfo.query)) {
                 logd("firewall($connId): dns bypassed, $uid")
                 return FirewallRuleset.RULE7
             }
@@ -4904,7 +4918,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // decision based on qname, dest ip and uid.
             val srcIp = ""
             val srcPort = 0
-            val dstPort = 53
+            val dstPort = 0
             val protocol = KnownPorts.DNS_PORT
             val blocklists = smm.blocklists
             val connId = "" // no need of connId as only firewall decision is taken here
@@ -4934,7 +4948,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 connType
             )
             logd("onUpstreamAnswer: connInfo: $connInfo, domain: $domain, anyRealIpBlocked: $anyRealIpBlocked, isSplApp: $isSplApp, rinr: $rinr, time: ${elapsedRealtime() - startTime} ms")
-            val rule = firewall(connInfo, domain, anyRealIpBlocked, isSplApp, rinr)
+            val rule = firewall(connInfo, domain, anyRealIpBlocked, isSplApp, rinr, forUpstreamAnswer = true)
             val blocked = FirewallRuleset.ground(rule)
             if (blocked) {
                 logd("onUpstreamAnswer: blocked by firewall, rule: $rule, connInfo: $connInfo, ipcsv: $ipcsv, time: ${elapsedRealtime() - startTime} ms")

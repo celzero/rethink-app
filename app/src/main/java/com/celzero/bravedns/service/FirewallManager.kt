@@ -447,6 +447,16 @@ object FirewallManager : KoinComponent {
         db.deletePackage(uid, packageName)
     }
 
+    suspend fun clearAllApps() {
+        mutex.withLock { appInfos.clear() }
+        try {
+            db.deleteAll()
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_FIREWALL, "clearAllApps failed", e)
+        }
+        informObservers()
+    }
+
     suspend fun getNonFirewalledAppsPackageNames(): List<AppInfo> {
         mutex.withLock {
             return appInfos.values().filter { it.connectionStatus == ConnectionStatus.ALLOW.id }
@@ -701,7 +711,24 @@ object FirewallManager : KoinComponent {
             }
         }
 
-        val dbok = db.updateUid(oldUid, newUid, pkg)
+        val dbok = try {
+            db.updateUid(oldUid, newUid, pkg)
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_FIREWALL, "updateUid failed for ($oldUid, $pkg) -> $newUid; attempting delete+insert fallback", e)
+            try {
+                val ai = getAppInfoByUid(newUid)
+                if (ai != null) {
+                    db.deletePackage(oldUid, pkg)
+                    db.insert(ai)
+                    1
+                } else {
+                    0
+                }
+            } catch (e2: Exception) {
+                Logger.w(LOG_TAG_FIREWALL, "updateUid fallback also failed", e2)
+                0
+            }
+        }
         Logger.d(LOG_TAG_FIREWALL, "update: $pkg; $oldUid -> $newUid; c? $cacheok; db? $dbok")
         informObservers()
     }

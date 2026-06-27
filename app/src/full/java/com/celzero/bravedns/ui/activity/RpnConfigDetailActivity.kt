@@ -59,7 +59,7 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_RPN
 import com.celzero.bravedns.ui.activity.RpnConfigDetailActivity.Companion.STATS_POLL_MS
-import com.celzero.bravedns.ui.dialog.CountrySsidDialog
+import com.celzero.bravedns.ui.dialog.RpnSsidDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.SnackbarHelper
@@ -1136,7 +1136,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         if (configKey.isBlank() || countryConfig == null) return
         var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         if (Themes.isFrostTheme(themeId)) themeId = R.style.App_Dialog_NoDim
-        val dlg = CountrySsidDialog(
+        val dlg = RpnSsidDialog(
             this, themeId, configKey,
             countryConfig?.countryName ?: configKey,
             countryConfig?.ssids.orEmpty()

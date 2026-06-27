@@ -310,7 +310,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
                 null
             }
             uiCtx {
-                if (dnsStatusId != null && isDnsError(dnsStatusId)) {
+                if (dnsStatusId != null && isDnsError(dnsStatusId) && ps != UIUtils.ProxyStatus.TPU) {
                     // check for dns failure cases and update the UI
                     b.statusText.text = getString(R.string.status_failing)
                         .replaceFirstChar(Char::titlecase)

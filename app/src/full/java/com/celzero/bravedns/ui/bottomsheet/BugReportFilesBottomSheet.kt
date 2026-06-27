@@ -168,7 +168,7 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
 
         // bug report zip
         val bugReportZip = File(BugReportZipper.getZipFileName(dir))
-        if (bugReportZip.exists() && bugReportZip.length() > 0) {
+        if (bugReportZip.exists() && bugReportZip.length() != 0L) {
             files.add(
                 BugReportFile(
                     file = bugReportZip,
@@ -182,7 +182,7 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
         // tombstone zip
         if (isAtleastO()) {
             val tombstoneZip = EnhancedBugReport.getTombstoneZipFile(requireContext())
-            if (tombstoneZip != null && tombstoneZip.exists() && tombstoneZip.length() > 0) {
+            if (tombstoneZip != null && tombstoneZip.exists() && tombstoneZip.length() != 0L) {
                 files.add(
                     BugReportFile(
                         file = tombstoneZip,
@@ -198,7 +198,7 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
         val bugReportDir = File(dir, BugReportZipper.BUG_REPORT_DIR_NAME)
         if (bugReportDir.exists() && bugReportDir.isDirectory) {
             bugReportDir.listFiles()?.forEach { file ->
-                if (file.isFile && file.length() > 0) {
+                if (file.isFile && file.length() != 0L) {
                     files.add(
                         BugReportFile(
                             file = file,
@@ -216,7 +216,7 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
             val tombstoneDir = File(dir, EnhancedBugReport.TOMBSTONE_DIR_NAME)
             if (tombstoneDir.exists() && tombstoneDir.isDirectory) {
                 tombstoneDir.listFiles()?.forEach { file ->
-                    if (file.isFile && file.length() > 0) {
+                    if (file.isFile && file.length() != 0L) {
                         files.add(
                             BugReportFile(
                                 file = file,
