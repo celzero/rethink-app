@@ -246,6 +246,20 @@
         android:textSize="@dimen/default_font_text_view"
         android:visibility="gone" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/bs_conn_allow_reason_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="sans-serif-light"
+        android:gravity="center"
+        android:padding="5dp"
+        android:textColor="?attr/primaryLightColorText"
+        android:textIsSelectable="true"
+        android:textSize="@dimen/default_font_text_view"
+        android:visibility="gone" />
+
     <LinearLayout
         android:id="@+id/bs_conn_blocked_rule1_header_ll"
         android:layout_width="match_parent"
