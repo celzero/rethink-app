@@ -1262,6 +1262,7 @@
     <string name="firewall_rule_lockdown_wg" translatable="true">Lockdown Proxy</string>
     <string name="firewall_rule_proxy_error" translatable="true">Proxy Error</string>
     <string name="firewall_rule_temp_allow" translatable="false">Temporary Allow</string>
+    <string name="bsct_allow_reason" translatable="true">Allow reason: %1$s</string>
 
     <string name="firewall_rule_no_rule_desc" translatable="true">No firewall rules matched this connection.</string>
     <string name="firewall_rule_block_app_desc" translatable="true"><![CDATA[A user-set firewall rule blocked this <i>app</i>.<br/><br/> To change go to <i>All Apps</i> tab.]]></string>

@@ -344,6 +344,14 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
             return rule.id == RULE12.id
         }
 
+        // Returns the trust/bypass rule that explains why a connection was allowed (these
+        // take precedence over universal/app block rules), or null when no such rule applied.
+        fun getAllowReason(ruleId: String?): FirewallRuleset? {
+            if (ruleId == null) return null
+            val rule = getFirewallRule(ruleId) ?: return null
+            return if (rule.act == R.integer.allow && isBypassRule(rule)) rule else null
+        }
+
         fun isProxyError(rule: String?): Boolean {
             if (rule == null) return false
 

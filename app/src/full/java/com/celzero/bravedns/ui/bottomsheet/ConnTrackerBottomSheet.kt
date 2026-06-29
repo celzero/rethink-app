@@ -147,6 +147,8 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         updateConnDetailsChip()
         // updates the blocked rules chip
         updateBlockedRulesChip()
+        // shows why an allowed connection bypassed existing block rules, if applicable
+        updateAllowReason()
         // assigns color for the blocked rules chip
         lightenUpChip()
         // updates the summary details
@@ -249,6 +251,21 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                 b.bsConnTrackAppInfo.text = getFirewallRule(rule)?.title?.let { getString(it) }
             }
         }
+    }
+
+    // When a connection is allowed via a trust/bypass rule (e.g. an isolated, trusted or
+    // bypassed app/IP/domain) that takes precedence over universal/app block rules, surface
+    // the specific reason so the allow is not mistaken for a bug. Row stays hidden for
+    // blocked or normally-allowed connections and for any unmapped rule id.
+    private fun updateAllowReason() {
+        val reason = FirewallRuleset.getAllowReason(info?.blockedByRule)
+        if (info?.isBlocked == true || reason == null) {
+            b.bsConnAllowReasonText.visibility = View.GONE
+            return
+        }
+        b.bsConnAllowReasonText.visibility = View.VISIBLE
+        b.bsConnAllowReasonText.text =
+            getString(R.string.bsct_allow_reason, getString(reason.title))
     }
 
     private fun isInvalidProxyDetails(): Boolean {
