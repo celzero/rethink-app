@@ -1286,7 +1286,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val isCellular = cap.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
             curnet.isActiveNetworkCellular = isCellular
         }
-        return curnet.isActiveNetworkMetered
+        return curnet.isActiveNetworkCellular
     }
 
     private fun isAppBlocked(connectionStatus: FirewallManager.ConnectionStatus): Boolean {
