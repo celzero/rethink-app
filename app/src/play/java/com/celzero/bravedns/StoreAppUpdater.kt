@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.IntentSender
 import android.util.Log
 import com.celzero.bravedns.service.AppUpdater
+import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
@@ -61,8 +62,12 @@ class StoreAppUpdater(context: Context) : AppUpdater {
                     AppUpdateType.FLEXIBLE)) {
                 Log.i(LOG_TAG, "Update available, starting flexible update")
                 try {
-                    appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.FLEXIBLE,
-                                                              activity, APP_UPDATE_REQUEST_CODE)
+                    appUpdateManager.startUpdateFlowForResult(
+                        appUpdateInfo,
+                        activity,
+                        AppUpdateOptions.newBuilder(AppUpdateType.FLEXIBLE).build(),
+                        APP_UPDATE_REQUEST_CODE
+                    )
                 } catch (e: IntentSender.SendIntentException) {
                     unregisterListener(listener)
                     Log.e(LOG_TAG, "SendIntentException: ${e.message} ", e)
@@ -71,8 +76,12 @@ class StoreAppUpdater(context: Context) : AppUpdater {
                     AppUpdateType.IMMEDIATE)) {
                 Log.i(LOG_TAG, "Update available, starting immediate update")
                 try {
-                    appUpdateManager.startUpdateFlowForResult(appUpdateInfo,
-                                                              AppUpdateType.IMMEDIATE, activity, APP_UPDATE_REQUEST_CODE)
+                    appUpdateManager.startUpdateFlowForResult(
+                        appUpdateInfo,
+                        activity,
+                        AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build(),
+                        APP_UPDATE_REQUEST_CODE
+                    )
                 } catch (e: IntentSender.SendIntentException) {
                     unregisterListener(listener)
                     Log.e(LOG_TAG, "SendIntentException: ${e.message} ", e)

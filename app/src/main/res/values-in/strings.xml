@@ -13,7 +13,7 @@
     <string name="settings_orbot_heading">Setel Orbot</string>
     <string name="always_on_dialog_positive">Berhenti</string>
     <string name="search_firewall_all_apps"><font size="12">Cari aplikasi berdasarkan uid, nama</font></string>
-    <string name="settings_vpn_heading">vpn</string>
+    <string name="settings_vpn_heading">VPN</string>
     <string name="orbot_stop_dialog_negative">Hentikan Orbot</string>
     <string name="settings_orbot_header">Orbot\t❯</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">dns pribadi telah aktif</string>
@@ -134,7 +134,7 @@
     <string name="about_settings_vpn_profile">Profil VPN</string>
     <string name="hsf_vpn_dialog_header">Perhatian!</string>
     <string name="firewall_mode_info_title">Firewall</string>
-    <string name="rules_load_failure_reload">muat ulang</string>
+    <string name="rules_load_failure_reload">Muat ulang</string>
     <string name="pause_desc">Catatan: %1$s aplikasi yang diblokir akan terus diblokir.</string>
     <string name="hsf_whats_new_remove_text">Menutup…</string>
     <string name="cd_dns_crypt_name">DNSCrypt %1$s</string>
@@ -171,14 +171,14 @@
     <string name="firewall_rule_device_lock">Perangkat Terkunci</string>
     <string name="firewall_rule_no_rule_desc">Tidak ada aturan firewall sesuai koneksi ini.</string>
     <string name="new_app_notification_action_deny">Tetap memblok</string>
-    <string name="about_web">tautan</string>
+    <string name="about_web">Tautan</string>
     <string name="about_whats_new">Yang baru di versi %1$s</string>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name" translatable="false">Re-Rethink</string>
     <string name="unicode_question_sign">❔</string>
     <string name="fav_icon">ikon_fav</string>
     <string name="firewall_rule_unknown">Sumber Tidak Diketahui</string>
     <string name="category_name_installed">Aplikasi yang Terpasang</string>
-    <string name="about_app">aplikasi</string>
+    <string name="about_app">Aplikasi</string>
     <string name="about_mail_to">hello@celzero.com</string>
     <string name="about_version_install_source">v%1$s (%2$s)</string>
     <string name="apps_icon_content_desc">Ikon Aplikasi</string>
@@ -195,18 +195,18 @@
     <string name="hybrid_mode_info_title">DNS + Firewall</string>
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="new_app_notification_action_toast_deny">Koneksi jaringan app diabaikan</string>
-    <string name="dc_other_dns_heading">tipe</string>
+    <string name="dc_other_dns_heading">Tipe</string>
     <string name="about_mail_bugreport_text">Kirimkan email ke : hello@celzero.com</string>
     <string name="cd_custom_doh_url_name_default">DoH</string>
     <string name="unicode_warning_sign">⚠</string>
     <string name="new_app_bulk_notification_title">Perhatian</string>
-    <string name="about_settings">sistem</string>
+    <string name="about_settings">Sistem</string>
     <string name="about_github_link">https://github.com/celzero/rethink-app</string>
     <string name="about_website_link">https://www.rethinkdns.com/</string>
     <string name="settings_protocol_translation_dns_inactive">Beralih ke mode DNS/DNS+Firewall untuk mengaktifkan pengaturan ini</string>
     <string name="about_docs_link">https://docs.rethinkdns.com/</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">Terhubung dengan RethinkDNS dan Firewall</string>
-    <string name="dns_explanation_dns_connected">Terhubung dengan RethinkDNS</string>
+    <string name="dns_explanation_dns_connected">Terhubung dengan Re-RethinkDNS</string>
     <string name="dns_explanation_firewall_connected">Terhubung dengan Firewall</string>
     <string name="new_app_bulk_notification_content">Rethink memblokir %1$s aplikasi baru. Ketuk untuk melihat atau mengubah.</string>
     <string name="ci_dialog_desc">Izinkan (pintas/bypass) atau blokir alamat IP, subnet IP (dalam rentang tertentu), Port. Contoh: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
@@ -393,7 +393,7 @@
     <string name="dns_proxy_dialog_message_no_app">Alamat IP: %1$s
 \n
 \nNomor port: %2$s</string>
-    <string name="dc_block_heading">aturan-aturan</string>
+    <string name="dc_block_heading">Aturan-aturan</string>
     <string name="settings_http_proxy_error_text4">Koneksi ke host gagal. Coba lagi.</string>
     <string name="new_app_notification_content">Rethink memblokir aplikasi yang baru dipasang, %1$s.</string>
     <string name="firewall_status_whitelisted">Aturan firewall universal dilewati (di-bypass)</string>
@@ -403,7 +403,7 @@
     <string name="app_mode_dns_firewall">DNS dan Firewall (bawaan)</string>
     <string name="settings_socks5_vpn_disabled_error">Mulai Rethink untuk melanjutkan.</string>
     <string name="settings_http_proxy_desc">Meneruskan ke %1$s</string>
-    <string name="about_connect">kontak</string>
+    <string name="about_connect">Kontak</string>
     <string name="cd_dns_proxy_mode_internal">Dalam</string>
     <string name="settings_https_heading">Atur KONEKSI Proksi HTTP(S)</string>
     <string name="settings_http_proxy_toast_success">Proksi HTTP telah diatur</string>
@@ -808,7 +808,7 @@
     <string name="fapps_isolate_block_dialog_title">Mengisolasi aplikasi</string>
     <string name="ci_trust_initial">T</string>
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">IP yang paling banyak terhubung</string>
-    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">domain yang paling banyak terhubung</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">Domain yang paling banyak terhubung</string>
     <string name="settings_locale_heading">Ganti Bahasa</string>
     <string name="settings_biometric_desc">Amankan aplikasi ini menggunakan kunci layar Anda</string>
     <string name="settings_locale_desc">Pilih bahasa pilihan Anda</string>
@@ -822,9 +822,9 @@
     <string name="fapps_info_metered_msg">Izinkan / Blokir pada jaringan terukur (Data Seluler).</string>
     <string name="fapps_bypass_block_dialog_message">Lewati (Bypass) aturan firewall universal untuk aplikasi yang <i>terdaftar</i> \?</string>
     <string name="fapps_info_exclude_msg">Kecualikan dari keduanya, DNS + Firewall.</string>
-    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">aplikasi yang paling banyak diblokir</string>
-    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">aplikasi yang paling banyak diizinkan</string>
-    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">domain yang paling banyak diblokir</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">Aplikasi yang paling banyak diblokir</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">Aplikasi yang paling banyak diizinkan</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">Domain yang paling banyak diblokir</string>
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">IP yang paling banyak diblokir</string>
     <string name="fapps_info_isolate_msg">Blokir semua kecuali IP tepercaya.</string>
     <string name="fapps_unblock_dialog_title">Izinkan aplikasi</string>
@@ -855,7 +855,7 @@
     <string name="lbl_ip_rules" translatable="true">Aturan IP</string>
     <string name="lbl_domain_rules" translatable="true">Aturan Domain</string>
     <string name="bsdl_block_desc" translatable="true">Blokir, percayai <u>domain ini</u></string>
-    <string name="lbl_rules" translatable="true">aturan</string>
+    <string name="lbl_rules" translatable="true">Aturan</string>
     <string name="lbl_configure" translatable="true">Konfigurasikan</string>
     <string name="lbl_logs" translatable="true">catatan</string>
     <string name="bypass_dns_firewall" translatable="true">lewati (bypass) dns &amp; firewall</string>
@@ -1103,7 +1103,7 @@
     <string name="sponser_dialog_usage_msg" translatable="true">Anda telah menggunakan Rethink selama <b>%1$s hari</b>, yang berarti Anda harus mengeluarkan biaya penggunaan sebesar <b>$%2$s</b>. Apakah Anda akan mempertimbangkan untuk mensponsori untuk mempertahankan pengembangannya?</string>
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Gunakan DNS Sistem untuk domain yang tidak didelegasikan</string>
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Gunakan DNS Sistem untuk domain yang tidak didelegasikan seperti <i>.lan</i>, <i>.internal</i>, dll.</string>
-    <string name="dc_filtering_heading" translatable="true">penyaringan</string>
+    <string name="dc_filtering_heading" translatable="true">Penyaringan</string>
     <string name="cd_split_dns_heading" translatable="true">DNS Terpisah (pengujian)</string>
     <string name="cd_split_dns_desc" translatable="true">Meneruskan kueri DNS dari aplikasi yang diproksi ke server DNS proxy.</string>
     <string name="univ_firewall_rule_11" translatable="true">Blokir semua sambungan host lokal</string>
@@ -1144,7 +1144,7 @@
     <string name="adv_set_dial_timeout_desc" translatable="true">Tutup soket TCP dan UDP yang tidak aktif setelah durasi ini.</string>
     <string name="about_terms_of_service" translatable="true">Ketentuan Layanan</string>
     <string name="bypasses_network_restrictions" translatable="true">Pemeriksaan jangkauan melewati semua batasan jaringan. Dalam mode <i>Otomatis</i>, Rethink secara acak menggunakan IP dan nama host yang terhubung sebelumnya.</string>
-    <string name="most_contacted_asn" translatable="true">penyedia yang paling banyak dihubungi</string>
+    <string name="most_contacted_asn" translatable="true">Penyedia yang paling banyak dihubungi</string>
     <string name="adv_tasker_dialog_msg" translatable="true">Masukkan nama paket (dipisahkan koma) yang diizinkan untuk memulai atau menghentikan Rethink.</string>
     <string name="adv_tasker_dialog_instructions" translatable="true">Instruksi:\nTambahan yang diperlukan dalam siaran:\n• Kunci: pengirim\n• Nilai: Nama paket aplikasi pemanggil\n\nContoh: kunci:pengirim nilai:com.termux\n\nTindakan yang didukung:\n• Mulai VPN – com.celzero.bravedns.intent.action.VPN_START\n• Hentikan VPN – com.celzero.bravedns.intent.action.VPN_STOP</string>
     <string name="adv_tasker_dialog_edit_hint" translatable="true">Masukkan nama paket (contoh: net.dinglisch.android.taskerm)</string>
@@ -1189,9 +1189,9 @@
     <string name="wg_setting_use_on_mobile" translatable="true">Hanya seluler</string>
     <string name="wg_setting_use_on_mobile_desc" translatable="true">Gunakan VPN WireGuard ini melalui data seluler.</string>
     <string name="hop_add_remove_title" translatable="true">Tambahkan / Hapus Relay</string>
-    <string name="most_blocked_asn" translatable="true">penyedia yang paling banyak diblokir</string>
+    <string name="most_blocked_asn" translatable="true">Penyedia yang paling banyak diblokir</string>
     <string name="download_ip_info_title" translatable="true">Tampilkan informasi penyedia</string>
-    <string name="top_active_conns" translatable="true">koneksi aktif teratas</string>
+    <string name="top_active_conns" translatable="true">Koneksi aktif teratas</string>
     <string name="wg_mobile_only_hop_err" translatable="true">Mode khusus seluler tidak didukung untuk Relay</string>
     <string name="hop_error_toast_msg_1" translatable="true">Tidak bisa relay, sudah %1$s</string>
     <string name="hop_failure_toast" translatable="true">Kesalahan relay: %1$s -&gt; %2$s</string>

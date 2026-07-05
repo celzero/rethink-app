@@ -33,9 +33,9 @@ abstract class ConsoleLogDatabase : RoomDatabase() {
         }
 
         private val MIGRATION_1_2 = object : androidx.room.migration.Migration(1, 2) {
-            override fun migrate(database: androidx.sqlite.db.SupportSQLiteDatabase) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
                 // set default log level to 3 (INFO)
-                database.execSQL("ALTER TABLE ConsoleLog ADD COLUMN level INTEGER DEFAULT 3")
+                db.execSQL("ALTER TABLE ConsoleLog ADD COLUMN level INTEGER DEFAULT 3")
             }
         }
     }

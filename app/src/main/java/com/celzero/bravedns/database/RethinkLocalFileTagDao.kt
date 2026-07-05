@@ -94,7 +94,8 @@ interface RethinkLocalFileTagDao {
         selected: Set<Int>
     ): PagingSource<Int, RethinkLocalFileTag>
 
-    @Query("Update RethinkLocalFileTag set isSelected = 0") fun clearSelectedTags()
+    @Query("Update RethinkLocalFileTag set isSelected = 0")
+    suspend fun clearSelectedTags()
 
     @Query(
         "select  value, uname, vname, `group`, subg, url as urls, show, entries, pack, level, simpleTagId, isSelected from RethinkLocalFileTag"

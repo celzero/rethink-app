@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name" translatable="false">Re-Rethink</string>
     <string name="title_about">O Rethink</string>
     <string name="title_settings">Ustawienia</string>
     <string name="slide_2_desc">RethinkDNS to najłatwiejszy sposób monitorowania aktywności sieciowej, omijania cenzury Internetu i zapory sieciowej na urządzeniu z Androidem.</string>
@@ -11,7 +11,7 @@
     <string name="status_app_error">błąd aplikacji</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">prywatne dns włączone</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">brak zabezpieczienia</string>
-    <string name="dns_explanation_dns_connected">Połączone z RethinkDNS</string>
+    <string name="dns_explanation_dns_connected">Połączone z Re-RethinkDNS</string>
     <string name="status_protected_with_tor_private_dns">zabezpieczone przez tor &amp; prywatnym dns</string>
     <string name="status_protected_with_socks5">zabezpieczone przez socks proxy</string>
     <string name="status_protected_with_proxy">zabezpieczone przez proxy</string>
@@ -113,10 +113,10 @@
     <string name="dns_crypt_relay_remove_dialog_title">Usunąć DNSCrypt Relay\?</string>
     <string name="dns_crypt_relay_remove_dialog_message">Usuń przekaźnik DNSCrypt z zapisanej konfiguracji.</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s listy blokowania</string>
-    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">najbardziej dozwolone aplikacje</string>
-    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">najczęściej blokowane aplikacje</string>
-    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">domeny, z którymi najczęściej się łączono</string>
-    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">najczęściej blokowane domeny</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">Najbardziej dozwolone aplikacje</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">Najczęściej blokowane aplikacje</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">Domeny, z którymi najczęściej się łączono</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">Najczęściej blokowane domeny</string>
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app">Uruchom Rethink, aby kontynuować</string>
     <string name="ssv_see_more">Pokaż Wszystko</string>
     <string name="app_name_small_case">rethink</string>
@@ -161,7 +161,7 @@
     <string name="download_update_dialog_failure_message" translatable="true">Albo nasze serwery są wyłączone, albo nie można nawiązać połączenia. Spróbuj ponownie za jakiś czas.</string>
     <string name="app_mode_wireguard" translatable="true">VPN</string>
     <string name="info_dialog_copy_toast_msg" translatable="true">Zkopiowano adres IP.</string>
-    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="settings_vpn_heading" translatable="true">VPN</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">Skopiowano URL</string>
     <string name="blocklist_update_check_failure" translatable="true">Coś poszło nie tak. Spróbuj ponownie później!</string>
     <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
@@ -286,9 +286,9 @@
     <string name="hsf_chip_appearance" translatable="true">Temat: %1$s</string>
     <string name="about_docs" translatable="true">Przeczytaj dokumenty</string>
     <string name="about_privacy_policy" translatable="true">Polityka prywatności</string>
-    <string name="about_connect" translatable="true">kontakt</string>
+    <string name="about_connect" translatable="true">Kontakt</string>
     <string name="about_email" translatable="true">Napisz do nas</string>
-    <string name="about_settings" translatable="true">system</string>
+    <string name="about_settings" translatable="true">System</string>
     <string name="about_settings_app_info" translatable="true">Informacje o aplikacji</string>
     <string name="about_settings_vpn_profile" translatable="true">Profil VPN</string>
     <string name="about_settings_notification" translatable="true">Ustawienia powiadomień</string>
@@ -348,7 +348,7 @@
     <string name="firewall_status_excluded" translatable="true">wykluczone z dns i firewalla</string>
     <string name="firewall_status_bypass_dns_firewall" translatable="true">omija reguły DNS i firewalla</string>
     <string name="rules_card_domain_count" translatable="true">%1$s reguła(y) domeny</string>
-    <string name="dc_other_dns_heading" translatable="true">typ</string>
+    <string name="dc_other_dns_heading" translatable="true">Typ</string>
     <string name="dc_check_update_heading" translatable="true">Komunikat o aktualizacji listy bloków</string>
     <string name="about_version" translatable="true">v%1$s</string>
     <string name="error_loading_log_file" translatable="true">Błąd ładowania pliku dziennika</string>
@@ -363,7 +363,7 @@
     <string name="firewall_rule_dns_blocked" translatable="true">DNS zablokowany</string>
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Połączenie zostało dopuszczone, ponieważ aplikacja źródłowa <i/> jest ustawiona na <i>obchodzenie reguł dns i zapory</i>.<br/><br/> Aby to zmienić, przejdź do ekranu <i>App-specific Firewall</i>.</string>
     <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">To połączenie zostało zablokowane, ponieważ domena <i/> jest ustawiona jako zablokowana w regułach domeny uniwersalnej.<br/><br/> Aby zmienić to zachowanie przejdź do zakładki <i>Configure DNS</i>.</string>
-    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">najczęściej kontaktowane adresy IP</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">Najczęściej kontaktowane adresy IP</string>
     <string name="cd_custom_doh_dialog_title" translatable="true">Niestandardowy adres URL serwera</string>
     <string name="cd_dns_proxy_mode_internal" translatable="true">Wewnętrzny</string>
     <string name="cd_dns_proxy_mode_external" translatable="true">Zewnętrzny</string>
@@ -386,7 +386,7 @@
     <string name="fapps_firewall_filter_hint" translatable="true">Wyświetlam wszystkie aplikacje</string>
     <string name="fapps_firewall_filter_desc" translatable="true">Wyświetlanie <u>%1$s</u> %2$s aplikacji</string>
     <string name="rules_load_failure_desc" translatable="true">Nie znaleziono żadnych reguł firewalla</string>
-    <string name="rules_load_failure_reload" translatable="true">przeładuj</string>
+    <string name="rules_load_failure_reload" translatable="true">Przeładuj</string>
     <string name="dns_proxy_toast_parameter" translatable="true">DNS Proxy</string>
     <string name="settings_local_blocklist_dialog_positive" translatable="true">Pobierz</string>
     <string name="settings_local_blocklist_version" translatable="true">Wersja: %1$s</string>
@@ -578,7 +578,7 @@
     <string name="lbbs_redownload" translatable="true">Pobierz ponownie listy blokujące</string>
     <string name="brbs_backup_dialog_message" translatable="true">Wykonuje kopię zapasową ustawień aplikacji, sieci i logów dns do pliku. Spowoduje to ponowne uruchomienie sieci VPN.</string>
     <string name="brbs_restore_dialog_failure_title" translatable="true">Przywracanie nie powiodło się</string>
-    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">większość zablokowanych adresów IP</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">Większość zablokowanych adresów IP</string>
     <string name="settings_pcap_heading" translatable="true">Przechwytywanie pakietów</string>
     <string name="settings_pcap_dialog_option_2" translatable="true">Wyjście do Logcata</string>
     <string name="settings_pcap_dialog_option_3" translatable="true">Wyjście do folderu Pobrane</string>
@@ -590,12 +590,12 @@
     <string name="hsf_packet_capture_chip_text" translatable="true">Przechwytywanie pakietów aktywne</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Przechwytywanie pakietów wyłączone</string>
     <string name="hsf_pause_vpn_failure" translatable="true">Nie można wstrzymać: Rethink nie jest aktywny</string>
-    <string name="dc_block_heading" translatable="true">zasady</string>
-    <string name="dc_rethink_dns_radio" translatable="true">RethinkDNS</string>
+    <string name="dc_block_heading" translatable="true">Zasady</string>
+    <string name="dc_rethink_dns_radio" translatable="true">Re-RethinkDNS</string>
     <string name="dc_dns_leaks_heading" translatable="true">Zapobieganie wyciekom DNS</string>
     <string name="about_bravedns_explantion" translatable="true">RethinkD to najprostszy sposób na monitorowanie aktywności aplikacji, obchodzenie cenzury internetowej i zapory aplikacji na urządzeniu z systemem Android.</string>
     <string name="about_sponsor_link_text" translatable="true">Wesprzyj nas</string>
-    <string name="about_app" translatable="true">aplikacja</string>
+    <string name="about_app" translatable="true">Aplikacja</string>
     <string name="collecting_logs_progress_text" translatable="true">Przechwytywanie…</string>
     <string name="contributors_dialog_title" translatable="true">Autorzy</string>
     <string name="cd_dns_crypt_name_default" translatable="true">DNSCrypt</string>
@@ -782,14 +782,14 @@
     <string name="radio_sky_btn" translatable="true">Niebo</string>
     <string name="rt_filter_hint" translatable="true">Wyświetlanie <u>wszystkich</u> list blokujących</string>
     <string name="settings_theme_dialog_themes_1" translatable="true">Ustawiane przez system</string>
-    <string name="about_web" translatable="true">linki</string>
+    <string name="about_web" translatable="true">Linki</string>
     <string name="cd_dns_crypt_title" translatable="true">resolwery</string>
     <string name="dns_proxy_app" translatable="true">Aplikacja</string>
     <string name="ci_bypass_universal_txt" translatable="true">Obejście uniwersalne</string>
     <string name="ci_no_rules_text" translatable="true">Brak reguł IP lub portów.</string>
     <string name="ci_bypass_universal_initial" translatable="true">BU</string>
     <string name="lbbs_copy" translatable="true">Skopiuj jako adres URL RDNS+</string>
-    <string name="lbl_rules" translatable="true">reguły</string>
+    <string name="lbl_rules" translatable="true">Reguły</string>
     <string name="settings_biometeric_heading" translatable="true">Włącz blokadę aplikacji</string>
     <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">Wył. (domyślnie)</string>
@@ -896,7 +896,7 @@
     <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">Kraje, z którymi najczęściej się kontaktowano</string>
     <string name="cloudflare_dns_desc" translatable="true">Nie blokuje żadnych żądań DNS. Używa punktu końcowego DNS Cloudflare 1.1.1.1.</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">Ustawianie powiadomienia jako trwałego</string>
-    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">najczęściej blokowane kraje</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">Najczęściej blokowane kraje</string>
     <string name="lbl_app_wise" translatable="true">na aplikację</string>
     <string name="status_protected_with_wg" translatable="true">"chroniony za pomocą  wireguard"</string>
     <string name="lbl_public_key" translatable="true">Klucz publiczny</string>

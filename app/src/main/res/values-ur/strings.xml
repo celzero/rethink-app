@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ریتھینک ڈی این ایس</string>
+    <string name="app_name" translatable="false">Re-Rethink</string>
     <string name="title_about">کے بارے میں</string>
     <string name="title_settings">ترتیبات</string>
     <string name="title_statistics">اعدادوشمار</string>

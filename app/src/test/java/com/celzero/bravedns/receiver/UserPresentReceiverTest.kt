@@ -16,23 +16,19 @@
 
 package com.celzero.bravedns.receiver
 
+import android.content.Context
 import android.content.Intent
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
+import android.content.BroadcastReceiver
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
+import org.junit.Assert.*
 
 /**
  * Unit tests for UserPresentReceiver
  * Tests the screen unlock event handling
  */
-@RunWith(RobolectricTestRunner::class)
-@Config(sdk = [28])
 class UserPresentReceiverTest {
 
     private lateinit var receiver: UserPresentReceiver
@@ -44,10 +40,8 @@ class UserPresentReceiverTest {
 
     @Test
     fun `receiver should handle ACTION_USER_PRESENT intent`() {
-        // Test that receiver can handle the ACTION_USER_PRESENT intent
-        val intent = Intent(Intent.ACTION_USER_PRESENT)
-        assertNotNull("Intent with ACTION_USER_PRESENT should be valid", intent.action)
-        assertEquals("Intent action should match", Intent.ACTION_USER_PRESENT, intent.action)
+        // ACTION_USER_PRESENT constant should be stable and usable in routing logic
+        assertEquals("ACTION_USER_PRESENT constant", "android.intent.action.USER_PRESENT", Intent.ACTION_USER_PRESENT)
     }
 
     @Test
@@ -59,16 +53,21 @@ class UserPresentReceiverTest {
     @Test
     fun `receiver class should extend BroadcastReceiver`() {
         // Test that the receiver extends the correct base class
-        assertTrue("UserPresentReceiver should be a BroadcastReceiver", 
-                  receiver is android.content.BroadcastReceiver)
+        assertTrue(
+            "UserPresentReceiver should be a BroadcastReceiver",
+            BroadcastReceiver::class.java.isAssignableFrom(receiver.javaClass)
+        )
     }
 
     @Test
     fun `receiver should handle unknown actions gracefully`() {
-        // Test that receiver can handle unknown actions without crashing
         val unknownAction = "com.example.unknown.action"
-        val intent = Intent(unknownAction)
-        assertNotNull("Intent with unknown action should be valid", intent.action)
+        val intent = mockk<Intent>()
+        val context = mockk<Context>(relaxed = true)
+        every { intent.action } returns unknownAction
+
+        // Unknown actions must not crash the receiver.
+        receiver.onReceive(context, intent)
         assertEquals("Intent action should match", unknownAction, intent.action)
     }
 
@@ -90,26 +89,36 @@ class UserPresentReceiverTest {
 
     @Test
     fun `receiver handles null action gracefully`() {
-        // Test that receiver can handle null action without crashing
-        val intent = Intent()
-        intent.action = null
+        val intent = mockk<Intent>()
+        val context = mockk<Context>(relaxed = true)
+        every { intent.action } returns null
+
+        receiver.onReceive(context, intent)
         assertNull("Intent action should be null", intent.action)
     }
 
     @Test
     fun `receiver handles various action types`() {
-        // Test that receiver can handle different action types
         val testActions = listOf(
-            Intent.ACTION_USER_PRESENT,
             Intent.ACTION_SCREEN_ON,
             Intent.ACTION_SCREEN_OFF,
             "android.intent.action.UNKNOWN"
         )
-        
+
+        val context = mockk<Context>(relaxed = true)
         testActions.forEach { action ->
-            val intent = Intent(action)
+            val intent = mockk<Intent>()
+            every { intent.action } returns action
+
+            receiver.onReceive(context, intent)
             assertEquals("Intent action should match for $action", action, intent.action)
         }
+
+        assertEquals(
+            "ACTION_USER_PRESENT should stay stable",
+            "android.intent.action.USER_PRESENT",
+            Intent.ACTION_USER_PRESENT
+        )
     }
 
     @Test

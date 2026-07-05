@@ -63,7 +63,7 @@
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline." translatable="true">đang chờ</string>
     <string name="status_dns_server_down" translatable="true">máy chủ dns ngừng hoạt động</string>
     <string name="status_protected_with_proxy_private_dns" translatable="true">"đã được bảo vệ bởi proxy &amp;  dns riêng tư"</string>
-    <string name="dns_explanation_dns_connected" translatable="true">Đã kết nối với RethinkDNS</string>
+    <string name="dns_explanation_dns_connected" translatable="true">Đã kết nối với Re-RethinkDNS</string>
     <string name="notification_action_pause_vpn" translatable="true">NGƯNG</string>
     <string name="notification_action_dns_mode" translatable="true">DNS</string>
     <string name="dns_firewall_mode_info_explanation_new" translatable="true">Tất cả những điều trên + bỏ qua kiểm duyệt Internet.</string>
@@ -155,7 +155,7 @@
     <string name="app_mode_firewall" translatable="true">Tường lửa</string>
     <string name="app_mode_dns_firewall" translatable="true">DNS và Tường lửa (mặc định)</string>
     <string name="app_mode_wireguard" translatable="true">VPN</string>
-    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="settings_vpn_heading" translatable="true">VPN</string>
     <string name="info_dialog_copy_toast_msg" translatable="true">Đã sao chép địa chỉ IP.</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">Đã sao chép URL</string>
     <string name="settings_enable_logs" translatable="true">Bật ghi nhật ký trên thiết bị</string>
@@ -263,7 +263,7 @@
     <string name="firewall_status_blocked" translatable="true">bị chặn</string>
     <string name="firewall_status_unknown" translatable="true">không rõ</string>
     <string name="ct_bs_app_info_error" translatable="true">Không tìm thấy thông tin ứng dụng</string>
-    <string name="hs_biometeric_title" translatable="true">Mở khoá RethinkDNS</string>
+    <string name="hs_biometeric_title" translatable="true">Mở khoá Re-RethinkDNS</string>
     <string name="hs_biometeric_desc" translatable="true">Sử dụng xác thực sinh trắc học để mở khóa Rethink</string>
     <string name="hs_biometeric_error" translatable="true">Lỗi xác thực sinh trắc học</string>
     <string name="firewall_card_status_active" translatable="true">ứng dụng %1$s</string>
@@ -289,7 +289,7 @@
     <string name="orbot_bs_status_4" translatable="true">Thiết lập Tor-as-a-Proxy (Orbot) chỉ bằng một cú nhấp.</string>
     <string name="orbot_stop_dialog_message" translatable="true">Rethink đã ngừng chuyển tiếp kết nối tới Orbot, nhưng Orbot có thể đang chạy nền.</string>
     <string name="orbot_stop_dialog_dns_message" translatable="true">Rethink được thiết lập để chuyển tiếp các truy vấn DNS tới Orbot. Thay đổi theo yêu cầu.</string>
-    <string name="orbot_explanation" translatable="true">Orbot là ứng dụng proxy miễn phí hỗ trợ các ứng dụng khác sử dụng Internet <u>an toàn hơn</u>. \nOrbot sử dụng <u>Tor</u> để mã hóa lưu lượng truy cập Internet giúp bạn <u>vượt qua kiểm duyệt</u> và chống lại các hình thức <u>giám sát mạng</u> đe dọa quyền tự do và quyền riêng tư cá nhân. \n<u>TCP Proxy</u>: RethinkDNS chỉ chuyển tiếp các kết nối TCP của tất cả trừ các ứng dụng bị loại trừ tới Orbot. \n<u>Proxy HTTP</u>: RethinkDNS<i>đặt</i> proxy HTTP nhưng không bắt buộc các ứng dụng phải sử dụng nó. Thông thường, các trình duyệt như Chrome và Firefox sử dụng nó. Các ứng dụng sử dụng proxy HTTP(S) sẽ bỏ qua cả quy tắc Tường lửa và DNS.</string>
+    <string name="orbot_explanation" translatable="true">Orbot là ứng dụng proxy miễn phí hỗ trợ các ứng dụng khác sử dụng Internet <u>an toàn hơn</u>. \nOrbot sử dụng <u>Tor</u> để mã hóa lưu lượng truy cập Internet giúp bạn <u>vượt qua kiểm duyệt</u> và chống lại các hình thức <u>giám sát mạng</u> đe dọa quyền tự do và quyền riêng tư cá nhân. \n<u>TCP Proxy</u>: RethinkDNS chỉ chuyển tiếp các kết nối TCP của tất cả trừ các ứng dụng bị loại trừ tới Orbot. \n<u>Proxy HTTP</u>: Re-RethinkDNS<i>đặt</i> proxy HTTP nhưng không bắt buộc các ứng dụng phải sử dụng nó. Thông thường, các trình duyệt như Chrome và Firefox sử dụng nó. Các ứng dụng sử dụng proxy HTTP(S) sẽ bỏ qua cả quy tắc Tường lửa và DNS.</string>
     <string name="settings_orbot_disabled_error" translatable="true">Tắt proxy HTTP(S) và/hoặc SOCKS5 để tiếp tục thiết lập Tor-as-a-proxy.</string>
     <string name="settings_autostart_bootup_desc" translatable="true">Khi bật nguồn thiết bị, khởi động Rethink nếu nó vẫn đang chạy trước khi tắt máy.</string>
     <string name="settings_network_all_networks_desc" translatable="true">Khi được bật, Rethink sẽ sử dụng tất cả các mạng khả dụng để kết nối với Internet. Nếu không, nó sẽ sử dụng bất kỳ mạng nào được Android coi là <i> đang hoạt động</i>.</string>
@@ -309,7 +309,7 @@
     <string name="firewall_status_whitelisted" translatable="true">bỏ qua các quy tắc tường lửa phổ quát</string>
     <string name="hs_biometeric_feature_not_supported" translatable="true">Xác thực sinh trắc học không được hỗ trợ hoặc bị tắt trên thiết bị này</string>
     <string name="firewall_card_text_inactive" translatable="true">Kích hoạt chế độ tường lửa.</string>
-    <string name="lbl_rules" translatable="true">quy tắc</string>
+    <string name="lbl_rules" translatable="true">Quy tắc</string>
     <string name="lbl_configure" translatable="true">Cấu hình</string>
     <string name="bypass_universal" translatable="true">bỏ qua phổ quát</string>
     <string name="bypass_dns_firewall" translatable="true">bỏ qua dns &amp; tường lửa</string>
@@ -343,7 +343,7 @@
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">Kích hoạt RDNS+</string>
     <string name="hsf_whats_new_remove_text" translatable="true">Đang đóng…</string>
     <string name="hsf_blocklist_updating_text" translatable="true">Đang bật…</string>
-    <string name="dc_other_dns_heading" translatable="true">loại</string>
+    <string name="dc_other_dns_heading" translatable="true">Loại</string>
     <string name="dc_custom_block_heading" translatable="true">Quy tắc tên miền</string>
     <string name="about_github" translatable="true">Đóng góp trên GitHub</string>
     <string name="cd_custom_doh_url_name_default" translatable="true">DoH</string>
@@ -406,7 +406,7 @@
     <string name="about_mail_to" translatable="true">hello@celzero.com</string>
     <string name="about_settings_notification" translatable="true">Cài đặt thông báo</string>
     <string name="dc_rethink_dns_radio" translatable="true">Rethink DNS</string>
-    <string name="dc_block_heading" translatable="true">quy tắc</string>
+    <string name="dc_block_heading" translatable="true">Quy tắc</string>
     <string name="dc_entries" translatable="true">%1$s mục »</string>
     <string name="about_app_contributors" translatable="true">Tác giả</string>
     <string name="dc_local_block_desc_1" translatable="true">Chọn từ hơn 195 danh sách chặn. Nhấn vào đây để tải xuống hoặc định cấu hình danh sách chặn.</string>
@@ -422,18 +422,18 @@
     <string name="about_bug_report" translatable="true">Báo cáo lỗi</string>
     <string name="about_bug_no_log_dialog_positive_btn" translatable="true">Gửi email</string>
     <string name="about_faq" translatable="true">Xem câu hỏi thường gặp</string>
-    <string name="about_connect" translatable="true">liên hệ</string>
+    <string name="about_connect" translatable="true">Liên hệ</string>
     <string name="about_email" translatable="true">Gửi email cho chúng tôi</string>
     <string name="about_bug_report_dialog_positive_btn" translatable="true">Gửi email</string>
-    <string name="about_web" translatable="true">liên kết</string>
+    <string name="about_web" translatable="true">Liên kết</string>
     <string name="about_bug_no_log_dialog_title" translatable="true">Báo cáo lỗi</string>
     <string name="about_website" translatable="true">Truy cập rethinkdns.com</string>
     <string name="about_privacy_policy" translatable="true">Đọc chính sách bảo mật</string>
     <string name="error_loading_log_file" translatable="true">Lỗi khi tải tệp nhật ký</string>
     <string name="cd_custom_doh_url_name" translatable="true">DoH %1$s</string>
     <string name="about_sponsor_link_text" translatable="true">Nhà tài trợ</string>
-    <string name="about_app" translatable="true">ứng dụng</string>
-    <string name="about_settings" translatable="true">hệ thống</string>
+    <string name="about_app" translatable="true">Ứng dụng</string>
+    <string name="about_settings" translatable="true">Hệ thống</string>
     <string name="about_settings_app_info" translatable="true">Thông tin ứng dụng</string>
     <string name="about_whats_new" translatable="true">Có gì mới trong %1$s</string>
     <string name="cd_dns_proxy_mode_internal" translatable="true">Nội bộ</string>
@@ -503,7 +503,7 @@
     <string name="network_log_app_name_unknown" translatable="true">Không rõ</string>
     <string name="rules_load_failure_heading" translatable="true">Ghi chú</string>
     <string name="rules_load_failure_desc" translatable="true">Không tìm thấy quy tắc tường lửa nào</string>
-    <string name="rules_load_failure_reload" translatable="true">tải lại</string>
+    <string name="rules_load_failure_reload" translatable="true">Tải lại</string>
     <string name="lbl_random" translatable="true">(ngẫu nhiên)</string>
     <string name="lbl_mtu" translatable="true">MTU</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
@@ -842,7 +842,7 @@
     <string name="bad_config_reason_invalid_value" translatable="true">Giá trị không hợp lệ</string>
     <string name="bad_config_reason_invalid_key" translatable="true">Khóa không hợp lệ</string>
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Khởi động Rethink để tiếp tục</string>
-    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">các quốc gia bị chặn nhiều nhất</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">Các quốc gia bị chặn nhiều nhất</string>
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">Các IP bị chặn nhiều nhất</string>
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">Các IP được liên hệ nhiều nhất</string>
     <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">Các tên miền bị chặn nhiều nhất</string>

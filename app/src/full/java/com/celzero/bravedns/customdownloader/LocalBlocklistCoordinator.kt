@@ -35,7 +35,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.download.BlocklistDownloadHelper
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
-import com.celzero.bravedns.ui.activity.AppLockActivity
+import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
@@ -451,7 +451,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
 
         if (Utilities.isAtleastO()) {
             val name: CharSequence = context.getString(R.string.notif_channel_download)
-            val description = context.resources.getString(R.string.notif_channed_desc_download)
+            val description = context.getString(R.string.notif_channed_desc_download)
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(DOWNLOAD_NOTIFICATION_TAG, name, importance)
             channel.description = description
@@ -492,7 +492,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
     private fun getPendingIntent(context: Context): PendingIntent {
         return Utilities.getActivityPendingIntent(
             context,
-            Intent(context, AppLockActivity::class.java),
+            Intent(context, HomeScreenActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             mutable = false
         )

@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 RethinkDNS and its authors
+ * Copyright 2020 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.iab
+package com.celzero.bravedns.ui.location
 
-interface OnPurchaseListener {
-
-    fun onPurchaseResult(isPurchaseSuccess: Boolean, message: String)
-}
+data class ServerLocation(
+    val id: String,
+    val name: String,
+    val latency: String,
+    var isSelected: Boolean = false
+)

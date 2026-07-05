@@ -22,7 +22,7 @@
     <string name="status_protected_with_socks5_private_dns">protegido com socks5 e dns privado</string>
     <string name="status_protected_with_http_private_dns">protegido com proxy http e dns privado</string>
     <string name="notification_action_stop_vpn">Parar</string>
-    <string name="dns_explanation_dns_connected">Conectado a RethinkDNS</string>
+    <string name="dns_explanation_dns_connected">Conectado a Re-RethinkDNS</string>
     <string name="dns_explanation_firewall_connected">Conectado a firewall</string>
     <string name="dns_mode_info_explanation_new">Monitorizar, bloquear e cifrar pedidos DNS.</string>
     <string name="dns_firewall_mode_info_explanation_new">Para além dos anteriores (DNS e Firewall), evitar também a censura na Internet.</string>
@@ -102,13 +102,13 @@
     <string name="settings_theme_dialog_themes_1">Definido pelo sistema</string>
     <string name="settings_theme_dialog_themes_4">Preto profundo</string>
     <string name="settings_notification_dialog_option_1">\nPausar/Parar (predefinição):\n\nMostra dois botões, para pausar ou parar Rethink rapidamente.</string>
-    <string name="dc_other_dns_heading">tipo</string>
+    <string name="dc_other_dns_heading">Tipo</string>
     <string name="settings_ip_text_ipv4">IPv4</string>
     <string name="settings_notification_dialog_option_2">\nDNS / DNS + Firewall:\nMostra dois botões para mudar rapidamente entre o modo DNS para poupar bateria e o modo normal DNS + Firewall.</string>
     <string name="hsf_vpn_dialog_message">Rethink necessita da sua permissão para criar uma VPN local para cifrar os pedidos DNS, implementar um monitor de rede e impor as regras da firewall.
 \n
 \nRethink não recolhe informações nem monitoriza as suas atividades.</string>
-    <string name="dc_block_heading">regras</string>
+    <string name="dc_block_heading">Regras</string>
     <string name="settings_ip_text_ipv6">IPv6</string>
     <string name="firewall_status_excluded">excluída de dns e da firewall</string>
     <string name="firewall_card_text_inactive">Ativar modo firewall.</string>
@@ -174,7 +174,7 @@
     <string name="app_mode_dns">DNS</string>
     <string name="app_mode_firewall">Firewall</string>
     <string name="app_mode_wireguard">VPN</string>
-    <string name="settings_vpn_heading">vpn</string>
+    <string name="settings_vpn_heading">VPN</string>
     <string name="settings_enable_logs">Ativar registo no dispositivo</string>
     <string name="app_mode_choose">Escolha o modo</string>
     <string name="connection_http3">HTTP3</string>
@@ -240,7 +240,7 @@
     <string name="conn_track_clear_logs_message">Isto elimina os registos da rede mas não as regras de firewall. Esta operação não é reversível. Continuar?</string>
     <string name="info_dialog_url_copy_toast_msg">URL copiado</string>
     <string name="bypass_universal">contorno universal</string>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name" translatable="false">Re-Rethink</string>
     <string name="title_about">Acerca</string>
     <string name="orbot_bs_status_trying_connect">A configurar Orbot…</string>
     <string name="orbot_install_dialog_title">Instalar Orbot?</string>
@@ -336,7 +336,7 @@
     <string name="about_bug_no_log_dialog_message">Não foi possível obter os registos de falhas. Deseja reportar manualmente o seu erro?</string>
     <string name="about_email">Envie um e-mail</string>
     <string name="about_privacy_policy">Política de privacidade</string>
-    <string name="about_app">aplicação</string>
+    <string name="about_app">Aplicação</string>
     <string name="about_settings_app_info">Info da aplicação</string>
     <string name="about_settings_notification">Definições de notificação</string>
     <string name="about_mozilla">Rethink é apoiado por Mozilla Builders, FOSS United Foundation, OSOM Products Inc.</string>
@@ -359,14 +359,14 @@
     <string name="about_bug_report">Reportar erros</string>
     <string name="about_bug_no_log_dialog_title">Relatório de erros</string>
     <string name="about_bug_no_log_dialog_positive_btn">Enviar e-mail</string>
-    <string name="about_web">ligações</string>
+    <string name="about_web">Ligações</string>
     <string name="about_website">Visitar rethinkdns.com</string>
     <string name="about_github">Contribuir no GitHub</string>
     <string name="about_faq">FAQ</string>
     <string name="about_docs">Documentação</string>
-    <string name="about_connect">contactos</string>
+    <string name="about_connect">Contactos</string>
     <string name="about_sponsor_link_text">Patrocinador</string>
-    <string name="about_settings">sistema</string>
+    <string name="about_settings">Sistema</string>
     <string name="about_settings_vpn_profile">Perfil VPN</string>
     <string name="about_whats_new">Novidades da versão %1$s</string>
     <string name="about_twitter">Siga-nos no Twitter</string>
@@ -565,7 +565,7 @@
     <string name="unicode_question_sign">❔</string>
     <string name="fav_icon">fav_icon</string>
     <string name="rules_load_failure_desc">Não foram encontradas regras</string>
-    <string name="rules_load_failure_reload">recarregar</string>
+    <string name="rules_load_failure_reload">Recarregar</string>
     <string name="network_log_app_name_unknown">Desconhecido</string>
     <string name="dns_crypt_connection_failure">Erro ao ligar ao servidor DNSCrypt.</string>
     <string name="dns_proxy_connection_failure">Erro ao ligar ao servidor DNS Proxy.</string>
@@ -767,10 +767,10 @@
     <string name="fapps_isolate_block_dialog_title">Isolar aplicações</string>
     <string name="fapps_isolate_block_dialog_message">Isolar aplicações <i>da lista</i>\?</string>
     <string name="ci_trust_rule">Confiar</string>
-    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">aplicações mais permitidas</string>
-    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">aplicações mais bloqueadas</string>
-    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">domínios mais contactados</string>
-    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">domínios mais bloqueados</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">Aplicações mais permitidas</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">Aplicações mais bloqueadas</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">Domínios mais contactados</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">Domínios mais bloqueados</string>
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">IPs mais contactados</string>
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">IPs mais bloqueados</string>
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app">Inicie Rethink para continuar</string>
@@ -797,7 +797,7 @@
     <string name="lbl_configure" translatable="true">Configurar</string>
     <string name="bsct_block_domain" translatable="true">Bloquear, confiar <u>domínio(s)</u> para <u>esta aplicação</u></string>
     <string name="lbl_logs" translatable="true">registos</string>
-    <string name="lbl_rules" translatable="true">regras</string>
+    <string name="lbl_rules" translatable="true">Regras</string>
     <string name="bypass_dns_firewall" translatable="true">ignorar dns e firewall</string>
     <string name="settings_general_customize" translatable="true">personalizar</string>
     <string name="settings_default_dns_desc" translatable="true">Em casos raros, quando o DNS preferencial do utilizador não pode ser usado, é utilizado o DNS de recurso.</string>
@@ -934,8 +934,8 @@
     <string name="app_ip_domain_rules" translatable="true">Por regras de IP/Domínio da aplicação</string>
     <string name="univ_firewall_heading" translatable="true">Regras universais de firewall</string>
     <string name="app_ip_domain_rules_desc" translatable="true">Modificar regras de IP/Domínio da aplicação.</string>
-    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">países mais contactados</string>
-    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">países mais bloqueados</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">Países mais contactados</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">Países mais bloqueados</string>
     <string name="bad_config_error" translatable="true">%1$s em %2$s</string>
     <string name="generic_error" translatable="true">Erro desconhecido “%s”</string>
     <string name="unknown_error" translatable="true">Erro desconhecido</string>

@@ -263,7 +263,7 @@
     <string name="about_dialog_neutral_button" translatable="true">기능 제안하기</string>
     <string name="no_browser_error" translatable="true">브라우저에서 웹페이지를 열 수 없습니다.</string>
     <string name="configure_dns_connected_doh_status" translatable="true">DNS over HTTPS</string>
-    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="settings_vpn_heading" translatable="true">VPN</string>
     <string name="download_update_dialog_title" translatable="true">새로운 업데이트!</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">URL 복사됨</string>
     <string name="app_mode_choose" translatable="true">모드 선택</string>

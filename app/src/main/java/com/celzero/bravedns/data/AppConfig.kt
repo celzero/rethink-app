@@ -372,6 +372,24 @@ internal constructor(
         }
     }
 
+    private data class ProxySelection(
+        val provider: ProxyProvider,
+        val type: ProxyType
+    )
+
+    private fun proxySelection(): ProxySelection {
+        return ProxySelection(
+            provider = ProxyProvider.getProxyProvider(persistentState.proxyProvider),
+            type = ProxyType.of(persistentState.proxyType)
+        )
+    }
+
+    private fun canEnableProxyForProviders(vararg allowedProviders: ProxyProvider): Boolean {
+        if (!canEnableProxy()) return false
+        val provider = proxySelection().provider
+        return allowedProviders.contains(provider)
+    }
+
     enum class ProtoTranslationMode(val id: Int) {
         PTMODEAUTO(Settings.PtModeAuto),
         PTMODEFORCE64(Settings.PtModeForce64),
@@ -535,8 +553,7 @@ internal constructor(
     }
 
     fun isWireGuardEnabled(): Boolean {
-        val proxyType = ProxyType.of(persistentState.proxyType)
-        return proxyType.isProxyTypeWireguard()
+        return proxySelection().type.isProxyTypeWireguard()
     }
 
     private suspend fun getDNSProxyServerDetails(): DnsProxyEndpoint? {
@@ -1028,41 +1045,30 @@ internal constructor(
             return
         }
 
-        if (provider == ProxyProvider.WIREGUARD) {
-            setProxy(proxyType, provider)
-            return
-        }
-
-        if (provider == ProxyProvider.ORBOT) {
-            setProxy(proxyType, provider)
-            return
-        }
-
-        if (provider == ProxyProvider.TCP) {
+        if (provider == ProxyProvider.WIREGUARD ||
+            provider == ProxyProvider.ORBOT ||
+            provider == ProxyProvider.TCP
+        ) {
             setProxy(proxyType, provider)
             return
         }
 
         // If add proxy request is custom proxy (either http/socks5), check if the other
         // proxy is already set. if yes, then make the proxy type as HTTP_SOCKS5.
-        val currentProxyType = ProxyType.of(getProxyType())
-        if (proxyType.isProxyTypeHttp()) {
-            if (currentProxyType.isProxyTypeSocks5()) {
-                setProxy(ProxyType.HTTP_SOCKS5, provider)
-                return
-            }
-            setProxy(ProxyType.HTTP, provider)
-            return
-        }
+        val currentProxyType = proxySelection().type
+        val nextProxyType =
+            when {
+                proxyType.isProxyTypeHttp() && currentProxyType.isProxyTypeSocks5() ->
+                    ProxyType.HTTP_SOCKS5
 
-        if (proxyType.isProxyTypeSocks5()) {
-            if (currentProxyType.isProxyTypeHttp()) {
-                setProxy(ProxyType.HTTP_SOCKS5, provider)
-                return
+                proxyType.isProxyTypeSocks5() && currentProxyType.isProxyTypeHttp() ->
+                    ProxyType.HTTP_SOCKS5
+
+                proxyType.isProxyTypeHttp() -> ProxyType.HTTP
+                proxyType.isProxyTypeSocks5() -> ProxyType.SOCKS5
+                else -> proxyType
             }
-            setProxy(ProxyType.SOCKS5, provider)
-            return
-        }
+        setProxy(nextProxyType, provider)
     }
 
     fun removeAllProxies() {
@@ -1077,7 +1083,7 @@ internal constructor(
     }
 
     fun removeProxy(removeType: ProxyType, removeProvider: ProxyProvider) {
-        val currentProxyType = ProxyType.of(getProxyType())
+        val currentProxyType = proxySelection().type
 
         if (currentProxyType.isProxyTypeHttpSocks5()) {
             if (removeType.isProxyTypeHttp()) {
@@ -1116,67 +1122,59 @@ internal constructor(
     // Settings.ProxyModeSOCKS5
     // Settings.ProxyModeHTTPS
     fun getTunProxyMode(): TunProxyMode {
-        val type = persistentState.proxyType
-        val provider = persistentState.proxyProvider
-        Logger.d(LOG_TAG_VPN, "selected proxy type: $type, with provider as $provider")
+        val selection = proxySelection()
+        Logger.d(
+            LOG_TAG_VPN,
+            "selected proxy type: ${selection.type.name}, with provider as ${selection.provider.name}"
+        )
 
-        if (ProxyProvider.WIREGUARD.name == provider) {
-            return TunProxyMode.WIREGUARD
+        when (selection.provider) {
+            ProxyProvider.WIREGUARD -> return TunProxyMode.WIREGUARD
+            ProxyProvider.ORBOT -> return TunProxyMode.ORBOT
+            else -> Unit
         }
 
-        if (ProxyProvider.ORBOT.name == provider) {
-            return TunProxyMode.ORBOT
-        }
-
-        when (type) {
-            ProxyType.HTTP.name -> {
-                return TunProxyMode.HTTPS
-            }
-            ProxyType.SOCKS5.name -> {
-                return TunProxyMode.SOCKS5
-            }
-            ProxyType.HTTP_SOCKS5.name -> {
+        when (selection.type) {
+            ProxyType.HTTP -> return TunProxyMode.HTTPS
+            ProxyType.SOCKS5 -> return TunProxyMode.SOCKS5
+            ProxyType.HTTP_SOCKS5 -> {
                 // FIXME: tunnel does not support both http and socks5 at once.
                 return TunProxyMode.SOCKS5
             }
+            else -> Unit
         }
         return TunProxyMode.NONE
     }
 
     fun isCustomHttpProxyEnabled(): Boolean {
-        val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        // return false if the proxy provider is not custom
-        if (!proxyProvider.isProxyProviderCustom()) return false
-
-        val proxyType = ProxyType.of(persistentState.proxyType)
-        return proxyType.isProxyTypeHttp() || proxyType.isProxyTypeHttpSocks5()
+        val selection = proxySelection()
+        return selection.provider.isProxyProviderCustom() && hasHttpProxyTypeEnabled()
     }
 
     fun isCustomSocks5Enabled(): Boolean {
-        val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        // return false if the proxy provider is not custom
-        if (!proxyProvider.isProxyProviderCustom()) return false
-
-        val proxyType = ProxyType.of(persistentState.proxyType)
-        return proxyType.isProxyTypeSocks5() || proxyType.isProxyTypeHttpSocks5()
+        val selection = proxySelection()
+        return selection.provider.isProxyProviderCustom() && hasSocks5ProxyTypeEnabled()
     }
 
     fun isOrbotProxyEnabled(): Boolean {
-        val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        return proxyProvider.isProxyProviderOrbot()
+        return proxySelection().provider.isProxyProviderOrbot()
     }
 
     fun isWgEnabled(): Boolean {
-        val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        return proxyProvider.isProxyProviderWireguard()
+        return proxySelection().provider.isProxyProviderWireguard()
     }
 
     fun isProxyEnabled(): Boolean {
-        val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        if (proxyProvider.isProxyProviderNone()) return false
+        val selection = proxySelection()
+        return !selection.provider.isProxyProviderNone() && selection.type.isAnyProxyEnabled()
+    }
 
-        val proxyType = ProxyType.of(persistentState.proxyType)
-        return proxyType.isAnyProxyEnabled()
+    fun hasHttpProxyTypeEnabled(): Boolean {
+        return proxySelection().type.isProxyTypeHasHttp()
+    }
+
+    fun hasSocks5ProxyTypeEnabled(): Boolean {
+        return proxySelection().type.isSocks5Enabled()
     }
 
     fun canEnableProxy(): Boolean {
@@ -1184,33 +1182,23 @@ internal constructor(
     }
 
     fun canEnableSocks5Proxy(): Boolean {
-        val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        return !getBraveMode().isDnsMode() &&
-            (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderCustom())
+        return canEnableProxyForProviders(ProxyProvider.NONE, ProxyProvider.CUSTOM)
     }
 
     fun canEnableWireguardProxy(): Boolean {
-        val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        return !getBraveMode().isDnsMode() &&
-            (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderWireguard())
+        return canEnableProxyForProviders(ProxyProvider.NONE, ProxyProvider.WIREGUARD)
     }
 
     fun canEnableHttpProxy(): Boolean {
-        val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        return !getBraveMode().isDnsMode() &&
-            (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderCustom())
+        return canEnableProxyForProviders(ProxyProvider.NONE, ProxyProvider.CUSTOM)
     }
 
     fun canEnableTcpProxy(): Boolean {
-        val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        return !getBraveMode().isDnsMode() &&
-            (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderTcp())
+        return canEnableProxyForProviders(ProxyProvider.NONE, ProxyProvider.TCP)
     }
 
     fun canEnableOrbotProxy(): Boolean {
-        val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        return canEnableProxy() &&
-            (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderOrbot())
+        return canEnableProxyForProviders(ProxyProvider.NONE, ProxyProvider.ORBOT)
     }
 
     suspend fun getConnectedSocks5Proxy(): ProxyEndpoint? {
@@ -1246,8 +1234,8 @@ internal constructor(
         val sb = StringBuilder()
         sb.append("   Brave mode: ${getBraveMode()}\n")
         sb.append("   DNS type: ${getDnsType()}\n")
-        sb.append("   Proxy type: ${ProxyType.of(getProxyType()).name}\n")
-        sb.append("   Proxy provider: ${getProxyProvider()}\n")
+        sb.append("   Proxy type: ${proxySelection().type.name}\n")
+        sb.append("   Proxy provider: ${proxySelection().provider.name}\n")
         sb.append("   Pcap mode: ${getPcapFilePath()}\n")
         sb.append("   Connected DNS: ${persistentState.connectedDnsName}\n")
         sb.append("   Prevent DNS leaks: ${persistentState.preventDnsLeaks}\n")

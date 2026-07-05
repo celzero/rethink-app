@@ -19,7 +19,7 @@
     <string name="firewall_mode_notification_title">Захищено! Підключено до Брандмауера.</string>
     <string name="always_on_dialog_positive">Зупинити</string>
     <string name="always_on_dialog_neutral">Налаштуваннях</string>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name" translatable="false">Re-Rethink</string>
     <string name="app_name_small_case">rethink</string>
     <string name="settings_title_desc">DNS та брандмауер, що легко налаштовуються</string>
     <string name="always_on_dialog_lockdown_stop_message">Rethink запускає VPN у режимі <i>Блокування</i>. Його зупинка призведе до втрати підключення до Інтернету для цього профілю користувача. Ви все одно хочете продовжити\?</string>
@@ -51,7 +51,7 @@
     <string name="status_protected_with_proxy">захищено проксі</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">ввімкнено приватний dns</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">не захищено</string>
-    <string name="dns_explanation_dns_connected">Підключено до RethinkDNS</string>
+    <string name="dns_explanation_dns_connected">Підключено до Re-RethinkDNS</string>
     <string name="dns_explanation_firewall_connected">Підключено до Брандмауера</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">Підключено до RethinkDNS та Брандмауера</string>
     <string name="notification_action_resume_vpn">ПРОДОВЖИТИ</string>
@@ -130,7 +130,7 @@
     <string name="new_app_notification_action_toast_deny" translatable="true">Відмовлено в підключенні до мережі для застосунку</string>
     <string name="notif_dialog_pause_dialog_title" translatable="true">Застосунок призупинено!</string>
     <string name="notif_dialog_pause_dialog_message" translatable="true">Застосунок у стані паузи, відновити, щоб продовжити</string>
-    <string name="notif_channel_desc_vpn_failure" translatable="true">Повідомляти, коли Android або інший VPN-застосунок зупиняє RethinkDNS</string>
+    <string name="notif_channel_desc_vpn_failure" translatable="true">Повідомляти, коли Android або інший VPN-застосунок зупиняє Re-RethinkDNS</string>
     <string name="category_name_sys_apps" translatable="true">Системні застосунки</string>
     <string name="ada_noapp_dialog_title" translatable="true">Немає такого застосунку</string>
     <string name="ada_noapp_dialog_message" translatable="true">Інформація про застосунок відсутня. Можливо, цей застосунок було видалено\?</string>
@@ -166,7 +166,7 @@
     <string name="ct_bs_app_info_error" translatable="true">Інформація про застосунок не знайдено</string>
     <string name="hsf_chip_appearance" translatable="true">Тема: %1$s</string>
     <string name="about_bravedns_explantion" translatable="true">Rethink — це найпростіший спосіб відстежувати активність застосунків, обходити інтернет-цензуру та брандмауери на вашому пристрої Android.</string>
-    <string name="about_app" translatable="true">застосунок</string>
+    <string name="about_app" translatable="true">Застосунок</string>
     <string name="about_settings_app_info" translatable="true">Інформація про застосунок</string>
     <string name="about_app_translate" translatable="true">Перекласти</string>
     <string name="cd_custom_dns_proxy_default_app" translatable="true">Відсутнє</string>
@@ -313,8 +313,8 @@
     <string name="bsac_title_desc" translatable="true">Правила застосовуються лише до цього застосунку.</string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[This connection was allowed because the <i>домен</i> встановлено як довірений домен.<br/><br/> Щоб змінити, перейдіть на екран <i>Брандмауер для конкретного додатка</i>.]]></string>
     <string name="new_app_bulk_notification_content" translatable="true">RethinkDNS заблокував новий застосунок %1$s . Натисніть, щоб переглянути або змінити.</string>
-    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">найбільш дозволені застосунки</string>
-    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">найбільш заблоковані застосунки</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">Найбільш дозволені застосунки</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">Найбільш заблоковані застосунки</string>
     <string name="always_on_dialog_heading" translatable="true">Вимкнути Постійно ввімкнений VPN</string>
     <string name="always_on_dialog_positive_btn" translatable="true">Перейти до налаштуваннях</string>
     <string name="always_on_dialog_stop_heading" translatable="true">Постійно ввімкнений VPN</string>
@@ -433,7 +433,7 @@
     <string name="about_sponsor_link_text" translatable="true">Спонсорувати</string>
     <string name="univ_firewall_rule_4" translatable="true">Блокувати UDP, крім DNS та NTP</string>
     <string name="univ_view_blocked_ip" translatable="true">Правила IP та портів</string>
-    <string name="about_web" translatable="true">посилання</string>
+    <string name="about_web" translatable="true">Посилання</string>
     <string name="about_bravedns_toreport_text" translatable="true">допомога та зворотний зв\'язок</string>
     <string name="univ_firewall_rule_5" translatable="true">Блокувати у разі обходу DNS</string>
     <string name="univ_view_blocked_ip_desc" translatable="true">Зміна заблокованих та довірених правил для доменів, IP чи портів.</string>
@@ -444,7 +444,7 @@
     <string name="about_privacy_policy" translatable="true">Читати політику конфіденційності</string>
     <string name="hs_download_positive_website" translatable="true">Відвідайте вебсайт</string>
     <string name="about_bug_no_log_dialog_title" translatable="true">Звіт про помилку</string>
-    <string name="about_connect" translatable="true">зв\'язок</string>
+    <string name="about_connect" translatable="true">Зв\'язок</string>
     <string name="about_join_telegram" translatable="true">Telegram</string>
     <string name="about_faq" translatable="true">Переглянути ЧаПи</string>
     <string name="about_github" translatable="true">Зробити внесок на GitHub</string>
@@ -456,21 +456,21 @@
     <string name="settings_locale_dialog_title" translatable="true">Виберіть бажану мову</string>
     <string name="configure_dns_connected_dns_proxy_status" translatable="true">DNS проксі</string>
     <string name="settings_default_dns_heading" translatable="true">Вибрати резервний DNS</string>
-    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">найбільш контактуючі ip</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">Найбільш контактуючі ip</string>
     <string name="configure_dns_connection_name" translatable="true">Підключенно до %1$s</string>
-    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">найбільш заблоковані ip</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">Найбільш заблоковані ip</string>
     <string name="http_proxy_dialog_heading" translatable="true">Встановити HTTP(S) ПІДКЛЮЧЕННЯ проксі</string>
-    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">найбільш контактуючі домени</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">Найбільш контактуючі домени</string>
     <string name="show_logs_disabled_dns_message" translatable="true">Логування DNS запитів вимкнено. Для повторного увімкнення перейдіть у <i>Налаштування</i> та увімкніть <i>Увімкнути логування на пристрої.</i></string>
     <string name="search_proxy_add_apps" translatable="true">Пошук застосунків за назвою</string>
     <string name="settings_ip_network_heading" translatable="true">Виберати версію IP</string>
-    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">найбільш контактуючі країни</string>
-    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">найбільш заблоковані країни</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">Найбільш контактуючі країни</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">Найбільш заблоковані країни</string>
     <string name="settings_default_dns_desc" translatable="true">У рідкісних випадках, коли бажаний користувачем DNS неможливо встановити, використовується резервний DNS.</string>
     <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
     <string name="local_blocklist_redownload_desc" translatable="true">Блоклисти на пристрої вже мають останню версію v%1$s.</string>
     <string name="configure_dns_crypt" translatable="true">DNSCrypt: %1$s розв\'язувачів імен (розв\'язуют доменні імена в IP-адреси)</string>
-    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">найбільш заблоковані домени</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">Найбільш заблоковані домени</string>
     <string name="configure_dns_connected_doh_status" translatable="true">DNS через HTTPS</string>
     <string name="ssv_see_more" translatable="true">Показати усе</string>
     <string name="download_update_dialog_title" translatable="true">Нове оновлення!</string>
@@ -484,7 +484,7 @@
     <string name="download_update_dialog_trylater_message" translatable="true">Оновлення неможливо виконати зараз, будь ласка, спробуйте пізніше.</string>
     <string name="search_custom_domains" translatable="true"><font size="12">Пошук доменів</font></string>
     <string name="download_update_dialog_trylater_title" translatable="true">Неможливо оновити зараз</string>
-    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="settings_vpn_heading" translatable="true">VPN</string>
     <string name="download_update_dialog_message_ok" translatable="true">Ви вже використовуєте останню версію.</string>
     <string name="search_universal_ips" translatable="true"><font size="12">Пошук IP</font></string>
     <string name="download_update_dialog_message_ok_title" translatable="true">Актуально!</string>
@@ -541,7 +541,7 @@
     <string name="lbl_status" translatable="true">Стан</string>
     <string name="lbl_remove" translatable="true">Вилучити</string>
     <string name="connection_http3" translatable="true">HTTP3</string>
-    <string name="dc_other_dns_heading" translatable="true">тип</string>
+    <string name="dc_other_dns_heading" translatable="true">Тип</string>
     <string name="unknown_error" translatable="true">Невідома помилка</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Захищено! Підключений до DNS + брандмауер + проксі.</string>
     <string name="dc_custom_dns_radio" translatable="true">Інший DNS</string>
@@ -694,7 +694,7 @@
     <string name="cd_custom_dns_proxy_title" translatable="true">Користувкий DNS-проксі</string>
     <string name="settings_http_proxy_error_text3" translatable="true">Ім\'я хосту порожнє</string>
     <string name="settings_http_proxy_error_text4" translatable="true">Помилка з\'єднання з host-вузлом. Спробуйте ще раз.</string>
-    <string name="about_settings" translatable="true">система</string>
+    <string name="about_settings" translatable="true">Система</string>
     <string name="about_dialog_positive_button" translatable="true">Почнемо</string>
     <string name="cd_dns_crypt_resolver_heading" translatable="true">Резолвер</string>
     <string name="cd_dns_proxy_error_text_2" translatable="true">Діапазон портів повинен бути від 1024-65535</string>
@@ -837,7 +837,7 @@
     <string name="hsf_pause_vpn_failure" translatable="true">Не вдається призупинити: Rethink неактивнен</string>
     <string name="hsf_vpn_dialog_message" translatable="true">Rethink потрібен дозвіл для налаштування локального VPN-сервісу та шифрування запитів DNS з вашого пристроя, розгортання мережевого монітора та забезпечення функціонування фаєрволу. \n\nRethink не збирає жодних даних і жодним чином не шпигує за вами.</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> може призвести до втрати підключення. Змініть налаштування, щоб дозволити Rethink використовувати дані та інші ресурси у фоновому режимі.</string>
-    <string name="dc_block_heading" translatable="true">правила</string>
+    <string name="dc_block_heading" translatable="true">Правила</string>
     <string name="dc_entries" translatable="true">%1$s записів</string>
     <string name="dc_custom_block_heading" translatable="true">Доменні правила</string>
     <string name="dc_local_block_heading" translatable="true">Блоклисти пристроя</string>
@@ -1074,7 +1074,7 @@
     <string name="sponser_dialog_usage_msg" translatable="true">Ви користуєтеся Rethink протягом <b>%1$s днів</b>, що перекладається як вартість використання <b>$%2$s</b>. Чи розглядаєте ви можливість спонсорування для підтримки його розвитку?</string>
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Використовувати системний DNS для неделегованих доменів</string>
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Використовуйте системний DNS для неделегованих доменів, таких як <i>.lan</i>, <i>.internal</i>, тощо.</string>
-    <string name="dc_filtering_heading" translatable="true">фільтрація</string>
+    <string name="dc_filtering_heading" translatable="true">Фільтрація</string>
     <string name="cd_split_dns_heading" translatable="true">Розділений DNS (експериментальний)</string>
     <string name="cd_split_dns_desc" translatable="true">Пересилати DNS-запити від проксі-програм на DNS-сервери проксі-сервера.</string>
     <string name="univ_firewall_rule_11" translatable="true">Блокувати всі підключення до локального хоста</string>
@@ -1130,8 +1130,8 @@
     <string name="hop_add_remove_title" translatable="true">Додати /Вилучити реле</string>
     <string name="about_terms_of_service" translatable="true">Умови надання послуг</string>
     <string name="bypasses_network_restrictions" translatable="true">Перевірки досяжності обходять усі мережеві обмеження. В режимі <i>Auto</i> Rethink випадковим чином використовує раніше підключені IP-адреси та імена хостів.</string>
-    <string name="most_contacted_asn" translatable="true">найчастіше контактовані постачальники</string>
-    <string name="most_blocked_asn" translatable="true">більшість заблокованих провайдерів</string>
+    <string name="most_contacted_asn" translatable="true">Найчастіше контактовані постачальники</string>
+    <string name="most_blocked_asn" translatable="true">Більшість заблокованих провайдерів</string>
     <string name="adv_tasker_dialog_msg" translatable="true">Введіть назви пакетів (розділені комами), яким дозволено запускати або зупиняти Rethink.</string>
     <string name="adv_tasker_dialog_instructions" translatable="true">Інструкції:\nНеобхідні додаткові елементи в трансляції:\n• Ключ: відправник\n• Значення: Назва пакета програми, що викликає\n\nПриклад: ключ: відправник значення: com.termux\n\nПідтримувані дії:\n• Запустити VPN – com.celzero.bravedns.intent.action.VPN_START\n• Зупинити VPN – com.celzero.bravedns.intent.action.VPN_STOP</string>
     <string name="adv_tasker_dialog_edit_hint" translatable="true">Введіть назву пакета (приклад: net.dinglisch.android.taskerm)</string>
@@ -1139,7 +1139,7 @@
     <string name="download_ip_info_desc" translatable="true">Отримує інформацію про постачальників послуг для веб-сайтів з <i>rethinkdns.com</i>, що працює на <i>%1$s</i></string>
     <string name="adv_taster_title" translatable="true">Автоматизація</string>
     <string name="adv_taster_desc" translatable="true">Налаштуйте програми, які можуть запускати або зупиняти Rethink.</string>
-    <string name="top_active_conns" translatable="true">найактивніші з\'єднання</string>
+    <string name="top_active_conns" translatable="true">Найактивніші з\'єднання</string>
     <string name="load_more" translatable="true">Завантажити все</string>
     <string name="close_conns_dialog_title" translatable="true">Тісні зв\'язки</string>
     <string name="close_conns_dialog_desc" translatable="true">Закрити всі з’єднання для %1$s?</string>

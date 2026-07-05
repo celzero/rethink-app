@@ -340,7 +340,7 @@
     <string name="hsf_chip_appearance" translatable="true">Ашәахә: %1$s</string>
     <string name="hsf_pause_vpn_failure" translatable="true">Cannot pause: Rethink not active</string>
     <string name="dc_block_heading" translatable="true">Ашәақәа</string>
-    <string name="dc_other_dns_heading" translatable="true">ашҟа</string>
+    <string name="dc_other_dns_heading" translatable="true">Ашҟа</string>
     <string name="dc_custom_dns_radio" translatable="true">Аҧсуа DNS</string>
     <string name="dc_rethink_dns_radio" translatable="true">Риthink Ҟьшьшәааԥш</string>
     <string name="dc_entries" translatable="true">%1$s аҧызар »</string>
@@ -369,9 +369,9 @@
     <string name="about_privacy_policy" translatable="true">Апсихуақьтәи аполитика аԥхьа</string>
     <string name="about_connect" translatable="true">Аҧしшәлашь</string>
     <string name="about_sponsor_link_text" translatable="true">Абжьыра</string>
-    <string name="about_app" translatable="true">апп</string>
+    <string name="about_app" translatable="true">Апп</string>
     <string name="about_email" translatable="true">Е-маил ашәашәалоит</string>
-    <string name="about_settings" translatable="true">sistema</string>
+    <string name="about_settings" translatable="true">Sistema</string>
     <string name="about_settings_app_info" translatable="true">Апликациазын адылхъва</string>
     <string name="about_settings_vpn_profile" translatable="true">VPN Ашьапынеибамра</string>
     <string name="about_settings_notification" translatable="true">А kebijakan ашәахәаҧшқәа</string>
@@ -1012,7 +1012,7 @@
     <string name="sponser_dialog_usage_msg" translatable="true">Уры уиэит «Rethink» <b>%1$s амш</b>, урҭыр аусура аԥазалара <b>$%2$s</b>. Аразвилаз ашәшьары змоу аспонсорра узышьҭалаша ушьҭыршьымшәа?</string>
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Ашәаҧшра ашәарҭадара аҿы дахьыжьымкәа адоменқәа рахь System DNS ахыҵхәаҧш</string>
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Асистем DNS аиахъазлар ауеит адоменқәа рзы, еицҧаауамызқәа, мамзаргьы <i>.lan</i>, <i>.internal</i>, еиԥш.</string>
-    <string name="dc_filtering_heading" translatable="true">фильтрациа</string>
+    <string name="dc_filtering_heading" translatable="true">Фильтрациа</string>
     <string name="cd_split_dns_heading" translatable="true">Split DNS (ашәахcharт ашқәа)</string>
     <string name="cd_split_dns_desc" translatable="true">Аԥсшәа:\nАԥсоуп DNS ашәҟәы иахәаԥкны анхацәа рҟны ианызсыжьуа апрокси арҿы апрокси а DNS хылаԥшҩцәа рҟны.</string>
     <string name="univ_firewall_rule_11" translatable="true">Уабыжьым иҟны аҧҵәаны аҿацәқәрақә зегьы рыцхраамла</string>

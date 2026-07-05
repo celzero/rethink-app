@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name" translatable="false">Re-Rethink</string>
     <string name="settings_title_desc">DNS и Firewall с много възможности за персонализиране</string>
     <string name="accessibility_service_description">Rethink използва услуга за достъпност, за да открива и защитава фонови приложения. Rethink не събира и не продава никаква информация.</string>
     <string name="slide_2_desc">Rethink е най-лесният начин да наблюдавате мрежовата активност, да заобикаляте интернет цензурата и приложенията за защитна стена на вашето устройство с Android.</string>
@@ -12,7 +12,7 @@
     <string name="status_no_internet">няма интернет</string>
     <string name="status_protected_with_http_private_dns">защитен с http proxy и частен dns</string>
     <string name="status_protected_with_socks5_private_dns">защитен със socks5 и частен dns</string>
-    <string name="dns_explanation_dns_connected">Свързан с RethinkDNS</string>
+    <string name="dns_explanation_dns_connected">Свързан с Re-RethinkDNS</string>
     <string name="status_protected_with_proxy">защитен с прокси</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">не е защитен</string>
     <string name="dns_explanation_firewall_connected">Свързан към защитната стена</string>
@@ -255,7 +255,7 @@
     <string name="download_update_dialog_message" translatable="true">Новата версия на приложението е достъпна за изтегляне от уебсайта. Искате ли да продължите?</string>
     <string name="status_protected_with_wg_private_dns" translatable="true">защитен с wireguard и частен dns</string>
     <string name="public_key_copy_toast_msg" translatable="true">Копиран публичният ключ.</string>
-    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="settings_vpn_heading" translatable="true">VPN</string>
     <string name="orbot_both" translatable="true">TCP + HTTP прокси</string>
     <string name="dns_proxy_remove_success" translatable="true">Изтриване на DNS прокси.</string>
     <string name="local_blocklist_download" translatable="true">Изтегляне на блокови списъци</string>

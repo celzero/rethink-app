@@ -17,22 +17,19 @@
 package com.celzero.bravedns.receiver
 
 import android.content.Intent
+import android.content.BroadcastReceiver
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
+import org.koin.core.component.KoinComponent
 
 /**
  * Unit tests for BraveAutoStartReceiver
  * Tests the auto-start logic for VPN on boot and Private Space unlock
  */
-@RunWith(RobolectricTestRunner::class)
-@Config(sdk = [28])
 class BraveAutoStartReceiverTest {
 
     private lateinit var receiver: BraveAutoStartReceiver
@@ -52,11 +49,10 @@ class BraveAutoStartReceiverTest {
             Intent.ACTION_USER_UNLOCKED,
             Intent.ACTION_MY_PACKAGE_REPLACED
         )
-        
+
         supportedActions.forEach { action ->
-            val intent = Intent(action)
-            assertNotNull("Intent with action $action should be valid", intent.action)
-            assertEquals("Intent action should match", action, intent.action)
+            assertNotNull("Supported action should not be null", action)
+            assertTrue("Supported action should be an Android intent action", action.startsWith("android.intent.action."))
         }
     }
 
@@ -72,15 +68,19 @@ class BraveAutoStartReceiverTest {
     @Test
     fun `receiver class should extend BroadcastReceiver`() {
         // Test that the receiver extends the correct base class
-        assertTrue("BraveAutoStartReceiver should be a BroadcastReceiver", 
-                  receiver is android.content.BroadcastReceiver)
+        assertTrue(
+            "BraveAutoStartReceiver should be a BroadcastReceiver",
+            BroadcastReceiver::class.java.isAssignableFrom(receiver.javaClass)
+        )
     }
 
     @Test
     fun `receiver should implement KoinComponent`() {
         // Test that the receiver implements KoinComponent for dependency injection
-        assertTrue("BraveAutoStartReceiver should implement KoinComponent", 
-                  receiver is org.koin.core.component.KoinComponent)
+        assertTrue(
+            "BraveAutoStartReceiver should implement KoinComponent",
+            KoinComponent::class.java.isAssignableFrom(receiver.javaClass)
+        )
     }
 
     @Test
@@ -97,9 +97,11 @@ class BraveAutoStartReceiverTest {
     @Test
     fun `receiver handles ACTION_USER_UNLOCKED for Private Space unlock`() {
         // Test that ACTION_USER_UNLOCKED is a valid intent action
-        val intent = Intent(Intent.ACTION_USER_UNLOCKED)
-        assertEquals("ACTION_USER_UNLOCKED should be correct action", 
-                    Intent.ACTION_USER_UNLOCKED, intent.action)
+        assertEquals(
+            "ACTION_USER_UNLOCKED should be correct action",
+            "android.intent.action.USER_UNLOCKED",
+            Intent.ACTION_USER_UNLOCKED
+        )
     }
 
     @Test

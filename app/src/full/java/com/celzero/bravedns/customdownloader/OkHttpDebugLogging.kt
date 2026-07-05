@@ -25,6 +25,7 @@ import java.util.logging.Level
 import java.util.logging.LogRecord
 import java.util.logging.Logger
 import java.util.logging.SimpleFormatter
+import java.util.Locale
 import kotlin.reflect.KClass
 
 object OkHttpDebugLogging {
@@ -41,7 +42,12 @@ object OkHttpDebugLogging {
             formatter =
                 object : SimpleFormatter() {
                     override fun format(record: LogRecord) =
-                        String.format("[%1\$tF %1\$tT] %2\$s %n", record.millis, record.message)
+                        String.format(
+                            Locale.US,
+                            "[%1\$tF %1\$tT] %2\$s %n",
+                            record.millis,
+                            record.message
+                        )
                 }
         }
 

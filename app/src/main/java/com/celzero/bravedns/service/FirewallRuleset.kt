@@ -283,7 +283,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
         // TODO: Move ico to enum var like for label and desc
         fun getRulesIcon(ruleId: String?): Int {
             return when (ruleId) {
-                RULE0.id -> R.drawable.ic_whats_new
+                RULE0.id -> R.drawable.ic_update
                 RULE1.id -> R.drawable.ic_app_info
                 RULE1B.id -> R.drawable.ic_auto_start
                 RULE1C.id -> R.drawable.ic_filter_error

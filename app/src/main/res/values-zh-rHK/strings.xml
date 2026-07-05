@@ -74,7 +74,7 @@
     <string name="ada_app_exclude">排除</string>
     <string name="rethink_sky_desc">超過 280 個地方；更長嘅在線時間；喺 cloudflare.com 上面行嘅中間解析服務</string>
     <string name="dc_rethink_dns">Rethink DNS</string>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name" translatable="false">Re-Rethink</string>
     <string name="app_name_small_case">rethink</string>
     <string name="title_about">關於</string>
     <string name="title_settings">設定</string>
@@ -104,7 +104,7 @@
     <string name="status_protected_with_proxy">被代理保護住</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">私人 DNS 開着咗</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">未保護</string>
-    <string name="dns_explanation_dns_connected">連線咗去 RethinkDNS</string>
+    <string name="dns_explanation_dns_connected">連線咗去 Re-RethinkDNS</string>
     <string name="dns_explanation_firewall_connected">連線咗去防火牆</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">連線咗去 RethinkDNS 同防火牆</string>
     <string name="notification_action_resume_vpn">恢復</string>
@@ -171,7 +171,7 @@
     <string name="search_dns_logs"><font size="12">搵網域或者 IP</font></string>
     <string name="search_universal_ips"><font size="12">搵 IP</font></string>
     <string name="search_custom_domains"><font size="12">搵網域</font></string>
-    <string name="settings_vpn_heading">vpn</string>
+    <string name="settings_vpn_heading">VPN</string>
     <string name="info_dialog_url_copy_toast_msg">複製咗 URL</string>
     <string name="connection_http3">HTTP3</string>
     <string name="settings_ip_network_heading">揀 IP 版本</string>
@@ -331,7 +331,7 @@
     <string name="about_docs">睇文檔</string>
     <string name="about_connect">聯繫我哋</string>
     <string name="about_sponsor_link_text">贊助</string>
-    <string name="about_app">app</string>
+    <string name="about_app">App</string>
     <string name="about_email">電郵聯繫</string>
     <string name="about_settings">系統</string>
     <string name="about_settings_app_info">App 資料</string>

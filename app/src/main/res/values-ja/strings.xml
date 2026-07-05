@@ -124,7 +124,7 @@
     <string name="app_mode_dns" translatable="true">DNS</string>
     <string name="app_mode_firewall" translatable="true">ファイアウォール</string>
     <string name="app_mode_dns_firewall" translatable="true">DNSとファイアウォール（デフォルト）</string>
-    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="settings_vpn_heading" translatable="true">VPN</string>
     <string name="info_dialog_rethink_toast_msg" translatable="true">RDNS+ DNS over HTTPS URL としてコピー</string>
     <string name="app_mode_choose" translatable="true">モードの選択</string>
     <string name="connection_http3" translatable="true">HTTP3</string>
@@ -578,7 +578,7 @@
     <string name="hsf_packet_capture_chip_text" translatable="true">パケット キャプチャがアクティブ</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">パケット キャプチャが無効</string>
     <string name="hsf_whats_new_remove_text" translatable="true">閉じる..</string>
-    <string name="dc_rethink_dns_radio" translatable="true">RethinkDNS</string>
+    <string name="dc_rethink_dns_radio" translatable="true">Re-RethinkDNS</string>
     <string name="hsf_whats_new_chip_text" translatable="true">更新情報</string>
     <string name="hsf_proxy_chip_text" translatable="true">プロキシがアクティブ</string>
     <string name="dc_block_heading" translatable="true">ルール</string>

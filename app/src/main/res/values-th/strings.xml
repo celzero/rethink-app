@@ -62,7 +62,7 @@
     <string name="status_app_error" translatable="true">ข้อผิดพลาดของแอป</string>
     <string name="apps_info_title" translatable="true">แอปพลิเคชั่น</string>
     <string name="app_mode_wireguard" translatable="true">VPN</string>
-    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="settings_vpn_heading" translatable="true">VPN</string>
     <string name="public_key_copy_toast_msg" translatable="true">คัดลอกคีย์สาธารณะแล้ว</string>
     <string name="app_mode_choose" translatable="true">เลือกโหมด</string>
     <string name="relative_time_today" translatable="true">วันนี้</string>
@@ -370,7 +370,7 @@
     <string name="status_protected_with_http" translatable="true">ได้รับการปกป้องด้วยพร็อกซี HTTP</string>
     <string name="status_protected_with_proxy" translatable="true">ได้รับการปกป้องด้วยพร็อกซี</string>
     <string name="status_protected_with_wg_private_dns" translatable="true">ได้รับการปกป้องด้วย wireguard และ dns ส่วนตัว</string>
-    <string name="dns_explanation_dns_connected" translatable="true">เชื่อมต่อกับ RethinkDNS</string>
+    <string name="dns_explanation_dns_connected" translatable="true">เชื่อมต่อกับ Re-RethinkDNS</string>
     <string name="dns_explanation_firewall_connected" translatable="true">เชื่อมต่อกับไฟร์วอลล์</string>
     <string name="notification_action_resume_vpn" translatable="true">ประวัติย่อ</string>
     <string name="notification_action_pause_vpn" translatable="true">หยุดชั่วคราว</string>

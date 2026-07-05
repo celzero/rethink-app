@@ -42,7 +42,7 @@ import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.VpnBuilderPolicy.Companion.getNetworkBehaviourDuration
 import com.celzero.bravedns.service.WireguardManager.NOTIF_CHANNEL_ID_WIREGUARD_ALERTS
-import com.celzero.bravedns.ui.NotificationHandlerActivity
+import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.ConnectivityCheckHelper
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_WG_PERMISSION_NAME
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_WG_PERMISSION_VALUE
@@ -448,7 +448,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
         }
 
         Logger.w(LOG_TAG_VPN, "ssid wgs: missing permissions, show notification")
-        val intent = Intent(context, NotificationHandlerActivity::class.java)
+        val intent = Intent(context, HomeScreenActivity::class.java)
         intent.putExtra(
             NOTIF_WG_PERMISSION_NAME,
             NOTIF_WG_PERMISSION_VALUE
@@ -464,7 +464,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
         var builder: NotificationCompat.Builder
         if (isAtleastO()) {
             val name: CharSequence = context.getString(R.string.notif_channel_firewall_alerts)
-            val description = context.resources.getString(R.string.notif_channel_desc_firewall_alerts)
+            val description = context.getString(R.string.notif_channel_desc_firewall_alerts)
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(NOTIF_CHANNEL_ID_WIREGUARD_ALERTS, name, importance)
             channel.description = description
@@ -474,7 +474,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_WIREGUARD_ALERTS)
         }
 
-        val contentTitle: String = context.resources.getString(R.string.lbl_action_required)
+        val contentTitle: String = context.getString(R.string.lbl_action_required)
         val contentText: String =
             context.getString(R.string.location_enable_explanation, context.getString(R.string.lbl_ssids))
 

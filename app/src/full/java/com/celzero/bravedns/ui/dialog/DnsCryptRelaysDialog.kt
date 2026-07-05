@@ -15,45 +15,76 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui.dialog
 
-import android.app.Activity
-import android.app.Dialog
-import android.os.Bundle
-import android.view.Window
-import android.view.WindowManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.celzero.bravedns.databinding.DialogDnscryptRelaysBinding
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.asFlow
+import androidx.paging.PagingData
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.celzero.bravedns.R
+import com.celzero.bravedns.adapter.RelayRow
+import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.DnsCryptRelayEndpoint
+import com.celzero.bravedns.ui.compose.theme.Dimensions
+import com.celzero.bravedns.ui.compose.theme.RethinkTopBar
 
-class DnsCryptRelaysDialog(
-    private var activity: Activity,
-    internal var adapter: RecyclerView.Adapter<*>,
-    themeID: Int
-) : Dialog(activity, themeID) {
-
-    private lateinit var b: DialogDnscryptRelaysBinding
-
-    private var mLayoutManager: RecyclerView.LayoutManager? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
-        b = DialogDnscryptRelaysBinding.inflate(layoutInflater)
-        setContentView(b.root)
-        initView()
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DnsCryptRelaysDialog(
+    appConfig: AppConfig,
+    relays: LiveData<PagingData<DnsCryptRelayEndpoint>>,
+    onDismiss: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            DnsCryptRelaysContent(appConfig = appConfig, relays = relays, onDismiss = onDismiss)
+        }
     }
+}
 
-    private fun initView() {
-        window?.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.MATCH_PARENT
-        )
-
-        mLayoutManager = LinearLayoutManager(activity)
-
-        b.recyclerViewDialog.layoutManager = mLayoutManager
-        b.recyclerViewDialog.adapter = adapter
-
-        b.customDialogOkButton.setOnClickListener { this.dismiss() }
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DnsCryptRelaysContent(
+    appConfig: AppConfig,
+    relays: LiveData<PagingData<DnsCryptRelayEndpoint>>,
+    onDismiss: () -> Unit
+) {
+    val items = relays.asFlow().collectAsLazyPagingItems()
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            RethinkTopBar(
+                title = stringResource(R.string.cd_dnscrypt_relay_heading),
+                onBackClick = onDismiss
+            )
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier.padding(padding)
+        ) {
+            LazyColumn(
+                modifier = Modifier.padding(horizontal = Dimensions.screenPaddingHorizontal),
+                verticalArrangement = Arrangement.spacedBy(Dimensions.spacingXs)
+            ) {
+                items(items.itemCount) { index ->
+                    val item = items[index] ?: return@items
+                    RelayRow(item, appConfig)
+                }
+            }
+        }
     }
 }

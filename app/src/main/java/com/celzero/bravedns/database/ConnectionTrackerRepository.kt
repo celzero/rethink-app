@@ -77,6 +77,30 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         return connectionTrackerDAO.logsCount()
     }
 
+    suspend fun getAllLoggedAppsWithCount(rules: Set<String> = emptySet()): List<LogAppCount> {
+        return if (rules.isEmpty()) {
+            connectionTrackerDAO.getAllLoggedAppsWithCount()
+        } else {
+            connectionTrackerDAO.getAllLoggedAppsWithCountFiltered(rules)
+        }
+    }
+
+    suspend fun getAllowedLoggedAppsWithCount(rules: Set<String> = emptySet()): List<LogAppCount> {
+        return if (rules.isEmpty()) {
+            connectionTrackerDAO.getAllowedLoggedAppsWithCount()
+        } else {
+            connectionTrackerDAO.getAllowedLoggedAppsWithCountFiltered(rules)
+        }
+    }
+
+    suspend fun getBlockedLoggedAppsWithCount(rules: Set<String> = emptySet()): List<LogAppCount> {
+        return if (rules.isEmpty()) {
+            connectionTrackerDAO.getBlockedLoggedAppsWithCount()
+        } else {
+            connectionTrackerDAO.getBlockedLoggedAppsWithCountFiltered(rules)
+        }
+    }
+
     fun getLeastLoggedTime(): Long {
         return connectionTrackerDAO.getLeastLoggedTime()
     }

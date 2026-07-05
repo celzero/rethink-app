@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="title_settings">Nustatymai</string>
-    <string name="dns_explanation_dns_connected">Prisijungta prie RethinkDNS</string>
+    <string name="dns_explanation_dns_connected">Prisijungta prie Re-RethinkDNS</string>
     <string name="dns_explanation_firewall_connected">Prisijungta prie ugniasienės</string>
     <string name="app_name_small_case">rethink</string>
     <string name="universal_firewall_explanation">Taikykite ugniasienės taisykles visoms programėlėms pagal įrenginio įvykius, pvz., ugniasienę, kai įrenginys užrakintas arba kai tam tikra programėlė nenaudojama.</string>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name" translatable="false">Re-Rethink</string>
     <string name="title_about">Apie</string>
     <string name="about_title_desc">Aptik ir blokuok tinklo saugumo grėsmes</string>
     <string name="txt_home">Pagrindinis</string>
@@ -83,7 +83,7 @@
     <string name="app_mode_dns">DNS</string>
     <string name="app_mode_dns_firewall">DNS ir ugniasienė (numatytasis)</string>
     <string name="app_mode_wireguard">VPN</string>
-    <string name="settings_vpn_heading">vpn</string>
+    <string name="settings_vpn_heading">VPN</string>
     <string name="settings_enable_logs">Įgalinti registravimą įrenginyje</string>
     <string name="app_mode_choose">Pasirinkti režimą</string>
     <string name="connection_http3">HTTP3</string>
@@ -188,10 +188,10 @@
     <string name="hsf_blocklist_updating_text">Įgalinama…</string>
     <string name="hsf_chip_appearance">Tema: %1$s</string>
     <string name="hsf_pause_vpn_failure">Nepavyksta pristabdyti: RethinkDNS neaktyvus</string>
-    <string name="dc_block_heading">taisyklės</string>
-    <string name="dc_other_dns_heading">tipas</string>
+    <string name="dc_block_heading">Taisyklės</string>
+    <string name="dc_other_dns_heading">Tipas</string>
     <string name="dc_custom_dns_radio">Kitas DNS</string>
-    <string name="dc_rethink_dns_radio">RethinkDNS</string>
+    <string name="dc_rethink_dns_radio">Re-RethinkDNS</string>
     <string name="dc_entries">%1$s įrašai 🔗</string>
     <string name="dc_local_block_desc_1">Galite rinktis iš daugiau nei 185 blokavimo sąrašų. Spustelėkite čia, jei norite atsisiųsti arba konfigūruoti blokavimo sąrašus.</string>
     <string name="dc_custom_block_heading">Leisti arba neleisti atskirų domenų</string>
@@ -203,7 +203,7 @@
     <string name="about_bug_no_log_dialog_positive_btn">Siųsti el. laišką</string>
     <string name="about_faq">Peržiūrėti DUK</string>
     <string name="about_email">Parašyti mums el. laišką</string>
-    <string name="about_settings">sistema</string>
+    <string name="about_settings">Sistema</string>
     <string name="about_settings_app_info">Programėlės informacija</string>
     <string name="about_settings_vpn_profile">VPN profilis</string>
     <string name="about_settings_notification">Pranešimų nustatymai</string>
@@ -294,7 +294,7 @@
     <string name="fav_icon">fav_icon</string>
     <string name="rules_load_failure_heading">Pastaba</string>
     <string name="rules_load_failure_desc">Nerasta ugniasienės taisyklių</string>
-    <string name="rules_load_failure_reload">perkrauti</string>
+    <string name="rules_load_failure_reload">Perkrauti</string>
     <string name="network_log_app_name_unknown">Nežinoma</string>
     <string name="network_log_app_name_unnamed">Be pavadinimo (%1$s)</string>
     <string name="dns_crypt_connection_failure">Klaida jungiantis prie DNSCrypt serverio.</string>
@@ -511,7 +511,7 @@
     <string name="firewall_status_unknown">nežinoma</string>
     <string name="ct_bs_app_info_error">Programėlės informacija nerasta</string>
     <string name="firewall_card_status_active">%1$s programėlės</string>
-    <string name="about_app">programėlė</string>
+    <string name="about_app">Programėlė</string>
     <string name="log_file_not_available">Gedimo ataskaitai nerasta</string>
     <string name="hsf_vpn_dialog_message">RethinkDNS reikia leidimo nustatyti vietinį VPN, kad būtų galima užšifruoti įrenginio DNS užklausas, įdiegti tinklo monitorių ir vykdyti ugniasienės taisykles.
 \n
@@ -537,9 +537,9 @@
     <string name="about_bug_report_dialog_positive_btn">Siųsti el. laišką</string>
     <string name="about_bug_no_log_dialog_title">Pranešimas apie klaidą</string>
     <string name="about_bug_report">Pranešimas apie klaidą</string>
-    <string name="about_connect">susisiekti</string>
+    <string name="about_connect">Susisiekti</string>
     <string name="about_bug_no_log_dialog_message">Nepavyko gauti gedimų žurnalų. Ar norite rankiniu būdu pranešti apie klaidą\?</string>
-    <string name="about_web">nuorodos</string>
+    <string name="about_web">Nuorodos</string>
     <string name="about_sponsor_link_text">Paremti</string>
     <string name="about_twitter_handle">https://twitter.com/rethinkdns</string>
     <string name="about_dialog_neutral_button">Pasiūlyti funkcijas</string>
@@ -622,7 +622,7 @@
     <string name="build__flavor_play_store">play</string>
     <string name="cd_dialog_title">Pridėti domeną</string>
     <string name="new_app_bulk_notification_content">RethinkDNS užblokavo %1$s naujas (-ą) programėles (-ę). Bakstelėkite norėdami peržiūrėti arba keisti.</string>
-    <string name="notif_channel_desc_vpn_failure">Informuoti, kai Android arba kita VPN programa sustabdo RethinkDNS</string>
+    <string name="notif_channel_desc_vpn_failure">Informuoti, kai Android arba kita VPN programa sustabdo Re-RethinkDNS</string>
     <string name="notif_channed_desc_download">Įspėti apie įrenginio blokavimo sąrašų atsisiuntimo eigą</string>
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="notif_channel_desc_firewall_alerts">Įspėti apie ugniasienės klaidas ir anomalijas</string>

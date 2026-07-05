@@ -11,31 +11,10 @@
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />
 
-        <activity
-            android:name=".ui.activity.FirewallActivity"
-            android:finishOnTaskLaunch="true" />
+
         <activity android:name=".ui.HomeScreenActivity"
             android:launchMode="singleTask" />
-        <activity
-            android:name=".ui.activity.AppLockActivity"
-            android:exported="true"
-            android:launchMode="singleTask">
-            <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="content" />
-                <data android:scheme="file" />
-                <data android:mimeType="*/*" />
-                <data android:pathPattern=".*\\.rbk" />
-                <data android:host="*" />
-            </intent-filter>
-        </activity>
         <!-- Alias for AppLockActivity -->
         <activity-alias
             android:name=".ui.activity.LauncherAliasAppLock"
@@ -43,7 +22,7 @@
             android:exported="true"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
-            android:targetActivity=".ui.activity.AppLockActivity">
+            android:targetActivity=".ui.HomeScreenActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -63,130 +42,32 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity-alias>
-        <activity
-            android:name=".ui.activity.DnsDetailActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.WelcomeActivity"
-            android:finishOnTaskLaunch="true"
-            android:noHistory="true" />
-        <activity
-            android:name=".ui.activity.AppInfoActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.PauseActivity"
-            android:launchMode="singleInstance" />
-        <activity
-            android:name=".ui.activity.DnsListActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.CustomRulesActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.ConfigureRethinkBasicActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.ProxySettingsActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.MiscSettingsActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.TunnelSettingsActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.AppListActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.DetailedStatisticsActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.NetworkLogsActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.WgMainActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.WgConfigEditorActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.WgConfigDetailActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.CheckoutActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.PurchaseHistoryActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.ServerOrderHistoryActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.CustomerSupportActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.TcpProxyMainActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.UniversalFirewallSettingsActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.ConfigureOtherDnsActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.BlockFreeDnsActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.AppWiseIpLogsActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.AppWiseDomainLogsActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity android:name=".ui.activity.ConsoleLogActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity android:name=".ui.activity.EventsActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.NotificationHandlerActivity"
-            android:excludeFromRecents="true"
-            android:launchMode="singleInstance"
-            android:taskAffinity=""
-            android:theme="@style/AppThemeDialog" />
+
+
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="fullSensor"
             tools:replace="screenOrientation" />
-        <activity
-            android:name=".ui.activity.AlertsActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.AntiCensorshipActivity"
-            android:finishOnTaskLaunch="true" />
+
         <activity
             android:name=".ui.TestDialogActivity"
             android:exported="false" />
-        <activity
-            android:name=".ui.activity.AdvancedSettingActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.activity.DomainConnectionsActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
+
+        <!--<activity
             android:name=".ui.activity.PingTestActivity"
             android:finishOnTaskLaunch="true" />
-        <activity android:name=".ui.activity.FragmentHostActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity android:name=".ui.activity.RpnWinProxyDetailsActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity android:name=".ui.activity.BubbleActivity"
+        <activity android:name=".ui.activity.RpnAvailabilityCheckActivity"
+            android:finishOnTaskLaunch="true" />-->
+        <activity
+            android:name=".ui.activity.BubbleActivity"
             android:allowEmbedded="true"
             android:resizeableActivity="true"
             android:exported="false"
             android:excludeFromRecents="true"
             android:taskAffinity=""
-            android:launchMode="standard"/>
-        <activity android:name=".ui.activity.RpnConfigDetailActivity"
-                    android:finishOnTaskLaunch="true" />
+            android:launchMode="standard" />
+        <!-- <activity android:name=".ui.location.LocationSelectorActivity"
+            android:finishOnTaskLaunch="true" />-->
 
         <receiver
             android:name=".receiver.BraveAutoStartReceiver"
@@ -249,7 +130,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.provider;${applicationId}.backup.BackupAgent"
+            android:authorities="com.celzero.bravedns.provider;com.celzero.bravedns.backup.BackupAgent"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

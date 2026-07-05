@@ -203,6 +203,12 @@ class WorkScheduler(val context: Context) {
             )
     }
 
+    fun cancelBlocklistUpdateCheckJob() {
+        Logger.i(LOG_TAG_SCHEDULER, "Cancel all the work related to blocklist update check")
+        WorkManager.getInstance(context.applicationContext)
+            .cancelAllWorkByTag(BLOCKLIST_UPDATE_CHECK_JOB_TAG)
+    }
+
     fun scheduleDataUsageJob() {
         Logger.i(LOG_TAG_SCHEDULER, "Data usage job scheduled")
         val workRequest =

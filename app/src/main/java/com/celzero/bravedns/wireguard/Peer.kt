@@ -61,7 +61,7 @@ class Peer private constructor(builder: Builder) {
         unresolvedEndpoint = builder.unresolvedEndpoint
         persistentKeepalive = builder.persistentKeepalive
         preSharedKey = builder.preSharedKey
-        publicKey = Objects.requireNonNull(builder.publicKey, "Peers must have a public key")!!
+        publicKey = requireNotNull(builder.publicKey) { "Peers must have a public key" }
     }
 
     @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
@@ -232,7 +232,7 @@ class Peer private constructor(builder: Builder) {
         }
 
         fun addAllowedIps(allowedIps: Collection<InetNetwork>?): Builder {
-            this.allowedIps.addAll(allowedIps!!)
+            allowedIps?.let { this.allowedIps.addAll(it) }
             return this
         }
 

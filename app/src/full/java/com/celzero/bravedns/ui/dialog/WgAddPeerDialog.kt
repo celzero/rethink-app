@@ -15,186 +15,196 @@
  */
 package com.celzero.bravedns.ui.dialog
 
-import Logger
-import android.app.Activity
-import android.app.Dialog
-import android.os.Bundle
-import android.view.View
-import android.view.Window
-import android.view.WindowManager
 import android.widget.Toast
-import androidx.core.widget.doOnTextChanged
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.DialogWgAddPeerBinding
 import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.ui.bottomsheet.RuleSheetTextFieldRow
+import com.celzero.bravedns.ui.compose.theme.Dimensions
+import com.celzero.bravedns.ui.compose.theme.RethinkBottomSheetActionRow
+import com.celzero.bravedns.ui.compose.theme.RethinkBottomSheetCard
+import com.celzero.bravedns.ui.compose.theme.RethinkSecondaryActionStyle
 import com.celzero.bravedns.util.UIUtils.getDurationInHumanReadableFormat
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.tos
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.util.ErrorMessages
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class WgAddPeerDialog(
-    private val activity: Activity,
-    themeID: Int,
-    private var configId: Int,
-    private val wgPeer: Peer?
-) : Dialog(activity, themeID) {
+@Composable
+fun WgAddPeerDialog(
+    configId: Int,
+    wgPeer: Peer?,
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val isEditing = wgPeer != null
 
-    private lateinit var b: DialogWgAddPeerBinding
-
-    private var isEditing = false
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
-        b = DialogWgAddPeerBinding.inflate(layoutInflater)
-        setContentView(b.root)
-        initView()
-        setupClickListener()
-    }
-
-    private fun initView() {
-        window?.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.MATCH_PARENT
-        )
-        setupAutoExpand(b.peerAllowedIps)
-
-        if (wgPeer != null) {
-            isEditing = true
-            b.peerPublicKey.setText(wgPeer.getPublicKey().base64())
-            if (wgPeer.getPreSharedKey().isPresent) {
-                b.peerPresharedKey.setText(wgPeer.getPreSharedKey().get().base64())
-            }
-            b.peerAllowedIps.setText(wgPeer.getAllowedIps().joinToString { it.toString() })
-            if (wgPeer.getEndpoint().isPresent) {
-                b.peerEndpoint.setText(wgPeer.getEndpoint().get().toString())
-            }
-            if (wgPeer.persistentKeepalive.isPresent) {
-                val kas = wgPeer.persistentKeepalive.get()
-                b.keepAliveHint.visibility = View.VISIBLE
-                b.peerPersistentKeepAlive.setText(kas.toString())
-                b.keepAliveHint.text = getDurationInHumanReadableFormat(activity, kas)
-            } else {
-                b.keepAliveHint.visibility = View.GONE
-            }
-        }
-        // re-measure after setting text
-        b.root.post {
-            triggerExpandNow()
-        }
-    }
-
-    private fun triggerExpandNow() {
-        listOf(b.peerAllowedIps).forEach { adjustMaxLines(it) }
-    }
-
-    private fun setupAutoExpand(et: com.google.android.material.textfield.TextInputEditText) {
-        et.setHorizontallyScrolling(false)
-        et.maxLines = 4 // initial cap
-        et.doOnTextChanged { _, _, _, _ -> adjustMaxLines(et) }
-    }
-
-    private fun adjustMaxLines(et: com.google.android.material.textfield.TextInputEditText) {
-        // post to ensure lineCount updated after layout
-        et.post {
-            val lines = et.lineCount
-            val threshold = 4
-            val hardCap = 12
-            if (lines > threshold) {
-                et.maxLines = minOf(lines, hardCap)
-            }
-        }
-    }
-
-    private fun setupClickListener() {
-        b.customDialogDismissButton.setOnClickListener { this.dismiss() }
-
-        b.peerPersistentKeepAlive.doOnTextChanged { text, _, _, _ ->
-            if (text.toString().isNotEmpty()) {
-                try {
-                    val kas = text.toString().toInt()
-                    b.keepAliveHint.visibility = View.VISIBLE
-                    b.keepAliveHint.text = getDurationInHumanReadableFormat(activity, kas)
-                } catch (_: NumberFormatException) {
-                    b.keepAliveHint.visibility = View.GONE
-                }
-            } else {
-                b.keepAliveHint.visibility = View.GONE
-            }
-        }
-
-        b.customDialogOkButton.setOnClickListener {
-            b.customDialogOkButton.isEnabled = false
-
-            val peerPublicKey = b.peerPublicKey.text.toString()
-            val presharedKey = b.peerPresharedKey.text.toString()
-            val peerEndpoint = b.peerEndpoint.text.toString()
-            val peerPersistentKeepAlive = b.peerPersistentKeepAlive.text.toString()
-            val allowedIps = b.peerAllowedIps.text.toString()
-
-            try {
-                val builder = Peer.Builder()
-                if (allowedIps.isNotEmpty()) builder.parseAllowedIPs(allowedIps)
-                if (peerEndpoint.isNotEmpty()) builder.parseEndpoint(peerEndpoint)
-                if (peerPersistentKeepAlive.isNotEmpty())
-                    builder.parsePersistentKeepalive(peerPersistentKeepAlive)
-                if (presharedKey.isNotEmpty()) builder.parsePreSharedKey(presharedKey)
-                if (peerPublicKey.isNotEmpty()) builder.parsePublicKey(peerPublicKey)
-                val newPeer = builder.build()
-
-                ui {
-                    showSaving()
-                    ioCtx {
-                        if (wgPeer != null && isEditing)
-                            WireguardManager.deletePeer(configId, wgPeer)
-                        WireguardManager.addPeer(configId, newPeer)
+    WgDialog(onDismissRequest = onDismiss) {
+        WgDialogColumn(
+            scrollable = true,
+            verticalSpacing = Dimensions.spacingMd
+        ) {
+            var publicKey by remember { mutableStateOf(wgPeer?.getPublicKey()?.base64()?.tos().orEmpty()) }
+            var presharedKey by remember {
+                mutableStateOf(
+                    if (wgPeer?.getPreSharedKey()?.isPresent == true) {
+                        wgPeer.getPreSharedKey().get().base64().tos().orEmpty()
+                    } else {
+                        ""
                     }
-                    Utilities.showToastUiCentered(
-                        activity,
-                        context.getString(R.string.config_add_success_toast),
-                        Toast.LENGTH_SHORT
-                    )
-                    this.dismiss()
-                }
-            } catch (e: Throwable) {
-                resetSaveButton()
-                val ex = Logger.throwableToException(e)
-                Logger.e(Logger.LOG_TAG_PROXY, "Error while adding peer", ex)
-                Utilities.showToastUiCentered(
-                    activity,
-                    ErrorMessages[activity, e],
-                    Toast.LENGTH_SHORT
                 )
-                return@setOnClickListener
             }
+            var allowedIps by remember {
+                mutableStateOf(wgPeer?.getAllowedIps()?.joinToString { it.toString() }.orEmpty())
+            }
+            var endpoint by remember {
+                mutableStateOf(
+                    if (wgPeer?.getEndpoint()?.isPresent == true) {
+                        wgPeer.getEndpoint().get().toString()
+                    } else {
+                        ""
+                    }
+                )
+            }
+            var keepAlive by remember {
+                mutableStateOf(
+                    if (wgPeer?.persistentKeepalive?.isPresent == true) {
+                        wgPeer.persistentKeepalive.get().toString()
+                    } else {
+                        ""
+                    }
+                )
+            }
+            var keepAliveHint by remember {
+                mutableStateOf(
+                    if (wgPeer?.persistentKeepalive?.isPresent == true) {
+                        getDurationInHumanReadableFormat(context, wgPeer.persistentKeepalive.get())
+                    } else {
+                        ""
+                    }
+                )
+            }
+
+            RethinkBottomSheetCard {
+                Text(text = stringResource(R.string.add_peer), style = MaterialTheme.typography.titleLarge)
+                RuleSheetTextFieldRow(
+                    value = publicKey,
+                    onValueChange = { publicKey = it },
+                    label = { Text(text = stringResource(R.string.lbl_public_key)) },
+                    keyboardType = KeyboardType.Password
+                )
+                RuleSheetTextFieldRow(
+                    value = presharedKey,
+                    onValueChange = { presharedKey = it },
+                    label = { Text(text = stringResource(R.string.lbl_preshared_key)) },
+                    keyboardType = KeyboardType.Password
+                )
+                RuleSheetTextFieldRow(
+                    value = keepAlive,
+                    onValueChange = { value ->
+                        keepAlive = value
+                        keepAliveHint =
+                            value.toIntOrNull()?.let { getDurationInHumanReadableFormat(context, it) }
+                                .orEmpty()
+                    },
+                    label = { Text(text = stringResource(R.string.lbl_persistent_keepalive)) },
+                    keyboardType = KeyboardType.Number
+                )
+                if (keepAliveHint.isNotBlank()) {
+                    Text(
+                        text = keepAliveHint,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                RuleSheetTextFieldRow(
+                    value = endpoint,
+                    onValueChange = { endpoint = it },
+                    label = { Text(text = stringResource(R.string.parse_error_inet_endpoint)) },
+                    keyboardType = KeyboardType.Password
+                )
+                RuleSheetTextFieldRow(
+                    value = allowedIps,
+                    onValueChange = { allowedIps = it },
+                    label = { Text(text = stringResource(R.string.lbl_allowed_ips)) },
+                    keyboardType = KeyboardType.Text
+                )
+            }
+            RethinkBottomSheetActionRow(
+                primaryText = stringResource(R.string.lbl_save),
+                onPrimaryClick = {
+                    scope.launch {
+                        savePeer(
+                            context = context,
+                            configId = configId,
+                            wgPeer = wgPeer,
+                            isEditing = isEditing,
+                            publicKey = publicKey,
+                            presharedKey = presharedKey,
+                            allowedIps = allowedIps,
+                            endpoint = endpoint,
+                            keepAlive = keepAlive,
+                            onSuccess = onDismiss,
+                            onError = { message ->
+                                Utilities.showToastUiCentered(context, message, Toast.LENGTH_SHORT)
+                            }
+                        )
+                    }
+                },
+                secondaryText = stringResource(R.string.lbl_dismiss),
+                onSecondaryClick = onDismiss,
+                secondaryStyle = RethinkSecondaryActionStyle.TEXT
+            )
         }
     }
+}
 
-    /** Switch the Save button into a loading state: spinner visible, text dimmed. */
-    private fun showSaving() {
-        b.customDialogOkButton.text = activity.getString(R.string.lbl_saving)
-        b.customDialogOkButton.isEnabled = false
-        b.customDialogOkProgress.visibility = View.VISIBLE
-    }
+private suspend fun savePeer(
+    context: android.content.Context,
+    configId: Int,
+    wgPeer: Peer?,
+    isEditing: Boolean,
+    publicKey: String,
+    presharedKey: String,
+    allowedIps: String,
+    endpoint: String,
+    keepAlive: String,
+    onSuccess: () -> Unit,
+    onError: (String) -> Unit
+) {
+    try {
+        val builder = Peer.Builder()
+        if (allowedIps.isNotEmpty()) builder.parseAllowedIPs(allowedIps)
+        if (endpoint.isNotEmpty()) builder.parseEndpoint(endpoint)
+        if (keepAlive.isNotEmpty()) builder.parsePersistentKeepalive(keepAlive)
+        if (presharedKey.isNotEmpty()) builder.parsePreSharedKey(presharedKey)
+        if (publicKey.isNotEmpty()) builder.parsePublicKey(publicKey)
+        val newPeer = builder.build()
 
-    /** Restore the Save button to its normal, interactive state. */
-    private fun resetSaveButton() {
-        b.customDialogOkButton.text = activity.getString(R.string.lbl_save)
-        b.customDialogOkButton.isEnabled = true
-        b.customDialogOkProgress.visibility = View.GONE
-    }
-
-    private fun ui(f: suspend () -> Unit) {
-        (activity as LifecycleOwner).lifecycleScope.launch(Dispatchers.Main) { f() }
-    }
-
-    private suspend fun ioCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.IO) { f() }
+        withContext(Dispatchers.IO) {
+            if (wgPeer != null && isEditing) {
+                WireguardManager.deletePeer(configId, wgPeer)
+            }
+            WireguardManager.addPeer(configId, newPeer)
+        }
+        onSuccess()
+    } catch (e: Throwable) {
+        Napier.e("Error while adding peer", e)
+        onError(ErrorMessages[context, e])
     }
 }

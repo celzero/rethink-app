@@ -15,163 +15,106 @@
  */
 package com.celzero.bravedns.adapter
 
-import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.Drawable
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
-import androidx.paging.PagingDataAdapter
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConnection
-import com.celzero.bravedns.databinding.ListItemStatisticsSummaryBinding
 import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.ui.activity.AppInfoActivity
-import com.celzero.bravedns.ui.activity.DomainConnectionsActivity
-import com.celzero.bravedns.ui.activity.NetworkLogsActivity
+import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.compose.statistics.StatisticsSummaryItem
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class DomainConnectionsAdapter(private val context: Context, private val type: DomainConnectionsActivity.InputType) :
-    PagingDataAdapter<AppConnection, DomainConnectionsAdapter.DomainConnectionsViewHolder>(
-        DIFF_CALLBACK
-    ) {
-
-    companion object {
-        private val DIFF_CALLBACK =
-            object : DiffUtil.ItemCallback<AppConnection>() {
-                override fun areItemsTheSame(
-                    oldConnection: AppConnection,
-                    newConnection: AppConnection
-                ): Boolean {
-                    return (oldConnection == newConnection)
-                }
-
-                override fun areContentsTheSame(
-                    oldConnection: AppConnection,
-                    newConnection: AppConnection
-                ): Boolean {
-                    return (oldConnection == newConnection)
-                }
-            }
+@Composable
+fun ConnectionRow(dc: AppConnection) {
+    val context = LocalContext.current
+    val fallbackName = if (dc.appOrDnsName.isNullOrEmpty()) {
+        context.getString(R.string.network_log_app_name_unnamed, "(${dc.uid})")
+    } else {
+        dc.appOrDnsName
     }
-
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): DomainConnectionsViewHolder {
-        val itemBinding =
-            ListItemStatisticsSummaryBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
+    val totalUsageText = if (dc.downloadBytes != null && dc.uploadBytes != null) {
+        val download =
+            context.getString(
+                R.string.symbol_download,
+                Utilities.humanReadableByteCount(dc.downloadBytes, true)
             )
-        return DomainConnectionsViewHolder(itemBinding)
+        val upload =
+            context.getString(
+                R.string.symbol_upload,
+                Utilities.humanReadableByteCount(dc.uploadBytes, true)
+            )
+        context.getString(R.string.two_argument, upload, download)
+    } else {
+        null
     }
 
-    override fun onBindViewHolder(holder: DomainConnectionsViewHolder, position: Int) {
-        val appNetworkActivity = getItem(position) ?: return
-        holder.bind(appNetworkActivity)
-    }
+    val scope = rememberCoroutineScope()
+    var title by remember(dc.uid, dc.appOrDnsName) { mutableStateOf(fallbackName.orEmpty()) }
+    var icon by remember(dc.uid) { mutableStateOf(Utilities.getDefaultIcon(context)) }
+    var isUnknown by remember(dc.uid) { mutableStateOf(true) }
 
-    inner class DomainConnectionsViewHolder(private val b: ListItemStatisticsSummaryBinding) :
-        RecyclerView.ViewHolder(b.root) {
-
-        fun bind(dc: AppConnection) {
-            io {
+    LaunchedEffect(dc.uid, dc.appOrDnsName) {
+        val resolved =
+            withContext(Dispatchers.IO) {
                 val appInfo = FirewallManager.getAppInfoByUid(dc.uid)
-                uiCtx {
-                    if (dc.appOrDnsName.isNullOrEmpty()) {
-                        b.ssDataUsage.text = appInfo?.appName ?: context.getString(
-                            R.string.network_log_app_name_unnamed,
-                            "(${dc.uid})"
-                        )
-                    } else {
-                        b.ssDataUsage.text = dc.appOrDnsName
-                    }
-                    b.ssIcon.visibility = View.VISIBLE
-                    b.ssFlag.visibility = View.GONE
-                    loadAppIcon(
-                        Utilities.getIcon(
-                            context,
-                            appInfo?.packageName.orEmpty(),
-                            appInfo?.appName.orEmpty()
-                        )
-                    )
+                val displayName = if (dc.appOrDnsName.isNullOrEmpty()) {
+                    appInfo?.appName ?: fallbackName.orEmpty()
+                } else {
+                    dc.appOrDnsName
                 }
+                val resolvedIcon =
+                    Utilities.getIcon(
+                        context,
+                        appInfo?.packageName ?: "",
+                        appInfo?.appName ?: ""
+                    ) ?: Utilities.getDefaultIcon(context)
+                Triple(appInfo == null, displayName, resolvedIcon)
             }
-            if (dc.downloadBytes == null || dc.uploadBytes == null) {
-                return
-            }
+        isUnknown = resolved.first
+        title = resolved.second
+        icon = resolved.third
+    }
 
-            val download =
-                context.getString(
-                    R.string.symbol_download,
-                    Utilities.humanReadableByteCount(dc.downloadBytes, true)
-                )
-            val upload =
-                context.getString(
-                    R.string.symbol_upload,
-                    Utilities.humanReadableByteCount(dc.uploadBytes, true)
-                )
-            val total = context.getString(R.string.two_argument, upload, download)
-            b.ssName.text = total
-            b.ssCount.text = dc.count.toString()
-
-            b.ssProgress.visibility = View.GONE
-
-            b.ssContainer.setOnClickListener {
-                io {
-                    if (isUnknownApp(dc)) {
-                        uiCtx {
-                            val intent = Intent(context, NetworkLogsActivity::class.java)
-                            intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, NetworkLogsActivity.Tabs.NETWORK_LOGS.screen)
-                            intent.putExtra(Constants.SEARCH_QUERY, dc.appOrDnsName)
-                            context.startActivity(intent)
-                        }
-                    } else {
-                        uiCtx {
-                            val intent = Intent(context, AppInfoActivity::class.java)
-                            intent.putExtra(AppInfoActivity.INTENT_UID, dc.uid)
-                            context.startActivity(intent)
-                        }
-                    }
-                }
+    val onClick = {
+        scope.launch(Dispatchers.IO) {
+            if (isUnknown) {
+                // Navigate to network logs via HomeScreenActivity
+                val intent = Intent(context, HomeScreenActivity::class.java)
+                intent.putExtra(HomeScreenActivity.EXTRA_NAV_TARGET, HomeScreenActivity.NAV_TARGET_NETWORK_LOGS)
+                intent.putExtra(Constants.SEARCH_QUERY, dc.appOrDnsName)
+                withContext(Dispatchers.Main) { context.startActivity(intent) }
+            } else {
+                val intent = Intent(context, HomeScreenActivity::class.java)
+                intent.putExtra(HomeScreenActivity.EXTRA_NAV_TARGET, HomeScreenActivity.NAV_TARGET_APP_INFO)
+                intent.putExtra(HomeScreenActivity.EXTRA_APP_INFO_UID, dc.uid)
+                withContext(Dispatchers.Main) { context.startActivity(intent) }
             }
         }
-
-        private suspend fun isUnknownApp(appConnection: AppConnection): Boolean {
-            val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
-            return appInfo == null
-        }
-
-        private fun loadAppIcon(drawable: Drawable?) {
-            ui {
-                Glide.with(context)
-                    .load(drawable)
-                    .error(Utilities.getDefaultIcon(context))
-                    .into(b.ssIcon)
-            }
-        }
+        Unit
     }
 
-    private fun io(f: suspend () -> Unit) {
-        (context as LifecycleOwner).lifecycleScope.launch(Dispatchers.IO) { f() }
-    }
-
-    private fun ui(f: suspend () -> Unit) {
-        (context as LifecycleOwner).lifecycleScope.launch(Dispatchers.Main) { f() }
-    }
-
-    private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
-    }
+    StatisticsSummaryItem(
+        title = title,
+        subtitle = totalUsageText,
+        countText = dc.count.toString(),
+        iconDrawable = icon,
+        flagText = null,
+        showProgress = false,
+        progress = 0f,
+        progressColor = Color.Transparent,
+        showIndicator = true,
+        onClick = onClick
+    )
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">रीथिंकडीएनएस</string>
+    <string name="app_name" translatable="false">Re-Rethink</string>
     <string name="app_name_small_case">रीथिंक</string>
     <string name="title_about">हमारे बारे में</string>
     <string name="title_settings">सेटिंग्स</string>

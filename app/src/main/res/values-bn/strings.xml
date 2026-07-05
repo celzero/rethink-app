@@ -116,7 +116,7 @@
     <string name="alert_permission_accessibility">অনুমতি - অ্যাক্সেসযোগ্যতা</string>
     <string name="firewall_act_network_monitor_tab">নেটওয়ার্ক লগ</string>
     <string name="download_update_dialog_trylater_title">এখনই আপডেট করা যাচ্ছে না</string>
-    <string name="settings_vpn_heading">vpn</string>
+    <string name="settings_vpn_heading">VPN</string>
     <string name="info_dialog_url_copy_toast_msg">ইউআরএল কপি করা হয়েছে</string>
     <string name="orbot_both_desc">উপরের সবগুলো.</string>
     <string name="orbot_install_dialog_positive">ইনস্টল করুন</string>
@@ -290,7 +290,7 @@
     <string name="settings_theme_dialog_themes_4">সত্যিকারের কালো</string>
     <string name="settings_notification_desc2">DNS / DNS + ফায়ারওয়াল</string>
     <string name="ct_bs_app_info_error">অ্যাপের তথ্য পাওয়া যায়নি</string>
-    <string name="dc_rethink_dns_radio">RethinkDNS</string>
+    <string name="dc_rethink_dns_radio">Re-RethinkDNS</string>
     <string name="about_github">GitHub-এ অবদান রাখুন</string>
     <string name="about_mail_subject">[RethinkDNS]:</string>
     <string name="cd_custom_doh_dialog_title">কাস্টম সার্ভার URL</string>
@@ -354,7 +354,7 @@
     <string name="about_dialog_neutral_button">বৈশিষ্ট্য প্রস্তাব করুন</string>
     <string name="univ_firewall_rule_1">ডিভাইস লক হয়ে গেলে সমস্ত অ্যাপ ব্লক করুন</string>
     <string name="univ_firewall_rule_7">IPv6 তে IPv4 ব্লক করুন (পরীক্ষামূলক)</string>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name" translatable="false">Re-Rethink</string>
     <string name="pause_title_desc">ঘুমানো…</string>
     <string name="app_name_small_case">rethink</string>
     <string name="title_settings">পছন্দসমূহ</string>

@@ -20,7 +20,7 @@
     <string name="lbl_domain" translatable="true">Dominyo</string>
     <string name="lbl_wildcard" translatable="true">Wildcard</string>
     <string name="lbl_action_required" translatable="true">Kailangan ng Aksyon</string>
-    <string name="lbl_rules" translatable="true">mga patakaran</string>
+    <string name="lbl_rules" translatable="true">Mga patakaran</string>
     <string name="lbl_configure" translatable="true">I-configure</string>
     <string name="lbl_logs" translatable="true">tala</string>
     <string name="lbl_ip_rules" translatable="true">Mga Patakaran sa IP</string>
@@ -60,7 +60,7 @@
     <string name="status_app_error" translatable="true">error ng aplikasyon</string>
     <string name="untracked" translatable="true">hindi nasusundan</string>
     <string name="bypass_dns_firewall" translatable="true">Lusutan ang DNS at firewall</string>
-    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Paalala: Na-deactivate na ang RethinkDNS</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Paalala: Na-deactivate na ang Re-RethinkDNS</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">Pindutin upang baguhin ang mga setting ng proteksyon</string>
     <string name="dns_mode_notification_title" translatable="true">Nakasegurong nakakabit sa mabilis at ligtas na DNS.</string>
     <string name="firewall_mode_notification_title" translatable="true">Nakaseguro! Nakakonekta sa Firewall.</string>
@@ -71,7 +71,7 @@
     <string name="notification_action_dns_mode" translatable="true">DNS</string>
     <string name="firewall_rules" translatable="true">Mga Patakaran sa Network</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">Private DNS ay pinagana</string>
-    <string name="dns_explanation_dns_connected" translatable="true">Nakakonekta sa RethinkDNS</string>
+    <string name="dns_explanation_dns_connected" translatable="true">Nakakonekta sa Re-RethinkDNS</string>
     <string name="dns_explanation_firewall_connected" translatable="true">Nakakonekta sa Firewall</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">hindi protektado</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">Nakakonekta sa RethinkDNS at Firewall</string>

@@ -15,52 +15,71 @@
  */
 package com.celzero.bravedns.ui.dialog
 
-import android.app.Activity
-import com.celzero.bravedns.adapter.HopItem
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.celzero.bravedns.R
+import com.celzero.bravedns.adapter.HopRow
 import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.ui.compose.theme.Dimensions
+import com.celzero.bravedns.ui.compose.theme.RethinkBottomSheetActionRow
+import com.celzero.bravedns.ui.compose.theme.RethinkBottomSheetCard
 import com.celzero.bravedns.wireguard.Config
+import io.github.aakira.napier.Napier
 
-/**
- * Dialog for WireGuard configuration hopping
- * Now extends GenericHopDialog to reuse common hop logic
- */
-class WgHopDialog(
-    activity: Activity,
-    themeID: Int,
+@Composable
+fun WgHopDialog(
     srcId: Int,
-    configs: List<Config>,
+    hopables: List<Config>,
     selectedId: Int,
-    onHopChanged: ((Int) -> Unit)? = null
-) : GenericHopDialog(
-    activity,
-    themeID,
-    srcId,
-    configs.map { config ->
-        val mapping = WireguardManager.getConfigFilesById(config.getId())
-        HopItem.WireGuardHop(config, mapping?.isActive ?: false)
-    },
-    selectedId,
-    onHopChanged
+    onDismiss: () -> Unit
 ) {
-    companion object {
-        /**
-         * Create WireGuard hop dialog
-         */
-        fun create(
-            activity: Activity,
-            themeID: Int,
-            srcConfigId: Int,
-            availableConfigs: List<Config>,
-            currentlySelectedConfigId: Int = -1,
-            onHopChanged: ((Int) -> Unit)? = null
-        ): WgHopDialog {
-            return WgHopDialog(
-                activity,
-                themeID,
-                srcConfigId,
-                availableConfigs,
-                currentlySelectedConfigId,
-                onHopChanged
+    val context = LocalContext.current
+    WgDialog(onDismissRequest = onDismiss) {
+        val selectedHopId = remember(selectedId) { mutableStateOf(selectedId) }
+        WgDialogColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalSpacing = Dimensions.spacingSmMd
+        ) {
+            Text(
+                text = stringResource(R.string.hop_add_remove_title),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            RethinkBottomSheetCard(modifier = Modifier.weight(1f)) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(Dimensions.spacingSm)
+                ) {
+                    items(hopables) { config ->
+                        val mapping = WireguardManager.getConfigFilesById(config.getId()) ?: return@items
+                        HopRow(
+                            context = context,
+                            srcId = srcId,
+                            config = config,
+                            isActive = mapping.isActive,
+                            selectedId = selectedHopId.value,
+                            onSelectedIdChange = { selectedHopId.value = it }
+                        )
+                    }
+                }
+            }
+            RethinkBottomSheetActionRow(
+                primaryText = stringResource(R.string.ada_noapp_dialog_positive),
+                onPrimaryClick = {
+                    Napier.d("Dismiss hop dialog")
+                    onDismiss()
+                }
             )
         }
     }
