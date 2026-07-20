@@ -175,20 +175,21 @@
 
             </RelativeLayout>
 
-            <RelativeLayout
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/aad_aap_firewall_new_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:paddingStart="10dp"
-                android:paddingEnd="10dp">
+                android:paddingEnd="10dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
                 <androidx.appcompat.widget.AppCompatTextView
                     style="@style/TextAppearance.Material3.TitleSmall"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
+                    android:layout_weight="1"
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="5dp"
@@ -197,7 +198,20 @@
                     android:text="@string/ada_firewall_title"
                     android:textColor="?attr/colorOnBackground" />
 
-            </RelativeLayout>
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/aad_notes_chip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:text="@string/lbl_notes"
+                    android:textColor="?attr/primaryTextColor"
+                    android:visibility="visible"
+                    app:chipBackgroundColor="#E8E8E8"
+                    app:chipStrokeColor="?attr/primaryTextColor"
+                    app:chipStrokeWidth="1dp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/aad_app_settings_card"

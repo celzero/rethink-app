@@ -114,7 +114,6 @@ class FirewallAppListAdapter(
                 val appStatus = FirewallManager.appStatus(appInfo.uid)
                 val connStatus = FirewallManager.connectionStatus(appInfo.uid)
                 uiCtx {
-                    b.firewallAppLabelTv.text = appInfo.appName
                     // setting the appname with different color for system and user apps
                     // causes conflict with the firewall status like blocked and isolated
                     // so removing the color change for now
@@ -123,6 +122,8 @@ class FirewallAppListAdapter(
                     } else {
                         b.firewallAppLabelTv.setTextColor(userAppColor)
                     } */
+                    b.firewallAppLabelTv.text = appInfo.appName
+                    b.firewallAppInfo.text = context.getString(R.string.app_id_package, appInfo.uid, appInfo.packageName)
                     b.firewallAppToggleOther.text = getFirewallText(appStatus, connStatus)
                     displayIcon(
                         getIcon(context, appInfo.packageName, appInfo.appName), b.firewallAppIconIv)

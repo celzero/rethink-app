@@ -46,6 +46,9 @@
     <string name="lbl_applications" translatable="true">Applications</string>
     <string name="lbl_ip_rules" translatable="true">IP Rules</string>
     <string name="lbl_domain_rules" translatable="true">Domain Rules</string>
+    <string name="lbl_notes" translatable="true">Notes</string>
+    <string name="title_notes" translatable="true">Edit Notes</string>
+    <string name="hint_notes" translatable="true">Add notes about this rule...</string>
     <string name="lbl_delete" translatable="true">Delete</string>
     <string name="lbl_proceed" translatable="true">Proceed</string>
     <string name="lbl_private_key" translatable="true">Private key</string>
@@ -322,6 +325,7 @@
     <string name="firewall_mode_info_explanation_new" translatable="true">Monitor network activity and firewall any app or IP address.</string>
 
     <string name="apps_info_title" translatable="true">Apps</string>
+
 
     <string name="hybrid_mode_info_title" translatable="true">DNS + Firewall</string>
 
@@ -725,6 +729,8 @@
     <string name="firewall_status_block_metered" translatable="true">blocked on metered (mobile) networks</string>
     <string name="firewall_status_blocked" translatable="true">blocked</string>
     <string name="firewall_status_unknown" translatable="true">unknown</string>
+    <string name="app_id_package" translatable="false">UID: %1$d - %2$s</string>
+
 
     <!--Connection tracker bottom sheet -->
     <string name="ct_bs_app_info_error" translatable="true">App Info not found</string>
@@ -1133,6 +1139,7 @@
     <!-- Firewall -->
     <string name="fapps_filter_filter_heading" translatable="true">Type</string>
     <string name="fapps_filter_categories_heading" translatable="true">Categories</string>
+    <string name="fapps_filter_sort_heading">Sort by</string>
 
     <string name="fapps_filter_clear_btn" translatable="true">Clear</string>
 
@@ -1351,6 +1358,11 @@
     <string name="category_name_others" translatable="true">Other</string>
     <string name="category_name_non_app_sys" translatable="true">System Services</string>
     <string name="category_name_installed" translatable="true">Installed Apps</string>
+
+    <!-- Sort constants -->
+    <string name="fapps_filter_sort_name">Name</string>
+    <string name="fapps_filter_sort_package">Package name</string>
+    <string name="fapps_filter_sort_uid">UID</string>
 
     <!-- Build flavor constants -->
     <string name="build__flavor_website" translatable="true">website</string>

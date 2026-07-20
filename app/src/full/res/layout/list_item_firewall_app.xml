@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_marginBottom="1dp"
     android:animateLayoutChanges="true"
     android:background="?attr/background"
@@ -80,6 +81,16 @@
                             android:layout_marginStart="5dp"
                             android:layout_marginEnd="5dp"
                             android:textSize="@dimen/default_font_text_view" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/firewall_app_info"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginEnd="5dp"
+                            android:textSize="@dimen/default_font_text_view"
+                            tools:text="UID: 10123 - com.android.chrome" />
 
                     </androidx.appcompat.widget.LinearLayoutCompat>
                 </androidx.appcompat.widget.LinearLayoutCompat>

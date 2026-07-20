@@ -28,6 +28,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     private var firewallFilter = AppListActivity.FirewallFilter.ALL
     private var search: String = ""
     private val rethinkUid = android.os.Process.myUid()
+    private var sort: String = "name"
 
     init {
         filter.value = ""
@@ -56,6 +57,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
         this.firewallFilter = filters.firewallFilter
         this.topLevelFilter = filters.topLevelFilter
+        this.sort = filters.sort
 
         this.search = filters.searchString
         setFilterWithDebounce(filters.searchString)
@@ -93,7 +95,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         "%$searchString%",
                         firewallFilter.getFilter(),
                         firewallFilter.getConnectionStatusFilter(),
-                        includeProxyBypass
+                        includeProxyBypass,
+                        sort
                     )
                 }
                 .liveData
@@ -105,7 +108,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         category,
                         firewallFilter.getFilter(),
                         firewallFilter.getConnectionStatusFilter(),
-                        includeProxyBypass
+                        includeProxyBypass,
+                        sort
                     )
                 }
                 .liveData
@@ -121,7 +125,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         "%$search%",
                         firewallFilter.getFilter(),
                         firewallFilter.getConnectionStatusFilter(),
-                        includeProxyBypass
+                        includeProxyBypass,
+                        sort
                     )
                 }
                 .liveData
@@ -133,7 +138,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         category,
                         firewallFilter.getFilter(),
                         firewallFilter.getConnectionStatusFilter(),
-                        includeProxyBypass
+                        includeProxyBypass,
+                        sort
                     )
                 }
                 .liveData
@@ -149,7 +155,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         "%$search%",
                         firewallFilter.getFilter(),
                         firewallFilter.getConnectionStatusFilter(),
-                        includeProxyBypass
+                        includeProxyBypass,
+                        sort
                     )
                 }
                 .liveData
@@ -161,7 +168,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         category,
                         firewallFilter.getFilter(),
                         firewallFilter.getConnectionStatusFilter(),
-                        includeProxyBypass
+                        includeProxyBypass,
+                        sort
                     )
                 }
                 .liveData
@@ -432,7 +440,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                 "%$search%",
                 firewallFilter.getFilter(),
                 appType,
-                firewallFilter.getConnectionStatusFilter()
+                firewallFilter.getConnectionStatusFilter(),
+                sort
             )
         } else {
             appInfoDAO.getFilteredApps(
@@ -440,7 +449,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                 category,
                 firewallFilter.getFilter(),
                 appType,
-                firewallFilter.getConnectionStatusFilter()
+                firewallFilter.getConnectionStatusFilter(),
+                sort
             )
         }
     }

@@ -28,6 +28,7 @@ import android.text.format.DateUtils
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -44,6 +45,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppWiseDomainsAdapter
 import com.celzero.bravedns.adapter.AppWiseIpsAdapter
 import com.celzero.bravedns.database.AppInfo
+import com.celzero.bravedns.database.AppInfoDAO
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
@@ -83,6 +85,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
     private val persistentState by inject<PersistentState>()
     private val eventLogger by inject<EventLogger>()
+    private val appInfoDAO by inject<AppInfoDAO>()
 
     private val ipRulesViewModel: CustomIpViewModel by viewModel()
     private val domainRulesViewModel: CustomDomainViewModel by viewModel()
@@ -96,6 +99,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
     private var showBypassToolTip: Boolean = true
     private var isWarningAcknowledged: Boolean = false
+    private var appNotes: String = ""
 
     private val warningBackCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
@@ -203,9 +207,10 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             connStatus = FirewallManager.connectionStatus(appInfo.uid)
             uiCtx {
                 this.appInfo = appInfo
+                appNotes = appInfo.notes
 
                 b.aadAppDetailName.text = appName(packages.count())
-                b.aadPkgName.text = appInfo.packageName
+                b.aadPkgName.text = getString(R.string.app_id_package, appInfo.uid, appInfo.packageName)
                 b.excludeProxySwitch.isChecked = appInfo.isProxyExcluded
                 
                 // Set temporary allow toggle state
@@ -219,6 +224,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                     Utilities.getIcon(this, appInfo.packageName, appInfo.appName),
                     b.aadAppDetailIcon
                 )
+                updateNotesChipVisibility()
 
                 if (appInfo.packageName == RETHINK_PACKAGE) {
                     updateFirewallStatusUi(appStatus, connStatus)
@@ -557,6 +563,12 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             }
 
             showCloseConnectionDialog(uid, appInfo.appName)
+        }
+
+        b.aadNotesChip.setOnClickListener {
+            guardAppInfoInitialized("aadNotesChip") {
+                showNotesDialog()
+            }
         }
     }
 
@@ -1109,6 +1121,41 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
     private fun logEvent(msg: String, details: String) {
         eventLogger.log(EventType.FW_RULE_MODIFIED, Severity.LOW, msg, EventSource.UI, true, details)
+    }
+
+    private fun showNotesDialog() {
+        val editText = EditText(this)
+        editText.setText(appNotes)
+        editText.hint = getString(R.string.hint_notes)
+        editText.setLines(4)
+
+        val dialog = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+            .setTitle(R.string.title_notes)
+            .setView(editText)
+            .setPositiveButton(R.string.lbl_save) { _, _ ->
+                appNotes = editText.text.toString()
+                updateNotesChipVisibility()
+                saveNotesToDatabase()
+                logEvent(
+                    "app notes updated",
+                    "Notes updated for ${appInfo.appName} (${appInfo.uid})"
+                )
+            }
+            .setNegativeButton(R.string.lbl_cancel, null)
+            .create()
+        dialog.show()
+    }
+
+    private fun saveNotesToDatabase() {
+        io {
+            appInfo.notes = appNotes
+            appInfoDAO.update(appInfo)
+        }
+    }
+
+    private fun updateNotesChipVisibility() {
+        // Always show the chip, regardless of whether notes are empty or not
+        b.aadNotesChip.visibility = View.VISIBLE
     }
 
     private fun io(f: suspend () -> Unit): Job {

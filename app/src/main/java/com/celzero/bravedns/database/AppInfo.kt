@@ -43,6 +43,7 @@ class AppInfo : Serializable {
     var modifiedTs: Long = 0
     var tempAllowEnabled: Boolean = false
     var tempAllowExpiryTime: Long = 0
+    var notes: String = ""
 
     override fun equals(other: Any?): Boolean {
         if (other !is AppInfo) return false
@@ -81,6 +82,7 @@ class AppInfo : Serializable {
                 "modifiedTs" -> modifiedTs = it.value as Long
                 "tempAllowEnabled" -> tempAllowEnabled = (it.value as Int == 1)
                 "tempAllowExpiryTime" -> tempAllowExpiryTime = it.value as Long
+                "notes" -> notes = it.value as String
                 else -> {
                     // ignore
                 }
@@ -102,6 +104,7 @@ class AppInfo : Serializable {
         screenOffAllowed: Boolean,
         backgroundAllowed: Boolean,
         tombstoneTs: Long = 0,
+        notes: String = "",
     ) {
         this.packageName = packageName
         this.appName = appName
@@ -116,6 +119,7 @@ class AppInfo : Serializable {
         this.screenOffAllowed = screenOffAllowed
         this.backgroundAllowed = backgroundAllowed
         this.tombstoneTs = tombstoneTs
+        this.notes = notes
     }
 
     fun hasInternetPermission(packageManager: PackageManager): Boolean {

@@ -54,7 +54,7 @@ import com.celzero.bravedns.util.Constants
         SubscriptionStateHistory::class,
         CountryConfig::class
     ],
-    version = 30,
+    version = 31,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -105,6 +105,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_27_28)
                 .addMigrations(MIGRATION_28_29)
                 .addMigrations(MIGRATION_29_30)
+                .addMigrations(MIGRATION_30_31)
                 .build()
 
         private val roomCallback: Callback =
@@ -1228,6 +1229,20 @@ abstract class AppDatabase : RoomDatabase() {
                         Logger.i(LOG_TAG_APP_DB, "MIGRATION_29_30: added selectionCount, isFavourite, hopEnabled to CountryConfig")
                     } catch (e: Exception) {
                         Logger.e(LOG_TAG_APP_DB, "MIGRATION_29_30: columns already exist, ignore", e)
+                    }
+                }
+            }
+
+        private val MIGRATION_30_31: Migration =
+            object : Migration(30, 31) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    try {
+                        db.execSQL(
+                            "ALTER TABLE AppInfo ADD COLUMN notes TEXT NOT NULL DEFAULT ''"
+                        )
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_30_31: added notes column to AppInfo")
+                    } catch (e: Exception) {
+                        Logger.e(LOG_TAG_APP_DB, "MIGRATION_30_31: notes column already exists, ignore", e)
                     }
                 }
             }

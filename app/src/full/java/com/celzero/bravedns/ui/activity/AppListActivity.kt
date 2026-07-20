@@ -199,6 +199,8 @@ class AppListActivity :
         var topLevelFilter = TopLevelFilter.ALL
         var firewallFilter = FirewallFilter.ALL
         var searchString: String = ""
+
+        var sort: String = "name"
     }
 
     private fun Context.isDarkThemeOn(): Boolean {

@@ -80,13 +80,16 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
 
         remakeParentFilterChipsUi()
         if (f == null) {
+            remakeSortChipsUi()
             applyParentFilter(AppListActivity.TopLevelFilter.ALL.id)
             return
         } else {
             this.filters.firewallFilter = f.firewallFilter
             this.filters.categoryFilters.addAll(f.categoryFilters)
+            this.filters.sort = f.sort
         }
 
+        remakeSortChipsUi()
         applyParentFilter(f.topLevelFilter.id)
         setFilter(f.topLevelFilter, f.categoryFilters)
     }
@@ -105,6 +108,7 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
             }
             new.categoryFilters.clear()
             new.topLevelFilter = AppListActivity.TopLevelFilter.ALL
+            new.sort = "name"
             AppListActivity.filters.postValue(new)
             this.dismiss()
         }
@@ -170,6 +174,34 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
             } else {
                 // no-op
                 // no action needed for checkState: false
+            }
+        }
+
+        return chip
+    }
+
+    private fun remakeSortChipsUi(){
+        b.fsSortChipGroup.removeAllViews()
+        b.fsSortChipGroup.addView(makeSortChip("name", getString(R.string.fapps_filter_sort_name)))
+        b.fsSortChipGroup.addView(makeSortChip("package", getString(R.string.fapps_filter_sort_package)))
+        b.fsSortChipGroup.addView(makeSortChip("uid", getString(R.string.fapps_filter_sort_uid)))
+    }
+
+    private fun makeSortChip(value: String, label: String): Chip {
+        val chip = layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
+        chip.id = View.generateViewId()
+        chip.tag = value
+        chip.text = label
+        chip.isChecked = filters.sort == value
+
+        if (chip.isChecked) {
+            colorUpChipIcon(chip)
+        }
+
+        chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
+            if (isSelected) {
+                filters.sort = button.tag.toString()
+                colorUpChipIcon(chip)
             }
         }
 

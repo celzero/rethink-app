@@ -59,6 +59,29 @@
         android:visibility="visible"
         app:singleSelection="false" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:padding="10dp"
+        android:text="@string/fapps_filter_sort_heading"
+        android:textColor="?attr/secondaryTextColor"
+        android:textSize="@dimen/large_font_text_view" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/fs_sort_chip_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="5dp"
+        android:padding="2dp"
+        android:visibility="visible"
+        app:singleSelection="true"
+        app:selectionRequired="true"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
