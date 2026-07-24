@@ -67,7 +67,7 @@ class FirewallAppListAdapter(
 
     companion object {
         private const val ALPHA_FULL = 1f
-        private const val ALPHA_DISABLED = 0.4f
+        private const val ALPHA_DISABLED = 0.38f
 
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<AppInfo>() {
