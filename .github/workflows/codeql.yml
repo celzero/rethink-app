@@ -31,6 +31,21 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: 🔒 Disable Default Code Scanning Setup
+        # Advanced setup (this workflow) conflicts with Default Setup when both are active.
+        # docs.github.com/en/rest/code-scanning/code-scanning#update-a-code-scanning-default-setup-configuration
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if api_output=$(gh api repos/${{ github.repository }}/code-scanning/default-setup \
+              --method PATCH \
+              -f state=not-configured 2>&1); then
+            echo "Default setup disabled successfully."
+          else
+            echo "Warning: could not disable default setup via API (may already be disabled or token may lack permissions): $api_output"
+            echo "If this issue persists, manually disable it at: Settings > Code security > CodeQL analysis > Default setup."
+          fi
+
       - name: 🔎 Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
