@@ -53,9 +53,9 @@ if (!deGoogled) {
         // google-services plugin can resolve it (the CI secret path). Fail with a
         // helpful message only if nothing is resolvable anywhere.
         def srcDir = file("src")
-        def hasSrcSetFile = srcDir.isDirectory() && srcDir.listFiles().any {
-            it.isDirectory() && file("${it}/google-services.json").exists()
-        }
+        def hasSrcSetFile = srcDir.isDirectory() && (srcDir.listFiles()?.any { dir ->
+            dir.isDirectory() && new File(dir, "google-services.json").exists()
+        } ?: false)
         if (hasSrcSetFile || file("src/google-services.json").exists()) {
             logger.lifecycle("google-services.json: no local copy; deferring to " +
                     "google-services plugin (variant source-set resolution, e.g. CI)")
@@ -64,8 +64,7 @@ if (!deGoogled) {
                     "google-services.json not found for '${buildTypeName}' build.\n" +
                             "  Local dev : place it at ${sourceFile}\n" +
                             "             (or directly at ${targetFile})\n" +
-                            "  CI        : ensure the GOOGLE_SERVICES_TEST_JSON secret is written\n" +
-                            "             to app/src/${buildTypeName}/google-services.json")
+                            "  CI        : ensure the secret is written to app/src/google-services.json")
         }
     }
 } else {
