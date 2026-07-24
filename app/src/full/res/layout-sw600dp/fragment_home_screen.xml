@@ -15,7 +15,6 @@
         android:orientation="vertical"
         android:gravity="center_horizontal">
 
-        <!-- Centered container with max width for tablet -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -24,11 +23,12 @@
             android:layout_marginEnd="40dp"
             android:maxWidth="900dp">
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:orientation="vertical"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
                 android:paddingTop="25dp"
                 android:paddingBottom="10dp"
                 android:visibility="visible">
@@ -44,27 +44,24 @@
                     android:textStyle="bold"
                     android:textSize="22sp" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/fhs_sponsor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="8dp"
-                android:layout_toEndOf="@id/fhs_title_rethink"
-                android:alpha="0.5"
-                android:background="?android:attr/selectableItemBackground"
-                android:padding="10dp"
-                android:src="@drawable/ic_heart_accent" />
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/fhs_sponsor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:alpha="0.5"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_heart_accent" />
 
-            <com.celzero.bravedns.sponsor.ui.SponsorBadgeView
-                android:id="@+id/fhs_sponsor_badge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toEndOf="@id/fhs_sponsor"
-                android:visibility="gone" />
+                <com.celzero.bravedns.sponsor.ui.SponsorBadgeView
+                    android:id="@+id/fhs_sponsor_badge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:visibility="gone" />
 
-            </RelativeLayout>
+            </LinearLayout>
 
             <RelativeLayout
                 android:layout_width="match_parent"
