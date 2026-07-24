@@ -27,23 +27,45 @@ def shouldSplit = !alphaBuild
 def isWebsiteDegoogled = project.hasProperty("websiteDegoogled") &&
         project.property("websiteDegoogled").toString().toBoolean()
 
-// add google-services.json only for play/website builds
+// add google-services.json only for play/website builds.
+// local dev : copy from the sibling ../firebase/{debug,release} dir (gitignored, outside repo).
+// CI        : secret is written to app/src/<buildType>/google-services.json
+//             by the GitHub Actions; so no local copy is needed there.
 if (!deGoogled) {
     def isRelease = gradle.startParameter.taskNames.any {
         it.toLowerCase().contains("release")
     }
+    def buildTypeName = isRelease ? "release" : "debug"
 
-    def sourceFile = file(isRelease
-            ? "${rootDir.parent}/firebase/release/google-services.json"
-            : "${rootDir.parent}/firebase/debug/google-services.json")
-
+    def sourceFile = file("${rootDir.parent}/firebase/${buildTypeName}/google-services.json")
     def targetFile = file("${projectDir}/google-services.json")
 
     if (sourceFile.exists()) {
+        // local dev: place the file at the module root so all variants pick it up
         targetFile.parentFile.mkdirs()
         targetFile.bytes = sourceFile.bytes
+        logger.lifecycle("google-services.json: copied from ${sourceFile}")
+    } else if (targetFile.exists()) {
+        // already in place (manual placement or a prior local copy); keep as-is
+        logger.lifecycle("google-services.json: using existing ${targetFile}")
     } else {
-        throw new GradleException("Missing ${sourceFile}")
+        // no local copy available; verify a variant source-set file exists so the
+        // google-services plugin can resolve it (the CI secret path). Fail with a
+        // helpful message only if nothing is resolvable anywhere.
+        def srcDir = file("src")
+        def hasSrcSetFile = srcDir.isDirectory() && (srcDir.listFiles()?.any { dir ->
+            dir.isDirectory() && new File(dir, "google-services.json").exists()
+        } ?: false)
+        if (hasSrcSetFile || file("src/google-services.json").exists()) {
+            logger.lifecycle("google-services.json: no local copy; deferring to " +
+                    "google-services plugin (variant source-set resolution, e.g. CI)")
+        } else {
+            throw new GradleException(
+                    "google-services.json not found for '${buildTypeName}' build.\n" +
+                            "  Local dev : place it at ${sourceFile}\n" +
+                            "             (or directly at ${targetFile})\n" +
+                            "  CI        : ensure the secret is written to app/src/google-services.json")
+        }
     }
 } else {
     logger.info("skipping google-services.json for de-googled/F-Droid build")
