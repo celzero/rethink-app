@@ -331,6 +331,14 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                     )
                     displayRethinkInRethinkUi()
                 }
+                sheet.onUnderstand = {
+                    persistentState.routeRethinkInRethink = true
+                    logEvent(
+                        "rinr enabled",
+                        "Rethink in Rethink enabled (no exemptions)"
+                    )
+                    displayRethinkInRethinkUi()
+                }
                 sheet.onCancel = {
                     b.settingsRInRSwitch.isChecked = false
                 }
