@@ -1815,7 +1815,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             return
         }
 
-        if (VpnController.hasStarted()) {
+        if (VpnController.hasTunnel()) {
             stopShimmer()
         }
     }
