@@ -882,6 +882,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 progressDialog.dismiss()
                 if (!isAdded) return@uiCtx
 
+                val selectedPositions = mutableSetOf<Int>()
+                val highlightColor = UIUtils.fetchColor(ctx, android.R.attr.colorControlHighlight)
+
                 // use recycler as using textview with large stats causes OOM and ANR issues
                 val recyclerView = androidx.recyclerview.widget.RecyclerView(ctx).apply {
                     layoutManager = androidx.recyclerview.widget.LinearLayoutManager(ctx)
@@ -897,7 +900,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                                 setPadding(pad, 1, pad, 1)
                                 typeface = android.graphics.Typeface.MONOSPACE
                                 textSize = 11.5f
-                                isFocusable = false
                             }
                             return object : androidx.recyclerview.widget.RecyclerView.ViewHolder(tv) {}
                         }
@@ -905,7 +907,22 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                             holder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
                             position: Int
                         ) {
-                            (holder.itemView as android.widget.TextView).text = lines[position]
+                            val tv = holder.itemView as android.widget.TextView
+                            tv.text = lines[position]
+                            if (selectedPositions.contains(position)) {
+                                tv.setBackgroundColor(highlightColor)
+                            } else {
+                                tv.background = null
+                            }
+
+                            tv.setOnClickListener {
+                                if (selectedPositions.contains(position)) {
+                                    selectedPositions.remove(position)
+                                } else {
+                                    selectedPositions.add(position)
+                                }
+                                notifyItemChanged(position)
+                            }
                         }
                     }
                 }
@@ -921,7 +938,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                     .setView(container)
                     .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
                     .setNeutralButton(R.string.dns_info_neutral) { _, _ ->
-                        copyToClipboard("stats_dump", clipText)
+                        val textToCopy = if (selectedPositions.isEmpty()) {
+                            clipText
+                        } else {
+                            selectedPositions.sorted().joinToString("\n") { lines[it] }
+                        }
+                        copyToClipboard("stats_dump", textToCopy)
                         showToastUiCentered(
                             ctx,
                             getString(R.string.copied_clipboard),
