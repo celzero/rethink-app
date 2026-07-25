@@ -158,7 +158,7 @@
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:importantForAccessibility="no"
-                        android:src="@drawable/dns_icon"
+                        android:src="@drawable/ic_sponsor_badge"
                         android:alpha="0.7"
                         app:tint="?attr/colorPrimary" />
 
