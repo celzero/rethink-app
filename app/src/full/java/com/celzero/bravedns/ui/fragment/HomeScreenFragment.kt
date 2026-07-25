@@ -606,7 +606,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun enableFirewallCardIfNeeded() {
         if (appConfig.getBraveMode().isFirewallActive()) {
-            b.fhsCardFirewallUnivRules.visibility = View.INVISIBLE
+            b.fhsCardFirewallUnivRules.visibility = View.GONE
             b.fhsCardFirewallUnivRulesCount.text =
                 getString(
                     R.string.firewall_card_universal_rules,
@@ -1437,14 +1437,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         b.fhsCardAppsBypassCount.text = bypassCount.toString()
                         b.fhsCardAppsExcludeCount.text = excludedCount.toString()
                         b.fhsCardAppsIsolatedCount.text = isolatedCount.toString()
-                        b.fhsCardApps.text =
-                            getString(
-                                R.string.firewall_card_text_active,
-                                blockedCount.toString(),
-                                bypassCount.toString(),
-                                excludedCount.toString(),
-                                isolatedCount.toString()
-                            )
                         b.fhsCardApps.visibility = View.GONE
                         b.fhsCardAllowedApps.isSelected = true
                     }
