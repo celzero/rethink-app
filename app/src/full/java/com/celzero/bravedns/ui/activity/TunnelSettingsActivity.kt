@@ -783,11 +783,11 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                         R.string.settings_selected_ip_desc,
                         getString(R.string.settings_ip_text_ipv4)
                     )
-                b.settingsActivityPtransRl.visibility = View.GONE
+                b.settingsActivityPtransRl.visibility = View.VISIBLE
                 b.settingsActivityConnectivityChecksRl.visibility = View.GONE
                 b.settingsActivityPingIpsBtn.visibility = View.GONE
 
-                b.dividerIp.visibility = View.GONE
+                b.dividerIp.visibility = View.VISIBLE
                 b.dividerPtrans.visibility = View.GONE
             }
             InternetProtocol.IPv6.id -> {
@@ -809,7 +809,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                         R.string.settings_selected_ip_desc,
                         getString(R.string.settings_ip_text_ipv46)
                     )
-                b.settingsActivityPtransRl.visibility = View.GONE
+                b.settingsActivityPtransRl.visibility = View.VISIBLE
                 b.settingsActivityConnectivityChecksRl.visibility = View.VISIBLE
                 if (persistentState.connectivityChecks) {
                     b.settingsActivityPingIpsBtn.visibility = View.VISIBLE
@@ -818,7 +818,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                 }
 
                 b.dividerIp.visibility = View.VISIBLE
-                b.dividerPtrans.visibility = View.GONE
+                b.dividerPtrans.visibility = View.VISIBLE
             }
             InternetProtocol.ALWAYSv46.id -> {
                 b.genSettingsIpDesc.text =
@@ -826,11 +826,11 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                         R.string.settings_selected_ip_desc,
                         getString(R.string.settings_ip_text_ipv4) + " & " + getString(R.string.settings_ip_text_ipv6)
                     )
-                b.settingsActivityPtransRl.visibility = View.GONE
+                b.settingsActivityPtransRl.visibility = View.VISIBLE
                 b.settingsActivityConnectivityChecksRl.visibility = View.GONE
                 b.settingsActivityPingIpsBtn.visibility = View.GONE
 
-                b.dividerIp.visibility = View.GONE
+                b.dividerIp.visibility = View.VISIBLE
                 b.dividerPtrans.visibility = View.GONE
             }
             else -> {
@@ -839,10 +839,10 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                         R.string.settings_selected_ip_desc,
                         getString(R.string.settings_ip_text_ipv4)
                     )
-                b.settingsActivityPtransRl.visibility = View.GONE
+                b.settingsActivityPtransRl.visibility = View.VISIBLE
                 b.settingsActivityConnectivityChecksRl.visibility = View.GONE
                 b.settingsActivityPingIpsBtn.visibility = View.GONE
-                b.dividerIp.visibility = View.GONE
+                b.dividerIp.visibility = View.VISIBLE
                 b.dividerPtrans.visibility = View.GONE
             }
         }

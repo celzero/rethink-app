@@ -376,6 +376,8 @@ internal constructor(
     enum class ProtoTranslationMode(val id: Int) {
         PTMODEAUTO(Settings.PtModeAuto),
         PTMODEFORCE64(Settings.PtModeForce64),
+        PTMODEFORCE46(Settings.PtModeForce46),
+        PTMODEFORCE(Settings.PtModeForce),
         PTMODENO46(Settings.PtModeNo46)
     }
 
@@ -389,6 +391,10 @@ internal constructor(
         // PTMODEAUTO will work in both cases, but it will add some overhead of checking.
         if (persistentState.protocolTranslationType && getInternetProtocol().isIPv6()) {
             return ProtoTranslationMode.PTMODEFORCE64
+        } else if (persistentState.protocolTranslationType && getInternetProtocol().isIPv4()) {
+            return ProtoTranslationMode.PTMODEFORCE46
+        } else if (persistentState.protocolTranslationType) { // auto / ipv4-ipv6 mode
+            return ProtoTranslationMode.PTMODEFORCE
         }
 
         // for debug builds
@@ -1248,7 +1254,7 @@ internal constructor(
         sb.append("   App version: ${persistentState.appVersion}\n")
         sb.append("   Brave mode: ${getBraveMode()}\n")
 
-        sb.append("   DNS \n")
+        sb.append("DNS \n")
         sb.append("   dns type: ${getDnsType()}\n")
         sb.append("   connected dns: ${persistentState.connectedDnsName}\n")
         sb.append("   alg: ${persistentState.enableDnsAlg}\n")
@@ -1263,11 +1269,11 @@ internal constructor(
         sb.append("   use sys dns for undelegated dms: ${persistentState.useSystemDnsForUndelegatedDomains}\n")
         sb.append("   bypass-dns-mode: ${BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.fromMode(persistentState.blockFreeDnsMode).name}\n")
 
-        sb.append("   Proxy \n")
+        sb.append("Proxy \n")
         sb.append("   Proxy type: ${ProxyType.of(getProxyType()).name}\n")
         sb.append("   Proxy provider: ${getProxyProvider()}\n")
 
-        sb.append("   VPN \n")
+        sb.append("VPN \n")
         sb.append("   stall on nw loss: ${persistentState.stallOnNoNetwork}\n")
         sb.append("   do not route private ips: ${!persistentState.privateIps}\n")
         sb.append("   use all available nws: ${persistentState.useMultipleNetworks}\n")

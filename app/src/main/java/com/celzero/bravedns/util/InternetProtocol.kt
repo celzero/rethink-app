@@ -27,6 +27,10 @@ enum class InternetProtocol(val id: Int) {
         return this == IPv6
     }
 
+    fun isIPv4(): Boolean {
+        return this == IPv4
+    }
+
     fun isIPv46(): Boolean {
         return this == IPv46
     }
