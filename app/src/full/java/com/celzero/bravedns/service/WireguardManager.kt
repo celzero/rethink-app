@@ -542,7 +542,7 @@ object WireguardManager : KoinComponent {
 
         // collect all proxy-ids for this uid and keep only WireGuard ones (wgX)
         val allProxyIdsForApp = ProxyManager.getProxyIdsForApp(uid)
-        val wgProxyIdsForApp = allProxyIdsForApp.filter { it.startsWith(ID_WG_BASE) }
+        val wgProxyIdsForApp = allProxyIdsForApp.filter { isWgProxyId(it) }
 
         // app-specific configs may be empty if the app is not configured
         if (wgProxyIdsForApp.isNotEmpty()) {
@@ -599,6 +599,13 @@ object WireguardManager : KoinComponent {
         Logger.i(LOG_TAG_PROXY, "returning proxy ids for $uid, $ip, $port, $domain: $proxyIds")
         return proxyIds
     }
+
+    fun isWgProxyId(pid: String): Boolean {
+        if (!pid.startsWith(ID_WG_BASE, ignoreCase = true)) return false
+        val suffix = pid.removePrefix(ID_WG_BASE)
+        return suffix.isNotEmpty() && suffix.toIntOrNull() != null
+    }
+
 
     private fun isEligibleForNetwork(id: Int, usesMobileNw: Boolean, ssid: String, mobileOnlySetting: Boolean, ssidEnabled: Boolean): Boolean {
         if (!mobileOnlySetting && !ssidEnabled) return true
