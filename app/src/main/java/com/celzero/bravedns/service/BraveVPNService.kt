@@ -74,6 +74,7 @@ import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.ConsoleLog
+import com.celzero.bravedns.database.CountryConfig
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.RefreshDatabase
@@ -128,6 +129,7 @@ import com.celzero.bravedns.util.Utilities.isNetworkSame
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.isUnspecifiedIp
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.WgHopManager
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.Client
@@ -2906,9 +2908,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                     // 2. tunFd is detached.
                     // 3. dupTunFd is set to false in the tunnel.
                     // 4. tunnel is restarted in lockdown mode or updated otherwise
-                    io("unlinkRelax") {
-                        val restartPolicy = VpnBuilderPolicy.fromOrdinalOrDefault(persistentState.vpnBuilderPolicy).vpnAdapterBehaviour
-                        if (restartPolicy == VpnBuilderPolicy.GoVpnAdapterBehaviour.PREFER_RESTART) {
+                    // update: only when the policy is set to relaxed the app is working as
+                    // expected, so always call unlink() before establishVpn() for all policies
+                    ioCtx("unlinkOnRestart") {
+                        val lockdown = underlyingNetworks?.vpnLockdown ?: isLockdown()
+                        if (lockdown) {
                             vpnAdapter?.unlink()
                         }
                     }
@@ -3040,9 +3044,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                             // and use a new fd after creation. This should only be done in lockdown mode,
                             // as leaks are not possible.
                             // doing so also fixes 'endpoint closed' errors which are frequent in lockdown mode
-                            if (lockdown) {
+                            // now unlink happens before creating new tunFd, see restartVpn()
+                            /* if (lockdown) {
                                 vpnAdapter?.unlink()
-                            }
+                            } */
                             // in case, if vpn-adapter exists, update the existing vpn-adapter
                             if (vpnAdapter?.updateLinkAndRoutes(fd, mtu, nwMtu, protos) == false) {
                                 Logger.e(LOG_TAG_VPN, "err update vpn-adapter")
@@ -5822,7 +5827,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             LOG_TAG_VPN,
             "refreshOrPauseOrResumeOrReAddProxiesFromObserver: event: ${eventType.name}, observed: ${observedNetworks.size}, canResumeMobileOnlyWg? $isActiveMobile, curr-ssid: $activeSsid"
         )
-        vpnAdapter?.refreshOrPauseOrResumeOrReAddProxies(isActiveMobile, activeSsid)
+        val wgConfigs: List<Config> = WireguardManager.getActiveConfigs()
+        val rpnConfigs: Set<CountryConfig> = RpnProxyManager.getEnabledConfigs()
+        if (wgConfigs.isEmpty() && rpnConfigs.isEmpty()) {
+            Logger.i(LOG_TAG_VPN, "$TAG no active wg-configs found")
+            return
+        }
+        // pause or resume the proxies based on the mobile/ssid conditions
+        vpnAdapter?.pauseAndResumeProxies(wgConfigs, rpnConfigs, isActiveMobile, activeSsid)
     }
 
     /**
