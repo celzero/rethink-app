@@ -89,6 +89,10 @@ private class NoOpIpTree : IpTree {
     override fun hasAny(key: String): Boolean = false
     override fun len(): Long = 0L
     override fun routes(key: String): String? = null
+    override fun routesLike(key: String, value: String): String? = null
+    override fun set(key: String, value: String) {}
+    override fun values(key: String): String? = null
+    override fun valuesLike(key: String, value: String): String? = null
 }
 
 /**
