@@ -122,4 +122,28 @@
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <!--
+        Import FAB — DEBUG builds only.
+        Visibility is set to GONE here; CustomDomainFragment shows it at runtime
+        only when BuildConfig.DEBUG / RethinkDnsApplication.DEBUG is true.
+        This prevents the button from being reachable in release builds
+        even if the layout resource is included.
+    -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/cda_import_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="10dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="10dp"
+        android:contentDescription="@string/import_rules_fab_desc"
+        android:src="@drawable/ic_import_conf"
+        android:visibility="gone"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toTopOf="@id/cda_add_fab"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
