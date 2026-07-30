@@ -611,8 +611,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         android:letterSpacing="0.03"
-                        android:text="@string/lbl_quick_actions"
-                        android:textAppearance="?attr/textAppearanceSubtitle1"
+                        android:text="@string/lbl_actions"
+                        android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textColor="?attr/primaryTextColor"
                         android:textStyle="bold" />
 
@@ -766,11 +766,9 @@
                     <com.google.android.material.textview.MaterialTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:letterSpacing="0.02"
-                        android:text="@string/title_settings"
-                        android:textAppearance="?attr/textAppearanceSubtitle1"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textStyle="bold" />
+                        android:text="@string/lbl_advanced"
+                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        android:textColor="?attr/primaryTextColor" />
 
                     <RelativeLayout
                         android:id="@+id/hop_rl"
@@ -937,9 +935,8 @@
                         android:layout_height="wrap_content"
                         android:letterSpacing="0.02"
                         android:text="@string/adv_taster_title"
-                        android:textAppearance="?attr/textAppearanceSubtitle1"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textStyle="bold" />
+                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        android:textColor="?attr/primaryTextColor"/>
 
                     <RelativeLayout
                         android:id="@+id/use_mobile_rl"
