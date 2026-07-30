@@ -42,7 +42,7 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="10dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Refresh"
+            android:contentDescription="@string/server_settings_refresh_servers"
             android:padding="8dp"
             android:src="@drawable/ic_refresh"
             app:tint="?attr/primaryTextColor" />
