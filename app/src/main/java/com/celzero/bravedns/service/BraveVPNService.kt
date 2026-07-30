@@ -3182,8 +3182,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         // the only two inputs the refresh logic consumes -- so skip them to avoid
         // redundant adapter work on every link-property callback.
         if (eventType == NetworkLifecycleObserver.EventType.LINK_PROPERTY_CHANGE) return
-        io("nwLifecyclePro") {
-            withContext(CoroutineName("nwLifecyclePro") + serializer) {
+        io("nwLifecycle") {
+            withContext(CoroutineName("nwLifecycle") + serializer) {
                 refreshOrPauseOrResumeOrReAddProxiesFromObserver(network, eventType, ssid)
             }
         }
