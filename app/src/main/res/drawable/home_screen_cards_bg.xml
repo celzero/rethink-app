@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Subtle gradient background -->
-    <item>
+    <!-- Inner glass highlight -->
+    <item
+        android:bottom="1dp"
+        android:left="1dp"
+        android:right="1dp"
+        android:top="1dp">
         <shape android:shape="rectangle">
-            <gradient
-                android:angle="45"
-                android:endColor="?attr/homeScreenBtnGradientEnd"
-                android:startColor="?attr/homeScreenBtnGradientStart"
-                android:type="linear" />
             <corners android:radius="20dp" />
+            <stroke
+                android:width="0.1dp"
+                android:color="#1AFFFFFF" />
         </shape>
     </item>
 
-    <!-- Glass edge effect -->
+    <!-- Outer glass edge -->
     <item>
         <shape android:shape="rectangle">
             <corners android:radius="20dp" />
             <stroke
-                android:width="0.5dp"
-                android:color="#1AFFFFFF" />
+                android:width="0.1dp"
+                android:color="#33FFFFFF" />
         </shape>
     </item>
 
