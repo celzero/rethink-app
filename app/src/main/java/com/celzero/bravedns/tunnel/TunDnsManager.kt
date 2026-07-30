@@ -542,7 +542,7 @@ object TunDnsManager: KoinComponent {
             val app = endpoint?.proxyAppName
             if (!app.isNullOrEmpty() && app == pkgName) {
                 logd("(onQuery-pid)proxy app: $app, return $fallbackProxy, global-proxy-lockdown? $isGlobalProxyLockdown")
-                return defaultProxy
+                return fallbackProxy
             }
         }
         val usesCellularNw = isIfaceCellular
@@ -573,13 +573,17 @@ object TunDnsManager: KoinComponent {
                 ssid,
                 if (rpnIds.isNotEmpty()) "" else emptyOrDefault // no need add default proxy in case if rpn id's available
             )
-            val noWgOrRpnTransport = !isAnyWgOrRpnDns(ids + rpnIds)
+            val proxyIds = rpnIds + ids
+            if (proxyIds.any { it == Backend.Block || it == Backend.BlockAll }) {
+                return Backend.Block
+            }
+            val noWgOrRpnTransport = !isAnyWgOrRpnDns(proxyIds)
             if (noWgOrRpnTransport) {
-                logd("(onQuery-pid)no wg found, return $fallbackProxy [${ids + rpnIds}], global-proxy-lockdown? $isGlobalProxyLockdown for uid: $uid")
+                logd("(onQuery-pid)no wg/rpn found, return $fallbackProxy [${proxyIds}], global-proxy-lockdown? $isGlobalProxyLockdown for uid: $uid")
                 fallbackProxy
             } else {
-                logd("(onQuery-pid)wg ids(${rpnIds + ids}) found for uid: $uid")
-                rpnIds.plus(ids).joinToString(",")
+                logd("(onQuery-pid)wg ids(${proxyIds}) found for uid: $uid")
+                proxyIds.joinToString(",")
             }
         }
     }
