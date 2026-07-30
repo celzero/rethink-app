@@ -135,6 +135,60 @@ class NetworkLifecycleObserverTest {
     }
 
     @Test
+    fun `start succeeds cellular-only when wifi registration throws`() {
+        var callCount = 0
+        var cellularCallback: ConnectivityManager.NetworkCallback? = null
+        every {
+            cm.registerNetworkCallback(any<NetworkRequest>(), any<ConnectivityManager.NetworkCallback>())
+        } answers {
+            callCount++
+            if (callCount == 1) {
+                throw SecurityException("wifi not allowed")
+            } else {
+                cellularCallback = secondArg<ConnectivityManager.NetworkCallback>()
+            }
+        }
+        val observer = newObserver()
+
+        val started = observer.start()
+
+        // WiFi registration failed but Cellular succeeded: start() reports success so
+        // cellular-only observation is not lost.
+        assertTrue(started)
+        assertEquals(2, callCount)
+        val network = mockNetwork(7L)
+        cellularCallback!!.onAvailable(network)
+        verify(exactly = 1) {
+            listener.onNetworkEvent(network, NetworkLifecycleObserver.EventType.NETWORK_ADDED, null)
+        }
+    }
+
+    @Test
+    fun `start rolls back wifi and returns false when cellular registration throws`() {
+        var callCount = 0
+        var wifiCallback: ConnectivityManager.NetworkCallback? = null
+        every {
+            cm.registerNetworkCallback(any<NetworkRequest>(), any<ConnectivityManager.NetworkCallback>())
+        } answers {
+            callCount++
+            if (callCount == 1) {
+                wifiCallback = secondArg<ConnectivityManager.NetworkCallback>()
+            } else {
+                throw SecurityException("cellular not allowed")
+            }
+        }
+        val observer = newObserver()
+
+        val started = observer.start()
+
+        // Cellular failed after WiFi succeeded: start() stays atomic, rolling back WiFi.
+        assertFalse(started)
+        assertEquals(2, callCount)
+        assertNotNull(wifiCallback)
+        verify(exactly = 1) { cm.unregisterNetworkCallback(wifiCallback!!) }
+    }
+
+    @Test
     fun `stop unregisters both callbacks when started`() {
         val list = captureCallbacks()
         val observer = newObserver()

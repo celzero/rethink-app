@@ -265,8 +265,9 @@ class NetworkLifecycleObserver(
     /**
      * Registers the network callbacks
      *
-     * @return true if registration succeeded or the observer was already active;
-     *         false if the connectivity manager is unavailable or registration threw.
+     * @return true if at least one transport (WiFi and/or Cellular) registered
+     *         successfully, or the observer was already active; false if the
+     *         connectivity manager is unavailable or every registration threw.
      */
     fun start(): Boolean {
         if (wifiCallback != null || cellularCallback != null) {
@@ -284,19 +285,31 @@ class NetworkLifecycleObserver(
         // (Re)enable forwarding before any callback is registered, so that the new
         // callbacks are not dropped by the stopped-guard in dispatch().
         stopped = false
+        // WiFi and Cellular are independent transports, so each registration is
+        // attempted independently: a failing WiFi registration no longer prevents
+        // cellular-only observation. The atomic rollback contract is preserved for
+        // the case where WiFi succeeded but Cellular then fails.
         val wifiCb = createCallback(resolveSsid = true)
-        return try {
+        var wifiRegistered = false
+        try {
             manager.registerNetworkCallback(wifiNetworkRequest, wifiCb)
             wifiCallback = wifiCb
+            wifiRegistered = true
             Logger.i(LOG_TAG_CONNECTION, "$TAG; wifi callback registered, inclLocationInfo? ${isAtleastS()}")
-            try {
-                val cellCb = createCallback(resolveSsid = false)
-                manager.registerNetworkCallback(cellularNetworkRequest, cellCb)
-                cellularCallback = cellCb
-                Logger.i(LOG_TAG_CONNECTION, "$TAG; cellular callback registered")
-            } catch (e: Exception) {
-                // Cellular registration failed; roll back the WiFi callback so start()
-                // remains atomic and stop()/re-start behave predictably.
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_CONNECTION, "$TAG; err registering wifi callback", e)
+        }
+
+        // Cellular registration is attempted regardless of the WiFi outcome.
+        val cellCb = createCallback(resolveSsid = false)
+        try {
+            manager.registerNetworkCallback(cellularNetworkRequest, cellCb)
+            cellularCallback = cellCb
+            Logger.i(LOG_TAG_CONNECTION, "$TAG; cellular callback registered")
+        } catch (e: Exception) {
+            if (wifiRegistered) {
+                // Roll back the WiFi callback so start() stays atomic when Cellular
+                // fails alongside a successful WiFi registration.
                 Logger.w(LOG_TAG_CONNECTION, "$TAG; err registering cellular callback, rolling back wifi", e)
                 wifiCallback = null
                 try {
@@ -304,14 +317,14 @@ class NetworkLifecycleObserver(
                 } catch (e2: Exception) {
                     Logger.w(LOG_TAG_CONNECTION, "$TAG; err rolling back wifi callback", e2)
                 }
-                return false
+            } else {
+                Logger.w(LOG_TAG_CONNECTION, "$TAG; err registering cellular callback", e)
             }
-            Logger.i(LOG_TAG_CONNECTION, "$TAG; start() ok, callbacks: 2 (wifi, cellular)")
-            true
-        } catch (e: Exception) {
-            Logger.w(LOG_TAG_CONNECTION, "$TAG; err registering wifi callback", e)
-            false
+            return false
         }
+
+        Logger.i(LOG_TAG_CONNECTION, "$TAG; start() ok, wifi? $wifiRegistered, cellular? true")
+        return true
     }
 
     /**
