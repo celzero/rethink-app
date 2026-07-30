@@ -265,9 +265,10 @@ class NetworkLifecycleObserver(
     /**
      * Registers the network callbacks
      *
-     * @return true if at least one transport (WiFi and/or Cellular) registered
-     *         successfully, or the observer was already active; false if the
-     *         connectivity manager is unavailable or every registration threw.
+     * @return` true if the Cellular callback registered successfully (WiFi is
+     *         best-effort and may fail), or the observer was already active;
+     *         false if the connectivity manager is unavailable or the Cellular
+     *         registration threw (any successful WiFi callback is rolled back).
      */
     fun start(): Boolean {
         if (wifiCallback != null || cellularCallback != null) {
