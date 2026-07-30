@@ -29,7 +29,7 @@ def isWebsiteDegoogled = project.hasProperty("websiteDegoogled") &&
 
 // add google-services.json only for play/website builds.
 // local dev : copy from the sibling ../firebase/{debug,release} dir (gitignored, outside repo).
-// CI        : secret is written to app/src/<buildType>/google-services.json
+// CI        : secret is written to app/src/google-services.json
 //             by the GitHub Actions; so no local copy is needed there.
 if (!deGoogled) {
     def isRelease = gradle.startParameter.taskNames.any {
