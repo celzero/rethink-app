@@ -48,12 +48,14 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import kotlin.time.Duration.Companion.milliseconds
 
 class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetHomeScreenBinding? = null
@@ -79,6 +81,9 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     companion object {
         const val SCREEN_WG = "screen_wireguard"
         const val SCREEN_PROXY = "screen_proxy"
+        // minimum duration the refresh icon animation stays visible, even if the
+        // underlying refresh completes faster
+        const val MIN_ANIMATION_DURATION_MS = 1500L
     }
 
     override fun onCreateView(
@@ -213,22 +218,45 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
         }
 
         b.bsHomeScreenRefreshIcon.setOnClickListener {
+            // prevent overlapping refreshes
+            if (!b.bsHomeScreenRefreshIcon.isEnabled) return@setOnClickListener
             b.bsHomeScreenRefreshIcon.isEnabled = false
             b.bsHomeScreenRefreshIcon.startAnimation(animation)
-            io {
-                VpnController.refreshResolvers()
-                VpnController.refreshProxies()
-            }
             logEvent(
                 "refresh triggered",
                 "User triggered refresh from home screen btmsht"
             )
-            delay(5000, lifecycleScope) {
-                if (isAdded && isVisible) {
-                    b.bsHomeScreenRefreshIcon.isEnabled = true
-                    b.bsHomeScreenRefreshIcon.clearAnimation()
-                    Utilities.showToastUiCentered(requireContext(), getString(R.string.dc_refresh_toast),
-                        Toast.LENGTH_SHORT)
+            ui {
+                var success = false
+                try {
+                    // run the refresh off the main thread; keep the spin animation
+                    // visible for at least the minimum duration even if the refresh
+                    // completes almost instantly
+                    val start = System.currentTimeMillis()
+                    ioCtx {
+                        VpnController.refreshResolvers()
+                        VpnController.refreshProxies()
+                    }
+                    // ensure the animation stays visible for a minimum duration
+                    val elapsed = System.currentTimeMillis() - start
+                    if (elapsed < MIN_ANIMATION_DURATION_MS) {
+                        delay((MIN_ANIMATION_DURATION_MS - elapsed).milliseconds)
+                    }
+                    success = true
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_VPN, "err refreshing resolvers/proxies: ${e.message}", e)
+                } finally {
+                    if (isAdded && isVisible) {
+                        b.bsHomeScreenRefreshIcon.isEnabled = true
+                        b.bsHomeScreenRefreshIcon.clearAnimation()
+                        if (success) {
+                            Utilities.showToastUiCentered(
+                                requireContext(),
+                                getString(R.string.dc_refresh_toast),
+                                Toast.LENGTH_SHORT
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -357,7 +385,15 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
         eventLogger.log(EventType.UI_SETTING_CHANGED, Severity.LOW, msg, EventSource.UI, false, details)
     }
 
+    private fun ui(f: suspend () -> Unit) {
+        lifecycleScope.launch(Dispatchers.Main) { f() }
+    }
+
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
+    }
+
+    private suspend fun ioCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.IO) { f() }
     }
 }
