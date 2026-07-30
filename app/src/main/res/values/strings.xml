@@ -39,6 +39,18 @@
     <string name="lbl_create" translatable="true">Create</string>
     <string name="lbl_qr_code" translatable="true">QR Code</string>
     <string name="lbl_import" translatable="true">Import</string>
+    <!-- Import Rules (DEBUG builds only — not translatable) -->
+    <string name="import_rules_fab_desc" translatable="false">Import rules from file</string>
+    <string name="import_rules_dialog_title" translatable="false">Import Rules</string>
+    <string name="import_rules_file_label" translatable="false">File</string>
+    <string name="import_rules_valid_label" translatable="false">Valid entries</string>
+    <string name="import_rules_ignored_label" translatable="false">Ignored</string>
+    <string name="import_rules_action_label" translatable="false">Action</string>
+    <string name="import_rules_btn" translatable="false">Import</string>
+    <string name="import_rules_complete_title" translatable="false">Import Complete</string>
+    <string name="import_rules_summary" translatable="false">Imported: %1$d\nSkipped duplicates: %2$d\nInvalid: %3$d</string>
+    <string name="import_rules_error_unreadable" translatable="false">Could not read the selected file.</string>
+    <string name="import_rules_error_empty" translatable="false">No valid entries found in the selected file.</string>
     <string name="lbl_wireguard" translatable="true">WireGuard</string>
     <string name="lbl_public_key" translatable="true">Public Key</string>
     <string name="lbl_addresses" translatable="true">Addresses</string>
@@ -130,6 +142,9 @@
     <string name="lbl_all_apps" translatable="false">All Apps</string>
 
     <string name="memory_notification_text">Rethink is experiencing low memory. System actions may be limited.</string>
+
+    <string name="ip_mismatch_notification_title" translatable="true">Network protocol mismatch</string>
+    <string name="ip_mismatch_notification_content" translatable="true">Your selected IP protocol is not available on the current network. Switch to \"IPv4 &amp; IPv6\" or \"Auto\" mode to stay connected.</string>
 
     <string name="rethink_block_notification_title" translatable="false">Rethink blocked its own traffic</string>
     <string name="rethink_block_notification_desc" translatable="false">Rethink is blocked by the "%1$s" rule.</string>
@@ -502,6 +517,9 @@
 
     <string name="settings_ptrans_heading" translatable="true">Force IPv4 egress</string>
     <string name="settings_ptrans_desc" translatable="true">Translate outbound IPv6 traffic to IPv4 on-device. Enable if you are connected to an IPv4-only network.</string>
+
+    <string name="settings_ptrans_new_heading" translatable="false">Perform protocol translations</string>
+    <string name="settings_ptrans_new_desc" translatable="false">Translate outbound traffic to the selected IP version on-device. Enable if you are connected to a network that only supports a specific IP version.</string>
 
     <string name="settings_connectivity_checks" translatable="true">Perform connectivity checks</string>
     <string name="settings_connectivity_checks_desc" translatable="true">Connectivity checks are sent to ascertain reachability.</string>
@@ -2288,7 +2306,7 @@
 
     <!-- Settings -->
 
-    <string name="lbl_quick_actions" translatable="false">Quick Actions</string>
+    <string name="lbl_actions" translatable="false">Actions</string>
 
     <string name="subscription_processing_timeout" translatable="false">Purchase processing is taking longer than expected. Please check your internet connection and try again.</string>
 
