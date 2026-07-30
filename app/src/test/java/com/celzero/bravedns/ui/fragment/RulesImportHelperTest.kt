@@ -371,6 +371,51 @@ class RulesImportHelperTest {
         assertEquals(0, result.invalidCount)
     }
 
+    // ── Port validation (IP type) ──────────────────────────────────────────
+
+    @Test
+    fun `parseFile IP type - entry with valid explicit port is accepted`() = runTest {
+        val mockIp = mockk<IPAddress>(relaxed = true)
+        every { IpRulesManager.getIpNetPort("1.2.3.4:8080") } returns Pair(mockIp, 8080)
+        givenFileContent("1.2.3.4:8080")
+        val result = RulesImportHelper.parseFile(mockContext, testUri, RulesImportHelper.ImportType.IP)!!
+        assertEquals(1, result.valid.size)
+        assertEquals("1.2.3.4:8080", result.valid[0])
+        assertEquals(0, result.invalidCount)
+    }
+
+    @Test
+    fun `parseFile IP type - entry with non-numeric explicit port is rejected`() = runTest {
+        val mockIp = mockk<IPAddress>(relaxed = true)
+        // getIpNetPort silently defaults non-numeric port to 0 (UNSPECIFIED_PORT)
+        every { IpRulesManager.getIpNetPort("1.2.3.4:abc") } returns Pair(mockIp, 0)
+        givenFileContent("1.2.3.4:abc")
+        val result = RulesImportHelper.parseFile(mockContext, testUri, RulesImportHelper.ImportType.IP)!!
+        assertTrue(result.valid.isEmpty())
+        assertEquals(1, result.invalidCount)
+    }
+
+    @Test
+    fun `parseFile IP type - entry with out-of-range explicit port is rejected`() = runTest {
+        val mockIp = mockk<IPAddress>(relaxed = true)
+        every { IpRulesManager.getIpNetPort("1.2.3.4:99999") } returns Pair(mockIp, 99999)
+        givenFileContent("1.2.3.4:99999")
+        val result = RulesImportHelper.parseFile(mockContext, testUri, RulesImportHelper.ImportType.IP)!!
+        assertTrue(result.valid.isEmpty())
+        assertEquals(1, result.invalidCount)
+    }
+
+    @Test
+    fun `parseFile IP type - entry with explicit port zero is accepted`() = runTest {
+        val mockIp = mockk<IPAddress>(relaxed = true)
+        every { IpRulesManager.getIpNetPort("1.2.3.4:0") } returns Pair(mockIp, 0)
+        givenFileContent("1.2.3.4:0")
+        val result = RulesImportHelper.parseFile(mockContext, testUri, RulesImportHelper.ImportType.IP)!!
+        assertEquals(1, result.valid.size)
+        assertEquals("1.2.3.4:0", result.valid[0])
+        assertEquals(0, result.invalidCount)
+    }
+
     // ═════════════════════════════════════════════════════════════════════════
     // 4. parseFile — DOMAIN import type
     // ═════════════════════════════════════════════════════════════════════════

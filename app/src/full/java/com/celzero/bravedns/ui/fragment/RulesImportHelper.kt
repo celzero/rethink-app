@@ -115,8 +115,14 @@ object RulesImportHelper {
                 ImportType.IP -> {
                     // Use the same parsing path as manual entry: getIpNetPort returns null
                     // for the IPAddress component when the string is not a valid IP/CIDR.
-                    val (ip, _) = IpRulesManager.getIpNetPort(line)
-                    if (ip != null) {
+                    val (ip, port) = IpRulesManager.getIpNetPort(line)
+                    // splitHostPort returns a non-empty first element when a host:port
+                    // separator was found.  When an explicit port is present, reject
+                    // non-numeric or out-of-range (0-65535) port strings.
+                    val hp = IpRulesManager.splitHostPort(line)
+                    val explicitPortOk = hp.first.isEmpty() ||
+                        (hp.second.toIntOrNull() != null && port in 0..65535)
+                    if (ip != null && explicitPortOk) {
                         valid.add(line)
                     } else {
                         invalidCount++
