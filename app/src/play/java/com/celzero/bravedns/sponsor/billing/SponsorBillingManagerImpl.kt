@@ -100,7 +100,11 @@ class SponsorBillingManagerImpl(context: Context) : SponsorBillingManager {
         val client = billingClient ?: return
         if (!client.isReady) return
 
-        // Query every contribution level so the UI can show localized prices.
+        // Sponsorship is a single INAPP product exposed through several fixed-price
+        // purchase options (offers). One ProductDetails is returned, but it carries
+        // one offer per contribution level (ProductDetails.oneTimePurchaseOfferDetailsList);
+        // flatten it into one SponsorProduct per known tier so the UI can show
+        // localized prices for every amount.
         val productList = SponsorProductIds.ALL_PRODUCT_IDS.map { id ->
             QueryProductDetailsParams.Product.newBuilder()
                 .setProductId(id)
@@ -113,7 +117,13 @@ class SponsorBillingManagerImpl(context: Context) : SponsorBillingManager {
             .build()
 
         client.queryProductDetailsAsync(params) { _: BillingResult, result ->
-            _products.value = result.productDetailsList.map { it.toSponsorProduct() }
+            val products = result.productDetailsList.flatMap { pd ->
+                pd.oneTimePurchaseOfferDetailsList.orEmpty()
+                    // Keep only the offers whose id maps to a known tier.
+                    .filter { SponsorProductIds.amountForOffer(it.purchaseOptionId ?: it.offerId) != null }
+                    .map { it.toSponsorProduct(pd) }
+            }
+            _products.value = products
         }
     }
 
@@ -124,11 +134,13 @@ class SponsorBillingManagerImpl(context: Context) : SponsorBillingManager {
             return
         }
 
-        // Each amount is its own fixed-price SKU (one-time product, quantity 1).
-        val productId = SponsorProductIds.productIdFor(amount)
+        // Sponsorship is a single product; the requested [amount] selects one of its
+        // purchase options (offers). The offer id encodes the dollar value (e.g.
+        // "sponsor-5"), so resolve it and pass the matching offerToken to the flow.
+        val targetOfferId = SponsorProductIds.offerIdFor(amount)
 
         val prodParam = QueryProductDetailsParams.Product.newBuilder()
-            .setProductId(productId)
+            .setProductId(SponsorProductIds.PRODUCT_ID)
             .setProductType(ProductType.INAPP)
             .build()
 
@@ -143,8 +155,26 @@ class SponsorBillingManagerImpl(context: Context) : SponsorBillingManager {
                 return@queryProductDetailsAsync
             }
 
+            // match the offer by id (purchaseOptionId first, then offerId), falling
+            // back to the first available offer if the exact tier is somehow missing.
+            val offers = productDetails.oneTimePurchaseOfferDetailsList.orEmpty()
+            val offer = offers.firstOrNull { (it.purchaseOptionId ?: it.offerId) == targetOfferId }
+                ?: offers.firstOrNull()
+            if (offer == null) {
+                _purchaseResult.tryEmit(SponsorPurchaseResult.Error("No sponsor offer available"))
+                return@queryProductDetailsAsync
+            }
+
+            // The offerToken is what actually selects the purchase option in the flow.
+            val offerToken = offer.offerToken
+            if (offerToken.isNullOrEmpty()) {
+                _purchaseResult.tryEmit(SponsorPurchaseResult.Error("Sponsor offer token unavailable"))
+                return@queryProductDetailsAsync
+            }
+
             val productParams = BillingFlowParams.ProductDetailsParams.newBuilder()
                 .setProductDetails(productDetails)
+                .setOfferToken(offerToken)
                 .build()
 
             val flowParams = BillingFlowParams.newBuilder()
@@ -233,14 +263,13 @@ class SponsorBillingManagerImpl(context: Context) : SponsorBillingManager {
         }
     }
 
-    private fun ProductDetails.toSponsorProduct(): SponsorProduct {
-        val price = oneTimePurchaseOfferDetails
+    private fun ProductDetails.OneTimePurchaseOfferDetails.toSponsorProduct(pd: ProductDetails): SponsorProduct {
         return SponsorProduct(
-            productId = productId,
-            title = title,
-            description = description,
-            price = price?.formattedPrice,
-            priceMicros = price?.priceAmountMicros ?: 0L
+            productId = pd.productId,
+            title = pd.title,
+            description = pd.description,
+            price = formattedPrice,
+            priceMicros = priceAmountMicros
         )
     }
 }
