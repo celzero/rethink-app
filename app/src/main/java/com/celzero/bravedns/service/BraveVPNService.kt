@@ -425,13 +425,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         val rinr = persistentState.routeRethinkInRethink
         val curnet = underlyingNetworks
         val exiting = who == Backend.Exit
-        val isBase = who == Backend.Base
         val proxying = ProxyManager.isAnyUserSetProxy(who)
-        val doNotProtect = isBase
+        val doNotProtect = !exiting
 
-        logd("bind: who: $who, addr: $addrPort, fd: $fid, rinr? $rinr, exit? $exiting, base? $isBase, proxying? $proxying")
-        if (doNotProtect) {
-            // do not proceed if the proxy is Base, protect/bind in all other cases.
+        logd("bind: who: $who, addr: $addrPort, fd: $fid, rinr? $rinr, exit? $exiting, proxying? $proxying")
+        if (doNotProtect && rinr) {
+            // do not proceed if rethink within rethink is enabled and proxyId(who) is not exit
             Logger.vv(LOG_TAG_VPN, "bind: rinr, within rethink, who: $who, fd: $fid, addr: $addrPort")
             return
         }
@@ -614,28 +613,23 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     }
 
     override fun protect(who: String?, fd: Long) = go2kt(protectDispatcher) {
-        val startTime = elapsedRealtime()
         if (who == null) {
             Logger.w(LOG_TAG_VPN, "protect: who is null, fd: $fd")
-            Logger.vv(LOG_TAG_VPN, "protect (who): execution time: ${elapsedRealtime() - startTime} ms (null who)")
             return@go2kt
         }
 
         val rinr = persistentState.routeRethinkInRethink
         val exiting = who == Backend.Exit
-        val isBase = who == Backend.Base
         val proxying = ProxyManager.isAnyUserSetProxy(who)
-        val doNotProtect = isBase
+        val doNotProtect = !exiting
 
-        logd("bind: who: $who, addr: fd: $fd, rinr? $rinr, exit? $exiting, base? $isBase, proxying? $proxying")
+        logd("bind: who: $who, addr: fd: $fd, rinr? $rinr, exit? $exiting, proxying? $proxying")
         if (doNotProtect) {
             // do not proceed if rethink within rethink is enabled and proxyId(who) is not exit
             Logger.vv(LOG_TAG_VPN, "protect: rinr, within rethink, who: $who, fd: $fd")
-            Logger.vv(LOG_TAG_VPN, "protect (who): execution time: ${elapsedRealtime() - startTime} ms (rinr skip exit)")
             return@go2kt
         }
         this.protect(fd.toInt())
-        Logger.vv(LOG_TAG_VPN, "protect (who): execution time: ${elapsedRealtime() - startTime} ms, who: $who, fd: $fd")
     }
 
     private suspend fun getUid(
