@@ -352,13 +352,13 @@
         <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtBlack</item>
         <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgBlack</item>
 
-        <item name="homeScreenBtnGradientEnd">@color/frost_white_10</item>
-        <item name="homeScreenBtnGradientStart">@color/frost_black_30</item>
+        <item name="homeScreenBtnGradientEnd">@color/colorPrimaryBlack</item>
+        <item name="homeScreenBtnGradientStart">@color/colorPrimaryDarkBlack</item>
         <item name="vpnHeaderGradientStart">@color/vpnHeaderGradientStartBlack</item>
         <item name="vpnHeaderGradientCenter">@color/vpnHeaderGradientCenterBlack</item>
         <item name="vpnHeaderGradientEnd">@color/vpnHeaderGradientEndBlack</item>
         <item name="colorGolden">@color/colorGoldenBlack</item>
-        <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView.Frost</item>
+        <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView</item>
 
         <!-- Guided Tour -->
         <item name="tourOverlayColor">@color/tourOverlayBlack</item>
