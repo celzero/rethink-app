@@ -20,21 +20,32 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
         android:padding="5dp">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/bs_home_screen_heading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
+            android:layout_centerInParent="true"
             android:gravity="center"
             android:text="@string/app_mode_choose"
             android:textColor="?attr/primaryLightColorText"
             android:textIsSelectable="true"
             android:textSize="@dimen/extra_large_font_text_view"
             android:textStyle="bold" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/bs_home_screen_refresh_icon"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Refresh"
+            android:padding="8dp"
+            android:src="@drawable/ic_refresh"
+            app:tint="?attr/primaryTextColor" />
     </RelativeLayout>
 
     <androidx.appcompat.widget.AppCompatTextView

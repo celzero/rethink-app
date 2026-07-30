@@ -1181,10 +1181,10 @@ object WireguardManager : KoinComponent {
             sb.append("   addr: ${stats?.addr ?: "N/A"}\n")
             sb.append("   errRx: ${routerStats?.errRx}\n")
             sb.append("   errTx: ${routerStats?.errTx}\n")
-            sb.append("   extra: ${routerStats?.extra}\n\n")
+            sb.append("   extra: ${routerStats?.extra}\n")
         }
         if (sb.isEmpty()) {
-            sb.append("   N/A\n\n")
+            sb.append("   N/A\n")
         }
         val s = sb.toString()
         Logger.d(LOG_TAG_PROXY, "wg stats: $s")

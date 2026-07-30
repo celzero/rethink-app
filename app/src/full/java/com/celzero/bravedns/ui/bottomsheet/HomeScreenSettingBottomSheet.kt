@@ -27,10 +27,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.lifecycle.lifecycleScope
+import android.view.animation.Animation
+import android.view.animation.RotateAnimation
+import android.widget.Toast
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.BottomSheetHomeScreenBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.ProxySettingsActivity
@@ -40,6 +47,8 @@ import com.celzero.bravedns.util.SsidPermissionManager
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
+import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
@@ -55,6 +64,9 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
 
     private val appConfig by inject<AppConfig>()
     private val persistentState by inject<PersistentState>()
+    private val eventLogger by inject<EventLogger>()
+
+    private lateinit var animation: Animation
 
     override fun getTheme(): Int =
         Themes.getBottomSheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
@@ -95,7 +107,21 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
         }
         initView()
         updateUptime()
+        addAnimation()
         initializeClickListeners()
+    }
+
+    private fun addAnimation() {
+        animation =
+            RotateAnimation(
+                0.0f,
+                360.0f,
+                Animation.RELATIVE_TO_SELF,
+                0.5f,
+                Animation.RELATIVE_TO_SELF,
+                0.5f)
+        animation.repeatCount = -1
+        animation.duration = 750
     }
 
     private fun initView() {
@@ -183,6 +209,27 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
                 }
             } else {
                 // do nothing
+            }
+        }
+
+        b.bsHomeScreenRefreshIcon.setOnClickListener {
+            b.bsHomeScreenRefreshIcon.isEnabled = false
+            b.bsHomeScreenRefreshIcon.startAnimation(animation)
+            io {
+                VpnController.refreshResolvers()
+                VpnController.refreshProxies()
+            }
+            logEvent(
+                "refresh triggered",
+                "User triggered refresh from home screen btmsht"
+            )
+            delay(5000, lifecycleScope) {
+                if (isAdded && isVisible) {
+                    b.bsHomeScreenRefreshIcon.isEnabled = true
+                    b.bsHomeScreenRefreshIcon.clearAnimation()
+                    Utilities.showToastUiCentered(requireContext(), getString(R.string.dc_refresh_toast),
+                        Toast.LENGTH_SHORT)
+                }
             }
         }
     }
@@ -304,6 +351,10 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
                 getString(R.string.dns_explanation_connected)
             }
         }
+    }
+
+    private fun logEvent(msg: String, details: String) {
+        eventLogger.log(EventType.UI_SETTING_CHANGED, Severity.LOW, msg, EventSource.UI, false, details)
     }
 
     private fun io(f: suspend () -> Unit) {

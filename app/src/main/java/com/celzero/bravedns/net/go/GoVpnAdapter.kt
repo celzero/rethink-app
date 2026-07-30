@@ -1835,6 +1835,20 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
+    suspend fun refreshProxies() {
+        if (!tunnel.isConnected) {
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip refreshing proxies")
+            return
+        }
+        Logger.i(LOG_TAG_VPN, "$TAG refresh proxies")
+
+        try {
+            tunnel.proxies.refreshProxies()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "$TAG err refreshing proxies: ${e.message}", e)
+        }
+    }
+
     suspend fun closeTun() {
         try {
             if (tunnel.isConnected) {
@@ -1861,6 +1875,15 @@ class GoVpnAdapter : KoinComponent {
                 "tunnel disconnect failure",
                 "Error disconnecting VPN tunnel: ${e.message}"
             )
+        }
+    }
+
+    suspend fun dupTunfd(dup: Boolean) {
+        try {
+            val res = Settings.dupTunFd(dup)
+            Logger.i(LOG_TAG_VPN, "$TAG dup tunnel fd: $res, $dup")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "$TAG err dup tunnel fd: ${e.message}", e)
         }
     }
 
@@ -2188,6 +2211,7 @@ class GoVpnAdapter : KoinComponent {
         Logger.i(LOG_TAG_VPN, "$TAG received update tun with opts: $tunnelOptions")
         // ok to init again, as updateTun is called to handle edge cases
         initResolverProxiesPcap(tunnelOptions)
+        setTunMode(tunnelOptions)
         return tunnel.isConnected
     }
 
