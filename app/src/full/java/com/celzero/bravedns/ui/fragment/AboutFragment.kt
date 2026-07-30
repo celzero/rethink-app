@@ -203,6 +203,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
         b.fhsTitleRethink.setOnClickListener(this)
         b.aboutSponsor.setOnClickListener(this)
+        b.aboutSponsorAgain.setOnClickListener(this)
         b.aboutManageRpn.setOnClickListener(this)
         b.aboutWebsite.setOnClickListener(this)
         b.aboutTwitter.setOnClickListener(this)
@@ -447,6 +448,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 openUrl(requireContext(), getString(R.string.about_website_link))
             }
             b.aboutSponsor -> {
+                sponsorProvider.openSponsor(requireContext())
+            }
+            b.aboutSponsorAgain -> {
                 sponsorProvider.openSponsor(requireContext())
             }
             b.aboutManageRpn -> {

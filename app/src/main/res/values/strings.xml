@@ -2682,6 +2682,7 @@
     <string name="sponsor_about_become" translatable="false">Become a Sponsor</string>
     <string name="sponsor_about_thanks" translatable="false">Thank you for supporting Rethink.</string>
     <string name="sponsor_about_since" translatable="false">Supporting since %1$s</string>
+    <string name="sponsor_about_again" translatable="false">Sponsor again</string>
     <string name="sponsor_action_label" translatable="false">Contribute %1$s</string>
     <string name="sponsor_pay_via_stripe" translatable="false">Pay via Stripe</string>
     <string name="sponsor_play_unavailable_msg" translatable="false">Google Play billing isn\'t available on this device. You can still sponsor us via Stripe.</string>
