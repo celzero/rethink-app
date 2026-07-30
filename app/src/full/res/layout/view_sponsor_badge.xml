@@ -6,8 +6,8 @@
 
     <ImageView
         android:id="@+id/sponsor_badge_icon"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
         android:layout_gravity="center"
         android:importantForAccessibility="no"
         android:src="@drawable/ic_sponsor_badge"

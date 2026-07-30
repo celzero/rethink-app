@@ -152,9 +152,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:value="4"
+                        android:value="1"
                         android:valueFrom="0"
-                        android:valueTo="9" />
+                        android:valueTo="6" />
 
                     <LinearLayout
                         android:layout_width="match_parent"

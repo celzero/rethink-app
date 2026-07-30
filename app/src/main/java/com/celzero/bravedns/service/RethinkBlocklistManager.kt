@@ -190,7 +190,7 @@ object RethinkBlocklistManager : KoinComponent {
         } catch (ioException: IOException) {
             Logger.e(
                 LOG_TAG_DNS,
-                "Failure reading json file, blocklist type: remote, timestamp: $timestamp",
+                "Failure reading json file, blocklist type: local, timestamp: $timestamp",
                 ioException
             )
         }

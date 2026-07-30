@@ -341,15 +341,14 @@ object TunDnsManager: KoinComponent {
         }
 
         if ((uid == INVALID_UID || uid == AndroidUidConfig.ANDROID.uid || uid == AndroidUidConfig.DNS.uid) && !isOriginInternal) {
-            var tid = defaultTid
-            if (FirewallManager.isAppExcludedFromProxy(uid)) {
-                tid = fallbackTid
+            val tid = if (FirewallManager.isAppExcludedFromProxy(uid)) {
+                fallbackTid
             } else {
                 val oneWgId = WireguardManager.getOneWireGuardProxyId()
-                tid = if (oneWgId != null) {
+                if (oneWgId != null) {
                     ID_WG_BASE + oneWgId
                 } else {
-                    tid
+                    defaultTid
                 }
             }
             return if (persistentState.splitDns) {
@@ -511,13 +510,15 @@ object TunDnsManager: KoinComponent {
         // calculation is done
         // TODO: check if the transport id is set to default/Auto, then return empty string/base
 
-        // in case of rinr mode, use only base even if auto is enabled
-        // use auto only in non-rinr mode and if plus is subscribed
         val defaultProxy = Backend.Base
 
         val isGlobalProxyLockdown = persistentState.wgGlobalLockdown
         val fallbackProxy = if (isGlobalProxyLockdown) Backend.Block else defaultProxy
         val pkgName = FirewallManager.getAppInfoByUid(uid)?.packageName ?: ""
+
+        // NOTE: no need to handle the rethink Uid and rinr in here, if the default is selected
+        // as transport id then the proxy id is not considered in go. All other cases rethink
+        // will be treated as any other app.
 
         // proxies are used only in dns-firewall mode
         if (!appConfig.getBraveMode().isDnsFirewallMode()) {
@@ -527,8 +528,8 @@ object TunDnsManager: KoinComponent {
 
         // user setting to disable proxy dns
         if (!persistentState.proxyDns) {
-            logd("(onQuery-pid)proxyDns is disabled, return $defaultProxy")
-            return defaultProxy
+            logd("(onQuery-pid)proxyDns is disabled, return $fallbackProxy, global-proxy-lockdown? $isGlobalProxyLockdown")
+            return fallbackProxy
         }
 
         if (FirewallManager.isAppExcludedFromProxy(uid)) {
@@ -540,23 +541,27 @@ object TunDnsManager: KoinComponent {
             val endpoint = appConfig.getSelectedDnsProxyDetails()
             val app = endpoint?.proxyAppName
             if (!app.isNullOrEmpty() && app == pkgName) {
-                logd("(onQuery-pid)proxy app: $app, return $defaultProxy")
-                return defaultProxy
+                logd("(onQuery-pid)proxy app: $app, return $fallbackProxy, global-proxy-lockdown? $isGlobalProxyLockdown")
+                return fallbackProxy
             }
         }
         val usesCellularNw = isIfaceCellular
         val ssid = ssid ?: ""
         val rpnIds = if (RpnProxyManager.isRpnActive()) RpnProxyManager.getAllPossibleConfigIdsForApp(uid, "", 0, domain, usesCellularNw, ssid) else emptyList()
 
+        val emptyOrDefault = if (isGlobalProxyLockdown) "" else defaultProxy
         return if (appConfig.isCustomSocks5Enabled()) {
-            logd("(onQuery-pid)customSocks5 enabled, return $rpnIds,${ProxyManager.ID_S5_BASE},${defaultProxy}")
-            (rpnIds + listOf("${ProxyManager.ID_S5_BASE},${defaultProxy}")).joinToString(",")
+            val id = proxyIdBuilder(ProxyManager.ID_S5_BASE, emptyOrDefault)
+            logd("(onQuery-pid)customSocks5 enabled, return $rpnIds,$id, global-proxy-lockdown? $isGlobalProxyLockdown")
+            rpnIds.plus(id).joinToString(",")
         } else if (appConfig.isCustomHttpProxyEnabled()) {
-            logd("(onQuery-pid)customHttp enabled, return $rpnIds,${ProxyManager.ID_HTTP_BASE},${defaultProxy}")
-            (rpnIds + listOf("${ProxyManager.ID_HTTP_BASE},${defaultProxy}")).joinToString(",")
+            val id = proxyIdBuilder(ProxyManager.ID_HTTP_BASE, emptyOrDefault)
+            logd("(onQuery-pid)customHttp enabled, return $rpnIds,$id, global-proxy-lockdown? $isGlobalProxyLockdown")
+            rpnIds.plus(id).joinToString(",")
         } else if (appConfig.isOrbotProxyEnabled()) {
-            logd("(onQuery-pid)orbot enabled, return $rpnIds,${ProxyManager.ID_ORBOT_BASE},${defaultProxy}")
-            (rpnIds + listOf("${ProxyManager.ID_ORBOT_BASE},${defaultProxy}")).joinToString(",")
+            val id = proxyIdBuilder(ProxyManager.ID_ORBOT_BASE, emptyOrDefault)
+            logd("(onQuery-pid)orbot enabled, return $rpnIds,$id, global-proxy-lockdown? $isGlobalProxyLockdown")
+            rpnIds.plus(id).joinToString(",")
         } else {
             // if the enabled wireguard is catchall-wireguard, then return wireguard id
             val ids = WireguardManager.getAllPossibleConfigIdsForApp(
@@ -566,15 +571,29 @@ object TunDnsManager: KoinComponent {
                 domain,
                 usesCellularNw,
                 ssid,
-                if (rpnIds.isNotEmpty()) "" else defaultProxy // no need add default proxy in case if rpn id's available
+                if (rpnIds.isNotEmpty()) "" else emptyOrDefault // no need add default proxy in case if rpn id's available
             )
-            val noProxyDetectedInWg = !isAnyWgOrRpnDns(ids + rpnIds)
-            if (noProxyDetectedInWg) {
-                logd("(onQuery-pid)no wg found, return $fallbackProxy [${ids + rpnIds}], global-proxy-lockdown? $isGlobalProxyLockdown for uid: $uid")
+            val proxyIds = rpnIds + ids
+            if (proxyIds.any { it == Backend.Block || it == Backend.BlockAll }) {
+                return Backend.Block
+            }
+            val noWgOrRpnTransport = !isAnyWgOrRpnDns(proxyIds)
+            if (noWgOrRpnTransport) {
+                logd("(onQuery-pid)no wg/rpn found, return $fallbackProxy [${proxyIds}], global-proxy-lockdown? $isGlobalProxyLockdown for uid: $uid")
                 fallbackProxy
             } else {
-                logd("(onQuery-pid)wg ids(${rpnIds + ids}) found for uid: $uid")
-                (rpnIds + ids).joinToString(",")
+                logd("(onQuery-pid)wg ids(${proxyIds}) found for uid: $uid")
+                proxyIds.joinToString(",")
+            }
+        }
+    }
+
+    private fun proxyIdBuilder(id: String, emptyOrDefault: String): String {
+        return buildString {
+            append(id)
+            if (emptyOrDefault.isNotEmpty()) {
+                append(',')
+                append(emptyOrDefault)
             }
         }
     }

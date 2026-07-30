@@ -1486,7 +1486,7 @@
                             style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/settings_ptrans_heading" />
+                            android:text="@string/settings_ptrans_new_heading" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_ptrans_desc"
@@ -1494,7 +1494,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="3dp"
-                            android:text="@string/settings_ptrans_desc"
+                            android:text="@string/settings_ptrans_new_desc"
                             android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
 

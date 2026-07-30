@@ -518,6 +518,16 @@ object IpRulesManager : KoinComponent {
         return db.getCustomIpDetail(uid, ipAddress, port)
     }
 
+    /**
+     * Returns true if a rule already exists for the given [uid] / [ipstr] / [port].
+     * Applies the same normalization as [addIpRule] so the DB lookup uses the stored form.
+     * Used by the DEBUG-only import feature to skip duplicates before bulk insertion.
+     */
+    suspend fun isIpRuleExists(uid: Int, ipstr: IPAddress, port: Int = 0): Boolean {
+        val normalizedIp = padAndNormalize(ipstr)
+        return db.getCustomIpDetail(uid, normalizedIp, port) != null
+    }
+
     suspend fun mkCustomIp(uid: Int, ipAddress: String, port: Int = UNSPECIFIED_PORT): CustomIp {
         return makeCustomIp(
             uid = uid,

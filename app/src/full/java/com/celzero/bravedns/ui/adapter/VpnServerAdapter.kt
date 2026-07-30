@@ -218,6 +218,9 @@ class VpnServerAdapter(
         fun bind(group: ServerGroup) {
             b.tvServerIp.visibility = View.GONE
             b.tvAppsCount.visibility = View.GONE
+            b.tvUptime.visibility = View.GONE
+            b.tvCcSep.visibility = View.GONE
+            b.tvUptimeSep.visibility = View.GONE
 
             if (group.key.equals(AUTO_SERVER_ID, ignoreCase = true)) {
                 b.refreshStopIcon.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.ic_refresh))
@@ -318,11 +321,16 @@ class VpnServerAdapter(
                 val ip4 = fetchIpForGroup(group)
                 uiCtx {
                     // Server IP row.
-                    // Show the actual IP label when available, fall back to "N/A"
+                    // Show the actual IP label when available, hide it otherwise
                     val ipText = ip4?.ip?.takeIf { it.isNotEmpty() }
-                    b.tvCcSep.visibility = View.VISIBLE
-                    b.tvServerIp.text = ipText ?: "N/A"
-                    b.tvServerIp.visibility = View.VISIBLE
+                    if (ipText != null) {
+                        b.tvServerIp.text = ipText
+                        b.tvServerIp.visibility = View.VISIBLE
+                        b.tvCcSep.visibility = View.VISIBLE
+                    } else {
+                        b.tvServerIp.visibility = View.GONE
+                        b.tvCcSep.visibility = View.GONE
+                    }
                 }
             }
         }
@@ -363,15 +371,10 @@ class VpnServerAdapter(
          * Live stats and IP are hidden since the proxy is not routing traffic.
          */
         private fun showStoppedStatus() {
-            b.tvServerIp.visibility = View.GONE
             b.statsLayout.visibility = View.VISIBLE
             b.tvServerStatus.text = ctx.getString(R.string.server_settings_proxy_stopped)
             b.tvServerStatus.setTextColor(fetchColor(ctx, R.attr.chipTextNeutral))
             b.tvStatusSep.visibility = View.GONE
-            b.tvAppsCount.visibility = View.GONE
-            b.tvUptimeSep.visibility = View.GONE
-            b.tvCcSep.visibility = View.GONE
-            b.tvUptime.visibility = View.GONE
         }
 
         /**
@@ -382,14 +385,10 @@ class VpnServerAdapter(
          * [applyStats] call will cancel the pulse and display real data.
          */
         private fun showTunnelLoadingStatus() {
-            b.tvServerIp.visibility = View.GONE
             b.statsLayout.visibility = View.VISIBLE
             b.tvServerStatus.text = ctx.getString(R.string.lbl_connecting)
             b.tvServerStatus.setTextColor(fetchColor(ctx, R.attr.chipTextNeutral))
             b.tvStatusSep.visibility = View.GONE
-            b.tvUptimeSep.visibility = View.GONE
-            b.tvCcSep.visibility = View.GONE
-            b.tvUptime.visibility = View.GONE
             // Kick off a gentle alpha pulse so the user can tell this item is "live"
             b.tvServerStatus.animate().cancel()
             b.tvServerStatus.alpha = 1f
@@ -405,13 +404,9 @@ class VpnServerAdapter(
          * call will cancel the pulse and display real data.
          */
         private fun showCheckingStatus() {
-            b.tvServerIp.visibility = View.GONE
             b.statsLayout.visibility = View.VISIBLE
             b.tvServerStatus.text = ctx.getString(R.string.lbl_checking)
             b.tvServerStatus.setTextColor(fetchColor(ctx, R.attr.chipTextNeutral))
-            b.tvUptimeSep.visibility = View.GONE
-            b.tvCcSep.visibility = View.GONE
-            b.tvUptime.visibility = View.GONE
             // states feel distinct to the user.
             b.tvServerStatus.animate().cancel()
             b.tvServerStatus.alpha = 1f
@@ -543,24 +538,6 @@ class VpnServerAdapter(
             b.tvUptimeSep.visibility = if (uptime.isNotEmpty()) View.VISIBLE else View.GONE
             b.tvUptime.visibility = if (uptime.isNotEmpty()) View.VISIBLE else View.GONE
             if (uptime.isNotEmpty()) b.tvUptime.text = uptime
-
-
-            when {
-                stats != null -> {
-                    // Tunnel is up and returning stats but the IP metadata isn't available
-                    // yet (or the backend didn't return one), show "N/A" so the row is
-                    // never left empty.
-                    b.tvCcSep.visibility = View.GONE
-                    b.tvServerIp.visibility = View.GONE
-                    b.tvCcSep.visibility = View.GONE
-                }
-                else -> {
-                    // No stats yet, keep the IP row hidden until we have real data.
-                    b.tvServerIp.visibility = View.GONE
-                    b.tvUptimeSep.visibility = View.GONE
-                    b.tvCcSep.visibility = View.GONE
-                }
-            }
         }
 
         private fun hideStats() {

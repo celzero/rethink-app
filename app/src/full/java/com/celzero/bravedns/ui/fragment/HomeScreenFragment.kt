@@ -606,7 +606,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun enableFirewallCardIfNeeded() {
         if (appConfig.getBraveMode().isFirewallActive()) {
-            b.fhsCardFirewallUnivRules.visibility = View.INVISIBLE
+            b.fhsCardFirewallUnivRules.visibility = View.GONE
             b.fhsCardFirewallUnivRulesCount.text =
                 getString(
                     R.string.firewall_card_universal_rules,
@@ -1437,14 +1437,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         b.fhsCardAppsBypassCount.text = bypassCount.toString()
                         b.fhsCardAppsExcludeCount.text = excludedCount.toString()
                         b.fhsCardAppsIsolatedCount.text = isolatedCount.toString()
-                        b.fhsCardApps.text =
-                            getString(
-                                R.string.firewall_card_text_active,
-                                blockedCount.toString(),
-                                bypassCount.toString(),
-                                excludedCount.toString(),
-                                isolatedCount.toString()
-                            )
                         b.fhsCardApps.visibility = View.GONE
                         b.fhsCardAllowedApps.isSelected = true
                     }
@@ -1823,7 +1815,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             return
         }
 
-        if (VpnController.hasStarted()) {
+        if (VpnController.hasTunnel()) {
             stopShimmer()
         }
     }
@@ -2224,8 +2216,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 // replace the string "protected" with appropriate string
                 // FIXME: spilt the string literals to separate strings
                 string =
-                    getString(statusId)
-                        .replaceFirst(getString(R.string.status_protected), message, true)
+                    getString(statusId).
+                        replaceFirst(getString(R.string.status_protected), message, true).lowercase()
             }
             if (persistentState.wgGlobalLockdown) {
                 val s = string.replaceFirst(getString(R.string.status_protected), getString(R.string.firewall_rule_global_lockdown).lowercase(), true)
@@ -2237,7 +2229,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         } else {
             if (persistentState.wgGlobalLockdown) {
-                val stat = getString(statusId)
+                val stat = getString(statusId).lowercase()
                 val s  = stat.replaceFirst(getString(R.string.status_protected), getString(R.string.firewall_rule_global_lockdown).lowercase(), true)
                 b.fhsProtectionLevelTxt.setTextColor(colorId)
                 b.fhsProtectionLevelTxt.text = s

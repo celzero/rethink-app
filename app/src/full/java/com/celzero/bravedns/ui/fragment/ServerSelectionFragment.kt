@@ -234,7 +234,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.serversScrollView.post {
             b.serversScrollView.setPadding(
                 b.serversScrollView.paddingLeft,
-                0,
+                20,
                 b.serversScrollView.paddingRight,
                 b.serversScrollView.paddingBottom
             )
