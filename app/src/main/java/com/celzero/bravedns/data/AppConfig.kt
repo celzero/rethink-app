@@ -21,7 +21,6 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsCryptEndpoint
 import com.celzero.bravedns.database.DnsCryptEndpointRepository
@@ -378,7 +377,7 @@ internal constructor(
         PTMODEFORCE64(Settings.PtModeForce64),
         PTMODEFORCE46(Settings.PtModeForce46),
         PTMODEFORCE(Settings.PtModeForce),
-        PTMODENO46(Settings.PtModeNo46)
+        PTMODENONE(Settings.PtModeNone)
     }
 
     fun getInternetProtocol(): InternetProtocol {
@@ -386,22 +385,14 @@ internal constructor(
     }
 
     fun getProtocolTranslationMode(): ProtoTranslationMode {
-        // TODO: we need to check if the underlying network, if it has ipv6 then its better to
-        // send PTMODEFORCE64 instead of PTMODEAUTO, as it will be straight forward, though
-        // PTMODEAUTO will work in both cases, but it will add some overhead of checking.
-        if (persistentState.protocolTranslationType && getInternetProtocol().isIPv6()) {
-            return ProtoTranslationMode.PTMODEFORCE64
-        } else if (persistentState.protocolTranslationType && getInternetProtocol().isIPv4()) {
-            return ProtoTranslationMode.PTMODEFORCE46
-        } else if (persistentState.protocolTranslationType) { // auto / ipv4-ipv6 mode
-            return ProtoTranslationMode.PTMODEFORCE
+        // PT mode is now computed in BraveVPNService.calculatePtMode(),
+        // which uses actual underlyingNetworks. This is a fallback, and used only during
+        // vpn startup before the first network change event arrives.
+        if (!persistentState.protocolTranslationType) {
+            return ProtoTranslationMode.PTMODEAUTO
         }
-
-        // for debug builds
-        if (DEBUG && persistentState.advSettingForcePTMode) {
-            return ProtoTranslationMode.PTMODENO46
-        }
-        return ProtoTranslationMode.PTMODEAUTO
+        // default until BraveVPNService receives network info and calls setTunMode()
+        return ProtoTranslationMode.PTMODEFORCE
     }
 
     fun setPcap(mode: Int, path: String = PcapMode.DISABLE_PCAP) {
