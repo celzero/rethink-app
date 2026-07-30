@@ -3183,7 +3183,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         // redundant adapter work on every link-property callback.
         if (eventType == NetworkLifecycleObserver.EventType.LINK_PROPERTY_CHANGE) return
         io("nwLifecyclePro") {
-            refreshOrPauseOrResumeOrReAddProxiesFromObserver(network, eventType, ssid)
+            withContext(CoroutineName("nwLifecyclePro") + serializer) {
+                refreshOrPauseOrResumeOrReAddProxiesFromObserver(network, eventType, ssid)
+            }
         }
     }
 
