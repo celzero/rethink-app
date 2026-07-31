@@ -125,28 +125,28 @@ object TunDnsManager: KoinComponent {
 
         if (uid == rethinkUid && !rinr) {
             val r = makeNsOpts(uid, tid, fqdn, false, isIfaceCellular, ssid)
-            logd("onQuery: makeNsOpts(rethink) for $fqdn")
+            logd("onQuery: makeNsOpts(rethink) for $fqdn, return $r")
             return r
         }
 
         if (uid != INVALID_UID) {
             when (DomainRulesManager.getDomainRule(fqdn, uid)) {
                 DomainRulesManager.Status.TRUST -> {
-                    logd("onQuery: DomainRulesManager.getDomainRule($fqdn, uid=$uid) for $fqdn")
+                    logd("onQuery: DomainRulesManager.getDomainRule($fqdn, uid=$uid) is trusted")
                     val r = makeNsOpts(uid, getTransportIdToBypass(tid, isLockdown), fqdn, true, isIfaceCellular, ssid)
-                    logd("onQuery: makeNsOpts(app-trusted) for $fqdn")
+                    logd("onQuery: makeNsOpts(app-trusted) for $fqdn, return $r")
                     return r
                 }
 
                 DomainRulesManager.Status.BLOCK -> {
-                    logd("onQuery: DomainRulesManager.getDomainRule($fqdn, uid=$uid) for $fqdn")
+                    logd("onQuery: DomainRulesManager.getDomainRule($fqdn, uid=$uid) is blocked")
                     val r = makeNsOpts(uid, Pair(Backend.BlockAll, ""), fqdn, false, isIfaceCellular, ssid)
-                    logd("onQuery: makeNsOpts(app-blocked) for $fqdn")
+                    logd("onQuery: makeNsOpts(app-blocked) for $fqdn, return $r")
                     return r
                 }
 
                 else -> {
-                    logd("onQuery: DomainRulesManager.getDomainRule($fqdn, uid=$uid) for $fqdn")
+                    logd("onQuery: DomainRulesManager.getDomainRule($fqdn, uid=$uid) is none")
                 }
             }
         }
@@ -154,24 +154,24 @@ object TunDnsManager: KoinComponent {
         // check for global domain rules
         when (DomainRulesManager.getDomainRule(fqdn, UID_EVERYBODY)) {
             DomainRulesManager.Status.TRUST -> {
-                logd("onQuery: DomainRulesManager.getDomainRule($fqdn, UID_EVERYBODY) for $fqdn")
+                logd("onQuery: DomainRulesManager.getDomainRule($fqdn, UID_EVERYBODY) is trusted")
                 val r = makeNsOpts(uid, getTransportIdToBypass(tid, isLockdown), fqdn, true, isIfaceCellular, ssid)
-                logd("onQuery: makeNsOpts(global-trusted) for $fqdn")
+                logd("onQuery: makeNsOpts(global-trusted) for $fqdn, return $r")
                 return r
             }
             DomainRulesManager.Status.BLOCK -> {
-                logd("onQuery: DomainRulesManager.getDomainRule($fqdn, UID_EVERYBODY) for $fqdn")
+                logd("onQuery: DomainRulesManager.getDomainRule($fqdn, UID_EVERYBODY) is blocked")
                 val r = makeNsOpts(uid, Pair(Backend.BlockAll, ""), fqdn, false, isIfaceCellular, ssid)
-                logd("onQuery: makeNsOpts(global-blocked) for $fqdn")
+                logd("onQuery: makeNsOpts(global-blocked) for $fqdn, return $r")
                 return r
             }
             else -> {
-                logd("onQuery: DomainRulesManager.getDomainRule($fqdn, UID_EVERYBODY) for $fqdn")
+                logd("onQuery: DomainRulesManager.getDomainRule($fqdn, UID_EVERYBODY) is unknown")
             }
         }
 
         val r = makeNsOpts(uid, tid, fqdn, false, isIfaceCellular, ssid)
-        logd("onQuery: makeNsOpts(default) for $fqdn")
+        logd("onQuery: makeNsOpts($r) for $fqdn, return $r")
         return r
     }
 
@@ -464,7 +464,7 @@ object TunDnsManager: KoinComponent {
             val pids = if (isAnyUserSetProxy(id)) {
                 proxyIds.filter(ProxyManager::isLocalProxy).joinToString(":")
             } else {
-                pidcsv
+                proxyIds.joinToString(":")
             }
 
             "$id:$pids"
@@ -553,15 +553,15 @@ object TunDnsManager: KoinComponent {
         return if (appConfig.isCustomSocks5Enabled()) {
             val id = proxyIdBuilder(ProxyManager.ID_S5_BASE, emptyOrDefault)
             logd("(onQuery-pid)customSocks5 enabled, return $rpnIds,$id, global-proxy-lockdown? $isGlobalProxyLockdown")
-            rpnIds.plus(id).joinToString(",")
+            rpnIds.plus(id).joinToString(":")
         } else if (appConfig.isCustomHttpProxyEnabled()) {
             val id = proxyIdBuilder(ProxyManager.ID_HTTP_BASE, emptyOrDefault)
             logd("(onQuery-pid)customHttp enabled, return $rpnIds,$id, global-proxy-lockdown? $isGlobalProxyLockdown")
-            rpnIds.plus(id).joinToString(",")
+            rpnIds.plus(id).joinToString(":")
         } else if (appConfig.isOrbotProxyEnabled()) {
             val id = proxyIdBuilder(ProxyManager.ID_ORBOT_BASE, emptyOrDefault)
             logd("(onQuery-pid)orbot enabled, return $rpnIds,$id, global-proxy-lockdown? $isGlobalProxyLockdown")
-            rpnIds.plus(id).joinToString(",")
+            rpnIds.plus(id).joinToString(":")
         } else {
             // if the enabled wireguard is catchall-wireguard, then return wireguard id
             val ids = WireguardManager.getAllPossibleConfigIdsForApp(
@@ -583,7 +583,7 @@ object TunDnsManager: KoinComponent {
                 fallbackProxy
             } else {
                 logd("(onQuery-pid)wg ids(${proxyIds}) found for uid: $uid")
-                proxyIds.joinToString(",")
+                proxyIds.joinToString(":")
             }
         }
     }
@@ -592,7 +592,7 @@ object TunDnsManager: KoinComponent {
         return buildString {
             append(id)
             if (emptyOrDefault.isNotEmpty()) {
-                append(',')
+                append(':')
                 append(emptyOrDefault)
             }
         }

@@ -421,13 +421,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     ) {
         val rinr = persistentState.routeRethinkInRethink
         val curnet = underlyingNetworks
-        val exiting = who == Backend.Exit
+        val isBase = who == Backend.Base
         val proxying = ProxyManager.isAnyUserSetProxy(who)
-        val doNotProtect = !exiting
+        val doNotProtect = isBase
 
-        logd("bind: who: $who, addr: $addrPort, fd: $fid, rinr? $rinr, exit? $exiting, proxying? $proxying")
+        logd("bind: who: $who, addr: $addrPort, fd: $fid, rinr? $rinr, base? $isBase, proxying? $proxying")
         if (doNotProtect && rinr) {
-            // do not proceed if rethink within rethink is enabled and proxyId(who) is not exit
+            // do not proceed if rethink within rethink is enabled and proxyId(who) is base
             Logger.vv(LOG_TAG_VPN, "bind: rinr, within rethink, who: $who, fd: $fid, addr: $addrPort")
             return
         }
@@ -602,13 +602,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         }
 
         val rinr = persistentState.routeRethinkInRethink
-        val exiting = who == Backend.Exit
+        val isBase = who == Backend.Base
         val proxying = ProxyManager.isAnyUserSetProxy(who)
-        val doNotProtect = !exiting
+        val doNotProtect = isBase
 
-        logd("bind: who: $who, addr: fd: $fd, rinr? $rinr, exit? $exiting, proxying? $proxying")
+        logd("bind: who: $who, addr: fd: $fd, rinr? $rinr, base? $isBase, proxying? $proxying")
         if (doNotProtect && rinr) {
-            // do not proceed if rethink within rethink is enabled and proxyId(who) is not exit
+            // do not proceed if rethink within rethink is enabled and proxyId(who) is base
             Logger.vv(LOG_TAG_VPN, "protect: rinr, within rethink, who: $who, fd: $fd")
             return@go2kt
         }
@@ -4702,7 +4702,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                     noblock = true
                     Logger.vv(
                         LOG_TAG_VPN,
-                        "onUpstreamAnswer: bypass rule: $rule, original tid: $id, bypass tid: [$tidcsv, $tidseccsv], pid: $pidCsv connInfo: $connInfo, ipcsv: $ipcsv"
+                        "onUpstreamAnswer: bypass rule: $rule, original tid: $id, bypass tid: [$tidcsv], [$tidseccsv], pid: $pidCsv connInfo: $connInfo, ipcsv: $ipcsv"
                     )
                 }
                 return@go2kt result
@@ -4717,11 +4717,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     private fun buildTidMap(csv: String, pidcsv: String): String {
         if (csv.isBlank()) return ""
         val proxyIds = pidcsv.split(",")
+        // joinToString conveniently combines both the transformation and the joining into a single
+        // operation, so there is no need for an intermediate map
         return csv.split(",").joinToString(",") { id ->
             val pids = if (isAnyUserSetProxy(id)) {
                 proxyIds.filter(ProxyManager::isLocalProxy).joinToString(":")
             } else {
-                pidcsv
+                proxyIds.joinToString(":")
             }
 
             "$id:$pids"
