@@ -92,6 +92,11 @@ object RpnProxyManager : KoinComponent {
     private const val WIN_NAME = "WIN"
     private const val WIN_ENTITLEMENT_FILE_NAME = "win_response.json"
     private const val WIN_STATE_FILE_NAME = "win_state.json"
+
+    /**
+     * RPN encrypted-file storage migration (external -> internal) files dir
+     */
+    private const val RPN_STORAGE_MIGRATION_VERSION = 2
     const val MAX_WIN_SERVERS = 5
     const val AUTO_SERVER_ID   = "AUTO"
     const val AUTO_COUNTRY_CODE = "AUTO"
@@ -777,23 +782,10 @@ object RpnProxyManager : KoinComponent {
             }
 
             val fileName = getJsonResponseFileName(WIN_ID)
-            val folder = applicationContext.getExternalFilesDir(RPN_PROXY_FOLDER_NAME)
+            val folder = getRpnFolder()
             if (folder == null) {
-                Logger.e(LOG_TAG_PROXY, "$TAG; storeWinEntitlement: failed to get external files dir")
+                Logger.e(LOG_TAG_PROXY, "$TAG; storeWinEntitlement: failed to get rpn folder")
                 return
-            }
-
-            if (!folder.exists()) {
-                val created = try {
-                    folder.mkdirs()
-                } catch (e: Exception) {
-                    Logger.e(LOG_TAG_PROXY, "$TAG; storeWinEntitlement: exception creating folder: ${e.message}", e)
-                    false
-                }
-                if (!created) {
-                    Logger.e(LOG_TAG_PROXY, "$TAG; storeWinEntitlement: failed to create folder: ${folder.absolutePath}")
-                    return
-                }
             }
 
             val file = File(folder, fileName)
@@ -888,6 +880,17 @@ object RpnProxyManager : KoinComponent {
     suspend fun load(): Int {
         // need to read the filepath from database and load the file
         // there will be an entry in the database for each RPN proxy
+
+        // One-time relocation of WIN encrypted files from external to internal storage.
+        // Runs before we iterate the proxies so the DB paths are already repointed by
+        // the time the load loop reads them. Failures are swallowed internally and do
+        // not block startup.
+        try {
+            migrateRpnFilesToInternalIfNeeded()
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; load: rpn storage migration threw, continuing: ${e.message}", e)
+        }
+
         val rp = try {
             db.getAllProxies()
         } catch (e: Exception) {
@@ -1226,6 +1229,15 @@ object RpnProxyManager : KoinComponent {
                 if (DEBUG) Logger.d(LOG_TAG_PROXY, "$TAG; getWinEntitlement: read entitlement bytes from file, bytes: $bytes, len: ${bytes.size}")
                 bytes
             } else null
+        } catch (e: EncryptionException.DecryptionFailed) {
+            // entitlement file (key mismatch, see getWinExistingData). Delete so
+            // storeWinEntitlement() can write a fresh one; returning null makes the caller
+            // fall back to DB / server recovery.
+            Logger.w(LOG_TAG_PROXY, "$TAG; getWinEntitlement: entitlement file (key mismatch), deleting: ${file.absolutePath}", e)
+            if (!file.delete()) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; getWinEntitlement: failed to delete file (key mismatch): ${file.absolutePath}")
+            }
+            null
         } catch (e: EncryptionException) {
             // File is corrupted, encrypted with an invalidated key, or unreadable.
             // Return null so the caller falls back to fetching fresh entitlement from the API.
@@ -1866,6 +1878,157 @@ object RpnProxyManager : KoinComponent {
         }
     }
 
+    /**
+     * Canonical folder for encrypted RPN files: app-internal storage.
+     *
+     * Returns the folder, creating it if necessary. Returns null only if mkdirs() fails.
+     */
+    private fun getRpnFolder(): File? {
+        val folder = File(applicationContext.filesDir, RPN_PROXY_FOLDER_NAME)
+        if (folder.exists()) return folder
+        return if (folder.mkdirs()) folder else null
+    }
+
+    /**
+     * One-time migration of WIN encrypted files from external storage
+     * ([Context.getExternalFilesDir]) to internal storage ([Context.filesDir]).
+     */
+    private suspend fun migrateRpnFilesToInternalIfNeeded() {
+        if (persistentState.rpnInternalStorageMigrationVersion >= RPN_STORAGE_MIGRATION_VERSION) return
+
+        val internalFolder = getRpnFolder()
+        if (internalFolder == null) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: internal folder unavailable, will retry next launch")
+            return
+        }
+        val externalFolder = try {
+            applicationContext.getExternalFilesDir(RPN_PROXY_FOLDER_NAME)
+        } catch (_: Exception) {
+            null
+        }
+
+        // migrate (and clean up) both legacy files. each result tells us whether it is
+        // safe to repoint that file's DB path to internal storage.
+        val stateResult = migrateOneRpnFile(externalFolder, internalFolder, WIN_STATE_FILE_NAME)
+        val entResult = migrateOneRpnFile(externalFolder, internalFolder, WIN_ENTITLEMENT_FILE_NAME)
+
+        // if either readable file could not be written to internal storage, keep its
+        // external path in the DB and retry the whole migration next launch.
+        if (!stateResult.repointToInternal || !entResult.repointToInternal) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: one or more files not fully migrated (state=${stateResult.summary}, entitlement=${entResult.summary}); will retry next launch")
+            return
+        }
+
+        // DB paths to internal storage (the canonical location now).
+        val proxy = try {
+            db.getProxyById(WIN_ID)
+        } catch (e: Exception) {
+            // no usable row (fresh install, cleared DB, etc.). legacy external junk
+            // was already cleaned up above; mark migration done.
+            Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: no WIN proxy row, marking migration done (state=${stateResult.summary}, entitlement=${entResult.summary})", e)
+            persistentState.rpnInternalStorageMigrationVersion = RPN_STORAGE_MIGRATION_VERSION
+            return
+        }
+
+        if (proxy != null) {
+            val newState = File(internalFolder, WIN_STATE_FILE_NAME).absolutePath
+            val newEnt = File(internalFolder, WIN_ENTITLEMENT_FILE_NAME).absolutePath
+            var changed = false
+            if (proxy.configPath != newState) {
+                proxy.configPath = newState
+                changed = true
+            }
+            if (proxy.serverResPath != newEnt) {
+                proxy.serverResPath = newEnt
+                changed = true
+            }
+            if (changed) {
+                try {
+                    proxy.modifiedTs = System.currentTimeMillis()
+                    db.update(proxy)
+                    Logger.i(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: repointed WIN proxy paths to internal (state=${stateResult.summary}, entitlement=${entResult.summary})")
+                } catch (e: Exception) {
+                    Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: DB update failed, will retry next launch: ${e.message}", e)
+                    return // do NOT set the flag; retry next launch
+                }
+            }
+        }
+
+        persistentState.rpnInternalStorageMigrationVersion = RPN_STORAGE_MIGRATION_VERSION
+        Logger.i(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: migration complete (state=${stateResult.summary}, entitlement=${entResult.summary})")
+    }
+
+    private data class RpnMigrateResult(val repointToInternal: Boolean, val summary: String)
+
+    /**
+     * Migrates a single legacy RPN encrypted file from [externalFolder] to [internalFolder].
+     */
+    private fun migrateOneRpnFile(
+        externalFolder: File?,
+        internalFolder: File,
+        fileName: String
+    ): RpnMigrateResult {
+        val internalFile = File(internalFolder, fileName)
+
+        if (externalFolder == null) return RpnMigrateResult(true, "no-external-folder")
+
+        val externalFile = File(externalFolder, fileName)
+        if (!externalFile.exists()) return RpnMigrateResult(true, "no-legacy-file")
+
+        val bytes = try {
+            EncryptedFileManager.readByteArray(applicationContext, externalFile)
+        } catch (e: EncryptionException.DecryptionFailed) {
+            // encrypted with a keyset that no longer exists (and never will
+            // again). The data is irrecoverable, but fully reconstructable from the
+            // entitlement / play billing / server via registerProxy() recovery. delete
+            // the junk so the legacy external folder is left clean.
+            Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: (key mismatch), deleting legacy external file", e)
+            if (!externalFile.delete()) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: could not delete external file: ${externalFile.absolutePath}")
+            }
+            return RpnMigrateResult(true, "mismatch-deleted")
+        } catch (e: EncryptionException) {
+            // unreadable for another crypto reason; also unrecoverable. delete
+            Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: unreadable (${e::class.simpleName}), deleting legacy external file", e)
+            if (!externalFile.delete()) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: could not delete unreadable external file: ${externalFile.absolutePath}")
+            }
+            return RpnMigrateResult(true, "unreadable-deleted")
+        } catch (e: Exception) {
+            // not a known failure, do NOT delete the file
+            Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: unexpected read error, will retry next launch: ${e.message}", e)
+            return RpnMigrateResult(false, "read-error-retry")
+        }
+
+        if (bytes.isEmpty()) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: external file empty, deleting legacy external file")
+            externalFile.delete()
+            return RpnMigrateResult(true, "empty-deleted")
+        }
+
+        // Re-encrypt into internal storage. EncryptedFileManager.write deletes any
+        // pre-existing target first, so a partial earlier attempt is handled.
+        val ok = try {
+            EncryptedFileManager.write(applicationContext, bytes, internalFile)
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: internal write failed, keeping readable external file, will retry next launch: ${e.message}", e)
+            return RpnMigrateResult(false, "write-failed-retry")
+        }
+        if (!ok) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: internal write returned false, keeping readable external file, will retry next launch")
+            return RpnMigrateResult(false, "write-failed-retry")
+        }
+
+        // Internal write succeeded; remove the legacy external copy. If the delete
+        // fails (possible on FUSE external storage) we still repoint the DB - the
+        // external file is now a stale duplicate and harmless.
+        if (!externalFile.delete()) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: migrated but could not delete external copy (harmless): ${externalFile.absolutePath}")
+        }
+        Logger.i(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: relocated to internal storage (${bytes.size} bytes)")
+        return RpnMigrateResult(true, "relocated")
+    }
+
     suspend fun getWinExistingData(): ByteArray? {
         val proxy = db.getProxyById(WIN_ID) ?: return null
         val cfg = proxy.configPath
@@ -1875,6 +2038,14 @@ object RpnProxyManager : KoinComponent {
         return try {
             val bytes = EncryptedFileManager.readByteArray(applicationContext, file)
             if (bytes.isNotEmpty()) bytes else null
+        } catch (e: EncryptionException.DecryptionFailed) {
+            // The file is an entitlement file: encrypted with a keyset that no longer exists
+            // reconstruct from the entitlement file / play billing / server.
+            Logger.w(LOG_TAG_PROXY, "$TAG; getWinExistingData: win state file (key mismatch), deleting: ${file.absolutePath}", e)
+            if (!file.delete()) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; getWinExistingData: failed to delete file(key mismatch): ${file.absolutePath}")
+            }
+            null
         } catch (e: EncryptionException) {
             Logger.w(LOG_TAG_PROXY, "$TAG; getWinExistingData: encrypted file unreadable (${e::class.simpleName}), returning null", e)
             null
@@ -1888,23 +2059,10 @@ object RpnProxyManager : KoinComponent {
         }
         return try {
             val fileName = getConfigFileName(WIN_ID)
-            val folder = applicationContext.getExternalFilesDir(RPN_PROXY_FOLDER_NAME)
+            val folder = getRpnFolder()
             if (folder == null) {
-                Logger.e(LOG_TAG_PROXY, "$TAG; updateWinConfigState: failed to get external files dir")
+                Logger.e(LOG_TAG_PROXY, "$TAG; updateWinConfigState: failed to get rpn folder")
                 return false
-            }
-
-            if (!folder.exists()) {
-                val created = try {
-                    folder.mkdirs()
-                } catch (e: Exception) {
-                    Logger.e(LOG_TAG_PROXY, "$TAG; updateWinConfigState: exception creating folder: ${e.message}", e)
-                    false
-                }
-                if (!created) {
-                    Logger.e(LOG_TAG_PROXY, "$TAG; updateWinConfigState: failed to create folder: ${folder.absolutePath}")
-                    return false
-                }
             }
 
             val file = File(folder, fileName)

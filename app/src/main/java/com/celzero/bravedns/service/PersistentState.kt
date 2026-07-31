@@ -448,6 +448,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // true once the encrypted wireguard config files have been migrated to plain files
     var wireguardPlainFileMigrationDone by booleanPref("wg_plain_file_migration_done").withDefault<Boolean>(false)
 
+    // RPN encrypted-file storage migration (external -> internal).
+    var rpnInternalStorageMigrationVersion by intPref("rpn_internal_storage_migration_version").withDefault<Int>(0)
+
     var appTestMode by booleanPref("app_test_mode").withDefault<Boolean>(false)
 
     // -1 = no override; any other value is a ProtoTranslationMode.id to force in DEBUG mode
