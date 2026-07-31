@@ -1239,7 +1239,7 @@ class BillingBackendClient(
             // RPN_FALLBACK_URL before the response surfaces to Retrofit. Must be added
             // before the session interceptor so that the session interceptor still runs
             // (and correctly attaches headers) for the fallback request as well.
-            .addInterceptor(buildFallbackInterceptor())
+            .addInterceptor(buildFallbackInterceptor(Constants.RPN_BASE_URL, Constants.RPN_FALLBACK_URL))
             .addInterceptor(buildSessionInterceptor(
                 DB_SESSION_HEADER, DB_SESSION_RESPONSE_HEADER,
                 { dbSessionBookmark }, { dbSessionBookmark = it }, "prod"
@@ -1257,20 +1257,24 @@ class BillingBackendClient(
     /**
      * Builds a Retrofit instance for the test billing API.
      *
-     * Test calls always target [Constants.RPN_FALLBACK_URL] directly — no primary/fallback
-     * split is needed for the test path.
+     * Mirrors the production primary/fallback split: calls target
+     * [Constants.RPN_BASE_TEST_URL] as the primary, and transparently fall back to
+     * [Constants.RPN_FALLBACK_TEST_URL] on 5xx or network errors.
      */
     private fun buildTestApi(): IBillingServerApiTest {
         val client = RetrofitManager
             .okHttpClient(persistentState.routeRethinkInRethink)
             .newBuilder()
+            .addInterceptor(buildFallbackInterceptor(
+                Constants.RPN_BASE_TEST_URL, Constants.RPN_FALLBACK_TEST_URL
+            ))
             .addInterceptor(buildSessionInterceptor(
                 DB_SESSION_TEST_HEADER, DB_SESSION_TEST_RESPONSE_HEADER,
                 { dbSessionTestBookmark }, { dbSessionTestBookmark = it }, "test"
             ))
             .build()
         return Retrofit.Builder()
-            .baseUrl(Constants.RPN_FALLBACK_URL)
+            .baseUrl(Constants.RPN_BASE_TEST_URL)
             .client(client)
             .addConverterFactory(SafeResponseConverterFactory())
             .addConverterFactory(GsonConverterFactory.create())
@@ -1279,8 +1283,8 @@ class BillingBackendClient(
     }
 
     /**
-     * OkHttp Application Interceptor that transparently retries a failed production request
-     * against [Constants.RPN_FALLBACK_URL] when [Constants.RPN_BASE_URL] is unreachable or
+     * OkHttp Application Interceptor that transparently retries a failed request
+     * against the supplied [fallbackUrl] when the supplied [baseUrl] is unreachable or
      * returns a server error.
      *
      * ### Fallback triggers
@@ -1301,10 +1305,14 @@ class BillingBackendClient(
      * passes through the session interceptor again, so session headers (bookmarks, DID token)
      * are attached correctly to the fallback request too.
      *
-     * Only used for [IBillingServerApi] (production). [IBillingServerApiTest] already
-     * targets [Constants.RPN_FALLBACK_URL] directly and does not need this interceptor.
+     * Used for both [IBillingServerApi] (production: [Constants.RPN_BASE_URL] →
+     * [Constants.RPN_FALLBACK_URL]) and [IBillingServerApiTest] (test:
+     * [Constants.RPN_BASE_TEST_URL] → [Constants.RPN_FALLBACK_TEST_URL]).
      */
-    private fun buildFallbackInterceptor(): Interceptor = Interceptor { chain ->
+    private fun buildFallbackInterceptor(
+        baseUrl: String,
+        fallbackUrl: String
+    ): Interceptor = Interceptor { chain ->
         val request = chain.request()
         try {
             val response = chain.proceed(request)
@@ -1312,7 +1320,7 @@ class BillingBackendClient(
                 Logger.w(LOG_IAB, "$TAG fallback: server error ${response.code} on ${request.url}, retrying with fallback URL")
                 response.close()
                 val fallbackRequest = request.newBuilder()
-                    .url(request.url.toString().replace(Constants.RPN_BASE_URL, Constants.RPN_FALLBACK_URL))
+                    .url(request.url.toString().replace(baseUrl, fallbackUrl))
                     .build()
                 chain.proceed(fallbackRequest)
             } else {
@@ -1321,7 +1329,7 @@ class BillingBackendClient(
         } catch (e: IOException) {
             Logger.w(LOG_IAB, "$TAG fallback: network error (${e.message}) on ${request.url}, retrying with fallback URL")
             val fallbackRequest = request.newBuilder()
-                .url(request.url.toString().replace(Constants.RPN_BASE_URL, Constants.RPN_FALLBACK_URL))
+                .url(request.url.toString().replace(baseUrl, fallbackUrl))
                 .build()
             chain.proceed(fallbackRequest)
         }
