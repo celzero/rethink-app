@@ -98,7 +98,7 @@ jobs:
             core.setOutput('head_sha', pullRequest.head.sha);
 
       - name: 🐦‍🔥 Review
-        uses: alibaba/open-code-review@main
+        uses: alibaba/open-code-review@e78474478f168a8009bd3b12334a87a2c985819d # v1.8.4
         with:
           llm_url: ${{ secrets.OCR_LLM_URL }}
           llm_auth_token: ${{ secrets.OCR_LLM_AUTH_TOKEN }}
