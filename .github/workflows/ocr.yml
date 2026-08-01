@@ -1,4 +1,4 @@
-name: Review
+name: 🏂 Code Review
 
 # from: github.com/alibaba/open-code-review/tree/5829539379e/examples/github_actions/ocr-review.yml
 
@@ -97,7 +97,7 @@ jobs:
             core.setOutput('base_ref', pullRequest.base.ref);
             core.setOutput('head_sha', pullRequest.head.sha);
 
-      - name: Review
+      - name: 🐦‍🔥 Review
         uses: alibaba/open-code-review@main
         with:
           llm_url: ${{ secrets.OCR_LLM_URL }}
