@@ -97,6 +97,9 @@ jobs:
             core.setOutput('base_ref', pullRequest.base.ref);
             core.setOutput('head_sha', pullRequest.head.sha);
 
+        # github.com/alibaba/open-code-review/blob/5829539379e/action.yml
+        # github.com/alibaba/open-code-review/tree/5829539379e/examples/github_actions
+        # open-codereview.ai/docs/cli-reference
       - name: 🐦‍🔥 Review
         uses: alibaba/open-code-review@e78474478f168a8009bd3b12334a87a2c985819d # v1.8.4
         with:
@@ -107,6 +110,8 @@ jobs:
           # turn on thinking mode as expected by anthropic api
           llm_extra_body: '${{ vars.OCR_LLM_EXTRA_BODY }}'
           # For issue_comment triggers, pass the resolved refs; for
-          # pull_request_target the action resolves them from the event.
+          # pull_request_target the action resolves them from the
+          # event automatically:
+          # github.com/alibaba/open-code-review/blob/5829539379e/action.yml#L208-L216
           base_ref: ${{ steps.pr-context.outputs.base_ref }}
           head_sha: ${{ steps.pr-context.outputs.head_sha }}
