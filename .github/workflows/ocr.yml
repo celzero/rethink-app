@@ -32,6 +32,7 @@ concurrency:
           && (
             startsWith(github.event.comment.body, '/open-code-review')
             || startsWith(github.event.comment.body, '@open-code-review')
+            || startsWith(github.event.comment.body, '/ocr')
           )
         )
       )
@@ -55,6 +56,7 @@ permissions:
 
 jobs:
   code-review:
+    name: 🧭 OCR
     runs-on: ubuntu-latest
     timeout-minutes: 100
     # Run on PR events, or on human-authored comments starting with trigger
@@ -144,7 +146,6 @@ jobs:
         run: |
           set -eux
 
-          # share.google/aimode/lmbJxZFxHJb5l7Bfd
           # Fork PRs: the head may live in a deleted fork.  Fetch the PR's
           # pull/<n>/head ref (advertised on the base repo, persistent after
           # close) so the head objects are present for the action's merge-base
@@ -154,33 +155,33 @@ jobs:
           fi
           git fetch origin "${HEAD_SHA}" 2>/dev/null || true
 
-          # Check whether the base branch still exists on origin.  For the
-          # common case (main, develop, release/*) it does, and the action's
-          # own checkout creates refs/remotes/origin/<branch> which makes
-          # `git merge-base origin/<branch> <head>` work naturally.
-          if git ls-remote --exit-code --heads origin "${BASE_REF}" >/dev/null 2>&1; then
-            echo "Base branch '${BASE_REF}' exists on origin"
-            echo "base_ref=${BASE_REF}" >> "$GITHUB_OUTPUT"
+          # Base branch deleted after merge — rare.  Fall back to the base
+          # SHA.  The action's `git fetch origin <sha>` only writes
+          # FETCH_HEAD (not a named ref), so `git merge-base origin/<sha>`
+          # can't resolve it.  We create refs/origin/<sha> instead: git
+          # DWIM rule 2 (refs/<refname>) resolves origin/<sha>.
+          #
+          # This must NOT be refs/heads/origin/<sha>: the action's internal
+          # checkout deletes ALL local branches (prepareExistingDirectory).
+          # refs/remotes/origin/<sha> would be pruned by its --prune fetch.
+          # refs/origin/<sha> is outside every namespace checkout mutates.
+          echo "::warning::base branch '${BASE_REF}' deleted on origin; falling back to SHA ${BASE_SHA}"
+          git fetch origin "${BASE_SHA}" 2>/dev/null || true
+          
+          if git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
+            git update-ref "refs/origin/${BASE_SHA}" "${BASE_SHA}"
+            echo "Created refs/origin/${BASE_SHA} as DWIM fallback"
+            echo "base_ref=${BASE_SHA}" >> "$GITHUB_OUTPUT"
           else
-            # Base branch deleted after merge — rare.  Fall back to the base
-            # SHA.  The action's `git fetch origin <sha>` only writes
-            # FETCH_HEAD (not a named ref), so `git merge-base origin/<sha>`
-            # can't resolve it.  We create refs/origin/<sha> instead: git
-            # DWIM rule 2 (refs/<refname>) resolves origin/<sha>.
-            #
-            # This must NOT be refs/heads/origin/<sha>: the action's internal
-            # checkout deletes ALL local branches (prepareExistingDirectory).
-            # refs/remotes/origin/<sha> would be pruned by its --prune fetch.
-            # refs/origin/<sha> is outside every namespace checkout mutates.
-            echo "::warning::base branch '${BASE_REF}' deleted on origin; falling back to SHA ${BASE_SHA}"
-            git fetch origin "${BASE_SHA}" 2>/dev/null || true
-            if git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
-              git update-ref "refs/origin/${BASE_SHA}" "${BASE_SHA}"
-              echo "Created refs/origin/${BASE_SHA} as DWIM fallback"
-              echo "base_ref=${BASE_SHA}" >> "$GITHUB_OUTPUT"
-            else
-              echo "::error::base SHA ${BASE_SHA} not fetchable; review may produce an empty diff"
-              echo "base_ref=${BASE_SHA}" >> "$GITHUB_OUTPUT"
+            echo "::error::base SHA ${BASE_SHA} not fetchable; review may produce an empty diff"
+
+            # Check whether the base branch still exists on origin.  For the
+            # common case (main, develop, release/*) it does, and the action's
+            # own checkout creates refs/remotes/origin/<branch> which makes
+            # `git merge-base origin/<branch> <head>` work naturally.
+            if git ls-remote --exit-code --heads origin "${BASE_REF}" >/dev/null 2>&1; then
+              echo "Base branch '${BASE_REF}' exists on origin"
+              echo "base_ref=${BASE_REF}" >> "$GITHUB_OUTPUT"
             fi
           fi
 
