@@ -4378,20 +4378,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         withContext(CoroutineName(s) + Dispatchers.Main) { f() }
 
     override fun onQuery(origin: String, uidGostr: String, fqdn: String, qtype: Long): DNSOpts {
-        // measure the overall time onQuery takes on every call, including the go2kt
-        // (runBlocking + dispatcher dispatch) overhead; gated behind DEBUG to avoid
-        // overhead on the DNS hot path in release builds
-        val startNanos = System.nanoTime()
-        return try {
-            go2kt(dnsQueryDispatcher) {
-                val d = TunDnsManager.DnsParams(origin, uidGostr, fqdn, qtype, isLockdown(), getUnderlyingSsid(), isIfaceCellular(""))
-                TunDnsManager.handleOnQuery(d)
-            }
-        } finally {
-            if (DEBUG) {
-                val elapsedNanos = System.nanoTime() - startNanos
-                logd("onQuery overall exec time (incl. go2kt): ${elapsedNanos / 1_000_000.0}ms ($elapsedNanos ns) for $fqdn")
-            }
+        return go2kt(dnsQueryDispatcher) {
+            val d = TunDnsManager.DnsParams(origin, uidGostr, fqdn, qtype, isLockdown(), getUnderlyingSsid(), isIfaceCellular(""))
+            TunDnsManager.handleOnQuery(d)
         }
     }
 

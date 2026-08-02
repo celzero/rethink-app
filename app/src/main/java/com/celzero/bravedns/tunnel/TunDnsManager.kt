@@ -79,19 +79,7 @@ object TunDnsManager: KoinComponent {
     }
 
     suspend fun handleOnQuery(d: DnsParams): DNSOpts {
-        if (!DEBUG) return handleOnQueryInternal(d)
-
-        val startNanos = System.nanoTime()
-        try {
-            return handleOnQueryInternal(d)
-        } finally {
-            // measure the execution time of handleOnQuery logic on every call;
-            // gated behind DEBUG to avoid overhead on the DNS hot path in release builds
-            if (DEBUG) {
-                val elapsedNanos = System.nanoTime() - startNanos
-                logd("onQuery: handleOnQuery exec time: ${elapsedNanos / 1_000_000.0}ms ($elapsedNanos ns) for ${d.fqdn}")
-            }
-        }
+        return handleOnQueryInternal(d)
     }
 
     private suspend fun handleOnQueryInternal(d: DnsParams): DNSOpts {
