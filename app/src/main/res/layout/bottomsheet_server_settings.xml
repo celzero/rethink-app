@@ -112,7 +112,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="8dp"
-                android:backgroundTint="?attr/cardBackgroundColor"
+                app:cardBackgroundColor="?attr/cardBackgroundColor"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp">
@@ -382,7 +382,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="8dp"
-                android:background="?attr/cardBackgroundColor"
+                app:cardBackgroundColor="?attr/cardBackgroundColor"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp">
@@ -800,7 +800,6 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Reset card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -808,7 +807,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="8dp"
-                android:background="?attr/cardBackgroundColor"
+                app:cardBackgroundColor="?attr/cardBackgroundColor"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp">
@@ -818,7 +817,8 @@
                     android:layout_height="wrap_content"
                     android:background="?attr/cardBackgroundColor"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:layout_margin="10dp"
+                    android:padding="10dp">
 
                     <androidx.appcompat.widget.AppCompatTextView
                         style="@style/TextAppearance.AppCompat.Subhead"
