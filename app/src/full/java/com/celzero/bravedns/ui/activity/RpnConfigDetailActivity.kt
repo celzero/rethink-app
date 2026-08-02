@@ -354,7 +354,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 // Server endpoint is shown as a single muted line in the hero banner.
                 // The IP (second part of addr) is intentionally discarded.
                 val endpoint = addlInfo?.let { serverEndpoint(it) }
-                if (endpoint.isNullOrBlank()) {
+                if (addlInfo == null || endpoint.isNullOrBlank()) {
                     b.valueAddlInfo.visibility = View.GONE
                     b.tvHeroPub.visibility = View.GONE
                     pubPub = ""
