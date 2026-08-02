@@ -23,6 +23,7 @@ import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.firestack.backend.RpnEntitlement
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,6 +38,9 @@ class EntitlementDetailViewModel : ViewModel() {
         private const val TAG = "EntitlementDetailVM"
         const val RESET_TIMEOUT_MS = 20_000L
     }
+
+    private var loadJob: Job? = null
+    private var resetJob: Job? = null
 
     /**
      * Lifecycle of the entitlement-details load.
@@ -67,6 +71,7 @@ class EntitlementDetailViewModel : ViewModel() {
 
     /** Drops any previous [EntitlementState.Done] so a reopened sheet never renders stale data. */
     fun resetEntitlement() {
+        loadJob?.cancel()
         _entitlementState.value = EntitlementState.Idle
     }
 
@@ -77,7 +82,8 @@ class EntitlementDetailViewModel : ViewModel() {
      */
     fun loadEntitlement() {
         if (_entitlementState.value is EntitlementState.Loading) return
-        viewModelScope.launch {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
             _entitlementState.value = EntitlementState.Loading
             Logger.i(LOG_TAG_UI, "$TAG.loadEntitlement: fetching entitlement details")
 
@@ -126,7 +132,8 @@ class EntitlementDetailViewModel : ViewModel() {
 
     fun reset() {
         if (_resetState.value is ResetState.InProgress) return
-        viewModelScope.launch {
+        resetJob?.cancel()
+        resetJob = viewModelScope.launch {
             _resetState.value = ResetState.InProgress
             Logger.i(LOG_TAG_UI, "$TAG.reset: starting RPN reset")
 
@@ -157,6 +164,7 @@ class EntitlementDetailViewModel : ViewModel() {
     }
 
     fun onResetConsumed() {
+        resetJob?.cancel()
         _resetState.value = ResetState.Idle
     }
 }
