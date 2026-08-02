@@ -94,7 +94,11 @@ jobs:
               repo: context.repo.repo,
               pull_number: prNumber
             });
-            core.setOutput('base_ref', pullRequest.base.ref);
+            // A closed PR's base branch may have been deleted, so its name
+            // (base.ref) is no longer fetchable; base.sha is the last-known
+            // base commit and always resolvable in the repo.
+            const isClosed = pullRequest.state === 'closed';
+            core.setOutput('base_ref', isClosed ? pullRequest.base.sha : pullRequest.base.ref);
             core.setOutput('head_sha', pullRequest.head.sha);
 
         # github.com/alibaba/open-code-review/blob/5829539379e/action.yml
