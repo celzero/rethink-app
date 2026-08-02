@@ -1258,15 +1258,15 @@ class BillingBackendClient(
      * Builds a Retrofit instance for the test billing API.
      *
      * Mirrors the production primary/fallback split: calls target
-     * [Constants.RPN_BASE_TEST_URL] as the primary, and transparently fall back to
-     * [Constants.RPN_FALLBACK_TEST_URL] on 5xx or network errors.
+     * [Constants.RPN_TEST_BASE_URL] as the primary, and transparently fall back to
+     * [Constants.RPN_TEST_FALLBACK_URL] on 5xx or network errors.
      */
     private fun buildTestApi(): IBillingServerApiTest {
         val client = RetrofitManager
             .okHttpClient(persistentState.routeRethinkInRethink)
             .newBuilder()
             .addInterceptor(buildFallbackInterceptor(
-                Constants.RPN_BASE_TEST_URL, Constants.RPN_FALLBACK_TEST_URL
+                Constants.RPN_TEST_BASE_URL, Constants.RPN_TEST_FALLBACK_URL
             ))
             .addInterceptor(buildSessionInterceptor(
                 DB_SESSION_TEST_HEADER, DB_SESSION_TEST_RESPONSE_HEADER,
@@ -1274,7 +1274,7 @@ class BillingBackendClient(
             ))
             .build()
         return Retrofit.Builder()
-            .baseUrl(Constants.RPN_BASE_TEST_URL)
+            .baseUrl(Constants.RPN_TEST_BASE_URL)
             .client(client)
             .addConverterFactory(SafeResponseConverterFactory())
             .addConverterFactory(GsonConverterFactory.create())
