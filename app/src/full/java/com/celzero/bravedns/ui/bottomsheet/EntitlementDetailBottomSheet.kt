@@ -85,9 +85,10 @@ class EntitlementDetailBottomSheet : BottomSheetDialogFragment() {
         b.btnRestore.setOnClickListener { viewModel.reset() }
 
         // Fetch happens on the ViewModel scope (survives sheet dismissal); the
-        // sheet only observes the state. Reset first so a Done from a previous
+        // sheet only observes the state. Reset first so a result from a previous
         // session is never replayed as stale data.
         viewModel.resetEntitlement()
+        viewModel.onResetConsumed()
         viewModel.loadEntitlement()
     }
 
@@ -183,17 +184,17 @@ class EntitlementDetailBottomSheet : BottomSheetDialogFragment() {
         val status2 = activeEntitlement?.status()
         compareAndSet(b.rowStatus, "Status", status1.capitalizeWords(), status2?.capitalizeWords(), valuesEqual(status1, status2))
 
-        // CID: show only the first 12 digits of both entitlements. A mismatch here
+        // CID: compare the full strings, truncate only for display. A mismatch here
         // warrants a restore.
-        val cid1 = entitlement.cid().take(12)
-        val cid2 = activeEntitlement?.cid()?.take(12)
-        compareAndSet(b.rowCid, "Client ID", cid1, cid2, valuesEqual(cid1, cid2), triggerRestore = true)
+        val fullCid1 = entitlement.cid()
+        val fullCid2 = activeEntitlement?.cid()
+        compareAndSet(b.rowCid, "Client ID", fullCid1.take(12), fullCid2?.take(12), valuesEqual(fullCid1, fullCid2), triggerRestore = true)
 
-        // DID: show only the first 4 digits of both entitlements. A mismatch here
+        // DID: compare the full strings, truncate only for display. A mismatch here
         // warrants a restore.
-        val did1 = entitlement.did().take(4)
-        val did2 = activeEntitlement?.did()?.take(4)
-        compareAndSet(b.rowDid, "Device ID", did1, did2, valuesEqual(did1, did2), triggerRestore = true)
+        val fullDid1 = entitlement.did()
+        val fullDid2 = activeEntitlement?.did()
+        compareAndSet(b.rowDid, "Device ID", fullDid1.take(4), fullDid2?.take(4), valuesEqual(fullDid1, fullDid2), triggerRestore = true)
 
         setupRow(b.rowWho, "Identifier", who)
 
@@ -203,7 +204,7 @@ class EntitlementDetailBottomSheet : BottomSheetDialogFragment() {
         val activeExpiry = activeEntitlement?.expiry()
         val exp1 = UIUtils.formatToRelativeTime(requireContext(), entitlement.expiry())
         val exp2 = activeExpiry?.let { UIUtils.formatToRelativeTime(requireContext(), it) }
-        val expSame = activeExpiry == null || entitlement.expiry() == activeExpiry
+        val expSame = entitlement.expiry() == activeExpiry
         compareAndSet(b.rowExpiry, "Expiry", exp1, exp2, expSame, triggerRestore = true)
 
         // Provider ID
