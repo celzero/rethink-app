@@ -653,21 +653,7 @@ object RpnProxyManager : KoinComponent {
 
         val entitlementBytes = getWinEntitlement()
         val prevRegistrationBytes = getWinExistingStateData()
-        // Resolve the device ID BEFORE acquiring winRegistrationMutex: getDeviceId()
-        // can block on identityMutex (contended by concurrent refreshIdentity /
-        // reconcileDidForCid) and may issue a network identity refresh when no DID is
-        // stored. Holding the lock across it would stall queued registerProxy callers.
-        val deviceId = billingBackendClient.getDeviceId()
-        // Route the registration through winRegistrationMutex so a concurrent
-        // registerProxy cannot race past isWinRegistered()==false and also invoke
-        // registerWin — the TOCTOU this mutex was introduced to prevent. Reset always
-        // re-registers with the fresh entitlement regardless of current state, so unlike
-        // registerProxy it does NOT short-circuit on isWinRegistered(). Using the bounded
-        // registerAndFetchWinWithTimeout (15s) ensures a hung gomobile call cannot block
-        // other callers indefinitely. (unregisterWin above intentionally runs unlocked:
-        // it precedes the slow entitlement query, and widening the lock to span it would
-        // reintroduce the convoy; if registerProxy slips in between reset's unregister
-        // and re-register, its result is overwritten by the fresh registration below.)
+
         val registrationBytes = try {
             winRegistrationMutex.withLock {
                 val regBytes = registerAndFetchWinWithTimeout(
