@@ -47,6 +47,7 @@ import java.io.FileDescriptor
 import java.io.FileOutputStream
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Implements [LogConsumer] to drain Go runtime logs from a shared-memory file descriptor.
@@ -278,6 +279,8 @@ class GoMemLogConsumer(private val appContext: Context, private val scope: Corou
         io {
             try {
                 consoleLogRepository.insertBatch(batch)
+            } catch (e: CancellationException) {
+            throw e
             } catch (e: Exception) {
                 Logger.e(
                     LOG_TAG_BUG_REPORT,
