@@ -187,15 +187,15 @@ class EntitlementDetailBottomSheet : BottomSheetDialogFragment() {
         // warrants a restore.
         val cid1 = entitlement.cid().take(12)
         val cid2 = activeEntitlement?.cid()?.take(12)
-        compareAndSet(b.rowCid, "Client ID (CID)", cid1, cid2, valuesEqual(cid1, cid2), triggerRestore = true)
+        compareAndSet(b.rowCid, "Client ID", cid1, cid2, valuesEqual(cid1, cid2), triggerRestore = true)
 
         // DID: show only the first 4 digits of both entitlements. A mismatch here
         // warrants a restore.
         val did1 = entitlement.did().take(4)
         val did2 = activeEntitlement?.did()?.take(4)
-        compareAndSet(b.rowDid, "Device ID (DID)", did1, did2, valuesEqual(did1, did2), triggerRestore = true)
+        compareAndSet(b.rowDid, "Device ID", did1, did2, valuesEqual(did1, did2), triggerRestore = true)
 
-        setupRow(b.rowWho, "Identifier (WHO)", who)
+        setupRow(b.rowWho, "Identifier", who)
 
         // Expiry: compare the raw timestamps, format only for display. Comparing the
         // formatted relative strings would miss small but real differences (both would
@@ -227,7 +227,7 @@ class EntitlementDetailBottomSheet : BottomSheetDialogFragment() {
         val test2 = activeEntitlement?.test()?.toString()
         compareAndSet(b.rowTest, "Is Test", test1.capitalizeWords(), test2?.capitalizeWords(), valuesEqual(test1, test2), showDivider = false)
 
-        b.btnRestore.visibility = if (canRestore) View.VISIBLE else View.GONE
+        b.restoreCv.visibility = if (canRestore) View.VISIBLE else View.GONE
 
         if (everythingSame && activeEntitlement != null) {
             b.tvComparisonInfo.text = getString(R.string.unicode_check_sign)
