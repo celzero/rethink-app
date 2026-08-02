@@ -120,13 +120,37 @@ object RpnProxyManager : KoinComponent {
 
     // Single-flight guard for the WIN tunnel-registration critical section ONLY
     // (isWinRegistered check + registerWin Go call + config persist, ~3s).
-    // NOT held during the recovery ladder (entitlement re-derivation, server queries)
-    // or the server-location fetch — those remain parallel. This prevents concurrent
-    // registerProxy callers from racing past the isWinRegistered() fast-path and both
-    // invoking registerWin (a TOCTOU: both see win()==null before either completes).
-    // The prior winRegistrationMutex locked the entire function (including the slow
-    // recovery ladder), causing ~15s stalls; this narrow lock avoids that.
+    // Held by BOTH registerProxy (check-then-register) and resetAndRefetchRpn
+    // (force re-register with fresh entitlement), so the two paths cannot invoke
+    // registerWin concurrently — the TOCTOU this mutex was introduced to prevent
+    // (both observing win()==null before either completes). NOT held during the
+    // recovery ladder (entitlement re-derivation, server queries), the
+    // server-location fetch, reset's unregisterWin(), or the deviceId resolution
+    // (billingBackendClient.getDeviceId(), which can block on identityMutex /
+    // issue a network identity refresh) — those remain parallel. The prior
+    // winRegistrationMutex locked the entire function (including the slow recovery
+    // ladder), causing ~15s stalls; this narrow lock avoids that.
     private val winRegistrationMutex = Mutex()
+
+    // Serializes the delete-then-write sequence to the two RPN internal encrypted
+    // files (WIN state + entitlement in File(filesDir, RPN_PROXY_FOLDER_NAME)).
+    // EncryptedFileManager.write is non-atomic (deleteFile then writeInternal), and
+    // updateWinConfigState adds its own file.delete() before that, so two concurrent
+    // writers to the SAME path can interleave their delete+write steps and leave a
+    // missing/corrupt file, or let stale bytes overwrite fresh ones. The writers that
+    // touch these paths — migrateOneRpnFile (runs once during load() on app upgrade),
+    // storeWinEntitlement (payment / registerProxy recovery), and updateWinConfigState
+    // (registerProxy / resetAndRefetchRpn) — all run on Dispatchers.IO with nothing
+    // gating registration on load() completion, so they can overlap during startup.
+    // Readers (getWinEntitlement / getWinExistingStateData) are intentionally NOT
+    // locked: their delete-on-key-mismatch only fires on already-corrupt files and
+    // EncryptedFileManager.write tolerates a missing target, so reader-vs-writer races
+    // are not dangerous; only write-vs-write interleaving is.
+    //
+    // Lock ordering: winRegistrationMutex -> winFileMutex (only updateWinConfigState
+    // nests both, and always in that order); nothing acquires them in reverse, so the
+    // pair is deadlock-safe.
+    private val winFileMutex = Mutex()
 
     /**
      * Emits a list of [CountryConfig] objects that were selected by the user but are
@@ -629,13 +653,42 @@ object RpnProxyManager : KoinComponent {
 
         val entitlementBytes = getWinEntitlement()
         val prevRegistrationBytes = getWinExistingStateData()
+        // Resolve the device ID BEFORE acquiring winRegistrationMutex: getDeviceId()
+        // can block on identityMutex (contended by concurrent refreshIdentity /
+        // reconcileDidForCid) and may issue a network identity refresh when no DID is
+        // stored. Holding the lock across it would stall queued registerProxy callers.
+        val deviceId = billingBackendClient.getDeviceId()
+        // Route the registration through winRegistrationMutex so a concurrent
+        // registerProxy cannot race past isWinRegistered()==false and also invoke
+        // registerWin — the TOCTOU this mutex was introduced to prevent. Reset always
+        // re-registers with the fresh entitlement regardless of current state, so unlike
+        // registerProxy it does NOT short-circuit on isWinRegistered(). Using the bounded
+        // registerAndFetchWinWithTimeout (15s) ensures a hung gomobile call cannot block
+        // other callers indefinitely. (unregisterWin above intentionally runs unlocked:
+        // it precedes the slow entitlement query, and widening the lock to span it would
+        // reintroduce the convoy; if registerProxy slips in between reset's unregister
+        // and re-register, its result is overwritten by the fresh registration below.)
         val registrationBytes = try {
-            VpnController.registerAndFetchWinConfig(entitlementBytes, prevRegistrationBytes, billingBackendClient.getDeviceId())
+            winRegistrationMutex.withLock {
+                val regBytes = registerAndFetchWinWithTimeout(
+                    entitlementBytes, prevRegistrationBytes, deviceId, "reset"
+                )
+                if (regBytes != null) {
+                    updateWinConfigState(regBytes)
+                }
+                regBytes
+            }
         } catch (e: Exception) {
             Logger.e(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: tunnel registration failed: ${e.message}", e)
             return ResetResult.Failure("Failed to register with tunnel")
         }
-        updateWinConfigState(registrationBytes)
+        if (registrationBytes == null) {
+            Logger.e(
+                LOG_TAG_PROXY,
+                "$TAG; resetAndRefetchRpn: tunnel registration failed (timed out or tunnel returned null after ${WIN_REGISTRATION_TIMEOUT_MS}ms)"
+            )
+            return ResetResult.Failure("Failed to register with tunnel")
+        }
         Logger.i(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: re-registered with tunnel")
 
         // Clear all user-specific server state (selections, favourites, selection counts)
@@ -790,11 +843,17 @@ object RpnProxyManager : KoinComponent {
             }
 
             val file = File(folder, fileName)
-            val res = try {
-                EncryptedFileManager.write(applicationContext, ws, file)
-            } catch (e: Exception) {
-                Logger.e(LOG_TAG_PROXY, "$TAG; storeWinEntitlement: exception writing file: ${e.message}", e)
-                false
+            // Serialize against concurrent migrateOneRpnFile / updateWinConfigState writers
+            // targeting the same internal path (EncryptedFileManager.write is non-atomic
+            // delete-then-write; interleaving can leave a corrupt/missing file or let stale
+            // migration bytes overwrite fresh payment bytes).
+            val res = winFileMutex.withLock {
+                try {
+                    EncryptedFileManager.write(applicationContext, ws, file)
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_PROXY, "$TAG; storeWinEntitlement: exception writing file: ${e.message}", e)
+                    false
+                }
             }
 
             if (!res) {
@@ -1101,6 +1160,21 @@ object RpnProxyManager : KoinComponent {
 
                 Logger.i(LOG_TAG_PROXY, "$TAG; registerProxy: calling VpnController.isWinRegistered()")
                 var ok = true
+                // Resolve the device ID BEFORE acquiring winRegistrationMutex.
+                // getDeviceId() can block on identityMutex (contended by concurrent
+                // refreshIdentity / reconcileDidForCid calls) and may issue a network
+                // identity refresh (createOrRegisterDid / refreshIdentityLocked) when no
+                // DID is stored — running it inside the lock would stall every queued
+                // registerProxy caller for its full duration, reintroducing the convoy
+                // the narrow lock is meant to avoid. The DID is independent of the
+                // check-then-register critical section (it does not depend on
+                // isWinRegistered state), so resolving it in parallel is safe;
+                // identityMutex already serializes identity mutations internally.
+                val deviceId = billingBackendClient.getDeviceId()
+                Logger.i(
+                    LOG_TAG_PROXY,
+                    "$TAG; registerProxy: getDeviceId() returned len=${deviceId.length} (ent bytes=${entitlementBytes?.size}, state bytes=${stateBytes?.size})"
+                )
                 // Single-flight: serialize ONLY the check-then-register critical section so
                 // concurrent callers coalesce into one registerWin Go call. The recovery
                 // ladder above ran unlocked (parallel); the server fetch below also runs
@@ -1113,12 +1187,7 @@ object RpnProxyManager : KoinComponent {
                     if (!alreadyRegistered) {
                         Logger.i(
                             LOG_TAG_PROXY,
-                            "$TAG; registerProxy: isWinRegistered()=false, calling billingBackendClient.getDeviceId()"
-                        )
-                        val deviceId = billingBackendClient.getDeviceId()
-                        Logger.i(
-                            LOG_TAG_PROXY,
-                            "$TAG; registerProxy: getDeviceId() returned len=${deviceId.length}, calling registerAndFetchWinConfig (ent bytes=${entitlementBytes?.size}, state bytes=${stateBytes?.size})"
+                            "$TAG; registerProxy: isWinRegistered()=false, calling registerAndFetchWinConfig"
                         )
                         val regBytes = registerAndFetchWinWithTimeout(entitlementBytes, stateBytes, deviceId, "first")
                         if (regBytes == null && !VpnController.isWinRegistered()) {
@@ -2004,7 +2073,7 @@ object RpnProxyManager : KoinComponent {
     /**
      * Migrates a single legacy RPN encrypted file from [externalFolder] to [internalFolder].
      */
-    private fun migrateOneRpnFile(
+    private suspend fun migrateOneRpnFile(
         externalFolder: File?,
         internalFolder: File,
         fileName: String
@@ -2049,11 +2118,19 @@ object RpnProxyManager : KoinComponent {
 
         // Re-encrypt into internal storage. EncryptedFileManager.write deletes any
         // pre-existing target first, so a partial earlier attempt is handled.
-        val ok = try {
-            EncryptedFileManager.write(applicationContext, bytes, internalFile)
-        } catch (e: Exception) {
-            Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: internal write failed, keeping readable external file, will retry next launch: ${e.message}", e)
-            return RpnMigrateResult(false, "write-failed-retry")
+        // Serialize against concurrent storeWinEntitlement / updateWinConfigState writers
+        // targeting the same internal path: EncryptedFileManager.write is non-atomic
+        // (delete-then-write), so unsynchronized concurrent writes can interleave and
+        // leave a corrupt/missing file, or let these stale (legacy) bytes overwrite a
+        // fresh payment-derived entitlement written moments earlier. The external-file
+        // read above is independent of internal writers and stays unlocked.
+        val ok = winFileMutex.withLock {
+            try {
+                EncryptedFileManager.write(applicationContext, bytes, internalFile)
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: internal write failed, keeping readable external file, will retry next launch: ${e.message}", e)
+                return@withLock false
+            }
         }
         if (!ok) {
             Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: internal write returned false, keeping readable external file, will retry next launch")
@@ -2107,12 +2184,18 @@ object RpnProxyManager : KoinComponent {
             }
 
             val file = File(folder, fileName)
-            if (file.exists()) file.delete()
-            val ok = try {
-                EncryptedFileManager.write(applicationContext, byteArray, file)
-            } catch (e: Exception) {
-                Logger.e(LOG_TAG_PROXY, "$TAG; updateWinConfigState: exception writing file: ${e.message}", e)
-                false
+            // Hold winFileMutex across the manual delete + EncryptedFileManager.write so
+            // a concurrent migrateOneRpnFile / storeWinEntitlement writer cannot interleave
+            // its own delete+write against this same path (EncryptedFileManager.write is
+            // non-atomic delete-then-write).
+            val ok = winFileMutex.withLock {
+                if (file.exists()) file.delete()
+                try {
+                    EncryptedFileManager.write(applicationContext, byteArray, file)
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_PROXY, "$TAG; updateWinConfigState: exception writing file: ${e.message}", e)
+                    false
+                }
             }
 
             if (!ok) {
