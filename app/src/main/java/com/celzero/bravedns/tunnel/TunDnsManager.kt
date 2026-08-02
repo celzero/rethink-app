@@ -176,7 +176,7 @@ object TunDnsManager: KoinComponent {
         }
 
         val r = makeNsOpts(uid, tid, fqdn, false, isIfaceCellular, ssid)
-        logd("onQuery: makeNsOpts($r) for $fqdn, return $r")
+        logd("onQuery: makeNsOpts for $fqdn, return $r")
         return r
     }
 
