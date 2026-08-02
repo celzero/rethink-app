@@ -1435,7 +1435,10 @@ class GoVpnAdapter : KoinComponent {
         wgConfigs.forEach {
             val id = ID_WG_BASE + it.getId()
             val stats = getProxyStatusById(id).first
-            if (stats == null || stats == Backend.TNT) {
+            if (stats == null) {
+                addWgProxy(id, true)
+                Logger.w(LOG_TAG_VPN, "$TAG proxy stats for $id is null, re-adding wg id: $id")
+            } else if (stats == Backend.TNT) {
                 Logger.w(LOG_TAG_VPN, "$TAG proxy stats for $id is null or tnt, $stats, re-adding? $avoidReaddingProxies")
                 // there are cases where the proxy needs to be re-added, so pingOrReAddProxy
                 // case: some of the wg proxies are added to tunnel but erring out, so
@@ -1460,23 +1463,19 @@ class GoVpnAdapter : KoinComponent {
             }
             val rpn = getWinByKey(key)
             val status = rpn?.status()
-            if (status == Backend.TNT) {
+            if (status == null) {
+                reconnectRpnProxy(key)
+                Logger.i(LOG_TAG_VPN, "$TAG re-added rpn proxy: $key")
+                logEvent(Severity.LOW, "re-add rpn proxy", "re-added rpn proxy with key: $key, reason: $status")
+            } else if (status == Backend.TNT) {
                 if (avoidReaddingProxies) {
                     refreshRpnProxy(key)
                     Logger.i(LOG_TAG_VPN, "$TAG refreshed rpn proxy: $key")
-                    logEvent(
-                        Severity.LOW,
-                        "refresh rpn proxy",
-                        "refreshed rpn proxy with key: $key"
-                    )
+                    logEvent(Severity.LOW, "refresh rpn proxy", "refreshed rpn proxy with key: $key, rpn in TNT state")
                 } else {
                     reconnectRpnProxy(key)
                     Logger.i(LOG_TAG_VPN, "$TAG re-added rpn proxy: $key")
-                    logEvent(
-                        Severity.LOW,
-                        "re-add rpn proxy",
-                        "re-added rpn proxy with key: $key"
-                    )
+                    logEvent(Severity.LOW, "re-add rpn proxy", "re-added rpn proxy with key: $key, rpn in TNT state")
                 }
             }
         }
