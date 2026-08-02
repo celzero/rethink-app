@@ -128,20 +128,41 @@ object EncryptedFileManager : KoinComponent {
             }
         }
 
-        // Log critical failures to event system
-        val message = "$operation failed for file: $file"
+        // a DecryptionFailed (key mismatch / corrupt ciphertext after a signing-key change,
+        // keyset reset, or the cross-file cascade) or a generic I/O error is RECOVERABLE
+        //
+        // callers delete the stale file and re-derive from authoritative sources (DB / Play
+        // billing / server).
+        val isRecoverable = cryptoException is EncryptionException.DecryptionFailed
+                || cryptoException is EncryptionException.IOError
+
+        val verb = if (isRecoverable) "unreadable (recoverable, will regenerate)" else "failed"
+        val message = "$operation $verb for file: $file"
         val details = "${cryptoException::class.simpleName}: ${cryptoException.message}\nCause: ${e::class.simpleName}: ${e.message}"
 
-        eventLogger.log(
-            type = EventType.PROXY_ERROR,
-            severity = Severity.CRITICAL,
-            message = message,
-            source = EventSource.SYSTEM,
-            userAction = false,
-            details = details
-        )
-
-        Logger.e(LOG_TAG, "$message: ${cryptoException.message}")
+        if (isRecoverable) {
+            // Expected during app install/update cycles; log at LOW for traceability,
+            // not as an error.
+            eventLogger.log(
+                type = EventType.PROXY_ERROR,
+                severity = Severity.LOW,
+                message = message,
+                source = EventSource.SYSTEM,
+                userAction = false,
+                details = details
+            )
+            Logger.w(LOG_TAG, "$message: ${cryptoException.message}")
+        } else {
+            eventLogger.log(
+                type = EventType.PROXY_ERROR,
+                severity = Severity.CRITICAL,
+                message = message,
+                source = EventSource.SYSTEM,
+                userAction = false,
+                details = details
+            )
+            Logger.e(LOG_TAG, "$message: ${cryptoException.message}")
+        }
         return cryptoException
     }
 

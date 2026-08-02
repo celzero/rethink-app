@@ -381,8 +381,8 @@ object VpnController : KoinComponent {
         rvpn?.writeConsoleLog(log)
     }
 
-    suspend fun registerAndFetchWinConfig(prevBytes: ByteArray?, deviceId: String): ByteArray? {
-        return rvpn?.registerAndFetchWinIfNeeded(prevBytes, deviceId)
+    suspend fun registerAndFetchWinConfig(entitlementBytes: ByteArray?, stateBytes: ByteArray?, deviceId: String): ByteArray? {
+        return rvpn?.registerAndFetchWinIfNeeded(entitlementBytes, stateBytes, deviceId)
     }
 
     /** Ask the tunnel to refresh the WIN proxy state and return the updated bytes. */
@@ -522,6 +522,9 @@ object VpnController : KoinComponent {
         rvpn?.screenLock()
     }
 
+    suspend fun getActiveEntitlement(): RpnEntitlement? {
+        return rvpn?.getActiveEntitlement()
+    }
 
     suspend fun getWinByKey(key: String): Proxy? {
         return rvpn?.getWinByKey(key)

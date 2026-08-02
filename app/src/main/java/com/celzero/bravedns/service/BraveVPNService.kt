@@ -6211,8 +6211,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         return vpnAdapter?.getRpnLocations(type) ?: Pair(null, null)
     }
 
-    suspend fun registerAndFetchWinIfNeeded(prevBytes: ByteArray?, deviceId: String): ByteArray? {
-        return vpnAdapter?.registerAndFetchWinIfNeeded(prevBytes, deviceId)
+    suspend fun registerAndFetchWinIfNeeded(entitlementBytes: ByteArray?, stateBytes: ByteArray?, deviceId: String): ByteArray? {
+        return vpnAdapter?.registerAndFetchWinIfNeeded(entitlementBytes, stateBytes, deviceId)
     }
 
     suspend fun getEntitlementDetails(prevBytes: ByteArray?, deviceId: String): RpnEntitlement? {
@@ -6286,6 +6286,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
     suspend fun getWinByKey(key: String): Proxy? {
         return vpnAdapter?.getWinByKey(key)
+    }
+
+    suspend fun getActiveEntitlement(): RpnEntitlement? {
+        return vpnAdapter?.getActiveEntitlement()
     }
 
     suspend fun getWinIdentifier(): String? {

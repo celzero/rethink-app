@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="?attr/background"
     android:fillViewport="true">
 
@@ -33,6 +34,18 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_comparison_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textAlignment="center"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:text="✅"
+            tools:visibility="visible" />
+
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,6 +61,10 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp">
+
+                <include
+                    android:id="@+id/row_rpn_active"
+                    layout="@layout/layout_entitlement_row" />
 
                 <include
                     android:id="@+id/row_status"
@@ -90,10 +107,20 @@
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_dismiss"
+            android:id="@+id/btn_restore"
+            style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:layout_marginTop="24dp"
+            android:text="@string/rpn_restore_confirm_title"
+            android:visibility="gone"
+            app:cornerRadius="12dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_dismiss"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="12dp"
             android:text="@string/lbl_dismiss"
             app:cornerRadius="12dp" />
 
