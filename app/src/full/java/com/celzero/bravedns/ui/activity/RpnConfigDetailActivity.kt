@@ -140,9 +140,9 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         /** Polling interval for live stats. */
         private const val STATS_POLL_MS = 2_000L
 
-        // symbols used in the stats meta line.
-        private const val HANDSHAKE_EMOJI = "✓"
-        private const val RECONNECT_EMOJI = "⟳"
+        // Emoji accents used in the compact stats meta line (kept subtle via RelativeSizeSpan).
+        private const val HANDSHAKE_EMOJI = "🤝"
+        private const val RECONNECT_EMOJI = "🔃"
     }
 
     private fun Context.isDarkThemeOn(): Boolean =
@@ -537,7 +537,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         b.valueRx.text = getString(R.string.symbol_download, Utilities.humanReadableByteCount(rx, true))
         b.valueTx.text = getString(R.string.symbol_upload, Utilities.humanReadableByteCount(tx, true))
 
-        // e.g. "Connected · ✓ 1m · ⟳ 12m"
+        // e.g. "Connected · 🤝 1m · 🔃 12m"
         val statusText = buildStatusText(ps, statusPair.second)
         val lastOK = stats?.lastOK ?: 0L
         val lastOpen = stats?.lastOpen ?: 0L

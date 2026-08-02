@@ -2497,7 +2497,7 @@
     <string name="lbl_server_info" translatable="false">Endpoint</string>
     <string name="lbl_never" translatable="false">Never</string>
 
-    <string name="rpn_meta_last_times" translatable="false">%1$s · ✓ %2$s · ⟳ %3$s</string>
+    <string name="rpn_meta_last_times" translatable="false">%1$s · 🤝 %2$s · 🔃 %3$s</string>
 
     <!-- Emoji icons used in the privacy exposure card -->
     <string name="emoji_eye" translatable="false">👁️</string>
