@@ -146,7 +146,6 @@
                     android:layout_gravity="center"
                     android:background="@drawable/rectangle_border_background"
                     android:clickable="true"
-                    android:drawablePadding="-15dp"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground"
                     android:gravity="center"
