@@ -109,7 +109,18 @@ object EncryptedFileManager : KoinComponent {
                 EncryptionException.KeystoreError(e)
             }
             is java.io.IOException -> {
-                EncryptionException.IOError(e)
+                // Tink wraps streaming-AEAD decryption failures (ciphertext encrypted
+                // with a key that is no longer in the keyset, e.g. after a keyset reset
+                // caused by a dev/reinstall that wiped SharedPreferences) in plain
+                // java.io.IOException with messages like: "No matching key found for the
+                // ciphertext in the stream." That is a decryption/key-mismatch failure, NOT
+                // a disk I/O failure, so classify it as DecryptionFailed so callers can treat the
+                // file as a key mismatch file and recover from authoritative sources.
+                if (isTinkDecryptionFailure(e)) {
+                    EncryptionException.DecryptionFailed(e)
+                } else {
+                    EncryptionException.IOError(e)
+                }
             }
             else -> {
                 // Unknown exception - wrap as keystore error
@@ -117,20 +128,41 @@ object EncryptedFileManager : KoinComponent {
             }
         }
 
-        // Log critical failures to event system
-        val message = "$operation failed for file: $file"
+        // a DecryptionFailed (key mismatch / corrupt ciphertext after a signing-key change,
+        // keyset reset, or the cross-file cascade) or a generic I/O error is RECOVERABLE
+        //
+        // callers delete the stale file and re-derive from authoritative sources (DB / Play
+        // billing / server).
+        val isRecoverable = cryptoException is EncryptionException.DecryptionFailed
+                || cryptoException is EncryptionException.IOError
+
+        val verb = if (isRecoverable) "unreadable (recoverable, will regenerate)" else "failed"
+        val message = "$operation $verb for file: $file"
         val details = "${cryptoException::class.simpleName}: ${cryptoException.message}\nCause: ${e::class.simpleName}: ${e.message}"
 
-        eventLogger.log(
-            type = EventType.PROXY_ERROR,
-            severity = Severity.CRITICAL,
-            message = message,
-            source = EventSource.SYSTEM,
-            userAction = false,
-            details = details
-        )
-
-        Logger.e(LOG_TAG, "$message: ${cryptoException.message}")
+        if (isRecoverable) {
+            // Expected during app install/update cycles; log at LOW for traceability,
+            // not as an error.
+            eventLogger.log(
+                type = EventType.PROXY_ERROR,
+                severity = Severity.LOW,
+                message = message,
+                source = EventSource.SYSTEM,
+                userAction = false,
+                details = details
+            )
+            Logger.w(LOG_TAG, "$message: ${cryptoException.message}")
+        } else {
+            eventLogger.log(
+                type = EventType.PROXY_ERROR,
+                severity = Severity.CRITICAL,
+                message = message,
+                source = EventSource.SYSTEM,
+                userAction = false,
+                details = details
+            )
+            Logger.e(LOG_TAG, "$message: ${cryptoException.message}")
+        }
         return cryptoException
     }
 
@@ -421,6 +453,35 @@ object EncryptedFileManager : KoinComponent {
             if (current.javaClass.name == "android.security.KeyStoreException") return true
             // GeneralSecurityException wrapping AEADBadTagException
             if (current is GeneralSecurityException && current.cause is AEADBadTagException) return true
+            current = current.cause
+        }
+        return false
+    }
+
+    /**
+     * Detects a Tink streaming-AEAD decryption failure that is reported as a plain
+     * [java.io.IOException] (Tink's [InputStreamDecrypter] throws IOException when no key
+     * in the keyset can decrypt the ciphertext stream). The canonical message is:
+     *   "No matching key found for the ciphertext in the stream."
+     *
+     * This signals that the ciphertext was produced by a *different* (now-discarded)
+     * keyset than the one currently in SharedPreferences - a key-mismatch, not a disk
+     * error. Distinct from [isKeysetCorruption]: there the keyset itself is unreadable;
+     * here the keyset is fine but the ciphertext is not.
+     */
+    private fun isTinkDecryptionFailure(e: Throwable?): Boolean {
+        var current: Throwable? = e
+        while (current != null) {
+            if (current is java.io.IOException) {
+                val msg = current.message
+                // Match Tink's InputStreamDecrypter / StreamingAeadThroughIOConnection
+                // signatures without being brittle to minor wording changes.
+                if (msg != null && (msg.contains("No matching key")
+                            || msg.contains("ciphertext in the stream")
+                            || msg.contains("decryption failed"))) {
+                    return true
+                }
+            }
             current = current.cause
         }
         return false

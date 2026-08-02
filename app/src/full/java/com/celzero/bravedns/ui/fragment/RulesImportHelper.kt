@@ -38,6 +38,19 @@ import kotlinx.coroutines.withContext
  */
 object RulesImportHelper {
 
+    /**
+     * Maximum number of validated entries retained from a single import file. Acts as a
+     * safety cap so an arbitrarily large file cannot exhaust memory or flood the rule DB.
+     */
+    private const val MAX_IMPORT_ENTRIES = 10_000
+
+    /**
+     * Maximum length (in chars) of a single line read from the import file. Genuine IP /
+     * domain rules are far shorter than this; longer lines are treated as invalid and skipped
+     * without being buffered, preventing a single pathological line from consuming memory.
+     */
+    private const val MAX_LINE_LENGTH = 4_096
+
     /** Determines which rule type a fragment is importing. */
     enum class ImportType { IP, DOMAIN }
 
@@ -92,55 +105,68 @@ object RulesImportHelper {
     ): ParsedFile? = withContext(Dispatchers.IO) {
         val fileName = resolveFileName(context, uri)
 
-        val lines: List<String>
-        try {
-            lines = context.contentResolver.openInputStream(uri)
-                ?.bufferedReader(Charsets.UTF_8)
-                ?.use { it.readLines() }
-                ?: return@withContext null
-        } catch (_: Exception) {
-            return@withContext null
-        }
-
         val valid = mutableListOf<String>()
         var invalidCount = 0
 
-        for (rawLine in lines) {
-            val line = rawLine.trim()
+        val stream = try {
+            context.contentResolver.openInputStream(uri)
+        } catch (_: Exception) {
+            return@withContext null
+        } ?: return@withContext null
 
-            // Skip blank lines and comment lines (lines starting with '#')
-            if (line.isEmpty() || line.startsWith("#")) continue
-
-            when (importType) {
-                ImportType.IP -> {
-                    // Use the same parsing path as manual entry: getIpNetPort returns null
-                    // for the IPAddress component when the string is not a valid IP/CIDR.
-                    val (ip, port) = IpRulesManager.getIpNetPort(line)
-                    // splitHostPort returns a non-empty first element when a host:port
-                    // separator was found.  When an explicit port is present, reject
-                    // non-numeric or out-of-range (0-65535) port strings.
-                    val hp = IpRulesManager.splitHostPort(line)
-                    val explicitPortOk = hp.first.isEmpty() ||
-                        (hp.second.toIntOrNull() != null && port in 0..65535)
-                    if (ip != null && explicitPortOk) {
-                        valid.add(line)
-                    } else {
+        try {
+            // Stream the file line-by-line with useLines so the whole file is never held in
+            // memory. Each line is validated immediately; only bounded valid entries are
+            // retained, and over-long lines are rejected without being buffered.
+            stream.bufferedReader(Charsets.UTF_8).useLines { lines ->
+                val iterator = lines.iterator()
+                while (iterator.hasNext()) {
+                    val rawLine = iterator.next()
+                    if (rawLine.length > MAX_LINE_LENGTH) {
                         invalidCount++
+                        continue
                     }
-                }
+                    val line = rawLine.trim()
 
-                ImportType.DOMAIN -> {
-                    // extractHost normalises URLs (strips schema, removes www. prefix) and
-                    // returns null for formats we don't support (e.g. wildcards with schema).
-                    val host = DomainRulesManager.extractHost(line)
-                    if (host != null && isAcceptableDomain(host)) {
-                        // Store the already-extracted host so insertDomain() doesn't re-parse
-                        valid.add(host)
-                    } else {
-                        invalidCount++
+                    // Skip blank lines and comment lines (lines starting with '#')
+                    if (line.isEmpty() || line.startsWith("#")) continue
+
+                    when (importType) {
+                        ImportType.IP -> {
+                            // Use the same parsing path as manual entry: getIpNetPort returns null
+                            // for the IPAddress component when the string is not a valid IP/CIDR.
+                            val (ip, port) = IpRulesManager.getIpNetPort(line)
+                            // splitHostPort returns a non-empty first element when a host:port
+                            // separator was found.  When an explicit port is present, reject
+                            // non-numeric or out-of-range (0-65535) port strings.
+                            val hp = IpRulesManager.splitHostPort(line)
+                            val explicitPortOk = hp.first.isEmpty() ||
+                                (hp.second.toIntOrNull() != null && port in 0..65535)
+                            if (ip != null && explicitPortOk) {
+                                if (valid.size >= MAX_IMPORT_ENTRIES) return@useLines
+                                valid.add(line)
+                            } else {
+                                invalidCount++
+                            }
+                        }
+
+                        ImportType.DOMAIN -> {
+                            // extractHost normalises URLs (strips schema, removes www. prefix) and
+                            // returns null for formats we don't support (e.g. wildcards with schema).
+                            val host = DomainRulesManager.extractHost(line)
+                            if (host != null && isAcceptableDomain(host)) {
+                                if (valid.size >= MAX_IMPORT_ENTRIES) return@useLines
+                                // Store the already-extracted host so insertDomain() doesn't re-parse
+                                valid.add(host)
+                            } else {
+                                invalidCount++
+                            }
+                        }
                     }
                 }
             }
+        } catch (_: Exception) {
+            return@withContext null
         }
 
         ParsedFile(fileName, valid.toList(), invalidCount)

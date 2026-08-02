@@ -333,6 +333,7 @@ class GoVpnAdapter : KoinComponent {
         if (appConfig.getDnsType() != AppConfig.DnsType.RETHINK_REMOTE) {
             Logger.i(LOG_TAG_VPN, "$TAG removing block free transport as dns type is not rethink remote")
             removeResolver(Backend.BlockFree)
+            logEvent(Severity.LOW, "remove block free transport, pref not rethink", "remove block free transport as preferred transport is not rethink, no use of blockfree transport in that case.")
         }
     }
 
@@ -1435,7 +1436,10 @@ class GoVpnAdapter : KoinComponent {
         wgConfigs.forEach {
             val id = ID_WG_BASE + it.getId()
             val stats = getProxyStatusById(id).first
-            if (stats == null || stats == Backend.TNT) {
+            if (stats == null) {
+                addWgProxy(id, true)
+                Logger.w(LOG_TAG_VPN, "$TAG proxy stats for $id is null, re-adding wg id: $id")
+            } else if (stats == Backend.TNT) {
                 Logger.w(LOG_TAG_VPN, "$TAG proxy stats for $id is null or tnt, $stats, re-adding? $avoidReaddingProxies")
                 // there are cases where the proxy needs to be re-added, so pingOrReAddProxy
                 // case: some of the wg proxies are added to tunnel but erring out, so
@@ -1460,23 +1464,19 @@ class GoVpnAdapter : KoinComponent {
             }
             val rpn = getWinByKey(key)
             val status = rpn?.status()
-            if (status == Backend.TNT) {
+            if (status == null) {
+                reconnectRpnProxy(key)
+                Logger.i(LOG_TAG_VPN, "$TAG re-added rpn proxy: $key")
+                logEvent(Severity.LOW, "re-add rpn proxy", "re-added rpn proxy with key: $key, reason: $status")
+            } else if (status == Backend.TNT) {
                 if (avoidReaddingProxies) {
                     refreshRpnProxy(key)
                     Logger.i(LOG_TAG_VPN, "$TAG refreshed rpn proxy: $key")
-                    logEvent(
-                        Severity.LOW,
-                        "refresh rpn proxy",
-                        "refreshed rpn proxy with key: $key"
-                    )
+                    logEvent(Severity.LOW, "refresh rpn proxy", "refreshed rpn proxy with key: $key, rpn in TNT state")
                 } else {
                     reconnectRpnProxy(key)
                     Logger.i(LOG_TAG_VPN, "$TAG re-added rpn proxy: $key")
-                    logEvent(
-                        Severity.LOW,
-                        "re-add rpn proxy",
-                        "re-added rpn proxy with key: $key"
-                    )
+                    logEvent(Severity.LOW, "re-add rpn proxy", "re-added rpn proxy with key: $key, rpn in TNT state")
                 }
             }
         }
@@ -2759,7 +2759,7 @@ class GoVpnAdapter : KoinComponent {
 
     }
 
-    suspend fun registerAndFetchWinIfNeeded(prevBytes: ByteArray? = null, deviceId: String): ByteArray? {
+    suspend fun registerAndFetchWinIfNeeded(entitlementBytes: ByteArray?, stateBytes: ByteArray?, deviceId: String): ByteArray? {
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_PROXY, "$TAG no tunnel, skip register win(rpn)")
             return null
@@ -2774,14 +2774,16 @@ class GoVpnAdapter : KoinComponent {
         }
         return try {
             val rpn = tunnel.proxies.rpn()
-            Logger.i(LOG_TAG_PROXY, "$TAG start win(rpn) reg, existing bytes size: ${prevBytes?.size}, device-len: ${deviceId.length}")
-            val bytes = rpn.registerWin(prevBytes, deviceId, constructRpnOps())
+            Logger.i(LOG_TAG_PROXY, "$TAG start win(rpn) reg, existing ent bytes size: ${entitlementBytes?.size}, state bytes sz: ${stateBytes?.size}, device-len: ${deviceId.length}")
+            // first bytes param: entitlement bytes
+            // second bytes param: state bytes
+            val bytes = rpn.registerWin(entitlementBytes, stateBytes, deviceId, constructRpnOps())
             Logger.i(LOG_TAG_PROXY, "$TAG win(rpn) registered, ${bytes?.size} bytes")
             logEvent(Severity.MEDIUM, "register win(rpn)", "win(rpn) registered, ${bytes?.size} bytes")
             bytes
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_PROXY, "$TAG err register win(rpn), prev: ${prevBytes?.size} bytes: ${e.message}", e)
-            logEvent(Severity.CRITICAL, "register win(rpn)", "error registering win(rpn): ${e.message}")
+            Logger.e(LOG_TAG_PROXY, "$TAG err register win(rpn), prev ent: ${entitlementBytes?.size} bytes, state: ${stateBytes?.size}, device-len: ${deviceId.length}: ${e.message}", e)
+            logEvent(Severity.CRITICAL, "register win(rpn)", "error registering win(rpn) for ent: ${entitlementBytes?.size} bytes, state: ${stateBytes?.size}, device-len: ${deviceId.length}, err: ${e.message}")
             null
         }
     }
@@ -2938,6 +2940,20 @@ class GoVpnAdapter : KoinComponent {
             return tunnel.proxies.rpn().win().who()
         } catch (e: Exception) {
             Logger.w(LOG_TAG_PROXY, "$TAG err get win(rpn): ${e.message}")
+            return null
+        }
+    }
+
+    suspend fun getActiveEntitlement(): RpnEntitlement? {
+        if (!tunnel.isConnected) {
+            Logger.i(LOG_TAG_PROXY, "$TAG no tunnel, skip get active entitlement")
+            return null
+        }
+
+        try {
+            return tunnel.proxies.rpn().win().entitlement()
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG err get active entitlement from: ${e.message}")
             return null
         }
     }

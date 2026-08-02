@@ -63,7 +63,7 @@ class GoLogFileDescriptorReader(
 ) {
     private var appContext: Context? = null
 
-    @Volatile private var prevLogLevel: Logger.LoggerLevel = Logger.LoggerLevel.VERY_VERBOSE
+    @Volatile private var prevLogLevel: Logger.LoggerLevel = Logger.LoggerLevel.INFO
     private var writer: BufferedWriter? = null
 
     companion object {

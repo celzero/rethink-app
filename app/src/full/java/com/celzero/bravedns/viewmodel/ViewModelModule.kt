@@ -55,6 +55,7 @@ object ViewModelModule {
         viewModel { ManagePurchaseViewModel() }
         viewModel { ServerOrderHistoryViewModel(get()) }
         viewModel { ServerSelectionViewModel() }
+        viewModel { EntitlementDetailViewModel() }
         viewModel { SponsorViewModel(androidApplication(), get(), get()) }
     }
 

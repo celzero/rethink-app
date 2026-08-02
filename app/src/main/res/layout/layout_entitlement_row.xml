@@ -29,6 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:layout_marginTop="8dp"
-        android:background="?attr/divider" />
+        android:background="?attr/border"
+        android:alpha="0.5" />
 
 </LinearLayout>

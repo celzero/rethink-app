@@ -1713,6 +1713,10 @@
 
     <string name="config_invalid_desc" translatable="true">Invalid WireGuard configuration</string>
 
+    <!-- RPN config detail: shown when the proxy could not be registered/fetched -->
+    <string name="rpn_recovery_title" translatable="true">Couldn\'t load server</string>
+    <string name="rpn_recovery_desc" translatable="true">We couldn\'t register or fetch this server. Make sure the VPN is connected and try again. If it still fails, remove and re-add the server.</string>
+
     <!-- dns description -->
     <string name="cloudflare_dns_desc" translatable="true">Does not block any DNS requests. Uses Cloudflare\'s 1.1.1.1 DNS endpoint.</string>
     <string name="cloudflare_family_dns_desc" translatable="true">Blocks malware and adult content. Uses Cloudflare\'s 1.1.1.3 DNS endpoint.</string>
@@ -2489,9 +2493,11 @@
     <string name="lbl_last_handshake" translatable="false">Last Handshake</string>
     <string name="lbl_last_open" translatable="false">Last Reconnect</string>
     <string name="lbl_errors" translatable="false">Errors</string>
-    <string name="lbl_client_ipv4" translatable="false">Client Info</string>
-    <string name="lbl_server_info" translatable="false">Server Info</string>
+    <string name="lbl_client_ipv4" translatable="false">Exit IP</string>
+    <string name="lbl_server_info" translatable="false">Endpoint</string>
     <string name="lbl_never" translatable="false">Never</string>
+
+    <string name="rpn_meta_last_times" translatable="false">%1$s · 🤝 %2$s · 🔃 %3$s</string>
 
     <!-- Emoji icons used in the privacy exposure card -->
     <string name="emoji_eye" translatable="false">👁️</string>

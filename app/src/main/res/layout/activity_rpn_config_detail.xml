@@ -83,7 +83,7 @@
                         android:maxLines="1"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="14sp"
-                        app:layout_constraintBottom_toTopOf="@id/row_hero_rxtx"
+                        app:layout_constraintBottom_toTopOf="@id/value_addl_info"
                         app:layout_constraintEnd_toStartOf="@id/refresh_chip"
                         app:layout_constraintStart_toEndOf="@id/flag_container"
                         app:layout_constraintTop_toBottomOf="@id/config_name_text"
@@ -153,49 +153,25 @@
                         tools:text="1 Gbps · 35% · Normal"
                         tools:visibility="visible" />
 
-                    <LinearLayout
-                        android:id="@+id/row_hero_rxtx"
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/value_addl_info"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="2dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:visibility="visible"
+                        android:alpha="0.75"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="11sp"
+                        android:visibility="gone"
                         app:layout_constraintBottom_toTopOf="@id/tv_hero_pub"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/tv_hero_city">
-
-                        <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/value_rx"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:alpha="0.75"
-                            android:textColor="?attr/primaryLightColorText"
-                            android:textSize="11sp"
-                            tools:text="4.5 MB" />
-
-                        <com.google.android.material.textview.MaterialTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:alpha="0.5"
-                            android:text="  ·  "
-                            android:textColor="?attr/primaryLightColorText"
-                            android:textSize="11sp" />
-
-                        <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/value_tx"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:alpha="0.75"
-                            android:textColor="?attr/primaryLightColorText"
-                            android:textSize="11sp"
-                            tools:text="1.2 MB" />
-
-                    </LinearLayout>
+                        app:layout_constraintTop_toBottomOf="@id/tv_hero_city"
+                        tools:text="engage.cloudflareclient.com:2408"
+                        tools:visibility="visible" />
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/tv_hero_pub"
@@ -212,7 +188,7 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/row_hero_rxtx"
+                        app:layout_constraintTop_toBottomOf="@id/value_addl_info"
                         tools:text="user@example.com"
                         tools:visibility="visible" />
 
@@ -299,24 +275,15 @@
                             android:layout_height="wrap_content"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
-                            android:paddingTop="8dp"
-                            android:paddingBottom="8dp">
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/label_status"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/lbl_status"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="13sp" />
+                            android:paddingTop="6dp"
+                            android:paddingBottom="6dp">
 
                             <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/value_status"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="?attr/accentGood"
-                                android:textSize="13sp"
+                                android:textColor="?attr/primaryTextColor"
+                                android:textSize="11sp"
                                 android:textStyle="bold"
                                 tools:text="Active" />
 
@@ -325,23 +292,68 @@
                                 android:layout_height="wrap_content"
                                 android:text=" · "
                                 android:textColor="?attr/primaryLightColorText"
-                                android:textSize="13sp" />
+                                android:textSize="11sp" />
 
                             <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/value_since"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="?attr/primaryLightColorText"
-                                android:textSize="13sp"
-                                tools:text="42 min ago" />
+                                android:textSize="11sp"
+                                tools:text="14 hours ago" />
+
+                            <View
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1" />
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/value_rx"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="?attr/primaryTextColor"
+                                android:textSize="11sp"
+                                tools:text="↓ 4.5 MB" />
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=" · "
+                                android:textColor="?attr/primaryLightColorText"
+                                android:textSize="11sp" />
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/value_tx"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="?attr/primaryTextColor"
+                                android:textSize="11sp"
+                                tools:text="↑ 1.2 MB" />
                         </LinearLayout>
 
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="0.5dp"
                             android:alpha="0.08"
-                            android:background="?attr/divider"
-                            android:visibility="gone" />
+                            android:background="?attr/divider" />
+
+                        <LinearLayout
+                            android:id="@+id/row_last_ok"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp">
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/value_last_ok"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="?attr/primaryLightColorText"
+                                android:textSize="12sp"
+                                tools:text="Connected · 🤝 1m · 🔄 12m" />
+                        </LinearLayout>
 
                         <View
                             android:layout_width="match_parent"
@@ -412,142 +424,6 @@
                                     android:visibility="gone"
                                     tools:text="10.0.0.1" />
                             </FrameLayout>
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="0.5dp"
-                            android:alpha="0.08"
-                            android:background="?attr/divider" />
-
-                        <LinearLayout
-                            android:id="@+id/row_addl_info"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:paddingTop="10dp"
-                            android:paddingBottom="10dp">
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/label_addl_info"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="6dp"
-                                android:text="@string/lbl_server_info"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="13sp" />
-
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content">
-
-                                <com.facebook.shimmer.ShimmerFrameLayout
-                                    android:id="@+id/shimmer_addl_info"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:visibility="visible"
-                                    app:shimmer_auto_start="true"
-                                    app:shimmer_duration="1000">
-
-                                    <LinearLayout
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:orientation="vertical">
-
-                                        <View
-                                            android:layout_width="110dp"
-                                            android:layout_height="13dp"
-                                            android:layout_marginBottom="8dp"
-                                            android:background="@drawable/shimmer_placeholder" />
-
-                                        <View
-                                            android:layout_width="220dp"
-                                            android:layout_height="11dp"
-                                            android:layout_marginBottom="6dp"
-                                            android:background="@drawable/shimmer_placeholder" />
-
-                                        <View
-                                            android:layout_width="160dp"
-                                            android:layout_height="11dp"
-                                            android:background="@drawable/shimmer_placeholder" />
-                                    </LinearLayout>
-                                </com.facebook.shimmer.ShimmerFrameLayout>
-
-                                <com.google.android.material.textview.MaterialTextView
-                                    android:id="@+id/value_addl_info"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:lineSpacingExtra="3dp"
-                                    android:textColor="?attr/primaryTextColor"
-                                    android:textSize="13sp"
-                                    android:visibility="gone" />
-                            </FrameLayout>
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="0.5dp"
-                            android:alpha="0.08"
-                            android:background="?attr/divider" />
-
-                        <LinearLayout
-                            android:id="@+id/row_last_ok"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:paddingTop="8dp"
-                            android:paddingBottom="8dp">
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/label_last_ok"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/lbl_last_handshake"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="13sp" />
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/value_last_ok"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="?attr/primaryTextColor"
-                                android:textSize="13sp"
-                                tools:text="2 min ago" />
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="0.5dp"
-                            android:alpha="0.08"
-                            android:background="?attr/divider" />
-
-                        <LinearLayout
-                            android:id="@+id/row_last_open"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:paddingTop="8dp"
-                            android:paddingBottom="8dp">
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/label_last_open"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/lbl_last_open"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="13sp" />
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/value_last_open"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="?attr/primaryTextColor"
-                                android:textSize="13sp"
-                                tools:text="2 min ago" />
                         </LinearLayout>
 
                         <View

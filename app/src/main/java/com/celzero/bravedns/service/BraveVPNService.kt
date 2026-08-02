@@ -398,7 +398,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     }
 
     override fun bind4(who: String, addrPort: String, fid: Long) = go2kt(bind4Dispatcher) {
-        val startTime = elapsedRealtime()
         var v4Net = underlyingNetworks?.ipv4Net
         val isAuto = InternetProtocol.isAuto(persistentState.internetProtocolType)
         if (ROUTE4IN6 && isAuto && v4Net.isNullOrEmpty()) {
@@ -406,13 +405,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         }
 
         bindAny(who, addrPort, fid, v4Net ?: emptyList())
-        Logger.vv(LOG_TAG_VPN, "bind4: execution time: ${elapsedRealtime() - startTime} ms, who: $who, addrPort: $addrPort, fid: $fid")
+        Logger.vv(LOG_TAG_VPN, "bind4: who: $who, addrPort: $addrPort, fid: $fid")
     }
 
     override fun bind6(who: String, addrPort: String, fid: Long) = go2kt(bind6Dispatcher) {
-        val startTime = elapsedRealtime()
         bindAny(who, addrPort, fid, underlyingNetworks?.ipv6Net ?: emptyList())
-        Logger.vv(LOG_TAG_VPN, "bind6: execution time: ${elapsedRealtime() - startTime} ms, who: $who, addrPort: $addrPort, fid: $fid")
+        Logger.vv(LOG_TAG_VPN, "bind6: who: $who, addrPort: $addrPort, fid: $fid")
     }
 
     private suspend fun bindAny(
@@ -421,16 +419,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         fid: Long,
         nws: List<ConnectionMonitor.NetworkProperties>
     ) {
-        val startTime = elapsedRealtime()
         val rinr = persistentState.routeRethinkInRethink
         val curnet = underlyingNetworks
-        val exiting = who == Backend.Exit
+        val isBase = who == Backend.Base
         val proxying = ProxyManager.isAnyUserSetProxy(who)
-        val doNotProtect = !exiting
+        val doNotProtect = isBase
 
-        logd("bind: who: $who, addr: $addrPort, fd: $fid, rinr? $rinr, exit? $exiting, proxying? $proxying")
+        logd("bind: who: $who, addr: $addrPort, fd: $fid, rinr? $rinr, base? $isBase, proxying? $proxying")
         if (doNotProtect && rinr) {
-            // do not proceed if rethink within rethink is enabled and proxyId(who) is not exit
+            // do not proceed if rethink within rethink is enabled and proxyId(who) is base
             Logger.vv(LOG_TAG_VPN, "bind: rinr, within rethink, who: $who, fd: $fid, addr: $addrPort")
             return
         }
@@ -439,16 +436,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
         if (nws.isEmpty()) {
             Logger.w(LOG_TAG_VPN, "no network to bind, who: $who, fd: $fid, addr: $addrPort")
-            Logger.vv(LOG_TAG_VPN, "bindAny: execution time: ${elapsedRealtime() - startTime} ms (nws empty)")
             return
         }
 
         var pfd: ParcelFileDescriptor? = null
         try {
             // split the addrPort to get the IP address and convert it to InetAddress
-            val stSplit = elapsedRealtime()
             val dest = IpRulesManager.splitHostPort(addrPort)
-            Logger.vv(LOG_TAG_VPN, "bindAny: splitHostPort time: ${elapsedRealtime() - stSplit} ms")
             val destIp = IPAddressString(dest.first).address
             val destPort = dest.second.toIntOrNull()
             val destAddr = destIp.toInetAddress()
@@ -470,19 +464,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
             // check if the destination port is DNS port, if so bind to the network where the dns
             // belongs to, else bind to the available network
-            val stDnsLookup = elapsedRealtime()
             val net = if (KnownPorts.isDns(destPort)) curnet?.dnsServers?.get(destAddr) else null
-            Logger.vv(LOG_TAG_VPN, "bindAny: dns lookup time: ${elapsedRealtime() - stDnsLookup} ms")
             if (net != null) {
-                val stBindToNw = elapsedRealtime()
                 val ok = bindToNw(net, pfd, fid)
-                Logger.vv(LOG_TAG_VPN, "bindAny: bindToNw (dns) time: ${elapsedRealtime() - stBindToNw} ms")
                 if (!ok) {
                     Logger.e(LOG_TAG_VPN, "bind failed, who: $who, addr: $addrPort, fd: $fid, handle: ${net.networkHandle}, netid:${netid(net.networkHandle)}")
                 } else {
                     logd("bind: dns, who: $who, addr: $addrPort, fd: $fid, handle: ${net.networkHandle}, netid:${netid(net.networkHandle)}, ok: true")
                 }
-                Logger.vv(LOG_TAG_VPN, "bindAny: execution time: ${elapsedRealtime() - startTime} ms (dns path)")
                 return
             }
 
@@ -491,17 +480,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             // no need to bind if use active network is true
             if (curnet?.useActive == true) {
                 logd("bind: use active network is true, who: $who, addr: $addrPort, fd: $fid")
-                Logger.vv(LOG_TAG_VPN, "bindAny: execution time: ${elapsedRealtime() - startTime} ms (active nw path)")
                 return
             }
 
             nws.forEach {
-                val stBindToNw = elapsedRealtime()
                 val ok = bindToNw(it.network, pfd, fid)
-                Logger.vv(LOG_TAG_VPN, "bindAny: bindToNw loop time: ${elapsedRealtime() - stBindToNw} ms, handle: ${it.network.networkHandle}")
+                Logger.vv(LOG_TAG_VPN, "bindAny: bindToNw handle: ${it.network.networkHandle}")
                 if (ok) {
                     logd("bind: nw, who: $who, addr: $addrPort, fd: $fid, handle: ${it.network.networkHandle}, netid:${netid(it.network.networkHandle)}")
-                    Logger.vv(LOG_TAG_VPN, "bindAny: execution time: ${elapsedRealtime() - startTime} ms (nw found)")
                     return
                 }
             }
@@ -511,14 +497,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             pfd?.detachFd()
         }
         Logger.e(LOG_TAG_VPN, "bind failed: who: $who, addr: $addrPort, fd: $fid")
-        Logger.vv(LOG_TAG_VPN, "bindAny: execution time: ${elapsedRealtime() - startTime} ms (fail/exit)")
     }
 
     private fun netid(nwHandle: Long): Long {
-        val startTime = elapsedRealtime()
         // ref: cs.android.com/android/platform/superproject/main/+/main:packages/modules/Connectivity/framework/src/android/net/Network.java;drc=0209c366627e98d6311629a0592c6e22be7d13e0;l=491
         val res = nwHandle shr (32)
-        Logger.vv(LOG_TAG_VPN, "netid: execution time: ${elapsedRealtime() - startTime} ms, nwHandle: $nwHandle, result: $res")
+        Logger.vv(LOG_TAG_VPN, "netid: nwHandle: $nwHandle, result: $res")
         return res
     }
 
@@ -549,7 +533,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     }
 
     private fun bindToNw(net: Network, pfd: ParcelFileDescriptor, fid: Long): Boolean {
-        val startTime = elapsedRealtime()
         val res = try {
             net.bindSocket(pfd.fileDescriptor)
             true
@@ -557,7 +540,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             Logger.e(LOG_TAG_VPN, "err bindToNw(nw: ${net.networkHandle}, netid: ${netid(net.networkHandle)}, fid: $fid, ${e.message}, $e")
             false
         }
-        Logger.vv(LOG_TAG_VPN, "bindToNw: execution time: ${elapsedRealtime() - startTime} ms, nw: ${net.networkHandle}, fid: $fid, success: $res")
+        Logger.vv(LOG_TAG_VPN, "bindToNw: nw: ${net.networkHandle}, fid: $fid, success: $res")
         return res
     }
 
@@ -619,13 +602,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         }
 
         val rinr = persistentState.routeRethinkInRethink
-        val exiting = who == Backend.Exit
+        val isBase = who == Backend.Base
         val proxying = ProxyManager.isAnyUserSetProxy(who)
-        val doNotProtect = !exiting
+        val doNotProtect = isBase
 
-        logd("bind: who: $who, addr: fd: $fd, rinr? $rinr, exit? $exiting, proxying? $proxying")
-        if (doNotProtect) {
-            // do not proceed if rethink within rethink is enabled and proxyId(who) is not exit
+        logd("bind: who: $who, addr: fd: $fd, rinr? $rinr, base? $isBase, proxying? $proxying")
+        if (doNotProtect && rinr) {
+            // do not proceed if rethink within rethink is enabled and proxyId(who) is base
             Logger.vv(LOG_TAG_VPN, "protect: rinr, within rethink, who: $who, fd: $fd")
             return@go2kt
         }
@@ -640,7 +623,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         dstIp: String,
         dstPort: Int
     ): Int {
-        val startTime = elapsedRealtime()
         val res = if (recdUid != INVALID_UID) {
             recdUid
         } else {
@@ -650,7 +632,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                 recdUid // uid must have been retrieved from procfs by the caller
             }
         }
-        Logger.vv(LOG_TAG_VPN, "getUid: execution time: ${elapsedRealtime() - startTime} ms, recdUid: $recdUid, protocol: $protocol, srcIp: $srcIp, srcPort: $srcPort, dstIp: $dstIp, dstPort: $dstPort, result: $res")
+        Logger.vv(LOG_TAG_VPN, "getUid: recdUid: $recdUid, protocol: $protocol, srcIp: $srcIp, srcPort: $srcPort, dstIp: $dstIp, dstPort: $dstPort, result: $res")
         return res
     }
 
@@ -664,7 +646,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         isAlg: Boolean,
         forUpstreamAnswer: Boolean = false
     ): FirewallRuleset {
-        val startTime = elapsedRealtime()
         val connId = connInfo.connId
         val skipUnknownAppRule = forUpstreamAnswer && !persistentState.splitDns
         val res = try {
@@ -931,7 +912,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             Logger.crash(LOG_TAG_VPN, "unexpected err in firewall()($connId), block anyway", iex)
             FirewallRuleset.RULE1C
         }
-        Logger.vv(LOG_TAG_VPN, "firewall: execution time: ${elapsedRealtime() - startTime} ms, connId: $connId, rule: $res")
+        Logger.vv(LOG_TAG_VPN, "firewall: connId: $connId, rule: $res")
         return res
     }
 
@@ -1215,7 +1196,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     }
 
     private fun isConnectionMetered(dst: String): Boolean {
-        val startTime = elapsedRealtime()
         val curnet = underlyingNetworks
         // assume active network until underlying networks are set by ConnectionMonitor
         // do not use persistentState.useMultipleNetworks
@@ -1235,7 +1215,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                 isActiveIfaceMetered()
             }
         }
-        Logger.vv(LOG_TAG_VPN, "isConnectionMetered: execution time: ${elapsedRealtime() - startTime} ms, dst: $dst, result: $res")
+        Logger.vv(LOG_TAG_VPN, "isConnectionMetered: dst: $dst, result: $res")
         return res
     }
 
@@ -2903,8 +2883,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                     // 3. dupTunFd is set to false in the tunnel.
                     // 4. tunnel is restarted in lockdown mode or updated otherwise
                     // update: only when the policy is set to relaxed the app is working as
-                    // expected, so always call unlink() before establishVpn() for all policies
-                    ioCtx("unlinkOnRestart") {
+                    // expected, so always call unlink() before establishVpn() for all policies,
+                    // making that behaviour common for all policies
+                    withContext(CoroutineName(why) + serializer) {
                         val lockdown = underlyingNetworks?.vpnLockdown ?: isLockdown()
                         if (lockdown) {
                             vpnAdapter?.unlink()
@@ -4471,17 +4452,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     }
 
     override fun onProxyAdded(pid: String?, handle: String): Unit = go2kt(proxyAddedDispatcher) {
-        val startTime = elapsedRealtime()
         if (pid == null) {
             Logger.e(LOG_TAG_VPN, "onProxyAdded: received null id")
-            Logger.vv(LOG_TAG_VPN, "onProxyAdded: execution time: ${elapsedRealtime() - startTime} ms (null pid)")
             return@go2kt
         }
 
         if (!pid.contains(ID_WG_BASE, true) && !pid.contains(Backend.RpnWin, true)) {
             // only wireguard / rpn proxies are considered for overlay network
             logd("onProxyAdded: no-op as it is not wg/rpn proxy, added $pid")
-            Logger.vv(LOG_TAG_VPN, "onProxyAdded: execution time: ${elapsedRealtime() - startTime} ms (no-op)")
             return@go2kt
         }
 
@@ -4502,21 +4480,17 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             }
             refreshOrPauseOrResumeOrReAddProxies()
         }
-        Logger.vv(LOG_TAG_VPN, "onProxyAdded: execution time: ${elapsedRealtime() - startTime} ms, pid: $pid")
     }
 
     override fun onProxyRemoved(pid: String?, handle: String) {
-        val startTime = elapsedRealtime()
         if (pid == null) {
             Logger.e(LOG_TAG_VPN, "onProxyAdded: received null id")
-            Logger.vv(LOG_TAG_VPN, "onProxyRemoved: execution time: ${elapsedRealtime() - startTime} ms (null pid)")
             return
         }
 
         if (!pid.contains(ID_WG_BASE) && !pid.contains(Backend.RpnWin)) {
             // only wireguard proxies are considered for overlay network
             logd("onProxyRemoved: proxy removed $pid, not wg or rpn proxy, no-op for overlay network")
-            Logger.vv(LOG_TAG_VPN, "onProxyRemoved: execution time: ${elapsedRealtime() - startTime} ms (no-op)")
             return
         }
         // proxy removed, refresh overlay network pair
@@ -4529,7 +4503,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             val rmvd = vpnAdapter?.handleOnProxyRemoved(pid)
             Logger.i(LOG_TAG_VPN, "onProxyRemoved: handled proxy removed for $pid, success? $rmvd")
         }
-        Logger.vv(LOG_TAG_VPN, "onProxyRemoved: execution time: ${elapsedRealtime() - startTime} ms, pid: $pid")
     }
 
     override fun onProxyStopped(id: String?, handle: String) {
@@ -4729,7 +4702,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                     noblock = true
                     Logger.vv(
                         LOG_TAG_VPN,
-                        "onUpstreamAnswer: bypass rule: $rule, original tid: $id, bypass tid: [$tidcsv, $tidseccsv], pid: $pidCsv connInfo: $connInfo, ipcsv: $ipcsv"
+                        "onUpstreamAnswer: bypass rule: $rule, original tid: $id, bypass tid: [$tidcsv], [$tidseccsv], pid: $pidCsv connInfo: $connInfo, ipcsv: $ipcsv"
                     )
                 }
                 return@go2kt result
@@ -4744,11 +4717,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     private fun buildTidMap(csv: String, pidcsv: String): String {
         if (csv.isBlank()) return ""
         val proxyIds = pidcsv.split(",")
+        // joinToString conveniently combines both the transformation and the joining into a single
+        // operation, so there is no need for an intermediate map
         return csv.split(",").joinToString(",") { id ->
             val pids = if (isAnyUserSetProxy(id)) {
                 proxyIds.filter(ProxyManager::isLocalProxy).joinToString(":")
             } else {
-                pidcsv
+                proxyIds.joinToString(":")
             }
 
             "$id:$pids"
@@ -4896,7 +4871,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             cm.isBlocked = if (proxyRule.isEmpty()) true else cm.isBlocked
             cm.blockedByRule = proxyRule.ifEmpty { FirewallRuleset.RULE18.id }
             logd("onSocketClosed-flow/postflow: $s, pid: ${s.pid.isNullOrEmpty()}, cm: $cm")
-            val stWriteLog = elapsedRealtime()
             if (isRethink) {
                 netLogTracker.writeRethinkLog(cm)
             } else {
@@ -5017,14 +4991,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
 
     override fun preflow(protocol: Int, uid: Int, src: String?, dst: String?): PreMark = go2kt(preflowDispatcher) {
-        val startTime = elapsedRealtime()
-        val stParse = elapsedRealtime()
         val srcIpPort = parseIpAndPort(src)
         val dstIpPort = parseIpAndPort(dst)
-        Logger.vv(LOG_TAG_VPN, "preflow: parseIpAndPort time: ${elapsedRealtime() - stParse} ms")
         Logger.d(LOG_TAG_VPN, "preflow - init: $uid, rcvd: $src & $dst, parsed: $srcIpPort & $dstIpPort")
         val newUid = if (uid == INVALID_UID) { // fetch uid only if it is invalid
-            val stGetUid = elapsedRealtime()
             val resolvedUid = getUid(
                 uid,
                 protocol,
@@ -5033,7 +5003,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                 dstIpPort.first,
                 dstIpPort.second
             )
-            Logger.vv(LOG_TAG_VPN, "preflow: getUid time: ${elapsedRealtime() - stGetUid} ms")
             resolvedUid
         } else {
             uid
@@ -5044,7 +5013,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         p.uid = newUid.toString()
         p.isUidSelf = newUid == rethinkUid
         Logger.i(LOG_TAG_VPN, "preflow: returning ${p.uid} for src: $srcIpPort, dst: $dstIpPort, isRethink? ${p.isUidSelf}")
-        Logger.vv(LOG_TAG_VPN, "preflow: execution time: ${elapsedRealtime() - startTime} ms, uid: $newUid")
         return@go2kt p
     }
 
@@ -6232,8 +6200,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         return vpnAdapter?.getRpnLocations(type) ?: Pair(null, null)
     }
 
-    suspend fun registerAndFetchWinIfNeeded(prevBytes: ByteArray?, deviceId: String): ByteArray? {
-        return vpnAdapter?.registerAndFetchWinIfNeeded(prevBytes, deviceId)
+    suspend fun registerAndFetchWinIfNeeded(entitlementBytes: ByteArray?, stateBytes: ByteArray?, deviceId: String): ByteArray? {
+        return vpnAdapter?.registerAndFetchWinIfNeeded(entitlementBytes, stateBytes, deviceId)
     }
 
     suspend fun getEntitlementDetails(prevBytes: ByteArray?, deviceId: String): RpnEntitlement? {
@@ -6307,6 +6275,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
     suspend fun getWinByKey(key: String): Proxy? {
         return vpnAdapter?.getWinByKey(key)
+    }
+
+    suspend fun getActiveEntitlement(): RpnEntitlement? {
+        return vpnAdapter?.getActiveEntitlement()
     }
 
     suspend fun getWinIdentifier(): String? {
