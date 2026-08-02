@@ -79,6 +79,8 @@ object TunDnsManager: KoinComponent {
     }
 
     suspend fun handleOnQuery(d: DnsParams): DNSOpts {
+        if (!DEBUG) return handleOnQueryInternal(d)
+
         val startNanos = System.nanoTime()
         try {
             return handleOnQueryInternal(d)
