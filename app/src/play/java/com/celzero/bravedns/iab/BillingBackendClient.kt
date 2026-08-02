@@ -1307,7 +1307,7 @@ class BillingBackendClient(
      *
      * Used for both [IBillingServerApi] (production: [Constants.RPN_BASE_URL] →
      * [Constants.RPN_FALLBACK_URL]) and [IBillingServerApiTest] (test:
-     * [Constants.RPN_BASE_TEST_URL] → [Constants.RPN_FALLBACK_TEST_URL]).
+     * [Constants.RPN_TEST_BASE_URL] → [Constants.RPN_TEST_FALLBACK_URL]).
      */
     private fun buildFallbackInterceptor(
         baseUrl: String,
