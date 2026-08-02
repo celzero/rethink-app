@@ -1011,12 +1011,7 @@ object RpnProxyManager : KoinComponent {
                     val accountId = sub?.accountId.orEmpty()
                     Logger.i(LOG_TAG_PROXY, "$TAG; registerProxy: server-entitlement sub=${if (sub != null) "present" else "null"}, accountIdLen=${accountId.length}, purchaseTokenLen=${sub?.purchaseToken?.length ?: 0}")
                     // sub.deviceId holds only the sentinel indicator "pip/identity.json"
-                    val didStart = System.currentTimeMillis()
                     val deviceId = billingBackendClient.getDeviceId(accountId)
-                    Logger.i(
-                        LOG_TAG_PROXY,
-                        "$TAG; registerProxy: getDeviceId returned len=${deviceId.length} in ${System.currentTimeMillis() - didStart}ms"
-                    )
                     val purchaseToken = sub?.purchaseToken.orEmpty()
                     if (accountId.isNotEmpty() && purchaseToken.isNotEmpty()) {
                         Logger.i(
