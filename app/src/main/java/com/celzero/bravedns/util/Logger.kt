@@ -223,9 +223,30 @@ object Logger : KoinComponent {
         dbWrite(LOG_GO_LOGGER_V2, message, type)
     }
 
-    fun goLog3(message: String, type: LoggerLevel) {
-        // no need to log the go logs, add it to the database
-        dbWrite(LOG_GO_LOGGER, message, type)
+    fun goLog3(message: String, type: LoggerLevel): ConsoleLog? {
+        // uiLogLevel is user selected log level to display in the UI, so if the log
+        // level is less than the user selected log level, do not write to the database.
+        if (uiLogLevel > type.id) return null
+
+        val now = System.currentTimeMillis()
+        val formattedMsg = "${levelChar(type)} $LOG_GO_LOGGER: $message"
+        return ConsoleLog(0, formattedMsg, type.id, now)
+    }
+
+    /**
+     * Single-character prefix for a log line, matching the level chars written by the
+     * Go runtime (see [LoggerLevel.fromChar]). Centralised so [dbWrite] and the
+     * batch-oriented [makeGoLog] never drift apart.
+     */
+    private fun levelChar(level: LoggerLevel): String = when (level) {
+        LoggerLevel.VERY_VERBOSE -> "Y"
+        LoggerLevel.VERBOSE -> "V"
+        LoggerLevel.DEBUG -> "D"
+        LoggerLevel.INFO -> "I"
+        LoggerLevel.WARN -> "W"
+        LoggerLevel.ERROR -> "E"
+        LoggerLevel.STACKTRACE -> "E"
+        else -> "V"
     }
 
     suspend fun wireLog(message: String) {
@@ -266,16 +287,7 @@ object Logger : KoinComponent {
         if (uiLogLevel > level.id) return
 
         val now = System.currentTimeMillis()
-        val l = when (level) {
-            LoggerLevel.VERY_VERBOSE -> "Y"
-            LoggerLevel.VERBOSE -> "V"
-            LoggerLevel.DEBUG -> "D"
-            LoggerLevel.INFO -> "I"
-            LoggerLevel.WARN -> "W"
-            LoggerLevel.ERROR -> "E"
-            LoggerLevel.STACKTRACE -> "E"
-            else -> "V"
-        }
+        val l = levelChar(level)
 
         val formattedMsg = if (tag == LOG_GO_LOGGER) {
             "$l $tag: $msg"
