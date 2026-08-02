@@ -82,7 +82,7 @@ jobs:
       - name: 🦚 Context
         id: pr-context
         if: github.event_name == 'issue_comment'
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             // For issue_comment events, resolve PR base/head so the action
@@ -94,16 +94,102 @@ jobs:
               repo: context.repo.repo,
               pull_number: prNumber
             });
-            // A closed PR's base branch may have been deleted, so its name
-            // (base.ref) is no longer fetchable; base.sha is the last-known
-            // base commit and always resolvable in the repo.
             const isClosed = pullRequest.state === 'closed';
-            core.setOutput('base_ref', isClosed ? pullRequest.base.sha : pullRequest.base.ref);
+            core.setOutput('is_closed', isClosed ? 'true' : 'false');
+            // Always use the branch name — the action's internal
+            // actions/checkout fetches all branches, so origin/<branch>
+            // resolves naturally via refs/remotes/origin/<branch>.  The old
+            // bare-SHA approach caused empty diffs because git can't resolve
+            // origin/<sha> without a named ref (FETCH_HEAD is not one).
+            core.setOutput('base_ref', pullRequest.base.ref);
+            // Also expose the SHA for the rare deleted-branch fallback in
+            // the prepare step.
+            core.setOutput('base_sha', pullRequest.base.sha);
             core.setOutput('head_sha', pullRequest.head.sha);
 
-        # github.com/alibaba/open-code-review/blob/5829539379e/action.yml
-        # github.com/alibaba/open-code-review/tree/5829539379e/examples/github_actions
-        # open-codereview.ai/docs/cli-reference
+        # Supply-chain hardening: this job holds secrets, so every action here
+        # is pinned by full commit SHA (github-script, checkout, and the OCR
+        # action itself).  First-party actions are pinned too; a mutable tag
+        # in a secrets-bearing pull_request_target job is an injection vector.
+        #
+        # Strategy for closed PRs: always pass base.ref (the branch name) to
+        # the OCR action — its internal actions/checkout fetches all branches,
+        # so `origin/<branch>` resolves naturally via refs/remotes/origin/<branch>.
+        # The old approach (base.sha for closed PRs) failed because git can't
+        # resolve `origin/<sha>` without a named ref; FETCH_HEAD is not one.
+        #
+        # Edge case: if the base branch was deleted after merge (rare), the
+        # action's fetch fails and merge-base falls back to HEAD_SHA (empty
+        # diff).  The prepare step detects this via ls-remote, falls back to
+        # the base SHA, and creates refs/origin/<sha> so git DWIM (rule 2:
+        # refs/<refname>) resolves it.  This namespace survives the action's
+        # checkout: refs/heads/* are deleted (prepareExistingDirectory),
+        # refs/remotes/origin/* and refs/tags/* are pruned (--prune fetch),
+        # but refs/origin/* is untouched.
+      - name: ⬇️ Checkout (shallow — prepare step needs a git remote)
+        if: github.event_name == 'issue_comment' && steps.pr-context.outputs.is_closed == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - name: 🌉 Prepare closed-PR reviews
+        id: prepare
+        if: github.event_name == 'issue_comment' && steps.pr-context.outputs.is_closed == 'true'
+        shell: bash
+        env:
+          BASE_REF: ${{ steps.pr-context.outputs.base_ref }}
+          BASE_SHA: ${{ steps.pr-context.outputs.base_sha }}
+          HEAD_SHA: ${{ steps.pr-context.outputs.head_sha }}
+          PR_NUM: ${{ github.event.pull_request.number || github.event.issue.number }}
+        run: |
+          set -eux
+
+          # share.google/aimode/lmbJxZFxHJb5l7Bfd
+          # Fork PRs: the head may live in a deleted fork.  Fetch the PR's
+          # pull/<n>/head ref (advertised on the base repo, persistent after
+          # close) so the head objects are present for the action's merge-base
+          # and diff.
+          if [ -n "${PR_NUM}" ]; then
+            git fetch origin "pull/${PR_NUM}/head" 2>/dev/null || true
+          fi
+          git fetch origin "${HEAD_SHA}" 2>/dev/null || true
+
+          # Check whether the base branch still exists on origin.  For the
+          # common case (main, develop, release/*) it does, and the action's
+          # own checkout creates refs/remotes/origin/<branch> which makes
+          # `git merge-base origin/<branch> <head>` work naturally.
+          if git ls-remote --exit-code --heads origin "${BASE_REF}" >/dev/null 2>&1; then
+            echo "Base branch '${BASE_REF}' exists on origin"
+            echo "base_ref=${BASE_REF}" >> "$GITHUB_OUTPUT"
+          else
+            # Base branch deleted after merge — rare.  Fall back to the base
+            # SHA.  The action's `git fetch origin <sha>` only writes
+            # FETCH_HEAD (not a named ref), so `git merge-base origin/<sha>`
+            # can't resolve it.  We create refs/origin/<sha> instead: git
+            # DWIM rule 2 (refs/<refname>) resolves origin/<sha>.
+            #
+            # This must NOT be refs/heads/origin/<sha>: the action's internal
+            # checkout deletes ALL local branches (prepareExistingDirectory).
+            # refs/remotes/origin/<sha> would be pruned by its --prune fetch.
+            # refs/origin/<sha> is outside every namespace checkout mutates.
+            echo "::warning::base branch '${BASE_REF}' deleted on origin; falling back to SHA ${BASE_SHA}"
+            git fetch origin "${BASE_SHA}" 2>/dev/null || true
+            if git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
+              git update-ref "refs/origin/${BASE_SHA}" "${BASE_SHA}"
+              echo "Created refs/origin/${BASE_SHA} as DWIM fallback"
+              echo "base_ref=${BASE_SHA}" >> "$GITHUB_OUTPUT"
+            else
+              echo "::error::base SHA ${BASE_SHA} not fetchable; review may produce an empty diff"
+              echo "base_ref=${BASE_SHA}" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+          if git cat-file -e "${HEAD_SHA}^{commit}" 2>/dev/null; then
+            echo "Head ${HEAD_SHA} resolved"
+          else
+            echo "::warning::head SHA ${HEAD_SHA} not yet resolved; the action's fork-safe fetch will retry"
+          fi
+
       - name: 🐦‍🔥 Review
         uses: alibaba/open-code-review@e78474478f168a8009bd3b12334a87a2c985819d # v1.8.4
         with:
@@ -117,5 +203,15 @@ jobs:
           # pull_request_target the action resolves them from the
           # event automatically:
           # github.com/alibaba/open-code-review/blob/5829539379e/action.yml#L208-L216
-          base_ref: ${{ steps.pr-context.outputs.base_ref }}
+          #
+          # prepare.outputs.base_ref is set only for closed PRs: branch name
+          # if the branch exists on origin, base SHA otherwise (with DWIM
+          # fallback).  For open PRs or pull_request_target, fall back to the
+          # pr-context output (branch name).
+          base_ref: ${{ steps.prepare.outputs.base_ref || steps.pr-context.outputs.base_ref }}
           head_sha: ${{ steps.pr-context.outputs.head_sha }}
+          # Pin the npm CLI to the same release as the pinned action commit.
+          # The action's own default is `latest` (action.yml install step:
+          # npm install -g "@alibaba-group/open-code-review@${OCR_VERSION}"),
+          # which could drift away from the action code at e7847447.
+          ocr_version: 1.8.4
