@@ -2946,7 +2946,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun getActiveEntitlement(): RpnEntitlement? {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_PROXY, "$TAG no tunnel, skip get active entitlement from")
+            Logger.i(LOG_TAG_PROXY, "$TAG no tunnel, skip get active entitlement")
             return null
         }
 
