@@ -245,7 +245,7 @@ object Logger : KoinComponent {
         LoggerLevel.INFO -> "I"
         LoggerLevel.WARN -> "W"
         LoggerLevel.ERROR -> "E"
-        LoggerLevel.STACKTRACE -> "E"
+        LoggerLevel.STACKTRACE -> "F"
         else -> "V"
     }
 
