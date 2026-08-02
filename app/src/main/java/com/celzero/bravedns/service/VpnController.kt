@@ -407,7 +407,7 @@ object VpnController : KoinComponent {
     }
 
     suspend fun handleRpnProxies() {
-        return rvpn?.handleRpnProxies() ?: Unit
+        rvpn?.handleRpnProxies()
     }
 
     suspend fun createWgHop(origin: String, hop: String): Pair<Boolean, String> {

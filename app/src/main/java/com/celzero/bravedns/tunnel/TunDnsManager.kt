@@ -1,5 +1,6 @@
 package com.celzero.bravedns.tunnel
 
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import com.celzero.bravedns.data.AppConfig
@@ -78,6 +79,20 @@ object TunDnsManager: KoinComponent {
     }
 
     suspend fun handleOnQuery(d: DnsParams): DNSOpts {
+        val startNanos = System.nanoTime()
+        try {
+            return handleOnQueryInternal(d)
+        } finally {
+            // measure the execution time of handleOnQuery logic on every call;
+            // gated behind DEBUG to avoid overhead on the DNS hot path in release builds
+            if (DEBUG) {
+                val elapsedNanos = System.nanoTime() - startNanos
+                logd("onQuery: handleOnQuery exec time: ${elapsedNanos / 1_000_000.0}ms ($elapsedNanos ns) for ${d.fqdn}")
+            }
+        }
+    }
+
+    private suspend fun handleOnQueryInternal(d: DnsParams): DNSOpts {
         // uid: $uid
         logd("onQuery: rcvd params: $d")
         val uidStr = d.uidStr.orEmpty()
