@@ -14,8 +14,8 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="12dp"
         android:layout_marginBottom="8dp"
-        android:background="?attr/border"
-        android:alpha="0.5" />
+        android:alpha="0.5"
+        android:background="?attr/border" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -78,13 +78,13 @@
             android:layout_height="36dp"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
+            android:contentDescription="@string/server_settings_refresh_servers"
             android:insetLeft="0dp"
+            android:insetTop="0dp"
             android:insetRight="0dp"
+            android:insetBottom="0dp"
             android:paddingStart="0dp"
             android:paddingEnd="0dp"
-            android:contentDescription="@string/server_settings_refresh_servers"
             app:backgroundTint="?attr/chipBgColorPositive"
             app:cornerRadius="8dp"
             app:icon="@drawable/ic_refresh_white"
@@ -112,6 +112,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="8dp"
+                android:backgroundTint="?attr/cardBackgroundColor"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp">
@@ -119,6 +120,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?attr/cardBackgroundColor"
                     android:orientation="vertical">
 
                     <LinearLayout
@@ -135,8 +137,8 @@
                             android:layout_width="18dp"
                             android:layout_height="18dp"
                             android:layout_marginEnd="10dp"
-                            android:src="@drawable/ic_filter"
                             android:alpha="0.7"
+                            android:src="@drawable/ic_filter"
                             android:tint="?attr/svgStrokeColor" />
 
                         <LinearLayout
@@ -380,6 +382,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="8dp"
+                android:background="?attr/cardBackgroundColor"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp">
@@ -387,6 +390,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?attr/cardBackgroundColor"
                     android:orientation="vertical">
 
                     <LinearLayout
@@ -403,8 +407,8 @@
                             android:layout_width="18dp"
                             android:layout_height="18dp"
                             android:layout_marginEnd="10dp"
-                            android:src="@drawable/ic_configure"
                             android:alpha="0.7"
+                            android:src="@drawable/ic_configure"
                             android:tint="?attr/svgStrokeColor" />
 
                         <LinearLayout
@@ -665,8 +669,8 @@
                         android:layout_marginStart="12dp"
                         android:layout_marginEnd="12dp"
                         android:alpha="0.08"
-                        android:visibility="gone"
-                        android:background="?attr/primaryTextColor" />
+                        android:background="?attr/primaryTextColor"
+                        android:visibility="gone" />
 
                     <RelativeLayout
                         android:id="@+id/permanent_config_row"
@@ -676,8 +680,8 @@
                         android:paddingStart="16dp"
                         android:paddingTop="12dp"
                         android:paddingEnd="16dp"
-                        android:visibility="gone"
-                        android:paddingBottom="16dp">
+                        android:paddingBottom="16dp"
+                        android:visibility="gone">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -729,6 +733,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="8dp"
+                android:background="?attr/cardBackgroundColor"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp">
@@ -737,9 +742,10 @@
                     android:id="@+id/exclude_countries_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
+                    android:background="?attr/cardBackgroundColor"
                     android:clickable="true"
                     android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingStart="16dp"
@@ -777,9 +783,9 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="3dp"
                             android:alpha="0.6"
+                            android:text="@string/auto_exclude_cc_none"
                             android:textColor="?attr/primaryLightColorText"
-                            android:textSize="12sp"
-                            android:text="@string/auto_exclude_cc_none" />
+                            android:textSize="12sp" />
 
                     </LinearLayout>
 
@@ -802,6 +808,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="8dp"
+                android:background="?attr/cardBackgroundColor"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp">
@@ -809,40 +816,40 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:padding="10dp"
-                    android:orientation="vertical">
+                    android:background="?attr/cardBackgroundColor"
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    style="@style/TextAppearance.AppCompat.Subhead"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:gravity="center_vertical"
-                    android:lineSpacingExtra="5dp"
-                    android:text="@string/rpn_restore_confirm_message"
-                    android:textSize="@dimen/large_font_text_view" />
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"
+                        android:gravity="center_vertical"
+                        android:lineSpacingExtra="5dp"
+                        android:text="@string/rpn_restore_confirm_message"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/large_font_text_view" />
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/btn_reset_rpn"
-                    style="@style/TextAppearance.AppCompat.Subhead"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:background="@drawable/rectangle_border_background"
-                    android:clickable="true"
-                    android:drawablePadding="-15dp"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:gravity="center"
-                    android:paddingStart="25dp"
-                    android:paddingTop="10dp"
-                    android:paddingEnd="25dp"
-                    android:paddingBottom="10dp"
-                    android:text="@string/rpn_restore_confirm_title"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/large_font_text_view"/>
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/btn_reset_rpn"
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@drawable/rectangle_border_background"
+                        android:clickable="true"
+                        android:drawablePadding="-15dp"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:gravity="center"
+                        android:paddingStart="25dp"
+                        android:paddingTop="10dp"
+                        android:paddingEnd="25dp"
+                        android:paddingBottom="10dp"
+                        android:text="@string/rpn_restore_confirm_title"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/large_font_text_view" />
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
@@ -856,9 +863,9 @@
                 android:layout_marginEnd="24dp"
                 android:text="@string/config_add_success_toast"
                 android:textAllCaps="false"
+                android:textColor="?attr/homeScreenHeaderTextColor"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:textColor="?attr/homeScreenHeaderTextColor"
                 app:backgroundTint="?attr/accentGood"
                 app:cornerRadius="16dp"
                 app:elevation="0dp"
