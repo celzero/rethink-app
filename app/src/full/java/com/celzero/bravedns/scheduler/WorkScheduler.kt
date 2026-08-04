@@ -44,7 +44,6 @@ class WorkScheduler(val context: Context, val persistentState: PersistentState) 
         const val BLOCKLIST_UPDATE_CHECK_JOB_TAG = "ScheduledBlocklistUpdateCheckJob"
         const val DATA_USAGE_JOB_TAG = "ScheduledDataUsageJob"
         const val CONSOLE_LOG_SAVE_JOB_TAG = "ConsoleLogSaveJob"
-
         const val APP_EXIT_INFO_JOB_TIME_INTERVAL_DAYS: Long = 7
         const val PURGE_CONSOLE_LOGS_TIME_INTERVAL_HOURS: Long = 3
         const val BLOCKLIST_UPDATE_CHECK_INTERVAL_DAYS: Long = 3
@@ -127,21 +126,21 @@ class WorkScheduler(val context: Context, val persistentState: PersistentState) 
 
     fun schedulePurgeConnectionsLog() {
         val logLifespan = persistentState.logLifespan
-        val purgeInterval = when(logLifespan) {
-          context.getString(R.string.settings_log_lifespan_dialog_option_0) -> 1L
-          context.getString(R.string.settings_log_lifespan_dialog_option_1) -> 1L
-          context.getString(R.string.settings_log_lifespan_dialog_option_2) -> 3L
-          context.getString(R.string.settings_log_lifespan_dialog_option_3) -> 6L
-          context.getString(R.string.settings_log_lifespan_dialog_option_4) -> 12L
-          context.getString(R.string.settings_log_lifespan_dialog_option_5) -> 24L
-          context.getString(R.string.settings_log_lifespan_dialog_option_6) -> 24L
-          else -> 24L // 7 days (default)
+        val (purgeInterval, timeUnit) = when(logLifespan) {
+          context.getString(R.string.settings_log_lifespan_dialog_option_0) -> 15L to TimeUnit.MINUTES
+          context.getString(R.string.settings_log_lifespan_dialog_option_1) -> 1L to TimeUnit.HOURS
+          context.getString(R.string.settings_log_lifespan_dialog_option_2) -> 3L to TimeUnit.HOURS
+          context.getString(R.string.settings_log_lifespan_dialog_option_3) -> 6L to TimeUnit.HOURS
+          context.getString(R.string.settings_log_lifespan_dialog_option_4) -> 12L to TimeUnit.HOURS
+          context.getString(R.string.settings_log_lifespan_dialog_option_5) -> 24L to TimeUnit.HOURS
+          context.getString(R.string.settings_log_lifespan_dialog_option_6) -> 24L to TimeUnit.HOURS
+          else -> 24L to TimeUnit.HOURS // 7 days (default)
         }
         val purgeLogs =
             PeriodicWorkRequest.Builder(
                 PurgeConnectionLogs::class.java,
                 purgeInterval,
-                TimeUnit.HOURS
+                timeUnit
             )
                 .addTag(PURGE_CONNECTION_LOGS_JOB_TAG)
                 .build()
