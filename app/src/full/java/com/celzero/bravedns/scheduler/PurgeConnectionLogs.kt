@@ -20,6 +20,7 @@ import Logger.LOG_TAG_SCHEDULER
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.celzero.bravedns.R
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
@@ -42,13 +43,13 @@ class PurgeConnectionLogs(val context: Context, workerParameters: WorkerParamete
     override suspend fun doWork(): Result {
         val logLifespan = persistentState.logLifespan
         val hoursToPurge = when(logLifespan) {
-            "1 hour" -> 1
-            "3 hours" -> 3
-            "6 hours" -> 6
-            "12 hours" -> 12
-            "1 day" -> 24
-            "3 days" -> 72
-            "7 days" -> 168
+            context.getString(R.string.settings_log_lifespan_dialog_option_0) -> 1
+            context.getString(R.string.settings_log_lifespan_dialog_option_1) -> 3
+            context.getString(R.string.settings_log_lifespan_dialog_option_2) -> 6
+            context.getString(R.string.settings_log_lifespan_dialog_option_3) -> 12
+            context.getString(R.string.settings_log_lifespan_dialog_option_4) -> 24
+            context.getString(R.string.settings_log_lifespan_dialog_option_5) -> 72
+            context.getString(R.string.settings_log_lifespan_dialog_option_6) -> 168
             else -> 168 // 7 days (default)
         }
 

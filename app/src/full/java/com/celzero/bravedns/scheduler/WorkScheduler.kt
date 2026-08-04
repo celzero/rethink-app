@@ -29,6 +29,7 @@ import com.celzero.bravedns.service.PersistentState
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
+import com.celzero.bravedns.R
 import com.celzero.bravedns.util.Utilities
 import com.google.common.util.concurrent.ListenableFuture
 import java.util.concurrent.ExecutionException
@@ -127,13 +128,13 @@ class WorkScheduler(val context: Context) {
     fun schedulePurgeConnectionsLog() {
         val logLifespan = PersistentState(context.applicationContext).logLifespan
         val purgeInterval = when(logLifespan) {
-          "1 hour" -> 1L
-          "3 hours" -> 1L
-          "6 hours" -> 3L
-          "12 hours" -> 6L
-          "1 day" -> 12L
-          "3 days" -> 24L
-          "7 days" -> 24L
+          context.getString(R.string.settings_log_lifespan_dialog_option_0) -> 1L
+          context.getString(R.string.settings_log_lifespan_dialog_option_1) -> 1L
+          context.getString(R.string.settings_log_lifespan_dialog_option_2) -> 3L
+          context.getString(R.string.settings_log_lifespan_dialog_option_3) -> 6L
+          context.getString(R.string.settings_log_lifespan_dialog_option_4) -> 12L
+          context.getString(R.string.settings_log_lifespan_dialog_option_5) -> 24L
+          context.getString(R.string.settings_log_lifespan_dialog_option_6) -> 24L
           else -> 24L // 7 days (default)
         }
         val purgeLogs =
