@@ -35,7 +35,7 @@ import com.google.common.util.concurrent.ListenableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
-class WorkScheduler(val context: Context) {
+class WorkScheduler(val context: Context, val persistentState: PersistentState) {
     companion object {
         const val APP_EXIT_INFO_ONE_TIME_JOB_TAG = "OnDemandCollectAppExitInfoJob"
         const val APP_EXIT_INFO_JOB_TAG = "ScheduledCollectAppExitInfoJob"
@@ -126,7 +126,7 @@ class WorkScheduler(val context: Context) {
     }
 
     fun schedulePurgeConnectionsLog() {
-        val logLifespan = PersistentState(context.applicationContext).logLifespan
+        val logLifespan = persistentState.logLifespan
         val purgeInterval = when(logLifespan) {
           context.getString(R.string.settings_log_lifespan_dialog_option_0) -> 1L
           context.getString(R.string.settings_log_lifespan_dialog_option_1) -> 1L
