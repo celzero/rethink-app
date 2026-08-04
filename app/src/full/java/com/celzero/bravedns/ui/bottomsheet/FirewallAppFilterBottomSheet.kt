@@ -38,6 +38,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import com.celzero.bravedns.viewmodel.AppInfoViewModel
 
 class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetFirewallSortFilterBinding? = null
@@ -108,7 +109,7 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
             }
             new.categoryFilters.clear()
             new.topLevelFilter = AppListActivity.TopLevelFilter.ALL
-            new.sort = "name"
+            new.sort = AppInfoViewModel.SortOption.NAME
             AppListActivity.filters.postValue(new)
             this.dismiss()
         }
@@ -181,14 +182,18 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun remakeSortChipsUi(){
-        b.fsSortChipGroup.removeAllViews()
-        b.fsSortChipGroup.addView(makeSortChip("name", getString(R.string.fapps_filter_sort_name)))
-        b.fsSortChipGroup.addView(makeSortChip("package", getString(R.string.fapps_filter_sort_package)))
-        b.fsSortChipGroup.addView(makeSortChip("uid", getString(R.string.fapps_filter_sort_uid)))
+        b.fsSortChipGroup.addView(makeSortChip(AppInfoViewModel.SortOption.NAME, getString(R.string.fapps_filter_sort_name)))
+        b.fsSortChipGroup.addView(makeSortChip(AppInfoViewModel.SortOption.PACKAGE, getString(R.string.fapps_filter_sort_package)))
+        b.fsSortChipGroup.addView(makeSortChip(AppInfoViewModel.SortOption.UID, getString(R.string.fapps_filter_sort_uid)))
     }
 
-    private fun makeSortChip(value: String, label: String): Chip {
-        val chip = layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
+    private fun makeSortChip(
+        value: AppInfoViewModel.SortOption,
+        label: String
+    ): Chip {
+        val chip =
+            layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
+
         chip.id = View.generateViewId()
         chip.tag = value
         chip.text = label
@@ -200,7 +205,7 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
 
         chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
             if (isSelected) {
-                filters.sort = button.tag.toString()
+                filters.sort = button.tag as AppInfoViewModel.SortOption
                 colorUpChipIcon(chip)
             }
         }
