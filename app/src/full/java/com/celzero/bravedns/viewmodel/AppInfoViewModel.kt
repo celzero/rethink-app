@@ -28,7 +28,12 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     private var firewallFilter = AppListActivity.FirewallFilter.ALL
     private var search: String = ""
     private val rethinkUid = android.os.Process.myUid()
-    private var sort: String = "name"
+    enum class SortOption(val value: String) {
+        NAME("name"),
+        PACKAGE("package"),
+        UID("uid")
+    }
+    private var sort: SortOption = SortOption.NAME
 
     init {
         filter.value = ""
@@ -96,7 +101,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         firewallFilter.getFilter(),
                         firewallFilter.getConnectionStatusFilter(),
                         includeProxyBypass,
-                        sort
+                        sort.value
                     )
                 }
                 .liveData
@@ -109,7 +114,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         firewallFilter.getFilter(),
                         firewallFilter.getConnectionStatusFilter(),
                         includeProxyBypass,
-                        sort
+                        sort.value
                     )
                 }
                 .liveData
@@ -126,7 +131,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         firewallFilter.getFilter(),
                         firewallFilter.getConnectionStatusFilter(),
                         includeProxyBypass,
-                        sort
+                        sort.value
                     )
                 }
                 .liveData
@@ -139,7 +144,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         firewallFilter.getFilter(),
                         firewallFilter.getConnectionStatusFilter(),
                         includeProxyBypass,
-                        sort
+                        sort.value
                     )
                 }
                 .liveData
@@ -156,7 +161,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         firewallFilter.getFilter(),
                         firewallFilter.getConnectionStatusFilter(),
                         includeProxyBypass,
-                        sort
+                        sort.value
                     )
                 }
                 .liveData
@@ -169,7 +174,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         firewallFilter.getFilter(),
                         firewallFilter.getConnectionStatusFilter(),
                         includeProxyBypass,
-                        sort
+                        sort.value
                     )
                 }
                 .liveData
@@ -441,7 +446,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                 firewallFilter.getFilter(),
                 appType,
                 firewallFilter.getConnectionStatusFilter(),
-                sort
+                sort.value
             )
         } else {
             appInfoDAO.getFilteredApps(
@@ -450,7 +455,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                 firewallFilter.getFilter(),
                 appType,
                 firewallFilter.getConnectionStatusFilter(),
-                sort
+                sort.value
             )
         }
     }
