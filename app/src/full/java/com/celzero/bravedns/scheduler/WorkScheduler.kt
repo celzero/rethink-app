@@ -127,7 +127,7 @@ class WorkScheduler(val context: Context, val persistentState: PersistentState) 
     fun schedulePurgeConnectionsLog() {
         val logLifespan = persistentState.logLifespan
         val (purgeInterval, timeUnit) = when(logLifespan) {
-          context.getString(R.string.settings_log_lifespan_dialog_option_0) -> 15L to TimeUnit.MINUTES
+          context.getString(R.string.settings_log_lifespan_dialog_option_0) -> 30L to TimeUnit.MINUTES
           context.getString(R.string.settings_log_lifespan_dialog_option_1) -> 1L to TimeUnit.HOURS
           context.getString(R.string.settings_log_lifespan_dialog_option_2) -> 3L to TimeUnit.HOURS
           context.getString(R.string.settings_log_lifespan_dialog_option_3) -> 6L to TimeUnit.HOURS
