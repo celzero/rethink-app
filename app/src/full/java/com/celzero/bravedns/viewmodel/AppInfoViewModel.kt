@@ -459,4 +459,10 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
             )
         }
     }
+
+    fun updateAppNotes(appInfo: AppInfo) {
+        viewModelScope.launch {
+            appInfoDAO.update(appInfo)
+        }
+    }
 }
