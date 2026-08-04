@@ -182,6 +182,7 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun remakeSortChipsUi(){
+        b.fsSortChipGroup.removeAllViews()
         b.fsSortChipGroup.addView(makeSortChip(AppInfoViewModel.SortOption.NAME, getString(R.string.fapps_filter_sort_name)))
         b.fsSortChipGroup.addView(makeSortChip(AppInfoViewModel.SortOption.PACKAGE, getString(R.string.fapps_filter_sort_package)))
         b.fsSortChipGroup.addView(makeSortChip(AppInfoViewModel.SortOption.UID, getString(R.string.fapps_filter_sort_uid)))
