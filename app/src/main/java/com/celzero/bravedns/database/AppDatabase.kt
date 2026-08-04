@@ -1236,13 +1236,13 @@ abstract class AppDatabase : RoomDatabase() {
         private val MIGRATION_30_31: Migration =
             object : Migration(30, 31) {
                 override fun migrate(db: SupportSQLiteDatabase) {
-                    try {
+                    if (!doesColumnExistInTable(db, "AppInfo", "notes")) {
                         db.execSQL(
                             "ALTER TABLE AppInfo ADD COLUMN notes TEXT NOT NULL DEFAULT ''"
                         )
                         Logger.i(LOG_TAG_APP_DB, "MIGRATION_30_31: added notes column to AppInfo")
-                    } catch (e: Exception) {
-                        Logger.e(LOG_TAG_APP_DB, "MIGRATION_30_31: notes column already exists, ignore", e)
+                    } else {
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_30_31: notes column already exists in AppInfo")
                     }
                 }
             }

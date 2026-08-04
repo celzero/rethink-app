@@ -200,7 +200,7 @@ class AppListActivity :
         var firewallFilter = FirewallFilter.ALL
         var searchString: String = ""
 
-        var sort: String = "name"
+        var sort: AppInfoViewModel.SortOption = AppInfoViewModel.SortOption.NAME
     }
 
     private fun Context.isDarkThemeOn(): Boolean {

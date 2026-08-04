@@ -45,7 +45,6 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppWiseDomainsAdapter
 import com.celzero.bravedns.adapter.AppWiseIpsAdapter
 import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.database.AppInfoDAO
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
@@ -70,6 +69,7 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
+import com.celzero.bravedns.viewmodel.AppInfoViewModel
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -85,8 +85,8 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
     private val persistentState by inject<PersistentState>()
     private val eventLogger by inject<EventLogger>()
-    private val appInfoDAO by inject<AppInfoDAO>()
 
+    private val appInfoViewModel: AppInfoViewModel by viewModel()
     private val ipRulesViewModel: CustomIpViewModel by viewModel()
     private val domainRulesViewModel: CustomDomainViewModel by viewModel()
     private val networkLogsViewModel: AppConnectionsViewModel by viewModel()
@@ -224,7 +224,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                     Utilities.getIcon(this, appInfo.packageName, appInfo.appName),
                     b.aadAppDetailIcon
                 )
-                updateNotesChipVisibility()
+                showNotesChip()
 
                 if (appInfo.packageName == RETHINK_PACKAGE) {
                     updateFirewallStatusUi(appStatus, connStatus)
@@ -1134,7 +1134,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             .setView(editText)
             .setPositiveButton(R.string.lbl_save) { _, _ ->
                 appNotes = editText.text.toString()
-                updateNotesChipVisibility()
+                showNotesChip()
                 saveNotesToDatabase()
                 logEvent(
                     "app notes updated",
@@ -1147,13 +1147,11 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun saveNotesToDatabase() {
-        io {
-            appInfo.notes = appNotes
-            appInfoDAO.update(appInfo)
-        }
+        appInfo.notes = appNotes
+        appInfoViewModel.updateAppNotes(appInfo)
     }
 
-    private fun updateNotesChipVisibility() {
+    private fun showNotesChip() {
         // Always show the chip, regardless of whether notes are empty or not
         b.aadNotesChip.visibility = View.VISIBLE
     }
