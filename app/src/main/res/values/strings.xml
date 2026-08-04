@@ -656,7 +656,6 @@
     <string name="settings_log_lifespan_dialog_option_5" translatable="false">3 days</string>
     <string name="settings_log_lifespan_dialog_option_6" translatable="false">7 days</string>
 
-
     <string name="settings_gologger_dialog_option_0" translatable="false">Very verbose</string>
     <string name="settings_gologger_dialog_option_1" translatable="false">Verbose</string>
     <string name="settings_gologger_dialog_option_2" translatable="false">Debug</string>
