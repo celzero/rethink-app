@@ -198,18 +198,25 @@
                     android:text="@string/ada_firewall_title"
                     android:textColor="?attr/colorOnBackground" />
 
-                <com.google.android.material.chip.Chip
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/aad_notes_chip"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:text="@string/lbl_notes"
-                    android:textColor="?attr/primaryTextColor"
-                    android:visibility="visible"
-                    app:chipBackgroundColor="#E8E8E8"
-                    app:chipStrokeColor="?attr/primaryTextColor"
-                    app:chipStrokeWidth="1dp" />
+                    android:layout_marginEnd="10dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="12dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="12dp"
+                        android:paddingBottom="8dp"
+                        android:text="@string/lbl_notes"
+                        android:textColor="?attr/colorOnBackground"
+                        android:textSize="@dimen/default_font_text_view" />
+                </com.google.android.material.card.MaterialCardView>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
