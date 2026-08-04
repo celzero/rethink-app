@@ -15,6 +15,7 @@ import com.celzero.bravedns.database.AppInfoDAO
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.util.Constants
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -461,7 +462,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     }
 
     fun updateAppNotes(appInfo: AppInfo) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             appInfoDAO.update(appInfo)
         }
     }
