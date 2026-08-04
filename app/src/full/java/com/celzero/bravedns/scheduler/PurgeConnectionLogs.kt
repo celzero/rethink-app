@@ -36,10 +36,6 @@ class PurgeConnectionLogs(val context: Context, workerParameters: WorkerParamete
 
     private val persistentState by inject<PersistentState>()
 
-    companion object {
-        const val NUMBER_OF_DAYS_TO_PURGE_EVENTS = 4
-    }
-
     override suspend fun doWork(): Result {
         val logLifespan = persistentState.logLifespan
         val hoursToPurge = when(logLifespan) {
