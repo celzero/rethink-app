@@ -579,7 +579,6 @@
     <string name="lbl_app_wise" translatable="true">mỗi ứng dụng</string>
     <string name="lbl_allowed_ips" translatable="true">IPs cho phép</string>
     <string name="lbl_insecure" translatable="true">(không an toàn)</string>
-    <string name="failed_using_default" translatable="true">Bị thất bại: sử dụng DNS dự phòng</string>
     <string name="lbl_cache" translatable="true">Bộ nhớ tạm</string>
     <string name="remaining_apps_dialog_title" translatable="true">Bao gồm các ứng dụng còn lại</string>
     <string name="ci_no_rules_text" translatable="true">Không có quy tắc IP hoặc Cổng.</string>
@@ -680,7 +679,7 @@
     <string name="lbl_experimental" translatable="true">(thử nghiệm)</string>
     <string name="lbl_service_providers" translatable="true">Nhà cung cấp dịch vụ</string>
     <string name="lbl_manual" translatable="true">Thủ công</string>
-    <string name="lbl_fallback" translatable="true">Dự phòng</string>
+    <string name="lbl_bootstrap" translatable="true">Dự phòng</string>
     <string name="wireguard_title" translatable="true">Internet bảo mật với WireGuard</string>
     <string name="wireguard_desc" translatable="true">Mã hóa giao thông mạng của bạn với WireGuard. Chọn những lối đi khác nhau cho từng ứng dụng.</string>
     <string name="firewall_title" translatable="true">Bảo vệ Android của bạn với tường lửa</string>

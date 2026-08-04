@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.customdownloader
 
-import Logger
-import Logger.LOG_OKHTTP
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_OKHTTP
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Daemons

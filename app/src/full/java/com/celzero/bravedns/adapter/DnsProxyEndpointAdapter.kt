@@ -19,6 +19,7 @@ package com.celzero.bravedns.adapter
 import android.content.Context
 import android.content.DialogInterface
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
@@ -28,12 +29,16 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
+import com.celzero.bravedns.customdownloader.IpInfoDownloader
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsProxyEndpoint
 import com.celzero.bravedns.databinding.DnsProxyListItemBinding
 import com.celzero.bravedns.service.FirewallManager
+import com.celzero.bravedns.service.IpRulesManager
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
+import com.celzero.firestack.backend.Backend
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -135,6 +140,40 @@ class DnsProxyEndpointAdapter(
                     AppCompatResources.getDrawable(context, R.drawable.ic_info)
                 )
             }
+
+            io { updateFlag(endpoint) }
+        }
+
+        private suspend fun updateFlag(endpoint: DnsProxyEndpoint) {
+            var ip: String? = null
+
+            if (endpoint.isSelected) {
+                val ips = VpnController.getDnsIps(Backend.Preferred)
+                ip = ips?.split(",")?.firstOrNull()?.trim()?.let { stripPort(it) }
+            }
+
+            if (ip.isNullOrBlank()) {
+                ip = endpoint.proxyIP
+            }
+
+            if (ip.isNullOrBlank()) {
+                uiCtx { b.dnsProxyListUrlFlagText.visibility = View.GONE }
+                return
+            }
+
+            val ipInfo = IpInfoDownloader.getIpInfo(ip)
+            uiCtx {
+                if (ipInfo != null && ipInfo.countryCode.isNotEmpty()) {
+                    b.dnsProxyListUrlFlagText.text = Utilities.getFlag(ipInfo.countryCode)
+                    b.dnsProxyListUrlFlagText.visibility = View.VISIBLE
+                } else {
+                    b.dnsProxyListUrlFlagText.visibility = View.GONE
+                }
+            }
+        }
+
+        private fun stripPort(addr: String): String {
+            return IpRulesManager.splitHostPort(addr).first
         }
     }
 

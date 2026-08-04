@@ -586,7 +586,6 @@
     <string name="allow" translatable="true">อนุญาต</string>
     <string name="dns_mode_notification_title" translatable="true">ได้รับการป้องกัน! เชื่อมต่อกับ DNS ที่รวดเร็วและปลอดภัย</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">ได้รับการป้องกัน! เชื่อมต่อกับ DNS + ไฟร์วอลล์ + พร็อกซีแล้ว</string>
-    <string name="failed_using_default" translatable="true">ล้มเหลว: การใช้ DNS สำรอง</string>
     <string name="universal_firewall_explanation" translatable="true">ใช้กฎไฟร์วอลล์กับแอปพลิเคชันทั้งหมดตามเหตุการณ์ของอุปกรณ์ เช่น ไฟร์วอลล์เมื่ออุปกรณ์ถูกล็อกหรือเมื่อไม่ได้ใช้งานแอปพลิเคชันใดแอปหนึ่ง</string>
     <string name="dns_firewall_mode_info_explanation_new" translatable="true">ทั้งหมดข้างต้น + หลีกเลี่ยงการเซ็นเซอร์อินเตอร์เน็ต</string>
     <string name="custom_url_error_invalid_url" translatable="true">URL ไม่ถูกต้อง</string>

@@ -15,8 +15,6 @@
  */
 package com.celzero.bravedns.rpnproxy
 
-import Logger
-import Logger.LOG_IAB
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.Purchase
 import com.celzero.bravedns.database.SubscriptionStatus
@@ -30,17 +28,24 @@ import com.celzero.bravedns.iab.InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_
 import com.celzero.bravedns.iab.InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_5YRS_DAYS
 import com.celzero.bravedns.iab.InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
 import com.celzero.bravedns.iab.PurchaseDetail
+import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2.Companion.LOCAL_CANCEL_REVOKE_GUARD_MS
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_IAB
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.CoroutineContext
 
 /**
  * Subscription State Machine V2.
@@ -57,12 +62,36 @@ class SubscriptionStateMachineV2 : KoinComponent {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     // Lock ordering (must always be acquired in this order to prevent deadlocks)
-    // 1. InAppBillingHandler.connectionMutex(outermost protects billing API calls)
+    // 1. (removed) InAppBillingHandler.connectionMutex - replaced by a non-locking
+    //    `connecting` AtomicBoolean dedup flag; cancel/revoke no longer take a lock.
     // 2. stateLock(protects state machine transitions)
     // 3. SubscriptionStatusRepository.mutex(innermost protects DB writes)
     // Never acquire a higher-numbered lock while holding a lower-numbered one.
     // fixme: see if these locks can be removed/made into single transaction
     private val stateLock = Mutex()
+
+    /**
+     * Coroutine-context marker installed while [stateLock] is held by [processEventSafely].
+     *
+     * Reentrancy guard: [stateLock] is a NON-reentrant Mutex, and [StateMachine.processEvent]
+     * runs transition actions INLINE (synchronously) inside `stateLock.withLock { ... }`. So if
+     * an action itself calls [processEventSafely] on the SAME coroutine, the nested
+     * `stateLock.withLock` would self-deadlock (the lock is already held by this coroutine and
+     * can never be released because the inner call is waiting for it).
+     *
+     * The two current call sites that previously needed a transition from within an action
+     * avoid this by deferring via `scope.launch { processEventSafely(...) }` ([handleSystemCheck]
+     * at ~line 2405) or by recording a flag and firing the event AFTER the `withLock` block
+     * ([expireStaleInAppFromDb] at ~line 1395). Those deferred launches run on a SEPARATE
+     * coroutine context that does NOT carry this marker, so they pass the guard and simply
+     * block on the mutex until the outer transition releases it (correct, no deadlock).
+     *
+     * This marker exists so that a FUTURE mistake (a synchronous processEventSafely call from
+     * an action) is detected and logged instead of hanging the coroutine forever.
+     */
+    private object StateLockHeldKey : CoroutineContext.Key<StateLockMarker>
+    private class StateLockMarker : AbstractCoroutineContextElement(StateLockHeldKey)
+
     var stateMachine: StateMachine<SubscriptionState, SubscriptionEvent, SubscriptionData>
 
     companion object {
@@ -251,6 +280,16 @@ class SubscriptionStateMachineV2 : KoinComponent {
                 )
                 addTransition(
                     fromState = SubscriptionState.PurchaseInitiated,
+                    event = SubscriptionEvent.ServerAckFailed(""),
+                    toState = SubscriptionState.ServerAckPending,
+                    guard = { event, _ -> event is SubscriptionEvent.ServerAckFailed },
+                    action = { event, _ ->
+                        val e = event as SubscriptionEvent.ServerAckFailed
+                        handleServerAckFailed(e.error)
+                    }
+                )
+                addTransition(
+                    fromState = SubscriptionState.PurchaseInitiated,
                     event = SubscriptionEvent.BillingError("", -1),
                     toState = SubscriptionState.Error,
                     guard = { event, _ -> event is SubscriptionEvent.BillingError },
@@ -311,9 +350,59 @@ class SubscriptionStateMachineV2 : KoinComponent {
                 )
                 addTransition(
                     fromState = SubscriptionState.PurchasePending,
+                    event = SubscriptionEvent.ServerAckFailed(""),
+                    toState = SubscriptionState.ServerAckPending,
+                    guard = { event, _ -> event is SubscriptionEvent.ServerAckFailed },
+                    action = { event, _ ->
+                        val e = event as SubscriptionEvent.ServerAckFailed
+                        handleServerAckFailed(e.error)
+                    }
+                )
+                addTransition(
+                    fromState = SubscriptionState.PurchasePending,
                     event = SubscriptionEvent.SystemCheck,
                     toState = SubscriptionState.Initial,
                     action = { _, _ -> handleSystemCheck() }
+                )
+
+                // ServerAckPending: payment was received by Play but server ack failed.
+                // Recovery: if Play eventually propagates the ack or a background retry
+                // succeeds, PaymentSuccessful transitions to Active.
+                addTransition(
+                    fromState = SubscriptionState.ServerAckPending,
+                    event = SubscriptionEvent.PaymentSuccessful(createDummyPurchaseDetail()),
+                    toState = SubscriptionState.Active,
+                    guard = { event, _ -> event is SubscriptionEvent.PaymentSuccessful },
+                    action = { event, _ ->
+                        handlePaymentSuccessful((event as SubscriptionEvent.PaymentSuccessful).purchaseDetail)
+                    }
+                )
+                addTransition(
+                    fromState = SubscriptionState.ServerAckPending,
+                    event = SubscriptionEvent.SubscriptionRestored(createDummyPurchaseDetail()),
+                    toState = SubscriptionState.Active,
+                    guard = { event, _ -> event is SubscriptionEvent.SubscriptionRestored },
+                    action = { event, _ ->
+                        handleSubscriptionRestored((event as SubscriptionEvent.SubscriptionRestored).purchaseDetail)
+                    }
+                )
+                addTransition(
+                    fromState = SubscriptionState.ServerAckPending,
+                    event = SubscriptionEvent.SystemCheck,
+                    toState = SubscriptionState.ServerAckPending,
+                    action = { _, _ -> handleSystemCheck() }
+                )
+                addTransition(
+                    fromState = SubscriptionState.ServerAckPending,
+                    event = SubscriptionEvent.SubscriptionExpired,
+                    toState = SubscriptionState.Expired,
+                    action = { _, data -> handleSubscriptionExpiredWithData(data as? SubscriptionData) }
+                )
+                addTransition(
+                    fromState = SubscriptionState.ServerAckPending,
+                    event = SubscriptionEvent.SubscriptionRevoked,
+                    toState = SubscriptionState.Revoked,
+                    action = { _, data -> handleSubscriptionRevoked(data as? SubscriptionData) }
                 )
 
                 // Renewal: Active to Active (idempotent, updates expiry)
@@ -624,12 +713,13 @@ class SubscriptionStateMachineV2 : KoinComponent {
         object Expired: SubscriptionState()
         object Revoked: SubscriptionState()
         object Error: SubscriptionState()
+        object ServerAckPending: SubscriptionState()
         object Grace: SubscriptionState()
         object OnHold: SubscriptionState()
         object Paused: SubscriptionState()
 
         val isActive: Boolean
-            get() = this is Active || this is Grace
+            get() = this is Active || this is Grace || this is OnHold || this is Paused
 
         val canMakePurchase: Boolean
             get() = this is Initial || this is Expired || this is Revoked ||
@@ -663,6 +753,7 @@ class SubscriptionStateMachineV2 : KoinComponent {
         object SystemCheck : SubscriptionEvent()
         data class BillingError(val error: String, val billingResultCode: Int = -1) : SubscriptionEvent()
         data class DatabaseError(val error: String) : SubscriptionEvent()
+        data class ServerAckFailed(val error: String) : SubscriptionEvent()
         object ErrorRecovered : SubscriptionEvent()
     }
 
@@ -675,7 +766,27 @@ class SubscriptionStateMachineV2 : KoinComponent {
     val currentState: StateFlow<SubscriptionState> = stateMachine.currentState
 
     private suspend fun processEventSafely(event: SubscriptionEvent) {
-        stateLock.withLock { stateMachine.processEvent(event) }
+        // Reentrancy guard: see [StateLockMarker]. If this coroutine is already executing
+        // inside a stateLock.withLock block (i.e. we were called synchronously from a
+        // transition action), re-entering stateLock would self-deadlock. Drop the event with
+        // a loud log rather than hanging. The event is recoverable: SystemCheck and
+        // reconcile fire regularly and will re-derive correct state.
+        if (currentCoroutineContext()[StateLockHeldKey] != null) {
+            Logger.e(LOG_IAB, "$TAG: processEventSafely RE-ENTERED while stateLock is already held " +
+                "by this coroutine (event=${event.name}). Dropping event to avoid stateLock " +
+                "self-deadlock. Fix the caller to defer via scope.launch{...} (see " +
+                "handleSystemCheck) or fire the event outside the withLock block (see " +
+                "expireStaleInAppFromDb).")
+            return
+        }
+        stateLock.withLock {
+            // Install the marker for the duration of the transition so any synchronous
+            // re-entry is detectable above. withContext on a bare element (no interceptor)
+            // does not redispatch; it just augments coroutineContext for the block.
+            withContext(StateLockMarker()) {
+                stateMachine.processEvent(event)
+            }
+        }
     }
 
     private fun initializeStateMachine() {
@@ -706,6 +817,10 @@ class SubscriptionStateMachineV2 : KoinComponent {
         processEventSafely(SubscriptionEvent.PurchaseFailed(error, billingResultCode))
     }
 
+    suspend fun serverAckFailed(error: String) {
+        processEventSafely(SubscriptionEvent.ServerAckFailed(error))
+    }
+
     suspend fun userCancelled() {
         processEventSafely(SubscriptionEvent.UserCancelled)
     }
@@ -724,6 +839,10 @@ class SubscriptionStateMachineV2 : KoinComponent {
 
     suspend fun systemCheck() {
         processEventSafely(SubscriptionEvent.SystemCheck)
+    }
+
+    suspend fun errorRecovered() {
+        processEventSafely(SubscriptionEvent.ErrorRecovered)
     }
 
     /**
@@ -749,7 +868,8 @@ class SubscriptionStateMachineV2 : KoinComponent {
         purchases: List<Purchase>,
         productMeta: Map<String, Pair<String, String>> = emptyMap(),
         purchaseExpiryMap: Map<String, Long> = emptyMap(),
-        queriedProductType: String = BillingClient.ProductType.SUBS
+        queriedProductType: String = BillingClient.ProductType.SUBS,
+        shouldExpire: Boolean = true
     ) {
         if (purchases.isEmpty()) {
             if (queriedProductType == BillingClient.ProductType.SUBS) {
@@ -757,7 +877,7 @@ class SubscriptionStateMachineV2 : KoinComponent {
                 // in the local DB is stale the subscription has been revoked, refunded, or
                 // fully lapsed without the app receiving a renewal callback.
                 Logger.i(LOG_IAB, "$TAG: reconcile: Play returned empty SUBS snapshot, expiring active SUBS in DB")
-                expireStaleSubsFromDb()
+                expireStaleSubsFromDb(shouldExpire)
             } else {
                 Logger.i(LOG_IAB, "$TAG: reconcile: Play returned empty INAPP snapshot, no action (INAPP expiry is clock-based)")
             }
@@ -771,10 +891,17 @@ class SubscriptionStateMachineV2 : KoinComponent {
         )
 
         // Phase 1 – build actions while holding the lock (read-only, no DB calls).
-        val currentMachineState = stateMachine.getCurrentState()
-        val currentData         = stateMachine.getCurrentData()
-
+        // IMPORTANT: currentMachineState / currentData MUST be read INSIDE stateLock.
+        // Reading them before acquiring the lock is a TOCTOU race: stateLock is a
+        // kotlinx.coroutines suspending Mutex (coroutine-owned, not thread-owned), and a
+        // concurrent processEventSafely() running on a different coroutine of the same
+        // Dispatchers.IO pool can transition the machine between the read and the lock
+        // acquisition. The skipAlreadyActive / skipAlreadyCancelledValid / isResubscription
+        // decisions below would then be computed against stale state, silently dropping a
+        // needed transition. Reading them under the lock guarantees a consistent snapshot.
         val actions = stateLock.withLock {
+            val currentMachineState = stateMachine.getCurrentState()
+            val currentData         = stateMachine.getCurrentData()
             purchases
                 .distinctBy { it.purchaseToken }
                 .mapNotNull { purchase ->
@@ -993,8 +1120,15 @@ class SubscriptionStateMachineV2 : KoinComponent {
      *    in-memory state transitions to [SubscriptionState.Expired].
      *
      * INAPP rows are intentionally skipped - their expiry is governed by the local clock.
+     *
+     * @param shouldExpire If false, returns without expiring anything. Used by callers
+     *                     that perform server validation before deciding whether to expire.
      */
-    private suspend fun expireStaleSubsFromDb() {
+    private suspend fun expireStaleSubsFromDb(shouldExpire: Boolean = true) {
+        if (!shouldExpire) {
+            Logger.d(LOG_IAB, "$TAG: expireStaleSubsFromDb: shouldExpire=false, skipping expiry")
+            return
+        }
         try {
             // Active and Cancelled states are "still alive" from the local perspective.
             // Grace / OnHold / Paused are also Play-managed states that should be expired
@@ -1037,7 +1171,7 @@ class SubscriptionStateMachineV2 : KoinComponent {
                     // stores STATE_EXPIRED with billingExpiry=0 or a future estimate.
                     // A zero expiry would cause handleSystemCheckAndDatabaseRestoration
                     // to resurrect the subscription to Active on the next cold start.
-                    if (sub.billingExpiry > now || sub.billingExpiry <= 0L ||
+                    if (sub.billingExpiry !in 1..now ||
                         sub.billingExpiry == Long.MAX_VALUE) {
                         sub.billingExpiry = now
                         sub.accountExpiry = now
@@ -1058,18 +1192,31 @@ class SubscriptionStateMachineV2 : KoinComponent {
             }
 
             if (expiredCount > 0) {
-                // Before firing the event, seed the machine data with the last-expired
-                // SUBS row so handleSubscriptionExpiredWithData uses it instead of
-                // falling back to getCurrentSubscription(), which could return a
-                // co-existing INAPP row that should NOT be expired.
                 val lastExpired = subsRows.lastOrNull {
                     it.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id
                 }
-                if (lastExpired != null) {
-                    stateMachine.updateData(SubscriptionData(lastExpired))
+                // Atomically seed the machine data AND fire the SubscriptionExpired
+                // transition under a single stateLock acquisition. Previously updateData()
+                // ran WITHOUT the lock and processEventSafely() then re-acquired it, leaving
+                // a window in which a concurrent transition (e.g. a Play reconcile on another
+                // coroutine) could observe or overwrite the seed between the two steps. Because
+                // handleSubscriptionExpiredWithData prefers data.subscriptionStatus over a DB
+                // lookup, a stale/overwritten seed could target the WRONG row (e.g. a
+                // co-existing INAPP row that must NOT be expired) — the exact hazard the
+                // original seed comment warned about.
+                //
+                // The transition is fired via direct stateMachine.processEvent() (not
+                // processEventSafely) because we ALREADY hold stateLock here. StateLockMarker
+                // is installed so any synchronous re-entry from the handler is caught by the
+                // processEventSafely guard (~line 774) instead of self-deadlocking.
+                stateLock.withLock {
+                    withContext(StateLockMarker()) {
+                        if (lastExpired != null) {
+                            stateMachine.updateData(SubscriptionData(lastExpired))
+                        }
+                        stateMachine.processEvent(SubscriptionEvent.SubscriptionExpired)
+                    }
                 }
-                // Transition the in-memory state machine to Expired once (idempotent).
-                processEventSafely(SubscriptionEvent.SubscriptionExpired)
                 Logger.i(LOG_IAB, "$TAG: expireStaleSubsFromDb: expired $expiredCount row(s), state machine transitioned to Expired")
             } else {
                 Logger.d(LOG_IAB, "$TAG: expireStaleSubsFromDb: all rows within guard window, no rows expired")
@@ -1238,8 +1385,7 @@ class SubscriptionStateMachineV2 : KoinComponent {
                     // Always clamp: billingExpiry=0 or a future estimate both cause
                     // handleSystemCheckAndDatabaseRestoration to resurrect Expired → Active.
                     if ((absentFromPlay || noPlayRecord) &&
-                        (sub.billingExpiry > now || sub.billingExpiry <= 0L ||
-                         sub.billingExpiry == Long.MAX_VALUE)) {
+                        (sub.billingExpiry !in 1..now || sub.billingExpiry == Long.MAX_VALUE)) {
                         sub.billingExpiry = now
                         sub.accountExpiry = now
                     }
@@ -1343,6 +1489,34 @@ class SubscriptionStateMachineV2 : KoinComponent {
             inAppRows.distinctBy { it.purchaseToken }
         } catch (e: Exception) {
             Logger.e(LOG_IAB, "$TAG: getActiveInAppPurchase: ${e.message}", e)
+            emptyList()
+        }
+    }
+
+    /**
+     * Returns all active SUBS (subscription) [SubscriptionStatus] rows from the database.
+     *
+     * Uses the same active-state set as [expireStaleSubsFromDb] so the caller always works on
+     * exactly the same rows that would otherwise be expired.
+     *
+     * Returns an empty list if no active subscriptions exist.
+     */
+    suspend fun getActiveSubsPurchase(): List<SubscriptionStatus> {
+        return try {
+            val activeStatuses = listOf(
+                SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id,
+                SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id,
+                SubscriptionStatus.SubscriptionState.STATE_GRACE.id,
+                SubscriptionStatus.SubscriptionState.STATE_ON_HOLD.id,
+                SubscriptionStatus.SubscriptionState.STATE_PAUSED.id,
+                SubscriptionStatus.SubscriptionState.STATE_ACK_PENDING.id,
+                SubscriptionStatus.SubscriptionState.STATE_PURCHASED.id
+            )
+            val rows = subscriptionDb.getSubscriptionsByStates(activeStatuses)
+            rows.filter { sub -> !isInAppProduct(sub.productId) }
+                .distinctBy { it.purchaseToken }
+        } catch (e: Exception) {
+            Logger.e(LOG_IAB, "$TAG: getActiveSubsPurchase: ${e.message}", e)
             emptyList()
         }
     }
@@ -1629,6 +1803,15 @@ class SubscriptionStateMachineV2 : KoinComponent {
         }
     }
 
+    private suspend fun handleServerAckFailed(error: String) {
+        try {
+            Logger.w(LOG_IAB, "$TAG: handleServerAckFailed: payment received but server ack failed: $error")
+            dbSyncService.savePurchaseFailureHistory("ServerAckFailed: $error", null)
+        } catch (e: Exception) {
+            Logger.e(LOG_IAB, "$TAG: handleServerAckFailed error: ${e.message}", e)
+        }
+    }
+
     /**
      * The primary writer of [SubscriptionStatus] for purchase-success paths.
      *
@@ -1907,7 +2090,6 @@ class SubscriptionStateMachineV2 : KoinComponent {
 
         s.lastUpdatedTs  = System.currentTimeMillis()
         s.windowDays = d.windowDays
-        s.orderId = d.orderId
     }
 
     private suspend fun handleUserCancelled(data: SubscriptionData?) {
@@ -2173,11 +2355,37 @@ class SubscriptionStateMachineV2 : KoinComponent {
      */
     private suspend fun handleSystemCheckAndDatabaseRestoration() {
         stateLock.withLock {
+            // Install the reentrancy marker (mirrors processEventSafely) so a
+            // synchronous processEventSafely() call fired by any action below is caught by
+            // the guard and dropped with a loud log instead of silently
+            // self-deadlocking on stateLock.
+            //
+            // COROUTINE vs THREAD: stateLock is a kotlinx.coroutines.sync.Mutex — a SUSPENDING
+            // lock owned by the coroutine that called withLock{}, NOT by a thread, and it is
+            // NON-reentrant (it has no ownership tracking, so the same coroutine locking it
+            // twice suspends forever). withContext(StateLockMarker()) does NOT switch threads
+            // or redispatch: with no dispatcher in the context it runs INLINE on the current
+            // coroutine, only augmenting coroutineContext so currentCoroutineContext()[StateLockHeldKey]
+            // returns the marker. The lock therefore stays held by this coroutine across the
+            // withContext boundary, and the marker is visible to any synchronous re-entry.
+            //
+            // This path fires events via direct stateMachine.processEvent() (not
+            // processEventSafely) precisely because we ALREADY hold stateLock; processEvent
+            // does not re-lock. Any action that genuinely needs to fire a further event must
+            // defer via scope.launch { processEventSafely(...) } (see handleSystemCheck) — a
+            // NEW coroutine does NOT inherit this lock or marker, so it blocks cleanly until
+            // stateLock is released instead of self-deadlocking.
+            withContext(StateLockMarker()) {
         try {
             Logger.i(LOG_IAB, "$TAG: handleSystemCheckAndDatabaseRestoration")
-            val dbStateInfo = dbSyncService.loadStateFromDatabase() ?: run {
+            // Labeled return (not bare `return`) because withContext's block is crossinline,
+            // which forbids non-local returns; return@withContext exits the lambda cleanly,
+            // after which withLock's finally releases stateLock. Functionally identical to the
+            // prior bare return since nothing follows the withLock block.
+            val dbStateInfo = dbSyncService.loadStateFromDatabase()
+            if (dbStateInfo == null) {
                 Logger.d(LOG_IAB, "$TAG: no DB state to restore")
-                return
+                return@withContext
             }
 
             val sub = dbStateInfo.currentSubscription
@@ -2206,7 +2414,9 @@ class SubscriptionStateMachineV2 : KoinComponent {
             val pd = createPurchaseDetailFromSubscription(sub)
             when (effectiveState) {
                 SubscriptionState.Active,
-                SubscriptionState.Grace -> {
+                SubscriptionState.Grace,
+                SubscriptionState.OnHold,
+                SubscriptionState.Paused -> {
                     // Restore in memory; fire SubscriptionRestored which is idempotent
                     // (skips DB write if prevStatus already ACTIVE).
                     stateMachine.processEvent(SubscriptionEvent.SubscriptionRestored(pd))
@@ -2250,6 +2460,7 @@ class SubscriptionStateMachineV2 : KoinComponent {
         } catch (e: Exception) {
             Logger.e(LOG_IAB, "$TAG: handleSystemCheckAndDatabaseRestoration error: ${e.message}", e)
         }
+            } // withContext(StateLockMarker())
         } // stateLock.withLock
     }
 
@@ -2275,11 +2486,20 @@ class SubscriptionStateMachineV2 : KoinComponent {
             if (result.expiredSubscriptionsUpdated > 0 && !result.currentSubscriptionValid) {
                 // At least one INAPP row was expired AND the current subscription is
                 // no longer valid → transition the in-memory state to Expired.
-                // We call processEventSafely here because handleSystemCheck is always
-                // invoked from within a state-machine action, not under stateLock directly,
-                // so re-entrance is safe.
-                processEventSafely(SubscriptionEvent.SubscriptionExpired)
-                Logger.i(LOG_IAB, "$TAG: handleSystemCheck, state machine transitioned to Expired (INAPP local expiry)")
+                //
+                // CRITICAL: cannot call processEventSafely() inline here. handleSystemCheck
+                // is a transition ACTION — it runs synchronously INSIDE
+                // processEventSafely's `stateLock.withLock { stateMachine.processEvent(...) }`
+                // stateLock is a non-reentrant Mutex, so re-entering it would
+                // self-deadlock (same class of bug as the identityMutex self-deadlock in
+                // BillingBackendClient.getDeviceId). expireStaleInAppFromDb() documents this
+                // same hazard
+                //
+                // Defer the event onto `scope` so it runs AFTER the current transition
+                // completes and stateLock is released. After SystemCheck, the machine lands
+                // in Initial / Active / ServerAckPending — all of which accept SubscriptionExpired.
+                scope.launch { processEventSafely(SubscriptionEvent.SubscriptionExpired) }
+                Logger.i(LOG_IAB, "$TAG: handleSystemCheck, deferred SubscriptionExpired event (INAPP local expiry)")
             }
         } catch (e: Exception) {
             Logger.e(LOG_IAB, "$TAG: handleSystemCheck error: ${e.message}", e)

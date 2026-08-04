@@ -15,13 +15,12 @@
  */
 package com.celzero.bravedns
 
-import Logger
-import Logger.LOG_TAG_APP_UPDATE
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_APP_UPDATE
 import android.app.Activity
 import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.JSON_LATEST
 import com.celzero.bravedns.util.Constants.Companion.JSON_UPDATE

@@ -19,6 +19,7 @@ package com.celzero.bravedns.adapter
 import android.content.Context
 import android.content.DialogInterface
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -28,9 +29,11 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
+import com.celzero.bravedns.customdownloader.IpInfoDownloader
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsCryptRelayEndpoint
 import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
+import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
@@ -118,6 +121,7 @@ class DnsCryptRelayEndpointAdapter(
                 updateSelectedStatus()
             } else {
                 b.dnsCryptEndpointListUrlExplanation.text = ""
+                b.dnsCryptEndpointListUrlExplanation.visibility = View.GONE
             }
 
             b.dnsCryptEndpointListActionImage.isChecked = endpoint.isSelected
@@ -130,6 +134,8 @@ class DnsCryptRelayEndpointAdapter(
                     ContextCompat.getDrawable(context, R.drawable.ic_info)
                 )
             }
+
+            io { updateFlag(endpoint) }
         }
 
         private fun updateSelectedStatus() {
@@ -140,6 +146,7 @@ class DnsCryptRelayEndpointAdapter(
                 uiCtx {
                     b.dnsCryptEndpointListUrlExplanation.text =
                         context.getString(status).replaceFirstChar(Char::titlecase)
+                    b.dnsCryptEndpointListUrlExplanation.visibility = View.VISIBLE
                 }
             }
         }
@@ -245,6 +252,38 @@ class DnsCryptRelayEndpointAdapter(
                     )
                 }
             }
+        }
+
+        private suspend fun updateFlag(endpoint: DnsCryptRelayEndpoint) {
+            var ip: String? = null
+
+            if (endpoint.isSelected) {
+                val ips = VpnController.getDnsIps(Backend.Preferred)
+                ip = ips?.split(",")?.firstOrNull()?.trim()?.let { stripPort(it) }
+            }
+
+            if (ip.isNullOrBlank()) {
+                ip = Utilities.getIpForUrl(context, endpoint.dnsCryptRelayURL)
+            }
+
+            if (ip.isNullOrBlank()) {
+                uiCtx { b.dnsCryptEndpointListUrlFlagText.visibility = View.GONE }
+                return
+            }
+
+            val ipInfo = IpInfoDownloader.getIpInfo(ip)
+            uiCtx {
+                if (ipInfo != null && ipInfo.countryCode.isNotEmpty()) {
+                    b.dnsCryptEndpointListUrlFlagText.text = Utilities.getFlag(ipInfo.countryCode)
+                    b.dnsCryptEndpointListUrlFlagText.visibility = View.VISIBLE
+                } else {
+                    b.dnsCryptEndpointListUrlFlagText.visibility = View.GONE
+                }
+            }
+        }
+
+        private fun stripPort(addr: String): String {
+            return IpRulesManager.splitHostPort(addr).first
         }
 
         private fun io(f: suspend () -> Unit) {

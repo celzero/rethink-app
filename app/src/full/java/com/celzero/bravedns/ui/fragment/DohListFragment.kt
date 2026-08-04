@@ -15,12 +15,16 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import android.widget.TextView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -30,6 +34,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.databinding.DialogSetCustomDohBinding
 import com.celzero.bravedns.databinding.FragmentDohListBinding
+import com.celzero.bravedns.util.RecyclerViewSpacingDecoration
 import com.celzero.bravedns.viewmodel.DoHEndpointViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -46,36 +51,76 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
 
     private val appConfig by inject<AppConfig>()
 
-    // Doh UI elements
     private var layoutManager: RecyclerView.LayoutManager? = null
     private var dohRecyclerAdapter: DohEndpointAdapter? = null
     private val viewModel: DoHEndpointViewModel by viewModel()
 
     companion object {
         fun newInstance() = DohListFragment()
+
+        private val dpToPx: Float by lazy {
+            Resources.getSystem().displayMetrics.density
+        }
+
+        private val spacing4dp: Int by lazy { (4 * dpToPx).toInt() }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
         initClickListeners()
+        applyEdgeToEdge()
     }
 
     private fun initView() {
         layoutManager = LinearLayoutManager(requireContext())
         b.recyclerDohConnections.layoutManager = layoutManager
+        b.recyclerDohConnections.addItemDecoration(
+            RecyclerViewSpacingDecoration(spacing4dp, spacing4dp)
+        )
 
         dohRecyclerAdapter = DohEndpointAdapter(requireContext(), get())
         viewModel.dohEndpointList.observe(viewLifecycleOwner) {
             dohRecyclerAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
         }
         b.recyclerDohConnections.adapter = dohRecyclerAdapter
+
+        dohRecyclerAdapter!!.addLoadStateListener { loadStates ->
+            val isEmpty = loadStates.source.refresh is LoadState.NotLoading &&
+                    dohRecyclerAdapter!!.itemCount == 0
+            val isLoading = loadStates.source.refresh is LoadState.Loading
+
+            b.dohEmptyState.visibility = if (isEmpty) View.VISIBLE else View.GONE
+            b.dohLoadingIndicator.visibility = if (isLoading && dohRecyclerAdapter!!.itemCount == 0) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+            b.recyclerDohConnections.visibility = if (isLoading && dohRecyclerAdapter!!.itemCount == 0) {
+                View.GONE
+            } else {
+                View.VISIBLE
+            }
+        }
     }
 
     private fun initClickListeners() {
         // see CustomIpFragment#setupClickListeners#bringToFront()
         b.dohFabAddServerIcon.bringToFront()
         b.dohFabAddServerIcon.setOnClickListener { showAddCustomDohDialog() }
+    }
+
+    private fun applyEdgeToEdge() {
+        ViewCompat.setOnApplyWindowInsetsListener(b.recyclerDohConnections) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(
+                v.paddingLeft,
+                v.paddingTop,
+                v.paddingRight,
+                v.paddingBottom + systemBars.bottom
+            )
+            insets
+        }
     }
 
     /**

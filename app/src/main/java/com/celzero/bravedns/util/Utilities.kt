@@ -15,12 +15,11 @@
  */
 package com.celzero.bravedns.util
 
-import Logger
-import Logger.LOG_TAG_APP_DB
-import Logger.LOG_TAG_DOWNLOAD
-import Logger.LOG_TAG_FIREWALL
-import Logger.LOG_TAG_UI
-import Logger.LOG_TAG_VPN
+import com.celzero.bravedns.util.Logger.LOG_TAG_APP_DB
+import com.celzero.bravedns.util.Logger.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Logger.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.PendingIntent
@@ -60,6 +59,7 @@ import com.celzero.bravedns.util.Constants.Companion.FLAVOR_WEBSITE
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
+import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
@@ -629,6 +629,22 @@ object Utilities {
         return isFdroidFlavour() && BuildConfig.IS_WEBSITE_DEGOOGLD_BUILD
     }
 
+    /**
+     * Whether Google Play billing can be used on this device for this build.
+     *
+     * Returns `true` only when:
+     *  - the running flavor ships the Play Billing implementation (play or website), and
+     *  - the Play Store (Google Play Services) package is installed and enabled.
+     *
+     * The fdroid flavor has no billing client and always returns `false`. On devices without
+     * Google Play Services (e.g. degoogled phones running the play/website build), the sponsor
+     * UI uses this to fall back to the Stripe web option only.
+     */
+    fun isGooglePlayServicesAvailable(context: Context): Boolean {
+        if (!isPlayStoreFlavour() && !isWebsiteFlavour()) return false
+        return getApplicationInfo(context, PKG_NAME_PLAY_STORE)?.enabled == true
+    }
+
 
     /** Returns true when the app is built with the "alpha" build type. */
     fun isAlphaBuild(): Boolean {
@@ -813,13 +829,18 @@ object Utilities {
 
     fun getRemoteBlocklistStamp(url: String): String {
         return try {
+            if (url.isBlank()) return ""
             // extract the path from the url string
             // eg., https://dns.google/dns-query will result in /dns-query
-            val path = URI(url).path
+            val path = URI(url).path ?: return ""
             // remove the trailing and leading slashes from the path
             // eg., /dns-query will result in dns-query
             // earlier check of : will not work as now remote stamp can contain sec/rec
-            return path.trimStart { it == '/' }.trimEnd { it == '/' }
+            val stamp = path.trim('/').trim()
+            // don't conflate a non-blocklist DoH path (e.g. /dns-query) with an
+            // empty stamp; only base rethinkdns endpoints carry the stamp as path
+            Logger.d(Logger.LOG_TAG_DNS, "getRemoteBlocklistStamp: url=$url, stamp=$stamp")
+            stamp
         } catch (e: Exception) {
             Logger.w(Logger.LOG_TAG_DNS, "failure fetching stamp from Go ${e.message}", e)
             ""
@@ -987,6 +1008,16 @@ object Utilities {
             Logger.e(LOG_TAG_VPN, "err writing to file ${file.path}, ${e.message}", e)
             false
         }
+    }
+
+    fun getIpForUrl(context: Context, url: String): String? {
+        val urls = context.resources.getStringArray(R.array.urls)
+        val ips = context.resources.getStringArray(R.array.ips)
+        val index = urls.indexOf(url)
+        if (index != -1 && index < ips.size) {
+            return ips[index].split(",").firstOrNull()?.trim()
+        }
+        return null
     }
 
 }

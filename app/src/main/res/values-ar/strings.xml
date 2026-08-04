@@ -836,7 +836,6 @@
     <string name="lbl_peer" translatable="true">نظير</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">احذف DNS عبر نقطة نهاية TLS من التكوين المحفوظ.</string>
     <string name="fapps_info_bypass_msg" translatable="true">تجاوز قواعد جدار الحماية العالمي.</string>
-    <string name="failed_using_default" translatable="true">فشل: استخدام DNS الإحتياطي</string>
     <string name="hs_biometeric_title" translatable="true">إلغاء قفل Rethink</string>
     <string name="hs_biometeric_failed" translatable="true">فشلت المصادقة البيومترية</string>
     <string name="hs_biometeric_error" translatable="true">خطأ في المصادقة البيومترية</string>
@@ -1034,7 +1033,7 @@
     <string name="fapps_bypass_block_dialog_title" translatable="true">تجاوز التطبيقات</string>
     <string name="fail_open_network_title" translatable="true">لا تتوقف عند فقدان الشبكة</string>
     <string name="fail_open_network_desc" translatable="true">عند تعطيله، يقوم Rethink بإيقاف جميع البيانات عند عدم توفر أي إتصال، كما هو الحال في <i>وضع الطائرة</i>.</string>
-    <string name="lbl_fallback" translatable="true">بديل احتياطي</string>
+    <string name="lbl_bootstrap" translatable="true">بديل احتياطي</string>
     <string name="lbl_default" translatable="true">المبدئي</string>
     <string name="lbl_action" translatable="true">الإجراء</string>
     <string name="lbl_connect" translatable="true">اتصل</string>

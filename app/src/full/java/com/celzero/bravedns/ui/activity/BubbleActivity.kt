@@ -15,11 +15,15 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import Logger
+import com.celzero.bravedns.util.Logger
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.activity.addCallback
+import androidx.appcompat.widget.TooltipCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -39,7 +43,9 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.BaseActivity
+import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.viewmodel.AllowedAppsBubbleViewModel
 import com.celzero.bravedns.viewmodel.BlockedAppsBubbleViewModel
 import kotlinx.coroutines.CancellationException
@@ -124,6 +130,7 @@ class BubbleActivity : BaseActivity(R.layout.activity_bubble) {
         showContentState()
         setupRecyclerViews()
         setupLoadStateListeners()
+        setupQuickFixes()
 
         // Start collectors once per resume; cancel previous collectors if any.
         startAllowedCollector()
@@ -236,41 +243,41 @@ class BubbleActivity : BaseActivity(R.layout.activity_bubble) {
         // Optimistic UI update: remove right away from blocked list for fast feedback.
         // PagingDataAdapter doesn't support direct removal; we force a refresh after DB update,
         // but also hide the row by refreshing immediately.
-        lifecycleScope.launch {
+        io {
             try {
                 Logger.i(TAG, "Temporarily allowing app for 15 minutes: ${blockedApp.appName} (uid: ${blockedApp.uid})")
 
-                withContext<Unit>(Dispatchers.IO) {
-                    FirewallManager.updateTempAllow(blockedApp.uid, true)
-                }
+                FirewallManager.updateTempAllow(blockedApp.uid, true)
 
-                if (!isFinishing && !isDestroyed) {
-                    // Refresh BOTH lists: remove from blocked and show in allowed.
-                    blockedAdapter.refresh()
-                    allowedAdapter.refresh()
+                uiCtx {
+                    if (!isFinishing && !isDestroyed) {
+                        // Refresh BOTH lists: remove from blocked and show in allowed.
+                        blockedAdapter.refresh()
+                        allowedAdapter.refresh()
+                    }
                 }
 
                 Logger.i(TAG, "App temporarily allowed successfully for 15 minutes")
             } catch (e: Exception) {
-                Logger.e(TAG, "err allowing app: ${e.message}", e)
+                Logger.e(TAG, "err allowing app: ${e.message}")
             }
         }
     }
 
     private fun removeAllowedApp(allowedApp: AllowedAppInfo) {
-        lifecycleScope.launch {
+        io {
             try {
                 Logger.i(TAG, "Removing temp allow for app: ${allowedApp.appName} (uid: ${allowedApp.uid})")
 
-                withContext(Dispatchers.IO) {
-                    // Clear temp allow status
-                    appInfoRepository.clearTempAllowByUid(allowedApp.uid)
-                }
+                // Clear temp allow status
+                appInfoRepository.clearTempAllowByUid(allowedApp.uid)
 
-                if (!isFinishing && !isDestroyed) {
-                    // Refresh BOTH lists: remove from allowed and allow it to appear again in blocked.
-                    allowedAdapter.refresh()
-                    blockedAdapter.refresh()
+                uiCtx {
+                    if (!isFinishing && !isDestroyed) {
+                        // Refresh BOTH lists: remove from allowed and allow it to appear again in blocked.
+                        allowedAdapter.refresh()
+                        blockedAdapter.refresh()
+                    }
                 }
 
                 Logger.i(TAG, "Temp allow removed successfully")
@@ -411,5 +418,173 @@ class BubbleActivity : BaseActivity(R.layout.activity_bubble) {
         blockedCollectJob = null
         allowedCollectJob?.cancel()
         allowedCollectJob = null
+    }
+
+    private fun setupQuickFixes() {
+        b.bubbleQuickFixesContainer.removeAllViews()
+
+        // 1. Proxy Lockdown
+        addQuickFixIcon(
+            R.drawable.ic_firewall_lockdown_on,
+            R.string.bubble_fix_proxy_lockdown,
+            persistentState.wgGlobalLockdown
+        ) {
+            persistentState.wgGlobalLockdown = !persistentState.wgGlobalLockdown
+            setupQuickFixes()
+        }
+
+        // 2. Loopback
+        addQuickFixIcon(
+            R.drawable.ic_loopback,
+            R.string.bubble_fix_loopback,
+            persistentState.routeRethinkInRethink
+        ) {
+            persistentState.routeRethinkInRethink = !persistentState.routeRethinkInRethink
+            setupQuickFixes()
+        }
+
+        // 3. Loopback proxy forwarder apps
+        // Inverted logic: excludeAppsInProxy = true means loopback forwarders are DISABLED (Safe)
+        // so we consider it "active/restrictive" when excludeAppsInProxy = false.
+        addQuickFixIcon(
+            R.drawable.ic_loopback_proxy,
+            R.string.bubble_fix_loopback_proxy,
+            !persistentState.excludeAppsInProxy
+        ) {
+            persistentState.excludeAppsInProxy = !persistentState.excludeAppsInProxy
+            setupQuickFixes()
+        }
+
+        // 4. Custom Interface IPs
+        addQuickFixIcon(
+            R.drawable.ic_tun_nw_policy,
+            R.string.bubble_fix_custom_ips,
+            persistentState.customLanIpMode
+        ) {
+            persistentState.customLanIpMode = !persistentState.customLanIpMode
+            setupQuickFixes()
+        }
+
+        // 5. IP Version
+        addQuickFixIcon(
+            R.drawable.ic_ip_network,
+            R.string.bubble_fix_ip_version,
+            persistentState.internetProtocolType != InternetProtocol.IPv4.id
+        ) {
+            persistentState.internetProtocolType = if (persistentState.internetProtocolType == InternetProtocol.IPv4.id) {
+                InternetProtocol.IPv46.id
+            } else {
+                InternetProtocol.IPv4.id
+            }
+            setupQuickFixes()
+        }
+
+        // 6. Advanced DNS filtering
+        addQuickFixIcon(
+            R.drawable.ic_adv_dns_filter,
+            R.string.bubble_fix_adv_dns,
+            persistentState.enableDnsAlg
+        ) {
+            persistentState.enableDnsAlg = !persistentState.enableDnsAlg
+            setupQuickFixes()
+        }
+
+        // 7. Block DNS from unknown source
+        addQuickFixIcon(
+            R.drawable.ic_block_unknown_dns,
+            R.string.bubble_fix_unknown_dns,
+            persistentState.blockDnsForUnknownApp
+        ) {
+            persistentState.blockDnsForUnknownApp = !persistentState.blockDnsForUnknownApp
+            setupQuickFixes()
+        }
+
+        // 8. Universal firewall rules: Block when source app is unknown
+        addQuickFixIcon(
+            R.drawable.ic_unknown_app,
+            R.string.bubble_fix_unknown_app,
+            persistentState.getBlockUnknownConnections()
+        ) {
+            persistentState.setBlockUnknownConnections(!persistentState.getBlockUnknownConnections())
+            setupQuickFixes()
+        }
+
+        // 9. Block UDP except DNS and NTP
+        addQuickFixIcon(
+            R.drawable.ic_udp,
+            R.string.bubble_fix_udp,
+            persistentState.getUdpBlocked()
+        ) {
+            persistentState.setUdpBlocked(!persistentState.getUdpBlocked())
+            setupQuickFixes()
+        }
+
+        // 10. Block when DNS is bypassed
+        addQuickFixIcon(
+            R.drawable.ic_bypass_dns_firewall_on,
+            R.string.bubble_fix_dns_bypass,
+            persistentState.getDisallowDnsBypass()
+        ) {
+            persistentState.setDisallowDnsBypass(!persistentState.getDisallowDnsBypass())
+            setupQuickFixes()
+        }
+
+        // 11. Block on metered network
+        addQuickFixIcon(
+            R.drawable.ic_univ_metered,
+            R.string.bubble_fix_metered,
+            persistentState.getBlockMeteredConnections()
+        ) {
+            persistentState.setBlockMeteredConnections(!persistentState.getBlockMeteredConnections())
+            setupQuickFixes()
+        }
+
+        // 12. Universal Lockdown
+        addQuickFixIcon(
+            R.drawable.ic_global_lockdown,
+            R.string.bubble_fix_lockdown,
+            persistentState.getUniversalLockdown()
+        ) {
+            persistentState.setUniversalLockdown(!persistentState.getUniversalLockdown())
+            setupQuickFixes()
+        }
+    }
+
+    private fun addQuickFixIcon(drawableId: Int, tooltipId: Int, isActive: Boolean, onClick: () -> Unit) {
+        val imageView = ImageView(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                resources.getDimensionPixelSize(R.dimen.bubble_quick_fix_icon_size),
+                resources.getDimensionPixelSize(R.dimen.bubble_quick_fix_icon_size)
+            ).apply {
+                marginEnd = resources.getDimensionPixelSize(R.dimen.bubble_quick_fix_icon_margin)
+            }
+            setImageDrawable(ContextCompat.getDrawable(this@BubbleActivity, drawableId))
+
+            // Tint based on state
+            if (isActive) {
+                setColorFilter(UIUtils.fetchColor(this@BubbleActivity, R.attr.accentGood))
+                alpha = 1.0f
+            } else {
+                setColorFilter(UIUtils.fetchColor(this@BubbleActivity, R.attr.primaryLightColorText))
+                alpha = 0.4f
+            }
+
+            contentDescription = getString(tooltipId)
+            TooltipCompat.setTooltipText(this, getString(tooltipId))
+            setBackgroundResource(R.drawable.bg_card_ripple)
+            setPadding(8, 8, 8, 8)
+            setOnClickListener {
+                onClick()
+            }
+        }
+        b.bubbleQuickFixesContainer.addView(imageView)
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch(Dispatchers.IO) { f() }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 }

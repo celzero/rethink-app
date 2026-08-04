@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.iab
 
-import Logger
-import Logger.LOG_IAB
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_IAB
 import com.android.billingclient.api.BillingClient.ProductType
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
@@ -390,8 +390,8 @@ internal class OneTimePurchaseProcessor(
 
             is AckResult.PermanentFailure -> {
                 loge(mname, "server ack permanent failure: ${ackResult.reason}")
-                subscriptionStateMachine.purchaseFailed(
-                    "Server acknowledgement failed: ${ackResult.reason}", null
+                subscriptionStateMachine.serverAckFailed(
+                    "Server acknowledgement failed: ${ackResult.reason}"
                 )
             }
         }

@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -26,7 +26,6 @@ import android.os.Bundle
 import android.os.Process
 import android.text.format.DateUtils
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
@@ -789,7 +788,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             io {
                 val pkg = FirewallManager.getPackageNameByAppName(appNames[position])
                 uiCtx {
-                    Logger.i(Logger.LOG_TAG_UI, "AppInfoActivity, package name: $pkg")
+                    Logger.i(LOG_TAG_UI, "AppInfoActivity, package name: $pkg")
                     openAndroidAppInfo(ctx, pkg)
                 }
             }
@@ -1086,6 +1085,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
+        if (isDestroyed) return
         Glide.with(this).load(drawable).error(Utilities.getDefaultIcon(this)).into(mIconImageView)
     }
 

@@ -864,7 +864,6 @@
     <string name="lbl_stopped" translatable="true">रुका हुआ</string>
     <string name="lbl_secure" translatable="true">सुरक्षित करें</string>
     <string name="lbl_anonymous" translatable="true">अज्ञातकृत</string>
-    <string name="failed_using_default" translatable="true">विफल: फ़ॉलबैक DNS का उपयोग</string>
     <string name="logs_disclaimer" translatable="true">पहले 20,000 अक्षर दिखाए जा रहे हैं</string>
     <string name="cd_dialog_edit_title" translatable="true">डोमेन नियम संपादित करें</string>
     <string name="bad_config_explanation_positive_number" translatable="true">: सकारात्मक होना चाहिए</string>

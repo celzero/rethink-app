@@ -292,7 +292,6 @@
     <string name="lbl_idle" translatable="true">במנוחה</string>
     <string name="lbl_anonymous" translatable="true">אנונימי</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">מוגן! מחובר ל- DNS + Firewall + proxy.</string>
-    <string name="failed_using_default" translatable="true">נכשל: משתמש בDNS חלופי</string>
     <string name="lbl_unselected" translatable="true">לא נבחר</string>
     <string name="lbl_on_device" translatable="true">on-device</string>
     <string name="lbl_secure" translatable="true">מאובטח</string>

@@ -16,8 +16,8 @@
 
 package com.celzero.bravedns.scheduler
 
-import Logger
-import Logger.LOG_TAG_VPN
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import android.content.Context
 import android.net.VpnService
 import androidx.work.CoroutineWorker
@@ -67,7 +67,7 @@ class BootStartWorker(context: Context, params: WorkerParameters) :
 
         // The app UI (e.g. HomeScreenFragment) may also auto-start the VPN around the same
         // time (app update / process restart). Skip if the VPN is already active.
-        if (VpnController.hasTunnel() || VpnController.hasStarted()) {
+        if (VpnController.hasTunnel()) {
             Logger.i(LOG_TAG_VPN, "vpn already active, skipping boot start, event $eventType")
             return Result.success()
         }

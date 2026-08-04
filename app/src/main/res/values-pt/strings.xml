@@ -870,7 +870,6 @@
     <string name="http_proxy_dialog_desc" translatable="true">URL de configuração do formulário, &lt;protocolo&gt;://&lt;nome de utilizador&gt;:&lt;palavra-passe&gt;@&lt;domínio-ou-ip&gt;:&lt;porta&gt;&lt;caminho&gt;. Exemplo: http://proxy.example.com:8080/</string>
     <string name="lbl_preshared_key" translatable="true">Chave pré-partilhada</string>
     <string name="lbl_allowed_ips" translatable="true">IPs permitidos</string>
-    <string name="failed_using_default" translatable="true">Falha: a utilizar DNS de recurso</string>
     <string name="status_protected_with_wg" translatable="true">protegido com wireguard</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">Eliminar, da configuração guardada, o \'endpoint\' DNS Over TLS.</string>
     <string name="settings_allow_lan_heading" translatable="true">Não encaminhar IPs privados (experimental)</string>

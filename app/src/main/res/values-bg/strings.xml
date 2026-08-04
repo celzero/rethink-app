@@ -79,7 +79,6 @@
     <string name="lbl_secure" translatable="true">защитен</string>
     <string name="lbl_overall" translatable="true">Като цяло</string>
     <string name="lbl_anonymous" translatable="true">анонимен</string>
-    <string name="failed_using_default" translatable="true">Неуспешно: използване на резервен DNS</string>
     <string name="alert_firewall_accessibility_exception" translatable="true">Неуспешно отваряне на настройките за достъпност. Опитайте отново по-късно!</string>
     <string name="brave_dns_connect_mode_change_firewall" translatable="true">Изберете режим.</string>
     <string name="brave_dns_connect_mode_change_dns" translatable="true">Изберете режим.</string>

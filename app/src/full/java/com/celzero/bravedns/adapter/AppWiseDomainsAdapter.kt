@@ -15,9 +15,9 @@
  */
 package com.celzero.bravedns.adapter
 
-import Logger
-import Logger.LOG_TAG_DNS
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -86,8 +86,6 @@ class AppWiseDomainsAdapter(
         private const val PERCENTAGE_MULTIPLIER = 100
     }
 
-    private lateinit var adapter: AppWiseDomainsAdapter
-
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -98,7 +96,6 @@ class AppWiseDomainsAdapter(
                 parent,
                 false
             )
-        adapter = this
         return ConnectionDetailsViewHolder(itemBinding)
     }
 
@@ -148,8 +145,6 @@ class AppWiseDomainsAdapter(
                 } else {
                     b.acdIpAddress.text = conn.appOrDnsName
                 }
-                //b.acdFlag.visibility = View.VISIBLE
-                //b.acdFlag.text = conn.flag
                 showFlagOrIcon(conn.appOrDnsName, conn.flag)
                 return
             }
@@ -317,10 +312,6 @@ class AppWiseDomainsAdapter(
                 return
             }
 
-            /*if (isRethink) {
-                Logger.i(LOG_TAG_UI, "$TAG rethink connection - no close connection dialog")
-                return
-            }*/
             Logger.v(LOG_TAG_UI, "$TAG show close connection dialog for uid: $uid")
             val dialog = MaterialAlertDialogBuilder(context, R.style.App_Dialog_NoDim)
                 .setTitle(context.getString(R.string.close_conns_dialog_title))
@@ -351,11 +342,6 @@ class AppWiseDomainsAdapter(
                 return
             }
 
-            /*if (isRethink) {
-                Logger.i(LOG_TAG_UI, "$TAG rethink connection - no bottom sheet")
-                return
-            }*/
-
             if (isActiveConn) {
                 Logger.i(LOG_TAG_UI, "$TAG active connection - no bottom sheet")
                 return
@@ -374,11 +360,11 @@ class AppWiseDomainsAdapter(
             // Fix: Validate position before passing to avoid IndexOutOfBoundsException
             val currentPosition = absoluteAdapterPosition
             if (currentPosition != RecyclerView.NO_POSITION) {
-                bottomSheetFragment.dismissListener(adapter, currentPosition)
+                bottomSheetFragment.dismissListener(this@AppWiseDomainsAdapter, currentPosition)
             } else {
                 // Position is invalid, pass -1 to indicate refresh should be used
                 Logger.w(LOG_TAG_UI, "$TAG invalid adapter position when opening bottom sheet")
-                bottomSheetFragment.dismissListener(adapter, RecyclerView.NO_POSITION)
+                bottomSheetFragment.dismissListener(this@AppWiseDomainsAdapter, RecyclerView.NO_POSITION)
             }
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
@@ -428,19 +414,10 @@ class AppWiseDomainsAdapter(
     }
 
     override fun notifyDataset(position: Int) {
-        // Fix: IndexOutOfBoundsException - validate position before notifying
-        try {
-            if (position in 0..<itemCount) {
-                notifyItemChanged(position)
-            } else {
-                // Position is invalid, refresh the entire dataset instead
-                Logger.w(LOG_TAG_UI, "$TAG invalid position: $position, itemCount: $itemCount, refreshing adapter")
-                refresh()
-            }
-        } catch (e: Exception) {
-            // If notification fails, refresh the adapter to ensure consistency
-            Logger.e(LOG_TAG_UI, "$TAG error notifying position $position: ${e.message}", e)
-            refresh()
-        }
+        // PagingDataAdapter does not support manual notifyItem* calls.
+        // Calling notifyItemChanged on a PagingDataAdapter can cause
+        // RecyclerView inconsistency crashes (IndexOutOfBoundsException).
+        // Always use refresh() to reload the current data from the PagingSource.
+        refresh()
     }
 }

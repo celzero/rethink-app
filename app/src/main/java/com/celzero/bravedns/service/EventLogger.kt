@@ -15,7 +15,7 @@
  */
 package com.celzero.bravedns.service
 
-import Logger
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.database.Event
 import com.celzero.bravedns.database.EventDao
 import com.celzero.bravedns.database.EventSource

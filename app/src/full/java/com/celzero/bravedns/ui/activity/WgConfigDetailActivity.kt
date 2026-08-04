@@ -15,9 +15,9 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import Logger
-import Logger.LOG_TAG_PROXY
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -40,9 +40,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.adapter.WgPeersAdapter
+import com.celzero.bravedns.customdownloader.IpInfoDownloader
 import com.celzero.bravedns.data.SsidItem
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
@@ -51,6 +51,7 @@ import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.databinding.ActivityWgDetailBinding
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.EventLogger
+import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.VpnController
@@ -63,6 +64,7 @@ import com.celzero.bravedns.service.WireguardManager.INVALID_CONF_ID
 import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
 import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_WIREGUARD
+import com.celzero.bravedns.ui.activity.WgConfigDetailActivity.Companion.STATS_POLL_MS
 import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
 import com.celzero.bravedns.ui.dialog.WgHopDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
@@ -85,6 +87,7 @@ import com.celzero.bravedns.wireguard.WgInterface
 import com.celzero.firestack.backend.IPMetadata
 import com.celzero.firestack.backend.RouterStats
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import inet.ipaddr.HostName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -109,6 +112,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
     private var wgInterface: WgInterface? = null
     private val peers: MutableList<Peer> = mutableListOf()
     private var wgType: WgType = WgType.DEFAULT
+    private var isRestoredFromState = false
 
     /** Coroutine that polls VpnController every [STATS_POLL_MS] ms. */
     private var statsJob: Job? = null
@@ -117,10 +121,17 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
     private val ssidPermissionCallback = object : SsidPermissionManager.PermissionCallback {
         override fun onPermissionsGranted() {
             Logger.vv(LOG_TAG_UI, "ssid-callback permissions granted")
-            // Refresh the SSID section to update error layouts and functionality
-            val cfg = WireguardManager.getConfigFilesById(configId)
-            ui {
-                setupSsidSection(cfg)
+            // Check if we need background location too
+            if (isAtleastQ() && !SsidPermissionManager.hasBackgroundLocationPermission(this@WgConfigDetailActivity)) {
+                showLocationDisclosureDialog {
+                    SsidPermissionManager.requestBackgroundLocationPermission(this@WgConfigDetailActivity)
+                }
+            } else {
+                // Refresh the SSID section to update error layouts and functionality
+                val cfg = WireguardManager.getConfigFilesById(configId)
+                ui {
+                    setupSsidSection(cfg)
+                }
             }
         }
 
@@ -136,7 +147,9 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
             // Show explanation dialog before requesting permissions
             Logger.vv(LOG_TAG_UI, "ssid-callback permissions rationale")
             ui {
-                showSsidPermissionExplanationDialog()
+                showLocationDisclosureDialog {
+                    SsidPermissionManager.requestSsidPermissions(this@WgConfigDetailActivity)
+                }
             }
         }
     }
@@ -170,6 +183,8 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
         super.onCreate(savedInstanceState)
 
         handleFrostEffectIfNeeded(persistentState.theme)
+
+        isRestoredFromState = savedInstanceState != null
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -318,6 +333,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
         }
         setupSsidSection(mapping)
         io { updateStatusUi(config.getId()) }
+        io { updateFlag(configId) }
         prefillConfig(config)
         refreshHopStatus()
         if (persistentState.downloadIpInfo && mapping?.isActive == true) {
@@ -426,6 +442,40 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
                 Logger.w(LOG_TAG_UI, "failed to resolve client ips: ${e.message}")
             }
             uiCtx { applyClientIps(ip4Meta, ip6Meta) }
+        }
+    }
+
+    private fun stripPort(addr: String): String {
+        return IpRulesManager.splitHostPort(addr).first
+    }
+
+    private suspend fun updateFlag(id: Int) {
+        val cid = ID_WG_BASE + id
+        val addr = VpnController.getProxyAddrById(cid)
+
+        var ip: String? = addr?.split(",")?.firstOrNull()?.trim()?.let { stripPort(it) }
+
+        if (ip.isNullOrBlank()) {
+            val c = WireguardManager.getConfigById(configId)
+            val host = c?.getPeers()?.getOrNull(0)?.getEndpoint()?.orElse(null)?.host
+            if (!host.isNullOrBlank() && HostName(host).asAddress() != null) {
+                ip = host
+            }
+        }
+
+        if (ip.isNullOrBlank()) {
+            uiCtx { b.interfaceFlagText.visibility = View.INVISIBLE }
+            return
+        }
+
+        val ipInfo = IpInfoDownloader.getIpInfo(ip)
+        uiCtx {
+            if (ipInfo != null && ipInfo.countryCode.isNotEmpty()) {
+                b.interfaceFlagText.text = Utilities.getFlag(ipInfo.countryCode)
+                b.interfaceFlagText.visibility = View.VISIBLE
+            } else {
+                b.interfaceFlagText.visibility = View.INVISIBLE
+            }
         }
     }
 
@@ -623,7 +673,9 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
             return
         }
         b.configNameText.visibility = View.VISIBLE
-        b.configNameText.setText(config.getName(), TextView.BufferType.NORMAL)
+        if (!isRestoredFromState) {
+            b.configNameText.setText(config.getName(), TextView.BufferType.NORMAL)
+        }
         b.configIdText.text =
             getString(R.string.single_argument_parenthesis, config.getId().toString())
 
@@ -1137,21 +1189,33 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
 
         sw.setOnCheckedChangeListener { _, isChecked ->
             // Check current permissions and location status dynamically
-            val currentHasPermissions = SsidPermissionManager.hasRequiredPermissions(this)
+            val hasForeground = SsidPermissionManager.hasForegroundPermissions(this)
+            val hasBackground = SsidPermissionManager.hasBackgroundLocationPermission(this)
             val currentLocationEnabled = SsidPermissionManager.isLocationEnabled(this)
 
             // Check permissions before enabling SSID feature
-            if (isChecked && !currentHasPermissions) {
-                // Don't reset the switch, just request permissions
-                SsidPermissionManager.checkAndRequestPermissions(this, ssidPermissionCallback)
-                Logger.d(LOG_TAG_UI, "SSID permissions not granted, requesting...")
-                return@setOnCheckedChangeListener
+            if (isChecked) {
+                if (!hasForeground) {
+                    showLocationDisclosureDialog {
+                        SsidPermissionManager.requestSsidPermissions(this@WgConfigDetailActivity)
+                    }
+                    Logger.d(LOG_TAG_UI, "SSID foreground permissions not granted, requesting...")
+                    return@setOnCheckedChangeListener
+                } else if (isAtleastQ() && !hasBackground) {
+                    showLocationDisclosureDialog {
+                        SsidPermissionManager.requestBackgroundLocationPermission(this@WgConfigDetailActivity)
+                    }
+                    Logger.d(LOG_TAG_UI, "SSID background permissions not granted, requesting...")
+                    return@setOnCheckedChangeListener
+                }
             }
 
             // Check if location services are enabled
             if (isChecked && !currentLocationEnabled) {
                 // Don't reset the switch, just prompt user to enable location
-                showLocationEnableDialog()
+                showLocationDisclosureDialog {
+                    SsidPermissionManager.requestSsidPermissions(this@WgConfigDetailActivity)
+                }
                 Logger.d(LOG_TAG_UI, "Location services not enabled, prompting user...")
                 return@setOnCheckedChangeListener
             }
@@ -1163,7 +1227,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
                 "ConfigId: $configId, Enabled: $isChecked"
             )
 
-            if (isChecked && currentHasPermissions && currentLocationEnabled) {
+            if (isChecked && SsidPermissionManager.hasRequiredPermissions(this) && currentLocationEnabled) {
                 // Enable experimental-dependent settings when experimental features are enabled
                 if (persistentState.enableStabilityDependentSettings()) {
                     SnackbarHelper.showStabilityProgram(b.root, persistentState)
@@ -1194,7 +1258,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
             }
 
             // Update error layouts after state change with current permission status
-            updateErrorLayouts(currentHasPermissions, currentLocationEnabled, permissionErrorLayout, locationErrorLayout)
+            updateErrorLayouts(SsidPermissionManager.hasRequiredPermissions(this), currentLocationEnabled, permissionErrorLayout, locationErrorLayout)
         }
 
         layout.setOnClickListener { sw.performClick() }
@@ -1255,41 +1319,40 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
         }
     }
 
-    private fun showLocationEnableDialog() {
+    private fun showLocationDisclosureDialog(onContinue: () -> Unit) {
         val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
-        builder.setTitle(getString(R.string.ssid_location_error))
-        builder.setMessage(getString(R.string.location_enable_explanation, getString(R.string.lbl_ssids)))
+        builder.setTitle(getString(R.string.location_disclosure_title))
+        builder.setMessage(getString(R.string.location_disclosure_message))
         builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.ssid_location_error_action)) { dialog, _ ->
-            SsidPermissionManager.requestLocationEnable(this)
+        builder.setPositiveButton(getString(R.string.location_disclosure_positive)) { dialog, _ ->
+            onContinue()
             dialog.dismiss()
-            Logger.vv(LOG_TAG_UI, "Prompted user to enable location services, opening settings...")
         }
-        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
-            // Reset the SSID switch since location is required
+        builder.setNegativeButton(getString(R.string.location_disclosure_negative)) { _, _ ->
+            // Reset the SSID switch
             b.ssidCheck.isChecked = false
             io { WireguardManager.updateSsidEnabled(configId, false) }
-            logEvent("SSID location denied", "User denied enabling location services for configId: $configId")
+            logEvent("Location disclosure denied", "User denied location disclosure for configId: $configId")
         }
         val dialog = builder.create()
         dialog.show()
     }
 
-    private fun showSsidPermissionExplanationDialog() {
+    private fun showLocationEnableDialog() {
         val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
-        builder.setTitle(getString(R.string.ssid_permission_error_action))
-        builder.setMessage(getString(R.string.ssid_permission_explanation, getString(R.string.lbl_ssids)))
+        builder.setTitle(getString(R.string.location_disclosure_title))
+        builder.setMessage(getString(R.string.location_disclosure_message))
         builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.ssid_permission_error_action)) { dialog, _ ->
-            SsidPermissionManager.requestSsidPermissions(this)
+        builder.setPositiveButton(getString(R.string.location_disclosure_positive)) { dialog, _ ->
+            SsidPermissionManager.requestLocationEnable(this)
             dialog.dismiss()
-            Logger.vv(LOG_TAG_UI, "Showing SSID permission rationale dialog, requesting permissions...")
+            Logger.vv(LOG_TAG_UI, "Prompted user to enable location services, opening settings...")
         }
-        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
-            // Reset the SSID switch since permissions are required
+        builder.setNegativeButton(getString(R.string.location_disclosure_negative)) { _, _ ->
+            // Reset the SSID switch since location is required
             b.ssidCheck.isChecked = false
             io { WireguardManager.updateSsidEnabled(configId, false) }
-            logEvent("SSID permission denied", "User denied SSID permissions for configId: $configId")
+            logEvent("SSID location denied", "User denied enabling location services for configId: $configId")
         }
         val dialog = builder.create()
         dialog.show()

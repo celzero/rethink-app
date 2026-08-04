@@ -141,7 +141,6 @@
     <string name="lbl_stopped" translatable="true">중지됨</string>
     <string name="lbl_private" translatable="true">비공개</string>
     <string name="lbl_anonymous" translatable="true">익명</string>
-    <string name="failed_using_default" translatable="true">실패함: fallback DNS 사용 중</string>
     <string name="always_on_dialog" translatable="true">\"VPN 항상 켜기\"가 이 기기에서 활성화 돼있습니다. Rethink를 시작하려면, 설정 앱으로 가서 \"VPN 항상 켜기\"를 꺼주세요.</string>
     <string name="always_on_dialog_stop_heading" translatable="true">VPN 항상 켜기</string>
     <string name="always_on_dialog_positive" translatable="true">중지</string>
@@ -780,7 +779,7 @@
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true"><i>.lan</i>, <i>.internal</i> 등 별도로 지정된 DNS가 없는 도메인에는 시스템 DNS를 사용합니다.</string>
     <string name="lbl_hop" translatable="true">중계</string>
     <string name="lbl_manual" translatable="true">수동 편집</string>
-    <string name="lbl_fallback" translatable="true">대체</string>
+    <string name="lbl_bootstrap" translatable="true">대체</string>
     <string name="lbl_experimental" translatable="true">(실험적)</string>
     <string name="lbl_service_providers" translatable="true">서비스 제공자</string>
     <string name="lbl_default" translatable="true">기본값</string>

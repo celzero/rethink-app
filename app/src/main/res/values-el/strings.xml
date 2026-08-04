@@ -52,7 +52,6 @@
     <string name="firewall_mode_notification_title" translatable="true">Προστατεύεσαι! Συνδεθήκατε στο τείχος προστασίας.</string>
     <string name="pause_mode_notification_title" translatable="true">Παύση! Οι εφαρμογές που έχουν αποκλειστεί θα συνεχίσουν να βρίσκονται σε τείχος προστασίας.</string>
     <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">προστατεύεται</string>
-    <string name="failed_using_default" translatable="true">Αποτυχία: χρήση εφεδρικού DNS</string>
     <string name="status_app_error" translatable="true">σφάλμα της εφαρμογής</string>
     <string name="status_dns_error" translatable="true">σφάλμα dns</string>
     <string name="status_dns_server_down" translatable="true">διακομιστής dns εκτός λειτουργίας</string>

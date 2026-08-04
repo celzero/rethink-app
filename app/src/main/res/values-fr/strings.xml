@@ -912,7 +912,7 @@
     <string name="add_peer" translatable="true">Ajouter Pair</string>
     <string name="cloudflare_family_dns_desc" translatable="true">Bloque les logiciels malveillants et le contenu pour adultes. Utilise le point de terminaison DNS 1.1.1.3 de Cloudflare.</string>
     <string name="crypt_quad9_security_desc" translatable="true">Quad9 (anycast) dnssec/no-log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112.112.112</string>
-    <string name="lbl_save" translatable="true">enregistrer</string>
+    <string name="lbl_save" translatable="true">Enregistrer</string>
     <string name="cd_deleted_toast" translatable="true">Toutes les règles de domaine ont étés supprimées</string>
     <string name="lbl_optional" translatable="true">(facultatif)</string>
     <string name="settings_go_log_desc" translatable="true">À des fins de débogage</string>
@@ -970,7 +970,6 @@
     <string name="lbl_private" translatable="true">Privé</string>
     <string name="lbl_secure" translatable="true">Sécurisé</string>
     <string name="lbl_peer" translatable="true">Pair</string>
-    <string name="failed_using_default" translatable="true">Échec : utilisation du DNS de secours</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">Supprimer le point de terminaison DoT ?</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">Supprimer le point de terminaison DNS over TLS de la configuration enregistrée.</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Acheminez le propre trafic de Rethink, comme les téléchargements de listes de blocage, les vérifications de connectivité, les connexions DNS, dans le tunnel.</string>
@@ -1032,7 +1031,7 @@
     <string name="lbl_service_providers" translatable="true">Fournisseurs de service</string>
     <string name="lbl_hop" translatable="true">Relais</string>
     <string name="lbl_manual" translatable="true">Manuel</string>
-    <string name="lbl_fallback" translatable="true">Alternative</string>
+    <string name="lbl_bootstrap" translatable="true">Alternative</string>
     <string name="settings_biometric_dialog_option_0" translatable="true">Aucun</string>
     <string name="settings_biometric_dialog_option_1" translatable="true">Immédiatement</string>
     <string name="ac_split_tcp" translatable="true">TCP</string>

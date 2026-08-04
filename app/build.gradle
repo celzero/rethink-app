@@ -2,6 +2,9 @@ plugins {
     id 'com.android.application'
     id 'com.google.devtools.ksp'
     id 'kotlin-android'
+    // to generate BOM in CycloneDX format
+    // ./gradlew cyclonedxBom
+    // id 'org.cyclonedx.bom' version '3.2.4'
 }
 
 // apply Google Services and Firebase Crashlytics plugins conditionally
@@ -16,13 +19,57 @@ def alphaBuild = taskNames.contains("alpha")
 // check for fdroidserver value is set in system env
 def fdroidBuildServer = System.getenv("fdroidserver")
 def isFdroidBuildServer = fdroidBuildServer != null && !fdroidBuildServer.isEmpty() && fdroidBuildServer != "null"
-def deGoogled = !apkBuild || fdroidBuild || isFdroidBuildServer
+def deGoogled = !apkBuild || fdroidBuild || isFdroidBuildServer || alphaBuild
 def shouldSplit = !alphaBuild
 
 // Pass -PwebsiteDegoogled=true when building the fdroid flavor with our own keys.
 // Official F-Droid builds omit this flag and will be labeled as "fdroid".
 def isWebsiteDegoogled = project.hasProperty("websiteDegoogled") &&
         project.property("websiteDegoogled").toString().toBoolean()
+
+// add google-services.json only for play/website builds.
+// local dev : copy from the sibling ../firebase/{debug,release} dir (gitignored, outside repo).
+// CI        : secret is written to app/src/google-services.json
+//             by the GitHub Actions; so no local copy is needed there.
+if (!deGoogled) {
+    def isRelease = gradle.startParameter.taskNames.any {
+        it.toLowerCase().contains("release")
+    }
+    def buildTypeName = isRelease ? "release" : "debug"
+
+    def sourceFile = file("${rootDir.parent}/firebase/${buildTypeName}/google-services.json")
+    def targetFile = file("${projectDir}/google-services.json")
+
+    if (sourceFile.exists()) {
+        // local dev: place the file at the module root so all variants pick it up
+        targetFile.parentFile.mkdirs()
+        targetFile.bytes = sourceFile.bytes
+        logger.lifecycle("google-services.json: copied from ${sourceFile}")
+    } else if (targetFile.exists()) {
+        // already in place (manual placement or a prior local copy); keep as-is
+        logger.lifecycle("google-services.json: using existing ${targetFile}")
+    } else {
+        // no local copy available; verify a variant source-set file exists so the
+        // google-services plugin can resolve it (the CI secret path). Fail with a
+        // helpful message only if nothing is resolvable anywhere.
+        def srcDir = file("src")
+        def hasSrcSetFile = srcDir.isDirectory() && (srcDir.listFiles()?.any { dir ->
+            dir.isDirectory() && new File(dir, "google-services.json").exists()
+        } ?: false)
+        if (hasSrcSetFile || file("src/google-services.json").exists()) {
+            logger.lifecycle("google-services.json: no local copy; deferring to " +
+                    "google-services plugin (variant source-set resolution, e.g. CI)")
+        } else {
+            throw new GradleException(
+                    "google-services.json not found for '${buildTypeName}' build.\n" +
+                            "  Local dev : place it at ${sourceFile}\n" +
+                            "             (or directly at ${targetFile})\n" +
+                            "  CI        : ensure the secret is written to app/src/google-services.json")
+        }
+    }
+} else {
+    logger.info("skipping google-services.json for de-googled/F-Droid build")
+}
 
 println("app-task names: '$taskNames'")
 println("gradle deGoogled? $deGoogled (fdroidBuild: $fdroidBuild, fdroidBuildServer: $isFdroidBuildServer, apkBuild: $apkBuild)")
@@ -416,6 +463,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.3.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-accessibility:3.7.0'
     androidTestImplementation 'androidx.test:rules:1.7.0'
     testImplementation 'org.robolectric:robolectric:4.16.1'
     testImplementation 'androidx.test:core:1.7.0'
@@ -428,6 +476,7 @@ dependencies {
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2'
     testImplementation 'io.insert-koin:koin-test:4.1.1'
     testImplementation 'io.insert-koin:koin-test-junit4:4.1.1'
+    testImplementation 'androidx.work:work-testing:2.11.2'
     androidTestImplementation 'io.mockk:mockk-android:1.14.9'
 
     leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.14'

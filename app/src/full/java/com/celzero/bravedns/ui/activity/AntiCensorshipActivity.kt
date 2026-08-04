@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import Logger
-import Logger.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_FIREWALL
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
@@ -259,6 +259,8 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
 
     private fun handleAcMode(isSelected: Boolean, ds: DialStrategies) {
         if (isSelected) {
+            // set auto proxy to true if split auto is selected (Settings.AutoModeRemote)
+            persistentState.autoProxyEnabled = ds == DialStrategies.TCP_PROXY
             persistentState.dialStrategy = ds.mode
             disableRadioButtons(ds)
             if (ds == DialStrategies.NEVER_SPLIT) {
@@ -267,11 +269,6 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
             } else if (ds == DialStrategies.SPLIT_AUTO || ds == DialStrategies.TCP_PROXY) {
                 // set retry to retry with split for split auto and tcp proxy by default
                 handleRetryMode(true, RetryStrategies.RETRY_WITH_SPLIT.mode, showToast = false)
-            }
-            if (ds == DialStrategies.TCP_PROXY) {
-                persistentState.autoProxyEnabled = true
-            } else {
-                persistentState.autoProxyEnabled = false
             }
             logEvent("Anti-censorship dial strategy changed to ${ds.mode}")
         } else {

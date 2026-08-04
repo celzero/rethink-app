@@ -540,7 +540,6 @@
     <string name="lbl_secure" translatable="true">beveiligde</string>
     <string name="lbl_anonymous" translatable="true">anoniem</string>
     <string name="status_dns_server_down" translatable="true">dns server onbereikbaar</string>
-    <string name="failed_using_default" translatable="true">Fout: gebruikt nu terugval DNS</string>
     <string name="status_protected_with_wg_private_dns" translatable="true">beschermd met wireguard &amp; privé dns</string>
     <string name="dns_crypt_relay_remove_success" translatable="true">DNSCrypt Relay verwijderd.</string>
     <string name="settings_general_customize" translatable="true">aanpassen</string>

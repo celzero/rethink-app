@@ -209,6 +209,26 @@
                     app:iconPadding="8dp"
                     tools:visibility="visible" />
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_extend"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:text="@string/extend_access_title"
+                    android:textAllCaps="false"
+                    android:textSize="15sp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    android:textColor="?attr/primaryTextColor"
+                    app:cornerRadius="12dp"
+                    app:icon="@drawable/ic_refresh"
+                    app:iconTint="?attr/primaryTextColor"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp"
+                    tools:visibility="visible" />
+
                 <com.google.android.material.progressindicator.LinearProgressIndicator
                     android:id="@+id/progress_resubscribe"
                     android:layout_width="match_parent"

@@ -3,17 +3,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/background"
-    android:padding="5dp">
+    android:padding="10dp">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/cip_heading"
-        style="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
         android:text="@string/cd_dnscrypt_relay_heading"
-        android:textColor="?attr/accentGood"
-        android:textSize="@dimen/large_font_text_view" />
+        android:textAppearance="?attr/textAppearanceTitleMedium"
+        android:textColor="?attr/accentGood" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_dialog"
@@ -34,7 +35,6 @@
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
-        android:textColor="?attr/accentGood"
-        android:textSize="@dimen/large_font_text_view" />
+        android:textColor="?attr/accentGood" />
 
 </RelativeLayout>

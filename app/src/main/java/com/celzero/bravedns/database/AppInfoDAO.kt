@@ -15,7 +15,6 @@ limitations under the License.
 */
 package com.celzero.bravedns.database
 
-import Logger.LOG_TAG_APP_DB
 import android.database.Cursor
 import androidx.paging.PagingSource
 import androidx.room.Dao

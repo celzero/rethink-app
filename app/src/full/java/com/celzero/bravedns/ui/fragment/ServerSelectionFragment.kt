@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.animation.ObjectAnimator
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -30,7 +30,6 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -219,7 +218,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 if (!isAdded) return@post
                 b.serversScrollView.setPadding(
                     b.serversScrollView.paddingLeft,
-                    0,
+                    b.serversScrollView.paddingTop,
                     b.serversScrollView.paddingRight,
                     navView.height + 300
                 )
@@ -235,7 +234,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.serversScrollView.post {
             b.serversScrollView.setPadding(
                 b.serversScrollView.paddingLeft,
-                0,
+                20,
                 b.serversScrollView.paddingRight,
                 b.serversScrollView.paddingBottom
             )
@@ -257,6 +256,10 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             val hasTunnel = VpnController.hasTunnel()
             val selectedList = RpnProxyManager.getEnabledConfigs()
             Logger.v(LOG_TAG_UI, "$TAG; WIN registered: $isWinRegistered, rpnActive: $rpnActive, hasTunnel: $hasTunnel")
+            // try registering the rpn if it is not registered
+            if (!isWinRegistered && rpnActive && hasTunnel) {
+                RpnProxyManager.registerProxy(RpnProxyManager.RpnType.WIN)
+            }
 
             val servers = RpnProxyManager.getWinServers()
             Logger.v(LOG_TAG_UI, "$TAG; fetched ${servers.size} servers from RPN")
@@ -325,13 +328,13 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                         }
                         is ServerSelectionViewModel.RefreshState.NeedsLoading -> {
                             // updateWinProxy returned no servers on a user-initiated refresh.
-                            Logger.w(LOG_TAG_UI, "$TAG.observeRefreshState: NeedsLoading on user-initiated refresh — consuming silently")
+                            Logger.w(LOG_TAG_UI, "$TAG.observeRefreshState: NeedsLoading on user-initiated refresh, consuming")
                             serverSelectionViewModel.onRefreshConsumed()
                         }
                         is ServerSelectionViewModel.RefreshState.NoTunnel -> {
                             // VPN tunnel dropped (or was never up) during the refresh; show
                             // the "Start Rethink to proceed" error so the user knows what to do.
-                            Logger.w(LOG_TAG_UI, "$TAG.observeRefreshState: NoTunnel — showing no-tunnel error")
+                            Logger.w(LOG_TAG_UI, "$TAG.observeRefreshState: NoTunnel, showing no-tunnel error")
                             serverSelectionViewModel.onRefreshConsumed()
                             setLoadingState(false)
                             showErrorState(noTunnel = true)
@@ -378,7 +381,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                             if (resetDialogDismissedByUser) {
                                 // User explicitly dismissed the dialog; show inline bar
                                 // as a subtle indicator; the dialog will NOT re-appear.
-                                Logger.i(LOG_TAG_UI, "$TAG.observeResetState: InProgress, dialog dismissed — showing inline bar")
+                                Logger.i(LOG_TAG_UI, "$TAG.observeResetState: InProgress, dialog dismissed, showing inline bar")
                                 if (isAdded && view != null) {
                                     b.registrationProgressBar.show()
                                     // Disable search and action icons while reset is in progress
@@ -2141,7 +2144,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 )
 
                 if (!hasTunnel) {
-                    Logger.w(LOG_TAG_UI, "$TAG: registration — VPN tunnel lost, showing no-tunnel error")
+                    Logger.w(LOG_TAG_UI, "$TAG: registration; VPN tunnel lost, showing no-tunnel error")
                     withContext(Dispatchers.Main) {
                         if (!isAdded) return@withContext
                         dismissServerLoadingDialog()
@@ -2229,7 +2232,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         dialog.setCanceledOnTouchOutside(true)
         dialog.show()
         dialog.setOnCancelListener {
-            Logger.i(LOG_TAG_UI, "$TAG: reset dialog dismissed by user — switching to inline bar")
+            Logger.i(LOG_TAG_UI, "$TAG: reset dialog dismissed by user, switching to inline bar")
             resetDialogDismissedByUser = true
             dismissRpnResetDialog()
             if (isAdded && view != null) b.registrationProgressBar.show()

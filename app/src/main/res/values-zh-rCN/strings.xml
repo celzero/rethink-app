@@ -1029,7 +1029,6 @@
     <string name="lbl_secure" translatable="true">安全</string>
     <string name="lbl_anonymous" translatable="true">匿名</string>
     <string name="lbl_peer" translatable="true">对等端点</string>
-    <string name="failed_using_default" translatable="true">失败：使用回落 DNS</string>
     <string name="settings_rinr_heading" translatable="true">环回（实验性）</string>
     <string name="settings_rinr_desc_enabled" translatable="true">将 Rethink 自身的流量路由入隧道。若您不了解您在做什么，请不要启用。</string>
     <string name="settings_rinr_desc_disabled" translatable="true">将如下载屏蔽名单、连接检查与 DNS 连接等的 Rethink 自身流量路由回隧道。</string>
@@ -1112,7 +1111,7 @@
     <string name="lbl_protos" translatable="true">协议</string>
     <string name="lbl_hop" translatable="true">中继</string>
     <string name="lbl_manual" translatable="true">手动</string>
-    <string name="lbl_fallback" translatable="true">回落</string>
+    <string name="lbl_bootstrap" translatable="true">回落</string>
     <string name="univ_firewall_rule_11" translatable="true">拦截全部本地连接</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">是否删除所有域名规则？</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">删除这些规则后会允许任何应用连接这些当前被拦截的域名。</string>

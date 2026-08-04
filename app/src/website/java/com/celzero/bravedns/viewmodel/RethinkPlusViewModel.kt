@@ -15,12 +15,13 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import Logger
-import Logger.LOG_IAB
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_IAB
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.billingclient.api.BillingClient.ProductType
+import com.celzero.bravedns.R
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.ProductDetail
 import com.celzero.bravedns.rpnproxy.PipKeyManager
@@ -38,6 +39,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.atomic.AtomicBoolean
 import org.koin.core.component.KoinComponent
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -86,11 +88,70 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
     private val _retryConnectionEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val retryConnectionEvent: SharedFlow<Unit> = _retryConnectionEvent.asSharedFlow()
 
+    /**
+     * Sticky record of the last unresolved user-facing condition (acknowledgement
+     * failure / error / pending-timeout). Unlike [uiState] which is overwritten on every
+     * transition, this is retained across fragment re-entry so the Fragment can re-surface
+     * the error dialog / bottom sheet after the user navigates away and returns
+     * Cleared only when the state genuinely resolves
+     * (Active / Success / Ready / Loading).
+     */
+    private val _lastUnresolved = MutableStateFlow<SubscriptionUiState?>(null)
+    val lastUnresolved: StateFlow<SubscriptionUiState?> = _lastUnresolved.asStateFlow()
+
+    /**
+     * Single funnel for all [uiState] assignments. Records the condition in [_lastUnresolved]
+     * when it is one the user must be notified about (Error / ServerAckPending /
+     * PendingTimeout / AcknowledgementFailed) and clears it on genuine resolution.
+     */
+    private fun setUi(state: SubscriptionUiState) {
+        rememberIfUnresolved(state)
+        _uiState.value = state
+    }
+
+    private fun rememberIfUnresolved(state: SubscriptionUiState) {
+        when (state) {
+            is SubscriptionUiState.Error,
+            is SubscriptionUiState.ServerAckPending,
+            is SubscriptionUiState.PendingTimeout,
+            is SubscriptionUiState.AcknowledgementFailed -> {
+                _lastUnresolved.value = state
+                // Also publish to the process-wide billing handler so the dashboard
+                // (which does not share this ViewModel instance) can show a persistent
+                // acknowledgement-failure banner (Section 4.2).
+                InAppBillingHandler.setAckFailureState(
+                    com.celzero.bravedns.iab.AckFailureInfo(
+                        title = (state as? SubscriptionUiState.AcknowledgementFailed)?.title
+                            ?: (state as? SubscriptionUiState.Error)?.title
+                            ?: getApplication<Application>().getString(R.string.purchase_failed),
+                        message = (state as? SubscriptionUiState.AcknowledgementFailed)?.message
+                            ?: (state as? SubscriptionUiState.Error)?.message
+                            ?: (state as? SubscriptionUiState.ServerAckPending)?.message
+                            ?: (state as? SubscriptionUiState.PendingTimeout)?.message
+                            ?: "",
+                        canRetry = (state as? SubscriptionUiState.AcknowledgementFailed)?.canRetry
+                            ?: (state as? SubscriptionUiState.Error)?.isRetryable
+                            ?: true,
+                        refundInitiated = (state as? SubscriptionUiState.AcknowledgementFailed)?.refundInitiated
+                            ?: false
+                    )
+                )
+            }
+            is SubscriptionUiState.Success,
+            is SubscriptionUiState.Ready,
+            is SubscriptionUiState.Loading -> {
+                _lastUnresolved.value = null
+                InAppBillingHandler.setAckFailureState(null)
+            }
+            else -> { /* keep current value */ }
+        }
+    }
+
     // Watchdog job: cancels Loading if billing never responds.
     private var loadingWatchdogJob: Job? = null
 
 
-    @Volatile private var isBillingInitializing = false
+    private val isBillingInitializing = AtomicBoolean(false)
 
     @Volatile private var billingInitCalled = false
 
@@ -139,26 +200,34 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
         // Re-entrant guard: if a billing init flight is already in progress, ignore.
         // This prevents a 2nd/3rd call (from state-machine callbacks or reconnect events)
         // from overwriting an already-resolved Error/Ready state with Loading.
-        if (isBillingInitializing) {
+        if (!isBillingInitializing.compareAndSet(false, true)) {
             Logger.d(LOG_IAB, "$TAG: initializeBilling already in progress, ignoring re-entrant call")
             return
         }
-        isBillingInitializing = true
         billingInitCalled = true
 
         viewModelScope.launch {
-            _uiState.value = SubscriptionUiState.Loading
+            setUi(SubscriptionUiState.Loading)
             startLoadingWatchdog()
 
             try {
+                // surface a dedicated offline state before attempting
+                // any network-dependent billing work so the user sees "You're offline".
+                if (isOffline()) {
+                    cancelLoadingWatchdog()
+                    isBillingInitializing.set(false)
+                    setUi(SubscriptionUiState.NoInternet())
+                    return@launch
+                }
+
                 // Check if already subscribed, skipped in extend mode so the user can
                 // purchase an additional one-time plan while their current one is active.
                 if (!extendMode && InAppBillingHandler.hasValidSubscription()) {
                     cancelLoadingWatchdog()
-                    isBillingInitializing = false
-                    _uiState.value = SubscriptionUiState.AlreadySubscribed(
+                    isBillingInitializing.set(false)
+                    setUi(SubscriptionUiState.AlreadySubscribed(
                         RpnProxyManager.getRpnProductId() ?: ""
-                    )
+                    ))
                     return@launch
                 }
 
@@ -167,18 +236,18 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
 
                 if (_uiState.value !is SubscriptionUiState.Loading) {
                     Logger.d(LOG_IAB, "$TAG: state resolved while checkAvailability was running, bailing out")
-                    isBillingInitializing = false
+                    isBillingInitializing.set(false)
                     return@launch
                 }
 
                 if (!avd.first) {
                     cancelLoadingWatchdog()
-                    isBillingInitializing = false
-                    _uiState.value = SubscriptionUiState.Error(
+                    isBillingInitializing.set(false)
+                    setUi( SubscriptionUiState.Error(
                         title = "Not Available",
                         message = avd.second,
                         isRetryable = false
-                    )
+                    ))
                     return@launch
                 }
 
@@ -203,12 +272,12 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
             } catch (e: Exception) {
                 Logger.e(LOG_IAB, "$TAG: Error initializing billing: ${e.message}", e)
                 cancelLoadingWatchdog()
-                isBillingInitializing = false
-                _uiState.value = SubscriptionUiState.Error(
+                isBillingInitializing.set(false)
+                setUi( SubscriptionUiState.Error(
                     title = "Initialization Failed",
                     message = e.message ?: "Unknown error occurred",
                     isRetryable = true
-                )
+                ))
             }
         }
     }
@@ -217,16 +286,16 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
     private fun startLoadingWatchdog() {
         cancelLoadingWatchdog()
         loadingWatchdogJob = viewModelScope.launch {
-            delay(LOADING_TIMEOUT_MS)
+            delay(LOADING_TIMEOUT_MS.milliseconds)
             // If we are still in Loading after the timeout, surface an error so the user can retry.
             if (_uiState.value is SubscriptionUiState.Loading) {
                 Logger.w(LOG_IAB, "$TAG: Loading watchdog fired, billing took too long to respond")
-                isBillingInitializing = false
-                _uiState.value = SubscriptionUiState.Error(
+                isBillingInitializing.set(false)
+                setUi( SubscriptionUiState.Error(
                     title = "Connection Timeout",
                     message = "Google Play Billing is not responding. Please try again.",
                     isRetryable = true
-                )
+                ))
             }
         }
     }
@@ -237,6 +306,27 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
     }
 
     /**
+     * Whether the device currently has internet connectivity.
+     * Fails open (returns false) on SystemService errors so a transient error does not
+     * block the user from the purchase screen.
+     */
+    private fun isOffline(): Boolean {
+        return try {
+            val cm = getApplication<Application>().getSystemService(
+                android.content.Context.CONNECTIVITY_SERVICE
+            ) as? android.net.ConnectivityManager
+            val network = cm?.activeNetwork
+            val caps = network?.let { cm.getNetworkCapabilities(it) }
+            caps == null || !caps.hasCapability(
+                android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET
+            )
+        } catch (e: Exception) {
+            Logger.w(LOG_IAB, "$TAG: connectivity check failed: ${e.message}")
+            false
+        }
+    }
+
+    /**
      * Set product details from billing handler
      */
     fun setProducts(productList: List<ProductDetail>) {
@@ -244,11 +334,11 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
         _products.value = productList
 
         if (productList.isEmpty()) {
-            _uiState.value = SubscriptionUiState.Error(
+            setUi( SubscriptionUiState.Error(
                 title = "No Products Available",
                 message = "Unable to load subscription plans",
                 isRetryable = true
-            )
+            ))
             return
         }
 
@@ -266,19 +356,19 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
             Logger.i(LOG_IAB, "$TAG: Cannot make purchase in state: ${currentState.name}, " +
                     "hasValid=${currentState.hasValidSubscription}")
             if (currentState.hasValidSubscription) {
-                _uiState.value = SubscriptionUiState.AlreadySubscribed(
+                setUi( SubscriptionUiState.AlreadySubscribed(
                     RpnProxyManager.getRpnProductId() ?: ""
-                )
+                ))
             } else {
                 // Subscription is in a non-purchasable, non-valid state (e.g. Uninitialized).
-                _uiState.value = SubscriptionUiState.Ready(
+                setUi( SubscriptionUiState.Ready(
                     _filteredProducts.value, false, PipKeyManager.getAvailabilityData()
-                )
+                ))
             }
             return
         }
 
-        _uiState.value = SubscriptionUiState.Ready(_filteredProducts.value, false, PipKeyManager.getAvailabilityData())
+        setUi(SubscriptionUiState.Ready(_filteredProducts.value, false, PipKeyManager.getAvailabilityData()))
     }
 
     /**
@@ -311,13 +401,13 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
 
         // Update UI state with filtered products
         if (_filteredProducts.value.isNotEmpty()) {
-            _uiState.value = SubscriptionUiState.Ready(_filteredProducts.value, false, PipKeyManager.getAvailabilityData())
+            setUi(SubscriptionUiState.Ready(_filteredProducts.value, false, PipKeyManager.getAvailabilityData()))
         } else {
-            _uiState.value = SubscriptionUiState.Error(
+            setUi(SubscriptionUiState.Error(
                 title = "No Products",
                 message = "No ${type.name.lowercase()} products available",
                 isRetryable = false
-            )
+            ))
         }
     }
 
@@ -356,7 +446,7 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
 
     fun markPurchaseFlowActive() {
         purchaseFlowActive = true
-        _uiState.value = SubscriptionUiState.Processing("Initializing purchase...")
+        setUi(SubscriptionUiState.Processing("Initializing purchase..."))
         Logger.d(LOG_IAB, "$TAG: purchaseFlowActive set manually (extend mode)")
 
         // Watch InAppBillingHandler.oneTimePurchaseCompletedFlow so we can detect success even
@@ -369,10 +459,10 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
                     Logger.i(LOG_IAB, "$TAG: extend-mode INAPP purchase completed, emitting Success")
                     purchaseFlowActive = false
                     extendObserverJob = null
-                    _uiState.value = SubscriptionUiState.Success(
+                    setUi(SubscriptionUiState.Success(
                         productId = RpnProxyManager.getRpnProductId() ?: "",
                         isExtend = true
-                    )
+                    ))
                     return@collect
                 }
             }
@@ -389,13 +479,13 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
             is SubscriptionStateMachineV2.SubscriptionState.PurchaseInitiated -> {
                 // Only PurchaseInitiated (triggered by user tapping Buy) marks an active flow.
                 purchaseFlowActive = true
-                _uiState.value = SubscriptionUiState.Processing("Initializing purchase...")
+                setUi(SubscriptionUiState.Processing("Initializing purchase..."))
             }
 
             is SubscriptionStateMachineV2.SubscriptionState.PurchasePending -> {
                 // Only start polling if the user actually initiated a purchase in this session.
                 if (purchaseFlowActive) {
-                    _uiState.value = SubscriptionUiState.PendingPurchase
+                    setUi(SubscriptionUiState.PendingPurchase())
                     startPendingPurchasePolling()
                 } else {
                     Logger.d(LOG_IAB, "$TAG: PurchasePending without active flow, querying Play once to reconcile")
@@ -415,19 +505,27 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
                     purchaseFlowActive = false
                     extendObserverJob?.cancel()
                     extendObserverJob = null
-                    _uiState.value = SubscriptionUiState.Success(
+                    setUi(SubscriptionUiState.Success(
                         productId = RpnProxyManager.getRpnProductId() ?: "",
                         isExtend = false
-                    )
+                    ))
                 } else {
                     val current = _uiState.value
                     if (billingInitCalled && !extendMode && current is SubscriptionUiState.Loading) {
-                        _uiState.value = SubscriptionUiState.AlreadySubscribed(
+                        setUi(SubscriptionUiState.AlreadySubscribed(
                             RpnProxyManager.getRpnProductId() ?: ""
-                        )
+                        ))
                     }
                     // If already in Ready/Error/etc., don't disrupt the current UI.
                 }
+            }
+
+            is SubscriptionStateMachineV2.SubscriptionState.ServerAckPending -> {
+                purchaseFlowActive = false
+                extendObserverJob?.cancel()
+                extendObserverJob = null
+                stopPendingPurchasePolling()
+                setUi(SubscriptionUiState.ServerAckPending())
             }
 
             is SubscriptionStateMachineV2.SubscriptionState.Error -> {
@@ -438,11 +536,11 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
                 stopPendingPurchasePolling()
                 if (wasInFlow) {
                     // Real purchase flow failed, show an actionable error.
-                    _uiState.value = SubscriptionUiState.Error(
+                    setUi(SubscriptionUiState.Error(
                         title = "Subscription Error",
                         message = "An error occurred while processing your payment",
                         isRetryable = true
-                    )
+                    ))
                 } else {
                     // handlePurchase drove PurchasePending → Error because Play returned
                     // no purchases (stale DB row, no real purchase). Show the payment
@@ -450,11 +548,11 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
                     Logger.d(LOG_IAB, "$TAG: Error state without active flow, showing payment screen")
                     val products = _filteredProducts.value.ifEmpty { allProducts }
                     if (products.isNotEmpty()) {
-                        _uiState.value = SubscriptionUiState.Ready(
+                        setUi(SubscriptionUiState.Ready(
                             products = products,
                             isResubscribe = false,
                             availabilityData = PipKeyManager.getAvailabilityData()
-                        )
+                        ))
                     } else {
                         // Products not fetched yet trigger fetch; setProducts() will update UI
                         viewModelScope.launch(Dispatchers.IO) {
@@ -479,11 +577,11 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
 
                 val products = _filteredProducts.value.ifEmpty { allProducts }
                 if (products.isNotEmpty()) {
-                    _uiState.value = SubscriptionUiState.Ready(
+                    setUi(SubscriptionUiState.Ready(
                         products = products,
                         isResubscribe = true,
                         availabilityData = PipKeyManager.getAvailabilityData()
-                    )
+                    ))
                 } else {
                     // Products not loaded yet - trigger load; UI will update via onProductsFetched
                     Logger.d(LOG_IAB, "$TAG: $state but no products loaded, triggering fetch")
@@ -502,19 +600,34 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
                 Logger.d(LOG_IAB, "$TAG: Ignoring transient init state ${state.name}")
             }
 
-            else -> {
-                Logger.d(LOG_IAB, "$TAG: Unhandled state: ${state.name}")
+            is SubscriptionStateMachineV2.SubscriptionState.Grace,
+            is SubscriptionStateMachineV2.SubscriptionState.OnHold,
+            is SubscriptionStateMachineV2.SubscriptionState.Paused -> {
+                // These are valid subscription sub-states. The user still has access.
+                // Keep the current UI state; show availability data so the dashboard
+                // reflects the real connection info.
+                Logger.d(LOG_IAB, "$TAG: Subscription in sub-state: ${state.name}, keeping current UI")
+                if (_uiState.value is SubscriptionUiState.Loading ||
+                    _uiState.value is SubscriptionUiState.Processing) {
+                    return
+                }
+                PipKeyManager.getAvailabilityData()?.let { avail ->
+                    setUi(avail)
+                }
             }
         }
     }
 
     /**
-     * Start polling for pending purchase status
+     * Start polling for pending purchase status. Updates the UI message with time-based
+     * escalation and transitions to [SubscriptionUiState.PendingTimeout]
+     * when polling times out.
      */
     private fun startPendingPurchasePolling() {
         if (pollingJob != null) return
 
         pollingStartTime = System.currentTimeMillis()
+        setUi(SubscriptionUiState.PendingPurchase(message = pendingEscalationMessage(0L)))
 
         pollingJob = viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
@@ -523,21 +636,43 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
                 if (elapsedTime > POLLING_TIMEOUT_MS) {
                     Logger.i(LOG_IAB, "$TAG: Polling timeout reached")
                     stopPendingPurchasePolling()
-                    withContext(Dispatchers.Main) {
-                        _uiState.value = SubscriptionUiState.Error(
-                            title = "Timeout",
-                            message = "Purchase verification timeout. Please check your subscription status.",
-                            isRetryable = false
-                        )
-                    }
+                    // surface a specific timeout state with a "Check Status"
+                    // action instead of dropping straight into ServerAckPending.
+                    setUi(SubscriptionUiState.PendingTimeout())
                     break
                 }
 
+                // Refresh the escalation message so the user understands the wait.
+                setUi(SubscriptionUiState.PendingPurchase(message = pendingEscalationMessage(elapsedTime)))
                 Logger.d(LOG_IAB, "$TAG: Polling pending purchase, elapsed: $elapsedTime ms")
                 InAppBillingHandler.fetchPurchases(listOf(ProductType.SUBS, ProductType.INAPP))
                 delay(POLLING_INTERVAL_MS.milliseconds)
             }
         }
+    }
+
+    /**
+     * Returns a time-based escalation message for the pending state.
+     */
+    private fun pendingEscalationMessage(elapsedMs: Long): String {
+        val res = getApplication<Application>().resources
+        return when {
+            elapsedMs < 30_000L -> res.getString(R.string.pending_stage_initial)
+            elapsedMs < 5 * 60 * 1000L -> res.getString(R.string.pending_stage_waiting)
+            else -> res.getString(R.string.pending_stage_delayed)
+        }
+    }
+
+    /**
+     * Manually re-check a pending purchase after a timeout. Triggered by
+     * the "Check Status" action on the [SubscriptionUiState.PendingTimeout] sheet.
+     */
+    fun checkPendingStatus() {
+        purchaseFlowActive = true
+        setUi(SubscriptionUiState.PendingPurchase(
+            message = getApplication<Application>().resources.getString(R.string.pending_checking_status)
+        ))
+        startPendingPurchasePolling()
     }
 
     /**
@@ -556,19 +691,19 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
         if (!isSuccess) {
             cancelLoadingWatchdog()
             Logger.e(LOG_IAB, "$TAG: Billing connection failed: $message")
-            isBillingInitializing = false
-            _uiState.value = SubscriptionUiState.Error(
+            isBillingInitializing.set(false)
+            setUi(SubscriptionUiState.Error(
                 title = "Connection Failed",
                 message = message,
                 isRetryable = true
-            )
+            ))
         } else {
             // Ensure the UI is in Loading while we fetch products.
             if (_uiState.value !is SubscriptionUiState.Loading) {
-                _uiState.value = SubscriptionUiState.Loading
+                setUi(SubscriptionUiState.Loading)
             }
             startLoadingWatchdog()
-            isBillingInitializing = true
+            isBillingInitializing.set(true)
 
             viewModelScope.launch(Dispatchers.IO) {
                 // Re-check subscription state first; if already active, skip product query.
@@ -576,11 +711,11 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
                 // while their existing subscription is still active.
                 if (!extendMode && InAppBillingHandler.hasValidSubscription()) {
                     cancelLoadingWatchdog()
-                    isBillingInitializing = false
+                    isBillingInitializing.set(false)
                     withContext(Dispatchers.Main) {
-                        _uiState.value = SubscriptionUiState.AlreadySubscribed(
+                        setUi(SubscriptionUiState.AlreadySubscribed(
                             RpnProxyManager.getRpnProductId()
-                        )
+                        ))
                     }
                     return@launch
                 }
@@ -594,13 +729,13 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
                 val avd = checkAvailability()
                 if (!avd.first) {
                     cancelLoadingWatchdog()
-                    isBillingInitializing = false
+                    isBillingInitializing.set(false)
                     withContext(Dispatchers.Main) {
-                        _uiState.value = SubscriptionUiState.Error(
+                        setUi(SubscriptionUiState.Error(
                             title = "Not Available",
                             message = avd.second,
                             isRetryable = false
-                        )
+                        ))
                     }
                     return@launch
                 }
@@ -616,13 +751,13 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
      */
     fun onProductsFetched(isSuccess: Boolean, productList: List<ProductDetail>) {
         cancelLoadingWatchdog()
-        isBillingInitializing = false
+        isBillingInitializing.set(false)
         if (!isSuccess || productList.isEmpty()) {
-            _uiState.value = SubscriptionUiState.Error(
+            setUi(SubscriptionUiState.Error(
                 title = "Products Unavailable",
                 message = "Unable to load plans. Please try again.",
                 isRetryable = true
-            )
+            ))
         } else {
             setProducts(productList)
         }
@@ -639,13 +774,66 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
      */
     fun retry() {
         // Always clear the guard before retrying so initializeBilling() is not blocked.
-        isBillingInitializing = false
+        isBillingInitializing.set(false)
         initializeBilling()
         // If billing client is NOT ready, signal the Fragment to reconnect.
         if (!InAppBillingHandler.isBillingClientSetup()) {
             Logger.d(LOG_IAB, "$TAG: retry, billing client not ready, requesting reconnect from Fragment")
             _retryConnectionEvent.tryEmit(Unit)
         }
+    }
+
+    /**
+     * Re-verify Play + server status after an acknowledgement/transaction failure
+     * Clears the sticky unresolved record and the purchase-flow flag, then
+     * re-queries Google Play so the purchase processors can retry the server ack. The UI
+     * is moved to a PendingPurchase "verifying" state so the user always gets feedback
+     * (the button is never a silent no-op after a failure).
+     */
+    fun reverifyAfterFailure() {
+        Logger.i(LOG_IAB, "$TAG: reverifyAfterFailure: clearing unresolved + re-querying Play")
+        _lastUnresolved.value = null
+        purchaseFlowActive = false
+        extendObserverJob?.cancel()
+        extendObserverJob = null
+        stopPendingPurchasePolling()
+        setUi(
+            SubscriptionUiState.PendingPurchase(
+                message = getApplication<Application>().resources.getString(R.string.verifying_with_play_store)
+            )
+        )
+        viewModelScope.launch(Dispatchers.IO) {
+            InAppBillingHandler.fetchPurchases(listOf(ProductType.SUBS, ProductType.INAPP))
+        }
+    }
+
+    /**
+     * Maps a Google Play Billing response code to a user-friendly error and records it as
+     * the sticky unresolved condition. Surfaces a full-screen error with a
+     * retry action instead of only a transient Toast.
+     */
+    fun onPlayServicesError(responseCode: Int) {
+        val ctx = getApplication<Application>()
+        val res = ctx.resources
+        val msg = when (responseCode) {
+            com.android.billingclient.api.BillingClient.BillingResponseCode.SERVICE_UNAVAILABLE ->
+                res.getString(R.string.billing_err_service_unavailable)
+            com.android.billingclient.api.BillingClient.BillingResponseCode.BILLING_UNAVAILABLE ->
+                res.getString(R.string.billing_err_billing_unavailable)
+            com.android.billingclient.api.BillingClient.BillingResponseCode.SERVICE_TIMEOUT ->
+                res.getString(R.string.billing_err_service_timeout)
+            com.android.billingclient.api.BillingClient.BillingResponseCode.FEATURE_NOT_SUPPORTED ->
+                res.getString(R.string.billing_err_feature_not_supported)
+            else -> res.getString(R.string.billing_err_generic_retry)
+        }
+        Logger.w(LOG_IAB, "$TAG: onPlayServicesError: code=$responseCode, msg=$msg")
+        setUi(
+            SubscriptionUiState.Error(
+                title = res.getString(R.string.billing_play_services_error_title),
+                message = msg,
+                isRetryable = true
+            )
+        )
     }
 
     override fun onCleared() {
@@ -685,7 +873,20 @@ sealed class SubscriptionUiState {
 
     data class Processing(val message: String) : SubscriptionUiState()
 
-    object PendingPurchase : SubscriptionUiState()
+    /**
+     * A purchase is pending Play verification. [message] carries a time-based escalation
+     * string: "Verifying…" → "Still waiting…" → "taking longer…".
+     */
+    data class PendingPurchase(val message: String = "") : SubscriptionUiState()
+
+    /**
+     * Pending-purchase polling timed out without resolution. Offers a
+     * "Check Status" action that manually re-queries Play, and "Contact Support".
+     */
+    data class PendingTimeout(val message: String = "") : SubscriptionUiState()
+
+    /** No network available */
+    data class NoInternet(val message: String = "") : SubscriptionUiState()
 
     data class Success(val productId: String, val isExtend: Boolean = false) : SubscriptionUiState()
 
@@ -693,6 +894,21 @@ sealed class SubscriptionUiState {
         val title: String,
         val message: String,
         val isRetryable: Boolean
+    ) : SubscriptionUiState()
+
+    data class ServerAckPending(val message: String = "") : SubscriptionUiState()
+
+    /**
+     * Both acknowledgement systems (our server and Google Play) failed to confirm the
+     * purchase. The payment was taken but verification is blocked on both sides. The user
+     * must be explicitly notified and offered retry / support / refund
+     */
+    data class AcknowledgementFailed(
+        val title: String,
+        val message: String,
+        val canRetry: Boolean,
+        val refundInitiated: Boolean = false,
+        val supportTicketRecommended: Boolean = true
     ) : SubscriptionUiState()
 
     data class AlreadySubscribed(val productId: String) : SubscriptionUiState()

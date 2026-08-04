@@ -15,11 +15,11 @@
  */
 package com.celzero.bravedns.ui
 
-import Logger
-import Logger.LOG_TAG_APP_UPDATE
-import Logger.LOG_TAG_BACKUP_RESTORE
-import Logger.LOG_TAG_DOWNLOAD
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_APP_UPDATE
+import com.celzero.bravedns.util.Logger.LOG_TAG_BACKUP_RESTORE
+import com.celzero.bravedns.util.Logger.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.app.UiModeManager
 import android.content.ActivityNotFoundException
 import android.content.Context

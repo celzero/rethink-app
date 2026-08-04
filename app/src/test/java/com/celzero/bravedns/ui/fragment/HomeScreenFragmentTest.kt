@@ -117,7 +117,6 @@ class HomeScreenFragmentTest : KoinTest {
                 every { activationRequested } returns false
             }
             every { VpnController.hasTunnel() } returns false
-            every { VpnController.hasStarted() } returns false
             every { VpnController.isAppPaused() } returns false
             every { VpnController.isAlwaysOn(any()) } returns false
             every { VpnController.isVpnLockdown() } returns false
@@ -127,7 +126,7 @@ class HomeScreenFragmentTest : KoinTest {
 
             // Add coEvery for suspend functions if they exist
             coEvery { VpnController.p50(any()) } returns 50L
-            coEvery { VpnController.getDnsStatus(any()) } returns 1L
+            coEvery { VpnController.getDnsStatus(any()) } returns 1
             println("✅ VPN controller mocks configured")
         } catch (e: Exception) {
             println("⚠️  Warning: Failed to setup VPN controller mocks: ${e.message}")
@@ -768,7 +767,6 @@ class HomeScreenFragmentTest : KoinTest {
     fun `fragment should handle network state changes gracefully`() {
         connectionStatusLiveData.postValue(BraveVPNService.State.NEW)
         connectionStatusLiveData.postValue(BraveVPNService.State.WORKING)
-        connectionStatusLiveData.postValue(BraveVPNService.State.APP_ERROR)
         testDispatcher.scheduler.advanceUntilIdle()
 
         // Should handle different connection states
@@ -789,17 +787,6 @@ class HomeScreenFragmentTest : KoinTest {
         testDispatcher.scheduler.advanceUntilIdle()
 
         // Shimmer should be active for inactive VPN
-        Assert.assertTrue(true)
-    }
-
-    @Test
-    fun `shimmer should stop when VPN has started`() {
-        every { VpnController.hasStarted() } returns true
-
-        vpnEnabledLiveData.postValue(true)
-        testDispatcher.scheduler.advanceUntilIdle()
-
-        // Shimmer should stop for active VPN
         Assert.assertTrue(true)
     }
 

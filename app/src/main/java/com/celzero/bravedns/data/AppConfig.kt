@@ -15,13 +15,12 @@
  */
 package com.celzero.bravedns.data
 
-import Logger
-import Logger.LOG_TAG_VPN
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsCryptEndpoint
 import com.celzero.bravedns.database.DnsCryptEndpointRepository
@@ -46,6 +45,7 @@ import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TcpProxyHelper
+import com.celzero.bravedns.ui.bottomsheet.BlockFreeDnsModeBottomSheet
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.InternetProtocol
@@ -83,7 +83,7 @@ internal constructor(
 
         private const val ORBOT_DNS = "Orbot"
 
-        const val FALLBACK_DNS_IF_NET_DNS_EMPTY = "9.9.9.9,2620:fe::fe"
+        const val BOOTSTRAP_DNS_IF_NET_DNS_EMPTY = "9.9.9.9,2620:fe::fe"
 
         // used to add index to the transport ids added as part of Plus transport
         // for now only DOH, DoT are supported
@@ -375,7 +375,9 @@ internal constructor(
     enum class ProtoTranslationMode(val id: Int) {
         PTMODEAUTO(Settings.PtModeAuto),
         PTMODEFORCE64(Settings.PtModeForce64),
-        PTMODENO46(Settings.PtModeNo46)
+        PTMODEFORCE46(Settings.PtModeForce46),
+        PTMODEFORCE(Settings.PtModeForce),
+        PTMODENONE(Settings.PtModeNone)
     }
 
     fun getInternetProtocol(): InternetProtocol {
@@ -383,18 +385,14 @@ internal constructor(
     }
 
     fun getProtocolTranslationMode(): ProtoTranslationMode {
-        // TODO: we need to check if the underlying network, if it has ipv6 then its better to
-        // send PTMODEFORCE64 instead of PTMODEAUTO, as it will be straight forward, though
-        // PTMODEAUTO will work in both cases, but it will add some overhead of checking.
-        if (persistentState.protocolTranslationType && getInternetProtocol().isIPv6()) {
-            return ProtoTranslationMode.PTMODEFORCE64
+        // PT mode is now computed in BraveVPNService.calculatePtMode(),
+        // which uses actual underlyingNetworks. This is a fallback, and used only during
+        // vpn startup before the first network change event arrives.
+        if (!persistentState.protocolTranslationType) {
+            return ProtoTranslationMode.PTMODEAUTO
         }
-
-        // for debug builds
-        if (DEBUG && !persistentState.advSettingForcePTMode) {
-            return ProtoTranslationMode.PTMODENO46
-        }
-        return ProtoTranslationMode.PTMODEAUTO
+        // default until BraveVPNService receives network info and calls setTunMode()
+        return ProtoTranslationMode.PTMODEFORCE
     }
 
     fun setPcap(mode: Int, path: String = PcapMode.DISABLE_PCAP) {
@@ -1246,14 +1244,49 @@ internal constructor(
         val sb = StringBuilder()
         sb.append("   App version: ${persistentState.appVersion}\n")
         sb.append("   Brave mode: ${getBraveMode()}\n")
-        sb.append("   DNS type: ${getDnsType()}\n")
+
+        sb.append("DNS \n")
+        sb.append("   dns type: ${getDnsType()}\n")
+        sb.append("   connected dns: ${persistentState.connectedDnsName}\n")
+        sb.append("   alg: ${persistentState.enableDnsAlg}\n")
+        sb.append("   split: ${persistentState.splitDns}\n")
+        sb.append("   local blocklist enabled: ${persistentState.blocklistEnabled}\n")
+        sb.append("   local blocklist stamp: ${persistentState.localBlocklistStamp}\n")
+        sb.append("   show icons: ${persistentState.fetchFavIcon}\n")
+        sb.append("   dns booster: ${persistentState.enableDnsCache}\n")
+        sb.append("   never proxy dns: ${!persistentState.proxyDns}\n")
+        sb.append("   prevent dns leaks: ${persistentState.preventDnsLeaks}\n")
+        sb.append("   block dns from unknown src: ${persistentState.blockDnsForUnknownApp}\n")
+        sb.append("   use sys dns for undelegated dms: ${persistentState.useSystemDnsForUndelegatedDomains}\n")
+        sb.append("   bypass-dns-mode: ${BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.fromMode(persistentState.blockFreeDnsMode).name}\n")
+
+        sb.append("Proxy \n")
         sb.append("   Proxy type: ${ProxyType.of(getProxyType()).name}\n")
         sb.append("   Proxy provider: ${getProxyProvider()}\n")
-        sb.append("   Pcap mode: ${getPcapFilePath()}\n")
-        sb.append("   Connected DNS: ${persistentState.connectedDnsName}\n")
-        sb.append("   Prevent DNS leaks: ${persistentState.preventDnsLeaks}\n")
-        sb.append("   Internet protocol: ${getInternetProtocol()}\n")
-        sb.append("   Protocol translation mode: ${getProtocolTranslationMode()}\n")
+
+        sb.append("VPN \n")
+        sb.append("   stall on nw loss: ${persistentState.stallOnNoNetwork}\n")
+        sb.append("   do not route private ips: ${!persistentState.privateIps}\n")
+        sb.append("   use all available nws: ${persistentState.useMultipleNetworks}\n")
+        sb.append("   vpn tun metered? ${persistentState.setVpnBuilderToMetered}\n")
+        sb.append("   meter mobile nw: ${persistentState.treatOnlyMobileNetworkAsMetered}\n")
+        sb.append("   loopback? ${persistentState.routeRethinkInRethink}\n")
+        sb.append("   bootstrap dns: ${persistentState.defaultDnsUrl}\n")
+        sb.append("   conn policy: ${persistentState.vpnBuilderPolicy}\n")
+        sb.append("   loopback proxy fwdr apps: ${!persistentState.excludeAppsInProxy}\n")
+        sb.append("   randomize wg port: ${persistentState.randomizeListenPort}\n")
+        sb.append("   global proxy lockdown: ${persistentState.wgGlobalLockdown}\n")
+        sb.append("   flood wg: ${persistentState.floodWireGuard}\n")
+        sb.append("   persistent keepalive: ${persistentState.smartPersistentKeepalive}\n")
+        sb.append("   shorter TCP keepalive: ${persistentState.tcpKeepAlive}\n")
+        sb.append("   endpoint independent mapping: ${persistentState.endpointIndependence}\n")
+        sb.append("   idle timeout: ${persistentState.dialTimeoutSec}\n")
+        sb.append("   bandwidth booster: ${persistentState.useMaxMtu}\n")
+        sb.append("   socket buffer sz: ${persistentState.socketBufferSizeBytes}\n")
+        sb.append("   internet protocol: ${getInternetProtocol()}\n")
+        sb.append("   protocol translation mode: ${getProtocolTranslationMode()}\n")
+        sb.append("   remember uninstalled apps: ${persistentState.tombstoneApps}\n")
+        sb.append("   pcap mode: ${getPcapFilePath()}\n")
 
         return sb.toString()
     }

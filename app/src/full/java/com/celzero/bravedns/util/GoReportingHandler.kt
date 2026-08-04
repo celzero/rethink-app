@@ -1,9 +1,8 @@
 package com.celzero.bravedns.util
 
-import Logger
-import Logger.LOG_GO_LOGGER_V1
-import Logger.LOG_TAG_APP
-import Logger.LOG_TAG_BUG_REPORT
+import com.celzero.bravedns.util.Logger.LOG_GO_LOGGER_V1
+import com.celzero.bravedns.util.Logger.LOG_TAG_APP
+import com.celzero.bravedns.util.Logger.LOG_TAG_BUG_REPORT
 import android.annotation.SuppressLint
 import android.app.NotificationManager
 import android.app.PendingIntent

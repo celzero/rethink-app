@@ -267,7 +267,6 @@
     <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">várakozás</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">hibás</string>
     <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">védett</string>
-    <string name="failed_using_default" translatable="true">Sikertelen: tartalék DNS használata</string>
     <string name="status_app_error" translatable="true">alkalmazás hiba</string>
     <string name="status_no_internet" translatable="true">nincs internet</string>
     <string name="status_protected_with_proxy_private_dns" translatable="true">proxy és privát DNS segítségével védett</string>
@@ -1062,7 +1061,7 @@
     <string name="wireguard_title" translatable="true">Biztonságos internetkapcsolat WireGuarddal</string>
     <string name="lbl_hop" translatable="true">Átjátszó</string>
     <string name="lbl_manual" translatable="true">Kézikönyv</string>
-    <string name="lbl_fallback" translatable="true">Tartalék</string>
+    <string name="lbl_bootstrap" translatable="true">Tartalék</string>
     <string name="settings_biometric_dialog_option_0" translatable="true">Egyik sem</string>
     <string name="ac_title" translatable="true">Cenzúraellenes mód</string>
     <string name="ac_desc" translatable="true">A cenzúra megkerülésére szolgáló eszközök szabadságot nyújthatnak az interneten, de nem minden hálózati környezetben működnek. Csak olyan kapcsolatokon használhatók, amelyek nem proxy mögött futnak.</string>

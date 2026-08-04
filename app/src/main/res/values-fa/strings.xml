@@ -346,7 +346,6 @@
     <string name="dot_custom_url_remove_dialog_title" translatable="true">نقطه پایانی DoTحذف شود؟</string>
     <string name="orbot_no_app_toast" translatable="true">برای فعال کردن Orbot حداقل یک برنامه اضافه کنید</string>
     <string name="settings_rinr_heading" translatable="true">Loopback (تجربی)</string>
-    <string name="failed_using_default" translatable="true">بازگشتی DNS ناموفق: استفاده از</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">وقتی غیرفعال است، برنامه‌های ارسال‌کننده پروکسی (SOCKS5، HTTP، DNS) را از تونل VPN Rethink مستثنی می‌کند.</string>
     <string name="settings_connectivity_checks" translatable="true">بررسی های اتصال را انجام دهید</string>
     <string name="settings_connectivity_checks_desc" translatable="true">بررسی های اتصال برای اطمینان از قابلیت دسترسی ارسال می شود.</string>
@@ -516,7 +515,7 @@
     <string name="lbl_service_providers" translatable="true">ارائه دهندگان خدمات</string>
     <string name="lbl_hop" translatable="true">رله‌ها</string>
     <string name="lbl_manual" translatable="true">دستی</string>
-    <string name="lbl_fallback" translatable="true">عقب‌گرد</string>
+    <string name="lbl_bootstrap" translatable="true">عقب‌گرد</string>
     <string name="lbl_default" translatable="true">پیش‌فرض</string>
     <string name="lbl_action" translatable="true">عمل</string>
     <string name="lbl_connect" translatable="true">اتصال</string>

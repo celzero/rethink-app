@@ -1045,7 +1045,6 @@
     <string name="lbl_starting" translatable="true">Iniciando</string>
     <string name="lbl_remove" translatable="true">Remover</string>
     <string name="lbl_anonymous" translatable="true">anônimo</string>
-    <string name="failed_using_default" translatable="true">Falha: usando DNS alternativo</string>
     <string name="lbl_cache" translatable="true">Cache</string>
     <string name="lbl_overall" translatable="true">Total</string>
     <string name="lbl_remaining_apps" translatable="true">Aplicativos restantes</string>
@@ -1085,7 +1084,7 @@
     <string name="lbl_service_providers" translatable="true">Provedores de serviços</string>
     <string name="lbl_hop" translatable="true">Relés</string>
     <string name="lbl_manual" translatable="true">Manual</string>
-    <string name="lbl_fallback" translatable="true">Fallback</string>
+    <string name="lbl_bootstrap" translatable="true">Fallback</string>
     <string name="wireguard_title" translatable="true">Internet segura com WireGuard</string>
     <string name="wireguard_desc" translatable="true">Criptografe seu tráfego de internet com o WireGuard. Escolha rotas diferentes para aplicativos diferentes.</string>
     <string name="firewall_title" translatable="true">Proteja seu Android com Firewall</string>

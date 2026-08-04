@@ -52,6 +52,8 @@ sealed class SubscriptionUiState {
         val isRetryable: Boolean
     ) : SubscriptionUiState()
 
+    data class ServerAckPending(val message: String = "") : SubscriptionUiState()
+
     data class AlreadySubscribed(val productId: String) : SubscriptionUiState()
 }
 

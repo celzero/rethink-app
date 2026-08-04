@@ -1049,7 +1049,6 @@
     <string name="lbl_stopped" translatable="true">Detenido</string>
     <string name="lbl_secure" translatable="true">seguro</string>
     <string name="lbl_cache" translatable="true">Cache</string>
-    <string name="failed_using_default" translatable="true">Falló: usando DNS alternativas</string>
     <string name="one_wg_apps_added" translatable="true">Enrutar todas las aplicaciones</string>
     <string name="catch_all_wg_dialog_title" translatable="true">Siempre activo</string>
     <string name="routing_remaining_apps" translatable="true">Enrutamiento de las aplicaciones restantes</string>
@@ -1138,7 +1137,7 @@
     <string name="lbl_action" translatable="true">Acción</string>
     <string name="lbl_connect" translatable="true">Conectar</string>
     <string name="lbl_criteria" translatable="true">Parámetro</string>
-    <string name="lbl_fallback" translatable="true">Alternativa</string>
+    <string name="lbl_bootstrap" translatable="true">Alternativa</string>
     <string name="lbl_hop" translatable="true">Relés</string>
     <string name="settings_theme_dialog_themes_5" translatable="true">Claro Plus</string>
     <string name="settings_theme_dialog_themes_6" translatable="true">Oscuro Plus</string>

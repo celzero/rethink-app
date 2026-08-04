@@ -1039,7 +1039,6 @@
     <string name="lbl_secure" translatable="true">безопасные</string>
     <string name="orbot_no_app_toast" translatable="true">Добавьте хотя бы одно приложение, чтобы включить Orbot</string>
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s отключён, так как активны прокси</string>
-    <string name="failed_using_default" translatable="true">Не удалось: используется запасной DNS</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Защищен! Подключен к DNS + Firewall + Proxy.</string>
     <string name="lbl_idle" translatable="true">Холостой ход</string>
     <string name="lbl_peer" translatable="true">Участник</string>
@@ -1193,7 +1192,7 @@
     <string name="vpn_policy_title" translatable="true">Правила изменения подключения</string>
     <string name="use_fallback_dns_to_bypass" translatable="true">Использовать запасной DNS как обходной</string>
     <string name="use_fallback_dns_to_bypass_desc" translatable="true">При включении, всегда используется запасной DNS для обходных приложений, доменов и IP-адресов.</string>
-    <string name="lbl_fallback" translatable="true">Запасной</string>
+    <string name="lbl_bootstrap" translatable="true">Запасной</string>
     <string name="vpn_policy_relaxed" translatable="true">Расслабленный</string>
     <string name="title_database_dump" translatable="true">База данных</string>
     <string name="copied_clipboard" translatable="true">Скопировано</string>

@@ -791,7 +791,6 @@
     <string name="lbl_insecure" translatable="true">(பாதுகாப்பற்றது)</string>
     <string name="lbl_save" translatable="true">சேமி</string>
     <string name="lbl_secure" translatable="true">பாதுகாப்பானது</string>
-    <string name="failed_using_default" translatable="true">தோல்வியுற்றது: குறைவடையும் டி.என்.எச்</string>
     <string name="bsct_block_domain" translatable="true"><u> இந்த பயன்பாட்டிற்கு </u> க்கு தொகுதி, நம்பிக்கை <u> டொமைன் (கள்) </u></string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">டாட் எண்ட்பாயிண்ட் நீக்கவா?</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">சேமிக்கப்பட்ட உள்ளமைவிலிருந்து டி.எல்.எச் இறுதிப்புள்ளி மீது டி.என்.எச்சை நீக்கவும்.</string>

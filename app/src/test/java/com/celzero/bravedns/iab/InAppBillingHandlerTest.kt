@@ -103,7 +103,10 @@ class InAppBillingHandlerTest : KoinTest {
         // Reset private counters and state
         setPrivateField(InAppBillingHandler, "consecutiveEmptySubsQueries", 0)
         setPrivateField(InAppBillingHandler, "consecutiveEmptyInAppQueries", 0)
-        setPrivateField(InAppBillingHandler, "isInitialized", false)
+        // isInitialized is an AtomicBoolean; reset its value rather than replacing the field.
+        @Suppress("UNCHECKED_CAST")
+        val initFlag = getPrivateField<java.util.concurrent.atomic.AtomicBoolean>(InAppBillingHandler, "isInitialized")
+        initFlag.set(false)
     }
 
     @After

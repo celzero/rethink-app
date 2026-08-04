@@ -19,6 +19,10 @@ import com.android.billingclient.api.BillingClient
 
 @JvmInline
 value class BillingResponse(private val code: Int) {
+    /** The raw [BillingClient.BillingResponseCode], exposed for UI message mapping. */
+    val rawCode: Int
+        get() = code
+
     val isOk: Boolean
         get() = code == BillingClient.BillingResponseCode.OK
 
@@ -31,11 +35,14 @@ value class BillingResponse(private val code: Int) {
     val isRecoverableError: Boolean
         get() = code in setOf(
             BillingClient.BillingResponseCode.ERROR,
-            BillingClient.BillingResponseCode.SERVICE_DISCONNECTED,
+            BillingClient.BillingResponseCode.SERVICE_TIMEOUT,
         )
 
     val serviceDisconnected: Boolean
         get() = code == BillingClient.BillingResponseCode.SERVICE_DISCONNECTED
+
+    val isServiceTimeout: Boolean
+        get() = code == BillingClient.BillingResponseCode.SERVICE_TIMEOUT
 
     val isNonrecoverableError: Boolean
         get() = code in setOf(

@@ -8,17 +8,21 @@
     android:orientation="vertical"
     tools:context=".ui.activity.ConfigureOtherDnsActivity">
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/dns_detail_act_tabLayout"
-        style="@style/TabbedLayoutDefault"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/dns_detail_heading"
+        style="@style/TextAppearance.Material3.TitleMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
+        android:padding="5dp"
+        android:text="@string/dc_global_heading"
+        android:textColor="?attr/colorPrimary" />
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/dns_detail_act_viewpager"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/dns_detail_fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:nestedScrollingEnabled="true"
-        android:orientation="horizontal" />
+        android:layout_height="match_parent" />
 
 </LinearLayout>

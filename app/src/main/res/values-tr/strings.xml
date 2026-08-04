@@ -1047,7 +1047,6 @@
     <string name="remaining_apps_dialog_title" translatable="true">Kalan uygulamaları dahil et</string>
     <string name="remaining_apps_dialog_desc" translatable="true">Başka bir Proxy tarafından yönlendirilmeyen kalmış tüm uygulamaları dahil edin</string>
     <string name="cd_dialog_edit_title" translatable="true">Etki alanı kuralını düzenle</string>
-    <string name="failed_using_default" translatable="true">Başarısız oldu: yedek DNS kullanılıyor</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Blok listesi indirmeleri, bağlantı kontrolleri, DNS bağlantıları gibi Rethink\'in kendi trafiğini tünele geri yönlendirin.</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Rethink\'in kendi trafiğini tünel üzerinden yönlendirmek. Ne yaptığınızı bilmiyorsanız, kapatın.</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">Diğer WireGuard VPN\'ler tarafından yönlendirilmeyen tüm bağlantılar ve uygulamalar bu VPN tarafından yönlendirilecektir.</string>
@@ -1094,7 +1093,7 @@
     <string name="settings_mobile_metered_desc" translatable="true">Sadece mobil veriyi sınırlı sayıp gerisini sınırsız algıla.</string>
     <string name="settings_biometric_dialog_option_2" translatable="true">5 dakika sonra</string>
     <string name="settings_biometric_dialog_option_3" translatable="true">15 dakika sonra</string>
-    <string name="lbl_fallback" translatable="true">Yedek</string>
+    <string name="lbl_bootstrap" translatable="true">Yedek</string>
     <string name="lbl_default" translatable="true">Varsayılan</string>
     <string name="lbl_action" translatable="true">Aksiyon</string>
     <string name="lbl_connect" translatable="true">Bağlan</string>

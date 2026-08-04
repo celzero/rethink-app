@@ -104,7 +104,6 @@
     <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">suojattu</string>
     <string name="universal_firewall_explanation" translatable="true">Käytä palomuurisääntöjä kaikissa sovelluksissa laitteen tapahtumien perusteella, esimerkiksi kun laite on lukittu tai kun tietty sovellus ei ole käytössä.</string>
     <string name="dns_mode_info_title" translatable="true">DNS</string>
-    <string name="failed_using_default" translatable="true">Epäonnistui: käytetään vara-DNS:ää</string>
     <string name="status_protected_with_tor" translatable="true">suojattu Torilla</string>
     <string name="notification_action_pause_vpn" translatable="true">Keskeytä</string>
     <string name="status_protected_with_proxy" translatable="true">suojattu välityspalvelimella</string>

@@ -15,9 +15,9 @@
  */
 package com.celzero.bravedns.scheduler
 
-import Logger
-import Logger.LOG_IAB
-import Logger.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_IAB
+import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import android.content.Context
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
@@ -103,7 +103,7 @@ class RpnProxyUpdateWorker(
                 request
             )
 
-            Logger.i(LOG_TAG_PROXY, "$TAG; scheduled: first run in ${INTERVAL_MINUTES}m, then every ${INTERVAL_MINUTES}m (CANCEL_AND_REENQUEUE — fresh timer from registration)")
+            Logger.i(LOG_TAG_PROXY, "$TAG; scheduled: first run in ${INTERVAL_MINUTES}m, then every ${INTERVAL_MINUTES}m (CANCEL_AND_REENQUEUE; fresh timer from registration)")
         }
 
         /** Cancel the periodic worker (e.g. when RPN is disabled). */

@@ -999,7 +999,6 @@
     <string name="lbl_on_device" translatable="true">auf dem Gerät</string>
     <string name="lbl_cache" translatable="true">Cache</string>
     <string name="lbl_starting" translatable="true">Wird gestartet</string>
-    <string name="failed_using_default" translatable="true">Fehlgeschlagen: Verwendung von Fallback-DNS</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">DoT Endpunkt löschen?</string>
     <string name="memory_notification_text">Rethink hat gerade nur wenig Speicher zur Verfügung. Einige Funktionen könnten eingeschränkt sein.</string>
     <string name="lbl_persistent_keepalive" translatable="true">Dauerhafte Aufrechterhaltung der Verbindung</string>
@@ -1096,7 +1095,7 @@
     <string name="hop_failure_toast" translatable="true">Relay-Fehler: %1$s -&gt; %2$s</string>
     <string name="wg_mobile_only_hop_err" translatable="true">Mobile-only-Modus wird für Relays nicht unterstützt</string>
     <string name="hop_error_toast_msg_3" translatable="true">Deaktiviere den Mobile-only-oder-SSID-Modus, um Relays zu nutzen</string>
-    <string name="lbl_fallback" translatable="true">Ausweichlösung</string>
+    <string name="lbl_bootstrap" translatable="true">Ausweichlösung</string>
     <string name="dc_filtering_heading" translatable="true">Filterung</string>
     <string name="univ_firewall_rule_11" translatable="true">Alle lokalen Host-Verbindungen blockieren</string>
     <string name="firewall_rule_bypass_proxy" translatable="true">Proxy umgehen</string>

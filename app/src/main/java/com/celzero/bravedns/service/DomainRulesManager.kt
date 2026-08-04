@@ -15,9 +15,9 @@
  */
 package com.celzero.bravedns.service
 
-import Logger
-import Logger.LOG_TAG_DNS
-import Logger.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
+import com.celzero.bravedns.util.Logger.LOG_TAG_FIREWALL
 import android.content.Context
 import android.os.SystemClock.elapsedRealtime
 import android.util.Patterns

@@ -15,8 +15,8 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui.bottomsheet
 
-import Logger
-import Logger.LOG_TAG_DNS
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration

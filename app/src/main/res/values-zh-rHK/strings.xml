@@ -976,7 +976,6 @@
     <string name="lbl_secure" translatable="true">安全</string>
     <string name="lbl_anonymous" translatable="true">匿名</string>
     <string name="lbl_peer" translatable="true">對等端</string>
-    <string name="failed_using_default" translatable="true">失敗：用後備 DNS</string>
     <string name="one_wg_error_toast" translatable="true">停用簡單模式嘅 WireGuard 以切換去進階模式</string>
     <string name="routing_remaining_apps" translatable="true">路由剩低嘅所有應用程式</string>
     <string name="wireguard_disable_failure" translatable="true">閂唔到「永久連線嘅 WireGuard 」</string>

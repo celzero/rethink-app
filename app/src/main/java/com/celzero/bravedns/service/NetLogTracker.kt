@@ -16,8 +16,8 @@
 
 package com.celzero.bravedns.service
 
-import Logger
-import Logger.LOG_BATCH_LOGGER
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_BATCH_LOGGER
 import android.content.Context
 import android.util.Log
 import com.celzero.bravedns.data.ConnTrackerMetaData
@@ -195,9 +195,6 @@ internal constructor(
         val transaction = dnsdb.processOnResponse(summary)
 
         transaction.responseCalendar = Calendar.getInstance()
-
-        // TODO: This method should be part of BraveVPNService
-        dnsdb.updateVpnConnectionState(transaction)
 
         if (!persistentState.logsEnabled) return
 

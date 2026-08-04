@@ -1,18 +1,18 @@
 /*
-Copyright 2020 RethinkDNS and its authors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2020 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.celzero.bravedns.util
 
 import java.io.File
@@ -27,9 +27,12 @@ class Constants {
         // rethink base url (modified from download to dl on v053l)
         const val DOWNLOAD_BASE_URL = "https://dl.rethinkdns.com"
 
-        // rethink base url for rpn
-        const val RPN_FALLBACK_URL = "https://redir.nile.workers.dev"
+        // rethink base & fallback url for rpn (prod & test)
         const val RPN_BASE_URL = "https://svc.rethinkdns.com"
+        const val RPN_FALLBACK_URL = "https://svc.nile.workers.dev"
+
+        const val RPN_TEST_BASE_URL = "https://redir.nile.workers.dev"
+        const val RPN_TEST_FALLBACK_URL = "https://redir.rethinkdns.com"
 
         // base url for ipinfo download
         const val IP_INFO_BASE_URL = "https://dl.rethinkdns.com/ip/"
@@ -138,8 +141,8 @@ class Constants {
 
         const val RETHINK_SEARCH_URL = "https://rethinkdns.com/search?s="
 
-        // default filetag.json for remote blocklist (stored in assets folder) (v055o)
-        const val PACKAGED_REMOTE_FILETAG_TIMESTAMP: Long = 1753394162186
+        // default filetag.json for remote blocklist (stored in assets folder) (v055z)
+        const val PACKAGED_REMOTE_FILETAG_TIMESTAMP: Long = 1782341672020
 
         // rethinkdns sponsor link
         const val RETHINKDNS_SPONSOR_LINK = "https://svc.rethinkdns.com/r/sponsor"

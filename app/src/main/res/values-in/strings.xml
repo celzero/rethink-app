@@ -1033,7 +1033,6 @@
     <string name="lbl_secure" translatable="true">aman</string>
     <string name="lbl_anonymous" translatable="true">anonim</string>
     <string name="lbl_peer" translatable="true">Peer</string>
-    <string name="failed_using_default" translatable="true">Gagal: menggunakan DNS cadangan</string>
     <string name="orbot_no_app_toast" translatable="true">Tambahkan setidaknya satu aplikasi untuk mengaktifkan Orbot</string>
     <string name="settings_rinr_heading" translatable="true">Putar Balik (eksperimental)</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Rutekan Lalu lintas Rethink sendiri, seperti unduhan daftar blokir, pemeriksaan konektivitas, koneksi DNS, kembali ke tunnel.</string>
@@ -1167,7 +1166,7 @@
     <string name="use_fallback_dns_to_bypass" translatable="true">Gunakan DNS fallback sebagai bypass</string>
     <string name="title_database_dump" translatable="true">Basis data</string>
     <string name="copied_clipboard" translatable="true">Disalin</string>
-    <string name="lbl_fallback" translatable="true">Cadangan</string>
+    <string name="lbl_bootstrap" translatable="true">Cadangan</string>
     <string name="conn_track_clear_rule_logs_title" translatable="true">Hapus log untuk aturan ini?</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">Hapus semua Aturan Domain?</string>
     <string name="use_fallback_dns_to_bypass_desc" translatable="true">Bila diaktifkan, selalu menggunakan DNS cadangan untuk aplikasi, domain, dan IP yang dilewati.</string>

@@ -99,7 +99,6 @@
     <string name="notification_action_resume_vpn" translatable="true">НАСТАВИ</string>
     <string name="hybrid_mode_notification_title" translatable="true">Заштићени! Повезани са DNS + заштитни зид.</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Заштићени! Повезани са DNS + заштитни зид + прокси.</string>
-    <string name="failed_using_default" translatable="true">Неуспех: користи се резервни DNS</string>
     <string name="status_dns_server_down" translatable="true">dns сервер није оперативан</string>
     <string name="status_protected_with_tor" translatable="true">заштићен са tor-ом</string>
     <string name="status_protected_with_private_dns" translatable="true">заштићен са приватним dns-ом</string>

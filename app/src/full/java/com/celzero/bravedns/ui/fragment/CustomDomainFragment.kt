@@ -16,11 +16,14 @@
 package com.celzero.bravedns.ui.fragment
 
 import android.content.Context.INPUT_METHOD_SERVICE
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.SearchView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -29,11 +32,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.adapter.CustomDomainAdapter
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.DialogAddCustomDomainBinding
+import com.celzero.bravedns.databinding.DialogImportConfirmBinding
 import com.celzero.bravedns.databinding.FragmentCustomDomainBinding
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.DomainRulesManager.isValidDomain
@@ -65,6 +70,10 @@ class CustomDomainFragment :
     private var uid = UID_EVERYBODY
     private var rule = CustomRulesActivity.RULES.APP_SPECIFIC_RULES
 
+    // ActivityResultLauncher for the document picker (DEBUG import only).
+    // Must be registered in onCreate — before onStart — to survive configuration changes.
+    private lateinit var importFileLauncher: ActivityResultLauncher<Array<String>>
+
     companion object {
         fun newInstance(uid: Int, rules: CustomRulesActivity.RULES): CustomDomainFragment {
             val args = Bundle()
@@ -74,6 +83,18 @@ class CustomDomainFragment :
             fragment.arguments = args
             return fragment
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Register the document picker launcher here (before onStart) so it survives
+        // configuration changes. The actual UI is only shown when DEBUG == true.
+        importFileLauncher =
+            registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+                // uri is null when the user dismisses the picker without selecting a file
+                uri ?: return@registerForActivityResult
+                handleImportUri(uri)
+            }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -165,6 +186,17 @@ class CustomDomainFragment :
         b.cdaAddFab.setOnClickListener { showAddDomainDialog() }
 
         b.cdaSearchDeleteIcon.setOnClickListener { showDomainRulesDeleteDialog() }
+
+        // Import FAB is only shown and wired up in DEBUG builds.
+        // The FAB itself is GONE in XML; this block also stays dead-code in release builds
+        // so ProGuard/R8 can strip it entirely.
+        if (DEBUG) {
+            b.cdaImportFab.visibility = View.VISIBLE
+            b.cdaImportFab.setOnClickListener {
+                // Launch the system document picker; accept plain text files only
+                importFileLauncher.launch(arrayOf("text/plain"))
+            }
+        }
     }
 
     private fun observeCustomRules() {
@@ -388,6 +420,112 @@ class CustomDomainFragment :
         builder.create().show()
     }
 
+    // -----------------------------------------------------------------------------------------
+    // DEBUG-only import helpers
+    // The methods below are only called when DEBUG == true. They are intentionally grouped
+    // together at the bottom of the class to make the debug boundary visually clear.
+    // -----------------------------------------------------------------------------------------
+
+    /**
+     * Called after the user picks a file in the document picker.
+     * Parses the file on an IO coroutine, then shows the confirmation dialog on the main thread.
+     */
+    private fun handleImportUri(uri: Uri) {
+        io {
+            val parsed = RulesImportHelper.parseFile(
+                requireContext(), uri, RulesImportHelper.ImportType.DOMAIN
+            )
+            uiCtx {
+                if (parsed == null) {
+                    Utilities.showToastUiCentered(
+                        requireContext(),
+                        getString(R.string.import_rules_error_unreadable),
+                        Toast.LENGTH_SHORT
+                    )
+                    return@uiCtx
+                }
+                if (parsed.valid.isEmpty()) {
+                    Utilities.showToastUiCentered(
+                        requireContext(),
+                        getString(R.string.import_rules_error_empty),
+                        Toast.LENGTH_SHORT
+                    )
+                    return@uiCtx
+                }
+                showImportConfirmDialog(parsed)
+            }
+        }
+    }
+
+    /**
+     * Shows the import confirmation dialog.
+     * Displays file name, valid entry count, ignored count, and Block / Allow radio group.
+     * Domain rules always use TRUST for "Allow" (unlike IP rules which vary by UID).
+     */
+    private fun showImportConfirmDialog(parsed: RulesImportHelper.ParsedFile) {
+        val dBind = DialogImportConfirmBinding.inflate(layoutInflater)
+        val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+            .setView(dBind.root)
+            .create()
+
+        val lp = WindowManager.LayoutParams()
+        dialog.show()
+        lp.copyFrom(dialog.window?.attributes)
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+        dialog.setCancelable(true)
+        dialog.window?.attributes = lp
+
+        dBind.dicFileName.text = parsed.fileName
+        dBind.dicValidCount.text = parsed.valid.size.toString()
+        dBind.dicIgnoredCount.text = parsed.invalidCount.toString()
+
+        // Domain rules use the same labels as manual add: Block vs Trust
+        dBind.dicAllowRadio.text = getString(R.string.ci_trust_rule)
+
+        dBind.dicCancelBtn.setOnClickListener { dialog.dismiss() }
+
+        dBind.dicImportBtn.setOnClickListener {
+            val isBlock = dBind.dicActionGroup.checkedRadioButtonId == R.id.dic_block_radio
+            val domainStatus = if (isBlock) DomainRulesManager.Status.BLOCK else DomainRulesManager.Status.TRUST
+            dialog.dismiss()
+            runImport(parsed.valid, domainStatus)
+        }
+    }
+
+    /**
+     * Runs the actual insertion on an IO coroutine, then shows the summary dialog.
+     * The RecyclerView refreshes automatically via LiveData once insertion is complete.
+     */
+    private fun runImport(entries: List<String>, domainStatus: DomainRulesManager.Status) {
+        io {
+            val summary = RulesImportHelper.importRules(
+                entries = entries,
+                importType = RulesImportHelper.ImportType.DOMAIN,
+                uid = uid,
+                domainStatus = domainStatus
+            )
+            uiCtx { showImportSummaryDialog(summary) }
+        }
+    }
+
+    /** Shows a simple summary dialog after all rules have been inserted. */
+    private fun showImportSummaryDialog(summary: RulesImportHelper.ImportSummary) {
+        val msg = getString(
+            R.string.import_rules_summary,
+            summary.imported,
+            summary.duplicates,
+            summary.invalid
+        )
+        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+            .setTitle(getString(R.string.import_rules_complete_title))
+            .setMessage(msg)
+            .setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { d, _ -> d.dismiss() }
+            .create()
+            .show()
+        logEvent("Import complete: imported=${summary.imported}, duplicates=${summary.duplicates}, invalid=${summary.invalid}, uid=$uid")
+    }
+
     private fun logEvent(details: String) {
         eventLogger.log(EventType.FW_RULE_MODIFIED, Severity.LOW, "Custom Domain", EventSource.UI, false, details)
     }
@@ -400,3 +538,4 @@ class CustomDomainFragment :
         withContext(Dispatchers.Main) { f() }
     }
 }
+

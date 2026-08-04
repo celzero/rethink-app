@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.database
 
-import Logger
-import Logger.LOG_TAG_APP_DB
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_APP_DB
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
@@ -25,6 +25,8 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.celzero.bravedns.sponsor.database.SponsorDao
+import com.celzero.bravedns.sponsor.database.SponsorEntity
 import com.celzero.bravedns.util.Constants
 
 @Database(
@@ -52,9 +54,10 @@ import com.celzero.bravedns.util.Constants
         WgHopMap::class,
         SubscriptionStatus::class,
         SubscriptionStateHistory::class,
-        CountryConfig::class
+        CountryConfig::class,
+        SponsorEntity::class
     ],
-    version = 30,
+    version = 31,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -62,7 +65,13 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         const val DATABASE_NAME = "bravedns.db"
-        private const val DATABASE_PATH = "database/rethink_v22.db"
+        // Pre-packaged asset at the current schema version (31). Because the asset's
+        // user_version matches @Database.version and its room_master_table identity_hash
+        // matches the hash Room 2.8.1 computes for v31, Room opens it with NO migration
+        // and NO schema validation at first launch. This avoids the 22->31 migration path
+        // running on the freshly-copied asset, which was a source of the
+        // "Bad database header" failure seen after clearing app storage.
+        private const val DATABASE_PATH = "database/rethink_v31.db"
         private const val PRAGMA = "pragma wal_checkpoint(full)"
 
         // setJournalMode() is added as part of issue #344
@@ -71,8 +80,47 @@ abstract class AppDatabase : RoomDatabase() {
         // Otherwise, WRITE_AHEAD_LOGGING will be used.
         // Ref:
         // https://developer.android.com/reference/android/arch/persistence/room/RoomDatabase.JournalMode#automatic
-        fun buildDatabase(context: Context) =
-            Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DATABASE_NAME)
+        // A valid SQLite database file is at least 100 bytes (the header page) and begins
+        // with the 16-byte magic string "SQLite format 3\0". Files failing this check are
+        // treated as corrupt/truncated so the pre-packaged asset can be re-copied by Room's
+        // createFromAsset() instead of being reused as-is.
+        private fun isValidSQLiteFile(file: java.io.File): Boolean {
+            if (file.length() < 100) return false
+            return try {
+                java.io.RandomAccessFile(file, "r").use { raf ->
+                    val magic = ByteArray(16)
+                    raf.readFully(magic)
+                    String(magic, Charsets.ISO_8859_1).startsWith("SQLite format 3")
+                }
+            } catch (_: Exception) {
+                false
+            }
+        }
+
+        fun buildDatabase(context: Context): AppDatabase {
+            // Self-heal: if a corrupt/truncated bravedns.db is present on disk (e.g. a
+            // 0-byte file left behind by a premature ATTACH in LogDatabase.populateDatabase
+            // after the user clears app storage via Android settings), delete it so that
+            // Room's createFromAsset() re-copies the pre-packaged asset and the seed data
+            // (default DoH/DNSCrypt/RDNS/DoT/ODoH rows) is restored. Without this, Room sees
+            // that the file already exists and skips the asset copy, failing with:
+            //   "Bad database header, unable to read 4 bytes at offset 60" (user_version).
+            val dbFile = context.applicationContext.getDatabasePath(DATABASE_NAME)
+            if (dbFile.exists() && !isValidSQLiteFile(dbFile)) {
+                Logger.i(
+                    LOG_TAG_APP_DB,
+                    "Corrupt DB file detected (${dbFile.length()} bytes); deleting to allow asset re-copy"
+                )
+                dbFile.delete()
+                // remove sidecar files so a stale wal/shm cannot resurrect broken state
+                context.applicationContext.getDatabasePath("$DATABASE_NAME-wal").delete()
+                context.applicationContext.getDatabasePath("$DATABASE_NAME-shm").delete()
+            }
+            return Room.databaseBuilder(
+                context.applicationContext,
+                AppDatabase::class.java,
+                DATABASE_NAME
+            )
                 .createFromAsset(DATABASE_PATH)
                 .addCallback(roomCallback)
                 .setJournalMode(JournalMode.AUTOMATIC)
@@ -105,7 +153,9 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_27_28)
                 .addMigrations(MIGRATION_28_29)
                 .addMigrations(MIGRATION_29_30)
+                .addMigrations(MIGRATION_30_31)
                 .build()
+        }
 
         private val roomCallback: Callback =
             object : Callback() {
@@ -1232,6 +1282,27 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
+        private val MIGRATION_30_31: Migration =
+            object : Migration(30, 31) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.execSQL(
+                        """
+                        CREATE TABLE IF NOT EXISTS Sponsor (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                            purchase_token TEXT NOT NULL,
+                            product_id TEXT NOT NULL,
+                            purchase_time INTEGER NOT NULL,
+                            sponsor_since INTEGER NOT NULL,
+                            consumed INTEGER NOT NULL DEFAULT 1,
+                            contribution_count INTEGER NOT NULL DEFAULT 1,
+                            last_contribution_time INTEGER NOT NULL DEFAULT 0
+                        )
+                        """.trimIndent()
+                    )
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_30_31: created Sponsor table")
+                }
+            }
+
         // ref: stackoverflow.com/a/57204285
         private fun doesColumnExistInTable(
             db: SupportSQLiteDatabase,
@@ -1300,6 +1371,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun subscriptionStatusDao(): SubscriptionStatusDao
 
     abstract fun subscriptionStateHistoryDao(): SubscriptionStateHistoryDao
+
+    abstract fun sponsorDao(): SponsorDao
 
     abstract fun countryConfigDAO(): CountryConfigDAO
 

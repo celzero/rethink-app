@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.service
 
-import Logger
-import Logger.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import android.content.Context
 import android.text.format.DateUtils
 import com.celzero.bravedns.backup.BackupHelper.Companion.TEMP_WG_DIR
@@ -27,13 +27,13 @@ import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.database.WgConfigFilesRepository
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
+import com.celzero.bravedns.util.UIUtils.getRelativeTimeSpan
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.WgHopManager
 import com.celzero.bravedns.wireguard.WgInterface
 import com.celzero.firestack.backend.Backend
-import com.celzero.firestack.backend.IPMetadata
 import com.celzero.firestack.backend.RouterStats
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -523,7 +523,6 @@ object WireguardManager : KoinComponent {
 
     // no need to check for app excluded from proxy here, expected to call this fn after that
     suspend fun getAllPossibleConfigIdsForApp(uid: Int, ip: String, port: Int, domain: String, usesMobileNw: Boolean, ssid: String, default: String): List<String> {
-        val block = Backend.Block
         val proxyIds: MutableList<String> = mutableListOf()
 
         if (oneWireGuardEnabled()) {
@@ -543,7 +542,7 @@ object WireguardManager : KoinComponent {
 
         // collect all proxy-ids for this uid and keep only WireGuard ones (wgX)
         val allProxyIdsForApp = ProxyManager.getProxyIdsForApp(uid)
-        val wgProxyIdsForApp = allProxyIdsForApp.filter { it.startsWith(ID_WG_BASE) }
+        val wgProxyIdsForApp = allProxyIdsForApp.filter { isWgProxyId(it) }
 
         // app-specific configs may be empty if the app is not configured
         if (wgProxyIdsForApp.isNotEmpty()) {
@@ -601,10 +600,17 @@ object WireguardManager : KoinComponent {
         return proxyIds
     }
 
+    fun isWgProxyId(pid: String): Boolean {
+        if (!pid.startsWith(ID_WG_BASE, ignoreCase = true)) return false
+        val suffix = pid.removePrefix(ID_WG_BASE)
+        return suffix.isNotEmpty() && suffix.toIntOrNull() != null
+    }
+
+
     private fun isEligibleForNetwork(id: Int, usesMobileNw: Boolean, ssid: String, mobileOnlySetting: Boolean, ssidEnabled: Boolean): Boolean {
         if (!mobileOnlySetting && !ssidEnabled) return true
 
-        val passMobileOnly = mobileOnlySetting && (usesMobileNw && ssid.isEmpty())
+        val passMobileOnly = mobileOnlySetting && usesMobileNw
         val passSsid = ssidEnabled && !usesMobileNw && matchesSsidListForConfig(id, ssid)
         return passMobileOnly || passSsid
     }
@@ -1138,7 +1144,7 @@ object WireguardManager : KoinComponent {
         }
     }
 
-    data class WgStats(val routerStats: RouterStats?, val mtu: Long?, val status: Int?, val ip4: Boolean?, val ip6: Boolean?, val clientV4: IPMetadata?, val clientV6: IPMetadata?)
+    data class WgStats(val routerStats: RouterStats?, val mtu: Long?, val ip4: Boolean?, val ip6: Boolean?, val addr: String?)
     suspend fun stats(): String {
         val sb = StringBuilder()
         mappings.filter { it.isActive }.forEach {
@@ -1146,7 +1152,15 @@ object WireguardManager : KoinComponent {
             val stats = VpnController.getWireGuardStats(id)
             val routerStats = stats?.routerStats
             sb.append("   id: ${it.id}, name: ${it.name}\n")
-            sb.append("   addr: ${routerStats?.addrs}").append("\n")
+            sb.append("   always-on? ${it.isCatchAll}\n")
+            sb.append("   lockdown? ${it.isLockdown}\n")
+            sb.append("   mobile-only? ${it.useOnlyOnMetered}\n")
+            sb.append("   ssid-only? ${it.ssidEnabled}")
+            if (it.ssidEnabled) {
+                sb.append(", ssids: ${it.ssids}")
+            }
+            sb.append("\n")
+            sb.append("   ifaddr: ${routerStats?.addrs}").append("\n")
             sb.append("   mtu: ${stats?.mtu}\n")
             sb.append("   status: ${routerStats?.status}\n")
             sb.append("   status-reason: ${routerStats?.statusReason}\n")
@@ -1164,31 +1178,17 @@ object WireguardManager : KoinComponent {
             sb.append("   lastOpen: ${getRelativeTimeSpan(routerStats?.lastOpen)}\n")
             sb.append("   hdl: ${routerStats?.hdl}\n")
             sb.append("   since: ${getRelativeTimeSpan(routerStats?.since)}\n")
+            sb.append("   addr: ${stats?.addr ?: "N/A"}\n")
             sb.append("   errRx: ${routerStats?.errRx}\n")
             sb.append("   errTx: ${routerStats?.errTx}\n")
             sb.append("   extra: ${routerStats?.extra}\n")
-            sb.append("   clientV4: ${stats?.clientV4?.toString()}\n")
-            sb.append("   clientV6: ${stats?.clientV6?.toString()}\n\n")
         }
         if (sb.isEmpty()) {
-            sb.append("   N/A\n\n")
+            sb.append("   N/A\n")
         }
         val s = sb.toString()
         Logger.d(LOG_TAG_PROXY, "wg stats: $s")
         return sb.toString()
-    }
-
-    private fun getRelativeTimeSpan(t: Long?): CharSequence? {
-        if (t == null || t <= 0L) return "0"
-
-        val now = System.currentTimeMillis()
-        // returns a string describing 'time' as a time relative to 'now'
-        return DateUtils.getRelativeTimeSpanString(
-            t,
-            now,
-            DateUtils.SECOND_IN_MILLIS,
-            DateUtils.FORMAT_ABBREV_RELATIVE
-        )
     }
 
     private fun getConfigFilePath(): String {

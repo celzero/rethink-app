@@ -1,55 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/endpoint_list_parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="0.5dp"
-    android:background="?android:attr/selectableItemBackground">
+    android:clickable="true"
+    android:focusable="true"
+    app:cardCornerRadius="12dp">
 
     <RelativeLayout
         android:id="@+id/endpoint_list_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:padding="5dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:padding="12dp"
         android:visibility="visible">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:layout_marginStart="5dp"
             android:layout_toStartOf="@id/endpoint_info_img"
-            android:orientation="vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/endpoint_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/large_font_text_view" />
+                android:id="@+id/endpoint_flag_text"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="5dp"
+                android:gravity="center"
+                android:singleLine="true"
+                android:textSize="25sp"
+                android:visibility="gone"
+                tools:visibility="visible" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/endpoint_desc"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/default_font_text_view" />
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/endpoint_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
+                    android:textColor="?attr/primaryTextColor" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/endpoint_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/primaryLightColorText" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/endpoint_info_img"
-            style="@style/Widget.Material3.Button.TextButton.Dialog"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_centerInParent="true"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="4dp"
             android:layout_toStartOf="@id/endpoint_check"
-            android:padding="10dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@null"
+            android:padding="12dp"
             android:src="@drawable/ic_info" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
@@ -67,9 +93,4 @@
 
     </RelativeLayout>
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:layout_below="@id/endpoint_list_container" />
-
-</RelativeLayout>
+</com.google.android.material.card.MaterialCardView>

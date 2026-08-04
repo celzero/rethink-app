@@ -1015,7 +1015,6 @@
     <string name="lbl_private" translatable="true">私密</string>
     <string name="lbl_secure" translatable="true">安全</string>
     <string name="lbl_anonymous" translatable="true">匿名</string>
-    <string name="failed_using_default" translatable="true">失敗：使用後備 DNS</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">是否刪除 DoT 端點？</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">於已儲存的設定中刪除此 DNS over TLS 端點。</string>
     <string name="orbot_no_app_toast" translatable="true">新增至少一個應用程式以啟用 Orbot</string>
@@ -1065,7 +1064,7 @@
     <string name="lbl_test" translatable="true">測試</string>
     <string name="lbl_experimental" translatable="true">（實驗性）</string>
     <string name="lbl_hop" translatable="true">中繼</string>
-    <string name="lbl_fallback" translatable="true">後備</string>
+    <string name="lbl_bootstrap" translatable="true">後備</string>
     <string name="dc_filtering_heading" translatable="true">篩選</string>
     <string name="lbl_protos" translatable="true">協定</string>
     <string name="wireguard_title" translatable="true">使用 WireGuard 安全連線</string>

@@ -550,7 +550,6 @@
     <string name="category_name_others" translatable="true">Інші</string>
     <string name="lbl_notification" translatable="true">повідомлення</string>
     <string name="memory_notification_text">Rethink бракує пам\'яті. Дії системи можуть бути обмежені.</string>
-    <string name="failed_using_default" translatable="true">Не вдалося: використання резервного DNS</string>
     <string name="settings_enable_logs_desc" translatable="true">Зберігати журнали DNS й брандмауера локально на пристрої.</string>
     <string name="dns_card_latency_active" translatable="true">%1$s мс</string>
     <string name="no_browser_error" translatable="true">Не вдалося відкрити веб-сторінку з браузера.</string>
@@ -1154,7 +1153,7 @@
     <string name="smart_dns_desc" translatable="true"><i>Smart DNS</i> випадковим чином використовує будь-який з цих DNS-резолверів:</string>
     <string name="hop_error_toast_msg_3" translatable="true">Вимкніть опцію \"Тільки мобільні пристрої\" або \"SSID\", щоб використовувати реле</string>
     <string name="wg_mobile_only_hop_err" translatable="true">Режим \"лише для мобільних пристроїв\" не підтримується для реле</string>
-    <string name="lbl_fallback" translatable="true">Резервний варіант</string>
+    <string name="lbl_bootstrap" translatable="true">Резервний варіант</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">Видалити всі правила домену?</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">Видалення цих правил дозволить будь-якій програмі підключатися до наразі заблокованих доменів.</string>
     <string name="vpn_policy_auto_desc" translatable="true">Реагує на важливі зміни в мережі та з\'єднанні.</string>

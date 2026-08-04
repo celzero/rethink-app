@@ -967,7 +967,6 @@
     <string name="lbl_secure" translatable="true">sante</string>
     <string name="lbl_anonymous" translatable="true">ашәахьамыз</string>
     <string name="lbl_peer" translatable="true">Аҧхьа</string>
-    <string name="failed_using_default" translatable="true">Мшä: ахарҭаа ашьцыраамҭала аицлак</string>
     <string name="routing_remaining_apps" translatable="true">Аҧсшьа ақәымчқәа рызцәажәаратә</string>
     <string name="lbl_remaining_apps" translatable="true">Ашәахәқәрақәла еи оста</string>
     <string name="remaining_apps_dialog_title" translatable="true">Ацәырҵәра зцу ақәымтәқәа зегьы еилаг&lt;ctrl63&gt;</string>
@@ -1088,7 +1087,7 @@
     <string name="smart_dns_desc" translatable="true"><i>Smart DNS</i> адырланыра дырхәылаауа ашәышаз дырхәымҵәаауа а DNS резолверқәа:</string>
     <string name="hop_error_toast_msg_3" translatable="true">Адаҟьа амо ҟаҵа, аицклаҩқәа хәыҬны иалагаларазы</string>
     <string name="wg_mobile_only_hop_err" translatable="true">Аупшәа-плшьымбара уалынала Ашәахьчаразы адгылара раамҭакала ауни</string>
-    <string name="lbl_fallback" translatable="true">Ацәырԥшра</string>
+    <string name="lbl_bootstrap" translatable="true">Ацәырԥшра</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">Адомэинқәепхақәрақәа зегьы анушьалаа?</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">Ари ҳәын-ҳәатәқәа шьҧк ахәҭыхлара ирызвоит зегьы акьыр𝗌 «адәиҭыхны иаарҧшны» аҵыхәтә хаҭарак аҿы аҧсҭазаара.</string>
     <string name="vpn_policy_auto_desc" translatable="true">Ашәашәоит а 네트워크 аҿы ауал аҟаҵа аҿыц аҭакрақәа рзы.</string>

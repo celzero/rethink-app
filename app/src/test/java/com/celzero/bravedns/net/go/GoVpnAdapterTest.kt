@@ -243,13 +243,13 @@ class GoVpnAdapterTest : KoinTest {
         every { tunnel.proxies } returns proxies
         every { proxies.rpn() } returns rpn
         every { rpn.win() } returns win
-        every { win.status() } returns 11L
+        every { win.status() } returns 11
 
         val adapter = newAdapter(tunnel)
 
         val status = adapter.getDnsStatus(com.celzero.firestack.backend.Backend.RpnWin)
 
-        assertEquals(11L, status)
+        assertEquals(11, status)
     }
 
     @Test
@@ -360,7 +360,7 @@ class GoVpnAdapterTest : KoinTest {
         adapter.getRpnProps(RpnProxyManager.RpnType.WIN)
         adapter.testRpnProxy()
         adapter.getEntitlementDetails(null, "dev")
-        adapter.registerAndFetchWinIfNeeded(deviceId = "dev")
+        adapter.registerAndFetchWinIfNeeded(null, null, deviceId = "dev")
         adapter.refreshRpnProxy("")
         adapter.reconnectRpnProxy("")
         adapter.isWinRegistered()
@@ -375,8 +375,6 @@ class GoVpnAdapterTest : KoinTest {
         adapter.unregisterWin()
         adapter.setRpnAutoMode()
         adapter.isRpnReachable("1.1.1.1:53")
-        adapter.registerSeProxyIfNeeded()
-        adapter.unregisterSeProxyIfNeeded()
         adapter.setExperimentalWireGuardSettings()
         adapter.setAutoDialsParallel()
         adapter.setAutoMode()

@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.ClipData
@@ -39,6 +39,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.net.toUri
@@ -71,12 +72,16 @@ import com.celzero.bravedns.ui.activity.ConsoleLogActivity
 import com.celzero.bravedns.ui.activity.EventsActivity
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
 import com.celzero.bravedns.ui.bottomsheet.BugReportFilesBottomSheet
+import com.celzero.bravedns.sponsor.provider.SponsorProvider
+import com.celzero.bravedns.sponsor.repository.SponsorRepository
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_4
+import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
 import com.celzero.bravedns.util.KernelProc
 import com.celzero.bravedns.util.MemoryUtils
+import com.celzero.bravedns.util.MemoryProfiler
+import com.celzero.bravedns.util.GoMemoryProfiler
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
@@ -96,8 +101,12 @@ import com.celzero.bravedns.util.disableFrostTemporarily
 import com.celzero.bravedns.util.restoreFrost
 import com.celzero.firestack.intra.Intra
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.isActive
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -116,6 +125,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     private val appDatabase by inject<AppDatabase>()
     private val persistentState by inject<PersistentState>()
     private val eventLogger by inject<EventLogger>()
+    private val sponsorProvider by inject<SponsorProvider>()
+    private val sponsorRepository by inject<SponsorRepository>()
+
+    // Scope that survives fragment destruction so profiling work completes.
+    // Canceled in onDestroyView.
+    private var profileScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     companion object {
         private const val SCHEME_PACKAGE = "package"
@@ -143,6 +158,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // Re-create the scope in case the fragment view was destroyed and re-created.
+        if (!profileScope.isActive) {
+            profileScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+        }
         initView()
     }
 
@@ -150,6 +169,11 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         super.onResume()
         val themeId = Themes.getTheme(persistentState.theme)
         restoreFrost(themeId)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        profileScope.cancel()
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -165,6 +189,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.fhsTitleRethink.isAllCaps = false
         }
 
+        if (DEBUG) {
+            b.aboutMemoryProfile.visibility = View.VISIBLE
+        } else {
+            b.aboutMemoryProfile.visibility = View.GONE
+        }
+
         updateVersionInfo()
         updateSponsorInfo()
         updateTokenUi(persistentState.firebaseUserToken)
@@ -173,6 +203,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
         b.fhsTitleRethink.setOnClickListener(this)
         b.aboutSponsor.setOnClickListener(this)
+        b.aboutSponsorAgain.setOnClickListener(this)
         b.aboutManageRpn.setOnClickListener(this)
         b.aboutWebsite.setOnClickListener(this)
         b.aboutTwitter.setOnClickListener(this)
@@ -202,6 +233,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutStats.setOnClickListener(this)
         b.aboutProc.setOnClickListener(this)
         b.aboutStackTrace.setOnClickListener(this)
+        b.aboutMemoryProfile.setOnClickListener(this)
         b.aboutDbStats.setOnClickListener(this)
         b.tokenTextView.setOnClickListener(this)
         b.aboutConsoleLogs.setOnClickListener(this)
@@ -295,9 +327,39 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.aboutSponsor.visibility = View.GONE
             b.aboutManageRpn.visibility = View.VISIBLE
             b.sponsorInfoUsage.visibility = View.GONE
+            b.aboutCommunitySponsor.visibility = View.GONE
+            return
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            // Seed immediately from a one-shot DB read so the sponsor CTA reflects the
+            // persisted sponsorship state before the reactive flow emits. Without this,
+            // the "Sponsor" button (visible by default in the layout) is shown briefly
+            // even for already-sponsored users on the initial launch.
+            applySponsorState(sponsorRepository.isCurrentlySponsored())
+            sponsorRepository.isSponsored.collect { isSponsored ->
+                applySponsorState(isSponsored)
+            }
+        }
+    }
+
+    private suspend fun applySponsorState(isSponsored: Boolean) {
+        if (isSponsored) {
+            b.aboutSponsor.visibility = View.GONE
+            b.aboutManageRpn.visibility = View.GONE
+            b.sponsorInfoUsage.visibility = View.GONE
+            b.aboutCommunitySponsor.visibility = View.VISIBLE
+
+            val sponsorSince = sponsorRepository.getSponsorSince()
+            if (sponsorSince != null && sponsorSince > 0) {
+                val dateStr = Utilities.convertLongToTime(sponsorSince, TIME_FORMAT_4)
+                b.aboutSponsorSince.text = getString(R.string.sponsor_about_since, dateStr)
+            }
         } else {
             b.aboutSponsor.visibility = View.VISIBLE
             b.aboutManageRpn.visibility = View.GONE
+            b.sponsorInfoUsage.visibility = View.VISIBLE
+            b.aboutCommunitySponsor.visibility = View.GONE
             b.sponsorInfoUsage.text = getSponsorInfo()
         }
     }
@@ -386,7 +448,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 openUrl(requireContext(), getString(R.string.about_website_link))
             }
             b.aboutSponsor -> {
-                openUrl(requireContext(), RETHINKDNS_SPONSOR_LINK)
+                sponsorProvider.openSponsor(requireContext())
+            }
+            b.aboutSponsorAgain -> {
+                sponsorProvider.openSponsor(requireContext())
             }
             b.aboutManageRpn -> {
                 openRpnDashboardScreen()
@@ -450,6 +515,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.aboutStackTrace -> {
                 openStackTraceDialog()
             }
+            b.aboutMemoryProfile -> {
+                openMemoryProfile()
+            }
             b.aboutDbStats -> {
                 openDatabaseDumpDialog()
             }
@@ -499,6 +567,116 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 showStackTraceDialog(goStackTrace, jvmStackTrace)
             }
         }
+    }
+
+    private fun openMemoryProfile() {
+        if (!DEBUG) return
+        val ctx = context ?: return
+        val theme = UIUtils.getAccentColor(persistentState.theme)
+        showToastUiCentered(ctx, "Capturing memory profiles...", Toast.LENGTH_SHORT)
+        profileScope.launch {
+            val jvmResult = MemoryProfiler.captureHeapDump(ctx)
+            val goResult = GoMemoryProfiler.captureGoHeapDump(ctx)
+            withContext(Dispatchers.Main) {
+                // Notification always fires — uses app context, not fragment.
+                showMemoryProfileNotification(ctx, theme, jvmResult, goResult)
+                // Toast only if the fragment is still attached.
+                if (isAdded) {
+                    val msg = buildProfileResultMessage(jvmResult, goResult)
+                    showToastUiCentered(ctx, msg, Toast.LENGTH_LONG)
+                }
+            }
+        }
+    }
+
+    private fun buildProfileResultMessage(
+        jvmResult: MemoryProfiler.ProfileResult,
+        goResult: GoMemoryProfiler.ProfileResult
+    ): String {
+        val parts = mutableListOf<String>()
+        if (jvmResult.success) {
+            parts.add("JVM: ${jvmResult.file.name}")
+        } else {
+            parts.add("JVM failed")
+        }
+        if (goResult.success) {
+            parts.add("Go: ${goResult.file.name}")
+        } else {
+            parts.add("Go failed")
+        }
+        return parts.joinToString(" | ")
+    }
+
+    private fun showMemoryProfileNotification(
+        context: android.content.Context,
+        theme: Int,
+        jvmResult: MemoryProfiler.ProfileResult,
+        goResult: GoMemoryProfiler.ProfileResult
+    ) {
+        val jvmOk = jvmResult.success
+        val goOk = goResult.success
+        val bothOk = jvmOk && goOk
+        val bothFailed = !jvmOk && !goOk
+
+        val title = when {
+            bothOk -> "Memory profiles captured"
+            bothFailed -> "Memory profiles failed"
+            else -> "Memory profile partial"
+        }
+
+        val contentText = buildString {
+            if (jvmOk) {
+                appendLine("JVM: ${jvmResult.file.name} (${formatFileSize(jvmResult.file.length())})")
+            } else {
+                appendLine("JVM: ${jvmResult.errorMessage ?: "failed"}")
+            }
+            if (goOk) {
+                appendLine("Go: ${goResult.file.name} (${formatFileSize(goResult.file.length())})")
+            } else {
+                appendLine("Go: ${goResult.errorMessage ?: "failed"}")
+            }
+        }.trimEnd()
+
+        val builder = NotificationCompat.Builder(context, "MEM_PROFILE_CHANNEL")
+            .setSmallIcon(android.R.drawable.ic_menu_info_details)
+            .setContentTitle(title)
+            .setContentText(contentText)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
+            .setColor(ContextCompat.getColor(context, theme))
+            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
+            .setSilent(true)
+            .setAutoCancel(true)
+
+        val manager = context.getSystemService(android.content.Context.NOTIFICATION_SERVICE)
+                as android.app.NotificationManager
+
+        if (!isAtleastO()) {
+            manager.notify("MEM_PROFILE", 210, builder.build())
+            return
+        }
+
+        val channel = android.app.NotificationChannel(
+            "MEM_PROFILE_CHANNEL",
+            "Memory Profile",
+            android.app.NotificationManager.IMPORTANCE_LOW
+        ).apply {
+            description = "Memory profiling results"
+        }
+        manager.createNotificationChannel(channel)
+        manager.notify("MEM_PROFILE", 210, builder.build())
+    }
+
+    private fun formatFileSize(bytes: Long): String {
+        if (bytes <= 0) return "0 B"
+        val units = arrayOf("B", "KB", "MB", "GB")
+        val base = 1024.0
+        val digitGroups = kotlin.math.min(
+            (kotlin.math.log10(bytes.toDouble()) / kotlin.math.log10(base)).toInt(),
+            units.size - 1
+        )
+        var divisor = 1.0
+        repeat(digitGroups) { divisor *= base }
+        return "%.1f %s".format(bytes / divisor, units[digitGroups])
     }
 
     /** Captures the current stack trace of every live JVM/Kotlin thread off the main thread. */
@@ -658,8 +836,15 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         persistentState.firebaseUserToken = newToken
         persistentState.firebaseUserTokenTimestamp = System.currentTimeMillis()
         updateTokenUi(newToken)
+        setFirebaseUserId(newToken)
         logEvent(EventType.SYSTEM_EVENT, "Stability Program Token", "User regenerated new token for stability program")
         return newToken
+    }
+
+    fun setFirebaseUserId(token: String) {
+        try {
+            FirebaseErrorReporting.setUserId(token)
+        } catch (_: Exception) { }
     }
 
     private fun openStatsDialog() {
@@ -701,6 +886,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 progressDialog.dismiss()
                 if (!isAdded) return@uiCtx
 
+                val selectedPositions = mutableSetOf<Int>()
+                val highlightColor = UIUtils.fetchColor(ctx, android.R.attr.colorControlHighlight)
+
                 // use recycler as using textview with large stats causes OOM and ANR issues
                 val recyclerView = androidx.recyclerview.widget.RecyclerView(ctx).apply {
                     layoutManager = androidx.recyclerview.widget.LinearLayoutManager(ctx)
@@ -716,7 +904,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                                 setPadding(pad, 1, pad, 1)
                                 typeface = android.graphics.Typeface.MONOSPACE
                                 textSize = 11.5f
-                                isFocusable = false
                             }
                             return object : androidx.recyclerview.widget.RecyclerView.ViewHolder(tv) {}
                         }
@@ -724,7 +911,22 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                             holder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
                             position: Int
                         ) {
-                            (holder.itemView as android.widget.TextView).text = lines[position]
+                            val tv = holder.itemView as android.widget.TextView
+                            tv.text = lines[position]
+                            if (selectedPositions.contains(position)) {
+                                tv.setBackgroundColor(highlightColor)
+                            } else {
+                                tv.background = null
+                            }
+
+                            tv.setOnClickListener {
+                                if (selectedPositions.contains(position)) {
+                                    selectedPositions.remove(position)
+                                } else {
+                                    selectedPositions.add(position)
+                                }
+                                notifyItemChanged(position)
+                            }
                         }
                     }
                 }
@@ -740,7 +942,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                     .setView(container)
                     .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
                     .setNeutralButton(R.string.dns_info_neutral) { _, _ ->
-                        copyToClipboard("stats_dump", clipText)
+                        val textToCopy = if (selectedPositions.isEmpty()) {
+                            clipText
+                        } else {
+                            selectedPositions.sorted().joinToString("\n") { lines[it] }
+                        }
+                        copyToClipboard("stats_dump", textToCopy)
                         showToastUiCentered(
                             ctx,
                             getString(R.string.copied_clipboard),
