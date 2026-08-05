@@ -225,7 +225,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
             Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt())?.name?.lowercase()
                 ?.replaceFirstChar(Char::titlecase)?.replace("_", " ")
         // set log lifespan name in the description
-        b.genSettingsLogLifespanDesc.text = persistentState.logLifespan
+        b.genSettingsLogLifespanDesc.text = LogLifespan.getLifespanName(persistentState.logLifespan)
 
         // for app locale (default system/user selected locale)
         if (isAtleastT()) {
@@ -797,24 +797,18 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
     private fun showLogLifespanDialog() {
         val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         alertBuilder.setTitle(getString(R.string.settings_log_lifespan_heading))
-        val items = arrayOf((LogLifespan.entries.forEach { it.lifespanName }).toString())
-        var checkedItem = -1
-        for (i in items) {
-            if (i.equals(persistentState.logLifespan)) {
-                checkedItem = items.indexOf(i)
-                break
-            }
-        }
+        val items = LogLifespan.getLifespanNames()
+        var checkedItem = persistentState.logLifespan.toInt()
         alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
             dialog.dismiss()
             if (checkedItem == which) {
                 return@setSingleChoiceItems
             }
 
+            persistentState.logLifespan = which.toLong()
+            workScheduler.schedulePurgeConnectionsLog()
             val selectedItem = items[which]
             b.genSettingsLogLifespanDesc.text = selectedItem
-            persistentState.logLifespan = selectedItem
-            workScheduler.schedulePurgeConnectionsLog()
             logEvent("Log lifespan set to ${selectedItem}")
 
         }

@@ -129,7 +129,7 @@ class WorkScheduler(val context: Context, val persistentState: PersistentState) 
         val logLifespan = persistentState.logLifespan
         val purgeInterval = LogLifespan.getPurgeInterval(logLifespan)
         val timeUnit = when(logLifespan) {
-            LogLifespan.ONE_HOUR.lifespanName -> TimeUnit.MINUTES
+            LogLifespan.ONE_HOUR.id -> TimeUnit.MINUTES
             else -> TimeUnit.HOURS
         }
         val purgeLogs =
