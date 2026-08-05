@@ -1,13 +1,16 @@
 package com.celzero.bravedns.util
 
-enum class LogLifespan (val id: Long, val lifespanName: String, val lifespanHours: Int, val purgeInterval: Long) {
-    ONE_HOUR(0, "1 hour", 1, 30L),
-    THREE_HOURS(1, "3 hours", 3, 1L),
-    SIX_HOURS(2, "6 hours", 6, 3L),
-    TWELVE_HOURS(3, "12 hours", 12, 6L),
-    ONE_DAY(4, "1 day", 24, 12L),
-    THREE_DAYS(5, "3 days", 72, 24L),
-    SEVEN_DAYS(6, "7 days", 168, 24L);
+import android.content.Context
+import com.celzero.bravedns.R
+
+enum class LogLifespan (val id: Long, val lifespanResId: Int, val lifespanHours: Int, val purgeInterval: Long) {
+    ONE_HOUR(0, R.string.settings_log_lifespan_dialog_option_0, 1, 30L),
+    THREE_HOURS(1, R.string.settings_log_lifespan_dialog_option_1, 3, 1L),
+    SIX_HOURS(2, R.string.settings_log_lifespan_dialog_option_2, 6, 3L),
+    TWELVE_HOURS(3, R.string.settings_log_lifespan_dialog_option_3, 12, 6L),
+    ONE_DAY(4, R.string.settings_log_lifespan_dialog_option_4, 24, 12L),
+    THREE_DAYS(5, R.string.settings_log_lifespan_dialog_option_5, 72, 24L),
+    SEVEN_DAYS(6, R.string.settings_log_lifespan_dialog_option_6, 168, 24L);
 
     companion object {
         fun getLogLifespan(id: Long): LogLifespan {
@@ -20,16 +23,16 @@ enum class LogLifespan (val id: Long, val lifespanName: String, val lifespanHour
             return SEVEN_DAYS
         }
 
-        fun getLifespanNames(): Array<String> {
+        fun getLifespanStrings(context: Context): Array<String> {
             val names = mutableListOf<String>()
             for (entry in entries) {
-                names.add(entry.lifespanName)
+                names.add(context.getString(entry.lifespanResId))
             }
             return names.toTypedArray()
         }
 
-        fun getLifespanName(id: Long): String {
-            return getLogLifespan(id).lifespanName
+        fun getLifespanString(id: Long, context: Context): String {
+            return context.getString(getLogLifespan(id).lifespanResId)
         }
 
         fun getLifespanHours(id: Long): Int {

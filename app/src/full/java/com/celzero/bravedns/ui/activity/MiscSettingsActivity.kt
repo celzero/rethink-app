@@ -225,7 +225,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
             Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt())?.name?.lowercase()
                 ?.replaceFirstChar(Char::titlecase)?.replace("_", " ")
         // set log lifespan name in the description
-        b.genSettingsLogLifespanDesc.text = LogLifespan.getLifespanName(persistentState.logLifespan)
+        b.genSettingsLogLifespanDesc.text = LogLifespan.getLifespanString(persistentState.logLifespan, this)
 
         // for app locale (default system/user selected locale)
         if (isAtleastT()) {
@@ -797,7 +797,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
     private fun showLogLifespanDialog() {
         val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         alertBuilder.setTitle(getString(R.string.settings_log_lifespan_heading))
-        val items = LogLifespan.getLifespanNames()
+        val items = LogLifespan.getLifespanStrings(this)
         var checkedItem = persistentState.logLifespan.toInt()
         alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
             dialog.dismiss()

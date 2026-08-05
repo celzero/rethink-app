@@ -647,6 +647,7 @@
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/settings_log_lifespan_icon"
+                        android:contentDescription="Settings option that allows users to change the lifespan of logs before deletion"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
@@ -678,12 +679,13 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="3dp"
-                            android:text="@string/settings_log_lifespan_dialog_option_6"
+                            android:text="@string/settings_log_lifespan_desc_default"
                             android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/settings_activity_log_lifespan_img"
+                        android:importantForAccessibility="no"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"

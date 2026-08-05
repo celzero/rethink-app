@@ -634,6 +634,7 @@
     <string name="settings_go_log_desc" translatable="true">For debugging purposes</string>
 
     <string name="settings_log_lifespan_heading" translatable="true">Log Lifespan</string>
+    <string name="settings_log_lifespan_desc_default" translatable="true">7 days (default)</string>
 
     <string name="settings_rinr_heading" translatable="true">Loopback (experimental)</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Route Rethink\'s own traffic, like blocklist downloads, connectivity checks, DNS connections, back into the tunnel.</string>
@@ -648,13 +649,13 @@
     <string name="app_info_rethink_warning_proceed" translatable="true">I understand</string>
     <string name="rethink_home_screen_warning" translatable="true">may affect connectivity ⚠️</string>
 
-    <string name="settings_log_lifespan_dialog_option_0" translatable="false">1 hour</string>
-    <string name="settings_log_lifespan_dialog_option_1" translatable="false">3 hours</string>
-    <string name="settings_log_lifespan_dialog_option_2" translatable="false">6 hours</string>
-    <string name="settings_log_lifespan_dialog_option_3" translatable="false">12 hours</string>
-    <string name="settings_log_lifespan_dialog_option_4" translatable="false">1 day</string>
-    <string name="settings_log_lifespan_dialog_option_5" translatable="false">3 days</string>
-    <string name="settings_log_lifespan_dialog_option_6" translatable="false">7 days</string>
+    <string name="settings_log_lifespan_dialog_option_0" translatable="true">1 hour</string>
+    <string name="settings_log_lifespan_dialog_option_1" translatable="true">3 hours</string>
+    <string name="settings_log_lifespan_dialog_option_2" translatable="true">6 hours</string>
+    <string name="settings_log_lifespan_dialog_option_3" translatable="true">12 hours</string>
+    <string name="settings_log_lifespan_dialog_option_4" translatable="true">1 day</string>
+    <string name="settings_log_lifespan_dialog_option_5" translatable="true">3 days</string>
+    <string name="settings_log_lifespan_dialog_option_6" translatable="true">7 days</string>
 
     <string name="settings_gologger_dialog_option_0" translatable="false">Very verbose</string>
     <string name="settings_gologger_dialog_option_1" translatable="false">Verbose</string>
