@@ -26,6 +26,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequest
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.LogLifespan
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
@@ -126,15 +127,10 @@ class WorkScheduler(val context: Context, val persistentState: PersistentState) 
 
     fun schedulePurgeConnectionsLog() {
         val logLifespan = persistentState.logLifespan
-        val (purgeInterval, timeUnit) = when(logLifespan) {
-          context.getString(R.string.settings_log_lifespan_dialog_option_0) -> 30L to TimeUnit.MINUTES
-          context.getString(R.string.settings_log_lifespan_dialog_option_1) -> 1L to TimeUnit.HOURS
-          context.getString(R.string.settings_log_lifespan_dialog_option_2) -> 3L to TimeUnit.HOURS
-          context.getString(R.string.settings_log_lifespan_dialog_option_3) -> 6L to TimeUnit.HOURS
-          context.getString(R.string.settings_log_lifespan_dialog_option_4) -> 12L to TimeUnit.HOURS
-          context.getString(R.string.settings_log_lifespan_dialog_option_5) -> 24L to TimeUnit.HOURS
-          context.getString(R.string.settings_log_lifespan_dialog_option_6) -> 24L to TimeUnit.HOURS
-          else -> 24L to TimeUnit.HOURS // 7 days (default)
+        val purgeInterval = LogLifespan.getPurgeInterval(logLifespan)
+        val timeUnit = when(logLifespan) {
+            LogLifespan.ONE_HOUR.lifespanName -> TimeUnit.MINUTES
+            else -> TimeUnit.HOURS
         }
         val purgeLogs =
             PeriodicWorkRequest.Builder(

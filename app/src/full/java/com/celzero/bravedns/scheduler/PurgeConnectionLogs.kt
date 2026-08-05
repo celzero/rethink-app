@@ -24,6 +24,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.LogLifespan
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.Calendar
@@ -38,16 +39,7 @@ class PurgeConnectionLogs(val context: Context, workerParameters: WorkerParamete
 
     override suspend fun doWork(): Result {
         val logLifespan = persistentState.logLifespan
-        val hoursToPurge = when(logLifespan) {
-            context.getString(R.string.settings_log_lifespan_dialog_option_0) -> 1
-            context.getString(R.string.settings_log_lifespan_dialog_option_1) -> 3
-            context.getString(R.string.settings_log_lifespan_dialog_option_2) -> 6
-            context.getString(R.string.settings_log_lifespan_dialog_option_3) -> 12
-            context.getString(R.string.settings_log_lifespan_dialog_option_4) -> 24
-            context.getString(R.string.settings_log_lifespan_dialog_option_5) -> 72
-            context.getString(R.string.settings_log_lifespan_dialog_option_6) -> 168
-            else -> 168 // 7 days (default)
-        }
+        val hoursToPurge = LogLifespan.getLifespanHours(logLifespan)
 
         Logger.d(LOG_TAG_SCHEDULER, "starting purge-database job")
         val calendar = Calendar.getInstance()

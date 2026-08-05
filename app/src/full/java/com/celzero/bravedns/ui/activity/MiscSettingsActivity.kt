@@ -75,6 +75,7 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_REGENERATION_PERIOD_DAYS
+import com.celzero.bravedns.util.LogLifespan
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.SnackbarHelper
@@ -796,19 +797,10 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
     private fun showLogLifespanDialog() {
         val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         alertBuilder.setTitle(getString(R.string.settings_log_lifespan_heading))
-        val items =
-            arrayOf(
-                getString(R.string.settings_log_lifespan_dialog_option_0),
-                getString(R.string.settings_log_lifespan_dialog_option_1),
-                getString(R.string.settings_log_lifespan_dialog_option_2),
-                getString(R.string.settings_log_lifespan_dialog_option_3),
-                getString(R.string.settings_log_lifespan_dialog_option_4),
-                getString(R.string.settings_log_lifespan_dialog_option_5),
-                getString(R.string.settings_log_lifespan_dialog_option_6),
-            )
+        val items = arrayOf((LogLifespan.entries.forEach { it.lifespanName }).toString())
         var checkedItem = -1
         for (i in items) {
-            if (i == persistentState.logLifespan) {
+            if (i.equals(persistentState.logLifespan)) {
                 checkedItem = items.indexOf(i)
                 break
             }
