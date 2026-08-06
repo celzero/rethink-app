@@ -371,7 +371,7 @@
     <string name="settings_dns_proxy_dialog_hostname" translatable="true">호스트 이름</string>
     <string name="whats_new_version_update" translatable="false"><![CDATA[<b>LAN 파티!</b><br/><br/> 1. <i>새로운 기능</i>: 사설 IP 제외(LAN / 링크 로컬).<br/> 2. 우회 DNS 만들기 & 방화벽 설정 작업.<br/> 3. 방화벽에 의해 차단되었을 수 있는 도메인에 대한 DNS 로그에 차단 가능성 표시.<br/> 4. 지원되는 경우 적응형 아이콘 표시.<br/> 5. 생체 인증 프롬프트 15분마다 한 번씩.<br/> 6. 6개의 기타 UI 및 성능 개선.<br/><br/> <a href=https://svc.rethinkdns.com/r/translate>이 앱 번역을 도와주세요.</ 가>]]></string>
     <string name="settings_ip_text_ipv6" translatable="true">IPv6</string>
-    <string name="settings_default_dns_desc" translatable="true">드물게 사용자 기본 설정 DNS를 확인할 수 없는 경우 폴백 DNS가 사용됩니다.</string>
+    <string name="settings_default_dns_desc" translatable="true">시작 시에만 암호화된 DNS 서버의 IP 주소를 찾기 위해 사용됩니다.</string>
     <string name="firewall_status_block_metered" translatable="true">종량제(모바일) 네트워크에서 차단됨</string>
     <string name="ct_bs_app_info_error" translatable="true">앱 정보를 찾을 수 없음</string>
     <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
@@ -423,7 +423,7 @@
     <string name="settings_locale_desc" translatable="true">선호하는 언어를 선택하세요</string>
     <string name="settings_locale_dialog_title" translatable="true">선호하는 언어를 선택하세요</string>
     <string name="settings_biometeric_heading" translatable="true">앱 잠금 사용</string>
-    <string name="settings_default_dns_heading" translatable="true">대체 DNS 선택</string>
+    <string name="settings_default_dns_heading" translatable="true">부트스트랩 DNS 선택</string>
     <string name="settings_pcap_heading" translatable="true">패킷 캡처</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">꺼짐 (기본값)</string>
     <string name="settings_pcap_dialog_option_2" translatable="true">Logcat으로 출력</string>
@@ -451,7 +451,7 @@
     <string name="hsf_start_btn_state" translatable="true">시작</string>
     <string name="hsf_vpn_prepare_failure" translatable="true">VPN 권한이 없거나 다른 앱이 Always-on VPN 모드에 있습니다.</string>
     <string name="rules_card_domain_count" translatable="true">%1$s 도메인 규칙</string>
-    <string name="hsf_vpn_dialog_message" translatable="true">Rethink는 장치의 DNS 요청을 암호화하고 네트워크 모니터를 구현하고 방화벽 규칙을 적용하기 위해 로컬 VPN을 설정하는 권한이 필요합니다. \n \nRethink는 정보를 수집하거나 어떤 식으로든 사용자를 염탐하지 않습니다.</string>
+    <string name="hsf_vpn_dialog_message" translatable="true">Rethink는 장치의 DNS 요청을 암호화하고, 네트워크 모니터링을 구현하고, 방화벽 규칙을 적용하기 위해 로컬 VPN을 설정하는 권한이 필요합니다.\n\nWi-Fi 기반 프록시 자동화 기능을 사용하려면 연결된 Wi-Fi 네트워크(SSID)를 식별하기 위해 위치 권한이 필요합니다. 이 권한은 해당 기능을 켤 때에만 요청됩니다.\n\nRethink는 정보를 수집하거나 어떤 식으로든 사용자를 염탐하지 않습니다.</string>
     <string name="hsf_start_dialog_header" translatable="true">시작 %1$s</string>
     <string name="hs_biometeric_feature_not_supported" translatable="true">이 기기에서는 생체 인증이 지원되지 않거나 비활성화됩니다</string>
     <string name="hs_biometeric_failed" translatable="true">생체인증 실패</string>
@@ -706,7 +706,7 @@
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true"><i>.lan</i>, <i>.internal</i> 등 별도로 지정된 DNS가 없는 도메인에는 시스템 DNS를 사용합니다.</string>
     <string name="lbl_hop" translatable="true">중계</string>
     <string name="lbl_manual" translatable="true">수동 편집</string>
-    <string name="lbl_bootstrap" translatable="true">대체</string>
+    <string name="lbl_bootstrap" translatable="true">부트스트랩</string>
     <string name="lbl_experimental" translatable="true">(실험적)</string>
     <string name="lbl_service_providers" translatable="true">서비스 제공자</string>
     <string name="lbl_default" translatable="true">기본값</string>
@@ -1146,4 +1146,36 @@
     <string name="fs_configure_apps_desc" translatable="true">앱별 방화벽 규칙 및 네트워크 정책</string>
     <string name="lbl_grace_period" translatable="true">유예 기간</string>
     <string name="lbl_expires_on" translatable="true">만료일</string>
+    <string name="ip_mismatch_notification_title" translatable="true">네트워크 프로토콜 불일치</string>
+    <string name="ip_mismatch_notification_content" translatable="true">선택한 IP 프로토콜을 현재 네트워크에서 사용할 수 없습니다. 계속 연결하려면 \"IPv4 &amp; IPv6\" 또는 \"자동\" 모드로 전환하세요.</string>
+    <string name="doh_empty_state_title" translatable="true">DoH 엔드포인트 없음</string>
+    <string name="doh_empty_state_desc" translatable="true">시작하려면 DNS-over-HTTPS 엔드포인트를 추가하세요.</string>
+    <string name="odoh_empty_state_title" translatable="true">ODoH 엔드포인트 없음</string>
+    <string name="odoh_empty_state_desc" translatable="true">시작하려면 Oblivious DNS-over-HTTPS 엔드포인트를 추가하세요.</string>
+    <string name="dot_empty_state_title" translatable="true">DoT 엔드포인트 없음</string>
+    <string name="dot_empty_state_desc" translatable="true">시작하려면 DNS-over-TLS 엔드포인트를 추가하세요.</string>
+    <string name="dns_proxy_empty_state_title" translatable="true">DNS 프록시 엔드포인트 없음</string>
+    <string name="dns_proxy_empty_state_desc" translatable="true">시작하려면 DNS 프록시 엔드포인트를 추가하세요.</string>
+    <string name="dns_crypt_empty_state_title" translatable="true">DNSCrypt 엔드포인트 없음</string>
+    <string name="dns_crypt_empty_state_desc" translatable="true">시작하려면 DNSCrypt 엔드포인트를 추가하세요.</string>
+    <string name="settings_rinr_btmsht_title" translatable="true">루프백 (실험적)</string>
+    <string name="rethink_empty_state_title" translatable="true">차단 목록 없음</string>
+    <string name="rethink_empty_state_desc" translatable="true">시작하려면 차단 목록을 다운로드하거나 구성하세요.</string>
+    <string name="location_disclosure_positive" translatable="true">진행</string>
+    <string name="location_disclosure_negative" translatable="true">나중에</string>
+    <string name="sponsor_continue" translatable="true">진행</string>
+    <string name="settings_rinr_exempt_btn" translatable="true">Rethink 제외</string>
+    <string name="app_info_rethink_warning_title" translatable="true">주의</string>
+    <string name="app_info_rethink_warning_desc" translatable="true">Rethink의 방화벽 규칙을 변경하려 합니다. Rethink는 VPN 터널을 관리하므로, Rethink의 트래픽을 허용, 차단, 격리하면 전체 네트워크 접속이 끊길 수 있습니다.</string>
+    <string name="app_info_rethink_warning_proceed" translatable="true">알겠습니다</string>
+    <string name="dc_global_heading" translatable="true">전역</string>
+    <string name="rethink_home_screen_warning" translatable="true">연결에 영향 끼칠 수 있음 ⚠️</string>
+    <string name="rpn_recovery_title" translatable="true">서버를 불러올 수 없음</string>
+    <string name="build_flavor_website_degoogled" translatable="true">website-degoogled</string>
+    <string name="use_bootstrap_dns_to_bypass_desc" translatable="true">켜면 우회한 도메인, IP에 부트스트랩 DNS를 사용합니다.</string>
+    <string name="location_disclosure_title" translatable="true">Wi-Fi 기능을 위한 위치 권한</string>
+    <string name="location_disclosure_message" translatable="true">Rethink는 Wi-Fi 네트워크 정보(SSID/BSSID)를 위치 정보로 취급합니다. 백그라운드 위치를 이용하면 앱을 열지 않더라도 Wi-Fi 네트워크가 변경될 때 프록시 자동화를 적용할 수 있습니다. Rethink는 사용자의 물리적인 GPS 위치 정보를 수집, 저장, 공유하지 않습니다.</string>
+    <string name="rpn_recovery_desc" translatable="true">서버를 등록하거나 가져올 수 없습니다. VPN이 연결되었는지 확인하고 다시 시도하세요. 계속 실패한다면, 서버를 제거했다가 다시 추가해 보세요.</string>
+    <string name="use_bootstrap_dns_to_bypass" translatable="true">우회 시 부트스트랩 DNS 사용</string>
+    <string name="settings_rinr_btmsht_desc" translatable="true">루프백 모드에서는, Rethink가 자체 네트워크 트래픽을 재라우팅할 수 있습니다. 즉 다른 일반 애플리케이션처럼 Rethink에도 자체 트래픽에 IP 및 도메인 규칙, 전역 방화벽 규칙, 프록시 규칙을 적용할 수 있습니다. 루프백 모드는 사용자에게 더 많은 제어 권한을 주지만, 항상 원하는 대로 동작하지 않을 수도 있습니다.\n\n\nRethink를 방화벽, DNS, 프록시 규칙에서 제외하는 것이 좋습니다. 이렇게 해도 네트워크 모니터링이나 로깅에는 영향을 끼치지 않고, 규칙만 변경됩니다.\n\n\n지금은, 루프백 모드에서 프록시 락다운이 강제되지 않습니다.</string>
 </resources>
