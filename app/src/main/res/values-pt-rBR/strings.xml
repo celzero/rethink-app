@@ -165,7 +165,7 @@
     <string name="brbs_restore_dialog_failure_positive">Repetir restauração</string>
     <string name="brbs_restore_complete_toast">Restauração concluída, reiniciando o aplicativo…</string>
     <string name="rdns_plus" translatable="false">RDNS Plus</string>
-    <string name="block">bloquear</string>
+    <string name="block">Bloquear</string>
     <string name="status_no_internet">sem internet</string>
     <string name="title_about">Sobre</string>
     <string name="app_name" translatable="false">RethinkDNS</string>
@@ -215,9 +215,9 @@
     <string name="orbot_explanation">Orbot é um aplicativo de proxy gratuito que permite que outros aplicativos usem a internet com mais &lt;u&gt;segurança&lt;/u&gt;. \nOrbot usa o &lt;u&gt;Tor&lt;/u&gt; para criptografar seu tráfego de internet, o que ajuda você a &lt;u&gt;ignorar a censura&lt;/u&gt; e a se defender contra formas de &lt;u&gt;vigilância de rede&lt;/u&gt; que ameaçam a liberdade e a privacidade pessoais. \n&lt;u&gt;Proxy TCP&lt;/u&gt;: Rethink encaminha apenas conexões TCP de aplicativos &lt;i&gt;incluídos&lt;/i&gt; para Orbot. \n&lt;u&gt;Proxy HTTP&lt;/u&gt;: Rethink &lt;i&gt;estabelece&lt;/i&gt; o túnel HTTP CONNECT para Orbot e encaminha apenas conexões TCP de aplicativos &lt;i&gt;incluídos&lt;/i&gt;.</string>
     <string name="settings_autostart_bootup_heading">Inicialização automática ao ligar (experimental)</string>
     <string name="settings_https_disabled_error">Conectado ao %1$s. Desligue-o para continuar.</string>
-    <string name="settings_general_header">geral</string>
+    <string name="settings_general_header">Geral</string>
     <string name="settings_autostart_bootup_desc">Ao ligar o dispositivo, inicie o Rethink se ele estava em execução antes de desligar.</string>
-    <string name="isolate">isolar</string>
+    <string name="isolate">Isolar</string>
     <string name="app_name_small_case" translatable="false">rethink</string>
     <string name="pause_title_desc">descansando…</string>
     <string name="settings_title_desc">DNS + Firewall altamente personalizável</string>
@@ -230,10 +230,10 @@
     <string name="slide_2_desc">Rethink é a melhor maneira de monitorar as atividades da rede, ignorar a censura da internet e implementar um firewall para os aplicativos em seu dispositivo Android.</string>
     <string name="slide_1_title">Gratuito e de código aberto</string>
     <string name="slide_1_desc">Rethink é um software de código aberto apoiado pelo programa Mozilla Builders MVP da FOSS United Foundation.</string>
-    <string name="allow">permitir</string>
+    <string name="allow">Permitir</string>
     <string name="bypass_universal">Ignorar todos</string>
-    <string name="exclude">excluir</string>
-    <string name="untracked">não rastreado</string>
+    <string name="exclude">Excluir</string>
+    <string name="untracked">Não rastreado</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Atenção: Rethink foi desativado</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Toque para alterar a configuração de proteção</string>
     <string name="dns_mode_notification_title">Protegido! Conectado ao DNS rápido e seguro.</string>
@@ -282,7 +282,7 @@
     <string name="always_on_dialog_stop_message">A opção \"VPN Sempre Ativa\" nas configurações de VPN do Android está ativada para o Rethink. Quer mesmo encerrar o Rethink?</string>
     <string name="always_on_dialog_positive">Encerrar</string>
     <string name="always_on_dialog_neutral">Configurações</string>
-    <string name="firewall_act_universal_tab">universal</string>
+    <string name="firewall_act_universal_tab">Universal</string>
     <string name="firewall_act_network_monitor_tab">Rede</string>
     <string name="dns_act_configure_tab">Configurar</string>
     <string name="univ_firewall_dialog_title">Excluir regra de IP?</string>
@@ -336,7 +336,7 @@
     <string name="settings_ptrans_heading">Forçar saída IPv4</string>
     <string name="settings_ptrans_desc">Traduzir o tráfego IPv6 de saída para IPv4 no dispositivo. Ative se você estiver conectado a uma rede somente com IPv4.</string>
     <string name="settings_allow_bypass_heading">Habilitar visibilidade da rede</string>
-    <string name="settings_proxy_header">proxy</string>
+    <string name="settings_proxy_header">Proxy</string>
     <string name="settings_socks5_heading">Configurar proxy SOCKS5</string>
     <string name="settings_socks5_desc">Encaminhar conexões para o endpoint SOCKS5.</string>
     <string name="settings_https_heading">Configurar proxy HTTP(S) CONNECT</string>
@@ -477,7 +477,7 @@
     <string name="cd_dns_crypt_dialog_name">Nome</string>
     <string name="cd_dns_crypt_dialog_stamp">Selo</string>
     <string name="cd_dns_crypt_dialog_desc">Descrição (opcional)</string>
-    <string name="lbl_add">adicionar</string>
+    <string name="lbl_add">Adicionar</string>
     <string name="cd_dns_crypt_error_text_1">Selo não pode estar vazio</string>
     <string name="cd_doh_dialog_heading">Adicionar DNS sobre HTTPS</string>
     <string name="cd_doh_dialog_resolver_name">Nome do resolvedor</string>
@@ -705,7 +705,7 @@
     <string name="intent_launch_error">Não foi possível abrir %1$s</string>
     <string name="firewall_rule_block_univ_ip">IP / Porta (Universal)</string>
     <string name="private_dns_dialog_heading">Desativar DNS Privado</string>
-    <string name="private_dns_dialog_desc">As configurações de DNS do Rethink são substituídas pelo \"DNS Privado\" do Android. \n \nPara usar o DNS do Rethink, acesse as configurações no seu dispositivo Android e desative a opção \"DNS Privado\".</string>
+    <string name="private_dns_dialog_desc">As configurações de DNS do Rethink estão sendo substituídas pelo \"DNS Privado\" do Android.\n \nPara usar o DNS do Rethink, acesse as configurações do seu dispositivo Android e desative a opção \"DNS Privado\".</string>
     <string name="private_dns_error">Não foi possível iniciar a tela de DNS Privado.</string>
     <string name="private_dns_dialog_positive">Ir para as configurações</string>
     <string name="lbl_apply" translatable="true">Aplicar</string>
@@ -727,10 +727,10 @@
     <string name="lbl_rules" translatable="true">regras</string>
     <string name="settings_locale_desc" translatable="true">Escolha o seu idioma preferido</string>
     <string name="settings_locale_dialog_neutral" translatable="true">Ajude a traduzir este aplicativo</string>
-    <string name="lbl_logs" translatable="true">registros</string>
-    <string name="bypass_dns_firewall" translatable="true">ignorar dns e firewall</string>
+    <string name="lbl_logs" translatable="true">Registros</string>
+    <string name="bypass_dns_firewall" translatable="true">Ignorar DNS e Firewall</string>
     <string name="bsct_block_domain" translatable="true">Bloquear, confiar &lt;u&gt;domínio(s)&lt;/u&gt; para &lt;u&gt;este aplicativo&lt;/u&gt;</string>
-    <string name="settings_general_customize" translatable="true">personalizar</string>
+    <string name="settings_general_customize" translatable="true">Personalizar</string>
     <string name="settings_pcap_heading" translatable="true">Captura de pacotes</string>
     <string name="settings_default_dns_heading" translatable="true">Escolher DNS alternativo</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">Desativado (padrão)</string>
@@ -757,7 +757,7 @@
     <string name="cd_dns_alg_desc" translatable="true">Atribuir IP exclusivo por solicitação de DNS.</string>
     <string name="cd_dns_alg_heading" translatable="true">Filtragem de DNS avançada (experimental)</string>
     <string name="lbl_maybe_blocked" translatable="true">Talvez bloqueado</string>
-    <string name="lbl_network" translatable="true">rede</string>
+    <string name="lbl_network" translatable="true">Rede</string>
     <string name="lbl_import" translatable="true">Importar</string>
     <string name="lbl_qr_code" translatable="true">Código QR</string>
     <string name="lbl_addresses" translatable="true">Endereços</string>
@@ -776,7 +776,7 @@
     <string name="lbl_sec" translatable="true">seg</string>
     <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">Ignora as regras de DNS e firewall.</string>
     <string name="lbl_hour" translatable="true">hr</string>
-    <string name="lbl_save" translatable="true">salvar</string>
+    <string name="lbl_save" translatable="true">Salvar</string>
     <string name="settings_go_log_desc" translatable="true">Para fins de depuração</string>
     <string name="settings_biometric_desc" translatable="true">Proteger esse aplicativo usando sua tela de bloqueio</string>
     <string name="public_key_copy_toast_msg" translatable="true">Chave pública copiada.</string>
@@ -793,7 +793,7 @@
     <string name="search_proxy_add_apps" translatable="true">Buscar aplicativos por nome</string>
     <string name="lbl_inactive" translatable="true">Inativo</string>
     <string name="lbl_active" translatable="true">Ativo</string>
-    <string name="lbl_app_wise" translatable="true">por aplicativo</string>
+    <string name="lbl_app_wise" translatable="true">Por aplicativo</string>
     <string name="status_protected_with_wg" translatable="true">Protegido com wireguard</string>
     <string name="settings_default_dns_desc" translatable="true">Em casos raros, quando o DNS preferido do usuário não pode ser determinado, o DNS alternativo é usado.</string>
     <string name="lbl_insecure" translatable="true">(inseguro)</string>
@@ -989,15 +989,15 @@
     <string name="whats_new_version_update" translatable="false"><![CDATA[<b>Don\'t Panic 2</b><br/><br/> 1. New: Capture network engine errors in user bug reports.<br/> 2. New: use System DNS for undelegated domain names iff Prevent DNS leaks is ON.<br/> 3. Improvement: Dual-stack (IPv4 + IPv6) WireGuard connectivity.<br/> 4. Improvement: Avoid blocking the UI elements when the network engine is unresponsive.<br/> 5. Fix: Connection timeouts with Advanced DNS filtering turned ON.<br/> 6. Fix: WireGuard peer endpoints with domain names hang on network changes.<br/><br/> <a href=https://svc.rethinkdns.com/r/translate>Help translate this app</a>]]></string>
     <string name="exclude_apps_from_proxy_failure_toast">Este aplicativo ignora proxies</string>
     <string name="exclude_apps_from_proxy">Ignorar aplicativo de todos os proxies</string>
-    <string name="lbl_notification" translatable="true">notificação</string>
+    <string name="lbl_notification" translatable="true">Notificação</string>
     <string name="memory_notification_text">Rethink está com pouca memória. As ações do sistema podem ser limitadas.</string>
-    <string name="lbl_test" translatable="true">testar</string>
+    <string name="lbl_test" translatable="true">Testar</string>
     <string name="lbl_protos" translatable="true">protos</string>
     <string name="lbl_experimental" translatable="true">(experimental)</string>
     <string name="lbl_service_providers" translatable="true">Provedores de serviços</string>
     <string name="lbl_hop" translatable="true">Relés</string>
     <string name="lbl_manual" translatable="true">Manual</string>
-    <string name="lbl_bootstrap" translatable="true">Fallback</string>
+    <string name="lbl_bootstrap" translatable="true">Bootstrap</string>
     <string name="wireguard_title" translatable="true">Internet segura com WireGuard</string>
     <string name="wireguard_desc" translatable="true">Criptografe seu tráfego de internet com o WireGuard. Escolha rotas diferentes para aplicativos diferentes.</string>
     <string name="firewall_title" translatable="true">Proteja seu Android com Firewall</string>
@@ -1040,7 +1040,7 @@
     <string name="settings_allow_incoming_wg_packets_desc" translatable="true">Quando habilitado, permitir conexões de entrada iniciadas por peers WireGuard.</string>
     <string name="stability_program_snackbar_msg" translatable="true">Programa de estabilidade habilitado. Relatórios de falhas ajudam a melhorar recursos experimentais.</string>
     <string name="top_active_conns" translatable="true">Principais conexões ativas</string>
-    <string name="lbl_expires_on" translatable="true">Expira em</string>
+    <string name="lbl_expires_on" translatable="true">Valido até</string>
     <string name="ac_desync" translatable="true">Desincronizar</string>
     <plurals name="peer_count">
         <item quantity="one">%d peer</item>
@@ -1113,4 +1113,23 @@
     <string name="close_conns_dialog_desc" translatable="true">Feche todas as conexões para%1$s?</string>
     <string name="ac_split_tls" translatable="true">TCP/TLS</string>
     <string name="tombstone_app_desc" translatable="true">Quando habilitado, manter regras do aplicativo por 7 dias.</string>
+    <string name="lbl_saving" translatable="true">Salvando…</string>
+    <string name="ip_mismatch_notification_title" translatable="true">Incompatibilidade do protocolo de rede</string>
+    <string name="ip_mismatch_notification_content" translatable="true">Seu protocolo IP selecionado não está disponível na rede atual. Mude para o modo \"IPv4 &amp; IPv6\" ou \"Auto\" para ficar conectado.</string>
+    <string name="doh_empty_state_title" translatable="true">Sem endpoints do DoH</string>
+    <string name="doh_empty_state_desc" translatable="true">Adicione um endpoint DNS-over-HTTPS para começar.</string>
+    <string name="odoh_empty_state_title" translatable="true">Sem endpoints do ODoH</string>
+    <string name="odoh_empty_state_desc" translatable="true">Adicione um endpoint do Oblivious DNS-over-HTTPS para começar.</string>
+    <string name="dot_empty_state_title" translatable="true">Sem endpoints do DoT</string>
+    <string name="dot_empty_state_desc" translatable="true">Adicione um endpoint do DNS-over-TLS para começar.</string>
+    <string name="dns_proxy_empty_state_title" translatable="true">Sem endpoints no Proxy do DNS</string>
+    <string name="dns_proxy_empty_state_desc" translatable="true">Adicione um endpoint no Proxy do DNS para começar.</string>
+    <string name="dns_crypt_empty_state_title" translatable="true">Sem endpoints do DNSCrypt</string>
+    <string name="dns_crypt_empty_state_desc" translatable="true">Adicione um endpoint no DNSCrypt para começar.</string>
+    <string name="rethink_empty_state_title" translatable="true">Nenhuma lista de bloqueios encontrada</string>
+    <string name="rethink_empty_state_desc" translatable="true">Baixe ou configure uma lista de bloqueios para começar.</string>
+    <string name="settings_rinr_btmsht_title" translatable="true">Loopback (experimental)</string>
+    <string name="settings_rinr_btmsht_desc" translatable="true">No modo Loopback, o Rethink pode redirecionar seu próprio tráfego de rede. Isso significa que o Rethink pode aplicar regras de IP e domínio, regras universais de firewall e regras de proxy no tráfego do Rethink como se fosse qualquer outro aplicativo regular. Mesmo assim, o Loopback oferece mais controle, o comportamento disso pode nem sempre ser desejável.\n\n\nRecomenda-se isentar o Rethink de firewall, DNS e regras de proxy. Fazer isso não afeta o monitoramento ou o registro de rede, mas apenas as regras.\n\n\nNo modo Loopback, o Bloqueio do Proxy não será aplicado, por enquanto.</string>
+    <string name="settings_rinr_exempt_btn" translatable="true">Isentar o Rethink</string>
+    <string name="app_info_rethink_warning_title" translatable="true">Cuidado</string>
 </resources>
