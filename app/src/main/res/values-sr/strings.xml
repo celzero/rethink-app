@@ -116,8 +116,8 @@
     <string name="conn_track_clear_logs_title" translatable="true">Обрисати све мрежне записе?</string>
     <string name="conn_track_clear_logs_message" translatable="true">Ово брише само мрежне записе али не и правила заштитног зида. Ова радња је неопозива. Да ли желите да наставите?</string>
     <string name="bsct_app_info" translatable="true">Информације о апликацији</string>
-    <string name="bsct_block_domain" translatable="true">Блокирај, веруј <u>доменима</u> за <u>ову апликацију</u></string>
-    <string name="bsct_block" translatable="true">Блокирај, заобиђи, изузми, изолуј <u>ову апликацију</u></string>
+    <string name="bsct_block_domain" translatable="true">Блокирај, веруј &lt;u&gt;доменима&lt;/u&gt; за &lt;u&gt;ову апликацију&lt;/u&gt;</string>
+    <string name="bsct_block" translatable="true">Блокирај, заобиђи, изузми, изолуј &lt;u&gt;ову апликацију&lt;/u&gt;</string>
     <string name="bsct_conn_block_desc_device" translatable="true">блокирано %1$s на уређају</string>
     <string name="bsct_conn_desc_allowed" translatable="true">дозвољено на %1$s%2$s</string>
     <string name="bsct_conn_desc_blocked" translatable="true">блокирано на %1$s%2$s</string>
@@ -135,7 +135,7 @@
     <string name="custom_url_error_invalid_url" translatable="true">Неисправан URL</string>
     <string name="dns_query_clear_logs_title" translatable="true">Обрисати све DNS записе?</string>
     <string name="dns_query_clear_logs_message" translatable="true">Ово брише DNS записе на уређаје. Ова радња је неопозива. Да ли желите да наставите?</string>
-    <string name="bsct_block_ip" translatable="true">Блокирај, веруј <u>овој IP</u> за <u>ову апликацију</u></string>
+    <string name="bsct_block_ip" translatable="true">Блокирај, веруј &lt;u&gt;овој IP&lt;/u&gt; за &lt;u&gt;ову апликацију&lt;/u&gt;</string>
     <string name="private_dns_dialog_positive" translatable="true">Иди на подешавања</string>
     <string name="firewall_act_network_monitor_tab" translatable="true">Мрежа</string>
     <string name="dns_act_configure_tab" translatable="true">Подеси</string>
@@ -423,11 +423,11 @@
     <string name="ctbs_app_other_apps" translatable="true">%1$s + %2$s остале апликације</string>
     <string name="ctbs_block_other_apps" translatable="true">Правила примењена за %1$s ће такође бити применљива за %2$s осталих апликација</string>
     <string name="dns_log_dialog_positive" translatable="true">Обриши записе</string>
-    <string name="dns_btm_sheet_dialog_message" translatable="true"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s блок листи</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
-    <string name="dns_btm_sheet_dialog_ips" translatable="true"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_message" translatable="true"><Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s блок листи</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_ips" translatable="true"><Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
     <string name="dns_btm_sheet_chip" translatable="true">+%1$s остали IP-јеви</string>
     <string name="dns_btm_sheet_chip_no_answer" translatable="true">Нема одговора</string>
-    <string name="dns_btm_resolved_crypt" translatable="true">разрешено <u>анонимно</u>%1$s по %2$s путем %3$s</string>
+    <string name="dns_btm_resolved_crypt" translatable="true">разрешено &lt;u&gt;анонимно&lt;/u&gt;%1$s по %2$s путем %3$s</string>
     <string name="dns_btm_resolved_doh" translatable="true">разрешено %1$s по %2$s</string>
     <string name="dns_btm_resolved_doh_no_server" translatable="true">разрешено %1$s</string>
     <string name="dns_btm_latency_ms" translatable="true">%1$sms</string>
@@ -616,7 +616,7 @@
     <string name="bypass_dns_firewall_tooltip">%1$s ради једино са Rethink-овим DNS-om</string>
     <string name="exclude_apps_from_proxy">Заобиђи апликацију од свих проксија</string>
     <string name="bsac_title_desc" translatable="true">Правила се примањују само на ову апликацију.</string>
-    <string name="bsdl_block_desc" translatable="true">Блокирај, веруј <u>овом домену</u></string>
+    <string name="bsdl_block_desc" translatable="true">Блокирај, веруј &lt;u&gt;овом домену&lt;/u&gt;</string>
     <string name="bsdl_blocked_desc" translatable="true">блокирано %1$s од %2$s</string>
     <string name="network_dns" translatable="true">Системски DNS</string>
     <string name="notif_download_content_title" translatable="true">Преузми блок листу на уређај</string>
@@ -873,7 +873,7 @@
     <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true">Ова DNS конекција је проксована и прослеђена на пожељну DNS крајњу тачку корисника.<br/><br/> За промену онемогући <i>спречи DNS цурења</i> на екрану DNS <i>подешавања</i>.</string>
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Конекција је дозвољена јер је <i>изворна апликација</i> подешена да <i>заобиђе dns и правила заштитног зида</i>.<br/><br/> За промену идите на екран <i>заштитни зид по апликацији</i>.</string>
     <string name="firewall_rule_trusted_ip_desc" translatable="true">Конекција је дозвољена јер је <i>одредишна IP</i> подешена као IP од поверења.<br/><br/> За промену иди на екран <i>заштитни зид по апликацији</i>.</string>
-    <string name="whats_new_version_update" translatable="true">&lt;b&gt;Не паничите 2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Ново: Хватање грешака мрежног енџина у корисничким извештајима о грешки.&lt;br/&gt; 2. Ново: користи системски DNS за неделегиране називе домена уколико је укључен Спречи DNS цурења.&lt;br/&gt; 3. Унапређење: Двострука (IPv4 + IPv6) WireGuard повезивост.&lt;br/&gt; 4. Унапређење: Избегавај блокирање UI елемената када је мрежни енџин нереспонзиван.&lt;br/&gt; 5. Исправка: истицање времена повезивања са укљученим Напредним DNS филтрирањем.&lt;br/&gt; 6. Исправка: WireGuard peer крајње тачке са називима домена висе при променама мреже.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Помозите у превођењу ове апликације&lt;/a&gt;</string>
+    <string name="whats_new_version_update" translatable="false"><![CDATA[<b>Не паничите 2</b><br/><br/> 1. Ново: Хватање грешака мрежног енџина у корисничким извештајима о грешки.<br/> 2. Ново: користи системски DNS за неделегиране називе домена уколико је укључен Спречи DNS цурења.<br/> 3. Унапређење: Двострука (IPv4 + IPv6) WireGuard повезивост.<br/> 4. Унапређење: Избегавај блокирање UI елемената када је мрежни енџин нереспонзиван.<br/> 5. Исправка: истицање времена повезивања са укљученим Напредним DNS филтрирањем.<br/> 6. Исправка: WireGuard peer крајње тачке са називима домена висе при променама мреже.<br/><br/> <a href=https://svc.rethinkdns.com/r/translate>Помозите у превођењу ове апликације</a>]]></string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Пошаљи прокси прослеђујуће апликације на повратну петљу</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">Када је онемогућено, изузима прокси (SOCKS5, HTTP, DNS) прослеђујуће апликације из Rethink-овог VPN тунела.</string>
     <string name="orbot_stop_dialog_message" translatable="true">Rethink је престао да прослеђује конекције Orbot-у, али Orbot је можда покренут у позадини.</string>
