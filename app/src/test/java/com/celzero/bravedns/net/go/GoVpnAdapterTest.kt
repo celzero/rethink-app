@@ -343,6 +343,36 @@ class GoVpnAdapterTest : KoinTest {
     }
 
     @Test
+    fun `companion replaceHostWithIp replaces host with first ipv4`() {
+        assertEquals(
+            "https://8.8.8.8/dns-query",
+            GoVpnAdapter.replaceHostWithIp("https://dns.google.com/dns-query", "8.8.8.8,3.4.2.3")
+        )
+    }
+
+    @Test
+    fun `companion replaceHostWithIp brackets ipv6`() {
+        assertEquals(
+            "https://[2606:4700:20::681a:e1e]/dns-query",
+            GoVpnAdapter.replaceHostWithIp("https://dns.google.com/dns-query", "2606:4700:20::681a:e1e,8.8.8.8")
+        )
+    }
+
+    @Test
+    fun `companion replaceHostWithIp returns url unchanged when no ip`() {
+        val url = "https://dns.google.com/dns-query"
+        assertEquals(url, GoVpnAdapter.replaceHostWithIp(url, ""))
+    }
+
+    @Test
+    fun `companion replaceHostWithIp keeps path and preserves http scheme`() {
+        assertEquals(
+            "http://172.67.70.254/",
+            GoVpnAdapter.replaceHostWithIp("http://basic.rethinkdns.com/", "172.67.70.254,104.26.14.30")
+        )
+    }
+
+    @Test
     fun `smoke disconnected guard for critical suspend methods`() = runTest {
         val tunnel = mockk<Tunnel>(relaxed = true)
         every { tunnel.isConnected } returns false
