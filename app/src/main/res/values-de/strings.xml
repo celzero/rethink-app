@@ -64,8 +64,8 @@
     <string name="conn_track_clear_logs_message">Dabei werden nur die Netzwerk-Logs, nicht aber die Firewall-Regeln gelöscht. Dieser Vorgang ist nicht umkehrbar. Möchtest du fortfahren?</string>
     <string name="dns_query_clear_logs_title">Alle DNS-Logs löschen?</string>
     <string name="dns_query_clear_logs_message">Dadurch werden die DNS-Logs auf dem Gerät gelöscht. Dieser Vorgang ist nicht umkehrbar. Möchtest du fortfahren?</string>
-    <string name="bsct_block_ip">Blockieren, <u>dieser IP</u> für <u>diese App</u> vertrauen</string>
-    <string name="bsct_block"><u>Diese App</u> blockieren, umgehen, ausschließen, isolieren</string>
+    <string name="bsct_block_ip">Blockieren, &lt;u&gt;dieser IP&lt;/u&gt; für &lt;u&gt;diese App&lt;/u&gt; vertrauen</string>
+    <string name="bsct_block">&lt;u&gt;Diese App&lt;/u&gt; blockieren, umgehen, ausschließen, isolieren</string>
     <string name="bsct_conn_block_desc">blockiert %1$s durch %2$s</string>
     <string name="bsct_conn_desc_blocked">blockiert bei %1$s %2$s</string>
     <string name="always_on_dialog_positive_btn">Einstellungen öffnen</string>
@@ -357,7 +357,7 @@
     <string name="ci_no_rule">Keine Regel</string>
     <string name="ci_block">Blockieren</string>
     <string name="ci_delete">löschen</string>
-    <string name="ada_noapp_dialog_message">App-Informationen fehlen. Vielleicht wurde diese App deinstalliert\?</string>
+    <string name="ada_noapp_dialog_message">App-Informationen fehlen. Vielleicht wurde diese App deinstalliert?</string>
     <string name="ada_noapp_dialog_positive">OK</string>
     <string name="ada_firewall_status"><![CDATA[Diese App <b><i>%1$s</i></b>.]]></string>
     <string name="ada_ip_connection_count">Verbunden mit %1$s IP-Adresse(n)</string>
@@ -482,10 +482,7 @@
     <string name="brbs_backup_dialog_failure_message">Das Backup konnte nicht erstellt werden. Erneut versuchen?</string>
     <string name="ada_app_dns_settings">DNS-Einstellungen</string>
     <string name="hsf_vpn_dialog_message">Rethink benötigt die Berechtigung, ein lokales VPN einzurichten, um die DNS-Anfragen des Geräts zu verschlüsseln, einen Netzwerkmonitor zu implementieren und Firewall-Regeln durchzusetzen.\n\nRethink sammelt keine Informationen und spioniert dich in keiner Weise aus.</string>
-    <string name="firewall_card_text_active">%1$s blockiert
-\n%2$s umgangen
-\n%3$s ausgeschlossen
-\n%4$s isoliert</string>
+    <string name="firewall_card_text_active">%1$s blockiert \n%2$s umgangen \n%3$s ausgeschlossen \n%4$s isoliert</string>
     <string name="firewall_card_text_inactive">Firewall-Modus aktivieren.</string>
     <string name="dns_card_latency_active">%1$s ms</string>
     <string name="hsf_vpn_dialog_header">Achtung!</string>
@@ -502,7 +499,7 @@
     <string name="apps_card_ips_count">%1$s IP- und Port-Regel(n)</string>
     <string name="hsf_start_btn_state">Start</string>
     <string name="hsf_stop_btn_state">Stopp</string>
-    <string name="hsf_uptime">(aktiv %1$s; Prototypen: %2$s; Typ: %3$s)</string>
+    <string name="hsf_uptime" translatable="false">(aktiv %1$s; Prototypen: %2$s; Typ: %3$s)</string>
     <string name="hsf_downtime">(inaktiv seit %1$s)</string>
     <string name="hsf_start_dialog_header">%1$s starten</string>
     <string name="hsf_start_dialog_positive">Start</string>
@@ -720,21 +717,21 @@
     <string name="fapps_firewall_filter_isolate">Isoliert</string>
     <string name="fapps_info_exclude_msg">Sowohl von DNS als auch von der Firewall ausschließen.</string>
     <string name="fapps_bypass_block_dialog_title">Apps umgehen</string>
-    <string name="fapps_unblock_dialog_message">Verbindungen für <i>aufgelistete</i> Apps erlauben\?</string>
+    <string name="fapps_unblock_dialog_message">Verbindungen für <i>aufgelistete</i> Apps erlauben?</string>
     <string name="fapps_exclude_block_dialog_title">Apps ausschließen</string>
     <string name="fapps_isolate_block_dialog_title">Apps isolieren</string>
-    <string name="fapps_isolate_block_dialog_message"><i>Aufgelistete</i> Apps isolieren\?</string>
-    <string name="fapps_exclude_block_dialog_message"><i>Aufgelistete</i> Apps von DNS und Firewall ausschließen\?</string>
+    <string name="fapps_isolate_block_dialog_message"><i>Aufgelistete</i> Apps isolieren?</string>
+    <string name="fapps_exclude_block_dialog_message"><i>Aufgelistete</i> Apps von DNS und Firewall ausschließen?</string>
     <string name="fapps_firewall_filter_desc"><![CDATA[<u>%1$s</u> %2$s Apps werden angezeigt]]></string>
     <string name="fapps_firewall_filter_desc_category"><![CDATA[<u>%1$s</u> %2$s Apps in Kategorien %3$s werden angezeigt]]></string>
-    <string name="unicode_warning_sign">⚠</string>
+    <string name="unicode_warning_sign" translatable="false">⚠</string>
     <string name="ci_trust_rule">Vertrauen</string>
     <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">Meist blockierte Apps</string>
     <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">Meist erlaubte Apps</string>
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">Meist kontaktierte IPs</string>
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">Meist blockierte IPs</string>
     <string name="ssv_see_more">Alle anzeigen</string>
-    <string name="fapps_bypass_block_dialog_message">Universelle Firewall-Regeln für <i>aufgelistete</i> Apps umgehen\?</string>
+    <string name="fapps_bypass_block_dialog_message">Universelle Firewall-Regeln für <i>aufgelistete</i> Apps umgehen?</string>
     <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">Meist kontaktierte Domains</string>
     <string name="settings_locale_desc">Bevorzugte Sprache wählen</string>
     <string name="settings_locale_dialog_title">Bevorzugte Sprache wählen</string>
@@ -896,7 +893,7 @@
     <string name="bad_config_reason_unknown_section" translatable="true">Unbekannte Sektion</string>
     <string name="crypt_relay_netherlands" translatable="true">Anonymisiertes DNS-Relay, gehostet in den Niederlanden</string>
     <string name="invalid_file_error" translatable="true">Ungültige Datei</string>
-    <string name="include_all_app_wg_dialog_desc">Alle Apps durch diesen Tunnel tunneln\?</string>
+    <string name="include_all_app_wg_dialog_desc">Alle Apps durch diesen Tunnel tunneln?</string>
     <string name="key_length_error" translatable="true">Falsche Schlüssellänge</string>
     <string name="config_delete_dialog_title">Konfiguration löschen</string>
     <string name="logs_card_duration" translatable="true">da %1$s</string>
@@ -908,7 +905,7 @@
     <string name="bad_config_error" translatable="true">%1$s in %2$s</string>
     <string name="parse_error_inet_endpoint" translatable="true">Endpunkt</string>
     <string name="exclude_all_app_wg_dialog_title">Alle Apps ausschließen</string>
-    <string name="exclude_all_app_wg_dialog_desc">Alle Apps von diesem Tunnel ausschließen\?</string>
+    <string name="exclude_all_app_wg_dialog_desc">Alle Apps von diesem Tunnel ausschließen?</string>
     <string name="no_configs_error" translatable="true">Keine Konfigurationen gefunden</string>
     <string name="status_protected_with_wg_private_dns" translatable="true">geschützt mit WireGuard &amp; privatem DNS</string>
     <string name="crypt_adguard_family_desc" translatable="true">Adguard DNS mit sicherer Suche und Blockierung von Inhalten für Erwachsene.</string>
