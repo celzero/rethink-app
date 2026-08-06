@@ -537,7 +537,7 @@
     <string name="settings_check_update_desc">每周一次自动检查应用是否有可用更新。</string>
     <string name="settings_http_proxy_error_text3">域名为空</string>
     <string name="firewall_status_excluded">已排除在 DNS 与防火墙外</string>
-    <string name="hsf_vpn_dialog_message">Rethink 需要设置本地 VPN 的权限，以加密设备的 DNS 请求、实现网络监测与执行防火墙规则。 \n \nRethink 并不会收集任何数据，且不会以任何方式监视您。</string>
+    <string name="hsf_vpn_dialog_message">Rethink 需要权限来设置本地 VPN，以加密设备的 DNS 请求、实现网络监控并强制执行防火墙规则。\n\n基于 Wi-Fi 的代理自动化需要位置权限来识别连接的 Wi-Fi 网络（SSID）。此权限仅在您启用该功能时请求。\n\nRethink 不会以任何方式收集您的信息或监视您。</string>
     <string name="dc_check_update_desc">每<i>三</i>天检查一次屏蔽名单更新</string>
     <string name="about_settings">系统</string>
     <string name="cd_dnscrypt_relay_heading">中继</string>
@@ -777,14 +777,14 @@
     <string name="settings_pcap_heading" translatable="true">数据包捕获</string>
     <string name="lbl_rules" translatable="true">规则</string>
     <string name="lbl_configure" translatable="true">配置</string>
-    <string name="settings_default_dns_heading" translatable="true">选择回落 DNS</string>
+    <string name="settings_default_dns_heading" translatable="true">选择 Bootstrap DNS</string>
     <string name="lbl_logs" translatable="true">日志</string>
     <string name="bsct_block_domain" translatable="true">对&lt;u&gt;此应用&lt;/u&gt;拦截、信任&lt;u&gt;此域名&lt;/u&gt;</string>
     <string name="firewall_status_bypass_dns_firewall" translatable="true">已绕过 DNS 与防火墙规则</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">VPN 处于仅 DNS 时无法设定代理。</string>
     <string name="settings_general_customize" translatable="true">自定义</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">关闭（默认）</string>
-    <string name="settings_default_dns_desc" translatable="true">在极少数情况下，用户偏好的 DNS 无法确定时，将使用回落 DNS 。</string>
+    <string name="settings_default_dns_desc" translatable="true">仅在启动期间用于查找加密 DNS 服务器的 IP 地址。</string>
     <string name="settings_pcap_dialog_option_2" translatable="true">输出至 Logcat</string>
     <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
     <string name="settings_pcap_dialog_option_3" translatable="true">输出至下载文件夹</string>
@@ -916,7 +916,7 @@
     <string name="config_add_success_toast">配置已添加</string>
     <string name="include_all_app_wg_dialog_title">包含所有应用</string>
     <string name="exclude_all_app_wg_dialog_desc">是否从此隧道排除所有应用？</string>
-    <string name="wireguard_no_config_msg">无 WireGuard VPN。添加一些配置以开始连接。</string>
+    <string name="wireguard_no_config_msg">无 WireGuard VPN。添加一些即可开始使用。</string>
     <string name="cloudflare_dns_desc" translatable="true">不拦截任何 DNS 请求。使用 Cloudflare 的 1.1.1.1 DNS 端点。</string>
     <string name="cloudflare_family_dns_desc" translatable="true">拦截恶意软件与成人内容。使用 Cloudflare 的 1.1.1.3 DNS 端点。</string>
     <string name="cleanbrowsing_family_dns_desc" translatable="true">家庭过滤器拦截对所有成人、色情与露骨网站的访问。其亦将拦截可用于绕行过滤器的代理与 VPN 域名。包含混合内容的网站（如 Reddit ）也被拦截。 Google 、 Bing 与 YouTube 被设置为安全模式。</string>
@@ -986,7 +986,7 @@
     <string name="settings_connectivity_checks" translatable="true">检查连接</string>
     <string name="settings_connectivity_checks_desc" translatable="true">发送连接检查以确保网络连通性。</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">已保护！已连接至 DNS + 防火牆 + 代理。</string>
-    <string name="settings_exclude_proxy_apps_heading" translatable="true">回环代理转发应用</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">环回代理转发应用</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">禁用后，将转发代理（ SOCKS5 、 HTTP 、 DNS ）应用从 Rethink 的 VPN 隧道中排除。</string>
     <string name="lbl_notification" translatable="true">通知</string>
     <string name="memory_notification_text">Rethink 当前可用内存过低。系统操作可能受限。</string>
@@ -1026,7 +1026,7 @@
     <string name="lbl_protos" translatable="true">协议</string>
     <string name="lbl_hop" translatable="true">中继</string>
     <string name="lbl_manual" translatable="true">手动</string>
-    <string name="lbl_bootstrap" translatable="true">回落</string>
+    <string name="lbl_bootstrap" translatable="true">Bootstrap</string>
     <string name="univ_firewall_rule_11" translatable="true">拦截全部本地连接</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">是否删除所有域名规则？</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">删除这些规则后会允许任何应用连接这些当前被拦截的域名。</string>
@@ -1656,4 +1656,44 @@
     <string name="fs_configure_network_desc" translatable="true">VPN 隧道模式和网络首选项</string>
     <string name="fs_configure_apps_desc" translatable="true">每个应用的防火墙规则和网络策略</string>
     <string name="lbl_expires_on" translatable="true">到期日</string>
+    <string name="lbl_paused" translatable="true">已暂停</string>
+    <string name="lbl_expired" translatable="true">已过期</string>
+    <string name="rpn_purchased_state" translatable="true">已购买</string>
+    <string name="lbl_cancelled" translatable="true">已取消</string>
+    <string name="dc_block_unknown_desc" translatable="true">阻止所有源自未知应用程序的 DNS 请求。</string>
+    <string name="dc_block_unknown_heading" translatable="true">阻止来自未知来源的 DNS</string>
+    <string name="lbl_plan" translatable="true">套餐</string>
+    <string name="lbl_grace_period" translatable="true">宽限期</string>
+    <string name="ip_mismatch_notification_title" translatable="true">网络协议不匹配</string>
+    <string name="ip_mismatch_notification_content" translatable="true">您选择的 IP 协议在当前网络上不可用。请切换到“IPv4 和 IPv6”或“自动”模式以保持连接。</string>
+    <string name="doh_empty_state_title" translatable="true">无 DoH 端点</string>
+    <string name="doh_empty_state_desc" translatable="true">添加一个 DNS-over-HTTPS 端点即可开始使用。</string>
+    <string name="odoh_empty_state_title" translatable="true">无 ODoH 端点</string>
+    <string name="odoh_empty_state_desc" translatable="true">添加一个 Oblivious DNS-over-HTTPS 端点即可开始使用。</string>
+    <string name="dot_empty_state_title" translatable="true">无 DoT 端点</string>
+    <string name="dot_empty_state_desc" translatable="true">添加一个 DNS-over-TLS 端点即可开始使用。</string>
+    <string name="dns_proxy_empty_state_title" translatable="true">无 DNS 代理端点</string>
+    <string name="dns_proxy_empty_state_desc" translatable="true">添加一个 DNS 代理端点即可开始使用。</string>
+    <string name="dns_crypt_empty_state_title" translatable="true">无 DNSCrypt 端点</string>
+    <string name="dns_crypt_empty_state_desc" translatable="true">添加一个 DNSCrypt 端点即可开始使用。</string>
+    <string name="rethink_empty_state_title" translatable="true">未找到屏蔽名单</string>
+    <string name="rethink_empty_state_desc" translatable="true">下载或配置一个屏蔽名单即可开始使用。</string>
+    <string name="app_info_rethink_warning_proceed" translatable="true">我已了解</string>
+    <string name="rethink_home_screen_warning" translatable="true">可能会影响连接 ⚠️</string>
+    <string name="rpn_recovery_title" translatable="true">无法加载服务器</string>
+    <string name="build_flavor_website_degoogled" translatable="true">website-degoogled</string>
+    <string name="rpn_recovery_desc" translatable="true">我们无法注册或获取此服务器。请确保 VPN 已连接并重试。如果仍然失败，请移除并重新添加服务器。</string>
+    <string name="dc_global_heading" translatable="true">全局</string>
+    <string name="use_bootstrap_dns_to_bypass" translatable="true">使用 Bootstrap DNS 作为绕过</string>
+    <string name="use_bootstrap_dns_to_bypass_desc" translatable="true">启用后，始终对绕过的域名和 IP 地址使用 Bootstrap DNS。</string>
+    <string name="location_disclosure_title" translatable="true">Wi-Fi 功能的位置权限</string>
+    <string name="location_disclosure_message" translatable="true">Rethink 将 Wi-Fi 网络信息（SSID/BSSID）视为位置数据。后台位置允许应用在您的 Wi-Fi 更改时自动应用代理自动化，即使应用未打开。Rethink 不会收集、存储或共享您的实际 GPS 位置。</string>
+    <string name="location_disclosure_positive" translatable="true">继续</string>
+    <string name="location_disclosure_negative" translatable="true">以后再说</string>
+    <string name="sponsor_continue" translatable="true">继续</string>
+    <string name="settings_rinr_btmsht_title" translatable="true">环回（实验性）</string>
+    <string name="settings_rinr_exempt_btn" translatable="true">排除 Rethink</string>
+    <string name="app_info_rethink_warning_title" translatable="true">注意</string>
+    <string name="app_info_rethink_warning_desc" translatable="true">您即将更改 Rethink 的防火墙规则。由于 Rethink 管理 VPN 隧道，因此放行、拦截或隔离其自身流量可能会导致整个网络访问中断。</string>
+    <string name="settings_rinr_btmsht_desc" translatable="true">在环回模式下，Rethink 可以重新路由自身的网络流量。这意味着，Rethink 可以像对待其他常规应用一样，对其流量应用 IP 和域名规则、全局防火墙规则以及代理规则。尽管环回模式提供了更多控制权，但其最终行为可能并非总是理想的。\n\n\n建议将 Rethink 排除在防火墙、DNS 和代理规则之外。这样做不会影响网络监控或日志记录，只会影响规则本身。\n\n\n在环回模式下，代理锁定功能目前不会强制执行。</string>
 </resources>
