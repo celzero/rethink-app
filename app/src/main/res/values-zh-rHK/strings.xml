@@ -263,16 +263,9 @@
     <string name="settings_notification_desc2">DNS / DNS + 防火牆</string>
     <string name="settings_notification_desc3">冇</string>
     <string name="settings_notification_dialog_title">揀通知行爲</string>
-    <string name="settings_notification_dialog_option_1">"
-\n暫停／停止（默認）：
-\n比兩粒掣嚟快速暫停同停止 Rethink。"</string>
-    <string name="settings_notification_dialog_option_2">"
-\nDNS / DNS + 防火牆：
-\n比兩粒掣嚟快速咁喺慳電嘅 DNS 模式同普通嘅 DNS + 防火牆模式之間轉。"</string>
-    <string name="settings_notification_dialog_option_3">"
-\n冇：
-\n唔比任何掣。
-\n"</string>
+    <string name="settings_notification_dialog_option_1">\n\n暫停／停止（默認）：\n\n比兩粒掣嚟快速暫停同停止 Rethink。</string>
+    <string name="settings_notification_dialog_option_2">\n\nDNS / DNS + 防火牆：\n\n比兩粒掣嚟快速咁喺慳電嘅 DNS 模式同普通嘅 DNS + 防火牆模式之間轉。</string>
+    <string name="settings_notification_dialog_option_3">\n\n冇：\n\n唔比任何掣。\n\n</string>
     <string name="settings_selected_theme">而家嘅主題：%1$s</string>
     <string name="settings_protocol_translation_dns_inactive">轉去 DNS 或 DNS + 防火牆模式啓用呢個設定</string>
     <string name="apps_icon_content_desc">App Icon</string>
@@ -289,7 +282,7 @@
     <string name="apps_card_ips_count">%1$s 條 IP 同埠規則</string>
     <string name="hsf_start_btn_state">啓動</string>
     <string name="hsf_stop_btn_state">停止</string>
-    <string name="hsf_uptime">（由 %1$s 開始啓動；協定：%2$s；類型：%3$s）</string>
+    <string name="hsf_uptime" translatable="false">（由 %1$s 開始啓動；協定：%2$s；類型：%3$s）</string>
     <string name="hsf_downtime">（由 %1$s 開始停用）</string>
     <string name="hsf_vpn_dialog_header">注意！</string>
     <string name="lbl_proceed">繼續</string>
