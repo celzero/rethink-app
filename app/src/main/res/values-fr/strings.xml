@@ -103,7 +103,7 @@
     <string name="download_update_dialog_trylater_title">Impossible d’appliquer la mise à jour actuellement</string>
     <string name="download_update_dialog_trylater_message">La mise à jour ne peut être appliquée pour le moment, veuillez réessayer plus tard.</string>
     <string name="settings_enable_logs">Activer la journalisation embarquée sur l’appareil</string>
-    <string name="whats_new_version_update">&lt;b&gt;Ne paniquez pas 2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Nouveau : capturez les erreurs du moteur réseau dans les rapports de bugs des utilisateurs.&lt;br/&gt; 2. Nouveau : utilisez le DNS système pour les noms de domaine non délégués si empêcher les fuites DNS sont activées.&lt;br/&gt; 3. Amélioration : connectivité WireGuard à double pile (IPv4 + IPv6).&lt;br/&gt; 4. Amélioration : évitez de bloquer les éléments de l\'interface utilisateur lorsque le moteur réseau ne répond pas.&lt;br/&gt; 5. Correction : les délais d\'expiration de connexion avec le filtrage DNS avancé sont activés.&lt;br/&gt; 6. Correction : les points de terminaison homologues WireGuard avec des noms de domaine se bloquent lors des modifications du réseau.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Aidez à traduire cette application&lt;/a&gt;</string>
+    <string name="whats_new_version_update" translatable="false"><![CDATA[<b>Ne paniquez pas 2</b><br/><br/> 1. Nouveau : capturez les erreurs du moteur réseau dans les rapports de bugs des utilisateurs.<br/> 2. Nouveau : utilisez le DNS système pour les noms de domaine non délégués si empêcher les fuites DNS sont activées.<br/> 3. Amélioration : connectivité WireGuard à double pile (IPv4 + IPv6).<br/> 4. Amélioration : évitez de bloquer les éléments de l\'interface utilisateur lorsque le moteur réseau ne répond pas.<br/> 5. Correction : les délais d\'expiration de connexion avec le filtrage DNS avancé sont activés.<br/> 6. Correction : les points de terminaison homologues WireGuard avec des noms de domaine se bloquent lors des modifications du réseau.<br/><br/> <a href=https://svc.rethinkdns.com/r/translate>Aidez à traduire cette application</a>]]></string>
     <string name="settings_ptrans_desc">Traduit le trafic sortant IPv6 en IPv4 sur l’appareil. Activez cette option si vous êtes connecté à un réseau uniquement IPv4.</string>
     <string name="settings_allow_bypass_desc">Autorisez les applications requérantes à accéder à tous les réseaux disponibles. Ces applications peuvent contourner le tunnel VPN de Rethink à la demande. Certaines applications de conférence audio/vidéo comme Zoom et Meet peuvent en avoir besoin pour fonctionner correctement.</string>
     <string name="settings_lock_down_mode_desc">Certaines options sont désactivées lorsque le VPN est en mode de verrouillage. <u>Voir les paramètres VPN</u>.</string>
@@ -610,7 +610,7 @@
     <string name="notif_download_content_text">Téléchargement en cours…</string>
     <string name="dc_local_block_enabled">Activé</string>
     <string name="brbs_restore_dialog_positive">Restaurer</string>
-    <string name="cd_dialog_desc">Une URL ou un nom de domaine avec un joker optionnel : *.test.com, test.com/test</string>
+    <string name="cd_dialog_desc">Une URL ou un nom de domaine avec un joker optionnel : *.test.com, test.com/test</string>
     <string name="dns_proxy_remove_dialog_message">Supprimer le proxy DNS de la configuration sauvegardée.</string>
     <string name="settings_vpn_heading">vpn</string>
     <string name="settings_socks5_desc">Transférer les connexions vers le point de terminaison SOCKS5.</string>
@@ -647,7 +647,7 @@
     <string name="firewall_act_universal_tab">global</string>
     <string name="cd_custom_doh_dialog_title">URL du serveur personnalisé</string>
     <string name="dns_btm_sheet_chip_no_answer">Sans réponse</string>
-    <string name="dns_btm_resolved_crypt">résolu <u>anonymement</u> %1$s par %2$s via %3$s</string>
+    <string name="dns_btm_resolved_crypt">résolu &lt;u&gt;anonymement&lt;/u&gt; %1$s par %2$s via %3$s</string>
     <string name="univ_firewall_rule_2">Bloquer les applications non utilisées</string>
     <string name="network_log_app_name_unknown">Inconnus</string>
     <string name="univ_firewall_rule_9">Bloquer sur les réseaux avec facturation à l\'usage (mobiles)</string>
@@ -896,7 +896,7 @@
     <string name="new_warp_invalid_config_toast" translatable="true">Configuration WARP invalide</string>
     <string name="app_ip_domain_rules_desc" translatable="true">Modifier par application IP / Règles de domaine.</string>
     <string name="lbl_http_socks5" translatable="true">HTTP(S) &amp; SOCKS5</string>
-    <string name="wireguard_disclaimer">Le DNS est transmis à %1$s, ICMP (ex : ping) est envoyé au réseau sous-jacent.</string>
+    <string name="wireguard_disclaimer">Le DNS est transmis à %1$s, ICMP (ex : ping) est envoyé au réseau sous-jacent.</string>
     <string name="bad_config_explanation_positive_number" translatable="true">: doit être positif</string>
     <string name="wireguard_no_config_msg">Pas de VPN WireGuard. Ajoutez-en pour commencer.</string>
     <string name="new_warp_error_toast" translatable="true">Impossible de récupérer la configuration WARP</string>
@@ -944,7 +944,7 @@
     <string name="lbl_private" translatable="true">Privé</string>
     <string name="lbl_secure" translatable="true">Sécurisé</string>
     <string name="lbl_peer" translatable="true">Pair</string>
-    <string name="dot_custom_url_remove_dialog_title" translatable="true">Supprimer le point de terminaison DoT ?</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Supprimer le point de terminaison DoT ?</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">Supprimer le point de terminaison DNS over TLS de la configuration enregistrée.</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Acheminez le propre trafic de Rethink, comme les téléchargements de listes de blocage, les vérifications de connectivité, les connexions DNS, dans le tunnel.</string>
     <string name="cd_toast_edit" translatable="true">Modifié</string>
@@ -970,7 +970,7 @@
     <string name="one_wg_error_toast" translatable="true">Pour passer en mode avancé, arrêtez WireGuard en mode simple</string>
     <string name="wireguard_disable_failure" translatable="true">\"Always-on WireGuard\" ne peut pas être désactivé</string>
     <string name="wireguard_disable_title" translatable="true">Arrêter WireGuard</string>
-    <string name="wireguard_disable_message" translatable="true">Arrêter tous les VPN WireGuard actifs ?</string>
+    <string name="wireguard_disable_message" translatable="true">Arrêter tous les VPN WireGuard actifs ?</string>
     <string name="remaining_apps_dialog_title" translatable="true">Inclure les applications restantes</string>
     <string name="lbl_remaining_apps" translatable="true">Applications restantes</string>
     <string name="wg_apps_dialog_title_include" translatable="true">Inclure les applications %1$s</string>
