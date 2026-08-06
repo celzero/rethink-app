@@ -205,11 +205,11 @@
     <string name="app_mode_firewall" translatable="true">Брандмауер</string>
     <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Служба доступності Rethink зупинилася або вийшла з ладу. <i><b>Перейдіть до налаштувань і примусово зупиніть</b></i> Rethink і запустіть його знову, щоб використовувати <i>Блокування будь-якого застосунку, яка не використовується</i>. \n \nRethink використовує службу доступності, щоб відстежувати, які застосунки використовуються (на передньому плані) і які не використовуються (у фоновому режимі).</string>
     <string name="always_on_dialog" translatable="true">«Завжди увімкнений VPN» увімкнено на цьому пристрої. Щоб запустити Rethink, перейдіть до Налаштувань та вимкніть «Завжди увімкнений VPN».</string>
-    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Блокує підключення програми до Інтернету. \n <u>#2</u>: Блокує підключення будь-якої програми до певної IP-адреси. \n <u>#3</u>: Блокує всі з\'єднання, коли пристрій заблоковано (Універсальний брандмауер). \n <u>#4</u>: Блокує будь-які програми, які не використовуються (Універсальний брандмауер). \n <u>#5</u>: Блокує з’єднання, коли вихідна програма невідома (Universal Firewall). \n <u>#6</u>: Блокує весь UDP-трафік, окрім DNS (універсальний брандмауер). \n <u>#7</u>: Блокувати з’єднання, коли DNS обходиться (Universal Firewall).</string>
+    <string name="bsct_conn_rule_explanation" translatable="true">&lt;u&gt;#1&lt;/u&gt;: Блокує підключення програми до Інтернету. \n &lt;u&gt;#2&lt;/u&gt;: Блокує підключення будь-якої програми до певної IP-адреси. \n &lt;u&gt;#3&lt;/u&gt;: Блокує всі з\'єднання, коли пристрій заблоковано (Універсальний брандмауер). \n &lt;u&gt;#4&lt;/u&gt;: Блокує будь-які програми, які не використовуються (Універсальний брандмауер). \n &lt;u&gt;#5&lt;/u&gt;: Блокує з’єднання, коли вихідна програма невідома (Universal Firewall). \n &lt;u&gt;#6&lt;/u&gt;: Блокує весь UDP-трафік, окрім DNS (універсальний брандмауер). \n &lt;u&gt;#7&lt;/u&gt;: Блокувати з’єднання, коли DNS обходиться (Universal Firewall).</string>
     <string name="settings_allow_bypass_desc" translatable="true">Дозволити застосункам, що запитують, доступ до всіх доступних мереж. Ці застосунки можуть обходити VPN тунель Rethink за вимогою. Деякі застосунки для аудіо чи відео конференцій, такі як Zoom та Meet, можуть потребувати цього для належної роботи.</string>
     <string name="settings_https_desc" translatable="true">Пересилати з\'єднання за протоколом HTTP(s).</string>
     <string name="whats_new_version_update" translatable="false"><![CDATA[<b>Don\'t Panic 2</b><br/><br/> 1. Нове: Фіксування помилок мережі у користувацьких звітах про помилки.<br/>2. Нове: використовуйте Системний DNS для неделегованих доменних імен, якщо провайдер застосовує політику Запобігання витоку DNS.<br/> 3. Покращення: підключення WireGuard з подвійним стеком (IPv4 + IPv6).<br/> 4. Покращення: уникайте блокування елементів інтерфейсу користувача, коли мережа не відповідає.<br/> 5. Виправлення: Час очікування з’єднання з увімкненою розширеною фільтрацією DNS.<br/> 6. Виправлення: Кінцеві точки вузлів WireGuard з доменними іменами залежать від змін у мережі.<br/><br/> <a href=https://svc.rethinkdns.com/r/translate>Допоможіть перекласти цей застосунок</a>]]></string>
-    <string name="orbot_explanation" translatable="true">Orbot – це безплатний застосунок-проксі, який дає змогу іншим застосункам <u>безпечніше</u> використовувати Інтернет. \nOrbot використовує <u>Tor</u> для шифрування вашого Інтернет-трафіку, що допомагає вам <u>обійти цензуру</u> та захиститися від форм <u>мережевого спостереження</u>, які загрожують особистій свободі та конфіденційності. \n<u>TCP Proxy</u>: Rethink пересилає до Orbot лише TCP-сегменти посилань <i>доданих</i> застосунків. \n<u>Http Proxy</u>; Rethink <i>встановлює</i> тунель HTTP ПІДКЛЮЧЕННЯ до Orbot і пересилає лише TCP-сегменти посилань <i>доданих</i> застосунків.</string>
+    <string name="orbot_explanation" translatable="true">Orbot – це безплатний застосунок-проксі, який дає змогу іншим застосункам &lt;u&gt;безпечніше&lt;/u&gt; використовувати Інтернет. \nOrbot використовує &lt;u&gt;Tor&lt;/u&gt; для шифрування вашого Інтернет-трафіку, що допомагає вам &lt;u&gt;обійти цензуру&lt;/u&gt; та захиститися від форм &lt;u&gt;мережевого спостереження&lt;/u&gt;, які загрожують особистій свободі та конфіденційності. \n&lt;u&gt;TCP Proxy&lt;/u&gt;: Rethink пересилає до Orbot лише TCP-сегменти посилань &lt;i&gt;доданих&lt;/i&gt; застосунків. \n&lt;u&gt;Http Proxy&lt;/u&gt;; Rethink &lt;i&gt;встановлює&lt;/i&gt; тунель HTTP ПІДКЛЮЧЕННЯ до Orbot і пересилає лише TCP-сегменти посилань &lt;i&gt;доданих&lt;/i&gt; застосунків.</string>
     <string name="settings_import_export_desc" translatable="true">Вручну створіть резервну копію або відновіть дані та налаштування застосунку.</string>
     <string name="settings_socks_forwarding_desc_no_app" translatable="true">Переадресація на %1$s:%2$s</string>
     <string name="univ_firewall_rule_6" translatable="true">Блокувати нові встановлені застосунки за замовчуванням</string>
@@ -1033,7 +1033,7 @@
     <string name="exclude_no_package_err_toast" translatable="true">Для виключення програм потрібна назва пакета.</string>
     <string name="hop_error_toast_msg_1" translatable="true">Не вдається ретранслювати, вже %1$s</string>
     <string name="hop_error_toast_msg_2" translatable="true">Для реле WireGuard недоступний; будь ласка, додайте більше.</string>
-    <string name="mode_change_error_proxy_enabled" translatable="true">Неможливо змінити режими, коли використовуються проксі-сервери. Натисніть, щоб <u>редагувати налаштування проксі-сервера</u>.</string>
+    <string name="mode_change_error_proxy_enabled" translatable="true">Неможливо змінити режими, коли використовуються проксі-сервери. Натисніть, щоб &lt;u&gt;редагувати налаштування проксі-сервера&lt;/u&gt;.</string>
     <string name="blocklist_not_available_toast" translatable="true">Щоб оновити списки блокування, завантажте останню версію.</string>
     <string name="lbl_ultra_secure" translatable="true">надбезпечний</string>
     <string name="adv_set_dial_timeout_title" translatable="true">Тайм-аут простою</string>
@@ -1119,19 +1119,19 @@
     <string name="settings_tunnel_metered" translatable="true">Завжди з обліком</string>
     <string name="settings_tunnel_metered_desc" translatable="true">Позначте VPN-тунель Rethink як лімітований, щоб програми споживали менше даних. Увага: це може призвести до того, що програми призупинять великі завантаження та вивантаження, такі як резервні копії.</string>
     <string name="stability_program_toast" translatable="true">Зареєстровано в <i>програмі стабільності</i> для <i>експериментальних функцій</i>.</string>
-    <string name="search_event_logs" translatable="true"><font size="12">Пошук подій, повідомлень</font></string>
-    <string name="bug_report_files_desc" translatable="true">Виберіть файли, які потрібно включити до електронного листа зі звітом про помилку</string>
-    <string name="bug_report_deselect_all" translatable="true">Зняти вибір усіх</string>
-    <string name="bug_report_no_files_selected" translatable="true">Будь ласка, виберіть принаймні один файл</string>
-    <string name="bug_report_creating_zip" translatable="true">Створення архіву…</string>
-    <string name="bug_report_file_not_found" translatable="true">Файл не знайдено</string>
-    <string name="bug_report_error_opening_file" translatable="true">Не вдається відкрити цей тип файлу</string>
-    <string name="bug_report_delete_confirmation" translatable="true">Ви впевнені, що хочете видалити \"%1$s\"?</string>
-    <string name="bug_report_file_deleted" translatable="true">Файл \"%1$s\" видалено</string>
-    <string name="bug_report_delete_failed" translatable="true">Не вдалося видалити \"%1$s\"</string>
-    <string name="bug_report_no_files_available" translatable="true">Немає файлів звітів про помилки</string>
-    <string name="cd_allowed_dns_record_types_heading" translatable="true">Дозволені типи DNS-записів</string>
-    <string name="cd_allowed_dns_record_types_desc" translatable="true">Виберіть, які типи записів ресурсів DNS дозволити.</string>
+    <string name="search_event_logs" translatable="false"><font size="12">Пошук подій, повідомлень</font></string>
+    <string name="bug_report_files_desc" translatable="false">Виберіть файли, які потрібно включити до електронного листа зі звітом про помилку</string>
+    <string name="bug_report_deselect_all" translatable="false">Зняти вибір усіх</string>
+    <string name="bug_report_no_files_selected" translatable="false">Будь ласка, виберіть принаймні один файл</string>
+    <string name="bug_report_creating_zip" translatable="false">Створення архіву…</string>
+    <string name="bug_report_file_not_found" translatable="false">Файл не знайдено</string>
+    <string name="bug_report_error_opening_file" translatable="false">Не вдається відкрити цей тип файлу</string>
+    <string name="bug_report_delete_confirmation" translatable="false">Ви впевнені, що хочете видалити \"%1$s\"?</string>
+    <string name="bug_report_file_deleted" translatable="false">Файл \"%1$s\" видалено</string>
+    <string name="bug_report_delete_failed" translatable="false">Не вдалося видалити \"%1$s\"</string>
+    <string name="bug_report_no_files_available" translatable="false">Немає файлів звітів про помилки</string>
+    <string name="cd_allowed_dns_record_types_heading" translatable="false">Дозволені типи DNS-записів</string>
+    <string name="cd_allowed_dns_record_types_desc" translatable="false">Виберіть, які типи записів ресурсів DNS дозволити.</string>
     <string name="dns_record_types_auto_mode_status" translatable="true">Автоматичний (усі типи)</string>
     <string name="rpn_restore_failure" translatable="false"></string>
     <plurals name="server_count">
