@@ -30,9 +30,7 @@
     <string name="universal_firewall_explanation">Appliquer des règles de pare-feu à toutes les applications en fonction des événements survenant sur l’appareil, par exemple, lorsque l’appareil est verrouillé ou lorsqu’une application particulière n’est pas utilisée.</string>
     <string name="notification_action_dns_mode">DNS</string>
     <string name="firewall_mode_info_title">Pare-feu</string>
-    <string name="alert_firewall_accessibility_explanation">Rethink utilise un service d’accessibilité pour savoir quelles sont les applications en cours d’utilisation (avant-plan) et celles qui ne le sont pas (arrière-plan).
-\n
-\nRethink ne collecte aucune information et ne vous espionne en aucune façon.</string>
+    <string name="alert_firewall_accessibility_explanation">Rethink utilise un service d’accessibilité pour savoir quelles sont les applications en cours d’utilisation (avant-plan) et celles qui ne le sont pas (arrière-plan). \n \nRethink ne collecte aucune information et ne vous espionne en aucune façon.</string>
     <string name="dns_firewall_mode_info_explanation_new">Tout ce qui précède + contournez la censure sur Internet.</string>
     <string name="dns_mode_info_explanation_new">Surveillez, bloquez et chiffrez les requêtes DNS.</string>
     <string name="alert_firewall_accessibility_regrant_explanation">Le service d’accessibilité de Rethink s’est arrêté ou a dysfonctionné. <i><b>Allez dans Paramètres puis forcer l’arrêt</b></i> de Rethink et redémarrez-le pour utiliser la fonctionnalité <i>Bloquer les applications non utilisées.</i>
@@ -290,9 +288,7 @@
     <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
     <string name="app_info_error">Impossible de lancer les infos sur l’application.</string>
     <string name="ctbs_app_info_not_available_toast">Les paramètres de l’application sont introuvables</string>
-    <string name="hsf_vpn_dialog_message">Rethink a besoin de l’autorisation de mettre en place un VPN local pour chiffrer les requêtes DNS de l’appareil, mettre en œuvre un moniteur réseau et appliquer des règles de pare-feu.
-\n
-\nRethink ne collecte aucune information et ne vous espionne en aucune façon.</string>
+    <string name="hsf_vpn_dialog_message">Rethink a besoin de l’autorisation de mettre en place un VPN local pour chiffrer les requêtes DNS de l’appareil, mettre en œuvre un moniteur réseau et appliquer des règles de pare-feu. \n \nRethink ne collecte aucune information et ne vous espionne en aucune façon.</string>
     <string name="dns_btm_resolved_doh">résolu %1$s par %2$s</string>
     <string name="firewall_rule_block_app_new_install">Nouvelle appli</string>
     <string name="firewall_rule_block_udp_ntp">UDP bloqué</string>
@@ -333,7 +329,7 @@
     <string name="brbs_backup_dialog_title">Faire une sauvegarde</string>
     <string name="orbot_bs_status_trying_connect">Configuration d’Orbot…</string>
     <string name="dc_custom_block_heading">Règles de domaines</string>
-    <string name="always_on_dialog_lockdown_stop_message">Rethink exécute le VPN en mode <i>Confinement</i>. L’arrêter entraînerait une perte de connectivité Internet sur ce profil utilisateur. Voulez-vous continuer malgré tout \?</string>
+    <string name="always_on_dialog_lockdown_stop_message">Rethink exécute le VPN en mode <i>Confinement</i>. L’arrêter entraînerait une perte de connectivité Internet sur ce profil utilisateur. Voulez-vous continuer malgré tout ?</string>
     <string name="orbot_stop_dialog_dns_message">Rethink est configuré pour transmettre les requêtes DNS à Orbot. Modifiez-le si nécessaire.</string>
     <string name="app_mode_firewall">Pare-feu</string>
     <string name="orbot_none">Aucun (par défaut)</string>

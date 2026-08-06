@@ -14,7 +14,7 @@
     <string name="dns_btm_resolved_crypt">সমাধান করা হয়েছে <u>বেনামে</u> %1$s দ্বারা %2$s</string>
     <string name="dns_btm_resolved_doh_no_server">সমাধান করা হয়েছে %1$s</string>
     <string name="settings_notification_desc3">কোনটি না</string>
-    <string name="settings_dns_proxy_dialog_app_desc">নির্বাচিত অ্যাপটিকে আপনার পক্ষ থেকে প্রক্সি সংযোগ করতে দেওয়ার জন্য VPN থেকে বাদ দেওয়া হবে।</string>
+    <string name="settings_dns_proxy_dialog_app_desc" translatable="false">নির্বাচিত অ্যাপটিকে আপনার পক্ষ থেকে প্রক্সি সংযোগ করতে দেওয়ার জন্য VPN থেকে বাদ দেওয়া হবে।</string>
     <string name="status_protected_with_http_private_dns">HTTP প্রক্সি এবং ব্যক্তিগত ডিএনএস দিয়ে সুরক্ষিত</string>
     <string name="status_protected_with_http">HTTP প্রক্সি দিয়ে সুরক্ষিত</string>
     <string name="always_on_dialog_lockdown_stop_message">RethinkDNS <i>লকডাউন</i> মোডে VPN চালাচ্ছে। এটি বন্ধ করার ফলে এই ব্যবহারকারীর প্রোফাইলে ইন্টারনেট সংযোগ নষ্ট হবে৷ আপনি কি যাইহোক চালিয়ে যেতে চান\?</string>
@@ -31,13 +31,13 @@
     <string name="hsf_chip_appearance">থিম: %1$s</string>
     <string name="dc_dns_website_heading">DNS লগে ওয়েবসাইট আইকন দেখান (পরীক্ষামূলক)</string>
     <string name="about_docs">ডক্স পড়ুন</string>
-    <string name="about_docs_link">https://docs.rethinkdns.com/</string>
+    <string name="about_docs_link" translatable="false">https://docs.rethinkdns.com/</string>
     <string name="log_file_not_available">কোন ক্র্যাশ রিপোর্ট পাওয়া যায়নি</string>
     <string name="cd_dns_crypt_resolver_heading">সমাধানকারী</string>
     <string name="dns_crypt_relay_error_toast">কোনো সমাধানকারী নির্বাচন করা হয়নি</string>
     <string name="status_dns_error">dns ত্রুটি</string>
     <string name="notification_action_resume_vpn">জীবনবৃত্তান্ত</string>
-    <string name="dns_crypt_relay_remove_dialog_title">DNSCrypt রিলে মুছবেন\?</string>
+    <string name="dns_crypt_relay_remove_dialog_title">DNSCrypt রিলে মুছবেন?</string>
     <string name="configure_dns_connected_dns_proxy_status">DNS প্রক্সি</string>
     <string name="download_update_dialog_message_success">ব্লকলিস্ট ডাউনলোড সফল হয়েছে।</string>
     <string name="search_dns_logs"><font size="12">ডোমেন নাম বা আইপি অনুসন্ধান করুন</font></string>
@@ -47,8 +47,8 @@
     <string name="hsf_stop_btn_state">থামা</string>
     <string name="dc_dns_website_desc"><i>duckduckgo.com</i> থেকে ওয়েবসাইট আইকন নিয়ে আসে। ডিস্ক স্পেস 350 mb পর্যন্ত খরচ করে</string>
     <string name="about_bug_report">বাগ রিপোর্ট</string>
-    <string name="about_telegram_link">https://telegram.me/rethinkdns</string>
-    <string name="about_version">v%1$s</string>
+    <string name="about_telegram_link" translatable="false">https://telegram.me/rethinkdns</string>
+    <string name="about_version" translatable="false">v%1$s</string>
     <string name="lbl_add">যোগ করুন</string>
     <string name="univ_ip_delete_toast_success">সমস্ত আইপি নিয়ম মুছে ফেলা হয়েছে।</string>
     <string name="univ_delete_firewall_dialog_message">এই নিয়মগুলি মুছে ফেলার ফলে যেকোনও অ্যাপ্লিকেশন বর্তমানে ব্লক করা আইপিগুলির সাথে সংযোগ করতে পারবে৷</string>
@@ -73,12 +73,12 @@
     <string name="cd_dns_proxy_mode_internal">অভ্যন্তরীণ</string>
     <string name="univ_firewall_rule_6">ডিফল্টরূপে নতুন ইনস্টল করা অ্যাপগুলিকে ব্লক করুন</string>
     <string name="dns_connected_rethink_plus">সংযুক্ত %1$s ব্লকলিস্ট ব্যবহার করা হচ্ছে</string>
-    <string name="rdns_plus">RDNS Plus</string>
+    <string name="rdns_plus" translatable="false">RDNS Plus</string>
     <string name="configure_dns_crypt">DNSCrypt: %1$s সমাধানকারী</string>
     <string name="download_update_dialog_message_ok_title">আপ টু ডেট !</string>
     <string name="app_mode_dns_firewall">DNS এবং ফায়ারওয়াল (ডিফল্ট)</string>
     <string name="orbot_http">হাইপারটেক্সট ট্রান্সফার প্রটোকল প্রক্সি</string>
-    <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
+    <string name="orbot_download_link_website" translatable="false">https://github.com/guardianproject/orbot/releases</string>
     <string name="settings_theme_desc">গাঢ়/হালকা থিম</string>
     <string name="settings_http_proxy_dialog_title">কাস্টম সার্ভার URL</string>
     <string name="settings_socks5_dialog_hint_password">পাসওয়ার্ড (ঐচ্ছিক)</string>
@@ -86,7 +86,7 @@
     <string name="apps_card_ips_count">%1$s আইপি এবং পোর্টের নিয়ম</string>
     <string name="dc_custom_block_heading">পৃথক ডোমেনের অনুমতি দিন বা অস্বীকার করুন</string>
     <string name="about_mail_to">hello@celzero.com</string>
-    <string name="about_version_install_source">v%1$s (%2$s)</string>
+    <string name="about_version_install_source" translatable="false">v%1$s (%2$s)</string>
     <string name="error_loading_log_file">লগ ফাইল লোড করার সময় ত্রুটি</string>
     <string name="cd_dns_crypt_dialog_title">DNSCrypt সমাধানকারী বা রিলে যোগ করুন</string>
     <string name="univ_ip_delete_individual_toast">%1$s মুছে ফেলা হয়েছে।</string>
@@ -95,8 +95,8 @@
     <string name="notification_action_pause_vpn">বিরতি</string>
     <string name="apps_info_title">অ্যাপস</string>
     <string name="brave_dns_connect_mode_change_firewall">মোড নির্বাচন করুন।</string>
-    <string name="dns_query_clear_logs_title">সব DNS লগ মুছবেন\?</string>
-    <string name="univ_firewall_dialog_title">আইপি নিয়ম মুছে ফেলবেন\?</string>
+    <string name="dns_query_clear_logs_title">সব DNS লগ মুছবেন?</string>
+    <string name="univ_firewall_dialog_title">আইপি নিয়ম মুছে ফেলবেন?</string>
     <string name="search_universal_ips"><font size="12">আইপি অনুসন্ধান করুন</font></string>
     <string name="info_dialog_rethink_toast_msg">RDNS+ DNS-over-HTTPS URL হিসেবে কপি করা হয়েছে</string>
     <string name="settings_orbot_disabled_error">Tor-as-a-proxy সেটআপ চালিয়ে যেতে HTTP(S) এবং/অথবা SOCKS5 প্রক্সি বন্ধ করুন।</string>
@@ -121,10 +121,7 @@
     <string name="orbot_both_desc">উপরের সবগুলো.</string>
     <string name="orbot_install_dialog_positive">ইনস্টল করুন</string>
     <string name="settings_ip_text_ipv46">স্বয়ংক্রিয়</string>
-    <string name="settings_notification_dialog_option_3">"
-\nকোনোটিই নয়:
-\nকোনো বোতাম দেখায় না।
-\n"</string>
+    <string name="settings_notification_dialog_option_3">\n\nকোনোটিই নয়:\n\nকোনো বোতাম দেখায় না।\n\n</string>
     <string name="hsf_exclude_error">VPN লকডাউন মোডে বাদ দেওয়া সম্ভব নয়</string>
     <string name="about_bug_no_log_dialog_title">বাগ রিপোর্ট</string>
     <string name="about_app_update_check">অ্যাপ আপডেটের জন্য চেক করুন</string>
@@ -170,7 +167,7 @@
     <string name="fapps_filter_filter_heading">ধরণ</string>
     <string name="block">ব্লক</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">সুরক্ষিত নয়</string>
-    <string name="dns_query_clear_logs_message">এটি ডিভাইসে থাকা DNS লগ মুছে দেয়। এই অপারেশন বিপরীত করা যায় না. আপনি কি এগিয়ে যেতে চান\?</string>
+    <string name="dns_query_clear_logs_message">এটি ডিভাইসে থাকা DNS লগ মুছে দেয়। এই অপারেশন বিপরীত করা যায় না. আপনি কি এগিয়ে যেতে চান?</string>
     <string name="always_on_dialog_heading">সবসময়-চালু VPN অক্ষম করুন</string>
     <string name="always_on_dialog_neutral">পছন্দসমূহ</string>
     <string name="doh_custom_url_remove_success">এন্ডপয়েন্ট মুছে ফেলা হয়েছে।</string>
@@ -190,7 +187,7 @@
     <string name="dc_block_heading">নিয়ম</string>
     <string name="about_settings">পদ্ধতি</string>
     <string name="cd_dns_crypt_error_text_1">স্ট্যাম্প খালি করা যাবে না</string>
-    <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
+    <string name="dns_proxy_desc" translatable="false">%1$s:%2$s, %3$s</string>
     <string name="allow">অনুমতি</string>
     <string name="status_protected_with_tor_private_dns">টর এবং প্রাইভেট ডিএনএস দিয়ে সুরক্ষিত</string>
     <string name="dns_mode_info_title">DNS</string>
@@ -216,10 +213,8 @@
     <string name="bsct_conn_block_desc_device">ডিভাইসে %1$s ব্লক করা হয়েছে</string>
     <string name="dns_proxy_remove_dialog_message">সংরক্ষিত কনফিগারেশন থেকে DNS প্রক্সি মুছুন।</string>
     <string name="orbot_bs_status_3">অরবোটে %1$s ফরোয়ার্ড করা, HTTP প্রক্সিও সেট করা হয়েছে।</string>
-    <string name="orbot_stop_dialog_message_combo">%1$s
-\n
-\n%2$s</string>
-    <string name="orbot_install_dialog_title">অরবট ইনস্টল করবেন\?</string>
+    <string name="orbot_stop_dialog_message_combo" translatable="false">%1$s \n \n%2$s</string>
+    <string name="orbot_install_dialog_title">অরবট ইনস্টল করবেন?</string>
     <string name="settings_orbot_install_desc">অরবট ইনস্টল করতে এখানে আলতো চাপুন</string>
     <string name="settings_theme_heading">চেহারা</string>
     <string name="dns_card_latency_active">লেটেন্সি: %1$sms</string>
@@ -230,17 +225,17 @@
     <string name="about_mozilla">RethinkDNS হল Mozilla Builders MVP প্রোগ্রামের অংশ।</string>
     <string name="about_mail_bugreport_share_title">ইমেল প্রদানকারী নির্বাচন করুন</string>
     <string name="dns_info_neutral">অনুলিপি</string>
-    <string name="dns_proxy_desc_no_app">%1$s:%2$s</string>
+    <string name="dns_proxy_desc_no_app" translatable="false">%1$s:%2$s</string>
     <string name="fapps_filter_parent_installed">ইনস্টলকৃত</string>
     <string name="status_protected_with_socks5_private_dns">মোজা 5 এবং ব্যক্তিগত ডিএনএস দিয়ে সুরক্ষিত</string>
     <string name="always_on_dialog_positive">বন্ধ</string>
     <string name="download_update_dialog_failure_title">কিছু সমস্যা হয়েছে!</string>
     <string name="settings_ptrans_heading">জোর করে আইপিভি 4 প্রস্থান করুন</string>
     <string name="orbot_none_desc">উপরের কেউই না.</string>
-    <string name="orbot_install_activity_error">কিছু ভুল হয়েছে, কিছুক্ষণ পরে চেষ্টা করুন</string>
+    <string name="orbot_install_activity_error" translatable="false">কিছু ভুল হয়েছে, কিছুক্ষণ পরে চেষ্টা করুন</string>
     <string name="firewall_status_blocked">অবরুদ্ধ</string>
     <string name="hsf_start_dialog_header">শুরু করুন %1$s</string>
-    <string name="about_website_link">https://www.rethinkdns.com/</string>
+    <string name="about_website_link" translatable="false">https://www.rethinkdns.com/</string>
     <string name="cd_dns_proxy_error_text_1">অবৈধ আইপি ঠিকানা</string>
     <string name="cd_dns_crypt_dialog_name">নাম</string>
     <string name="cd_doh_dialog_resolver_url">সমাধানকারী URL</string>
@@ -248,19 +243,15 @@
     <string name="univ_view_blocked_ip">আইপি এবং পোর্টের নিয়ম</string>
     <string name="univ_accessibility_dialog_positive">প্রদান</string>
     <string name="univ_accessibility_dialog_negative">অস্বীকার</string>
-    <string name="dns_proxy_dialog_message">অ্যাপের নাম: %1$s
-\n
-\nআইপি ঠিকানা: %2$s
-\n
-\nপোর্ট নম্বর: %3$s</string>
+    <string name="dns_proxy_dialog_message">অ্যাপের নাম: %1$s \n \nআইপি ঠিকানা: %2$s \n \nপোর্ট নম্বর: %3$s</string>
     <string name="dns_proxy_app">অ্যাপ</string>
     <string name="isolate">তালাবদ্ধ</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">অপেক্ষা</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">সুরক্ষিত</string>
     <string name="dns_mode_info_explanation_new">ডিএনএস অনুরোধগুলি মনিটর করুন, ব্লক করুন এবং এনক্রিপ্ট করুন।</string>
-    <string name="conn_track_clear_logs_message">এটি শুধুমাত্র নেটওয়ার্ক লগ মুছে দেয় কিন্তু ফায়ারওয়াল নিয়ম নয়। এই অপারেশন বিপরীত করা যায় না. আপনি কি এগিয়ে যেতে চান\?</string>
-    <string name="dns_crypt_custom_url_remove_dialog_title">DNSCrypt সমাধানকারী মুছবেন\?</string>
-    <string name="dns_proxy_remove_dialog_title">ডিএনএস প্রক্সি মুছবেন\?</string>
+    <string name="conn_track_clear_logs_message">এটি শুধুমাত্র নেটওয়ার্ক লগ মুছে দেয় কিন্তু ফায়ারওয়াল নিয়ম নয়। এই অপারেশন বিপরীত করা যায় না. আপনি কি এগিয়ে যেতে চান?</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title">DNSCrypt সমাধানকারী মুছবেন?</string>
+    <string name="dns_proxy_remove_dialog_title">ডিএনএস প্রক্সি মুছবেন?</string>
     <string name="search_firewall_all_apps"><font size="12">অ্যাপগুলি অনুসন্ধান করুন</font></string>
     <string name="app_mode_dns_low_battery">DNS (ব্যাটারি সেভার)</string>
     <string name="settings_orbot_heading">অরবট সেটআপ করুন</string>
@@ -268,12 +259,12 @@
     <string name="settings_ip_dialog_title">আইপি সংস্করণ চয়ন করুন</string>
     <string name="settings_ip_dialog_ipv46">স্বয়ংক্রিয় (পরীক্ষামূলক)</string>
     <string name="settings_ip_text_ipv4">IPv4</string>
-    <string name="settings_selected_ip_desc">%1$s</string>
+    <string name="settings_selected_ip_desc" translatable="false">%1$s</string>
     <string name="dc_other_dns_heading">ধরন</string>
     <string name="about_bravedns_toreport_text">সাহায্য এবং প্রতিক্রিয়া</string>
     <string name="about_bug_report_desc">ইমেইল ক্র্যাশ লগ</string>
     <string name="about_connect">যোগাযোগ</string>
-    <string name="about_faq_link">https://www.rethinkdns.com/faq</string>
+    <string name="about_faq_link" translatable="false">https://www.rethinkdns.com/faq</string>
     <string name="cd_dns_crypt_dialog_heading">DNSCrypt সমাধানকারী বা রিলে যোগ করুন</string>
     <string name="cd_dns_crypt_dialog_stamp">ছাপ</string>
     <string name="cd_doh_dialog_heading">HTTPS এর উপর DNS যোগ করুন</string>
@@ -284,7 +275,7 @@
     <string name="status_no_internet">কোন ইন্টারনেট নেই</string>
     <string name="dns_crypt_relay_remove_success">DNSCrypt রিলে মুছে ফেলা হয়েছে।</string>
     <string name="download_update_dialog_message_ok">আপনি ইতিমধ্যেই সর্বশেষ সংস্করণে রয়েছেন৷</string>
-    <string name="orbot_app_issue">অরবট চালু করা যায়নি। এটা ইনস্টল করা হয়\?</string>
+    <string name="orbot_app_issue">অরবট চালু করা যায়নি। এটা ইনস্টল করা হয়?</string>
     <string name="orbot_install_dialog_neutral">ওয়েবসাইট</string>
     <string name="settings_dns_proxy_dialog_hostname">হোস্ট নাম</string>
     <string name="settings_theme_dialog_themes_4">সত্যিকারের কালো</string>
@@ -307,7 +298,7 @@
     <string name="hsf_blocklist_chip_text_no_data">RethinkDNS+ সক্ষম করুন</string>
     <string name="dc_local_block_desc_1">185+ ব্লকলিস্ট থেকে বেছে নিন। ব্লকলিস্ট ডাউনলোড বা কনফিগার করতে এখানে ক্লিক করুন।</string>
     <string name="about_mail_bugreport_subject">[RethinkDns]: বাগ রিপোর্ট</string>
-    <string name="about_twitter_handle">https://twitter.com/rethinkdns</string>
+    <string name="about_twitter_handle" translatable="false">https://twitter.com/rethinkdns</string>
     <string name="app_info_error">অ্যাপের তথ্য চালু করা যায়নি।</string>
     <string name="cd_custom_dns_proxy_name">প্রক্সি %1$s</string>
     <string name="cd_dns_proxy_error_text_3">অবৈধ পোর্ট</string>
@@ -335,7 +326,7 @@
     <string name="about_email">আমাদেরকে ইমেইল করুন</string>
     <string name="about_whats_new">%1$s এ নতুন কি</string>
     <string name="cd_custom_doh_url_name_default">DoH</string>
-    <string name="cd_custom_dns_proxy_default_ip">127.0.0.1</string>
+    <string name="cd_custom_dns_proxy_default_ip" translatable="false">127.0.0.1</string>
     <string name="dns_btm_resolved_doh">সমাধান করা হয়েছে %1$s দ্বারা %2$s</string>
     <string name="univ_firewall_rule_2">ব্যবহার না করা কোনো অ্যাপ ব্লক করুন</string>
     <string name="dns_connected_no_count">সংযুক্ত হয়েছে</string>
@@ -354,9 +345,9 @@
     <string name="about_dialog_neutral_button">বৈশিষ্ট্য প্রস্তাব করুন</string>
     <string name="univ_firewall_rule_1">ডিভাইস লক হয়ে গেলে সমস্ত অ্যাপ ব্লক করুন</string>
     <string name="univ_firewall_rule_7">IPv6 তে IPv4 ব্লক করুন (পরীক্ষামূলক)</string>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name" translatable="false">RethinkDNS</string>
     <string name="pause_title_desc">ঘুমানো…</string>
-    <string name="app_name_small_case">rethink</string>
+    <string name="app_name_small_case" translatable="false">rethink</string>
     <string name="title_settings">পছন্দসমূহ</string>
     <string name="title_about">বিস্তারিত</string>
     <string name="finish">শেষ করুন</string>
@@ -383,7 +374,7 @@
     <string name="pause_mode_notification_title">বিরাম দেওয়া হয়েছে! ব্লক করা অ্যাপগুলি ফায়ারওয়াল করা অব্যাহত থাকবে।</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">রিথিঙ্কডিএনএস এবং ফায়ারওয়ালের সাথে সংযুক্ত</string>
     <string name="universal_firewall_explanation">ডিভাইস ইভেন্টের উপর ভিত্তি করে সমস্ত অ্যাপ্লিকেশনগুলিতে ফায়ারওয়াল নিয়ম প্রয়োগ করুন, উদাহরণস্বরূপ, যখন ডিভাইসটি লক থাকে বা যখন একটি নির্দিষ্ট অ্যাপ ব্যবহার করা হয় না তখন ফায়ারওয়াল৷</string>
-    <string name="doh_custom_url_remove_dialog_title">DoH এন্ডপয়েন্ট মুছবেন\?</string>
+    <string name="doh_custom_url_remove_dialog_title">DoH এন্ডপয়েন্ট মুছবেন?</string>
     <string name="dns_firewall_mode_info_explanation_new">উপরের সবগুলো + বাইপাস ইন্টারনেট সেন্সরশিপ।</string>
     <string name="dns_crypt_relay_remove_dialog_message">সংরক্ষিত কনফিগারেশন থেকে DNSCrypt রিলে মুছুন।</string>
     <string name="custom_url_error_invalid_url">অবৈধ ইউ আর এল</string>
@@ -391,17 +382,17 @@
 \n
 \nRethinkDNS অ্যাক্সেসিবিলিটি পরিষেবা ব্যবহার করে কোন অ্যাপগুলি ব্যবহার করা হচ্ছে (ফোরগ্রাউন্ড) বনাম যেগুলি ব্যবহারে নেই (পটভূমিতে) তা ট্র্যাক করতে।</string>
     <string name="alert_firewall_accessibility_exception">অ্যাক্সেসিবিলিটি সেটিংস খোলার ব্যর্থতা৷ পরে আবার চেষ্টা করুন!</string>
-    <string name="conn_track_clear_logs_title">সমস্ত নেটওয়ার্ক লগ মুছবেন\?</string>
+    <string name="conn_track_clear_logs_title">সমস্ত নেটওয়ার্ক লগ মুছবেন?</string>
     <string name="bsct_conn_desc_blocked">%1$s %2$s এ অবরুদ্ধ</string>
     <string name="always_on_dialog">এই ডিভাইসে \"সর্বদা-চালু VPN\" সক্ষম করা আছে৷ পুনর্বিবেচনা শুরু করতে, অনুগ্রহ করে সেটিংস অ্যাপে যান এবং \"সর্বদা-চালু VPN\" অক্ষম করুন।</string>
-    <string name="always_on_dialog_stop_message">পুনর্বিবেচনার জন্য সর্বদা-চালু VPN সক্ষম করা আছে৷ আপনি কি নিশ্চিত যে আপনি যাইহোক পুনর্বিবেচনা বন্ধ করতে চান\?</string>
+    <string name="always_on_dialog_stop_message">পুনর্বিবেচনার জন্য সর্বদা-চালু VPN সক্ষম করা আছে৷ আপনি কি নিশ্চিত যে আপনি যাইহোক পুনর্বিবেচনা বন্ধ করতে চান?</string>
     <string name="bsct_conn_rule_explanation"><u>#1</u>: একটি অ্যাপকে ইন্টারনেটে সংযোগ করা থেকে ব্লক করে। \n<u>#2</u>: যেকোনও অ্যাপকে একটি নির্দিষ্ট আইপিতে সংযোগ করা থেকে ব্লক করে। \n<u>#3</u>: ডিভাইস লক করা হলে সমস্ত সংযোগ ব্লক করে (ইউনিভার্সাল ফায়ারওয়াল)। \n<u>#4</u>: ব্যবহার না করা কোনো অ্যাপকে ব্লক করে (ইউনিভার্সাল ফায়ারওয়াল)। \n<u>#5</u>: সোর্স অ্যাপ অজানা হলে সংযোগ ব্লক করে (ইউনিভার্সাল ফায়ারওয়াল)। \n<u>#6</u>: DNS (ইউনিভার্সাল ফায়ারওয়াল) ব্যতীত সমস্ত UDP ট্র্যাফিক ব্লক করে। \n<u>#7</u>: DNS বাইপাস হয়ে গেলে সংযোগ ব্লক করুন (ইউনিভার্সাল ফায়ারওয়াল)।</string>
     <string name="firewall_status_block_metered">মিটারযুক্ত (মোবাইল) নেটওয়ার্কগুলিতে অবরুদ্ধ</string>
     <string name="bsct_conn_desc_allowed">%1$s %2$s এ অনুমোদিত</string>
-    <string name="univ_firewall_dialog_message">এই নিয়ম মুছে দিলে যেকোন অ্যাপ এই আইপিতে সংযোগ করতে পারবে। আপনি কি এগিয়ে যেতে চান\?</string>
+    <string name="univ_firewall_dialog_message">এই নিয়ম মুছে দিলে যেকোন অ্যাপ এই আইপিতে সংযোগ করতে পারবে। আপনি কি এগিয়ে যেতে চান?</string>
     <string name="dns_crypt_url_remove_dialog_message">সংরক্ষিত কনফিগারেশন থেকে DNSCrypt সমাধানকারী মুছুন।</string>
     <string name="local_blocklist_download">ব্লকলিস্ট ডাউনলোড করুন</string>
-    <string name="local_blocklist_download_desc">এই বৈশিষ্ট্যটি ব্যবহার করতে ব্লকলিস্ট (প্রায় 60MB) ডাউনলোড করবেন\?</string>
+    <string name="local_blocklist_download_desc">এই বৈশিষ্ট্যটি ব্যবহার করতে ব্লকলিস্ট (প্রায় 60MB) ডাউনলোড করবেন?</string>
     <string name="refresh_complete">অ্যাপ তালিকা পুনঃ-সিঙ্ক সম্পূর্ণ হয়েছে।</string>
     <string name="show_logs_disabled_network_message">সংযোগ লগিং নিষ্ক্রিয় করা হয়েছে. পুনরায় সক্ষম করতে, <i>সেটিংস</i> এ যান এবং <i>অন-ডিভাইস লগিং সক্ষম করুন।</i></string>
     <string name="blocklist_update_check_failure">কিছু ভুল হয়েছে. পরে আবার চেষ্টা করুন!</string>
@@ -409,12 +400,12 @@
     <string name="configure_dns_connection_name">%1$s এর সাথে সংযুক্ত</string>
     <string name="settings_enable_logs">অন-ডিভাইস লগিং সক্ষম করুন</string>
     <string name="orbot_socks5_desc">অরবোটে সমস্ত TCP সংযোগ ফরোয়ার্ড করে।</string>
-    <string name="download_update_dialog_message">অ্যাপটির একটি নতুন সংস্করণ ওয়েবসাইট থেকে ডাউনলোডের জন্য উপলব্ধ। আপনি কি এগিয়ে যেতে চান\?</string>
+    <string name="download_update_dialog_message">অ্যাপটির একটি নতুন সংস্করণ ওয়েবসাইট থেকে ডাউনলোডের জন্য উপলব্ধ। আপনি কি এগিয়ে যেতে চান?</string>
     <string name="download_update_dialog_failure_message">হয় আমাদের সার্ভার ডাউন বা সংযোগ স্থাপন করা যায়নি. কিছুক্ষণ পরে আবার চেষ্টা করুন.</string>
     <string name="app_mode_dns">DNS</string>
     <string name="settings_ip_network_heading">আইপি সংস্করণ চয়ন করুন</string>
     <string name="settings_socks5_desc">SOCKS5 এন্ডপয়েন্টে কানেকশন ফরোয়ার্ড করুন।</string>
-    <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
+    <string name="orbot_website_link" translatable="false">https://guardianproject.info/apps/org.torproject.android/</string>
     <string name="settings_network_all_networks">সমস্ত উপলব্ধ নেটওয়ার্ক ব্যবহার করুন (পরীক্ষামূলক)</string>
     <string name="whats_new_version_update"><b>সর্বোচ্চ প্রচেষ্টা</b> \u0020 \u0020 
 \n1. একটি আরও ব্যক্তিগত পুনর্বিবেচনা সমাধানের সাথে পরিচয় করিয়ে দেওয়া হচ্ছে, <i>ম্যাক্স</i>। \u0020 \u0020 
@@ -445,9 +436,7 @@
     <string name="settings_autostart_bootup_desc">ডিভাইস পাওয়ার-আপে, যদি এটি বন্ধ করার আগে চলমান থাকে তবে রিথিঙ্কডিএনএস শুরু করুন।</string>
     <string name="settings_ip_dialog_ipv4">IPv4 (ডিফল্ট)</string>
     <string name="settings_protocol_translation_dns_inactive">এই সেটিং সক্ষম করতে DNS/DNS+ফায়ারওয়াল মোডে স্যুইচ করুন</string>
-    <string name="settings_notification_dialog_option_2">"
-\nDNS / DNS + ফায়ারওয়াল:
-\nব্যাটারি-সেভার DNS মোড এবং নিয়মিত DNS + ফায়ারওয়াল মোডের মধ্যে দ্রুত স্যুইচ করতে দুটি বোতাম দেখায়৷"</string>
+    <string name="settings_notification_dialog_option_2">\n\nDNS / DNS + ফায়ারওয়াল:\n\nব্যাটারি-সেভার DNS মোড এবং নিয়মিত DNS + ফায়ারওয়াল মোডের মধ্যে দ্রুত স্যুইচ করতে দুটি বোতাম দেখায়৷</string>
     <string name="firewall_card_text_active">%1$s অবরুদ্ধ
 \n%2$s বাইপাস
 \n%3$s বাদ
@@ -458,7 +447,7 @@
     <string name="dc_check_update_desc">প্রতি <i>তিন</i> দিনে একবার ব্লকলিস্ট আপডেট চেক করুন</string>
     <string name="about_bravedns_explantion">RethinkDNS হল অ্যাপের কার্যকলাপ নিরীক্ষণ, ইন্টারনেট সেন্সরশিপ এবং আপনার অ্যান্ড্রয়েড ডিভাইসে ফায়ারওয়াল অ্যাপ্লিকেশানগুলিকে আটকানোর সবচেয়ে সহজ উপায়৷</string>
     <string name="about_bravedns_whoarewe">RethinkDNS হল একটি বিনামূল্যের এবং ওপেন সোর্স প্রজেক্ট, যার নেতৃত্বে Amazon, IBM, এবং Scientific Games-এর প্রাক্তন প্রকৌশলীরা৷</string>
-    <string name="about_bug_no_log_dialog_message">ক্র্যাশ লগগুলি আনা যায়নি৷ আপনি কি ম্যানুয়ালি আপনার বাগ রিপোর্ট করতে চান\?</string>
+    <string name="about_bug_no_log_dialog_message">ক্র্যাশ লগগুলি আনা যায়নি৷ আপনি কি ম্যানুয়ালি আপনার বাগ রিপোর্ট করতে চান?</string>
     <string name="hsf_vpn_dialog_message">ডিভাইসের DNS অনুরোধগুলি এনক্রিপ্ট করতে, একটি নেটওয়ার্ক মনিটর প্রয়োগ করতে এবং ফায়ারওয়াল নিয়মগুলি প্রয়োগ করতে একটি স্থানীয় VPN সেট আপ করার জন্য RethinkDNS-এর অনুমতি প্রয়োজন৷RethinkDNS কোনো তথ্য সংগ্রহ করে না বা কোনোভাবেই আপনার উপর গুপ্তচরবৃত্তি করে না।</string>
     <string name="about_website">rethinkdns.com এ যান</string>
     <string name="hsf_downtime">(%1$s থেকে নিষ্ক্রিয়)</string>
@@ -467,8 +456,8 @@
     <string name="hsf_blocklist_updating_text">সক্ষম করা হচ্ছে…</string>
     <string name="hsf_proxy_chip_removed_toast">প্রক্সি সরানো হয়েছে</string>
     <string name="about_mail_bugreport_text">এই ইমেলটি পাঠান: hello@celzero.com</string>
-    <string name="about_github_link">https://github.com/celzero/rethink-app</string>
-    <string name="about_mozilla_alumni_link">https://builders.mozilla.community/alumni.html</string>
+    <string name="about_github_link" translatable="false">https://github.com/celzero/rethink-app</string>
+    <string name="about_mozilla_alumni_link" translatable="false">https://builders.mozilla.community/alumni.html</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s অন্যান্য অ্যাপ(গুলি)</string>
     <string name="ctbs_block_other_apps">%1$s-এর জন্য প্রযোজ্য নিয়মগুলি %2$s অন্যান্য অ্যাপের জন্যও প্রযোজ্য হবে</string>
     <string name="dns_log_dialog_positive">লগ মুছুন</string>
@@ -479,17 +468,15 @@
     <string name="cd_dns_proxy_mode_external">বাহ্যিক</string>
     <string name="cd_dns_crypt_relay_heading">রিলে</string>
     <string name="cd_doh_dialog_resolver_name">সমাধানকারীর নাম</string>
-    <string name="ct_ip_details">%1$s (%2$s)</string>
+    <string name="ct_ip_details" translatable="false">%1$s (%2$s)</string>
     <string name="ctbs_app_info_not_available_toast">অ্যাপ সেটিংস পৃষ্ঠা পাওয়া যায়নি</string>
     <string name="ctbs_dialog_negative_btn">পূর্বাবস্থায় যান</string>
     <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s ব্লকলিস্ট(গুলি)&lt;/h3&gt;%3$s।&lt;br/&gt;&lt;br/&gt;</Data> </string>
     <string name="hs_download_positive_website">ওয়েবসাইট</string>
     <string name="hs_download_negative_default">আমাকে পরে মনে করিয়ে দিবেন</string>
-    <string name="univ_delete_firewall_dialog_title">সমস্ত আইপি নিয়ম মুছে ফেলবেন\?</string>
+    <string name="univ_delete_firewall_dialog_title">সমস্ত আইপি নিয়ম মুছে ফেলবেন?</string>
     <string name="univ_ip_delete_dialog_positive">সব মুছে দিন</string>
-    <string name="dns_proxy_dialog_message_no_app">আইপি ঠিকানা: %1$s
-\n
-\nপোর্ট নম্বর: %2$s</string>
+    <string name="dns_proxy_dialog_message_no_app">আইপি ঠিকানা: %1$s \n \nপোর্ট নম্বর: %2$s</string>
     <string name="firewall_rule_block_app_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i>কে ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>সমস্ত অ্যাপস</i> ট্যাবে যান।</string>
     <string name="ada_app_unmetered">মিটারবিহীন</string>
     <string name="notif_channel_firewall_alerts">ফায়ারওয়াল সতর্কতা</string>
@@ -505,12 +492,12 @@
     <string name="firewall_rule_block_dns_bypass">DNS বাইপাস</string>
     <string name="firewall_rule_global_lockdown_desc">এই সংযোগটি অবরুদ্ধ করা হয়েছে কারণ সর্বজনীন লকডাউন সেট করা হয়েছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান।</string>
     <string name="ci_bypass_universal">বাইপাস সার্বজনীন</string>
-    <string name="dc_dns_crypt">DNSCrypt</string>
-    <string name="dc_dns_proxy">DNS প্রক্সি</string>
+    <string name="dc_dns_crypt" translatable="false">DNSCrypt</string>
+    <string name="dc_dns_proxy" translatable="false">DNS প্রক্সি</string>
     <string name="lbbs_download">ব্লকলিস্ট আপডেট করুন</string>
     <string name="brbs_restore_dialog_message">একটি ব্যাকআপ ফাইল থেকে অ্যাপ সেটিংস, নেটওয়ার্ক এবং ডিএনএস লগ পুনরুদ্ধার করুন। এটি অ্যাপটি পুনরায় চালু করবে।</string>
     <string name="brbs_restore_dialog_positive">পুনঃস্থাপন</string>
-    <string name="brbs_restore_dialog_failure_message">পুনরুদ্ধার করা যায়নি। আবার চেষ্টা করুন\?</string>
+    <string name="brbs_restore_dialog_failure_message">পুনরুদ্ধার করা যায়নি। আবার চেষ্টা করুন?</string>
     <string name="copy_clipboard_label">ইউআরএল (URL)</string>
     <string name="firewall_rule_exempt_orbot_setup">অরবোট সেটআপ</string>
     <string name="firewall_rule_bypass_universal_ip_desc">এই সংযোগের অনুমতি দেওয়া হয়েছিল কারণ &lt;i&gt;গন্তব্য আইপি&lt;/i&gt; সমস্ত সার্বজনীন ফায়ারওয়াল নিয়মগুলিকে বাইপাস করতে সেট করা হয়েছে৷&lt;br/&gt;&lt;br/&gt; পরিবর্তন করতে &lt;i&gt;ইউনিভার্সাল&lt;-এ &lt;i&gt;আইপি নিয়মে&lt;i&gt; যান &lt;/i&gt; ট্যাব।</string>
@@ -568,7 +555,7 @@
     <string name="firewall_rule_block_metered">মিটারযুক্ত (মোবাইল)</string>
     <string name="firewall_rule_bypass_universal_ip">বাইপাস আইপি</string>
     <string name="category_name_non_app_sys">সিস্টেম পরিষেবা</string>
-    <string name="cd_remove_dialog_title">ডোমেইন মুছবেন\?</string>
+    <string name="cd_remove_dialog_title">ডোমেইন মুছবেন?</string>
     <string name="cd_dialog_error_invalid_domain">অবৈধ URL(ডোমেন)।</string>
     <string name="ada_app_status_block">বন্ধ</string>
     <string name="ada_app_dns_settings">DNS সেটিংস</string>
@@ -639,7 +626,7 @@
     <string name="notif_download_content_title">অন-ডিভাইস ব্লকলিস্ট ডাউনলোড</string>
     <string name="rt_dialog_neutral">Continue</string>
     <string name="rt_download">ব্লকলিস্ট ডাউনলোড করুন</string>
-    <string name="dc_doh">HTTPS এর উপর Dns</string>
+    <string name="dc_doh" translatable="false">HTTPS এর উপর Dns</string>
     <string name="new_app_bulk_notification_content">RethinkDNS ব্লক করেছে %1$s নতুন অ্যাপ। দেখতে বা পরিবর্তন করতে আলতো চাপুন।</string>
     <string name="category_name_installed">ইনস্টল করা অ্যাপস</string>
     <string name="ci_blocked_initial">নীল</string>
@@ -668,7 +655,7 @@
     <string name="notif_dialog_pause_dialog_neutral">দেখান</string>
     <string name="cd_toast_added">ডোমেন সফলভাবে যোগ করা হয়েছে</string>
     <string name="cd_no_rule_initial">এন</string>
-    <string name="rt_dialog_message">আপনি কি নতুন কনফিগার করা ব্লকলিস্ট প্রয়োগ করতে চান\?</string>
+    <string name="rt_dialog_message">আপনি কি নতুন কনফিগার করা ব্লকলিস্ট প্রয়োগ করতে চান?</string>
     <string name="rt_chip_update_available">হালনাগাদ আছে</string>
     <string name="brbs_restore_dialog_title">ব্যাকআপ পুনরুদ্ধার</string>
     <string name="socks5_proxy_toast_parameter">SOCKS5 প্রক্সি</string>
@@ -681,7 +668,7 @@
     <string name="cd_dialog_error_invalid_wildcard">অবৈধ ওয়াইল্ডকার্ড।</string>
     <string name="ci_bypass_universal_txt">বাইপাস ইউনিভার্সাল</string>
     <string name="rt_list_simple_btn_txt">সহজ</string>
-    <string name="brbs_backup_dialog_failure_message">ব্যাকআপ করা যায়নি। আবার চেষ্টা করুন\?</string>
+    <string name="brbs_backup_dialog_failure_message">ব্যাকআপ করা যায়নি। আবার চেষ্টা করুন?</string>
     <string name="orbot_toast_parameter">টর-এ-এ-প্রক্সি</string>
     <string name="update_complete_action_snack">আবার শুরু</string>
     <string name="firewall_rule_trusted_ip">বাইপাসড আইপি (অ্যাপ)</string>
@@ -697,17 +684,17 @@
     <string name="fapps_firewall_filter_excluded">ছাঁটা</string>
     <string name="fapps_firewall_filter_isolate">তালাবদ্ধ</string>
     <string name="fapps_unmetered_unblock_dialog_title">আনমিটারে অনুমতি দিন</string>
-    <string name="fapps_unmetered_unblock_dialog_message"><i>তালিকাভুক্ত</i> অ্যাপগুলির জন্য মিটারবিহীন (ওয়াইফাই) নেটওয়ার্কে সংযোগের অনুমতি দেবেন\?</string>
-    <string name="unicode_warning_sign">⚠</string>
-    <string name="unicode_question_sign">❔</string>
+    <string name="fapps_unmetered_unblock_dialog_message"><i>তালিকাভুক্ত</i> অ্যাপগুলির জন্য মিটারবিহীন (ওয়াইফাই) নেটওয়ার্কে সংযোগের অনুমতি দেবেন?</string>
+    <string name="unicode_warning_sign" translatable="false">⚠</string>
+    <string name="unicode_question_sign" translatable="false">❔</string>
     <string name="rules_load_failure_heading">বিঃদ্রঃ</string>
-    <string name="fapps_metered_block_dialog_message"><i>তালিকাভুক্ত</i> অ্যাপের জন্য মিটারযুক্ত (মোবাইল) নেটওয়ার্কে সংযোগ ব্লক করবেন\?</string>
-    <string name="fapps_metered_unblock_dialog_message"><i>তালিকাভুক্ত</i> অ্যাপের জন্য মিটারযুক্ত (মোবাইল) নেটওয়ার্কে সংযোগের অনুমতি দেবেন\?</string>
+    <string name="fapps_metered_block_dialog_message"><i>তালিকাভুক্ত</i> অ্যাপের জন্য মিটারযুক্ত (মোবাইল) নেটওয়ার্কে সংযোগ ব্লক করবেন?</string>
+    <string name="fapps_metered_unblock_dialog_message"><i>তালিকাভুক্ত</i> অ্যাপের জন্য মিটারযুক্ত (মোবাইল) নেটওয়ার্কে সংযোগের অনুমতি দেবেন?</string>
     <string name="fapps_firewall_filter_bypass_universal">বাইপাস</string>
-    <string name="fapps_unmetered_block_dialog_message"><i>তালিকাভুক্ত</i> অ্যাপের জন্য মিটারবিহীন (ওয়াইফাই) নেটওয়ার্কে সংযোগ ব্লক করবেন\?</string>
+    <string name="fapps_unmetered_block_dialog_message"><i>তালিকাভুক্ত</i> অ্যাপের জন্য মিটারবিহীন (ওয়াইফাই) নেটওয়ার্কে সংযোগ ব্লক করবেন?</string>
     <string name="fapps_metered_block_dialog_title">মিটারে ব্লক</string>
     <string name="fapps_firewall_filter_desc_category">বিভাগে দেখানো হচ্ছে <u>%1$s</u> %2$s অ্যাপগুলি: %3$s</string>
-    <string name="fav_icon">fav_icon</string>
+    <string name="fav_icon" translatable="false">fav_icon</string>
     <string name="fapps_unmetered_block_dialog_title">আনমিটারে ব্লক করুন</string>
     <string name="fapps_metered_unblock_dialog_title">মিটারে অনুমতি দিন</string>
     <string name="rules_load_failure_reload">পুনরায় লোড</string>
@@ -784,4 +771,6 @@
     <string name="lbl_unselected" translatable="true">অনির্বাচিত</string>
     <string name="lbl_idle" translatable="true">নিষ্ক্রিয়</string>
     <string name="lbl_on_device" translatable="true">ডিভাইসে</string>
+    <string name="unicode_x_sign" translatable="false"></string>
+    <string name="http_proxy_dialog_desc" translatable="true"></string>
 </resources>
