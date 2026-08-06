@@ -251,7 +251,7 @@
     <string name="ctbs_dialog_negative_btn" translatable="true">पीछे जाएँ</string>
     <string name="dns_log_dialog_positive" translatable="true">लॉग हटाएं</string>
     <string name="dns_btm_sheet_chip" translatable="true">+%1$s अन्य आईपी</string>
-    <string name="dns_btm_resolved_crypt" translatable="true">%1$s को %2$s द्वारा %3$s के माध्यम से <u>अज्ञात रूप से</u> हल किया गया</string>
+    <string name="dns_btm_resolved_crypt" translatable="true">%1$s को %2$s द्वारा %3$s के माध्यम से &lt;u&gt;अज्ञात रूप से&lt;/u&gt; हल किया गया</string>
     <string name="dns_btm_resolved_doh" translatable="true">%2$s द्वारा हल किया गया %1$s</string>
     <string name="hs_download_positive_play_store" translatable="true">अपडेट पूर्ण करे</string>
     <string name="hs_download_positive_default" translatable="true">ठीक है</string>
@@ -616,8 +616,8 @@
     <string name="cd_dns_crypt_name_default" translatable="true">डीएनएसक्रिप्ट</string>
     <string name="cd_dns_crypt_name" translatable="true">डीएनएसक्रिप्ट %1$s</string>
     <string name="cd_dns_crypt_relay_name" translatable="true">डीएनएसरीले %1$s</string>
-    <string name="dns_btm_sheet_dialog_message" translatable="true"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s blocklist(s)</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
-    <string name="dns_btm_sheet_dialog_ips" translatable="true"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_message" translatable="true"><Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s blocklist(s)</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_ips" translatable="true"><Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
     <string name="hs_download_positive_website" translatable="true">बेवसाइट देखे</string>
     <string name="univ_view_blocked_ip" translatable="true">आईपी और पोर्ट नियम</string>
     <string name="univ_ip_delete_toast_success" translatable="true">सभी आईपी नियम हटा दिए गए।</string>
@@ -747,7 +747,7 @@
     <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">सबसे ज्यादा अवरुद्ध डोमेन</string>
     <string name="firewall_rule_isolate_desc" translatable="true"><![CDATA[एक उपयोगकर्ता-सेट फ़ायरवॉल नियम ने इस <i>ऐप</i> को <i>बायपासड आईपी</i> के अलावा अन्य से कनेक्ट करने से रोक दिया है। <br/> <br/> बदलने के लिए <i>सभी ऐप्स</i> टैब पर जाएं।]]></string>
     <string name="firewall_rule_block_dns_bypass_desc" translatable="true"><![CDATA[यह कनेक्शन अवरुद्ध कर दिया गया था क्योंकि <i>स्रोत ऐप</i> ने उपयोगकर्ता-पसंदीदा डीएनएस को दरकिनार कर दिया था।<br/><br/> इस व्यवहार को बदलने के लिए <i>यूनीवर्सल</i> टैब पर जाएं।]]></string>
-    <string name="whats_new_version_update" translatable="true">&lt;b&gt;पैनिक न करें 2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. नया: उपयोगकर्ता बग रिपोर्ट में नेटवर्क इंजन की त्रुटियों को कैप्चर करें।&lt;br/&gt; 2. नया: अप्रतिनियुक्त डोमेन नामों के लिए सिस्टम DNS का उपयोग करें यदि DNS लीक को रोकें चालू है।&lt;br/&gt; 3. सुधार: डुअल-स्टैक (IPv4 + IPv6) वायरगार्ड कनेक्टिविटी।&lt;br/&gt; 4. सुधार: जब नेटवर्क इंजन अनुत्तरदायी हो तो UI तत्वों को ब्लॉक करने से बचें।&lt;br/&gt; 5. फिक्स: उन्नत DNS फ़िल्टरिंग चालू होने पर कनेक्शन टाइमआउट।&lt;br/&gt; 6. फिक्स: डोमेन नामों के साथ वायरगार्ड पीयर एंडपॉइंट नेटवर्क परिवर्तनों पर लटके रहते हैं।&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;इस ऐप का अनुवाद करने में सहायता करें&lt;/a&gt;</string>
+    <string name="whats_new_version_update" translatable="false"><![CDATA[<b>पैनिक न करें 2</b><br/><br/> 1. नया: उपयोगकर्ता बग रिपोर्ट में नेटवर्क इंजन की त्रुटियों को कैप्चर करें।<br/> 2. नया: अप्रतिनियुक्त डोमेन नामों के लिए सिस्टम DNS का उपयोग करें यदि DNS लीक को रोकें चालू है।<br/> 3. सुधार: डुअल-स्टैक (IPv4 + IPv6) वायरगार्ड कनेक्टिविटी।<br/> 4. सुधार: जब नेटवर्क इंजन अनुत्तरदायी हो तो UI तत्वों को ब्लॉक करने से बचें।<br/> 5. फिक्स: उन्नत DNS फ़िल्टरिंग चालू होने पर कनेक्शन टाइमआउट।<br/> 6. फिक्स: डोमेन नामों के साथ वायरगार्ड पीयर एंडपॉइंट नेटवर्क परिवर्तनों पर लटके रहते हैं।<br/><br/> <a href=https://svc.rethinkdns.com/r/translate>इस ऐप का अनुवाद करने में सहायता करें</a>]]></string>
     <string name="lbl_rules" translatable="true">नियम</string>
     <string name="lbl_configure" translatable="true">कॉन्फ़िगर</string>
     <string name="lbl_logs" translatable="true">लॉग</string>
