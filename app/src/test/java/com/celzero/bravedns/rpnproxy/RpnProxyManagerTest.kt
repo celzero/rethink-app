@@ -28,9 +28,11 @@ import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.PurchaseDetail
 import com.celzero.bravedns.iab.QueryEntitlementResult
 import com.celzero.bravedns.service.EncryptedFileManager
+import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.shadows.ShadowBackend
 import com.celzero.firestack.backend.Backend
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -40,9 +42,11 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkAll
+import io.mockk.unmockkObject
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -60,11 +64,10 @@ import org.koin.test.KoinTest
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.lang.reflect.Field
-import java.util.concurrent.ConcurrentHashMap
 
 @ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [28])
+@Config(sdk = [28], shadows = [ShadowBackend::class])
 class RpnProxyManagerTest : KoinTest {
 
     private lateinit var context: Context
@@ -73,12 +76,13 @@ class RpnProxyManagerTest : KoinTest {
     private val mockPersistentState: PersistentState = mockk(relaxed = true)
     private val mockBillingBackendClient: BillingBackendClient = mockk(relaxed = true)
     private val mockSubscriptionStatusDb: SubscriptionStatusRepository = mockk(relaxed = true)
-    private val mockStateMachine: SubscriptionStateMachineV2 = mockk(relaxed = true)
+    private lateinit var mockStateMachine: SubscriptionStateMachineV2
 
     private val stateFlow = MutableStateFlow<SubscriptionStateMachineV2.SubscriptionState>(SubscriptionStateMachineV2.SubscriptionState.Initial)
 
     @Before
     fun setUp() {
+        mockStateMachine = mockk(relaxed = true)
         context = ApplicationProvider.getApplicationContext()
         try { stopKoin() } catch (_: Exception) {}
 
@@ -98,6 +102,7 @@ class RpnProxyManagerTest : KoinTest {
         mockkObject(InAppBillingHandler)
         mockkObject(EncryptedFileManager)
         mockkObject(ProxyManager)
+        mockkObject(IpRulesManager)
 
         // Mock properties correctly for a relaxed mock
         every { mockStateMachine.currentState } returns stateFlow
@@ -109,13 +114,12 @@ class RpnProxyManagerTest : KoinTest {
 
         // Reset state
         RpnProxyManager.deactivateRpn("test setup")
-        // Reset server key meta
-        getPrivateField<ConcurrentHashMap<String, Any>>(RpnProxyManager, "serverKeyMeta").clear()
     }
 
     @After
     fun tearDown() {
         stopKoin()
+        unmockkObject(IpRulesManager)
         unmockkAll()
     }
 
@@ -124,12 +128,6 @@ class RpnProxyManagerTest : KoinTest {
         val field: Field = obj.javaClass.getDeclaredField(fieldName)
         field.isAccessible = true
         return field.get(obj) as T
-    }
-
-    private fun <T> setPrivateField(obj: Any, fieldName: String, value: T) {
-        val field: Field = obj.javaClass.getDeclaredField(fieldName)
-        field.isAccessible = true
-        field.set(obj, value)
     }
 
     // =========================================================================

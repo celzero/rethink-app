@@ -1,0 +1,34 @@
+plugins {
+    id 'com.android.test'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.celzero.bravedns.benchmark'
+    compileSdk 36
+
+    defaultConfig {
+        minSdk 23
+        targetSdk 35
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        // This benchmark build type is used for keyboard benchmarks
+        benchmark {
+            debuggable = false
+            signingConfig signingConfigs.debug
+            matchingFallbacks = ['release']
+        }
+    }
+
+    targetProjectPath = ":app"
+    experimentalProperties["android.experimental.self-instrumenting"] = true
+}
+
+dependencies {
+    implementation "androidx.benchmark:benchmark-macro-junit4:1.3.3"
+    implementation "androidx.test.ext:junit:1.3.0"
+    implementation "androidx.test.uiautomator:uiautomator:2.3.0"
+}
