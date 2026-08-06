@@ -207,7 +207,7 @@
     <string name="orbot_install_dialog_message">Orbot 將 Tor 的特性與功能帶入 Android 。</string>
     <string name="orbot_install_dialog_positive">安裝</string>
     <string name="orbot_install_activity_error" translatable="false">似乎出了一些問題，請稍後再試</string>
-    <string name="whats_new_version_update">&lt;b&gt;別慌張 2&lt;/b&gt;&lt;br /&gt;&lt;br /&gt; 1. 新功能: 在使用者錯誤報告中引入網路引擎的錯誤。&lt;br /&gt; 2. 新功能: 若且唯若「防止 DNS 洩漏」功能啟動時，使用系統 DNS 解析未授權的網域名稱。&lt;br /&gt; 3. 改進: 支援雙協定 (IPv4 + IPv6) WireGuard 連線。&lt;br /&gt; 4. 改進: 當網路引擎沒有回應時，避免鎖定圖形介面元素，&lt;br /&gt; 5. 修正: 進階 DNS 過濾的連線逾時偵測預設為 ON。&lt;br /&gt; 6. 修正: 當網路環境改變時，卡住含網域名稱的 WireGuard 端點。&lt;br /&gt;&lt;br /&gt;&lt;a href= https:// svc.rethinkdns.com/ r/ translate&gt;歡迎一起翻譯這個應用程式&lt;/a&gt;</string>
+    <string name="whats_new_version_update" translatable="false"><![CDATA[<b>別慌張 2</b><br /><br /> 1. 新功能: 在使用者錯誤報告中引入網路引擎的錯誤。<br /> 2. 新功能: 若且唯若「防止 DNS 洩漏」功能啟動時，使用系統 DNS 解析未授權的網域名稱。<br /> 3. 改進: 支援雙協定 (IPv4 + IPv6) WireGuard 連線。<br /> 4. 改進: 當網路引擎沒有回應時，避免鎖定圖形介面元素，<br /> 5. 修正: 進階 DNS 過濾的連線逾時偵測預設為 ON。<br /> 6. 修正: 當網路環境改變時，卡住含網域名稱的 WireGuard 端點。<br /><br /><a href= https:// svc.rethinkdns.com/ r/ translate>歡迎一起翻譯這個應用程式</a>]]></string>
     <string name="settings_orbot_header">Orbot\t❯</string>
     <string name="settings_orbot_desc">在非 VPN 模式下使用 HTTPS/SOCKS5 的 Orbot。</string>
     <string name="settings_network_all_networks">使用所有可用網路（實驗性）</string>
