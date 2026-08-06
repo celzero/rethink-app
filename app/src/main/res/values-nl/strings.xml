@@ -13,11 +13,11 @@
     <string name="hybrid_mode_info_title">DNS + Firewall</string>
     <string name="alert_permission_accessibility">Toestemming - Toegankelijkheid</string>
     <string name="dns_firewall_mode_info_explanation_new">Al het bovenstaande + het omzeilen van internetcensuur.</string>
-    <string name="dns_proxy_remove_dialog_title">DNS Proxy verwijderen\?</string>
+    <string name="dns_proxy_remove_dialog_title">DNS Proxy verwijderen?</string>
     <string name="bsct_block">Blokkeren, omzeilen, uitsluiten, lockdown <u>deze app</u></string>
     <string name="dns_act_configure_tab">Configureren</string>
     <string name="dns_proxy_remove_dialog_message">Verwijder de DNS-proxy uit de opgeslagen configuratie.</string>
-    <string name="local_blocklist_download_desc">Blocklists downloaden (ongeveer 60MB) om deze functie te gebruiken\?</string>
+    <string name="local_blocklist_download_desc">Blocklists downloaden (ongeveer 60MB) om deze functie te gebruiken?</string>
     <string name="orbot">Orbot</string>
     <string name="settings_general_header">algemeen</string>
     <string name="configure_dns_connected_doh_status">DNS over HTTPS</string>
@@ -54,13 +54,11 @@
     <string name="settings_dns_proxy_dialog_password">Wachtwoord</string>
     <string name="settings_app_list_default_app">Niemand</string>
     <string name="settings_ip_text_ipv46">Auto</string>
-    <string name="settings_dns_proxy_dialog_app_desc">De geselecteerde app wordt uitgesloten van het VPN om het namens u verbindingen te laten proxyen.</string>
+    <string name="settings_dns_proxy_dialog_app_desc" translatable="false">De geselecteerde app wordt uitgesloten van het VPN om het namens u verbindingen te laten proxyen.</string>
     <string name="settings_notification_desc2">DNS / DNS + Firewall</string>
     <string name="settings_ip_dialog_ipv6">IPv6 (experimenteel)</string>
     <string name="settings_notification_desc1">Pauze / Stop (standaard)</string>
-    <string name="settings_notification_dialog_option_2">"
-\nDNS / DNS + Firewall:
-\nToont twee knoppen om snel te schakelen tussen de batterijbesparende DNS-modus en de gewone DNS + Firewall-modus."</string>
+    <string name="settings_notification_dialog_option_2">\n\nDNS / DNS + Firewall:\n\nToont twee knoppen om snel te schakelen tussen de batterijbesparende DNS-modus en de gewone DNS + Firewall-modus.</string>
     <string name="apps_icon_content_desc">Toepassingspictogram</string>
     <string name="firewall_status_excluded">uitgesloten van dns en firewall</string>
     <string name="firewall_status_block_unmetered">geblokkeerd op niet-gemeten (wifi) netwerken</string>
@@ -75,9 +73,9 @@
     <string name="always_on_dialog_lockdown_stop_message">RethinkDNS draait VPN in <i>Lockdown</i> mode. Stoppen zou resulteren in verlies van internet connectiviteit op dit gebruikers profiel. Wil je toch doorgaan?</string>
     <string name="always_on_dialog_positive">Stop</string>
     <string name="always_on_dialog_neutral">Instellingen</string>
-    <string name="univ_firewall_dialog_title">IP-regel verwijderen\?</string>
-    <string name="univ_firewall_dialog_message">Het verwijderen van deze regel zou elke app toestaan om verbinding te maken met dit IP. Wilt u doorgaan\?</string>
-    <string name="doh_custom_url_remove_dialog_title">DoH eindpunt verwijderen\?</string>
+    <string name="univ_firewall_dialog_title">IP-regel verwijderen?</string>
+    <string name="univ_firewall_dialog_message">Het verwijderen van deze regel zou elke app toestaan om verbinding te maken met dit IP. Wilt u doorgaan?</string>
+    <string name="doh_custom_url_remove_dialog_title">DoH eindpunt verwijderen?</string>
     <string name="doh_custom_url_remove_dialog_message">Verwijder het DNS over Https eindpunt uit de opgeslagen configuratie.</string>
     <string name="doh_custom_url_remove_success">Eindpunt verwijderd.</string>
     <string name="dns_proxy_remove_success">DNS Proxy verwijderd.</string>
@@ -85,7 +83,7 @@
     <string name="blocklist_update_check_failure">Er ging iets mis. Probeer het later nog eens!</string>
     <string name="http_proxy_dialog_heading">HTTP(S)-proxy instellen</string>
     <string name="download_update_dialog_title">Nieuwe update!</string>
-    <string name="download_update_dialog_message">Een nieuwe versie van de app is te downloaden van de website. Wilt u doorgaan\?</string>
+    <string name="download_update_dialog_message">Een nieuwe versie van de app is te downloaden van de website. Wilt u doorgaan?</string>
     <string name="download_update_dialog_message_success">Blocklist download succesvol.</string>
     <string name="download_update_dialog_failure_title">Iets ging fout!</string>
     <string name="app_mode_dns">DNS</string>
@@ -93,8 +91,8 @@
     <string name="info_dialog_rethink_toast_msg">Gekopieerd als RDNS+ DNS-over-HTTPS URL</string>
     <string name="settings_enable_logs_desc">Sla DNS- en firewall-logs lokaal op het apparaat op.</string>
     <string name="app_mode_choose">Kies de modus</string>
-    <string name="app_name">RethinkDNS</string>
-    <string name="app_name_small_case">rethink</string>
+    <string name="app_name" translatable="false">RethinkDNS</string>
+    <string name="app_name_small_case" translatable="false">rethink</string>
     <string name="title_settings">Instellingen</string>
     <string name="pause_title_desc">een dutje doen…</string>
     <string name="about_title_desc">Detecteer en blokkeer netwerkbeveiligingsbedreigingen</string>
@@ -121,21 +119,21 @@
     <string name="alert_firewall_accessibility_exception">Storing bij het openen van de Toegankelijkheidsinstellingen. Probeer het later nog eens!</string>
     <string name="default_dns_name">RDNS Standaard</string>
     <string name="custom_url_error_invalid_url">Ongeldige URL</string>
-    <string name="conn_track_clear_logs_title">Alle netwerk logs verwijderen\?</string>
-    <string name="dns_query_clear_logs_title">Alle DNS logs verwijderen\?</string>
+    <string name="conn_track_clear_logs_title">Alle netwerk logs verwijderen?</string>
+    <string name="dns_query_clear_logs_title">Alle DNS logs verwijderen?</string>
     <string name="bsct_app_info">App Info</string>
     <string name="bsct_block_ip">Blokkeer, omzeil <u>dit IP</u> voor <u>deze app</u></string>
     <string name="bsct_conn_block_desc">geblokkeerd %1$s door %2$s</string>
     <string name="bsct_conn_block_desc_device">geblokkeerd %1$s op apparaat</string>
     <string name="bsct_conn_desc_allowed">toegestaan op %1$s %2$s</string>
     <string name="bsct_conn_desc_blocked">geblokkeerd op %1$s %2$s</string>
-    <string name="orbot_install_dialog_title">Orbot installeren\?</string>
+    <string name="orbot_install_dialog_title">Orbot installeren?</string>
     <string name="orbot_install_dialog_message">Orbot brengt de functies en functionaliteit van Tor naar Android.</string>
     <string name="orbot_install_dialog_positive">Installeren</string>
     <string name="orbot_install_dialog_neutral">website</string>
-    <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
-    <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
-    <string name="orbot_install_activity_error">Er ging iets mis, probeer het nog eens</string>
+    <string name="orbot_website_link" translatable="false">https://guardianproject.info/apps/org.torproject.android/</string>
+    <string name="orbot_download_link_website" translatable="false">https://github.com/guardianproject/orbot/releases</string>
+    <string name="orbot_install_activity_error" translatable="false">Er ging iets mis, probeer het nog eens</string>
     <string name="settings_orbot_header">Orbot ❯</string>
     <string name="settings_orbot_desc">Orbot in non-vpn modus met HTTPS/SOCKS5.</string>
     <string name="settings_orbot_install_desc">Tik hier om Orbot te installeren</string>
@@ -166,24 +164,21 @@
     <string name="settings_ip_dialog_ipv4">IPv4 (standaard)</string>
     <string name="settings_ip_text_ipv4">IPv4</string>
     <string name="settings_ip_text_ipv6">IPv6</string>
-    <string name="settings_selected_ip_desc">%1$s</string>
+    <string name="settings_selected_ip_desc" translatable="false">%1$s</string>
     <string name="settings_notification_heading">Notificatieactie kiezen</string>
     <string name="settings_notification_desc">Actieknoppen om te tonen bij de RethinkDNS melding: %1$s</string>
     <string name="settings_notification_desc3">Geen</string>
     <string name="settings_notification_dialog_option_1">"
 \nPauze / Stop (standaard):
 \nToont twee knoppen, om RethinkDNS snel te pauzeren en te stoppen."</string>
-    <string name="settings_notification_dialog_option_3">"
-\nGeen:
-\nToont geen knop.
-\n"</string>
+    <string name="settings_notification_dialog_option_3">\n\nGeen:\n\nToont geen knop.\n\n</string>
     <string name="settings_selected_theme">Huidig thema: %1$s</string>
     <string name="settings_protocol_translation_dns_inactive">Schakel over naar DNS/DNS+Firewall modus om deze instelling in te schakelen</string>
     <string name="firewall_status_allow">toegestaan</string>
     <string name="firewall_status_whitelisted">omzeilt universele firewall regels</string>
     <string name="settings_ip_network_desc">Kies tussen Internet Protocol versies.</string>
     <string name="slide_2_title">Welkom</string>
-    <string name="rdns_plus">RDNS Plus</string>
+    <string name="rdns_plus" translatable="false">RDNS Plus</string>
     <string name="slide_2_desc">RethinkDNS is de eenvoudigste manier om netwerkactiviteiten te controleren, internetcensuur te omzeilen en firewall-apps op uw Android-toestel te gebruiken.</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Waarschuwing: RethinkDNS is gedeactiveerd</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Tik om de beveiligingsinstelling te wijzigen</string>
@@ -210,10 +205,8 @@
     <string name="orbot_bs_status_4">Met één klik Tor-as-a-Proxy (Orbot) instellen.</string>
     <string name="orbot_status_arg_2">TCP</string>
     <string name="orbot_status_arg_3">DNS en TCP</string>
-    <string name="orbot_app_issue">Kan Orbot niet starten. Is het geïnstalleerd\?</string>
-    <string name="orbot_stop_dialog_message_combo">%1$s
-\n
-\n%2$s</string>
+    <string name="orbot_app_issue">Kan Orbot niet starten. Is het geïnstalleerd?</string>
+    <string name="orbot_stop_dialog_message_combo" translatable="false">%1$s \n \n%2$s</string>
     <string name="orbot_stop_dialog_negative">Stop Orbot</string>
     <string name="orbot_stop_dialog_neutral">DNS wijzigen</string>
     <string name="app_mode_firewall">Firewall</string>
@@ -226,18 +219,18 @@
     <string name="status_dns_error">dns-fout</string>
     <string name="notification_action_dns_mode">DNS</string>
     <string name="dns_mode_info_explanation_new">DNS-verzoeken bewaken, blokkeren en versleutelen.</string>
-    <string name="dns_query_clear_logs_message">Hiermee worden DNS-logboeken op het apparaat verwijderd. Deze operatie is niet omkeerbaar. Wilt u doorgaan\?</string>
-    <string name="always_on_dialog_stop_message">Always-on VPN is ingeschakeld voor Rethink. Weet je zeker dat je Rethink toch wilt stoppen\?</string>
+    <string name="dns_query_clear_logs_message">Hiermee worden DNS-logboeken op het apparaat verwijderd. Deze operatie is niet omkeerbaar. Wilt u doorgaan?</string>
+    <string name="always_on_dialog_stop_message">Always-on VPN is ingeschakeld voor Rethink. Weet je zeker dat je Rethink toch wilt stoppen?</string>
     <string name="app_mode_dns_low_battery">DNS (batterijbesparing)</string>
     <string name="info_dialog_copy_toast_msg">IP adres gekopieerd.</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">private dns is ingeschakeld</string>
     <string name="brave_dns_connect_mode_change_dns">Kies de modus.</string>
-    <string name="conn_track_clear_logs_message">Dit verwijdert alleen netwerklogs, maar geen firewallregels. Deze operatie is niet omkeerbaar. Wilt u doorgaan\?</string>
+    <string name="conn_track_clear_logs_message">Dit verwijdert alleen netwerklogs, maar geen firewallregels. Deze operatie is niet omkeerbaar. Wilt u doorgaan?</string>
     <string name="bsct_conn_rule_explanation"><u>#1</u>: Blokkeert een app om verbinding te maken met het internet. \n <u>#2</u>: Blokkeert een app om verbinding te maken met een bepaald IP-adres. \n <u>#3</u>: Blokkeert alle verbindingen wanneer het apparaat is vergrendeld (Universal Firewall). \n <u>#4</u>: Blokkeert elke app die niet in gebruik is (Universal Firewall). \n <u>#5</u>: Blokkeert verbindingen wanneer bron app onbekend is (Universal Firewall). \n <u>#6</u>: Blokkeert alle UDP verkeer behalve DNS (Universal Firewall). \n <u>#7</u>: Blokkeert verbindingen wanneer DNS wordt omzeild (Universal Firewall).</string>
     <string name="firewall_act_universal_tab">Universele</string>
     <string name="always_on_dialog">\"Always-On VPN\" is ingeschakeld op dit apparaat. Om Rethink te starten, ga naar Instellingen app en schakel \"Always-on VPN\" uit.</string>
     <string name="download_update_dialog_message_ok">Je zit al op de laatste versie.</string>
-    <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
+    <string name="about_translate_link" translatable="false">https://svc.rethinkdns.com/r/translate</string>
     <string name="firewall_rule_foreground">App Niet in gebruik</string>
     <string name="univ_firewall_rule_1">Alle apps blokkeren wanneer het apparaat is vergrendeld</string>
     <string name="dc_local_block_desc_1">Kies uit 185+ blocklists. Klik hier om bloklijsten te downloaden of te configureren.</string>
@@ -275,15 +268,15 @@
     <string name="about_mozilla">RethinkDNS maakt deel uit van het Mozilla Builders MVP programma.</string>
     <string name="about_mail_to">hello@celzero.com</string>
     <string name="about_mail_bugreport_text">Stuur deze e-mail naar : hello@celzero.com</string>
-    <string name="about_docs_link">https://docs.rethinkdns.com/</string>
-    <string name="about_github_link">https://github.com/celzero/rethink-app</string>
+    <string name="about_docs_link" translatable="false">https://docs.rethinkdns.com/</string>
+    <string name="about_github_link" translatable="false">https://github.com/celzero/rethink-app</string>
     <string name="about_mail_subject">[RethinkDNS]:</string>
-    <string name="about_faq_link">https://www.rethinkdns.com/faq</string>
-    <string name="about_website_link">https://www.rethinkdns.com/</string>
-    <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
-    <string name="about_version_install_source">%1$s (%2$s)</string>
+    <string name="about_faq_link" translatable="false">https://www.rethinkdns.com/faq</string>
+    <string name="about_website_link" translatable="false">https://www.rethinkdns.com/</string>
+    <string name="about_privacy_policy_link" translatable="false">https://www.rethinkdns.com/privacy</string>
+    <string name="about_version_install_source" translatable="false">%1$s (%2$s)</string>
     <string name="notification_screen_error">Kan App Notificatie scherm niet starten.</string>
-    <string name="about_twitter_handle">https://twitter.com/rethinkdns</string>
+    <string name="about_twitter_handle" translatable="false">https://twitter.com/rethinkdns</string>
     <string name="app_info_error">Kon App info niet starten.</string>
     <string name="cd_custom_doh_dialog_title">Aangepaste server-URL</string>
     <string name="no_browser_error">Kan webpagina niet openen vanuit browser.</string>
@@ -293,7 +286,7 @@
     <string name="cd_custom_doh_url_name_default">DoH</string>
     <string name="cd_custom_doh_url_name">DoH %1$s</string>
     <string name="cd_doh_dialog_heading">DNS over HTTPS toevoegen</string>
-    <string name="ct_ip_details">%1$s (%2$s)</string>
+    <string name="ct_ip_details" translatable="false">%1$s (%2$s)</string>
     <string name="dns_btm_sheet_chip">+%1$s Andere IP\'s</string>
     <string name="dns_btm_resolved_crypt">opgelost <u>anoniem</u> %1$s door %2$s</string>
     <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
@@ -310,18 +303,14 @@
     <string name="univ_firewall_rule_8">Poort 80 (onveilig HTTP-verkeer) blokkeren</string>
     <string name="univ_delete_firewall_dialog_message">Door deze regels te verwijderen, zou elke toepassing verbinding kunnen maken met de momenteel geblokkeerde IP\'s.</string>
     <string name="dns_connected">Verbonden</string>
-    <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
+    <string name="dns_proxy_desc" translatable="false">%1$s:%2$s, %3$s</string>
     <string name="dns_proxy_port">Poortnummer</string>
-    <string name="dns_proxy_dialog_message">App naam: %1$s
-\n
-\nIP-adres: %2$s
-\n
-\nPoortnummer: %3$s</string>
+    <string name="dns_proxy_dialog_message">App naam: %1$s \n \nIP-adres: %2$s \n \nPoortnummer: %3$s</string>
     <string name="fapps_firewall_filter_desc_category">Toont <u>%1$s</u> %2$s apps in categorieën: %3$s</string>
     <string name="fapps_filter_clear_btn">Wissen</string>
     <string name="rules_load_failure_reload">herladen</string>
     <string name="fapps_info_dialog_positive_btn">Oke</string>
-    <string name="fav_icon">fav_icon</string>
+    <string name="fav_icon" translatable="false">fav_icon</string>
     <string name="network_log_app_name_unknown">Onbekend</string>
     <string name="rules_load_failure_desc">Geen firewall regels gevonden</string>
     <string name="update_complete_snack_message">Nieuwe versie gedownload.</string>
@@ -353,7 +342,7 @@
     <string name="ada_app_isolate">Lockdown</string>
     <string name="settings_orbot_notification_content">Fout bij het starten van Tor-as-a-Proxy. Open de Orbot-app om deze handmatig te starten.</string>
     <string name="always_on_dialog_positive_btn">Open Instellingen</string>
-    <string name="dns_crypt_custom_url_remove_dialog_title">DNSCrypt-resolver verwijderen\?</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title">DNSCrypt-resolver verwijderen?</string>
     <string name="dns_crypt_url_remove_dialog_message">Verwijder de DNSCrypt-oplosser uit de opgeslagen configuratie.</string>
     <string name="dns_crypt_url_remove_success">DNSCrypt-resolver verwijderd.</string>
     <string name="local_blocklist_download">Bloklijsten downloaden</string>
@@ -408,7 +397,7 @@
     <string name="about_bug_report_desc">e-mail crash logs</string>
     <string name="about_join_telegram">Telegram</string>
     <string name="about_bug_report_dialog_positive_btn">Verzend e-mail</string>
-    <string name="about_bug_no_log_dialog_message">Kon geen crash logs ophalen. Wilt u uw bug handmatig rapporteren\?</string>
+    <string name="about_bug_no_log_dialog_message">Kon geen crash logs ophalen. Wilt u uw bug handmatig rapporteren?</string>
     <string name="about_bug_no_log_dialog_positive_btn">Verzend e-mail</string>
     <string name="about_web">links</string>
     <string name="about_website">Bezoek rethinkdns.com</string>
@@ -424,9 +413,9 @@
     <string name="about_dialog_positive_button">Laten we gaan</string>
     <string name="about_mail_to_string">mailto:</string>
     <string name="about_mail_bugreport_share_title">Selecteer e-mailprovider</string>
-    <string name="about_telegram_link">https://telegram.me/rethinkdns</string>
-    <string name="about_mozilla_alumni_link">https://builders.mozilla.community/alumni.html</string>
-    <string name="about_version">v%1$s</string>
+    <string name="about_telegram_link" translatable="false">https://telegram.me/rethinkdns</string>
+    <string name="about_mozilla_alumni_link" translatable="false">https://builders.mozilla.community/alumni.html</string>
+    <string name="about_version" translatable="false">v%1$s</string>
     <string name="vpn_profile_error">Kon VPN profiel niet starten.</string>
     <string name="dns_btm_latency_ms">%1$sms</string>
     <string name="hs_download_negative_default">Herinner me later</string>
@@ -438,14 +427,12 @@
     <string name="univ_view_blocked_ip_desc">Wijzigen van geblokkeerde of omzeilde IP / Poort regels.</string>
     <string name="univ_ip_delete_individual_toast">%1$s verwijderd.</string>
     <string name="univ_ip_delete_dialog_positive">Verwijder alles</string>
-    <string name="univ_delete_firewall_dialog_title">Alle IP-regels verwijderen\?</string>
+    <string name="univ_delete_firewall_dialog_title">Alle IP-regels verwijderen?</string>
     <string name="univ_accessibility_crash_dialog_positive">Ga naar instellingen</string>
     <string name="dns_connected_no_count">Verbonden</string>
     <string name="dns_info_neutral">Kopieëren</string>
-    <string name="dns_proxy_desc_no_app">%1$s:%2$s</string>
-    <string name="dns_proxy_dialog_message_no_app">IP adres: %1$s
-\n
-\nPoortnummer: %2$s</string>
+    <string name="dns_proxy_desc_no_app" translatable="false">%1$s:%2$s</string>
+    <string name="dns_proxy_dialog_message_no_app">IP adres: %1$s \n \nPoortnummer: %2$s</string>
     <string name="dns_query_latency">%1$sms</string>
     <string name="dns_proxy_dialog_header_dns">DNS-proxy toevoegen</string>
     <string name="dns_proxy_app">App</string>
@@ -456,8 +443,8 @@
     <string name="fapps_firewall_filter_excluded">Uitgesloten</string>
     <string name="fapps_firewall_filter_isolate">lockdown</string>
     <string name="fapps_firewall_filter_desc">Het tonen van <u>%1$s</u> %2$s apps</string>
-    <string name="unicode_warning_sign">⚠</string>
-    <string name="unicode_question_sign">❔</string>
+    <string name="unicode_warning_sign" translatable="false">⚠</string>
+    <string name="unicode_question_sign" translatable="false">❔</string>
     <string name="rules_load_failure_heading">Notitie</string>
     <string name="dns_crypt_connection_failure">Fout bij de verbinding met de DNSCrypt-server.</string>
     <string name="dns_proxy_connection_failure">Fout bij verbinding met DNS Proxy server.</string>
@@ -484,7 +471,7 @@
     <string name="cd_custom_dns_proxy_title">Aangepaste DNS-proxy</string>
     <string name="cd_custom_dns_proxy_name_default">Proxy</string>
     <string name="cd_custom_dns_proxy_name">Proxy %1$s</string>
-    <string name="cd_custom_dns_proxy_default_ip">127.0.0.1</string>
+    <string name="cd_custom_dns_proxy_default_ip" translatable="false">127.0.0.1</string>
     <string name="cd_custom_dns_proxy_default_app">Niemand</string>
     <string name="cd_dns_proxy_mode_internal">Intern</string>
     <string name="cd_dns_proxy_mode_external">Extern</string>
@@ -711,4 +698,6 @@
     <string name="whats_new_version_update" translatable="true">&lt;b&gt;Don\'t Panic 2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. New: Capture network engine errors in user bug reports.&lt;br/&gt; 2. New: use System DNS for undelegated domain names iff Prevent DNS leaks is ON.&lt;br/&gt; 3. Improvement: Dual-stack (IPv4 + IPv6) WireGuard connectivity.&lt;br/&gt; 4. Improvement: Avoid blocking the UI elements when the network engine is unresponsive.&lt;br/&gt; 5. Fix: Connection timeouts with Advanced DNS filtering turned ON.&lt;br/&gt; 6. Fix: WireGuard peer endpoints with domain names hang on network changes.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Help translate this app&lt;/a&gt;</string>
     <string name="lbl_split" translatable="true">Splitsen</string>
     <string name="lbl_on_device" translatable="true">op-apparaat</string>
+    <string name="unicode_x_sign" translatable="false"></string>
+    <string name="ct_ip_port" translatable="false"></string>
 </resources>
