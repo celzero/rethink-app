@@ -29,7 +29,7 @@
     <string name="slide_2_desc" translatable="true">Ang Rethink ay ang pinakamadaling paraan upang magmonitor ng network activity, mag-bypass ng Internet censorship, at firewall apps sa iyong Android device.</string>
     <string name="slide_1_title" translatable="true">Libre at Open Source</string>
     <string name="slide_1_desc" translatable="true">Ang Rethink ay isang open source na software na sinusuportahan ng programa ng Mozilla Builders MVP.</string>
-    <string name="rdns_plus" translatable="true">RDNS Plus</string>
+    <string name="rdns_plus" translatable="false">RDNS Plus</string>
     <string name="allow" translatable="true">pahintulutan</string>
     <string name="block" translatable="true">harangan</string>
     <string name="title_settings" translatable="true">Mga Setting</string>
@@ -42,13 +42,13 @@
     <string name="firewall_act_universal_tab" translatable="true">pangkalahatan</string>
     <string name="search_universal_ips" translatable="true"><font size="12">Maghanap ng mga IP</font></string>
     <string name="firewall_rule_block_univ_ip" translatable="true">IP / Port (Pangkalahatan)</string>
-    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Malagpasan ba ang universal DNS &amp; firewall na mga patakaran para sa mga <i>nakalista</i> na mga apps\?</string>
+    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Malagpasan ba ang universal DNS &amp; firewall na mga patakaran para sa mga <i>nakalista</i> na mga apps?</string>
     <string name="firewall_rule_bypass_universal_ip" translatable="true">Na-bypass ang IP</string>
     <string name="firewall_status_whitelisted" translatable="true">nakakalusot sa pangkalahatang mga patakaran ng firewall</string>
     <string name="firewall_card_universal_rules" translatable="true">%1$s (mga) patakaran ng universal</string>
     <string name="fapps_firewall_filter_bypass_universal" translatable="true">Nalampasan</string>
     <string name="fapps_info_bypass_msg" translatable="true">Iwasan ang mga patakaran ng Universal na firewall.</string>
-    <string name="fapps_bypass_block_dialog_message" translatable="true">Mag-bypass ng universal firewall rules para sa <i>naka-lista</i> na mga apps\?</string>
+    <string name="fapps_bypass_block_dialog_message" translatable="true">Mag-bypass ng universal firewall rules para sa <i>naka-lista</i> na mga apps?</string>
     <string name="firewall_rule_univ_block_metered" translatable="true">Naka-meter (Pangkalahatan)</string>
     <string name="firewall_rule_new_app_desc" translatable="true"><![CDATA[Ito ang <i>unang</i> pagkakataon na nagpakabit ang app na ito ng koneksyon.<br/><br/> Upang magbago, pumunta sa tab na <i>Universal</i>.]]></string>
     <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true"><![CDATA[Ang isang universal na patakaran ng firewall na iniset ng user ay nag-block ng <i>app</i> na ito habang nagtatangka itong kumonekta sa <i>Metered</i> (Mobile) na network. <br/> <br/> Upang baguhin, pumunta sa tab na <i>Universal</i>.]]></string>
@@ -93,22 +93,22 @@
     <string name="private_dns_dialog_positive" translatable="true">Pumunta sa Mga Setting</string>
     <string name="firewall_act_network_monitor_tab" translatable="true">Network</string>
     <string name="dns_act_configure_tab" translatable="true">I-configure</string>
-    <string name="univ_firewall_dialog_title" translatable="true">Tanggalin ang IP Rule\?</string>
-    <string name="univ_firewall_dialog_message" translatable="true">Pagtanggal ng patakaran na ito ay magpapahintulot sa anumang app na kumonekta sa IP na ito. Gusto mo bang magpatuloy\?</string>
-    <string name="doh_custom_url_remove_dialog_title" translatable="true">I-delete ang endpoint ng DoH\?</string>
+    <string name="univ_firewall_dialog_title" translatable="true">Tanggalin ang IP Rule?</string>
+    <string name="univ_firewall_dialog_message" translatable="true">Pagtanggal ng patakaran na ito ay magpapahintulot sa anumang app na kumonekta sa IP na ito. Gusto mo bang magpatuloy?</string>
+    <string name="doh_custom_url_remove_dialog_title" translatable="true">I-delete ang endpoint ng DoH?</string>
     <string name="doh_custom_url_remove_success" translatable="true">Tinanggal ang endpoint.</string>
     <string name="doh_custom_url_remove_dialog_message" translatable="true">Alisin ang endpoint ng DNS over Https mula sa nakalagay na konfigurasyon.</string>
-    <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">Tanggalin ang DNSCrypt resolver\?</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">Tanggalin ang DNSCrypt resolver?</string>
     <string name="dns_crypt_url_remove_dialog_message" translatable="true">Tanggalin ang DNSCrypt resolver mula sa mga na-save na konfigurasyon.</string>
     <string name="dns_crypt_url_remove_success" translatable="true">Ang DNSCrypt resolver ay tinanggal.</string>
-    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">Tanggalin ang DNSCrypt Relay\?</string>
+    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">Tanggalin ang DNSCrypt Relay?</string>
     <string name="dns_crypt_relay_remove_dialog_message" translatable="true">Tanggalin ang DNSCrypt relay mula sa naka-save na konfigurasyon.</string>
     <string name="dns_crypt_relay_remove_success" translatable="true">Ang DNSCrypt Relay ay tinanggal.</string>
-    <string name="dns_proxy_remove_dialog_title" translatable="true">Tanggalin ang DNS Proxy\?</string>
+    <string name="dns_proxy_remove_dialog_title" translatable="true">Tanggalin ang DNS Proxy?</string>
     <string name="dns_proxy_remove_dialog_message" translatable="true">Tanggalin ang DNS Proxy mula sa naka-save na konfigurasyon.</string>
     <string name="dns_proxy_remove_success" translatable="true">Tinanggal ang DNS Proxy.</string>
     <string name="local_blocklist_download" translatable="true">I-download ang Mga Blocklist</string>
-    <string name="local_blocklist_download_desc" translatable="true">Mag-download ng mga blocklist (mga 60MB) para magamit ang feature na ito\?</string>
+    <string name="local_blocklist_download_desc" translatable="true">Mag-download ng mga blocklist (mga 60MB) para magamit ang feature na ito?</string>
     <string name="local_blocklist_redownload" translatable="true">Napapanahon!</string>
     <string name="local_blocklist_redownload_desc" translatable="true">Ang mga blocklist sa device ay nasa pinakabagong bersyon na v%1$s.</string>
     <string name="blocklist_update_check_failure" translatable="true">May nangyaring mali. Pakisubukan muli mamaya!</string>
