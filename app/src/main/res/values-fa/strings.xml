@@ -777,7 +777,7 @@ href="https://central.sonatype.com/">Sonatype</a><br/> ]]></string>
     <string name="brbs_restore_title" translatable="true">بازیابی</string>
     <string name="brbs_title" translatable="true">پشتیبان‌گیری و بازیابی</string>
     <string name="bsac_title_desc" translatable="true">قوانین فقط برای این برنامه اعمال می‌شود.</string>
-    <string name="bsdl_block_desc" translatable="true">مسدود کردن، اعتماد به <u>این دامنه</u></string>
+    <string name="bsdl_block_desc" translatable="true">مسدود کردن، اعتماد به &lt;u&gt;این دامنه&lt;/u&gt;</string>
     <string name="bsrf_clear_filter" translatable="true">پاک کردن</string>
     <string name="build__flavor_website" translatable="true">وب‌سایت</string>
     <string name="bsrf_sub_group_heading" translatable="true">زیرگروه</string>
