@@ -11,7 +11,7 @@
     <string name="finish">Bitir</string>
     <string name="slide_1_title">Ücretsiz ve Açık Kaynaklı</string>
     <string name="slide_1_desc">Rethink, Mozilla Builders MVP programı ve FOSS United Foundation tarafından desteklenen açık kaynaklı bir yazılımdır.</string>
-    <string name="untracked">izlenmiyor</string>
+    <string name="untracked">İzlenmiyor</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Uyarı: Rethink devre dışı bırakıldı</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Koruma ayarını değiştirmek için dokunun</string>
     <string name="dns_mode_notification_title">Korunuyor! Hızlı ve Güvenli DNS\'e Bağlandı.</string>
@@ -22,10 +22,10 @@
     <string name="about_title_desc">Ağ güvenliği tehditlerini tespit edin ve engelleyin</string>
     <string name="block">Engelle</string>
     <string name="bypass_universal">Genel Olarak Atla</string>
-    <string name="isolate">koru</string>
+    <string name="isolate">İzole Et</string>
     <string name="slide_2_title">Hoş Geldiniz</string>
     <string name="rdns_plus" translatable="false">RDNS Plus</string>
-    <string name="exclude">hariç tut</string>
+    <string name="exclude">Hariç tut</string>
     <string name="slide_2_desc">Rethink, Android aygıtınızda ağ etkinliğini izlemenin, İnternet sansürünü ve güvenlik duvarı uygulamalarını atlamanın en kolay yoludur.</string>
     <string name="allow">İzin ver</string>
     <string name="pause_mode_notification_title">Duraklatıldı! Engellenen uygulamalar güvenlik duvarıyla korunmaya devam edecek.</string>
@@ -721,7 +721,7 @@
     <string name="lbl_configure" translatable="true">Yapılandır</string>
     <string name="lbl_logs" translatable="true">Günlükler</string>
     <string name="lbl_network" translatable="true">Ağ</string>
-    <string name="bypass_dns_firewall" translatable="true">dns &amp; güvenlik duvarını atla</string>
+    <string name="bypass_dns_firewall" translatable="true">DNS &amp; Güvenlik duvarını atla</string>
     <string name="title_statistics" translatable="true">İstatistikler</string>
     <string name="lbl_domain" translatable="true">Alan adı</string>
     <string name="lbl_cancel" translatable="true">İptal</string>
@@ -1163,7 +1163,7 @@
     <string name="tour_btn_skip">Turu geç</string>
     <string name="stability_program_snackbar_msg" translatable="true">Stabilite programı etkinleştirildi. Çökme raporları, deneysel özelliklerin geliştirilmesine yardım eder.</string>
     <string name="stability_program_snackbar_disable" translatable="true">Kapat</string>
-    <string name="lbl_expires_on" translatable="true">Sona erecek</string>
+    <string name="lbl_expires_on" translatable="true">Geçerlilik süresi</string>
     <plurals name="server_count">
         <item quantity="one">%1$d sunucu</item>
         <item quantity="other">%1$d sunucu</item>
@@ -1180,4 +1180,22 @@
     <string name="lbl_cancelled" translatable="true">İptal edildi</string>
     <string name="lbl_plan" translatable="true">Plan</string>
     <string name="lbl_grace_period" translatable="true">Ödeme Süresi</string>
+    <string name="ip_mismatch_notification_title" translatable="true">Ağ protokolü uyuşmazlığı</string>
+    <string name="ip_mismatch_notification_content" translatable="true">Seçtiğin IP protokolü mevcut ağda mevcut değil. \"IPv4 &amp; IPv6\" ya da \"Otomatik\" moda geçerek bağlantıda kalmaya devam edebilirsin.</string>
+    <string name="doh_empty_state_title" translatable="true">DoH endpoint\'i yok</string>
+    <string name="doh_empty_state_desc" translatable="true">Bir DNS-over-HTTPS endpoint\'i ekleyerek başla.</string>
+    <string name="odoh_empty_state_title" translatable="true">ODoH endpoint\'i yok</string>
+    <string name="odoh_empty_state_desc" translatable="true">Bir Oblivious DNS-over-HTTPS endpoint\'i ekleyerek başla.</string>
+    <string name="dot_empty_state_title" translatable="true">DoT endpoint\'i yok</string>
+    <string name="dot_empty_state_desc" translatable="true">Bir DNS-over-TLS endpoint\'i ekleyerek başla.</string>
+    <string name="dns_proxy_empty_state_title" translatable="true">DNS Proxy endpoint\'i yok</string>
+    <string name="dns_proxy_empty_state_desc" translatable="true">Bir DNS Proxy endpoint\'i ekleyerek başla.</string>
+    <string name="dns_crypt_empty_state_title" translatable="true">DNSCrypt endpoint\'i yok</string>
+    <string name="dns_crypt_empty_state_desc" translatable="true">Bir DNSCrypt endpoint\'i ekleyerek başla.</string>
+    <string name="rethink_empty_state_title" translatable="true">Blok listesi bulunamadı</string>
+    <string name="rethink_empty_state_desc" translatable="true">Blok listesini indirerek veya konfigure ederek başla.</string>
+    <string name="settings_rinr_btmsht_title" translatable="true">Geri döngü (deneysel)</string>
+    <string name="settings_rinr_btmsht_desc" translatable="true">Geri döngü modunda Rethink kendi ağ trafiğini kendisine yönlendirir. Demek oluyor ki, Rethink kendi trafiğine (IP ve Domain kuralları, güvenlik duvarı kurallar vb.) aynı diğer uygulamalar gibi kuralları uygular. Geri döngü modu fazlaca kontrol sağlasada sonuçları pek beklendiği gibi olmayabilir.\n\n\nRethink\'i güvenlik duvarı, DNS ve proxy kurallarından muaf tutmanız önerilir. Bu işlem, ağ izleme veya günlük kaydı işlemlerini etkilemez; yalnızca kuralları etkiler.\n\n\nGeri döngü modunda, Proxy Lockdown özelliği şimdilik uygulanmayacaktır.</string>
+    <string name="settings_rinr_exempt_btn" translatable="true">Rethink\'i muaf tut</string>
+    <string name="app_info_rethink_warning_title" translatable="true">Uyarı</string>
 </resources>
