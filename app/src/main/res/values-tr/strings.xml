@@ -390,7 +390,7 @@
     <string name="about_sponsor_link_text">Sponsor</string>
     <string name="brbs_backup_complete_toast">Yedekleme tamamlandı</string>
     <string name="dns_query_latency">%1$sms</string>
-    <string name="dns_proxy_remove_dialog_title">DNS Vekil Sunucusu silinsin mi\?</string>
+    <string name="dns_proxy_remove_dialog_title">DNS Vekil Sunucusu silinsin mi?</string>
     <string name="search_firewall_network_log"><font size="12">Uygulamaları, IP\'leri, alan adlarını arayın</font></string>
     <string name="app_mode_wireguard">VPN</string>
     <string name="settings_vpn_heading">vpn</string>
@@ -546,26 +546,22 @@
     <string name="apps_info_title">Uygulamalar</string>
     <string name="alert_permission_accessibility">İzin - Erişilebilirlik</string>
     <string name="alert_firewall_accessibility_exception">Erişilebilirlik Ayarları açılamıyor. Daha sonra tekrar deneyin!</string>
-    <string name="alert_firewall_accessibility_regrant_explanation">Rethink erişilebilirlik hizmeti durdu veya çöktü. <i><b>Ayarlar\'a gidip Rethink\'i Durdurmaya Zorlayın</b></i> ve <i>Kullanılmayan herhangi bir uygulamayı engelle</i> özelliğini kullanmak için tekrar başlatın.
-\n
-\nRethink, hangi uygulamaların kullanımda olduğunu (ön plan) ve hangilerinin kullanımda olmadığını (arka plan) izlemek için erişilebilirlik hizmetini kullanır.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation">Rethink erişilebilirlik hizmeti durdu veya çöktü. <i><b>Ayarlar\'a gidip Rethink\'i Durdurmaya Zorlayın</b></i> ve <i>Kullanılmayan herhangi bir uygulamayı engelle</i> özelliğini kullanmak için tekrar başlatın. \n \nRethink, hangi uygulamaların kullanımda olduğunu (ön plan) ve hangilerinin kullanımda olmadığını (arka plan) izlemek için erişilebilirlik hizmetini kullanır.</string>
     <string name="hybrid_mode_info_title">DNS + Güvenlik Duvarı</string>
     <string name="brave_dns_connect_mode_change_firewall">Mod Seçin.</string>
-    <string name="bsct_block"><u>Bu uygulamayı</u> engelleyin, atlayın, hariç tutun, koruyun</string>
+    <string name="bsct_block">&lt;u&gt;Bu uygulamayı&lt;/u&gt; engelleyin, atlayın, hariç tutun, koruyun</string>
     <string name="always_on_dialog_heading">Her Zaman Açık VPN\'i Devre Dışı Bırak</string>
     <string name="dns_firewall_mode_info_explanation_new">Yukarıdakilerin hepsi + İnternet sansürünü atlayın.</string>
     <string name="conn_track_clear_logs_message">Bu işlem yalnızca ağ günlüklerini siler ancak güvenlik duvarı kurallarını silmez. Bu işlem geri döndürülemez. Devam etmek istiyor musunuz?</string>
-    <string name="alert_firewall_accessibility_explanation">Rethink, hangi uygulamaların kullanımda olduğunu (ön plan) ve hangilerinin kullanımda olmadığını (arka plan) izlemek için erişilebilirlik hizmetini kullanır.
-\n
-\nRethink herhangi bir şekilde bilgi toplamaz veya sizi gözetlemez.</string>
+    <string name="alert_firewall_accessibility_explanation">Rethink, hangi uygulamaların kullanımda olduğunu (ön plan) ve hangilerinin kullanımda olmadığını (arka plan) izlemek için erişilebilirlik hizmetini kullanır. \n \nRethink herhangi bir şekilde bilgi toplamaz veya sizi gözetlemez.</string>
     <string name="custom_url_error_invalid_url">Geçersiz URL</string>
     <string name="dns_query_clear_logs_message">Bu, aygıt üzerindeki DNS günlüklerini siler. Bu işlem geri döndürülemez. Devam etmek istiyor musunuz?</string>
     <string name="always_on_dialog_neutral">Ayarlar</string>
     <string name="bsct_conn_rule_explanation">&lt;u&gt;#1&lt;/u&gt;: Bir uygulamanın internete bağlanmasını engeller. \n &lt;u&gt;#2&lt;/u&gt;: Herhangi bir uygulamanın belirli bir IP\'ye bağlanmasını engeller. \n &lt;u&gt;#3&lt;/u&gt;: Ekran kilitlendiğinde bütün bağlantıları engeller (Genel Güvenlik Duvarı). \n &lt;u&gt;#4&lt;/u&gt;: Kullanımda olmayan her uygulamayı engeller (Genel Güvenlik Duvarı). \n &lt;u&gt;#5&lt;/u&gt;: Kaynak uygulaması belirsiz bütün bağlantıları engeller (Genel Güvenlik Duvarı). \n &lt;u&gt;#6&lt;/u&gt;: DNS hariç bütün UDP trafiğini engeller(Genel Güvenlik Duvarı). \n &lt;u&gt;#7&lt;/u&gt;: DNS atlanırsa bütün bağlantıları engeller (Genel Güvenlik Duvarı).</string>
-    <string name="bsct_block_ip">Engelle, <u>bu IP\'ye</u> <u>bu uygulama</u> için güven</string>
+    <string name="bsct_block_ip">Engelle, &lt;u&gt;bu IP\'ye&lt;/u&gt; &lt;u&gt;bu uygulama&lt;/u&gt; için güven</string>
     <string name="bsct_conn_block_desc">%1$s, %2$s tarafından engellendi</string>
     <string name="always_on_dialog">Bu cihazda \"Her Zaman Açık VPN\" etkinleştirilmiştir. Rethink\'i başlatmak için lütfen Ayarlar uygulamasına gidin ve \"Her Zaman Açık VPN \"i devre dışı bırakın.</string>
-    <string name="always_on_dialog_lockdown_stop_message">Rethink, VPN\'i <i>Lockdown</i> modunda çalıştırıyor. Durdurulması, bu kullanıcı profilinde İnternet bağlantısının kaybına neden olur. Yine de devam etmek istiyor musunuz\?</string>
+    <string name="always_on_dialog_lockdown_stop_message">Rethink, VPN\'i <i>Lockdown</i> modunda çalıştırıyor. Durdurulması, bu kullanıcı profilinde İnternet bağlantısının kaybına neden olur. Yine de devam etmek istiyor musunuz?</string>
     <string name="dns_crypt_url_remove_dialog_message">DNSCrypt çözümleyicisini kayıtlı yapılandırmadan silin.</string>
     <string name="show_logs_disabled_network_message">Bağlantı günlükleme devre dışı bırakıldı. Yeniden etkinleştirmek için <i>Ayarlar</i>\'a gidin ve <i>Bağlantı Günlükleme</i>\'yi etkin hale getirin.</string>
     <string name="univ_firewall_dialog_title">IP Kuralı Silinsin mi?</string>
@@ -574,7 +570,7 @@
     <string name="doh_custom_url_remove_success">Uç nokta silindi.</string>
     <string name="blocklist_update_check_failure">Bir şeyler ters gitti. Daha sonra tekrar deneyin!</string>
     <string name="dns_crypt_url_remove_success">DNSCrypt çözümleyici silindi.</string>
-    <string name="local_blocklist_download_desc">Bu özelliği kullanmak için gereken engelleme listeleri (~60MB) indirilsin mi\?</string>
+    <string name="local_blocklist_download_desc">Bu özelliği kullanmak için gereken engelleme listeleri (~60MB) indirilsin mi?</string>
     <string name="dc_other_dns_heading">Tür</string>
     <string name="settings_allow_bypass_desc">İsteyen uygulamaların bütün kullanılabilir ağlara bağlanmasına izin verin. Bu uygulamalar Rethink’in VPN tünelini isteğe bağlı olarak atlayabilir. Zoom ve Meet gibi bazı sesli/görüntülü konferans uygulamalarının düzgün çalışması için gerekebilir.</string>
     <string name="download_update_dialog_message">Uygulamanın yeni sürümü web sitesinden indirilebilir. Devam etmek istiyor musunuz?</string>
@@ -720,7 +716,7 @@
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Kötü amaçlı yazılımları, fidye yazılımlarını, kripto yazılımlarını, kimlik avcılarını ve diğer tehditleri engelleyin.</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s engel listesi</string>
     <string name="lbl_rules" translatable="true">kurallar</string>
-    <string name="bsct_block_domain" translatable="true">Engelle, <u>bu uygulama</u> için <u>alan adlarına</u> güven</string>
+    <string name="bsct_block_domain" translatable="true">Engelle, &lt;u&gt;bu uygulama&lt;/u&gt; için &lt;u&gt;alan adlarına&lt;/u&gt; güven</string>
     <string name="lbl_maybe_blocked" translatable="true">Belki Engellendi</string>
     <string name="lbl_configure" translatable="true">Yapılandır</string>
     <string name="lbl_logs" translatable="true">Günlükler</string>
