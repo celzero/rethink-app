@@ -560,7 +560,7 @@
     <string name="about_bug_report">Сообщить об ошибке</string>
     <string name="about_bug_report_dialog_positive_btn">Отправить письмо</string>
     <string name="about_bug_no_log_dialog_title">Сообщить об ошибке</string>
-    <string name="about_bug_no_log_dialog_message">Не удалось получить лог файл сбоя. Вы хотите вручную сообщить о ошибке\?</string>
+    <string name="about_bug_no_log_dialog_message">Не удалось получить лог файл сбоя. Вы хотите вручную сообщить о ошибке?</string>
     <string name="about_github">GitHub</string>
     <string name="about_privacy_policy">Конфиденциальность</string>
     <string name="about_settings_app_info">О приложении</string>
@@ -635,7 +635,7 @@
     <string name="orbot_socks5">Прокси-сервер только для TCP</string>
     <string name="univ_accessibility_dialog_negative">Отклонить</string>
     <string name="about_bravedns_whoarewe">Rethink - это свободный проект с открытым исходным кодом, возглавляемый бывшими инженерами из Amazon, IBM и Scientific Games.</string>
-    <string name="orbot_app_issue">Не удалось запустить Orbot. Он установлен\?</string>
+    <string name="orbot_app_issue">Не удалось запустить Orbot. Он установлен?</string>
     <string name="orbot_stop_dialog_dns_message">Rethink настроен на пересылку DNS-запросов в Orbot. Измените по мере необходимости.</string>
     <string name="settings_https_disabled_error">Подключен к %1$s. Выключите его, чтобы продолжить.</string>
     <string name="settings_orbot_notification_action">Открыть Orbot</string>
