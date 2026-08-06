@@ -473,7 +473,7 @@
     <string name="settings_ptrans_heading" translatable="true">Bắt buộc đầu ra IPv4</string>
     <string name="settings_allow_lan_desc" translatable="true">Loại trừ các tuyến LAN, loopback, link-local khỏi đường hầm VPN của Rethink.</string>
     <string name="settings_lock_down_mode_desc" translatable="true">Một số tùy chọn bị tắt khi VPN ở chế độ khóa.<u>Xem cài đặt VPN</u></string>
-    <string name="settings_dns_proxy_dialog_app_desc" translatable="true">Ứng dụng đã chọn sẽ bị loại trừ khỏi VPN để cho phép ứng dụng đó thay mặt bạn kết nối proxy.</string>
+    <string name="settings_dns_proxy_dialog_app_desc" translatable="false">Ứng dụng đã chọn sẽ bị loại trừ khỏi VPN để cho phép ứng dụng đó thay mặt bạn kết nối proxy.</string>
     <string name="settings_theme_dialog_themes_4" translatable="true">Đen Thật</string>
     <string name="settings_default_dns_desc" translatable="true">Trong một số ít trường hợp khi không thể xác định được DNS ưa thích của người dùng, DNS dự phòng sẽ được sử dụng.</string>
     <string name="firewall_status_block_unmetered" translatable="true">bị chặn trên các mạng (wifi) không có đồng hồ đo</string>
