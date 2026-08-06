@@ -165,7 +165,6 @@ class ConnectionLogAdapter(private val context: Context) :
             displayTransactionDetails(log)
             displayProtocolDetails(log.port, log.protocol)
             displayAppDetails(log)
-            displaySummaryDetails(log)
             val blocked = if (log.blockedByRule == FirewallRuleset.RULE12.id) {
                 log.proxyDetails.isEmpty()
             } else {
@@ -176,6 +175,7 @@ class ConnectionLogAdapter(private val context: Context) :
             } else {
                 log.blockedByRule
             }
+            displaySummaryDetails(blocked, log)
             displayFirewallRulesetHint(blocked, rule)
 
             b.connectionParentLayout.setOnClickListener { openBottomSheet(log) }
@@ -312,7 +312,7 @@ class ConnectionLogAdapter(private val context: Context) :
             }
         }
 
-        private fun displaySummaryDetails(log: MergedConnectionLog) {
+        private fun displaySummaryDetails(blocked: Boolean, log: MergedConnectionLog) {
             launchBinding {
                 val hasCid = VpnController.hasCid(log.connId, log.uid)
                 val connType = ConnectionTracker.ConnType.get(log.connType)
@@ -335,8 +335,13 @@ class ConnectionLogAdapter(private val context: Context) :
                             b.connectionDelay.text = ""
                             hasMinSummary = true
                         } else {
+                            if (blocked) {
+                                b.connectionDuration.text = context.getString(R.string.symbol_red_circle)
+                                hasMinSummary = true
+                            } else {
+                                b.connectionDuration.text = ""
+                            }
                             b.connectionDataUsage.text = ""
-                            b.connectionDuration.text = ""
                         }
                         if (connType.isMetered()) {
                             b.connectionDelay.text = context.getString(R.string.symbol_currency)
@@ -370,8 +375,13 @@ class ConnectionLogAdapter(private val context: Context) :
                     }
 
                     b.connectionSummaryLl.visibility = View.VISIBLE
-                    val duration = getDurationInHumanReadableFormat(context, log.duration)
-                    b.connectionDuration.text = context.getString(R.string.single_argument, duration)
+                    if (blocked) {
+                        b.connectionDuration.text = context.getString(R.string.symbol_red_circle)
+                    } else {
+                        val duration = getDurationInHumanReadableFormat(context, log.duration)
+                        b.connectionDuration.text =
+                            context.getString(R.string.single_argument, duration)
+                    }
                     val download =
                         context.getString(
                             R.string.symbol_download,
