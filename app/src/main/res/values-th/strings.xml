@@ -23,10 +23,7 @@
     <string name="download_update_dialog_title" translatable="true">อัปเดตใหม่!</string>
     <string name="orbot_stop_dialog_dns_message" translatable="true">Rethink ได้รับการตั้งค่าให้ส่งต่อคำขอ DNS ไปยัง Orbot เปลี่ยนแปลงตามต้องการ</string>
     <string name="settings_app_notification_a13_heading" translatable="true">การแจ้งเตือนแอป</string>
-    <string name="settings_notification_dialog_option_3" translatable="true">"
-\nไม่มี:
-\nไม่แสดงปุ่มใดๆ
-\n"</string>
+    <string name="settings_notification_dialog_option_3" translatable="true">\n\nไม่มี:\n\nไม่แสดงปุ่มใดๆ\n\n</string>
     <string name="logs_card_network_count" translatable="true">การเชื่อมต่อ %1$s</string>
     <string name="hsf_start_btn_state" translatable="true">เริ่ม</string>
     <string name="logs_card_dns_count" translatable="true">%1$s การค้นหา</string>
@@ -84,7 +81,7 @@
     <string name="dc_check_update_heading" translatable="true">แจ้งเตือนการอัพเดตรายการบล็อค</string>
     <string name="cd_custom_doh_url_name_default" translatable="true">DoH</string>
     <string name="cd_custom_doh_dialog_title" translatable="true">ตัวแก้ปัญหา</string>
-    <string name="dns_btm_sheet_dialog_message" translatable="true"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s blocklist(s)</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_message" translatable="true"><Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s blocklist(s)</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
     <string name="dns_proxy_name" translatable="true">ชื่อพร็อกซี</string>
     <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true">A user-set universal firewall rule blocked this <i>app</i> when trying to connect on <i>Metered</i> (Mobile) network.<br/><br/> To change go to <i>Universal</i> tab.</string>
     <string name="firewall_rule_isolate_desc" translatable="true">A user-set firewall rule blocked this <i>app</i> connecting to other than <i>bypassed IPs</i>.<br/><br/> To change go to <i>All Apps</i> tab.</string>
@@ -109,9 +106,9 @@
     <string name="dns_query_clear_logs_title" translatable="true">ลบบันทึก DNS ทั้งหมดหรือไม่?</string>
     <string name="dns_query_clear_logs_message" translatable="true">การดำเนินการนี้จะลบบันทึก DNS บนอุปกรณ์ การดำเนินการนี้ไม่สามารถย้อนกลับได้ คุณต้องการดำเนินการต่อหรือไม่?</string>
     <string name="bsct_app_info" translatable="true">ข้อมูลแอป</string>
-    <string name="bsct_block_ip" translatable="true">บล็อค เชื่อถือ <u>IP</u> นี้สำหรับ <u>แอป</u> นี้</string>
+    <string name="bsct_block_ip" translatable="true">บล็อค เชื่อถือ &lt;u&gt;IP&lt;/u&gt; นี้สำหรับ &lt;u&gt;แอป&lt;/u&gt; นี้</string>
     <string name="bsct_block_domain" translatable="true">บล็อกและเชื่อถือโดเมนสำหรับแอปนี้</string>
-    <string name="bsct_block" translatable="true">บล็อค ข้าม แยกออก <u>แอพนี้</u></string>
+    <string name="bsct_block" translatable="true">บล็อค ข้าม แยกออก &lt;u&gt;แอพนี้&lt;/u&gt;</string>
     <string name="always_on_dialog_heading" translatable="true">ปิดใช้งาน VPN ที่เปิดตลอดเวลา</string>
     <string name="always_on_dialog_positive_btn" translatable="true">ไปที่การตั้งค่า</string>
     <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">ลบตัวแก้ไข DNSCrypt หรือไม่?</string>
@@ -142,9 +139,7 @@
     <string name="settings_socks5_dialog_hint_port" translatable="true">Port</string>
     <string name="settings_notification_desc1" translatable="true">หยุดชั่วคราว / หยุด (ค่าเริ่มต้น)</string>
     <string name="settings_locale_heading" translatable="true">เปลี่ยนภาษา</string>
-    <string name="settings_notification_dialog_option_1" translatable="true">"
-\nหยุดชั่วคราว / หยุด (ค่าเริ่มต้น):
-\nแสดงปุ่มสองปุ่ม เพื่อหยุดชั่วคราวและหยุดการคิดใหม่อย่างรวดเร็ว"</string>
+    <string name="settings_notification_dialog_option_1" translatable="true">\n\nหยุดชั่วคราว / หยุด (ค่าเริ่มต้น):\n\nแสดงปุ่มสองปุ่ม เพื่อหยุดชั่วคราวและหยุดการคิดใหม่อย่างรวดเร็ว</string>
     <string name="settings_selected_theme" translatable="true">ธีมปัจจุบัน: %1$s</string>
     <string name="settings_protocol_translation_dns_inactive" translatable="true">สลับไปที่โหมด DNS/DNS+ไฟร์วอลล์เพื่อเปิดใช้งานการตั้งค่านี้</string>
     <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
@@ -170,7 +165,7 @@
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">อย่าตรวจสอบใบรับรอง TLS ของเซิร์ฟเวอร์ (เปิดใช้งานเฉพาะเมื่อคุณรู้ว่าคุณกำลังทำอะไรอยู่)</string>
     <string name="cd_dns_alg_heading" translatable="true">การกรอง DNS ขั้นสูง (ทดลอง)</string>
     <string name="ctbs_dialog_negative_btn" translatable="true">ย้อนกลับ</string>
-    <string name="dns_btm_sheet_dialog_ips" translatable="true"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_ips" translatable="true"><Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
     <string name="dns_btm_sheet_chip_no_answer" translatable="true">ไม่มีคำตอบ</string>
     <string name="dns_log_dialog_positive" translatable="true">ลบบันทึก</string>
     <string name="dns_btm_resolved_crypt" translatable="true">แก้ไขโดยไม่ระบุตัวตน %1$s โดย %2$s ผ่านทาง %3$s</string>
@@ -191,9 +186,7 @@
     <string name="dns_connected_rethink_plus" translatable="true">เชื่อมต่อแล้ว %1$s รายการบล็อคที่ใช้งานอยู่</string>
     <string name="dns_connected_no_count" translatable="true">เชื่อมต่อ</string>
     <string name="dns_connected" translatable="true">เชื่อมต่อ</string>
-    <string name="dns_proxy_dialog_message_no_app" translatable="true">ที่อยู่ IP: %1$s
-\n
-\nหมายเลขพอร์ต: %2$s</string>
+    <string name="dns_proxy_dialog_message_no_app" translatable="true">ที่อยู่ IP: %1$s \n \nหมายเลขพอร์ต: %2$s</string>
     <string name="dns_info_positive" translatable="true">Ok</string>
     <string name="dns_proxy_dialog_header_dns" translatable="true">เพิ่มพร็อกซี DNS</string>
     <string name="fapps_firewall_filter_bypass_universal" translatable="true">ข้ามไป</string>
@@ -280,7 +273,7 @@
     <string name="ada_app_status_block_md" translatable="true">ถูกบล็อคจากเครือข่ายแบบมิเตอร์ (มือถือ)</string>
     <string name="ada_app_dns_settings" translatable="true">การตั้งค่า DNS</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen" translatable="true">ล้างบันทึก</string>
-    <string name="bsdl_block_desc" translatable="true">Block, trust <u>this domain</u></string>
+    <string name="bsdl_block_desc" translatable="true">Block, trust &lt;u&gt;this domain&lt;/u&gt;</string>
     <string name="bsdl_blocked_desc" translatable="true">ถูกบล็อค %1$s โดย %2$s</string>
     <string name="bypass_dns_firewall_tooltip">%1$s ทำงานกับ DNS ของ Rethink เท่านั้น</string>
     <string name="bsac_title_desc" translatable="true">กฎมีผลใช้กับแอปนี้เท่านั้น</string>
@@ -337,11 +330,7 @@
     <string name="about_app_update_check" translatable="true">ตรวจสอบการอัปเดตแอป</string>
     <string name="univ_accessibility_dialog_negative" translatable="true">ปฏิเสธ</string>
     <string name="dns_info_neutral" translatable="true">สำเนา</string>
-    <string name="dns_proxy_dialog_message" translatable="true">ชื่อแอป: %1$s
-\n
-\nที่อยู่ IP: %2$s
-\n
-\nหมายเลขพอร์ต: %3$s</string>
+    <string name="dns_proxy_dialog_message" translatable="true">ชื่อแอป: %1$s \n \nที่อยู่ IP: %2$s \n \nหมายเลขพอร์ต: %3$s</string>
     <string name="fapps_filter_filter_heading" translatable="true">พิมพ์</string>
     <string name="fapps_filter_parent_installed" translatable="true">ติดตั้งแล้ว</string>
     <string name="fapps_filter_categories_heading" translatable="true">หมวดหมู่</string>
@@ -440,10 +429,7 @@
     <string name="settings_custom_downloader_desc" translatable="true">หากปิดใช้งาน ตัวจัดการการดาวน์โหลด <i>ในตัวของ Android </i>จะถูกใช้</string>
     <string name="settings_ip_dialog_ipv46" translatable="true">อัตโนมัติ (ทดลอง)</string>
     <string name="settings_ip_text_ipv4" translatable="true">IPv4</string>
-    <string name="firewall_card_text_active" translatable="true">%1$s ถูกบล็อค
-\n%2$s ถูกข้าม
-\n%3$s ถูกแยก
-\n%4$s ถูกแยก</string>
+    <string name="firewall_card_text_active" translatable="true">%1$s ถูกบล็อค \n%2$s ถูกข้าม \n%3$s ถูกแยก \n%4$s ถูกแยก</string>
     <string name="log_file_not_available" translatable="true">ไม่พบรายงานความผิดพลาด</string>
     <string name="ctbs_app_info_not_available_toast" translatable="true">ไม่พบหน้าการตั้งค่าแอป</string>
     <string name="dns_btm_sheet_chip" translatable="true">+%1$s IP อื่นๆ</string>
@@ -676,9 +662,7 @@
     <string name="settings_notification_heading" translatable="true">เลือกการดำเนินการแจ้งเตือน</string>
     <string name="settings_notification_desc" translatable="true">ปุ่มการดำเนินการที่จะแสดงพร้อมกับการแจ้งเตือน Rethink: %1$s</string>
     <string name="settings_notification_desc2" translatable="true">DNS / DNS + ไฟร์วอลล์</string>
-    <string name="settings_notification_dialog_option_2" translatable="true">"
-\nDNS / DNS + ไฟร์วอลล์:
-\nแสดงปุ่มสองปุ่มเพื่อสลับระหว่างโหมด DNS ประหยัดแบตเตอรี่และโหมด DNS + ไฟร์วอลล์ปกติอย่างรวดเร็ว"</string>
+    <string name="settings_notification_dialog_option_2" translatable="true">\n\nDNS / DNS + ไฟร์วอลล์:\n\nแสดงปุ่มสองปุ่มเพื่อสลับระหว่างโหมด DNS ประหยัดแบตเตอรี่และโหมด DNS + ไฟร์วอลล์ปกติอย่างรวดเร็ว</string>
     <string name="settings_locale_desc" translatable="true">เลือกภาษาที่คุณต้องการ</string>
     <string name="settings_locale_dialog_title" translatable="true">เลือกภาษาที่คุณต้องการ</string>
     <string name="settings_biometeric_heading" translatable="true">เปิดใช้งานการล็อคแอป</string>
@@ -917,27 +901,17 @@
     <string name="dc_setting_dns_cache_desc" translatable="true">การรวมคำขอ การตอบสนองแคช การจัดการข้อผิดพลาดที่ยืดหยุ่น</string>
     <string name="status_protected_with_socks5" translatable="true">ป้องกันด้วยพร็อกซีถุงเท้า</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">เปิดใช้งาน DNS ส่วนตัวแล้ว</string>
-    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: บล็อกแอปไม่ให้เชื่อมต่อกับอินเทอร์เน็ต
-\n<u>#2</u>: บล็อกแอปใดๆ ไม่ให้เชื่อมต่อกับ IP เฉพาะ
-\n<u>#3</u>: บล็อกการเชื่อมต่อทั้งหมดเมื่ออุปกรณ์ถูกล็อก (ไฟร์วอลล์สากล)
-\n<u>#4</u>: บล็อกแอปใดๆ ที่ไม่ได้ใช้งาน (ไฟร์วอลล์สากล)
-\n<u>#5</u>: บล็อกการเชื่อมต่อเมื่อไม่รู้จักแอปต้นทาง (ไฟร์วอลล์สากล)
-\n<u>#6</u>: บล็อกการรับส่งข้อมูล UDP ทั้งหมด ยกเว้น DNS (ไฟร์วอลล์สากล)
-\n<u>#7</u>: บล็อกการเชื่อมต่อเมื่อข้าม DNS (ไฟร์วอลล์สากล)</string>
+    <string name="bsct_conn_rule_explanation" translatable="true">&lt;u&gt;#1&lt;/u&gt;: บล็อกแอปไม่ให้เชื่อมต่อกับอินเทอร์เน็ต \n&lt;u&gt;#2&lt;/u&gt;: บล็อกแอปใดๆ ไม่ให้เชื่อมต่อกับ IP เฉพาะ \n&lt;u&gt;#3&lt;/u&gt;: บล็อกการเชื่อมต่อทั้งหมดเมื่ออุปกรณ์ถูกล็อก (ไฟร์วอลล์สากล) \n&lt;u&gt;#4&lt;/u&gt;: บล็อกแอปใดๆ ที่ไม่ได้ใช้งาน (ไฟร์วอลล์สากล) \n&lt;u&gt;#5&lt;/u&gt;: บล็อกการเชื่อมต่อเมื่อไม่รู้จักแอปต้นทาง (ไฟร์วอลล์สากล) \n&lt;u&gt;#6&lt;/u&gt;: บล็อกการรับส่งข้อมูล UDP ทั้งหมด ยกเว้น DNS (ไฟร์วอลล์สากล) \n&lt;u&gt;#7&lt;/u&gt;: บล็อกการเชื่อมต่อเมื่อข้าม DNS (ไฟร์วอลล์สากล)</string>
     <string name="private_dns_dialog_desc" translatable="true">การตั้งค่า DNS ของ Rethink จะถูกแทนที่ด้วย DNS ส่วนตัวของ Android
 \n
 \nหากต้องการใช้ DNS ของ Rethink ให้ไปที่การตั้งค่า Android แล้วปิด \"DNS ส่วนตัว\"</string>
-    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink ใช้บริการการเข้าถึงเพื่อติดตามว่าแอปใดใช้งานอยู่ (เบื้องหน้า) และแอปใดไม่ได้ใช้งาน (เบื้องหลัง)
-\n
-\nRethink ไม่รวบรวมข้อมูลหรือสอดส่องคุณในทางใดทางหนึ่ง</string>
-    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">บริการการเข้าถึง Rethink หยุดทำงานหรือขัดข้อง <i><b>ไปที่การตั้งค่าและบังคับหยุด</b></i> Rethink และเริ่มใหม่อีกครั้งเพื่อใช้ฟีเจอร์ <i>บล็อกแอปใดๆ ที่ไม่ได้ใช้งาน</i>
-\n
-\nRethink ใช้บริการการเข้าถึงเพื่อติดตามว่าแอปใดใช้งานอยู่ (เบื้องหน้า) เทียบกับแอปที่ไม่ได้ใช้งาน (เบื้องหลัง)</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink ใช้บริการการเข้าถึงเพื่อติดตามว่าแอปใดใช้งานอยู่ (เบื้องหน้า) และแอปใดไม่ได้ใช้งาน (เบื้องหลัง) \n \nRethink ไม่รวบรวมข้อมูลหรือสอดส่องคุณในทางใดทางหนึ่ง</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">บริการการเข้าถึง Rethink หยุดทำงานหรือขัดข้อง <i><b>ไปที่การตั้งค่าและบังคับหยุด</b></i> Rethink และเริ่มใหม่อีกครั้งเพื่อใช้ฟีเจอร์ <i>บล็อกแอปใดๆ ที่ไม่ได้ใช้งาน</i> \n \nRethink ใช้บริการการเข้าถึงเพื่อติดตามว่าแอปใดใช้งานอยู่ (เบื้องหน้า) เทียบกับแอปที่ไม่ได้ใช้งาน (เบื้องหลัง)</string>
     <string name="firewall_act_universal_tab" translatable="true">สากล</string>
     <string name="dns_crypt_url_remove_dialog_message" translatable="true">ลบตัวแก้ไข DNSCrypt จากการกำหนดค่าที่บันทึกไว้</string>
     <string name="download_update_dialog_message" translatable="true">สามารถดาวน์โหลดแอปพลิเคชันเวอร์ชันใหม่ได้จากเว็บไซต์ คุณต้องการดำเนินการต่อหรือไม่?</string>
     <string name="download_update_dialog_message_success" translatable="true">ดาวน์โหลดรายการบล็อคสำเร็จแล้ว</string>
-    <string name="whats_new_version_update" translatable="true">&lt;b&gt;Don\'t Panic 2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. ใหม่: จับข้อผิดพลาดของกลไกเครือข่ายในรายงานจุดบกพร่องของผู้ใช้&lt;br/&gt; 2. ใหม่: ใช้ System DNS สำหรับชื่อโดเมนที่ไม่ได้รับการมอบหมายก็ต่อเมื่อ Prevent DNS leaks เปิดอยู่&lt;br/&gt; 3. การปรับปรุง: การเชื่อมต่อ WireGuard แบบ Dual-stack (IPv4 + IPv6)&lt;br/&gt; 4. การปรับปรุง: หลีกเลี่ยงการบล็อกองค์ประกอบ UI เมื่อกลไกเครือข่ายไม่มีการตอบสนอง&lt;br/&gt; 5. แก้ไข: หมดเวลาการเชื่อมต่อเมื่อเปิดการกรอง DNS ขั้นสูง&lt;br/&gt; 6. แก้ไข: จุดสิ้นสุดของเพียร์ WireGuard ที่มีชื่อโดเมนค้างเมื่อมีการเปลี่ยนแปลงเครือข่าย&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;ช่วยแปลแอปนี้&lt;/a&gt;</string>
+    <string name="whats_new_version_update" translatable="false"><![CDATA[<b>Don\'t Panic 2</b><br/><br/> 1. ใหม่: จับข้อผิดพลาดของกลไกเครือข่ายในรายงานจุดบกพร่องของผู้ใช้<br/> 2. ใหม่: ใช้ System DNS สำหรับชื่อโดเมนที่ไม่ได้รับการมอบหมายก็ต่อเมื่อ Prevent DNS leaks เปิดอยู่<br/> 3. การปรับปรุง: การเชื่อมต่อ WireGuard แบบ Dual-stack (IPv4 + IPv6)<br/> 4. การปรับปรุง: หลีกเลี่ยงการบล็อกองค์ประกอบ UI เมื่อกลไกเครือข่ายไม่มีการตอบสนอง<br/> 5. แก้ไข: หมดเวลาการเชื่อมต่อเมื่อเปิดการกรอง DNS ขั้นสูง<br/> 6. แก้ไข: จุดสิ้นสุดของเพียร์ WireGuard ที่มีชื่อโดเมนค้างเมื่อมีการเปลี่ยนแปลงเครือข่าย<br/><br/> <a href=https://svc.rethinkdns.com/r/translate>ช่วยแปลแอปนี้</a>]]></string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">เมื่อปิดใช้งาน จะไม่รวมแอปส่งต่อพร็อกซี (SOCKS5, HTTP, DNS) จากอุโมงค์ VPN ของ Rethink</string>
     <string name="settings_ip_network_desc" translatable="true">เลือกระหว่างเวอร์ชันโปรโตคอลอินเทอร์เน็ต</string>
     <string name="settings_ptrans_desc" translatable="true">แปลทราฟฟิก IPv6 ขาออกให้เป็น IPv4 บนอุปกรณ์ เปิดใช้งานหากคุณเชื่อมต่อกับเครือข่าย IPv4 เท่านั้น</string>
@@ -945,18 +919,13 @@
     <string name="settings_allow_bypass_desc" translatable="true">อนุญาตให้แอปร้องขอการเข้าถึงเครือข่ายที่มีอยู่ทั้งหมด แอปเหล่านี้อาจข้ามอุโมงค์ VPN ของ Rethink ได้ตามต้องการ แอปการประชุมทางเสียง/วิดีโอบางแอป เช่น Zoom และ Meet อาจต้องใช้สิ่งนี้เพื่อให้ทำงานได้อย่างถูกต้อง</string>
     <string name="orbot_stop_dialog_message" translatable="true">Rethink หยุดการส่งต่อการเชื่อมต่อไปยัง Orbot แล้ว แต่ Orbot อาจยังคงทำงานอยู่เบื้องหลัง</string>
     <string name="settings_socks5_vpn_disabled_error" translatable="true">เริ่มคิดใหม่เพื่อดำเนินการต่อ</string>
-    <string name="orbot_explanation" translatable="true">Orbot เป็นแอปพร็อกซีฟรีที่ช่วยให้แอปอื่นใช้อินเทอร์เน็ตได้ &lt;u&gt;ปลอดภัยยิ่งขึ้น&lt;/u&gt;
-\nOrbot ใช้ &lt;u&gt;Tor&lt;/u&gt; เพื่อเข้ารหัสการรับส่งข้อมูลทางอินเทอร์เน็ตของคุณ ซึ่งช่วยให้คุณ &lt;u&gt;หลีกเลี่ยงการเซ็นเซอร์&lt;/u&gt; และป้องกันการเฝ้าติดตามเครือข่าย&lt;/u&gt; ในรูปแบบต่างๆ ที่คุกคามเสรีภาพและความเป็นส่วนตัวของบุคคล
-\n&lt;u&gt;TCP Proxy&lt;/u&gt;: Rethink ส่งต่อเฉพาะการเชื่อมต่อ TCP ของแอป &lt;i&gt;ที่รวมอยู่&lt;/i&gt; ไปยัง Orbot
-\n&lt;u&gt;HTTP Proxy&lt;/u&gt;: Rethink &lt;i&gt;สร้าง&lt;/i&gt;อุโมงค์ HTTP CONNECT ไปยัง Orbot และส่งต่อเฉพาะการเชื่อมต่อ TCP ของแอป &lt;i&gt;ที่รวมอยู่&lt;/i&gt;</string>
+    <string name="orbot_explanation" translatable="true">Orbot เป็นแอปพร็อกซีฟรีที่ช่วยให้แอปอื่นใช้อินเทอร์เน็ตได้ &lt;u&gt;ปลอดภัยยิ่งขึ้น&lt;/u&gt; \nOrbot ใช้ &lt;u&gt;Tor&lt;/u&gt; เพื่อเข้ารหัสการรับส่งข้อมูลทางอินเทอร์เน็ตของคุณ ซึ่งช่วยให้คุณ &lt;u&gt;หลีกเลี่ยงการเซ็นเซอร์&lt;/u&gt; และป้องกันการเฝ้าติดตามเครือข่าย&lt;/u&gt; ในรูปแบบต่างๆ ที่คุกคามเสรีภาพและความเป็นส่วนตัวของบุคคล \n&lt;u&gt;TCP Proxy&lt;/u&gt;: Rethink ส่งต่อเฉพาะการเชื่อมต่อ TCP ของแอป &lt;i&gt;ที่รวมอยู่&lt;/i&gt; ไปยัง Orbot \n&lt;u&gt;HTTP Proxy&lt;/u&gt;: Rethink &lt;i&gt;สร้าง&lt;/i&gt;อุโมงค์ HTTP CONNECT ไปยัง Orbot และส่งต่อเฉพาะการเชื่อมต่อ TCP ของแอป &lt;i&gt;ที่รวมอยู่&lt;/i&gt;</string>
     <string name="settings_import_export_heading" translatable="true">การสำรองข้อมูลและกู้คืน</string>
     <string name="settings_dns_proxy_dialog_header" translatable="true">ตั้งค่าพร็อกซี SOCKS5</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">Off (default)</string>
     <string name="firewall_status_block_unmetered" translatable="true">ถูกบล็อคบนเครือข่ายแบบไม่มีการวัดปริมาณ (wifi)</string>
     <string name="firewall_status_blocked" translatable="true">ถูกบล็อค</string>
-    <string name="hsf_vpn_dialog_message" translatable="true">Rethink ต้องได้รับอนุญาตในการตั้งค่า VPN ในพื้นที่เพื่อเข้ารหัสคำขอ DNS ของอุปกรณ์ ดำเนินการตรวจสอบเครือข่าย และบังคับใช้กฎไฟร์วอลล์
-\n
-\nRethink จะไม่รวบรวมข้อมูลหรือสอดส่องคุณในทางใดทางหนึ่ง</string>
+    <string name="hsf_vpn_dialog_message" translatable="true">Rethink ต้องได้รับอนุญาตในการตั้งค่า VPN ในพื้นที่เพื่อเข้ารหัสคำขอ DNS ของอุปกรณ์ ดำเนินการตรวจสอบเครือข่าย และบังคับใช้กฎไฟร์วอลล์ \n \nRethink จะไม่รวบรวมข้อมูลหรือสอดส่องคุณในทางใดทางหนึ่ง</string>
     <string name="dc_custom_block_heading" translatable="true">กฎของโดเมน</string>
     <string name="about_bravedns_whoarewe" translatable="true">Rethink คือโครงการโอเพ่นซอร์สฟรีที่นำโดยอดีตวิศวกรจาก Amazon, IBM และ Scientific Games</string>
     <string name="about_bug_no_log_dialog_message" translatable="true">ไม่สามารถดึงข้อมูลบันทึกข้อผิดพลาดได้ คุณต้องการรายงานข้อผิดพลาดด้วยตนเองหรือไม่?</string>
