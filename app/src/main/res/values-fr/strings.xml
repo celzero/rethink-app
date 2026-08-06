@@ -37,7 +37,7 @@
     <string name="bsct_conn_block_desc_device">bloquée %1$s sur l’appareil</string>
     <string name="bsct_block_ip">Bloquer, tolérer &lt;u&gt;cette IP&lt;/u&gt; pour &lt;u&gt;cette appli&lt;/u&gt;</string>
     <string name="always_on_dialog">L’option \"VPN permanent\" est déjà activée sur cet appareil. Pour lancer RethinkDNS, allez dans les paramètres de l’application et désactivez \"VPN permanent\".</string>
-    <string name="bsct_conn_rule_explanation"><u>#1</u> : Bloque la connexion d’une application à Internet. \n <u>#2</u> : Bloque la connexion d’une application à une IP particulière. \n <u>#3</u> : Bloque toutes les connexions lorsque l’appareil est verrouillé (Pare-feu global). \n <u>#4</u> : Bloque les applis non utilisées (Pare-feu global). \n <u>#5</u> : Bloque les connexions lorsque l’application source est inconnue (Pare-feu global). \n <u>#6</u> : Bloque tout le trafic UDP sauf le DNS (Pare-feu global). \n <u>#7</u> : Bloque les connexions lorsque le DNS est contourné (Pare-feu global).</string>
+    <string name="bsct_conn_rule_explanation">&lt;u&gt;#1&lt;/u&gt; : Bloque la connexion d’une application à Internet. \n &lt;u&gt;#2&lt;/u&gt; : Bloque la connexion d’une application à une IP particulière. \n &lt;u&gt;#3&lt;/u&gt; : Bloque toutes les connexions lorsque l’appareil est verrouillé (Pare-feu global). \n &lt;u&gt;#4&lt;/u&gt; : Bloque les applis non utilisées (Pare-feu global). \n &lt;u&gt;#5&lt;/u&gt; : Bloque les connexions lorsque l’application source est inconnue (Pare-feu global). \n &lt;u&gt;#6&lt;/u&gt; : Bloque tout le trafic UDP sauf le DNS (Pare-feu global). \n &lt;u&gt;#7&lt;/u&gt; : Bloque les connexions lorsque le DNS est contourné (Pare-feu global).</string>
     <string name="status_protected_with_private_dns">protégé par DNS privé</string>
     <string name="allow">autoriser</string>
     <string name="bsct_block">Bloquer, contourner, exclure, confiner &lt;u&gt;cette application&lt;/u&gt;</string>
@@ -659,7 +659,7 @@
     <string name="ci_dialog_edittext_hint">Adresse IP, sous-réseau ou port</string>
     <string name="ci_no_rule">Aucune règle</string>
     <string name="ada_app_status_allow">est autorisée</string>
-    <string name="ada_app_status_isolate">est confinée ; seules les IP et les domaines de confiance sont autorisées</string>
+    <string name="ada_app_status_isolate">est confinée ; seules les IP et les domaines de confiance sont autorisées</string>
     <string name="rt_dialog_neutral">Continuer</string>
     <string name="lbbs_search">Recherche de domaines dans les listes de blocage</string>
     <string name="lbbs_update_check">Vérifier MàJ</string>
@@ -1023,21 +1023,21 @@
     <string name="dns_title" translatable="true">Bloquer Pubs &amp; Logiciels Malveillants avec DNS</string>
     <string name="dns_desc" translatable="true">Choisir depuis 190+ listes pour stopper pubs, traqueurs, et logiciels malveillants.</string>
     <string name="status_no_network" translatable="true">pas de réseau</string>
-    <string name="conn_track_clear_rule_logs_title" translatable="true">Supprimer les logs pour cette règle ?</string>
-    <string name="conn_track_clear_rule_logs_message" translatable="true">Cela va supprimer les logs réseau seulement pour la règle de pare-feu actuellement affichée. Cette opération est irréversible. Voulez-vous continuer ?</string>
+    <string name="conn_track_clear_rule_logs_title" translatable="true">Supprimer les logs pour cette règle ?</string>
+    <string name="conn_track_clear_rule_logs_message" translatable="true">Cela va supprimer les logs réseau seulement pour la règle de pare-feu actuellement affichée. Cette opération est irréversible. Voulez-vous continuer ?</string>
     <string name="settings_mobile_metered_heading" translatable="true">Mesurer les réseaux mobiles</string>
     <string name="settings_mobile_metered_desc" translatable="true">Traiter seulement les réseaux mobiles comme mesurés, le reste comme non mesuré.</string>
     <string name="settings_biometric_dialog_heading" translatable="true">Authentification biométrique</string>
     <string name="settings_biometric_dialog_option_2" translatable="true">Après 5 minutes</string>
     <string name="settings_biometric_dialog_option_3" translatable="true">Après 15 minutes</string>
-    <string name="sponser_dialog_usage_msg" translatable="true">Vous utilisez Rethink depuis <b>%1$s jours</b>, ce qui correspond à un coût d\'utilisation de <b>$%2$s</b>. Envisageriez-vous de devenir sponsor afin de soutenir son développement ?</string>
+    <string name="sponser_dialog_usage_msg" translatable="true">Vous utilisez Rethink depuis <b>%1$s jours</b>, ce qui correspond à un coût d\'utilisation de <b>$%2$s</b>. Envisageriez-vous de devenir sponsor afin de soutenir son développement ?</string>
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Utiliser le système DNS pour les domaines non délégués</string>
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Utilisez le système DNS pour les domaines non délégués tels que <i>.lan</i>, <i>.internal</i>, etc.</string>
     <string name="dc_filtering_heading" translatable="true">filtrage</string>
     <string name="cd_split_dns_heading" translatable="true">Séparer le DNS (expérimental)</string>
     <string name="cd_split_dns_desc" translatable="true">Transférer les requêtes DNS des applications proxy vers les serveurs DNS du proxy.</string>
     <string name="univ_firewall_rule_11" translatable="true">Bloquer toutes les connexions locales</string>
-    <string name="univ_delete_domain_dialog_title" translatable="true">Supprimer toutes les règles de domaine ?</string>
+    <string name="univ_delete_domain_dialog_title" translatable="true">Supprimer toutes les règles de domaine ?</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">Supprimer ces règles permettrait à n\'importe quelle application de se connecter aux domaines actuellement bloqués.</string>
     <string name="firewall_rule_private_dns" translatable="true">DNS privé</string>
     <string name="firewall_rule_bypass_proxy" translatable="true">Proxy ignoré</string>
@@ -1078,14 +1078,14 @@
     <string name="ac_toast_retry_disabled" translatable="true">Choisir une option anti-censure pour définir votre stratégie.</string>
     <string name="exclude_no_package_err_toast" translatable="true">Exclure des applications nécessite un nom de package.</string>
     <string name="hop_error_toast_msg_1" translatable="true">Impossible de relayer, déjà %1$s</string>
-    <string name="hop_error_toast_msg_2" translatable="true">Aucun WireGuard disponible pour le relais ; veuillez en ajouter.</string>
+    <string name="hop_error_toast_msg_2" translatable="true">Aucun WireGuard disponible pour le relais ; veuillez en ajouter.</string>
     <string name="hop_error_toast_msg_3" translatable="true">Désactiver le mode mobile uniquement ou le SSID pour utiliser les relais</string>
-    <string name="mode_change_error_proxy_enabled" translatable="true">Impossible de modifier les modes lorsque des proxies sont utilisés. Appuyez pour <u>modifier les paramètres du proxy</u>.</string>
+    <string name="mode_change_error_proxy_enabled" translatable="true">Impossible de modifier les modes lorsque des proxies sont utilisés. Appuyez pour &lt;u&gt;modifier les paramètres du proxy&lt;/u&gt;.</string>
     <string name="blocklist_not_available_toast" translatable="true">Pour mettre à jour les listes de blocage, téléchargez la dernière version de l\'application.</string>
     <string name="lbl_ultra_secure" translatable="true">ultra sécurisé</string>
     <string name="adv_set_dial_timeout_desc" translatable="true">Fermer les sockets TCP et UDP inactifs après cette durée.</string>
     <string name="no_stats_available" translatable="true">Pas de statistiques</string>
-    <string name="hop_failure_toast" translatable="true">Erreur de relai : %1$s -&gt; %2$s</string>
+    <string name="hop_failure_toast" translatable="true">Erreur de relai : %1$s -&gt; %2$s</string>
     <string name="wg_setting_use_on_mobile" translatable="true">Mobile uniquement</string>
     <string name="wg_setting_use_on_mobile_desc" translatable="true">Utiliser ce VPN WireGuard via les données mobiles.</string>
     <string name="hop_add_remove_title" translatable="true">Ajouter/Supprimer un relais</string>
@@ -1093,22 +1093,22 @@
     <string name="most_contacted_asn" translatable="true">fournisseurs les plus contactés</string>
     <string name="most_blocked_asn" translatable="true">fournisseurs les plus bloqués</string>
     <string name="adv_tasker_dialog_msg" translatable="true">Saisir les noms des paquets (séparés par des virgules) autorisés à démarrer ou à arrêter Rethink.</string>
-    <string name="adv_tasker_dialog_instructions" translatable="true">Instructions :\nÉléments requis pour la diffusion :\n• Clé : sender\n• Valeur : Nom du package de l’application appelante\n\nExemple : key : sender value : com.termux\n\nActions prises en charge :\n• Démarrer le VPN : com.celzero.bravedns.intent.action.VPN_START\n• Arrêter le VPN : com.celzero.bravedns.intent.action.VPN_STOP</string>
-    <string name="adv_tasker_dialog_edit_hint" translatable="true">Saisir le nom du package (exemple : net.dinglisch.android.taskerm)</string>
+    <string name="adv_tasker_dialog_instructions" translatable="true">Instructions :\nÉléments requis pour la diffusion :\n• Clé : sender\n• Valeur : Nom du package de l’application appelante\n\nExemple : key : sender value : com.termux\n\nActions prises en charge :\n• Démarrer le VPN : com.celzero.bravedns.intent.action.VPN_START\n• Arrêter le VPN : com.celzero.bravedns.intent.action.VPN_STOP</string>
+    <string name="adv_tasker_dialog_edit_hint" translatable="true">Saisir le nom du package (exemple : net.dinglisch.android.taskerm)</string>
     <string name="download_ip_info_title" translatable="true">Afficher les informations du fournisseur</string>
     <string name="download_ip_info_desc" translatable="true">Récupère les informations du fournisseur de services pour les sites web depuis <i>rethinkdns.com</i>, propulsé par <i>%1$s</i></string>
     <string name="adv_taster_desc" translatable="true">Configurer les applications qui peuvent démarrer ou arrêter Rethink.</string>
     <string name="top_active_conns" translatable="true">connexions actives principales</string>
     <string name="load_more" translatable="true">Tout charger</string>
     <string name="close_conns_dialog_title" translatable="true">Fermer les connexions</string>
-    <string name="close_conns_dialog_desc" translatable="true">Fermer toutes les connexions pour %1$s ?</string>
-    <string name="local_blocklist_delete_desc" translatable="true">Supprimer les listes de blocage sur l\'appareil ?</string>
+    <string name="close_conns_dialog_desc" translatable="true">Fermer toutes les connexions pour %1$s ?</string>
+    <string name="local_blocklist_delete_desc" translatable="true">Supprimer les listes de blocage sur l\'appareil ?</string>
     <string name="fail_open_network_title" translatable="true">Blocage dû à une perte de réseau</string>
     <string name="fail_open_network_desc" translatable="true">Lorsqu\'il est activé, Rethink bloque toutes les données lorsqu\'aucune connectivité n\'est disponible, comme en <i>mode avion</i>.</string>
     <string name="about_license" translatable="true">Licence Apache-2.0</string>
     <string name="smart_dns" translatable="true">DNS intelligent</string>
     <string name="processing_dialog_desc" translatable="true">Veuillez patienter pendant que nous traitons votre demande.</string>
-    <string name="smart_dns_desc" translatable="true"><i>Smart DNS</i> utilise aléatoirement l\'un de ces résolveurs DNS :</string>
+    <string name="smart_dns_desc" translatable="true"><i>Smart DNS</i> utilise aléatoirement l\'un de ces résolveurs DNS :</string>
     <string name="wg_mobile_only_hop_err" translatable="true">Le mode mobile uniquement n\'est pas pris en charge pour les relais</string>
     <string name="vpn_policy_auto_desc" translatable="true">Réagit aux changements importants de réseau et de connectivité.</string>
     <string name="vpn_policy_sensitive" translatable="true">Sensible</string>
@@ -1132,7 +1132,7 @@
     <string name="wg_ssid_type_exact" translatable="true">Correspond exactement</string>
     <string name="wg_ssid_type_wildcard" translatable="true">Correspond partiellement</string>
     <string name="wg_ssid_invalid_error" translatable="true">Les identifiants Wi-Fi (%1$s) doivent comporter 32 caractères ou moins.</string>
-    <string name="wg_ssid_delete_confirmation" translatable="true">Supprimer %1$s ?</string>
+    <string name="wg_ssid_delete_confirmation" translatable="true">Supprimer %1$s ?</string>
     <string name="settings_firebase_error_reporting_heading" translatable="true">Programme de stabilité</string>
     <string name="settings_firebase_error_reporting_desc" translatable="true">Enregistrer les journaux d\'erreurs pour contribuer à améliorer la stabilité.</string>
     <string name="tombstone_app_title" translatable="true">Se souvenir des applications désinstallées</string>
@@ -1140,7 +1140,7 @@
     <string name="settings_locale_dialog_default" translatable="true">Valeurs par défaut du système</string>
     <string name="settings_allow_incoming_wg_packets" translatable="true">WireGuard P2P</string>
     <string name="settings_allow_incoming_wg_packets_desc" translatable="true">Lorsqu\'elle est activée, cette option autorise les connexions entrantes initiées par les pairs WireGuard.</string>
-    <string name="lockdown_download_message" translatable="true"><i>Le gestionnaire de téléchargement</i> intégré d\'Android peut rencontrer des problèmes lorsque le VPN est en mode <i>Verrouillage</i>. Souhaitez-vous activer le gestionnaire de téléchargement de Rethink à la place ?</string>
+    <string name="lockdown_download_message" translatable="true"><i>Le gestionnaire de téléchargement</i> intégré d\'Android peut rencontrer des problèmes lorsque le VPN est en mode <i>Verrouillage</i>. Souhaitez-vous activer le gestionnaire de téléchargement de Rethink à la place ?</string>
     <string name="lockdown_download_enable_inapp" translatable="true">Activer le téléchargeur</string>
     <string name="lbl_action" translatable="true">Action</string>
     <string name="settings_theme_dialog_themes_5" translatable="true">Plus clair</string>
