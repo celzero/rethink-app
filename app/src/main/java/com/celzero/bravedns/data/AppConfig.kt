@@ -21,7 +21,6 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsCryptEndpoint
 import com.celzero.bravedns.database.DnsCryptEndpointRepository
@@ -376,7 +375,9 @@ internal constructor(
     enum class ProtoTranslationMode(val id: Int) {
         PTMODEAUTO(Settings.PtModeAuto),
         PTMODEFORCE64(Settings.PtModeForce64),
-        PTMODENO46(Settings.PtModeNo46)
+        PTMODEFORCE46(Settings.PtModeForce46),
+        PTMODEFORCE(Settings.PtModeForce),
+        PTMODENONE(Settings.PtModeNone)
     }
 
     fun getInternetProtocol(): InternetProtocol {
@@ -384,18 +385,14 @@ internal constructor(
     }
 
     fun getProtocolTranslationMode(): ProtoTranslationMode {
-        // TODO: we need to check if the underlying network, if it has ipv6 then its better to
-        // send PTMODEFORCE64 instead of PTMODEAUTO, as it will be straight forward, though
-        // PTMODEAUTO will work in both cases, but it will add some overhead of checking.
-        if (persistentState.protocolTranslationType && getInternetProtocol().isIPv6()) {
-            return ProtoTranslationMode.PTMODEFORCE64
+        // PT mode is now computed in BraveVPNService.calculatePtMode(),
+        // which uses actual underlyingNetworks. This is a fallback, and used only during
+        // vpn startup before the first network change event arrives.
+        if (!persistentState.protocolTranslationType) {
+            return ProtoTranslationMode.PTMODEAUTO
         }
-
-        // for debug builds
-        if (DEBUG && persistentState.advSettingForcePTMode) {
-            return ProtoTranslationMode.PTMODENO46
-        }
-        return ProtoTranslationMode.PTMODEAUTO
+        // default until BraveVPNService receives network info and calls setTunMode()
+        return ProtoTranslationMode.PTMODEFORCE
     }
 
     fun setPcap(mode: Int, path: String = PcapMode.DISABLE_PCAP) {
@@ -1248,7 +1245,7 @@ internal constructor(
         sb.append("   App version: ${persistentState.appVersion}\n")
         sb.append("   Brave mode: ${getBraveMode()}\n")
 
-        sb.append("   DNS \n")
+        sb.append("DNS \n")
         sb.append("   dns type: ${getDnsType()}\n")
         sb.append("   connected dns: ${persistentState.connectedDnsName}\n")
         sb.append("   alg: ${persistentState.enableDnsAlg}\n")
@@ -1263,11 +1260,11 @@ internal constructor(
         sb.append("   use sys dns for undelegated dms: ${persistentState.useSystemDnsForUndelegatedDomains}\n")
         sb.append("   bypass-dns-mode: ${BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.fromMode(persistentState.blockFreeDnsMode).name}\n")
 
-        sb.append("   Proxy \n")
+        sb.append("Proxy \n")
         sb.append("   Proxy type: ${ProxyType.of(getProxyType()).name}\n")
         sb.append("   Proxy provider: ${getProxyProvider()}\n")
 
-        sb.append("   VPN \n")
+        sb.append("VPN \n")
         sb.append("   stall on nw loss: ${persistentState.stallOnNoNetwork}\n")
         sb.append("   do not route private ips: ${!persistentState.privateIps}\n")
         sb.append("   use all available nws: ${persistentState.useMultipleNetworks}\n")

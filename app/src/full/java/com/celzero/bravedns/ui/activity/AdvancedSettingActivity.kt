@@ -26,6 +26,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityAdvancedSettingBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
@@ -33,6 +34,7 @@ import com.celzero.bravedns.ui.tour.GuidedTourManager
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.android.ext.android.inject
 
 class AdvancedSettingActivity : BaseActivity(R.layout.activity_advanced_setting) {
@@ -66,8 +68,8 @@ class AdvancedSettingActivity : BaseActivity(R.layout.activity_advanced_setting)
             b.settingsAutoDialRl.visibility = View.VISIBLE
             b.dvAutoDialSwitch.isChecked = persistentState.autoDialsParallel
             b.settingsResetTourRl.visibility = View.VISIBLE
-            b.dvPtModeSwitch.isChecked = !persistentState.advSettingForcePTMode
             b.settingsPtModeRl.visibility = View.VISIBLE
+            updatePtModeDescription()
             b.settingsGoMaxMemoryLl.visibility = View.VISIBLE
             val maxMemMb = (persistentState.goMaxMemory / (1024 * 1024)).toInt()
             val index = memoryValues.indexOf(maxMemMb).coerceAtLeast(0)
@@ -80,6 +82,51 @@ class AdvancedSettingActivity : BaseActivity(R.layout.activity_advanced_setting)
             b.settingsPtModeRl.visibility = View.GONE
             b.settingsGoMaxMemoryLl.visibility = View.GONE
         }
+    }
+
+    private fun updatePtModeDescription() {
+        val modeId = persistentState.advSettingForcePTModeId
+        val modeText = if (modeId == -1) {
+            "No override"
+        } else {
+            AppConfig.ProtoTranslationMode.entries.firstOrNull { it.id == modeId }?.name
+                ?: "No override"
+        }
+        b.settingsPtModeDesc.text = "Override: $modeText"
+    }
+
+    private fun showPtModeDialog() {
+        // "None" as first item means no debug override (normal computed mode)
+        val noneLabel = "No override"
+        val modeLabels = AppConfig.ProtoTranslationMode.entries.map { it.name }
+        val items = (listOf(noneLabel) + modeLabels).toTypedArray()
+
+        val currentId = persistentState.advSettingForcePTModeId
+        val checkedItem = if (currentId == -1) {
+            0
+        } else {
+            val idx = AppConfig.ProtoTranslationMode.entries.indexOfFirst { it.id == currentId }
+            if (idx == -1) 0 else idx + 1
+        }
+
+        MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+            .setTitle("Protocol Translation Mode")
+            .setSingleChoiceItems(items, checkedItem) { dialog, which ->
+                dialog.dismiss()
+                if (which == 0) {
+                    persistentState.advSettingForcePTModeId = -1
+                } else {
+                    persistentState.advSettingForcePTModeId =
+                        AppConfig.ProtoTranslationMode.entries[which - 1].id
+                }
+                updatePtModeDescription()
+                Logger.i(
+                    LOG_TAG_UI,
+                    "AdvSetting; pt mode override set to ${items[which]}"
+                )
+            }
+            .create()
+            .show()
     }
 
     private fun setupClickListeners() {
@@ -110,12 +157,8 @@ class AdvancedSettingActivity : BaseActivity(R.layout.activity_advanced_setting)
             b.settingsResetTourDesc.text = getString(R.string.tour_debug_reset_done)
         }
 
-        b.dvPtModeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            persistentState.advSettingForcePTMode = isChecked
-        }
-
         b.settingsPtModeRl.setOnClickListener {
-            b.dvPtModeSwitch.isChecked = !b.dvPtModeSwitch.isChecked
+            showPtModeDialog()
         }
 
         b.goMaxMemorySeekbar.setOnSeekBarChangeListener(

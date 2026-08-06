@@ -60,12 +60,12 @@ interface SponsorBillingManager {
     /**
      * Launches the purchase flow for the sponsor product matching [amount].
      *
-     * Each contribution level is its own fixed-price one-time INAPP product
-     * (e.g. a $5 contribution maps to the "sponsor.5" SKU). The concrete product
-     * id is resolved by the flavor implementation, so the channel-agnostic UI
-     * only needs to express the desired contribution amount. Google removed
-     * client-side purchase quantities for one-time products in Play Billing 7/8,
-     * so each level is a distinct SKU purchased once (quantity = 1).
+     * Sponsorship is a single one-time INAPP product ("sponsor.tier.prod") exposed
+     * through several fixed-price purchase options (offers), one per contribution
+     * level (e.g. $5 maps to the "sponsor-5" offer). The concrete product id and
+     * offer id are resolved by the flavor implementation, so the channel-agnostic
+     * UI only needs to express the desired contribution amount. The matching
+     * offer's offerToken is passed to the Play billing flow.
      */
     fun launchBillingFlow(activity: Activity, amount: Int)
     fun consumePurchase(purchaseToken: String)

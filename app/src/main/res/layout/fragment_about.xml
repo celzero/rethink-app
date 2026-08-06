@@ -158,7 +158,7 @@
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:importantForAccessibility="no"
-                        android:src="@drawable/dns_icon"
+                        android:src="@drawable/ic_sponsor_badge"
                         android:alpha="0.7"
                         app:tint="?attr/colorPrimary" />
 
@@ -187,6 +187,21 @@
                         android:gravity="center"
                         android:textAppearance="@style/TextAppearance.Material3.BodySmall"
                         android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/about_sponsor_again"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:text="@string/sponsor_about_again"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                        android:textColor="?attr/colorPrimary" />
 
                 </LinearLayout>
 
@@ -762,10 +777,10 @@
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
+                android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:background="?android:attr/selectableItemBackground"
-                android:drawableStart="@drawable/ic_stack_trace"
+                android:drawableStart="@drawable/ic_profile_memory"
                 android:drawablePadding="22dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"

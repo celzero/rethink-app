@@ -17,31 +17,42 @@ package com.celzero.bravedns.sponsor.billing
 
 object SponsorProductIds {
     /**
-     * Fixed-price one-time INAPP products, one per contribution level.
+     * Sponsorship is exposed as a SINGLE one-time INAPP product ([PRODUCT_ID]) with
+     * several fixed-price "purchase options" (offers). Each offer id encodes its
+     * contribution amount (e.g. "sponsor-5" -> $5).
      *
-     * Create each of these SKUs in the store backend with a matching id and the
-     * corresponding price (e.g. id "sponsor.tier.5" priced at US$4.99).
-     *
-     * Why multiple SKUs (not one SKU x quantity): client-side purchase quantities
-     * for one-time products are not available, so every amount needs its own
-     * product.
+     * In Play Console this is one product ("sponsor.tier.prod") with one offer per
+     * amount. The Billing Library surfaces these offers as
+     * `ProductDetails.oneTimePurchaseOfferDetailsList`, each carrying its own price
+     * and offerToken; the client selects the desired amount by passing that offer's
+     * offerToken to the billing flow.
      */
-    private val AMOUNT_TO_PRODUCT = mapOf(
-        1 to "sponsor.tier.1",
-        5 to "sponsor.tier.5",
-        10 to "sponsor.tier.10",
-        15 to "sponsor.tier.15",
-        25 to "sponsor.tier.25",
-        50 to "sponsor.tier.50",
-        100 to "sponsor.tier.100"
+    const val PRODUCT_ID = "sponsor.tier.prod"
+
+    /** Offer (purchase-option) id for each contribution level. */
+    private val AMOUNT_TO_OFFER = mapOf(
+        1 to "sponsor-1",
+        5 to "sponsor-5",
+        10 to "sponsor-10",
+        15 to "sponsor-15",
+        25 to "sponsor-25",
+        50 to "sponsor-50",
+        100 to "sponsor-100"
     )
 
-    /** All sponsor SKUs, used to query their prices from the store. */
-    val ALL_PRODUCT_IDS: List<String> = AMOUNT_TO_PRODUCT.values.toList()
+    /** Reverse lookup: offer id -> amount, used to label fetched offer prices. */
+    private val OFFER_TO_AMOUNT: Map<String, Int> =
+        AMOUNT_TO_OFFER.entries.associate { (amount, offerId) -> offerId to amount }
 
-    /** The product id for the given [amount], falling back to the default tier. */
-    fun productIdFor(amount: Int): String =
-        AMOUNT_TO_PRODUCT[amount] ?: AMOUNT_TO_PRODUCT.getValue(DEFAULT_AMOUNT)
+    /** The single sponsor product id, used to query its offers from the store. */
+    val ALL_PRODUCT_IDS: List<String> = listOf(PRODUCT_ID)
+
+    /** The offer (purchase-option) id for the given [amount], falling back to the default tier. */
+    fun offerIdFor(amount: Int): String =
+        AMOUNT_TO_OFFER[amount] ?: AMOUNT_TO_OFFER.getValue(DEFAULT_AMOUNT)
+
+    /** The contribution amount for a given offer id, or null if it is not a known sponsor tier. */
+    fun amountForOffer(offerId: String?): Int? = offerId?.let { OFFER_TO_AMOUNT[it] }
 
     const val PRODUCT_TYPE = "inapp"
 

@@ -41,6 +41,7 @@ import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
@@ -268,7 +269,12 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
             }
 
             if (ip.isNullOrBlank()) {
-                ip = Utilities.getIpForUrl(context, endpoint.url)
+                val url = getBaseUrl(endpoint.url)
+                if (url.isNullOrBlank()) {
+                    uiCtx { b.rethinkEndpointListUrlFlagText.visibility = View.GONE }
+                    return
+                }
+                ip = Utilities.getIpForUrl(context, url)
             }
 
             if (ip.isNullOrBlank()) {
@@ -285,6 +291,15 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
                     b.rethinkEndpointListUrlFlagText.visibility = View.GONE
                 }
             }
+        }
+
+        fun getBaseUrl(url: String): String? {
+            val uri = android.net.Uri.parse(url)
+            val scheme = uri.scheme ?: return null
+            val host = uri.host ?: return null
+            val port = if (uri.port != -1) ":${uri.port}" else ""
+
+            return "$scheme://$host$port/"
         }
 
         private fun stripPort(addr: String): String {

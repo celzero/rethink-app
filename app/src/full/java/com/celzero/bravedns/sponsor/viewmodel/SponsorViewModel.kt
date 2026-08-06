@@ -33,11 +33,12 @@ import kotlinx.coroutines.launch
 /**
  * UI state for the sponsor screen.
  *
- * Pricing model: each selectable contribution level is its own fixed-price
- * one-time product. [amounts] lists the dollar values (and their slider order);
- * [selectedIndex] points at the currently highlighted level. The dollar amount
- * doubles as the purchase key passed to the billing layer, which resolves it to
- * the matching store SKU (e.g. $5 -> "sponsor.5").
+ * Pricing model: sponsorship is a single one-time product with several
+ * fixed-price purchase options (offers), one per amount. [amounts] lists the
+ * dollar values (and their slider order); [selectedIndex] points at the
+ * currently highlighted level. The dollar amount doubles as the purchase key
+ * passed to the billing layer, which resolves it to the matching offer (e.g.
+ * $5 -> "sponsor-5" on the "sponsor.tier.prod" product).
  */
 data class SponsorUiState(
     val products: List<SponsorProduct> = emptyList(),

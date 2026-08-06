@@ -371,7 +371,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         android:letterSpacing="0.03"
-                        android:text="Actions"
+                        android:text="@string/lbl_actions"
                         android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textColor="?attr/primaryTextColor"
                         android:textStyle="bold" />

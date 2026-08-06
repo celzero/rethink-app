@@ -39,13 +39,6 @@ import com.celzero.firestack.backend.RouterStats
 import com.celzero.firestack.backend.RpnEntitlement
 import com.celzero.firestack.backend.RpnServers
 import com.celzero.firestack.intra.Controller
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.net.Socket
@@ -53,16 +46,12 @@ import java.net.Socket
 object VpnController : KoinComponent {
 
     @Volatile private var rvpn: BraveVPNService? = null
-    private var connectionState: BraveVPNService.State? = null
+    private var vpnState: BraveVPNService.State? = null
     private val persistentState by inject<PersistentState>()
-    private var states: Channel<BraveVPNService.State?>? = null
+    @Volatile private var states: BraveVPNService.State? = null
     @Volatile private var protocol: Pair<Boolean, Boolean> = Pair(false, false)
     private const val URL4 = "IPv4"
     private const val URL6 = "IPv6"
-
-    // usually same as vpnScope from BraveVPNService
-    var externalScope: CoroutineScope? = null
-        private set
 
     @Volatile private var vpnStartElapsedTime: Long = SystemClock.elapsedRealtime()
 
@@ -73,44 +62,15 @@ object VpnController : KoinComponent {
     // TODO: make clients listen on create, start, stop, destroy from vpn-service
     fun onVpnCreated(b: BraveVPNService) {
         rvpn = b
-        externalScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-        states = Channel(Channel.CONFLATED) // drop unconsumed states
 
         // store app start time, used in HomeScreenBottomSheet
         vpnStartElapsedTime = SystemClock.elapsedRealtime()
-
-        externalScope!!.launch {
-            states!!.consumeEach { state ->
-                // transition from paused connection state only on NEW/NULL
-                when (state) {
-                    null -> {
-                        updateState(null)
-                    }
-                    BraveVPNService.State.NEW -> {
-                        updateState(state)
-                    }
-                    else -> {
-                        // do not update if in paused-state unless state is new / null
-                        if (!isAppPaused()) {
-                            updateState(state)
-                        }
-                    }
-                }
-            }
-        }
     }
 
     fun onVpnDestroyed() {
         rvpn = null
-        try {
-            states?.cancel()
-        } catch (_: Exception) {}
         states = null
         vpnStartElapsedTime = SystemClock.elapsedRealtime()
-        try {
-            externalScope?.cancel("VPNController - onVpnDestroyed")
-        } catch (_: Exception) {}
-        externalScope = null
     }
 
     fun uptimeMs(): Long {
@@ -126,12 +86,24 @@ object VpnController : KoinComponent {
     }
 
     fun onConnectionStateChanged(state: BraveVPNService.State?) {
-        val s = states
-        externalScope?.launch { s?.send(state) }
+        when (state) {
+            null -> {
+                updateState(null)
+            }
+            BraveVPNService.State.NEW -> {
+                updateState(state)
+            }
+            else -> {
+                // do not update if in paused-state unless state is new / null
+                if (!isAppPaused()) {
+                    updateState(state)
+                }
+            }
+        }
     }
 
     private fun updateState(state: BraveVPNService.State?) {
-        connectionState = state
+        vpnState = state
         connectionStatus.postValue(state)
     }
 
@@ -162,7 +134,7 @@ object VpnController : KoinComponent {
             // on or after Android O, context.startForegroundService(intent) should be invoked.
             ContextCompat.startForegroundService(context, startServiceIntent)
 
-            onConnectionStateChanged(connectionState)
+            onConnectionStateChanged(vpnState)
             Logger.i(LOG_TAG_VPN, "VPNController; Start(sync) executed")
         } catch (e: Exception) {
             Logger.w(LOG_TAG_VPN, "VPNController; Start(sync) failed, ${e.message}")
@@ -171,7 +143,7 @@ object VpnController : KoinComponent {
 
     fun stop(reason: String, context: Context, userInitiated: Boolean = true) {
         Logger.i(LOG_TAG_VPN, "VPN Controller stop with context: $context")
-        connectionState = null
+        vpnState = null
         onConnectionStateChanged(null)
         rvpn?.signalStopService(reason, userInitiated)
     }
@@ -180,7 +152,7 @@ object VpnController : KoinComponent {
     fun state(): VpnState {
         val requested: Boolean = persistentState.getVpnEnabled()
         val b = rvpn
-        val cs = connectionState
+        val cs = vpnState
         val on = b?.hasTunnel() == true
         return VpnState(requested, on, cs)
     }
@@ -190,22 +162,20 @@ object VpnController : KoinComponent {
         return hasTunnel()
     }
 
-    suspend fun refresh() {
+    suspend fun refreshResolvers() {
         rvpn?.refreshResolvers()
+    }
+
+    suspend fun refreshProxies() {
+        rvpn?.refreshProxies()
     }
 
     fun hasTunnel(): Boolean {
         return rvpn?.hasTunnel() == true
     }
 
-    fun hasStarted(): Boolean {
-        val cs = connectionState
-        return cs == BraveVPNService.State.WORKING ||
-            cs == BraveVPNService.State.FAILING
-    }
-
     fun isAppPaused(): Boolean {
-        return connectionState == BraveVPNService.State.PAUSED
+        return vpnState == BraveVPNService.State.PAUSED
     }
 
     fun isVpnLockdown(): Boolean {
@@ -411,8 +381,8 @@ object VpnController : KoinComponent {
         rvpn?.writeConsoleLog(log)
     }
 
-    suspend fun registerAndFetchWinConfig(prevBytes: ByteArray?, deviceId: String): ByteArray? {
-        return rvpn?.registerAndFetchWinIfNeeded(prevBytes, deviceId)
+    suspend fun registerAndFetchWinConfig(entitlementBytes: ByteArray?, stateBytes: ByteArray?, deviceId: String): ByteArray? {
+        return rvpn?.registerAndFetchWinIfNeeded(entitlementBytes, stateBytes, deviceId)
     }
 
     /** Ask the tunnel to refresh the WIN proxy state and return the updated bytes. */
@@ -437,7 +407,7 @@ object VpnController : KoinComponent {
     }
 
     suspend fun handleRpnProxies() {
-        return rvpn?.handleRpnProxies() ?: Unit
+        rvpn?.handleRpnProxies()
     }
 
     suspend fun createWgHop(origin: String, hop: String): Pair<Boolean, String> {
@@ -552,6 +522,9 @@ object VpnController : KoinComponent {
         rvpn?.screenLock()
     }
 
+    suspend fun getActiveEntitlement(): RpnEntitlement? {
+        return rvpn?.getActiveEntitlement()
+    }
 
     suspend fun getWinByKey(key: String): Proxy? {
         return rvpn?.getWinByKey(key)

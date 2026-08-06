@@ -360,7 +360,7 @@ class GoVpnAdapterTest : KoinTest {
         adapter.getRpnProps(RpnProxyManager.RpnType.WIN)
         adapter.testRpnProxy()
         adapter.getEntitlementDetails(null, "dev")
-        adapter.registerAndFetchWinIfNeeded(deviceId = "dev")
+        adapter.registerAndFetchWinIfNeeded(null, null, deviceId = "dev")
         adapter.refreshRpnProxy("")
         adapter.reconnectRpnProxy("")
         adapter.isWinRegistered()

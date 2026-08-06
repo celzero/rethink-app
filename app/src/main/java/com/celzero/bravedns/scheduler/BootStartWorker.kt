@@ -67,7 +67,7 @@ class BootStartWorker(context: Context, params: WorkerParameters) :
 
         // The app UI (e.g. HomeScreenFragment) may also auto-start the VPN around the same
         // time (app update / process restart). Skip if the VPN is already active.
-        if (VpnController.hasTunnel() || VpnController.hasStarted()) {
+        if (VpnController.hasTunnel()) {
             Logger.i(LOG_TAG_VPN, "vpn already active, skipping boot start, event $eventType")
             return Result.success()
         }

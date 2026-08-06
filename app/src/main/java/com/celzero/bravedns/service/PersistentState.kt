@@ -97,7 +97,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         // e.g. "default", "privacy,family", "privacy,family,security"
         const val RPN_DNS_TUN_TYPES = "rpn_dns_tun_types"
 
-        const val ADV_SETTINGS_FORCE_PT_MODE = "adv_setting_force_pt_mode"
+        // -1 = no override; other values = ProtoTranslationMode.id override
+        const val ADV_SETTINGS_FORCE_PT_MODE_ID = "adv_setting_force_pt_mode_id"
 
         // Guided tour version bump this constant to re-show the tour after major UI changes.
         // Any stored version lower than this will cause the tour to re-trigger.
@@ -447,9 +448,13 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // true once the encrypted wireguard config files have been migrated to plain files
     var wireguardPlainFileMigrationDone by booleanPref("wg_plain_file_migration_done").withDefault<Boolean>(false)
 
+    // RPN encrypted-file storage migration (external -> internal).
+    var rpnInternalStorageMigrationVersion by intPref("rpn_internal_storage_migration_version").withDefault<Int>(0)
+
     var appTestMode by booleanPref("app_test_mode").withDefault<Boolean>(false)
 
-    var advSettingForcePTMode by booleanPref("adv_setting_force_pt_mode").withDefault<Boolean>(false)
+    // -1 = no override; any other value is a ProtoTranslationMode.id to force in DEBUG mode
+    var advSettingForcePTModeId by intPref("adv_setting_force_pt_mode_id").withDefault<Int>(-1)
 
     var floodWireGuard by booleanPref("flood_wireguard").withDefault(false)
 
