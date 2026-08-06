@@ -35,7 +35,7 @@
     <string name="dns_mode_info_explanation_new">Surveillez, bloquez et chiffrez les requêtes DNS.</string>
     <string name="alert_firewall_accessibility_regrant_explanation">Le service d’accessibilité de Rethink s’est arrêté ou a dysfonctionné. <i><b>Allez dans Paramètres puis forcez l’arrêt</b></i> de Rethink et redémarrez-le pour utiliser la fonctionnalité <i>Bloquer les applications non utilisées</i>.\n\nRethink utilise le service d’accessibilité pour savoir quelles sont les applications en cours d’utilisation (avant-plan) et celles qui ne le sont pas (arrière-plan).</string>
     <string name="bsct_conn_block_desc_device">bloquée %1$s sur l’appareil</string>
-    <string name="bsct_block_ip">Bloquer, tolérer <u>cette IP</u> pour <u>cette appli</u></string>
+    <string name="bsct_block_ip">Bloquer, tolérer &lt;u&gt;cette IP&lt;/u&gt; pour &lt;u&gt;cette appli&lt;/u&gt;</string>
     <string name="always_on_dialog">L’option \"VPN permanent\" est déjà activée sur cet appareil. Pour lancer RethinkDNS, allez dans les paramètres de l’application et désactivez \"VPN permanent\".</string>
     <string name="bsct_conn_rule_explanation"><u>#1</u> : Bloque la connexion d’une application à Internet. \n <u>#2</u> : Bloque la connexion d’une application à une IP particulière. \n <u>#3</u> : Bloque toutes les connexions lorsque l’appareil est verrouillé (Pare-feu global). \n <u>#4</u> : Bloque les applis non utilisées (Pare-feu global). \n <u>#5</u> : Bloque les connexions lorsque l’application source est inconnue (Pare-feu global). \n <u>#6</u> : Bloque tout le trafic UDP sauf le DNS (Pare-feu global). \n <u>#7</u> : Bloque les connexions lorsque le DNS est contourné (Pare-feu global).</string>
     <string name="status_protected_with_private_dns">protégé par DNS privé</string>
@@ -173,10 +173,7 @@
     <string name="settings_protocol_translation_dns_inactive">Passez en mode DNS/DNS+Pare-feu pour activer ce paramètre</string>
     <string name="firewall_status_whitelisted">contourne les règles du pare-feu global</string>
     <string name="firewall_card_status_active">%1$s applis</string>
-    <string name="firewall_card_text_active">%1$s bloquée(s)
-\n%2$s avec exception(s)
-\n %3$s exclue(s)
-\n %4$s confinée(s)</string>
+    <string name="firewall_card_text_active">%1$s bloquée(s) \n%2$s avec exception(s) \n %3$s exclue(s) \n %4$s confinée(s)</string>
     <string name="firewall_status_isolate">confinée</string>
     <string name="firewall_card_text_inactive">Activez le mode pare-feu.</string>
     <string name="dns_card_latency_active">%1$sms</string>
@@ -791,7 +788,7 @@
     <string name="firewall_status_bypass_dns_firewall" translatable="true">contourne les règles des DNS et des pare-feu</string>
     <string name="cd_dns_alg_heading" translatable="true">Filtrage DNS avancé (expérimental)</string>
     <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Exceptions</string>
-    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Contourner les règles du pare-feu DNS universel &amp; pour les applications <i>listées</i> \?</string>
+    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Contourner les règles du pare-feu DNS universel &amp; pour les applications <i>listées</i> ?</string>
     <string name="firewall_rule_bypass_dns_firewall" translatable="true">App. contournée</string>
     <string name="firewall_rule_dns_blocked" translatable="true">DNS bloqué</string>
     <string name="ada_app_firewall" translatable="true">Pare-feu</string>
@@ -916,18 +913,18 @@
     <string name="lbl_preshared_key" translatable="true">Clé pré-partagée</string>
     <string name="crypt_relay_netherlands" translatable="true">Relais DNS anonyme hébergé aux Pays-Bas</string>
     <string name="invalid_file_error" translatable="true">Fichier invalide</string>
-    <string name="include_all_app_wg_dialog_desc">Tunneller toutes les applications dans ce tunnel \?</string>
+    <string name="include_all_app_wg_dialog_desc">Tunneller toutes les applications dans ce tunnel ?</string>
     <string name="config_delete_dialog_title">Supprimer la configuration</string>
     <string name="logs_card_duration" translatable="true">depuis %1$s</string>
     <string name="cleanbrowsing_adult_dns_desc" translatable="true">Les filtres adultes bloquent l\'accès à tous les sites adultes, pornographiques et explicites. Il ne bloque pas les sites proxy ou VPN, ni les sites de contenu mixte. Les sites comme Reddit sont autorisés. Google et Bing sont mis sur le mode SafeSearch.</string>
-    <string name="config_delete_dialog_desc">Voulez-vous vraiment supprimer cette configuration \?</string>
+    <string name="config_delete_dialog_desc">Voulez-vous vraiment supprimer cette configuration ?</string>
     <string name="new_warp_config_desc" translatable="true">Récupérer la configuration WARP du serveur</string>
     <string name="parse_error_generic" translatable="true">chaîne</string>
     <string name="generic_error" translatable="true">Erreur inconnue “%s”</string>
     <string name="app_ip_domain_rules" translatable="true">Par application IP / Règles de domaine</string>
     <string name="bad_config_error" translatable="true">%1$s dans %2$s</string>
     <string name="exclude_all_app_wg_dialog_title">Exclure toutes les applications</string>
-    <string name="exclude_all_app_wg_dialog_desc">Exclure toutes les applications de ce tunnel \?</string>
+    <string name="exclude_all_app_wg_dialog_desc">Exclure toutes les applications de ce tunnel ?</string>
     <string name="no_configs_error" translatable="true">Aucune configuration trouvée</string>
     <string name="crypt_adguard_family_desc" translatable="true">Adguard DNS avec la recherche sécuritaire et le blocage des contenus adultes.</string>
     <string name="crypt_relay_france" translatable="true">Relais DNS anonyme hébergé à Paris, France fourni par https://cryptostrom.is/.</string>
