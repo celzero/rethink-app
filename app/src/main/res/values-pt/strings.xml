@@ -38,7 +38,7 @@
     <string name="always_on_dialog_positive_btn">Ir para definições</string>
     <string name="bsct_conn_block_desc">%1$s bloqueado por %2$s</string>
     <string name="bsct_conn_rule_explanation">&lt;u&gt;#1&lt;/u&gt;: Bloqueia a ligação de uma aplicação à Internet. \n &lt;u&gt;#2&lt;/u&gt;: Bloqueia a ligação de todas as aplicações a um determinado IP. \n &lt;u&gt;##3&lt;/u&gt;: Bloqueia todas as ligações quando o dispositivo está bloqueado (firewall universal). \n &lt;u&gt;#4&lt;/u&gt;: Bloqueia qualquer aplicação que não esteja a ser utilizada (firewall universal). \n &lt;u&gt;##5&lt;/u&gt;: Bloqueia as ligações quando a aplicação de origem é desconhecida (firewall universal). \n&lt;u&gt;##6&lt;/u&gt;: Bloqueia todo o tráfego UDP exceto DNS (firewall universal). \n &lt;u&gt;#7&lt;/u&gt;: Bloqueia ligações quando o DNS é ignorado (firewall universal).</string>
-    <string name="whats_new_version_update">&lt;b&gt;Não entres em pânico 2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Novo: Capturar erros do motor de rede nos relatórios de erros dos utilizadores.&lt;br/&gt; 2. Novo: utilizar o DNS do sistema para nomes de domínio não delegados se Prevent DNS estiver ativado.&lt;br/&gt;3. Melhoria: Conectividade WireGuard de pilha dupla (IPv4 + IPv6).&lt;br/&gt;4. Melhoria: Evitar o bloqueio dos elementos da IU quando o motor de rede não responde.&lt;br/&gt; 5. Correção: Tempo limite de ligação com a filtragem avançada de DNS ativada.&lt;br/&gt; 6. Correção: Os pontos de extremidade de pares do WireGuard com nomes de domínio ficam suspensos em alterações de rede.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ajuda a traduzir esta aplicação&lt;/a&gt;</string>
+    <string name="whats_new_version_update" translatable="false"><![CDATA[<b>Não entres em pânico 2</b><br/><br/> 1. Novo: Capturar erros do motor de rede nos relatórios de erros dos utilizadores.<br/> 2. Novo: utilizar o DNS do sistema para nomes de domínio não delegados se Prevent DNS estiver ativado.<br/>3. Melhoria: Conectividade WireGuard de pilha dupla (IPv4 + IPv6).<br/>4. Melhoria: Evitar o bloqueio dos elementos da IU quando o motor de rede não responde.<br/> 5. Correção: Tempo limite de ligação com a filtragem avançada de DNS ativada.<br/> 6. Correção: Os pontos de extremidade de pares do WireGuard com nomes de domínio ficam suspensos em alterações de rede.<br/><br/> <a href=https://svc.rethinkdns.com/r/translate>Ajuda a traduzir esta aplicação</a>]]></string>
     <string name="relative_time_yesterday">Ontem</string>
     <string name="always_on_dialog_heading">Desativar VPN sempre ativa</string>
     <string name="always_on_dialog">A opção \"VPN sempre ativa\" está ativada neste dispositivo. Para iniciar Rethink, aceda às definições da VPN Android e desative a opção \"VPN sempre ativa\".</string>
@@ -497,7 +497,7 @@
     <string name="dns_btm_sheet_dialog_ips"><Data><![CDATA[ %1$s %2$s <br/>]]></Data></string>
     <string name="dns_btm_sheet_chip">+%1$s outros IPs</string>
     <string name="dns_btm_sheet_chip_no_answer">Sem resposta</string>
-    <string name="dns_btm_resolved_crypt">resolvido <u>anonimamente</u> %1$s por %2$s através de %3$s</string>
+    <string name="dns_btm_resolved_crypt">resolvido &lt;u&gt;anonimamente&lt;/u&gt; %1$s por %2$s através de %3$s</string>
     <string name="dns_btm_resolved_doh">resolvido %1$s por %2$s</string>
     <string name="dns_btm_latency_ms">%1$s ms</string>
     <string name="hs_download_positive_default">ok</string>
