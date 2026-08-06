@@ -203,9 +203,7 @@
     <string name="settings_https_desc">Encaminhar conexões para o endpoint HTTP(S) CONNECT.</string>
     <string name="hybrid_mode_notification_title">Protegido! Conectado ao DNS + Firewall.</string>
     <string name="orbot_socks5">Apenas proxy TCP</string>
-    <string name="alert_firewall_accessibility_regrant_explanation">O serviço de acessibilidade do Rethink parou ou travou. <i><b>Vá para \"Configurações\" e \"Forçar parada\"</b></i> do Rethink e inicie novamente para usar o recurso <i>Bloquear qualquer aplicativo que não esteja em uso</i>.
-\n
-\nRethink usa o serviço de acessibilidade para rastrear quais aplicativos estão em uso (primeiro plano) e aqueles que não estão em uso (segundo plano).</string>
+    <string name="alert_firewall_accessibility_regrant_explanation">O serviço de acessibilidade do Rethink parou ou travou. <i><b>Vá para \"Configurações\" e \"Forçar parada\"</b></i> do Rethink e inicie novamente para usar o recurso <i>Bloquear qualquer aplicativo que não esteja em uso</i>. \n \nRethink usa o serviço de acessibilidade para rastrear quais aplicativos estão em uso (primeiro plano) e aqueles que não estão em uso (segundo plano).</string>
     <string name="orbot_socks5_desc">Encaminhar todas as conexões TCP para Orbot.</string>
     <string name="bsct_conn_rule_explanation"><u>#1</u>: Impede que um aplicativo se conecte à internet. \n <u>#2</u>: Impede que qualquer aplicativo se conecte a um IP específico. \n <u>#3</u>: Bloqueia todas as conexões quando o dispositivo está bloqueado (Firewall Universal). \n <u>#4</u>: Bloqueia qualquer aplicativo que não esteja em uso (Firewall Universal). \n <u>#5</u>: Bloqueia conexões quando o aplicativo de origem for desconhecido (Firewall Universal). \n <u>#6</u>: Bloqueia todo o tráfego UDP, exceto DNS (Firewall Universal). \n <u>#7</u>: Bloqueia conexões quando o DNS é autorizado (Firewall Universal).</string>
     <string name="status_protected_with_tor">protegido com tor</string>
@@ -248,7 +246,7 @@
     <string name="status_dns_error">falha de dns</string>
     <string name="status_dns_server_down">servidor dns inativo</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">dns privado está ativado</string>
-    <string name="bsct_block">Bloquear, ignorar, excluir e restringir <u>este aplicativo</u></string>
+    <string name="bsct_block">Bloquear, ignorar, excluir e restringir &lt;u&gt;este aplicativo&lt;/u&gt;</string>
     <string name="notification_action_resume_vpn">RETOMAR</string>
     <string name="dns_explanation_firewall_connected">Conectado ao Firewall</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">Conectado ao RethinkDNS e Firewall</string>
@@ -264,9 +262,7 @@
     <string name="dns_mode_info_explanation_new">Monitorar, bloquear e criptografar solicitações DNS.</string>
     <string name="dns_firewall_mode_info_explanation_new">Todas as opções acima, ignorar também censura à Internet.</string>
     <string name="alert_permission_accessibility">Permissão - Acessibilidade</string>
-    <string name="alert_firewall_accessibility_explanation">Rethink usa serviço de acessibilidade para rastrear quais aplicativos estão em uso (primeiro plano) e aqueles que não estão em uso (segundo plano).
-\n
-\nRethink não coleta nenhuma informação nem espiona você de forma alguma.</string>
+    <string name="alert_firewall_accessibility_explanation">Rethink usa serviço de acessibilidade para rastrear quais aplicativos estão em uso (primeiro plano) e aqueles que não estão em uso (segundo plano). \n \nRethink não coleta nenhuma informação nem espiona você de forma alguma.</string>
     <string name="alert_firewall_accessibility_exception">Falha ao abrir as \"Configurações de Acessibilidade\". Tente mais tarde!</string>
     <string name="brave_dns_connect_mode_change_firewall">Escolha o modo.</string>
     <string name="brave_dns_connect_mode_change_dns">Escolha o modo.</string>
@@ -277,7 +273,7 @@
     <string name="dns_query_clear_logs_title">Excluir todos os registros DNS?</string>
     <string name="dns_query_clear_logs_message">Isso exclui os registros DNS do dispositivo. Esta operação não é reversível. Continuar?</string>
     <string name="bsct_app_info">Informações do aplicativo</string>
-    <string name="bsct_block_ip">Bloquear, confiar <u>neste IP</u> para <u>este aplicativo</u></string>
+    <string name="bsct_block_ip">Bloquear, confiar &lt;u&gt;neste IP&lt;/u&gt; para &lt;u&gt;este aplicativo&lt;/u&gt;</string>
     <string name="bsct_conn_block_desc">%1$s bloqueado por %2$s</string>
     <string name="bsct_conn_block_desc_device">%1$s bloqueado no dispositivo</string>
     <string name="bsct_conn_desc_blocked">bloqueado em %1$s %2$s</string>
@@ -393,7 +389,7 @@
     <string name="settings_dns_proxy_dialog_header">Definir proxy SOCKS5 (TCP)</string>
     <string name="settings_dns_proxy_dialog_app">Aplicativo</string>
     <string name="settings_dns_proxy_dialog_hostname">Nome do host</string>
-    <string name="settings_dns_proxy_dialog_app_desc">O aplicativo selecionado será excluído da VPN para permitir conexões proxy em seu nome.</string>
+    <string name="settings_dns_proxy_dialog_app_desc" translatable="false">O aplicativo selecionado será excluído da VPN para permitir conexões proxy em seu nome.</string>
     <string name="settings_app_list_default_app">Nenhum</string>
     <string name="settings_socks_forwarding_desc">Encaminhando para %1$s:%2$s, %3$s</string>
     <string name="settings_socks_forwarding_desc_no_app">Encaminhando para %1$s:%2$s</string>
@@ -424,20 +420,15 @@
     <string name="firewall_status_block_metered">bloqueado em redes móveis</string>
     <string name="firewall_status_blocked">bloqueado</string>
     <string name="firewall_status_unknown">desconhecido</string>
-    <string name="firewall_card_text_active">%1$s bloqueados
-\n%2$s ignorados
-\n%3$s excluídos
-\n%4$s restritos</string>
+    <string name="firewall_card_text_active">%1$s bloqueados \n%2$s ignorados \n%3$s excluídos \n%4$s restritos</string>
     <string name="firewall_card_text_inactive">Ativar modo Firewall.</string>
     <string name="dns_card_latency_active">%1$sms</string>
     <string name="dns_card_latency_inactive">Ativar modo DNS.</string>
     <string name="apps_card_ips_count">%1$s regra(s) de IP e porta</string>
     <string name="hsf_start_btn_state">iniciar</string>
     <string name="hsf_stop_btn_state">encerrar</string>
-    <string name="hsf_uptime">(ativo %1$s; protos: %2$s; tipo: %3$s)</string>
-    <string name="hsf_vpn_dialog_message">Rethink precisa de permissão para configurar uma VPN local para criptografar as solicitações DNS do dispositivo, implementar um monitor de rede e aplicar regras de firewall.
-\n
-\nRethink não coleta nenhuma informação nem espiona você de forma alguma.</string>
+    <string name="hsf_uptime" translatable="false">(ativo %1$s; protos: %2$s; tipo: %3$s)</string>
+    <string name="hsf_vpn_dialog_message">Rethink precisa de permissão para configurar uma VPN local para criptografar as solicitações DNS do dispositivo, implementar um monitor de rede e aplicar regras de firewall. \n \nRethink não coleta nenhuma informação nem espiona você de forma alguma.</string>
     <string name="lbl_proceed">Continuar</string>
     <string name="hsf_vpn_prepare_failure">Permissão VPN ausente ou outro aplicativo está com a opção \"VPN Sempre Ativa\".</string>
     <string name="hsf_start_dialog_header">Iniciar %1$s</string>
@@ -498,10 +489,10 @@
     <string name="ctbs_block_other_apps">Regras aplicadas para %1$s também serão aplicadas para %2$s outros aplicativos</string>
     <string name="ctbs_dialog_negative_btn">Voltar</string>
     <string name="dns_log_dialog_positive">Excluir registros</string>
-    <string name="dns_btm_sheet_dialog_message"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s lista(s) de bloqueio</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
-    <string name="dns_btm_sheet_dialog_ips"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_message"><Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s lista(s) de bloqueio</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_ips"><Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
     <string name="dns_btm_sheet_chip_no_answer">Sem resposta</string>
-    <string name="dns_btm_resolved_crypt">resolvido <u>de forma anônima</u> %1$s por %2$s via %3$s</string>
+    <string name="dns_btm_resolved_crypt">resolvido &lt;u&gt;de forma anônima&lt;/u&gt; %1$s por %2$s via %3$s</string>
     <string name="hs_download_positive_play_store">Atualização concluída</string>
     <string name="hs_download_positive_website">Visitar site</string>
     <string name="hs_download_negative_default">Lembre-me mais tarde</string>
@@ -530,14 +521,8 @@
     <string name="dns_crypt_relay_error_toast">Nenhum resolvedor selecionado</string>
     <string name="dns_proxy_desc" translatable="false">%1$s:%2$s, %3$s</string>
     <string name="dns_proxy_desc_no_app" translatable="false">%1$s:%2$s</string>
-    <string name="dns_proxy_dialog_message_no_app">Endereço IP: %1$s
-\n
-\nNúmero da porta: %2$s</string>
-    <string name="dns_proxy_dialog_message">Nome do aplicativo: %1$s
-\n
-\nEndereço IP: %2$s
-\n
-\nNúmero da porta: %3$s</string>
+    <string name="dns_proxy_dialog_message_no_app">Endereço IP: %1$s \n \nNúmero da porta: %2$s</string>
+    <string name="dns_proxy_dialog_message">Nome do aplicativo: %1$s \n \nEndereço IP: %2$s \n \nNúmero da porta: %3$s</string>
     <string name="dns_proxy_port">Número da porta</string>
     <string name="dns_proxy_ip_address">Endereço IP</string>
     <string name="fapps_filter_parent_installed">Instalada</string>
@@ -896,7 +881,7 @@
     <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[Uma regra de firewall definida pelo usuário bloqueou o <i>domínio</i>.<br/><br/> Para alterar, acesse a tela <i>Firewall específico do aplicativo</i>.]]></string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[Esta conexão foi permitida porque o <i>domínio</i> está configurado como Domínio confiável.<br/><br/> Para alterar, acesse a tela <i>Firewall específico do aplicativo</i>.]]></string>
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[Esta conexão foi permitida porque o <i>domínio</i> está configurado como confiável nas regras de domínio universal.<br/><br/> Para alterar esse comportamento, acesse a guia <i>Configurar DNS</i>.]]></string>
-    <string name="bsdl_block_desc" translatable="true">Bloquear, confiar <u>neste domínio</u></string>
+    <string name="bsdl_block_desc" translatable="true">Bloquear, confiar &lt;u&gt;neste domínio&lt;/u&gt;</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">Agrupar solicitações, respostas de cache, tratamento de erros resiliente</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category" translatable="true">%1$s lista(s) de bloqueio</string>
     <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">países mais contactados</string>
