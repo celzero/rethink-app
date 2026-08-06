@@ -16,7 +16,7 @@
     <string name="lbl_apply" translatable="true">적용</string>
     <string name="status_protected_with_http" translatable="true">HTTP 프록시로 보호됨</string>
     <string name="dns_query_clear_logs_title" translatable="true">모든 DNS 로그를 삭제하시겠습니까?</string>
-    <string name="conn_track_clear_logs_title" translatable="true">모든 네트워크 로그를 삭제하시겠습니까\?</string>
+    <string name="conn_track_clear_logs_title" translatable="true">모든 네트워크 로그를 삭제하시겠습니까?</string>
     <string name="bsct_block_domain" translatable="true">&lt;u&gt;이 앱&lt;/u&gt;의 &lt;u&gt;도메인&lt;/u&gt;을 차단 및 신뢰</string>
     <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink는 접근성 서비스를 사용하여 사용 중인 앱(포그라운드)과 사용 중이 아닌 앱(백그라운드)을 추적합니다. \n \nRethink는 어떤 방식으로도 정보를 수집하거나 사용자를 감시하지 않습니다.</string>
     <string name="universal_firewall_explanation" translatable="true">기기의 이벤트를 기반으로 모든 앱에 방화벽을 적용합니다. 예를 들어 기기가 잠겨 있거나 특정 앱을 사용하지 않을 때 방화벽이 적용됩니다.</string>
@@ -113,7 +113,7 @@
     <string name="lbl_select_all" translatable="true">전체 선택</string>
     <string name="status_protected_with_tor" translatable="true">Tor로 보호됨</string>
     <string name="status_protected_with_socks5" translatable="true">SOCKS 프록시로 보호됨</string>
-    <string name="rdns_plus" translatable="true">RDNS Plus</string>
+    <string name="rdns_plus" translatable="false">RDNS Plus</string>
     <string name="lbl_create" translatable="true">만들기</string>
     <string name="status_protected_with_socks5_private_dns" translatable="true">SOCKS5 및 개인 DNS로 보호됨</string>
     <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Rethink 접근성 서비스가 중단되었거나 오류가 발생했습니다. <i><b>설정으로 이동하여 Rethink를 강제 종료</b></i>한 뒤 다시 실행해야 <i>사용하지 않는 앱 차단</i> 기능을 사용할 수 있습니다.\n\nRethink는 어떤 앱이 사용 중(포그라운드)인지 또는 사용 중이 아닌지(백그라운드)를 파악하기 위해 접근성 서비스를 사용합니다.</string>
