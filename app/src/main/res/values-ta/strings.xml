@@ -8,8 +8,8 @@
     <string name="settings_title_desc">மிகவும் தனிப்பயனாக்கக்கூடிய டிஎன்எச் மற்றும் ஃபயர்வால்</string>
     <string name="dns_mode_info_title">டிஎன்எச்</string>
     <string name="always_on_dialog_neutral">அமைப்புகள்</string>
-    <string name="app_name">"மறுபரிசீலனை  டிஎன்எஸ்"</string>
-    <string name="app_name_small_case">மறுபரிசீலனை</string>
+    <string name="app_name" translatable="false">"மறுபரிசீலனை  டிஎன்எஸ்"</string>
+    <string name="app_name_small_case" translatable="false">மறுபரிசீலனை</string>
     <string name="title_about">பற்றி</string>
     <string name="title_settings">அமைப்புகள்</string>
     <string name="pause_title_desc">சிறு தூக்கம் போடுகிறேன்…</string>
@@ -75,22 +75,22 @@
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">பாதுகாக்கப்பட்டுள்ளது</string>
     <string name="status_dns_error">டிஎன்எச் பிழை</string>
     <string name="conn_track_clear_logs_title">அனைத்து பிணையம் பதிவுகளையும் நீக்கவா?</string>
-    <string name="dns_query_clear_logs_message">இது சாதனத்தில் உள்ள DNS பதிவுகளை நீக்குகிறது. இந்த செயல்பாடு மீளக்கூடியது அல்ல. தொடர வேண்டுமா\?</string>
+    <string name="dns_query_clear_logs_message">இது சாதனத்தில் உள்ள DNS பதிவுகளை நீக்குகிறது. இந்த செயல்பாடு மீளக்கூடியது அல்ல. தொடர வேண்டுமா?</string>
     <string name="bsct_conn_block_desc">%2$s ஆல் %1$s தடுக்கப்பட்டது</string>
     <string name="always_on_dialog_positive_btn">அமைப்புகளுக்குச் செல்லவும்</string>
-    <string name="conn_track_clear_logs_message">இது பிணைய பதிவுகளை மட்டுமே நீக்குகிறது ஆனால் ஃபயர்வால் விதிகளை அல்ல. இந்த செயல்பாடு மீளக்கூடியது அல்ல. தொடர வேண்டுமா\?</string>
-    <string name="dns_query_clear_logs_title">அனைத்து DNS பதிவுகளையும் நீக்கவா\?</string>
-    <string name="dns_crypt_custom_url_remove_dialog_title">DNSCrypt தீர்வை நீக்கவா\?</string>
+    <string name="conn_track_clear_logs_message">இது பிணைய பதிவுகளை மட்டுமே நீக்குகிறது ஆனால் ஃபயர்வால் விதிகளை அல்ல. இந்த செயல்பாடு மீளக்கூடியது அல்ல. தொடர வேண்டுமா?</string>
+    <string name="dns_query_clear_logs_title">அனைத்து DNS பதிவுகளையும் நீக்கவா?</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title">DNSCrypt தீர்வை நீக்கவா?</string>
     <string name="bsct_conn_desc_blocked">%1$s %2$s இல் தடுக்கப்பட்டது</string>
-    <string name="always_on_dialog_stop_message">மறுபரிசீலனை செய்ய எப்போதும் இயங்கும் VPN இயக்கப்பட்டுள்ளது. எப்படியும் மறுபரிசீலனை செய்வதை நிச்சயமாக நிறுத்த விரும்புகிறீர்களா\?</string>
-    <string name="doh_custom_url_remove_dialog_title">DoH இறுதிப்புள்ளியை நீக்கவா\?</string>
+    <string name="always_on_dialog_stop_message">மறுபரிசீலனை செய்ய எப்போதும் இயங்கும் VPN இயக்கப்பட்டுள்ளது. எப்படியும் மறுபரிசீலனை செய்வதை நிச்சயமாக நிறுத்த விரும்புகிறீர்களா?</string>
+    <string name="doh_custom_url_remove_dialog_title">DoH இறுதிப்புள்ளியை நீக்கவா?</string>
     <string name="doh_custom_url_remove_dialog_message">சேமித்த உள்ளமைவிலிருந்து Https இறுதிப் புள்ளியில் DNS ஐ நீக்கவும்.</string>
     <string name="dns_crypt_url_remove_success">DNSCrypt தீர்வு நீக்கப்பட்டது.</string>
     <string name="always_on_dialog_stop_heading">எப்போதும் VPN-ஆன்</string>
     <string name="always_on_dialog_positive">நிறுத்து</string>
-    <string name="dns_crypt_relay_remove_dialog_title">DNSCrypt Relay ஐ நீக்கவா\?</string>
+    <string name="dns_crypt_relay_remove_dialog_title">DNSCrypt Relay ஐ நீக்கவா?</string>
     <string name="dns_act_configure_tab">கட்டமைக்க</string>
-    <string name="univ_firewall_dialog_title">ஐபி விதியை நீக்கவா\?</string>
+    <string name="univ_firewall_dialog_title">ஐபி விதியை நீக்கவா?</string>
     <string name="univ_firewall_dialog_message">இந்த விதியை நீக்கினால், எந்தவொரு ஆப்சையும் இந்த ஐபியுடன் இணைக்க முடியும். தொடர வேண்டுமா?</string>
     <string name="alert_firewall_accessibility_regrant_explanation">RethinkDNS அணுகல்தன்மை பணி நிறுத்தப்பட்டது அல்லது செயலிழந்தது. <i><b>செட்டிங்ச் சென்று ஃபோர்ச் ச்டாப்</b></i> ரீதிங்க்டிஎன்எச் மற்றும் அதை மீண்டும் தொடங்கவும் <i>பயன்படுத்தாத எந்த பயன்பாட்டையும் தடு</i> நற்பொருத்தம். \n \nRethinkDNS எந்தெந்த பயன்பாடுகள் பயன்பாட்டில் உள்ளன (முன்புறம்) மற்றும் பயன்பாட்டில் இல்லாதவை (பின்னணி) ஆகியவற்றைக் கண்காணிக்க அணுகல்தன்மை சேவையைப் பயன்படுத்துகிறது.</string>
     <string name="firewall_act_universal_tab">உலகளாவிய</string>
@@ -102,7 +102,7 @@
     <string name="status_protected_with_proxy_private_dns">பதிலாள் மற்றும் தனியார் டிஎன்எச் மூலம் பாதுகாக்கப்படுகிறது</string>
     <string name="block">தொகுதி</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">காத்திருக்கிறது</string>
-    <string name="rdns_plus">ஆர்டிஎன்எஸ் கூடுதல்</string>
+    <string name="rdns_plus" translatable="false">ஆர்டிஎன்எஸ் கூடுதல்</string>
     <string name="status_dns_server_down">டிஎன்எச் சர்வர் செயலிழந்தது</string>
     <string name="bsct_conn_rule_explanation">&lt;u&gt;#1 &lt;/u&gt;: இணையத்துடன் இணைப்பதில் இருந்து ஒரு பயன்பாட்டைத் தடுக்கிறது. \n&lt;u&gt;#2 &lt;/u&gt;: ஒரு குறிப்பிட்ட ஐபியுடன் இணைப்பதைத் தடுக்கிறது. \n&lt;u&gt;#3 &lt;/u&gt;: சாதனம் பூட்டப்படும்போது அனைத்து இணைப்புகளையும் தடுக்கிறது (யுனிவர்சல் ஃபயர்வால்). \n&lt;u&gt;#4 &lt;/u&gt;: பயன்பாட்டில் இல்லாத எந்த பயன்பாட்டையும் தடுக்கிறது (யுனிவர்சல் ஃபயர்வால்). \n&lt;u&gt;#5 &lt;/u&gt;: மூல பயன்பாடு தெரியாதபோது இணைப்புகளைத் தடுக்கிறது (யுனிவர்சல் ஃபயர்வால்). \n&lt;u&gt;#6 &lt;/u&gt;: டி.என்.எச் (யுனிவர்சல் ஃபயர்வால்) தவிர அனைத்து யுடிபி போக்குவரத்தையும் தடுக்கிறது. \n&lt;u&gt;#7 &lt;/u&gt;: டி.என்.எச் புறக்கணிக்கப்படும்போது இணைப்புகளைத் தடுக்கவும் (யுனிவர்சல் ஃபயர்வால்).</string>
     <string name="always_on_dialog_lockdown_stop_message">ரீடிங்க் <i> பூட்டுதல் </i> பயன்முறையில் VPN ஐ இயக்குகிறது. அதை நிறுத்துவது இந்த பயனர் சுயவிவரத்தில் இணைய இணைப்பை இழக்க நேரிடும். எப்படியும் தொடர விரும்புகிறீர்களா?</string>
