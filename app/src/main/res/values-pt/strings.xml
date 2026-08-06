@@ -125,7 +125,7 @@
     <string name="always_on_dialog_neutral">Definições</string>
     <string name="firewall_act_network_monitor_tab">Rede</string>
     <string name="dns_act_configure_tab">Configurar</string>
-    <string name="univ_firewall_dialog_title">Eliminar regra de IP\?</string>
+    <string name="univ_firewall_dialog_title">Eliminar regra de IP?</string>
     <string name="univ_firewall_dialog_message">A eliminação desta regra permitiria que qualquer aplicação se ligasse a este IP. Continuar?</string>
     <string name="doh_custom_url_remove_dialog_title">Eliminar \'endpoint\' DoH?</string>
     <string name="doh_custom_url_remove_dialog_message">Eliminar, da configuração guardada, o \'endpoint\' DNS Over HTTPS.</string>
@@ -206,7 +206,7 @@
     <string name="dns_card_latency_inactive">Ativar modo DNS.</string>
     <string name="apps_card_ips_count">%1$s regra(s) de IP/Portas</string>
     <string name="hsf_start_btn_state">iniciar</string>
-    <string name="hsf_uptime">(ativo %1$s; protos: %2$s; tipo: %3$s)</string>
+    <string name="hsf_uptime" translatable="false">(ativo %1$s; protos: %2$s; tipo: %3$s)</string>
     <string name="hsf_downtime">(inativo desde %1$s)</string>
     <string name="hsf_vpn_dialog_header">Atenção!</string>
     <string name="lbl_proceed">Continuar</string>
@@ -225,7 +225,7 @@
     <string name="conn_track_clear_logs_message">Isto elimina os registos da rede mas não as regras de firewall. Esta operação não é reversível. Continuar?</string>
     <string name="info_dialog_url_copy_toast_msg">URL copiado</string>
     <string name="bypass_universal">contorno universal</string>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name" translatable="false">RethinkDNS</string>
     <string name="title_about">Acerca</string>
     <string name="orbot_bs_status_trying_connect">A configurar Orbot…</string>
     <string name="orbot_install_dialog_title">Instalar Orbot?</string>
@@ -244,7 +244,7 @@
     <string name="orbot_bs_status_1">A encaminhar ligações %1$s para Orbot.</string>
     <string name="orbot_install_dialog_message">Orbot traz os recursos e funcionalidades do Tor para o Android.</string>
     <string name="orbot_install_dialog_neutral">site</string>
-    <string name="orbot_install_activity_error">Algo correu mal, tente novamente após algum tempo</string>
+    <string name="orbot_install_activity_error" translatable="false">Algo correu mal, tente novamente após algum tempo</string>
     <string name="settings_network_all_networks">Utilizar todas as redes disponíveis (experimental)</string>
     <string name="settings_check_update_heading">Procurar atualizações</string>
     <string name="about_title_desc">Deteta e bloqueia ameaças à segurança da rede</string>
@@ -262,7 +262,7 @@
     <string name="pause_title_desc">A descansar…</string>
     <string name="accessibility_service_description">Rethink usa o serviço de acessibilidade para detetar e proteger aplicações em segundo plano. Rethink não recolhe nem vende quaisquer informações.</string>
     <string name="orbot_both">TCP + Proxy HTTP</string>
-    <string name="app_name_small_case">rethink</string>
+    <string name="app_name_small_case" translatable="false">rethink</string>
     <string name="settings_lock_down_mode_desc">Determinadas opções são desativadas quando a VPN está no modo de bloqueio. <u>Consulte as definições VPN</u>.</string>
     <string name="settings_https_desc">Encaminhar ligações para o \'endpoint\' HTTP(S) CONNECT.</string>
     <string name="orbot_http">Proxy HTTP</string>
@@ -368,7 +368,7 @@
     <string name="about_translate_link" translatable="false">https://svc.rethinkdns.com/r/translate</string>
     <string name="about_privacy_policy_link" translatable="false">https://www.rethinkdns.com/privacy</string>
     <string name="about_version" translatable="false">v%1$s</string>
-    <string name="about_version_install_source">v%1$s (%2$s)</string>
+    <string name="about_version_install_source" translatable="false">v%1$s (%2$s)</string>
     <string name="about_dialog_neutral_button">Sugerir funcionalidades</string>
     <string name="app_info_error">Não foi possível ver as informação da aplicação.</string>
     <string name="vpn_profile_error">Não foi possível iniciar o perfil VPN.</string>
@@ -441,11 +441,7 @@
     <string name="fapps_metered_block_dialog_message">Bloquear ligações em redes limitadas (móveis) para as aplicações <i>da lista</i>\?</string>
     <string name="firewall_rule_block_udp_ntp">UDP bloqueado</string>
     <string name="firewall_rule_trusted_ip_desc"><![CDATA[Esta ligação foi permitida porque o <i>IP de destino</i> está configurado com um IP de confiança.<br/><br/>Para alterar, aceda ao ecrã <i>Firewall por aplicação </i>.]]></string>
-    <string name="dns_proxy_dialog_message">Nome da aplicação: %1$s
-\n
-\nEndereço IP: %2$s
-\n
-\nNúmero da porta: %3$s</string>
+    <string name="dns_proxy_dialog_message">Nome da aplicação: %1$s \n \nEndereço IP: %2$s \n \nNúmero da porta: %3$s</string>
     <string name="fapps_info_dialog_message">Bloqueie a ligação de aplicações à Internet. Limitar o acesso à Internet ajuda a evitar o uso indevido de dados, além de economizar bateria.</string>
     <string name="fapps_firewall_filter_desc_category"><![CDATA[A mostrar <u>%1$s</u> de %2$s aplicações nas categorias: %3$s]]></string>
     <string name="rules_load_failure_heading">Nota</string>
@@ -489,7 +485,7 @@
     <string name="cd_dns_crypt_error_text_1">O carimbo não pode ficar vazio</string>
     <string name="cd_doh_dialog_heading">Adicionar DNS Over HTTPS</string>
     <string name="cd_dnscrypt_relay_heading">Relays</string>
-    <string name="ct_ip_details">%1$s (%2$s)</string>
+    <string name="ct_ip_details" translatable="false">%1$s (%2$s)</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s outras aplicações</string>
     <string name="ctbs_block_other_apps">As regras aplicadas em %1$s também serão aplicadas em %2$s outras aplicações</string>
     <string name="ctbs_dialog_negative_btn">Recuar</string>
@@ -514,18 +510,16 @@
     <string name="univ_view_blocked_ip">Regras de IP e de porta</string>
     <string name="univ_ip_delete_individual_toast">%1$s eliminado.</string>
     <string name="univ_ip_delete_toast_success">Todas as regras de IP foram eliminadas.</string>
-    <string name="univ_delete_firewall_dialog_title">Eliminar todas as regras de IP\?</string>
+    <string name="univ_delete_firewall_dialog_title">Eliminar todas as regras de IP?</string>
     <string name="univ_accessibility_crash_dialog_positive">Ir para as definições</string>
     <string name="univ_accessibility_dialog_positive">Permitir</string>
     <string name="dns_connected_no_count">Ligado</string>
     <string name="dns_connected">Ligado</string>
     <string name="dns_info_positive">OK</string>
     <string name="dns_crypt_relay_error_toast">Nenhum resolvedor selecionado</string>
-    <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
+    <string name="dns_proxy_desc" translatable="false">%1$s:%2$s, %3$s</string>
     <string name="dns_proxy_desc_no_app" translatable="false">%1$s:%2$s</string>
-    <string name="dns_proxy_dialog_message_no_app">Endereço IP: %1$s
-\n
-\nNúmero da porta: %2$s</string>
+    <string name="dns_proxy_dialog_message_no_app">Endereço IP: %1$s \n \nNúmero da porta: %2$s</string>
     <string name="fapps_filter_filter_heading">Tipo</string>
     <string name="fapps_filter_categories_heading">Categorias</string>
     <string name="fapps_filter_clear_btn">Limpar</string>
@@ -546,7 +540,7 @@
     <string name="fapps_firewall_filter_desc"><![CDATA[A mostrar <u>%1$s</u> de %2$s aplicações]]></string>
     <string name="unicode_warning_sign" translatable="false">⚠</string>
     <string name="unicode_question_sign" translatable="false">❔</string>
-    <string name="fav_icon">fav_icon</string>
+    <string name="fav_icon" translatable="false">fav_icon</string>
     <string name="rules_load_failure_desc">Não foram encontradas regras</string>
     <string name="rules_load_failure_reload">recarregar</string>
     <string name="network_log_app_name_unknown">Desconhecido</string>
@@ -611,7 +605,7 @@
     <string name="build__flavor_play_store">Google Play</string>
     <string name="build__flavor_fdroid">Fdroid</string>
     <string name="cd_toast_added">Domínio adicionado com sucesso</string>
-    <string name="cd_remove_dialog_title">Eliminar domínio\?</string>
+    <string name="cd_remove_dialog_title">Eliminar domínio?</string>
     <string name="cd_remove_dialog_message">Eliminar domínio da configuração guardada.</string>
     <string name="cd_dialog_title">Adicionar regra de domínio</string>
     <string name="cd_dialog_desc">Um URL ou um nome de domínio com um wildcard opcional: *.test.com, test.com/test</string>
@@ -635,7 +629,7 @@
     <string name="ci_bypass_universal">Ignorar universal</string>
     <string name="ci_delete">eliminar</string>
     <string name="ada_noapp_dialog_title">Nenhuma aplicação</string>
-    <string name="ada_noapp_dialog_message">Falta a informação da aplicação. Talvez esta aplicação tenha sido desinstalada\?</string>
+    <string name="ada_noapp_dialog_message">Falta a informação da aplicação. Talvez esta aplicação tenha sido desinstalada?</string>
     <string name="ada_noapp_dialog_positive">OK</string>
     <string name="ada_firewall_status"><![CDATA[Esta aplicação <b><i>%1$s</i></b>.]]></string>
     <string name="ada_ip_connection_count">Conectado a %1$s endereços IP</string>
@@ -696,7 +690,7 @@
     <string name="brbs_backup_dialog_title">Criar backup</string>
     <string name="brbs_backup_dialog_positive">Backup</string>
     <string name="brbs_restore_dialog_failure_title">Falha ao restaurar</string>
-    <string name="brbs_restore_dialog_failure_message">Não foi possível restaurar. Tentar novamente\?</string>
+    <string name="brbs_restore_dialog_failure_message">Não foi possível restaurar. Tentar novamente?</string>
     <string name="brbs_restore_dialog_failure_positive">Repetir restauro</string>
     <string name="dns_query_latency">%1$s ms</string>
     <string name="dns_proxy_dialog_header_dns">Adicionar proxy DNS</string>
@@ -761,7 +755,7 @@
     <string name="lbl_disabled" translatable="true">Desativada</string>
     <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[Uma regra de firewall, definida pelo utilizador, bloqueou o <i>domínio</i>.<br/><br/>Para alterar, aceda ao ecrã <i>Firewall por aplicação</i>.]]></string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[Esta ligação foi permitida porque o <i>domínio</i> está definido como confiável.<br/><br/>Para alterar, aceda ao ecrã <i>Firewall por aplicação</i>.]]></string>
-    <string name="bsdl_block_desc" translatable="true">Bloquear, confiar <u>neste domínio</u></string>
+    <string name="bsdl_block_desc" translatable="true">Bloquear, confiar &lt;u&gt;neste domínio&lt;/u&gt;</string>
     <string name="lbl_cancel" translatable="true">Cancelar</string>
     <string name="lbl_apply" translatable="true">Aplicar</string>
     <string name="lbl_dismiss" translatable="true">Cancelar</string>
