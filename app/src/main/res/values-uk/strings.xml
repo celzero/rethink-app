@@ -19,15 +19,15 @@
     <string name="firewall_mode_notification_title">Захищено! Підключено до Брандмауера.</string>
     <string name="always_on_dialog_positive">Зупинити</string>
     <string name="always_on_dialog_neutral">Налаштуваннях</string>
-    <string name="app_name">RethinkDNS</string>
-    <string name="app_name_small_case">rethink</string>
+    <string name="app_name" translatable="false">RethinkDNS</string>
+    <string name="app_name_small_case" translatable="false">rethink</string>
     <string name="settings_title_desc">DNS та брандмауер, що легко налаштовуються</string>
     <string name="always_on_dialog_lockdown_stop_message">Rethink запускає VPN у режимі <i>Блокування</i>. Його зупинка призведе до втрати підключення до Інтернету для цього профілю користувача. Ви все одно хочете продовжити\?</string>
     <string name="private_dns_dialog_heading">Вимкнути Приватний DNS</string>
     <string name="about_title_desc">Виявлення та блокування загроз мережевої безпеки</string>
     <string name="accessibility_service_description">Rethink використовує службу спеціальних можливостей для виявлення та блокування фонових застосунків. Rethink не збирає та не продає жодної інформації.</string>
     <string name="slide_2_desc">Rethink - це найпростіший спосіб моніторингу мережевої активності, обходу інтернет-цензури та брандмауерів на вашому Android пристрої.</string>
-    <string name="rdns_plus">RDNS Plus</string>
+    <string name="rdns_plus" translatable="false">RDNS Plus</string>
     <string name="allow">дозволити</string>
     <string name="bypass_universal">універсальний обхід</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Натисніть, щоб змінити налаштування захисту</string>
@@ -1162,8 +1162,6 @@
     <string name="vpn_policy_relaxed" translatable="true">Розслаблений</string>
     <string name="vpn_policy_relaxed_desc" translatable="true">Реагує на цікаві зміни в підключенні.</string>
     <string name="vpn_policy_title" translatable="true">Політика зміни підключення</string>
-    <string name="use_fallback_dns_to_bypass" translatable="true">Використовувати резервний DNS як обхідний</string>
-    <string name="use_fallback_dns_to_bypass_desc" translatable="true">Якщо ввімкнено, завжди використовується резервний DNS для обійдених програм, доменів та IP-адрес.</string>
     <string name="title_database_dump" translatable="true">База даних</string>
     <string name="copied_clipboard" translatable="true">Скопійовано</string>
     <string name="conn_track_clear_rule_logs_title" translatable="true">Видалити журнали для цього правила?</string>
