@@ -208,7 +208,7 @@
     <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Блокує підключення програми до Інтернету. \n <u>#2</u>: Блокує підключення будь-якої програми до певної IP-адреси. \n <u>#3</u>: Блокує всі з\'єднання, коли пристрій заблоковано (Універсальний брандмауер). \n <u>#4</u>: Блокує будь-які програми, які не використовуються (Універсальний брандмауер). \n <u>#5</u>: Блокує з’єднання, коли вихідна програма невідома (Universal Firewall). \n <u>#6</u>: Блокує весь UDP-трафік, окрім DNS (універсальний брандмауер). \n <u>#7</u>: Блокувати з’єднання, коли DNS обходиться (Universal Firewall).</string>
     <string name="settings_allow_bypass_desc" translatable="true">Дозволити застосункам, що запитують, доступ до всіх доступних мереж. Ці застосунки можуть обходити VPN тунель Rethink за вимогою. Деякі застосунки для аудіо чи відео конференцій, такі як Zoom та Meet, можуть потребувати цього для належної роботи.</string>
     <string name="settings_https_desc" translatable="true">Пересилати з\'єднання за протоколом HTTP(s).</string>
-    <string name="whats_new_version_update" translatable="true">&lt;b&gt;Don\'t Panic 2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Нове: Фіксування помилок мережі у користувацьких звітах про помилки.&lt;br/&gt;2. Нове: використовуйте Системний DNS для неделегованих доменних імен, якщо провайдер застосовує політику Запобігання витоку DNS.&lt;br/&gt; 3. Покращення: підключення WireGuard з подвійним стеком (IPv4 + IPv6).&lt;br/&gt; 4. Покращення: уникайте блокування елементів інтерфейсу користувача, коли мережа не відповідає.&lt;br/&gt; 5. Виправлення: Час очікування з’єднання з увімкненою розширеною фільтрацією DNS.&lt;br/&gt; 6. Виправлення: Кінцеві точки вузлів WireGuard з доменними іменами залежать від змін у мережі.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Допоможіть перекласти цей застосунок&lt;/a&gt;</string>
+    <string name="whats_new_version_update" translatable="false"><![CDATA[<b>Don\'t Panic 2</b><br/><br/> 1. Нове: Фіксування помилок мережі у користувацьких звітах про помилки.<br/>2. Нове: використовуйте Системний DNS для неделегованих доменних імен, якщо провайдер застосовує політику Запобігання витоку DNS.<br/> 3. Покращення: підключення WireGuard з подвійним стеком (IPv4 + IPv6).<br/> 4. Покращення: уникайте блокування елементів інтерфейсу користувача, коли мережа не відповідає.<br/> 5. Виправлення: Час очікування з’єднання з увімкненою розширеною фільтрацією DNS.<br/> 6. Виправлення: Кінцеві точки вузлів WireGuard з доменними іменами залежать від змін у мережі.<br/><br/> <a href=https://svc.rethinkdns.com/r/translate>Допоможіть перекласти цей застосунок</a>]]></string>
     <string name="orbot_explanation" translatable="true">Orbot – це безплатний застосунок-проксі, який дає змогу іншим застосункам <u>безпечніше</u> використовувати Інтернет. \nOrbot використовує <u>Tor</u> для шифрування вашого Інтернет-трафіку, що допомагає вам <u>обійти цензуру</u> та захиститися від форм <u>мережевого спостереження</u>, які загрожують особистій свободі та конфіденційності. \n<u>TCP Proxy</u>: Rethink пересилає до Orbot лише TCP-сегменти посилань <i>доданих</i> застосунків. \n<u>Http Proxy</u>; Rethink <i>встановлює</i> тунель HTTP ПІДКЛЮЧЕННЯ до Orbot і пересилає лише TCP-сегменти посилань <i>доданих</i> застосунків.</string>
     <string name="settings_import_export_desc" translatable="true">Вручну створіть резервну копію або відновіть дані та налаштування застосунку.</string>
     <string name="settings_socks_forwarding_desc_no_app" translatable="true">Переадресація на %1$s:%2$s</string>
@@ -583,16 +583,13 @@
     <string name="cd_dns_proxy_error_text_1" translatable="true">Некоректна IP адреса</string>
     <string name="ctbs_dialog_negative_btn" translatable="true">Назад</string>
     <string name="hs_download_positive_default" translatable="true">Добре</string>
-    <string name="dns_btm_resolved_crypt" translatable="true">дозволено <u>анонімно</u> %1$s по %2$s через %3$s</string>
+    <string name="dns_btm_resolved_crypt" translatable="true">дозволено &lt;u&gt;анонімно&lt;/u&gt; %1$s по %2$s через %3$s</string>
     <string name="ci_dialog_desc" translatable="true">Дозволити ОБІЙТИ або ЗАБЛОКУВАТИ: IP-адресу, IP-підмережу (діапазон), порт. Приклади: 10.10.10.10, 10.1.1.*, 10.2.2/24, ff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">Обходить DNS &amp; Firewall</string>
     <string name="http_proxy_dialog_desc" translatable="true">Налаштуйте URL-адресу форми, &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt;. Приклад: http://proxy.example.com:8080/</string>
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[This connection was allowed because the <i>Для програми-джерела</i> налаштовано <i>обхід правил DNS та брандмауера</i>.<br/><br/> Щоб змінити, перейдіть на екран <i>Брандмауер для конкретної програми</i>.]]></string>
     <string name="settings_pcap_heading" translatable="true">Перех-ня пакетів</string>
-    <string name="firewall_card_text_active" translatable="true">%1$s заблоковані
-\n%2$s обходять 
-\n%3$s виключені
-\n%4$s ізольовані</string>
+    <string name="firewall_card_text_active" translatable="true">%1$s заблоковані \n%2$s обходять \n%3$s виключені \n%4$s ізольовані</string>
     <string name="contributors_dialog_title" translatable="true">Автори</string>
     <string name="cd_dns_proxy_mode_internal" translatable="true">Внутрішній</string>
     <string name="cd_dns_proxy_mode_external" translatable="true">Зовнішній</string>
@@ -901,7 +898,7 @@
     <string name="ci_blocked_initial" translatable="true">Б</string>
     <string name="ci_delete" translatable="true">видалити</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen" translatable="true">Очистити log-журнали</string>
-    <string name="bsdl_block_desc" translatable="true">Заблокувати, довіряти<u>цьому домену</u></string>
+    <string name="bsdl_block_desc" translatable="true">Заблокувати, довіряти&lt;u&gt;цьому домену&lt;/u&gt;</string>
     <string name="notif_download_failure_content" translatable="true">Не вдалося завантажити. Спробуйте ще раз.</string>
     <string name="notif_download_success_content" translatable="true">Вдало завантажено.</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen" translatable="true">Блокування контенту для дорослих та піратського контенту, онлайн-гемблінгу (азартні ігри) та сайтів знайомств, а також соціальних мереж.</string>
