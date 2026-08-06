@@ -33,7 +33,7 @@
     <string name="dns_proxy_dialog_message_no_app">Dirección IP: %1$s \n \nNúmero de puerto: %2$s</string>
     <string name="dns_proxy_dialog_header_dns">Añadir proxy DNS</string>
     <string name="cd_toast_added">Dominio añadido con éxito</string>
-    <string name="whats_new_version_update">&lt;b&gt;Que no cunda el pánico 2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Nuevo: Captura de errores del motor de red en los informes de errores de los usuarios.&lt;br/&gt; 2. Nuevo: use el DNS del sistema para nombres de dominio no delegados si la opción Evitar fugas de DNS está activada.&lt;br/&gt; 3. Mejora: Conectividad WireGuard de doble pila (IPv4 + IPv6).&lt;br/&gt; 4. Mejora: Evite bloquear los elementos de la interfaz de usuario cuando el motor de red no responde.&lt;br/&gt; 5. Corrección: Tiempos de espera de conexión con el filtrado de DNS avanzado activado.&lt;br/&gt; 6. Corrección: Los terminales de pares de WireGuard con nombres de dominio se bloquean en los cambios de red.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Help traducir esta aplicación&lt;/a&gt;</string>
+    <string name="whats_new_version_update" translatable="false"><![CDATA[<b>Que no cunda el pánico 2</b><br/><br/> 1. Nuevo: Captura de errores del motor de red en los informes de errores de los usuarios.<br/> 2. Nuevo: use el DNS del sistema para nombres de dominio no delegados si la opción Evitar fugas de DNS está activada.<br/> 3. Mejora: Conectividad WireGuard de doble pila (IPv4 + IPv6).<br/> 4. Mejora: Evite bloquear los elementos de la interfaz de usuario cuando el motor de red no responde.<br/> 5. Corrección: Tiempos de espera de conexión con el filtrado de DNS avanzado activado.<br/> 6. Corrección: Los terminales de pares de WireGuard con nombres de dominio se bloquean en los cambios de red.<br/><br/> <a href=https://svc.rethinkdns.com/r/translate>Help traducir esta aplicación</a>]]></string>
     <string name="dc_dns_leaks_desc">Cuando está activado, Rethink captura todos los paquetes en el puerto 53 y los reenvía a un punto de acceso DNS establecido por el usuario</string>
     <string name="about_settings_app_info">Información de la aplicación</string>
     <string name="settings_orbot_disabled_error">Desactive el proxy HTTP(S) y/o SOCKS5 para continuar con la configuración de Tor-como-un-proxy.</string>
@@ -189,7 +189,7 @@
     <string name="dns_btm_sheet_dialog_ips"><Data><![CDATA[ %1$s %2$s <br/>]]></Data></string>
     <string name="dns_btm_sheet_chip">+%1$s Otras IPs</string>
     <string name="dns_btm_sheet_chip_no_answer">Sin respuesta</string>
-    <string name="dns_btm_resolved_crypt">resuelto <u>de forma anónima</u> %1$s por %2$s a través de %3$s</string>
+    <string name="dns_btm_resolved_crypt">resuelto &lt;u&gt;de forma anónima&lt;/u&gt; %1$s por %2$s a través de %3$s</string>
     <string name="dns_btm_resolved_doh">resuelto %1$s por %2$s</string>
     <string name="dns_btm_resolved_doh_no_server">resuelto %1$s</string>
     <string name="hs_download_positive_default">aceptar</string>
@@ -416,10 +416,7 @@
     <string name="settings_app_list_default_app">Ninguna</string>
     <string name="settings_socks_forwarding_desc">Reenviando a %1$s:%2$s, %3$s</string>
     <string name="settings_socks_forwarding_desc_no_app">Reenviando a %1$s:%2$s</string>
-    <string name="firewall_card_text_active">%1$s bloqueados
-\n%2$s omitidos
-\n%3$s excluidos
-\n%4$s aislados</string>
+    <string name="firewall_card_text_active">%1$s bloqueados \n%2$s omitidos \n%3$s excluidos \n%4$s aislados</string>
     <string name="settings_socks5_dialog_hint_ip">Dirección IP</string>
     <string name="settings_theme_dialog_themes_2">Claro</string>
     <string name="settings_theme_dialog_themes_3">Oscuro</string>
@@ -915,7 +912,7 @@
     <string name="include_all_app_wg_dialog_title">Incluir todas las aplicaciones</string>
     <string name="add_peer" translatable="true">Añadir par</string>
     <string name="exclude_all_app_wg_dialog_title">Excluir todas las aplicaciones</string>
-    <string name="exclude_all_app_wg_dialog_desc">¿Excluir todas las aplicaciones de este túnel\?</string>
+    <string name="exclude_all_app_wg_dialog_desc">¿Excluir todas las aplicaciones de este túnel?</string>
     <string name="wireguard_enabled_failure">Detener otros proxies activos para habilitar WireGuard</string>
     <string name="wireguard_no_config_msg">No hay VPNs WireGuard. Añade alguna para empezar.</string>
     <string name="include_all_app_wg_dialog_desc">¿Tunelizar todas las aplicaciones a través de este túnel?</string>
