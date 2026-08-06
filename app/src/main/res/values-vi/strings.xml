@@ -270,7 +270,7 @@
     <string name="title_about" translatable="true">About</string>
     <string name="download_update_dialog_trylater_message" translatable="true">Không thể thực hiện cập nhật ngay bây giờ, vui lòng thử lại sau.</string>
     <string name="search_rethinkplus_file_tag" translatable="true"><font size="12">Tìm kiếm danh sách chặn</font></string>
-    <string name="whats_new_version_update" translatable="true">&lt;b&gt;Đừng Hoảng Loạn 2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Mới: Bắt giữ các lỗi máy mạng trong báo cáo lỗi người dùng.&lt;br/&gt; 2. Mới: sử dụng DNS hệ thống cho những yêu cầu không được chuyển giao nếu cài đặt Ngăn ngừa rò rỉ DNS được BẬT.&lt;br/&gt; 3. Cải tiến: Kết nối WireGuard Dual-stack (IPv4 + IPv6).&lt;br/&gt; 4. Cải tiến: Phòng tránh việc chặn các yếu tố giao diện khi máy mạng không phản hồi.&lt;br/&gt; 5. Sửa: Kết nối hết hạn khi cài đặt Lọc DNS Nâng cao được BẬT.&lt;br/&gt; 6. Sửa: Điểm cuối ngang hàng WireGuard với tên miền bị treo khi có sự thay đổi mạng.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Giúp dịch ứng dụng này&lt;/a&gt;</string>
+    <string name="whats_new_version_update" translatable="false"><![CDATA[<b>Đừng Hoảng Loạn 2</b><br/><br/> 1. Mới: Bắt giữ các lỗi máy mạng trong báo cáo lỗi người dùng.<br/> 2. Mới: sử dụng DNS hệ thống cho những yêu cầu không được chuyển giao nếu cài đặt Ngăn ngừa rò rỉ DNS được BẬT.<br/> 3. Cải tiến: Kết nối WireGuard Dual-stack (IPv4 + IPv6).<br/> 4. Cải tiến: Phòng tránh việc chặn các yếu tố giao diện khi máy mạng không phản hồi.<br/> 5. Sửa: Kết nối hết hạn khi cài đặt Lọc DNS Nâng cao được BẬT.<br/> 6. Sửa: Điểm cuối ngang hàng WireGuard với tên miền bị treo khi có sự thay đổi mạng.<br/><br/> <a href=https://svc.rethinkdns.com/r/translate>Giúp dịch ứng dụng này</a>]]></string>
     <string name="settings_allow_bypass_desc" translatable="true">Cho phép các ứng dụng yêu cầu truy cập vào tất cả các mạng có sẵn. Các ứng dụng này có thể bỏ qua đường hầm VPN của Rethink theo yêu cầu. Một số ứng dụng hội nghị âm thanh/video như Zoom và Meet có thể cần tính năng này để hoạt động bình thường.</string>
     <string name="settings_import_export_heading" translatable="true">Sao lưu và khôi phục</string>
     <string name="settings_https_desc" translatable="true">Chuyển tiếp các kết nối tới điểm cuối HTTP(S) CONNECT.</string>
@@ -299,8 +299,8 @@
     <string name="lbl_configure" translatable="true">Cấu hình</string>
     <string name="bypass_universal" translatable="true">bỏ qua phổ quát</string>
     <string name="bypass_dns_firewall" translatable="true">bỏ qua dns &amp; tường lửa</string>
-    <string name="bsct_block_ip" translatable="true">Chặn, tin tưởng \u0020<u>địa chỉ IP này</u> cho <u>ứng dụng này</u></string>
-    <string name="bsct_block_domain" translatable="true">Chặn, tin tưởng <u>tên miền </u> cho <u>ứng dụng này </u></string>
+    <string name="bsct_block_ip" translatable="true">"Chặn, tin tưởng  &lt;u&gt;địa chỉ IP này&lt;/u&gt; cho &lt;u&gt;ứng dụng này&lt;/u&gt;"</string>
+    <string name="bsct_block_domain" translatable="true">Chặn, tin tưởng &lt;u&gt;tên miền &lt;/u&gt; cho &lt;u&gt;ứng dụng này &lt;/u&gt;</string>
     <string name="lbl_logs" translatable="true">nhật kí</string>
     <string name="pause_title_desc" translatable="true">đang nghỉ một chút…</string>
     <string name="settings_custom_downloader_heading" translatable="true">Sử dụng trình tải xuống trong ứng dụng</string>
@@ -369,7 +369,7 @@
     <string name="cd_dns_alg_heading" translatable="true">Lọc DNS nâng cao (thử nghiệm)</string>
     <string name="cd_dns_alg_desc" translatable="true">Gán IP riêng cho mỗi yêu cầu DNS.</string>
     <string name="dns_log_dialog_positive" translatable="true">Xóa nhật ký</string>
-    <string name="dns_btm_sheet_dialog_ips" translatable="true"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_ips" translatable="true"><Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
     <string name="univ_firewall_rule_4" translatable="true">Chặn UDP ngoại trừ DNS và NTP</string>
     <string name="dns_query_latency" translatable="true">%1$sms</string>
     <string name="dns_proxy_name" translatable="true">Tên proxy</string>
@@ -439,7 +439,7 @@
     <string name="contributors_dialog_title" translatable="true">Tác giả</string>
     <string name="cd_dns_crypt_dialog_desc" translatable="true">Mô tả (không bắt buộc)</string>
     <string name="ctbs_dialog_negative_btn" translatable="true">Quay lại</string>
-    <string name="dns_btm_sheet_dialog_message" translatable="true"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s danh sách chặn</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_message" translatable="true"><Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s danh sách chặn</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
     <string name="dns_btm_sheet_chip" translatable="true">+%1$s IP khác</string>
     <string name="univ_ip_delete_dialog_positive" translatable="true">Xóa tất cả</string>
     <string name="dns_btm_sheet_chip_no_answer" translatable="true">Không có câu trả lời</string>
@@ -621,7 +621,7 @@
     <string name="fapps_info_bypass_msg" translatable="true">Bỏ qua quy tắc tường lửa chung.</string>
     <string name="fapps_unmetered_unblock_dialog_message">Cho phép các kết nối trên mạng không có đồng hồ đo (WiFi) cho các ứng dụng <i>được liệt kê</i>\?</string>
     <string name="fapps_metered_block_dialog_title" translatable="true">Chặn trên mạng có đồng hồ đo</string>
-    <string name="dns_btm_resolved_crypt" translatable="true">đã được giải mã <u>ẩn danh</u> %1$s bởi %2$s thông qua %3$s</string>
+    <string name="dns_btm_resolved_crypt" translatable="true">đã được giải mã &lt;u&gt;ẩn danh&lt;/u&gt; %1$s bởi %2$s thông qua %3$s</string>
     <string name="univ_firewall_rule_5" translatable="true">Chặn khi DNS bị bỏ qua</string>
     <string name="app_ip_domain_rules_desc" translatable="true">Chỉnh sửa quy tắc IP / Tên miền theo ứng dụng.</string>
     <string name="fapps_unmetered_block_dialog_title" translatable="true">Chặn trên mạng không có đồng hồ đo</string>
