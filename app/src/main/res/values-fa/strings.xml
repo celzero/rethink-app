@@ -88,8 +88,8 @@
     <string name="default_dns_name" translatable="true">RDNS پیش فرض</string>
     <string name="dns_query_clear_logs_title" translatable="true">همه گزارش‌های DNS حذف شوند؟</string>
     <string name="bsct_app_info" translatable="true">اطلاعات برنامه</string>
-    <string name="bsct_block_ip" translatable="true">مسدود کنید، به <u>این IP</u> برای <u>این برنامه</u> اعتماد کنید</string>
-    <string name="bsct_block_domain" translatable="true">برای <u>این برنامه</u> دامنه(های) <u/> را مسدود کنید، اعتماد کنید</string>
+    <string name="bsct_block_ip" translatable="true">مسدود کنید، به &lt;u&gt;این IP&lt;/u&gt; برای &lt;u&gt;این برنامه&lt;/u&gt; اعتماد کنید</string>
+    <string name="bsct_block_domain" translatable="true">برای &lt;u&gt;این برنامه&lt;/u&gt; دامنه(های) &lt;u/&gt; را مسدود کنید، اعتماد کنید</string>
     <string name="bsct_conn_block_desc" translatable="true">%1$s توسط %2$s مسدود شد</string>
     <string name="bsct_conn_desc_blocked" translatable="true">مسدود شده در %1$s %2$s</string>
     <string name="always_on_dialog" translatable="true">\"VPN همیشه روشن\" در این دستگاه فعال است. برای شروع Rethink، لطفاً به برنامه تنظیمات بروید و «VPN همیشه روشن» را غیرفعال کنید.</string>
@@ -104,7 +104,7 @@
     <string name="status_protected_with_tor" translatable="true">محافظت شده توسط تور</string>
     <string name="alert_permission_accessibility" translatable="true">مجوز-دسترسی</string>
     <string name="dns_query_clear_logs_message" translatable="true">این عمل گزارش‌های DNS روی دستگاه را حذف می‌کند و برگشت پذیر نیست. آیا می خواهید ادامه دهید؟</string>
-    <string name="bsct_block" translatable="true">مسدود کردن، دور زدن، مستثنی کردن، انزوای <u>این برنامه</u></string>
+    <string name="bsct_block" translatable="true">مسدود کردن، دور زدن، مستثنی کردن، انزوای &lt;u&gt;این برنامه&lt;/u&gt;</string>
     <string name="exclude" translatable="true">مستثنی</string>
     <string name="always_on_dialog_heading" translatable="true">VPN همیشه روشن را غیرفعال کنید</string>
     <string name="untracked" translatable="true">ردیابی نشده</string>
@@ -112,9 +112,7 @@
 \n
 \nRethink هیچ اطلاعاتی را جمع آوری نکرده و به هیچ وجه از شما جاسوسی نمی کند.</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">متصل به DNS و دیوار آتش Rethink</string>
-    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">سرویس دسترسی RethinkDNS متوقف شده یا از کار افتاده است. <i><b>به تنظیمات رفته و RethinkDNS را اجباراً متوقف کنید</b></i> و دوباره آن را برای استفاده از <i>ویژگی مسدود کردن هر برنامه‌ای که از آن</i> استفاده نمی‌کنید، راه‌اندازی کنید.
-\n
-\nRethinkDNS از سرویس دسترسی برای ردیابی برنامه هایی که در حال استفاده هستند (پیش زمینه) در برابر برنامه هایی که در حال استفاده نیستند (پس زمینه) استفاده می کند.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">سرویس دسترسی RethinkDNS متوقف شده یا از کار افتاده است. <i><b>به تنظیمات رفته و RethinkDNS را اجباراً متوقف کنید</b></i> و دوباره آن را برای استفاده از <i>ویژگی مسدود کردن هر برنامه‌ای که از آن</i> استفاده نمی‌کنید، راه‌اندازی کنید. \n \nRethinkDNS از سرویس دسترسی برای ردیابی برنامه هایی که در حال استفاده هستند (پیش زمینه) در برابر برنامه هایی که در حال استفاده نیستند (پس زمینه) استفاده می کند.</string>
     <string name="bsct_conn_rule_explanation" translatable="true">&lt;u&gt;#1&lt;/u&gt;: اتصال یک برنامه به اینترنت را مسدود می‌کند.\n.&lt;/u&gt;&lt;u&gt;#2&lt;/u&gt;: اتصال هر برنامه ای را به یک IP خاص مسدود می کند.\n.&lt;u&gt;#3&lt;/u&gt;: وقتی دستگاه قفل است، همه اتصالات را مسدود می‌کند (دیوار آتش کلی).\n.&lt;u&gt;#4&lt;/u&gt;: هر برنامه ای را که استفاده نمی شود، مسدود می کند (دیوار آتش کلی).\n.&lt;u&gt;#5&lt;/u&gt;: هنگامی که منبع برنامه ناشناخته باشد، اتصالات را مسدود می کند (دیوار آتش کلی). \n.&lt;u&gt;#6&lt;/u&gt;: تمام ترافیک UDP به جز DNS (دیوار آتش کلی) را مسدود می کند.\n.&lt;u&gt;#7&lt;/u&gt;: هنگامی که DNS دور زده می‌شود، اتصالات را مسدود کنید (دیوار آتش کلی).</string>
     <string name="always_on_dialog_stop_message" translatable="true">VPN همیشه روشن برای Rethink فعال است. آیا مطمئنید که در هر صورت می‌خواهید Rethink را متوقف کنید؟</string>
     <string name="always_on_dialog_positive" translatable="true">توقف</string>
@@ -216,9 +214,7 @@
     <string name="orbot_bs_status_3" translatable="true">ارسال %1$s به Orbot، پروکسی HTTP نیز تنظیم شده است.</string>
     <string name="orbot_stop_dialog_title" translatable="true">مداخله دستی لازم است</string>
     <string name="orbot_app_issue" translatable="true">Orbot اجرا نشد. آیا نصب شده است؟</string>
-    <string name="orbot_stop_dialog_message_combo" translatable="true">%1$s
-\n
-\n%2$s</string>
+    <string name="orbot_stop_dialog_message_combo" translatable="false">%1$s \n \n%2$s</string>
     <string name="orbot_status_arg_2" translatable="true">TCP</string>
     <string name="orbot_title" translatable="true">Orbot و پروکسی ها</string>
     <string name="orbot_stop_dialog_dns_message" translatable="true">RethinkDNS برای ارسال DNS queries به Orbot تنظیم شده است. در صورت نیاز تغییر دهید.</string>
