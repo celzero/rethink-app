@@ -16,7 +16,7 @@
      required=false /> — the standard Android TV declarations so the
      Play Store / Android TV launcher recognise this APK as a TV app.
 
-  2. <activity com.ezelab.rethinktv.ui.TvHomeActivity ...> with
+  2. <activity com.celzero.bravedns.tv.ui.TvHomeActivity ...> with
      LEANBACK_LAUNCHER + LAUNCHER intent filters — the TV-specific
      launcher entry. LAUNCHER is included so the activity is also
      reachable from the standard launcher if the .tv APK happens to
@@ -57,7 +57,7 @@
           can reach it from the standard app drawer.
         -->
         <activity
-            android:name="com.ezelab.rethinktv.ui.TvHomeActivity"
+            android:name="com.celzero.bravedns.tv.ui.TvHomeActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:taskAffinity=""
