@@ -30,7 +30,6 @@ import com.celzero.bravedns.util.LogLifespan
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import com.celzero.bravedns.R
 import com.celzero.bravedns.util.Utilities
 import com.google.common.util.concurrent.ListenableFuture
 import java.util.concurrent.ExecutionException

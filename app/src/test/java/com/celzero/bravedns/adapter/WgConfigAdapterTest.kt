@@ -342,7 +342,7 @@ class WgConfigAdapterTest : KoinTest {
 
         // Test getDnsStatus with String parameter - SUSPEND FUNCTION
         val dnsStatus = VpnController.getDnsStatus("1001")
-        assertEquals("Expected DNS status", 1L, dnsStatus)
+        assertEquals("Expected DNS status", 1, dnsStatus)
     }
 
     // === DATA MODEL TESTS ===

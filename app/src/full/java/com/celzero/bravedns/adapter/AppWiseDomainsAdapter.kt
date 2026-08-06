@@ -73,12 +73,16 @@ class AppWiseDomainsAdapter(
                 override fun areItemsTheSame(
                     oldConnection: AppConnection,
                     newConnection: AppConnection
-                ) = oldConnection == newConnection
+                ): Boolean =
+                    oldConnection.uid == newConnection.uid &&
+                        oldConnection.ipAddress == newConnection.ipAddress &&
+                        oldConnection.appOrDnsName == newConnection.appOrDnsName
+
 
                 override fun areContentsTheSame(
                     oldConnection: AppConnection,
                     newConnection: AppConnection
-                ) = oldConnection == newConnection
+                ): Boolean = oldConnection == newConnection
             }
 
         private const val TAG = "AppWiseDomainsAdapter"

@@ -644,15 +644,18 @@ class InAppBillingHandlerTest : KoinTest {
     }
 
     @Test
-    fun `queryEntitlementFromServer returns purchase with zeroed expiry on failure without linked token`() = runTest {
+    fun `queryEntitlementFromServer preserves purchase on failure without linked token`() = runTest {
         val purchase = makePurchaseDetail("prd-1", payload = "old-payload", expiryTime = 5000L)
         coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } returns
             QueryEntitlementResult.Failure(purchase, null)
 
         val result = InAppBillingHandler.queryEntitlementFromServer("acc-1", "did-1", purchase)
 
-        assertEquals(0L, result.expiryTime)
-        assertEquals("", result.payload)
+        // A business error (Failure) is NOT a definitive expiry; the original purchase must be
+        // preserved so the local billing window remains the authoritative gate. Only
+        // QueryEntitlementResult.Expired zeroes the payload/expiry.
+        assertEquals(5000L, result.expiryTime)
+        assertEquals("old-payload", result.payload)
     }
 
     // =========================================================================
