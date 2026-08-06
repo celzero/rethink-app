@@ -16,7 +16,7 @@
     <string name="finish">Fertig</string>
     <string name="slide_2_desc">Rethink ist das einfachste Mittel, um Netzwerkaktivitäten zu überwachen, Internetzensur zu umgehen und Apps auf deinem Android-Gerät mit einer Firewall einzudämmen.</string>
     <string name="slide_1_desc">Rethink ist eine Open-Source-Software, die vom Mozilla Builders MVP-Programm und der FOSS United Foundation unterstützt wird.</string>
-    <string name="rdns_plus">RDNS Plus</string>
+    <string name="rdns_plus" translatable="false">RDNS Plus</string>
     <string name="block">blockieren</string>
     <string name="untracked">ungetrackt</string>
     <string name="dns_mode_notification_title">Geschützt! Verbunden mit schnellem und sicherem DNS.</string>
@@ -75,17 +75,17 @@
     <string name="always_on_dialog_positive">Beenden</string>
     <string name="firewall_act_network_monitor_tab">Netzwerk</string>
     <string name="dns_act_configure_tab">Konfigurieren</string>
-    <string name="doh_custom_url_remove_dialog_title">DoH-Endpunkt löschen\?</string>
+    <string name="doh_custom_url_remove_dialog_title">DoH-Endpunkt löschen?</string>
     <string name="doh_custom_url_remove_dialog_message">Den Endpunkt für DNS-over-HTTPS (DoH) aus der gespeicherten Konfiguration löschen.</string>
     <string name="doh_custom_url_remove_success">Endpunkt gelöscht.</string>
     <string name="dns_crypt_custom_url_remove_dialog_title">DNSCrypt-Resolver löschen?</string>
     <string name="dns_crypt_relay_remove_success">DNSCrypt-Relay gelöscht.</string>
-    <string name="dns_proxy_remove_dialog_title">DNS-Proxy löschen\?</string>
+    <string name="dns_proxy_remove_dialog_title">DNS-Proxy löschen?</string>
     <string name="dns_proxy_remove_dialog_message">DNS-Proxy aus der gespeicherten Konfiguration löschen.</string>
     <string name="dns_crypt_url_remove_dialog_message">Den DNSCrypt-Resolver aus der gespeicherten Konfiguration löschen.</string>
     <string name="dns_crypt_url_remove_success">DNSCrypt-Resolver gelöscht.</string>
-    <string name="dns_crypt_relay_remove_dialog_title">DNSCrypt-Relay löschen\?</string>
-    <string name="local_blocklist_download_desc">Blocklisten herunterladen (ca. 60 MB), um diese Funktion zu nutzen\?</string>
+    <string name="dns_crypt_relay_remove_dialog_title">DNSCrypt-Relay löschen?</string>
+    <string name="local_blocklist_download_desc">Blocklisten herunterladen (ca. 60 MB), um diese Funktion zu nutzen?</string>
     <string name="dns_proxy_remove_success">DNS-Proxy gelöscht.</string>
     <string name="configure_dns_connected_doh_status">DNS über HTTPS</string>
     <string name="download_update_dialog_title">Neues Update!</string>
@@ -122,10 +122,10 @@
     <string name="orbot_http_desc">Baut einen HTTP-CONNECT-Tunnel zu Orbot auf.</string>
     <string name="orbot_stop_dialog_message">Rethink hat aufgehört Verbindungen zu Orbot weiterzuleiten, aber Orbot läuft vielleicht noch im Hintergrund.</string>
     <string name="orbot_explanation">Orbot ist eine kostenlose Proxy-App, die es anderen Apps ermöglicht, das Internet <u>sicherer</u> zu nutzen.\nOrbot verwendet <u>Tor</u>, um deinen Internetverkehr zu verschlüsseln, was dir dabei hilft, <u>Zensur zu umgehen</u> und dich gegen Formen der <u>Netzwerküberwachung</u> zu verteidigen, die die persönliche Freiheit und Privatsphäre bedrohen.\n<u>TCP Proxy</u>: Rethink leitet nur TCP-Verbindungen von <i>eingeschlossenen</i> Apps an Orbot weiter.\n<u>HTTP Proxy</u>: Rethink <i>stellt</i> einen HTTP CONNECT-Tunnel zu Orbot <i>her</i> und leitet nur TCP-Verbindungen von <i>eingeschlossenen</i> Apps weiter.</string>
-    <string name="orbot_install_dialog_title">Orbot installieren\?</string>
+    <string name="orbot_install_dialog_title">Orbot installieren?</string>
     <string name="settings_orbot_desc">Orbot im nicht-VPN-Modus mit HTTPS/SOCKS5.</string>
     <string name="private_dns_dialog_positive">Einstellungen öffnen</string>
-    <string name="univ_firewall_dialog_title">IP-Regel löschen\?</string>
+    <string name="univ_firewall_dialog_title">IP-Regel löschen?</string>
     <string name="univ_firewall_dialog_message">Das Löschen dieser Regel würde jeder Anwendung erlauben, sich mit dieser IP zu verbinden. Möchtest du fortfahren?</string>
     <string name="blocklist_update_check_failure">Ein Fehler ist aufgetreten. Versuche es später noch einmal!</string>
     <string name="refresh_complete"><!-- use dc_refresh_toast --> Neusynchronisierung der App-Liste abgeschlossen.</string>
@@ -158,14 +158,12 @@
     <string name="settings_https_desc">Weiterleitung von Verbindungen zum HTTP(S) CONNECT-Endpunkt.</string>
     <string name="orbot_bs_status_trying_connect">Orbot einrichten…</string>
     <string name="orbot_stop_dialog_dns_message">Rethink ist so eingerichtet, dass DNS-Anfragen an Orbot weitergeleitet werden. Ändere dies nach Bedarf.</string>
-    <string name="orbot_stop_dialog_message_combo">%1$s
-\n
-\n%2$s</string>
+    <string name="orbot_stop_dialog_message_combo" translatable="false">%1$s \n \n%2$s</string>
     <string name="settings_orbot_notification_content">Der Start von Tor-as-a-Proxy ist fehlgeschlagen. Öffne die Orbot-App, um sie manuell zu starten.</string>
     <string name="settings_ip_network_desc">Zwischen den Versionen des Internetprotokolls auswählen.</string>
     <string name="settings_socks5_desc">Verbindungen zum SOCKS5-Endpunkt weiterleiten.</string>
     <string name="orbot_bs_status_3">Weiterleitung %1$s an Orbot, HTTP Proxy ebenfalls eingestellt.</string>
-    <string name="orbot_install_activity_error">Irgendetwas ist schief gelaufen, versuchen Sie es nach einiger Zeit erneut</string>
+    <string name="orbot_install_activity_error" translatable="false">Irgendetwas ist schief gelaufen, versuchen Sie es nach einiger Zeit erneut</string>
     <string name="settings_orbot_notification_action">Orbot öffnen</string>
     <string name="orbot">Orbot</string>
     <string name="orbot_status_arg_2">TCP</string>
@@ -197,8 +195,8 @@
     <string name="orbot_bs_status_2">HTTP-Proxy ist eingestellt.</string>
     <string name="orbot_stop_dialog_title">Manueller Eingriff erforderlich</string>
     <string name="orbot_stop_dialog_negative">Orbot stoppen</string>
-    <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
-    <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
+    <string name="orbot_website_link" translatable="false">https://guardianproject.info/apps/org.torproject.android/</string>
+    <string name="orbot_download_link_website" translatable="false">https://github.com/guardianproject/orbot/releases</string>
     <string name="allow">erlauben</string>
     <string name="settings_allow_bypass_heading">Netzwerk-Sichtbarkeit aktivieren</string>
     <string name="settings_title_desc">Ein hochgradig anpassbares DNS und Firewall</string>
@@ -207,7 +205,7 @@
     <string name="bsct_app_info">App-Informationen</string>
     <string name="settings_orbot_install_desc">Tippe hier, um Orbot zu installieren</string>
     <string name="settings_socks5_vpn_disabled_error">Starte Rethink, um fortzufahren.</string>
-    <string name="orbot_app_issue">Orbot konnte nicht gestartet werden. Ist es installiert\?</string>
+    <string name="orbot_app_issue">Orbot konnte nicht gestartet werden. Ist es installiert?</string>
     <string name="settings_general_header">Allgemein</string>
     <string name="settings_network_all_networks">Alle verfügbaren Netze nutzen (experimentell)</string>
     <string name="settings_https_heading">HTTP(S) CONNECT-Proxy einrichten</string>
@@ -259,7 +257,7 @@
     <string name="settings_http_proxy_error_text4">Verbindung mit dem Host fehlgeschlagen. Versuche es erneut.</string>
     <string name="settings_ip_dialog_ipv46">Auto (experimentell)</string>
     <string name="settings_socks5_dialog_hint_password">Passwort (optional)</string>
-    <string name="settings_dns_proxy_dialog_app_desc">Die gewählte Anwendung wird vom VPN ausgeschlossen, damit es in Ihrem Namen Verbindungen projizieren kann.</string>
+    <string name="settings_dns_proxy_dialog_app_desc" translatable="false">Die gewählte Anwendung wird vom VPN ausgeschlossen, damit es in Ihrem Namen Verbindungen projizieren kann.</string>
     <string name="settings_ip_dialog_ipv6">IPv6 (experimentell)</string>
     <string name="apps_icon_content_desc">Anwendungssymbol</string>
     <string name="accessibility_notification_content">Der Rethink-Dienst für Barrierefreiheit wurde angehalten oder ist abgestürzt. Im Hintergrund laufende Apps werden nicht mehr blockiert. Tippe auf den Bildschirm, um ihn wieder zu aktivieren.</string>
@@ -293,7 +291,7 @@
     <string name="settings_ip_text_ipv4">IPv4</string>
     <string name="settings_ip_text_ipv6">IPv6</string>
     <string name="settings_ip_text_ipv46">Auto</string>
-    <string name="settings_selected_ip_desc">%1$s</string>
+    <string name="settings_selected_ip_desc" translatable="false">%1$s</string>
     <string name="settings_notification_heading">Benachrichtigungsaktion auswählen</string>
     <string name="settings_notification_desc">Aktionsschaltflächen, die mit der Rethink-Benachrichtigung angezeigt werden sollen: %1$s</string>
     <string name="settings_notification_dialog_option_2">\nDNS / DNS + Firewall:\nZeigt zwei Schaltflächen zum schnellen Umschalten zwischen dem batteriesparenden DNS-Modus und dem normalen DNS + Firewall-Modus.</string>
@@ -391,10 +389,10 @@
     <string name="rethink_sky_desc">280+ Standorte; höhere Betriebszeit; Stub-Resolver läuft auf cloudflare.com</string>
     <string name="bsrf_sub_group_heading">Untergruppe</string>
     <string name="bsrf_clear_filter">Leeren</string>
-    <string name="dc_rethink_dns">Rethink DNS</string>
-    <string name="dc_doh">DNS über HTTPS</string>
-    <string name="dc_dns_crypt">DNSCrypt</string>
-    <string name="dc_dns_proxy">DNS-Proxy</string>
+    <string name="dc_rethink_dns" translatable="false">Rethink DNS</string>
+    <string name="dc_doh" translatable="false">DNS über HTTPS</string>
+    <string name="dc_dns_crypt" translatable="false">DNSCrypt</string>
+    <string name="dc_dns_proxy" translatable="false">DNS-Proxy</string>
     <string name="lbbs_enabled">Aktiviert</string>
     <string name="lbbs_search">Domains in Blocklisten suchen</string>
     <string name="lbbs_download">Blocklisten aktualisieren</string>
@@ -410,7 +408,7 @@
     <string name="brbs_backup_dialog_positive">Sichern (Backup)</string>
     <string name="brbs_restore_dialog_message">App-Einstellungen, Netzwerk- und DNS-Protokolle aus einer Sicherungsdatei wiederherstellen. Dadurch wird die App neu gestartet.</string>
     <string name="brbs_restore_dialog_positive">Wiederherstellen</string>
-    <string name="brbs_restore_dialog_failure_message">Konnte nicht wiederhergestellt werden. Erneut versuchen\?</string>
+    <string name="brbs_restore_dialog_failure_message">Konnte nicht wiederhergestellt werden. Erneut versuchen?</string>
     <string name="brbs_restore_dialog_failure_positive">Wiederherstellen wiederholen</string>
     <string name="brbs_restore_complete_toast">Wiederherstellung abgeschlossen, Neustart der Anwendung…</string>
     <string name="brbs_backup_complete_toast">Sicherung komplett</string>
@@ -481,7 +479,7 @@
     <string name="brbs_backup_dialog_failure_title">Sicherung fehlgeschlagen</string>
     <string name="brbs_backup_dialog_failure_positive">Wiederholung der Sicherung</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s Blocklisten</string>
-    <string name="brbs_backup_dialog_failure_message">Das Backup konnte nicht erstellt werden. Erneut versuchen\?</string>
+    <string name="brbs_backup_dialog_failure_message">Das Backup konnte nicht erstellt werden. Erneut versuchen?</string>
     <string name="ada_app_dns_settings">DNS-Einstellungen</string>
     <string name="hsf_vpn_dialog_message">Rethink benötigt die Berechtigung, ein lokales VPN einzurichten, um die DNS-Anfragen des Geräts zu verschlüsseln, einen Netzwerkmonitor zu implementieren und Firewall-Regeln durchzusetzen.\n\nRethink sammelt keine Informationen und spioniert dich in keiner Weise aus.</string>
     <string name="firewall_card_text_active">%1$s blockiert
@@ -1177,8 +1175,6 @@
     <string name="vpn_policy_relaxed" translatable="true">Entspannt</string>
     <string name="vpn_policy_relaxed_desc" translatable="true">Reagiert auf interessante Verbindungsänderungen.</string>
     <string name="vpn_policy_title" translatable="true">Verbindungsänderungsrichtlinie</string>
-    <string name="use_fallback_dns_to_bypass" translatable="true">Fallback-DNS als Umgehung verwenden</string>
-    <string name="use_fallback_dns_to_bypass_desc" translatable="true">Wenn aktiviert, immer Fallback-DNS für umgangene Apps, Domains und IPs verwenden.</string>
     <string name="title_database_dump" translatable="true">Datenbank</string>
     <string name="copied_clipboard" translatable="true">Kopiert</string>
     <string name="conn_track_clear_rule_logs_title" translatable="true">Protokolle für diese Regel löschen?</string>
