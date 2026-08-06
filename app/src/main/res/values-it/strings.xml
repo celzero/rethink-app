@@ -6,8 +6,8 @@
     <string name="blocklist_update_check_not_required">Le liste dei filtri sono già all\'ultima versione.</string>
     <string name="refresh_complete"><!-- use dc_refresh_toast -->Risincronizzazione dell\'elenco delle app completata.</string>
     <string name="show_logs_disabled_network_message">Il registro delle connessioni è stato disattivato. Per riattivarlo, andare su <i>Impostazioni</i> e attivare <i>Salva connessioni sul registro.</i></string>
-    <string name="whats_new_version_update">&lt;b&gt;Partecipazione alla LAN!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Nuovo: I log DNS e IP per ogni applicazione ora hanno una nuova vista meglio ordinata.&lt;br/&gt;2. Nuovo: Impostazione per &lt;i&gt;escludere&lt;/i&gt; opzionalmente le app che fanno da proxy forwarder.&lt;br/&gt; 3. Sistemato crash con &lt;i&gt;DNS Booster&lt;/i&gt; mentre si utilizza DNSCrypt.&lt;br/&gt; 4. Sistemata la traduzioneIPv6 to IPv4 in casi specifici.&lt;br/&gt; 5. Altre correzioni di bug e miglioramenti.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Aiutare a tradurre questa applicazione&lt;/a&gt;</string>
-    <string name="orbot_explanation">Orbot è un\'applicazione proxy gratuita che consente ad altre applicazioni di utilizzare Internet in modo più <u>sicuro</u>. \nOrbot utilizza <u>Tor</u> per crittografare il traffico Internet, aiutandoti a <u>aggirare la censura</u> e a difendersi dai vari tipi di <u>sorveglianza della rete</u> che minacciano la libertà personale e la privacy. \n<u>Proxy TCP</u>: Rethink inoltra a Orbot solo le connessioni TCP di tutte le applicazioni, tranne quelle escluse. \n<u>Proxy HTTP</u>: Rethink <i>imposta</i> la proxy HTTP, ma non impone alle app di utilizzarlo. Di solito, browser come Chrome e Firefox la utilizzano. Le applicazioni che utilizzano la proxy HTTP(S) aggirano sia le regole del Firewall che del DNS.</string>
+    <string name="whats_new_version_update" translatable="false"><![CDATA[<b>Partecipazione alla LAN!</b><br/><br/> 1. Nuovo: I log DNS e IP per ogni applicazione ora hanno una nuova vista meglio ordinata.<br/>2. Nuovo: Impostazione per <i>escludere</i> opzionalmente le app che fanno da proxy forwarder.<br/> 3. Sistemato crash con <i>DNS Booster</i> mentre si utilizza DNSCrypt.<br/> 4. Sistemata la traduzioneIPv6 to IPv4 in casi specifici.<br/> 5. Altre correzioni di bug e miglioramenti.<br/><br/> <a href=https://svc.rethinkdns.com/r/translate>Aiutare a tradurre questa applicazione</a>]]></string>
+    <string name="orbot_explanation">Orbot è un\'applicazione proxy gratuita che consente ad altre applicazioni di utilizzare Internet in modo più &lt;u&gt;sicuro&lt;/u&gt;. \nOrbot utilizza &lt;u&gt;Tor&lt;/u&gt; per crittografare il traffico Internet, aiutandoti a &lt;u&gt;aggirare la censura&lt;/u&gt; e a difendersi dai vari tipi di &lt;u&gt;sorveglianza della rete&lt;/u&gt; che minacciano la libertà personale e la privacy. \n&lt;u&gt;Proxy TCP&lt;/u&gt;: Rethink inoltra a Orbot solo le connessioni TCP di tutte le applicazioni, tranne quelle escluse. \n&lt;u&gt;Proxy HTTP&lt;/u&gt;: Rethink &lt;i&gt;imposta&lt;/i&gt; la proxy HTTP, ma non impone alle app di utilizzarlo. Di solito, browser come Chrome e Firefox la utilizzano. Le applicazioni che utilizzano la proxy HTTP(S) aggirano sia le regole del Firewall che del DNS.</string>
     <string name="status_protected_with_socks5_private_dns">protetto con socks5 e dns privato</string>
     <string name="block">blocca</string>
     <string name="status_app_error">errore dell\'app</string>
@@ -202,7 +202,7 @@
     <string name="accessibility_service_description">Rethink utilizza i servizi di accessibilità per rilevare e filtrare le connessioni in background. Rethink non raccoglie ne vende alcuna informazione.</string>
     <string name="bsct_conn_desc_blocked">bloccato su %1$s %2$s</string>
     <string name="bsct_conn_block_desc_device">bloccato %1$s sul dispositivo</string>
-    <string name="bsct_conn_rule_explanation"><u>#1</u>: Blocca un\'applicazione dal connettersi a Internet. \n <u>#2</u>: Blocca tutte le applicazioni dal connettersi ad un particolare IP. \n <u>#3</u>: Blocca tutte le connessioni quando il dispositivo è bloccato (Regole universali Firewall). \n <u>#4</u>: Blocca qualsiasi app non in uso (Regole universali Firewall). \n <u>#5</u>: Blocca le connessioni quando l\'app di origine è sconosciuta (Regole universali Firewall). \n <u>#6</u>: Blocca tutto il traffico UDP tranne il DNS (Regole universali Firewall). \n <u>#7</u>: Blocca le connessioni che aggirano il DNS (Regole universali Firewall).</string>
+    <string name="bsct_conn_rule_explanation">&lt;u&gt;#1&lt;/u&gt;: Blocca un\'applicazione dal connettersi a Internet. \n &lt;u&gt;#2&lt;/u&gt;: Blocca tutte le applicazioni dal connettersi ad un particolare IP. \n &lt;u&gt;#3&lt;/u&gt;: Blocca tutte le connessioni quando il dispositivo è bloccato (Regole universali Firewall). \n &lt;u&gt;#4&lt;/u&gt;: Blocca qualsiasi app non in uso (Regole universali Firewall). \n &lt;u&gt;#5&lt;/u&gt;: Blocca le connessioni quando l\'app di origine è sconosciuta (Regole universali Firewall). \n &lt;u&gt;#6&lt;/u&gt;: Blocca tutto il traffico UDP tranne il DNS (Regole universali Firewall). \n &lt;u&gt;#7&lt;/u&gt;: Blocca le connessioni che aggirano il DNS (Regole universali Firewall).</string>
     <string name="always_on_dialog_stop_message">Hai impostato Rethink come \"VPN sempre attiva\" dalle Impostazioni del dispositivo. Sei sicuro di voler comunque arrestare Rethink?</string>
     <string name="alert_firewall_accessibility_regrant_explanation">Il servizio di accessibilità Rethink si è arrestato o si è bloccato. <i><b>Andare in Impostazioni e forzare l\'arresto di</b></i> Rethink e avviarlo nuovamente per utilizzare la funzione <i>Blocca le app non in uso</i> .
 \n
@@ -243,7 +243,7 @@
     <string name="hsf_vpn_dialog_message">Rethink ha bisogno del permesso di impostare una VPN locale per crittografare le richieste DNS del dispositivo, monitorare le connessioni di rete e applicare le regole del firewall.
 \n
 \nRethink non raccoglie informazioni né spia l\'utente in alcun modo.</string>
-    <string name="contributors_list">Il &lt;i&gt;Rethink Open Source Project&lt;/i&gt; deve la sua esistenza a questi volontari, che dedicano innumerevoli ore al suo sviluppo.&lt;br/&gt; &lt;br/&gt;🛡️ App Android &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt;&lt;a href=https://github.com/Mygod&gt;Mygod&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Motore di rete &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Resolver &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Moderatori della community &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TronSlayer&gt;Andersen&lt;/a&gt;&lt;br/&gt;&lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt;📌 Geo-IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Traduzioni &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 Icons &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Build server &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list"><![CDATA[Il <i>Rethink Open Source Project</i> deve la sua esistenza a questi volontari, che dedicano innumerevoli ore al suo sviluppo.<br/> <br/>🛡️ App Android <br/> <a href=https://github.com/BayLee4>BayLee4</a><br/> <a href=https://github.com/Ch4t4r>Ch4t4r</a><br/> <a href=https://github.com/HrBDev>HrBDev</a><br/> <a href=https://github.com/hussainmohd-a>hussainmohd-a</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/markwmuller>markwmuller</a><br/><a href=https://github.com/Mygod>Mygod</a><br/> <a href=https://github.com/Uldiniad>Uldiniad</a><br/> <a href=https://github.com/Poussinou>Poussinou</a><br/> <a href=https://github.com/pjosingh>pjosingh</a><br/> <br/>🚂 Motore di rete <br/> <a href=https://github.com/alalamav>alalamav</a><br/> <a href=https://github.com/bemasc>bemasc</a><br/> <a href=https://github.com/dmcardle>dmcardle</a><br/> <a href=https://github.com/fortuna>fortuna</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/PeterDaveHello>PeterDaveHello</a><br/> <a href=https://github.com/SeanBurford>SeanBurford</a><br/> <br/>📚 Resolver <br/> <a href=https://github.com/ahmed-tasaly>ahmed-tasaly</a><br/> <a href=https://github.com/amithm7>amithm7</a><br/> <a href=https://github.com/arfshl>arfshl</a><br/> <a href=https://github.com/badmojr>badmojr</a><br/> <a href=https://github.com/bongochong>bongochong</a><br/> <a href=https://github.com/elliotwutingfeng>elliotwutingfeng</a><br/> <a href=https://github.com/georgyo>georgyo</a><br/> <a href=https://github.com/GiddyGoatGaming>GiddyGoatGaming</a><br/> <a href=https://github.com/Harish-Narayan>Harish-Narayan</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/JakeChampion>JakeChampion</a><br/> <a href=https://github.com/MasterKia>MasterKia</a><br/> <a href=https://github.com/mtxadmin>mtxadmin</a><br/> <a href=https://github.com/neneeen>neneeen</a><br/> <a href=https://github.com/PeterDaveHello>PeterDaveHello</a><br/> <a href=https://github.com/santhosh-ponnusamy>santhosh-ponnusamy</a><br/> <a href=https://github.com/shruuub>shruuub</a><br/> <a href=https://github.com/shuvashish76>shuvashish76</a><br/> <br/>⚜ Moderatori della community <br/> <a href=https://t.me/amithm7>amithm7</a><br/> <a href=https://t.me/TronSlayer>Andersen</a><br/><a href=https://t.me/ppatra>ppatra</a><br/> <a href=https://t.me/InFamous23>InFamous23</a><br/> <a href=https://t.me/TheTr1ckst3r>TheTr1ckst3r</a><br/> <a href=https://t.me/Ch4t4r>Ch4t4r</a><br/> <a href=https://t.me/Billi_ance>Billi_ance</a><br/> <a href=https://t.me/kaliangel>kaliangel</a><br/> <a href=https://github.com/PoneyClairDeLune>PoneyClairDeLune</a><br/>📌 Geo-IP <br/> <a href=https://db-ip.com>db-ip.com</a><br/> <br/>❇ Traduzioni <br/> <a href=https://weblate.org/en/>Weblate</a><br/> <br/>🦆 Icons <br/> <a href=https://github.com/celzero/rethink-app/issues/346>Icons</a><br/> <br/>📦 Build server <br/> <a href=https://jitpack.io/>JitPack</a><br/> <a href=https://github.com/>GitHub</a><br/>]]></string>
     <string name="cd_custom_dns_proxy_default_app">Nessuno</string>
     <string name="cd_dns_proxy_error_text_3">Porta invalida</string>
     <string name="cd_dns_proxy_mode_internal">Locale</string>
@@ -520,8 +520,8 @@
     <string name="fapps_metered_block_dialog_title">Blocca su rete a consumo</string>
     <string name="fapps_metered_block_dialog_message">Bloccare le connessioni sulla rete a consumo (dati mobili) delle le applicazioni <i>elencate</i>\?</string>
     <string name="fapps_firewall_filter_hint">Mostra tutte le app</string>
-    <string name="fapps_firewall_filter_desc"><u>%1$s</u>%2$s app elencate</string>
-    <string name="fapps_firewall_filter_desc_category"><u>%1$s</u> %2$s app elencate delle categorie: %3$s</string>
+    <string name="fapps_firewall_filter_desc"><![CDATA[<u>%1$s</u>%2$s app elencate]]></string>
+    <string name="fapps_firewall_filter_desc_category"><![CDATA[<u>%1$s</u> %2$s app elencate delle categorie: %3$s]]></string>
     <string name="rules_load_failure_heading">Nota</string>
     <string name="rules_load_failure_desc">Nessuna regola del firewall trovata</string>
     <string name="rules_load_failure_reload">ricarica</string>
@@ -577,17 +577,17 @@
     <string name="firewall_rule_block_app_univ_mobile_desc">Una regola universale del firewall impostata dall\'utente ha bloccato quest\'<i>app</i> dal connettersi alla rete <i>A consumo (dati mobili)</i>.<br/><br/> Per modificarla, vai a <i>Tutte le app</i>.</string>
     <string name="firewall_rule_block_ip_univ_desc">Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>IP / Porta di destinazione</i>.<br/><br/> Per modificarla, vai a <i>Regole Universali</i>.</string>
     <string name="firewall_rule_block_ip_desc">Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>IP di destinazione</i>.<br/><br/> Per modificarla, vai a alla <i>schermata dell\'app specifica nel Firewall</i>.</string>
-    <string name="firewall_rule_bypass_universal_ip_desc">Questa connessione è stata consentita perché l\'&lt;i&gt;IP di destinazione&lt;/i&gt; è impostato in modo da aggirare tutte le regole universali del firewall.&lt;br/&gt;&lt;br/&gt; Per modificare, vai a &lt;i&gt;Regole IP&lt;i&gt; dalla scheda &lt;i&gt;Regole Universali&lt;/i&gt;.</string>
+    <string name="firewall_rule_bypass_universal_ip_desc"><![CDATA[Questa connessione è stata consentita perché l\'<i>IP di destinazione</i> è impostato in modo da aggirare tutte le regole universali del firewall.<br/><br/> Per modificare, vai a <i>Regole IP<i> dalla scheda <i>Regole Universali</i>.]]></string>
     <string name="firewall_rule_device_lock_desc">Questa connessione è stata bloccata perché <i>il dispositivo era bloccato</i> in quel momento.<br/><br/> Per modificare questa impostazione, vai a <i>Regole Universali</i>.</string>
     <string name="firewall_rule_unknown_desc">Questa connessione è stata bloccata perché non è stato possibile determinarne <i>l\'app d\'origine</i>.<br/><br/> Per modificare questa impostazione, vai a <i>Regole Universali</i>.</string>
     <string name="firewall_rule_foreground_desc">Questa connessione è stata bloccata perché l\'app d\'origine <i>non era in primo piano</i>.<br/><br/> Per modificare questa impostazione, vai a <i>Regole Universali</i>.</string>
     <string name="firewall_rule_block_udp_ntp_desc">Una regola del firewall impostata dall\'utente ha bloccato questa connessione <i>UDP</i>.<br/><br/> Per modificarla, vai a <i>Regole Universali</i>.</string>
     <string name="firewall_rule_block_dns_bypass_desc">Questa connessione è stata bloccata perché <i>l\'app d\'origine</i> ha aggirato il DNS scelto dall\'utente.<br/><br/> Per modificare questa impostazione, vai a <i>Regole Universali</i>.</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc">Questa connessione è stata consentita perché l\'<i>app d\'origine</i> è impostata su <i>aggirare le regole universali del firewall</i>.<br/><br/> Per modificarla, vai a alla <i>schermata dell\'app specifica nel Firewall</i>.</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc">Questa connessione DNS è stata reindirizzata all\'endpoint DNS scelto dall\'utente.<br/><br/> Per modificare, disabilita <i>Previeni aggiramenti del DNS</i> dalla schermata <i>Configura</i> del DNS.</string>
-    <string name="firewall_rule_exempt_orbot_setup_desc">Questa connessione è stata consentita perché era in corso la configurazione in un click di <i> Tor-come-proxy</i> tramite Orbot.</string>
-    <string name="firewall_rule_block_http_desc">Questa connessione è stata bloccata perché probabilmente utilizzava <i>HTTP non sicuro</i>.<br/><br/> Per modificare, vai a <i>Regole Universali</i>.</string>
-    <string name="firewall_rule_global_lockdown_desc">Questa connessione è stata bloccata perché è attivata la quarantena universale.<br/><br/> Per modificare, vai a <i>Regole Universali</i>.</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc"><![CDATA[Questa connessione è stata consentita perché l\'<i>app d\'origine</i> è impostata su <i>aggirare le regole universali del firewall</i>.<br/><br/> Per modificarla, vai a alla <i>schermata dell\'app specifica nel Firewall</i>.]]></string>
+    <string name="firewall_rule_exempt_dns_proxied_desc"><![CDATA[Questa connessione DNS è stata reindirizzata all\'endpoint DNS scelto dall\'utente.<br/><br/> Per modificare, disabilita <i>Previeni aggiramenti del DNS</i> dalla schermata <i>Configura</i> del DNS.]]></string>
+    <string name="firewall_rule_exempt_orbot_setup_desc"><![CDATA[Questa connessione è stata consentita perché era in corso la configurazione in un click di <i> Tor-come-proxy</i> tramite Orbot.]]></string>
+    <string name="firewall_rule_block_http_desc"><![CDATA[Questa connessione è stata bloccata perché probabilmente utilizzava <i>HTTP non sicuro</i>.<br/><br/> Per modificare, vai a <i>Regole Universali</i>.]]></string>
+    <string name="firewall_rule_global_lockdown_desc"><![CDATA[Questa connessione è stata bloccata perché è attivata la quarantena universale.<br/><br/> Per modificare, vai a <i>Regole Universali</i>.]]></string>
     <string name="new_app_bulk_notification_title">Attenzione</string>
     <string name="new_app_bulk_notification_content">Rethink ha bloccato %1$s nuove applicazioni. Tocca per visualizzare o modificare.</string>
     <string name="new_app_notification_content">Rethink ha bloccato l\'app installata di recente, %1$s.</string>
@@ -641,7 +641,7 @@
     <string name="ada_noapp_dialog_title">Nessuna app</string>
     <string name="ada_noapp_dialog_message">Impossibile trovare le informazioni sull\'app. È stata disinstallata\?</string>
     <string name="ada_noapp_dialog_positive">Okay</string>
-    <string name="ada_firewall_status">Quest\'app <b><i>%1$s</i></b>.</string>
+    <string name="ada_firewall_status"><![CDATA[Quest\'app <b><i>%1$s</i></b>.]]></string>
     <string name="ada_ip_connection_count">Connessioni effettuate a %1$s indirizzi/o IP</string>
     <string name="ada_ip_connection_count_zero">0 indirizzi IP</string>
     <string name="ada_ip_no_connection">Nessun registro di rete per quest\'app.</string>
@@ -706,9 +706,7 @@
     <string name="about_privacy_policy">Leggi l\'informativa sulla privacy</string>
     <string name="private_dns_error">Impossibile avviare schermata DNS privato.</string>
     <string name="private_dns_dialog_heading">Disattiva DNS privato</string>
-    <string name="private_dns_dialog_desc">Le impostazioni DNS di Rethink sono sovrascritte dal DNS privato di Android.
-\n
-\nPer utilizzare il DNS di Rethink vai nelle Impostazioni di Android e disattiva \"DNS privato\".</string>
+    <string name="private_dns_dialog_desc">Le impostazioni DNS di Rethink sono sovrascritte dal DNS privato di Android. \n \nPer utilizzare il DNS di Rethink vai nelle Impostazioni di Android e disattiva \"DNS privato\".</string>
     <string name="private_dns_dialog_positive">Vai alle Impostazioni</string>
     <string name="relative_time_today">Oggi</string>
     <string name="relative_time_yesterday">Ieri</string>
@@ -729,8 +727,8 @@
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Blocca malware, ransomware, cryptoware, phisher e altre minacce.</string>
     <string name="rt_filter_parent_selected">Selezionati</string>
     <string name="rt_filter_hint">Mostra <u>tutte</u> le blocklist</string>
-    <string name="rt_filter_desc">Liste dei filtri <u>%1$s</u> mostrate</string>
-    <string name="rt_filter_desc_subgroups">Liste dei filtri <u>%1$s</u> nel sottogruppo %3$s del gruppo %2$s mostrate</string>
+    <string name="rt_filter_desc"><![CDATA[Liste dei filtri <u>%1$s</u> mostrate]]></string>
+    <string name="rt_filter_desc_subgroups"><![CDATA[Liste dei filtri <u>%1$s</u> nel sottogruppo %3$s del gruppo %2$s mostrate]]></string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s blocklist</string>
     <string name="about_translate_link" translatable="false">https://svc.rethinkdns.com/r/translate</string>
     <string name="about_privacy_policy_link" translatable="false">https://www.rethinkdns.com/privacy</string>
@@ -773,8 +771,8 @@
     <string name="lbl_apply" translatable="true">Applica</string>
     <string name="firewall_rule_trusted_domain" translatable="true">Dominio attendibile (App)</string>
     <string name="firewall_rule_block_domain" translatable="true">Dominio (App)</string>
-    <string name="firewall_rule_block_domain_desc" translatable="true">Una regola del firewall impostata dall\'utente ha bloccato questo <i>dominio</i>.<br/><br/> Per modificarla, vai a alla schermata del <i>firewall specifico per le app</i>.</string>
-    <string name="firewall_rule_trusted_domain_desc" translatable="true">Questa connessione è stata consentita perché il <i>dominio</i> è impostato come attendibile.<br/><br/> Per modificarlo, accedere alla schermata del <i>firewall specifico per le app</i>.</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[Una regola del firewall impostata dall\'utente ha bloccato questo <i>dominio</i>.<br/><br/> Per modificarla, vai a alla schermata del <i>firewall specifico per le app</i>.]]></string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[Questa connessione è stata consentita perché il <i>dominio</i> è impostato come attendibile.<br/><br/> Per modificarlo, accedere alla schermata del <i>firewall specifico per le app</i>.]]></string>
     <string name="cd_no_rules_text" translatable="true">Nessuna regola dominio.</string>
     <string name="lbl_dismiss" translatable="true">Chiudi</string>
     <string name="lbl_all" translatable="true">Tutti</string>
@@ -787,7 +785,7 @@
     <string name="lbl_ip_rules" translatable="true">Regole IP</string>
     <string name="lbl_domain_rules" translatable="true">Regole dominio</string>
     <string name="bsdl_block_desc" translatable="true">Blocca, autorizza <u>questo dominio</u></string>
-    <string name="firewall_rule_dns_blocked_desc" translatable="true">Questa connessione è stata bloccata perché il dominio <i/> è bloccato dal DNS preferito dall\'utente.<br/><br/> Per modificare questo comportamento, accedere alla scheda <i>Configura DNS</i>.</string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[Questa connessione è stata bloccata perché il dominio <i/> è bloccato dal DNS preferito dall\'utente.<br/><br/> Per modificare questo comportamento, accedere alla scheda <i>Configura DNS</i>.]]></string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">Aggira DNS e firewall</string>
     <string name="lbl_maybe_blocked" translatable="true">Forse bloccato</string>
     <string name="lbl_rules" translatable="true">regole</string>
@@ -828,8 +826,8 @@
     <string name="dc_setting_dns_cache_desc" translatable="true">Accorpare le richieste, memorizzare le risposte nella cache, gestire gli errori in modo resiliente</string>
     <string name="lbl_configure" translatable="true">Configura</string>
     <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Bypassare regole universale di DNS e firewall per le applicazioni <i>elencate</i>\?</string>
-    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Questa connessione è stata bloccata perché il <i>dominio</i> è impostato come bloccato nelle regole del dominio universale.<br/><br/> Per modificare questo comportamento, accedere alla scheda <i>Configura DNS</i>.</string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Questa connessione è stata consentita perché il <i>dominio</i> è impostato come attendibile nelle regole del dominio universale.<br/><br/> Per modificare questo comportamento, andare alla scheda <i>Configura DNS</i>.</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[Questa connessione è stata bloccata perché il <i>dominio</i> è impostato come bloccato nelle regole del dominio universale.<br/><br/> Per modificare questo comportamento, accedere alla scheda <i>Configura DNS</i>.]]></string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[Questa connessione è stata consentita perché il <i>dominio</i> è impostato come attendibile nelle regole del dominio universale.<br/><br/> Per modificare questo comportamento, andare alla scheda <i>Configura DNS</i>.]]></string>
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Questa connessione è stata consentita perché l\'<i>app d\'origine</i> è impostata su <i>aggira DNS e firewall</i>.<br/><br/> Per modificarla, vai a alla schermata <i>Firewall specifico per app</i>.</string>
     <string name="brbs_backup_restore_desc" translatable="true">Non funziona per tutte le versioni dell\'app o per tutti i dispositivi</string>
     <string name="bsct_block_domain" translatable="true">Blocca, autorizza <u>domini</u> per <u>questa app</u></string>
@@ -917,10 +915,677 @@
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> potrebbe causare una perdita di connettività. Modificare l\'impostazione per consentire a Rethink di utilizzare dati e altre risorse quando è in background.</string>
     <string name="dc_proxy_dns_desc" translatable="true">Non fare mai proxy di DNS su proxy come Always-on WireGuard, SOCKS5, HTTP.</string>
     <string name="lbl_notification" translatable="true">notifiche</string>
-    <string name="firewall_rule_proxied_desc" translatable="true">Questa connessione è stata inoltrata al Proxy preferito dall\'utente.<br/><br/> Per cambiare, andare su <i>Proxy</i> dalla schermata <i>Configura</i>.</string>
+    <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[Questa connessione è stata inoltrata al Proxy preferito dall\'utente.<br/><br/> Per cambiare, andare su <i>Proxy</i> dalla schermata <i>Configura</i>.]]></string>
     <string name="cd_deleted_toast" translatable="true">Cancellate tutte le regole di dominio</string>
     <string name="cd_toast_edit" translatable="true">Modificato</string>
     <string name="adv_taster_title" translatable="true">Automazione</string>
     <string name="unicode_x_sign" translatable="false"></string>
     <string name="ct_ip_port" translatable="false"></string>
+    <string name="rpn_restore_failure" translatable="false"></string>
+    <string name="bad_config_explanation_pka" translatable="true"></string>
+    <plurals name="server_count">
+    </plurals>
+    <string name="bfdm_option_auto_desc" translatable="false"></string>
+    <string name="subscription_activated" translatable="false"></string>
+    <string name="server_settings_identity_desc" translatable="false"></string>
+    <string name="lbl_reddit" translatable="false"></string>
+    <string name="bad_config_reason_invalid_key" translatable="true"></string>
+    <string name="tour_step_counter"></string>
+    <string name="parse_error_inet_network" translatable="true"></string>
+    <string name="symbol_turtle" translatable="false"></string>
+    <string name="settings_gologger_dialog_option_4" translatable="false"></string>
+    <string name="firewall_bubble_permission_denied_toast" translatable="false"></string>
+    <string name="server_settings_port_desc" translatable="false"></string>
+    <string name="about_reddit_handle" translatable="false"></string>
+    <string name="parse_error_inet_address" translatable="true"></string>
+    <string name="wg_ssid_dialog_description" translatable="true"></string>
+    <plurals name="duration_years" translatable="false">
+    </plurals>
+    <string name="close" translatable="false"></string>
+    <string name="payment_history_title" translatable="false"></string>
+    <string name="ping_testing_title" translatable="false"></string>
+    <plurals name="peer_count">
+    </plurals>
+    <string name="symbol_red_circle" translatable="false"></string>
+    <string name="lbl_mastodon" translatable="false"></string>
+    <string name="conflict_notif_body" translatable="false"></string>
+    <string name="vpn_status_disconnected" translatable="false"></string>
+    <string name="server_removal_title" translatable="false"></string>
+    <string name="proxy_rpn_desc_inactive" translatable="false"></string>
+    <string name="extend_mode_banner_desc" translatable="false"></string>
+    <string name="symbol_diamond" translatable="false"></string>
+    <string name="settings_allow_incoming_wg_packets" translatable="true"></string>
+    <string name="three_argument_colon" translatable="false"></string>
+    <string name="settings_flood_wg" translatable="false"></string>
+    <string name="crypt_adguard_desc" translatable="true"></string>
+    <string name="wireguard_description" translatable="true"></string>
+    <string name="support_category_payment" translatable="false"></string>
+    <string name="billing_annually_cancel" translatable="false"></string>
+    <string name="quad9_dns_desc" translatable="true"></string>
+    <string name="conflict_desc_consume" translatable="false"></string>
+    <string name="bfdm_heading" translatable="false"></string>
+    <string name="cd_allowed_dns_record_types_heading" translatable="false"></string>
+    <string name="settings_gologger_dialog_option_6" translatable="false"></string>
+    <string name="delete_all_events_confirmation" translatable="false"></string>
+    <string name="remaining_apps_dialog_desc" translatable="true"></string>
+    <string name="delete_all_events" translatable="false"></string>
+    <string name="symbol_unlock" translatable="false"></string>
+    <string name="cloudflare_security_dns_desc" translatable="true"></string>
+    <string name="one_time_label" translatable="false"></string>
+    <string name="server_order_empty_subtitle" translatable="false"></string>
+    <string name="tour_step_dns_title" translatable="false"></string>
+    <string name="confirm_revoke_message" translatable="false"></string>
+    <string name="tour_btn_finish"></string>
+    <string name="billing_info" translatable="false"></string>
+    <string name="payment_history_state_pending" translatable="false"></string>
+    <string name="dc_filtering_heading" translatable="true">filtraggio</string>
+    <string name="bad_config_reason_invalid_number" translatable="true"></string>
+    <string name="ci_ip_label" translatable="false"></string>
+    <string name="server_settings_dns_desc_includes" translatable="false"></string>
+    <string name="symbol_bunny" translatable="false"></string>
+    <string name="bubble_blocked_count" translatable="false"></string>
+    <string name="firewall_bubble_channel_desc" translatable="false"></string>
+    <string name="wg_apps_dialog_title_include" translatable="true"></string>
+    <string name="about_license_link" translatable="false"></string>
+    <string name="lbl_separator_dot" translatable="false"></string>
+    <string name="device_auth_error_device_id_label" translatable="false"></string>
+    <string name="emoji_antenna" translatable="false"></string>
+    <string name="tour_btn_skip"></string>
+    <string name="emoji_shield" translatable="false"></string>
+    <string name="lbl_all_apps" translatable="false"></string>
+    <string name="symbol_rocket" translatable="false"></string>
+    <string name="server_selection_sub_expires_today" translatable="false"></string>
+    <string name="rpn_restore_success" translatable="false"></string>
+    <string name="plan_5yr" translatable="false"></string>
+    <string name="vpn_not_active_dialog_desc" translatable="false"></string>
+    <string name="bfdm_option_auto_label" translatable="false"></string>
+    <string name="about_matrix_handle" translatable="false"></string>
+    <string name="smart_dns_desc" translatable="true"></string>
+    <string name="add_remove_apps" translatable="true"></string>
+    <string name="bad_extension_error" translatable="true"></string>
+    <string name="status_protected_with_rpn" translatable="false"></string>
+    <string name="rethink_terms" translatable="false"></string>
+    <string name="bfdm_option_global_desc" translatable="false"></string>
+    <string name="parse_error_integer" translatable="true"></string>
+    <string name="server_selection_proxy_unavailable" translatable="false"></string>
+    <string name="lockdown_download_message" translatable="true"></string>
+    <string name="auto_exclude_cc_row_title" translatable="false"></string>
+    <string name="custom_rules_proxy_desc" translatable="false"></string>
+    <string name="extend_mode_banner_title" translatable="false"></string>
+    <string name="support_error_empty_description" translatable="false"></string>
+    <string name="key_length_explanation_binary" translatable="true"></string>
+    <string name="setup_wireguard" translatable="true"></string>
+    <string name="tour_step_proxy_desc" translatable="false"></string>
+    <string name="conflict_desc_cancel" translatable="false"></string>
+    <string name="key_length_explanation_hex" translatable="true"></string>
+    <string name="custom_lan_ip_open_error" translatable="false"></string>
+    <string name="conflict_desc_customer" translatable="false"></string>
+    <string name="device_auth_error_email_body_greeting" translatable="false"></string>
+    <string name="crypt_relay_singapore" translatable="true"></string>
+    <string name="bug_report_delete_failed" translatable="false"></string>
+    <string name="conflict_btn_refund" translatable="false"></string>
+    <string name="device_not_registered_badge" translatable="false"></string>
+    <string name="choose_plan" translatable="false"></string>
+    <string name="country_ssid_add_new" translatable="false"></string>
+    <string name="settings_allow_incoming_wg_packets_desc" translatable="true"></string>
+    <string name="catch_all_wg_dialog_desc" translatable="true"></string>
+    <string name="tcp_keep_alive_title" translatable="true">TCP keep alive più breve</string>
+    <string name="custom_lan_ip_saved_manual" translatable="false"></string>
+    <string name="notif_channel_desc_rpn" translatable="false"></string>
+    <string name="support_attach_vpn_stats_desc" translatable="false"></string>
+    <string name="ping_ready_desc" translatable="false"></string>
+    <string name="wireguard_enabled_failure" translatable="true"></string>
+    <string name="bug_report_no_files_selected" translatable="false"></string>
+    <string name="device_auth_error_http_code" translatable="false"></string>
+    <string name="lbl_saving" translatable="true"></string>
+    <string name="lbl_dp" translatable="false"></string>
+    <string name="server_loading_dialog_status_timeout" translatable="false"></string>
+    <string name="country_ssid_icon" translatable="false"></string>
+    <string name="symbol_id" translatable="false"></string>
+    <string name="tour_debug_reset_desc" translatable="false"></string>
+    <string name="firewall_rule_temp_allow_desc" translatable="false"><![CDATA[]]></string>
+    <string name="wg_ssid_duplicate_error" translatable="false"></string>
+    <string name="add_peer" translatable="true"></string>
+    <string name="lbl_dc" translatable="false"></string>
+    <string name="device_not_registered_title" translatable="false"></string>
+    <string name="server_order_id_fmt" translatable="false"></string>
+    <string name="server_selection_sub_ends_on" translatable="false"></string>
+    <string name="cloudflare_family_dns_desc" translatable="true"></string>
+    <string name="crypt_quad9_security_desc" translatable="true"></string>
+    <string name="bubble_time_minutes_ago" translatable="false"></string>
+    <string name="settings_jumbo_packets" translatable="true"></string>
+    <string name="wireguard_disable_failure_relay" translatable="true"></string>
+    <string name="bug_report_file_deleted" translatable="false"></string>
+    <string name="progress_step_contacting_server" translatable="false"></string>
+    <string name="wg_ssid_empty_error" translatable="false"></string>
+    <string name="ping_test_button" translatable="false"></string>
+    <string name="symbol_global" translatable="false"></string>
+    <string name="price_placeholder" translatable="false"></string>
+    <string name="rpn_restore_dialog_hint" translatable="false"></string>
+    <string name="conflict_title_cancel" translatable="false"></string>
+    <string name="device_not_registered_notif_body" translatable="false"></string>
+    <string name="payment_history_summary_subtitle" translatable="false"></string>
+    <string name="catch_all_wg_dialog_title" translatable="true"></string>
+    <string name="hint_seconds" translatable="false"></string>
+    <string name="cleanbrowsing_family_dns_desc" translatable="true"></string>
+    <string name="ping_success_desc" translatable="false"></string>
+    <string name="ping_reach_hint" translatable="false"></string>
+    <string name="tour_step_proxy_title" translatable="false"></string>
+    <string name="bug_report_deselect_all" translatable="false"></string>
+    <string name="server_removed" translatable="false"></string>
+    <string name="import_error" translatable="true"></string>
+    <string name="device_auth_error_account_id_label" translatable="false"></string>
+    <string name="inapp_extend_access_btn" translatable="false"></string>
+    <string name="rpn_purchased_state" translatable="true"></string>
+    <string name="conflict_title_device" translatable="false"></string>
+    <string name="single_argument_parenthesis" translatable="false"></string>
+    <string name="support_attach_history" translatable="false"></string>
+    <string name="symbol_sky" translatable="false"></string>
+    <string name="vpn_policy_fixed" translatable="true"></string>
+    <string name="billing_no_recurring" translatable="false"></string>
+    <string name="conflict_title_ack" translatable="false"></string>
+    <string name="settings_wireguard_lockdown_mode" translatable="false"></string>
+    <string name="lockdown_download_enable_inapp" translatable="true"></string>
+    <string name="bubble_time_hours_ago" translatable="false"></string>
+    <string name="tour_debug_reset_done" translatable="false"></string>
+    <string name="country_ssid_dialog_description" translatable="false"></string>
+    <string name="server_order_desc" translatable="false"></string>
+    <string name="new_warp_invalid_config_toast" translatable="true"></string>
+    <string name="bad_config_reason_unknown_attribute" translatable="true"></string>
+    <string name="settings_gologger_dialog_option_2" translatable="false"></string>
+    <string name="device_not_registered_email_subject" translatable="false"></string>
+    <string name="custom_lan_ip_gateway" translatable="false"></string>
+    <string name="server_settings_dns_no_filters" translatable="false"></string>
+    <string name="auto_exclude_cc_loading" translatable="false"></string>
+    <string name="support_attach_vpn_stats" translatable="false"></string>
+    <string name="numeric_twenty_four" translatable="false"></string>
+    <string name="load_more" translatable="true"></string>
+    <string name="conflict_desc_revoke" translatable="false"></string>
+    <string name="ping_test_again" translatable="false"></string>
+    <string name="symbol_satellite" translatable="false"></string>
+    <string name="ping_no_proxy_title" translatable="false"></string>
+    <string name="settings_gologger_dialog_option_0" translatable="false"></string>
+    <string name="ssid_permission_explanation" translatable="true"></string>
+    <string name="firewall_bubble_permission_granted_toast" translatable="false"></string>
+    <string name="config_delete_all_dialog_desc" translatable="true"></string>
+    <string name="lbl_ipinfo_inc" translatable="false"></string>
+    <string name="wg_ssid_input_hint" translatable="true"></string>
+    <string name="lbl_client_ipv4" translatable="false"></string>
+    <string name="wg_ssid_and_mobile_err" translatable="true"></string>
+    <string name="server_selection_error_retry" translatable="false"></string>
+    <string name="rpn_restore_dialog_status_fetching" translatable="false"></string>
+    <string name="country_ssid_empty_state" translatable="false"></string>
+    <string name="auto_exclude_cc_count" translatable="false"></string>
+    <string name="lbl_search" translatable="false"></string>
+    <string name="fs_configure_logs_desc" translatable="true"></string>
+    <string name="tour_step_firewall_title" translatable="false"></string>
+    <string name="most_contacted_asn" translatable="true">Provider più contattati</string>
+    <string name="single_argument" translatable="false"></string>
+    <string name="download_ip_info_desc" translatable="true"></string>
+    <string name="lbl_connecting" translatable="false"></string>
+    <string name="lbl_hopping" translatable="false"></string>
+    <string name="revoke_subscription_note" translatable="false"></string>
+    <string name="conflict_title_customer" translatable="false"></string>
+    <string name="ac_tcp_proxy_desc" translatable="false"></string>
+    <string name="server_settings_stop_proxies" translatable="false"></string>
+    <string name="location_enable_explanation" translatable="true"></string>
+    <string name="conflict_desc_device" translatable="false"></string>
+    <string name="auto_exclude_cc_title" translatable="false"></string>
+    <string name="symbol_dollar" translatable="false"></string>
+    <string name="lbl_test" translatable="true">test</string>
+    <string name="bad_config_reason_missing_attribute" translatable="true"></string>
+    <string name="wg_ssid_type_wildcard" translatable="true"></string>
+    <string name="dc_block_unknown_desc" translatable="true"></string>
+    <string name="fs_configure_others_desc" translatable="true"></string>
+    <string name="server_removal_subtitle" translatable="false"></string>
+    <string name="payment_history_error" translatable="false"></string>
+    <string name="server_selection_clear_search" translatable="false"></string>
+    <string name="ssid_permission_error_action" translatable="true"></string>
+    <string name="emoji_pin" translatable="false"></string>
+    <string name="tombstone_app_title" translatable="true"></string>
+    <string name="key_length_explanation_base64" translatable="true"></string>
+    <string name="server_selection_no_servers" translatable="false"></string>
+    <string name="server_selection_search_hint" translatable="false"></string>
+    <string name="lbl_rdns" translatable="false"></string>
+    <string name="device_not_registered_desc" translatable="false"></string>
+    <string name="device_not_registered_master_badge" translatable="false"></string>
+    <string name="ping_failure_desc" translatable="false"></string>
+    <string name="rpn_restore_dialog_status_refreshing" translatable="false"></string>
+    <string name="tour_debug_reset_title" translatable="false"></string>
+    <string name="lbl_never" translatable="false"></string>
+    <string name="temp_allow_active" translatable="false"></string>
+    <string name="stability_program_toast" translatable="true"></string>
+    <string name="server_settings_identity_title" translatable="false"></string>
+    <string name="wireguard_disclaimer" translatable="true"></string>
+    <string name="bug_report_file_not_found" translatable="false"></string>
+    <string name="vpn_policy_sensitive" translatable="true"></string>
+    <string name="device_auth_error_id_unavailable" translatable="false"></string>
+    <string name="auto_exclude_cc_min_info" translatable="false"></string>
+    <string name="fail_open_network_title" translatable="true"></string>
+    <string name="server_selection_error_title" translatable="false"></string>
+    <string name="temp_allow_desc" translatable="false"></string>
+    <string name="save_percentage" translatable="false"></string>
+    <string name="settings_theme_dialog_themes_6" translatable="true"></string>
+    <string name="wg_ssid_type_exact" translatable="true"></string>
+    <string name="server_favourite_removed" translatable="false"></string>
+    <string name="brbs_restore_invalid_file" translatable="false"></string>
+    <string name="lbl_dot_abbr" translatable="false"></string>
+    <string name="dc_block_unknown_heading" translatable="true"></string>
+    <string name="bad_config_explanation_positive_number" translatable="true"></string>
+    <string name="bad_config_reason_missing_section" translatable="true"></string>
+    <string name="resubscribe_title" translatable="false"></string>
+    <string name="lbl_matrix" translatable="false"></string>
+    <string name="ping_failure_title" translatable="false"></string>
+    <string name="ping_partial_desc" translatable="false"></string>
+    <string name="wg_ssid_match_type_label" translatable="false"></string>
+    <string name="bfdm_option_global_label" translatable="false"></string>
+    <string name="wireguard_no_config_msg" translatable="true"></string>
+    <string name="confirm_cancel_message" translatable="false"></string>
+    <string name="rpn_troubleshoot_title" translatable="false"></string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true"></string>
+    <string name="smart_dns" translatable="true"></string>
+    <string name="new_warp_error_toast" translatable="true"></string>
+    <string name="tour_step_logs_title" translatable="false"></string>
+    <string name="symbol_black_down" translatable="false"></string>
+    <string name="bad_config_context" translatable="true"></string>
+    <string name="server_order_expires_fmt" translatable="false"></string>
+    <string name="confirm_cancel_title" translatable="false"></string>
+    <string name="server_selection_remove_message" translatable="false"></string>
+    <string name="settings_socket_buffer_size_desc" translatable="false"></string>
+    <string name="config_invalid_desc" translatable="true"></string>
+    <string name="extend_purchase_activated" translatable="false"></string>
+    <string name="price_per_month_format" translatable="false"></string>
+    <string name="payment_history_empty_subtitle" translatable="false"></string>
+    <string name="purchase_failed" translatable="false"></string>
+    <string name="support_section_attachments" translatable="false"></string>
+    <string name="vpn_policy_title" translatable="true"></string>
+    <string name="fs_configure_proxy_desc" translatable="true"></string>
+    <string name="search_event_logs" translatable="false"></string>
+    <string name="manage_on_google_play" translatable="false"></string>
+    <string name="bad_config_explanation_udp_port" translatable="true"></string>
+    <string name="two_argument_colon" translatable="false"></string>
+    <string name="verifying_purchase" translatable="false"></string>
+    <string name="conflict_btn_refund_retry" translatable="false"></string>
+    <string name="wg_mobile_only_hop_err" translatable="true"></string>
+    <string name="adv_set_experimental_desc" translatable="false"></string>
+    <string name="manage_subscription_desc" translatable="false"></string>
+    <string name="tour_step_rpn_desc" translatable="false"></string>
+    <string name="google_dns_desc" translatable="true"></string>
+    <string name="numeric_seven" translatable="false"></string>
+    <string name="retry" translatable="false"></string>
+    <string name="lbl_remaining_apps" translatable="true"></string>
+    <string name="lbl_ip" translatable="false"></string>
+    <string name="custom_lan_ip_save_error" translatable="false"></string>
+    <string name="bug_report_error_opening_file" translatable="false"></string>
+    <string name="lbl_last_handshake" translatable="false"></string>
+    <string name="something_went_wrong" translatable="false"></string>
+    <string name="most_blocked_asn" translatable="true">Provider più bloccati</string>
+    <string name="settings_jumbo_packets_desc" translatable="true"></string>
+    <string name="server_order_title" translatable="false"></string>
+    <string name="set_auto_dial_title" translatable="false"></string>
+    <string name="bad_config_reason_invalid_value" translatable="true"></string>
+    <string name="purchase_successful" translatable="false"></string>
+    <string name="symbol_ps" translatable="false"></string>
+    <string name="two_argument_space" translatable="false"></string>
+    <string name="support_privacy_note" translatable="false"></string>
+    <string name="connection_location_with_colo" translatable="false"></string>
+    <string name="symbol_sparkle" translatable="false"></string>
+    <string name="rpn_test_desc" translatable="false"></string>
+    <string name="tour_step_firewall_desc" translatable="false"></string>
+    <string name="bug_report_delete_confirmation" translatable="false"></string>
+    <string name="stability_program_snackbar_msg" translatable="true"></string>
+    <string name="country_ssid_configured_list" translatable="false"></string>
+    <string name="device_not_registered_what_this_means_desc" translatable="false"></string>
+    <string name="hero_plan_and_account" translatable="false"></string>
+    <string name="server_settings_permanent_config_desc" translatable="false"></string>
+    <string name="local_blocklist_delete_desc" translatable="true"></string>
+    <string name="select_plan_first" translatable="false"></string>
+    <string name="manage_sub_cancelling" translatable="false"></string>
+    <string name="server_order_open_error" translatable="false"></string>
+    <string name="auto_exclude_cc_limit_reached" translatable="false"></string>
+    <string name="ssid_location_error" translatable="true"></string>
+    <string name="one_wg_dialog_desc" translatable="true"></string>
+    <string name="manage_sub_revoking" translatable="false"></string>
+    <string name="server_selection_remove_title" translatable="false"></string>
+    <string name="rpn_restore_in_progress_btn" translatable="false"></string>
+    <string name="server_order_auto_renew" translatable="false"></string>
+    <string name="support_category_connectivity" translatable="false"></string>
+    <string name="settings_gologger_dialog_option_5" translatable="false"></string>
+    <string name="vpn_not_active_dialog_title" translatable="false"></string>
+    <string name="rpn_restore_dialog_status_registering" translatable="false"></string>
+    <string name="select_wg_proxy_desc" translatable="false"></string>
+    <string name="two_argument_parenthesis" translatable="false"></string>
+    <string name="original_price" translatable="false"></string>
+    <string name="settings_tunnel_metered_desc" translatable="true"></string>
+    <string name="proxy_rpn_heading" translatable="false"></string>
+    <string name="auto_exclude_cc_none" translatable="false"></string>
+    <string name="support_error_collect" translatable="false"></string>
+    <string name="settings_smart_persistent_keepalive_desc" translatable="false"></string>
+    <string name="conflict_refund_failed" translatable="false"></string>
+    <string name="lbl_checking" translatable="false"></string>
+    <string name="contact_support_title" translatable="false"></string>
+    <string name="server_settings_config_auto_hint" translatable="false"></string>
+    <string name="wg_ssid_delete_title" translatable="false"></string>
+    <string name="lockdown_wg_dialog_desc" translatable="false"></string>
+    <string name="symbol_lock" translatable="false"></string>
+    <string name="adv_taster_desc" translatable="true"></string>
+    <string name="lbl_prefix" translatable="false"></string>
+    <string name="unknown_error" translatable="true"></string>
+    <string name="lbl_errors" translatable="false"></string>
+    <string name="auto_exclude_cc_search_hint" translatable="false"></string>
+    <string name="three_argument" translatable="false"></string>
+    <string name="server_order_empty_no_credentials" translatable="false"></string>
+    <string name="set_auto_dial_desc" translatable="false"></string>
+    <string name="ping_partial_title" translatable="false"></string>
+    <string name="lbl_dc_abbr" translatable="false"></string>
+    <string name="progress_step_refreshing" translatable="false"></string>
+    <string name="custom_lan_ip_manual_desc" translatable="false"></string>
+    <string name="custom_lan_ip_saved_auto" translatable="false"></string>
+    <string name="unicode_check_sign" translatable="false"></string>
+    <string name="server_order_summary_title" translatable="false"></string>
+    <string name="wireguard_disable_title" translatable="true"></string>
+    <string name="firewall_rule_temp_allow" translatable="false"></string>
+    <string name="processing_dialog_desc" translatable="true"></string>
+    <string name="server_settings_dns_section" translatable="false"></string>
+    <string name="server_settings_title" translatable="false"></string>
+    <string name="auto_exclude_cc_no_servers" translatable="false"></string>
+    <string name="crypt_relay_sweden" translatable="true"></string>
+    <string name="status_revoked" translatable="false"></string>
+    <string name="server_settings_refresh_servers" translatable="false"></string>
+    <string name="wg_setting_ssid_desc" translatable="true"></string>
+    <string name="server_order_type_subscription" translatable="false"></string>
+    <string name="wireguard_apps_proxy_map_desc" translatable="true"></string>
+    <string name="subscription_congrats_desc" translatable="false"></string>
+    <string name="conflict_detail_http_code" translatable="false"></string>
+    <string name="device_auth_error_notif_body" translatable="false"></string>
+    <string name="console_log_title" translatable="true"></string>
+    <string name="progress_do_not_close" translatable="false"></string>
+    <string name="stability_program_snackbar_disable" translatable="true"></string>
+    <string name="symbol_duck" translatable="false"></string>
+    <string name="config_delete_all_dialog_title" translatable="true"></string>
+    <string name="emoji_eye" translatable="false"></string>
+    <string name="include_all_app_wg_dialog_title" translatable="true"></string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true"></string>
+    <string name="rpn_restore_dialog_title" translatable="false"></string>
+    <string name="cloudflare_dns_desc" translatable="true"></string>
+    <string name="tour_step_logs_desc" translatable="false"></string>
+    <string name="lbl_ssids" translatable="false"></string>
+    <string name="server_selection_auto_always_on" translatable="false"></string>
+    <string name="cancel_subscription" translatable="false"></string>
+    <string name="ping_success_title" translatable="false"></string>
+    <string name="server_settings_dns_family" translatable="false"></string>
+    <string name="monthly_plan" translatable="false"></string>
+    <string name="settings_flood_wg_desc" translatable="true"></string>
+    <string name="support_attach_sub_status_desc" translatable="false"></string>
+    <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[]]></string>
+    <string name="routing_remaining_apps" translatable="true"></string>
+    <string name="conflict_title_consume" translatable="false"></string>
+    <string name="wireguard_disable_failure" translatable="true"></string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true"></string>
+    <string name="support_attach_sub_status" translatable="false"></string>
+    <string name="no_events_desc" translatable="false"></string>
+    <string name="ping_total_latency" translatable="false"></string>
+    <string name="subscription_congrats_title" translatable="false"></string>
+    <string name="cd_allowed_dns_record_types_desc" translatable="false"></string>
+    <string name="support_attachments_desc" translatable="false"></string>
+    <string name="conflict_desc_ack" translatable="false"></string>
+    <string name="custom_rules_proxy_title" translatable="false"></string>
+    <string name="about_foss_link" translatable="false"></string>
+    <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[]]></string>
+    <string name="payment_history_open_error" translatable="false"></string>
+    <string name="subscribe_now" translatable="false"></string>
+    <string name="firewall_bubble_desc" translatable="false"></string>
+    <string name="placeholder_dash" translatable="false"></string>
+    <string name="support_description_hint" translatable="false"></string>
+    <string name="device_auth_error_device_id_partial" translatable="false"></string>
+    <string name="auto_exclude_cc_subtitle" translatable="false"></string>
+    <string name="ping_reach_reachable" translatable="false"></string>
+    <string name="close_conns_dialog_title" translatable="true"></string>
+    <string name="payment_history_summary_title" translatable="false"></string>
+    <string name="symbol_green_circle" translatable="false"></string>
+    <string name="fail_open_network_desc" translatable="true"></string>
+    <string name="no_events_recorded" translatable="false"></string>
+    <string name="remaining_apps_dialog_title" translatable="true"></string>
+    <string name="event_logs_title" translatable="false"></string>
+    <string name="device_not_registered_email_body_details" translatable="false"></string>
+    <string name="confirm_revoke_title" translatable="false"></string>
+    <string name="symbol_hyphen" translatable="false"></string>
+    <string name="config_add_success_toast" translatable="true"></string>
+    <string name="server_settings_config_manual_hint" translatable="false"></string>
+    <string name="vpn_policy_relaxed" translatable="true"></string>
+    <string name="fs_configure_advanced_desc" translatable="true"></string>
+    <string name="fs_configure_network_desc" translatable="true"></string>
+    <string name="wg_ssid_delete_confirmation" translatable="true"></string>
+    <string name="settings_tunnel_metered" translatable="true"></string>
+    <string name="bfdm_desc" translatable="false"></string>
+    <string name="verifying_with_play_store" translatable="false"></string>
+    <string name="error_loading_manage_subscription" translatable="false"></string>
+    <string name="about_mastodom_handle" translatable="false"></string>
+    <string name="key_contents_error" translatable="true"></string>
+    <string name="progress_step_validating" translatable="false"></string>
+    <string name="cancel_subscription_note" translatable="false"></string>
+    <string name="bubble_allowed_title" translatable="false"></string>
+    <string name="symbol_star" translatable="false"></string>
+    <string name="wg_ssid_invalid_error" translatable="true"></string>
+    <string name="ci_desc" translatable="false"></string>
+    <string name="dashboard_expiry_label" translatable="false"></string>
+    <string name="two_argument_dot" translatable="false"></string>
+    <string name="extend_purchase_success_message" translatable="false"></string>
+    <string name="support_issue_category_label" translatable="false"></string>
+    <string name="server_settings_start_rpn" translatable="false"></string>
+    <string name="symbol_key" translatable="false"></string>
+    <string name="country_ssid_dialog_title" translatable="false"></string>
+    <string name="close_all" translatable="true"></string>
+    <string name="cd_dialog_edit_title" translatable="true"></string>
+    <string name="billing_monthly_cancel" translatable="false"></string>
+    <string name="tour_step_dns_desc" translatable="false"></string>
+    <string name="settings_firebase_error_reporting_desc" translatable="true"></string>
+    <string name="server_settings_config_handling_section" translatable="false"></string>
+    <string name="symbol_mb" translatable="false"></string>
+    <string name="crypt_relay_us" translatable="true"></string>
+    <string name="device_auth_error_btn_email" translatable="false"></string>
+    <string name="wg_ssid_condition_label" translatable="false"></string>
+    <string name="ac_tcp_proxy" translatable="false"></string>
+    <string name="purchase_now" translatable="false"></string>
+    <string name="server_settings_config_mode_manual" translatable="false"></string>
+    <string name="server_settings_config_mode_auto" translatable="false"></string>
+    <string name="server_settings_open" translatable="false"></string>
+    <string name="lbl_not_available_short" translatable="false"></string>
+    <string name="premium_subtitle" translatable="false"></string>
+    <string name="crypt_cleanbrowsing_family_desc" translatable="true"></string>
+    <string name="processing_purchase" translatable="false"></string>
+    <string name="two_argument" translatable="false"></string>
+    <string name="bubble_empty_state_desc" translatable="false"></string>
+    <string name="device_auth_error_desc" translatable="false"></string>
+    <string name="support_error_email" translatable="false"></string>
+    <string name="bad_config_reason_unknown_section" translatable="true"></string>
+    <string name="lbl_odoh" translatable="false"></string>
+    <string name="device_auth_error_title" translatable="false"></string>
+    <string name="server_settings_sheet_subtitle" translatable="false"></string>
+    <string name="support_category_refund" translatable="false"></string>
+    <string name="choose_plan_subtitle" translatable="false"></string>
+    <string name="symbol_lockdown" translatable="false"></string>
+    <string name="server_order_started_fmt" translatable="false"></string>
+    <string name="crypt_relay_netherlands" translatable="true"></string>
+    <string name="invalid_file_error" translatable="true"></string>
+    <string name="include_all_app_wg_dialog_desc" translatable="true"></string>
+    <string name="support_category_activation" translatable="false"></string>
+    <string name="temp_allow_desc_with_time" translatable="false"></string>
+    <string name="firewall_rule_lockdown_wg" translatable="true"></string>
+    <string name="key_length_error" translatable="true"></string>
+    <string name="hop_failure_notification_title" translatable="false"></string>
+    <string name="payment_processing" translatable="false"></string>
+    <string name="adv_set_experimental_title" translatable="false"></string>
+    <string name="billing_error_generic" translatable="false"></string>
+    <string name="top_active_conns" translatable="true"></string>
+    <string name="server_selection_sub_expired_on" translatable="false"></string>
+    <string name="rpn_restore_dialog_status_unregistering" translatable="false"></string>
+    <string name="numeric_one" translatable="false"></string>
+    <string name="custom_lan_ip_router" translatable="false"></string>
+    <string name="rpn_report_issue" translatable="false"></string>
+    <string name="please_wait_processing" translatable="false"></string>
+    <string name="support_email_chooser_title" translatable="false"></string>
+    <string name="config_delete_dialog_title" translatable="true"></string>
+    <string name="fs_configure_apps_desc" translatable="true"></string>
+    <string name="event_logs_subtitle" translatable="false"></string>
+    <string name="settings_wireguard_lockdown_mode_desc" translatable="false"></string>
+    <string name="ping_ready_title" translatable="false"></string>
+    <string name="firewall_bubble_text" translatable="false"></string>
+    <string name="truncated_text" translatable="false"></string>
+    <string name="server_settings_config_handling_desc" translatable="false"></string>
+    <string name="billing_error_recoverable" translatable="false"></string>
+    <string name="payment_history_empty_title" translatable="false"></string>
+    <string name="lbl_dot" translatable="false"></string>
+    <string name="settings_socket_buffer_size" translatable="false"></string>
+    <string name="billing_sub_cancel" translatable="false"></string>
+    <string name="lbl_reset" translatable="false"></string>
+    <string name="server_selection_sub_days_left" translatable="false"></string>
+    <string name="cancel_subscription_note_future" translatable="false"></string>
+    <string name="subscribe_title" translatable="false"></string>
+    <string name="server_selection_max_reached" translatable="false"></string>
+    <string name="settings_firebase_error_reporting_heading" translatable="true"></string>
+    <string name="server_settings_enable_split_dns" translatable="false"></string>
+    <string name="two_argument_no_space" translatable="false"></string>
+    <string name="resubscribe_error" translatable="false"></string>
+    <string name="firewall_bubble_title" translatable="false"></string>
+    <string name="payment_processing_desc" translatable="false"></string>
+    <string name="bad_config_context_top_level" translatable="false"></string>
+    <string name="tour_step_vpn_title" translatable="false"></string>
+    <string name="symbol_upload" translatable="false"></string>
+    <string name="processing_dialog_title" translatable="true"></string>
+    <string name="support_section_describe" translatable="false"></string>
+    <string name="unicode_start_sign" translatable="false"></string>
+    <string name="bug_report_no_files_available" translatable="false"></string>
+    <string name="one_wg_apps_added" translatable="true"></string>
+    <string name="support_loading_data" translatable="false"></string>
+    <string name="settings_gologger_dialog_option_3" translatable="false"></string>
+    <string name="inapp_expiry_soon" translatable="false"></string>
+    <string name="rpn_title" translatable="false"></string>
+    <string name="custom_lan_ip_desc" translatable="false"></string>
+    <string name="title_proc" translatable="false"></string>
+    <string name="loading" translatable="false"></string>
+    <string name="about_license" translatable="true"></string>
+    <string name="symbol_slash" translatable="false"></string>
+    <string name="symbol_currency" translatable="false"></string>
+    <string name="temp_allow_label" translatable="false"></string>
+    <string name="server_selection_error_message" translatable="false"></string>
+    <string name="bug_report_files_desc" translatable="false"></string>
+    <string name="tour_premium_badge_label" translatable="false"></string>
+    <string name="wireguard_disable_message" translatable="true"></string>
+    <string name="about_terms_link" translatable="false"></string>
+    <string name="vpn_policy_sensitive_desc" translatable="true"></string>
+    <string name="cleanbrowsing_adult_dns_desc" translatable="true"></string>
+    <string name="rpn_report_desc" translatable="false"></string>
+    <string name="conflict_title_revoke" translatable="false"></string>
+    <string name="config_delete_dialog_desc" translatable="true"></string>
+    <string name="custom_lan_ip_title" translatable="false"></string>
+    <string name="lbl_odoh_abbr" translatable="false"></string>
+    <string name="console_log_include_file_trace" translatable="false"></string>
+    <string name="firewall_bubble_subtitle" translatable="false"></string>
+    <string name="server_favourite_added" translatable="false"></string>
+    <string name="parse_error_reason" translatable="true"></string>
+    <string name="vpn_policy_auto_desc" translatable="true"></string>
+    <string name="new_warp_config_desc" translatable="true"></string>
+    <string name="lbl_expires_on" translatable="true">Scade il</string>
+    <string name="server_settings_split_dns_disabled" translatable="false"></string>
+    <string name="server_selection_frequent_label" translatable="false"></string>
+    <string name="server_settings_proxy_stopped" translatable="false"></string>
+    <string name="vpn_policy_fixed_desc" translatable="true"></string>
+    <string name="custom_lan_ip_auto_desc" translatable="false"></string>
+    <string name="firewall_bubble_channel_name" translatable="false"></string>
+    <string name="app_name_alpha" translatable="false"></string>
+    <string name="ssid_location_error_action" translatable="true"></string>
+    <string name="parse_error_generic" translatable="true"></string>
+    <string name="bubble_time_just_now" translatable="false"></string>
+    <string name="lbl_ssid" translatable="false"></string>
+    <string name="subscription_action_failed" translatable="false"></string>
+    <string name="generic_error" translatable="true"></string>
+    <string name="bad_config_error" translatable="true"></string>
+    <string name="lbl_not_set" translatable="false"></string>
+    <string name="error_message" translatable="false"></string>
+    <string name="support_attach_history_desc" translatable="false"></string>
+    <string name="parse_error_inet_endpoint" translatable="true"></string>
+    <string name="server_settings_permanent_config_title" translatable="false"></string>
+    <string name="manage_purchase_title" translatable="false"></string>
+    <string name="progress_step_updating" translatable="false"></string>
+    <string name="support_btn_sending" translatable="false"></string>
+    <string name="exclude_all_app_wg_dialog_title" translatable="true"></string>
+    <string name="symbol_black_up" translatable="false"></string>
+    <string name="vpn_policy_relaxed_desc" translatable="true"></string>
+    <string name="exclude_all_app_wg_dialog_desc" translatable="true"></string>
+    <string name="tour_step_vpn_desc" translatable="false"></string>
+    <string name="wg_apps_dialog_title_exclude" translatable="true"></string>
+    <string name="no_configs_error" translatable="true"></string>
+    <string name="bubble_allow_btn" translatable="false"></string>
+    <string name="symbol_download" translatable="false"></string>
+    <string name="device_not_registered_what_this_means" translatable="false"></string>
+    <string name="firewall_rule_proxied" translatable="true"></string>
+    <string name="server_selection_no_servers_desc" translatable="false"></string>
+    <string name="ping_status_failed" translatable="false"></string>
+    <string name="hop_error_toast_msg_3" translatable="true"></string>
+    <string name="conflict_notif_title" translatable="false"></string>
+    <string name="about_floss_fund_link" translatable="false"></string>
+    <string name="server_selection_error_hint" translatable="false"></string>
+    <string name="server_selection_title" translatable="false"></string>
+    <string name="wg_ssid_add_button" translatable="false"></string>
+    <string name="custom_lan_ip_validation_error" translatable="false"></string>
+    <string name="one_wg_error_toast" translatable="true"></string>
+    <string name="server_order_summary_subtitle" translatable="false"></string>
+    <string name="symbol_heavy" translatable="false"></string>
+    <string name="settings_locale_dialog_default" translatable="true"></string>
+    <string name="conflict_refund_success" translatable="false"></string>
+    <string name="device_not_registered_entitlement_cid_label" translatable="false"></string>
+    <string name="rpn_restore_confirm_message" translatable="false"></string>
+    <string name="crypt_adguard_family_desc" translatable="true"></string>
+    <string name="bad_config_reason_syntax_error" translatable="true"></string>
+    <string name="lbl_amnezia" translatable="false"></string>
+    <string name="settings_gologger_dialog_option_1" translatable="false"></string>
+    <string name="billing_yearly" translatable="false"></string>
+    <string name="revoke_subscription" translatable="false"></string>
+    <string name="lbl_dp_abbr" translatable="false"></string>
+    <string name="copied_clipboard" translatable="true"></string>
+    <string name="server_settings_port_dialog_title" translatable="false"></string>
+    <string name="subscription_processing_timeout" translatable="false"></string>
+    <string name="exclude_apps_from_proxy_failure_toast"></string>
+    <string name="exclude_apps_from_proxy"></string>
+    <string name="rpn_perform_test" translatable="false"></string>
+    <string name="crypt_relay_france" translatable="true"></string>
+    <string name="firewall_rule_bypass_proxy" translatable="true"></string>
+    <string name="settings_smart_persistent_keepalive" translatable="false"></string>
+    <string name="ping_testing_desc" translatable="false"></string>
+    <string name="adv_tasker_dialog_instructions" translatable="true"></string>
+    <string name="adv_tasker_dialog_edit_hint" translatable="true"></string>
+    <string name="bug_report_creating_zip" translatable="false"></string>
+    <string name="payment_history_transition_fmt" translatable="false"></string>
+    <string name="inapp_expiry_extend_hint" translatable="false"></string>
+    <string name="server_order_empty_title" translatable="false"></string>
+    <string name="symbol_mobile" translatable="false"></string>
+    <string name="bubble_activity_title" translatable="false"></string>
+    <string name="settings_gologger_dialog_option_7" translatable="false"></string>
+    <string name="support_btn_send" translatable="false"></string>
+    <string name="wg_setting_ssid_title" translatable="true"></string>
+    <string name="symbol_clock" translatable="false"></string>
+    <string name="server_selection_max_info" translatable="false"></string>
+    <string name="title_database_dump" translatable="true"></string>
+    <string name="wireguard_connection_error" translatable="true"></string>
+    <string name="ping_reach_rpn_disabled" translatable="false"></string>
+    <string name="plan_2yr" translatable="false"></string>
+    <string name="ping_test_title" translatable="false"></string>
+    <string name="rpn_restore_confirm_title" translatable="false"></string>
+    <string name="illegal_filename_error" translatable="true"></string>
+    <string name="device_auth_error_email_body_details" translatable="false"></string>
+    <string name="close_conns_dialog_desc" translatable="true"></string>
+    <string name="bypasses_network_restrictions" translatable="true"></string>
+    <string name="symbol_max" translatable="false"></string>
+    <string name="server_settings_port_title" translatable="false"></string>
+    <string name="device_auth_error_email_body_closing" translatable="false"></string>
+    <string name="server_selection_tap_to_select" translatable="false"></string>
+    <string name="notif_channel_rpn" translatable="false"></string>
+    <string name="trial_days_format" translatable="false"></string>
+    <string name="tombstone_app_desc" translatable="true"></string>
+    <string name="lbl_server_config" translatable="false"></string>
+    <string name="symbol_lightening" translatable="false"></string>
+    <string name="crypt_quad9_desc" translatable="true"></string>
+    <string name="bubble_empty_state_title" translatable="false"></string>
+    <string name="server_selection_sub_on_hold" translatable="false"></string>
 </resources>
