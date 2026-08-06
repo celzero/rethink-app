@@ -338,7 +338,7 @@
     <string name="category_name_sys_apps">System-Apps</string>
     <string name="category_name_others">Andere</string>
     <string name="category_name_non_app_sys">System Dienstleistungen</string>
-    <string name="cd_remove_dialog_title">Domain löschen\?</string>
+    <string name="cd_remove_dialog_title">Domain löschen?</string>
     <string name="cd_dialog_error_invalid_domain">Ungültige URL oder Domain-Name</string>
     <string name="cd_dialog_title">Domainregel hinzufügen</string>
     <string name="cd_dialog_desc">Eine URL oder eine Domain, optional mit Wildcard: z.B. *.test.com, test.com/test</string>
@@ -647,15 +647,15 @@
     <string name="cd_dns_crypt_title">Resolver</string>
     <string name="dns_connected">Verbunden</string>
     <string name="dns_proxy_dialog_message">App-Name: %1$s\n\nIP-Adresse: %2$s\n\nPort-Nummer: %3$s</string>
-    <string name="dns_proxy_desc_no_app">%1$s:%2$s</string>
+    <string name="dns_proxy_desc_no_app" translatable="false">%1$s:%2$s</string>
     <string name="fapps_filter_parent_system">System</string>
     <string name="fapps_firewall_filter_excluded">Ausgeschlossen</string>
     <string name="fapps_unmetered_block_dialog_message">Verbindungen in ungetakteten Netzwerken(WLAN) für die <i>aufgelisteten</i> Apps blockieren?</string>
     <string name="fapps_unmetered_unblock_dialog_message">Verbindungen in ungetakteten Netzwerken (WLAN) für die <i>aufgelisteten</i> Apps erlauben?</string>
     <string name="fapps_metered_block_dialog_title">Bei getaktet blockieren</string>
     <string name="fapps_firewall_filter_hint">Alle Apps anzeigen</string>
-    <string name="unicode_question_sign">❔</string>
-    <string name="fav_icon">fav_icon</string>
+    <string name="unicode_question_sign" translatable="false">❔</string>
+    <string name="fav_icon" translatable="false">fav_icon</string>
     <string name="rules_load_failure_heading">Anmerkung</string>
     <string name="network_log_app_name_unknown">Unbekannt</string>
     <string name="dns_crypt_connection_failure">Fehler beim Verbinden mit dem DNSCrypt-Server.</string>
@@ -667,7 +667,7 @@
     <string name="settings_local_blocklist_in_use">%1$s verwendete Sperrlisten</string>
     <string name="settings_local_blocklist_dialog_positive">Downloads</string>
     <string name="update_complete_snack_message">Neue Version heruntergeladen.</string>
-    <string name="univ_delete_firewall_dialog_title">Alle IP-Regeln löschen\?</string>
+    <string name="univ_delete_firewall_dialog_title">Alle IP-Regeln löschen?</string>
     <string name="univ_delete_firewall_dialog_message">Das Löschen dieser Regeln würde es jeder App ermöglichen, sich mit den derzeit blockierten IPs zu verbinden.</string>
     <string name="dns_proxy_dialog_message_no_app">IP-Adresse: %1$s\n\nPort-Nummer: %2$s</string>
     <string name="fapps_info_dialog_message">Die Internetverbindung von Apps blockieren. Die Beschränkung des Internetzugangs hilft, eine unangemessene Datennutzung zu verhindern und den Akku zu schonen.</string>
@@ -685,7 +685,7 @@
     <string name="dns_info_positive">Ok</string>
     <string name="dns_info_neutral">Kopieren</string>
     <string name="dns_crypt_relay_error_toast">Kein Resolver ausgewählt</string>
-    <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
+    <string name="dns_proxy_desc" translatable="false">%1$s:%2$s, %3$s</string>
     <string name="dns_query_latency">%1$sms</string>
     <string name="dns_proxy_dialog_header_dns">DNS-Proxy hinzufügen</string>
     <string name="dns_proxy_name">Name des Proxy</string>
@@ -1664,4 +1664,5 @@
     <string name="symbol_lightening" translatable="false"></string>
     <string name="bubble_empty_state_title" translatable="false"></string>
     <string name="server_selection_sub_on_hold" translatable="false"></string>
+    <string name="unicode_x_sign" translatable="false"></string>
 </resources>
