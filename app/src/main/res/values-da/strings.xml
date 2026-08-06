@@ -166,14 +166,14 @@
     <string name="dns_query_clear_logs_title" translatable="true">Slet alle DNS-logfiler?</string>
     <string name="dns_query_clear_logs_message" translatable="true">Dette sletter DNS-logfiler på enhenden. Dette kan ikke omgøres. Vil du fortsætte?</string>
     <string name="bsct_app_info" translatable="true">App-information</string>
-    <string name="bsct_block_ip" translatable="true">Blokér, stol på <u>denne IP</u> for <u>denne app</u></string>
-    <string name="bsct_block_domain" translatable="true">Blokér, stol på <u>domæne(r)</u> for <u>denne app</u></string>
-    <string name="bsct_block" translatable="true">Blokér, omgå, ekskludér, isolér <u>denne app</u></string>
+    <string name="bsct_block_ip" translatable="true">Blokér, stol på &lt;u&gt;denne IP&lt;/u&gt; for &lt;u&gt;denne app&lt;/u&gt;</string>
+    <string name="bsct_block_domain" translatable="true">Blokér, stol på &lt;u&gt;domæne(r)&lt;/u&gt; for &lt;u&gt;denne app&lt;/u&gt;</string>
+    <string name="bsct_block" translatable="true">Blokér, omgå, ekskludér, isolér &lt;u&gt;denne app&lt;/u&gt;</string>
     <string name="bsct_conn_block_desc" translatable="true">blokerede %1$s af %2$s</string>
     <string name="bsct_conn_block_desc_device" translatable="true">blokerede %1$s på enheden</string>
     <string name="bsct_conn_desc_allowed" translatable="true">tilladt på %1$s%2$s</string>
     <string name="bsct_conn_desc_blocked" translatable="true">blokeret på %1$s%2$s</string>
-    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Blokerer en app fra at forbinde til internettet.\n<u>#2</u>: Blokerer enhver app fra tilslutning til en bestemt IP.\n<u>#3</u>: Blokerer alle forbindelser, når enheden er låst (Universel firewall).\n<u>#4</u>: Blokerer enhver app, der ikke er i brug (Universel firewall).\n<u>#5</u>: Blokerer forbindelser, når kildeapp\'en er ukendt (Universel firewall).\n<u>#6</u>: Blokerer al UDP-trafik undtagen DNS (Universel firewall).\n<u>#7</u>: Blokér forbindelser, når DNS omgås (Universel firewall).</string>
+    <string name="bsct_conn_rule_explanation" translatable="true">&lt;u&gt;#1&lt;/u&gt;: Blokerer en app fra at forbinde til internettet.\n&lt;u&gt;#2&lt;/u&gt;: Blokerer enhver app fra tilslutning til en bestemt IP.\n&lt;u&gt;#3&lt;/u&gt;: Blokerer alle forbindelser, når enheden er låst (Universel firewall).\n&lt;u&gt;#4&lt;/u&gt;: Blokerer enhver app, der ikke er i brug (Universel firewall).\n&lt;u&gt;#5&lt;/u&gt;: Blokerer forbindelser, når kildeapp\'en er ukendt (Universel firewall).\n&lt;u&gt;#6&lt;/u&gt;: Blokerer al UDP-trafik undtagen DNS (Universel firewall).\n&lt;u&gt;#7&lt;/u&gt;: Blokér forbindelser, når DNS omgås (Universel firewall).</string>
     <string name="always_on_dialog_heading" translatable="true">Deaktivér \"Altid på-VPN\"</string>
     <string name="always_on_dialog" translatable="true">\"Altid på-VPN\" er aktiveret på denne enhed. For at starte Rethink skal du gå til indstillinger og deaktivere \"Altid på-VPN\".</string>
     <string name="always_on_dialog_positive_btn" translatable="true">Gå til indstillinger</string>
