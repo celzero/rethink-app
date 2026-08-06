@@ -412,6 +412,11 @@ object FirewallManager : KoinComponent {
         }
     }
 
+    // snapshot of the full AppInfo collection (uid+packageName -> AppInfo)
+    suspend fun getAppInfoSnapshot(): Map<Pair<Int, String>, AppInfo> {
+        return snapshotAppInfos().associateBy { Pair(it.uid, it.packageName) }
+    }
+
     suspend fun tombstoneApp(uid: Int, packageName: String?, ts: Long = System.currentTimeMillis()) {
         val newUid = if (uid > 0) -1 * uid else uid // use negative uid to mark the app as tombstone
         mutex.withLock {
@@ -630,6 +635,17 @@ object FirewallManager : KoinComponent {
         if (packageName.isNullOrBlank()) return null
         mutex.withLock {
             return appInfos.values().firstOrNull { it.packageName == packageName }
+        }
+    }
+
+    // resolve the AppInfo that matches BOTH uid and packageName. This is required because the same
+    // packageName can legitimately exist under multiple uids (work-profile / cloned / dual-messenger
+    // apps, or shared-uid apps). getAppInfoByPackage() only returns the first match and must not be
+    // used when the caller already knows the uid, otherwise sibling uid entries get dropped.
+    suspend fun getAppInfoByUidAndPackage(uid: Int, packageName: String?): AppInfo? {
+        if (packageName.isNullOrBlank()) return null
+        mutex.withLock {
+            return appInfos.get(uid).firstOrNull { it.packageName == packageName }
         }
     }
 
