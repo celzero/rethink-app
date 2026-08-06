@@ -47,9 +47,13 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
     companion object {
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<AppConnection>() {
-                override fun areItemsTheSame(old: AppConnection, new: AppConnection) = old == new
+                override fun areItemsTheSame(old: AppConnection, new: AppConnection): Boolean =
+                    old.uid == new.uid &&
+                        old.ipAddress == new.ipAddress &&
+                        old.appOrDnsName == new.appOrDnsName
 
-                override fun areContentsTheSame(old: AppConnection, new: AppConnection) = old == new
+                override fun areContentsTheSame(old: AppConnection, new: AppConnection): Boolean =
+                    old == new
             }
         private const val TAG = "AppWiseIpsAdapter"
         private const val INITIAL_MIN_PERCENTAGE = 100
