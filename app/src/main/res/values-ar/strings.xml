@@ -687,8 +687,8 @@
     <string name="ci_blocked_initial">B</string>
     <string name="about_privacy_policy">قراءة سياسة الخصوصية</string>
     <string name="about_app_translate">ترجم</string>
-    <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
-    <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
+    <string name="about_translate_link" translatable="false">https://svc.rethinkdns.com/r/translate</string>
+    <string name="about_privacy_policy_link" translatable="false">https://www.rethinkdns.com/privacy</string>
     <string name="notification_screen_error">تعذر تشغيل شاشة إشعار التطبيق.</string>
     <string name="intent_launch_error">العد لا يتم إطلاقه %1$s</string>
     <string name="no_browser_error">لا يمكن فتح صفحة الويب من المتصفح.</string>
