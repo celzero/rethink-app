@@ -15,7 +15,6 @@
  */
 package com.celzero.bravedns.util
 
-import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -39,9 +38,12 @@ import com.celzero.bravedns.database.ProxyEndpoint.Companion.DEFAULT_PROXY_TYPE
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.Constants.Companion.HTTP_PROXY_PORT
 import com.celzero.bravedns.util.Constants.Companion.SOCKS_DEFAULT_PORT
+import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
+import com.celzero.bravedns.util.UIUtils.getRelativeTimeSpan
 import com.celzero.bravedns.util.Utilities.getActivityPendingIntent
 import com.celzero.bravedns.util.Utilities.getBroadcastPendingIntent
 import com.celzero.bravedns.util.Utilities.isAtleastO
@@ -110,6 +112,18 @@ class OrbotHelper(
         var selectedProxyType: String = AppConfig.ProxyType.NONE.name
 
         const val NOTIF_CHANNEL_ID_PROXY_ALERTS = "PROXY_ALERTS"
+
+        suspend fun stats(): String {
+            val sb = StringBuilder()
+            val stats = VpnController.getLocalProxyStatsById(ProxyManager.ID_ORBOT_BASE)
+            val routerStats = stats?.routerStats
+            sb.append("   ip4: ${stats?.ip4}\n")
+            sb.append("   ip6: ${stats?.ip6}\n")
+            sb.append("   since: ${getRelativeTimeSpan(routerStats?.since)}\n")
+            sb.append("   addr: ${stats?.addr ?: "N/A"}\n\n")
+
+            return sb.toString()
+        }
     }
 
     private var socks5Port: Int? = null
