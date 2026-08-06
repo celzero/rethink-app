@@ -437,9 +437,7 @@
     <string name="orbot_stop_dialog_title" translatable="true">Потрібне ручне втручання</string>
     <string name="settings_ptrans_desc" translatable="true">Перетворювати вихідний трафік з IPv6 на IPv4 на пристрої. Увімкніть, якщо ви підключені до мережі, яка підтримує лише IPv4.</string>
     <string name="settings_orbot_heading" translatable="true">Налаштування Orbot</string>
-    <string name="orbot_stop_dialog_message_combo" translatable="true">%1$s
-\n
-\n%2$s</string>
+    <string name="orbot_stop_dialog_message_combo" translatable="false">%1$s \n \n%2$s</string>
     <string name="orbot_both" translatable="true">TCP + HTTP Proxy</string>
     <string name="settings_socks5_desc" translatable="true">Перенаправляти з\'єднання на кінцевий пункт SOCKS5.</string>
     <string name="orbot_install_dialog_neutral" translatable="true">веб-сторінка</string>
