@@ -538,10 +538,7 @@
     <string name="apps_icon_content_desc">Иконка приложения</string>
     <string name="firewall_status_excluded">исключен из dns и брандмауэра</string>
     <string name="firewall_card_status_active">%1$s приложений</string>
-    <string name="firewall_card_text_active">%1$s заблокировано
-\n%2$s обойдено
-\n%3$s исключено
-\n%4$s изолировано</string>
+    <string name="firewall_card_text_active">%1$s заблокировано \n%2$s обойдено \n%3$s исключено \n%4$s изолировано</string>
     <string name="dns_card_latency_active">%1$sмс</string>
     <string name="dns_card_latency_inactive">Включить режим DNS.</string>
     <string name="apps_card_ips_count">%1$s Правил(а) IP и портов</string>
@@ -858,7 +855,7 @@
     <string name="new_warp_invalid_config_toast" translatable="true">Некорректная конфигурация WARP</string>
     <string name="add_remove_apps" translatable="true">Добавить / Удалить приложения (%1$s)</string>
     <string name="add_peer" translatable="true">Добавить пир</string>
-    <string name="config_delete_dialog_desc">Вы уверены, что хотите удалить данную конфигурацию\?</string>
+    <string name="config_delete_dialog_desc">Вы уверены, что хотите удалить данную конфигурацию?</string>
     <string name="config_delete_dialog_title">Удалить конфигурацию</string>
     <string name="wireguard_enabled_failure">Остановите другие активные прокси чтобы включить WireGuard</string>
     <string name="wireguard_no_config_msg">Нет конфигураций WireGuard VPNов. Добавьте один чтобы начать.</string>
@@ -926,11 +923,11 @@
     <string name="wireguard_description" translatable="true">WireGuard как прокси.</string>
     <string name="new_warp_config_desc" translatable="true">Получить конфигурацию WARP от сервера</string>
     <string name="new_warp_error_toast" translatable="true">Получить конфигурацию WARP не удалось</string>
-    <string name="include_all_app_wg_dialog_desc">Проводить все приложения через этот туннель\?</string>
+    <string name="include_all_app_wg_dialog_desc">Проводить все приложения через этот туннель?</string>
     <string name="config_add_success_toast">Конфигурация добавлена</string>
     <string name="include_all_app_wg_dialog_title">Включить все приложения</string>
     <string name="exclude_all_app_wg_dialog_title">Исключить все приложения</string>
-    <string name="exclude_all_app_wg_dialog_desc">Исключить все приложения из этого туннеля\?</string>
+    <string name="exclude_all_app_wg_dialog_desc">Исключить все приложения из этого туннеля?</string>
     <string name="cloudflare_security_dns_desc" translatable="true">Блокирует вредоносный контент. В конечной точке используется DNS 1.1.1.2 от Cloudflare.</string>
     <string name="google_dns_desc" translatable="true">Не блокирует никакие DNS-запросы. В конечной точке используется DNS от Google.</string>
     <string name="crypt_adguard_family_desc" translatable="true">Adguard DNS с безопасным поиском и блокировкой взрослого контента.</string>
