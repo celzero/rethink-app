@@ -146,13 +146,13 @@
     <string name="brave_dns_connect_mode_change_dns" translatable="true">Vyberte mód.</string>
     <string name="default_dns_name" translatable="true">RDNS Výchozí</string>
     <string name="custom_url_error_invalid_url" translatable="true">Neplatná URL</string>
-    <string name="bsct_block" translatable="true">Blokovat, obejít, vyloučit, izolovat <u>tuto app</u></string>
+    <string name="bsct_block" translatable="true">Blokovat, obejít, vyloučit, izolovat &lt;u&gt;tuto app&lt;/u&gt;</string>
     <string name="always_on_dialog_positive_btn" translatable="true">Přejít do Nastavení</string>
     <string name="bsct_app_info" translatable="true">Info o aplikaci</string>
     <string name="bsct_conn_desc_blocked" translatable="true">blokováno na %1$s %2$s</string>
     <string name="dns_query_clear_logs_title" translatable="true">Smazat všechny DNS záznamy?</string>
-    <string name="bsct_block_ip" translatable="true">Blokovat, důvěřovat <u>tomuto IP</u> pro <u>tuto app</u></string>
-    <string name="bsct_block_domain" translatable="true">Blokovat, důvěřovat <u>doméně/doménám</u> pro <u>tuto app</u></string>
+    <string name="bsct_block_ip" translatable="true">Blokovat, důvěřovat &lt;u&gt;tomuto IP&lt;/u&gt; pro &lt;u&gt;tuto app&lt;/u&gt;</string>
+    <string name="bsct_block_domain" translatable="true">Blokovat, důvěřovat &lt;u&gt;doméně/doménám&lt;/u&gt; pro &lt;u&gt;tuto app&lt;/u&gt;</string>
     <string name="dns_query_clear_logs_message" translatable="true">Tímto smažete DNS záznamy uložené v zařízení. Tato akce je nevratná. Chcete pokračovat?</string>
     <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Blokovat připojení aplikace k Internetu.\n <u>#2</u>: Blokovat připojení libovolné aplikace k určité IP adrese.\n <u>#3</u>: Blokovat všechna připojení, když je zařízení uzamčeno (Univerzální Firewall).\n <u>#4</u>: Blokovat jakoukoli nepoužívanou aplikaci (Univerzální Firewall).\n <u>#5</u>: Blokovat připojení, když je zdrojová aplikace neznámá (Univerzální Firewall).\n <u>#6</u>: Blokovat veškerý provoz UDP kromě DNS (Univerzální Firewall).\n <u>#7</u>: Blokovat připojení při obcházení DNS (Univerzální Firewall).</string>
     <string name="always_on_dialog" translatable="true">Funkce „Always-On VPN“ je na tomto zařízení aktivní. Chcete-li spustit Rethink, přejděte do Nastavení a vypněte „Always-on VPN“.</string>
@@ -498,7 +498,7 @@
     <string name="dns_log_dialog_positive" translatable="true">Smazat záznamy</string>
     <string name="dns_btm_sheet_chip" translatable="true">+%1$s dalších IP</string>
     <string name="dns_btm_sheet_chip_no_answer" translatable="true">Žádná odpověď</string>
-    <string name="dns_btm_resolved_crypt" translatable="true">vyřešeno <u>anonymně</u> %1$s přes %2$s via %3$s</string>
+    <string name="dns_btm_resolved_crypt" translatable="true">vyřešeno &lt;u&gt;anonymně&lt;/u&gt; %1$s přes %2$s via %3$s</string>
     <string name="dns_btm_resolved_doh" translatable="true">vyřešeno %1$s přes %2$s</string>
     <string name="dns_btm_resolved_doh_no_server" translatable="true">vyřešeno %1$s</string>
     <string name="dns_btm_latency_ms" translatable="true">%1$sms</string>
@@ -743,7 +743,7 @@
     <string name="crypt_relay_sweden" translatable="true">Anonymizovaný DNS relay ve Švédsku, poskytováno https://cryptostrom.is/.</string>
     <string name="crypt_relay_us" translatable="true">Anonymizovaný DNS relay v USA - Los Angeles, CA, poskytováno https://cryptostrom.is/.</string>
     <string name="crypt_relay_singapore" translatable="true">Anonymizovaný DNS relay v Singapuru.</string>
-    <string name="whats_new_version_update" translatable="true"><b>Nepanikař 2</b><br/><br/>1. Nové: Zachytávat chyby síťového enginu v uživatelských hlášeních chyb.<br/>2. Nové: používat systémové DNS pro nedelegované domény, pokud je zapnuto „Zabránit únikům DNS“.<br/>3. Vylepšení: Dual-stack (IPv4 + IPv6) konektivita ve WireGuardu.<br/>4. Vylepšení: Zabraňovat blokování prvků uživatelského rozhraní, když síťový engine neodpovídá.<br/>5. Oprava: Vypršení časového limitu při zapnutém pokročilém filtrování DNS.<br/>6. Oprava: Peer endpointy WireGuardu s doménovými názvy se mohou při změnách sítě zaseknout.<br/><br/><a href="https://svc.rethinkdns.com/r/translate">Pomozte přeložit tuto aplikaci</a></string>
+    <string name="whats_new_version_update" translatable="false"><![CDATA[<b>Nepanikař 2</b><br/><br/>1. Nové: Zachytávat chyby síťového enginu v uživatelských hlášeních chyb.<br/>2. Nové: používat systémové DNS pro nedelegované domény, pokud je zapnuto „Zabránit únikům DNS“.<br/>3. Vylepšení: Dual-stack (IPv4 + IPv6) konektivita ve WireGuardu.<br/>4. Vylepšení: Zabraňovat blokování prvků uživatelského rozhraní, když síťový engine neodpovídá.<br/>5. Oprava: Vypršení časového limitu při zapnutém pokročilém filtrování DNS.<br/>6. Oprava: Peer endpointy WireGuardu s doménovými názvy se mohou při změnách sítě zaseknout.<br/><br/><a href="https://svc.rethinkdns.com/r/translate">Pomozte přeložit tuto aplikaci</a>]]></string>
     <string name="pcap_failure_toast" translatable="true">Chyba při vytváření pcap souboru, zkuste to znovu!</string>
     <string name="firewall_status_blocked" translatable="true">blokováno</string>
     <string name="dc_entries" translatable="true">%1$s záznamů »</string>
@@ -857,7 +857,7 @@
     <string name="exclude_apps_from_proxy">Obcházet aplikaci pro všechny proxy</string>
     <string name="exclude_apps_from_proxy_failure_toast">Tato aplikace již obchází proxy</string>
     <string name="bsac_title_desc" translatable="true">Pravidla platí pouze pro tuto aplikaci.</string>
-    <string name="bsdl_block_desc" translatable="true">Blokovat, důvěřovat <u>této doméně</u></string>
+    <string name="bsdl_block_desc" translatable="true">Blokovat, důvěřovat &lt;u&gt;této doméně&lt;/u&gt;</string>
     <string name="notif_download_content_title" translatable="true">Stahování On-Device blokovacího seznamu</string>
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen" translatable="true">Blokuje malware, ransomware, cryptoware, phishing a další hrozby.</string>
     <string name="rt_dialog_title" translatable="true">Uložit změny</string>
@@ -938,8 +938,8 @@
     <string name="firewall_rule_block_ip_desc" translatable="true">Uživatelem nastavené pravidlo firewallu zablokovalo <i>cílovou IP adresu</i>.<br/><br/> Pro změnu přejděte na obrazovku <i>Firewall specifický pro aplikace</i>.</string>
     <string name="firewall_rule_trusted_ip_desc" translatable="true">Toto připojení bylo povoleno, protože <i>cílová IP adresa</i> je nastavena jako Důvěryhodná IP.<br/><br/> Pro změnu přejděte na obrazovku <i>Firewall specifický pro aplikace</i>.</string>
     <string name="rt_filter_desc" translatable="true">Zobrazuji <u>%1$s</u> seznamy blokování</string>
-    <string name="dns_btm_sheet_dialog_message" translatable="true"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s blokovací seznam(y)</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
-    <string name="dns_btm_sheet_dialog_ips" translatable="true"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_message" translatable="true"><Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s blokovací seznam(y)</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_ips" translatable="true"><Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
     <string name="fapps_firewall_filter_desc" translatable="true">Zobrazeno <u>%1$s</u> %2$s aplikací</string>
     <string name="firewall_rule_block_app_desc" translatable="true">A uživatelem nastavené pravidlo firewallu zablokovalo tuto <i>aplikaci</i>.<br/><br/> Pro změnu přejděte na kartu <i>Všechny aplikace</i>.</string>
     <string name="firewall_rule_new_app_desc" translatable="true">Tato aplikace navázala spojení <i>poprvé</i>.<br/><br/> Pro změnu přejděte na kartu <i>Univerzální</i>.</string>
