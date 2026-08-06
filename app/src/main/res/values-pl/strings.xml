@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name" translatable="false">RethinkDNS</string>
     <string name="title_about">O Rethink</string>
     <string name="title_settings">Ustawienia</string>
     <string name="slide_2_desc">RethinkDNS to najłatwiejszy sposób monitorowania aktywności sieciowej, omijania cenzury Internetu i zapory sieciowej na urządzeniu z Androidem.</string>
@@ -70,10 +70,10 @@
     <string name="brave_dns_connect_mode_change_dns">Wybierz Tryb.</string>
     <string name="default_dns_name">RDNS Ustawienie Domyślne</string>
     <string name="custom_url_error_invalid_url">Nieprawidłowy URL</string>
-    <string name="conn_track_clear_logs_title">Usunąć wszystkie logi sieciowe\?</string>
-    <string name="conn_track_clear_logs_message">Powoduje to usunięcie tylko dzienników sieciowych, ale nie reguł zapory sieciowej. Ta operacja nie jest odwracalna. Czy chcesz kontynuować\?</string>
-    <string name="dns_query_clear_logs_title">Usunąć wszystkie logi DNS\?</string>
-    <string name="dns_query_clear_logs_message">Powoduje to usunięcie dzienników DNS na urządzeniu. Ta operacja nie jest odwracalna. Czy chcesz kontynuować\?</string>
+    <string name="conn_track_clear_logs_title">Usunąć wszystkie logi sieciowe?</string>
+    <string name="conn_track_clear_logs_message">Powoduje to usunięcie tylko dzienników sieciowych, ale nie reguł zapory sieciowej. Ta operacja nie jest odwracalna. Czy chcesz kontynuować?</string>
+    <string name="dns_query_clear_logs_title">Usunąć wszystkie logi DNS?</string>
+    <string name="dns_query_clear_logs_message">Powoduje to usunięcie dzienników DNS na urządzeniu. Ta operacja nie jest odwracalna. Czy chcesz kontynuować?</string>
     <string name="bsct_app_info">Informacje o Aplikacji</string>
     <string name="dns_mode_info_title">DNS</string>
     <string name="notification_action_dns_mode">DNS</string>
