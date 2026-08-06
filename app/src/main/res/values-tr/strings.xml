@@ -116,7 +116,7 @@
     <string name="dns_info_neutral">Kopyala</string>
     <string name="dns_proxy_port">Liman Numarası</string>
     <string name="fapps_firewall_filter_isolate">İzole edildi</string>
-    <string name="fapps_metered_unblock_dialog_message"><i>Listelenen</i> uygulamalar için kotalı (mobil) ağda bağlantılara izin verilsin mi\?</string>
+    <string name="fapps_metered_unblock_dialog_message"><i>Listelenen</i> uygulamalar için kotalı (mobil) ağda bağlantılara izin verilsin mi?</string>
     <string name="network_log_app_name_unknown">Bilinmeyen</string>
     <string name="firewall_rule_block_metered">Ölçülü (Mobil)</string>
     <string name="firewall_rule_foreground">Kullanılmayan Uygulama</string>
@@ -265,7 +265,7 @@
     <string name="search_universal_ips"><font size="12">IP\'leri arayın</font></string>
     <string name="info_dialog_copy_toast_msg">IP adresi kopyalandı.</string>
     <string name="orbot_none_desc">Yukarıdakilerin hiçbiri.</string>
-    <string name="orbot_install_dialog_title">Orbot kurulsun mu\?</string>
+    <string name="orbot_install_dialog_title">Orbot kurulsun mu?</string>
     <string name="hsf_start_dialog_message">Güvenli ve emniyetli Android\'e bir adım uzaktasınız: Ağ etkinliğini anında görün, web sitelerini, IP\'leri ve kötü davranan uygulamaları engelleyin.</string>
     <string name="hsf_exclude_error">VPN kilitleme modunda hariç tutma mümkün değil</string>
     <string name="dc_entries">%1$s girişler</string>
@@ -275,7 +275,7 @@
     <string name="dns_btm_resolved_doh_no_server">çözüldü %1$s</string>
     <string name="univ_ip_delete_dialog_positive">Tümünü sil</string>
     <string name="univ_accessibility_dialog_positive">İzin ver</string>
-    <string name="fapps_unmetered_unblock_dialog_message"><i>Listelenen</i> uygulamalar için kotasız (WiFi) ağda bağlantılara izin verilsin mi\?</string>
+    <string name="fapps_unmetered_unblock_dialog_message"><i>Listelenen</i> uygulamalar için kotasız (WiFi) ağda bağlantılara izin verilsin mi?</string>
     <string name="settings_local_blocklist_in_use">%1$s kullanımdaki blok listeleri</string>
     <string name="firewall_rule_block_udp_ntp">UDP Engellendi</string>
     <string name="notif_dialog_pause_dialog_title">Uygulama duraklatıldı!</string>
@@ -458,7 +458,7 @@
     <string name="cd_dns_crypt_dialog_name">Ad</string>
     <string name="univ_accessibility_crash_dialog_positive">Ayarlara Git</string>
     <string name="dns_proxy_name">Vekil Adı</string>
-    <string name="fapps_unmetered_block_dialog_message"><i>Listelenen</i> uygulamalar için kotasız (WiFi) ağda bağlantılar engellensin mi\?</string>
+    <string name="fapps_unmetered_block_dialog_message"><i>Listelenen</i> uygulamalar için kotasız (WiFi) ağda bağlantılar engellensin mi?</string>
     <string name="rules_load_failure_heading">Not</string>
     <string name="pause_text">duraklatıldı</string>
     <string name="firewall_rule_global_lockdown">Kilitlenme</string>
@@ -490,7 +490,7 @@
     <string name="cd_doh_dialog_resolver_name">Çözümleyici Adı</string>
     <string name="hs_download_positive_play_store">Eksiksiz Güncelleme</string>
     <string name="univ_delete_firewall_dialog_title">Tüm IP Kuralları silinsin mi?</string>
-    <string name="fapps_metered_block_dialog_message"><i>Listelenen</i> uygulamalar için kotalı (mobil) ağda bağlantılar engellensin mi\?</string>
+    <string name="fapps_metered_block_dialog_message"><i>Listelenen</i> uygulamalar için kotalı (mobil) ağda bağlantılar engellensin mi?</string>
     <string name="update_complete_action_snack">YENİDEN BAŞLAT</string>
     <string name="new_app_notification_content">Rethink son yüklenen %1$s uygulamasını engelledi.</string>
     <string name="category_name_others">Diğer</string>
@@ -620,7 +620,7 @@
     <string name="ada_app_status_block">engellendi</string>
     <string name="ada_app_unmetered">Ölçülmeyen</string>
     <string name="network_dns">Sistem DNS</string>
-    <string name="cd_remove_dialog_title">Etki alanı silinsin mi\?</string>
+    <string name="cd_remove_dialog_title">Etki alanı silinsin mi?</string>
     <string name="firewall_rule_bypass_universal_ip">Bypass edilen IP</string>
     <string name="cd_dialog_error_invalid_domain">Geçersiz URL veya etki alanı adı</string>
     <string name="cd_blocked_initial">Si</string>
@@ -684,7 +684,7 @@
     <string name="ctbs_block_other_apps">%1$s için uygulanan kurallar %2$s diğer uygulamalar için de geçerli olacaktır</string>
     <string name="notif_download_failure_content">İndirme başarısız oldu. Tekrar deneyin.</string>
     <string name="rt_dialog_title">Değişiklikleri Kaydet</string>
-    <string name="dc_dns_proxy">DNS Vekil</string>
+    <string name="dc_dns_proxy" translatable="false">DNS Vekil</string>
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="ci_delete">sil</string>
     <string name="ci_bypass_universal_initial">BE</string>
@@ -699,8 +699,8 @@
     <string name="settings_app_notification_a13_heading">Uygulama Bildirimi</string>
     <string name="about_privacy_policy">Gizlilik ilkesini oku</string>
     <string name="about_app_translate">Çevir</string>
-    <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
-    <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
+    <string name="about_translate_link" translatable="false">https://svc.rethinkdns.com/r/translate</string>
+    <string name="about_privacy_policy_link" translatable="false">https://www.rethinkdns.com/privacy</string>
     <string name="notification_screen_error">Uygulama Bildirim ekranı başlatılamadı.</string>
     <string name="intent_launch_error">Sayım başlatılmadı %1$s</string>
     <string name="no_browser_error">Tarayıcıdan web sayfası açılamıyor.</string>
@@ -1669,4 +1669,5 @@
     <string name="lbl_cancelled" translatable="true">İptal edildi</string>
     <string name="lbl_plan" translatable="true">Plan</string>
     <string name="lbl_grace_period" translatable="true">Ödeme Süresi</string>
+    <string name="ct_ip_port" translatable="false"></string>
 </resources>
