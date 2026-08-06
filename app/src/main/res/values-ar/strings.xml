@@ -619,8 +619,8 @@
     <string name="settings_ip_network_heading">اختر إصدار IP</string>
     <string name="orbot_bs_status_2">تم تعيين وكيل HTTP.</string>
     <string name="whats_new_version_update" translatable="false"><![CDATA[<b>متعدد اللغات!</b><br/><br/> 1. إعادة دعم Android 6.<br/>2. تجديد RDNS + UI.<br/> 3. تجديد محرك الشبكة وجدار الحماية.<br/> 4. <i>ميزة جديدة</i>: الترجمة لأكثر من 15 لغة<br/> 5. <i>ميزة جديدة</i>: ايقونات متكيفة<br/> 6. <i>ميزة جديدة</i>: إظهار أسماء النطاقات في سجلات شبكة التطبيق.<br/> 7. إصلاح الاشعارات المفقودة في Android 13.<br/> 8. إصلاح سلوك Orbot DNS المتضمن.<br/> 9. شاشة التطبيقات متاحة الآن في نمط DNS-only.<br/> 10. تحسينات كبيرة على مدير التنزيل المدمج.<br/><br/> <a href=https://hosted.weblate.org/projects/rethink-dns-firewall/app/>ساعدنا في ترجمة هذا التطبيق</a>]]></string>
-    <string name="bsct_block_ip">حظر ، تجاوز <u> عنوان IP هذا </u> لـ <u> هذا التطبيق </u></string>
-    <string name="bsct_block">حظر ، تجاوز ، استبعاد ، عزل <u> هذا التطبيق </u></string>
+    <string name="bsct_block_ip">حظر ، تجاوز &lt;u&gt; عنوان IP هذا &lt;/u&gt; لـ &lt;u&gt; هذا التطبيق &lt;/u&gt;</string>
+    <string name="bsct_block">حظر ، تجاوز ، استبعاد ، عزل &lt;u&gt; هذا التطبيق &lt;/u&gt;</string>
     <string name="orbot_both_desc">كل ما ورداعلاه.</string>
     <string name="orbot_stop_dialog_message">توقف Rethink عن إعادة توجيه الإتصالات إلى Orbot ، ولكن ربما يعمل Orbot في الخلفية.</string>
     <string name="cd_dns_crypt_dialog_name">الاسم</string>
