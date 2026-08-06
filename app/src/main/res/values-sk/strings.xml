@@ -117,9 +117,9 @@
     <string name="dns_query_clear_logs_title" translatable="true">Odstrániť všetky DNS záznamy?</string>
     <string name="dns_query_clear_logs_message" translatable="true">Týmto sa odstránia DNS záznamy na zariadení. Táto operácia je nezvratná. Chcete pokračovať?</string>
     <string name="bsct_app_info" translatable="true">Info o Aplikácií</string>
-    <string name="bsct_block_domain" translatable="true">Blokovať, dôveru <u>doménam</u> pre <u>túto aplikáciu</u></string>
-    <string name="bsct_block_ip" translatable="true">Blokovať, dôveru <u>tejto IP adrese</u> pre <u>túto aplikáciu</u></string>
-    <string name="bsct_block" translatable="true">Zablokujte, vynechajte, vylúčte, izolujte <u>túto aplikáciu</u></string>
+    <string name="bsct_block_domain" translatable="true">Blokovať, dôveru &lt;u&gt;doménam&lt;/u&gt; pre &lt;u&gt;túto aplikáciu&lt;/u&gt;</string>
+    <string name="bsct_block_ip" translatable="true">Blokovať, dôveru &lt;u&gt;tejto IP adrese&lt;/u&gt; pre &lt;u&gt;túto aplikáciu&lt;/u&gt;</string>
+    <string name="bsct_block" translatable="true">Zablokujte, vynechajte, vylúčte, izolujte &lt;u&gt;túto aplikáciu&lt;/u&gt;</string>
     <string name="bsct_conn_block_desc" translatable="true">zablokovaná %1$s používateľom %2$s</string>
     <string name="bsct_conn_block_desc_device" translatable="true">zablokovaný %1$s na zariadení</string>
     <string name="bsct_conn_desc_allowed" translatable="true">povolené na %1$s %2$s</string>
@@ -161,12 +161,8 @@
     <string name="untracked" translatable="true">nesleduj</string>
     <string name="firewall_mode_info_explanation_new" translatable="true">Monitorujte sieťovú aktivitu a firewall akejkoľvek aplikácie alebo IP adresy.</string>
     <string name="dns_mode_info_explanation_new" translatable="true">Monitorujte, blokujte a šifrujte požiadavky DNS.</string>
-    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink využíva službu dostupnosti na sledovanie, ktoré aplikácie sa používajú (v popredí) a ktoré nepoužívajú (na pozadí).
-\n
-\nRethink nezhromažďuje žiadne informácie ani vás žiadnym spôsobom nešpehuje.</string>
-    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Rethink služba dostupnosti zastavila alebo zlyhala. <i><b>Prejdite na Nastavenia a Vynútené zastavenie</b></i> Rethink a znova spustite <i>Zablokovať akúkoľvek nepoužívanú aplikáciu</i>.
-\n
-\nRethink využíva službu dostupnosti na sledovanie, ktoré aplikácie sa používajú (v popredí) a ktoré nepoužívajú (na pozadí).</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink využíva službu dostupnosti na sledovanie, ktoré aplikácie sa používajú (v popredí) a ktoré nepoužívajú (na pozadí). \n \nRethink nezhromažďuje žiadne informácie ani vás žiadnym spôsobom nešpehuje.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Rethink služba dostupnosti zastavila alebo zlyhala. <i><b>Prejdite na Nastavenia a Vynútené zastavenie</b></i> Rethink a znova spustite <i>Zablokovať akúkoľvek nepoužívanú aplikáciu</i>. \n \nRethink využíva službu dostupnosti na sledovanie, ktoré aplikácie sa používajú (v popredí) a ktoré nepoužívajú (na pozadí).</string>
     <string name="always_on_dialog_lockdown_stop_message" translatable="true">Rethink používa VPN v režime <i>Uzamknutie</i>. Jeho zastavenie by viedlo k strate internetového pripojenia v tomto užívateľskom profile. Chcete napriek tomu pokračovať?</string>
     <string name="bsct_conn_rule_explanation" translatable="true">&lt;u&gt;#1&lt;/u&gt;: Blokuje pripojenie aplikácie k internetu. \n&lt;u&gt;#2&lt;/u&gt;: Blokuje pripojenie akejkoľvek aplikácie ku konkrétnej adrese IP. \n&lt;u&gt;#3&lt;/u&gt;: Blokuje všetky pripojenia, keď je zariadenie uzamknuté (Universal Firewall). \n&lt;u&gt;#4&lt;/u&gt;: Blokuje všetky nepoužívané aplikácie (Universal Firewall). \n&lt;u&gt;#5&lt;/u&gt;: Blokuje pripojenia, keď je zdrojová aplikácia neznáma (Universal Firewall). \n&lt;u&gt;#6&lt;/u&gt;: Blokuje všetku komunikáciu UDP okrem DNS (Universal Firewall). \n&lt;u&gt;#7&lt;/u&gt;: Blokovať pripojenia pri obídení DNS (Universal Firewall).</string>
     <string name="doh_custom_url_remove_dialog_title" translatable="true">Odstrániť DoH pripojenie?</string>
