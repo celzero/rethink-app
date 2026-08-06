@@ -141,12 +141,12 @@
     <string name="lbl_domain" translatable="true">Domena</string>
     <string name="dns_proxy_remove_success" translatable="true">Usunięto serwer proxy DNS.</string>
     <string name="local_blocklist_download" translatable="true">Pobierz listy zablokowanych</string>
-    <string name="dns_proxy_remove_dialog_title" translatable="true">Usunąć DNS Proxy\?</string>
+    <string name="dns_proxy_remove_dialog_title" translatable="true">Usunąć DNS Proxy?</string>
     <string name="dns_proxy_remove_dialog_message" translatable="true">Usuń serwer proxy DNS z zapisanej konfiguracji.</string>
     <string name="local_blocklist_redownload" translatable="true">Aktualny!</string>
     <string name="local_blocklist_redownload_desc" translatable="true">Listy blokowania na urządzeniu są już w najnowszej wersji v% 1$s.</string>
     <string name="refresh_complete" translatable="true">Ponowna synchronizacja listy aplikacji zakończona.</string>
-    <string name="local_blocklist_download_desc" translatable="true">Pobierz listy zablokowanych (około 60MB), aby korzystać z tej funkcji\?</string>
+    <string name="local_blocklist_download_desc" translatable="true">Pobierz listy zablokowanych (około 60MB), aby korzystać z tej funkcji?</string>
     <string name="configure_dns_connected_doh_status" translatable="true">DNS przez HTTPS</string>
     <string name="configure_dns_crypt" translatable="true">DNSCrypt: %1$s resolwery</string>
     <string name="show_logs_disabled_network_message" translatable="true">Rejestrowanie połączeń zostało wyłączone. Aby ponownie włączyć, przejdź do <i>Ustawień</i> i włącz <i>Włącz rejestrowanie na urządzeniu.</i></string>
@@ -157,7 +157,7 @@
     <string name="search_universal_ips" translatable="true"><font size="12"> Wyszukiwanie adresów IP</font></string>
     <string name="search_custom_domains" translatable="true"><font size="12">Wyszukaj nazwy domen</font></string>
     <string name="search_rethinkplus_file_tag" translatable="true">&lt;rozmiar czcionki=\"12\"&gt;Listy blokowania wyszukiwania&lt;/font&gt;</string>
-    <string name="download_update_dialog_message" translatable="true">Nowa wersja aplikacji jest dostępna do pobrania ze strony internetowej. Czy chcesz kontynuować\?</string>
+    <string name="download_update_dialog_message" translatable="true">Nowa wersja aplikacji jest dostępna do pobrania ze strony internetowej. Czy chcesz kontynuować?</string>
     <string name="download_update_dialog_failure_message" translatable="true">Albo nasze serwery są wyłączone, albo nie można nawiązać połączenia. Spróbuj ponownie za jakiś czas.</string>
     <string name="app_mode_wireguard" translatable="true">VPN</string>
     <string name="info_dialog_copy_toast_msg" translatable="true">Zkopiowano adres IP.</string>
@@ -206,8 +206,8 @@
     <string name="orbot_both" translatable="true">TCP+ HTTP proxy serwer</string>
     <string name="settings_proxy_header" translatable="true">proxy serwer</string>
     <string name="orbot" translatable="true">Orbot</string>
-    <string name="always_on_dialog_stop_message" translatable="true">Zawsze włączona sieć VPN jest włączona dla Rethink. Czy na pewno i tak chcesz zatrzymać Rethink\?</string>
-    <string name="orbot_app_issue" translatable="true">Nie można uruchomić programu Orbot. Czy jest zainstalowany\?</string>
+    <string name="always_on_dialog_stop_message" translatable="true">Zawsze włączona sieć VPN jest włączona dla Rethink. Czy na pewno i tak chcesz zatrzymać Rethink?</string>
+    <string name="orbot_app_issue" translatable="true">Nie można uruchomić programu Orbot. Czy jest zainstalowany?</string>
     <string name="orbot_bs_status_trying_connect" translatable="true">Konfigurowanie Orbot…</string>
     <string name="orbot_stop_dialog_title" translatable="true">Wymagana ręczna interwencja</string>
     <string name="orbot_stop_dialog_dns_message" translatable="true">Rethink jest skonfigurowany do przekazywania zapytań DNS do Orbota. Zmień zgodnie z wymaganiami.</string>
@@ -223,7 +223,7 @@
     <string name="orbot_status_arg_2" translatable="true">TCP</string>
     <string name="orbot_status_arg_3" translatable="true">DNS i TCP</string>
     <string name="orbot_stop_dialog_message" translatable="true">Rethink przestał przekazywać połączenia do Orbota, ale Orbot może działać w tle.</string>
-    <string name="orbot_install_dialog_title" translatable="true">Zainstalować Orbot\?</string>
+    <string name="orbot_install_dialog_title" translatable="true">Zainstalować Orbot?</string>
     <string name="settings_app_notification_a13_heading" translatable="true">Powiadomienia aplikacji</string>
     <string name="settings_app_notification_a13_desc" translatable="true">Włącz uprawnienie do pokazywania powiadomień</string>
     <string name="settings_http_proxy_desc" translatable="true">Przekierowuję do: %1$s</string>

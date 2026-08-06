@@ -768,7 +768,7 @@
     <string name="fapps_unmetered_unblock_dialog_title" translatable="true">Bei ungetaktet zulassen</string>
     <string name="firewall_rule_trusted_domain" translatable="true">Vertrauenswürdige Domäne (App)</string>
     <string name="cd_no_rules_text" translatable="true">Keine Domain-Regeln.</string>
-    <string name="bsdl_block_desc" translatable="true">Blockieren, <u>dieser Domäne</u> vertrauen</string>
+    <string name="bsdl_block_desc" translatable="true">Blockieren, &lt;u&gt;dieser Domäne&lt;/u&gt; vertrauen</string>
     <string name="bypass_dns_firewall" translatable="true">DNS &amp; Firewall umgehen</string>
     <string name="settings_general_customize" translatable="true">Anpassen</string>
     <string name="settings_default_dns_heading" translatable="true">Fallback-DNS auswählen</string>
