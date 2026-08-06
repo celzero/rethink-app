@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">RethinkDNS</string>
-    <string name="app_name_small_case">rethink</string>
+    <string name="app_name" translatable="false">RethinkDNS</string>
+    <string name="app_name_small_case" translatable="false">rethink</string>
     <string name="fapps_unmetered_block_dialog_message">¿Bloquear las conexiones en la red sin límites (WiFi) para las aplicaciones en la <i>lista</i>\?</string>
     <string name="unicode_question_sign" translatable="false">❔</string>
     <string name="network_log_app_name_unnamed">Sin nombre (%1$s)</string>
