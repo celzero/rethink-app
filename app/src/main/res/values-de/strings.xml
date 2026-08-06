@@ -615,7 +615,7 @@
     <string name="dns_btm_sheet_dialog_message"><Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s Blockliste(n)</h3>%3$s.<br/><br/>]]></Data></string>
     <string name="dns_btm_sheet_dialog_ips"><Data><![CDATA[ %1$s %2$s <br/>]]></Data></string>
     <string name="dns_btm_sheet_chip_no_answer">Keine Antwort</string>
-    <string name="dns_btm_resolved_crypt">aufgelöst <u>anonym</u> %1$s von %2$s durch %3$s</string>
+    <string name="dns_btm_resolved_crypt">aufgelöst &lt;u&gt;anonym&lt;/u&gt; %1$s von %2$s durch %3$s</string>
     <string name="dns_btm_resolved_doh">aufgelöst %1$s durch %2$s</string>
     <string name="dns_btm_resolved_doh_no_server">aufgelöst %1$s</string>
     <string name="dns_btm_latency_ms">%1$ss</string>
