@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">रीथिंकडीएनएस</string>
-    <string name="app_name_small_case">रीथिंक</string>
+    <string name="app_name" translatable="false">रीथिंकडीएनएस</string>
+    <string name="app_name_small_case" translatable="false">रीथिंक</string>
     <string name="title_about">हमारे बारे में</string>
     <string name="title_settings">सेटिंग्स</string>
     <string name="pause_title_desc">एक झपकी लेते हुए…</string>
@@ -16,7 +16,7 @@
     <string name="slide_2_desc">रीथिंक नेटवर्क गतिविधि की निगरानी करने, इंटरनेट सेंसरशिप को बायपास करने, और आपके एंड्रॉइड डिवाइस पर ऐप्स फ़ायरवॉल करने का सबसे आसान तरीका है।</string>
     <string name="slide_1_title">नि: शुल्क और ओपन सोर्स</string>
     <string name="slide_1_desc">रीथिंक एक ओपन सोर्स सॉफ्टवेयर है जो मोज़िला बिल्डर्स एमवीपी प्रोग्राम द्वारा समर्थित है।</string>
-    <string name="rdns_plus">आरडीएनएस प्लस</string>
+    <string name="rdns_plus" translatable="false">आरडीएनएस प्लस</string>
     <string name="allow">अनुमति दें</string>
     <string name="block">ब्लॉक करें</string>
     <string name="bypass_universal">यूनवर्सल बायपास</string>
