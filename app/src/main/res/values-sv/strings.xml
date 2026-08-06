@@ -1653,4 +1653,12 @@
     <string name="lbl_allowed" translatable="true">Tillåten</string>
     <string name="lbl_create" translatable="true">Skapa</string>
     <string name="lbl_action_required" translatable="true">Åtgärd behövs</string>
+    <string name="lbl_proceed" translatable="true">Fortsätt</string>
+    <string name="lbl_delete" translatable="true">Radera</string>
+    <string name="lbl_qr_code" translatable="true">QR-kod</string>
+    <string name="lbl_domain" translatable="true">Domän</string>
+    <string name="lbl_wildcard" translatable="true">Jokertecken</string>
+    <string name="lbl_public_key" translatable="true">Publik Nyckel</string>
+    <string name="lbl_private_key" translatable="true">Privat nyckel</string>
+    <string name="lbl_disabled" translatable="true">Inaktiverad</string>
 </resources>
