@@ -1661,4 +1661,5 @@
     <string name="lbl_expires_on" translatable="true">صالحة حتى</string>
     <string name="firewall_rule_proxied" translatable="true">موكّل</string>
     <string name="firewall_rule_bypass_proxy" translatable="true">تجاوز الوكيل</string>
+    <string name="ct_ip_port" translatable="false"></string>
 </resources>
