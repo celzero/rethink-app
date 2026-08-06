@@ -17,10 +17,8 @@
     <string name="status_protected_with_http" translatable="true">HTTP 프록시로 보호됨</string>
     <string name="dns_query_clear_logs_title" translatable="true">모든 DNS 로그를 삭제하시겠습니까?</string>
     <string name="conn_track_clear_logs_title" translatable="true">모든 네트워크 로그를 삭제하시겠습니까\?</string>
-    <string name="bsct_block_domain" translatable="true"><u>이 앱</u>의 <u>도메인</u>을 차단 및 신뢰</string>
-    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink는 접근성 서비스를 사용하여 사용 중인 앱(포그라운드)과 사용 중이 아닌 앱(백그라운드)을 추적합니다.
-\n
-\nRethink는 어떤 방식으로도 정보를 수집하거나 사용자를 감시하지 않습니다.</string>
+    <string name="bsct_block_domain" translatable="true">&lt;u&gt;이 앱&lt;/u&gt;의 &lt;u&gt;도메인&lt;/u&gt;을 차단 및 신뢰</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink는 접근성 서비스를 사용하여 사용 중인 앱(포그라운드)과 사용 중이 아닌 앱(백그라운드)을 추적합니다. \n \nRethink는 어떤 방식으로도 정보를 수집하거나 사용자를 감시하지 않습니다.</string>
     <string name="universal_firewall_explanation" translatable="true">기기의 이벤트를 기반으로 모든 앱에 방화벽을 적용합니다. 예를 들어 기기가 잠겨 있거나 특정 앱을 사용하지 않을 때 방화벽이 적용됩니다.</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">경고: Rethink가 비활성화되었습니다</string>
     <string name="lbl_import" translatable="true">불러오기</string>
@@ -107,7 +105,7 @@
     <string name="dns_explanation_dns_connected" translatable="true">RethinkDNS에 연결됨</string>
     <string name="notification_action_dns_mode" translatable="true">DNS</string>
     <string name="lbl_very" translatable="true">매우</string>
-    <string name="bsct_block_ip" translatable="true"><u>이 앱</u>에서 <u>이 IP</u>를 차단 또는 신뢰</string>
+    <string name="bsct_block_ip" translatable="true">&lt;u&gt;이 앱&lt;/u&gt;에서 &lt;u&gt;이 IP&lt;/u&gt;를 차단 또는 신뢰</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">보호되지 않음</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">RethinkDNS 및 방화벽에 연결됨</string>
     <string name="allow" translatable="true">허용</string>
@@ -201,7 +199,7 @@
     <string name="cd_custom_dns_proxy_title" translatable="true">사용자 지정 DNS 프록시</string>
     <string name="cd_custom_dns_proxy_name_default" translatable="true">프록시</string>
     <string name="cd_custom_dns_proxy_name" translatable="true">프록시 %1$s</string>
-    <string name="bsct_block" translatable="true"><u>이 앱을</u> 차단, 무시, 제외, 격리하기</string>
+    <string name="bsct_block" translatable="true">&lt;u&gt;이 앱을&lt;/u&gt; 차단, 무시, 제외, 격리하기</string>
     <string name="bsct_conn_block_desc_device" translatable="true">%1$s이 장치에서 차단됨</string>
     <string name="bsct_conn_block_desc" translatable="true">%2$s에 의해 %1$s이 차단됨</string>
     <string name="always_on_dialog_heading" translatable="true">VPN 항상 켜기 비활성화</string>
@@ -1157,8 +1155,6 @@
     <string name="ac_split_auto_desc" translatable="true">필요하면 패킷을 변경합니다.</string>
     <string name="hop_error_toast_msg_1" translatable="true">중계 불가, 이미 %1$s</string>
     <string name="adv_tasker_dialog_edit_hint" translatable="true">패키지 이름 입력 (예: net.dinglisch.android.taskerm)</string>
-    <string name="use_fallback_dns_to_bypass" translatable="true">폴백 DNS를 우회 경로로 사용</string>
-    <string name="use_fallback_dns_to_bypass_desc" translatable="true">켠 경우 우회한 앱, 도메인, IP가 항상 폴백 DNS를 사용합니다.</string>
     <string name="wireguard_disable_failure" translatable="true">\"WireGuard 항상 켜기\"를 끌 수 없음</string>
     <string name="wireguard_disable_failure_relay" translatable="true">\"WireGuard 중계\"를 끌 수 없음</string>
     <string name="hop_error_toast_msg_2" translatable="true">중계에 이용할 수 있는 WireGuard 없음. 더 추가해 주세요.</string>
