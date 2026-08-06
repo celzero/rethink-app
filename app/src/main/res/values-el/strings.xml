@@ -108,7 +108,7 @@
     <string name="firewall_rules" translatable="true">Κανόνες δικτύου</string>
     <string name="hybrid_mode_info_title" translatable="true">DNS + Firewallwall</string>
     <string name="default_dns_name" translatable="true">RDNS Default</string>
-    <string name="bsct_block_domain" translatable="true">Block, εμπιστοσύνη <u>domain(s) </u> για <u> αυτή την εφαρμογή </u></string>
+    <string name="bsct_block_domain" translatable="true">Block, εμπιστοσύνη &lt;u&gt;domain(s) &lt;/u&gt; για &lt;u&gt; αυτή την εφαρμογή &lt;/u&gt;</string>
     <string name="lbl_sec" translatable="true">δευτ</string>
     <string name="lbl_min" translatable="true">λεπ</string>
     <string name="status_protected_with_socks5" translatable="true">προστατεύεται με socks proxy</string>
