@@ -1136,8 +1136,6 @@
     <string name="vpn_policy_relaxed" translatable="true">Relaxált</string>
     <string name="vpn_policy_relaxed_desc" translatable="true">Reagál az érdekes kapcsolati változásokra.</string>
     <string name="vpn_policy_title" translatable="true">Kapcsolatváltozási irányelv</string>
-    <string name="use_fallback_dns_to_bypass" translatable="true">Tartalék DNS használata megkerülésként</string>
-    <string name="use_fallback_dns_to_bypass_desc" translatable="true">Ha engedélyezve van, mindig a tartalék DNS-t használja a megkerült alkalmazásokhoz, domainekhez és IP-címekhez.</string>
     <string name="title_database_dump" translatable="true">Adatbázis állapota</string>
     <string name="lbl_always" translatable="true">Mindig</string>
     <string name="about_terms_of_service" translatable="true">Általános szerződési feltételek</string>
