@@ -376,9 +376,7 @@
     <string name="dns_card_latency_active" translatable="true">%1$s پیامک</string>
     <string name="hsf_vpn_dialog_header" translatable="true">توجه!</string>
     <string name="settings_socks5_dialog_hint_password" translatable="true">رمز (اختیاری)</string>
-    <string name="settings_notification_dialog_option_2" translatable="true">"
-\nDNS / DNS + دیوارهٔ آتش:
-\nدو دکمه را برای تغییر سریع بین حالت ذخیرهٔ-باتری DNS و حالت عادی DNS + دیوارهٔ آتش نشان می دهد."</string>
+    <string name="settings_notification_dialog_option_2" translatable="true">\n\nDNS / DNS + دیوارهٔ آتش:\n\nدو دکمه را برای تغییر سریع بین حالت ذخیرهٔ-باتری DNS و حالت عادی DNS + دیوارهٔ آتش نشان می دهد.</string>
     <string name="firewall_status_blocked" translatable="true">مسدود</string>
     <string name="settings_socks_forwarding_default_desc" translatable="true">انتقال اتصالات به SOCKS5 endpoint.</string>
     <string name="dns_card_latency_inactive" translatable="true">روشن کردن حالت DNS.</string>
@@ -387,10 +385,7 @@
     <string name="settings_biometeric_heading" translatable="true">فعال کردن قفل برنامه</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">خاموش (پیش‌فرض)</string>
     <string name="settings_notification_desc1" translatable="true">مکث / توقف (پیش‌فرض)</string>
-    <string name="settings_notification_dialog_option_3" translatable="true">"
-\nهیچ کدام:
-\nهیچ دکمه ای را نشان نمی‌دهد.
-\n"</string>
+    <string name="settings_notification_dialog_option_3" translatable="true">\n\nهیچ کدام:\n\nهیچ دکمه ای را نشان نمی‌دهد.\n\n</string>
     <string name="settings_locale_heading" translatable="true">تغییر زبان</string>
     <string name="settings_selected_theme" translatable="true">پوستهٔ فعلی: %1$s</string>
     <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
@@ -405,9 +400,7 @@
     <string name="hsf_downtime" translatable="true">(غیر فعال از %1$s)</string>
     <string name="settings_theme_dialog_themes_1" translatable="true">تنظیم شده توسط System</string>
     <string name="settings_notification_desc2" translatable="true">DNS / DNS + دیوارهٔ آتش</string>
-    <string name="settings_notification_dialog_option_1" translatable="true">"
-\nمکث / توقف (پیش‌فرض):
-\nدو دکمه را نشان می دهد تا به سرعت مکث کرده و Rethink را متوقف کنید."</string>
+    <string name="settings_notification_dialog_option_1" translatable="true">\n\nمکث / توقف (پیش‌فرض):\n\nدو دکمه را نشان می دهد تا به سرعت مکث کرده و Rethink را متوقف کنید.</string>
     <string name="settings_locale_desc" translatable="true">زبان مورد نظرتان را انتخاب کنید</string>
     <string name="firewall_card_status_active" translatable="true">%1$s برنامه</string>
     <string name="hsf_start_btn_state" translatable="true">آغاز</string>
