@@ -47,8 +47,8 @@
     <string name="lbl_ip_rules" translatable="true">IP Rules</string>
     <string name="lbl_domain_rules" translatable="true">Domain Rules</string>
     <string name="lbl_notes" translatable="true">Notes</string>
-    <string name="title_notes" translatable="true">Edit Notes</string>
-    <string name="hint_notes" translatable="true">Add notes about this rule...</string>
+    <string name="title_notes" translatable="true">Notes</string>
+    <string name="hint_notes" translatable="true">Add notes about this app</string>
     <string name="lbl_delete" translatable="true">Delete</string>
     <string name="lbl_proceed" translatable="true">Proceed</string>
     <string name="lbl_private_key" translatable="true">Private key</string>
