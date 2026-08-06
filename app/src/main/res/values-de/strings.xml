@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">RethinkDNS</string>
-    <string name="app_name_small_case">rethink</string>
+    <string name="app_name" translatable="false">RethinkDNS</string>
+    <string name="app_name_small_case" translatable="false">rethink</string>
     <string name="title_settings">Einstellungen</string>
     <string name="title_about">Über</string>
     <string name="about_title_desc">Netzwerksicherheitsbedrohungen erkennen und blockieren</string>
