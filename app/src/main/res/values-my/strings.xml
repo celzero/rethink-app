@@ -1659,4 +1659,6 @@
     <string name="bubble_empty_state_title" translatable="false"></string>
     <string name="server_selection_sub_on_hold" translatable="false"></string>
     <string name="lbl_random" translatable="true"></string>
+    <string name="title_about" translatable="true">1148</string>
+    <string name="title_settings" translatable="true">’…</string>
 </resources>
