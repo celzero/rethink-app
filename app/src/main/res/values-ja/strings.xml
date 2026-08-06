@@ -100,7 +100,7 @@
     <string name="doh_custom_url_remove_success" translatable="true">エンドポイントを削除しました。</string>
     <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">DNSCryptリゾルバを削除しますか？</string>
     <string name="dns_crypt_url_remove_dialog_message" translatable="true">保存された構成から DNSCrypt リゾルバーを削除します。</string>
-    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">DNSCryptリレーを削除しますか\?</string>
+    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">DNSCryptリレーを削除しますか?</string>
     <string name="dns_crypt_relay_remove_dialog_message" translatable="true">保存された構成から DNSCrypt リレーを削除します。</string>
     <string name="dns_crypt_relay_remove_success" translatable="true">DNSCrypt リレーが削除されました。</string>
     <string name="dns_proxy_remove_success" translatable="true">DNS プロキシが削除されました。</string>
@@ -168,7 +168,7 @@
     <string name="settings_dns_proxy_dialog_app" translatable="true">アプリ</string>
     <string name="settings_dns_proxy_dialog_hostname" translatable="true">ホスト名</string>
     <string name="settings_dns_proxy_dialog_port_number" translatable="true">ポート番号</string>
-    <string name="settings_dns_proxy_dialog_app_desc" translatable="true">選択したアプリはVPNから除外され、ユーザーに代わって接続をプロキシできるようになります。</string>
+    <string name="settings_dns_proxy_dialog_app_desc" translatable="false">選択したアプリはVPNから除外され、ユーザーに代わって接続をプロキシできるようになります。</string>
     <string name="settings_socks5_dialog_hint_username" translatable="true">ユーザ名 (オプション)</string>
     <string name="settings_socks5_dialog_hint_password" translatable="true">パスワード(オプション)</string>
     <string name="settings_theme_dialog_title" translatable="true">外観設定</string>
@@ -188,10 +188,7 @@
     <string name="settings_notification_dialog_option_1" translatable="true">"
 \n一時停止/停止（デフォルト）。
 \n2つのボタンを表示し、RethinkDNSの一時停止と停止を素早く行うことができます。"</string>
-    <string name="settings_notification_dialog_option_3" translatable="true">"
-\nなし：
-\nボタンを表示しません。
-\n"</string>
+    <string name="settings_notification_dialog_option_3" translatable="true">\n\nなし：\n\nボタンを表示しません。\n\n</string>
     <string name="settings_locale_heading" translatable="true">言語の変更</string>
     <string name="settings_locale_dialog_title" translatable="true">ご希望の言語を選択してください</string>
     <string name="settings_locale_dialog_neutral" translatable="true">このアプリの翻訳にご協力ください</string>
@@ -223,8 +220,8 @@
     <string name="about_app_update_check" translatable="true">更新を確認する</string>
     <string name="about_app_contributors" translatable="true">開発者</string>
     <string name="about_dialog_positive_button" translatable="true">レッツゴー</string>
-    <string name="about_version" translatable="true">v%1$s</string>
-    <string name="about_version_install_source" translatable="true">v%1$s (%2$s)</string>
+    <string name="about_version" translatable="false">v%1$s</string>
+    <string name="about_version_install_source" translatable="false">v%1$s (%2$s)</string>
     <string name="about_dialog_neutral_button" translatable="true">機能を提案する</string>
     <string name="app_info_error" translatable="true">App infoを起動できませんでした。</string>
     <string name="vpn_profile_error" translatable="true">VPNプロファイルを起動できませんでした。</string>
@@ -279,9 +276,7 @@
     <string name="dns_connected_no_count" translatable="true">接続済み</string>
     <string name="dns_info_positive" translatable="true">Ok</string>
     <string name="dns_info_neutral" translatable="true">コピー</string>
-    <string name="dns_proxy_dialog_message_no_app" translatable="true">IP アドレス: %1$s
-\n
-\nポート番号: %2$s</string>
+    <string name="dns_proxy_dialog_message_no_app" translatable="true">IP アドレス: %1$s \n \nポート番号: %2$s</string>
     <string name="dns_query_latency" translatable="true">%1$sms</string>
     <string name="dns_proxy_dialog_header_dns" translatable="true">DNSプロキシを追加する</string>
     <string name="dns_proxy_name" translatable="true">プロキシ名</string>
@@ -320,23 +315,23 @@
     <string name="orbot_stop_dialog_negative" translatable="true">Orbotを止める</string>
     <string name="orbot_install_dialog_message" translatable="true">Orbotは、Torの特徴と機能をAndroidにもたらします。</string>
     <string name="dns_proxy_remove_dialog_message" translatable="true">保存された構成から DNS プロキシを削除します。</string>
-    <string name="always_on_dialog_stop_message" translatable="true">Rethink は現在常時接続 VPN が有効になっています。Rethink を停止してもよろしいですか\?</string>
+    <string name="always_on_dialog_stop_message" translatable="true">Rethink は現在常時接続 VPN が有効になっています。Rethink を停止してもよろしいですか?</string>
     <string name="always_on_dialog_lockdown_stop_message" translatable="true">RethinkはVPNを<i>ロックダウン</i>モードで実行しています。これを停止した場合、現在のインターネット接続が失われます。続行しますか\?</string>
     <string name="private_dns_dialog_desc" translatable="true">Rethink の DNS 設定は、Android のプライベート DNS によって上書きされます。
 \n
 \nRethink の DNS を使用するには、Android の設定にアクセスし、「プライベート DNS」をオフにしてください。</string>
     <string name="private_dns_dialog_positive" translatable="true">設定を開く</string>
-    <string name="univ_firewall_dialog_title" translatable="true">IPの規則を削除しますか\?</string>
-    <string name="univ_firewall_dialog_message" translatable="true">この規則を削除すると、すべてのアプリケーションがこの IP に接続できるようになります。続行しますか\?</string>
+    <string name="univ_firewall_dialog_title" translatable="true">IPの規則を削除しますか?</string>
+    <string name="univ_firewall_dialog_message" translatable="true">この規則を削除すると、すべてのアプリケーションがこの IP に接続できるようになります。続行しますか?</string>
     <string name="doh_custom_url_remove_dialog_message" translatable="true">保存された構成から DNS over Https エンドポイントを削除します。</string>
     <string name="dns_crypt_url_remove_success" translatable="true">DNSCryptリゾルバを削除しました。</string>
-    <string name="dns_proxy_remove_dialog_title" translatable="true">DNSプロキシを削除しますか\?</string>
+    <string name="dns_proxy_remove_dialog_title" translatable="true">DNSプロキシを削除しますか?</string>
     <string name="download_update_dialog_failure_message" translatable="true">サーバーがダウンしているか、接続が確立されていないかのどちらかです。しばらくしてから、再度お試しください。</string>
-    <string name="local_blocklist_download_desc" translatable="true">この機能のブロックリスト(60MB程度)をダウンロードしますか\?</string>
+    <string name="local_blocklist_download_desc" translatable="true">この機能のブロックリスト(60MB程度)をダウンロードしますか?</string>
     <string name="blocklist_update_check_not_required" translatable="true">ブロックリストはすでに最新版になっています。</string>
     <string name="configure_dns_connected_doh_status" translatable="true">DNS over HTTPS</string>
     <string name="configure_dns_crypt" translatable="true">DNSCrypt：%1$s リゾルバ</string>
-    <string name="download_update_dialog_message" translatable="true">アプリの新しいバージョンは、Webサイトからダウンロードできます。続行しますか\?</string>
+    <string name="download_update_dialog_message" translatable="true">アプリの新しいバージョンは、Webサイトからダウンロードできます。続行しますか?</string>
     <string name="download_update_dialog_trylater_message" translatable="true">現在、更新を実行できません。しばらくしてからもう一度お試しください。</string>
     <string name="http_proxy_dialog_heading" translatable="true">HTTP(S)プロキシを設定する</string>
     <string name="download_update_dialog_trylater_title" translatable="true">現在更新できません</string>
@@ -370,9 +365,7 @@
     <string name="settings_socks5_dialog_hint_ip" translatable="true">IPアドレス</string>
     <string name="settings_theme_dialog_themes_3" translatable="true">ダーク</string>
     <string name="settings_locale_desc" translatable="true">ご希望の言語を選択してください</string>
-    <string name="settings_notification_dialog_option_2" translatable="true">"
-\nDNS / DNS + ファイアウォール。
-\nバッテリーを節約するDNSモードと通常のDNS＋ファイアウォールモードを素早く切り替えるための2つのボタンを表示します。"</string>
+    <string name="settings_notification_dialog_option_2" translatable="true">\n\nDNS / DNS + ファイアウォール。\n\nバッテリーを節約するDNSモードと通常のDNS＋ファイアウォールモードを素早く切り替えるための2つのボタンを表示します。</string>
     <string name="settings_selected_theme" translatable="true">現在のテーマ: %1$s</string>
     <string name="settings_default_dns_heading" translatable="true">フォールバックDNSを選択する</string>
     <string name="settings_pcap_dialog_option_3" translatable="true">ダウンロードフォルダへの出力</string>
@@ -426,11 +419,7 @@
     <string name="univ_view_blocked_ip_desc" translatable="true">ブロックまたは信頼されたドメイン、IP / ポート ルールを変更します。</string>
     <string name="fapps_info_dialog_message" translatable="true">アプリがインターネットに接続できないようにブロックします。インターネットへの接続を制限することで、不当なデータ利用を防ぐとともに、バッテリーの節約にもつながります。</string>
     <string name="dns_connected" translatable="true">接続済み</string>
-    <string name="dns_proxy_dialog_message" translatable="true">アプリ名: %1$s
-\n
-\nIP アドレス: %2$s
-\n
-\nポート番号: %3$s</string>
+    <string name="dns_proxy_dialog_message" translatable="true">アプリ名: %1$s \n \nIP アドレス: %2$s \n \nポート番号: %3$s</string>
     <string name="dns_proxy_ip_address" translatable="true">IPアドレス</string>
     <string name="fapps_filter_parent_installed" translatable="true">インストール済み</string>
     <string name="fapps_filter_parent_system" translatable="true">システム</string>
@@ -469,9 +458,7 @@
     <string name="pause_title_desc" translatable="true">昼寝中…</string>
     <string name="orbot_both_desc" translatable="true">上記すべてです。</string>
     <string name="orbot_bs_status_4" translatable="true">ワンクリックでTor-as-a-Proxy（Orbot）を設定できます。</string>
-    <string name="orbot_stop_dialog_message_combo" translatable="true">%1$s
-\n
-\n%2$s</string>
+    <string name="orbot_stop_dialog_message_combo" translatable="false">%1$s \n \n%2$s</string>
     <string name="orbot_stop_dialog_message" translatable="true">RethinkDNSはOrbotへの接続転送を停止していますが、Orbotはバックグラウンドで動作している可能性があります。</string>
     <string name="settings_https_disabled_error" translatable="true">%1$sに接続されています。続行するにはOFFにしてください。</string>
     <string name="settings_orbot_notification_content" translatable="true">Tor-as-a-Proxy の起動失敗。 Orbotアプリを開き、手動で起動します。</string>
@@ -531,9 +518,9 @@
     <string name="ci_no_rule_initial" translatable="true">N</string>
     <string name="ci_block" translatable="true">ブロック</string>
     <string name="radio_sky_btn" translatable="true">⛅ Sky</string>
-    <string name="dc_rethink_dns" translatable="true">Rethink DNS</string>
-    <string name="dc_dns_proxy" translatable="true">DNSプロキシ</string>
-    <string name="dc_doh" translatable="true">Dns over HTTPS</string>
+    <string name="dc_rethink_dns" translatable="false">Rethink DNS</string>
+    <string name="dc_dns_proxy" translatable="false">DNSプロキシ</string>
+    <string name="dc_doh" translatable="false">Dns over HTTPS</string>
     <string name="lbbs_configure" translatable="true">構成</string>
     <string name="lbbs_copy" translatable="true">RDNS+ URL としてコピー</string>
     <string name="lbbs_download" translatable="true">ブロックリストの更新</string>
@@ -564,7 +551,7 @@
     <string name="ci_no_rule_txt" translatable="true">ルールなし</string>
     <string name="category_name_sys_apps" translatable="true">システムアプリ</string>
     <string name="category_name_others" translatable="true">その他</string>
-    <string name="cd_remove_dialog_title" translatable="true">ドメインを削除しますか\?</string>
+    <string name="cd_remove_dialog_title" translatable="true">ドメインを削除しますか?</string>
     <string name="category_name_non_app_sys" translatable="true">システムサービス</string>
     <string name="category_name_installed" translatable="true">インストール済みのアプリ</string>
     <string name="cd_no_rules_text" translatable="true">ドメインルールはありません。</string>
@@ -635,4 +622,5 @@
     <string name="status_protected_with_wg" translatable="true">WireGuard で保護されています</string>
     <string name="lbl_dismiss" translatable="true">却下する</string>
     <string name="lbl_cache" translatable="true">キャッシュ</string>
+    <string name="http_proxy_dialog_desc" translatable="true"></string>
 </resources>
