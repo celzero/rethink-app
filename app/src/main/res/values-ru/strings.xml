@@ -271,7 +271,7 @@
     <string name="settings_allow_bypass_heading">Включить видимость сети</string>
     <string name="settings_ip_network_desc">Выбор между версиями протокола интернета.</string>
     <string name="settings_socks5_heading">Настройка прокси-сервера SOCKS5</string>
-    <string name="whats_new_version_update">&lt;b&gt;Не паникуй 2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Новое: захват сетевых ошибок для отчётов пользователей.&lt;br/&gt; 2. Новое: используется системный DNS для неделегированных доменных имён если настройка Предотвращать утечки DNS включена.&lt;br/&gt; 3. Улучшение: подключение к WireGuard теперь использует двойной стек (IPv4 + IPv6).&lt;br/&gt; 4. Улучшение: избежание блокирования элементов пользовательского интерфейса когда сетевой движок не отвечает.&lt;br/&gt; 5. Исправлено: тайм-ауты подключения когда Расширенная DNS фильтрация включена.&lt;br/&gt; 6. Исправлено: эндпоинты узлов WireGuard с доменными именами виснут при сетевых изменениях.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Помогите перевести это приложение&lt;/a&gt;</string>
+    <string name="whats_new_version_update" translatable="false"><![CDATA[<b>Не паникуй 2</b><br/><br/> 1. Новое: захват сетевых ошибок для отчётов пользователей.<br/> 2. Новое: используется системный DNS для неделегированных доменных имён если настройка Предотвращать утечки DNS включена.<br/> 3. Улучшение: подключение к WireGuard теперь использует двойной стек (IPv4 + IPv6).<br/> 4. Улучшение: избежание блокирования элементов пользовательского интерфейса когда сетевой движок не отвечает.<br/> 5. Исправлено: тайм-ауты подключения когда Расширенная DNS фильтрация включена.<br/> 6. Исправлено: эндпоинты узлов WireGuard с доменными именами виснут при сетевых изменениях.<br/><br/> <a href=https://svc.rethinkdns.com/r/translate>Помогите перевести это приложение</a>]]></string>
     <string name="fapps_info_dialog_message">Блокируйте подключение приложений к интернету. Ограничение доступа к интернету помогает предотвратить необоснованное использование данных, а также экономить заряд батареи.</string>
     <string name="fapps_unmetered_unblock_dialog_title">Разрешить на бездоговорной основе</string>
     <string name="fapps_unmetered_block_dialog_message">Блокировать соединения в сети без учета тарифов (WiFi) для приложений <i>, перечисленных в списке</i>\?</string>
@@ -585,7 +585,7 @@
     <string name="error_loading_log_file">Ошибка загрузки файла журнала</string>
     <string name="dns_btm_sheet_chip">+%1$s IP</string>
     <string name="dns_btm_sheet_chip_no_answer">Нет ответа</string>
-    <string name="dns_btm_resolved_crypt">разрешено <u>анонимно</u> %1$s по %2$s через %3$s</string>
+    <string name="dns_btm_resolved_crypt">разрешено &lt;u&gt;анонимно&lt;/u&gt; %1$s по %2$s через %3$s</string>
     <string name="dns_btm_resolved_doh">разрешено %1$s через %2$s</string>
     <string name="dns_btm_resolved_doh_no_server">разрешено %1$s</string>
     <string name="dns_btm_record_type">Тип запроса: %1$s</string>
