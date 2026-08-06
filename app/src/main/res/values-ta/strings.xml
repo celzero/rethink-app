@@ -1660,4 +1660,5 @@
     <string name="symbol_lightening" translatable="false"></string>
     <string name="bubble_empty_state_title" translatable="false"></string>
     <string name="server_selection_sub_on_hold" translatable="false"></string>
+    <string name="ac_desync" translatable="true"></string>
 </resources>
