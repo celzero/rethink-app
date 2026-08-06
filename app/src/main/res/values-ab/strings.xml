@@ -572,13 +572,13 @@
     <string name="firewall_rule_no_rule_desc" translatable="true">УИымтәи ауадаҩақәа рҿы ауи ауадаҩ уамак ашьапы.</string>
     <string name="firewall_rule_block_app_desc" translatable="true"><![CDATA[Аусущтәи абжьгарала ашәахьымҵәажәарала адҵәылахәыра ашәҟәы иацәыхааит.<br/><br/>Аҟәыршара азы «Ашәҟәқәа зегьы» амҩаԥгара ашәҟәы шца.]]></string>
     <string name="firewall_rule_new_app_desc" translatable="true"><![CDATA[Ари апҟаҵәа еицәажәара <i>садгьылҟаҵә</i> аҿы иԥҟаҵахеит.<br/><br/> Анагӡара аиҭакразы, <i>Аҭҵаамҭа</i> ахиа аиуаа рынҵә.]]></string>
-    <string name="firewall_rule_block_app_unmetered_desc" translatable="true"><![CDATA[Ажәақәымҵәатәи ашәахәҭрала ашәҟәы иианахәит ари <i>аԥшьыжь</i> "Unmetered" ашәырҟәылараан.<br/><br/> Аԥсахразы "All Apps" ашәахәҭраз акас иаԥырҵа.]]></string>
+    <string name="firewall_rule_block_app_unmetered_desc" translatable="true"><![CDATA[Ажәақәымҵәатәи ашәахәҭрала ашәҟәы иианахәит ари <i>аԥшьыжь</i> \"Unmetered\" ашәырҟәылараан.<br/><br/> Аԥсахразы \"All Apps\" ашәахәҭраз акас иаԥырҵа.]]></string>
     <string name="firewall_rule_block_app_mobile_desc" translatable="true"><![CDATA[<![CDATA[Аусул адәаҿы иаԥҵаз афирваллии ашьапынҵәа ари <i>аԥызаҟәҭ</i> ацәынаҟәырҵәшьымҭаҿы ацәынаҟәырҵәшьымҭаҿы ацәынаҟәырҵәшьымҭаҿы ацәынаҟәырҵәшьымҭаҿы ашәахәараҿы иахьымikit. Аԥсахра адәаҿы иҟоу <i>Аԥызаҟәҭқәа зегьы</i> амҩа]]))]]></string>
-    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true"><![CDATA[Акоуа иҟалаз аусуҩы ииҭыжьыжьыхыу универсалтә қыҿирала иахәаҧшны иаанымҳаит арҿиарахь "$app$" , "$metered$" (амобилтә) амҩынтәҟны.<br/><br/> Аиҭакразы еиуоу "Универсалтә" амҩынтәҟны. ]]></string>
+    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true"><![CDATA[Акоуа иҟалаз аусуҩы ииҭыжьыжьыхыу универсалтә қыҿирала иахәаҧшны иаанымҳаит арҿиарахь \"$app$\" , \"$metered$\" (амобилтә) амҩынтәҟны.<br/><br/> Аиҭакразы еиуоу \"Универсалтә\" амҩынтәҟны. ]]></string>
     <string name="firewall_rule_isolate_desc" translatable="true"><![CDATA[Аусуеиратәи еиқәырԥшрала ишьахынҟәаз аԥшьынҵәа ари <i>аԥшьынҵәа</i> иацәынаҩуа иахәаԥшьым аԥшьынҵәа <i>ршәаахәҭаз азԥхьаҵәа</i>&gt;&gt;.<br/><br/> Аԥсахразы <i>Зымҩаԥгазаалаа</i> ашәахьынҵәа ашәахьынҵәа.]]></string>
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[Ари еибырара уадыхъазлахеит, мамзаара урцәәлара <b>сынтәи ажәахәҧш</b> «dmz» заҧшәны иҟоуп.<br/><br/> Еицәахыршәлар азы абарҭа «App-specific Firewall» аҿы иҟаҵатәуп.]]></string>
     <string name="firewall_rule_block_ip_univ_desc" translatable="true"><![CDATA[Ашәахәы иҟазшьоу афирлу аусура иацәахәарӡоит <i>адҵа IP / Апорҭ</i>.<br/><br/> Аҧсахразы <i>Аҿи аҟәша</i> аҿы уахәа.]]></string>
-    <string name="firewall_rule_block_ip_desc" translatable="true"><![CDATA[Аусул иҟанаҭаз афиер ҟаҵаз акәым NONINFRINGEMENT => $app[firewall] ҟаҵаз.<br/><br/> Ацаразы,ала аусул иҟанаҭаз афиер ҟаҵаз экранал.]]></string>
+    <string name="firewall_rule_block_ip_desc" translatable="true"><![CDATA[Аусул иҟанаҭаз афиер ҟаҵаз акәым NONINFRINGEMENT =&gt; $app[firewall] ҟаҵаз.<br/><br/> Ацаразы,ала аусул иҟанаҭаз афиер ҟаҵаз экранал.]]></string>
     <string name="firewall_rule_trusted_ip_desc" translatable="true"><![CDATA[<![CDATA[Ари еиҳарак алагала азин аиуит, избан акәымла «а регистрация» IP дгьшьҭаҵоуп „Ашәаҭышәҟьан IP“.<br/><br/> Аԥсахра ашәҭкра ашәҭкразы ашәҭкра ашәҭкра ашәҭкра ашәҭкра ашәҭкра ашәҭкра ашәҭкра ашәҭкра ашәҭкра ашәҭкра ашәҭкра ашәҭкра ашәҭкра ашәҭкра ашәҭкра ашәҭкра ашәҭкра ашәҭкра ашәҭкра ашәҭкра ашәҭкра ашәҭкра ]]]]></string>
     <string name="firewall_rule_bypass_universal_ip_desc" translatable="true"><![CDATA[Ари еиднакIва ацынџьра иашьахашьахеит, избан акьыпылоу IP ашәахәҟны универсaльн афирвол ашәҟәықәҵшьқәк рымҩаԥыргоит.<br/><br/> Шәыдыррала, \"Универсaльн\" амҩаԥыргала, IP Шәахәҟны.]]></string>
     <string name="firewall_rule_device_lock_desc" translatable="true"><![CDATA[Ари ашәыхра ашьапыламҭа ашьҭахь иахҟьаит <i>ауадаҟны иҟаз аԥшьыла</i>.<br/><br/> Ари аҵыхәтәи аԥсахра ашәҟәынтәи аҧшым аҿы иааицәажәоит.]]></string>
@@ -1628,4 +1628,38 @@
     <string name="symbol_lightening" translatable="false"></string>
     <string name="bubble_empty_state_title" translatable="false"></string>
     <string name="server_selection_sub_on_hold" translatable="false"></string>
+    <string name="cd_doh_dialog_checkbox_desc" translatable="true"></string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true"></string>
+    <string name="settings_connectivity_checks_desc" translatable="true"></string>
+    <string name="cloudflare_security_dns_desc" translatable="true"></string>
+    <string name="firewall_rule_exempt_orbot_setup" translatable="true"></string>
+    <string name="ci_dialog_edittext_hint" translatable="true"></string>
+    <string name="local_blocklist_download" translatable="true"></string>
+    <string name="cd_dialog_title" translatable="true"></string>
+    <string name="cloudflare_family_dns_desc" translatable="true"></string>
+    <string name="settings_network_all_networks_desc" translatable="true"></string>
+    <string name="dns_title" translatable="true"></string>
+    <string name="hsf_start_dialog_message" translatable="true"></string>
+    <string name="hs_biometeric_feature_not_supported" translatable="true"></string>
+    <string name="fapps_metered_block_dialog_message" translatable="true"></string>
+    <string name="private_dns_dialog_desc" translatable="true"></string>
+    <string name="google_dns_desc" translatable="true"></string>
+    <string name="settings_notification_dialog_option_2" translatable="true"></string>
+    <string name="cd_dns_proxy_mode_internal" translatable="true"></string>
+    <string name="settings_app_notification_persistent_desc" translatable="true"></string>
+    <string name="notif_download_content_text" translatable="true"></string>
+    <string name="crypt_cleanbrowsing_family_desc" translatable="true"></string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[]]></string>
+    <string name="firewall_rule_block_http_desc" translatable="true"><![CDATA[]]></string>
+    <string name="local_blocklist_redownload_desc" translatable="true"></string>
+    <string name="settings_lock_down_proxy_desc" translatable="true"></string>
+    <string name="firewall_rule_block_dns_bypass_desc" translatable="true"><![CDATA[]]></string>
+    <string name="hsf_vpn_dialog_message" translatable="true"></string>
+    <string name="vpn_policy_sensitive_desc" translatable="true"></string>
+    <string name="app_ip_domain_rules" translatable="true"></string>
+    <string name="about_faq" translatable="true"></string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true"></string>
+    <string name="about_github" translatable="true"></string>
+    <string name="crypt_relay_france" translatable="true"></string>
+    <string name="orbot_socks5_desc" translatable="true"></string>
 </resources>
