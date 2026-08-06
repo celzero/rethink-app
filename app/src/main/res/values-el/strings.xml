@@ -132,7 +132,7 @@
     <string name="conn_track_clear_logs_message" translatable="true">Αυτό διαγράφει μόνο τα αρχεία καταγραφής δικτύου αλλά όχι τους κανόνες τείχους προστασίας. Αυτή η λειτουργία δεν είναι αναστρέψιμη. Θέλετε να συνεχίσετε;</string>
     <string name="dns_query_clear_logs_title" translatable="true">Διαγραφή όλων των αρχείων καταγραφής DNS;</string>
     <string name="dns_query_clear_logs_message" translatable="true">Αυτό διαγράφει τα αρχεία καταγραφής DNS της συσκευής. Αυτή η λειτουργία δεν είναι αναστρέψιμη. Θέλετε να συνεχίσετε;</string>
-    <string name="bsct_block_ip" translatable="true">Αποκλεισμός, εμπιστοσύνη <u>αυτή η IP</u> για <u>αυτή την εφαρμογή</u></string>
+    <string name="bsct_block_ip" translatable="true">Αποκλεισμός, εμπιστοσύνη &lt;u&gt;αυτή η IP&lt;/u&gt; για &lt;u&gt;αυτή την εφαρμογή&lt;/u&gt;</string>
     <string name="bsct_conn_block_desc" translatable="true">μπλοκαρισμένο %1$s από %2$s</string>
     <string name="bsct_conn_block_desc_device" translatable="true">μπλοκαρισμένο %1$s στη συσκευή</string>
     <string name="bsct_conn_desc_blocked" translatable="true">μπλοκαρισμένο στο %1$s %2$s</string>
@@ -152,14 +152,10 @@
     <string name="firewall_mode_info_explanation_new" translatable="true">Παρακολούθηση της δραστηριότητας δικτύου και τείχος προστασίας οποιασδήποτε εφαρμογής ή διεύθυνσης IP.</string>
     <string name="dns_mode_info_explanation_new" translatable="true">Παρακολουθήστε, αποκλείστε και κρυπτογραφήστε τις αιτήσεις DNS.</string>
     <string name="dns_firewall_mode_info_explanation_new" translatable="true">Όλα τα παραπάνω + παράκαμψη της λογοκρισίας στο Διαδίκτυο.</string>
-    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink χρησιμοποιεί την υπηρεσία προσβασιμότητας για να παρακολουθεί ποιες εφαρμογές χρησιμοποιούνται (προσκήνιο) σε σχέση με εκείνες που δεν χρησιμοποιούνται (παρασκήνιο).
-\n
-\nRethink δεν συλλέγει πληροφορίες ούτε σας κατασκοπεύει με οποιονδήποτε τρόπο.</string>
-    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Η υπηρεσία προσβασιμότητας Rethink σταμάτησε ή κατέρρευσε.. <i><b>Μεταβείτε στις Ρυθμίσεις και κάντε αναγκαστική διακοπή</b></i>Rethink και ξεκινήστε το ξανά για να χρησιμοποιήσετε <i>Αποκλείστε κάθε εφαρμογή που δεν χρησιμοποιείται</i>χαρακτηριστικό.
-\n
-\nΤο Rethink χρησιμοποιεί υπηρεσία προσβασιμότητας για να παρακολουθεί ποιες εφαρμογές είναι σε χρήση (προσκήνιο) σε σχέση με εκείνες που δεν είναι σε χρήση (παρασκήνιο).</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink χρησιμοποιεί την υπηρεσία προσβασιμότητας για να παρακολουθεί ποιες εφαρμογές χρησιμοποιούνται (προσκήνιο) σε σχέση με εκείνες που δεν χρησιμοποιούνται (παρασκήνιο). \n \nRethink δεν συλλέγει πληροφορίες ούτε σας κατασκοπεύει με οποιονδήποτε τρόπο.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Η υπηρεσία προσβασιμότητας Rethink σταμάτησε ή κατέρρευσε.. <i><b>Μεταβείτε στις Ρυθμίσεις και κάντε αναγκαστική διακοπή</b></i>Rethink και ξεκινήστε το ξανά για να χρησιμοποιήσετε <i>Αποκλείστε κάθε εφαρμογή που δεν χρησιμοποιείται</i>χαρακτηριστικό. \n \nΤο Rethink χρησιμοποιεί υπηρεσία προσβασιμότητας για να παρακολουθεί ποιες εφαρμογές είναι σε χρήση (προσκήνιο) σε σχέση με εκείνες που δεν είναι σε χρήση (παρασκήνιο).</string>
     <string name="bsct_app_info" translatable="true">Πληροφορίες εφαρμογής</string>
-    <string name="bsct_block" translatable="true">Αποκλεισμός, παράκαμψη, εξαίρεση, απομόνωση <u>αυτής της εφαρμογής</u></string>
+    <string name="bsct_block" translatable="true">Αποκλεισμός, παράκαμψη, εξαίρεση, απομόνωση &lt;u&gt;αυτής της εφαρμογής&lt;/u&gt;</string>
     <string name="bsct_conn_desc_allowed" translatable="true">επιτρέπεται στο %1$s %2$s</string>
     <string name="bsct_conn_rule_explanation" translatable="true">&lt;u&gt;#1&lt;/u&gt;: Αποκλείει μια εφαρμογή από τη σύνδεση στο Internet. \n &lt;u&gt;#2&lt;/u&gt;: Αποκλείει οποιαδήποτε εφαρμογή από τη σύνδεση σε μια συγκεκριμένη IP. \n &lt;u&gt;#3&lt;/u&gt;: Αποκλείει όλες τις συνδέσεις όταν η συσκευή είναι κλειδωμένη (Universal Firewall). \n &lt;u&gt;#4&lt;/u&gt;: Αποκλείει οποιαδήποτε εφαρμογή που δεν χρησιμοποιείται (Universal Firewall). \n &lt;u&gt;#5&lt;/u&gt;: Μπλοκάρει τις συνδέσεις όταν η εφαρμογή προέλευσης είναι άγνωστη (Universal Firewall). \n &lt;u&gt;#6&lt;/u&gt;: Αποκλείει όλη την κυκλοφορία UDP εκτός από το DNS (Universal Firewall). \n &lt;u&gt;#7&lt;/u&gt;: Αποκλείει τις συνδέσεις όταν παρακάμπτεται το DNS (Universal Firewall).</string>
     <string name="always_on_dialog_lockdown_stop_message" translatable="true">Το Rethink τρέχει το VPN σε κατάσταση <i>Lockdown</i>. Η διακοπή της θα είχε ως αποτέλεσμα την απώλεια της συνδεσιμότητας στο Internet για αυτό το προφίλ χρήστη. Θέλετε να συνεχίσετε ούτως ή άλλως;</string>
