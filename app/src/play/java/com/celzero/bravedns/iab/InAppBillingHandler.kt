@@ -811,7 +811,7 @@ object InAppBillingHandler : KoinComponent {
                     queryPurchases(queriedProductType, false)
                     return
                 }
-                logd(mname, "INAPP query returned empty, threshold reached ($consecutiveEmptyInAppQueries/$EMPTY_QUERY_THRESHOLD), expire old purchases...")
+                logd(mname, "INAPP query returned empty, threshold reached ($consecutiveEmptyInAppQueries/$EMPTY_QUERY_THRESHOLD), confirm with server...")
 
                 consecutiveEmptyInAppQueries = 0
 
@@ -3109,20 +3109,19 @@ object InAppBillingHandler : KoinComponent {
                 // the user is not left in a broken state.
                 val linked = result.linkedPurchaseId
                 if (!linked.isNullOrBlank()) {
+                    // The revoked purchase may have been superseded by an older one that is
+                    // still valid. Attempt to reactivate it so the user is not left in a
+                    // broken state.
                     loge(mname, "queryEntitlement server business error for token=${pt.take(8)}; linkedPurchaseId present, attempting reactivation of linkedToken=${linked.take(8)}")
                     try {
                         RpnProxyManager.tryReactivateLinkedPurchase(accountId, deviceId, linked)
                     } catch (e: Exception) {
                         loge(mname, "tryReactivateLinkedPurchase threw for linkedToken=${linked.take(8)}: ${e.message}", e)
                     }
-                    result.purchase
                 } else {
-                    // server informed that this purchase has failed with nothing to fall back on.
-                    // Treat the same as Expired: clear the payload and zero the expiry so
-                    // downstream callers stop treating this as a valid entitlement.
-                    loge(mname, "queryEntitlement server business error for token=${pt.take(8)}; no linkedPurchaseId, expiring local purchase")
-                    result.purchase.copy(expiryTime = 0L, payload = "")
+                    loge(mname, "queryEntitlement server business error for token=${pt.take(8)}; no linkedPurchaseId, preserving local purchase (fail-safe)")
                 }
+                result.purchase
             }
             is QueryEntitlementResult.Expired -> {
                 // Server has authoritatively confirmed the subscription is expired.
