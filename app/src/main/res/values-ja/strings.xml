@@ -312,7 +312,7 @@
     <string name="orbot_install_dialog_message" translatable="true">Orbotは、Torの特徴と機能をAndroidにもたらします。</string>
     <string name="dns_proxy_remove_dialog_message" translatable="true">保存された構成から DNS プロキシを削除します。</string>
     <string name="always_on_dialog_stop_message" translatable="true">Rethink は現在常時接続 VPN が有効になっています。Rethink を停止してもよろしいですか?</string>
-    <string name="always_on_dialog_lockdown_stop_message" translatable="true">RethinkはVPNを<i>ロックダウン</i>モードで実行しています。これを停止した場合、現在のインターネット接続が失われます。続行しますか\?</string>
+    <string name="always_on_dialog_lockdown_stop_message" translatable="true">RethinkはVPNを<i>ロックダウン</i>モードで実行しています。これを停止した場合、現在のインターネット接続が失われます。続行しますか?</string>
     <string name="private_dns_dialog_desc" translatable="true">Rethink の DNS 設定は、Android のプライベート DNS によって上書きされます。 \n \nRethink の DNS を使用するには、Android の設定にアクセスし、「プライベート DNS」をオフにしてください。</string>
     <string name="private_dns_dialog_positive" translatable="true">設定を開く</string>
     <string name="univ_firewall_dialog_title" translatable="true">IPの規則を削除しますか?</string>
@@ -568,8 +568,8 @@
     <string name="bsct_conn_block_desc" translatable="true">%1$s が %2$s によってブロックされました</string>
     <string name="bsct_conn_block_desc_device" translatable="true">デバイスで%1$sがブロックされました</string>
     <string name="dns_act_configure_tab" translatable="true">設定</string>
-    <string name="bsct_block_domain" translatable="true"><u>このアプリ</u>の<u>ドメイン</u>をブロック、信頼します</string>
-    <string name="bsct_block" translatable="true"><u>このアプリをブロック、バイパス、除外、隔離します</u></string>
+    <string name="bsct_block_domain" translatable="true">&lt;u&gt;このアプリ&lt;/u&gt;の&lt;u&gt;ドメイン&lt;/u&gt;をブロック、信頼します</string>
+    <string name="bsct_block" translatable="true">&lt;u&gt;このアプリをブロック、バイパス、除外、隔離します&lt;/u&gt;</string>
     <string name="bsct_conn_desc_allowed" translatable="true">%1$s %2$s で許可されます</string>
     <string name="bsct_conn_desc_blocked" translatable="true">%1$s %2$s でブロック</string>
     <string name="firewall_act_universal_tab" translatable="true">ユニバーサル</string>
