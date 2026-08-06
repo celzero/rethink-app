@@ -19,7 +19,7 @@
     <string name="lbl_ip_rules" translatable="true">IP ルール</string>
     <string name="lbl_domain_rules" translatable="true">ドメインルール</string>
     <string name="slide_1_desc" translatable="true">Rethink は、Mozilla Builders MVP プログラムによって支援されているオープンソースソフトウェアです。</string>
-    <string name="rdns_plus" translatable="true">RDNS Plus</string>
+    <string name="rdns_plus" translatable="false">RDNS Plus</string>
     <string name="allow" translatable="true">許可</string>
     <string name="untracked" translatable="true">未追跡</string>
     <string name="firewall_mode_notification_title" translatable="true">保護されています！ファイアウォールに接続しています。</string>
@@ -50,7 +50,7 @@
     <string name="dns_query_clear_logs_title" translatable="true">すべての DNS ログを削除しますか？</string>
     <string name="dns_query_clear_logs_message" translatable="true">デバイス上の DNS ログを削除します。この操作は元に戻せません。続行してよろしいですか？</string>
     <string name="bsct_app_info" translatable="true">アプリ情報</string>
-    <string name="bsct_block_ip" translatable="true"><u>この IP</u> を <u>このアプリ</u> に対してブロック・信頼</string>
+    <string name="bsct_block_ip" translatable="true">&lt;u&gt;この IP&lt;/u&gt; を &lt;u&gt;このアプリ&lt;/u&gt; に対してブロック・信頼</string>
     <string name="title_about" translatable="true">情報</string>
     <string name="title_settings" translatable="true">設定</string>
     <string name="title_statistics" translatable="true">統計</string>
