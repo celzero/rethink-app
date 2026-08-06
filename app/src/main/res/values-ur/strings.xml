@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ریتھینک ڈی این ایس</string>
+    <string name="app_name" translatable="false">ریتھینک ڈی این ایس</string>
     <string name="title_about">کے بارے میں</string>
     <string name="title_settings">ترتیبات</string>
     <string name="title_statistics">اعدادوشمار</string>
@@ -11,7 +11,7 @@
     <string name="isolate">الگ تھلگ</string>
     <string name="untracked">ٹریک نہیں کیا گیا</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">انتباہ:ریتھینک ڈی این ایس کو غیر فعال کر دیا گیا ہے</string>
-    <string name="app_name_small_case">ریتھینک</string>
+    <string name="app_name_small_case" translatable="false">ریتھینک</string>
     <string name="slide_1_title">مفت اور اوپن سورس</string>
     <string name="pause_title_desc">جھپکی لینا…</string>
     <string name="settings_title_desc">ایک انتہائی حسب ضرورت DNS اور فائر وال</string>
