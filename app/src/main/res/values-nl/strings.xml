@@ -12,7 +12,7 @@
     <string name="alert_permission_accessibility">Toestemming - Toegankelijkheid</string>
     <string name="dns_firewall_mode_info_explanation_new">Al het bovenstaande + het omzeilen van internetcensuur.</string>
     <string name="dns_proxy_remove_dialog_title">DNS Proxy verwijderen?</string>
-    <string name="bsct_block">Blokkeren, omzeilen, uitsluiten, lockdown <u>deze app</u></string>
+    <string name="bsct_block">Blokkeren, omzeilen, uitsluiten, lockdown &lt;u&gt;deze app&lt;/u&gt;</string>
     <string name="dns_act_configure_tab">Configureren</string>
     <string name="dns_proxy_remove_dialog_message">Verwijder de DNS-proxy uit de opgeslagen configuratie.</string>
     <string name="local_blocklist_download_desc">Blocklists downloaden (ongeveer 60MB) om deze functie te gebruiken?</string>
@@ -682,7 +682,7 @@
     <string name="memory_notification_text">Rethink heeft te weinig geheugen. Systeemacties kunnen beperkt zijn.</string>
     <string name="http_proxy_dialog_desc" translatable="true">URL van formulier instellen, &lt;protocol&gt;://&lt;gebruikersnaam&gt;:&lt;wachtwoord&gt;@&lt;domein-of-ip&gt;:&lt;poort&gt;&lt;pad&gt;. Voorbeeld: http://proxy.example.com:8080/</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Loopback proxy-forwarder-apps</string>
-    <string name="whats_new_version_update" translatable="true">&lt;b&gt;Don\'t Panic 2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. New: Capture network engine errors in user bug reports.&lt;br/&gt; 2. New: use System DNS for undelegated domain names iff Prevent DNS leaks is ON.&lt;br/&gt; 3. Improvement: Dual-stack (IPv4 + IPv6) WireGuard connectivity.&lt;br/&gt; 4. Improvement: Avoid blocking the UI elements when the network engine is unresponsive.&lt;br/&gt; 5. Fix: Connection timeouts with Advanced DNS filtering turned ON.&lt;br/&gt; 6. Fix: WireGuard peer endpoints with domain names hang on network changes.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Help translate this app&lt;/a&gt;</string>
+    <string name="whats_new_version_update" translatable="false"><![CDATA[<b>Don\'t Panic 2</b><br/><br/> 1. New: Capture network engine errors in user bug reports.<br/> 2. New: use System DNS for undelegated domain names iff Prevent DNS leaks is ON.<br/> 3. Improvement: Dual-stack (IPv4 + IPv6) WireGuard connectivity.<br/> 4. Improvement: Avoid blocking the UI elements when the network engine is unresponsive.<br/> 5. Fix: Connection timeouts with Advanced DNS filtering turned ON.<br/> 6. Fix: WireGuard peer endpoints with domain names hang on network changes.<br/><br/> <a href=https://svc.rethinkdns.com/r/translate>Help translate this app</a>]]></string>
     <string name="lbl_split" translatable="true">Splitsen</string>
     <string name="lbl_on_device" translatable="true">op-apparaat</string>
     <string name="unicode_x_sign" translatable="false"></string>
