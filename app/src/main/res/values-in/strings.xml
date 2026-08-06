@@ -1054,7 +1054,7 @@
     <string name="ac_retry_options_after_split_desc" translatable="true">Selalu terapkan teknik anti-sensor.</string>
     <string name="ac_toast_retry_disabled" translatable="true">Pilih opsi anti-sensor untuk memilih strategi.</string>
     <string name="exclude_no_package_err_toast" translatable="true">Mengecualikan aplikasi memerlukan nama paket.</string>
-    <string name="mode_change_error_proxy_enabled" translatable="true">Tidak dapat mengubah mode saat proxy sedang digunakan. Ketuk untuk <u>mengedit pengaturan proxy</u>.</string>
+    <string name="mode_change_error_proxy_enabled" translatable="true">Tidak dapat mengubah mode saat proxy sedang digunakan. Ketuk untuk &lt;u&gt;mengedit pengaturan proxy&lt;/u&gt;.</string>
     <string name="blocklist_not_available_toast" translatable="true">Untuk memperbarui daftar blokir, unduh versi aplikasi terbaru.</string>
     <string name="adv_set_dial_timeout_desc" translatable="true">Tutup soket TCP dan UDP yang tidak aktif setelah durasi ini.</string>
     <string name="about_terms_of_service" translatable="true">Ketentuan Layanan</string>
