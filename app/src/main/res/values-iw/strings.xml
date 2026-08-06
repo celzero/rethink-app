@@ -40,7 +40,7 @@
     <string name="brave_dns_connect_mode_change_dns" translatable="true">בחר מצב.</string>
     <string name="custom_url_error_invalid_url" translatable="true">כתובת האתר לא תקינה</string>
     <string name="bsct_app_info" translatable="true">מידע על האפליקציה</string>
-    <string name="bsct_block_ip" translatable="true">חסום, סמוך על <u>IP זה</u> עבור <u>אפליקציה זו</u></string>
+    <string name="bsct_block_ip" translatable="true">חסום, סמוך על &lt;u&gt;IP זה&lt;/u&gt; עבור &lt;u&gt;אפליקציה זו&lt;/u&gt;</string>
     <string name="bsct_block" translatable="true">חסום, עקוף, הוצא מן הכלל, בודד את <u>האפליקציה הזו</u></string>
     <string name="bsct_conn_block_desc" translatable="true">%1$s נחסם ע\"י %2$s</string>
     <string name="title_about" translatable="true">אודות</string>
@@ -101,9 +101,7 @@
     <string name="orbot_http_desc" translatable="true">יוצר מנהרת HTTP CONNECT לOrbot.</string>
     <string name="orbot_both" translatable="true">פרוקסי TCP + HTTP</string>
     <string name="orbot_bs_status_trying_connect" translatable="true">מגדיר את Orbot…</string>
-    <string name="orbot_stop_dialog_message_combo" translatable="true">%1$s
-\n
-\n%2$s</string>
+    <string name="orbot_stop_dialog_message_combo" translatable="false">%1$s \n \n%2$s</string>
     <string name="orbot_stop_dialog_message" translatable="true">Rethink הפסיק להעביר חיבורים ל-Orbot, אבל ייתכן ש-Orbot פועל ברקע.</string>
     <string name="orbot_stop_dialog_dns_message" translatable="true">Rethink מוגדר להעביר שאילתות DNS ל-Orbot. אפשר לשנות לפי הצורך.</string>
     <string name="orbot_stop_dialog_negative" translatable="true">עצור את Orbot</string>
@@ -140,8 +138,8 @@
     <string name="about_app_update_check" translatable="true">בדוק אם יש עדכוני אפליקציה</string>
     <string name="about_app_translate" translatable="true">תרגם</string>
     <string name="about_mail_to" translatable="true">hello@celzero.com</string>
-    <string name="about_version" translatable="true">v%1$s</string>
-    <string name="about_version_install_source" translatable="true">v%1$s (%2$s)</string>
+    <string name="about_version" translatable="false">v%1$s</string>
+    <string name="about_version_install_source" translatable="false">v%1$s (%2$s)</string>
     <string name="cd_dns_proxy_mode_internal" translatable="true">פְּנִימִי</string>
     <string name="univ_ip_delete_individual_toast" translatable="true">%1$s נמחקו.</string>
     <string name="dns_connected_rethink_plus" translatable="true">מְחוּבָּר. %1$s רשימות חסימה בשימוש</string>
@@ -164,7 +162,7 @@
     <string name="brbs_restore_no_uri_toast" translatable="true">השחזור נכשל; נסה שוב</string>
     <string name="brbs_backup_complete_toast" translatable="true">הגיבוי הושלם</string>
     <string name="brbs_restore_dialog_failure_title" translatable="true">השחזור נכשל</string>
-    <string name="brbs_restore_dialog_failure_message" translatable="true">לא ניתן לשחזר. לנסות שוב\?</string>
+    <string name="brbs_restore_dialog_failure_message" translatable="true">לא ניתן לשחזר. לנסות שוב?</string>
     <string name="brbs_backup_dialog_failure_positive" translatable="true">נסה לגבות שוב</string>
     <string name="brbs_backup_dialog_failure_title" translatable="true">הגיבוי נכשל</string>
     <string name="brbs_restore_dialog_positive" translatable="true">שחזר</string>
@@ -176,19 +174,19 @@
     <string name="download_update_dialog_failure_message" translatable="true">השרתים שלנו מושבתים או שלא ניתן היה ליצור חיבור. אנא נסה שוב מאוחר יותר.</string>
     <string name="download_update_dialog_message_ok_title" translatable="true">מעודכן!</string>
     <string name="always_on_dialog" translatable="true">\"VPN תמיד פועל\" מאופשר במכשיר זה. כדי להפעיל את Rethink, עבור אל אפליקציית ההגדרות והשבת את \"VPN תמיד פועל\".</string>
-    <string name="univ_delete_firewall_dialog_title" translatable="true">למחוק את כל כללי ה-IP\?</string>
-    <string name="univ_firewall_dialog_message" translatable="true">מחיקת כלל זה תאפשר לכלל האפליקציות להתחבר ל-IP זה. האם אתה רוצה להמשיך\?</string>
+    <string name="univ_delete_firewall_dialog_title" translatable="true">למחוק את כל כללי ה-IP?</string>
+    <string name="univ_firewall_dialog_message" translatable="true">מחיקת כלל זה תאפשר לכלל האפליקציות להתחבר ל-IP זה. האם אתה רוצה להמשיך?</string>
     <string name="download_update_dialog_message_ok" translatable="true">אתה כבר משתמש בגרסה העדכנית ביותר.</string>
     <string name="settings_dns_proxy_dialog_username" translatable="true">שם משתמש</string>
     <string name="download_update_dialog_title" translatable="true">עדכון חדש!</string>
-    <string name="download_update_dialog_message" translatable="true">גרסה חדשה של האפליקציה זמינה להורדה מהאתר. האם אתה רוצה להמשיך\?</string>
+    <string name="download_update_dialog_message" translatable="true">גרסה חדשה של האפליקציה זמינה להורדה מהאתר. האם אתה רוצה להמשיך?</string>
     <string name="download_update_dialog_message_success" translatable="true">הורדת רשימת החסימה הצליחה.</string>
-    <string name="orbot_install_dialog_title" translatable="true">להתקין Orbot\?</string>
+    <string name="orbot_install_dialog_title" translatable="true">להתקין Orbot?</string>
     <string name="settings_network_all_networks_desc" translatable="true">כאשר מופעל, Rethink משתמש בכל הרשתות הזמינות כדי להתחבר לאינטרנט. אם לא, הוא משתמש בכל הרשת שנחשבת ל-<i>פעילה</i> על ידי אנדרואיד.</string>
     <string name="settings_ip_network_heading" translatable="true">בחר גרסת IP</string>
     <string name="orbot_status_arg_3" translatable="true">DNS ו-TCP</string>
     <string name="orbot_stop_dialog_title" translatable="true">נדרשת התערבות ידנית</string>
-    <string name="orbot_app_issue" translatable="true">לא ניתן להפעיל את Orbot. האם האפליקציה מותקנת\?</string>
+    <string name="orbot_app_issue" translatable="true">לא ניתן להפעיל את Orbot. האם האפליקציה מותקנת?</string>
     <string name="orbot_install_dialog_message" translatable="true">Orbot מביא את התכונות והפונקציונליות של Tor לאנדרואיד.</string>
     <string name="settings_ip_dialog_ipv6" translatable="true">IPv6 (ניסיוני)</string>
     <string name="settings_autostart_bootup_desc" translatable="true">הפעלת Rethink עם הפעלת המכשיר אם הוא פעל לפני הכיבוי.</string>
@@ -313,7 +311,7 @@
 \n <u>#7</u>: חסום חיבורים כאשר DNS עוקף חסימה (חומת אש אוניברסלית).</string>
     <string name="doh_custom_url_remove_success" translatable="true">נקודת הקצה נמחקה.</string>
     <string name="blocklist_update_check_not_required" translatable="true">רשימות החסימה כבר נמצאות בגרסה האחרונה.</string>
-    <string name="bsct_block_domain" translatable="true">חסום, סמוך על <u>דומיינים</u> עבור <u>אפליקציה זו</u></string>
+    <string name="bsct_block_domain" translatable="true">חסום, סמוך על &lt;u&gt;דומיינים&lt;/u&gt; עבור &lt;u&gt;אפליקציה זו&lt;/u&gt;</string>
     <string name="dns_proxy_remove_success" translatable="true">פרוקסי DNS נמחק.</string>
     <string name="local_blocklist_download" translatable="true">הורד רשימות חסימה</string>
     <string name="local_blocklist_download_desc" translatable="true">להוריד רשימות חסימה (בסביבות 60MB) כדי להשתמש בתכונה זו?</string>
