@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="always_on_dialog_lockdown_stop_message">Hai impostato la VPN di Rethink in modalità <i>Obbligatoria</i> dalle impostazioni del dispositivo. Arrestarla potrebbe comportare la perdita della connessione a Internet su questo profilo utente. Vuoi continuare comunque\?</string>
+    <string name="always_on_dialog_lockdown_stop_message">Hai impostato la VPN di Rethink in modalità <i>Obbligatoria</i> dalle impostazioni del dispositivo. Arrestarla potrebbe comportare la perdita della connessione a Internet su questo profilo utente. Vuoi continuare comunque?</string>
     <string name="dns_crypt_relay_remove_success">Relay DNSCrypt cancellato.</string>
     <string name="dns_proxy_remove_dialog_title">Eliminare il proxy DNS?</string>
     <string name="blocklist_update_check_not_required">Le liste dei filtri sono già all\'ultima versione.</string>
@@ -50,9 +50,7 @@
     <string name="apps_info_title">Applicazioni</string>
     <string name="hybrid_mode_info_title">DNS + Firewall</string>
     <string name="dns_mode_info_explanation_new">Monitora, blocca e crittografa le richieste DNS.</string>
-    <string name="alert_firewall_accessibility_explanation">Rethink utilizza il servizio di accessibilità per tenere traccia delle app in uso (in primo piano) e di quelle non in uso (in background).
-\n
-\nRethink non raccoglie informazioni né spia l\'utente in alcun modo.</string>
+    <string name="alert_firewall_accessibility_explanation">Rethink utilizza il servizio di accessibilità per tenere traccia delle app in uso (in primo piano) e di quelle non in uso (in background). \n \nRethink non raccoglie informazioni né spia l\'utente in alcun modo.</string>
     <string name="alert_firewall_accessibility_exception">Impossibile aprire le impostazioni di accessibilità. Riprova più tardi!</string>
     <string name="default_dns_name">RDNS Predefinito</string>
     <string name="custom_url_error_invalid_url">URL non valido</string>
@@ -60,8 +58,8 @@
     <string name="dns_query_clear_logs_title">Cancellare il registro delle connessioni DNS?</string>
     <string name="dns_query_clear_logs_message">Ciò eliminerà il registro delle connessioni DNS sul dispositivo. Questa operazione non è reversibile. Vuoi procedere?</string>
     <string name="bsct_app_info">Informazioni sull\'app</string>
-    <string name="bsct_block_ip">Blocca, autorizza <u>questo IP</u> per <u>questa app</u></string>
-    <string name="bsct_block">Blocca, aggira, escludi, isola <u>questa app</u></string>
+    <string name="bsct_block_ip">Blocca, autorizza &lt;u&gt;questo IP&lt;/u&gt; per &lt;u&gt;questa app&lt;/u&gt;</string>
+    <string name="bsct_block">Blocca, aggira, escludi, isola &lt;u&gt;questa app&lt;/u&gt;</string>
     <string name="bsct_conn_block_desc">bloccato %1$s da %2$s</string>
     <string name="bsct_conn_desc_allowed">consentito su %1$s %2$s</string>
     <string name="always_on_dialog_heading">Disabilita \"VPN sempre attiva\"</string>
@@ -204,9 +202,7 @@
     <string name="bsct_conn_block_desc_device">bloccato %1$s sul dispositivo</string>
     <string name="bsct_conn_rule_explanation">&lt;u&gt;#1&lt;/u&gt;: Blocca un\'applicazione dal connettersi a Internet. \n &lt;u&gt;#2&lt;/u&gt;: Blocca tutte le applicazioni dal connettersi ad un particolare IP. \n &lt;u&gt;#3&lt;/u&gt;: Blocca tutte le connessioni quando il dispositivo è bloccato (Regole universali Firewall). \n &lt;u&gt;#4&lt;/u&gt;: Blocca qualsiasi app non in uso (Regole universali Firewall). \n &lt;u&gt;#5&lt;/u&gt;: Blocca le connessioni quando l\'app di origine è sconosciuta (Regole universali Firewall). \n &lt;u&gt;#6&lt;/u&gt;: Blocca tutto il traffico UDP tranne il DNS (Regole universali Firewall). \n &lt;u&gt;#7&lt;/u&gt;: Blocca le connessioni che aggirano il DNS (Regole universali Firewall).</string>
     <string name="always_on_dialog_stop_message">Hai impostato Rethink come \"VPN sempre attiva\" dalle Impostazioni del dispositivo. Sei sicuro di voler comunque arrestare Rethink?</string>
-    <string name="alert_firewall_accessibility_regrant_explanation">Il servizio di accessibilità Rethink si è arrestato o si è bloccato. <i><b>Andare in Impostazioni e forzare l\'arresto di</b></i> Rethink e avviarlo nuovamente per utilizzare la funzione <i>Blocca le app non in uso</i> .
-\n
-\nRethink utilizza il servizio di accessibilità per tenere traccia delle app in uso (in primo piano) e di quelle non in uso (in background).</string>
+    <string name="alert_firewall_accessibility_regrant_explanation">Il servizio di accessibilità Rethink si è arrestato o si è bloccato. <i><b>Andare in Impostazioni e forzare l\'arresto di</b></i> Rethink e avviarlo nuovamente per utilizzare la funzione <i>Blocca le app non in uso</i> . \n \nRethink utilizza il servizio di accessibilità per tenere traccia delle app in uso (in primo piano) e di quelle non in uso (in background).</string>
     <string name="brave_dns_connect_mode_change_firewall">Scegli la modalità.</string>
     <string name="brave_dns_connect_mode_change_dns">Scegli la modalità.</string>
     <string name="conn_track_clear_logs_message">Ciò eliminerà solo il registro delle connessioni, ma non le regole del firewall. Questa operazione non è reversibile. Vuoi procedere?</string>
@@ -240,9 +236,7 @@
     <string name="firewall_status_whitelisted">Aggira le regole universali del firewall</string>
     <string name="firewall_status_blocked">bloccata</string>
     <string name="lbl_proceed">Prosegui</string>
-    <string name="hsf_vpn_dialog_message">Rethink ha bisogno del permesso di impostare una VPN locale per crittografare le richieste DNS del dispositivo, monitorare le connessioni di rete e applicare le regole del firewall.
-\n
-\nRethink non raccoglie informazioni né spia l\'utente in alcun modo.</string>
+    <string name="hsf_vpn_dialog_message">Rethink ha bisogno del permesso di impostare una VPN locale per crittografare le richieste DNS del dispositivo, monitorare le connessioni di rete e applicare le regole del firewall. \n \nRethink non raccoglie informazioni né spia l\'utente in alcun modo.</string>
     <string name="contributors_list"><![CDATA[Il <i>Rethink Open Source Project</i> deve la sua esistenza a questi volontari, che dedicano innumerevoli ore al suo sviluppo.<br/> <br/>🛡️ App Android <br/> <a href=https://github.com/BayLee4>BayLee4</a><br/> <a href=https://github.com/Ch4t4r>Ch4t4r</a><br/> <a href=https://github.com/HrBDev>HrBDev</a><br/> <a href=https://github.com/hussainmohd-a>hussainmohd-a</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/markwmuller>markwmuller</a><br/><a href=https://github.com/Mygod>Mygod</a><br/> <a href=https://github.com/Uldiniad>Uldiniad</a><br/> <a href=https://github.com/Poussinou>Poussinou</a><br/> <a href=https://github.com/pjosingh>pjosingh</a><br/> <br/>🚂 Motore di rete <br/> <a href=https://github.com/alalamav>alalamav</a><br/> <a href=https://github.com/bemasc>bemasc</a><br/> <a href=https://github.com/dmcardle>dmcardle</a><br/> <a href=https://github.com/fortuna>fortuna</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/PeterDaveHello>PeterDaveHello</a><br/> <a href=https://github.com/SeanBurford>SeanBurford</a><br/> <br/>📚 Resolver <br/> <a href=https://github.com/ahmed-tasaly>ahmed-tasaly</a><br/> <a href=https://github.com/amithm7>amithm7</a><br/> <a href=https://github.com/arfshl>arfshl</a><br/> <a href=https://github.com/badmojr>badmojr</a><br/> <a href=https://github.com/bongochong>bongochong</a><br/> <a href=https://github.com/elliotwutingfeng>elliotwutingfeng</a><br/> <a href=https://github.com/georgyo>georgyo</a><br/> <a href=https://github.com/GiddyGoatGaming>GiddyGoatGaming</a><br/> <a href=https://github.com/Harish-Narayan>Harish-Narayan</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/JakeChampion>JakeChampion</a><br/> <a href=https://github.com/MasterKia>MasterKia</a><br/> <a href=https://github.com/mtxadmin>mtxadmin</a><br/> <a href=https://github.com/neneeen>neneeen</a><br/> <a href=https://github.com/PeterDaveHello>PeterDaveHello</a><br/> <a href=https://github.com/santhosh-ponnusamy>santhosh-ponnusamy</a><br/> <a href=https://github.com/shruuub>shruuub</a><br/> <a href=https://github.com/shuvashish76>shuvashish76</a><br/> <br/>⚜ Moderatori della community <br/> <a href=https://t.me/amithm7>amithm7</a><br/> <a href=https://t.me/TronSlayer>Andersen</a><br/><a href=https://t.me/ppatra>ppatra</a><br/> <a href=https://t.me/InFamous23>InFamous23</a><br/> <a href=https://t.me/TheTr1ckst3r>TheTr1ckst3r</a><br/> <a href=https://t.me/Ch4t4r>Ch4t4r</a><br/> <a href=https://t.me/Billi_ance>Billi_ance</a><br/> <a href=https://t.me/kaliangel>kaliangel</a><br/> <a href=https://github.com/PoneyClairDeLune>PoneyClairDeLune</a><br/>📌 Geo-IP <br/> <a href=https://db-ip.com>db-ip.com</a><br/> <br/>❇ Traduzioni <br/> <a href=https://weblate.org/en/>Weblate</a><br/> <br/>🦆 Icons <br/> <a href=https://github.com/celzero/rethink-app/issues/346>Icons</a><br/> <br/>📦 Build server <br/> <a href=https://jitpack.io/>JitPack</a><br/> <a href=https://github.com/>GitHub</a><br/>]]></string>
     <string name="cd_custom_dns_proxy_default_app">Nessuno</string>
     <string name="cd_dns_proxy_error_text_3">Porta invalida</string>
@@ -356,7 +350,7 @@
     <string name="apps_card_ips_count">%1$s regola/e IP e porta/e</string>
     <string name="hsf_start_btn_state">avvia</string>
     <string name="hsf_stop_btn_state">arresta</string>
-    <string name="hsf_uptime">(attivo %1$s; proto: %2$s; tipo: %3$s)</string>
+    <string name="hsf_uptime" translatable="false">(attivo %1$s; proto: %2$s; tipo: %3$s)</string>
     <string name="hsf_downtime">(inattivo da %1$s)</string>
     <string name="hsf_vpn_dialog_header">Attenzione!</string>
     <string name="hsf_vpn_prepare_failure">Manca il permesso VPN o un\'altra app è in modalità \"VPN sempre attiva\".</string>
@@ -639,7 +633,7 @@
     <string name="ci_bypass_universal">Aggira universale</string>
     <string name="ci_delete">elimina</string>
     <string name="ada_noapp_dialog_title">Nessuna app</string>
-    <string name="ada_noapp_dialog_message">Impossibile trovare le informazioni sull\'app. È stata disinstallata\?</string>
+    <string name="ada_noapp_dialog_message">Impossibile trovare le informazioni sull\'app. È stata disinstallata?</string>
     <string name="ada_noapp_dialog_positive">Okay</string>
     <string name="ada_firewall_status"><![CDATA[Quest\'app <b><i>%1$s</i></b>.]]></string>
     <string name="ada_ip_connection_count">Connessioni effettuate a %1$s indirizzi/o IP</string>
@@ -760,7 +754,7 @@
     <string name="fapps_exclude_block_dialog_title">Escludi app</string>
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">IP più contattati</string>
     <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">app più bloccate</string>
-    <string name="fapps_exclude_block_dialog_message">Escludere le applicazioni <i>elencate</i> da DNS e Firewall\?</string>
+    <string name="fapps_exclude_block_dialog_message">Escludere le applicazioni <i>elencate</i> da DNS e Firewall?</string>
     <string name="fapps_isolate_block_dialog_title">Isola app</string>
     <string name="fapps_isolate_block_dialog_message">Isolare le applicazioni <i>elencate</i>\?</string>
     <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">app più consentite</string>
@@ -784,7 +778,7 @@
     <string name="lbl_action_required" translatable="true">Azione richiesta</string>
     <string name="lbl_ip_rules" translatable="true">Regole IP</string>
     <string name="lbl_domain_rules" translatable="true">Regole dominio</string>
-    <string name="bsdl_block_desc" translatable="true">Blocca, autorizza <u>questo dominio</u></string>
+    <string name="bsdl_block_desc" translatable="true">Blocca, autorizza &lt;u&gt;questo dominio&lt;/u&gt;</string>
     <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[Questa connessione è stata bloccata perché il dominio <i/> è bloccato dal DNS preferito dall\'utente.<br/><br/> Per modificare questo comportamento, accedere alla scheda <i>Configura DNS</i>.]]></string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">Aggira DNS e firewall</string>
     <string name="lbl_maybe_blocked" translatable="true">Forse bloccato</string>
@@ -830,7 +824,7 @@
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[Questa connessione è stata consentita perché il <i>dominio</i> è impostato come attendibile nelle regole del dominio universale.<br/><br/> Per modificare questo comportamento, andare alla scheda <i>Configura DNS</i>.]]></string>
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Questa connessione è stata consentita perché l\'<i>app d\'origine</i> è impostata su <i>aggira DNS e firewall</i>.<br/><br/> Per modificarla, vai a alla schermata <i>Firewall specifico per app</i>.</string>
     <string name="brbs_backup_restore_desc" translatable="true">Non funziona per tutte le versioni dell\'app o per tutti i dispositivi</string>
-    <string name="bsct_block_domain" translatable="true">Blocca, autorizza <u>domini</u> per <u>questa app</u></string>
+    <string name="bsct_block_domain" translatable="true">Blocca, autorizza &lt;u&gt;domini&lt;/u&gt; per &lt;u&gt;questa app&lt;/u&gt;</string>
     <string name="lbl_import" translatable="true">Importa</string>
     <string name="lbl_allowed_ips" translatable="true">IP consentiti</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
