@@ -770,7 +770,7 @@
     <string name="firewall_rule_block_domain" translatable="true">Domínio (aplicação)</string>
     <string name="cd_no_rules_text" translatable="true">Sem regras de domínio.</string>
     <string name="lbl_configure" translatable="true">Configurar</string>
-    <string name="bsct_block_domain" translatable="true">Bloquear, confiar <u>domínio(s)</u> para <u>esta aplicação</u></string>
+    <string name="bsct_block_domain" translatable="true">Bloquear, confiar &lt;u&gt;domínio(s)&lt;/u&gt; para &lt;u&gt;esta aplicação&lt;/u&gt;</string>
     <string name="lbl_logs" translatable="true">registos</string>
     <string name="lbl_rules" translatable="true">regras</string>
     <string name="bypass_dns_firewall" translatable="true">ignorar dns e firewall</string>

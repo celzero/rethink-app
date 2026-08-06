@@ -816,7 +816,7 @@
     <string name="settings_locale_dialog_neutral" translatable="true">Ajude a traduzir este aplicativo</string>
     <string name="lbl_logs" translatable="true">registros</string>
     <string name="bypass_dns_firewall" translatable="true">ignorar dns e firewall</string>
-    <string name="bsct_block_domain" translatable="true">Bloquear, confiar <u>domínio(s)</u> para <u>este aplicativo</u></string>
+    <string name="bsct_block_domain" translatable="true">Bloquear, confiar &lt;u&gt;domínio(s)&lt;/u&gt; para &lt;u&gt;este aplicativo&lt;/u&gt;</string>
     <string name="settings_general_customize" translatable="true">personalizar</string>
     <string name="settings_pcap_heading" translatable="true">Captura de pacotes</string>
     <string name="settings_default_dns_heading" translatable="true">Escolher DNS alternativo</string>
