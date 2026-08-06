@@ -627,7 +627,7 @@
     <string name="orbot_bs_status_4">Menyetel Tor-sebagai-Proksi (Orbot) sekali klik.</string>
     <string name="settings_http_proxy_dialog_title">URL Server Khusus</string>
     <string name="settings_network_all_networks_desc">Jika diaktifkan, Rethink akan menggunakan semua jaringan yang tersedia untuk terhubung ke internet. Jika tidak, aplikasi ini akan menggunakan jaringan mana pun yang dianggap <i>aktif</i> oleh Android.</string>
-    <string name="hsf_vpn_dialog_message">Rethink memerlukan izin untuk menyiapkan VPN lokal guna mengenkripsi permintaan DNS perangkat, mengimplementasikan monitor jaringan, dan menegakkan aturan firewall. \n \nRethink tidak mengumpulkan informasi apa pun atau memata-matai Anda dengan cara apa pun.</string>
+    <string name="hsf_vpn_dialog_message">Rethink memerlukan izin untuk menyiapkan VPN lokal guna mengenkripsi permintaan DNS perangkat, menerapkan pemantau jaringan, dan memberlakukan aturan firewall.\n\nOtomatisasi proksi berbasis Wi-Fi memerlukan izin Lokasi untuk mengidentifikasi jaringan Wi-Fi yang terhubung (SSID). Izin ini hanya diminta saat Anda mengaktifkan fitur tersebut.\n\nRethink tidak mengumpulkan informasi apa pun atau memata-matai Anda dengan cara apa pun.</string>
     <string name="about_mail_bugreport_subject">[Rethink]: Laporan bug</string>
     <string name="settings_ptrans_heading">Paksa keluar IPv4</string>
     <string name="fapps_info_dialog_positive_btn">Oke</string>
@@ -785,8 +785,8 @@
     <string name="logs_card_network_count" translatable="true">%1$s koneksi</string>
     <string name="logs_card_dns_count" translatable="true">%1$s permintaan</string>
     <string name="hsf_packet_capture_chip_text" translatable="true">Penangkapan paket aktif</string>
-    <string name="settings_default_dns_heading" translatable="true">Pilih DNS cadangan</string>
-    <string name="settings_default_dns_desc" translatable="true">Dalam kasus yang jarang terjadi ketika DNS pilihan pengguna tidak dapat dipastikan, DNS fallback akan digunakan.</string>
+    <string name="settings_default_dns_heading" translatable="true">Pilih DNS Bootstrap</string>
+    <string name="settings_default_dns_desc" translatable="true">Hanya digunakan saat startup untuk menemukan alamat IP server DNS terenkripsi.</string>
     <string name="firewall_card_universal_rules" translatable="true">%1$s aturan universal</string>
     <string name="rules_card_domain_count" translatable="true">%1$s aturan domain</string>
     <string name="bsct_block_domain" translatable="true">Blokir, percayakan &lt;u&gt;domain&lt;/u&gt; untuk &lt;u&gt;aplikasi ini&lt;/u&gt;</string>
@@ -1079,7 +1079,7 @@
     <string name="vpn_policy_title" translatable="true">Kebijakan perubahan koneksi</string>
     <string name="title_database_dump" translatable="true">Basis data</string>
     <string name="copied_clipboard" translatable="true">Disalin</string>
-    <string name="lbl_bootstrap" translatable="true">Cadangan</string>
+    <string name="lbl_bootstrap" translatable="true">Bootstrap</string>
     <string name="conn_track_clear_rule_logs_title" translatable="true">Hapus log untuk aturan ini?</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">Hapus semua Aturan Domain?</string>
     <string name="ac_never_split_desc" translatable="true">Jangan mengubah paket.</string>
@@ -1188,4 +1188,36 @@
     <string name="stability_program_snackbar_disable" translatable="true">Batal</string>
     <string name="settings_flood_wg_desc" translatable="true">Jika diaktifkan, mengirimkan paket WireGuard tambahan agar lalu lintas terowongan lebih sulit dikenali dan diblokir di jaringan yang dibatasi.</string>
     <string name="lbl_expires_on" translatable="true">Berlaku hingga</string>
+    <string name="ip_mismatch_notification_title" translatable="true">Ketidaksesuaian protokol jaringan</string>
+    <string name="ip_mismatch_notification_content" translatable="true">Protokol IP yang Anda pilih tidak tersedia pada jaringan saat ini. Beralihlah ke mode \"IPv4 &amp; IPv6\" atau \"Otomatis\" agar tetap terhubung.</string>
+    <string name="doh_empty_state_title" translatable="true">Tidak ada endpoint DoH</string>
+    <string name="doh_empty_state_desc" translatable="true">Tambahkan endpoint DNS-over-HTTPS untuk memulai.</string>
+    <string name="odoh_empty_state_title" translatable="true">Tidak ada endpoint ODoH</string>
+    <string name="odoh_empty_state_desc" translatable="true">Tambahkan endpoint Oblivious DNS-over-HTTPS untuk memulai.</string>
+    <string name="dot_empty_state_title" translatable="true">Tidak ada endpoint DoT</string>
+    <string name="dot_empty_state_desc" translatable="true">Tambahkan endpoint DNS-over-TLS untuk memulai.</string>
+    <string name="dns_proxy_empty_state_title" translatable="true">Tidak ada endpoint DNS Proxy</string>
+    <string name="dns_proxy_empty_state_desc" translatable="true">Tambahkan endpoint DNS Proxy untuk memulai.</string>
+    <string name="dns_crypt_empty_state_title" translatable="true">Tidak ada endpoint DNSCrypt</string>
+    <string name="dns_crypt_empty_state_desc" translatable="true">Tambahkan endpoint DNSCrypt untuk memulai.</string>
+    <string name="rethink_empty_state_title" translatable="true">Tidak ditemukan blocklist</string>
+    <string name="rethink_empty_state_desc" translatable="true">Unduh atau konfigurasi blocklist untuk memulai.</string>
+    <string name="settings_rinr_btmsht_title" translatable="true">Loopback (eksperimental)</string>
+    <string name="settings_rinr_btmsht_desc" translatable="true">Dalam mode Loopback, Rethink dapat mengarahkan ulang lalu lintas jaringannya sendiri. Artinya, Rethink dapat menerapkan aturan IP dan domain, aturan firewall universal, serta aturan proksi pada lalu lintas Rethink seolah-olah Rethink adalah aplikasi biasa lainnya. Meskipun Loopback menawarkan kontrol lebih besar, perilaku yang dihasilkan mungkin tidak selalu diinginkan.\n\n\nDisarankan untuk mengecualikan Rethink dari aturan firewall, DNS, dan proksi. Hal ini tidak memengaruhi pemantauan atau pencatatan jaringan, melainkan hanya aturan tersebut.\n\n\nDalam mode Loopback, Proxy Lockdown tidak akan diterapkan untuk saat ini.</string>
+    <string name="settings_rinr_exempt_btn" translatable="true">Kecualikan Rethink</string>
+    <string name="app_info_rethink_warning_title" translatable="true">Perhatian</string>
+    <string name="app_info_rethink_warning_desc" translatable="true">Anda akan mengubah aturan firewall untuk Rethink. Karena Rethink mengelola terowongan VPN, mengizinkan, memblokir, atau mengisolasi lalu lintasnya sendiri dapat memutus akses jaringan secara keseluruhan.</string>
+    <string name="app_info_rethink_warning_proceed" translatable="true">Saya mengerti</string>
+    <string name="rethink_home_screen_warning" translatable="true">dapat memengaruhi konektivitas ⚠️</string>
+    <string name="dc_global_heading" translatable="true">Global</string>
+    <string name="dc_block_unknown_heading" translatable="true">Blokir DNS dari sumber tidak dikenal</string>
+    <string name="dc_block_unknown_desc" translatable="true">Blokir semua permintaan DNS yang berasal dari aplikasi tidak dikenal.</string>
+    <string name="build_flavor_website_degoogled" translatable="true">website-degoogled</string>
+    <string name="use_bootstrap_dns_to_bypass" translatable="true">Gunakan DNS bootstrap sebagai bypass</string>
+    <string name="use_bootstrap_dns_to_bypass_desc" translatable="true">Saat diaktifkan, selalu gunakan DNS bootstrap untuk domain dan IP yang dilewati.</string>
+    <string name="location_disclosure_title" translatable="true">Izin Lokasi untuk Fitur Wi-Fi</string>
+    <string name="location_disclosure_message" translatable="true">Rethink memperlakukan informasi jaringan Wi-Fi (SSID/BSSID) sebagai data lokasi. Lokasi latar belakang memungkinkan aplikasi menerapkan otomatisasi Proksi secara otomatis saat Wi-Fi Anda berubah, bahkan ketika aplikasi tidak terbuka. Rethink TIDAK mengumpulkan, menyimpan, atau membagikan lokasi GPS fisik Anda.</string>
+    <string name="location_disclosure_positive" translatable="true">Lanjutkan</string>
+    <string name="location_disclosure_negative" translatable="true">Jangan Sekarang</string>
+    <string name="sponsor_continue" translatable="true">Lanjutkan</string>
 </resources>
