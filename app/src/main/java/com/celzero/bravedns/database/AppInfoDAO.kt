@@ -31,6 +31,9 @@ interface AppInfoDAO {
 
     @Update fun update(appInfo: AppInfo): Int
 
+    @Query("update AppInfo set notes = :notes, modifiedTs = :modifiedTs where uid = :uid")
+    fun updateNotes(uid: Int, notes: String, modifiedTs: Long): Int
+
     @Query(
         "update AppInfo set firewallStatus = :firewallStatus, connectionStatus = :connectionStatus, modifiedTs = :modifiedTs where uid = :uid"
     )

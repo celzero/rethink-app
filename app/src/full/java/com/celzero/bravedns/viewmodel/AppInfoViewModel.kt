@@ -461,9 +461,9 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         }
     }
 
-    fun updateAppNotes(appInfo: AppInfo) {
+    fun updateAppNotes(uid: Int, notes: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            appInfoDAO.update(appInfo)
+            FirewallManager.updateAppNotes(uid, notes)
         }
     }
 }

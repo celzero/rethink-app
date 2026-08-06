@@ -995,6 +995,24 @@ object FirewallManager : KoinComponent {
         }
     }
 
+    suspend fun updateAppNotes(uid: Int, notes: String) {
+        try {
+            db.updateNotes(uid, notes)
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_FIREWALL, "updateAppNotes db failed for uid $uid", e)
+            return
+        }
+
+        val now = System.currentTimeMillis()
+        mutex.withLock {
+            appInfos.get(uid).forEach {
+                it.notes = notes
+                it.modifiedTs = now
+            }
+        }
+        informObservers()
+    }
+
     suspend fun getTombstoneApps(): List<AppInfo> {
         mutex.withLock {
             return try {

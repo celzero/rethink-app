@@ -1147,8 +1147,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun saveNotesToDatabase() {
-        appInfo.notes = appNotes
-        appInfoViewModel.updateAppNotes(appInfo)
+        appInfoViewModel.updateAppNotes(appInfo.uid, appNotes)
     }
 
     private fun showNotesChip() {
