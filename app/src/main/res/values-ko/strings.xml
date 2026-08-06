@@ -679,7 +679,7 @@
     <string name="firewall_rule_univ_block_metered" translatable="true">종량제 (전역)</string>
     <string name="firewall_rule_global_lockdown" translatable="true">락다운</string>
     <string name="firewall_rule_proxied" translatable="true">프록시 적용됨</string>
-    <string name="dns_btm_resolved_crypt" translatable="true">%3$s를 통해 %2$s만큼 <u>익명으로</u> %1$s를 해결했습니다</string>
+    <string name="dns_btm_resolved_crypt" translatable="true">%3$s를 통해 %2$s만큼 &lt;u&gt;익명으로&lt;/u&gt; %1$s를 해결했습니다</string>
     <string name="dns_info_positive" translatable="true">동의하다</string>
     <string name="firewall_rule_block_app_unmetered_desc" translatable="true"><![CDATA[이 <i>앱</i>이 <i>비과금</i> 네트워크에 접속을 시도하여 사용자 설정 방화벽 규칙에서 차단됐습니다.<br/><br/>변경하려면 <i>모든 앱</i> 탭으로 이동해 주세요.]]></string>
     <string name="firewall_rule_block_app_mobile_desc" translatable="true"><![CDATA[이 <i>앱</i>이 <i>종량제</i> 네트워크에 접속을 시도하여 사용자 설정 방화벽 규칙에서 차단됐습니다.<br/><br/> 변경하려면 <i>모든 앱</i> 탭으로 이동해 주세요.]]></string>
