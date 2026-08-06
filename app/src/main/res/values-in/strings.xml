@@ -631,9 +631,7 @@
     <string name="orbot_bs_status_4">Menyetel Tor-sebagai-Proksi (Orbot) sekali klik.</string>
     <string name="settings_http_proxy_dialog_title">URL Server Khusus</string>
     <string name="settings_network_all_networks_desc">Bila diaktifkan, Rethink menggunakan semua jaringan yang tersedia untuk terhubung ke Internet. Jika tidak, aplikasi RethinkDNS akan menggunakan jaringan mana pun yang dianggap <i>aktif</i> oleh Android.</string>
-    <string name="hsf_vpn_dialog_message">Rethink memerlukan izin untuk menyiapkan VPN lokal guna mengenkripsi permintaan DNS perangkat, mengimplementasikan monitor jaringan, dan menegakkan aturan firewall.
-\n
-\nRethink tidak mengumpulkan informasi apa pun atau memata-matai Anda dengan cara apa pun.</string>
+    <string name="hsf_vpn_dialog_message">Rethink memerlukan izin untuk menyiapkan VPN lokal guna mengenkripsi permintaan DNS perangkat, mengimplementasikan monitor jaringan, dan menegakkan aturan firewall. \n \nRethink tidak mengumpulkan informasi apa pun atau memata-matai Anda dengan cara apa pun.</string>
     <string name="about_mail_bugreport_subject">[Rethink]: Laporan bug</string>
     <string name="settings_ptrans_heading">Paksa keluar IPv4</string>
     <string name="fapps_info_dialog_positive_btn">Oke</string>
