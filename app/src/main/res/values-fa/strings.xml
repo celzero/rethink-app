@@ -296,10 +296,7 @@
     <string name="settings_network_all_networks_desc" translatable="true">When enabled, Rethink uses all available networks to connect to Internet. If not, it uses whichever network is deemed <i>active</i> by Android.</string>
     <string name="public_key_copy_toast_msg" translatable="true">Public key copied.</string>
     <string name="settings_orbot_header" translatable="true">اوربات</string>
-    <string name="orbot_explanation" translatable="true">Orbot یک برنامه پراکسی رایگان است که به سایر برنامه‌ها اجازه می‌دهد تا &lt;u&gt;ایمن‌تر&lt;/u&gt; از اینترنت استفاده کنند.
-\n Orbot از &lt;u&gt;Tor&lt;/u&gt; برای رمزگذاری ترافیک اینترنت شما استفاده می کند که به شما کمک می کند &lt;u&gt;سانسور را دور بزنید&lt;/u&gt; و در برابر اشکال &lt;u&gt;نظارت شبکه&lt;/u&gt; که آزادی و حریم خصوصی شخصی را تهدید می کند، دفاع کنید.
-\n &lt;u&gt;پراکسی TCP&lt;/u&gt;: فقط اتصالات TCP برنامه‌های &lt;i&gt;شامل شده&lt;/i&gt; را مجدداً به Orbot فوروارد کنید.
-\n &lt;u&gt;پراکسی HTTP&lt;/u&gt;: دوباره فکر کنید &lt;i&gt;تونل HTTP CONNECT را به Orbot ایجاد می کند و فقط اتصالات TCP برنامه های &lt;i&gt;شامل&lt;/i&gt; را ارسال می کند.</string>
+    <string name="orbot_explanation" translatable="true">Orbot یک برنامه پراکسی رایگان است که به سایر برنامه‌ها اجازه می‌دهد تا &lt;u&gt;ایمن‌تر&lt;/u&gt; از اینترنت استفاده کنند. \n Orbot از &lt;u&gt;Tor&lt;/u&gt; برای رمزگذاری ترافیک اینترنت شما استفاده می کند که به شما کمک می کند &lt;u&gt;سانسور را دور بزنید&lt;/u&gt; و در برابر اشکال &lt;u&gt;نظارت شبکه&lt;/u&gt; که آزادی و حریم خصوصی شخصی را تهدید می کند، دفاع کنید. \n &lt;u&gt;پراکسی TCP&lt;/u&gt;: فقط اتصالات TCP برنامه‌های &lt;i&gt;شامل شده&lt;/i&gt; را مجدداً به Orbot فوروارد کنید. \n &lt;u&gt;پراکسی HTTP&lt;/u&gt;: دوباره فکر کنید &lt;i&gt;تونل HTTP CONNECT را به Orbot ایجاد می کند و فقط اتصالات TCP برنامه های &lt;i&gt;شامل&lt;/i&gt; را ارسال می کند.</string>
     <string name="settings_general_customize" translatable="true">customize</string>
     <string name="settings_orbot_notification_content" translatable="true">Failure starting Tor-as-a-Proxy. Open the Orbot app to start it manually.</string>
     <string name="about_settings_app_info" translatable="true">اطلاعات برنامه</string>
