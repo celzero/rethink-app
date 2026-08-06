@@ -20,7 +20,10 @@ import android.net.ConnectivityManager
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.ConnTrackerMetaData
 import com.celzero.bravedns.database.ConnectionTracker
+import com.celzero.bravedns.database.RefreshDatabase
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.ConnectionMonitor
+import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.IpRulesManager
@@ -28,6 +31,7 @@ import com.celzero.bravedns.service.NetLogTracker
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TunFirewallManager
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.shadows.ShadowBackend
 import com.celzero.bravedns.shadows.ShadowDNSOpts
 import com.celzero.bravedns.shadows.ShadowDNSSummary
@@ -66,6 +70,7 @@ class TunDnsManagerTest {
     private val persistentState = mockk<PersistentState>(relaxed = true)
     private val appConfig = mockk<AppConfig>(relaxed = true)
     private val netLogTracker = mockk<NetLogTracker>(relaxed = true)
+    private val rdb = mockk<RefreshDatabase>(relaxed = true)
     private val connectivityManager = mockk<ConnectivityManager>(relaxed = true)
     private val keyguardManager = mockk<KeyguardManager>(relaxed = true)
 
@@ -78,19 +83,33 @@ class TunDnsManagerTest {
                 single { persistentState }
                 single { appConfig }
                 single { netLogTracker }
+                single { rdb }
             })
         }
         TunDnsManager.setDnsOptsFactoryForTest { mockk(relaxed = true) }
         TunDnsManager.setNetLogTrackerForTest(netLogTracker)
+        TunDnsManager.resetState()
         TunFirewallManager.setRethinkUidForTest(rethinkUid)
         mockkObject(FirewallManager)
         mockkObject(IpRulesManager)
         mockkObject(TunFirewallManager)
         mockkObject(VpnController)
         mockkObject(Utilities)
+        mockkObject(DomainRulesManager)
+        mockkObject(WireguardManager)
+        mockkObject(RpnProxyManager)
 
         every { Utilities.isAtleastR() } returns true
         every { Utilities.isMissingOrInvalidUid(any()) } answers { it.invocation.args[0] as Int == INVALID_UID }
+        every { DomainRulesManager.getDomainRule(any(), any()) } returns DomainRulesManager.Status.NONE
+        every { DomainRulesManager.getAggregatedDomainRule(any(), any()) } returns Pair(DomainRulesManager.Status.NONE, "")
+        every { DomainRulesManager.isDomainTrusted(any()) } returns false
+        every { WireguardManager.getOneWireGuardProxyId() } returns null
+        every { RpnProxyManager.isRpnActive() } returns false
+        every { persistentState.routeRethinkInRethink } returns false
+        coEvery { FirewallManager.isTempAllowed(any()) } returns false
+        coEvery { FirewallManager.connectionStatus(any()) } returns FirewallManager.ConnectionStatus.ALLOW
+        coEvery { FirewallManager.appStatus(any()) } returns mockk<FirewallManager.FirewallStatus>(relaxed = true)
     }
 
     @After
@@ -103,6 +122,9 @@ class TunDnsManagerTest {
         unmockkObject(TunFirewallManager)
         unmockkObject(VpnController)
         unmockkObject(Utilities)
+        unmockkObject(DomainRulesManager)
+        unmockkObject(WireguardManager)
+        unmockkObject(RpnProxyManager)
     }
 
     // region handleOnResponse tests
@@ -873,6 +895,24 @@ class TunDnsManagerTest {
 
         val connInfo = capturedParams.captured.connInfo
         assertEquals(ConnectionTracker.ConnType.UNMETERED.value, connInfo.connType)
+    }
+
+    // endregion
+
+    // region resetState and isUidPresentInAnyDnsRequest tests
+
+    @Test
+    fun `isUidPresentInAnyDnsRequest starts false and resetState keeps it false`() {
+        TunDnsManager.resetState()
+        assertFalse(TunDnsManager.isUidPresentInAnyDnsRequestForTest())
+    }
+
+    @Test
+    fun `resetState clears isUidPresentInAnyDnsRequest when previously set`() {
+        TunDnsManager.setIsUidPresentInAnyDnsRequestForTest(true)
+        assertTrue(TunDnsManager.isUidPresentInAnyDnsRequestForTest())
+        TunDnsManager.resetState()
+        assertFalse(TunDnsManager.isUidPresentInAnyDnsRequestForTest())
     }
 
     // endregion
