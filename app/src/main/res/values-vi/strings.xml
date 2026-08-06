@@ -80,11 +80,11 @@
     <string name="firewall_rules" translatable="true">Quy tắc mạng</string>
     <string name="firewall_mode_info_explanation_new" translatable="true">Giám sát hoạt động mạng và hoạt động tường lửa của bất kỳ ứng dụng hoặc địa chỉ IP nào.</string>
     <string name="alert_firewall_accessibility_explanation" translatable="true">RethinkDNS sử dụng dịch vụ trợ năng để theo dõi xem những ứng dụng nào đang được sử dụng trực tiếp (foreground) và những ứng dụng nào đang không được sử dụng trực tiếp/chạy ngầm (background).\n\nRethinkDNS không thu thập bất kỳ thông tin nào hoặc theo dõi bạn dưới bất kỳ hình thức nào.</string>
-    <string name="conn_track_clear_logs_message" translatable="true">Thao tác này chỉ xóa nhật ký mạng chứ không xóa các quy tắc tường lửa. Hoạt động này là không thể đảo ngược. Bạn có muốn tiếp tục\?</string>
+    <string name="conn_track_clear_logs_message" translatable="true">Thao tác này chỉ xóa nhật ký mạng chứ không xóa các quy tắc tường lửa. Hoạt động này là không thể đảo ngược. Bạn có muốn tiếp tục?</string>
     <string name="dns_query_clear_logs_title" translatable="true">Xoá tất cả nhật ký DNS?</string>
-    <string name="dns_query_clear_logs_message" translatable="true">Thao tác này sẽ xóa nhật ký DNS trên thiết bị. Hoạt động này là không thể đảo ngược. Bạn có muốn tiếp tục\?</string>
+    <string name="dns_query_clear_logs_message" translatable="true">Thao tác này sẽ xóa nhật ký DNS trên thiết bị. Hoạt động này là không thể đảo ngược. Bạn có muốn tiếp tục?</string>
     <string name="bsct_app_info" translatable="true">Thông tin ứng dụng</string>
-    <string name="bsct_block" translatable="true">Chặn, bỏ qua, loại trừ, cách ly<u>ứng dụng này</u></string>
+    <string name="bsct_block" translatable="true">Chặn, bỏ qua, loại trừ, cách ly&lt;u&gt;ứng dụng này&lt;/u&gt;</string>
     <string name="bsct_conn_block_desc" translatable="true">%1$s bị chặn bởi %2$s</string>
     <string name="bsct_conn_block_desc_device" translatable="true">đã chặn %1$s trên thiết bị</string>
     <string name="always_on_dialog_heading" translatable="true">Vô hiệu hoá VPN luôn bật</string>
