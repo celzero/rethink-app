@@ -528,7 +528,7 @@
     <string name="about_docs">Dokümanları okuyun</string>
     <string name="about_settings_notification">Bildirim ayarları</string>
     <string name="cd_dns_crypt_dialog_title">DNSCrypt Çözümleyici veya Aktarıcı Ekleme</string>
-    <string name="dns_btm_resolved_crypt">çözüldü <u>anonim olarak</u> %1$s tarafından %2$s aracılığıyla %3$s</string>
+    <string name="dns_btm_resolved_crypt">çözüldü &lt;u&gt;anonim olarak&lt;/u&gt; %1$s tarafından %2$s aracılığıyla %3$s</string>
     <string name="dns_connected">Bağlandı</string>
     <string name="fapps_filter_categories_heading">Kategoriler</string>
     <string name="firewall_rule_block_ip_desc"><![CDATA[Kullanıcı tarafından belirlenen güvenlik duvarı kuralı <i>hedef IP\'yi</i> engelledi.<br/><br/> Değiştirmek için <i>Uygulamaya Özel Güvenlik Duvarı</i> ekranına gidin.]]></string>
@@ -598,9 +598,7 @@
     <string name="apps_card_ips_count">%1$s IP ve Port kuralı</string>
     <string name="hsf_start_btn_state">başlat</string>
     <string name="dns_btm_resolved_doh">%1$s tarafından çözüldü %2$s</string>
-    <string name="hsf_vpn_dialog_message">Rethink, cihazın DNS isteklerini şifrelemek, bir ağ izleyicisi uygulamak ve güvenlik duvarı kurallarını uygulamak için yerel bir VPN kurma iznine ihtiyaç duyar.
-\n
-\nRethink herhangi bir şekilde bilgi toplamaz veya sizi gözetlemez.</string>
+    <string name="hsf_vpn_dialog_message">Rethink, cihazın DNS isteklerini şifrelemek, bir ağ izleyicisi uygulamak ve güvenlik duvarı kurallarını uygulamak için yerel bir VPN kurma iznine ihtiyaç duyar. \n \nRethink herhangi bir şekilde bilgi toplamaz veya sizi gözetlemez.</string>
     <string name="dc_dns_website_desc">Web sitesi simgelerini <i>nextdns.io</i> ve <i>duckduckgo.com</i> adresinden alır. 350 mb\'a kadar disk alanı tüketir</string>
     <string name="about_bravedns_explantion">Rethink, Android cihazınızda uygulama etkinliğini izlemenin, İnternet sansürünü aşmanın ve uygulamaları güvenlik duvarına almanın en kolay yoludur.</string>
     <string name="about_bravedns_whoarewe">Rethink, Amazon, IBM ve Scientific Games\'in eski mühendisleri tarafından yönetilen ücretsiz ve açık kaynaklı bir projedir.</string>
