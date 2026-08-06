@@ -340,10 +340,7 @@
     <string name="firewall_status_unknown">sconosciuto</string>
     <string name="ct_bs_app_info_error">Informazioni sull\'app non trovate</string>
     <string name="firewall_card_status_active">%1$s app</string>
-    <string name="firewall_card_text_active">%1$s bloccate
-\n%2$s aggirate
-\n%3$s escluse
-\n%4$s isolate</string>
+    <string name="firewall_card_text_active">%1$s bloccate \n%2$s aggirate \n%3$s escluse \n%4$s isolate</string>
     <string name="firewall_card_text_inactive">Abilita la modalità firewall.</string>
     <string name="dns_card_latency_active">%1$sms</string>
     <string name="dns_card_latency_inactive">Abilita la modalità DNS.</string>
@@ -463,7 +460,7 @@
     <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
     <string name="dns_btm_sheet_chip">+%1$s altri IP</string>
     <string name="dns_btm_sheet_chip_no_answer">Nessuna risposta</string>
-    <string name="dns_btm_resolved_crypt">risolto <u>anonimamente</u> %1$s da %2$s tramite %3$s</string>
+    <string name="dns_btm_resolved_crypt">risolto &lt;u&gt;anonimamente&lt;/u&gt; %1$s da %2$s tramite %3$s</string>
     <string name="dns_btm_resolved_doh">risolto %1$s da %2$s</string>
     <string name="dns_btm_resolved_doh_no_server">risolto %1$s</string>
     <string name="dns_btm_latency_ms">%1$s ms</string>
