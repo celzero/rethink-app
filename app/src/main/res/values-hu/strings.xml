@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name" translatable="false">RethinkDNS</string>
     <string name="title_about" translatable="true">Rólunk</string>
     <string name="about_title_desc" translatable="true">Hálózatbiztonsági fenyegetések észlelése és blokkolása</string>
     <string name="lbl_rules" translatable="true">szabályok</string>
