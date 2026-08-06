@@ -82,7 +82,7 @@ class AppInfo : Serializable {
                 "modifiedTs" -> modifiedTs = it.value as Long
                 "tempAllowEnabled" -> tempAllowEnabled = (it.value as Int == 1)
                 "tempAllowExpiryTime" -> tempAllowExpiryTime = it.value as Long
-                "notes" -> notes = it.value as String
+                "notes" -> notes = it.value as? String ?: ""
                 else -> {
                     // ignore
                 }
