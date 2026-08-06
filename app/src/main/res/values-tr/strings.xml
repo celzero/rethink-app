@@ -767,7 +767,7 @@
     <string name="firewall_card_universal_rules" translatable="true">%1$s evrensel kural(lar)</string>
     <string name="lbl_http" translatable="true">HTTP</string>
     <string name="pcap_failure_toast" translatable="true">Pcap dosyası oluşturulurken hata oluştu, Tekrar deneyin!</string>
-    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true"><i>Listelenen</i> uygulamalar için evrensel DNS &amp; güvenlik duvarı kurallarını atlayın\?</string>
+    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true"><i>Listelenen</i> uygulamalar için evrensel DNS &amp; güvenlik duvarı kurallarını atlayın?</string>
     <string name="lbl_wireguard" translatable="true">WireGuard</string>
     <string name="add_remove_apps" translatable="true">Ekle / Kaldır (%1$s uygulama)</string>
     <string name="bad_extension_error" translatable="true">Dosya .conf veya .zip olmalıdır</string>
@@ -785,7 +785,7 @@
     <string name="lbl_hour" translatable="true">saat</string>
     <string name="lbl_persistent_keepalive" translatable="true">Sürekli canlı tut</string>
     <string name="wireguard_enabled_failure">WireGuard\'ı etkinleştirmek için diğer aktif vekilleri durdurun</string>
-    <string name="fapps_exclude_block_dialog_message" translatable="true"><i>Listelenen</i> uygulamaları DNS ve Güvenlik Duvarı\'ndan hariç tutun\?</string>
+    <string name="fapps_exclude_block_dialog_message" translatable="true"><i>Listelenen</i> uygulamaları DNS ve Güvenlik Duvarı\'ndan hariç tutun?</string>
     <string name="add_peer" translatable="true">Eş Ekle</string>
     <string name="cloudflare_family_dns_desc" translatable="true">Kötü amaçlı yazılımları ve yetişkinlere yönelik içeriği engeller. Cloudflare\'in 1.1.1.3 DNS uç noktasını kullanır.</string>
     <string name="crypt_quad9_security_desc" translatable="true">Quad9 (anycast) dnssec/no–log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
@@ -811,7 +811,7 @@
     <string name="lbl_delete" translatable="true">Sil</string>
     <string name="settings_default_dns_heading" translatable="true">Yedek DNS\'yi seçin</string>
     <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Uygulamaları atlayın</string>
-    <string name="fapps_bypass_block_dialog_message" translatable="true"><i>Listelenen</i> uygulamalar için Evrensel güvenlik duvarı kurallarını atlayın\?</string>
+    <string name="fapps_bypass_block_dialog_message" translatable="true"><i>Listelenen</i> uygulamalar için Evrensel güvenlik duvarı kurallarını atlayın?</string>
     <string name="ci_trust_rule" translatable="true">Güvenilirlik</string>
     <string name="cd_dns_alg_heading" translatable="true">Gelişmiş DNS filtreleme (deneysel)</string>
     <string name="lbl_qr_code" translatable="true">QR kod</string>
@@ -863,14 +863,14 @@
     <string name="lbl_addresses" translatable="true">Adresler</string>
     <string name="logs_card_network_count" translatable="true">%1$s bağlantılar</string>
     <string name="lbl_active" translatable="true">Aktif</string>
-    <string name="fapps_isolate_block_dialog_message" translatable="true"><i>listelenen</i> uygulamalarını izole edin\?</string>
+    <string name="fapps_isolate_block_dialog_message" translatable="true"><i>listelenen</i> uygulamalarını izole edin?</string>
     <string name="include_all_app_wg_dialog_title">Tüm uygulamaları dahil et</string>
     <string name="lbl_dns_servers" translatable="true">DNS Sunucuları</string>
     <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">en çok iletişim kurulan ülkeler</string>
     <string name="cloudflare_dns_desc" translatable="true">Herhangi bir DNS isteğini engellemez. Cloudflare\'in 1.1.1.1 DNS uç noktasını kullanır.</string>
     <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">en çok engellenen ülkeler</string>
     <string name="lbl_app_wise" translatable="true">uygulama başına</string>
-    <string name="bsdl_block_desc" translatable="true">Engelle, <u>bu alan adına</u> güven</string>
+    <string name="bsdl_block_desc" translatable="true">Engelle, &lt;u&gt;bu alan adına&lt;/u&gt; güven</string>
     <string name="firewall_rule_domain_blocked_univ" translatable="true">Alan adı (Univ)</string>
     <string name="fapps_isolate_block_dialog_title" translatable="true">Uygulamaları izole edin</string>
     <string name="status_protected_with_wg" translatable="true">wireguard ile korunuyor</string>
@@ -892,7 +892,7 @@
     <string name="hs_biometeric_title" translatable="true">Rethink\'in Kilidini Açın</string>
     <string name="crypt_relay_netherlands" translatable="true">Hollanda\'da barındırılan anonimleştirilmiş DNS aktarıcısı</string>
     <string name="invalid_file_error" translatable="true">geçersiz dosya</string>
-    <string name="include_all_app_wg_dialog_desc">Tüm uygulamaları bu tünelden mi geçirelim\?</string>
+    <string name="include_all_app_wg_dialog_desc">Tüm uygulamaları bu tünelden mi geçirelim?</string>
     <string name="settings_pcap_dialog_option_2" translatable="true">Logcat Çıktısı</string>
     <string name="key_length_error" translatable="true">Yanlış anahtar uzunluğu</string>
     <string name="fapps_info_metered_msg" translatable="true">Ölçülü (Mobil) ağda İzin Ver / Engelle.</string>
@@ -910,7 +910,7 @@
     <string name="lbl_select_all" translatable="true">tümünü seç</string>
     <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[Bu bağlantı engellendi çünkü <i>alan adı</i> kullanıcının tercih ettiği DNS tarafından engellendi. Bu davranışı değiştirmek için <i>DNS Yapılandır</i> sekmesine gidin.]]></string>
     <string name="cleanbrowsing_adult_dns_desc" translatable="true">Yetişkin filtresi, tüm yetişkin, pornografik ve açık sitelere erişimi engeller. Proxy veya VPN\'leri, karışık içerikli siteleri engellemez. Reddit gibi sitelere izin verir. Google ve Bing Güvenli Mod\'a ayarlanmıştır.</string>
-    <string name="config_delete_dialog_desc">Bu Konfigürasyonu silmek istediğinizden emin misiniz\?</string>
+    <string name="config_delete_dialog_desc">Bu Konfigürasyonu silmek istediğinizden emin misiniz?</string>
     <string name="parse_error_reason" translatable="true">%1$s \"%2$s\" ayrıştırılamıyor</string>
     <string name="new_warp_config_desc" translatable="true">WARP yapılandırmasını sunucudan getir</string>
     <string name="firewall_rule_dns_blocked" translatable="true">DNS Engellendi</string>
@@ -922,7 +922,7 @@
     <string name="parse_error_inet_endpoint" translatable="true">Uç nokta</string>
     <string name="firewall_status_bypass_dns_firewall" translatable="true">dns ve güvenlik duvarı kurallarını atlar</string>
     <string name="exclude_all_app_wg_dialog_title">Tüm uygulamaları hariç tut</string>
-    <string name="exclude_all_app_wg_dialog_desc">Tüm uygulamaları bu tünelden hariç tutalım mı\?</string>
+    <string name="exclude_all_app_wg_dialog_desc">Tüm uygulamaları bu tünelden hariç tutalım mı?</string>
     <string name="no_configs_error" translatable="true">Hiçbir yapılandırma bulunamadı</string>
     <string name="firewall_rule_proxied" translatable="true">Proxy\'li</string>
     <string name="http_proxy_dialog_desc" translatable="true">Form URL\'sini değiştirin, &lt;protocol&gt; https://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt; Örnek: http://proxy.ör.com:8080/</string>
@@ -931,7 +931,7 @@
     <string name="crypt_adguard_family_desc" translatable="true">Güvenli arama ve yetişkinlere yönelik içerik engelleme özellikli Adguard DNS.</string>
     <string name="bad_config_reason_syntax_error" translatable="true">Sözdizimi hatası</string>
     <string name="hs_biometeric_desc" translatable="true">RethinkDNS\'in kilidini açmak için biyometrik kimlik doğrulamayı kullanın</string>
-    <string name="fapps_unblock_dialog_message" translatable="true"><i>Listelenen</i> uygulamalar için bağlantılara izin ver\?</string>
+    <string name="fapps_unblock_dialog_message" translatable="true"><i>Listelenen</i> uygulamalar için bağlantılara izin ver?</string>
     <string name="crypt_relay_france" translatable="true">Paris, Fransa\'da barındırılan ve https://cryptostrom.is/ tarafından sağlanan anonimleştirilmiş DNS aktarıcısı.</string>
     <string name="ssv_see_more" translatable="true">Tümünü Göster</string>
     <string name="lbl_listen_port" translatable="true">Dinleme noktası</string>
