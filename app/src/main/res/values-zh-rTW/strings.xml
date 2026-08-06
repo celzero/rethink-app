@@ -170,7 +170,7 @@
     <string name="brave_dns_connect_mode_change_dns">選擇模式。</string>
     <string name="alert_firewall_accessibility_regrant_explanation">Rethink 的無障礙服務已停止或崩潰。<i><b>請至系統設定強制停止</b></i>並再次啟動 Rethink ，以繼續使用<i>攔截未使用應用程式</i>的功能。\n\nRethink 使用無障礙服務來追蹤正在使用的應用程式（前景）與未使用的應用程式（背景）。</string>
     <string name="bsct_conn_block_desc">由 %2$s 攔截 %1$s</string>
-    <string name="bsct_conn_rule_explanation"><u>#1</u>：阻止某應用程式連線至互聯網。 \n <u>#2</u>：阻止任意應用程式連線至某特定 IP 。 \n <u>#3</u>：在裝置鎖定時阻止所有連線（通用攔截規則）。 \n <u>#4</u>：阻止任意未使用的應用程式連線（通用攔截規則）。 \n <u>#5</u>：阻止未知應用程式的連線（通用攔截規則）。 \n <u>#6</u>：攔截除 DNS 外的所有 UDP 流量（通用攔截規則）。 \n <u>#7</u>：攔截繞過 DNS 的流量（通用攔截規則）。</string>
+    <string name="bsct_conn_rule_explanation">&lt;u&gt;#1&lt;/u&gt;：阻止某應用程式連線至互聯網。 \n &lt;u&gt;#2&lt;/u&gt;：阻止任意應用程式連線至某特定 IP 。 \n &lt;u&gt;#3&lt;/u&gt;：在裝置鎖定時阻止所有連線（通用攔截規則）。 \n &lt;u&gt;#4&lt;/u&gt;：阻止任意未使用的應用程式連線（通用攔截規則）。 \n &lt;u&gt;#5&lt;/u&gt;：阻止未知應用程式的連線（通用攔截規則）。 \n &lt;u&gt;#6&lt;/u&gt;：攔截除 DNS 外的所有 UDP 流量（通用攔截規則）。 \n &lt;u&gt;#7&lt;/u&gt;：攔截繞過 DNS 的流量（通用攔截規則）。</string>
     <string name="always_on_dialog">「永久連線的 VPN 」已在此裝置上啟用。為啟動 Rethink ，請移步系統設定並停用「永久連線的 VPN 」。</string>
     <string name="always_on_dialog_stop_heading">永久連線的 VPN</string>
     <string name="univ_firewall_dialog_message">刪除此條規則將允許任何應用程式連線至此 IP 位址。您是否想要繼續？</string>
