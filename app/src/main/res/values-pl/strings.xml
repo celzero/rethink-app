@@ -63,12 +63,8 @@
     <string name="bsct_conn_block_desc">zablokowany %1$s przez %2$s</string>
     <string name="bsct_conn_desc_allowed">dozwolony na %1$s %2$s</string>
     <string name="bsct_conn_desc_blocked">zablokowany na %1$s %2$s</string>
-    <string name="alert_firewall_accessibility_explanation">Rethink korzysta z usługi ułatwień dostępu, aby śledzić, które aplikacje są używane (pierwszy plan), a które nie są używane (w tle).
-\n
-\nRethink nie gromadzi żadnych informacji ani nie szpieguje Cię w żaden sposób.</string>
-    <string name="alert_firewall_accessibility_regrant_explanation">Usługa ułatwień dostępu RethinkDNS została zatrzymana lub uległa awarii. <i><b>Przejdź do ustawień i wymuś zatrzymanie</b></i> RethinkDNS i uruchom go ponownie, aby użyć funkcji <i>Zablokuj nieużywane aplikacje</i>.
-\n
-\nRethinkDNS korzysta z usługi ułatwień dostępu, aby śledzić, które aplikacje są używane (pierwszy plan), a które nie są używane (w tle).</string>
+    <string name="alert_firewall_accessibility_explanation">Rethink korzysta z usługi ułatwień dostępu, aby śledzić, które aplikacje są używane (pierwszy plan), a które nie są używane (w tle). \n \nRethink nie gromadzi żadnych informacji ani nie szpieguje Cię w żaden sposób.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation">Usługa ułatwień dostępu RethinkDNS została zatrzymana lub uległa awarii. <i><b>Przejdź do ustawień i wymuś zatrzymanie</b></i> RethinkDNS i uruchom go ponownie, aby użyć funkcji <i>Zablokuj nieużywane aplikacje</i>. \n \nRethinkDNS korzysta z usługi ułatwień dostępu, aby śledzić, które aplikacje są używane (pierwszy plan), a które nie są używane (w tle).</string>
     <string name="alert_firewall_accessibility_exception">Błąd podczas otwierania ustawień ułatwień dostępu. Spróbuj ponownie później!</string>
     <string name="brave_dns_connect_mode_change_firewall">Wybierz Tryb.</string>
     <string name="brave_dns_connect_mode_change_dns">Wybierz Tryb.</string>
@@ -267,9 +263,7 @@
     <string name="hsf_start_btn_state" translatable="true">rozpocznij</string>
     <string name="hsf_vpn_dialog_header" translatable="true">Uwaga!</string>
     <string name="hsf_downtime" translatable="true">(nieaktywny od %1$s)</string>
-    <string name="hsf_vpn_dialog_message" translatable="true">Rethink potrzebuje pozwolenia na skonfigurowanie lokalnej sieci VPN w celu szyfrowania żądań DNS urządzenia, wdrożenia monitora sieci i egzekwowania reguł zapory.
-\n
-\nRethink nie zbiera żadnych informacji ani nie szpieguje użytkownika w żaden sposób.</string>
+    <string name="hsf_vpn_dialog_message" translatable="true">Rethink potrzebuje pozwolenia na skonfigurowanie lokalnej sieci VPN w celu szyfrowania żądań DNS urządzenia, wdrożenia monitora sieci i egzekwowania reguł zapory. \n \nRethink nie zbiera żadnych informacji ani nie szpieguje użytkownika w żaden sposób.</string>
     <string name="hsf_start_dialog_message" translatable="true">Jesteś o krok od bezpiecznego systemu Android: natychmiast zobacz aktywność sieciową, blokuj strony internetowe, IP i źle zachowujące się aplikacje.</string>
     <string name="hsf_proxy_chip_text" translatable="true">Proxy aktywne</string>
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">Włącz RethinkDNS+</string>
@@ -717,10 +711,7 @@
     <string name="settings_dns_proxy_dialog_hostname" translatable="true">Nazwa hosta</string>
     <string name="settings_dns_proxy_dialog_username" translatable="true">Nazwa użytkownika</string>
     <string name="settings_dns_proxy_dialog_password" translatable="true">Hasło</string>
-    <string name="firewall_card_text_active" translatable="true">%1$s zablokowane
-\n%2$ ominięte
-\n%3$ wykluczone
-\n%4$s odizolowane</string>
+    <string name="firewall_card_text_active" translatable="true">%1$s zablokowane \n%2$ ominięte \n%3$ wykluczone \n%4$s odizolowane</string>
     <string name="dc_custom_dns_radio" translatable="true">Inne DNS</string>
     <string name="fapps_unmetered_block_dialog_title" translatable="true">Blokuj na WiFi</string>
     <string name="ctbs_block_other_apps" translatable="true">Zasady stosowane dla %1$s będą również stosowane dla %2$s innych aplikacji</string>
