@@ -24,6 +24,7 @@ import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Process
+import android.text.InputType
 import android.text.format.DateUtils
 import android.view.View
 import android.view.ViewGroup
@@ -1123,10 +1124,13 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun showNotesDialog() {
-        val editText = EditText(this)
-        editText.setText(appNotes)
-        editText.hint = getString(R.string.hint_notes)
-        editText.setLines(4)
+        val appName = appInfo.appName
+        val editText = EditText(this).apply {
+            setText(appNotes)
+            hint = getString(R.string.hint_notes)
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            setMinLines(4)
+        }
 
         val dialog = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
             .setTitle(R.string.lbl_notes)
@@ -1136,7 +1140,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                 saveNotesToDatabase()
                 logEvent(
                     "app notes updated",
-                    "Notes updated for ${appInfo.appName} (${appInfo.uid})"
+                    "Notes updated for $appName ($uid)"
                 )
             }
             .setNegativeButton(R.string.lbl_cancel, null)
@@ -1145,7 +1149,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun saveNotesToDatabase() {
-        appInfoViewModel.updateAppNotes(appInfo.uid, appNotes)
+        appInfoViewModel.updateAppNotes(uid, appNotes)
     }
 
     private fun io(f: suspend () -> Unit): Job {
