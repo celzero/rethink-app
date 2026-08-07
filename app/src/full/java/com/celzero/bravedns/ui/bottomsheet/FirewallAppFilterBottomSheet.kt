@@ -206,7 +206,7 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
 
         chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
             if (isSelected) {
-                filters.sort = button.tag as AppInfoViewModel.SortOption
+                filters.sort = value
                 colorUpChipIcon(chip)
             }
         }
