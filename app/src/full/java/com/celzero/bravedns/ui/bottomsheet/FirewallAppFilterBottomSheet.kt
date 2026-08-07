@@ -32,7 +32,6 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.useTransparentNoDimBackground
-import com.celzero.bravedns.viewmodel.AppInfoViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.Dispatchers
@@ -109,7 +108,7 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
             }
             new.categoryFilters.clear()
             new.topLevelFilter = AppListActivity.TopLevelFilter.ALL
-            new.sort = AppInfoViewModel.SortOption.NAME
+            new.sort = AppListActivity.SortOption.NAME
             AppListActivity.filters.postValue(new)
             this.dismiss()
         }
@@ -183,13 +182,13 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
 
     private fun remakeSortChipsUi() {
         b.fsSortChipGroup.removeAllViews()
-        b.fsSortChipGroup.addView(makeSortChip(AppInfoViewModel.SortOption.NAME, getString(R.string.fapps_filter_sort_name)))
-        b.fsSortChipGroup.addView(makeSortChip(AppInfoViewModel.SortOption.PACKAGE, getString(R.string.fapps_filter_sort_package)))
-        b.fsSortChipGroup.addView(makeSortChip(AppInfoViewModel.SortOption.UID, getString(R.string.fapps_filter_sort_uid)))
+        b.fsSortChipGroup.addView(makeSortChip(AppListActivity.SortOption.NAME, getString(R.string.fapps_filter_sort_name)))
+        b.fsSortChipGroup.addView(makeSortChip(AppListActivity.SortOption.PACKAGE, getString(R.string.fapps_filter_sort_package)))
+        b.fsSortChipGroup.addView(makeSortChip(AppListActivity.SortOption.UID, getString(R.string.fapps_filter_sort_uid)))
     }
 
     private fun makeSortChip(
-        value: AppInfoViewModel.SortOption,
+        value: AppListActivity.SortOption,
         label: String
     ): Chip {
         val chip =

@@ -29,12 +29,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     private var firewallFilter = AppListActivity.FirewallFilter.ALL
     private var search: String = ""
     private val rethinkUid = android.os.Process.myUid()
-    enum class SortOption(val value: String) {
-        NAME("name"),
-        PACKAGE("package"),
-        UID("uid")
-    }
-    private var sort: SortOption = SortOption.NAME
+    private var sort: AppListActivity.SortOption = AppListActivity.SortOption.NAME
 
     init {
         filter.value = ""

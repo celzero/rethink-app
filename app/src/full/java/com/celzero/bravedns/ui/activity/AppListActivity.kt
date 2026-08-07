@@ -194,13 +194,19 @@ class AppListActivity :
         }
     }
 
+    enum class SortOption(val value: String) {
+        NAME("name"),
+        PACKAGE("package"),
+        UID("uid")
+    }
+
     class Filters {
         var categoryFilters: MutableSet<String> = mutableSetOf()
         var topLevelFilter = TopLevelFilter.ALL
         var firewallFilter = FirewallFilter.ALL
         var searchString: String = ""
 
-        var sort: AppInfoViewModel.SortOption = AppInfoViewModel.SortOption.NAME
+        var sort: SortOption = SortOption.NAME
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
