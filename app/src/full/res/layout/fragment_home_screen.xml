@@ -63,13 +63,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp"
-                android:baselineAligned="true"
+                android:baselineAligned="false"
                 android:orientation="horizontal"
                 android:weightSum="1">
 
                 <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="0.5"
                     android:orientation="vertical">
 
@@ -167,7 +167,7 @@
 
                 <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="0.5"
                     android:orientation="vertical">
 
@@ -270,7 +270,7 @@
                 android:layout_below="@id/fhs_card_top_ll"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp"
-                android:baselineAligned="true"
+                android:baselineAligned="false"
                 android:orientation="horizontal"
                 android:weightSum="1">
 
@@ -278,7 +278,6 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="0.5"
-                    android:baselineAligned="true"
                     android:orientation="vertical">
 
                     <com.google.android.material.card.MaterialCardView
@@ -345,7 +344,7 @@
 
                 <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="0.5"
                     android:orientation="vertical">
 
@@ -441,7 +440,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
-            android:baselineAligned="true"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:weightSum="1">
 
@@ -752,11 +751,10 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:layout_marginBottom="90dp"
-            android:layout_weight="0.3"
             android:gravity="bottom|center"
             android:orientation="vertical">
 

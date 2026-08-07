@@ -3,19 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:orientation="vertical">
+    android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="80dp">
+        android:paddingBottom="80dp">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -91,18 +90,16 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fs_apps_tv"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/apps_info_title"
                             android:textAppearance="?attr/textAppearanceTitleMedium"
                             android:textColor="?attr/colorOnSurface" />
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:ellipsize="end"
-                            android:maxLines="2"
                             android:text="@string/fs_configure_apps_desc"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?attr/primaryLightColorText" />
@@ -157,18 +154,16 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fs_dns_tv"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/dns_mode_info_title"
                             android:textAppearance="?attr/textAppearanceTitleMedium"
                             android:textColor="?attr/colorOnSurface" />
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:ellipsize="end"
-                            android:maxLines="2"
                             android:text="@string/dns_mode_info_explanation_new"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?attr/primaryLightColorText" />
@@ -223,18 +218,16 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fs_firewall_tv"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/firewall_mode_info_title"
                             android:textAppearance="?attr/textAppearanceTitleMedium"
                             android:textColor="?attr/colorOnSurface" />
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:ellipsize="end"
-                            android:maxLines="2"
                             android:text="@string/firewall_mode_info_explanation_new"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?attr/primaryLightColorText" />
@@ -289,18 +282,16 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fs_proxy_tv"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/cd_custom_dns_proxy_name_default"
                             android:textAppearance="?attr/textAppearanceTitleMedium"
                             android:textColor="?attr/colorOnSurface" />
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:ellipsize="end"
-                            android:maxLines="2"
                             android:text="@string/fs_configure_proxy_desc"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?attr/primaryLightColorText" />
@@ -355,18 +346,16 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fs_network_tv"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/lbl_network"
                             android:textAppearance="?attr/textAppearanceTitleMedium"
                             android:textColor="?attr/colorOnSurface" />
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:ellipsize="end"
-                            android:maxLines="2"
                             android:text="@string/fs_configure_network_desc"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?attr/primaryLightColorText" />
@@ -421,18 +410,16 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fs_others_tv"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/title_settings"
                             android:textAppearance="?attr/textAppearanceTitleMedium"
                             android:textColor="?attr/colorOnSurface" />
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:ellipsize="end"
-                            android:maxLines="2"
                             android:text="@string/fs_configure_others_desc"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?attr/primaryLightColorText" />
@@ -487,18 +474,16 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fs_logs_tv"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/lbl_logs"
                             android:textAppearance="?attr/textAppearanceTitleMedium"
                             android:textColor="?attr/colorOnSurface" />
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:ellipsize="end"
-                            android:maxLines="2"
                             android:text="@string/fs_configure_logs_desc"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?attr/primaryLightColorText" />
@@ -553,18 +538,16 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fs_anti_censorship_tv"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/anti_censorship_title"
                             android:textAppearance="?attr/textAppearanceTitleMedium"
                             android:textColor="?attr/colorOnSurface" />
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:ellipsize="end"
-                            android:maxLines="2"
                             android:text="@string/anti_censorship_desc"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?attr/primaryLightColorText" />
@@ -619,18 +602,16 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fs_advanced_tv"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/lbl_advanced"
                             android:textAppearance="?attr/textAppearanceTitleMedium"
                             android:textColor="?attr/colorOnSurface" />
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:ellipsize="end"
-                            android:maxLines="2"
                             android:text="@string/fs_configure_advanced_desc"
                             android:textAppearance="?attr/textAppearanceBodySmall"
                             android:textColor="?attr/primaryLightColorText" />
