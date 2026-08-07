@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_small_case">rethink</string>
+    <string name="app_name_small_case" translatable="false">rethink</string>
     <string name="title_about">Hakkında</string>
     <string name="pause_title_desc">ara veriliyor…</string>
     <string name="settings_title_desc">Son derece özelleştirilebilir bir DNS ve güvenlik duvarı</string>
@@ -11,23 +11,23 @@
     <string name="finish">Bitir</string>
     <string name="slide_1_title">Ücretsiz ve Açık Kaynaklı</string>
     <string name="slide_1_desc">Rethink, Mozilla Builders MVP programı ve FOSS United Foundation tarafından desteklenen açık kaynaklı bir yazılımdır.</string>
-    <string name="untracked">izlenmiyor</string>
+    <string name="untracked">İzlenmiyor</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Uyarı: Rethink devre dışı bırakıldı</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Koruma ayarını değiştirmek için dokunun</string>
     <string name="dns_mode_notification_title">Korunuyor! Hızlı ve Güvenli DNS\'e Bağlandı.</string>
     <string name="firewall_mode_notification_title">Korunuyor! Güvenlik Duvarına Bağlandı.</string>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name" translatable="false">RethinkDNS</string>
     <string name="hybrid_mode_notification_title">Korunuyor! DNS ve Güvenlik Duvarına Bağlandı.</string>
     <string name="title_settings">Ayarlar</string>
     <string name="about_title_desc">Ağ güvenliği tehditlerini tespit edin ve engelleyin</string>
-    <string name="block">engelle</string>
-    <string name="bypass_universal">genel olarak atla</string>
-    <string name="isolate">koru</string>
+    <string name="block">Engelle</string>
+    <string name="bypass_universal">Genel Olarak Atla</string>
+    <string name="isolate">İzole Et</string>
     <string name="slide_2_title">Hoş Geldiniz</string>
-    <string name="rdns_plus">RDNS Plus</string>
-    <string name="exclude">hariç tut</string>
+    <string name="rdns_plus" translatable="false">RDNS Plus</string>
+    <string name="exclude">Hariç tut</string>
     <string name="slide_2_desc">Rethink, Android aygıtınızda ağ etkinliğini izlemenin, İnternet sansürünü ve güvenlik duvarı uygulamalarını atlamanın en kolay yoludur.</string>
-    <string name="allow">izin ver</string>
+    <string name="allow">İzin ver</string>
     <string name="pause_mode_notification_title">Duraklatıldı! Engellenen uygulamalar güvenlik duvarıyla korunmaya devam edecek.</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">bekliyor</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">başarısız</string>
@@ -85,13 +85,13 @@
     <string name="notif_channel_desc_vpn_failure">Rethink Android veya başka bir VPN uygulaması tarafından durdurulduğunda bilgilendirin</string>
     <string name="settings_dns_proxy_dialog_app">Uygulama</string>
     <string name="about_email">Bize e-posta gönderin</string>
-    <string name="univ_firewall_dialog_message">Bu kuralın silinmesi, herhangi bir uygulamanın bu IP\'ye bağlanmasına izin verecektir. Devam etmek istiyor musunuz\?</string>
+    <string name="univ_firewall_dialog_message">Bu kuralın silinmesi, herhangi bir uygulamanın bu IP\'ye bağlanmasına izin verecektir. Devam etmek istiyor musunuz?</string>
     <string name="orbot_both_desc">Yukarıdakilerin hepsi.</string>
     <string name="settings_custom_downloader_heading">Uygulama içi indiriciyi kullanın</string>
     <string name="settings_socks5_dialog_hint_port">Bağlantı noktası</string>
     <string name="settings_ip_dialog_title">IP sürümünü seçin</string>
     <string name="hsf_blocklist_updating_text">Etkinleştiriliyor…</string>
-    <string name="about_connect">iletişim</string>
+    <string name="about_connect">İletişim</string>
     <string name="about_whats_new">Yenilikler %1$s</string>
     <string name="about_mail_bugreport_share_title">E-posta sağlayıcısını seçin</string>
     <string name="cd_dns_crypt_dialog_heading">DNSCrypt Çözümleyici veya Aktarıcı Ekleme</string>
@@ -116,13 +116,13 @@
     <string name="dns_info_neutral">Kopyala</string>
     <string name="dns_proxy_port">Liman Numarası</string>
     <string name="fapps_firewall_filter_isolate">İzole edildi</string>
-    <string name="fapps_metered_unblock_dialog_message"><i>Listelenen</i> uygulamalar için kotalı (mobil) ağda bağlantılara izin verilsin mi\?</string>
+    <string name="fapps_metered_unblock_dialog_message"><i>Listelenen</i> uygulamalar için kotalı (mobil) ağda bağlantılara izin verilsin mi?</string>
     <string name="network_log_app_name_unknown">Bilinmeyen</string>
     <string name="firewall_rule_block_metered">Ölçülü (Mobil)</string>
     <string name="firewall_rule_foreground">Kullanılmayan Uygulama</string>
     <string name="firewall_rule_block_http">Güvensiz HTTP</string>
     <string name="build__flavor_play_store">Oyna</string>
-    <string name="rt_list_simple_btn_txt">basit</string>
+    <string name="rt_list_simple_btn_txt">Basit</string>
     <string name="dc_local_block_enabled">Etkin</string>
     <string name="lbbs_download">Blok listelerini güncelleme</string>
     <string name="brbs_backup_dialog_positive">Yedekle</string>
@@ -139,7 +139,7 @@
     <string name="hsf_start_dialog_header">Başlangıç %1$s</string>
     <string name="dc_custom_dns_radio">Diğer DNS</string>
     <string name="about_settings_app_info">Uygulama Bilgisi</string>
-    <string name="cd_dns_crypt_title">çözücüler</string>
+    <string name="cd_dns_crypt_title">Çözücüler</string>
     <string name="cd_dns_crypt_name_default">DNSCrypt</string>
     <string name="cd_dns_crypt_relay_heading">Aktarım</string>
     <string name="hs_download_negative_default">Daha sonra anımsat</string>
@@ -152,11 +152,9 @@
     <string name="rt_dialog_neutral">Devam Et</string>
     <string name="about_mail_subject">[Rethink]:</string>
     <string name="brbs_backup_dialog_title">Yedek alın</string>
-    <string name="unicode_warning_sign">⚠</string>
+    <string name="unicode_warning_sign" translatable="false">⚠</string>
     <string name="download_update_dialog_failure_message">Sunucularımız kapalı ya da bağlantı kurulamadı. Lütfen bir süre sonra tekrar deneyin.</string>
-    <string name="orbot_stop_dialog_message_combo">%1$s
-\n
-\n%2$s</string>
+    <string name="orbot_stop_dialog_message_combo" translatable="false">%1$s \n \n%2$s</string>
     <string name="settings_http_proxy_error_text1">Port aralığı 1024-65535 arasında olmalıdır</string>
     <string name="hsf_stop_btn_state">durak</string>
     <string name="hsf_vpn_prepare_failure">Ya VPN izni eksiktir ya da başka bir uygulama Her Zaman Açık VPN modundadır.</string>
@@ -171,11 +169,11 @@
     <string name="new_app_bulk_notification_title">Dikkat</string>
     <string name="settings_notification_dialog_option_2">\nDNS / DNS + Güvenlik Duvarı:\nPil tasarrufu sağlayan DNS modu ile normal DNS + Güvenlik Duvarı modu arasında hızlıca geçiş yapmak için iki düğme gösterir.</string>
     <string name="ci_no_rule_txt">Kural Yok</string>
-    <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
+    <string name="orbot_download_link_website" translatable="false">https://github.com/guardianproject/orbot/releases</string>
     <string name="brbs_backup_title">Yedekle</string>
-    <string name="brbs_backup_dialog_failure_message">Yedekleme yapılamadı. Tekrar deneyelim mi\?</string>
-    <string name="dns_proxy_desc_no_app">%1$s:%2$s</string>
-    <string name="dc_rethink_dns">Rethink DNS</string>
+    <string name="brbs_backup_dialog_failure_message">Yedekleme yapılamadı. Tekrar deneyelim mi?</string>
+    <string name="dns_proxy_desc_no_app" translatable="false">%1$s:%2$s</string>
+    <string name="dc_rethink_dns" translatable="false">Rethink DNS</string>
     <string name="dns_crypt_relay_remove_dialog_message">DNSCrypt aktarıcısını kayıtlı yapılandırmadan silin.</string>
     <string name="search_custom_domains"><font size="12">Alan adlarını arama</font></string>
     <string name="orbot_bs_status_3">%1$s adresinden Orbot\'a yönlendirme, HTTP Proxy de ayarlandı.</string>
@@ -197,14 +195,14 @@
     <string name="firewall_rule_isolate_desc"><![CDATA[uygulama _atlanan IP\'ler_ dışındaki adreslere bağlanıyor. Değiştirmek için _Tüm Uygulamalar_ sekmesine gidin.]]></string>
     <string name="ci_dialog_title">IP / Port Kuralı Ekle</string>
     <string name="ci_block">Engelle</string>
-    <string name="ada_network_log_title">bu uygulama için ağ günlüğü</string>
+    <string name="ada_network_log_title">Bu uygulama için ağ günlüğü</string>
     <string name="lbbs_heading">195+ blok listesini yapılandır</string>
-    <string name="about_telegram_link">https://telegram.me/rethinkdns</string>
-    <string name="about_website_link">https://www.rethinkdns.com/</string>
+    <string name="about_telegram_link" translatable="false">https://telegram.me/rethinkdns</string>
+    <string name="about_website_link" translatable="false">https://www.rethinkdns.com/</string>
     <string name="brbs_backup_dialog_failure_positive">Yedeklemeyi Yeniden Dene</string>
     <string name="brbs_restore_dialog_failure_title">Geri yükleme başarısız oldu</string>
     <string name="dns_btm_latency_ms">%1$ss</string>
-    <string name="unicode_question_sign">❔</string>
+    <string name="unicode_question_sign" translatable="false">❔</string>
     <string name="radio_max_btn">🪂 Maks</string>
     <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
     <string name="orbot_stop_dialog_neutral">DNS Değiştir</string>
@@ -232,13 +230,13 @@
     <string name="notif_channel_desc_vpn_notification">Rethink aktif olduğunda ve arka planda çalıştığında bilgilendirin</string>
     <string name="ci_bypass_universal_txt">Bypass Evrensel</string>
     <string name="about_mail_to">hello@celzero.com</string>
-    <string name="about_twitter_handle">https://twitter.com/rethinkdns</string>
-    <string name="about_version">v%1$s</string>
+    <string name="about_twitter_handle" translatable="false">https://twitter.com/rethinkdns</string>
+    <string name="about_version" translatable="false">v%1$s</string>
     <string name="brbs_restore_dialog_message">Uygulama ayarlarını, ağ, ve dns günlüklerini bir yedekleme dosyasından geri yükleyin. Bu, uygulamayı yeniden başlatacaktır.</string>
     <string name="brbs_restore_dialog_failure_positive">Yeniden Dene Geri Yükle</string>
     <string name="brbs_restore_complete_toast">Geri yükleme tamamlandı, uygulama yeniden başlatılıyor…</string>
     <string name="always_on_dialog_stop_heading">Her zaman açık VPN</string>
-    <string name="firewall_act_universal_tab">genel</string>
+    <string name="firewall_act_universal_tab">Genel</string>
     <string name="dns_act_configure_tab">Yapılandır</string>
     <string name="configure_dns_connected_dns_proxy_status">DNS Vekil Sunucusu</string>
     <string name="search_firewall_all_apps"><font size="12">Kullanıcı kimliği, ada göre uygulama ara</font></string>
@@ -249,7 +247,7 @@
     <string name="settings_selected_theme">Şu anki tema: %1$s</string>
     <string name="hsf_whats_new_chip_text">Yenilikler</string>
     <string name="about_bug_no_log_dialog_positive_btn">E-posta gönder</string>
-    <string name="about_app">app, uygulama</string>
+    <string name="about_app">Uygulama</string>
     <string name="vpn_profile_error">VPN profili başlatılamadı.</string>
     <string name="dns_btm_sheet_chip">+%1$s Diğer IP\'ler</string>
     <string name="fapps_firewall_filter_excluded">Hariç tutulan</string>
@@ -259,15 +257,15 @@
     <string name="new_app_notification_action_toast_deny">Uygulama için ağ bağlantısı reddedildi</string>
     <string name="notif_dialog_pause_dialog_message">Uygulama duraklama durumunda, devam etmek için devam edin</string>
     <string name="ci_blocked_initial">Si</string>
-    <string name="dc_dns_crypt">DNSCrypt</string>
+    <string name="dc_dns_crypt" translatable="false">DNSCrypt</string>
     <string name="cd_custom_dns_proxy_name">Proxy %1$s</string>
-    <string name="dns_crypt_relay_remove_dialog_title">DNSCrypt Aktarıcısı Silinsin mi\?</string>
+    <string name="dns_crypt_relay_remove_dialog_title">DNSCrypt Aktarıcısı Silinsin mi?</string>
     <string name="http_proxy_dialog_heading">HTTP(S) BAĞLANMA Vekilini ayarla</string>
     <string name="download_update_dialog_title">Yeni Güncelleme!</string>
     <string name="search_universal_ips"><font size="12">IP\'leri arayın</font></string>
     <string name="info_dialog_copy_toast_msg">IP adresi kopyalandı.</string>
     <string name="orbot_none_desc">Yukarıdakilerin hiçbiri.</string>
-    <string name="orbot_install_dialog_title">Orbot kurulsun mu\?</string>
+    <string name="orbot_install_dialog_title">Orbot kurulsun mu?</string>
     <string name="hsf_start_dialog_message">Güvenli ve emniyetli Android\'e bir adım uzaktasınız: Ağ etkinliğini anında görün, web sitelerini, IP\'leri ve kötü davranan uygulamaları engelleyin.</string>
     <string name="hsf_exclude_error">VPN kilitleme modunda hariç tutma mümkün değil</string>
     <string name="dc_entries">%1$s girişler</string>
@@ -277,7 +275,7 @@
     <string name="dns_btm_resolved_doh_no_server">çözüldü %1$s</string>
     <string name="univ_ip_delete_dialog_positive">Tümünü sil</string>
     <string name="univ_accessibility_dialog_positive">İzin ver</string>
-    <string name="fapps_unmetered_unblock_dialog_message"><i>Listelenen</i> uygulamalar için kotasız (WiFi) ağda bağlantılara izin verilsin mi\?</string>
+    <string name="fapps_unmetered_unblock_dialog_message"><i>Listelenen</i> uygulamalar için kotasız (WiFi) ağda bağlantılara izin verilsin mi?</string>
     <string name="settings_local_blocklist_in_use">%1$s kullanımdaki blok listeleri</string>
     <string name="firewall_rule_block_udp_ntp">UDP Engellendi</string>
     <string name="notif_dialog_pause_dialog_title">Uygulama duraklatıldı!</string>
@@ -293,7 +291,7 @@
     <string name="settings_socks5_heading">SOCKS5 Proxy Kurulumu</string>
     <string name="orbot_bs_status_4">Tek tıklamayla Tor-as-a-Proxy (Orbot) kurulumu.</string>
     <string name="settings_http_proxy_error_text3">Ana bilgisayar adı boş</string>
-    <string name="settings_selected_ip_desc">%1$s</string>
+    <string name="settings_selected_ip_desc" translatable="false">%1$s</string>
     <string name="hsf_vpn_dialog_header">Dikkat!</string>
     <string name="dc_dns_leaks_desc">Etkinleştirildiğinde, Rethink 53 numaralı bağlantı noktasındaki tüm paketleri yakalar ve kullanıcı tarafından ayarlanan bir DNS uç noktasına iletir</string>
     <string name="about_dialog_neutral_button">Özellik önerin</string>
@@ -307,19 +305,19 @@
     <string name="notif_channel_desc_proxy_failure">Proxy hataları ve anomalileri hakkında uyarı</string>
     <string name="rt_download_desc">Bu özelliği kullanmak için blok listelerini (yaklaşık 60MB) indirin.</string>
     <string name="brbs_restore_title">Geri Yükle</string>
-    <string name="about_github_link">https://github.com/celzero/rethink-app</string>
-    <string name="about_mozilla_alumni_link">https://builders.mozilla.community/alumni.html</string>
+    <string name="about_github_link" translatable="false">https://github.com/celzero/rethink-app</string>
+    <string name="about_mozilla_alumni_link" translatable="false">https://builders.mozilla.community/alumni.html</string>
     <string name="brbs_restore_dialog_title">Yedeği geri yükle</string>
-    <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
+    <string name="dns_proxy_desc" translatable="false">%1$s:%2$s, %3$s</string>
     <string name="default_dns_name">RDNS Varsayılan</string>
-    <string name="dns_query_clear_logs_title">Tüm DNS kayıtları silinsin mi\?</string>
-    <string name="always_on_dialog_stop_message">Rethink için her zaman açık VPN etkinleştirildi. Yine de Rethink\'i durdurmak istediğinizden emin misiniz\?</string>
+    <string name="dns_query_clear_logs_title">Tüm DNS kayıtları silinsin mi?</string>
+    <string name="always_on_dialog_stop_message">Rethink için her zaman açık VPN etkinleştirildi. Yine de Rethink\'i durdurmak istediğinizden emin misiniz?</string>
     <string name="firewall_act_network_monitor_tab">Ağ</string>
-    <string name="dns_crypt_custom_url_remove_dialog_title">DNSCrypt çözümleyicisi silinsin mi\?</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title">DNSCrypt çözümleyicisi silinsin mi?</string>
     <string name="dns_crypt_relay_remove_success">DNSCrypt Aktarıcısı silindi.</string>
     <string name="download_update_dialog_trylater_message">Güncelleme şu anda gerçekleştirilemiyor, lütfen daha sonra tekrar deneyin.</string>
     <string name="settings_orbot_heading">Orbot Kurulumu</string>
-    <string name="settings_dns_proxy_dialog_app_desc">Seçilen uygulama, sizin adınıza bağlantıları proxy\'lemesine izin vermek için VPN\'den hariç tutulacaktır.</string>
+    <string name="settings_dns_proxy_dialog_app_desc" translatable="false">Seçilen uygulama, sizin adınıza bağlantıları proxy\'lemesine izin vermek için VPN\'den hariç tutulacaktır.</string>
     <string name="firewall_card_text_inactive">Güvenlik duvarı modunu etkinleştirin.</string>
     <string name="about_settings_vpn_profile">VPN Profili</string>
     <string name="cd_dns_crypt_resolver_heading">Çözümleyici</string>
@@ -334,9 +332,9 @@
     <string name="rethink_sky_desc">280+ konum; daha yüksek çalışma süresi; cloudflare.com üzerinde çalışan saplama çözümleyici</string>
     <string name="lbbs_configure">Yapılandır</string>
     <string name="about_mail_to_string">mailto:</string>
-    <string name="brbs_restore_dialog_failure_message">Geri yüklenemedi. Tekrar deneyelim mi\?</string>
-    <string name="fav_icon">fav_icon</string>
-    <string name="conn_track_clear_logs_title">Tüm ağ günlükleri silinsin mi\?</string>
+    <string name="brbs_restore_dialog_failure_message">Geri yüklenemedi. Tekrar deneyelim mi?</string>
+    <string name="fav_icon" translatable="false">fav_icon</string>
+    <string name="conn_track_clear_logs_title">Tüm ağ günlükleri silinsin mi?</string>
     <string name="always_on_dialog_positive">Dur</string>
     <string name="refresh_complete"><!-- use dc_refresh_toast --> Uygulama listesinin yeniden senkronizasyonu tamamlandı.</string>
     <string name="download_update_dialog_message_ok_title">Güncel!</string>
@@ -344,7 +342,7 @@
     <string name="app_mode_choose">Mod seçin</string>
     <string name="orbot_none">Yok (varsayılan)</string>
     <string name="settings_socks5_disabled_error">%1$s\'a bağlandı. Devam etmek için kapatın.</string>
-    <string name="settings_general_header">genel</string>
+    <string name="settings_general_header">Genel</string>
     <string name="apps_icon_content_desc">Uygulama Simgesi</string>
     <string name="hsf_start_dialog_positive">Başlangıç</string>
     <string name="about_bug_report_desc">e-posta çökme günlükleri</string>
@@ -358,7 +356,7 @@
     <string name="notif_channel_vpn_notification">Aktif VPN</string>
     <string name="category_name_sys_apps">Sistem Uygulamaları</string>
     <string name="rt_edit_dialog_positive">Düzenle</string>
-    <string name="cd_custom_dns_proxy_default_ip">127.0.0.1</string>
+    <string name="cd_custom_dns_proxy_default_ip" translatable="false">127.0.0.1</string>
     <string name="dns_btm_sheet_dialog_ips"><Data><![CDATA[ %1$s %2$s <br/>]]></Data></string>
     <string name="dns_proxy_remove_success">DNS Vekil Sunucusu silindi.</string>
     <string name="download_update_dialog_failure_title">Bir şeyler yanlış gitti!</string>
@@ -392,7 +390,7 @@
     <string name="about_sponsor_link_text">Sponsor</string>
     <string name="brbs_backup_complete_toast">Yedekleme tamamlandı</string>
     <string name="dns_query_latency">%1$sms</string>
-    <string name="dns_proxy_remove_dialog_title">DNS Vekil Sunucusu silinsin mi\?</string>
+    <string name="dns_proxy_remove_dialog_title">DNS Vekil Sunucusu silinsin mi?</string>
     <string name="search_firewall_network_log"><font size="12">Uygulamaları, IP\'leri, alan adlarını arayın</font></string>
     <string name="app_mode_wireguard">VPN</string>
     <string name="settings_vpn_heading">vpn</string>
@@ -408,7 +406,7 @@
     <string name="dc_local_block_desc_1">195+ engelleme listesi arasından seçim yapın. Blok listelerini indirmek veya yapılandırmak için buraya tıklayın.</string>
     <string name="about_twitter">Bizi Twitter\'da takip edin</string>
     <string name="about_mail_bugreport_subject">[Rethink]: Hata raporu</string>
-    <string name="about_version_install_source">%1$s (%2$s)</string>
+    <string name="about_version_install_source" translatable="false">%1$s (%2$s)</string>
     <string name="cd_custom_doh_url_name_default">DoH</string>
     <string name="cd_dns_proxy_error_text_1">Geçersiz IP adresi</string>
     <string name="ctbs_app_info_not_available_toast">Uygulama ayarları sayfası bulunamadı</string>
@@ -418,16 +416,16 @@
     <string name="ada_ip_connection_count">%1$s IP adres(ler)ine bağlandı</string>
     <string name="rt_re_download">Blok listelerini yeniden indirin</string>
     <string name="lbbs_enabled">Etkin</string>
-    <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
+    <string name="orbot_website_link" translatable="false">https://guardianproject.info/apps/org.torproject.android/</string>
     <string name="brbs_restore_desc">Yedekleme dosyasından geri yükle</string>
     <string name="bsct_conn_block_desc_device">cihaz üzerinde %1$s engellendi</string>
     <string name="always_on_dialog_positive_btn">Ayarlara git</string>
     <string name="local_blocklist_redownload_desc">Cihaz üzerindeki engelleme listeleri zaten en son v%1$s sürümündedir.</string>
-    <string name="settings_proxy_header">vekil sunucu</string>
+    <string name="settings_proxy_header">Vekil Sunucu</string>
     <string name="settings_orbot_notification_content">Tor-as-a-Proxy başlatılamıyor. Manuel olarak başlatmak için Orbot uygulamasını açın.</string>
     <string name="settings_http_proxy_error_text4">Ana bilgisayar bağlantısı başarısız oldu. Tekrar deneyin.</string>
     <string name="settings_notification_heading">Bildirim eylemini seçin</string>
-    <string name="hsf_uptime">( %1$s adresinden beri aktif ; protos: %2$s)</string>
+    <string name="hsf_uptime" translatable="false">( %1$s adresinden beri aktif ; protos: %2$s)</string>
     <string name="dc_dns_leaks_heading">DNS sızıntılarını önleyin</string>
     <string name="about_mail_bugreport_text">Bu e-postayı şu adrese gönderin: hello@celzero.com</string>
     <string name="cd_dns_crypt_dialog_desc">Açıklama (isteğe bağlı)</string>
@@ -439,10 +437,10 @@
     <string name="ada_app_status_block_md">ölçülü (mobil) ağlarda engellenir</string>
     <string name="notif_download_content_text">İndirme işlemi devam ediyor…</string>
     <string name="rt_chip_check_update">Güncellemeleri denetle</string>
-    <string name="lbl_advanced">gelişmiş</string>
+    <string name="lbl_advanced">Gelişmiş</string>
     <string name="bsrf_sub_group_heading">Alt grup</string>
     <string name="lbbs_search">Blok listelerindeki alan adlarını arama</string>
-    <string name="about_docs_link">https://docs.rethinkdns.com/</string>
+    <string name="about_docs_link" translatable="false">https://docs.rethinkdns.com/</string>
     <string name="radio_sky_btn">⛅ Gökyüzü</string>
     <string name="configure_dns_connected_doh_status">HTTPS üzerinden DNS</string>
     <string name="settings_enable_logs">Aygıt üzerinde günlük kaydını etkinleştirme</string>
@@ -450,7 +448,7 @@
     <string name="settings_lock_down_mode_desc">VPN kilitlenme modundayken bazı ayarlar devre dışıdır. <u>VPN ayarlarına gidin</u>.</string>
     <string name="orbot_stop_dialog_message">Rethink, bağlantıları Orbot\'a yönlendirmeyi durdurdu, ancak Orbot arka planda çalışıyor olabilir.</string>
     <string name="settings_dns_proxy_dialog_port_number">Liman Numarası</string>
-    <string name="settings_dns_proxy_dialog_positive_btn">set</string>
+    <string name="settings_dns_proxy_dialog_positive_btn">Set</string>
     <string name="settings_ip_dialog_ipv6">IPv6 (deneysel)</string>
     <string name="hsf_proxy_chip_text">Proxy etkin</string>
     <string name="dc_rethink_dns_radio">Rethink DNS</string>
@@ -460,7 +458,7 @@
     <string name="cd_dns_crypt_dialog_name">Ad</string>
     <string name="univ_accessibility_crash_dialog_positive">Ayarlara Git</string>
     <string name="dns_proxy_name">Vekil Adı</string>
-    <string name="fapps_unmetered_block_dialog_message"><i>Listelenen</i> uygulamalar için kotasız (WiFi) ağda bağlantılar engellensin mi\?</string>
+    <string name="fapps_unmetered_block_dialog_message"><i>Listelenen</i> uygulamalar için kotasız (WiFi) ağda bağlantılar engellensin mi?</string>
     <string name="rules_load_failure_heading">Not</string>
     <string name="pause_text">duraklatıldı</string>
     <string name="firewall_rule_global_lockdown">Kilitlenme</string>
@@ -471,11 +469,11 @@
     <string name="ada_noapp_dialog_positive">Tamam</string>
     <string name="rt_download">Blok listelerini indirin</string>
     <string name="rethink_max_desc">50+ konum; daha fazla özel; fly.io üzerinde çalışan özyinelemeli çözümleyici</string>
-    <string name="ct_ip_details">%1$s (%2$s)</string>
+    <string name="ct_ip_details" translatable="false">%1$s (%2$s)</string>
     <string name="settings_socks5_desc">Bağlantıları SOCKS5 uç noktasına yönlendirin.</string>
     <string name="orbot_bs_status_1">%1$s bağlantılarının Orbot\'a yönlendirilmesi.</string>
     <string name="orbot_install_dialog_positive">Kur</string>
-    <string name="orbot_install_activity_error">Bir şeyler ters gitti, bir süre sonra deneyin</string>
+    <string name="orbot_install_activity_error" translatable="false">Bir şeyler ters gitti, bir süre sonra deneyin</string>
     <string name="settings_network_all_networks">Mevcut tüm ağları kullanın (deneysel)</string>
     <string name="settings_check_update_desc">Uygulama güncellemelerini haftada bir otomatik olarak kontrol edin.</string>
     <string name="settings_dns_proxy_dialog_header">SOCKS5 Vekili Ayarla</string>
@@ -484,15 +482,15 @@
     <string name="firewall_status_isolate">izole edilmiş</string>
     <string name="lbl_proceed">Devam Et</string>
     <string name="about_website">rethinkdns.com adresini ziyaret edin</string>
-    <string name="about_settings">sistem</string>
+    <string name="about_settings">Sistem</string>
     <string name="cd_custom_dns_proxy_title">Özel DNS Proxy</string>
     <string name="cd_dns_proxy_mode_external">Harici</string>
     <string name="cd_dns_proxy_error_text_2">Port aralığı 1024-65535 arasında olmalıdır</string>
     <string name="cd_dns_crypt_error_text_1">Damga boş olamaz</string>
     <string name="cd_doh_dialog_resolver_name">Çözümleyici Adı</string>
     <string name="hs_download_positive_play_store">Eksiksiz Güncelleme</string>
-    <string name="univ_delete_firewall_dialog_title">Tüm IP Kuralları silinsin mi\?</string>
-    <string name="fapps_metered_block_dialog_message"><i>Listelenen</i> uygulamalar için kotalı (mobil) ağda bağlantılar engellensin mi\?</string>
+    <string name="univ_delete_firewall_dialog_title">Tüm IP Kuralları silinsin mi?</string>
+    <string name="fapps_metered_block_dialog_message"><i>Listelenen</i> uygulamalar için kotalı (mobil) ağda bağlantılar engellensin mi?</string>
     <string name="update_complete_action_snack">YENİDEN BAŞLAT</string>
     <string name="new_app_notification_content">Rethink son yüklenen %1$s uygulamasını engelledi.</string>
     <string name="category_name_others">Diğer</string>
@@ -501,14 +499,14 @@
     <string name="rt_download_start">Engelleme listeleri indiriliyor…</string>
     <string name="lbbs_update_check">Güncellemeleri denetle</string>
     <string name="brbs_title">Yedekle &amp; Geri Yükle</string>
-    <string name="about_faq_link">https://www.rethinkdns.com/faq</string>
+    <string name="about_faq_link" translatable="false">https://www.rethinkdns.com/faq</string>
     <string name="local_blocklist_redownload">Güncel!</string>
     <string name="settings_ptrans_desc">Giden IPv6 trafiğini aygıt üzerinde IPv4\'e çevirin. Yalnızca IPv4 olan bir ağa bağlıysanız etkinleştirin.</string>
     <string name="settings_theme_dialog_themes_1">Sistem tarafından ayarlanır</string>
     <string name="settings_ip_text_ipv46">Otomatik</string>
     <string name="settings_notification_desc3">Hiçbiri</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy kaldırıldı</string>
-    <string name="dc_block_heading">kurallar</string>
+    <string name="dc_block_heading">Kurallar</string>
     <string name="dc_check_update_heading">Blok listesi güncellemeleri hakkında bilgi istemi</string>
     <string name="about_join_telegram">Telegram</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s diğer uygulama(lar)</string>
@@ -519,9 +517,9 @@
     <string name="firewall_rule_block_app_desc"><![CDATA[Kullanıcı tarafından belirlenen güvenlik duvarı kuralı bu <i>uygulamayı</i> engelledi. Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.]]></string>
     <string name="notif_dialog_pause_dialog_positive">Devam ettir</string>
     <string name="build__flavor_website">web sitesi</string>
-    <string name="dc_doh">HTTPS üzerinden Dns</string>
+    <string name="dc_doh" translatable="false">HTTPS üzerinden Dns</string>
     <string name="cd_dns_crypt_relay_name">DNSRelay %1$s</string>
-    <string name="lbl_add">ekle</string>
+    <string name="lbl_add">Ekle</string>
     <string name="dns_proxy_toast_parameter">DNS Proxy</string>
     <string name="dns_mode_info_explanation_new">DNS isteklerini izleyin, engelleyin ve şifreleyin.</string>
     <string name="search_dns_logs"><font size="12">Alan adlarını veya IP\'leri arama</font></string>
@@ -530,7 +528,7 @@
     <string name="about_docs">Dokümanları okuyun</string>
     <string name="about_settings_notification">Bildirim ayarları</string>
     <string name="cd_dns_crypt_dialog_title">DNSCrypt Çözümleyici veya Aktarıcı Ekleme</string>
-    <string name="dns_btm_resolved_crypt">çözüldü <u>anonim olarak</u> %1$s tarafından %2$s aracılığıyla %3$s</string>
+    <string name="dns_btm_resolved_crypt">çözüldü &lt;u&gt;anonim olarak&lt;/u&gt; %1$s tarafından %2$s aracılığıyla %3$s</string>
     <string name="dns_connected">Bağlandı</string>
     <string name="fapps_filter_categories_heading">Kategoriler</string>
     <string name="firewall_rule_block_ip_desc"><![CDATA[Kullanıcı tarafından belirlenen güvenlik duvarı kuralı <i>hedef IP\'yi</i> engelledi.<br/><br/> Değiştirmek için <i>Uygulamaya Özel Güvenlik Duvarı</i> ekranına gidin.]]></string>
@@ -548,48 +546,44 @@
     <string name="apps_info_title">Uygulamalar</string>
     <string name="alert_permission_accessibility">İzin - Erişilebilirlik</string>
     <string name="alert_firewall_accessibility_exception">Erişilebilirlik Ayarları açılamıyor. Daha sonra tekrar deneyin!</string>
-    <string name="alert_firewall_accessibility_regrant_explanation">Rethink erişilebilirlik hizmeti durdu veya çöktü. <i><b>Ayarlar\'a gidip Rethink\'i Durdurmaya Zorlayın</b></i> ve <i>Kullanılmayan herhangi bir uygulamayı engelle</i> özelliğini kullanmak için tekrar başlatın.
-\n
-\nRethink, hangi uygulamaların kullanımda olduğunu (ön plan) ve hangilerinin kullanımda olmadığını (arka plan) izlemek için erişilebilirlik hizmetini kullanır.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation">Rethink erişilebilirlik hizmeti durdu veya çöktü. <i><b>Ayarlar\'a gidip Rethink\'i Durdurmaya Zorlayın</b></i> ve <i>Kullanılmayan herhangi bir uygulamayı engelle</i> özelliğini kullanmak için tekrar başlatın. \n \nRethink, hangi uygulamaların kullanımda olduğunu (ön plan) ve hangilerinin kullanımda olmadığını (arka plan) izlemek için erişilebilirlik hizmetini kullanır.</string>
     <string name="hybrid_mode_info_title">DNS + Güvenlik Duvarı</string>
     <string name="brave_dns_connect_mode_change_firewall">Mod Seçin.</string>
-    <string name="bsct_block"><u>Bu uygulamayı</u> engelleyin, atlayın, hariç tutun, koruyun</string>
+    <string name="bsct_block">&lt;u&gt;Bu uygulamayı&lt;/u&gt; engelleyin, atlayın, hariç tutun, koruyun</string>
     <string name="always_on_dialog_heading">Her Zaman Açık VPN\'i Devre Dışı Bırak</string>
     <string name="dns_firewall_mode_info_explanation_new">Yukarıdakilerin hepsi + İnternet sansürünü atlayın.</string>
-    <string name="conn_track_clear_logs_message">Bu işlem yalnızca ağ günlüklerini siler ancak güvenlik duvarı kurallarını silmez. Bu işlem geri döndürülemez. Devam etmek istiyor musunuz\?</string>
-    <string name="alert_firewall_accessibility_explanation">Rethink, hangi uygulamaların kullanımda olduğunu (ön plan) ve hangilerinin kullanımda olmadığını (arka plan) izlemek için erişilebilirlik hizmetini kullanır.
-\n
-\nRethink herhangi bir şekilde bilgi toplamaz veya sizi gözetlemez.</string>
+    <string name="conn_track_clear_logs_message">Bu işlem yalnızca ağ günlüklerini siler ancak güvenlik duvarı kurallarını silmez. Bu işlem geri döndürülemez. Devam etmek istiyor musunuz?</string>
+    <string name="alert_firewall_accessibility_explanation">Rethink, hangi uygulamaların kullanımda olduğunu (ön plan) ve hangilerinin kullanımda olmadığını (arka plan) izlemek için erişilebilirlik hizmetini kullanır. \n \nRethink herhangi bir şekilde bilgi toplamaz veya sizi gözetlemez.</string>
     <string name="custom_url_error_invalid_url">Geçersiz URL</string>
-    <string name="dns_query_clear_logs_message">Bu, aygıt üzerindeki DNS günlüklerini siler. Bu işlem geri döndürülemez. Devam etmek istiyor musunuz\?</string>
+    <string name="dns_query_clear_logs_message">Bu, aygıt üzerindeki DNS günlüklerini siler. Bu işlem geri döndürülemez. Devam etmek istiyor musunuz?</string>
     <string name="always_on_dialog_neutral">Ayarlar</string>
-    <string name="bsct_conn_rule_explanation"><u>#1</u>: Bir uygulamanın internete bağlanmasını engeller. \n <u>#2</u>: Herhangi bir uygulamanın belirli bir IP\'ye bağlanmasını engeller. \n <u>#3</u>: Ekran kilitlendiğinde bütün bağlantıları engeller (Genel Güvenlik Duvarı). \n <u>#4</u>: Kullanımda olmayan her uygulamayı engeller (Genel Güvenlik Duvarı). \n <u>#5</u>: Kaynak uygulaması belirsiz bütün bağlantıları engeller (Genel Güvenlik Duvarı). \n <u>#6</u>: DNS hariç bütün UDP trafiğini engeller(Genel Güvenlik Duvarı). \n <u>#7</u>: DNS atlanırsa bütün bağlantıları engeller (Genel Güvenlik Duvarı).</string>
-    <string name="bsct_block_ip">Engelle, <u>bu IP\'ye</u> <u>bu uygulama</u> için güven</string>
+    <string name="bsct_conn_rule_explanation">&lt;u&gt;#1&lt;/u&gt;: Bir uygulamanın internete bağlanmasını engeller. \n &lt;u&gt;#2&lt;/u&gt;: Herhangi bir uygulamanın belirli bir IP\'ye bağlanmasını engeller. \n &lt;u&gt;#3&lt;/u&gt;: Ekran kilitlendiğinde bütün bağlantıları engeller (Genel Güvenlik Duvarı). \n &lt;u&gt;#4&lt;/u&gt;: Kullanımda olmayan her uygulamayı engeller (Genel Güvenlik Duvarı). \n &lt;u&gt;#5&lt;/u&gt;: Kaynak uygulaması belirsiz bütün bağlantıları engeller (Genel Güvenlik Duvarı). \n &lt;u&gt;#6&lt;/u&gt;: DNS hariç bütün UDP trafiğini engeller(Genel Güvenlik Duvarı). \n &lt;u&gt;#7&lt;/u&gt;: DNS atlanırsa bütün bağlantıları engeller (Genel Güvenlik Duvarı).</string>
+    <string name="bsct_block_ip">Engelle, &lt;u&gt;bu IP\'ye&lt;/u&gt; &lt;u&gt;bu uygulama&lt;/u&gt; için güven</string>
     <string name="bsct_conn_block_desc">%1$s, %2$s tarafından engellendi</string>
     <string name="always_on_dialog">Bu cihazda \"Her Zaman Açık VPN\" etkinleştirilmiştir. Rethink\'i başlatmak için lütfen Ayarlar uygulamasına gidin ve \"Her Zaman Açık VPN \"i devre dışı bırakın.</string>
-    <string name="always_on_dialog_lockdown_stop_message">Rethink, VPN\'i <i>Lockdown</i> modunda çalıştırıyor. Durdurulması, bu kullanıcı profilinde İnternet bağlantısının kaybına neden olur. Yine de devam etmek istiyor musunuz\?</string>
+    <string name="always_on_dialog_lockdown_stop_message">Rethink, VPN\'i <i>Lockdown</i> modunda çalıştırıyor. Durdurulması, bu kullanıcı profilinde İnternet bağlantısının kaybına neden olur. Yine de devam etmek istiyor musunuz?</string>
     <string name="dns_crypt_url_remove_dialog_message">DNSCrypt çözümleyicisini kayıtlı yapılandırmadan silin.</string>
     <string name="show_logs_disabled_network_message">Bağlantı günlükleme devre dışı bırakıldı. Yeniden etkinleştirmek için <i>Ayarlar</i>\'a gidin ve <i>Bağlantı Günlükleme</i>\'yi etkin hale getirin.</string>
-    <string name="univ_firewall_dialog_title">IP Kuralı Silinsin mi\?</string>
-    <string name="doh_custom_url_remove_dialog_title">DoH uç noktası silinsin mi\?</string>
+    <string name="univ_firewall_dialog_title">IP Kuralı Silinsin mi?</string>
+    <string name="doh_custom_url_remove_dialog_title">DoH uç noktası silinsin mi?</string>
     <string name="doh_custom_url_remove_dialog_message">Https uç noktasındaki DNS\'yi kayıtlı yapılandırmadan silin.</string>
     <string name="doh_custom_url_remove_success">Uç nokta silindi.</string>
     <string name="blocklist_update_check_failure">Bir şeyler ters gitti. Daha sonra tekrar deneyin!</string>
     <string name="dns_crypt_url_remove_success">DNSCrypt çözümleyici silindi.</string>
-    <string name="local_blocklist_download_desc">Bu özelliği kullanmak için gereken engelleme listeleri (~60MB) indirilsin mi\?</string>
-    <string name="dc_other_dns_heading">tür</string>
+    <string name="local_blocklist_download_desc">Bu özelliği kullanmak için gereken engelleme listeleri (~60MB) indirilsin mi?</string>
+    <string name="dc_other_dns_heading">Tür</string>
     <string name="settings_allow_bypass_desc">İsteyen uygulamaların bütün kullanılabilir ağlara bağlanmasına izin verin. Bu uygulamalar Rethink’in VPN tünelini isteğe bağlı olarak atlayabilir. Zoom ve Meet gibi bazı sesli/görüntülü konferans uygulamalarının düzgün çalışması için gerekebilir.</string>
-    <string name="download_update_dialog_message">Uygulamanın yeni sürümü web sitesinden indirilebilir. Devam etmek istiyor musunuz\?</string>
+    <string name="download_update_dialog_message">Uygulamanın yeni sürümü web sitesinden indirilebilir. Devam etmek istiyor musunuz?</string>
     <string name="download_update_dialog_message_ok">Zaten en son sürümü kullanıyorsunuz.</string>
     <string name="info_dialog_url_copy_toast_msg">URL kopyalandı</string>
-    <string name="whats_new_version_update">&lt;b&gt;Azami çaba&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Yeni: Kullanıcı hata raporlarında ağ motoru hatalarını yakalayın.&lt;i&gt;Maksimum&lt;/i&gt;.&lt;br/&gt;2. Yeni: \"DNS sızıntılarını engelle\" seçeneği açık olduğunda, delegelenmemiş alan adları için Sistem DNS\'ini kullanma.&lt;br/&gt; 3. Geliştirme: İkili yığın (IPv4 + IPv6) WireGuard bağlantısı.&lt;br/&gt; 4. Geliştirme: Ağ motoru yanıt vermediğinde arayüz öğelerinin engellenmesini önleme.&lt;br/&gt; 5. Düzeltme: Gelişmiş DNS filtreleme açıkken bağlantı zaman aşımı sorunları.&lt;br/&gt; 6. Düzeltme: Domain adlarına sahip WireGuard peer uç noktaları, ağ değişikliklerinde donuyor.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Bu uygulamanın çevirisine yardımcı olun&lt;/a&gt;</string>
+    <string name="whats_new_version_update" translatable="false"><![CDATA[<b>Azami çaba</b><br/><br/> 1. Yeni: Kullanıcı hata raporlarında ağ motoru hatalarını yakalayın.<i>Maksimum</i>.<br/>2. Yeni: \"DNS sızıntılarını engelle\" seçeneği açık olduğunda, delegelenmemiş alan adları için Sistem DNS\'ini kullanma.<br/> 3. Geliştirme: İkili yığın (IPv4 + IPv6) WireGuard bağlantısı.<br/> 4. Geliştirme: Ağ motoru yanıt vermediğinde arayüz öğelerinin engellenmesini önleme.<br/> 5. Düzeltme: Gelişmiş DNS filtreleme açıkken bağlantı zaman aşımı sorunları.<br/> 6. Düzeltme: Domain adlarına sahip WireGuard peer uç noktaları, ağ değişikliklerinde donuyor.<br/><br/> <a href=https://svc.rethinkdns.com/r/translate>Bu uygulamanın çevirisine yardımcı olun</a>]]></string>
     <string name="settings_ip_network_desc">İnternet Protokolü sürümleri arasından seçim yapın.</string>
     <string name="orbot_http">HTTP Vekili</string>
     <string name="orbot_bs_status_2">HTTP Vekili ayarlandı.</string>
     <string name="orbot_stop_dialog_title">Manuel müdahale gerekli</string>
-    <string name="orbot_app_issue">Orbot başlatılamadı. Yüklü mü\?</string>
+    <string name="orbot_app_issue">Orbot başlatılamadı. Yüklü mü?</string>
     <string name="orbot_bs_status_trying_connect">Orbot kurulumu…</string>
-    <string name="orbot_explanation">Orbot, diğer uygulamaların İnterneti daha <u>güvenli</u> kullanmasını sağlayan ücretsiz bir proxy uygulamasıdır.\nOrbot, İnternet trafiğinizi şifrelemek için <u>Tor</u> kullanır ve böylece <u>sansürü aşmanıza</u> yardımcı olur ve kişisel özgürlük ile mahremiyeti tehdit eden <u>ağ gözetimi</u> türlerine karşı savunma sağlar.\n<u>TCP Proxy</u>: Rethink, yalnızca <i>dahil edilen</i> uygulamaların TCP bağlantılarını Orbot\'a yönlendirir.\n<u>HTTP Proxy</u>: Rethink, Orbot\'a <i>HTTP CONNECT tüneli kurar</i> ve yalnızca <i>dahil edilen</i> uygulamaların TCP bağlantılarını yönlendirir.</string>
+    <string name="orbot_explanation">Orbot, diğer uygulamaların İnterneti daha &lt;u&gt;güvenli&lt;/u&gt; kullanmasını sağlayan ücretsiz bir proxy uygulamasıdır.\nOrbot, İnternet trafiğinizi şifrelemek için &lt;u&gt;Tor&lt;/u&gt; kullanır ve böylece &lt;u&gt;sansürü aşmanıza&lt;/u&gt; yardımcı olur ve kişisel özgürlük ile mahremiyeti tehdit eden &lt;u&gt;ağ gözetimi&lt;/u&gt; türlerine karşı savunma sağlar.\n&lt;u&gt;TCP Proxy&lt;/u&gt;: Rethink, yalnızca &lt;i&gt;dahil edilen&lt;/i&gt; uygulamaların TCP bağlantılarını Orbot\'a yönlendirir.\n&lt;u&gt;HTTP Proxy&lt;/u&gt;: Rethink, Orbot\'a &lt;i&gt;HTTP CONNECT tüneli kurar&lt;/i&gt; ve yalnızca &lt;i&gt;dahil edilen&lt;/i&gt; uygulamaların TCP bağlantılarını yönlendirir.</string>
     <string name="orbot_status_arg_3">DNS ve TCP</string>
     <string name="settings_autostart_bootup_desc">Cihaz açıldığında, kapatılmadan önce çalışıyorsa Rethink’i başlatın.</string>
     <string name="settings_http_proxy_error_text2">Kapı Geçersiz</string>
@@ -600,103 +594,29 @@
     <string name="apps_card_ips_count">%1$s IP ve Port kuralı</string>
     <string name="hsf_start_btn_state">başlat</string>
     <string name="dns_btm_resolved_doh">%1$s tarafından çözüldü %2$s</string>
-    <string name="hsf_vpn_dialog_message">Rethink, cihazın DNS isteklerini şifrelemek, bir ağ izleyicisi uygulamak ve güvenlik duvarı kurallarını uygulamak için yerel bir VPN kurma iznine ihtiyaç duyar.
-\n
-\nRethink herhangi bir şekilde bilgi toplamaz veya sizi gözetlemez.</string>
+    <string name="hsf_vpn_dialog_message">Rethink, cihazın DNS isteklerini şifrelemek, bir ağ izleyicisi uygulamak ve güvenlik duvarı kurallarını uygulamak için yerel bir VPN kurma iznine ihtiyaç duyar. \n \nRethink herhangi bir şekilde bilgi toplamaz veya sizi gözetlemez.</string>
     <string name="dc_dns_website_desc">Web sitesi simgelerini <i>nextdns.io</i> ve <i>duckduckgo.com</i> adresinden alır. 350 mb\'a kadar disk alanı tüketir</string>
     <string name="about_bravedns_explantion">Rethink, Android cihazınızda uygulama etkinliğini izlemenin, İnternet sansürünü aşmanın ve uygulamaları güvenlik duvarına almanın en kolay yoludur.</string>
     <string name="about_bravedns_whoarewe">Rethink, Amazon, IBM ve Scientific Games\'in eski mühendisleri tarafından yönetilen ücretsiz ve açık kaynaklı bir projedir.</string>
-    <string name="about_bug_no_log_dialog_message">Kilitlenme günlükleri alınamadı. Hatanızı manuel olarak bildirmek ister misiniz\?</string>
+    <string name="about_bug_no_log_dialog_message">Kilitlenme günlükleri alınamadı. Hatanızı manuel olarak bildirmek ister misiniz?</string>
     <string name="about_faq">SSS\'leri Görüntüle</string>
-    <string name="contributors_list"><![CDATA[<i>Rethink Açık Kaynak Projesi</i> varlığını, geliştirilmesi için sayısız saatler harcayan bu gönüllülere borçludur.
-                                              🛡️ Android uygulaması 
-                                              <a href="https://github.com/anthonyryan1">Anthony Ryan</a> /
-                                              <a href="https://github.com/BayLee4">BayLee4</a> /
-                                              <a href="https://github.com/Ch4t4r">Ch4t4r</a> /
-                                              <a href="https://github.com/samthesamman">CodingAttack</a> /
-                                              <a href="https://github.com/HrBDev">HrBDev</a> /
-                                              <a href="https://github.com/hussainmohd-a">hussainmohd-a</a> /
-                                              <a href="https://github.com/ignoramous">ignoramous</a> /
-                                              <a href="https://github.com/ironveil">ironveil</a> /
-                                              <a href="https://github.com/markwmuller">markwmuller</a> /
-                                              <a href="https://github.com/mohammaduvez">Mohammaduvez</a> /
-                                              <a href="https://github.com/Mygod">Mygod</a> /
-                                              <a href="https://github.com/Poussinou">Poussinou</a> /
-                                              <a href="https://github.com/pjosingh">pjosingh</a> /
-                                              <a href="https://github.com/RohitSurwase">RohitSurwase</a> /
-                                              <a href="https://github.com/ShantanuVichare">Shantanu</a> /
-                                              <a href="https://github.com/Uldiniad">Uldiniad</a> /
-                                              <a href="https://github.com/yurtpage">yurtpage</a>
-                                              🚂 Ağ motoru 
-                                              <a href="https://github.com/alalamav">alalamav</a> /
-                                              <a href="https://github.com/bemasc">bemasc</a> /
-                                              <a href="https://github.com/dmcardle">dmcardle</a> /
-                                              <a href="https://github.com/fortuna">fortuna</a> /
-                                              <a href="https://github.com/ignoramous">ignoramous</a> /
-                                              <a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /
-                                              <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
-                                              <a href="https://github.com/SeanBurford">SeanBurford</a>
-                                              📚 Çözümleyici 
-                                              <a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a> /
-                                              <a href="https://github.com/amithm7">amithm7</a> /
-                                              <a href="https://github.com/arfshl">arfshl</a> /
-                                              <a href="https://github.com/badmojr">badmojr</a> /
-                                              <a href="https://github.com/bongochong">bongochong</a> /
-                                              <a href="https://github.com/elliotwutingfeng">elliotwutingfeng</a> /
-                                              <a href="https://github.com/georgyo">georgyo</a> /
-                                              <a href="https://github.com/GiddyGoatGaming">GiddyGoatGaming</a> /
-                                              <a href="https://github.com/Harish-Narayan">Harish-Narayan</a> /
-                                              <a href="https://github.com/ignoramous">ignoramous</a> /
-                                              <a href="https://github.com/JakeChampion">JakeChampion</a> /
-                                              <a href="https://github.com/MasterKia">MasterKia</a> /
-                                              <a href="https://github.com/mtxadmin">mtxadmin</a> /
-                                              <a href="https://github.com/neneeen">neneeen</a> /
-                                              <a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /
-                                              <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
-                                              <a href="https://github.com/shruuub">shruuub</a> /
-                                              <a href="https://github.com/shuvashish76">shuvashish76</a>
-                                              ⚜ Topluluk moderatörleri 
-                                              <a href="https://t.me/amithm7">amithm7</a> /
-                                              <a href="https://t.me/TronSlayer">Andersen</a> /
-                                              <a href="https://t.me/ppatra">ppatra</a> /
-                                               <a href="https://t.me/InFamous23">InFamous23</a> /
-                                              <a href="https://t.me/TheTr1ckst3r">TheTr1ckst3r</a> /
-                                              <a href="https://t.me/Ch4t4r">Ch4t4r</a> /
-                                              <a href="https://t.me/Billi_ance">Billi_ance</a> /
-                                              <a href="https://t.me/kaliangel">kaliangel</a> /
-                                              <a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a>
-                                              📌 Coğrafi-IP 
-                                              <a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IPinfo Lite</a>
-                                              ❇ Çeviriler 
-                                              <a href="https://weblate.org/en/">Weblate</a>
-                                              🦆 Simgeler 
-                                              <a href="https://github.com/celzero/rethink-app/issues/346">Simgeler</a>
-                                              📦 Derleme sunucuları 
-                                              <a href="https://jitpack.io/">JitPack</a> /
-                                              <a href="https://github.com/">GitHub</a> /
-                                              <a href="https://central.sonatype.com/">Sonatype</a>
-                                              ]]></string>
+    <string name="contributors_list"><![CDATA[<i>Rethink Açık Kaynak Projesi</i> varlığını, geliştirilmesi için sayısız saatler harcayan bu gönüllülere borçludur.\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020🛡️ Android uygulaması \n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/anthonyryan1">Anthony Ryan</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/BayLee4">BayLee4</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/Ch4t4r">Ch4t4r</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/samthesamman">CodingAttack</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/HrBDev">HrBDev</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/hussainmohd-a">hussainmohd-a</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ignoramous">ignoramous</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ironveil">ironveil</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/markwmuller">markwmuller</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/mohammaduvez">Mohammaduvez</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/Mygod">Mygod</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/Poussinou">Poussinou</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/pjosingh">pjosingh</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/RohitSurwase">RohitSurwase</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ShantanuVichare">Shantanu</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/Uldiniad">Uldiniad</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/yurtpage">yurtpage</a>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020🚂 Ağ motoru \n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/alalamav">alalamav</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/bemasc">bemasc</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/dmcardle">dmcardle</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/fortuna">fortuna</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ignoramous">ignoramous</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/SeanBurford">SeanBurford</a>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020📚 Çözümleyici \n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/amithm7">amithm7</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/arfshl">arfshl</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/badmojr">badmojr</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/bongochong">bongochong</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/elliotwutingfeng">elliotwutingfeng</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/georgyo">georgyo</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/GiddyGoatGaming">GiddyGoatGaming</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/Harish-Narayan">Harish-Narayan</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/ignoramous">ignoramous</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/JakeChampion">JakeChampion</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/MasterKia">MasterKia</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/mtxadmin">mtxadmin</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/neneeen">neneeen</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/shruuub">shruuub</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/shuvashish76">shuvashish76</a>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020⚜ Topluluk moderatörleri \n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/amithm7">amithm7</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/TronSlayer">Andersen</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/ppatra">ppatra</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 <a href="https://t.me/InFamous23">InFamous23</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/TheTr1ckst3r">TheTr1ckst3r</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/Ch4t4r">Ch4t4r</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/Billi_ance">Billi_ance</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://t.me/kaliangel">kaliangel</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020📌 Coğrafi-IP \n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IPinfo Lite</a>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020❇ Çeviriler \n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://weblate.org/en/">Weblate</a>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020🦆 Simgeler \n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/celzero/rethink-app/issues/346">Simgeler</a>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020📦 Derleme sunucuları \n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://jitpack.io/">JitPack</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://github.com/">GitHub</a> /\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020<a href="https://central.sonatype.com/">Sonatype</a>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020]]></string>
     <string name="cd_custom_doh_dialog_title">Özel Sunucu URL\'si</string>
     <string name="dc_check_update_desc">Her <i>üç</i> günde bir blok listesi güncellemelerini kontrol edin</string>
-    <string name="about_web">bağlantılar</string>
+    <string name="about_web">Bağlantılar</string>
     <string name="about_bug_report">Hata raporu</string>
     <string name="collecting_logs_progress_text">Yakalanıyor…</string>
     <string name="rbl_privacy">Gizlilik</string>
-    <string name="rt_dialog_message">Yeni yapılandırılmış blok listelerini uygulamak istiyor musunuz\?</string>
+    <string name="rt_dialog_message">Yeni yapılandırılmış blok listelerini uygulamak istiyor musunuz?</string>
     <string name="cd_doh_dialog_resolver_url">Çözümleyici URL\'si</string>
     <string name="firewall_rule_block_app_unmetered_desc"><![CDATA[Kullanıcı tarafından belirlenen güvenlik duvarı kuralı bu <i>uygulamanın</i> <i>Ölçülmemiş</i> ağda bağlantı kurma girişimini engelledi. Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.]]></string>
     <string name="firewall_rule_block_ip_univ_desc"><![CDATA[Kullanıcı tarafından belirlenen güvenlik duvarı kuralı <i>hedef IP / Port</i> adresini engelledi.<br/><br/> Değiştirmek için <i>Evrensel</i> sekmesine gidin.]]></string>
-    <string name="firewall_card_text_active">%1$s engellenmiş
-\n%2$s bypass edildi
-\n%3$s hariç tutuldu
-\n%4$s KİLİTLEME</string>
-    <string name="dns_proxy_dialog_message_no_app">IP adresi: %1$s
-\n
-\nLiman numarası: %2$s</string>
+    <string name="firewall_card_text_active">%1$s engellenmiş \n%2$s bypass edildi \n%3$s hariç tutuldu \n%4$s KİLİTLEME</string>
+    <string name="dns_proxy_dialog_message_no_app">IP adresi: %1$s \n \nLiman numarası: %2$s</string>
     <string name="ada_app_status_block">engellendi</string>
     <string name="ada_app_unmetered">Ölçülmeyen</string>
     <string name="network_dns">Sistem DNS</string>
-    <string name="cd_remove_dialog_title">Etki alanı silinsin mi\?</string>
+    <string name="cd_remove_dialog_title">Etki alanı silinsin mi?</string>
     <string name="firewall_rule_bypass_universal_ip">Bypass edilen IP</string>
     <string name="cd_dialog_error_invalid_domain">Geçersiz URL veya etki alanı adı</string>
     <string name="cd_blocked_initial">Si</string>
@@ -745,11 +665,7 @@
     <string name="ada_app_bypass_univ">Bypass Evrensel</string>
     <string name="ada_app_exclude">Dışarıda tut</string>
     <string name="bsac_title_desc">Kurallar sadece bu uygulama için geçerlidir.</string>
-    <string name="dns_proxy_dialog_message">Uygulama adı: %1$s
-\n
-\nIP adresi: %2$s
-\n
-\nLiman numarası: %3$s</string>
+    <string name="dns_proxy_dialog_message">Uygulama adı: %1$s \n \nIP adresi: %2$s \n \nLiman numarası: %3$s</string>
     <string name="bsdl_blocked_desc">%1$s tarafından engellendi %2$s</string>
     <string name="notif_download_success_content">Başarılı indir.</string>
     <string name="rbl_security">Güvenlik</string>
@@ -764,12 +680,12 @@
     <string name="ctbs_block_other_apps">%1$s için uygulanan kurallar %2$s diğer uygulamalar için de geçerli olacaktır</string>
     <string name="notif_download_failure_content">İndirme başarısız oldu. Tekrar deneyin.</string>
     <string name="rt_dialog_title">Değişiklikleri Kaydet</string>
-    <string name="dc_dns_proxy">DNS Vekil</string>
+    <string name="dc_dns_proxy" translatable="false">DNS Vekil</string>
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="ci_delete">sil</string>
     <string name="ci_bypass_universal_initial">BE</string>
     <string name="other_dns_list_tab3">Dns Vekil</string>
-    <string name="ada_firewall_title">bu uygulama için güvenlik duvarı kuralları</string>
+    <string name="ada_firewall_title">Bu uygulama için güvenlik duvarı kuralları</string>
     <string name="notif_download_cancel_content">İndirme iptal edildi.</string>
     <string name="rt_filter_parent_selected">Seçili</string>
     <string name="rt_filter_hint"><u>Tüm</u> engelleme listeleri gösteriliyor</string>
@@ -779,8 +695,8 @@
     <string name="settings_app_notification_a13_heading">Uygulama Bildirimi</string>
     <string name="about_privacy_policy">Gizlilik ilkesini oku</string>
     <string name="about_app_translate">Çevir</string>
-    <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
-    <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
+    <string name="about_translate_link" translatable="false">https://svc.rethinkdns.com/r/translate</string>
+    <string name="about_privacy_policy_link" translatable="false">https://www.rethinkdns.com/privacy</string>
     <string name="notification_screen_error">Uygulama Bildirim ekranı başlatılamadı.</string>
     <string name="intent_launch_error">Sayım başlatılmadı %1$s</string>
     <string name="no_browser_error">Tarayıcıdan web sayfası açılamıyor.</string>
@@ -790,9 +706,7 @@
     <string name="rt_filter_desc_subgroups"><![CDATA[<u>%1$s</u> engelleme listesi gösteriliyor, grup: %2$s ve alt grup: %3$s]]></string>
     <string name="relative_time_yesterday">Dün</string>
     <string name="private_dns_dialog_heading">Özel DNS\'yi kapatın</string>
-    <string name="private_dns_dialog_desc">Rethink\'in DNS ayarları Android\'in Özel DNS\'i tarafından geçersiz kılınır.
-\n
-\nRethink\'in DNS\'sini kullanmak için Android Ayarları\'na gidin ve \"Özel DNS \"yi kapatın.</string>
+    <string name="private_dns_dialog_desc">Rethink\'in DNS ayarları Android\'in Özel DNS\'i tarafından geçersiz kılınır. \n \nRethink\'in DNS\'sini kullanmak için Android Ayarları\'na gidin ve Özel DNS\'i kapatın.</string>
     <string name="private_dns_dialog_positive">Ayarlara git</string>
     <string name="private_dns_error">Özel dns ekranı başlatılamadı.</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Günlükleri temizleyin</string>
@@ -802,12 +716,12 @@
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Kötü amaçlı yazılımları, fidye yazılımlarını, kripto yazılımlarını, kimlik avcılarını ve diğer tehditleri engelleyin.</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s engel listesi</string>
     <string name="lbl_rules" translatable="true">kurallar</string>
-    <string name="bsct_block_domain" translatable="true">Engelle, <u>bu uygulama</u> için <u>alan adlarına</u> güven</string>
+    <string name="bsct_block_domain" translatable="true">Engelle, &lt;u&gt;bu uygulama&lt;/u&gt; için &lt;u&gt;alan adlarına&lt;/u&gt; güven</string>
     <string name="lbl_maybe_blocked" translatable="true">Belki Engellendi</string>
     <string name="lbl_configure" translatable="true">Yapılandır</string>
     <string name="lbl_logs" translatable="true">Günlükler</string>
-    <string name="lbl_network" translatable="true">ağ</string>
-    <string name="bypass_dns_firewall" translatable="true">dns &amp; güvenlik duvarını atla</string>
+    <string name="lbl_network" translatable="true">Ağ</string>
+    <string name="bypass_dns_firewall" translatable="true">DNS &amp; Güvenlik duvarını atla</string>
     <string name="title_statistics" translatable="true">İstatistikler</string>
     <string name="lbl_domain" translatable="true">Alan adı</string>
     <string name="lbl_cancel" translatable="true">İptal</string>
@@ -847,7 +761,7 @@
     <string name="firewall_card_universal_rules" translatable="true">%1$s evrensel kural(lar)</string>
     <string name="lbl_http" translatable="true">HTTP</string>
     <string name="pcap_failure_toast" translatable="true">Pcap dosyası oluşturulurken hata oluştu, Tekrar deneyin!</string>
-    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true"><i>Listelenen</i> uygulamalar için evrensel DNS &amp; güvenlik duvarı kurallarını atlayın\?</string>
+    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true"><i>Listelenen</i> uygulamalar için evrensel DNS &amp; güvenlik duvarı kurallarını atlayın?</string>
     <string name="lbl_wireguard" translatable="true">WireGuard</string>
     <string name="add_remove_apps" translatable="true">Ekle / Kaldır (%1$s uygulama)</string>
     <string name="bad_extension_error" translatable="true">Dosya .conf veya .zip olmalıdır</string>
@@ -865,11 +779,11 @@
     <string name="lbl_hour" translatable="true">saat</string>
     <string name="lbl_persistent_keepalive" translatable="true">Sürekli canlı tut</string>
     <string name="wireguard_enabled_failure">WireGuard\'ı etkinleştirmek için diğer aktif vekilleri durdurun</string>
-    <string name="fapps_exclude_block_dialog_message" translatable="true"><i>Listelenen</i> uygulamaları DNS ve Güvenlik Duvarı\'ndan hariç tutun\?</string>
+    <string name="fapps_exclude_block_dialog_message" translatable="true"><i>Listelenen</i> uygulamaları DNS ve Güvenlik Duvarı\'ndan hariç tutun?</string>
     <string name="add_peer" translatable="true">Eş Ekle</string>
     <string name="cloudflare_family_dns_desc" translatable="true">Kötü amaçlı yazılımları ve yetişkinlere yönelik içeriği engeller. Cloudflare\'in 1.1.1.3 DNS uç noktasını kullanır.</string>
     <string name="crypt_quad9_security_desc" translatable="true">Quad9 (anycast) dnssec/no–log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
-    <string name="lbl_save" translatable="true">kaydet</string>
+    <string name="lbl_save" translatable="true">Kaydet</string>
     <string name="dc_setting_dns_cache_heading" translatable="true">DNS güçlendirici (deneysel)</string>
     <string name="cd_deleted_toast" translatable="true">Tüm alan adı kuralları silindi</string>
     <string name="lbl_optional" translatable="true">(opsiyonel)</string>
@@ -880,7 +794,7 @@
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Devam etmek için Rethink\'i başlatın</string>
     <string name="settings_locale_heading" translatable="true">Dili değiştir</string>
     <string name="public_key_copy_toast_msg" translatable="true">Ortak anahtar kopyalandı.</string>
-    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">En çok izin verilmiş uygulamalar</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">En Çok İzin Verilmiş Uygulamalar</string>
     <string name="logs_disclaimer" translatable="true">İlk 20.000 karakter gösteriliyor</string>
     <string name="import_error" translatable="true">Tünel içe aktarılamıyor: %s</string>
     <string name="settings_locale_dialog_title" translatable="true">Tercih ettiğiniz dili seçin</string>
@@ -891,12 +805,12 @@
     <string name="lbl_delete" translatable="true">Sil</string>
     <string name="settings_default_dns_heading" translatable="true">Yedek DNS\'yi seçin</string>
     <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Uygulamaları atlayın</string>
-    <string name="fapps_bypass_block_dialog_message" translatable="true"><i>Listelenen</i> uygulamalar için Evrensel güvenlik duvarı kurallarını atlayın\?</string>
+    <string name="fapps_bypass_block_dialog_message" translatable="true"><i>Listelenen</i> uygulamalar için Evrensel güvenlik duvarı kurallarını atlayın?</string>
     <string name="ci_trust_rule" translatable="true">Güvenilirlik</string>
     <string name="cd_dns_alg_heading" translatable="true">Gelişmiş DNS filtreleme (deneysel)</string>
     <string name="lbl_qr_code" translatable="true">QR kod</string>
     <string name="bypass_dns_firewall_tooltip">%1$s yalnızca Rethink\'in DNS\'si ile çalışır</string>
-    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">en çok i̇leti̇şi̇me geçi̇len i̇p\'ler</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">En Çok İleti̇şi̇me Geçi̇len IP\'ler</string>
     <string name="fapps_info_isolate_msg" translatable="true">Güvenilir IP\'ler hariç tümünü engelleyin.</string>
     <string name="app_ip_domain_rules_desc" translatable="true">Uygulama başına IP / Etki alanı kurallarını değiştirin.</string>
     <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
@@ -905,7 +819,7 @@
     <string name="key_length_explanation_base64" translatable="true">: WireGuard base64 anahtarları 44 karakter (32 bayt) olmalıdır</string>
     <string name="fapps_info_bypass_msg" translatable="true">Evrensel güvenlik duvarı kurallarını atlayın.</string>
     <string name="wireguard_disclaimer">DNS %1$s adresine yönlendirildi.</string>
-    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">en çok engellenen IP\'ler</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">En Çok Engellenen IP\'ler</string>
     <string name="fapps_info_unmetered_msg" translatable="true">Ölçülmemiş (WiFi) ağda İzin Ver / Engelle.</string>
     <string name="hs_biometeric_feature_not_supported" translatable="true">Biyometrik kimlik doğrulama bu cihazda desteklenmiyor veya devre dışı bırakılmış</string>
     <string name="fapps_exclude_block_dialog_title" translatable="true">Uygulamaları hariç tut</string>
@@ -914,12 +828,12 @@
     <string name="bad_config_reason_missing_section" translatable="true">Eksik bölüm</string>
     <string name="brbs_backup_restore_desc" translatable="true">Uygulama sürümleri arasında çalışmıyor</string>
     <string name="wireguard_no_config_msg">WireGuard VPNleri yok. Başlamak için bazılarını ekleyin.</string>
-    <string name="settings_general_customize" translatable="true">özelleştir</string>
+    <string name="settings_general_customize" translatable="true">Özelleştir</string>
     <string name="new_warp_error_toast" translatable="true">WARP yapılandırması alınamıyor</string>
     <string name="bad_config_context" translatable="true">%1$s\'s %2$s</string>
     <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[Kullanıcı tarafından belirlenen güvenlik duvarı kuralı <i>alan adını</i> engelledi. Değiştirmek için <i>Uygulamaya Özel Güvenlik Duvarı</i> ekranına gidin.]]></string>
     <string name="hs_biometeric_failed" translatable="true">Biyometrik kimlik doğrulama başarısız oldu</string>
-    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">En çok engellenmiş uygulamalar</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">En Çok Engellenmiş Uygulamalar</string>
     <string name="settings_go_log_heading" translatable="true">Günlük seviyesi</string>
     <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[Bu bağlantı engellendi çünkü <i>alan adı</i> Evrensel alan adı kurallarında engellenmiş olarak ayarlandı. Bu davranışı değiştirmek için <i>DNS Yapılandır</i> sekmesine gidin.]]></string>
     <string name="lbl_auto" translatable="true">(otomatik)</string>
@@ -931,7 +845,7 @@
     <string name="ada_app_firewall" translatable="true">Güvenlik Duvarı</string>
     <string name="logs_card_dns_count" translatable="true">%1$s sorgular</string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[Bu bağlantıya izin verildi çünkü <i>alan adı</i> Güvenilir alan adı olarak ayarlandı. Değiştirmek için <i>Uygulamaya Özel Güvenlik Duvarı</i> ekranına gidin.]]></string>
-    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">en çok iletişim kurulan alan adları</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">En Çok İletişim Kurulan Alan Adları</string>
     <string name="lbl_day" translatable="true">gün</string>
     <string name="lbl_fast" translatable="true">hızlı</string>
     <string name="unknown_error" translatable="true">Bilinmeyen hata</string>
@@ -943,14 +857,14 @@
     <string name="lbl_addresses" translatable="true">Adresler</string>
     <string name="logs_card_network_count" translatable="true">%1$s bağlantılar</string>
     <string name="lbl_active" translatable="true">Aktif</string>
-    <string name="fapps_isolate_block_dialog_message" translatable="true"><i>listelenen</i> uygulamalarını izole edin\?</string>
+    <string name="fapps_isolate_block_dialog_message" translatable="true"><i>listelenen</i> uygulamalarını izole edin?</string>
     <string name="include_all_app_wg_dialog_title">Tüm uygulamaları dahil et</string>
     <string name="lbl_dns_servers" translatable="true">DNS Sunucuları</string>
-    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">en çok iletişim kurulan ülkeler</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">En Çok İletişim Kurulan Ülkeler</string>
     <string name="cloudflare_dns_desc" translatable="true">Herhangi bir DNS isteğini engellemez. Cloudflare\'in 1.1.1.1 DNS uç noktasını kullanır.</string>
     <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">en çok engellenen ülkeler</string>
-    <string name="lbl_app_wise" translatable="true">uygulama başına</string>
-    <string name="bsdl_block_desc" translatable="true">Engelle, <u>bu alan adına</u> güven</string>
+    <string name="lbl_app_wise" translatable="true">Uygulama Başına</string>
+    <string name="bsdl_block_desc" translatable="true">Engelle, &lt;u&gt;bu alan adına&lt;/u&gt; güven</string>
     <string name="firewall_rule_domain_blocked_univ" translatable="true">Alan adı (Univ)</string>
     <string name="fapps_isolate_block_dialog_title" translatable="true">Uygulamaları izole edin</string>
     <string name="status_protected_with_wg" translatable="true">wireguard ile korunuyor</string>
@@ -972,7 +886,7 @@
     <string name="hs_biometeric_title" translatable="true">Rethink\'in Kilidini Açın</string>
     <string name="crypt_relay_netherlands" translatable="true">Hollanda\'da barındırılan anonimleştirilmiş DNS aktarıcısı</string>
     <string name="invalid_file_error" translatable="true">geçersiz dosya</string>
-    <string name="include_all_app_wg_dialog_desc">Tüm uygulamaları bu tünelden mi geçirelim\?</string>
+    <string name="include_all_app_wg_dialog_desc">Tüm uygulamaları bu tünelden mi geçirelim?</string>
     <string name="settings_pcap_dialog_option_2" translatable="true">Logcat Çıktısı</string>
     <string name="key_length_error" translatable="true">Yanlış anahtar uzunluğu</string>
     <string name="fapps_info_metered_msg" translatable="true">Ölçülü (Mobil) ağda İzin Ver / Engelle.</string>
@@ -986,11 +900,11 @@
     <string name="firewall_rule_block_domain" translatable="true">Alan adı (Uygulama)</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">Kapalı (varsayılan)</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">VPN yalnızca DNS modunda çalışırken proxy\'ler kurulamıyor.</string>
-    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">en çok engellenen alan adları</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">En Çok Engellenen Alan Adları</string>
     <string name="lbl_select_all" translatable="true">tümünü seç</string>
     <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[Bu bağlantı engellendi çünkü <i>alan adı</i> kullanıcının tercih ettiği DNS tarafından engellendi. Bu davranışı değiştirmek için <i>DNS Yapılandır</i> sekmesine gidin.]]></string>
     <string name="cleanbrowsing_adult_dns_desc" translatable="true">Yetişkin filtresi, tüm yetişkin, pornografik ve açık sitelere erişimi engeller. Proxy veya VPN\'leri, karışık içerikli siteleri engellemez. Reddit gibi sitelere izin verir. Google ve Bing Güvenli Mod\'a ayarlanmıştır.</string>
-    <string name="config_delete_dialog_desc">Bu Konfigürasyonu silmek istediğinizden emin misiniz\?</string>
+    <string name="config_delete_dialog_desc">Bu Konfigürasyonu silmek istediğinizden emin misiniz?</string>
     <string name="parse_error_reason" translatable="true">%1$s \"%2$s\" ayrıştırılamıyor</string>
     <string name="new_warp_config_desc" translatable="true">WARP yapılandırmasını sunucudan getir</string>
     <string name="firewall_rule_dns_blocked" translatable="true">DNS Engellendi</string>
@@ -1002,7 +916,7 @@
     <string name="parse_error_inet_endpoint" translatable="true">Uç nokta</string>
     <string name="firewall_status_bypass_dns_firewall" translatable="true">dns ve güvenlik duvarı kurallarını atlar</string>
     <string name="exclude_all_app_wg_dialog_title">Tüm uygulamaları hariç tut</string>
-    <string name="exclude_all_app_wg_dialog_desc">Tüm uygulamaları bu tünelden hariç tutalım mı\?</string>
+    <string name="exclude_all_app_wg_dialog_desc">Tüm uygulamaları bu tünelden hariç tutalım mı?</string>
     <string name="no_configs_error" translatable="true">Hiçbir yapılandırma bulunamadı</string>
     <string name="firewall_rule_proxied" translatable="true">Proxy\'li</string>
     <string name="http_proxy_dialog_desc" translatable="true">Form URL\'sini değiştirin, &lt;protocol&gt; https://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt; Örnek: http://proxy.ör.com:8080/</string>
@@ -1011,7 +925,7 @@
     <string name="crypt_adguard_family_desc" translatable="true">Güvenli arama ve yetişkinlere yönelik içerik engelleme özellikli Adguard DNS.</string>
     <string name="bad_config_reason_syntax_error" translatable="true">Sözdizimi hatası</string>
     <string name="hs_biometeric_desc" translatable="true">RethinkDNS\'in kilidini açmak için biyometrik kimlik doğrulamayı kullanın</string>
-    <string name="fapps_unblock_dialog_message" translatable="true"><i>Listelenen</i> uygulamalar için bağlantılara izin ver\?</string>
+    <string name="fapps_unblock_dialog_message" translatable="true"><i>Listelenen</i> uygulamalar için bağlantılara izin ver?</string>
     <string name="crypt_relay_france" translatable="true">Paris, Fransa\'da barındırılan ve https://cryptostrom.is/ tarafından sağlanan anonimleştirilmiş DNS aktarıcısı.</string>
     <string name="ssv_see_more" translatable="true">Tümünü Göster</string>
     <string name="lbl_listen_port" translatable="true">Dinleme noktası</string>
@@ -1068,7 +982,7 @@
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> bağlantı kaybına neden olabilir. Rethink\'in arka planda veri ve diğer kaynakları kullanabilmesi için ayarı değiştirin.</string>
     <string name="dc_proxy_dns_heading" translatable="true">DNS\'i asla proxy üzerinden yönlendirme</string>
     <string name="dc_proxy_dns_desc" translatable="true">Her Zaman Açık WireGuard, SOCKS5, HTTP proxy\'leri üzerinden DNS proxy\'si oluşturmayın.</string>
-    <string name="lbl_notification" translatable="true">bildirim</string>
+    <string name="lbl_notification" translatable="true">Bildirim</string>
     <string name="memory_notification_text">Rethink düşük bellekle çalışıyor. Sistem eylemleri sınırlı olabilir.</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Loopback proxy yönlendirme uygulamaları</string>
     <string name="lbl_battery_optimization" translatable="true">Pil optimizasyonu</string>
@@ -1077,7 +991,7 @@
     <string name="lbl_unselected" translatable="true">Seçilmemiş</string>
     <string name="exclude_apps_from_proxy">Uygulamayı tüm proxy\'lerden hariç tut</string>
     <string name="exclude_apps_from_proxy_failure_toast">Bu uygulama proxy\'leri atlar (bypass)</string>
-    <string name="lbl_test" translatable="true">test</string>
+    <string name="lbl_test" translatable="true">Test</string>
     <string name="lbl_protos" translatable="true">protolar</string>
     <string name="lbl_experimental" translatable="true">(deneysel)</string>
     <string name="lbl_service_providers" translatable="true">Hizmet Sağlayıcıları</string>
@@ -1110,7 +1024,7 @@
     <string name="sponser_dialog_usage_msg" translatable="true">Rethink\'i <b>%1$s gündür</b> kullanıyorsunuz, bu da <b>$%2$s</b> kullanım maliyetine denk geliyor. Gelişimini sürdürmek için sponsor olmayı düşünür müsünüz?</string>
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Yetkisiz alanlar için Sistem DNS\'i kullan</string>
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true"><i>.lan</i>, <i>.internal</i> gibi yetkisiz alanlar için Sistem DNS\'i kullan.</string>
-    <string name="dc_filtering_heading" translatable="true">filtreleme</string>
+    <string name="dc_filtering_heading" translatable="true">Filtreleme</string>
     <string name="cd_split_dns_heading" translatable="true">Bölünmüş DNS (deneysel)</string>
     <string name="cd_split_dns_desc" translatable="true">Proxy kullanan uygulamaların DNS sorgularını proxy\'nin DNS sunucularına yönlendir.</string>
     <string name="univ_firewall_rule_11" translatable="true">Tüm yerel ana bilgisayar bağlantılarını engelle</string>
@@ -1159,7 +1073,7 @@
     <string name="hop_error_toast_msg_1" translatable="true">Aktarım yapılamaz, zaten %1$s</string>
     <string name="hop_error_toast_msg_2" translatable="true">Aktarım için WireGuard mevcut değil; lütfen daha fazla ekleyin.</string>
     <string name="hop_error_toast_msg_3" translatable="true">Aktarım kullanmak için Yalnızca Mobil veya SSID\'yi devre dışı bırakın</string>
-    <string name="mode_change_error_proxy_enabled" translatable="true">Proxy\'ler kullanılırken modlar değiştirilemez. <u>Proxy ayarlarını düzenlemek</u> için dokunun.</string>
+    <string name="mode_change_error_proxy_enabled" translatable="true">Proxy\'ler kullanılırken modlar değiştirilemez. &lt;u&gt;Proxy ayarlarını düzenlemek&lt;/u&gt; için dokunun.</string>
     <string name="blocklist_not_available_toast" translatable="true">Engelleme listelerini güncellemek için uygulamanın en son sürümünü indirin.</string>
     <string name="lbl_ultra_secure" translatable="true">ultra güvenli</string>
     <string name="adv_set_dial_timeout_title" translatable="true">Boşta kalma zaman aşımı</string>
@@ -1202,8 +1116,6 @@
     <string name="vpn_policy_fixed" translatable="true">Muhafazakar</string>
     <string name="vpn_policy_fixed_desc" translatable="true">Ağ değişikliklerine minimum düzeyde tepki verir.</string>
     <string name="vpn_policy_title" translatable="true">Bağlantı değişiklik politikası</string>
-    <string name="use_fallback_dns_to_bypass" translatable="true">Yedek DNS\'i atlama olarak kullan</string>
-    <string name="use_fallback_dns_to_bypass_desc" translatable="true">Etkinleştirildiğinde, atlanan uygulamalar, alan adları ve IP\'ler için her zaman yedek DNS kullanır.</string>
     <string name="title_database_dump" translatable="true">Veritabanı</string>
     <string name="copied_clipboard" translatable="true">Kopyalandı</string>
     <string name="wg_setting_ssid_title" translatable="true">Yalnızca Wi-Fi</string>
@@ -1234,18 +1146,56 @@
     <string name="settings_tunnel_metered" translatable="true">Her zaman ölçülmüş</string>
     <string name="settings_tunnel_metered_desc" translatable="true">Uygulamalara daha az veri tüketme talimatı vermek için Rethink\'in VPN tünelini ölçülmüş olarak işaretle. Dikkat: Bu, uygulamaların yedeklemeler gibi büyük yüklemeleri ve indirmeleri duraklatmasına neden olabilir.</string>
     <string name="stability_program_toast" translatable="true"><i>Deneysel özellikler</i> için <i>kararlılık programına</i> kaydolundu.</string>
-    <string name="search_event_logs" translatable="true"><font size="12">Olayları, mesajları ara</font></string>
-    <string name="bug_report_files_desc" translatable="true">Bug raporu e-postasına dahil etmek istediğiniz dosyaları seçin</string>
-    <string name="bug_report_deselect_all" translatable="true">Tümünün Seçimini Kaldır</string>
-    <string name="bug_report_no_files_selected" translatable="true">Lütfen en az bir adet dosya seçiniz</string>
-    <string name="bug_report_creating_zip" translatable="true">Arşiv oluşturuluyor…</string>
-    <string name="bug_report_file_not_found" translatable="true">Dosya bulunamadı</string>
-    <string name="bug_report_error_opening_file" translatable="true">Bu dosya tipi açılamıyor</string>
-    <string name="bug_report_delete_confirmation" translatable="true">\"%1$s\"\'ı silmek istediğinizden emin misiniz?</string>
-    <string name="bug_report_file_deleted" translatable="true">\"%1$s\" dosyası silindi</string>
-    <string name="bug_report_delete_failed" translatable="true">\"%1$s\" dosyası silinirken bir sorun oluştu</string>
-    <string name="bug_report_no_files_available" translatable="true">Hata raporu dosyası bulunamadı</string>
-    <string name="cd_allowed_dns_record_types_heading" translatable="true">İzin verilen DNS kaydı tipleri</string>
-    <string name="cd_allowed_dns_record_types_desc" translatable="true">İzin verilecek DNS kaynak kaydı türlerini seçin.</string>
+    <string name="search_event_logs" translatable="false"><font size="12">Olayları, mesajları ara</font></string>
+    <string name="bug_report_files_desc" translatable="false">Bug raporu e-postasına dahil etmek istediğiniz dosyaları seçin</string>
+    <string name="bug_report_deselect_all" translatable="false">Tümünün Seçimini Kaldır</string>
+    <string name="bug_report_no_files_selected" translatable="false">Lütfen en az bir adet dosya seçiniz</string>
+    <string name="bug_report_creating_zip" translatable="false">Arşiv oluşturuluyor…</string>
+    <string name="bug_report_file_not_found" translatable="false">Dosya bulunamadı</string>
+    <string name="bug_report_error_opening_file" translatable="false">Bu dosya tipi açılamıyor</string>
+    <string name="bug_report_delete_confirmation" translatable="false">\"%1$s\"\'ı silmek istediğinizden emin misiniz?</string>
+    <string name="bug_report_file_deleted" translatable="false">\"%1$s\" dosyası silindi</string>
+    <string name="bug_report_delete_failed" translatable="false">\"%1$s\" dosyası silinirken bir sorun oluştu</string>
+    <string name="bug_report_no_files_available" translatable="false">Hata raporu dosyası bulunamadı</string>
+    <string name="cd_allowed_dns_record_types_heading" translatable="false">İzin verilen DNS kaydı tipleri</string>
+    <string name="cd_allowed_dns_record_types_desc" translatable="false">İzin verilecek DNS kaynak kaydı türlerini seçin.</string>
     <string name="dns_record_types_auto_mode_status" translatable="true">Oto (Tüm tipler)</string>
+    <string name="tour_btn_skip">Turu geç</string>
+    <string name="stability_program_snackbar_msg" translatable="true">Stabilite programı etkinleştirildi. Çökme raporları, deneysel özelliklerin geliştirilmesine yardım eder.</string>
+    <string name="stability_program_snackbar_disable" translatable="true">Kapat</string>
+    <string name="lbl_expires_on" translatable="true">Geçerlilik süresi</string>
+    <plurals name="server_count">
+        <item quantity="one">%1$d sunucu</item>
+        <item quantity="other">%1$d sunucu</item>
+    </plurals>
+    <string name="tour_step_counter">%1$d / %2$d</string>
+    <plurals name="peer_count">
+        <item quantity="one">%d eş</item>
+        <item quantity="other">%d eş</item>
+    </plurals>
+    <string name="lbl_paused" translatable="true">Durdu</string>
+    <string name="tour_btn_finish">Anladım</string>
+    <string name="lbl_saving" translatable="true">Kaydediliyor…</string>
+    <string name="lbl_expired" translatable="true">Süresi doldu</string>
+    <string name="lbl_cancelled" translatable="true">İptal edildi</string>
+    <string name="lbl_plan" translatable="true">Plan</string>
+    <string name="lbl_grace_period" translatable="true">Ödeme Süresi</string>
+    <string name="ip_mismatch_notification_title" translatable="true">Ağ protokolü uyuşmazlığı</string>
+    <string name="ip_mismatch_notification_content" translatable="true">Seçtiğin IP protokolü mevcut ağda mevcut değil. \"IPv4 &amp; IPv6\" ya da \"Otomatik\" moda geçerek bağlantıda kalmaya devam edebilirsin.</string>
+    <string name="doh_empty_state_title" translatable="true">DoH endpoint\'i yok</string>
+    <string name="doh_empty_state_desc" translatable="true">Bir DNS-over-HTTPS endpoint\'i ekleyerek başla.</string>
+    <string name="odoh_empty_state_title" translatable="true">ODoH endpoint\'i yok</string>
+    <string name="odoh_empty_state_desc" translatable="true">Bir Oblivious DNS-over-HTTPS endpoint\'i ekleyerek başla.</string>
+    <string name="dot_empty_state_title" translatable="true">DoT endpoint\'i yok</string>
+    <string name="dot_empty_state_desc" translatable="true">Bir DNS-over-TLS endpoint\'i ekleyerek başla.</string>
+    <string name="dns_proxy_empty_state_title" translatable="true">DNS Proxy endpoint\'i yok</string>
+    <string name="dns_proxy_empty_state_desc" translatable="true">Bir DNS Proxy endpoint\'i ekleyerek başla.</string>
+    <string name="dns_crypt_empty_state_title" translatable="true">DNSCrypt endpoint\'i yok</string>
+    <string name="dns_crypt_empty_state_desc" translatable="true">Bir DNSCrypt endpoint\'i ekleyerek başla.</string>
+    <string name="rethink_empty_state_title" translatable="true">Blok listesi bulunamadı</string>
+    <string name="rethink_empty_state_desc" translatable="true">Blok listesini indirerek veya konfigure ederek başla.</string>
+    <string name="settings_rinr_btmsht_title" translatable="true">Geri döngü (deneysel)</string>
+    <string name="settings_rinr_btmsht_desc" translatable="true">Geri döngü modunda Rethink kendi ağ trafiğini kendisine yönlendirir. Demek oluyor ki, Rethink kendi trafiğine (IP ve Domain kuralları, güvenlik duvarı kurallar vb.) aynı diğer uygulamalar gibi kuralları uygular. Geri döngü modu fazlaca kontrol sağlasada sonuçları pek beklendiği gibi olmayabilir.\n\n\nRethink\'i güvenlik duvarı, DNS ve proxy kurallarından muaf tutmanız önerilir. Bu işlem, ağ izleme veya günlük kaydı işlemlerini etkilemez; yalnızca kuralları etkiler.\n\n\nGeri döngü modunda, Proxy Lockdown özelliği şimdilik uygulanmayacaktır.</string>
+    <string name="settings_rinr_exempt_btn" translatable="true">Rethink\'i muaf tut</string>
+    <string name="app_info_rethink_warning_title" translatable="true">Uyarı</string>
 </resources>
