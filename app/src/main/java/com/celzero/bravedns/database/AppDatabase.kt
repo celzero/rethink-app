@@ -98,6 +98,7 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         fun buildDatabase(context: Context): AppDatabase {
+            val appContext = context.applicationContext
             // Self-heal: if a corrupt/truncated bravedns.db is present on disk (e.g. a
             // 0-byte file left behind by a premature ATTACH in LogDatabase.populateDatabase
             // after the user clears app storage via Android settings), delete it so that
@@ -105,7 +106,7 @@ abstract class AppDatabase : RoomDatabase() {
             // (default DoH/DNSCrypt/RDNS/DoT/ODoH rows) is restored. Without this, Room sees
             // that the file already exists and skips the asset copy, failing with:
             //   "Bad database header, unable to read 4 bytes at offset 60" (user_version).
-            val dbFile = context.applicationContext.getDatabasePath(DATABASE_NAME)
+            val dbFile = appContext.getDatabasePath(DATABASE_NAME)
             if (dbFile.exists() && !isValidSQLiteFile(dbFile)) {
                 Logger.i(
                     LOG_TAG_APP_DB,
@@ -113,11 +114,26 @@ abstract class AppDatabase : RoomDatabase() {
                 )
                 dbFile.delete()
                 // remove sidecar files so a stale wal/shm cannot resurrect broken state
-                context.applicationContext.getDatabasePath("$DATABASE_NAME-wal").delete()
-                context.applicationContext.getDatabasePath("$DATABASE_NAME-shm").delete()
+                appContext.getDatabasePath("$DATABASE_NAME-wal").delete()
+                appContext.getDatabasePath("$DATABASE_NAME-shm").delete()
             }
-            return Room.databaseBuilder(
-                context.applicationContext,
+
+            return try {
+                newBuilder(appContext).also { it.openHelper.writableDatabase }
+            } catch (e: IllegalStateException) {
+                val message = e.message.orEmpty()
+                if ("Room cannot verify" !in message && "data integrity" !in message) {
+                    throw e
+                }
+                Logger.w(LOG_TAG_APP_DB, "Schema mismatch; recreating database: $message")
+                appContext.deleteDatabase(DATABASE_NAME)
+                newBuilder(appContext)
+            }
+        }
+
+        private fun newBuilder(context: Context): AppDatabase =
+            Room.databaseBuilder(
+                context,
                 AppDatabase::class.java,
                 DATABASE_NAME
             )
@@ -155,7 +171,6 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_29_30)
                 .addMigrations(MIGRATION_30_31)
                 .build()
-        }
 
         private val roomCallback: Callback =
             object : Callback() {
