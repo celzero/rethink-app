@@ -18,6 +18,7 @@ package com.celzero.bravedns.database
 import android.Manifest
 import android.content.ContentValues
 import android.content.pm.PackageManager
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
 import com.celzero.bravedns.service.FirewallManager
@@ -43,6 +44,7 @@ class AppInfo : Serializable {
     var modifiedTs: Long = 0
     var tempAllowEnabled: Boolean = false
     var tempAllowExpiryTime: Long = 0
+    @ColumnInfo(defaultValue = "''")
     var notes: String = ""
 
     override fun equals(other: Any?): Boolean {
