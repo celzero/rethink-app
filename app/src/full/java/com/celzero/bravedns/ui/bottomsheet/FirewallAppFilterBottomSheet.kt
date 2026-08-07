@@ -181,7 +181,7 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
         return chip
     }
 
-    private fun remakeSortChipsUi(){
+    private fun remakeSortChipsUi() {
         b.fsSortChipGroup.removeAllViews()
         b.fsSortChipGroup.addView(makeSortChip(AppInfoViewModel.SortOption.NAME, getString(R.string.fapps_filter_sort_name)))
         b.fsSortChipGroup.addView(makeSortChip(AppInfoViewModel.SortOption.PACKAGE, getString(R.string.fapps_filter_sort_package)))
@@ -204,7 +204,7 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
             colorUpChipIcon(chip)
         }
 
-        chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
+        chip.setOnCheckedChangeListener { _, isSelected: Boolean ->
             if (isSelected) {
                 filters.sort = value
                 colorUpChipIcon(chip)
