@@ -1,1 +1,1 @@
-Ugunsmūris, WireGuard VPN, tīkla uzraugs, ļaunatūras bloķētājs, DNS mainītājs.
+Ugunsmūris, WireGuard VPN, tīkla pārraugs, ļaunatūras aizturēšana, DNS maiņa.

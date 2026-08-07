@@ -1492,6 +1492,7 @@
 
     <!-- DNS logs bottom sheet -->
     <string name="bsdl_block_desc" translatable="true">Block, trust &lt;u>this domain&lt;/u></string>
+    <string name="bsdl_app_block_desc" translatable="true">Block, trust &lt;u>this domain&lt;/u> for this app</string>
     <string name="bsdl_blocked_desc" translatable="true">blocked %1$s by %2$s</string>
 
     <!-- app config -->

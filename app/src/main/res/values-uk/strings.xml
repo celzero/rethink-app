@@ -19,15 +19,15 @@
     <string name="firewall_mode_notification_title">Захищено! Підключено до Брандмауера.</string>
     <string name="always_on_dialog_positive">Зупинити</string>
     <string name="always_on_dialog_neutral">Налаштуваннях</string>
-    <string name="app_name">RethinkDNS</string>
-    <string name="app_name_small_case">rethink</string>
+    <string name="app_name" translatable="false">RethinkDNS</string>
+    <string name="app_name_small_case" translatable="false">rethink</string>
     <string name="settings_title_desc">DNS та брандмауер, що легко налаштовуються</string>
-    <string name="always_on_dialog_lockdown_stop_message">Rethink запускає VPN у режимі <i>Блокування</i>. Його зупинка призведе до втрати підключення до Інтернету для цього профілю користувача. Ви все одно хочете продовжити\?</string>
+    <string name="always_on_dialog_lockdown_stop_message">Rethink запускає VPN у режимі <i>Блокування</i>. Його зупинка призведе до втрати підключення до Інтернету для цього профілю користувача. Ви все одно хочете продовжити?</string>
     <string name="private_dns_dialog_heading">Вимкнути Приватний DNS</string>
     <string name="about_title_desc">Виявлення та блокування загроз мережевої безпеки</string>
     <string name="accessibility_service_description">Rethink використовує службу спеціальних можливостей для виявлення та блокування фонових застосунків. Rethink не збирає та не продає жодної інформації.</string>
     <string name="slide_2_desc">Rethink - це найпростіший спосіб моніторингу мережевої активності, обходу інтернет-цензури та брандмауерів на вашому Android пристрої.</string>
-    <string name="rdns_plus">RDNS Plus</string>
+    <string name="rdns_plus" translatable="false">RDNS Plus</string>
     <string name="allow">дозволити</string>
     <string name="bypass_universal">універсальний обхід</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Натисніть, щоб змінити налаштування захисту</string>
@@ -63,8 +63,8 @@
     <string name="firewall_rules">Правила мережі</string>
     <string name="firewall_mode_info_title">Брандмауер</string>
     <string name="universal_firewall_explanation" translatable="true">Застосовуйте правила брандмауера до всіх застосунків на основі подій на пристрої, наприклад, коли пристрій заблоковано або коли певна програма не використовується.</string>
-    <string name="bsct_block" translatable="true">Блокувати, обходити, виключати, ізолювати <u>цей застосунок</u></string>
-    <string name="univ_firewall_dialog_message" translatable="true">Видалення цього правила дозволить будь-якому застосунку підключатися до цієї IP-адреси. Ви бажаєте продовжити\?</string>
+    <string name="bsct_block" translatable="true">Блокувати, обходити, виключати, ізолювати &lt;u&gt;цей застосунок&lt;/u&gt;</string>
+    <string name="univ_firewall_dialog_message" translatable="true">Видалення цього правила дозволить будь-якому застосунку підключатися до цієї IP-адреси. Ви бажаєте продовжити?</string>
     <string name="refresh_complete" translatable="true"><!-- use dc_refresh_toast --> Повторну синхронізацію списку застосунків завершено.</string>
     <string name="search_firewall_network_log" translatable="true"><font size="12">Пошук застосунків, IP-адрес, доменів</font></string>
     <string name="app_mode_dns_firewall" translatable="true">DNS та Брандмауер (за замовчуванням)</string>
@@ -72,13 +72,13 @@
     <string name="app_mode_choose" translatable="true">Виберіть режим</string>
     <string name="orbot_http_desc" translatable="true">Встановлення тунелю HTTP CONNECT до Orbot.</string>
     <string name="orbot_bs_status_2" translatable="true">HTTP-проксі встановлено.</string>
-    <string name="orbot_app_issue" translatable="true">Не вдалося запустити Orbot. Він встановлений\?</string>
+    <string name="orbot_app_issue" translatable="true">Не вдалося запустити Orbot. Він встановлений?</string>
     <string name="settings_check_update_heading" translatable="true">Перевірити наявність оновлень</string>
     <string name="settings_check_update_desc" translatable="true">Автоматично перевіряти наявність оновлень для застосунку раз на тиждень.</string>
     <string name="settings_app_notification_a13_desc" translatable="true">Увімкніть дозвіл на сповіщення для застосунку</string>
     <string name="settings_theme_heading" translatable="true">Зовнішній вигляд</string>
     <string name="settings_dns_proxy_dialog_app" translatable="true">Застосунок</string>
-    <string name="settings_dns_proxy_dialog_app_desc" translatable="true">Вибраний застосунок буде виключено з VPN, щоб вона могла встановлювати проксі-з’єднання від вашого імені.</string>
+    <string name="settings_dns_proxy_dialog_app_desc" translatable="false">Вибраний застосунок буде виключено з VPN, щоб вона могла встановлювати проксі-з’єднання від вашого імені.</string>
     <string name="settings_app_list_default_app" translatable="true">Жоден</string>
     <string name="settings_theme_dialog_title" translatable="true">Зовнішній вигляд</string>
     <string name="firewall_card_status_active" translatable="true">%1$s застосунків</string>
@@ -92,14 +92,8 @@
     <string name="univ_firewall_rule_1" translatable="true">Блокувати всі застосунки, коли пристрій заблоковано</string>
     <string name="univ_firewall_rule_10" translatable="true">Блокувати усе, крім обраних застосунків та IP-адрес</string>
     <string name="univ_delete_firewall_dialog_message" translatable="true">Видалення цих правил дозволило б будь-якому застосунку підключатися до заблокованих на даний момент IP-адрес.</string>
-    <string name="dns_proxy_dialog_message" translatable="true">Назва застосунку: %1$s
-\n
-\nIP-адреса: %2$s
-\n
-\nНомер порту: %3$s</string>
-    <string name="dns_proxy_dialog_message_no_app" translatable="true">IP-адреса: %1$s
-\n
-\nНомер порту: %2$s</string>
+    <string name="dns_proxy_dialog_message" translatable="true">Назва застосунку: %1$s \n \nIP-адреса: %2$s \n \nНомер порту: %3$s</string>
+    <string name="dns_proxy_dialog_message_no_app" translatable="true">IP-адреса: %1$s \n \nНомер порту: %2$s</string>
     <string name="fapps_filter_filter_heading" translatable="true">Тип</string>
     <string name="fapps_filter_categories_heading" translatable="true">Категорії</string>
     <string name="fapps_filter_clear_btn" translatable="true">Скинути</string>
@@ -108,9 +102,9 @@
     <string name="fapps_firewall_filter_bypass_universal" translatable="true">Обійдені</string>
     <string name="fapps_firewall_filter_excluded" translatable="true">Виключені</string>
     <string name="fapps_unmetered_block_dialog_title" translatable="true">Блокувати на необмежених</string>
-    <string name="fapps_metered_block_dialog_message" translatable="true">Блокувати з\'єднання в мережі з обмеженням(мобільній мережі) для <i>перелічених</i> застосунків\?</string>
+    <string name="fapps_metered_block_dialog_message" translatable="true">Блокувати з\'єднання в мережі з обмеженням(мобільній мережі) для <i>перелічених</i> застосунків?</string>
     <string name="fapps_metered_block_dialog_title" translatable="true">Блокувати на обмежених</string>
-    <string name="fapps_metered_unblock_dialog_message" translatable="true">Дозволити з’єднання в обмеженій (мобільній) мережі для <i>перелічених</i> застосунків\?</string>
+    <string name="fapps_metered_unblock_dialog_message" translatable="true">Дозволити з’єднання в обмеженій (мобільній) мережі для <i>перелічених</i> застосунків?</string>
     <string name="network_log_app_name_unknown" translatable="true">Невідомо</string>
     <string name="network_log_app_name_unnamed" translatable="true">Без назви (%1$s)</string>
     <string name="accessibility_notification_content" translatable="true">Служба доступності RethinkDNS зупинилася або вийшла з ладу. Більше не блокує фонові застосунки. Натисніть, щоб увімкнути знову.</string>
@@ -133,7 +127,7 @@
     <string name="notif_channel_desc_vpn_failure" translatable="true">Повідомляти, коли Android або інший VPN-застосунок зупиняє RethinkDNS</string>
     <string name="category_name_sys_apps" translatable="true">Системні застосунки</string>
     <string name="ada_noapp_dialog_title" translatable="true">Немає такого застосунку</string>
-    <string name="ada_noapp_dialog_message" translatable="true">Інформація про застосунок відсутня. Можливо, цей застосунок було видалено\?</string>
+    <string name="ada_noapp_dialog_message" translatable="true">Інформація про застосунок відсутня. Можливо, цей застосунок було видалено?</string>
     <string name="ada_noapp_dialog_positive" translatable="true">Ок</string>
     <string name="ada_firewall_status" translatable="true"><![CDATA[This app <b><i>%1$s</i></b>.]]></string>
     <string name="ada_ip_no_connection" translatable="true">Для цієї категорії немає мережевих журналів.</string>
@@ -155,10 +149,8 @@
     <string name="brbs_backup_desc" translatable="true">Резервне копіювання налаштувань застосунків, журналів мережі та dns</string>
     <string name="brbs_backup_dialog_message" translatable="true">Створює резервну копію налаштувань застосунку, мережі та журналів dns у файл. Це призведе до перезапуску VPN.</string>
     <string name="brbs_restore_complete_toast" translatable="true">Відновлення завершено, перезапуск застосунку…</string>
-    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink використовує службу доступності, щоб відстежувати, які застосунки використовуються (на передньому плані) і які не використовуються (у фоновому режимі).
-\n
-\nRethink не збирає жодної інформації та жодним чином не шпигує за вами.</string>
-    <string name="download_update_dialog_message" translatable="true">Нова версія застосунку доступна для завантаження з вебсайту. Ви бажаєте продовжити\?</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink використовує службу доступності, щоб відстежувати, які застосунки використовуються (на передньому плані) і які не використовуються (у фоновому режимі). \n \nRethink не збирає жодної інформації та жодним чином не шпигує за вами.</string>
+    <string name="download_update_dialog_message" translatable="true">Нова версія застосунку доступна для завантаження з вебсайту. Ви бажаєте продовжити?</string>
     <string name="settings_locale_dialog_neutral" translatable="true">Допоможіть перекласти цей застосунок</string>
     <string name="settings_biometeric_heading" translatable="true">Увімкнути блокування застосунку</string>
     <string name="settings_biometric_desc" translatable="true">Захистіть цей застосунок за допомогою блокування екрана</string>
@@ -178,12 +170,12 @@
     <string name="fapps_info_isolate_msg" translatable="true">Блокувати всі, крім довірених IP-адрес.</string>
     <string name="fapps_unblock_dialog_message" translatable="true">Дозволити підключення для застосунків <i>зі списку</i>\?</string>
     <string name="fapps_bypass_block_dialog_title" translatable="true">Обхідні застосунки</string>
-    <string name="fapps_bypass_block_dialog_message" translatable="true">Обійти універсальні правила брандмауера для <i>перелічених</i> застосунків\?</string>
+    <string name="fapps_bypass_block_dialog_message" translatable="true">Обійти універсальні правила брандмауера для <i>перелічених</i> застосунків?</string>
     <string name="fapps_unblock_dialog_title" translatable="true">Дозволити застосунки</string>
     <string name="fapps_exclude_block_dialog_title" translatable="true">Виключення застосунків</string>
-    <string name="fapps_exclude_block_dialog_message" translatable="true">Виключити застосунки <i>зі списку</i> з DNS і Брандмауера\?</string>
+    <string name="fapps_exclude_block_dialog_message" translatable="true">Виключити застосунки <i>зі списку</i> з DNS і Брандмауера?</string>
     <string name="fapps_isolate_block_dialog_title" translatable="true">Ізолювати застосунки</string>
-    <string name="fapps_isolate_block_dialog_message" translatable="true">Ізолювати <i>перелічені</i> застосунки\?</string>
+    <string name="fapps_isolate_block_dialog_message" translatable="true">Ізолювати <i>перелічені</i> застосунки?</string>
     <string name="fapps_firewall_filter_desc" translatable="true"><![CDATA[Showing <u>%1$s</u> %2$s додатки]]></string>
     <string name="fapps_firewall_filter_desc_category" translatable="true"><![CDATA[Showing <u>%1$s</u> %2$s програми в категоріях: %3$s]]></string>
     <string name="firewall_rule_block_app_new_install" translatable="true">Новий застосунок</string>
@@ -211,15 +203,13 @@
     <string name="firewall_rule_trusted_domain" translatable="true">Довіряти домену застосунка</string>
     <string name="firewall_rule_block_domain" translatable="true">Домен (Застосунок)</string>
     <string name="app_mode_firewall" translatable="true">Брандмауер</string>
-    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Служба доступності Rethink зупинилася або вийшла з ладу. <i><b>Перейдіть до налаштувань і примусово зупиніть</b></i> Rethink і запустіть його знову, щоб використовувати <i>Блокування будь-якого застосунку, яка не використовується</i>.
-\n
-\nRethink використовує службу доступності, щоб відстежувати, які застосунки використовуються (на передньому плані) і які не використовуються (у фоновому режимі).</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Служба доступності Rethink зупинилася або вийшла з ладу. <i><b>Перейдіть до налаштувань і примусово зупиніть</b></i> Rethink і запустіть його знову, щоб використовувати <i>Блокування будь-якого застосунку, яка не використовується</i>. \n \nRethink використовує службу доступності, щоб відстежувати, які застосунки використовуються (на передньому плані) і які не використовуються (у фоновому режимі).</string>
     <string name="always_on_dialog" translatable="true">«Завжди увімкнений VPN» увімкнено на цьому пристрої. Щоб запустити Rethink, перейдіть до Налаштувань та вимкніть «Завжди увімкнений VPN».</string>
-    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Блокує підключення програми до Інтернету. \n <u>#2</u>: Блокує підключення будь-якої програми до певної IP-адреси. \n <u>#3</u>: Блокує всі з\'єднання, коли пристрій заблоковано (Універсальний брандмауер). \n <u>#4</u>: Блокує будь-які програми, які не використовуються (Універсальний брандмауер). \n <u>#5</u>: Блокує з’єднання, коли вихідна програма невідома (Universal Firewall). \n <u>#6</u>: Блокує весь UDP-трафік, окрім DNS (універсальний брандмауер). \n <u>#7</u>: Блокувати з’єднання, коли DNS обходиться (Universal Firewall).</string>
+    <string name="bsct_conn_rule_explanation" translatable="true">&lt;u&gt;#1&lt;/u&gt;: Блокує підключення програми до Інтернету. \n &lt;u&gt;#2&lt;/u&gt;: Блокує підключення будь-якої програми до певної IP-адреси. \n &lt;u&gt;#3&lt;/u&gt;: Блокує всі з\'єднання, коли пристрій заблоковано (Універсальний брандмауер). \n &lt;u&gt;#4&lt;/u&gt;: Блокує будь-які програми, які не використовуються (Універсальний брандмауер). \n &lt;u&gt;#5&lt;/u&gt;: Блокує з’єднання, коли вихідна програма невідома (Universal Firewall). \n &lt;u&gt;#6&lt;/u&gt;: Блокує весь UDP-трафік, окрім DNS (універсальний брандмауер). \n &lt;u&gt;#7&lt;/u&gt;: Блокувати з’єднання, коли DNS обходиться (Universal Firewall).</string>
     <string name="settings_allow_bypass_desc" translatable="true">Дозволити застосункам, що запитують, доступ до всіх доступних мереж. Ці застосунки можуть обходити VPN тунель Rethink за вимогою. Деякі застосунки для аудіо чи відео конференцій, такі як Zoom та Meet, можуть потребувати цього для належної роботи.</string>
     <string name="settings_https_desc" translatable="true">Пересилати з\'єднання за протоколом HTTP(s).</string>
-    <string name="whats_new_version_update" translatable="true">&lt;b&gt;Don\'t Panic 2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Нове: Фіксування помилок мережі у користувацьких звітах про помилки.&lt;br/&gt;2. Нове: використовуйте Системний DNS для неделегованих доменних імен, якщо провайдер застосовує політику Запобігання витоку DNS.&lt;br/&gt; 3. Покращення: підключення WireGuard з подвійним стеком (IPv4 + IPv6).&lt;br/&gt; 4. Покращення: уникайте блокування елементів інтерфейсу користувача, коли мережа не відповідає.&lt;br/&gt; 5. Виправлення: Час очікування з’єднання з увімкненою розширеною фільтрацією DNS.&lt;br/&gt; 6. Виправлення: Кінцеві точки вузлів WireGuard з доменними іменами залежать від змін у мережі.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Допоможіть перекласти цей застосунок&lt;/a&gt;</string>
-    <string name="orbot_explanation" translatable="true">Orbot – це безплатний застосунок-проксі, який дає змогу іншим застосункам <u>безпечніше</u> використовувати Інтернет. \nOrbot використовує <u>Tor</u> для шифрування вашого Інтернет-трафіку, що допомагає вам <u>обійти цензуру</u> та захиститися від форм <u>мережевого спостереження</u>, які загрожують особистій свободі та конфіденційності. \n<u>TCP Proxy</u>: Rethink пересилає до Orbot лише TCP-сегменти посилань <i>доданих</i> застосунків. \n<u>Http Proxy</u>; Rethink <i>встановлює</i> тунель HTTP ПІДКЛЮЧЕННЯ до Orbot і пересилає лише TCP-сегменти посилань <i>доданих</i> застосунків.</string>
+    <string name="whats_new_version_update" translatable="false"><![CDATA[<b>Don\'t Panic 2</b><br/><br/> 1. Нове: Фіксування помилок мережі у користувацьких звітах про помилки.<br/>2. Нове: використовуйте Системний DNS для неделегованих доменних імен, якщо провайдер застосовує політику Запобігання витоку DNS.<br/> 3. Покращення: підключення WireGuard з подвійним стеком (IPv4 + IPv6).<br/> 4. Покращення: уникайте блокування елементів інтерфейсу користувача, коли мережа не відповідає.<br/> 5. Виправлення: Час очікування з’єднання з увімкненою розширеною фільтрацією DNS.<br/> 6. Виправлення: Кінцеві точки вузлів WireGuard з доменними іменами залежать від змін у мережі.<br/><br/> <a href=https://svc.rethinkdns.com/r/translate>Допоможіть перекласти цей застосунок</a>]]></string>
+    <string name="orbot_explanation" translatable="true">Orbot – це безплатний застосунок-проксі, який дає змогу іншим застосункам &lt;u&gt;безпечніше&lt;/u&gt; використовувати Інтернет. \nOrbot використовує &lt;u&gt;Tor&lt;/u&gt; для шифрування вашого Інтернет-трафіку, що допомагає вам &lt;u&gt;обійти цензуру&lt;/u&gt; та захиститися від форм &lt;u&gt;мережевого спостереження&lt;/u&gt;, які загрожують особистій свободі та конфіденційності. \n&lt;u&gt;TCP Proxy&lt;/u&gt;: Rethink пересилає до Orbot лише TCP-сегменти посилань &lt;i&gt;доданих&lt;/i&gt; застосунків. \n&lt;u&gt;Http Proxy&lt;/u&gt;; Rethink &lt;i&gt;встановлює&lt;/i&gt; тунель HTTP ПІДКЛЮЧЕННЯ до Orbot і пересилає лише TCP-сегменти посилань &lt;i&gt;доданих&lt;/i&gt; застосунків.</string>
     <string name="settings_import_export_desc" translatable="true">Вручну створіть резервну копію або відновіть дані та налаштування застосунку.</string>
     <string name="settings_socks_forwarding_desc_no_app" translatable="true">Переадресація на %1$s:%2$s</string>
     <string name="univ_firewall_rule_6" translatable="true">Блокувати нові встановлені застосунки за замовчуванням</string>
@@ -227,74 +217,7 @@
     <string name="settings_app_notification_a13_heading" translatable="true">Сповіщення застосунку</string>
     <string name="notification_screen_error" translatable="true">Не вдалося запустити екран сповіщень застосунку.</string>
     <string name="settings_custom_downloader_heading" translatable="true">Використовувати вбудований завантажувач</string>
-    <string name="contributors_list" translatable="true"><![CDATA[The <i>Проект «Переосмислити відкритий код» завдячує своїм існуванням цим волонтерам, які присвячують незліченну кількість годин його розробці.<br/>
-                                              <br/>🛡️ Android app <br/>
-                                              <a href="https://github.com/anthonyryan1">Anthony Ryan</a> /
-                                              <a href="https://github.com/BayLee4">BayLee4</a> /
-                                              <a href="https://github.com/Ch4t4r">Ch4t4r</a> /
-                                              <a href="https://github.com/samthesamman">CodingAttack</a> /
-                                              <a href="https://github.com/HrBDev">HrBDev</a> /
-                                              <a href="https://github.com/hussainmohd-a">hussainmohd-a</a> /
-                                              <a href="https://github.com/ignoramous">ignoramous</a> /
-                                              <a href="https://github.com/ironveil">ironveil</a> /
-                                              <a href="https://github.com/markwmuller">markwmuller</a> /
-                                              <a href="https://github.com/mohammaduvez">Mohammaduvez</a> /
-                                              <a href="https://github.com/Mygod">Mygod</a> /
-                                              <a href="https://github.com/Poussinou">Poussinou</a> /
-                                              <a href="https://github.com/pjosingh">pjosingh</a> /
-                                              <a href="https://github.com/RohitSurwase">RohitSurwase</a> /
-                                              <a href="https://github.com/ShantanuVichare">Shantanu</a> /
-                                              <a href="https://github.com/Uldiniad">Uldiniad</a><br/> /
-                                              <a href="https://github.com/yurtpage">yurtpage</a><br/>
-                                              <br/>🚂 Network engine <br/>
-                                              <a href="https://github.com/alalamav">alalamav</a> /
-                                              <a href="https://github.com/bemasc">bemasc</a> /
-                                              <a href="https://github.com/dmcardle">dmcardle</a> /
-                                              <a href="https://github.com/fortuna">fortuna</a> /
-                                              <a href="https://github.com/ignoramous">ignoramous</a> /
-                                              <a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /
-                                              <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
-                                              <a href="https://github.com/SeanBurford">SeanBurford</a><br/>
-                                              <br/>📚 Resolver <br/>
-                                              <a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a> /
-                                              <a href="https://github.com/amithm7">amithm7</a> /
-                                              <a href="https://github.com/arfshl">arfshl</a> /
-                                              <a href="https://github.com/badmojr">badmojr</a> /
-                                              <a href="https://github.com/bongochong">bongochong</a> /
-                                              <a href="https://github.com/elliotwutingfeng">elliotwutingfeng</a> /
-                                              <a href="https://github.com/georgyo">georgyo</a> /
-                                              <a href="https://github.com/GiddyGoatGaming">GiddyGoatGaming</a> /
-                                              <a href="https://github.com/Harish-Narayan">Harish-Narayan</a> /
-                                              <a href="https://github.com/ignoramous">ignoramous</a> /
-                                              <a href="https://github.com/JakeChampion">JakeChampion</a> /
-                                              <a href="https://github.com/MasterKia">MasterKia</a> /
-                                              <a href="https://github.com/mtxadmin">mtxadmin</a> /
-                                              <a href="https://github.com/neneeen">neneeen</a> /
-                                              <a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /
-                                              <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
-                                              <a href="https://github.com/shruuub">shruuub</a> /
-                                              <a href="https://github.com/shuvashish76">shuvashish76</a><br/>
-                                              <br/>⚜ Community mods <br/>
-                                              <a href="https://t.me/amithm7">amithm7</a> /
-                                              <a href="https://t.me/TronSlayer">Andersen</a> /
-                                              <a href="https://t.me/ppatra">ppatra</a> /
-                                               <a href="https://t.me/InFamous23">InFamous23</a> /
-                                              <a href="https://t.me/TheTr1ckst3r">TheTr1ckst3r</a> /
-                                              <a href="https://t.me/Ch4t4r">Ch4t4r</a> /
-                                              <a href="https://t.me/Billi_ance">Billi_ance</a> /
-                                              <a href="https://t.me/kaliangel">kaliangel</a> /
-                                              <a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>
-                                              <br/>📌 Geo-IP <br/>
-                                              <a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IPinfo Lite</a><br/>
-                                              <br/>❇ Translations <br/>
-                                              <a href="https://weblate.org/en/">Weblate</a><br/>
-                                              <br/>🦆 Icons <br/>
-                                              <a href="https://github.com/celzero/rethink-app/issues/346">Icons</a><br/>
-                                              <br/>📦 Build servers <br/>
-                                              <a href="https://jitpack.io/">JitPack</a> /
-                                              <a href="https://github.com/">GitHub</a> /
-                                              <a href="https://central.sonatype.com/">Sonatype</a><br/>
-                                              ]]></string>
+    <string name="contributors_list" translatable="true"><![CDATA["\"The <i>Проект «Переосмислити відкритий код» завдячує своїм існуванням цим волонтерам, які присвячують незліченну кількість годин його розробці.<br/>\n                                              <br/>🛡️ Android app <br/>\n                                              <a href=\"https://github.com/anthonyryan1\">Anthony Ryan</a> /\n                                              <a href=\"https://github.com/BayLee4\">BayLee4</a> /\n                                              <a href=\"https://github.com/Ch4t4r\">Ch4t4r</a> /\n                                              <a href=\"https://github.com/samthesamman\">CodingAttack</a> /\n                                              <a href=\"https://github.com/HrBDev\">HrBDev</a> /\n                                              <a href=\"https://github.com/hussainmohd-a\">hussainmohd-a</a> /\n                                              <a href=\"https://github.com/ignoramous\">ignoramous</a> /\n                                              <a href=\"https://github.com/ironveil\">ironveil</a> /\n                                              <a href=\"https://github.com/markwmuller\">markwmuller</a> /\n                                              <a href=\"https://github.com/mohammaduvez\">Mohammaduvez</a> /\n                                              <a href=\"https://github.com/Mygod\">Mygod</a> /\n                                              <a href=\"https://github.com/Poussinou\">Poussinou</a> /\n                                              <a href=\"https://github.com/pjosingh\">pjosingh</a> /\n                                              <a href=\"https://github.com/RohitSurwase\">RohitSurwase</a> /\n                                              <a href=\"https://github.com/ShantanuVichare\">Shantanu</a> /\n                                              <a href=\"https://github.com/Uldiniad\">Uldiniad</a><br/> /\n                                              <a href=\"https://github.com/yurtpage\">yurtpage</a><br/>\n                                              <br/>🚂 Network engine <br/>\n                                              <a href=\"https://github.com/alalamav\">alalamav</a> /\n                                              <a href=\"https://github.com/bemasc\">bemasc</a> /\n                                              <a href=\"https://github.com/dmcardle\">dmcardle</a> /\n                                              <a href=\"https://github.com/fortuna\">fortuna</a> /\n                                              <a href=\"https://github.com/ignoramous\">ignoramous</a> /\n                                              <a href=\"https://github.com/PeterDaveHello\">PeterDaveHello</a> /\n                                              <a href=\"https://github.com/santhosh-ponnusamy\">santhosh-ponnusamy</a> /\n                                              <a href=\"https://github.com/SeanBurford\">SeanBurford</a><br/>\n                                              <br/>📚 Resolver <br/>\n                                              <a href=\"https://github.com/ahmed-tasaly\">ahmed-tasaly</a> /\n                                              <a href=\"https://github.com/amithm7\">amithm7</a> /\n                                              <a href=\"https://github.com/arfshl\">arfshl</a> /\n                                              <a href=\"https://github.com/badmojr\">badmojr</a> /\n                                              <a href=\"https://github.com/bongochong\">bongochong</a> /\n                                              <a href=\"https://github.com/elliotwutingfeng\">elliotwutingfeng</a> /\n                                              <a href=\"https://github.com/georgyo\">georgyo</a> /\n                                              <a href=\"https://github.com/GiddyGoatGaming\">GiddyGoatGaming</a> /\n                                              <a href=\"https://github.com/Harish-Narayan\">Harish-Narayan</a> /\n                                              <a href=\"https://github.com/ignoramous\">ignoramous</a> /\n                                              <a href=\"https://github.com/JakeChampion\">JakeChampion</a> /\n                                              <a href=\"https://github.com/MasterKia\">MasterKia</a> /\n                                              <a href=\"https://github.com/mtxadmin\">mtxadmin</a> /\n                                              <a href=\"https://github.com/neneeen\">neneeen</a> /\n                                              <a href=\"https://github.com/PeterDaveHello\">PeterDaveHello</a> /\n                                              <a href=\"https://github.com/santhosh-ponnusamy\">santhosh-ponnusamy</a> /\n                                              <a href=\"https://github.com/shruuub\">shruuub</a> /\n                                              <a href=\"https://github.com/shuvashish76\">shuvashish76</a><br/>\n                                              <br/>⚜ Community mods <br/>\n                                              <a href=\"https://t.me/amithm7\">amithm7</a> /\n                                              <a href=\"https://t.me/TronSlayer\">Andersen</a> /\n                                              <a href=\"https://t.me/ppatra\">ppatra</a> /\n                                               <a href=\"https://t.me/InFamous23\">InFamous23</a> /\n                                              <a href=\"https://t.me/TheTr1ckst3r\">TheTr1ckst3r</a> /\n                                              <a href=\"https://t.me/Ch4t4r\">Ch4t4r</a> /\n                                              <a href=\"https://t.me/Billi_ance\">Billi_ance</a> /\n                                              <a href=\"https://t.me/kaliangel\">kaliangel</a> /\n                                              <a href=\"https://github.com/PoneyClairDeLune\">PoneyClairDeLune</a><br/>\n                                              <br/>📌 Geo-IP <br/>\n                                              <a href=\"https://db-ip.com\">db-ip.com</a> / <a href=\"https://ipinfo.io/lite\">IPinfo Lite</a><br/>\n                                              <br/>❇ Translations <br/>\n                                              <a href=\"https://weblate.org/en/\">Weblate</a><br/>\n                                              <br/>🦆 Icons <br/>\n                                              <a href=\"https://github.com/celzero/rethink-app/issues/346\">Icons</a><br/>\n                                              <br/>📦 Build servers <br/>\n                                              <a href=\"https://jitpack.io/\">JitPack</a> /\n                                              <a href=\"https://github.com/\">GitHub</a> /\n                                              <a href=\"https://central.sonatype.com/\">Sonatype</a><br/>\n                                              \""]]></string>
     <string name="univ_firewall_rule_2" translatable="true">Блокувати застосунки, які не використовуються</string>
     <string name="univ_firewall_rule_3" translatable="true">Блокувати, якщо джерело застосунку невідоме</string>
     <string name="fapps_info_dialog_message" translatable="true">Блокуйте підключення застосунків до Інтернету. Обмеження доступу до Інтернету допомагає запобігти невиправданому використанню даних, а також заощадити заряд акумулятора.</string>
@@ -302,11 +225,11 @@
     <string name="fapps_unmetered_unblock_dialog_message">Дозволити підключення до нелімітованої мережі (WiFi) для застосунків <i>зі списку</i>\?</string>
     <string name="fapps_metered_unblock_dialog_title" translatable="true">Дозволити в обмеженому режимі</string>
     <string name="fapps_unmetered_unblock_dialog_title" translatable="true">Дозволити в необмеженому режимі</string>
-    <string name="fapps_unmetered_block_dialog_message" translatable="true">Блокувати з\'єднання в нелімітованій мережі (WiFi) для <i>перелічених</i> застосунків\?</string>
+    <string name="fapps_unmetered_block_dialog_message" translatable="true">Блокувати з\'єднання в нелімітованій мережі (WiFi) для <i>перелічених</i> застосунків?</string>
     <string name="fapps_firewall_filter_hint" translatable="true">Показати усі застосунки</string>
     <string name="firewall_rule_foreground_desc" translatable="true"><![CDATA[This connection was firewalled because the source app was <i>не на передньому плані</i>.<br/><br/> Щоб змінити цю поведінку, перейдіть на вкладку <i>Універсальний</i>.]]></string>
     <string name="ada_app_isolate" translatable="true">Ізолювати</string>
-    <string name="rt_dialog_message" translatable="true">Ви хочете застосувати нещодавно налаштовані списки блокування\?</string>
+    <string name="rt_dialog_message" translatable="true">Ви хочете застосувати нещодавно налаштовані списки блокування?</string>
     <string name="brbs_restore_dialog_message" translatable="true">Відновіть налаштування застосунку, мережеві та dns журнали з файлу резервної копії. Це призведе до перезапуску застосунку.</string>
     <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[A user-set firewall rule blocked the <i>домен</i>.<br/><br/> Щоб змінити, перейдіть на екран <i>Брандмауер для конкретної програми</i>.]]></string>
     <string name="new_app_notification_action_toast_allow" translatable="true">Для застосунку дозволено підключення до мережі</string>
@@ -318,30 +241,28 @@
     <string name="always_on_dialog_heading" translatable="true">Вимкнути Постійно ввімкнений VPN</string>
     <string name="always_on_dialog_positive_btn" translatable="true">Перейти до налаштуваннях</string>
     <string name="always_on_dialog_stop_heading" translatable="true">Постійно ввімкнений VPN</string>
-    <string name="private_dns_dialog_desc" translatable="true">Налаштування DNS Rethink перевизначаються приватними DNS Android.
-\n
-\nЩоб використовувати DNS Rethink, перейдіть до налаштувань Android і вимкніть \"Приватний DNS\".</string>
-    <string name="univ_firewall_dialog_title" translatable="true">Видалити правило IP\?</string>
+    <string name="private_dns_dialog_desc" translatable="true">Налаштування DNS Rethink перевизначаються приватними DNS Android. \n \nЩоб використовувати DNS Rethink, перейдіть до налаштувань Android і вимкніть \"Приватний DNS\".</string>
+    <string name="univ_firewall_dialog_title" translatable="true">Видалити правило IP?</string>
     <string name="doh_custom_url_remove_success" translatable="true">Кінцева точка видалена.</string>
     <string name="lbl_rules" translatable="true">правила</string>
     <string name="bypass_dns_firewall" translatable="true">обхід dns та брандмауера</string>
     <string name="hybrid_mode_info_title" translatable="true">DNS + Брандмауер</string>
     <string name="alert_firewall_accessibility_exception" translatable="true">Не вдалося відкрити Налаштування доступності. Спробуйте пізніше!</string>
-    <string name="bsct_block_ip" translatable="true">Блокувати, довіряти <u>цю IP-адресу</u> для <u>цього застосунку</u></string>
-    <string name="bsct_block_domain" translatable="true">Блокувати, довіряти <u>домен(и)</u> для <u>цього застосунку</u></string>
+    <string name="bsct_block_ip" translatable="true">Блокувати, довіряти &lt;u&gt;цю IP-адресу&lt;/u&gt; для &lt;u&gt;цього застосунку&lt;/u&gt;</string>
+    <string name="bsct_block_domain" translatable="true">Блокувати, довіряти &lt;u&gt;домен(и)&lt;/u&gt; для &lt;u&gt;цього застосунку&lt;/u&gt;</string>
     <string name="bsct_conn_desc_allowed" translatable="true">дозволено на %1$s %2$s</string>
     <string name="bsct_conn_desc_blocked" translatable="true">заблоковано на %1$s %2$s</string>
     <string name="local_blocklist_download" translatable="true">Завантажити списки блокування</string>
     <string name="bsct_conn_block_desc" translatable="true">заблоковано %1$s за адресою %2$s</string>
     <string name="lbl_network" translatable="true">мережа</string>
     <string name="default_dns_name" translatable="true">RDNS за замовчуванням</string>
-    <string name="dns_query_clear_logs_title" translatable="true">Видалити всі журнали DNS\?</string>
-    <string name="always_on_dialog_stop_message" translatable="true">У Rethink ввімкнено постійний доступ до VPN. Ви дійсно хочете зупинити Rethink\?</string>
+    <string name="dns_query_clear_logs_title" translatable="true">Видалити всі журнали DNS?</string>
+    <string name="always_on_dialog_stop_message" translatable="true">У Rethink ввімкнено постійний доступ до VPN. Ви дійсно хочете зупинити Rethink?</string>
     <string name="private_dns_dialog_positive" translatable="true">Перейти до Налаштувань</string>
     <string name="dns_crypt_relay_remove_success" translatable="true">DNSCrypt Relay видалено.</string>
     <string name="dns_crypt_relay_remove_dialog_message" translatable="true">Видалити ретранслятор DNSCrypt зі збереженої конфігурації.</string>
     <string name="dns_proxy_remove_success" translatable="true">DNS проксі видалено.</string>
-    <string name="local_blocklist_download_desc" translatable="true">Завантажити списки блокування (близько 60 МБ), щоб використовувати цю функцію\?</string>
+    <string name="local_blocklist_download_desc" translatable="true">Завантажити списки блокування (близько 60 МБ), щоб використовувати цю функцію?</string>
     <string name="cd_dialog_error_invalid_wildcard" translatable="true">Недійсний символ підстановки або домен</string>
     <string name="title_statistics" translatable="true">Статистика</string>
     <string name="lbl_cancel" translatable="true">Скасувати</string>
@@ -354,31 +275,31 @@
     <string name="lbl_domain_rules" translatable="true">Правила домену</string>
     <string name="lbl_wildcard" translatable="true">Підставний символ</string>
     <string name="lbl_all" translatable="true">Усі</string>
-    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">Видалити DNSCrypt Relay\?</string>
+    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">Видалити DNSCrypt Relay?</string>
     <string name="lbl_dismiss" translatable="true">Відхилити</string>
     <string name="lbl_configure" translatable="true">Конфігурація</string>
     <string name="lbl_blocked" translatable="true">Заблоковані</string>
     <string name="lbl_maybe_blocked" translatable="true">Можливо заблоковані</string>
     <string name="lbl_logs" translatable="true">журнали</string>
     <string name="dns_firewall_mode_info_explanation_new" translatable="true">Все перераховане вище + обхід інтернет-цензури.</string>
-    <string name="conn_track_clear_logs_title" translatable="true">Видалити всі мережеві журнали\?</string>
+    <string name="conn_track_clear_logs_title" translatable="true">Видалити всі мережеві журнали?</string>
     <string name="dns_mode_info_explanation_new" translatable="true">Моніторинг, блокування та шифрування DNS-запитів.</string>
     <string name="alert_permission_accessibility" translatable="true">Дозвіл - Доступність</string>
     <string name="custom_url_error_invalid_url" translatable="true">Неправильна URL-адреса</string>
-    <string name="dns_query_clear_logs_message" translatable="true">Видалення журналів DNS на пристрої. Ця операція не є зворотною. Ви хочете продовжити\?</string>
+    <string name="dns_query_clear_logs_message" translatable="true">Видалення журналів DNS на пристрої. Ця операція не є зворотною. Ви хочете продовжити?</string>
     <string name="brave_dns_connect_mode_change_firewall" translatable="true">Виберіть режим.</string>
     <string name="brave_dns_connect_mode_change_dns" translatable="true">Виберіть режим.</string>
-    <string name="conn_track_clear_logs_message" translatable="true">При цьому видаляються лише мережеві журнали, але не правила брандмауера. Ця операція не є зворотною. Ви хочете продовжити\?</string>
+    <string name="conn_track_clear_logs_message" translatable="true">При цьому видаляються лише мережеві журнали, але не правила брандмауера. Ця операція не є зворотною. Ви хочете продовжити?</string>
     <string name="bsct_conn_block_desc_device" translatable="true">заблоковано %1$s на пристрої</string>
     <string name="firewall_act_universal_tab" translatable="true">універсальний</string>
-    <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">Видалити резолвер DNSCrypt\?</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">Видалити резолвер DNSCrypt?</string>
     <string name="dns_crypt_url_remove_dialog_message" translatable="true">Видаліть резолвер DNSCrypt із збереженої конфігурації.</string>
     <string name="firewall_act_network_monitor_tab" translatable="true">Мережа</string>
     <string name="doh_custom_url_remove_dialog_message" translatable="true">Видалити кінцеву точку DNS через Https зі збереженої конфігурації.</string>
     <string name="dns_crypt_url_remove_success" translatable="true">Резолвер DNSCrypt видалено.</string>
     <string name="dns_act_configure_tab" translatable="true">Конфігурація</string>
-    <string name="doh_custom_url_remove_dialog_title" translatable="true">Видалити кінцеву точку DoH\?</string>
-    <string name="dns_proxy_remove_dialog_title" translatable="true">Видалити DNS проксі\?</string>
+    <string name="doh_custom_url_remove_dialog_title" translatable="true">Видалити кінцеву точку DoH?</string>
+    <string name="dns_proxy_remove_dialog_title" translatable="true">Видалити DNS проксі?</string>
     <string name="dns_proxy_remove_dialog_message" translatable="true">Видалити DNS проксі зі збереженої конфігурації.</string>
     <string name="lbl_import" translatable="true">Імпортувати</string>
     <string name="lbl_allowed_ips" translatable="true">Дозволені IP-адреси</string>
@@ -516,9 +437,7 @@
     <string name="orbot_stop_dialog_title" translatable="true">Потрібне ручне втручання</string>
     <string name="settings_ptrans_desc" translatable="true">Перетворювати вихідний трафік з IPv6 на IPv4 на пристрої. Увімкніть, якщо ви підключені до мережі, яка підтримує лише IPv4.</string>
     <string name="settings_orbot_heading" translatable="true">Налаштування Orbot</string>
-    <string name="orbot_stop_dialog_message_combo" translatable="true">%1$s
-\n
-\n%2$s</string>
+    <string name="orbot_stop_dialog_message_combo" translatable="false">%1$s \n \n%2$s</string>
     <string name="orbot_both" translatable="true">TCP + HTTP Proxy</string>
     <string name="settings_socks5_desc" translatable="true">Перенаправляти з\'єднання на кінцевий пункт SOCKS5.</string>
     <string name="orbot_install_dialog_neutral" translatable="true">веб-сторінка</string>
@@ -662,16 +581,13 @@
     <string name="cd_dns_proxy_error_text_1" translatable="true">Некоректна IP адреса</string>
     <string name="ctbs_dialog_negative_btn" translatable="true">Назад</string>
     <string name="hs_download_positive_default" translatable="true">Добре</string>
-    <string name="dns_btm_resolved_crypt" translatable="true">дозволено <u>анонімно</u> %1$s по %2$s через %3$s</string>
+    <string name="dns_btm_resolved_crypt" translatable="true">дозволено &lt;u&gt;анонімно&lt;/u&gt; %1$s по %2$s через %3$s</string>
     <string name="ci_dialog_desc" translatable="true">Дозволити ОБІЙТИ або ЗАБЛОКУВАТИ: IP-адресу, IP-підмережу (діапазон), порт. Приклади: 10.10.10.10, 10.1.1.*, 10.2.2/24, ff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">Обходить DNS &amp; Firewall</string>
     <string name="http_proxy_dialog_desc" translatable="true">Налаштуйте URL-адресу форми, &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt;. Приклад: http://proxy.example.com:8080/</string>
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[This connection was allowed because the <i>Для програми-джерела</i> налаштовано <i>обхід правил DNS та брандмауера</i>.<br/><br/> Щоб змінити, перейдіть на екран <i>Брандмауер для конкретної програми</i>.]]></string>
     <string name="settings_pcap_heading" translatable="true">Перех-ня пакетів</string>
-    <string name="firewall_card_text_active" translatable="true">%1$s заблоковані
-\n%2$s обходять 
-\n%3$s виключені
-\n%4$s ізольовані</string>
+    <string name="firewall_card_text_active" translatable="true">%1$s заблоковані \n%2$s обходять \n%3$s виключені \n%4$s ізольовані</string>
     <string name="contributors_dialog_title" translatable="true">Автори</string>
     <string name="cd_dns_proxy_mode_internal" translatable="true">Внутрішній</string>
     <string name="cd_dns_proxy_mode_external" translatable="true">Зовнішній</string>
@@ -980,7 +896,7 @@
     <string name="ci_blocked_initial" translatable="true">Б</string>
     <string name="ci_delete" translatable="true">видалити</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen" translatable="true">Очистити log-журнали</string>
-    <string name="bsdl_block_desc" translatable="true">Заблокувати, довіряти<u>цьому домену</u></string>
+    <string name="bsdl_block_desc" translatable="true">Заблокувати, довіряти&lt;u&gt;цьому домену&lt;/u&gt;</string>
     <string name="notif_download_failure_content" translatable="true">Не вдалося завантажити. Спробуйте ще раз.</string>
     <string name="notif_download_success_content" translatable="true">Вдало завантажено.</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen" translatable="true">Блокування контенту для дорослих та піратського контенту, онлайн-гемблінгу (азартні ігри) та сайтів знайомств, а також соціальних мереж.</string>
@@ -1117,7 +1033,7 @@
     <string name="exclude_no_package_err_toast" translatable="true">Для виключення програм потрібна назва пакета.</string>
     <string name="hop_error_toast_msg_1" translatable="true">Не вдається ретранслювати, вже %1$s</string>
     <string name="hop_error_toast_msg_2" translatable="true">Для реле WireGuard недоступний; будь ласка, додайте більше.</string>
-    <string name="mode_change_error_proxy_enabled" translatable="true">Неможливо змінити режими, коли використовуються проксі-сервери. Натисніть, щоб <u>редагувати налаштування проксі-сервера</u>.</string>
+    <string name="mode_change_error_proxy_enabled" translatable="true">Неможливо змінити режими, коли використовуються проксі-сервери. Натисніть, щоб &lt;u&gt;редагувати налаштування проксі-сервера&lt;/u&gt;.</string>
     <string name="blocklist_not_available_toast" translatable="true">Щоб оновити списки блокування, завантажте останню версію.</string>
     <string name="lbl_ultra_secure" translatable="true">надбезпечний</string>
     <string name="adv_set_dial_timeout_title" translatable="true">Тайм-аут простою</string>
@@ -1162,8 +1078,6 @@
     <string name="vpn_policy_relaxed" translatable="true">Розслаблений</string>
     <string name="vpn_policy_relaxed_desc" translatable="true">Реагує на цікаві зміни в підключенні.</string>
     <string name="vpn_policy_title" translatable="true">Політика зміни підключення</string>
-    <string name="use_fallback_dns_to_bypass" translatable="true">Використовувати резервний DNS як обхідний</string>
-    <string name="use_fallback_dns_to_bypass_desc" translatable="true">Якщо ввімкнено, завжди використовується резервний DNS для обійдених програм, доменів та IP-адрес.</string>
     <string name="title_database_dump" translatable="true">База даних</string>
     <string name="copied_clipboard" translatable="true">Скопійовано</string>
     <string name="conn_track_clear_rule_logs_title" translatable="true">Видалити журнали для цього правила?</string>
@@ -1205,18 +1119,18 @@
     <string name="settings_tunnel_metered" translatable="true">Завжди з обліком</string>
     <string name="settings_tunnel_metered_desc" translatable="true">Позначте VPN-тунель Rethink як лімітований, щоб програми споживали менше даних. Увага: це може призвести до того, що програми призупинять великі завантаження та вивантаження, такі як резервні копії.</string>
     <string name="stability_program_toast" translatable="true">Зареєстровано в <i>програмі стабільності</i> для <i>експериментальних функцій</i>.</string>
-    <string name="search_event_logs" translatable="true"><font size="12">Пошук подій, повідомлень</font></string>
-    <string name="bug_report_files_desc" translatable="true">Виберіть файли, які потрібно включити до електронного листа зі звітом про помилку</string>
-    <string name="bug_report_deselect_all" translatable="true">Зняти вибір усіх</string>
-    <string name="bug_report_no_files_selected" translatable="true">Будь ласка, виберіть принаймні один файл</string>
-    <string name="bug_report_creating_zip" translatable="true">Створення архіву…</string>
-    <string name="bug_report_file_not_found" translatable="true">Файл не знайдено</string>
-    <string name="bug_report_error_opening_file" translatable="true">Не вдається відкрити цей тип файлу</string>
-    <string name="bug_report_delete_confirmation" translatable="true">Ви впевнені, що хочете видалити \"%1$s\"?</string>
-    <string name="bug_report_file_deleted" translatable="true">Файл \"%1$s\" видалено</string>
-    <string name="bug_report_delete_failed" translatable="true">Не вдалося видалити \"%1$s\"</string>
-    <string name="bug_report_no_files_available" translatable="true">Немає файлів звітів про помилки</string>
-    <string name="cd_allowed_dns_record_types_heading" translatable="true">Дозволені типи DNS-записів</string>
-    <string name="cd_allowed_dns_record_types_desc" translatable="true">Виберіть, які типи записів ресурсів DNS дозволити.</string>
+    <string name="search_event_logs" translatable="false"><font size="12">Пошук подій, повідомлень</font></string>
+    <string name="bug_report_files_desc" translatable="false">Виберіть файли, які потрібно включити до електронного листа зі звітом про помилку</string>
+    <string name="bug_report_deselect_all" translatable="false">Зняти вибір усіх</string>
+    <string name="bug_report_no_files_selected" translatable="false">Будь ласка, виберіть принаймні один файл</string>
+    <string name="bug_report_creating_zip" translatable="false">Створення архіву…</string>
+    <string name="bug_report_file_not_found" translatable="false">Файл не знайдено</string>
+    <string name="bug_report_error_opening_file" translatable="false">Не вдається відкрити цей тип файлу</string>
+    <string name="bug_report_delete_confirmation" translatable="false">Ви впевнені, що хочете видалити \"%1$s\"?</string>
+    <string name="bug_report_file_deleted" translatable="false">Файл \"%1$s\" видалено</string>
+    <string name="bug_report_delete_failed" translatable="false">Не вдалося видалити \"%1$s\"</string>
+    <string name="bug_report_no_files_available" translatable="false">Немає файлів звітів про помилки</string>
+    <string name="cd_allowed_dns_record_types_heading" translatable="false">Дозволені типи DNS-записів</string>
+    <string name="cd_allowed_dns_record_types_desc" translatable="false">Виберіть, які типи записів ресурсів DNS дозволити.</string>
     <string name="dns_record_types_auto_mode_status" translatable="true">Автоматичний (усі типи)</string>
 </resources>
