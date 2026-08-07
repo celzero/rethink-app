@@ -127,7 +127,7 @@ class Config private constructor(builder: Builder) {
      *
      * @return the `Config` represented as a series of "key=value" lines
      */
-    fun toWgUserspaceString(skipListenPort: Boolean = false, isAmz: Boolean = false): String {
+    suspend fun toWgUserspaceString(skipListenPort: Boolean = false, isAmz: Boolean = false): String {
         // Skip the listen port if we're in advanced mode or randomize (adv) setting is enabled.
         val sb = StringBuilder()
         sb.append(wgInterface?.toWgUserspaceString(skipListenPort).orEmpty())

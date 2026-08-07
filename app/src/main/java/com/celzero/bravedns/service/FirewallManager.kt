@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.service
 
-import Logger
-import Logger.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_FIREWALL
 import android.app.KeyguardManager
 import android.content.Context
 import android.content.Intent
@@ -46,6 +46,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.Collections
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -92,7 +93,7 @@ object FirewallManager : KoinComponent {
         EXCLUDE(3),
         ISOLATE(4),
         NONE(5),
-        UNTRACKED(6),
+        // UNTRACKED(6), unused, remove in future
         BYPASS_DNS_FIREWALL(7);
 
         companion object {
@@ -190,11 +191,6 @@ object FirewallManager : KoinComponent {
 
         fun isolate(): Boolean {
             return this == ISOLATE
-        }
-
-        // even invalid uids are considered as untracked
-        fun isUntracked(): Boolean {
-            return this == UNTRACKED
         }
     }
 
@@ -301,7 +297,7 @@ object FirewallManager : KoinComponent {
         var appInfos: Multimap<Int, AppInfo> = HashMultimap.create()
 
         // TODO: protect access to the foregroundUids (read/write)
-        @Volatile var foregroundUids: HashSet<Int> = HashSet()
+        @Volatile var foregroundUids: MutableSet<Int> = Collections.synchronizedSet(HashSet())
 
         var appInfosLiveData: MutableLiveData<Collection<AppInfo>> = MutableLiveData()
 
@@ -399,7 +395,8 @@ object FirewallManager : KoinComponent {
     }
 
     suspend fun isUidFirewalled(uid: Int): Boolean {
-        return connectionStatus(uid) != ConnectionStatus.ALLOW
+        // see if the UID is firewalled in both metered and unmetered
+        return connectionStatus(uid) == ConnectionStatus.BOTH
     }
 
     suspend fun isUidSystemApp(uid: Int): Boolean {
@@ -410,7 +407,7 @@ object FirewallManager : KoinComponent {
 
     suspend fun getAllApps(): Set<AppInfoTuple> {
         mutex.withLock {
-            // only return apps that are not tombstoned
+            // return all apps including tombstoned ones; callers filter if needed
             return appInfos.values().map { AppInfoTuple(it.uid, it.packageName) }.toSet()
         }
     }
@@ -431,20 +428,34 @@ object FirewallManager : KoinComponent {
                 }
             }
         }
-        db.tombstoneApp(newUid, uid, packageName, ts)
+        db.tombstoneApp(uid, newUid, packageName, ts)
         Logger.d(LOG_TAG_FIREWALL, "tombstone app: $packageName, uid: $uid, ts: $ts, newUid: $newUid")
         informObservers()
     }
 
     suspend fun deletePackage(uid: Int, packageName: String?) {
         mutex.withLock {
-            appInfos
-                .values()
-                .filter { it.packageName == packageName }
-                .forEach { appInfos.remove(it.uid, it) }
+            val iter = appInfos.get(uid).iterator()
+            while (iter.hasNext()) {
+                val ai = iter.next()
+                if (ai.packageName == packageName) {
+                    iter.remove() // safe removal while iterating
+                    break
+                }
+            }
         }
         // Delete the uninstalled apps from database
         db.deletePackage(uid, packageName)
+    }
+
+    suspend fun clearAllApps() {
+        mutex.withLock { appInfos.clear() }
+        try {
+            db.deleteAll()
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_FIREWALL, "clearAllApps failed", e)
+        }
+        informObservers()
     }
 
     suspend fun getNonFirewalledAppsPackageNames(): List<AppInfo> {
@@ -486,7 +497,7 @@ object FirewallManager : KoinComponent {
     }
 
     suspend fun appStatus(uid: Int): FirewallStatus {
-        val appInfo = getAppInfoByUid(uid) ?: return FirewallStatus.UNTRACKED
+        val appInfo = getAppInfoByUid(uid) ?: return FirewallStatus.NONE
 
         return when (appInfo.firewallStatus) {
             FirewallStatus.BYPASS_UNIVERSAL.id -> FirewallStatus.BYPASS_UNIVERSAL
@@ -685,23 +696,54 @@ object FirewallManager : KoinComponent {
         val appInfo = getAppInfoByUid(oldUid)
         Logger.i(LOG_TAG_FIREWALL, "updateUidAndResetTombstone: $oldUid -> $newUid; has? ${appInfo?.packageName} == $pkg")
         val now = System.currentTimeMillis()
+        var mutatedAi: AppInfo? = null
+        var originalTombstoneTs = 0L
         mutex.withLock {
             val iter = appInfos.get(oldUid).iterator()
             while (iter.hasNext()) {
                 val ai = iter.next()
                 if (ai.packageName == pkg) {
                     iter.remove() // safe removal while iterating
+                    originalTombstoneTs = ai.tombstoneTs
                     ai.uid = newUid
                     ai.tombstoneTs = 0
                     ai.modifiedTs = now
                     appInfos.put(newUid, ai)
+                    mutatedAi = ai
                     cacheok = true
                     break
                 }
             }
         }
 
-        val dbok = db.updateUid(oldUid, newUid, pkg)
+        val dbok = try {
+            db.updateUid(oldUid, newUid, pkg)
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_FIREWALL, "updateUid failed for ($oldUid, $pkg) -> $newUid; attempting delete+insert fallback", e)
+            try {
+                val ai = getAppInfoByUid(newUid)
+                if (ai != null) {
+                    db.deletePackage(oldUid, pkg)
+                    db.insert(ai)
+                    1
+                } else {
+                    0
+                }
+            } catch (e2: Exception) {
+                Logger.w(LOG_TAG_FIREWALL, "updateUid fallback also failed", e2)
+                // Rollback cache mutation to stay consistent with DB (which still has oldUid)
+                if (cacheok && mutatedAi != null) {
+                    mutex.withLock {
+                        appInfos.remove(newUid, mutatedAi)
+                        mutatedAi.uid = oldUid
+                        mutatedAi.tombstoneTs = originalTombstoneTs
+                        appInfos.put(oldUid, mutatedAi)
+                    }
+                    Logger.w(LOG_TAG_FIREWALL, "rolled back cache for $pkg: $newUid -> $oldUid")
+                }
+                0
+            }
+        }
         Logger.d(LOG_TAG_FIREWALL, "update: $pkg; $oldUid -> $newUid; c? $cacheok; db? $dbok")
         informObservers()
     }
@@ -714,7 +756,12 @@ object FirewallManager : KoinComponent {
     }
 
     suspend fun load(): Int {
-        val apps = db.getAppInfo()
+        val apps = try {
+            db.getAppInfo()
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_FIREWALL, "load db failed", e)
+            return 0
+        }
         if (apps.isEmpty()) {
             Logger.w(LOG_TAG_FIREWALL, "no apps found in db, no app-based rules to load")
             return 0
@@ -774,8 +821,13 @@ object FirewallManager : KoinComponent {
     }
 
     suspend fun updateFirewalledApps(uid: Int, connectionStatus: ConnectionStatus) {
+        try {
+            db.updateFirewallStatusByUid(uid, FirewallStatus.NONE.id, connectionStatus.id)
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_FIREWALL, "updateFirewalledApps db failed for uid $uid", e)
+            return
+        }
         invalidateFirewallStatus(uid, FirewallStatus.NONE, connectionStatus)
-        db.updateFirewallStatusByUid(uid, FirewallStatus.NONE.id, connectionStatus.id)
     }
 
     suspend fun updateFirewallStatus(
@@ -792,12 +844,23 @@ object FirewallManager : KoinComponent {
             return
         }
 
+        try {
+            db.updateFirewallStatusByUid(uid, firewallStatus.id, connectionStatus.id)
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_FIREWALL, "updateFirewallStatus db failed for uid $uid", e)
+            return
+        }
         invalidateFirewallStatus(uid, firewallStatus, connectionStatus)
-        db.updateFirewallStatusByUid(uid, firewallStatus.id, connectionStatus.id)
     }
 
     suspend fun updateTempAllowStatus(uid: Int, durationMinutes: Int = TEMP_ALLOW_DEFAULT_MINUTES) {
         Logger.i(LOG_TAG_FIREWALL, "Apply temporary allow for uid: $uid for $durationMinutes minutes")
+
+        if (durationMinutes <= 0) {
+            Logger.w(LOG_TAG_FIREWALL, "Invalid duration ($durationMinutes) for uid $uid, reverting temp allow")
+            revertTempAllow(uid)
+            return
+        }
 
         val expiryTime = System.currentTimeMillis() + (durationMinutes * 60 * 1000L)
 
@@ -812,8 +875,13 @@ object FirewallManager : KoinComponent {
     private suspend fun revertTempAllow(uid: Int) {
         Logger.i(LOG_TAG_FIREWALL, "Reverting temporary allow for uid: $uid")
 
+        try {
+            db.clearTempAllowByUid(uid)
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_FIREWALL, "revertTempAllow db failed for uid $uid", e)
+            return
+        }
         tempAllowCache.invalidate(uid)
-        db.clearTempAllowByUid(uid)
 
         // schedule/cancel based on remaining entries (DB is source of truth)
         scheduleTempAllowExpiryIfPossible()
@@ -903,9 +971,6 @@ object FirewallManager : KoinComponent {
             FirewallStatus.ISOLATE -> {
                 R.string.isolate
             }
-            FirewallStatus.UNTRACKED -> {
-                R.string.untracked
-            }
             FirewallStatus.BYPASS_DNS_FIREWALL -> {
                 R.string.bypass_dns_firewall
             }
@@ -914,6 +979,12 @@ object FirewallManager : KoinComponent {
 
     fun updateIsProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
         io {
+            try {
+                db.updateProxyExcluded(uid, isProxyExcluded)
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_FIREWALL, "updateIsProxyExcluded db failed for uid $uid", e)
+                return@io
+            }
             val now = System.currentTimeMillis()
             mutex.withLock {
                 appInfos.get(uid).forEach {
@@ -921,7 +992,6 @@ object FirewallManager : KoinComponent {
                     it.modifiedTs = now
                 }
             }
-            db.updateProxyExcluded(uid, isProxyExcluded)
             informObservers()
         }
     }
@@ -938,6 +1008,28 @@ object FirewallManager : KoinComponent {
                 emptyList()
             }
         }
+    }
+
+    suspend fun exemptRethinkApp(rethinkUid: Int) {
+        try {
+            db.exemptRethinkApp()
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_FIREWALL, "exemptRethinkApp db failed for uid $rethinkUid", e)
+            return
+        }
+        mutex.withLock {
+            val appInfo = appInfos[rethinkUid].firstOrNull()
+            if (appInfo == null) {
+                Logger.e(LOG_TAG_FIREWALL, "appInfo is null for uid: $rethinkUid")
+                return@withLock
+            }
+
+            appInfo.connectionStatus = ConnectionStatus.ALLOW.id
+            appInfo.firewallStatus = FirewallStatus.BYPASS_DNS_FIREWALL.id
+            appInfo.isProxyExcluded = true
+            appInfo.modifiedTs = System.currentTimeMillis()
+        }
+        informObservers()
     }
 
     suspend fun isAppExcludedFromProxy(uid: Int): Boolean {

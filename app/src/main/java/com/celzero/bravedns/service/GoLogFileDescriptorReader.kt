@@ -15,10 +15,10 @@
  */
 package com.celzero.bravedns.service
 
-import Logger
-import Logger.LOG_GO_LOGGER
-import Logger.LOG_TAG_BUG_REPORT
-import Logger.LOG_TAG_VPN
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_GO_LOGGER
+import com.celzero.bravedns.util.Logger.LOG_TAG_BUG_REPORT
+import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
@@ -63,7 +63,7 @@ class GoLogFileDescriptorReader(
 ) {
     private var appContext: Context? = null
 
-    @Volatile private var prevLogLevel: Logger.LoggerLevel = Logger.LoggerLevel.VERY_VERBOSE
+    @Volatile private var prevLogLevel: Logger.LoggerLevel = Logger.LoggerLevel.INFO
     private var writer: BufferedWriter? = null
 
     companion object {
@@ -91,13 +91,8 @@ class GoLogFileDescriptorReader(
         val ownedFd = FdHelper.duplicate(fd, TAG) ?: return false
         Logger.d(LOG_TAG_BUG_REPORT, "$TAG start: fd duplicated, launching read loop")
 
-        // One coroutine: createCrashFile() completes, then readLoop() starts.
-        // writer is guaranteed non-null for the entire duration of readLoop().
         scope.launch(CoroutineName("goLogFd") + dispatcher) {
-            if (createCrashFile() == null) {
-                Logger.e(LOG_TAG_BUG_REPORT, "$TAG start: failed to create log file, err logs may not be available")
-            }
-            writeLine("Init GoLog->")
+            createCrashFile()
             readLoop(ownedFd)
         }
         return true
@@ -185,19 +180,17 @@ class GoLogFileDescriptorReader(
     }
 
     /**
-     * Appends [line] to the session file.
-     * [writer] is always non-null here [createCrashFile] ran before [readLoop] in the
-     * same coroutine.  The null-guard is a last-resort safety net only.
+     * Appends [line] to the session file, creating the file lazily on first call.
      */
     private fun writeLine(line: String) {
         try {
-            val w = writer ?: run {
-                Logger.e(LOG_TAG_BUG_REPORT, "$TAG writeLine: writer is null, line dropped")
+            if (writer == null && createCrashFile() == null) {
+                Logger.e(LOG_TAG_BUG_REPORT, "$TAG writeLine: failed to create log file, line dropped")
                 return
             }
-            w.write(line)
-            w.newLine()
-            w.flush() // flush per line so data survives a process crash mid-session
+            writer!!.write(line)
+            writer!!.newLine()
+            writer!!.flush() // flush per line so data survives a process crash mid-session
         } catch (e: Exception) {
             Logger.e(LOG_TAG_BUG_REPORT, "$TAG writeLine: write failed: ${e.message}", e)
         }

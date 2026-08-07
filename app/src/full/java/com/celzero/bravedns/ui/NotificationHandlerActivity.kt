@@ -15,9 +15,9 @@
  */
 package com.celzero.bravedns.ui
 
-import Logger
-import Logger.LOG_TAG_UI
-import Logger.LOG_TAG_VPN
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -50,6 +50,7 @@ import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_IAB_DEVI
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_IAB_DEVICE_AUTH_ERROR_VALUE
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_IAB_DEVICE_NOT_REGISTERED_NAME
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_IAB_DEVICE_NOT_REGISTERED_VALUE
+import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
@@ -97,7 +98,7 @@ class NotificationHandlerActivity: BaseActivity() {
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
         handleNotificationIntent(intent)

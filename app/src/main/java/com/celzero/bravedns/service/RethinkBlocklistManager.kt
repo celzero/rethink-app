@@ -15,9 +15,9 @@
  */
 package com.celzero.bravedns.service
 
-import Logger
-import Logger.LOG_TAG_DNS
-import Logger.LOG_TAG_VPN
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
+import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import android.content.Context
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.FileTag
@@ -190,7 +190,7 @@ object RethinkBlocklistManager : KoinComponent {
         } catch (ioException: IOException) {
             Logger.e(
                 LOG_TAG_DNS,
-                "Failure reading json file, blocklist type: remote, timestamp: $timestamp",
+                "Failure reading json file, blocklist type: local, timestamp: $timestamp",
                 ioException
             )
         }
@@ -372,8 +372,21 @@ object RethinkBlocklistManager : KoinComponent {
     suspend fun getStamp(fileValues: Set<Int>, type: RethinkBlocklistType): String {
         return try {
             val flags = convertListToCsv(fileValues)
-            val flags2Stamp = getRDNS(type)?.flagsToStamp(flags, Backend.EB32) ?: ""
-            Logger.d(LOG_TAG_VPN, "${type.name} flags: $flags; stamp: $flags2Stamp")
+            val rdns = getRDNS(type)
+            if (rdns == null) {
+                // Common when configuring Remote DNS while the VPN is stopped:
+                // rdnsRemote is only available through the live Go resolver.
+                // Returning "" here is intentional, but callers must NOT treat
+                // "" as "the user cleared the selection" when fileValues is
+                // non-empty (see RethinkBlocklistFragment observer / setStamp).
+                Logger.w(
+                    LOG_TAG_VPN,
+                    "getStamp: RDNS unavailable for ${type.name}; cannot encode ${fileValues.size} flags"
+                )
+                return ""
+            }
+            val flags2Stamp = rdns.flagsToStamp(flags, Backend.EB32)
+            Logger.d(LOG_TAG_VPN, "${type.name} flags: $flags; stamp-len: ${flags2Stamp.length}")
             flags2Stamp
         } catch (e: java.lang.Exception) {
             Logger.e(LOG_TAG_VPN, "err stamp2tags for $fileValues of type: ${type.name} ${e.message}, $e")
@@ -383,8 +396,16 @@ object RethinkBlocklistManager : KoinComponent {
 
     suspend fun getTagsFromStamp(stamp: String, type: RethinkBlocklistType): Set<Int> {
         return try {
-            val tags = convertCsvToList(getRDNS(type)?.stampToFlags(stamp))
-            Logger.d(LOG_TAG_VPN, "${type.name} stamp: $stamp; tags: $tags")
+            val rdns = getRDNS(type)
+            if (rdns == null) {
+                Logger.w(
+                    LOG_TAG_VPN,
+                    "getTagsFromStamp: RDNS unavailable for ${type.name}; stamp='${stamp.take(32)}'"
+                )
+                return setOf()
+            }
+            val tags = convertCsvToList(rdns.stampToFlags(stamp))
+            Logger.d(LOG_TAG_VPN, "${type.name} stamp-len: ${stamp.length}; tags: $tags")
             tags
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "err tags2stamp for $stamp of type: ${type.name} ${e.message}, $e")
@@ -393,9 +414,21 @@ object RethinkBlocklistManager : KoinComponent {
     }
 
     private fun convertCsvToList(csv: String?): Set<Int> {
-        if (csv == null) return setOf()
+        if (csv.isNullOrBlank()) return setOf()
 
-        return csv.split(",").map { it.toIntOrNull() ?: 0 }.toSet()
+        // Earlier, an empty/blank string was split into [""] which then mapped to 0
+        // via `toIntOrNull() ?: 0`, producing a phantom tag with value 0. That 0
+        // never matches any row in the file-tag tables, so the subsequent
+        // `getSelectedFileTags*()` reads returned an empty set and clobbered the
+        // in-memory selection. Filter blank tokens and drop unparseable ones
+        // instead of substituting 0. See issue: Advanced Mode (Remote DNS) loses
+        // the blocklist selection.
+        return csv.split(",")
+            .asSequence()
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .mapNotNull { it.toIntOrNull() }
+            .toSet()
     }
 
     private fun convertListToCsv(s: Set<Int>): String {

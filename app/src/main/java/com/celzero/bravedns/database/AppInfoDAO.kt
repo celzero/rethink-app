@@ -22,6 +22,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.celzero.bravedns.data.DataUsage
 
@@ -62,6 +63,20 @@ interface AppInfoDAO {
 
     @Query("update AppInfo set uid = :newUid, tombstoneTs = :tombstoneTs, modifiedTs = :modifiedTs where uid = :oldUid")
     fun tombstoneApp(oldUid: Int, newUid: Int, tombstoneTs: Long, modifiedTs: Long)
+
+    // clear stale values before updating
+    @Transaction
+    fun tombstoneAppWithPkg(newUid: Int, uid: Int, packageName: String, tombstoneTs: Long, modifiedTs: Long) {
+        deletePackage(newUid, packageName)
+        tombstoneApp(newUid, uid, packageName, tombstoneTs, modifiedTs)
+    }
+
+    // clear stale values before updating
+    @Transaction
+    fun tombstoneAppByUid(oldUid: Int, newUid: Int, tombstoneTs: Long, modifiedTs: Long) {
+        deleteByUid(newUid)
+        tombstoneApp(oldUid, newUid, tombstoneTs, modifiedTs)
+    }
 
     @Query("select * from AppInfo order by appCategory, uid") fun getAllAppDetails(): List<AppInfo>
 
@@ -158,6 +173,8 @@ interface AppInfoDAO {
 
     @Query("delete from AppInfo where uid = :uid") fun deleteByUid(uid: Int): Int
 
+    @Query("delete from AppInfo") fun deleteAll()
+
     @Query(
         "select uid as uid, downloadBytes as downloadBytes, uploadBytes as uploadBytes from AppInfo where uid = :uid"
     )
@@ -174,11 +191,8 @@ interface AppInfoDAO {
     @Query("select uid from AppInfo where packageName = :packageName")
     fun getAppInfoUidForPackageName(packageName: String): Int
 
-    @Query("update AppInfo set isProxyExcluded = :bypass where packageName = 'com.celzero.bravedns'")
-    fun setRethinkToBypassProxy(bypass: Boolean)
-
-    @Query("update AppInfo set firewallStatus = 7 and connectionStatus = 3 where packageName = 'com.celzero.bravedns'")
-    fun setRethinkToBypassDnsAndFirewall()
+    @Query("update AppInfo set firewallStatus = 7, connectionStatus = 3, isProxyExcluded = 1 where packageName = 'com.celzero.bravedns'")
+    fun exemptRethinkApp()
 
     @Query("select * from AppInfo where tempAllowEnabled = 1 and tempAllowExpiryTime > 0")
     suspend fun getTempAllowedApps(): List<AppInfo>

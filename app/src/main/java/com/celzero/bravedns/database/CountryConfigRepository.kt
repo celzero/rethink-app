@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.database
 
-import Logger
-import Logger.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import androidx.room.Transaction
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
 
@@ -109,7 +109,7 @@ class CountryConfigRepository(private val countryConfigDAO: CountryConfigDAO) {
     }
 
     suspend fun incrementSelectionCount(key: String) {
-        if (key.isBlank() || key == AUTO_SERVER_ID) return
+        if (key.isBlank() || key.equals(AUTO_SERVER_ID, true)) return
         countryConfigDAO.incrementSelectionCount(key)
         Logger.d(LOG_TAG_PROXY, "$TAG.incrementSelectionCount: key=$key")
     }

@@ -16,6 +16,7 @@
 package com.celzero.bravedns.adapter
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -48,8 +49,8 @@ class ServerOrderHistoryAdapter(private val context: Context) :
                 old == new
         }
 
-        private val DATE_FMT = SimpleDateFormat("MMM dd, yyyy  hh:mm a", Locale.getDefault())
-        private val DATE_ONLY = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+        private val DATE_FMT = SimpleDateFormat("MMM dd, yyyy  hh:mm a", Locale.ENGLISH)
+        private val DATE_ONLY = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderViewHolder {
@@ -79,27 +80,27 @@ class ServerOrderHistoryAdapter(private val context: Context) :
         private fun bindTypeBadge(entry: ServerOrderEntry) {
             if (entry.isSubscription) {
                 b.tvTypeBadge.text = context.getString(R.string.server_order_type_subscription)
-                b.tvTypeBadge.backgroundTintList = ContextCompat.getColorStateList(
-                    context, R.color.chipBackgroundColor
+                b.tvTypeBadge.backgroundTintList = ColorStateList.valueOf(
+                    UIUtils.fetchColor(context, R.attr.chipBgColorPositive)
                 )
                 b.tvTypeBadge.setTextColor(
                     UIUtils.fetchColor(context, R.attr.chipTextPositive)
                 )
                 b.ivTypeIcon.setImageResource(R.drawable.ic_rethink_plus)
-                b.ivTypeIcon.imageTintList = ContextCompat.getColorStateList(
-                    context, R.color.chipBackgroundColor
+                b.ivTypeIcon.imageTintList = ColorStateList.valueOf(
+                    UIUtils.fetchColor(context, R.attr.chipBgColorPositive)
                 )
             } else {
-                b.tvTypeBadge.text = context.getString(R.string.server_order_type_onetime)
-                b.tvTypeBadge.backgroundTintList = ContextCompat.getColorStateList(
-                    context, R.color.chipBgNeutral
+                b.tvTypeBadge.text = context.getString(R.string.one_time_label).uppercase(Locale.ROOT)
+                b.tvTypeBadge.backgroundTintList = ColorStateList.valueOf(
+                    UIUtils.fetchColor(context, R.attr.chipBgColorNeutral)
                 )
                 b.tvTypeBadge.setTextColor(
                     UIUtils.fetchColor(context, R.attr.chipTextNeutral)
                 )
                 b.ivTypeIcon.setImageResource(R.drawable.ic_rethink_plus_sparkle)
-                b.ivTypeIcon.imageTintList = ContextCompat.getColorStateList(
-                    context, R.color.chipBgNeutral
+                b.ivTypeIcon.imageTintList = ColorStateList.valueOf(
+                    UIUtils.fetchColor(context, R.attr.chipBgColorNeutral)
                 )
             }
         }
@@ -107,8 +108,8 @@ class ServerOrderHistoryAdapter(private val context: Context) :
         private fun bindStatusChip(entry: ServerOrderEntry) {
             val (label, bgAttr, textAttr) = statusStyle(entry)
             b.tvStatusChip.text = label
-            b.tvStatusChip.backgroundTintList = ContextCompat.getColorStateList(
-                context, bgAttr
+            b.tvStatusChip.backgroundTintList = ColorStateList.valueOf(
+                UIUtils.fetchColor(context, bgAttr)
             )
             b.tvStatusChip.setTextColor(UIUtils.fetchColor(context, textAttr))
         }
@@ -121,27 +122,27 @@ class ServerOrderHistoryAdapter(private val context: Context) :
                 return when (entry.subscriptionState) {
                     ServerOrderEntry.STATE_ACTIVE -> Triple(
                         context.getString(R.string.lbl_active),
-                        R.color.chipBackgroundColor,
+                        R.attr.chipBgColorPositive,
                         R.attr.chipTextPositive
                     )
                     ServerOrderEntry.STATE_CANCELLED -> Triple(
                         context.getString(R.string.lbl_cancelled),
-                        R.color.chipBgNegative,
+                        R.attr.chipBgColorNegative,
                         R.attr.chipTextNegative
                     )
                     ServerOrderEntry.STATE_EXPIRED -> Triple(
                         context.getString(R.string.lbl_expired),
-                        R.color.chipBgNeutral,
+                        R.attr.chipBgColorNeutral,
                         R.attr.chipTextNeutral
                     )
                     ServerOrderEntry.STATE_PAUSED -> Triple(
                         context.getString(R.string.lbl_paused),
-                        R.color.chipBgNeutral,
+                        R.attr.chipBgColorNeutral,
                         R.attr.chipTextNeutral
                     )
                     ServerOrderEntry.STATE_ON_HOLD -> Triple(
                         context.getString(R.string.server_selection_sub_on_hold),
-                        R.color.chipBgNeutral,
+                        R.attr.chipBgColorNeutral,
                         R.attr.chipTextNeutral
                     )
                     else -> Triple(
@@ -151,25 +152,30 @@ class ServerOrderHistoryAdapter(private val context: Context) :
                             ?.lowercase()
                             ?.replaceFirstChar { it.uppercase() }
                             ?: context.getString(R.string.network_log_app_name_unknown),
-                        R.color.chipBgNeutral,
+                        R.attr.chipBgColorNeutral,
                         R.attr.primaryLightColorText
                     )
                 }
             } else {
                 return when (entry.purchaseState) {
-                    0 -> Triple(
+                    ServerOrderEntry.PURCHASE_STATE_PURCHASED -> Triple(
                         context.getString(R.string.rpn_purchased_state),
-                        R.color.chipBackgroundColor,
+                        R.attr.chipBgColorPositive,
                         R.attr.chipTextPositive
                     )
-                    2 -> Triple(
+                    ServerOrderEntry.PURCHASE_STATE_CANCELLED -> Triple(
+                        context.getString(R.string.lbl_cancelled),
+                        R.attr.chipBgColorNegative,
+                        R.attr.chipTextNegative
+                    )
+                    ServerOrderEntry.PURCHASE_STATE_PENDING -> Triple(
                         context.getString(R.string.payment_history_state_pending),
-                        R.color.chipBgNeutral,
+                        R.attr.chipBgColorNeutral,
                         R.attr.chipTextNeutral
                     )
                     else -> Triple(
                         context.getString(R.string.network_log_app_name_unknown),
-                        R.color.chipBgNeutral,
+                        R.attr.chipBgColorNeutral,
                         R.attr.primaryLightColorText
                     )
                 }
@@ -194,13 +200,22 @@ class ServerOrderHistoryAdapter(private val context: Context) :
                 val startLabel = if (entry.startTimeMs > 0)
                     context.getString(R.string.server_order_started_fmt,
                         DATE_ONLY.format(Date(entry.startTimeMs))) else ""
-                val expiryLabel = if (entry.expiryTimeMs > 0)
-                    context.getString(R.string.server_order_expires_fmt,
-                        DATE_ONLY.format(Date(entry.expiryTimeMs))) else ""
-                val renewIcon = if (entry.autoRenewEnabled) " ↻" else " ✕"
 
                 b.tvDatePrimary.text = startLabel.ifEmpty { DATE_FMT.format(Date(entry.mtime)) }
-                val secondaryText = if (expiryLabel.isNotEmpty()) "$expiryLabel$renewIcon" else ""
+
+                val now = System.currentTimeMillis()
+                val expiryPassed = entry.expiryTimeMs in 1..now
+                val showExpiry = !entry.autoRenewEnabled || expiryPassed
+
+                val secondaryText = if (showExpiry) {
+                    if (entry.expiryTimeMs > 0)
+                        context.getString(R.string.server_order_expires_fmt,
+                            DATE_ONLY.format(Date(entry.expiryTimeMs)))
+                    else ""
+                } else {
+                    context.getString(R.string.server_order_auto_renew, DATE_ONLY.format(Date(entry.expiryTimeMs)))
+                }
+
                 b.tvDateSecondary.text = secondaryText
                 b.tvDateSecondary.visibility =
                     if (secondaryText.isNotEmpty()) View.VISIBLE else View.GONE
@@ -236,4 +251,3 @@ class ServerOrderHistoryAdapter(private val context: Context) :
         }
     }
 }
-

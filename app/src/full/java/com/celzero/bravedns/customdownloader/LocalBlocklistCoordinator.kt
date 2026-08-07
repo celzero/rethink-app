@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.customdownloader
 
-import Logger
-import Logger.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_DOWNLOAD
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -456,32 +456,31 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
             val channel = NotificationChannel(DOWNLOAD_NOTIFICATION_TAG, name, importance)
             channel.description = description
             getNotificationManager(context).createNotificationChannel(channel)
-            builder = NotificationCompat.Builder(context, DOWNLOAD_NOTIFICATION_TAG)
-            val contentText = context.getString(R.string.notif_download_content_text)
-            val contentTitle = context.getString(R.string.notif_download_content_title)
-
-            builder
-                .setSmallIcon(R.drawable.ic_notification_icon)
-                .setContentTitle(contentTitle)
-                .setContentIntent(getPendingIntent(context))
-                .setContentText(contentText)
-            builder.setProgress(NOTIFICATION_PROGRESS_MAX, 0, false)
-            builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-            builder.color =
-                ContextCompat.getColor(context, UIUtils.getAccentColor(persistentState.theme))
-
-            // Secret notifications are not shown on the lock screen.  No need for this app to show
-            // there.
-            // Only available in API >= 21
-            builder.setVisibility(NotificationCompat.VISIBILITY_SECRET)
-
-            // If true, silences this instance of the notification, regardless of the sounds or
-            // vibrations set on the notification or notification channel.
-            builder.setSilent(true)
-            builder.setAutoCancel(false)
-        } else {
-            builder = NotificationCompat.Builder(context, DOWNLOAD_NOTIFICATION_TAG)
         }
+
+        builder = NotificationCompat.Builder(context, DOWNLOAD_NOTIFICATION_TAG)
+        val contentText = context.getString(R.string.notif_download_content_text)
+        val contentTitle = context.getString(R.string.notif_download_content_title)
+
+        builder
+            .setSmallIcon(R.drawable.ic_notification_icon)
+            .setContentTitle(contentTitle)
+            .setContentIntent(getPendingIntent(context))
+            .setContentText(contentText)
+        builder.setProgress(NOTIFICATION_PROGRESS_MAX, 0, false)
+        builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
+        builder.color =
+            ContextCompat.getColor(context, UIUtils.getAccentColor(persistentState.theme))
+
+        // Secret notifications are not shown on the lock screen.  No need for this app to show
+        // there.
+        // Only available in API >= 21
+        builder.setVisibility(NotificationCompat.VISIBILITY_SECRET)
+
+        // If true, silences this instance of the notification, regardless of the sounds or
+        // vibrations set on the notification or notification channel.
+        builder.setSilent(true)
+        builder.setAutoCancel(false)
         return builder
     }
 

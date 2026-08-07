@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
-import Logger
-import Logger.LOG_TAG_BACKUP_RESTORE
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_BACKUP_RESTORE
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -24,8 +24,8 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
-import android.provider.OpenableColumns
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,7 +33,6 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.work.BackoffPolicy
 import androidx.work.Data
@@ -59,7 +58,6 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
-import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -81,7 +79,7 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
     private lateinit var restoreActivityResult: ActivityResultLauncher<Intent>
 
     override fun getTheme(): Int =
-        Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        Themes.getBottomSheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     private fun isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
@@ -110,11 +108,7 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.let { window ->
-            if (isAtleastQ()) {
-                val controller = WindowInsetsControllerCompat(window, window.decorView)
-                controller.isAppearanceLightNavigationBars = false
-                window.isNavigationBarContrastEnforced = false
-            }
+            Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
         }
         result()
         init()
@@ -143,6 +137,8 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun getDownloadSource(): String {
+        if (Utilities.isWebsiteDegoogledFlavour()) return getString(R.string.build_flavor_website_degoogled)
+
         if (Utilities.isFdroidFlavour()) return getString(R.string.build__flavor_fdroid)
 
         if (Utilities.isPlayStoreFlavour()) return getString(R.string.build__flavor_play_store)
@@ -286,6 +282,7 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
                             LOG_TAG_BACKUP_RESTORE,
                             "activity result for restore process with uri: $fileUri"
                         )
+                        persistUriPermission(fileUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
                         startRestoreProcess(fileUri)
                     }
                     Activity.RESULT_CANCELED -> {
@@ -309,6 +306,7 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
                             LOG_TAG_BACKUP_RESTORE,
                             "activity result for backup process with uri: $backupFileUri"
                         )
+                        persistUriPermission(backupFileUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
                         startBackupProcess(backupFileUri)
                     }
                     Activity.RESULT_CANCELED -> {
@@ -319,6 +317,15 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
                     }
                 }
             }
+    }
+
+    private fun persistUriPermission(uri: Uri?, modeFlags: Int) {
+        if (uri == null) return
+        try {
+            requireContext().contentResolver.takePersistableUriPermission(uri, modeFlags)
+        } catch (e: SecurityException) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "Could not persist URI permission for $uri", e)
+        }
     }
 
     private fun getFileNameFromUri(uri: Uri): String {

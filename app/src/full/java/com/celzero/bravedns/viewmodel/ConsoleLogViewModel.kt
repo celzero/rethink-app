@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -34,7 +34,11 @@ import kotlinx.coroutines.flow.flatMapLatest
 
 class ConsoleLogViewModel(private val dao: ConsoleLogDAO) : ViewModel() {
 
-    private data class QueryParams(val filter: String = "", val minLevel: Int = 0)
+    private data class QueryParams(
+        val filter: String = "",
+        val minLevel: Int = 0,
+        val sessionId: Long = 0L,
+    )
 
     private val queryParams = MutableStateFlow(QueryParams())
 
@@ -69,5 +73,9 @@ class ConsoleLogViewModel(private val dao: ConsoleLogDAO) : ViewModel() {
 
     fun setFilter(filter: String) {
         queryParams.value = queryParams.value.copy(filter = filter)
+    }
+
+    fun restartLogStream() {
+        queryParams.value = queryParams.value.copy(sessionId = queryParams.value.sessionId + 1)
     }
 }

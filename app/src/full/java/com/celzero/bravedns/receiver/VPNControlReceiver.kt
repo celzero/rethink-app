@@ -16,8 +16,8 @@
 
 package com.celzero.bravedns.receiver
 
-import Logger
-import Logger.LOG_TAG_VPN
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent

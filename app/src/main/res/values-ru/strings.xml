@@ -246,7 +246,6 @@
     <string name="lbl_add">добавить</string>
     <string name="fav_icon">fav_icon</string>
     <string name="conn_track_clear_logs_title">Удалить все сетевые журналы\?</string>
-    <string name="hsf_proxy_chip_remove_text">Остановка…</string>
     <string name="contributors_dialog_title">Авторы</string>
     <string name="dns_crypt_custom_url_remove_dialog_title">Удалить резолвер DNSCrypt\?</string>
     <string name="dns_proxy_remove_dialog_message">Удалить DNS-прокси из сохраненной конфигурации.</string>
@@ -1040,7 +1039,6 @@
     <string name="lbl_secure" translatable="true">безопасные</string>
     <string name="orbot_no_app_toast" translatable="true">Добавьте хотя бы одно приложение, чтобы включить Orbot</string>
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s отключён, так как активны прокси</string>
-    <string name="failed_using_default" translatable="true">Не удалось: используется запасной DNS</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Защищен! Подключен к DNS + Firewall + Proxy.</string>
     <string name="lbl_idle" translatable="true">Холостой ход</string>
     <string name="lbl_peer" translatable="true">Участник</string>
@@ -1051,8 +1049,6 @@
     <string name="settings_rinr_heading" translatable="true">Loopback (экспериментальный)</string>
     <string name="settings_connectivity_checks_desc" translatable="true">Проверки подключений отправляются для определения достижимости.</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Маршрутизация собственного трафика через туннель. Если вы не знаете что делаете, выключите его.</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Также включает настройку <!--settings_network_all_networks--> %1$s Вы хотите продолжить?</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Loopback (экспериментальный)</string>
     <string name="cd_dialog_edit_title" translatable="true">Изменить правило домена</string>
     <string name="one_wg_apps_added" translatable="true">Маршрутизация всех приложений</string>
     <string name="cd_toast_edit" translatable="true">Отредактировано</string>
@@ -1109,8 +1105,6 @@
     <string name="dc_filtering_heading" translatable="true">Фильтрация</string>
     <string name="cd_split_dns_heading" translatable="true">Разделенный DNS (экспериментальный)</string>
     <string name="cd_split_dns_desc" translatable="true">Перенаправляйте DNS-запросы из прокси-приложений на DNS-серверы прокси-сервера.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">Относитесь к правилам DNS как к правилам брандмауэра (экспериментально)</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">Блокировка DNS будет обойдена во время разрешения; решение будет принято во время подключения.</string>
     <string name="univ_firewall_rule_11" translatable="true">Блокировка всех локальных подключений</string>
     <string name="firewall_rule_private_dns" translatable="true">приватный DNS</string>
     <string name="firewall_rule_bypass_proxy" translatable="true">Обход прокси</string>
@@ -1198,7 +1192,7 @@
     <string name="vpn_policy_title" translatable="true">Правила изменения подключения</string>
     <string name="use_fallback_dns_to_bypass" translatable="true">Использовать запасной DNS как обходной</string>
     <string name="use_fallback_dns_to_bypass_desc" translatable="true">При включении, всегда используется запасной DNS для обходных приложений, доменов и IP-адресов.</string>
-    <string name="lbl_fallback" translatable="true">Запасной</string>
+    <string name="lbl_bootstrap" translatable="true">Запасной</string>
     <string name="vpn_policy_relaxed" translatable="true">Расслабленный</string>
     <string name="title_database_dump" translatable="true">База данных</string>
     <string name="copied_clipboard" translatable="true">Скопировано</string>

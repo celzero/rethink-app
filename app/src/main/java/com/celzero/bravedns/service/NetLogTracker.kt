@@ -16,8 +16,8 @@
 
 package com.celzero.bravedns.service
 
-import Logger
-import Logger.LOG_BATCH_LOGGER
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_BATCH_LOGGER
 import android.content.Context
 import android.util.Log
 import com.celzero.bravedns.data.ConnTrackerMetaData
@@ -70,7 +70,7 @@ internal constructor(
     // expected per row size is 100 bytes to 500 bytes, so a batch of 40 rows is around 4KB to 20KB
     private val logBatchSize = 40
     // dispatch buffer to consumer if greater than batch size, for console logs
-    private val consoleLogBatchSize = 1024
+    private val consoleLogBatchSize = 4096
 
     // a single thread to run sig and batch co-routines in;
     // to avoid use of mutex/semaphores over shared-state
@@ -191,13 +191,10 @@ internal constructor(
 
     // now, this method is doing multiple things which should be removed.
     // fixme: should intend to only write the logs to database.
-    fun processDnsLog(summary: DNSSummary, rethinkUid: Int) {
-        val transaction = dnsdb.processOnResponse(summary, rethinkUid)
+    fun processDnsLog(summary: DNSSummary) {
+        val transaction = dnsdb.processOnResponse(summary)
 
         transaction.responseCalendar = Calendar.getInstance()
-
-        // TODO: This method should be part of BraveVPNService
-        dnsdb.updateVpnConnectionState(transaction)
 
         if (!persistentState.logsEnabled) return
 

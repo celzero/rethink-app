@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.database
 
-import Logger
-import Logger.LOG_IAB
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_IAB
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -190,6 +190,20 @@ class SubscriptionStatusRepository(private val subscriptionStatusDAO: Subscripti
                 subscriptionStatusDAO.updateAccountExpiry(id, expiryTime, timestamp)
             } catch (e: Exception) {
                 Logger.e(LOG_IAB, "$TAG Error updating account expiry: ${e.message}", e)
+                throw e
+            }
+        }
+    }
+
+    /**
+     * Update developer payload
+     */
+    suspend fun updateDeveloperPayload(id: Int, payload: String, timestamp: Long): Int {
+        return mutex.withLock {
+            try {
+                subscriptionStatusDAO.updateDeveloperPayload(id, payload, timestamp)
+            } catch (e: Exception) {
+                Logger.e(LOG_IAB, "$TAG Error updating developer payload: ${e.message}", e)
                 throw e
             }
         }

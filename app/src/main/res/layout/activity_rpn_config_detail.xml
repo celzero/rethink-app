@@ -19,9 +19,9 @@
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/bg_vpn_header_gradient"
             app:collapsedTitleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
             app:contentScrim="@drawable/bg_vpn_header_gradient"
-            android:background="@drawable/bg_vpn_header_gradient"
             app:expandedTitleMarginBottom="0dp"
             app:expandedTitleMarginEnd="16dp"
             app:expandedTitleMarginStart="10dp"
@@ -56,137 +56,139 @@
                         android:id="@+id/config_name_text"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
+                        android:layout_marginStart="10dp"
                         android:layout_marginTop="20dp"
                         android:ellipsize="end"
-                        android:maxLines="1"
                         android:gravity="center_vertical"
+                        android:maxLines="1"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="24sp"
                         android:textStyle="bold"
-                        app:layout_constraintEnd_toStartOf="@id/config_id_text"
-                        app:layout_constraintStart_toEndOf="@id/tv_hero_flag"
-                        app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toTopOf="@id/tv_hero_city"
-                        app:layout_constraintVertical_chainStyle="packed"
+                        app:layout_constraintEnd_toStartOf="@id/refresh_chip"
+                        app:layout_constraintStart_toEndOf="@id/flag_container"
+                        app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintVertical_bias="0.30"
+                        app:layout_constraintVertical_chainStyle="packed"
                         tools:text="Germany" />
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/tv_hero_city"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
+                        android:layout_marginStart="11dp"
                         android:layout_marginTop="2dp"
                         android:ellipsize="end"
-                        android:maxLines="1"
                         android:gravity="center_vertical"
+                        android:maxLines="1"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="14sp"
-                        app:layout_constraintEnd_toStartOf="@id/config_id_text"
-                        app:layout_constraintStart_toEndOf="@id/tv_hero_flag"
+                        app:layout_constraintBottom_toTopOf="@id/value_addl_info"
+                        app:layout_constraintEnd_toStartOf="@id/refresh_chip"
+                        app:layout_constraintStart_toEndOf="@id/flag_container"
                         app:layout_constraintTop_toBottomOf="@id/config_name_text"
-                        app:layout_constraintBottom_toTopOf="@id/row_hero_rxtx"
                         tools:text="Frankfurt" />
 
-                    <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/tv_hero_flag"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:textSize="36sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/config_name_text"
+                    <RelativeLayout
+                        android:id="@+id/flag_container"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         app:layout_constraintBottom_toBottomOf="@id/tv_hero_city"
-                        tools:text="🇩🇪" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/config_name_text">
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/tv_hero_flag"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:textSize="36sp"
+                           android:layout_centerInParent="true"
+                            tools:text="🇩🇪" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/iv_hero_flag"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:padding="5dp"
+                            android:layout_centerInParent="true"
+                            android:src="@drawable/ic_rpn_auto"
+                            android:tint="?attr/primaryTextColor"
+                            android:alpha="0.8"
+                            android:visibility="gone"
+                            tools:visibility="visible"
+                            />
+                    </RelativeLayout>
+
+
 
                     <com.google.android.material.chip.Chip
-                        android:id="@+id/config_id_text"
+                        android:id="@+id/refresh_chip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
+                        android:text="Refresh"
                         android:textSize="11sp"
-                        app:chipIcon="@drawable/ic_refresh_white"
                         app:chipBackgroundColor="?attr/background"
-                        app:chipCornerRadius="12dp"
+                        app:chipCornerRadius="8dp"
+                        app:chipIcon="@drawable/ic_refresh_white"
                         app:chipMinHeight="28dp"
                         app:chipStrokeWidth="0dp"
-                        android:text="Refresh"
+                        app:layout_constraintBottom_toTopOf="@id/chip_hero_stats"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/config_name_text"
-                        app:layout_constraintBottom_toTopOf="@id/chip_hero_stats" />
+                        app:layout_constraintTop_toTopOf="@id/config_name_text" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_hero_stats"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textSize="11sp"
                         android:alpha="0.85"
+                        android:textSize="11sp"
+                        android:visibility="gone"
                         app:chipBackgroundColor="?attr/background"
-                        app:chipCornerRadius="10dp"
+                        app:chipCornerRadius="8dp"
                         app:chipMinHeight="24dp"
                         app:chipStrokeWidth="0dp"
-                        android:visibility="gone"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/config_id_text"
+                        app:layout_constraintTop_toBottomOf="@id/refresh_chip"
                         tools:text="1 Gbps · 35% · Normal"
                         tools:visibility="visible" />
 
-                    <LinearLayout
-                        android:id="@+id/row_hero_rxtx"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="2dp"
-                        android:visibility="visible"
-                        app:layout_constraintBottom_toTopOf="@id/tv_hero_who"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent">
-
-                        <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/value_rx"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:alpha="0.75"
-                            android:textColor="?attr/primaryLightColorText"
-                            android:textSize="11sp"
-                            tools:text="4.5 MB" />
-
-                        <com.google.android.material.textview.MaterialTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:alpha="0.5"
-                            android:text="  ·  "
-                            android:textColor="?attr/primaryLightColorText"
-                            android:textSize="11sp" />
-
-                        <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/value_tx"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:alpha="0.75"
-                            android:textColor="?attr/primaryLightColorText"
-                            android:textSize="11sp"
-                            tools:text="1.2 MB" />
-
-                    </LinearLayout>
-
                     <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/tv_hero_who"
+                        android:id="@+id/value_addl_info"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="2dp"
+                        android:alpha="0.75"
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="11sp"
+                        android:visibility="gone"
+                        app:layout_constraintBottom_toTopOf="@id/tv_hero_pub"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_hero_city"
+                        tools:text="engage.cloudflareclient.com:2408"
+                        tools:visibility="visible" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_hero_pub"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="5dp"
                         android:alpha="0.75"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="11sp"
                         android:visibility="gone"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/value_addl_info"
                         tools:text="user@example.com"
                         tools:visibility="visible" />
 
@@ -273,24 +275,15 @@
                             android:layout_height="wrap_content"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
-                            android:paddingTop="8dp"
-                            android:paddingBottom="8dp">
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/label_status"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/lbl_status"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="13sp" />
+                            android:paddingTop="6dp"
+                            android:paddingBottom="6dp">
 
                             <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/value_status"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="?attr/accentGood"
-                                android:textSize="13sp"
+                                android:textColor="?attr/primaryTextColor"
+                                android:textSize="11sp"
                                 android:textStyle="bold"
                                 tools:text="Active" />
 
@@ -299,48 +292,43 @@
                                 android:layout_height="wrap_content"
                                 android:text=" · "
                                 android:textColor="?attr/primaryLightColorText"
-                                android:textSize="13sp" />
+                                android:textSize="11sp" />
 
                             <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/value_since"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="?attr/primaryLightColorText"
-                                android:textSize="13sp"
-                                tools:text="42 min ago" />
-                        </LinearLayout>
+                                android:textSize="11sp"
+                                tools:text="14 hours ago" />
 
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="0.5dp"
-                            android:alpha="0.08"
-                            android:background="?attr/divider"
-                            android:visibility="gone" />
-
-                        <LinearLayout
-                            android:id="@+id/row_who"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:visibility="gone">
+                            <View
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1" />
 
                             <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/label_who"
+                                android:id="@+id/value_rx"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Identity"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="13sp" />
+                                android:textColor="?attr/primaryTextColor"
+                                android:textSize="11sp"
+                                tools:text="↓ 4.5 MB" />
 
                             <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/value_who"
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:maxLines="2"
+                                android:text=" · "
+                                android:textColor="?attr/primaryLightColorText"
+                                android:textSize="11sp" />
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/value_tx"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
                                 android:textColor="?attr/primaryTextColor"
-                                android:textSize="13sp" />
+                                android:textSize="11sp"
+                                tools:text="↑ 1.2 MB" />
                         </LinearLayout>
 
                         <View
@@ -359,21 +347,12 @@
                             android:paddingBottom="8dp">
 
                             <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/label_last_ok"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/lbl_last_handshake"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="13sp" />
-
-                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/value_last_ok"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="?attr/primaryTextColor"
-                                android:textSize="13sp"
-                                tools:text="2 min ago" />
+                                android:textColor="?attr/primaryLightColorText"
+                                android:textSize="12sp"
+                                tools:text="Connected · 🤝 1m · 🔄 12m" />
                         </LinearLayout>
 
                         <View
@@ -448,76 +427,6 @@
                         </LinearLayout>
 
                         <View
-                            android:layout_width="match_parent"
-                            android:layout_height="0.5dp"
-                            android:alpha="0.08"
-                            android:background="?attr/divider" />
-
-                        <LinearLayout
-                            android:id="@+id/row_ipv6"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:paddingTop="10dp"
-                            android:paddingBottom="10dp">
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/label_ipv6"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="6dp"
-                                android:text="@string/lbl_client_ipv6"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="13sp" />
-
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content">
-
-                                <com.facebook.shimmer.ShimmerFrameLayout
-                                    android:id="@+id/shimmer_ipv6"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:visibility="visible"
-                                    app:shimmer_auto_start="true"
-                                    app:shimmer_duration="1000">
-
-                                    <LinearLayout
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:orientation="vertical">
-
-                                        <View
-                                            android:layout_width="180dp"
-                                            android:layout_height="13dp"
-                                            android:layout_marginBottom="8dp"
-                                            android:background="@drawable/shimmer_placeholder" />
-
-                                        <View
-                                            android:layout_width="220dp"
-                                            android:layout_height="11dp"
-                                            android:layout_marginBottom="6dp"
-                                            android:background="@drawable/shimmer_placeholder" />
-
-                                        <View
-                                            android:layout_width="140dp"
-                                            android:layout_height="11dp"
-                                            android:background="@drawable/shimmer_placeholder" />
-                                    </LinearLayout>
-                                </com.facebook.shimmer.ShimmerFrameLayout>
-
-                                <com.google.android.material.textview.MaterialTextView
-                                    android:id="@+id/value_ipv6"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:lineSpacingExtra="3dp"
-                                    android:textColor="?attr/primaryTextColor"
-                                    android:textSize="13sp"
-                                    android:visibility="gone" />
-                            </FrameLayout>
-                        </LinearLayout>
-
-                        <View
                             android:id="@+id/divider_errors"
                             android:layout_width="match_parent"
                             android:layout_height="0.5dp"
@@ -578,8 +487,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         android:letterSpacing="0.03"
-                        android:text="@string/lbl_quick_actions"
-                        android:textAppearance="?attr/textAppearanceSubtitle1"
+                        android:text="@string/lbl_actions"
+                        android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textColor="?attr/primaryTextColor"
                         android:textStyle="bold" />
 
@@ -633,7 +542,6 @@
                             android:layout_marginStart="4dp"
                             android:layout_marginEnd="4dp"
                             android:layout_weight="1"
-                            android:visibility="gone"
                             android:background="@drawable/rectangle_border_background"
                             android:foreground="?attr/selectableItemBackground"
                             android:gravity="center"
@@ -642,7 +550,8 @@
                             android:paddingStart="12dp"
                             android:paddingTop="10dp"
                             android:paddingEnd="12dp"
-                            android:paddingBottom="10dp">
+                            android:paddingBottom="10dp"
+                            android:visibility="gone">
 
                             <androidx.appcompat.widget.AppCompatImageView
                                 android:id="@+id/hop_icon"
@@ -733,11 +642,9 @@
                     <com.google.android.material.textview.MaterialTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:letterSpacing="0.02"
-                        android:text="@string/title_settings"
-                        android:textAppearance="?attr/textAppearanceSubtitle1"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textStyle="bold" />
+                        android:text="@string/lbl_advanced"
+                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        android:textColor="?attr/primaryTextColor" />
 
                     <RelativeLayout
                         android:id="@+id/hop_rl"
@@ -904,9 +811,8 @@
                         android:layout_height="wrap_content"
                         android:letterSpacing="0.02"
                         android:text="@string/adv_taster_title"
-                        android:textAppearance="?attr/textAppearanceSubtitle1"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textStyle="bold" />
+                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        android:textColor="?attr/primaryTextColor"/>
 
                     <RelativeLayout
                         android:id="@+id/use_mobile_rl"

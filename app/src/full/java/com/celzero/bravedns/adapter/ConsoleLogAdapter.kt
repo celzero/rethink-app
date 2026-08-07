@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.adapter
 
+import com.celzero.bravedns.util.Logger
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -89,7 +90,7 @@ class ConsoleLogAdapter(private val context: Context) :
 
                     'E' ->
                         b.logDetail.setTextColor(
-                            UIUtils.fetchColor(context, R.attr.firewallBlockToggleBtnTxt)
+                            UIUtils.fetchColor(context, R.attr.accentBad)
                         )
 
                     else ->

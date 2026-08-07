@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View

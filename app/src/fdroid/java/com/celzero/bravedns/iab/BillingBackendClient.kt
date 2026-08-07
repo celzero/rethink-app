@@ -53,7 +53,7 @@ class BillingBackendClient(
         @Suppress("UNUSED_PARAMETER") deviceId: String,
         @Suppress("UNUSED_PARAMETER") purchase: PurchaseDetail,
         @Suppress("UNUSED_PARAMETER") purchaseToken: String
-    ): PurchaseDetail = purchase
+    ): QueryEntitlementResult = QueryEntitlementResult.Transient(purchase)
 
     suspend fun cancelPurchase(
         @Suppress("UNUSED_PARAMETER") accountId: String,

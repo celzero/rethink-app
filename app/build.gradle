@@ -6,6 +6,9 @@ plugins {
     // Compose-for-TV UI. Safe to apply project-wide — phone variants
     // contain no @Composable and the plugin then no-ops.
     id 'org.jetbrains.kotlin.plugin.compose'
+    // to generate BOM in CycloneDX format
+    // ./gradlew cyclonedxBom
+    // id 'org.cyclonedx.bom' version '3.2.4'
 }
 
 // apply Google Services and Firebase Crashlytics plugins conditionally
@@ -20,8 +23,57 @@ def alphaBuild = taskNames.contains("alpha")
 // check for fdroidserver value is set in system env
 def fdroidBuildServer = System.getenv("fdroidserver")
 def isFdroidBuildServer = fdroidBuildServer != null && !fdroidBuildServer.isEmpty() && fdroidBuildServer != "null"
-def deGoogled = !apkBuild || fdroidBuild || isFdroidBuildServer
+def deGoogled = !apkBuild || fdroidBuild || isFdroidBuildServer || alphaBuild
 def shouldSplit = !alphaBuild
+
+// Pass -PwebsiteDegoogled=true when building the fdroid flavor with our own keys.
+// Official F-Droid builds omit this flag and will be labeled as "fdroid".
+def isWebsiteDegoogled = project.hasProperty("websiteDegoogled") &&
+        project.property("websiteDegoogled").toString().toBoolean()
+
+// add google-services.json only for play/website builds.
+// local dev : copy from the sibling ../firebase/{debug,release} dir (gitignored, outside repo).
+// CI        : secret is written to app/src/google-services.json
+//             by the GitHub Actions; so no local copy is needed there.
+if (!deGoogled) {
+    def isRelease = gradle.startParameter.taskNames.any {
+        it.toLowerCase().contains("release")
+    }
+    def buildTypeName = isRelease ? "release" : "debug"
+
+    def sourceFile = file("${rootDir.parent}/firebase/${buildTypeName}/google-services.json")
+    def targetFile = file("${projectDir}/google-services.json")
+
+    if (sourceFile.exists()) {
+        // local dev: place the file at the module root so all variants pick it up
+        targetFile.parentFile.mkdirs()
+        targetFile.bytes = sourceFile.bytes
+        logger.lifecycle("google-services.json: copied from ${sourceFile}")
+    } else if (targetFile.exists()) {
+        // already in place (manual placement or a prior local copy); keep as-is
+        logger.lifecycle("google-services.json: using existing ${targetFile}")
+    } else {
+        // no local copy available; verify a variant source-set file exists so the
+        // google-services plugin can resolve it (the CI secret path). Fail with a
+        // helpful message only if nothing is resolvable anywhere.
+        def srcDir = file("src")
+        def hasSrcSetFile = srcDir.isDirectory() && (srcDir.listFiles()?.any { dir ->
+            dir.isDirectory() && new File(dir, "google-services.json").exists()
+        } ?: false)
+        if (hasSrcSetFile || file("src/google-services.json").exists()) {
+            logger.lifecycle("google-services.json: no local copy; deferring to " +
+                    "google-services plugin (variant source-set resolution, e.g. CI)")
+        } else {
+            throw new GradleException(
+                    "google-services.json not found for '${buildTypeName}' build.\n" +
+                            "  Local dev : place it at ${sourceFile}\n" +
+                            "             (or directly at ${targetFile})\n" +
+                            "  CI        : ensure the secret is written to app/src/google-services.json")
+        }
+    }
+} else {
+    logger.info("skipping google-services.json for de-googled/F-Droid build")
+}
 
 println("app-task names: '$taskNames'")
 println("gradle deGoogled? $deGoogled (fdroidBuild: $fdroidBuild, fdroidBuildServer: $isFdroidBuildServer, apkBuild: $apkBuild)")
@@ -65,6 +117,8 @@ def getVersionCode = {
     return code
 }
 
+def appVersionCode = getVersionCode()
+
 try {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 } catch (Exception ex) {
@@ -92,6 +146,8 @@ android {
         minSdkVersion(23)
         targetSdkVersion 35
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        // Defaults to false; the fdroid flavor overrides it via -PwebsiteDegoogled=true.
+        buildConfigField "boolean", "IS_WEBSITE_DEGOOGLD_BUILD", "false"
     }
 
     signingConfigs {
@@ -190,6 +246,27 @@ android {
             resValue "string", "app_name", "Rethink(α)"
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        releaseDebug {
+             // for testing release build with debug signing config
+            initWith buildTypes.release
+            minifyEnabled true
+            shrinkResources true
+            signingConfig signingConfigs.debug
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            ndk {
+                // Use SYMBOL_TABLE to reduce symbol file size significantly
+                debugSymbolLevel 'SYMBOL_TABLE'
+                // Only process symbols for the most common ABIs to avoid Crashlytics index errors
+                // This reduces the total symbol data Crashlytics needs to process
+                abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'
+            }
+            if (!deGoogled) {
+                firebaseCrashlytics {
+                    // Enable processing and uploading of native symbols to Firebase servers.
+                    nativeSymbolUploadEnabled true
+                }
+            }
+        }
     }
 
     // fix: injectCrashlyticsBuildIds task has a buffer overflow bug
@@ -254,6 +331,8 @@ android {
         }
         fdroid {
             dimension "releaseChannel"
+            // true only when built with -PwebsiteDegoogled=true (our own keys).
+            buildConfigField "boolean", "IS_WEBSITE_DEGOOGLD_BUILD", String.valueOf(isWebsiteDegoogled)
         }
         website {
             dimension "releaseChannel"
@@ -265,6 +344,9 @@ android {
             // for build type alpha, versionCode is set in env overriding gradle.properties
             versionCode = getVersionCode()
             versionName = gitVersion
+            // add base version code to the build config, so that if there is override of
+            // version numbers by some builds (because of split apks)
+            buildConfigField "int", "BASE_VERSION_CODE", String.valueOf(appVersionCode)
             vectorDrawables.useSupportLibrary = true
         }
         // Android TV flavor (rethink-tv fork addition).
@@ -282,6 +364,7 @@ android {
             applicationIdSuffix ".tv"
             versionCode = getVersionCode()
             versionName = gitVersion
+            buildConfigField "int", "BASE_VERSION_CODE", String.valueOf(appVersionCode)
             vectorDrawables.useSupportLibrary = true
         }
     }
@@ -410,22 +493,21 @@ dependencies {
 
     fullImplementation 'com.squareup.okhttp3:okhttp:5.3.2'
     fullImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:5.3.2'
-    fullImplementation 'com.squareup.okhttp3:logging-interceptor:5.3.2'
 
     fullImplementation 'com.squareup.retrofit2:retrofit:3.0.0'
     fullImplementation 'com.squareup.retrofit2:converter-gson:3.0.0'
 
     implementation 'com.squareup.okio:okio-jvm:3.16.4'
     // Glide
-    fullImplementation('com.github.bumptech.glide:glide:5.0.5') {
+    fullImplementation('com.github.bumptech.glide:glide:5.0.7') {
         exclude group: 'glide-parent'
     }
-    fullImplementation('com.github.bumptech.glide:okhttp3-integration:5.0.5') {
+    fullImplementation('com.github.bumptech.glide:okhttp3-integration:5.0.7') {
         exclude group: 'glide-parent'
     }
 
     // Ref: https://stackoverflow.com/a/46638213
-    kspFull 'com.github.bumptech.glide:compiler:5.0.5'
+    kspFull 'com.github.bumptech.glide:compiler:5.0.7'
 
     // Swipe button animation
     fullImplementation 'com.facebook.shimmer:shimmer:0.5.0'
@@ -446,12 +528,10 @@ dependencies {
 
     // add ":debug" suffix to the dependency to include debug symbols
     download firestackDependency()
-    websiteImplementation firestackDependency()
-    fdroidImplementation firestackDependency()
-    playImplementation firestackDependency()
+    implementation firestackDependency()
 
     // Work manager
-    implementation('androidx.work:work-runtime-ktx:2.11.0') {
+    implementation('androidx.work:work-runtime-ktx:2.11.2') {
         modules {
             module("com.google.guava:listenablefuture") {
                 replacedBy("com.google.guava:guava", "listenablefuture is part of guava")
@@ -467,6 +547,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.3.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-accessibility:3.7.0'
     androidTestImplementation 'androidx.test:rules:1.7.0'
     testImplementation 'org.robolectric:robolectric:4.16.1'
     testImplementation 'androidx.test:core:1.7.0'
@@ -479,6 +560,7 @@ dependencies {
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2'
     testImplementation 'io.insert-koin:koin-test:4.1.1'
     testImplementation 'io.insert-koin:koin-test-junit4:4.1.1'
+    testImplementation 'androidx.work:work-testing:2.11.2'
     androidTestImplementation 'io.mockk:mockk-android:1.14.9'
 
     leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.14'

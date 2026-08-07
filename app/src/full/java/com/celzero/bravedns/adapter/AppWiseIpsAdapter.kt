@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.adapter
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -56,12 +56,9 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
         private const val PERCENTAGE_MULTIPLIER = 100
     }
 
-    private lateinit var adapter: AppWiseIpsAdapter
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConnectionDetailsViewHolder {
         val itemBinding =
             ListItemAppIpDetailsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        adapter = this
         return ConnectionDetailsViewHolder(itemBinding)
     }
 
@@ -130,11 +127,11 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
             // Fix: Validate position before passing to avoid IndexOutOfBoundsException
             val currentPosition = absoluteAdapterPosition
             if (currentPosition != RecyclerView.NO_POSITION) {
-                bottomSheetFragment.dismissListener(adapter, currentPosition)
+                bottomSheetFragment.dismissListener(this@AppWiseIpsAdapter, currentPosition)
             } else {
                 // Position is invalid, pass -1 to indicate refresh should be used
                 Logger.w(LOG_TAG_UI, "$TAG invalid adapter position when opening bottom sheet")
-                bottomSheetFragment.dismissListener(adapter, RecyclerView.NO_POSITION)
+                bottomSheetFragment.dismissListener(this@AppWiseIpsAdapter, RecyclerView.NO_POSITION)
             }
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
@@ -211,20 +208,10 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
     }
 
     override fun notifyDataset(position: Int) {
-        // Fix: IndexOutOfBoundsException - validate position before notifying
-        // PagingDataAdapter manages its own data, so we need to be careful with manual notifications
-        try {
-            if (position >= 0 && position < itemCount) {
-                notifyItemChanged(position)
-            } else {
-                // Position is invalid, refresh the entire dataset instead
-                Logger.w(LOG_TAG_UI, "$TAG invalid position: $position, itemCount: $itemCount, refreshing adapter")
-                refresh()
-            }
-        } catch (e: Exception) {
-            // If notification fails, refresh the adapter to ensure consistency
-            Logger.e(LOG_TAG_UI, "$TAG error notifying position $position: ${e.message}", e)
-            refresh()
-        }
+        // PagingDataAdapter does not support manual notifyItem* calls.
+        // Calling notifyItemChanged on a PagingDataAdapter can cause
+        // RecyclerView inconsistency crashes (IndexOutOfBoundsException).
+        // Always use refresh() to reload the current data from the PagingSource.
+        refresh()
     }
 }

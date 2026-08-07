@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.backup
 
-import Logger
-import Logger.LOG_TAG_BACKUP_RESTORE
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_BACKUP_RESTORE
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageInfo
@@ -25,6 +25,7 @@ import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_WG_DIR
 import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_RESTORE_URI
 import com.celzero.bravedns.backup.BackupHelper.Companion.METADATA_FILENAME
 import com.celzero.bravedns.backup.BackupHelper.Companion.SHARED_PREFS_BACKUP_FILE_NAME
@@ -154,6 +155,11 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             // clean up the temp directory
             deleteRecursive(tempDir)
 
+            // WG configs are restored during RefreshDatabase.ACTION_REFRESH_RESTORE
+            // which runs after app restart with fresh Room connections.
+            // The caller (HomeScreenActivity.observeRestoreWorker) triggers the
+            // restart after this worker returns success.
+
             return true
         } catch (e: Exception) {
             Logger.crash(
@@ -173,12 +179,20 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             persistentState.remoteBlocklistTimestamp >
             Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP
         ) {
-            RethinkBlocklistManager.readJson(
-                context,
-                RethinkBlocklistManager.DownloadType.REMOTE,
-                persistentState.remoteBlocklistTimestamp
-            )
-            return
+            try {
+                RethinkBlocklistManager.readJson(
+                    context,
+                    RethinkBlocklistManager.DownloadType.REMOTE,
+                    persistentState.remoteBlocklistTimestamp
+                )
+                return
+            } catch (_: Exception) {
+                Logger.w(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "remote blocklist file not found locally (timestamp: ${persistentState.remoteBlocklistTimestamp}), falling back to packaged asset"
+                )
+                // fall through to use the packaged asset version
+            }
         }
 
         RemoteFileTagUtil.moveFileToLocalDir(context.applicationContext, persistentState)
@@ -249,8 +263,14 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             )
         }
 
-        deleteResidue(tempDir)
         return true
+    }
+
+    private fun checkPoint() {
+        Logger.i(LOG_TAG_BACKUP_RESTORE, "database checkpoint() during restore process")
+        appDatabase.checkPoint()
+        logDatabase.checkPoint()
+        return
     }
 
     private fun restoreWireGuardFiles(dir: File): Boolean {
@@ -274,19 +294,32 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             return false
         }
 
-        // read the wireguard files from the temp dir and write it to the wireguard folder
-        val files = dir.listFiles()
-        if (files == null) {
-            Logger.w(LOG_TAG_BACKUP_RESTORE, "files to restore is empty, path: ${dir.path}")
-            return false
-        }
-        files.forEach { file ->
-            // if file name ends with .conf, then copy it to the wireguard folder
-            if (!file.name.endsWith(".conf")) {
-                Logger.d(LOG_TAG_BACKUP_RESTORE, "not wg file, file name: ${file.name}")
-                return@forEach
-            }
+        var totalCopied = 0
 
+        // collect .conf files from the root of the temp dir
+        val confFiles = mutableListOf<File>()
+        dir.listFiles()?.forEach { file ->
+            if (file.name.endsWith(".conf")) {
+                confFiles.add(file)
+            } else {
+                Logger.d(LOG_TAG_BACKUP_RESTORE, "not wg file, file name: ${file.name}")
+            }
+        }
+
+        // also scan the wireguard/ subdirectory (where backup saves wg files)
+        val backupWgSubDir = File(dir, BACKUP_WG_DIR)
+        if (backupWgSubDir.exists() && backupWgSubDir.isDirectory) {
+            Logger.i(LOG_TAG_BACKUP_RESTORE, "scanning wireguard/ subdirectory for .conf files")
+            backupWgSubDir.listFiles()?.forEach { file ->
+                if (file.name.endsWith(".conf") && !confFiles.any { it.name == file.name }) {
+                    confFiles.add(file)
+                }
+            }
+        }
+
+        Logger.i(LOG_TAG_BACKUP_RESTORE, "found ${confFiles.size} .conf files to restore")
+
+        confFiles.forEach { file ->
             val currentWgFile = File(tempWgDir, file.name)
             if (!Utilities.copy(file.path, currentWgFile.path)) {
                 Logger.w(
@@ -300,8 +333,10 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
                     LOG_TAG_BACKUP_RESTORE,
                     "wireguard file: ${file.name} backed up from ${file.path} to ${currentWgFile.path}"
                 )
+                totalCopied++
             }
         }
+        Logger.i(LOG_TAG_BACKUP_RESTORE, "copied $totalCopied wireguard files to temp_wireguard")
         return true
     }
 
@@ -325,13 +360,6 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         val pInfo: PackageInfo? =
             Utilities.getPackageMetadata(context.packageManager, context.packageName)
         return pInfo?.versionCode ?: 0
-    }
-
-    private fun checkPoint() {
-        Logger.i(LOG_TAG_BACKUP_RESTORE, "database checkpoint() during restore process")
-        appDatabase.checkPoint()
-        logDatabase.checkPoint()
-        return
     }
 
     private fun validateMetadata(tempDirectory: String?): Boolean {
@@ -394,12 +422,12 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
 
                 if (key == PersistentState.APP_VERSION) {
                     val appVersion = v as Int
-                    if (appVersion >= minVersionSupported) {
-                        Logger.w(
-                            LOG_TAG_BACKUP_RESTORE,
-                            "app version is less than minAppVersion, proceed with restore"
-                        )
-                        return true
+                if (appVersion >= minVersionSupported) {
+                    Logger.d(
+                        LOG_TAG_BACKUP_RESTORE,
+                        "app version satisfies minAppVersion ($minVersionSupported), proceed with restore"
+                    )
+                    return true
                     } else {
                         // no-op
                     }
@@ -457,6 +485,11 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             val pref: Map<String, *> = input.readObject() as Map<String, *>
 
             for (e in pref.entries) {
+                if (!shouldRestorePref(e.key)) {
+                    Logger.i(LOG_TAG_BACKUP_RESTORE, "Skipping security pref: ${e.key}")
+                    continue
+                }
+                Logger.i(LOG_TAG_BACKUP_RESTORE, "Restoring shared pref: ${e.key}")
                 val v: Any? = e.value
                 val key: String = e.key
 
@@ -489,5 +522,11 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
                 // no-op
             }
         }
+    }
+
+    private fun shouldRestorePref(key: String): Boolean {
+        return !key.contains("androidx.security", ignoreCase = true) &&
+                !key.contains("keyset", ignoreCase = true) &&
+                !key.contains("master_key", ignoreCase = true)
     }
 }

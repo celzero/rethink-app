@@ -15,9 +15,9 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
-import Logger
-import Logger.LOG_TAG_FIREWALL
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.DialogInterface
 import android.content.res.Configuration
 import android.os.Bundle
@@ -26,7 +26,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppWiseDomainsAdapter
@@ -42,10 +41,10 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
+import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
@@ -69,7 +68,7 @@ class AppDomainRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmS
     private var position: Int = -1
 
     override fun getTheme(): Int =
-        getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        getBottomSheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     private var uid: Int = -1
     private var domain: String = ""
@@ -113,11 +112,7 @@ class AppDomainRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmS
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.let { window ->
-            if (isAtleastQ()) {
-                val controller = WindowInsetsControllerCompat(window, window.decorView)
-                controller.isAppearanceLightNavigationBars = false
-                window.isNavigationBarContrastEnforced = false
-            }
+            Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
         }
 
         uid = arguments?.getInt(UID) ?: INVALID_UID

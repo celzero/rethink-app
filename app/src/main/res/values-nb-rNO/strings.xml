@@ -123,7 +123,6 @@
     <string name="dns_card_latency_active">Forsinkelse: %1$s ms</string>
     <string name="dns_card_latency_inactive">Skru på DNS-modus.</string>
     <string name="hsf_proxy_chip_removed_toast">Mellomtjener fjernet</string>
-    <string name="hsf_proxy_chip_remove_text">Stopper …</string>
     <string name="hsf_whats_new_remove_text">Lukker …</string>
     <string name="hsf_blocklist_updating_text">Skrur på …</string>
     <string name="hsf_chip_appearance">Drakt: %1$s</string>

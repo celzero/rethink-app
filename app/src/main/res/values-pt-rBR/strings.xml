@@ -123,7 +123,6 @@
     <string name="dc_entries">%1$s entradas »</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy removido</string>
     <string name="dc_local_block_heading">Listas de bloqueio no dispositivo</string>
-    <string name="hsf_proxy_chip_remove_text">Encerrando…</string>
     <string name="about_dialog_positive_button">Vamos começar</string>
     <string name="hsf_whats_new_remove_text">Encerrando…</string>
     <string name="dc_rethink_dns_radio">Rethink DNS</string>
@@ -1046,7 +1045,6 @@
     <string name="lbl_starting" translatable="true">Iniciando</string>
     <string name="lbl_remove" translatable="true">Remover</string>
     <string name="lbl_anonymous" translatable="true">anônimo</string>
-    <string name="failed_using_default" translatable="true">Falha: usando DNS alternativo</string>
     <string name="lbl_cache" translatable="true">Cache</string>
     <string name="lbl_overall" translatable="true">Total</string>
     <string name="lbl_remaining_apps" translatable="true">Aplicativos restantes</string>
@@ -1054,8 +1052,6 @@
     <string name="routing_remaining_apps" translatable="true">Encaminhando aplicativos restantes</string>
     <string name="remaining_apps_dialog_title" translatable="true">Incluir aplicativos restantes</string>
     <string name="wireguard_apps_proxy_map_desc" translatable="true">parte de %1$s</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Loopback (experimental)</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Também ativa a configuração de<!--settings_network_all_networks--> %1$s. Continuar?</string>
     <string name="one_wg_apps_added" translatable="true">Encaminhar todos os aplicativos</string>
     <string name="wg_apps_dialog_title_include" translatable="true">Incluir %1$s aplicativo(s)</string>
     <string name="wg_apps_dialog_title_exclude" translatable="true">Excluir %1$s aplicativo(s)</string>
@@ -1088,7 +1084,7 @@
     <string name="lbl_service_providers" translatable="true">Provedores de serviços</string>
     <string name="lbl_hop" translatable="true">Relés</string>
     <string name="lbl_manual" translatable="true">Manual</string>
-    <string name="lbl_fallback" translatable="true">Fallback</string>
+    <string name="lbl_bootstrap" translatable="true">Fallback</string>
     <string name="wireguard_title" translatable="true">Internet segura com WireGuard</string>
     <string name="wireguard_desc" translatable="true">Criptografe seu tráfego de internet com o WireGuard. Escolha rotas diferentes para aplicativos diferentes.</string>
     <string name="firewall_title" translatable="true">Proteja seu Android com Firewall</string>
@@ -1111,8 +1107,6 @@
     <string name="dc_filtering_heading" translatable="true">filtragem</string>
     <string name="cd_split_dns_heading" translatable="true">DNS dividido (experimental)</string>
     <string name="cd_split_dns_desc" translatable="true">Encaminhe consultas DNS de aplicativos proxy para os servidores DNS do proxy.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">Tratar regras de DNS como regras de firewall (experimental)</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">O bloqueio de DNS será ignorado durante a resolução; a decisão será tomada no momento da conexão.</string>
     <string name="univ_firewall_rule_11" translatable="true">Bloquear todas as conexões de host local</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">Excluir todas as regras de domínio?</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">A exclusão dessas regras permitirá que qualquer aplicativo se conecte aos domínios atualmente bloqueados.</string>

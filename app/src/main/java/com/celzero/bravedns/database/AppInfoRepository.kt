@@ -15,7 +15,10 @@ limitations under the License.
 */
 package com.celzero.bravedns.database
 
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_APP_DB
 import android.database.Cursor
+import android.database.sqlite.SQLiteConstraintException
 import com.celzero.bravedns.data.DataUsage
 
 class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
@@ -37,13 +40,17 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
     suspend fun updateUid(oldUid: Int, newUid: Int, pkg: String): Int {
         val isExist = appInfoDAO.isUidPkgExist(newUid, pkg) != null
         if (isExist) {
-            // already app is present with the new uid, so no need to update
-            // in that case, old uid with same pkg should be deleted as we intend to update the uid
             appInfoDAO.deletePackage(oldUid, pkg)
             return 0
         }
         val modifiedTs = System.currentTimeMillis()
-        return appInfoDAO.updateUid(oldUid, pkg, newUid, modifiedTs)
+        return try {
+            appInfoDAO.updateUid(oldUid, pkg, newUid, modifiedTs)
+        } catch (_: SQLiteConstraintException) {
+            Logger.w(LOG_TAG_APP_DB, "updateUid constraint violation; old=($oldUid,$pkg) -> new=$newUid; deleting stale old entry")
+            appInfoDAO.deletePackage(oldUid, pkg)
+            0
+        }
     }
 
     suspend fun deleteByPackageName(packageNames: List<String>) {
@@ -58,20 +65,19 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         }
     }
 
+    suspend fun deleteAll() {
+        appInfoDAO.deleteAll()
+    }
+
     suspend fun tombstoneApp(oldUid: Int, newUid: Int, packageName: String?, tombstoneTs: Long) {
         val modifiedTs = System.currentTimeMillis()
-        try {
-            if (packageName == null) {
-                appInfoDAO.tombstoneApp(oldUid, newUid, tombstoneTs, modifiedTs)
-                return
-            }
-            appInfoDAO.tombstoneApp(oldUid, newUid, packageName, tombstoneTs, modifiedTs)
-        } catch (_: Exception) {
-            // tombstoneApp is called when there is a package name change or uid change
-            // in both the cases, we try to update the existing record with new uid or package name
-            // if the record is not present, it throws exception, which we catch here
-            // no need to log this exception
+        if (packageName == null) {
+            // clear stale values before updating
+            appInfoDAO.tombstoneAppByUid(oldUid, newUid, tombstoneTs, modifiedTs)
+            return
         }
+        // clear stale values before updating
+        appInfoDAO.tombstoneAppWithPkg(newUid, oldUid, packageName, tombstoneTs, modifiedTs)
     }
 
     suspend fun getAppInfo(): List<AppInfo> {
@@ -151,12 +157,8 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.getAppInfoUidForPackageName(packageName)
     }
 
-    suspend fun setRethinkToBypassProxy(bypass: Boolean) {
-        appInfoDAO.setRethinkToBypassProxy(bypass)
-    }
-
-    suspend fun setRethinkToBypassDnsAndFirewall() {
-        appInfoDAO.setRethinkToBypassDnsAndFirewall()
+    suspend fun exemptRethinkApp() {
+        appInfoDAO.exemptRethinkApp()
     }
 
     /**

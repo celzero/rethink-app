@@ -15,16 +15,15 @@
  */
 package com.celzero.bravedns.iab
 
-import Logger
-import Logger.LOG_IAB
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_IAB
 import com.android.billingclient.api.BillingClient.ProductType
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.celzero.bravedns.database.SubscriptionStatus
+import com.celzero.bravedns.iab.OneTimePurchaseProcessor.Companion.ACK_RETRY_DELAYS_MS
 import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -245,7 +244,12 @@ internal class OneTimePurchaseProcessor(
             payload = purchase.developerPayload,
             expiryTime = expiryTime,
             status = purchase.purchaseState.toSubscriptionStatusId(),
-            windowDays = resolveRevokeDays(planId),
+            // resolveRevokeDays must receive the PRODUCT ID (not planId).
+            // planId for INAPP is the purchaseOptionId (e.g. "legacy-base", "legacy-max")
+            // which never matches the product-ID constants (e.g. "proxy-yearly-5").
+            // Passing planId would cause proxy-yearly-5 to fall to the else-branch,
+            // returning 14 days (2yr window) instead of the correct 35 days (5yr window).
+            windowDays = resolveRevokeDays(productId),
             orderId = purchase.orderId.orEmpty()
         )
 
@@ -312,8 +316,9 @@ internal class OneTimePurchaseProcessor(
                     subscriptionStateMachine.subscriptionExpired()
                     return
                 }
+                // paymentSuccessful -> handlePaymentSuccessful handles DB upsert
+                // and RPN activation (including its dedup guard).
                 subscriptionStateMachine.paymentSuccessful(pd)
-                withContext(Dispatchers.IO) { activateRpn(pd) }
             } catch (e: Exception) {
                 loge(mname, "error processing acknowledged INAPP: ${e.message}", e)
                 safeNotifyFailed("Error processing acknowledged INAPP: ${e.message}", null)
@@ -368,12 +373,14 @@ internal class OneTimePurchaseProcessor(
                 val pdWithPayload = pd.copy(
                     payload = ackResult.developerPayload.ifEmpty { pd.payload }
                 )
-                subscriptionStateMachine.completePurchase(pdWithPayload)
+                // paymentSuccessful -> handlePaymentSuccessful handles the full DB
+                // upsert, state-machine transition to Active, and RPN activation.
+                // Skip completePurchase to prevent a redundant DB write + the
+                // transient PurchasePending state between the two calls.
                 subscriptionStateMachine.paymentSuccessful(pdWithPayload)
                 try { onAckSuccess?.invoke(purchase) } catch (e: Exception) {
                     loge(mname, "onAckSuccess callback failed (non-fatal): ${e.message}", e)
                 }
-                withContext(Dispatchers.IO) { activateRpn(pdWithPayload) }
             }
 
             is AckResult.TransientFailure -> {
@@ -383,8 +390,8 @@ internal class OneTimePurchaseProcessor(
 
             is AckResult.PermanentFailure -> {
                 loge(mname, "server ack permanent failure: ${ackResult.reason}")
-                subscriptionStateMachine.purchaseFailed(
-                    "Server acknowledgement failed: ${ackResult.reason}", null
+                subscriptionStateMachine.serverAckFailed(
+                    "Server acknowledgement failed: ${ackResult.reason}"
                 )
             }
         }
@@ -484,6 +491,7 @@ internal class OneTimePurchaseProcessor(
     /**
      * Returns the ISO-8601 billing period string for a given one-time product ID.
      * Used to derive [ProductDetail.productTitle] when the store hasn't cached the title yet.
+     *
      */
     private fun getProductBillingPeriod(productId: String): String = when (productId) {
         InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> "P2Y"
@@ -497,9 +505,10 @@ internal class OneTimePurchaseProcessor(
     private fun resolveRevokeDays(productId: String): Int = when (productId) {
         InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
         InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_5YRS_DAYS
-        InAppBillingHandler.ONE_TIME_PRODUCT_ID -> InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
+        // Legacy one-time product has same 2-year access window → use the same revoke window.
+        InAppBillingHandler.ONE_TIME_PRODUCT_ID -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
         InAppBillingHandler.ONE_TIME_TEST_PRODUCT_ID -> InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
-        else -> InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
+        else -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_DAYS // conservative default
     }
 
     private fun Int.toSubscriptionStatusId(): Int = when (this) {

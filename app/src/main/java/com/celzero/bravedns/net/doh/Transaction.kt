@@ -19,6 +19,7 @@ package com.celzero.bravedns.net.doh
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.firestack.backend.Backend
 import java.util.Calendar
+import kotlin.enums.enumEntries
 
 class Transaction {
 
@@ -47,7 +48,7 @@ class Transaction {
     var blockedTarget: String = ""
     var isEch: Boolean = false
 
-    enum class Status(val id: Long) {
+    enum class Status(val id: Int) {
         START(Backend.Start),
         COMPLETE(Backend.Complete),
         SEND_FAIL(Backend.SendFailed),
@@ -59,8 +60,8 @@ class Transaction {
         INTERNAL_ERROR(Backend.InternalError);
 
         companion object {
-            fun fromId(id: Long): Status {
-                for (status in enumValues<Status>()) {
+            fun fromId(id: Int): Status {
+                for (status in enumEntries<Status>()) {
                     if (status.id == id) {
                         return status
                     }

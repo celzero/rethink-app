@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.rpnproxy
 
-import Logger
-import Logger.LOG_IAB
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_IAB
 // BillingResult import removed: savePurchaseFailureHistory now uses Int? for cross-flavor compat
 import com.celzero.bravedns.database.SubscriptionStateHistory
 import com.celzero.bravedns.database.SubscriptionStateHistoryDao
@@ -77,10 +77,7 @@ class StateMachineDatabaseSyncService : KoinComponent {
         val hasRealExpiry = sub.billingExpiry > 0L && sub.billingExpiry != Long.MAX_VALUE
         val isLocallyExpired = hasRealExpiry && sub.billingExpiry < now
 
-        // Determine if this is a one-time (INAPP) purchase by productId
-        val isInApp = sub.productId.contains("onetime", ignoreCase = true) ||
-                sub.productId.contains("inapp",   ignoreCase = true) ||
-                sub.productId == "test_product"
+        val isInApp = SubscriptionStateMachineV2.isInAppProduct(sub.productId)
 
         Logger.d(
             LOG_IAB, "$TAG: determineState: status=${sub.status}, productId=${sub.productId}, " +
@@ -229,6 +226,22 @@ class StateMachineDatabaseSyncService : KoinComponent {
             val existing = subscriptionRepository.getByPurchaseToken(purchaseDetail.purchaseToken)
             if (existing != null) {
                 Logger.d(LOG_IAB, "$TAG: savePurchaseDetail: row already exists id=${existing.id}")
+                // update developerPayload and orderId if they are provided in purchaseDetail
+                // but missing in DB. This handles the case where /g/ack returns the payload
+                // but handlePaymentSuccessful hasn't run yet.
+                var needsUpdate = false
+                if (purchaseDetail.payload.isNotEmpty() && existing.developerPayload != purchaseDetail.payload) {
+                    existing.developerPayload = purchaseDetail.payload
+                    needsUpdate = true
+                }
+                if (purchaseDetail.orderId.isNotEmpty() && existing.orderId != purchaseDetail.orderId) {
+                    existing.orderId = purchaseDetail.orderId
+                    needsUpdate = true
+                }
+                if (needsUpdate) {
+                    subscriptionRepository.upsert(existing)
+                    Logger.i(LOG_IAB, "$TAG: savePurchaseDetail: updated existing row id=${existing.id} with new data")
+                }
                 existing.id.toLong()
             } else {
                 val sub = convertPurchaseDetailToSubscriptionStatus(purchaseDetail)
@@ -357,9 +370,7 @@ class StateMachineDatabaseSyncService : KoinComponent {
             } catch (_: Exception) { emptyList() }
 
             val inAppRowsToExpire = rowsBeforeUpdate.filter { sub ->
-                (sub.productId.contains("onetime", ignoreCase = true) ||
-                 sub.productId.contains("inapp",   ignoreCase = true) ||
-                 sub.productId == "test_product") &&
+                SubscriptionStateMachineV2.isInAppProduct(sub.productId) &&
                 sub.billingExpiry > 0L &&
                 sub.billingExpiry != Long.MAX_VALUE &&
                 sub.billingExpiry < now

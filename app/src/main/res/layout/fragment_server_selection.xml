@@ -27,7 +27,7 @@
             app:expandedTitleMarginStart="10dp"
             app:expandedTitleMarginTop="10dp"
             app:expandedTitleTextAppearance="@style/TextAppearance.Material3.HeadlineMedium"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:titleEnabled="true">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -67,6 +67,7 @@
                             android:layout_marginEnd="8dp"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
+                            android:clipChildren="false"
                             android:visibility="visible">
 
                             <LinearLayout
@@ -120,12 +121,15 @@
                                 android:background="@drawable/bg_vpn_status_chip"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal"
-                                android:padding="4dp">
+                                android:clipChildren="false"
+                                android:clipToPadding="false"
+                                android:padding="8dp">
 
                                 <View
                                     android:id="@+id/status_indicator"
                                     android:layout_width="8dp"
                                     android:layout_height="8dp"
+                                    android:layout_marginStart="2dp"
                                     android:layout_marginEnd="6dp"
                                     android:background="@drawable/ic_circle"
                                     android:backgroundTint="?attr/accentGood" />
@@ -168,7 +172,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:visibility="visible"
+                            android:visibility="gone"
                             android:layout_marginStart="4dp"
                             android:layout_marginEnd="4dp"
                             app:shimmer_auto_start="true"
@@ -222,8 +226,8 @@
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginBottom="12dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"
                             android:alpha="0.3"
                             android:background="?attr/primaryTextColor" />
 
@@ -231,7 +235,6 @@
                             android:id="@+id/subscription_banner"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="12dp"
                             android:layout_marginStart="4dp"
                             android:layout_marginEnd="4dp"
                             android:orientation="horizontal"
@@ -284,7 +287,7 @@
                                 android:layout_height="56dp"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal"
-                                android:padding="14dp">
+                                android:padding="12dp">
 
                                 <View
                                     android:layout_width="20dp"
@@ -338,6 +341,23 @@
 
                         </LinearLayout>
 
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/tv_hero_who"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:fontFamily="monospace"
+                            android:alpha="0.75"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:textColor="?attr/homeScreenHeaderTextColor"
+                            android:textSize="@dimen/small_font_text_view"
+                            android:visibility="gone"
+                            tools:text="user@example.com"
+                            tools:visibility="visible" />
+
                     </LinearLayout>
 
                 </LinearLayout>
@@ -353,6 +373,16 @@
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/registration_progress_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:indicatorColor="?attr/accentGood"
+            app:trackColor="@android:color/transparent"
+            app:trackThickness="3dp" />
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -360,7 +390,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:layout_marginTop="10dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -372,7 +401,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="0dp"
                 android:layout_marginEnd="8dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
@@ -549,6 +578,7 @@
                 android:orientation="vertical"
                 android:paddingStart="32dp"
                 android:paddingEnd="32dp"
+                tools:visibility="visible"
                 android:visibility="gone">
 
                 <FrameLayout
@@ -614,8 +644,29 @@
                     android:textStyle="bold"
                     app:cornerRadius="26dp"
                     app:elevation="4dp"
+                    app:backgroundTint="?attr/accentBad"
+                    android:textColor="@android:color/white"
+                    app:iconTint="@android:color/white"
+                    app:icon="@drawable/ic_refresh"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/error_reset_btn"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="52dp"
+                    android:paddingStart="28dp"
+                    android:paddingEnd="28dp"
+                    android:text="@string/lbl_reset"
+                    android:textSize="@dimen/large_font_text_view"
+                    android:textStyle="bold"
+                    app:cornerRadius="26dp"
+                    android:layout_marginTop="10dp"
+                    app:elevation="4dp"
                     android:textColor="?attr/accentBad"
                     app:iconTint="?attr/accentBad"
+                    app:strokeColor="?attr/accentBad"
                     app:icon="@drawable/ic_refresh"
                     app:iconGravity="textStart"
                     app:iconPadding="8dp" />
@@ -747,6 +798,7 @@
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="32dp"
+                tools:visibility="visible"
                 android:visibility="gone">
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -804,7 +856,7 @@
         android:insetTop="0dp"
         android:insetBottom="0dp"
         android:text="@string/server_settings_start_rpn"
-        android:textColor="@android:color/white"
+        android:textColor="?attr/homeScreenHeaderTextColor"
         android:visibility="gone"
         app:elevation="8dp"
         app:icon="@drawable/ic_vpn"

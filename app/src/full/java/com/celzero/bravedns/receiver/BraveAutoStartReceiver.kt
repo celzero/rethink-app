@@ -16,14 +16,17 @@
 
 package com.celzero.bravedns.receiver
 
-import Logger
-import Logger.LOG_TAG_VPN
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.net.VpnService
+import com.celzero.bravedns.scheduler.BootStartWorker
+import com.celzero.bravedns.scheduler.BootStartWorker.Companion.BOOT_COMPLETE_EVENT
+import com.celzero.bravedns.scheduler.BootStartWorker.Companion.PACKAGE_REPLACED_EVENT
+import com.celzero.bravedns.scheduler.BootStartWorker.Companion.REBOOT_EVENT
+import com.celzero.bravedns.scheduler.BootStartWorker.Companion.USER_UNLOCKED_EVENT
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -35,7 +38,6 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
         if (
             Intent.ACTION_REBOOT != intent.action &&
                 Intent.ACTION_BOOT_COMPLETED != intent.action &&
-                Intent.ACTION_LOCKED_BOOT_COMPLETED != intent.action &&
                 Intent.ACTION_USER_UNLOCKED != intent.action &&
                 Intent.ACTION_MY_PACKAGE_REPLACED != intent.action
         ) {
@@ -43,38 +45,26 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
             return
         }
 
-        if (!persistentState.prefAutoStartBootUp && (intent.action == Intent.ACTION_BOOT_COMPLETED || intent.action == Intent.ACTION_REBOOT || intent.action == Intent.ACTION_LOCKED_BOOT_COMPLETED)) {
+        // MY_PACKAGE_REPLACED is intentionally exempt: after an app update we want to
+        // restore a previously-running VPN regardless of the boot-up toggle.
+        if (!persistentState.prefAutoStartBootUp &&
+            (intent.action == Intent.ACTION_BOOT_COMPLETED ||
+                    intent.action == Intent.ACTION_REBOOT ||
+                    intent.action == Intent.ACTION_USER_UNLOCKED)
+        ) {
             Logger.w(LOG_TAG_VPN, "auto-start not enabled: ${persistentState.prefAutoStartBootUp}, skipping")
             return
         }
 
-        // if vpn was running before reboot, attempt an auto-start
-        // but: if always-on is enabled, then back-off, since android
-        // is expected to kick-start the vpn up on its own
-        if (VpnController.state().activationRequested && !VpnController.isAlwaysOn(context)) {
-            val eventType = when (intent.action) {
-                Intent.ACTION_USER_UNLOCKED -> "user unlock (Private Space)"
-                Intent.ACTION_LOCKED_BOOT_COMPLETED -> "locked boot"
-                Intent.ACTION_MY_PACKAGE_REPLACED -> "app update"
-                Intent.ACTION_REBOOT -> "reboot"
-                Intent.ACTION_BOOT_COMPLETED -> "boot"
-                else -> "boot(${intent.action})"
-            }
-
-            val prepareVpnIntent: Intent? =
-                try {
-                    Logger.i(LOG_TAG_VPN, "attempting to auto-start VPN after $eventType")
-                    VpnService.prepare(context)
-                } catch (_: NullPointerException) {
-                    Logger.w(LOG_TAG_VPN, "device does not support system-wide VPN mode")
-                    return
-                }
-
-            if (prepareVpnIntent == null) {
-                Logger.i(LOG_TAG_VPN, "vpn auto-start, event: $eventType")
-                VpnController.start(context, autoAttempt = true)
-                return
-            }
+        val eventType = when (intent.action) {
+            Intent.ACTION_USER_UNLOCKED -> USER_UNLOCKED_EVENT
+            Intent.ACTION_MY_PACKAGE_REPLACED -> PACKAGE_REPLACED_EVENT
+            Intent.ACTION_REBOOT -> REBOOT_EVENT
+            Intent.ACTION_BOOT_COMPLETED -> BOOT_COMPLETE_EVENT
+            else -> "boot(${intent.action})"
         }
+
+        Logger.i(LOG_TAG_VPN, "scheduling boot-start worker after $eventType")
+        BootStartWorker.enqueue(context, eventType)
     }
 }

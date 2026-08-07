@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.iab
 
-import Logger
-import Logger.LOG_IAB
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_IAB
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -98,7 +98,7 @@ object DeviceAuthErrorNotifier {
                 notificationManager.createNotificationChannel(channel)
             }
 
-            val title = context.getString(R.string.device_auth_error_notif_title)
+            val title = context.getString(R.string.device_auth_error_title)
             val body  = context.getString(R.string.device_auth_error_notif_body)
 
             val builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_RPN_ALERTS)

@@ -15,9 +15,9 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
-import Logger
-import Logger.LOG_TAG_UI
-import Logger.LOG_TAG_VPN
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -26,28 +26,36 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
+import android.view.animation.Animation
+import android.view.animation.RotateAnimation
+import android.widget.Toast
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.BottomSheetHomeScreenBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.ProxySettingsActivity
 import com.celzero.bravedns.ui.activity.WgMainActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.SsidPermissionManager
-import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
+import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
-import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.useTransparentNoDimBackground
-import com.celzero.firestack.backend.Rpn
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import kotlin.time.Duration.Companion.milliseconds
 
 class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetHomeScreenBinding? = null
@@ -58,9 +66,12 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
 
     private val appConfig by inject<AppConfig>()
     private val persistentState by inject<PersistentState>()
+    private val eventLogger by inject<EventLogger>()
+
+    private lateinit var animation: Animation
 
     override fun getTheme(): Int =
-        getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        Themes.getBottomSheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     private fun isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
@@ -70,6 +81,9 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     companion object {
         const val SCREEN_WG = "screen_wireguard"
         const val SCREEN_PROXY = "screen_proxy"
+        // minimum duration the refresh icon animation stays visible, even if the
+        // underlying refresh completes faster
+        const val MIN_ANIMATION_DURATION_MS = 1500L
     }
 
     override fun onCreateView(
@@ -94,15 +108,25 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.let { window ->
-            if (isAtleastQ()) {
-                val controller = WindowInsetsControllerCompat(window, window.decorView)
-                controller.isAppearanceLightNavigationBars = false
-                window.isNavigationBarContrastEnforced = false
-            }
+            Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
         }
         initView()
         updateUptime()
+        addAnimation()
         initializeClickListeners()
+    }
+
+    private fun addAnimation() {
+        animation =
+            RotateAnimation(
+                0.0f,
+                360.0f,
+                Animation.RELATIVE_TO_SELF,
+                0.5f,
+                Animation.RELATIVE_TO_SELF,
+                0.5f)
+        animation.repeatCount = -1
+        animation.duration = 750
     }
 
     private fun initView() {
@@ -192,6 +216,50 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
                 // do nothing
             }
         }
+
+        b.bsHomeScreenRefreshIcon.setOnClickListener {
+            // prevent overlapping refreshes
+            if (!b.bsHomeScreenRefreshIcon.isEnabled) return@setOnClickListener
+            b.bsHomeScreenRefreshIcon.isEnabled = false
+            b.bsHomeScreenRefreshIcon.startAnimation(animation)
+            logEvent(
+                "refresh triggered",
+                "User triggered refresh from home screen btmsht"
+            )
+            ui {
+                var success = false
+                try {
+                    // run the refresh off the main thread; keep the spin animation
+                    // visible for at least the minimum duration even if the refresh
+                    // completes almost instantly
+                    val start = System.currentTimeMillis()
+                    ioCtx {
+                        VpnController.refreshResolvers()
+                        VpnController.refreshProxies()
+                    }
+                    // ensure the animation stays visible for a minimum duration
+                    val elapsed = System.currentTimeMillis() - start
+                    if (elapsed < MIN_ANIMATION_DURATION_MS) {
+                        delay((MIN_ANIMATION_DURATION_MS - elapsed).milliseconds)
+                    }
+                    success = true
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_VPN, "err refreshing resolvers/proxies: ${e.message}", e)
+                } finally {
+                    if (isAdded && isVisible) {
+                        b.bsHomeScreenRefreshIcon.isEnabled = true
+                        b.bsHomeScreenRefreshIcon.clearAnimation()
+                        if (success) {
+                            Utilities.showToastUiCentered(
+                                requireContext(),
+                                getString(R.string.dc_refresh_toast),
+                                Toast.LENGTH_SHORT
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun openProxySettings(screen: String) {
@@ -209,7 +277,7 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     // disable dns and firewall mode, show user that vpn in lockdown mode indicator if needed
     private fun handleLockdownModeIfNeeded() {
         val isLockdown = VpnController.isVpnLockdown()
-        val isProxyEnabled = appConfig.isProxyEnabled()
+        val isProxyEnabled = appConfig.isProxyEnabled() || RpnProxyManager.isRpnActive()
         if (isLockdown) {
             b.bsHomeScreenVpnLockdownDesc.text = htmlToSpannedText(getString(R.string.hs_btm_sheet_lock_down))
             b.bsHomeScreenVpnLockdownDesc.visibility = View.VISIBLE
@@ -313,7 +381,19 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
+    private fun logEvent(msg: String, details: String) {
+        eventLogger.log(EventType.UI_SETTING_CHANGED, Severity.LOW, msg, EventSource.UI, false, details)
+    }
+
+    private fun ui(f: suspend () -> Unit) {
+        lifecycleScope.launch(Dispatchers.Main) { f() }
+    }
+
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
+    }
+
+    private suspend fun ioCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.IO) { f() }
     }
 }

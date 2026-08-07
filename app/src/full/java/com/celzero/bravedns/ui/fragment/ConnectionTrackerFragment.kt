@@ -15,8 +15,8 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui.fragment
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.view.View
@@ -27,12 +27,15 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.adapter.ConnectionLogAdapter
 import com.celzero.bravedns.adapter.ConnectionTrackerAdapter
 import com.celzero.bravedns.database.ConnectionTrackerRepository
+import com.celzero.bravedns.database.RethinkLogRepository
 import com.celzero.bravedns.databinding.FragmentConnectionTrackerBinding
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
@@ -52,6 +55,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.time.Duration.Companion.milliseconds
 
 /** Captures network logs and stores in ConnectionTracker, a room database. */
 class ConnectionTrackerFragment :
@@ -60,11 +64,13 @@ class ConnectionTrackerFragment :
 
     private var layoutManager: RecyclerView.LayoutManager? = null
     private val viewModel: ConnectionTrackerViewModel by viewModel()
+    private var lastScrollHeaderUpdateMs = 0L
 
     private var filterQuery: String = ""
     private val filterCategories: MutableSet<String> = mutableSetOf()
     private var filterType: TopLevelFilter = TopLevelFilter.ALL
     private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
+    private val rethinkLogRepository by inject<RethinkLogRepository>()
     private val persistentState by inject<PersistentState>()
 
     private var fromWireGuardScreen: Boolean = false
@@ -75,6 +81,13 @@ class ConnectionTrackerFragment :
         private const val TAG = "ConnTrackFrag"
         const val PROTOCOL_FILTER_PREFIX = "P:"
         private const val QUERY_TEXT_DELAY: Long = 1000
+
+        /**
+         * When true, ConnectionTrackerFragment shows a unified list of both
+         * ConnectionTracker and RethinkLog rows. When false, only ConnectionTracker
+         * rows are shown (legacy behaviour).
+         */
+        const val MERGE_RETHINK_LOGS = true
 
         fun newInstance(param: String): ConnectionTrackerFragment {
             val args = Bundle()
@@ -155,10 +168,22 @@ class ConnectionTrackerFragment :
 
     private fun setupRecyclerView() {
         b.recyclerConnection.setHasFixedSize(true)
+        b.recyclerConnection.setItemViewCacheSize(6)
         layoutManager = LinearLayoutManager(requireContext())
         layoutManager?.isItemPrefetchEnabled = true
         b.recyclerConnection.layoutManager = layoutManager
 
+        if (MERGE_RETHINK_LOGS) {
+            setupMergedRecyclerView()
+        } else {
+            setupConnectionTrackerRecyclerView()
+        }
+
+        b.recyclerConnection.layoutAnimation = null
+        setupRecyclerScrollListener()
+    }
+
+    private fun setupConnectionTrackerRecyclerView() {
         val recyclerAdapter = ConnectionTrackerAdapter(requireContext())
         recyclerAdapter.stateRestorationPolicy =
             RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
@@ -171,8 +196,16 @@ class ConnectionTrackerFragment :
 
         recyclerAdapter.addLoadStateListener { loadState ->
             val isEmpty = recyclerAdapter.itemCount < 1
+
+            if (loadState.refresh is LoadState.Loading && isEmpty) {
+                b.connectionListLogsDisabledTv.text = getString(R.string.loading)
+                b.connectionListLogsDisabledTv.visibility = View.VISIBLE
+                b.recyclerConnection.visibility = View.GONE
+                return@addLoadStateListener
+            }
+
             if (loadState.append.endOfPaginationReached && isEmpty) {
-                if (fromUniversalFirewallScreen || fromWireGuardScreen) {
+                if (fromUniversalFirewallScreen || fromWireGuardScreen || fromRpnScreen) {
                     b.connectionListLogsDisabledTv.text = getString(R.string.ada_ip_no_connection)
                     b.connectionListLogsDisabledTv.visibility = View.VISIBLE
                     b.connectionCardViewTop.visibility = View.GONE
@@ -185,7 +218,7 @@ class ConnectionTrackerFragment :
             } else {
                 b.connectionListLogsDisabledTv.visibility = View.GONE
                 if (!b.recyclerConnection.isVisible) b.recyclerConnection.visibility = View.VISIBLE
-                if (fromUniversalFirewallScreen || fromWireGuardScreen) {
+                if (fromUniversalFirewallScreen || fromWireGuardScreen || fromRpnScreen) {
                     b.connectionCardViewTop.visibility = View.GONE
                 } else {
                     b.connectionCardViewTop.visibility = View.VISIBLE
@@ -203,8 +236,62 @@ class ConnectionTrackerFragment :
                 Logger.e(LOG_TAG_UI, "$TAG; err in setting the recycler restoration policy")
             }
         }
-        b.recyclerConnection.layoutAnimation = null
-        setupRecyclerScrollListener()
+    }
+
+    private fun setupMergedRecyclerView() {
+        val recyclerAdapter = ConnectionLogAdapter(requireContext())
+        recyclerAdapter.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+
+        b.recyclerConnection.adapter = recyclerAdapter
+
+        viewModel.connectionTrackerListMerged.observe(viewLifecycleOwner) { pagingData ->
+            recyclerAdapter.submitData(lifecycle, pagingData)
+        }
+
+        recyclerAdapter.addLoadStateListener { loadState ->
+            val isEmpty = recyclerAdapter.itemCount < 1
+
+            // Show loading indicator during initial load
+            if (loadState.refresh is LoadState.Loading && isEmpty) {
+                b.connectionListLogsDisabledTv.text = getString(R.string.loading)
+                b.connectionListLogsDisabledTv.visibility = View.VISIBLE
+                b.recyclerConnection.visibility = View.GONE
+                return@addLoadStateListener
+            }
+
+            if (loadState.append.endOfPaginationReached && isEmpty) {
+                if (fromUniversalFirewallScreen || fromWireGuardScreen || fromRpnScreen) {
+                    b.connectionListLogsDisabledTv.text = getString(R.string.ada_ip_no_connection)
+                    b.connectionListLogsDisabledTv.visibility = View.VISIBLE
+                    b.connectionCardViewTop.visibility = View.GONE
+                } else {
+                    b.connectionListLogsDisabledTv.visibility = View.GONE
+                    b.connectionCardViewTop.visibility = View.VISIBLE
+                }
+                viewModel.connectionTrackerListMerged.removeObservers(this)
+                b.recyclerConnection.visibility = View.GONE
+            } else {
+                b.connectionListLogsDisabledTv.visibility = View.GONE
+                if (!b.recyclerConnection.isVisible) b.recyclerConnection.visibility = View.VISIBLE
+                if (fromUniversalFirewallScreen || fromWireGuardScreen || fromRpnScreen) {
+                    b.connectionCardViewTop.visibility = View.GONE
+                } else {
+                    b.connectionCardViewTop.visibility = View.VISIBLE
+                }
+            }
+        }
+
+        b.recyclerConnection.post {
+            try {
+                if (recyclerAdapter.itemCount > 0) {
+                    recyclerAdapter.stateRestorationPolicy =
+                        RecyclerView.Adapter.StateRestorationPolicy.ALLOW
+                }
+            } catch (_: Exception) {
+                Logger.e(LOG_TAG_UI, "$TAG; err in setting the recycler restoration policy")
+            }
+        }
     }
 
 
@@ -232,6 +319,10 @@ class ConnectionTrackerFragment :
 
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
+
+                    val now = System.currentTimeMillis()
+                    if (now - lastScrollHeaderUpdateMs < 100L) return
+                    lastScrollHeaderUpdateMs = now
 
                     val firstChild = recyclerView.getChildAt(0)
                     if (firstChild == null) {
@@ -356,7 +447,7 @@ class ConnectionTrackerFragment :
     private fun setQueryFilter() {
         lifecycleScope.launch {
             searchQuery
-                .debounce(QUERY_TEXT_DELAY)
+                .debounce(QUERY_TEXT_DELAY.milliseconds)
                 .distinctUntilChanged()
                 .collect { query ->
                     filterQuery = query
@@ -386,7 +477,12 @@ class ConnectionTrackerFragment :
                 .setMessage(R.string.conn_track_clear_rule_logs_message)
                 .setCancelable(true)
                 .setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
-                    io { connectionTrackerRepository.clearLogsByRule(rule) }
+                    io {
+                        connectionTrackerRepository.clearLogsByRule(rule)
+                        if (MERGE_RETHINK_LOGS) {
+                            rethinkLogRepository.clearLogsByRule(rule)
+                        }
+                    }
                 }
                 .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
                 .create()
@@ -398,7 +494,12 @@ class ConnectionTrackerFragment :
                 .setMessage(R.string.conn_track_clear_logs_message)
                 .setCancelable(true)
                 .setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
-                    io { connectionTrackerRepository.clearAllData() }
+                    io {
+                        connectionTrackerRepository.clearAllData()
+                        if (MERGE_RETHINK_LOGS) {
+                            rethinkLogRepository.clearAllData()
+                        }
+                    }
                 }
                 .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
                 .create()

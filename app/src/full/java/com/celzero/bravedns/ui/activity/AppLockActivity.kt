@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.app.ComponentCaller
 import android.app.UiModeManager
 import android.content.Context
@@ -26,15 +26,16 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import android.os.SystemClock
 import android.widget.Toast
-import com.celzero.bravedns.ui.BaseActivity
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.LauncherSwitcher
+import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
@@ -70,7 +71,7 @@ class AppLockActivity : BaseActivity(R.layout.activity_app_lock) {
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
 
@@ -162,6 +163,7 @@ class AppLockActivity : BaseActivity(R.layout.activity_app_lock) {
     private fun startHomeActivity() {
         Logger.v(LOG_TAG_UI, "$TAG starting home activity")
         val intent = Intent(this, HomeScreenActivity::class.java).apply {
+            putExtras(intent)
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
         startActivity(intent)

@@ -16,18 +16,19 @@
 package com.celzero.bravedns
 
 import android.content.ContentResolver
-import com.celzero.bravedns.iab.BillingModule
 import com.celzero.bravedns.data.DataModule
 import com.celzero.bravedns.database.DatabaseModule
 import com.celzero.bravedns.download.AppDownloadManager
+import com.celzero.bravedns.iab.BillingModule
+import com.celzero.bravedns.sponsor.SponsorModule
+import com.celzero.bravedns.rpnproxy.StateMachineDatabaseSyncService
+import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2
 import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.InAppMessageProvider
 import com.celzero.bravedns.service.NoOpInAppMessageProvider
 import com.celzero.bravedns.service.ServiceModule
-import com.celzero.bravedns.rpnproxy.StateMachineDatabaseSyncService
-import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.viewmodel.ViewModelModule
@@ -76,5 +77,6 @@ val AppModules: List<Module> by lazy {
         add(orbotHelperModule)
         add(appDownloadManagerModule)
         add(BillingModule.billingModules)
+        addAll(SponsorModule.modules)
     }
 }

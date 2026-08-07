@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.iab
 
-import Logger
-import Logger.LOG_IAB
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_IAB
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -26,7 +26,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
+import com.celzero.bravedns.iab.DeviceNotRegisteredNotifier.NOTIF_CHANNEL_ID_RPN_ALERTS
 import com.celzero.bravedns.ui.NotificationHandlerActivity
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_ID_IAB_DEVICE_NOT_REGISTERED
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_IAB_DEVICE_NOT_REGISTERED_NAME
@@ -98,7 +98,7 @@ object DeviceNotRegisteredNotifier {
                 notificationManager.createNotificationChannel(channel)
             }
 
-            val title = context.getString(R.string.device_not_registered_notif_title)
+            val title = context.getString(R.string.device_not_registered_title)
             val body  = context.getString(R.string.device_not_registered_notif_body)
 
             val builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_RPN_ALERTS)

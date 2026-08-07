@@ -423,7 +423,6 @@
     <string name="settings_notification_heading">选择通知行为</string>
     <string name="firewall_status_isolate">已隔离</string>
     <string name="hsf_start_btn_state">启动</string>
-    <string name="hsf_proxy_chip_remove_text">停止中……</string>
     <string name="about_version">v%1$s</string>
     <string name="cd_dns_proxy_mode_external">外部</string>
     <string name="cd_dns_proxy_error_text_1">无效 IP 地址</string>
@@ -1030,11 +1029,9 @@
     <string name="lbl_secure" translatable="true">安全</string>
     <string name="lbl_anonymous" translatable="true">匿名</string>
     <string name="lbl_peer" translatable="true">对等端点</string>
-    <string name="failed_using_default" translatable="true">失败：使用回落 DNS</string>
     <string name="settings_rinr_heading" translatable="true">环回（实验性）</string>
     <string name="settings_rinr_desc_enabled" translatable="true">将 Rethink 自身的流量路由入隧道。若您不了解您在做什么，请不要启用。</string>
     <string name="settings_rinr_desc_disabled" translatable="true">将如下载屏蔽名单、连接检查与 DNS 连接等的 Rethink 自身流量路由回隧道。</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">这会同时启用“<!--settings_network_all_networks--> %1$s”设置。您是否想要继续？</string>
     <string name="one_wg_apps_added" translatable="true">正在路由所有应用</string>
     <string name="one_wg_dialog_desc" translatable="true">包括 DNS 在内的来自所有应用的流量将被单个活跃的 WireGuard VPN 路由。其他活跃的 WireGuard VPN 将被停止。</string>
     <string name="catch_all_wg_dialog_title" translatable="true">永久连接</string>
@@ -1049,7 +1046,6 @@
     <string name="dot_custom_url_remove_dialog_message" translatable="true">于已保存的配置中删除此 DNS over TLS 端点。</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">使通知变得持久</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">持续通知</string>
-    <string name="settings_rinr_dialog_title" translatable="true">环回（实验性）</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">是否删除 DoT 端点？</string>
     <string name="orbot_no_app_toast" translatable="true">添加至少一个应用以应用 Orbot</string>
     <string name="cd_dialog_edit_title" translatable="true">编辑域名规则</string>
@@ -1107,8 +1103,6 @@
     <string name="dc_filtering_heading" translatable="true">过滤</string>
     <string name="cd_split_dns_heading" translatable="true">DNS 分流（实验性）</string>
     <string name="cd_split_dns_desc" translatable="true">将代理应用的 DNS 请求转发至代理的 DNS 服务器。</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">将 DNS 规则视为防火墙规则（实验性）</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">DNS 将在解析中绕过拦截；决定将在连接时作出。</string>
     <string name="firewall_rule_private_dns" translatable="true">私人 DNS</string>
     <string name="firewall_rule_bypass_proxy" translatable="true">绕行代理</string>
     <string name="firewall_rule_paused_app" translatable="true">应用已暂停</string>
@@ -1117,7 +1111,7 @@
     <string name="lbl_protos" translatable="true">协议</string>
     <string name="lbl_hop" translatable="true">中继</string>
     <string name="lbl_manual" translatable="true">手动</string>
-    <string name="lbl_fallback" translatable="true">回落</string>
+    <string name="lbl_bootstrap" translatable="true">回落</string>
     <string name="univ_firewall_rule_11" translatable="true">拦截全部本地连接</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">是否删除所有域名规则？</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">删除这些规则后会允许任何应用连接这些当前被拦截的域名。</string>

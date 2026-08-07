@@ -193,7 +193,7 @@
         <item name="chipTextColor">?attr/colorOnPrimary</item>
         <item name="secondaryTextColor">?attr/accentGood</item>
         <item name="textColorAccentBad">?attr/colorError</item>
-        <item name="homeScreenHeaderTextColor">?attr/colorOnPrimary</item>
+        <item name="homeScreenHeaderTextColor">?attr/colorOnSurface</item>
 
         <item name="switchNormal">@color/switchNormalLight</item>
         <item name="colorSwitchThumbNormal">@color/colorSwitchThumbNormalLight</item>
@@ -352,7 +352,7 @@
         <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtBlack</item>
         <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgBlack</item>
 
-        <item name="homeScreenBtnGradientEnd">@color/homeScreenBtnBackgroundBlack</item>
+        <item name="homeScreenBtnGradientEnd">@color/colorPrimaryBlack</item>
         <item name="homeScreenBtnGradientStart">@color/colorPrimaryDarkBlack</item>
         <item name="vpnHeaderGradientStart">@color/vpnHeaderGradientStartBlack</item>
         <item name="vpnHeaderGradientCenter">@color/vpnHeaderGradientCenterBlack</item>
@@ -420,7 +420,7 @@
         <item name="chipTextColor">?attr/colorOnPrimary</item>
         <item name="secondaryTextColor">?attr/accentGood</item>
         <item name="textColorAccentBad">?attr/colorError</item>
-        <item name="homeScreenHeaderTextColor">?attr/colorOnPrimary</item>
+        <item name="homeScreenHeaderTextColor">?attr/colorOnSurface</item>
 
         <item name="switchNormal">@color/switchNormalLightPlus</item>
         <item name="colorSwitchThumbNormal">@color/colorSwitchThumbNormalLightPlus</item>
@@ -594,6 +594,7 @@
     </style>
 
     <style name="AppThemeTrueBlackFrost" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
         <!-- M3 Standard Palette -->
         <item name="colorPrimary">@color/accentGoodBlack</item>
         <item name="colorOnPrimary">@android:color/black</item>
@@ -651,6 +652,7 @@
         <item name="switchStyle">@style/CustomMaterialSwitch</item>
         <item name="android:switchStyle">@style/CustomMaterialSwitch</item>
 
+        <item name="navBarColor">@color/cardBackgroundBG</item>
         <item name="android:navigationBarColor">@color/navBarColorBlack</item>
         <item name="tabIndicator">@color/tabIndicatorBlack</item>
 
@@ -686,13 +688,13 @@
         <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtBlack</item>
         <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgBlack</item>
 
-        <item name="homeScreenBtnGradientEnd">@color/homeScreenBtnBackgroundBlack</item>
-        <item name="homeScreenBtnGradientStart">@color/colorPrimaryDarkBlack</item>
+        <item name="homeScreenBtnGradientEnd">@color/frost_white_10</item>
+        <item name="homeScreenBtnGradientStart">@color/frost_black_30</item>
         <item name="vpnHeaderGradientStart">@color/vpnHeaderGradientStartBlack</item>
         <item name="vpnHeaderGradientCenter">@color/vpnHeaderGradientCenterBlack</item>
         <item name="vpnHeaderGradientEnd">@color/vpnHeaderGradientEndBlack</item>
         <item name="colorGolden">@color/colorGoldenBlack</item>
-        <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView</item>
+        <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView.Frost</item>
 
         <!-- Guided Tour -->
         <item name="tourOverlayColor">@color/tourOverlayBlack</item>
@@ -727,73 +729,12 @@
     </style>
 
     <!-- Light theme switch style -->
-    <style name="CustomMaterialSwitchLight" parent="Widget.Material3.CompoundButton.MaterialSwitch">
-        <item name="thumbTint">@color/accentGoodLight</item>
-        <item name="trackTint">@color/colorSurfaceLight</item>
-        <item name="thumbTintMode">src_in</item>
-        <item name="trackTintMode">src_in</item>
-        <item name="materialThemeOverlay">@style/CustomSwitchThemeOverlayLight</item>
-    </style>
 
     <!-- Light theme overlay to force switch colors -->
-    <style name="CustomSwitchThemeOverlayLight">
-        <item name="colorPrimary">@color/accentGoodLight</item>
-        <item name="colorSurfaceVariant">@color/colorSurfaceVariantLight</item>
-        <item name="colorSurface">@color/colorSurfaceLight</item>
-        <item name="colorOutline">@color/borderLight</item>
-    </style>
 
     <!-- Base required by Android dot-notation implicit parent resolution -->
-    <style name="SwitchOverlay.Sheet" />
-    <style name="SwitchOverlay" />
-
-    <style name="SwitchOverlay.Sheet.Dark">
-        <item name="colorPrimary">@color/accentGood</item>
-        <item name="colorSurfaceVariant">@color/colorSurfaceVariantDark</item>
-        <item name="colorSurface">@color/colorSurfaceBG</item>
-        <item name="colorOutline">@color/borderBG</item>
-    </style>
-    <style name="SwitchOverlay.Sheet.Light">
-        <item name="colorPrimary">@color/accentGoodLight</item>
-        <item name="colorSurfaceVariant">@color/colorSurfaceVariantLight</item>
-        <item name="colorSurface">@color/colorSurfaceLight</item>
-        <item name="colorOutline">@color/borderLight</item>
-    </style>
-    <style name="SwitchOverlay.Sheet.Black">
-        <item name="colorPrimary">@color/accentGoodBlack</item>
-        <item name="colorSurfaceVariant">@color/colorSurfaceVariantBlack</item>
-        <item name="colorSurface">@color/colorSurfaceBlack</item>
-        <item name="colorOutline">@color/borderBlack</item>
-    </style>
-    <style name="SwitchOverlay.Sheet.LightPlus">
-        <item name="colorPrimary">@color/accentGoodLightPlus</item>
-        <item name="colorSurfaceVariant">@color/colorSurfaceVariantLightPlus</item>
-        <item name="colorSurface">@color/colorSurfaceLightPlus</item>
-        <item name="colorOutline">@color/borderLightPlus</item>
-    </style>
-    <style name="SwitchOverlay.Sheet.BlackPlus">
-        <item name="colorPrimary">@color/accentGoodBlackPlus</item>
-        <item name="colorSurfaceVariant">@color/colorSurfaceVariantBlackPlus</item>
-        <item name="colorSurface">@color/colorSurfaceBlackPlus</item>
-        <item name="colorOutline">@color/borderBlackPlus</item>
-    </style>
 
     <!-- Per-theme switch widget styles for bottom sheets -->
-    <style name="MaterialSwitch.Sheet.Dark" parent="Widget.Material3.CompoundButton.MaterialSwitch">
-        <item name="materialThemeOverlay">@style/SwitchOverlay.Sheet.Dark</item>
-    </style>
-    <style name="MaterialSwitch.Sheet.Light" parent="Widget.Material3.CompoundButton.MaterialSwitch">
-        <item name="materialThemeOverlay">@style/SwitchOverlay.Sheet.Light</item>
-    </style>
-    <style name="MaterialSwitch.Sheet.Black" parent="Widget.Material3.CompoundButton.MaterialSwitch">
-        <item name="materialThemeOverlay">@style/SwitchOverlay.Sheet.Black</item>
-    </style>
-    <style name="MaterialSwitch.Sheet.LightPlus" parent="Widget.Material3.CompoundButton.MaterialSwitch">
-        <item name="materialThemeOverlay">@style/SwitchOverlay.Sheet.LightPlus</item>
-    </style>
-    <style name="MaterialSwitch.Sheet.BlackPlus" parent="Widget.Material3.CompoundButton.MaterialSwitch">
-        <item name="materialThemeOverlay">@style/SwitchOverlay.Sheet.BlackPlus</item>
-    </style>
 
     <style name="BottomSheet" parent="Theme.Material3.DayNight.BottomSheetDialog">
         <item name="android:background">@drawable/bg_bottom_sheet_dialog_fragment</item>
@@ -1022,35 +963,46 @@
         <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgBlackPlus</item>
     </style>
 
+    <style name="BottomSheetDialogThemeTrueBlackFrost" parent="BaseBottomSheetDialog">
+        <item name="colorSurface">@color/btmSheetBgColorBG</item>
+        <item name="colorOnSurface">@color/primaryTextBG</item>
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariantBlack</item>
+        <item name="colorOnSurfaceVariant">@color/primaryLightColorTextBG</item>
+        <item name="colorSurfaceContainer">@color/cardBackgroundBG</item>
+        <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView.Frost</item>
+        <item name="colorPrimary">@color/accentGoodBG</item>
+        <item name="colorOnPrimary">@android:color/black</item>
+        <item name="colorOutline">@color/borderBG</item>
+        <item name="navBarColor">@color/navBarColorBG</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:navigationBarColor">@color/navBarColorBG</item>
+
+        <item name="accentGood">@color/accentGoodBG</item>
+
+        <item name="switchNormal">@color/switchNormalBG</item>
+        <item name="colorSwitchThumbNormal">@color/colorSwitchThumbNormalBG</item>
+        <item name="controlActivated">@color/colorControlActivatedBG</item>
+        <item name="controlActivatedBad">@color/colorControlActivatedBadBG</item>
+
+        <item name="materialSwitchStyle">@style/CustomMaterialSwitch</item>
+        <item name="switchStyle">@style/CustomMaterialSwitch</item>
+        <item name="android:switchStyle">@style/CustomMaterialSwitch</item>
+
+        <item name="firewallNoRuleToggleBtnTxt">@color/firewallNoRuleToggleBtnTxtBlack</item>
+        <item name="firewallNoRuleToggleBtnBg">@color/firewallNoRuleToggleBtnBgBlack</item>
+        <item name="firewallBlockToggleBtnTxt">@color/firewallBlockToggleBtnTxtBlack</item>
+        <item name="firewallBlockToggleBtnBg">@color/firewallBlockToggleBtnBgBlack</item>
+        <item name="firewallWhiteListToggleBtnTxt">@color/firewallWhiteListToggleBtnTxtBlack</item>
+        <item name="firewallWhiteListToggleBtnBg">@color/firewallWhiteListToggleBtnBgBlack</item>
+        <item name="firewallExcludeToggleBtnTxt">@color/firewallExcludeToggleBtnTxtBlack</item>
+        <item name="firewallExcludeToggleBtnBg">@color/firewallExcludeToggleBtnBgBlack</item>
+        <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtBlack</item>
+        <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgBlack</item>
+    </style>
+
     <style name="SearchView.Custom" parent="Widget.AppCompat.SearchView">
         <item name="searchViewStyle">@style/Widget.AppCompat.Light.SearchView</item>
         <item name="android:maxWidth">@dimen/max_size</item>
-    </style>
-
-    <style name="Chip.HomeScreen.Entry" parent="Widget.Material3.Chip.Assist">
-        <item name="android:padding">10dp</item>
-        <item name="android:textColor">?attr/chipTextColor</item>
-        <item name="checkedIconVisible">false</item>
-        <item name="iconStartPadding">5dp</item>
-        <item name="shapeAppearance">@style/ShapeAppearance.LargeComponent</item>
-        <item name="chipBackgroundColor">?attr/homeScreenBtnBackground</item>
-    </style>
-
-    <style name="Chip.HomeScreen.Action" parent="Widget.Material3.Chip.Assist">
-        <item name="android:padding">10dp</item>
-        <item name="android:textColor">?attr/chipTextColor</item>
-        <item name="checkedIconVisible">false</item>
-        <item name="iconStartPadding">5dp</item>
-        <item name="shapeAppearance">@style/ShapeAppearance.LargeComponent</item>
-        <item name="chipBackgroundColor">?attr/homeScreenBtnBackground</item>
-    </style>
-
-    <style name="ThinnerChip" parent="Widget.Material3.Chip.Filter">
-        <item name="chipCornerRadius">12dp</item>
-        <item name="chipMinHeight">24dp</item>
-        <item name="android:textSize">11sp</item>
-        <item name="chipMinTouchTargetSize">30dp</item>
-        <item name="chipBackgroundColor">?attr/homeScreenBtnBackground</item>
     </style>
 
     <style name="ThinnerChip.Large" parent="Widget.Material3.Chip.Filter">
@@ -1068,13 +1020,6 @@
         <item name="chipMinTouchTargetSize">30dp</item>
         <item name="chipIconSize">15dp</item>
         <item name="chipBackgroundColor">?attr/homeScreenBtnBackground</item>
-    </style>
-
-    <style name="ThinnerChip.Entry" parent="Widget.Material3.Chip.Assist">
-        <item name="chipCornerRadius">12dp</item>
-        <item name="chipMinHeight">24dp</item>
-        <item name="android:textSize">11sp</item>
-        <item name="chipMinTouchTargetSize">30dp</item>
     </style>
 
     <style name="ShapeAppearance.LargeComponent" parent="ShapeAppearance.Material3.LargeComponent">
@@ -1101,16 +1046,6 @@
         <item name="android:textSize">@dimen/small_font_subheading_text</item>
     </style>
 
-    <style name="TextAppearance.Widget.HomeScreen.Title" parent="TextAppearance.Material3.TitleLarge">
-        <item name="android:background">@android:color/transparent</item>
-        <item name="android:drawablePadding">10dp</item>
-        <item name="android:padding">5dp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:alpha">0.8</item>
-        <item name="android:textColor">?attr/colorOnSurface</item>
-        <item name="android:textSize">@dimen/extra_large_font_text_view</item>
-    </style>
-
     <style name="TextAppearance.Widget.HomeScreen.Desc" parent="TextAppearance.Material3.BodyMedium">
         <item name="android:background">@android:color/transparent</item>
         <item name="android:drawablePadding">10dp</item>
@@ -1121,14 +1056,6 @@
         <item name="android:ellipsize">end</item>
         <item name="android:textColor">?attr/homeScreenHeaderTextColor</item>
         <item name="android:textSize">@dimen/extra_large_font_text_view</item>
-    </style>
-
-    <style name="Button.HomeScreen.Borderless" parent="Widget.Material3.Button.TextButton">
-        <item name="android:textAlignment">viewStart</item>
-        <item name="android:textColor">?attr/colorPrimary</item>
-        <item name="android:textSize">@dimen/default_font_text_view</item>
-        <item name="android:drawableEnd">@drawable/ic_right_arrow_white</item>
-        <item name="android:padding">10dp</item>
     </style>
 
     <style name="Button.HomeScreen.Main" parent="Widget.Material3.Button">
@@ -1208,6 +1135,7 @@
         AlphaLight : Purple 700 — sufficient contrast on white/light surfaces.
     -->
     <style name="ThemeOverlay.App.AlphaDark" parent="">
+        <item name="colorPrimary">@color/alpha_accent_dark</item>
         <item name="colorAccent">@color/alpha_accent_dark</item>
         <item name="android:colorAccent">@color/alpha_accent_dark</item>
         <item name="accentGood">@color/alpha_accent_dark</item>
@@ -1216,6 +1144,7 @@
     </style>
 
     <style name="ThemeOverlay.App.AlphaLight" parent="">
+        <item name="colorPrimary">@color/alpha_accent_light</item>
         <item name="colorAccent">@color/alpha_accent_light</item>
         <item name="android:colorAccent">@color/alpha_accent_light</item>
         <item name="accentGood">@color/alpha_accent_light</item>
@@ -1223,6 +1152,17 @@
         <item name="secondaryTextColor">@color/alpha_accent_light</item>
         <item name="homeScreenBtnGradientEnd">@color/alpha_accent_light</item>
         <item name="homeScreenBtnGradientStart">@color/alpha_accent_light</item>
+    </style>
+
+    <style name="Widget.Sponsor.Slider" parent="Widget.Material3.Slider">
+        <item name="android:stepSize">1</item>
+        <item name="tickVisible">true</item>
+        <item name="labelBehavior">floating</item>
+        <item name="thumbRadius">14dp</item>
+        <item name="haloRadius">28dp</item>
+        <item name="trackHeight">8dp</item>
+        <item name="thumbElevation">2dp</item>
+        <item name="haloColor">?attr/colorPrimaryContainer</item>
     </style>
 
 

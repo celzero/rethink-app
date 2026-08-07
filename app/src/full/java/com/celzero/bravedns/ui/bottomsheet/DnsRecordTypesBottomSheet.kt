@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
@@ -32,7 +31,6 @@ import com.celzero.bravedns.util.ResourceRecordTypes
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
-import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
@@ -51,7 +49,7 @@ class DnsRecordTypesBottomSheet : BottomSheetDialogFragment() {
     private var isAutoMode = true
 
     override fun getTheme(): Int =
-        Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        Themes.getBottomSheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     private fun isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
@@ -75,11 +73,7 @@ class DnsRecordTypesBottomSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.let { window ->
-            if (isAtleastQ()) {
-                val controller = WindowInsetsControllerCompat(window, window.decorView)
-                controller.isAppearanceLightNavigationBars = false
-                window.isNavigationBarContrastEnforced = false
-            }
+            Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
         }
         initView()
         setupAutoModeCard()

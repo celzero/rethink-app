@@ -159,7 +159,7 @@
                 android:fontFamily="sans-serif-medium"
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp"
-                android:text="@string/tour_btn_next"
+                android:text="@string/next"
                 android:textColor="?attr/tourButtonTextColor"
                 android:textSize="13sp"
                 app:cornerRadius="20dp"

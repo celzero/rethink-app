@@ -96,6 +96,8 @@ interface RethinkLogDao {
 
     @Query("delete from RethinkLog where uid = :uid") fun clearLogsByUid(uid: Int)
 
+    @Query("delete from RethinkLog where blockedByRule = :rule") fun clearLogsByRule(rule: String)
+
     @Query("DELETE FROM RethinkLog WHERE  timeStamp < :date") fun purgeLogsByDate(date: Long)
 
     @Query(

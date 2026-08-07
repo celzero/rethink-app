@@ -250,8 +250,6 @@ internal fun pillFor(
         "Exclude" to Color(0xFF607D8B)
     FirewallManager.FirewallStatus.ISOLATE ->
         "Isolate" to Color(0xFFEF6C00)
-    FirewallManager.FirewallStatus.UNTRACKED ->
-        "Untracked" to Color(0xFF455A64)
     FirewallManager.FirewallStatus.NONE -> when (connectionStatus) {
         FirewallManager.ConnectionStatus.ALLOW -> "Allow" to Color(0xFF2E7D32)
         FirewallManager.ConnectionStatus.BOTH -> "Block" to Color(0xFFC62828)

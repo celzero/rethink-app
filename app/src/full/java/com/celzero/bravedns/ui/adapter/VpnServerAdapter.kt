@@ -15,14 +15,18 @@
  */
 package com.celzero.bravedns.ui.adapter
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -41,7 +45,6 @@ import com.celzero.bravedns.ui.activity.RpnConfigDetailActivity
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.IPMetadata
 import com.celzero.firestack.backend.RouterStats
@@ -52,6 +55,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.Locale
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Adapter for the list of currently-selected (active) VPN servers shown in ServerSelectionFragment
@@ -124,7 +128,8 @@ class VpnServerAdapter(
     }
 
     companion object {
-        private const val STATS_POLL_MS = 2500L
+        private const val STATS_POLL_MS = 1500L
+        private const val MIN_REFRESH_ANIM_MS = 1500L
     }
 
     data class ServerGroup(
@@ -142,7 +147,7 @@ class VpnServerAdapter(
 
         fun getBestServer(): CountryConfig = servers.minByOrNull { it.load } ?: servers.first()
 
-        fun proxyId(): String = if (key.equals(AUTO_SERVER_ID, true)) "${Backend.RpnWin}**" else Backend.RpnWin + key
+        fun proxyId(): String = if (key.equals(AUTO_SERVER_ID, true)) Backend.RpnWin else Backend.RpnWin + key
     }
 
     interface ServerSelectionListener {
@@ -162,6 +167,7 @@ class VpnServerAdapter(
     }
 
     override fun onBindViewHolder(holder: ServerViewHolder, position: Int) {
+        if (lifecycleOwner == null) lifecycleOwner = holder.itemView.findViewTreeLifecycleOwner()
         holder.bind(serverGroups[position])
     }
 
@@ -211,14 +217,20 @@ class VpnServerAdapter(
 
         fun bind(group: ServerGroup) {
             b.tvServerIp.visibility = View.GONE
+            b.tvAppsCount.visibility = View.GONE
+            b.tvUptime.visibility = View.GONE
+            b.tvCcSep.visibility = View.GONE
+            b.tvUptimeSep.visibility = View.GONE
 
             if (group.key.equals(AUTO_SERVER_ID, ignoreCase = true)) {
-                b.infoIcon.visibility = View.GONE
+                b.refreshStopIcon.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.ic_refresh))
+                b.refreshStopIcon.visibility = View.VISIBLE
                 // AUTO server: show the vector ic_rpn_auto, hide the emoji text view
                 b.tvFlag.text = ""
                 b.ivFlagImage.visibility = View.VISIBLE
             } else {
-                b.infoIcon.visibility = View.VISIBLE
+                b.refreshStopIcon.visibility = View.VISIBLE
+                b.refreshStopIcon.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.ic_cross))
                 // Regular server: show the country flag emoji, hide the globe image
                 b.tvFlag.text = group.flagEmoji
                 b.ivFlagImage.visibility = View.GONE
@@ -228,19 +240,13 @@ class VpnServerAdapter(
                 val cities = group.servers.map { it.serverLocation }.distinct()
                 val cityText = if (cities.size <= 2) cities.joinToString(", ").capitalizeWords()
                 else "${cities.first().capitalizeWords()} +${cities.size - 1} more"
-                "$cityText • ${group.countryCode}"
+                cityText
             } else {
-                if (group.cityName.equals(group.countryCode, true)) {
-                    group.cityName.capitalizeWords()
-                } else {
-                    ctx.getString(
-                        R.string.hero_plan_and_account,
-                        group.cityName.capitalizeWords(),
-                        group.countryCode
-                    )
-                }
+                group.cityName.capitalizeWords()
             }
             b.tvCountryName.text = locationText
+            b.tvCountryCode.text = group.countryCode
+            showAppsCount(group.key)
 
             val hasSpeed = group.bestLinkSpeed > 0
             val hasLoad  = group.leastLoad > 0
@@ -252,22 +258,26 @@ class VpnServerAdapter(
                     b.latencyBadge.text = ctx.getString(R.string.two_argument_dot, speedStr, loadStr)
                     b.latencyBadge.setTextColor(fetchColor(ctx, loadAttr))
                     b.latencyBadge.visibility = View.VISIBLE
+                    b.tvStatusSep.visibility = View.VISIBLE
                 }
                 hasSpeed -> {
                     val (speedStr, speedAttr) = speedInfo(group.bestLinkSpeed)
                     b.latencyBadge.text = speedStr
                     b.latencyBadge.setTextColor(fetchColor(ctx, speedAttr))
                     b.latencyBadge.visibility = View.VISIBLE
+                    b.tvStatusSep.visibility = View.VISIBLE
                 }
                 hasLoad -> {
                     val (loadStr, loadAttr) = loadInfo(group.leastLoad)
                     b.latencyBadge.text = loadStr
                     b.latencyBadge.setTextColor(fetchColor(ctx, loadAttr))
                     b.latencyBadge.visibility = View.VISIBLE
+                    b.tvStatusSep.visibility = View.VISIBLE
                 }
                 else -> {
                     // No speed or load data available.
                     b.latencyBadge.visibility = View.GONE
+                    b.tvStatusSep.visibility = View.GONE
                 }
             }
 
@@ -280,22 +290,79 @@ class VpnServerAdapter(
                 // Redirect every tap to the settings sheet so the user can restart.
                 val stoppedClick = View.OnClickListener { listener.onProxyStoppedItemTapped() }
                 b.serverCard.setOnClickListener(stoppedClick)
-                b.infoIcon.setOnClickListener(stoppedClick)
+                b.refreshStopIcon.setOnClickListener(stoppedClick)
             } else if (loadingTunnelKeys.contains(group.key)) {
                 // WIN tunnel for this server is still being set up (getWinByKey returned null).
                 // Show a "Connecting…" indicator with a gentle pulse.
                 showTunnelLoadingStatus()
-                b.infoIcon.setOnClickListener { listener.onServerGroupRemoved(group) }
+                b.refreshStopIcon.setOnClickListener {
+                    handleRefreshClick(group)
+                }
                 b.serverCard.setOnClickListener { openServerDetail(group.getBestServer()) }
                 // Always start polling
                 statsJob = pollStatsLoop(group)
+                handleIpView(group)
             } else {
-                b.infoIcon.setOnClickListener { listener.onServerGroupRemoved(group) }
+                b.refreshStopIcon.setOnClickListener {
+                    handleRefreshClick(group)
+                }
                 b.serverCard.setOnClickListener { openServerDetail(group.getBestServer()) }
 
                 // Show "Checking…" immediately so the item is never left stranded
                 showCheckingStatus()
                 statsJob = pollStatsLoop(group)
+                handleIpView(group)
+            }
+        }
+
+        private fun handleIpView(group: ServerGroup) {
+            io {
+                // Fetch IP metadata for this server
+                val ip4 = fetchIpForGroup(group)
+                uiCtx {
+                    // Server IP row.
+                    // Show the actual IP label when available, hide it otherwise
+                    val ipText = ip4?.ip?.takeIf { it.isNotEmpty() }
+                    if (ipText != null) {
+                        b.tvServerIp.text = ipText
+                        b.tvServerIp.visibility = View.VISIBLE
+                        b.tvCcSep.visibility = View.VISIBLE
+                    } else {
+                        b.tvServerIp.visibility = View.GONE
+                        b.tvCcSep.visibility = View.GONE
+                    }
+                }
+            }
+        }
+
+        private fun handleRefreshClick(group: ServerGroup) {
+            if (group.key.equals(AUTO_SERVER_ID, ignoreCase = true)) {
+                io {
+                    val startTime = System.currentTimeMillis()
+                    var animator: ObjectAnimator? = null
+                    uiCtx {
+                        animator = ObjectAnimator.ofFloat(b.refreshStopIcon, "rotation", 0f, 360f).apply {
+                            duration = 600L
+                            repeatCount = ValueAnimator.INFINITE
+                            interpolator = LinearInterpolator()
+                            start()
+                        }
+                    }
+                    try {
+                        VpnController.reconnectRpnProxy("")
+                    } finally {
+                        val elapsed = System.currentTimeMillis() - startTime
+                        if (elapsed < MIN_REFRESH_ANIM_MS) {
+                            delay((MIN_REFRESH_ANIM_MS - elapsed).milliseconds)
+                        }
+                        uiCtx {
+                            animator?.cancel()
+                            b.refreshStopIcon.rotation = 0f
+                        }
+                    }
+                }
+            } else {
+                listener.onServerGroupRemoved(group)
             }
         }
 
@@ -304,15 +371,10 @@ class VpnServerAdapter(
          * Live stats and IP are hidden since the proxy is not routing traffic.
          */
         private fun showStoppedStatus() {
-            b.tvServerIp.visibility = View.GONE
             b.statsLayout.visibility = View.VISIBLE
             b.tvServerStatus.text = ctx.getString(R.string.server_settings_proxy_stopped)
             b.tvServerStatus.setTextColor(fetchColor(ctx, R.attr.chipTextNeutral))
             b.tvStatusSep.visibility = View.GONE
-            b.tvAppsCount.visibility = View.GONE
-            b.tvRxTx.visibility = View.GONE
-            b.tvUptimeSep.visibility = View.GONE
-            b.tvUptime.visibility = View.GONE
         }
 
         /**
@@ -323,15 +385,10 @@ class VpnServerAdapter(
          * [applyStats] call will cancel the pulse and display real data.
          */
         private fun showTunnelLoadingStatus() {
-            b.tvServerIp.visibility = View.GONE
             b.statsLayout.visibility = View.VISIBLE
             b.tvServerStatus.text = ctx.getString(R.string.lbl_connecting)
             b.tvServerStatus.setTextColor(fetchColor(ctx, R.attr.chipTextNeutral))
             b.tvStatusSep.visibility = View.GONE
-            b.tvAppsCount.visibility = View.GONE
-            b.tvRxTx.visibility = View.GONE
-            b.tvUptimeSep.visibility = View.GONE
-            b.tvUptime.visibility = View.GONE
             // Kick off a gentle alpha pulse so the user can tell this item is "live"
             b.tvServerStatus.animate().cancel()
             b.tvServerStatus.alpha = 1f
@@ -347,15 +404,9 @@ class VpnServerAdapter(
          * call will cancel the pulse and display real data.
          */
         private fun showCheckingStatus() {
-            b.tvServerIp.visibility = View.GONE
             b.statsLayout.visibility = View.VISIBLE
             b.tvServerStatus.text = ctx.getString(R.string.lbl_checking)
             b.tvServerStatus.setTextColor(fetchColor(ctx, R.attr.chipTextNeutral))
-            b.tvStatusSep.visibility = View.GONE
-            b.tvAppsCount.visibility = View.GONE
-            b.tvRxTx.visibility = View.GONE
-            b.tvUptimeSep.visibility = View.GONE
-            b.tvUptime.visibility = View.GONE
             // states feel distinct to the user.
             b.tvServerStatus.animate().cancel()
             b.tvServerStatus.alpha = 1f
@@ -388,8 +439,8 @@ class VpnServerAdapter(
             return lco.lifecycleScope.launch {
                 lco.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     while (true) {
-                        withContext(Dispatchers.IO) { fetchAndApplyStats(group) }
-                        delay(STATS_POLL_MS)
+                        ioCtx { fetchAndApplyStats(group) }
+                        delay(STATS_POLL_MS.milliseconds)
                     }
                 }
             }
@@ -401,17 +452,12 @@ class VpnServerAdapter(
                 val id = group.proxyId()
                 val statusPair = VpnController.getProxyStatusById(id)
                 val stats = VpnController.getProxyStats(id)
-                val apps = ProxyManager.getAppCountForProxy(id)
 
-                // Fetch IP metadata for this server (cached by since-timestamp; live fetches
-                // only happen when the tunnel connects for the first time or after a reconnect).
-                val ip4 = fetchIpForGroup(group)
+                Logger.v(LOG_TAG_UI, "VpnServerAdapter fetchAndApplyStats for id: $id, config: $config, status: $statusPair, stats: $stats")
+                uiCtx {
+                    if (!b.root.isAttachedToWindow) return@uiCtx
 
-                Logger.v(LOG_TAG_UI, "VpnServerAdapter fetchAndApplyStats for id: $id, config: $config, status: $statusPair, stats: $stats, apps/always-on: $apps/${config?.catchAll}")
-                withContext(Dispatchers.Main) {
-                    if (!b.root.isAttachedToWindow) return@withContext
-
-                    applyStats(config, statusPair, stats, apps, ip4)
+                    applyStats(config, statusPair, stats)
                 }
             } catch (t: Throwable) {
                 Logger.w(LOG_TAG_UI, "VpnServerAdapter fetchAndApplyStats[${group.key}]: ${t.message}")
@@ -430,39 +476,47 @@ class VpnServerAdapter(
                 val key = group.key
 
                 // Slow path: fetch live from the Go backend (3 s timeout to stay responsive).
-                val client = withTimeoutOrNull(3_000L) {
+                val client = withTimeoutOrNull(3_000L.milliseconds) {
                     runCatching { VpnController.getRpnClientInfoById(key) }.getOrNull()
                 }
-                val ip4 = runCatching { client?.iP4() }.getOrNull()
-                val ip6 = runCatching { client?.iP6() }.getOrNull()
-                ip4 ?: ip6
+                runCatching { client?.iP4() }.getOrNull()
             } catch (t: Throwable) {
                 Logger.w(LOG_TAG_UI, "VpnServerAdapter fetchIpForGroup[${group.key}]: ${t.message}")
                 null
             }
         }
 
-        /**
-         * Builds a compact ISP / city label from [ip4] metadata.
-         * Format: "City · ASN Org", "ASN Org", "City", or "" if neither is set.
-         */
-        private fun buildIspLabel(ip4: IPMetadata): String {
-            val city = ip4.city?.takeIf { it.isNotEmpty() }
-            val org  = ip4.asnOrg?.takeIf { it.isNotEmpty() }
-            return when {
-                city != null && org != null -> "$city · $org"
-                org  != null -> org
-                city != null -> city
-                else -> ""
+        private fun showAppsCount(key: String) {
+            io {
+                val config = RpnProxyManager.getCountryConfigByKey(key)
+                val apps = ProxyManager.getAppCountForProxy(Backend.RpnWin + key)
+                uiCtx {
+                    if (config == null) {
+                        b.tvAppsCount.visibility = View.GONE
+                        return@uiCtx
+                    }
+                    // Apps count  (R.string.add_remove_apps = "Add / Remove (%1$s apps)")
+                    b.tvAppsCount.visibility = View.VISIBLE
+                    if (config.catchAll) {
+                        b.tvAppsCount.text = ctx.getString(R.string.routing_remaining_apps)
+                    } else {
+                        b.tvAppsCount.text =
+                            ctx.getString(R.string.firewall_card_status_active, apps)
+                    }
+                    b.tvAppsCount.setTextColor(
+                        fetchColor(
+                            ctx,
+                            if (apps > 0 || config.catchAll) R.attr.primaryLightColorText else R.attr.accentBad
+                        )
+                    )
+                }
             }
         }
 
         private fun applyStats(
             config: CountryConfig?,
-            statusPair: Pair<Long?, String>,
-            stats: RouterStats?,
-            appsCount: Int,
-            ip4: IPMetadata? = null
+            statusPair: Pair<Int?, String>,
+            stats: RouterStats?
         ) {
             if (config == null) {
                 hideStats()
@@ -476,55 +530,14 @@ class VpnServerAdapter(
 
             // Status chip
             val status = UIUtils.ProxyStatus.entries.find { it.id == statusPair.first }
-            b.tvServerStatus.text = getStatusText(status, stats, statusPair.second)
-            b.tvServerStatus.setTextColor(fetchColor(ctx, getStatusColor(status, stats)))
-
-            // Apps count  (R.string.add_remove_apps = "Add / Remove (%1$s apps)")
-            b.tvStatusSep.visibility = View.VISIBLE
-            b.tvAppsCount.visibility = View.VISIBLE
-            if (config.catchAll) {
-                b.tvAppsCount.text = ctx.getString(R.string.routing_remaining_apps)
-            } else {
-                b.tvAppsCount.text = ctx.getString(R.string.firewall_card_status_active, appsCount)
-            }
-            b.tvAppsCount.setTextColor(
-                fetchColor(ctx, if (appsCount > 0 || config.catchAll) R.attr.primaryLightColorText else R.attr.accentBad)
-            )
-
-            // Rx / Tx
-            val rxtx = getRxTx(stats)
-            b.tvRxTx.visibility = if (rxtx.isNotEmpty()) View.VISIBLE else View.GONE
-            if (rxtx.isNotEmpty()) b.tvRxTx.text = rxtx
+            b.tvServerStatus.text = getStatusText(status, statusPair.second)
+            b.tvServerStatus.setTextColor(fetchColor(ctx, getStatusColor(status)))
 
             // Uptime
-            val uptime = getUpTime(config.key)
+            val uptime = getUpTime(stats)
             b.tvUptimeSep.visibility = if (uptime.isNotEmpty()) View.VISIBLE else View.GONE
             b.tvUptime.visibility = if (uptime.isNotEmpty()) View.VISIBLE else View.GONE
             if (uptime.isNotEmpty()) b.tvUptime.text = uptime
-
-            // Server IP row.
-            // Show the actual IP+ISP label when available, fall back to "N/A" once the
-            // tunnel has provided stats (so the row is never blank once we have context),
-            // or hide the row entirely while still waiting for the first stats reply.
-            val ipText = ip4?.ip?.takeIf { it.isNotEmpty() }
-            when {
-                ipText != null -> {
-                    val ispLabel = "" // buildIspLabel(ip4)
-                    b.tvServerIp.text = if (ispLabel.isNotEmpty()) "$ipText · $ispLabel" else ipText
-                    b.tvServerIp.visibility = View.VISIBLE
-                }
-                stats != null -> {
-                    // Tunnel is up and returning stats but the IP metadata isn't available
-                    // yet (or the backend didn't return one) — show "N/A" so the row is
-                    // never left empty.
-                    b.tvServerIp.text = ctx.getString(R.string.lbl_not_available_short)
-                    b.tvServerIp.visibility = View.VISIBLE
-                }
-                else -> {
-                    // No stats yet — keep the IP row hidden until we have real data.
-                    b.tvServerIp.visibility = View.GONE
-                }
-            }
         }
 
         private fun hideStats() {
@@ -532,8 +545,7 @@ class VpnServerAdapter(
             b.tvServerIp.visibility = View.GONE
         }
 
-        @Suppress("UNUSED_PARAMETER")
-        private fun getStatusColor(status: UIUtils.ProxyStatus?, stats: RouterStats?): Int {
+        private fun getStatusColor(status: UIUtils.ProxyStatus?): Int {
             // For RPN proxies, trust the status enum directly.  The since/lastOK heuristic
             // (lastOK == 0 && since > WG_UPTIME_THRESHOLD → "Failing") is designed for
             // WireGuard where lastOK is the handshake timestamp.  For RPN, lastOK tracks
@@ -550,10 +562,8 @@ class VpnServerAdapter(
             }
         }
 
-        @Suppress("UNUSED_PARAMETER")
         private fun getStatusText(
             status: UIUtils.ProxyStatus?,
-            stats: RouterStats?,
             errMsg: String?
         ): String {
             if (status == null) {
@@ -573,17 +583,8 @@ class VpnServerAdapter(
                 .replaceFirstChar(Char::titlecase)
         }
 
-        private fun getRxTx(stats: RouterStats?): String {
-            if (stats == null || (stats.rx == 0L && stats.tx == 0L)) return ""
-            val rx = ctx.getString(R.string.symbol_download,
-                Utilities.humanReadableByteCount(stats.rx, true))
-            val tx = ctx.getString(R.string.symbol_upload,
-                Utilities.humanReadableByteCount(stats.tx, true))
-            return ctx.getString(R.string.two_argument_space, tx, rx)
-        }
-
-        private fun getUpTime(id: String): CharSequence {
-            val selectedSinceTs = RpnProxyManager.getSelectedSinceTs(id)
+        private fun getUpTime(stats: RouterStats?): CharSequence {
+            val selectedSinceTs = stats?.since ?: 0L
             return if (selectedSinceTs > 0L)
                 DateUtils.getRelativeTimeSpanString(
                     selectedSinceTs, System.currentTimeMillis(),
@@ -645,30 +646,25 @@ class VpnServerAdapter(
          *   > 80 → Overloaded (chipTextNegative)
          */
         private fun loadInfo(loadPercent: Int): Pair<String, Int> {
-            val label: String
             val attr: Int
             when {
                 loadPercent <= 20 -> {
-                    label = "$loadPercent% · ${ctx.getString(R.string.server_load_light)}"
                     attr = R.attr.chipTextPositive
                 }
                 loadPercent <= 40 -> {
-                    label = "$loadPercent% · ${ctx.getString(R.string.server_load_normal)}"
                     attr = R.attr.accentGood
                 }
                 loadPercent <= 60 -> {
-                    label = "$loadPercent% · ${ctx.getString(R.string.server_load_busy)}"
                     attr = R.attr.chipTextNeutral
                 }
                 loadPercent <= 80 -> {
-                    label = "$loadPercent% · ${ctx.getString(R.string.server_load_very_busy)}"
                     attr = R.attr.chipTextNegative
                 }
                 else -> {
-                    label = "$loadPercent% · ${ctx.getString(R.string.server_load_overloaded)}"
                     attr = R.attr.chipTextNegative
                 }
             }
+            val label = "$loadPercent%"
             return Pair(label, attr)
         }
 
@@ -677,6 +673,19 @@ class VpnServerAdapter(
             intent.putExtra(RpnConfigDetailActivity.INTENT_EXTRA_FROM_SERVER_SELECTION, true)
             intent.putExtra(RpnConfigDetailActivity.INTENT_EXTRA_CONFIG_KEY, server.key)
             ctx.startActivity(intent)
+        }
+
+        private fun io(f: suspend () -> Unit) {
+            val lco = lifecycleOwner ?: b.root.findViewTreeLifecycleOwner()
+            lco?.lifecycleScope?.launch(Dispatchers.IO) { f() }
+        }
+
+        private suspend fun uiCtx(f: suspend () -> Unit) {
+            withContext(Dispatchers.Main) { f() }
+        }
+
+        private suspend fun ioCtx(f: suspend () -> Unit) {
+            withContext(Dispatchers.IO) { f() }
         }
 
     }

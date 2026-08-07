@@ -15,13 +15,12 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.widget.Toast
-import com.celzero.bravedns.ui.BaseActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -31,6 +30,8 @@ import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
+import com.celzero.bravedns.ui.BaseActivity
+import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
@@ -66,7 +67,7 @@ class RpnWinProxyDetailsActivity: BaseActivity(R.layout.activity_rpn_win_proxy_d
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
 

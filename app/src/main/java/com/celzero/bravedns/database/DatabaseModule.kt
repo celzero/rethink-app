@@ -15,6 +15,8 @@
  */
 package com.celzero.bravedns.database
 
+import com.celzero.bravedns.sponsor.database.SponsorDao
+import com.celzero.bravedns.sponsor.repository.SponsorRepository
 import com.celzero.bravedns.iab.ServerOrderHistoryRepository
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
@@ -59,6 +61,8 @@ object DatabaseModule {
 
         single { get<ConsoleLogDatabase>().consoleLogDAO() }
 
+        single { get<AppDatabase>().sponsorDao() }
+
     }
     private val repositoryModule = module {
         single { get<AppDatabase>().appInfoRepository() }
@@ -93,6 +97,7 @@ object DatabaseModule {
 
         single { get<ConsoleLogDatabase>().consoleLogRepository() }
 
+        single { SponsorRepository(get()) }
         single { ServerOrderHistoryRepository(get()) }
     }
 

@@ -15,14 +15,13 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import Logger
-import Logger.LOG_TAG_PROXY
-import Logger.throwableToException
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger.throwableToException
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.widget.Toast
-import com.celzero.bravedns.ui.BaseActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -30,6 +29,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityWgConfigEditorBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity.Companion.INTENT_EXTRA_WG_TYPE
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
@@ -53,6 +53,7 @@ class WgConfigEditorActivity : BaseActivity(R.layout.activity_wg_config_editor) 
     private var wgInterface: WgInterface? = null
     private var configId: Int = -1
     private var wgType: WgConfigDetailActivity.WgType = WgConfigDetailActivity.WgType.DEFAULT
+    private var isRestoredFromState = false
 
     companion object {
         const val INTENT_EXTRA_WG_ID = "WIREGUARD_TUNNEL_ID"
@@ -70,9 +71,11 @@ class WgConfigEditorActivity : BaseActivity(R.layout.activity_wg_config_editor) 
 
         handleFrostEffectIfNeeded(persistentState.theme)
 
+        isRestoredFromState = savedInstanceState != null
+
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
 
@@ -103,30 +106,34 @@ class WgConfigEditorActivity : BaseActivity(R.layout.activity_wg_config_editor) 
             wgInterface = wgConfig?.getInterface()
 
             uiCtx {
-                b.interfaceNameText.setText(wgConfig?.getName())
+                if (!isRestoredFromState) {
+                    b.interfaceNameText.setText(wgConfig?.getName())
 
-                b.privateKeyText.setText(wgInterface?.getKeyPair()?.getPrivateKey()?.base64())
-                b.publicKeyText.setText(wgInterface?.getKeyPair()?.getPublicKey()?.base64())
-                var dns = wgInterface?.dnsServers?.joinToString { it.hostAddress ?: "" }
-                val searchDomains = wgInterface?.dnsSearchDomains?.joinToString { it }
-                dns =
-                    if (!searchDomains.isNullOrEmpty()) {
-                        "$dns,$searchDomains"
-                    } else {
-                        dns
+                    b.privateKeyText.setText(wgInterface?.getKeyPair()?.getPrivateKey()?.base64())
+                    b.publicKeyText.setText(wgInterface?.getKeyPair()?.getPublicKey()?.base64())
+                    var dns = wgInterface?.dnsServers?.joinToString { it.hostAddress ?: "" }
+                    val searchDomains = wgInterface?.dnsSearchDomains?.joinToString { it }
+                    dns =
+                        if (!searchDomains.isNullOrEmpty()) {
+                            "$dns,$searchDomains"
+                        } else {
+                            dns
+                        }
+                    b.dnsServersText.setText(dns)
+                    if (wgInterface?.getAddresses()?.isEmpty() != true) {
+                        b.addressesLabelText.setText(
+                            wgInterface?.getAddresses()?.joinToString { it.toString() }
+                        )
                     }
-                b.dnsServersText.setText(dns)
-                if (wgInterface?.getAddresses()?.isEmpty() != true) {
-                    b.addressesLabelText.setText(
-                        wgInterface?.getAddresses()?.joinToString { it.toString() }
-                    )
+                    if (showListenPort()) {
+                        b.listenPortText.setText(wgInterface?.listenPort?.get().toString())
+                    }
+                    if (wgInterface?.mtu?.isPresent == true) {
+                        b.mtuText.setText(wgInterface?.mtu?.get().toString())
+                    }
                 }
-                if (showListenPort()) {
-                    b.listenPortText.setText(wgInterface?.listenPort?.get().toString())
-                }
-                if (wgInterface?.mtu?.isPresent == true) {
-                    b.mtuText.setText(wgInterface?.mtu?.get().toString())
-                }
+                // Always restore non-editable display state (not automatically saved by
+                // TextView/View for non-EditText views)
                 if (wgInterface?.isAmnezia() == true) {
                     b.amzProps.visibility = android.view.View.VISIBLE
                     b.amzProps.text = wgInterface?.getAmzProps()

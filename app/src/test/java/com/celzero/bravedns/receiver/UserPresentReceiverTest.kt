@@ -16,16 +16,23 @@
 
 package com.celzero.bravedns.receiver
 
-import android.content.Context
 import android.content.Intent
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.junit.Assert.*
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /**
  * Unit tests for UserPresentReceiver
  * Tests the screen unlock event handling
  */
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [28])
 class UserPresentReceiverTest {
 
     private lateinit var receiver: UserPresentReceiver

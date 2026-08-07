@@ -15,6 +15,10 @@
  */
 package com.celzero.bravedns.database
 
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
+import android.database.sqlite.SQLiteConstraintException
+
 class ProxyAppMappingRepository(
     private val proxyApplicationMappingDAO: ProxyApplicationMappingDAO
 ) {
@@ -47,36 +51,34 @@ class ProxyAppMappingRepository(
         return proxyApplicationMappingDAO.getWgAppMapping() ?: emptyList()
     }
 
-    suspend fun updateProxyIdForApp(uid: Int, proxyId: String, proxyName: String) {
-        proxyApplicationMappingDAO.updateProxyIdForApp(uid, proxyId, proxyName)
-    }
-
-    suspend fun removeAllAppsForProxy(proxyId: String) {
-        proxyApplicationMappingDAO.removeAllAppsForProxy(proxyId)
-    }
-
-    suspend fun removeAllWgProxies() {
-        proxyApplicationMappingDAO.removeAllWgProxies()
-    }
-
-    suspend fun updateProxyForAllApps(proxyId: String, proxyName: String) {
-        proxyApplicationMappingDAO.updateProxyForAllApps(proxyId, proxyName)
-    }
-
     suspend fun updateProxyNameForProxyId(proxyId: String, proxyName: String) {
         proxyApplicationMappingDAO.updateProxyNameForProxyId(proxyId, proxyName)
     }
 
-    suspend fun updateProxyForUnselectedApps(proxyId: String, proxyName: String) {
-        return proxyApplicationMappingDAO.updateProxyForUnselectedApps(proxyId, proxyName)
-    }
-
-    suspend fun updateUidForApp(uid: Int, packageName: String) {
-        proxyApplicationMappingDAO.updateUidForApp(uid, packageName)
+    suspend fun updateUidForApp(oldUid: Int, newUid: Int, packageName: String) {
+        if (oldUid == newUid) {
+            Logger.w(LOG_TAG_PROXY, "updateUidForApp: oldUid == newUid ($oldUid) for $packageName; skipping")
+            return
+        }
+        try {
+            proxyApplicationMappingDAO.updateUidForApp(oldUid, newUid, packageName)
+        } catch (_: SQLiteConstraintException) {
+            Logger.w(LOG_TAG_PROXY, "updateUidForApp constraint violation; old=$oldUid -> new=$newUid pkg=$packageName; attempting delete+insert fallback")
+            val existing = proxyApplicationMappingDAO.getProxiesForApp(oldUid, packageName)
+            proxyApplicationMappingDAO.deleteApp(oldUid, packageName)
+            existing.forEach { mapping ->
+                mapping.uid = newUid
+                proxyApplicationMappingDAO.insert(mapping)
+            }
+        }
     }
 
     suspend fun tombstoneApp(oldUid: Int, newUid: Int) {
-        proxyApplicationMappingDAO.tombstoneApp(oldUid, newUid)
+        try {
+            proxyApplicationMappingDAO.tombstoneApp(oldUid, newUid)
+        } catch (_: SQLiteConstraintException) {
+            Logger.w(LOG_TAG_PROXY, "tombstoneApp constraint violation; oldUid=$oldUid -> newUid=$newUid; skipping tombstone")
+        }
     }
 
     suspend fun getProxiesForApp(uid: Int, packageName: String): List<ProxyApplicationMapping> {

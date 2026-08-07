@@ -117,6 +117,9 @@ interface SubscriptionStatusDao {
     @Query("UPDATE SubscriptionStatus SET accountExpiry = :expiryTime, lastUpdatedTs = :timestamp WHERE id = :id")
     suspend fun updateAccountExpiry(id: Int, expiryTime: Long, timestamp: Long): Int
 
+    @Query("UPDATE SubscriptionStatus SET developerPayload = :payload, lastUpdatedTs = :timestamp WHERE id = :id")
+    suspend fun updateDeveloperPayload(id: Int, payload: String, timestamp: Long): Int
+
     @Query(
         """
         UPDATE SubscriptionStatus 

@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import com.celzero.bravedns.ui.BaseActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -30,9 +29,11 @@ import com.celzero.bravedns.databinding.ActivityCustomRulesBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.fragment.CustomDomainFragment
 import com.celzero.bravedns.ui.fragment.CustomIpFragment
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
@@ -84,7 +85,7 @@ class CustomRulesActivity : BaseActivity(R.layout.activity_custom_rules) {
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
 

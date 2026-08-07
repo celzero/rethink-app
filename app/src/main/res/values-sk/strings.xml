@@ -76,7 +76,6 @@
     <string name="dns_mode_notification_title" translatable="true">Ste Chránený! Pripojený k Rýchlemu a Bezpečnému DNS.</string>
     <string name="pause_mode_notification_title" translatable="true">Pozastavené! Zablokované aplikácie budú naďalej chránené bránou firewall.</string>
     <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">čakám</string>
-    <string name="failed_using_default" translatable="true">Zlyhanie: používa sa záložné DNS</string>
     <string name="status_app_error" translatable="true">chyba aplikácie</string>
     <string name="status_dns_error" translatable="true">chyba DNS</string>
     <string name="status_dns_server_down" translatable="true">DNS server nefunguje</string>

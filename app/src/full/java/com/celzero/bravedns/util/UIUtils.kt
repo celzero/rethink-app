@@ -15,8 +15,7 @@
  */
 package com.celzero.bravedns.util
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -24,12 +23,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.TypedArray
 import android.graphics.Color
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.text.Html
+import android.text.SpannableString
 import android.text.Spanned
 import android.text.format.DateUtils
+import android.text.style.StyleSpan
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -43,13 +45,17 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.DnsLogTracker
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.firestack.backend.Backend
+import com.celzero.firestack.backend.GoMetrics
 import com.celzero.firestack.backend.NetStat
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.radiobutton.MaterialRadioButton
@@ -61,8 +67,8 @@ import java.util.regex.Pattern
 
 object UIUtils {
 
-    fun getDnsStatusStringRes(status: Long?): Int {
-        if (status == null) return R.string.failed_using_default
+    fun getDnsStatusStringRes(status: Int?): Int {
+        if (status == null) return R.string.status_failing
 
         return when (Transaction.Status.fromId(status)) {
             Transaction.Status.START -> {
@@ -95,7 +101,7 @@ object UIUtils {
         }
     }
 
-    fun getProxyStatusStringRes(statusId: Long?): Int {
+    fun getProxyStatusStringRes(statusId: Int?): Int {
         return when (statusId) {
             Backend.TUP -> {
                 R.string.lbl_starting
@@ -124,7 +130,7 @@ object UIUtils {
         }
     }
 
-    enum class ProxyStatus(val id: Long) {
+    enum class ProxyStatus(val id: Int) {
         TOK(Backend.TOK),
         TUP(Backend.TUP),
         TZZ(Backend.TZZ),
@@ -135,21 +141,30 @@ object UIUtils {
     }
 
     fun formatToRelativeTime(context: Context, timestamp: Long): String {
-        val now = System.currentTimeMillis()
         return if (DateUtils.isToday(timestamp)) {
             context.getString(R.string.relative_time_today)
         } else if (isYesterday(Date(timestamp))) {
             context.getString(R.string.relative_time_yesterday)
         } else {
-            val d =
-                DateUtils.getRelativeTimeSpanString(
-                    timestamp,
-                    now,
-                    DateUtils.MINUTE_IN_MILLIS,
-                    DateUtils.FORMAT_ABBREV_RELATIVE
-                )
-            d.toString()
+            relativeTimeSpanString(timestamp, DateUtils.MINUTE_IN_MILLIS).toString()
         }
+    }
+
+    fun getRelativeTimeSpan(t: Long?): CharSequence? {
+        if (t == null || t <= 0L) return "0"
+        return relativeTimeSpanString(t)
+    }
+
+    private fun relativeTimeSpanString(
+        timestamp: Long,
+        minResolution: Long = DateUtils.SECOND_IN_MILLIS
+    ): CharSequence {
+        return DateUtils.getRelativeTimeSpanString(
+            timestamp,
+            System.currentTimeMillis(),
+            minResolution,
+            DateUtils.FORMAT_ABBREV_RELATIVE
+        )
     }
 
     // ref: https://stackoverflow.com/a/3006423
@@ -257,6 +272,15 @@ object UIUtils {
     }
 
     fun openAndroidAppInfo(context: Context, packageName: String?) {
+        if (packageName?.startsWith(NO_PACKAGE_PREFIX) == true) {
+            Utilities.showToastUiCentered(
+                context,
+                context.getString(R.string.ctbs_app_info_not_available_toast),
+                Toast.LENGTH_SHORT
+            )
+            return
+        }
+
         try {
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
             intent.data = Uri.fromParts("package", packageName, null)
@@ -704,13 +728,15 @@ object UIUtils {
         return stats
     }
 
-    fun formatNetMetrics(stat: NetStat?): String? {
+    fun formatNetMetrics(stat: GoMetrics?): String? {
         if (stat == null) return null
 
         val go = stat.go()?.toString()
-        val go2 = stat.gO2().toString()
+        val c = stat.c
+        val m = stat.m
+        val l = stat.l
 
-        var stats = go + go2
+        var stats = go + l + c + m
         stats = stats.replace("{", "\n")
         stats = stats.replace("}", "\n\n")
         stats = stats.replace(",", "\n")
@@ -809,13 +835,14 @@ object SnackbarHelper {
         val snackbar = Snackbar.make(bestAnchorFor(view), message, duration)
 
         // Anchor above BottomNavigationView so the snackbar is never hidden behind it.
-        findBottomNavView(view)?.let { navView ->
-            snackbar.anchorView = navView
+        val navView = findBottomNavView(view)
+        navView?.let {
+            snackbar.anchorView = it
         }
 
         // Style the container view.
         val snackView = snackbar.view
-        styleContainer(snackView, view.context)
+        styleContainer(snackView, view.context, navView != null)
 
         // Style the message text.
         val msgTv = snackView.findViewById<TextView>(
@@ -851,6 +878,19 @@ object SnackbarHelper {
             }
         })
 
+        ViewCompat.setOnApplyWindowInsetsListener(snackView) { v, insets ->
+            val navBarHeight = insets
+                .getInsets(WindowInsetsCompat.Type.navigationBars())
+                .bottom
+
+            (v.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
+                lp.bottomMargin += navBarHeight + 80
+                v.layoutParams = lp
+            }
+
+            insets
+        }
+
         current = snackbar
         lastMessage = message
         lastShownAt = now
@@ -880,7 +920,7 @@ object SnackbarHelper {
         show(
             view = view,
             message = message,
-            duration = Snackbar.LENGTH_INDEFINITE,
+            duration = Snackbar.LENGTH_LONG,
             actionLabel = actionLabel,
             action = {
                 persistentState.firebaseErrorReportingEnabled = false
@@ -903,6 +943,20 @@ object SnackbarHelper {
     }
 
     /**
+     * Apply a bold typeface to the string.
+     */
+    fun String.italic(): SpannableString {
+        return SpannableString(this).apply {
+            setSpan(
+                StyleSpan(Typeface.ITALIC),
+                0,
+                length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+    }
+
+    /**
      * Walk the view hierarchy upward to find the nearest [CoordinatorLayout] ancestor.
      * Falls back to the root decor view so the Snackbar is never clipped by
      * `fitsSystemWindows` insets on the fragment root.
@@ -922,14 +976,22 @@ object SnackbarHelper {
      */
     private fun findBottomNavView(view: View): BottomNavigationView? {
         // Walk up to the root first, then search the entire tree from there.
-        val root = view.rootView as? ViewGroup ?: return null
-        return searchForBottomNav(root)
+        val root = view.rootView ?: return null
+        
+        // 1. Try finding by ID directly (most reliable if ID is known)
+        val navView = root.findViewById<BottomNavigationView>(R.id.nav_view)
+        if (navView != null && navView.isShown) {
+            return navView
+        }
+
+        // 2. Fallback to recursive search
+        return (root as? ViewGroup)?.let { searchForBottomNav(it) }
     }
 
     private fun searchForBottomNav(group: ViewGroup): BottomNavigationView? {
         for (i in 0 until group.childCount) {
             val child = group.getChildAt(i)
-            if (child is BottomNavigationView) return child
+            if (child is BottomNavigationView && child.isShown) return child
             if (child is ViewGroup) {
                 val found = searchForBottomNav(child)
                 if (found != null) return found
@@ -942,7 +1004,7 @@ object SnackbarHelper {
      * Apply the themed background, elevation, and margins to the Snackbar container.
      *
      */
-    private fun styleContainer(snackView: View, context: Context) {
+    private fun styleContainer(snackView: View, context: Context, isAnchored: Boolean) {
         // First child is always the SnackbarContentLayout.
         val contentView: View = (snackView as? ViewGroup)?.getChildAt(0) ?: snackView
 
@@ -958,7 +1020,13 @@ object SnackbarHelper {
 
         // Outer layout margins: float the bar away from screen edges and off the nav bar.
         val hMargin = context.resources.getDimensionPixelSize(R.dimen.snackbar_horizontal_margin)
-        val bMargin = context.resources.getDimensionPixelSize(R.dimen.snackbar_bottom_margin)
+        var bMargin = context.resources.getDimensionPixelSize(R.dimen.snackbar_bottom_margin)
+
+        // if the snackbar is anchored, we need to add more margin to it so it is shown above the
+        // navigation menu to some extent.
+        if (isAnchored) {
+            bMargin *= 2
+        }
 
         val lp = snackView.layoutParams
         when (lp) {

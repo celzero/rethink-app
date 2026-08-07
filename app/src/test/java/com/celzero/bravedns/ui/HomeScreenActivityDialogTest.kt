@@ -19,7 +19,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.widget.Button
 import androidx.test.core.app.ApplicationProvider
-import io.mockk.*
+import io.mockk.unmockkAll
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -29,7 +29,10 @@ import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowAlertDialog
 import org.robolectric.shadows.ShadowLooper
-import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 /**
  * Unit tests for HomeScreenActivity's showDownloadDialog() method

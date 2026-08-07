@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.R
+import com.celzero.bravedns.ui.BaseActivity
 
 class AlertsActivity : BaseActivity(R.layout.activity_alerts) {
 

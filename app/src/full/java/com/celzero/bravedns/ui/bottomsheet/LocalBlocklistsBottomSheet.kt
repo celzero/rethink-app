@@ -15,8 +15,9 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
-import Logger
-import Logger.LOG_TAG_DNS
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Configuration
@@ -29,7 +30,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -47,7 +47,8 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_SEARCH_URL
-import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
+import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.UIUtils.openUrl
@@ -55,7 +56,6 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.blocklistCanonicalPath
 import com.celzero.bravedns.util.Utilities.convertLongToTime
 import com.celzero.bravedns.util.Utilities.deleteRecursive
-import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -80,10 +80,11 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     companion object {
         // Alpha values for button states
         private const val BUTTON_ALPHA_DISABLED = 0.5f
+        private const val TAG = "LocalBlocklistsBottomSheet"
     }
 
     override fun getTheme(): Int =
-        getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        getBottomSheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     interface OnBottomSheetDialogFragmentDismiss {
         fun onBtmSheetDismiss()
@@ -125,12 +126,9 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.let { window ->
-            if (isAtleastQ()) {
-                val controller = WindowInsetsControllerCompat(window, window.decorView)
-                controller.isAppearanceLightNavigationBars = false
-                window.isNavigationBarContrastEnforced = false
-            }
+            Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
         }
+        Logger.i(LOG_TAG_DNS, "$TAG; onViewCreated")
         updateLocalBlocklistUi()
         init()
         initializeObservers()
@@ -171,7 +169,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
 
     private fun initializeObservers() {
         appDownloadManager.downloadRequired.observe(viewLifecycleOwner) {
-            Logger.i(LOG_TAG_DNS, "Check for blocklist update, status: $it")
+            Logger.i(LOG_TAG_DNS, "$TAG; Check for blocklist update, status: $it")
             if (it == null) return@observe
 
             handleDownloadStatus(it)
@@ -352,6 +350,8 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
                 persistentState.newestLocalBlocklistTimestamp = INIT_TIME_MS
             }
 
+            if (!isAdded) return@ui
+
             updateLocalBlocklistUi()
             showCheckUpdateUi()
             Utilities.showToastUiCentered(
@@ -427,10 +427,12 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
 
     private fun updateLocalBlocklistUi() {
         if (Utilities.isPlayStoreFlavour()) {
+            Logger.i(LOG_TAG_UI, "$TAG; play flavour, no need to proceed")
             return
         }
 
         if (persistentState.blocklistEnabled) {
+            Logger.v(LOG_TAG_UI, "$TAG; blocklist enabled")
             enableBlocklistUi()
             return
         }
@@ -515,6 +517,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun enableBlocklist() {
+        Logger.v(LOG_TAG_UI, "Enabling blocklists")
         if (persistentState.blocklistEnabled) {
             removeBraveDnsLocal()
             updateLocalBlocklistUi()
@@ -686,7 +689,9 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun ui(f: suspend () -> Unit) {
-        lifecycleScope.launch(Dispatchers.Main) { f() }
+        lifecycleScope.launch(Dispatchers.Main) {
+            if (isAdded) f()
+        }
     }
 
     private suspend fun ioCtx(f: suspend () -> Unit) {

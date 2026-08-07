@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/interface_detail_card"
@@ -24,11 +25,11 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
+
             <LinearLayout
                 android:id="@+id/interface_name_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/one_wg_check"
                 android:orientation="vertical">
@@ -42,6 +43,22 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:paddingHorizontal="3dp">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/interface_flag_text"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_alignParentStart="true"
+                            android:layout_marginStart="5dp"
+                            android:layout_centerVertical="true"
+                            android:gravity="center"
+                            android:maxHeight="32dp"
+                            android:minWidth="32dp"
+                            android:singleLine="true"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                            android:textSize="25sp"
+                            tools:visibility="visible"
+                            android:visibility="gone" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/interface_id_text"
@@ -58,6 +75,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_toStartOf="@id/interface_id_text"
+                            android:layout_toEndOf="@id/interface_flag_text"
                             android:layout_centerVertical="true"
                             android:ellipsize="end"
                             android:singleLine="true"
@@ -69,7 +87,7 @@
                         android:id="@+id/protocol_info_chip_group"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
+                        android:layout_marginStart="8dp"
                         android:layout_marginEnd="5dp"
                         android:paddingBottom="2dp"
                         android:visibility="gone">

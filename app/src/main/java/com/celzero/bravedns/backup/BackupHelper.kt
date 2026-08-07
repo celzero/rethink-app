@@ -15,7 +15,7 @@
  */
 package com.celzero.bravedns.backup
 
-import Logger
+import com.celzero.bravedns.util.Logger
 import android.content.Context
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppDatabase

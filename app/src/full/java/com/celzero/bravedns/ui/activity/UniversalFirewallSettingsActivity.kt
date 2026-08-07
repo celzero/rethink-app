@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import Logger
-import Logger.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_FIREWALL
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -26,13 +26,11 @@ import android.provider.Settings
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.Toast
-import com.celzero.bravedns.ui.BaseActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
@@ -41,11 +39,10 @@ import com.celzero.bravedns.databinding.ActivityUniversalFirewallSettingsBinding
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
@@ -63,7 +60,7 @@ class UniversalFirewallSettingsActivity :
     private val eventLogger by inject<EventLogger>()
     private val connTrackerRepository by inject<ConnectionTrackerRepository>()
 
-    private var blockedUniversalRules : List<ConnectionTracker> = emptyList()
+    private var blockedUniversalRules : List<String> = emptyList()
 
     companion object {
         const val RULES_SEARCH_ID = "R:"
@@ -77,7 +74,7 @@ class UniversalFirewallSettingsActivity :
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
         init()
@@ -363,28 +360,28 @@ class UniversalFirewallSettingsActivity :
             // instead get all the stats in one go and update the UI
             blockedUniversalRules = connTrackerRepository.getBlockedUniversalRulesCount()
             val deviceLocked =
-                blockedUniversalRules.filter { it.blockedByRule.contains(FirewallRuleset.RULE3.id) }
+                blockedUniversalRules.filter { it.contains(FirewallRuleset.RULE3.id) }
             val backgroundMode =
-                blockedUniversalRules.filter { it.blockedByRule.contains(FirewallRuleset.RULE4.id) }
+                blockedUniversalRules.filter { it.contains(FirewallRuleset.RULE4.id) }
             val unknown =
-                blockedUniversalRules.filter { it.blockedByRule.contains(FirewallRuleset.RULE5.id) }
+                blockedUniversalRules.filter { it.contains(FirewallRuleset.RULE5.id) }
             val udp =
-                blockedUniversalRules.filter { it.blockedByRule.contains(FirewallRuleset.RULE6.id) }
+                blockedUniversalRules.filter { it.contains(FirewallRuleset.RULE6.id) }
             val dnsBypass =
-                blockedUniversalRules.filter { it.blockedByRule.contains(FirewallRuleset.RULE7.id) }
+                blockedUniversalRules.filter { it.contains(FirewallRuleset.RULE7.id) }
             val newApp =
-                blockedUniversalRules.filter { it.blockedByRule.contains(FirewallRuleset.RULE1B.id) }
+                blockedUniversalRules.filter { it.contains(FirewallRuleset.RULE1B.id) }
             val metered =
                 blockedUniversalRules.filter {
-                    it.blockedByRule.contains(FirewallRuleset.RULE1F.id)
+                    it.contains(FirewallRuleset.RULE1F.id)
                 }
             val http =
                 blockedUniversalRules.filter {
-                    it.blockedByRule.contains(FirewallRuleset.RULE10.id)
+                    it.contains(FirewallRuleset.RULE10.id)
                 }
             val universalLockdown =
                 blockedUniversalRules.filter {
-                    it.blockedByRule.contains(FirewallRuleset.RULE11.id)
+                    it.contains(FirewallRuleset.RULE11.id)
                 }
 
             val blockedCountList =
@@ -488,7 +485,7 @@ class UniversalFirewallSettingsActivity :
         if (rule.isNullOrEmpty()) return
 
         // if the rules are not blocked, then no need to start the activity
-        val size = blockedUniversalRules.filter { it.blockedByRule.contains(rule) }.size
+        val size = blockedUniversalRules.filter { it.contains(rule) }.size
         if (size == 0) return
 
         val intent = Intent(this, NetworkLogsActivity::class.java)

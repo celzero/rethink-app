@@ -96,7 +96,7 @@ fun ProxyScreen(navController: NavController) {
     // hit before WireguardManager.load() ran via the boot flow.
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) {
-            if (!WireguardManager.isLoaded()) WireguardManager.load(false)
+            WireguardManager.load(false)
         }
         reloadKey++
     }

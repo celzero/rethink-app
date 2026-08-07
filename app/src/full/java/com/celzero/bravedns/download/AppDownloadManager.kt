@@ -16,9 +16,9 @@
 
 package com.celzero.bravedns.download
 
-import Logger
-import Logger.LOG_TAG_DNS
-import Logger.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
+import com.celzero.bravedns.util.Logger.LOG_TAG_DOWNLOAD
 import android.app.DownloadManager
 import android.content.Context
 import android.net.Uri
@@ -42,6 +42,7 @@ import com.celzero.bravedns.service.RethinkBlocklistManager.DownloadType
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLISTS_ADM
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.hasLocalBlocklists
 import java.util.concurrent.TimeUnit
 
 /**
@@ -227,9 +228,10 @@ class AppDownloadManager(
         }
 
         val updatableTs = getDownloadableTimestamp(response)
+        val isBlocklistAvailable = hasLocalBlocklists(context, updatableTs)
 
         // no need to proceed if the current and received timestamp is same
-        if (updatableTs <= currentTs && !isRedownload) {
+        if (updatableTs <= currentTs && isBlocklistAvailable && !isRedownload) {
             Logger.i(
                 LOG_TAG_DNS,
                 "local blocklist update not required, current ts: $currentTs, updatable ts: $updatableTs"

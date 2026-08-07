@@ -141,7 +141,6 @@
     <string name="lbl_stopped" translatable="true">중지됨</string>
     <string name="lbl_private" translatable="true">비공개</string>
     <string name="lbl_anonymous" translatable="true">익명</string>
-    <string name="failed_using_default" translatable="true">실패함: fallback DNS 사용 중</string>
     <string name="always_on_dialog" translatable="true">\"VPN 항상 켜기\"가 이 기기에서 활성화 돼있습니다. Rethink를 시작하려면, 설정 앱으로 가서 \"VPN 항상 켜기\"를 꺼주세요.</string>
     <string name="always_on_dialog_stop_heading" translatable="true">VPN 항상 켜기</string>
     <string name="always_on_dialog_positive" translatable="true">중지</string>
@@ -185,8 +184,6 @@
     <string name="settings_theme_heading" translatable="true">외관</string>
     <string name="settings_theme_desc" translatable="true">어두운/밝은 테마</string>
     <string name="settings_go_log_heading" translatable="true">로그 수준</string>
-    <string name="settings_rinr_dialog_title" translatable="true">루프백 (실험적)</string>
-    <string name="settings_rinr_dialog_desc" translatable="true"><!--settings_network_all_networks-->%1$s설정도 활성화합니다. 계속 하시겠습니까?</string>
     <string name="settings_http_proxy_desc" translatable="true">%1$s로 포워딩하는 중</string>
     <string name="settings_http_proxy_dialog_title" translatable="true">사용자 지정 서버 URL</string>
     <string name="about_website" translatable="true">rethinkdns.com 방문하기</string>
@@ -566,7 +563,6 @@
     <string name="hsf_proxy_chip_text" translatable="true">프록시 활성화</string>
     <string name="hsf_exclude_error" translatable="true">VPN 락다운 모드에서는 제외할 수 없습니다</string>
     <string name="hsf_proxy_chip_removed_toast" translatable="true">프록시 제거됨</string>
-    <string name="hsf_proxy_chip_remove_text" translatable="true">중지 중…</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">패킷 캡처 비활성화됨</string>
     <string name="hsf_whats_new_remove_text" translatable="true">종료 중…</string>
     <string name="hsf_blocklist_updating_text" translatable="true">활성화 중…</string>
@@ -783,7 +779,7 @@
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true"><i>.lan</i>, <i>.internal</i> 등 별도로 지정된 DNS가 없는 도메인에는 시스템 DNS를 사용합니다.</string>
     <string name="lbl_hop" translatable="true">중계</string>
     <string name="lbl_manual" translatable="true">수동 편집</string>
-    <string name="lbl_fallback" translatable="true">대체</string>
+    <string name="lbl_bootstrap" translatable="true">대체</string>
     <string name="lbl_experimental" translatable="true">(실험적)</string>
     <string name="lbl_service_providers" translatable="true">서비스 제공자</string>
     <string name="lbl_default" translatable="true">기본값</string>
@@ -891,8 +887,6 @@
     <string name="bad_extension_error" translatable="true">.conf 혹은 .zip 파일이어야 함</string>
     <string name="setup_wireguard" translatable="true">WireGuard 설치</string>
     <string name="wireguard_description" translatable="true">WireGuard를 프록시로 이용합니다.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">DNS 규칙을 방화벽 규칙으로 다루기 (실험적)</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">리졸빙 단계에서는 DNS 차단을 무시하고, 실제 접속 시점에서 차단 여부를 결정합니다.</string>
     <string name="univ_firewall_rule_11" translatable="true">모든 로컬 호스트 연결 차단</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">도메인 규칙을 모두 삭제합니까?</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">규칙을 삭제하면 모든 응용 프로그램이 현재 차단한 도메인에 접속할 수 있게 됩니다.</string>

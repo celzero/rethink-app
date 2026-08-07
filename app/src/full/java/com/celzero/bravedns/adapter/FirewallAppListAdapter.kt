@@ -67,7 +67,7 @@ class FirewallAppListAdapter(
 
     companion object {
         private const val ALPHA_FULL = 1f
-        private const val ALPHA_DISABLED = 0.4f
+        private const val ALPHA_DISABLED = 0.38f
 
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<AppInfo>() {
@@ -76,12 +76,7 @@ class FirewallAppListAdapter(
                     oldConnection: AppInfo
                 ): Boolean {
                     return oldConnection.uid == newConnection.uid &&
-                            oldConnection.packageName == newConnection.packageName &&
-                            oldConnection.appName == newConnection.appName
-                            && oldConnection.tombstoneTs == newConnection.tombstoneTs
-                            && oldConnection.isProxyExcluded == newConnection.isProxyExcluded
-                            && oldConnection.firewallStatus == newConnection.firewallStatus
-                            && oldConnection.connectionStatus == newConnection.connectionStatus
+                            oldConnection.packageName == newConnection.packageName
                 }
 
                 override fun areContentsTheSame(
@@ -91,6 +86,8 @@ class FirewallAppListAdapter(
                     return oldConnection == newConnection
                 }
             }
+
+        private val rethinkUid = android.os.Process.myUid()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppListViewHolder {
@@ -137,14 +134,6 @@ class FirewallAppListAdapter(
                         b.firewallAppLabelTv.alpha = ALPHA_DISABLED
                         b.firewallAppIconIv.alpha = ALPHA_DISABLED
                     }
-                    if (appInfo.packageName == context.packageName) {
-                        b.firewallAppToggleWifi.visibility = View.GONE
-                        b.firewallAppToggleMobileData.visibility = View.GONE
-                        b.firewallAppToggleOther.text =
-                            context.getString(R.string.firewall_status_allow)
-                        return@uiCtx
-                    }
-
                     b.firewallAppToggleWifi.visibility = View.VISIBLE
                     b.firewallAppToggleMobileData.visibility = View.VISIBLE
                     // strike through the app name if the app is tombstoned
@@ -155,7 +144,16 @@ class FirewallAppListAdapter(
                     } else {
                         b.firewallAppLabelTv.paint.isStrikeThruText = false
                     }
-                    displayConnectionStatus(appStatus, connStatus)
+                    if (appInfo.uid == rethinkUid) {
+                        // do not show the wi-fi and mobile data icons for RethinkDNS
+                        b.firewallAppToggleWifi.visibility = View.GONE
+                        b.firewallAppToggleMobileData.visibility = View.GONE
+                    } else {
+                        // show the wi-fi and mobile data icons for other apps
+                        b.firewallAppToggleWifi.visibility = View.VISIBLE
+                        b.firewallAppToggleMobileData.visibility = View.VISIBLE
+                        displayConnectionStatus(appStatus, connStatus)
+                    }
                     displayDataUsage(appInfo)
                     maybeDisplayProxyStatus(appInfo)
                 }
@@ -178,7 +176,7 @@ class FirewallAppListAdapter(
 
             // show key icon in drawable right of b.firewallAppDataUsage
             val proxy = ProxyManager.getProxyIdForApp(appInfo.uid)
-            if (proxy.isEmpty() || proxy == ID_NONE) {
+            if (proxy.isEmpty() || (proxy.size == 1 && proxy[0] == ID_NONE)) {
                 return
             }
             b.firewallAppLabelTv.append(context.getString(R.string.symbol_key))
@@ -208,8 +206,6 @@ class FirewallAppListAdapter(
                     context.getString(R.string.firewall_status_whitelisted)
                 FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL ->
                     context.getString(R.string.firewall_status_bypass_dns_firewall)
-                FirewallManager.FirewallStatus.UNTRACKED ->
-                    context.getString(R.string.firewall_status_unknown)
             }
         }
 
@@ -253,10 +249,6 @@ class FirewallAppListAdapter(
                 FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL -> {
                     showMobileDataUnused()
                     showWifiUnused()
-                }
-                else -> {
-                    showWifiEnabled()
-                    showMobileDataEnabled()
                 }
             }
         }
@@ -430,7 +422,7 @@ class FirewallAppListAdapter(
             connStatus: FirewallManager.ConnectionStatus
         ) {
 
-            val builderSingle = MaterialAlertDialogBuilder(context)
+            val builderSingle = MaterialAlertDialogBuilder(context, R.style.App_Dialog_NoDim)
 
             builderSingle.setIcon(R.drawable.ic_firewall_block_grey)
             val count = packageList.count()

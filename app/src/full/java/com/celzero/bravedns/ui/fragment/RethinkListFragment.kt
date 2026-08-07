@@ -15,8 +15,9 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import Logger
+import com.celzero.bravedns.util.Logger
 import android.content.Intent
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +27,7 @@ import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
@@ -47,6 +49,7 @@ import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity.Companion.
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
+import com.celzero.bravedns.util.RecyclerViewSpacingDecoration
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.RethinkEndpointViewModel
@@ -65,7 +68,6 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     private val persistentState by inject<PersistentState>()
     private val appDownloadManager by inject<AppDownloadManager>()
 
-    // rethink doh ui elements
     private var layoutManager: RecyclerView.LayoutManager? = null
     private var recyclerAdapter: RethinkEndpointAdapter? = null
     private val viewModel: RethinkEndpointViewModel by viewModel()
@@ -74,6 +76,12 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
 
     companion object {
         fun newInstance() = RethinkListFragment()
+
+        private val dpToPx: Float by lazy {
+            Resources.getSystem().displayMetrics.density
+        }
+
+        private val spacing4dp: Int by lazy { (4 * dpToPx).toInt() }
     }
 
     override fun onCreateView(
@@ -167,6 +175,9 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
 
         layoutManager = LinearLayoutManager(requireContext())
         b.recyclerDohConnections.layoutManager = layoutManager
+        b.recyclerDohConnections.addItemDecoration(
+            RecyclerViewSpacingDecoration(spacing4dp, spacing4dp)
+        )
 
         recyclerAdapter = RethinkEndpointAdapter(requireContext(), get())
         viewModel.setFilter(uid)
@@ -174,6 +185,19 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             recyclerAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
         }
         b.recyclerDohConnections.adapter = recyclerAdapter
+
+        recyclerAdapter!!.addLoadStateListener { loadStates ->
+            val isEmpty = loadStates.source.refresh is LoadState.NotLoading &&
+                    recyclerAdapter!!.itemCount == 0
+            val isLoading = loadStates.source.refresh is LoadState.Loading
+
+            b.rethinkEmptyState.visibility = if (isEmpty) View.VISIBLE else View.GONE
+            b.rethinkLoadingIndicator.visibility = if (isLoading && recyclerAdapter!!.itemCount == 0) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+        }
     }
 
     private fun updateMaxSwitchUi() {
@@ -185,7 +209,6 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     }
 
     private fun initClickListeners() {
-        // see CustomIpFragment#setupClickListeners#bringToFront()
         b.dohFabAddServerIcon.bringToFront()
         b.dohFabAddServerIcon.setOnClickListener {
             val intent = Intent(requireContext(), ConfigureRethinkBasicActivity::class.java)
@@ -206,7 +229,6 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             b.bslbUpdateAvailableBtn.isEnabled = false
             val timestamp = getDownloadTimeStamp()
 
-            // show dialog if the download type is local
             showProgress(b.bslbUpdateAvailableBtn)
             download(timestamp, isRedownload = false)
         }
@@ -259,7 +281,6 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
 
     private fun initObservers() {
         val workManager = WorkManager.getInstance(requireContext().applicationContext)
-        // observer for custom download manager worker
         workManager
             .getWorkInfosByTagLiveData(RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER)
             .observe(viewLifecycleOwner) { workInfoList ->
@@ -272,7 +293,6 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
                     WorkInfo.State.ENQUEUED == workInfo.state ||
                         WorkInfo.State.RUNNING == workInfo.state
                 ) {
-                    // no-op
                 } else if (WorkInfo.State.SUCCEEDED == workInfo.state) {
                     hideProgress()
                     onDownloadSuccess()
@@ -290,8 +310,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
                     )
                     workManager.pruneWork()
                     workManager.cancelAllWorkByTag(LocalBlocklistCoordinator.CUSTOM_DOWNLOAD)
-                } else { // state == blocked
-                    // no-op
+                } else {
                 }
             }
 
@@ -301,13 +320,10 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
 
             when (it) {
                 AppDownloadManager.DownloadManagerStatus.NOT_STARTED -> {
-                    // no-op
                 }
                 AppDownloadManager.DownloadManagerStatus.IN_PROGRESS -> {
-                    // no-op
                 }
                 AppDownloadManager.DownloadManagerStatus.NOT_AVAILABLE -> {
-                    // TODO: prompt user for app update
                     Utilities.showToastUiCentered(
                         requireContext(),
                         "Download latest version to update the blocklists",
@@ -346,7 +362,6 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
                     )
                 }
                 AppDownloadManager.DownloadManagerStatus.STARTED -> {
-                    // no-op
                 }
             }
         }

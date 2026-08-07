@@ -15,7 +15,6 @@
  */
 package com.celzero.bravedns.util
 
-import Logger
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -117,7 +116,7 @@ class CoFactory<T>(
     // always recycle the exhausted channel, ie., the channel that is completed all the receives
     private suspend fun recycleChannel(c: Channel<Deferred<T>>) {
         channelsMutex.lock()
-        if (channels.size < 20) {
+        if (channels.size < 40) {
             channels.add(c)
         }
         channelsMutex.unlock()
@@ -143,7 +142,9 @@ class Factory(tag: String = "d"): ThreadFactory {
             namePrefix + threadNumber.getAndIncrement(),
             0
         )
-        if (t.isDaemon) t.isDaemon = false
+        // this was false before, now setting it to true as we are creating only Daemon threads
+        // through this call
+        t.isDaemon = true
         if (t.priority != Thread.NORM_PRIORITY) t.priority = Thread.NORM_PRIORITY
         return t
     }

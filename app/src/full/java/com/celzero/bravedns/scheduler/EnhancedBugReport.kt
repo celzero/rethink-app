@@ -15,17 +15,21 @@
  */
 package com.celzero.bravedns.scheduler
 
-import Logger.LOG_TAG_BUG_REPORT
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_BUG_REPORT
 import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import com.celzero.bravedns.scheduler.EnhancedBugReport.MAX_TOTAL_FILES
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.Utilities
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -43,12 +47,14 @@ object EnhancedBugReport : KoinComponent {
 
 
     // GoLogFileDescriptorReader2 → golog_<ts>.txt   (Go runtime log lines)
-    const val PREFIX_GO_LOG    = "golog_"
+    const val PREFIX_GO_LOG = "golog_"
     // GoCrashFileDescriptorReader → gocrash_<ts>.txt (Go runtime panic dump)
-    const val PREFIX_GO_CRASH  = "gocrash_"
+    const val PREFIX_GO_CRASH = "gocrash_"
     // EnhancedBugReport (Kotlin/JVM) → kotlin_<ts>.txt
-    const val PREFIX_KOTLIN    = "kotlin_"
-    const val FILE_EXTENSION   = ".txt"
+    const val PREFIX_KOTLIN = "kotlin_"
+
+    const val FILE_EXTENSION = ".txt"
+    const val FLIGHT_REC_EXT = ".pprof"
 
     // Total cap across ALL three file types in the tombstone folder.
     // When Firebase is OFF, files accumulate up to this limit before the oldest are deleted.
@@ -68,6 +74,8 @@ object EnhancedBugReport : KoinComponent {
      * the race condition that a timestamp-based guard cannot handle.
      */
     private val activeSessionFileNames = CopyOnWriteArraySet<String>()
+
+    private val mutex = Mutex()
 
     /**
      * Marks [fileName] as belonging to the current session.
@@ -90,23 +98,25 @@ object EnhancedBugReport : KoinComponent {
     fun newKotlinCrashFile(context: Context): File? =
         newTombstoneFile(context, PREFIX_KOTLIN)
 
-    @Synchronized
-    fun writeLogsToFile(context: Context?, token: String, logs: String) {
-        if (context == null) {
-            Log.e(LOG_TAG_BUG_REPORT, "context is null, cannot write logs to file")
-            return
-        }
-        try {
-            val file = newKotlinCrashFile(context) ?: run {
-                Log.e(LOG_TAG_BUG_REPORT, "failed to create kotlin crash file")
+    suspend fun writeLogsToFile(context: Context?, token: String, logs: String) {
+        return mutex.withLock {
+            if (context == null) {
+                Log.e(LOG_TAG_BUG_REPORT, "context is null, cannot write logs to file")
                 return
             }
-            val time = Utilities.convertLongToTime(System.currentTimeMillis(), Constants.TIME_FORMAT_3)
-            file.writeText("$time\nToken: $token\n$logs\n", Charset.defaultCharset())
-            Log.i(LOG_TAG_BUG_REPORT, "kotlin crash written: ${file.name} (${file.length()} B)")
-            enforceMaxFiles(context, justWritten = file)
-        } catch (e: Exception) {
-            Log.e(LOG_TAG_BUG_REPORT, "err writing kotlin crash: ${e.message}", e)
+            try {
+                val file = newKotlinCrashFile(context) ?: run {
+                    Log.e(LOG_TAG_BUG_REPORT, "failed to create kotlin crash file")
+                    return
+                }
+                val time =
+                    Utilities.convertLongToTime(System.currentTimeMillis(), Constants.TIME_FORMAT_3)
+                file.writeText("$time\nToken: $token\n$logs\n", Charset.defaultCharset())
+                Log.i(LOG_TAG_BUG_REPORT, "kotlin crash written: ${file.name} (${file.length()} B)")
+                enforceMaxFiles(context, justWritten = file)
+            } catch (e: Exception) {
+                Log.e(LOG_TAG_BUG_REPORT, "err writing kotlin crash: ${e.message}", e)
+            }
         }
     }
 
@@ -116,7 +126,7 @@ object EnhancedBugReport : KoinComponent {
             val zipFile = File(context.filesDir, TOMBSTONE_ZIP_FILE_NAME)
             val folder = tombstoneFolder(context.filesDir) ?: return
             val files = folder.listFiles { f ->
-                f.isFile && f.length() > 0          // skip empty files
+                f.isFile() && f.length() > 0L
             } ?: return
 
             Log.d(LOG_TAG_BUG_REPORT, "zipping ${files.size} non-empty tombstone file(s)")
@@ -205,8 +215,7 @@ object EnhancedBugReport : KoinComponent {
 
         if (previousSessionFiles.isEmpty()) return
 
-        val firebaseEnabled = FirebaseErrorReporting.isAvailable() &&
-            persistentState.firebaseErrorReportingEnabled
+        val firebaseEnabled = persistentState.firebaseErrorReportingEnabled
 
         if (firebaseEnabled) {
             reportFilesToFirebase(previousSessionFiles)
@@ -311,12 +320,6 @@ object EnhancedBugReport : KoinComponent {
                 else -> "CrashLog"
             }
             Logger.d(LOG_TAG_BUG_REPORT, "err-rpting: sending $type ${file.name} (${content.length} chars)")
-            if (content.length == 13 || content.length == 15) { // "writeLine("Init GoLog->")"
-                // no need to report this content, just send true so that this file can get
-                // deleted
-                Logger.vv(LOG_TAG_BUG_REPORT, "err-rpting: skipping $type ${file.name} (${content.length} chars)")
-                return true
-            }
             // add 2 kb in the exception, rest to be added in corresponding log calls
             val messagePreview = content.take(2 * 1024)
             val ex = RuntimeException("[$type] ${file.name}\n$messagePreview")

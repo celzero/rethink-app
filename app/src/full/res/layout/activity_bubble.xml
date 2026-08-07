@@ -45,6 +45,31 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/bubble_quick_fixes_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="12dp"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:id="@+id/bubble_quick_fixes_container"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="4dp">
+                        <!-- Quick fix icons will be added here dynamically -->
+                    </LinearLayout>
+                </HorizontalScrollView>
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/bubble_allowed_apps_ll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

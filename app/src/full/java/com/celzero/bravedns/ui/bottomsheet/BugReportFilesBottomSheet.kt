@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -25,7 +25,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.FileProvider
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,14 +35,12 @@ import com.celzero.bravedns.scheduler.BugReportZipper
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastO
-import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
-import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -78,7 +75,7 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
     }
 
     override fun getTheme(): Int =
-        Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        Themes.getBottomSheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     private fun isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
@@ -97,11 +94,7 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
     override fun onStart() {
         super.onStart()
         dialog?.window?.let { window ->
-            if (isAtleastQ()) {
-                val controller = WindowInsetsControllerCompat(window, window.decorView)
-                controller.isAppearanceLightNavigationBars = false
-                window.isNavigationBarContrastEnforced = false
-            }
+            Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
         }
         dialog?.let {
             val bottomSheet = it.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
@@ -117,11 +110,7 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.let { window ->
-            if (Utilities.isAtleastQ()) {
-                val controller = WindowInsetsControllerCompat(window, window.decorView)
-                controller.isAppearanceLightNavigationBars = false
-                window.isNavigationBarContrastEnforced = false
-            }
+            Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
         }
         initView()
         loadBugReportFiles()
@@ -180,7 +169,7 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
 
         // bug report zip
         val bugReportZip = File(BugReportZipper.getZipFileName(dir))
-        if (bugReportZip.exists() && bugReportZip.length() > 0) {
+        if (bugReportZip.exists() && bugReportZip.length() != 0L) {
             files.add(
                 BugReportFile(
                     file = bugReportZip,
@@ -194,7 +183,7 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
         // tombstone zip
         if (isAtleastO()) {
             val tombstoneZip = EnhancedBugReport.getTombstoneZipFile(requireContext())
-            if (tombstoneZip != null && tombstoneZip.exists() && tombstoneZip.length() > 0) {
+            if (tombstoneZip != null && tombstoneZip.exists() && tombstoneZip.length() != 0L) {
                 files.add(
                     BugReportFile(
                         file = tombstoneZip,
@@ -210,7 +199,7 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
         val bugReportDir = File(dir, BugReportZipper.BUG_REPORT_DIR_NAME)
         if (bugReportDir.exists() && bugReportDir.isDirectory) {
             bugReportDir.listFiles()?.forEach { file ->
-                if (file.isFile && file.length() > 0) {
+                if (file.isFile && file.length() != 0L) {
                     files.add(
                         BugReportFile(
                             file = file,
@@ -228,7 +217,7 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
             val tombstoneDir = File(dir, EnhancedBugReport.TOMBSTONE_DIR_NAME)
             if (tombstoneDir.exists() && tombstoneDir.isDirectory) {
                 tombstoneDir.listFiles()?.forEach { file ->
-                    if (file.isFile && file.length() > 0) {
+                    if (file.isFile && file.length() != 0L) {
                         files.add(
                             BugReportFile(
                                 file = file,
@@ -493,7 +482,7 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun showDeleteConfirmationDialog(fileItem: BugReportFile) {
-        val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.lbl_delete))
             .setMessage(getString(R.string.bug_report_delete_confirmation, fileItem.name))
             .setPositiveButton(getString(R.string.lbl_delete)) { _, _ ->

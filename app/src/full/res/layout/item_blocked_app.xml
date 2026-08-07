@@ -101,7 +101,7 @@
             android:text="@string/bubble_allow_btn"
             android:textAllCaps="false"
             android:textSize="12sp"
-            android:textColor="?attr/accentGood"
+            android:textColor="?attr/homeScreenHeaderTextColor"
             app:cornerRadius="17dp"
             app:iconPadding="6dp"
             app:iconSize="16dp"

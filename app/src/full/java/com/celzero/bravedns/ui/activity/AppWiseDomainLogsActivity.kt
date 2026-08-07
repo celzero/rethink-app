@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.Configuration
@@ -25,7 +25,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
-import com.celzero.bravedns.ui.BaseActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
@@ -40,6 +39,7 @@ import com.celzero.bravedns.databinding.ActivityAppWiseDomainLogsBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
@@ -85,7 +85,7 @@ class AppWiseDomainLogsActivity :
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
         uid = intent.getIntExtra(AppInfoActivity.INTENT_UID, INVALID_UID)
@@ -94,7 +94,7 @@ class AppWiseDomainLogsActivity :
         if (uid == INVALID_UID) {
             finish()
         }
-        val isRethink = Utilities.getApplicationInfo(this, this.packageName)?.uid == uid
+        val isRethink = android.os.Process.myUid() == uid
         init()
         if (isActiveConns) {
             setActiveConnsAdapter(isRethink)

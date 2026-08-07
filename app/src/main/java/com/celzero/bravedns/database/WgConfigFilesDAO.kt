@@ -35,12 +35,12 @@ interface WgConfigFilesDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(wgConfigFiles: WgConfigFiles): Long
 
     @Query(
-        "select * from WgConfigFiles order by isActive desc"
+        "select * from WgConfigFiles order by isActive desc, name collate nocase asc"
     )
     fun getWgConfigsLiveData(): PagingSource<Int, WgConfigFiles>
 
     @Query(
-        "select * from WgConfigFiles order by isActive desc"
+        "select * from WgConfigFiles order by isActive desc, name collate nocase asc"
     )
     fun getWgConfigs(): List<WgConfigFiles>
 

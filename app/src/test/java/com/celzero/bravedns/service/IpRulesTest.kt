@@ -1,7 +1,7 @@
 package com.celzero.bravedns.service
 
-import org.junit.Test
 import org.junit.Assert.assertEquals
+import org.junit.Test
 
 /**
  * Test for IP Rules Manager to ensure IP address rules are properly respected by the firewall.

@@ -17,6 +17,8 @@ package com.celzero.bravedns.ui.tour
 
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.tour.GuidedTourManager.resetForDebug
+import com.celzero.bravedns.ui.tour.GuidedTourManager.shouldShowTour
 
 /**
  * Singleton that owns the Home-screen guided tour flow.
@@ -70,7 +72,7 @@ object GuidedTourManager {
         ),
         TourStep(
             targetViewId   = R.id.rethinkPlus,
-            titleRes       = R.string.tour_step_rpn_title,
+            titleRes       = R.string.rpn_title,
             descRes        = R.string.tour_step_rpn_desc,
             tooltipSide    = TooltipSide.ABOVE,
             spotlightShape = SpotlightShape.CIRCLE,

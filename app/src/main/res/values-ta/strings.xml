@@ -241,7 +241,6 @@
     <string name="dns_proxy_remove_dialog_title" translatable="true">டிஎன்எச் ப்ராக்சியை நீக்கவா?</string>
     <string name="relative_time_today" translatable="true">இன்று</string>
     <string name="settings_ip_network_desc" translatable="true">இணைய நெறிமுறை பதிப்புகளுக்கு இடையே தேர்வு செய்யவும்.</string>
-    <string name="settings_rinr_dialog_title" translatable="true">லூப் பேக் (சோதனை)</string>
     <string name="settings_http_proxy_desc" translatable="true">%1$s க்கு பகிர்தல்</string>
     <string name="hsf_stop_btn_state" translatable="true">நிறுத்து</string>
     <string name="hsf_whats_new_chip_text" translatable="true">புதியது என்ன</string>
@@ -464,7 +463,6 @@
     <string name="settings_allow_lan_desc" translatable="true">ரீதிங்கின் விபிஎன் சுரங்கப்பாதையில் இருந்து LAN, லூப் பேக், மல்டிகாச்ட், இணைப்பு-உள்ளூர் வழிகளை விலக்குங்கள்.</string>
     <string name="settings_proxy_header" translatable="true">பதிலாள்</string>
     <string name="settings_default_dns_heading" translatable="true">குறைவடையும் DNS ஐத் தேர்வுசெய்க</string>
-    <string name="hsf_proxy_chip_remove_text" translatable="true">நிறுத்துதல்…</string>
     <string name="fapps_filter_categories_heading" translatable="true">வகைகள்</string>
     <string name="firewall_rule_proxied" translatable="true">பிரதிநிதித்துவம்</string>
     <string name="build__flavor_fdroid" translatable="true">fdroid</string>
@@ -793,7 +791,6 @@
     <string name="lbl_insecure" translatable="true">(பாதுகாப்பற்றது)</string>
     <string name="lbl_save" translatable="true">சேமி</string>
     <string name="lbl_secure" translatable="true">பாதுகாப்பானது</string>
-    <string name="failed_using_default" translatable="true">தோல்வியுற்றது: குறைவடையும் டி.என்.எச்</string>
     <string name="bsct_block_domain" translatable="true"><u> இந்த பயன்பாட்டிற்கு </u> க்கு தொகுதி, நம்பிக்கை <u> டொமைன் (கள்) </u></string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">டாட் எண்ட்பாயிண்ட் நீக்கவா?</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">சேமிக்கப்பட்ட உள்ளமைவிலிருந்து டி.எல்.எச் இறுதிப்புள்ளி மீது டி.என்.எச்சை நீக்கவும்.</string>
@@ -836,7 +833,6 @@
     <string name="app_mode_choose" translatable="true">பயன்முறையைத் தேர்வுசெய்க</string>
     <string name="firewall_rule_bypass_universal_ip_desc" translatable="true"><![CDATA[இந்த இணைப்பு அனுமதிக்கப்பட்டது, ஏனெனில் <i> இலக்கு ஐபி </i> அனைத்து உலகளாவிய ஃபயர்வால் விதிகளையும் புறக்கணிக்க அமைக்கப்பட்டுள்ளது. /i&gt; தாவல்.]]></string>
     <string name="settings_rinr_desc_enabled" translatable="true">ரூட்டிங் ரீதிங்கின் சொந்த போக்குவரத்தை சுரங்கப்பாதை வழியாக. நீங்கள் என்ன செய்கிறீர்கள் என்று உங்களுக்குத் தெரியாவிட்டால், அதை அணைக்கவும்.</string>
-    <string name="settings_rinr_dialog_desc" translatable="true"><!--settings_network_all_networks--> %1$s அமைப்பையும் இயக்குகிறது. நீங்கள் தொடர விரும்புகிறீர்களா?</string>
     <string name="settings_http_proxy_error_text1" translatable="true">துறைமுகம் வீச்சு 1024–65535 முதல் இருக்க வேண்டும்</string>
     <string name="settings_http_proxy_error_text2" translatable="true">தவறான துறைமுகம்</string>
     <string name="settings_dns_proxy_dialog_hostname" translatable="true">புரவலன்பெயர்</string>
@@ -1054,8 +1050,6 @@
     <string name="dc_filtering_heading" translatable="true">வடிகட்டுதல்</string>
     <string name="cd_split_dns_heading" translatable="true">பிளவு டி.என்.எச் (சோதனை)</string>
     <string name="cd_split_dns_desc" translatable="true">ப்ராக்சியின் டிஎன்எச் சேவையகங்களுக்கு ப்ராக்சிட் ஆப்சிலிருந்து முன்னோக்கி டிஎன்எச் வினவல்கள்.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">டி.என்.எச் விதிகளை ஃபயர்வால் விதிகளாக (சோதனை) கருதுங்கள்</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">தீர்மானத்தின் போது டி.என்.எச் தடுப்பது புறக்கணிக்கப்படும்; இணைப்பு நேரத்தில் முடிவு எடுக்கப்படும்.</string>
     <string name="univ_firewall_rule_11" translatable="true">அனைத்து உள்ளக புரவலன் இணைப்புகளையும் தடுக்கவும்</string>
     <string name="firewall_rule_private_dns" translatable="true">தனியார் டி.என்</string>
     <string name="firewall_rule_bypass_proxy" translatable="true">பைபாச் பதிலாள்</string>

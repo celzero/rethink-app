@@ -15,27 +15,39 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.SummaryStatisticsAdapter
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.DataUsageSummary
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.FragmentSummaryStatisticsBinding
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.DetailedStatisticsActivity
-import com.celzero.bravedns.util.CustomLinearLayoutManager
+import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -48,6 +60,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     private val viewModel: SummaryStatisticsViewModel by viewModel()
     private val appConfig by inject<AppConfig>()
     private val persistentState by inject<PersistentState>()
+    private val eventLogger by inject<EventLogger>()
 
     private var isVpnActive: Boolean = false
     private var loadMoreClicked: Boolean = false
@@ -202,6 +215,9 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
         b.toggleGroup.addOnButtonCheckedListener(listViewToggleListener)
 
+        b.fssCloseConnsChip.setOnClickListener {
+            showCloseConnectionDialog()
+        }
         b.fssActiveAppsChip.setOnClickListener {
             openDetailedStatsUi(SummaryStatisticsType.TOP_ACTIVE_CONNS)
         }
@@ -288,6 +304,26 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         showMostContactedCountries()
     }
 
+    private fun showCloseConnectionDialog() {
+        Logger.v(LOG_TAG_UI, "show close connection dialog all apps")
+        val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+            .setTitle(this.getString(R.string.close_conns_dialog_title))
+            .setMessage(getString(R.string.close_conns_dialog_desc, getString(R.string.lbl_all_apps).lowercase()))
+            .setPositiveButton(R.string.lbl_proceed) { _, _ ->
+                // close the connection
+                VpnController.closeConnectionsIfNeeded(Constants.UID_EVERYBODY, "summ-stats-manual-close")
+                Logger.i(LOG_TAG_UI, "closed connection for all apps")
+                showToastUiCentered(requireContext(), getString(R.string.config_add_success_toast), Toast.LENGTH_LONG)
+                logEvent("close connections",
+                    "Closed active connections for all apps from stats screen")
+            }
+            .setNegativeButton(R.string.lbl_cancel, null)
+            .create()
+        dialog.setCancelable(true)
+        dialog.setCanceledOnTouchOutside(true)
+        dialog.show()
+    }
+
     private fun showLoadMoreProgress(isClicked: Boolean) {
         if (isClicked) {
             loadMoreClicked = true
@@ -358,8 +394,9 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     private fun showTopActiveApps() {
         b.fssActiveAppsRecyclerView.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.fssActiveAppsRecyclerView.layoutManager = layoutManager
+        b.fssActiveAppsRecyclerView.itemAnimator = null
 
         val recyclerAdapter =
             SummaryStatisticsAdapter(
@@ -368,9 +405,21 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                 appConfig,
                 SummaryStatisticsType.TOP_ACTIVE_CONNS
             )
+        recyclerAdapter.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
         viewModel.getTopActiveConns.observe(viewLifecycleOwner) {
             recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+            b.fssActiveAppsRecyclerView.post {
+                try {
+                    if (recyclerAdapter.itemCount > 0) {
+                        recyclerAdapter.stateRestorationPolicy =
+                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
+                    }
+                } catch (_: Exception) {
+                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
+                }
+            }
         }
 
         recyclerAdapter.addLoadStateListener {
@@ -393,8 +442,9 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     private fun showAppNetworkActivity() {
         b.fssAppNetworkActivityRecyclerView.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.fssAppNetworkActivityRecyclerView.layoutManager = layoutManager
+        b.fssAppNetworkActivityRecyclerView.itemAnimator = null
 
         val recyclerAdapter =
             SummaryStatisticsAdapter(
@@ -402,9 +452,21 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                 persistentState,
                 appConfig,
                 SummaryStatisticsType.MOST_CONNECTED_APPS)
+        recyclerAdapter.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
         viewModel.getAllowedAppNetworkActivity.observe(viewLifecycleOwner) {
             recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+            b.fssAppNetworkActivityRecyclerView.post {
+                try {
+                    if (recyclerAdapter.itemCount > 0) {
+                        recyclerAdapter.stateRestorationPolicy =
+                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
+                    }
+                } catch (_: Exception) {
+                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
+                }
+            }
         }
 
         // remove the view if there is no data
@@ -428,8 +490,9 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     private fun showBlockedApps() {
         b.fssAppBlockedRecyclerView.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.fssAppBlockedRecyclerView.layoutManager = layoutManager
+        b.fssAppBlockedRecyclerView.itemAnimator = null
 
         val recyclerAdapter =
             SummaryStatisticsAdapter(
@@ -438,9 +501,21 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                 appConfig,
                 SummaryStatisticsType.MOST_BLOCKED_APPS
             )
+        recyclerAdapter.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
         viewModel.getBlockedAppNetworkActivity.observe(viewLifecycleOwner) {
             recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+            b.fssAppBlockedRecyclerView.post {
+                try {
+                    if (recyclerAdapter.itemCount > 0) {
+                        recyclerAdapter.stateRestorationPolicy =
+                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
+                    }
+                } catch (_: Exception) {
+                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
+                }
+            }
         }
 
         recyclerAdapter.addLoadStateListener {
@@ -463,8 +538,9 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     private fun showMostConnectedASN() {
         b.fssAsnAllowedRecyclerView.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.fssAsnAllowedRecyclerView.layoutManager = layoutManager
+        b.fssAsnAllowedRecyclerView.itemAnimator = null
 
         contactedAsnAdapter =
             SummaryStatisticsAdapter(
@@ -473,6 +549,8 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                 appConfig,
                 SummaryStatisticsType.MOST_CONNECTED_ASN
             )
+        contactedAsnAdapter?.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
 
         val timeCategory = viewModel.getTimeCategory()
@@ -480,6 +558,16 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
         viewModel.getMostConnectedASN.observe(viewLifecycleOwner) {
             contactedAsnAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
+            b.fssAsnAllowedRecyclerView.post {
+                try {
+                    if ((contactedAsnAdapter?.itemCount ?: 0) > 0) {
+                        contactedAsnAdapter?.stateRestorationPolicy =
+                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
+                    }
+                } catch (_: Exception) {
+                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
+                }
+            }
         }
 
         contactedAsnAdapter?.addLoadStateListener {
@@ -501,8 +589,9 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     private fun showMostBlockedASN() {
         b.fssAsnBlockedRecyclerView.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.fssAsnBlockedRecyclerView.layoutManager = layoutManager
+        b.fssAsnBlockedRecyclerView.itemAnimator = null
 
         blockedAsnAdapter =
             SummaryStatisticsAdapter(
@@ -511,12 +600,24 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                 appConfig,
                 SummaryStatisticsType.MOST_BLOCKED_ASN
             )
+        blockedAsnAdapter?.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
         val timeCategory = viewModel.getTimeCategory()
         blockedAsnAdapter?.setTimeCategory(timeCategory)
 
         viewModel.getMostBlockedASN.observe(viewLifecycleOwner) {
             blockedAsnAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
+            b.fssAsnBlockedRecyclerView.post {
+                try {
+                    if ((blockedAsnAdapter?.itemCount ?: 0) > 0) {
+                        blockedAsnAdapter?.stateRestorationPolicy =
+                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
+                    }
+                } catch (_: Exception) {
+                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
+                }
+            }
         }
 
         blockedAsnAdapter?.addLoadStateListener {
@@ -544,8 +645,9 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
 
         b.fssContactedDomainRecyclerView.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.fssContactedDomainRecyclerView.layoutManager = layoutManager
+        b.fssContactedDomainRecyclerView.itemAnimator = null
 
         contactedDomainsAdapter =
             SummaryStatisticsAdapter(
@@ -554,6 +656,8 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                 appConfig,
                 SummaryStatisticsType.MOST_CONTACTED_DOMAINS
             )
+        contactedDomainsAdapter?.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
 
         val timeCategory = viewModel.getTimeCategory()
@@ -561,6 +665,16 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
         viewModel.mcd.observe(viewLifecycleOwner) {
             contactedDomainsAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
+            b.fssContactedDomainRecyclerView.post {
+                try {
+                    if ((contactedDomainsAdapter?.itemCount ?: 0) > 0) {
+                        contactedDomainsAdapter?.stateRestorationPolicy =
+                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
+                    }
+                } catch (_: Exception) {
+                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
+                }
+            }
         }
 
         contactedDomainsAdapter?.addLoadStateListener {
@@ -587,8 +701,9 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             return
         }
         b.fssBlockedDomainRecyclerView.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.fssBlockedDomainRecyclerView.layoutManager = layoutManager
+        b.fssBlockedDomainRecyclerView.itemAnimator = null
 
         blockedDomainsAdapter =
             SummaryStatisticsAdapter(
@@ -597,12 +712,24 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                 appConfig,
                 SummaryStatisticsType.MOST_BLOCKED_DOMAINS
             )
+        blockedDomainsAdapter?.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
         val timeCategory = viewModel.getTimeCategory()
         blockedDomainsAdapter?.setTimeCategory(timeCategory)
 
         viewModel.mbd.observe(viewLifecycleOwner) {
             blockedDomainsAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
+            b.fssBlockedDomainRecyclerView.post {
+                try {
+                    if ((blockedDomainsAdapter?.itemCount ?: 0) > 0) {
+                        blockedDomainsAdapter?.stateRestorationPolicy =
+                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
+                    }
+                } catch (_: Exception) {
+                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
+                }
+            }
         }
 
         blockedDomainsAdapter?.addLoadStateListener {
@@ -630,8 +757,9 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
 
         b.fssContactedIpsRecyclerView.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.fssContactedIpsRecyclerView.layoutManager = layoutManager
+        b.fssContactedIpsRecyclerView.itemAnimator = null
 
         contactedIpsAdapter = SummaryStatisticsAdapter(
                 requireContext(),
@@ -639,12 +767,24 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                 appConfig,
                 SummaryStatisticsType.MOST_CONTACTED_IPS
             )
+        contactedIpsAdapter?.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
         val timeCategory = viewModel.getTimeCategory()
         contactedIpsAdapter?.setTimeCategory(timeCategory)
 
         viewModel.getMostContactedIps.observe(viewLifecycleOwner) {
             contactedIpsAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
+            b.fssContactedIpsRecyclerView.post {
+                try {
+                    if ((contactedIpsAdapter?.itemCount ?: 0) > 0) {
+                        contactedIpsAdapter?.stateRestorationPolicy =
+                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
+                    }
+                } catch (_: Exception) {
+                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
+                }
+            }
         }
 
         contactedIpsAdapter?.addLoadStateListener {
@@ -672,8 +812,9 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
 
         b.fssBlockedIpsRecyclerView.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.fssBlockedIpsRecyclerView.layoutManager = layoutManager
+        b.fssBlockedIpsRecyclerView.itemAnimator = null
 
         blockedIpsAdapter = SummaryStatisticsAdapter(
                 requireContext(),
@@ -681,12 +822,24 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                 appConfig,
                 SummaryStatisticsType.MOST_BLOCKED_IPS
             )
+        blockedIpsAdapter?.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
         val timeCategory = viewModel.getTimeCategory()
         blockedIpsAdapter?.setTimeCategory(timeCategory)
 
         viewModel.getMostBlockedIps.observe(viewLifecycleOwner) {
             blockedIpsAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
+            b.fssBlockedIpsRecyclerView.post {
+                try {
+                    if ((blockedIpsAdapter?.itemCount ?: 0) > 0) {
+                        blockedIpsAdapter?.stateRestorationPolicy =
+                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
+                    }
+                } catch (_: Exception) {
+                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
+                }
+            }
         }
 
         blockedIpsAdapter?.addLoadStateListener {
@@ -714,8 +867,9 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
 
         b.fssContactedCountriesRecyclerView.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
         b.fssContactedCountriesRecyclerView.layoutManager = layoutManager
+        b.fssContactedCountriesRecyclerView.itemAnimator = null
 
         contactedCountriesAdapter =
             SummaryStatisticsAdapter(
@@ -724,12 +878,24 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                 appConfig,
                 SummaryStatisticsType.MOST_CONTACTED_COUNTRIES
             )
+        contactedCountriesAdapter?.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
         val timeCategory = viewModel.getTimeCategory()
         contactedCountriesAdapter?.setTimeCategory(timeCategory)
 
         viewModel.getMostContactedCountries.observe(viewLifecycleOwner) {
             contactedCountriesAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
+            b.fssContactedCountriesRecyclerView.post {
+                try {
+                    if ((contactedCountriesAdapter?.itemCount ?: 0) > 0) {
+                        contactedCountriesAdapter?.stateRestorationPolicy =
+                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
+                    }
+                } catch (_: Exception) {
+                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
+                }
+            }
         }
 
         contactedCountriesAdapter?.addLoadStateListener {
@@ -747,6 +913,10 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - RECYCLER_HEIGHT_OFFSET) * scale + 0.5f)
         b.fssContactedCountriesRecyclerView.minimumHeight = pixels.toInt()
         b.fssContactedCountriesRecyclerView.adapter = contactedCountriesAdapter
+    }
+
+    private fun logEvent(msg: String, details: String) {
+        eventLogger.log(EventType.FW_RULE_MODIFIED, Severity.LOW, msg, EventSource.UI, true, details)
     }
 
     private fun io(f: suspend () -> Unit) {

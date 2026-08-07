@@ -15,8 +15,10 @@
  */
 package com.celzero.bravedns.util
 
+import android.view.Window
+import androidx.core.view.WindowInsetsControllerCompat
 import com.celzero.bravedns.R
-import com.celzero.bravedns.util.Utilities.isAtleastS
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 
 // Application themes enum
 enum class Themes(val id: Int) {
@@ -34,22 +36,14 @@ enum class Themes(val id: Int) {
         }
 
         fun getAvailableThemeCount(): Int {
-            return if (isAtleastS()) {
-                entries.count()
-            } else {
-                // Exclude LIGHT_FROST and DARK_FROST for pre-Android S devices
-                entries.count() - 2
-            }
+            return entries.count()
         }
 
         fun isFrostTheme(id: Int): Boolean {
             return id == DARK_FROST.id
         }
 
-        fun isThemeAvailable(id: Int): Boolean {
-            if (isFrostTheme(id)) {
-                return isAtleastS()
-            }
+        fun isThemeAvailable(_id: Int): Boolean {
             return true
         }
 
@@ -74,18 +68,12 @@ enum class Themes(val id: Int) {
                 TRUE_BLACK.id -> R.style.BottomSheetDialogThemeTrueBlack
                 LIGHT_PLUS.id -> R.style.BottomSheetDialogThemeWhitePlus
                 DARK_PLUS.id -> R.style.BottomSheetDialogThemeTrueBlackPlus
-                // for now use same as dark, can be changed later
-                DARK_FROST.id -> R.style.BottomSheetDialogThemeTrueBlack
+                DARK_FROST.id -> R.style.BottomSheetDialogThemeTrueBlackFrost
                 else -> 0
             }
         }
 
         fun getCurrentTheme(isDarkThemeOn: Boolean, theme: Int): Int {
-            // If Frost themes are requested on pre-Android S, fallback to appropriate theme
-            if (isFrostTheme(theme) && !isAtleastS()) {
-                return getTheme(DARK_FROST.id)
-            }
-
             return if (theme == SYSTEM_DEFAULT.id) {
                 if (isDarkThemeOn) {
                     getTheme(TRUE_BLACK.id)
@@ -107,12 +95,7 @@ enum class Themes(val id: Int) {
             }
         }
 
-        fun getBottomsheetCurrentTheme(isDarkThemeOn: Boolean, theme: Int): Int {
-            // If Frost themes are requested on pre-Android S, fallback to appropriate theme
-            if (isFrostTheme(theme) && !isAtleastS()) {
-                return getBottomSheetTheme(TRUE_BLACK.id)
-            }
-
+        fun getBottomSheetCurrentTheme(isDarkThemeOn: Boolean, theme: Int): Int {
             return if (theme == SYSTEM_DEFAULT.id) {
                 if (isDarkThemeOn) {
                     getBottomSheetTheme(TRUE_BLACK.id)
@@ -132,6 +115,32 @@ enum class Themes(val id: Int) {
             } else {
                 getBottomSheetTheme(TRUE_BLACK.id)
             }
+        }
+
+        fun isBottomSheetLightTheme(isDarkThemeOn: Boolean, theme: Int): Boolean {
+            val resolved = getBottomSheetCurrentTheme(isDarkThemeOn, theme)
+            return resolved == R.style.BottomSheetDialogThemeWhite ||
+                resolved == R.style.BottomSheetDialogThemeWhitePlus
+        }
+
+        fun isActivityLightTheme(isDarkThemeOn: Boolean, theme: Int): Boolean {
+            val resolved = getCurrentTheme(isDarkThemeOn, theme)
+            return resolved == R.style.AppThemeWhite ||
+                resolved == R.style.AppThemeWhitePlus
+        }
+
+        fun applyBottomSheetSystemBarAppearance(
+            window: Window,
+            isDarkThemeOn: Boolean,
+            theme: Int
+        ) {
+            if (!isAtleastQ()) return
+            val isLight = isBottomSheetLightTheme(isDarkThemeOn, theme)
+            WindowInsetsControllerCompat(window, window.decorView).apply {
+                isAppearanceLightStatusBars = isLight
+                isAppearanceLightNavigationBars = isLight
+            }
+            window.isNavigationBarContrastEnforced = false
         }
     }
 }

@@ -15,12 +15,16 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import android.widget.TextView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -30,6 +34,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ODoHEndpoint
 import com.celzero.bravedns.databinding.DialogSetCustomOdohBinding
 import com.celzero.bravedns.databinding.FragmentOdohListBinding
+import com.celzero.bravedns.util.RecyclerViewSpacingDecoration
 import com.celzero.bravedns.viewmodel.ODoHEndpointViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -52,29 +57,70 @@ class ODoHListFragment : Fragment(R.layout.fragment_odoh_list) {
 
     companion object {
         fun newInstance() = ODoHListFragment()
+
+        private val dpToPx: Float by lazy {
+            Resources.getSystem().displayMetrics.density
+        }
+
+        private val spacing4dp: Int by lazy { (4 * dpToPx).toInt() }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
         initClickListeners()
+        applyEdgeToEdge()
     }
 
     private fun initView() {
         layoutManager = LinearLayoutManager(requireContext())
         b.recyclerOdoh.layoutManager = layoutManager
+        b.recyclerOdoh.addItemDecoration(
+            RecyclerViewSpacingDecoration(spacing4dp, spacing4dp)
+        )
 
         adapter = ODoHEndpointAdapter(requireContext(), get())
         viewModel.dohEndpointList.observe(viewLifecycleOwner) {
             adapter!!.submitData(viewLifecycleOwner.lifecycle, it)
         }
         b.recyclerOdoh.adapter = adapter
+
+        adapter!!.addLoadStateListener { loadStates ->
+            val isEmpty = loadStates.source.refresh is LoadState.NotLoading &&
+                    adapter!!.itemCount == 0
+            val isLoading = loadStates.source.refresh is LoadState.Loading
+
+            b.odohEmptyState.visibility = if (isEmpty) View.VISIBLE else View.GONE
+            b.odohLoadingIndicator.visibility = if (isLoading && adapter!!.itemCount == 0) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+            b.recyclerOdoh.visibility = if (isLoading && adapter!!.itemCount == 0) {
+                View.GONE
+            } else {
+                View.VISIBLE
+            }
+        }
     }
 
     private fun initClickListeners() {
         // see CustomIpFragment#setupClickListeners#bringToFront()
         b.odohFabAdd.bringToFront()
         b.odohFabAdd.setOnClickListener { showAddDialog() }
+    }
+
+    private fun applyEdgeToEdge() {
+        ViewCompat.setOnApplyWindowInsetsListener(b.recyclerOdoh) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(
+                v.paddingLeft,
+                v.paddingTop,
+                v.paddingRight,
+                v.paddingBottom + systemBars.bottom
+            )
+            insets
+        }
     }
 
     private fun showAddDialog() {

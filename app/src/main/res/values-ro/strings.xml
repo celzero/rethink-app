@@ -183,7 +183,6 @@
     <string name="settings_locale_heading" translatable="true">Schimbă limba</string>
     <string name="hsf_start_btn_state" translatable="true">start</string>
     <string name="hsf_stop_btn_state" translatable="true">stop</string>
-    <string name="failed_using_default" translatable="true">Nereușit: se utilizează DNS-ul alternativ</string>
     <string name="status_app_error" translatable="true">eroare în aplicație</string>
     <string name="status_dns_error" translatable="true">eroare la DNS</string>
     <string name="status_dns_server_down" translatable="true">server DNS nefuncțional</string>
@@ -407,8 +406,6 @@
     <string name="settings_go_log_desc" translatable="true">În scop de depanare</string>
     <string name="settings_rinr_heading" translatable="true">Loopback (experimental)</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Direcționează traficul propriu al Rethink prin tunel. Dacă nu te pricepi, lasă-l \"Închis\".</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Loopback (experimental)</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Asta va activa și setarea <!--settings_network_all_networks--> %1$s. Vrei să continui?</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">Faceți notificarea permanentă</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Direcționează traficul propriu al Rethink (descărcarea listelor de blocat, verificările de conectivitate, conexiunile DNS) înapoi în tunel.</string>
     <string name="settings_http_proxy_desc" translatable="true">Trimitere la %1$s</string>
@@ -446,7 +443,6 @@
     <string name="hsf_packet_capture_chip_text" translatable="true">Capturare pachete activă</string>
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">Activează RDNS+</string>
     <string name="hsf_exclude_error" translatable="true">Excluderea nu e posibilă în modul VPN lockdown</string>
-    <string name="hsf_proxy_chip_remove_text" translatable="true">Se oprește…</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Capturarea pachetelor dezactivată</string>
     <string name="hsf_whats_new_remove_text" translatable="true">Se închide…</string>
     <string name="hsf_blocklist_updating_text" translatable="true">Se activează…</string>
@@ -1032,7 +1028,7 @@
     <string name="dc_local_block_enabled" translatable="true">Activat</string>
     <string name="lbl_hop" translatable="true">Relee</string>
     <string name="lbl_manual" translatable="true">Manual</string>
-    <string name="lbl_fallback" translatable="true">Rezervă</string>
+    <string name="lbl_bootstrap" translatable="true">Rezervă</string>
     <string name="lbl_test" translatable="true">test</string>
     <string name="lbl_protos" translatable="true">protos</string>
     <string name="lbl_experimental" translatable="true">(experimental)</string>
@@ -1061,8 +1057,6 @@
     <string name="dc_filtering_heading" translatable="true">filtrare</string>
     <string name="cd_split_dns_heading" translatable="true">DNS ramificat (experimental)</string>
     <string name="cd_split_dns_desc" translatable="true">Redirecționează cererile DNS de la aplicațiile care folosesc proxy către serverele DNS proxy.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">Tratează regulile DNS ca reguli de firewall (experimental)</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">Blocarea prin DNS va fi ocolită pe timpul soluționării; decizia va fi luată la momentul conectării.</string>
     <string name="univ_firewall_rule_11" translatable="true">Blochează toate conexiunile la localhost</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">Elimini toate regulile de domeniu?</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">Eliminarea acestor reguli va permite oricărei aplicații să se conecteze la domeniile blocate în prezent.</string>

@@ -28,7 +28,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@id/dc_refresh"
                 android:padding="5dp"
-                android:text="@string/dc_other_dns_heading"
+                android:text="@string/dc_global_heading"
                 android:textColor="?attr/colorPrimary" />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -56,20 +56,6 @@
                 android:orientation="vertical"
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp">
-
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/wireguard_rb"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:enabled="false"
-                    android:minHeight="48dp"
-                    android:padding="10dp"
-                    android:text="@string/lbl_wireguard"
-                    android:visibility="gone" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -853,6 +839,7 @@
 
                 </RelativeLayout>
 
+
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -875,6 +862,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginTop="5dp"
+                        android:layout_centerVertical="true"
                         android:layout_marginEnd="5dp"
                         android:padding="10dp"
                         android:src="@drawable/ic_prevent_dns_leaks" />
@@ -923,51 +911,52 @@
                     android:layout_marginEnd="16dp" />
 
                 <RelativeLayout
-                    android:id="@+id/dc_use_fallback_to_bypass_rl"
+                    android:id="@+id/dc_block_heading_rl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
                     android:paddingBottom="15dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/dc_use_fallback_to_bypass_img"
+                        android:id="@+id/dc_block_heading_img"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
                         android:layout_marginStart="5dp"
                         android:layout_marginTop="5dp"
                         android:layout_marginEnd="5dp"
-                        android:alpha="0.5"
+                        android:layout_marginBottom="5dp"
                         android:padding="10dp"
-                        android:src="@drawable/ic_use_fallback_bypass" />
+                        android:alpha="0.5"
+                        android:src="@drawable/ic_block_unknown_dns" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/dc_use_fallback_to_bypass_switch"
-                        android:layout_toEndOf="@id/dc_use_fallback_to_bypass_img"
+                        android:layout_toStartOf="@id/dc_block_unknown_switch"
+                        android:layout_toEndOf="@id/dc_block_heading_img"
                         android:orientation="vertical">
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/dc_use_fallback_to_bypass_heading"
+                            android:id="@+id/dc_block_unknown_heading"
                             style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/use_fallback_dns_to_bypass" />
+                            android:text="@string/dc_block_unknown_heading" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             style="@style/TextAppearance.Material3.BodyMedium"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="3dp"
-                            android:text="@string/use_fallback_dns_to_bypass_desc"
+                            android:text="@string/dc_block_unknown_desc"
                             android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
 
                     <com.google.android.material.materialswitch.MaterialSwitch
-                        android:id="@+id/dc_use_fallback_to_bypass_switch"
+                        android:id="@+id/dc_block_unknown_switch"
                         style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -976,6 +965,14 @@
                         android:padding="10dp" />
 
                 </RelativeLayout>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginStart="56dp"
+                    android:layout_marginEnd="16dp" />
 
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
@@ -1083,7 +1080,7 @@
                             style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="DNS to bypass" />
+                            android:text="@string/bfdm_heading" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_block_free_dns_desc"
@@ -1091,7 +1088,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="3dp"
-                            android:text="@string/dc_block_free_dns_desc"
+                            android:text=""
                             android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
 

@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.iab
 
-import Logger
-import Logger.LOG_IAB
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_IAB
 import android.os.Build
 import com.android.billingclient.api.BillingClient.ProductType
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
@@ -24,6 +24,7 @@ import com.celzero.bravedns.customdownloader.IBillingServerApi
 import com.celzero.bravedns.customdownloader.IBillingServerApiTest
 import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.customdownloader.SafeResponseConverterFactory
+import com.celzero.bravedns.iab.BillingBackendClient.Companion.DB_SESSION_UNCONSTRAINED
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
@@ -31,6 +32,8 @@ import com.celzero.bravedns.util.Constants
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import okhttp3.Interceptor
 import org.koin.core.component.KoinComponent
@@ -44,6 +47,7 @@ import java.net.SocketTimeoutException
 import java.net.URLEncoder
 import java.net.UnknownHostException
 import java.time.Instant
+import kotlin.time.Duration.Companion.milliseconds
 
 
 /**
@@ -100,6 +104,10 @@ class BillingBackendClient(
 
     /** Latest DID token received from the server; echoed on every subsequent request. */
     @Volatile private var didToken: String? = null
+
+    /** Serializes [refreshIdentity] and [getAccountId]/[getDeviceId]/[resolveIdentity] calls
+     * so that concurrent callers never race to create competing CID/DID pairs. */
+    private val identityMutex = Mutex()
 
     /**
      * Returns the [SecureIdentityStore.Env] that corresponds to the current app mode.
@@ -166,8 +174,8 @@ class BillingBackendClient(
      * Returns an empty string if all sources fail. Callers must treat a blank return
      * as "IDs not yet available" and abort or retry rather than proceeding with empty IDs.
      */
-    suspend fun getDeviceId(recvCid: String = ""): String {
-        val mname = this::getDeviceId.name
+    suspend fun getDeviceId(recvCid: String = ""): String = identityMutex.withLock {
+        val mname = this@BillingBackendClient::getDeviceId.name
         val env = currentEnv()
         val (storedCid, storedDid) = identityStore.get(env)
 
@@ -177,7 +185,7 @@ class BillingBackendClient(
             if (didResult.isSuccess) {
                 identityStore.save(env, recvCid, didResult.deviceId)
                 Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: re-registered device (didLen=${didResult.deviceId.length})")
-                return didResult.deviceId
+                return@withLock didResult.deviceId
             }
             // Log specific error code so callers using createOrRegisterDid() directly can surface it.
             when (didResult.errorCode) {
@@ -189,12 +197,12 @@ class BillingBackendClient(
 
         if (!storedDid.isNullOrBlank()) {
             Logger.v(LOG_IAB, "$TAG $mname [${env.label}]: loaded from SecureIdentityStore (len=${storedDid.length})")
-            return storedDid
+            return@withLock storedDid
         }
 
         // No usable DID in store; perform a full identity refresh so both CID and DID
         // are resolved and persisted atomically.
-        return when (val result = refreshIdentity()) {
+        return@withLock when (val result = refreshIdentityLocked()) {
             is RefreshIdentityResult.Success -> {
                 Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: received from server (len=${result.did.length})")
                 result.did
@@ -212,6 +220,35 @@ class BillingBackendClient(
                 ""
             }
         }
+    }
+
+    /**
+     * Atomically resolves a DID for [cid] under the identity mutex.
+     *
+     * If the store already contains a DID for [cid] it is returned immediately
+     * (no server call).  Otherwise [createOrRegisterDid] is called and the
+     * result is persisted on success.
+     *
+     * This is the **only** safe way for external callers (e.g. [reconcileCidDidFromPurchase])
+     * to obtain a DID for a specific CID without racing against a concurrent
+     * [refreshIdentity] call.
+     *
+     * @return [DidResult] with the resolved DID on success, or the appropriate error.
+     */
+    suspend fun reconcileDidForCid(cid: String): DidResult = identityMutex.withLock {
+        val env = currentEnv()
+        val (storedCid, storedDid) = identityStore.get(env)
+        if (storedCid == cid && !storedDid.isNullOrBlank()) {
+            Logger.d(LOG_IAB, "$TAG reconcileDidForCid [${env.label}]: did already present (len=${storedDid.length})")
+            return@withLock DidResult(storedDid)
+        }
+        val existing = if (storedCid == cid) (storedDid ?: "") else ""
+        val didResult = createOrRegisterDid(cid, existing)
+        if (didResult.isSuccess) {
+            identityStore.save(env, cid, didResult.deviceId)
+            Logger.i(LOG_IAB, "$TAG reconcileDidForCid [${env.label}]: obtained and persisted did (len=${didResult.deviceId.length})")
+        }
+        didResult
     }
 
     /**
@@ -269,11 +306,12 @@ class BillingBackendClient(
             // Pass null when blank so Retrofit omits the header entirely, letting the server
             // assign a fresh CID.  A non-blank value asks the server to confirm/correct it.
             val cidHeader = existingCid.takeIf { it.isNotBlank() }
+            val vcode = persistentState.appVersion.toString()
             Logger.v(LOG_IAB, "$TAG $mname [${env.label}]: calling /d/acc, cidHeader=${if (cidHeader != null) "present(len=${cidHeader.length})" else "absent"}")
             val response = if (persistentState.appTestMode) {
-                buildTestApi().registerCustomer(cidHeader, "", test = "", meta)
+                buildTestApi().registerCustomer(cidHeader, "",  vcode, test = "", meta)
             } else {
-                buildProductionApi().registerCustomer(cidHeader, "", meta)
+                buildProductionApi().registerCustomer(cidHeader, "", vcode, meta)
             }
             return@withContext when {
                 response == null -> {
@@ -351,11 +389,12 @@ class BillingBackendClient(
             // Pass null for did when blank so Retrofit omits the header, letting the server
             // assign a fresh DID.  accountId is always required and sent as a non-null header.
             val didHeader = existingDeviceId.takeIf { it.isNotBlank() }
+            val vcode = persistentState.appVersion.toString()
             Logger.v(LOG_IAB, "$TAG $mname [${env.label}]: calling /d/reg, cidLen=${accountId.length}, didHeader=${if (didHeader != null) "present(len=${didHeader.length})" else "absent"}")
             val response = if (persistentState.appTestMode) {
-                buildTestApi().registerDevice(accountId, didHeader, test = "", meta = meta)
+                buildTestApi().registerDevice(accountId, didHeader, vcode, test = "", meta = meta)
             } else {
-                buildProductionApi().registerDevice(accountId, didHeader, meta = meta)
+                buildProductionApi().registerDevice(accountId, didHeader, vcode, meta = meta)
             }
             return@withContext when {
                 response == null -> {
@@ -483,7 +522,16 @@ class BillingBackendClient(
      *   [RefreshIdentityResult.Failure] for all other failures (transient, network, etc.).
      *   Callers must treat non-[RefreshIdentityResult.Success] as "identity not ready".
      */
-    suspend fun refreshIdentity(): RefreshIdentityResult {
+    suspend fun refreshIdentity(): RefreshIdentityResult = identityMutex.withLock { refreshIdentityLocked() }
+
+    /**
+     * Lock-free implementation of [refreshIdentity]. The caller MUST already hold
+     * [identityMutex] (or invoke the public [refreshIdentity] wrapper that acquires it).
+     *
+     * Extracted so that [getDeviceId] — which already holds [identityMutex] — can perform
+     * a full identity refresh without re-acquiring the non-reentrant mutex and self-deadlocking.
+     */
+    private suspend fun refreshIdentityLocked(): RefreshIdentityResult {
         val mname = "refreshIdentity"
         // One-time migration: move legacy identity.json into the correct env-scoped file
         // before any read, so the migrated data is found by identityStore.get(env) below.
@@ -576,8 +624,8 @@ class BillingBackendClient(
         try {
             val handle = resolveApi()
             val response = when (handle) {
-                is ApiHandle.Production -> handle.api.registerDevice(accountId, deviceId, meta = meta)
-                is ApiHandle.Test -> handle.api.registerDevice(accountId, deviceId, test = "", meta = meta)
+                is ApiHandle.Production -> handle.api.registerDevice(accountId, deviceId, vcode = persistentState.appVersion.toString(), meta = meta)
+                is ApiHandle.Test -> handle.api.registerDevice(accountId, deviceId, vcode = persistentState.appVersion.toString(), test = "", meta = meta)
             }
             when {
                 response == null -> {
@@ -643,9 +691,10 @@ class BillingBackendClient(
         val sku = skuForType(productType)
 
         executeAckWithRetry(mname) { handle ->
+            val vcode = persistentState.appVersion.toString()
             when (handle) {
-                is ApiHandle.Production -> handle.api.acknowledgePurchase(accountId, deviceId, sku, pt)
-                is ApiHandle.Test -> handle.api.acknowledgePurchase(accountId, deviceId, sku, pt, test = "")
+                is ApiHandle.Production -> handle.api.acknowledgePurchase(accountId, deviceId, sku, pt, vcode)
+                is ApiHandle.Test -> handle.api.acknowledgePurchase(accountId, deviceId, sku, pt, vcode, test = "")
             }
         }
     }
@@ -689,7 +738,7 @@ class BillingBackendClient(
             if (attemptIndex > 0) {
                 val waitMs = delaysMs[attemptIndex - 1]
                 Logger.i(LOG_IAB, "$TAG $caller [${handle.envLabel}]: retry #$attemptIndex, waiting ${waitMs}ms")
-                delay(waitMs)
+                delay(waitMs.milliseconds)
             }
 
             try {
@@ -798,9 +847,10 @@ class BillingBackendClient(
             val encodedPt = URLEncoder.encode(purchaseToken, "UTF-8")
             val sku = skuForType(purchase.productType)
             val handle = resolveApi()
+            val vcode = persistentState.appVersion.toString()
             val response = when (handle) {
-                is ApiHandle.Production -> handle.api.queryEntitlement(accountId, deviceId, sku, encodedPt)
-                is ApiHandle.Test -> handle.api.queryEntitlement(accountId, deviceId, sku, encodedPt, test = "")
+                is ApiHandle.Production -> handle.api.queryEntitlement(accountId, deviceId, sku, encodedPt, vcode)
+                is ApiHandle.Test -> handle.api.queryEntitlement(accountId, deviceId, sku, encodedPt, vcode, test = "")
             }
             if (response == null) {
                 // Null response = server unreachable / transport error → transient.
@@ -880,24 +930,32 @@ class BillingBackendClient(
         val mname = "cancelPurchase"
         try {
             val handle = resolveApi()
+            val vcode = persistentState.appVersion.toString()
             Logger.d(LOG_IAB, "$TAG $mname [${handle.envLabel}]: accLen=${accountId.length}, devLen=${deviceId.length}, sku=$sku")
             val response = when (handle) {
-                is ApiHandle.Production -> handle.api.cancelPurchase(accountId, deviceId, sku, purchaseToken)
-                is ApiHandle.Test -> handle.api.cancelSubscription(accountId, deviceId, sku, purchaseToken, test = "")
+                is ApiHandle.Production -> handle.api.cancelPurchase(accountId, deviceId, sku, purchaseToken, vcode)
+                is ApiHandle.Test -> handle.api.cancelSubscription(accountId, deviceId, sku, purchaseToken, vcode, test = "")
             } ?: return@withContext Pair(false, "No response")
-            when {
-                response.code() == 401 -> {
-                    Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: 401 unauthorized; accLen=${accountId.length}, err=${response.errorBody()?.string()}")
-                    Pair(false, "Unauthorized: 401")
-                }
-                response.code() == 409 -> Pair(false, "Conflict: 409")
-                response.isSuccessful  -> {
+            val bodyStr = response.body()?.toString()
+            val errorBody = response.errorBody()?.string()
+            val rawForParsing = bodyStr?.takeIf { it.isNotBlank() } ?: errorBody
+            return@withContext when (val result = RpnPurchaseAckServerResponse.from(rawForParsing, response.code())) {
+                is RpnPurchaseAckServerResponse.Ok -> {
                     Logger.i(LOG_IAB, "$TAG $mname [${handle.envLabel}]: cancelled sku=$sku")
-                    Pair(true, "Cancelled")
+                    Pair(true, result.payload.message ?: "Cancelled")
                 }
-                else -> {
-                    Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: error code=${response.code()}, msg=${response.message()}, err=${response.errorBody()?.string()}")
-                    Pair(false, "Server error: ${response.code()}")
+                is RpnPurchaseAckServerResponse.Err -> {
+                    when (result.payload.httpCode) {
+                        401 -> {
+                            Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: 401 unauthorized; accLen=${accountId.length}, err=${result.payload.error}")
+                            Pair(false, "Unauthorized: 401")
+                        }
+                        409 -> Pair(false, "Conflict: 409")
+                        else -> {
+                            Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: error code=${result.payload.httpCode}, msg=${result.payload.error}")
+                            Pair(false, "Server error: ${result.payload.httpCode}")
+                        }
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -920,24 +978,31 @@ class BillingBackendClient(
         val mname = "revokePurchase"
         try {
             val handle = resolveApi()
+            val vcode = persistentState.appVersion.toString()
             val response = when (handle) {
-                is ApiHandle.Production -> handle.api.revokeSubscription(accountId, deviceId, sku, purchaseToken)
-                is ApiHandle.Test -> handle.api.revokeSubscription(accountId, deviceId, sku, purchaseToken, test = "")
+                is ApiHandle.Production -> handle.api.revokeSubscription(accountId, deviceId, sku, purchaseToken, vcode)
+                is ApiHandle.Test -> handle.api.revokeSubscription(accountId, deviceId, sku, purchaseToken, vcode, test = "")
             } ?: return@withContext Pair(false, "No response")
-            when {
-                response.code() == 401 -> {
-                    Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: 401 unauthorized; accLen=${accountId.length}, err=${response.errorBody()?.string()}")
-                    Pair(false, "Unauthorized: 401")
+            val bodyStr = response.body()?.toString()
+            val errorBody = response.errorBody()?.string()
+            val rawForParsing = bodyStr?.takeIf { it.isNotBlank() } ?: errorBody
+            return@withContext when (val result = RpnPurchaseAckServerResponse.from(rawForParsing, response.code())) {
+                is RpnPurchaseAckServerResponse.Ok -> {
+                    Logger.i(LOG_IAB, "$TAG $mname [${handle.envLabel}]: revoked sku=$sku")
+                    Pair(true, result.payload.message ?: "Revoked")
                 }
-                response.code() == 409 -> Pair(false, "Conflict: 409")
-                response.isSuccessful  -> {
-                    Logger.i(LOG_IAB, "$TAG $mname [${handle.envLabel}]: revoked sku=$sku, raw: ${response.raw().body}")
-                    Pair(true, "Revoked")
-                }
-                else -> {
-                    Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: err code=${response.code()}, " +
-                        "url=${response.raw().request.url}")
-                    Pair(false, "server err: ${response.code()}, ${response.errorBody()?.string()}")
+                is RpnPurchaseAckServerResponse.Err -> {
+                    when (result.payload.httpCode) {
+                        401 -> {
+                            Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: 401 unauthorized; accLen=${accountId.length}, err=${result.payload.error}")
+                            Pair(false, "Unauthorized: 401")
+                        }
+                        409 -> Pair(false, "Conflict: 409")
+                        else -> {
+                            Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: err code=${result.payload.httpCode}, msg=${result.payload.error}")
+                            Pair(false, "server err: ${result.payload.httpCode}, ${result.payload.error}")
+                        }
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -974,19 +1039,22 @@ class BillingBackendClient(
         }
         try {
             val handle = resolveApi()
+            val vcode = persistentState.appVersion.toString()
             val response = when (handle) {
                 is ApiHandle.Production -> handle.api.getPurchaseHistory(
                     accountId = accountId,
                     deviceId = deviceId,
                     purchaseToken = purchaseToken,
                     total = total,
+                    vcode = vcode
                 )
                 is ApiHandle.Test -> handle.api.getPurchaseHistory(
                     accountId = accountId,
                     deviceId = deviceId,
                     purchaseToken = purchaseToken,
-                    test = "",
                     total = total,
+                    vcode = vcode,
+                    test = "",
                 )
             }
             when {
@@ -1037,36 +1105,37 @@ class BillingBackendClient(
         try {
             val encodedToken = URLEncoder.encode(purchaseToken, "UTF-8")
             val handle = resolveApi()
+            val vcode = persistentState.appVersion.toString()
             val response = when (handle) {
-                is ApiHandle.Production -> handle.api.consumePurchase(accountId, deviceId, sku, encodedToken)
-                is ApiHandle.Test       -> handle.api.consumePurchase(accountId, deviceId, sku, encodedToken, test = "")
+                is ApiHandle.Production -> handle.api.consumePurchase(accountId, deviceId, sku, encodedToken, vcode)
+                is ApiHandle.Test -> handle.api.consumePurchase(accountId, deviceId, sku, encodedToken, vcode, test = "")
             }
             if (response == null) {
                 Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: null response")
                 return@withContext false
             }
-            val bodyStr  = response.body()?.toString() ?: response.errorBody()?.string()
-            val httpCode = response.code()
-            when {
-                response.isSuccessful -> {
+            val bodyStr = response.body()?.toString()
+            val errorBody = response.errorBody()?.string()
+            val rawForParsing = bodyStr?.takeIf { it.isNotBlank() } ?: errorBody
+            return@withContext when (val result = RpnPurchaseAckServerResponse.from(rawForParsing, response.code())) {
+                is RpnPurchaseAckServerResponse.Ok -> {
                     Logger.i(LOG_IAB, "$TAG $mname [${handle.envLabel}]: consumed sku=$sku body=$bodyStr")
                     true
                 }
-                httpCode == 409 && bodyStr?.contains("already consumed", ignoreCase = true) == true -> {
-                    Logger.i(LOG_IAB, "$TAG $mname [${handle.envLabel}]: idempotent already consumed sku=$sku")
-                    true
-                }
-                httpCode == 409 -> {
-                    Logger.w(LOG_IAB, "$TAG $mname [${handle.envLabel}]: 409 conflict sku=$sku body=$bodyStr")
-                    false
-                }
-                httpCode in 400..499 -> {
-                    Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: permanent client error $httpCode sku=$sku body=$bodyStr")
-                    false
-                }
-                else -> {
-                    Logger.w(LOG_IAB, "$TAG $mname [${handle.envLabel}]: transient server error $httpCode sku=$sku")
-                    false
+                is RpnPurchaseAckServerResponse.Err -> {
+                    val code = result.payload.httpCode
+                    // Idempotent: "already consumed" 409 is treated as success.
+                    if (code == 409 && result.payload.error.contains("already consumed", ignoreCase = true)) {
+                        Logger.i(LOG_IAB, "$TAG $mname [${handle.envLabel}]: idempotent already consumed sku=$sku")
+                        true
+                    } else {
+                        when {
+                            code == 409 -> Logger.w(LOG_IAB, "$TAG $mname [${handle.envLabel}]: 409 conflict sku=$sku body=$bodyStr")
+                            code in 400..499 -> Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: permanent client error $code sku=$sku body=$bodyStr")
+                            else -> Logger.w(LOG_IAB, "$TAG $mname [${handle.envLabel}]: transient server error $code sku=$sku")
+                        }
+                        false
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -1170,7 +1239,7 @@ class BillingBackendClient(
             // RPN_FALLBACK_URL before the response surfaces to Retrofit. Must be added
             // before the session interceptor so that the session interceptor still runs
             // (and correctly attaches headers) for the fallback request as well.
-            .addInterceptor(buildFallbackInterceptor())
+            .addInterceptor(buildFallbackInterceptor(Constants.RPN_BASE_URL, Constants.RPN_FALLBACK_URL))
             .addInterceptor(buildSessionInterceptor(
                 DB_SESSION_HEADER, DB_SESSION_RESPONSE_HEADER,
                 { dbSessionBookmark }, { dbSessionBookmark = it }, "prod"
@@ -1188,20 +1257,24 @@ class BillingBackendClient(
     /**
      * Builds a Retrofit instance for the test billing API.
      *
-     * Test calls always target [Constants.RPN_FALLBACK_URL] directly — no primary/fallback
-     * split is needed for the test path.
+     * Mirrors the production primary/fallback split: calls target
+     * [Constants.RPN_TEST_BASE_URL] as the primary, and transparently fall back to
+     * [Constants.RPN_TEST_FALLBACK_URL] on 5xx or network errors.
      */
     private fun buildTestApi(): IBillingServerApiTest {
         val client = RetrofitManager
             .okHttpClient(persistentState.routeRethinkInRethink)
             .newBuilder()
+            .addInterceptor(buildFallbackInterceptor(
+                Constants.RPN_TEST_BASE_URL, Constants.RPN_TEST_FALLBACK_URL
+            ))
             .addInterceptor(buildSessionInterceptor(
                 DB_SESSION_TEST_HEADER, DB_SESSION_TEST_RESPONSE_HEADER,
                 { dbSessionTestBookmark }, { dbSessionTestBookmark = it }, "test"
             ))
             .build()
         return Retrofit.Builder()
-            .baseUrl(Constants.RPN_FALLBACK_URL)
+            .baseUrl(Constants.RPN_TEST_BASE_URL)
             .client(client)
             .addConverterFactory(SafeResponseConverterFactory())
             .addConverterFactory(GsonConverterFactory.create())
@@ -1210,8 +1283,8 @@ class BillingBackendClient(
     }
 
     /**
-     * OkHttp Application Interceptor that transparently retries a failed production request
-     * against [Constants.RPN_FALLBACK_URL] when [Constants.RPN_BASE_URL] is unreachable or
+     * OkHttp Application Interceptor that transparently retries a failed request
+     * against the supplied [fallbackUrl] when the supplied [baseUrl] is unreachable or
      * returns a server error.
      *
      * ### Fallback triggers
@@ -1232,10 +1305,14 @@ class BillingBackendClient(
      * passes through the session interceptor again, so session headers (bookmarks, DID token)
      * are attached correctly to the fallback request too.
      *
-     * Only used for [IBillingServerApi] (production). [IBillingServerApiTest] already
-     * targets [Constants.RPN_FALLBACK_URL] directly and does not need this interceptor.
+     * Used for both [IBillingServerApi] (production: [Constants.RPN_BASE_URL] →
+     * [Constants.RPN_FALLBACK_URL]) and [IBillingServerApiTest] (test:
+     * [Constants.RPN_TEST_BASE_URL] → [Constants.RPN_TEST_FALLBACK_URL]).
      */
-    private fun buildFallbackInterceptor(): Interceptor = Interceptor { chain ->
+    private fun buildFallbackInterceptor(
+        baseUrl: String,
+        fallbackUrl: String
+    ): Interceptor = Interceptor { chain ->
         val request = chain.request()
         try {
             val response = chain.proceed(request)
@@ -1243,7 +1320,7 @@ class BillingBackendClient(
                 Logger.w(LOG_IAB, "$TAG fallback: server error ${response.code} on ${request.url}, retrying with fallback URL")
                 response.close()
                 val fallbackRequest = request.newBuilder()
-                    .url(request.url.toString().replace(Constants.RPN_BASE_URL, Constants.RPN_FALLBACK_URL))
+                    .url(request.url.toString().replace(baseUrl, fallbackUrl))
                     .build()
                 chain.proceed(fallbackRequest)
             } else {
@@ -1252,7 +1329,7 @@ class BillingBackendClient(
         } catch (e: IOException) {
             Logger.w(LOG_IAB, "$TAG fallback: network error (${e.message}) on ${request.url}, retrying with fallback URL")
             val fallbackRequest = request.newBuilder()
-                .url(request.url.toString().replace(Constants.RPN_BASE_URL, Constants.RPN_FALLBACK_URL))
+                .url(request.url.toString().replace(baseUrl, fallbackUrl))
                 .build()
             chain.proceed(fallbackRequest)
         }
@@ -1275,11 +1352,7 @@ class BillingBackendClient(
         tag: String
     ): Interceptor = Interceptor { chain ->
         val original = chain.request()
-        val sessionHdr = original.header(reqHeader)
-
-        if (sessionHdr == null) {
-            return@Interceptor chain.proceed(original)
-        }
+        val sessionHdr = original.header(reqHeader) ?: return@Interceptor chain.proceed(original)
 
         val reqBuilder = original.newBuilder()
         if (sessionHdr == DB_SESSION_UNCONSTRAINED) {

@@ -15,14 +15,24 @@
  */
 package com.celzero.bravedns.wireguard
 
-import Logger
-import Logger.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import com.celzero.bravedns.database.WgHopMap
 import com.celzero.bravedns.database.WgHopMapRepository
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
-import io.mockk.*
+import io.mockk.Runs
+import io.mockk.clearAllMocks
+import io.mockk.clearMocks
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.unmockkAll
+import io.mockk.verify
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNull

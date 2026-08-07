@@ -233,7 +233,6 @@
     <string name="hsf_blocklist_chip_text_no_data">Ativar RDNS+</string>
     <string name="hsf_exclude_error">Não é possível excluir no modo de VPN bloqueado</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy removido</string>
-    <string name="hsf_proxy_chip_remove_text">A parar…</string>
     <string name="hsf_whats_new_remove_text">A fechar…</string>
     <string name="hsf_chip_appearance">Tema: %1$s</string>
     <string name="hsf_pause_vpn_failure">Não é possível pausa: Rethink não está ativo</string>
@@ -871,7 +870,6 @@
     <string name="http_proxy_dialog_desc" translatable="true">URL de configuração do formulário, &lt;protocolo&gt;://&lt;nome de utilizador&gt;:&lt;palavra-passe&gt;@&lt;domínio-ou-ip&gt;:&lt;porta&gt;&lt;caminho&gt;. Exemplo: http://proxy.example.com:8080/</string>
     <string name="lbl_preshared_key" translatable="true">Chave pré-partilhada</string>
     <string name="lbl_allowed_ips" translatable="true">IPs permitidos</string>
-    <string name="failed_using_default" translatable="true">Falha: a utilizar DNS de recurso</string>
     <string name="status_protected_with_wg" translatable="true">protegido com wireguard</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">Eliminar, da configuração guardada, o \'endpoint\' DNS Over TLS.</string>
     <string name="settings_allow_lan_heading" translatable="true">Não encaminhar IPs privados (experimental)</string>
@@ -909,7 +907,6 @@
     <string name="settings_go_log_heading" translatable="true">Nível de registo</string>
     <string name="logs_card_duration" translatable="true">desde %1$s</string>
     <string name="logs_disclaimer" translatable="true">A mostrar os primeiros 20 000 caracteres</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Também ativa a definição <!--settings_network_all_networks--> %1$s. Deseja continuar?</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">Não validar certificados TLS do servidor (ative apenas se souber o que está a fazer)</string>
     <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">Ignorar regras de DNS e de firewall.</string>
     <string name="firewall_rule_proxied_desc" translatable="true">Esta ligação foi reencaminhada para o proxy preferido pelo utilizador.<br/><br/>Para alterar, aceda a <i>Proxy</i> no ecrã <i>Configurar</i>.</string>
@@ -969,7 +966,6 @@
     <string name="cd_dialog_edit_title" translatable="true">Editar regra de domínio</string>
     <string name="lbl_peer" translatable="true">Peer</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">Eliminar \'endpoint\' DoT?</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Loopback (experimental)</string>
     <string name="wireguard_apps_proxy_map_desc" translatable="true">parte de %1$s</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">Notificação persistente</string>
     <string name="settings_rinr_heading" translatable="true">Loopback (experimental)</string>

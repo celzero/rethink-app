@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import com.celzero.bravedns.ui.BaseActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -31,12 +30,15 @@ import com.celzero.bravedns.databinding.ActivityNetworkLogsBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity.Companion.RULES_SEARCH_ID
 import com.celzero.bravedns.ui.fragment.ConnectionTrackerFragment
+import com.celzero.bravedns.ui.fragment.ConnectionTrackerFragment.Companion.MERGE_RETHINK_LOGS
 import com.celzero.bravedns.ui.fragment.DnsLogFragment
 import com.celzero.bravedns.ui.fragment.RethinkLogFragment
 import com.celzero.bravedns.ui.fragment.WgNwStatsFragment
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
@@ -77,7 +79,7 @@ class NetworkLogsActivity : BaseActivity(R.layout.activity_network_logs) {
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
 
@@ -140,7 +142,7 @@ class NetworkLogsActivity : BaseActivity(R.layout.activity_network_logs) {
         }
 
         var count = 0
-        if (persistentState.routeRethinkInRethink) {
+        if (persistentState.routeRethinkInRethink && !MERGE_RETHINK_LOGS) {
             count = 1
         }
         return when (appConfig.getBraveMode()) {

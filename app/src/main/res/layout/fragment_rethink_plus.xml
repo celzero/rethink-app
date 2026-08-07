@@ -20,15 +20,52 @@
             <LinearLayout
                 android:id="@+id/topBanner"
                 android:layout_width="match_parent"
-                android:layout_height="140dp"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/hero_banner"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/rethink_plus_home_banner"
-                    android:visibility="visible" />
+                    android:orientation="vertical"
+                    android:paddingStart="20dp"
+                    android:paddingTop="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingBottom="8dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_rethink_plus_sparkle"
+                            android:layout_marginEnd="8dp"
+                            android:alpha="0.85" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/fhs_title_rethink"
+                            style="@style/TextAppearance.Heading.HomeScreen"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.85"
+                            android:text="@string/rpn_title" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/fhs_title_rethink_desc"
+                        style="@style/TextAppearance.SubHeading.HomeScreen"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.55"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/premium_subtitle" />
+
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -54,46 +91,6 @@
                         android:layout_gravity="center"
                         android:src="@drawable/ic_rethink_plus_sparkle" />
                 </LinearLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/payment_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="80dp"
-                android:orientation="vertical"
-                android:visibility="gone">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/benefits_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:layout_margin="16dp"
-                    android:lineSpacingExtra="10dp"
-                    android:background="@drawable/rectangle_border_background"
-                    android:text="Rethink Plus Benefits:\n\n* Enhanced DNS Security\n* Ad and Tracker Blocking\n* Faster Internet Speeds\n* Access to Premium Features"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/large_font_text_view" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/subscription_plans"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:visibility="visible" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/terms_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:padding="15dp"
-                    android:text="@string/rethink_terms"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/small_font_text_view" />
 
             </LinearLayout>
 
@@ -142,13 +139,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:visibility="gone"
+                android:visibility="visible"
                 android:orientation="vertical">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/icon_warning"
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:src="@drawable/ic_rethink_plus_sparkle" />
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -156,70 +153,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/rpn_title"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
+                    android:textSize="@dimen/extra_large_font_text_view"
                     android:layout_marginTop="24dp"
                     android:textColor="?attr/primaryTextColor" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/desc_unavailable"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/rpn_not_available_desc"
-                    android:textSize="16sp"
-                    android:layout_marginTop="16dp"
-                    android:textAlignment="center"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:gravity="center" />
-
-                <Button
-                    android:id="@+id/btn_learn_more"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Learn More"
-                    android:layout_marginTop="32dp"
-                    android:backgroundTint="?attr/colorPrimary"
-                    android:textColor="@android:color/white"
-                    android:elevation="2dp"
-                    android:visibility="gone" />
 
             </LinearLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <com.facebook.shimmer.ShimmerFrameLayout
-        android:id="@+id/shimmer_view_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="60dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:shimmer_auto_start="false"
-        app:shimmer_base_alpha="1.85"
-        app:shimmer_dropoff="1"
-        android:visibility="gone"
-        app:shimmer_duration="1000"
-        app:shimmer_highlight_alpha="0.75">
-
-        <LinearLayout
-            android:id="@+id/payment_button_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/payment_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"
-                android:letterSpacing="0.15"
-                android:text="@string/subscribe_title"
-                android:textColor="?attr/chipTextColor"
-                android:background="@drawable/rounded_corners_button_accent"
-                android:textSize="18sp" />
-        </LinearLayout>
-    </com.facebook.shimmer.ShimmerFrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

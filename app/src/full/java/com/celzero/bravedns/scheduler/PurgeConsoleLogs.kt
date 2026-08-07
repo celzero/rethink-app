@@ -1,7 +1,7 @@
 package com.celzero.bravedns.scheduler
 
-import Logger
-import Logger.LOG_BATCH_LOGGER
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_BATCH_LOGGER
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -35,7 +35,7 @@ class PurgeConsoleLogs(val context: Context, workerParameters: WorkerParameters)
         if (lapsedTime > TimeUnit.MINUTES.toMillis(MAX_TIME) && Logger.uiLogLevel < Logger.LoggerLevel.ERROR.id) {
             consoleLogRepository.consoleLogStartTimestamp = 0
             Logger.uiLogLevel = Logger.LoggerLevel.ERROR.id
-            GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel.toInt(), Logger.uiLogLevel.toInt())
+            GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel.toInt(), Logger.uiLogLevel.toInt(), persistentState.includeFileTrace)
             Logger.i(LOG_BATCH_LOGGER, "console log purged, disabled as it exceeded max time of $MAX_TIME hrs")
         }
         Logger.v(LOG_BATCH_LOGGER, "purged console logs older than $MAX_TIME hrs, current time: $currTime, start time: $startTime, lapsed time: $lapsedTime")

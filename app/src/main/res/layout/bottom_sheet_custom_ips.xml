@@ -69,7 +69,6 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:fontFamily="sans-serif-medium"
-                android:maxLines="1"
                 android:textColor="?attr/primaryTextColor"
                 android:textIsSelectable="true"
                 android:textSize="@dimen/extra_large_font_text_view" />
@@ -100,7 +99,6 @@
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:alpha="0.7"
                 android:src="@drawable/ic_delete_small"
                 android:tint="?attr/accentBad" />
 

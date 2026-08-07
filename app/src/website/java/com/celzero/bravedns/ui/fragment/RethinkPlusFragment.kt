@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.animation.ObjectAnimator
 import android.graphics.Color
 import android.os.Bundle
@@ -39,9 +39,9 @@ import com.celzero.bravedns.adapter.GooglePlaySubsAdapter
 import com.celzero.bravedns.databinding.FragmentRethinkPlusPremiumBinding
 import com.celzero.bravedns.iab.BillingListener
 import com.celzero.bravedns.iab.InAppBillingHandler
+import com.celzero.bravedns.iab.ServerApiError
 import com.celzero.bravedns.iab.ProductDetail
 import com.celzero.bravedns.iab.PurchaseDetail
-import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
 import com.celzero.bravedns.ui.bottomsheet.PurchaseProcessingBottomSheet
 import com.celzero.bravedns.ui.dialog.SubscriptionAnimDialog
@@ -52,7 +52,9 @@ import com.celzero.bravedns.viewmodel.RethinkPlusViewModel
 import com.celzero.bravedns.viewmodel.SubscriptionUiState
 import com.facebook.shimmer.Shimmer
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     GooglePlaySubsAdapter.SubscriptionChangeListener,
@@ -70,10 +72,6 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     private var shouldRecheckOnResume: Boolean = false
     // guard against double-taps on the subscribe button while a purchase is in flight.
     private var purchaseInFlight: Boolean = false
-
-    private enum class PurchaseButtonState {
-        PURCHASED, NOT_PURCHASED
-    }
 
     companion object {
         private const val TAG = "R+Ui"
@@ -109,6 +107,15 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             shouldRecheckOnResume = false
             viewModel.initializeBilling()
         }
+        // Re-surface any unresolved acknowledgement/error condition
+        // if the user navigated away and came back, the bottom sheet /
+        // error container was torn down but the failure is still pending. Re-emit it so
+        // the dialog is shown again and the user is not left unaware of the failure.
+        val unresolved = viewModel.lastUnresolved.value
+        if (unresolved != null && isAdded) {
+            Logger.d(Logger.LOG_IAB, "$TAG: onResume re-surfacing unresolved state: ${unresolved::class.simpleName}")
+            handleUiState(unresolved)
+        }
         // Show any pending Play Billing in-app messages (e.g. payment recovery overlay).
         InAppBillingHandler.enableInAppMessaging(requireActivity())
     }
@@ -140,21 +147,21 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             b.extendModeBanner.isVisible = true
             // hide the connection info card since it's not relevant in extend mode
             b.connectionInfoCard.visibility = View.GONE
+            }
         }
-    }
 
     private fun applyButtonTheme() {
         val ctx = requireContext()
 
         // subscribe button
         val accentGood = UIUtils.fetchColor(ctx, R.attr.accentGood)
-        val primaryText = UIUtils.fetchColor(ctx, R.attr.primaryTextColor)
         val lightText  = UIUtils.fetchColor(ctx, R.attr.primaryLightColorText)
+        val htxtClr = UIUtils.fetchColor(ctx, R.attr.homeScreenHeaderTextColor)
 
         b.subscribeButton.apply {
             backgroundTintList = android.content.res.ColorStateList.valueOf(accentGood)
-            setTextColor(primaryText)
-            iconTint = android.content.res.ColorStateList.valueOf(primaryText)
+            setTextColor(htxtClr)
+            iconTint = android.content.res.ColorStateList.valueOf(htxtClr)
         }
 
         b.btnContactSupport.apply {
@@ -164,7 +171,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
 
         b.retryButton.apply {
             backgroundTintList = android.content.res.ColorStateList.valueOf(accentGood)
-            setTextColor(primaryText)
+            setTextColor(htxtClr)
         }
 
         b.btnContactSupportError.apply {
@@ -210,14 +217,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     }
 
     private fun setupProductTypeToggle() {
-        // In extend mode pre-select ONE_TIME and hide the SUBS tab so the
-        // user focuses on one-time purchase options only.
-        val initialType = if (viewModel.extendMode) {
-            RethinkPlusViewModel.ProductTypeFilter.ONE_TIME
-        } else {
-            RethinkPlusViewModel.ProductTypeFilter.ONE_TIME
-        }
-        updateToggleState(initialType)
+        updateToggleState(RethinkPlusViewModel.ProductTypeFilter.ONE_TIME)
 
         if (!viewModel.extendMode) {
             b.btnSubscription.setOnClickListener {
@@ -280,6 +280,23 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
                 Logger.d(Logger.LOG_IAB, "$TAG: purchase already in flight, ignoring tap")
                 return@setOnClickListener
             }
+            // if a previous acknowledgement/transaction failed, re-verify
+            // Play + server status first instead of silently launching another purchase
+            // attempt (which would give the user no feedback).
+            val unresolved = viewModel.lastUnresolved.value
+            if (unresolved is SubscriptionUiState.ServerAckPending ||
+                unresolved is SubscriptionUiState.Error ||
+                unresolved is SubscriptionUiState.AcknowledgementFailed
+            ) {
+                animateButtonPress(b.subscribeButton)
+                Utilities.showToastUiCentered(
+                    requireContext(),
+                    getString(R.string.verifying_with_play_store),
+                    Toast.LENGTH_SHORT
+                )
+                viewModel.reverifyAfterFailure()
+                return@setOnClickListener
+            }
             animateButtonPress(b.subscribeButton)
             purchaseSubscription()
         }
@@ -295,6 +312,10 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
 
         b.btnContactSupportError.setOnClickListener {
             openHelpAndSupport()
+        }
+
+        b.btnRestorePurchases.setOnClickListener {
+            restorePurchases()
         }
     }
 
@@ -324,6 +345,14 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             }
         }
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.selectedProduct.collect { selection ->
+                    adapter?.setSelectedProduct(selection?.first, selection?.second)
+                }
+            }
+        }
+
         // when retry() detects the billing client is not ready, the ViewModel cannot reconnect
         // itself (it has no live context). This event tells the Fragment to do it.
         viewLifecycleOwner.lifecycleScope.launch {
@@ -341,52 +370,80 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     private fun setupIab() {
         val owner = viewLifecycleOwner
 
-        viewModel.subscriptionState.observe(owner) { state ->
-            handleSubscriptionState(state)
-        }
 
-        // observe billing errors (user cancel, network, etc.) to dismiss the processing sheet
+        // observe billing errors (user cancel, network, etc.) to update the processing sheet
+        // Single-shot: clear after consumption so config changes / re-subscription do not
+        // replay a stale error (e.g. a previously dismissed user-cancel).
         InAppBillingHandler.transactionErrorLiveData.observe(owner) { billingResult ->
-            billingResult ?: return@observe
+            if (billingResult == null) return@observe
+            InAppBillingHandler.transactionErrorLiveData.value = null
             purchaseInFlight = false
             cancelProcessingTimeout()
-            dismissProcessingBottomSheet()
+            viewModel.onTransactionError()
 
             val response = com.celzero.bravedns.iab.BillingResponse(billingResult.responseCode)
             when {
                 response.isUserCancelled -> {
                     Logger.d(Logger.LOG_IAB, "$TAG: User cancelled purchase")
-                }
-                response.isRecoverableError -> {
-                    showTransactionError(getString(R.string.billing_error_recoverable))
+                    dismissProcessingBottomSheet()
                 }
                 else -> {
-                    showTransactionError(
-                        billingResult.debugMessage.ifBlank { getString(R.string.billing_error_generic) }
+                    // map each response code to a friendly message.
+                    showProcessingBottomSheet(
+                        PurchaseProcessingBottomSheet.ProcessingState.Error,
+                        friendlyBillingMessage(response)
                     )
                 }
             }
         }
-    }
 
-    private fun handleSubscriptionState(state: SubscriptionStateMachineV2.SubscriptionState) {
-        Logger.d(LOG_TAG_UI, "$TAG: Observed subscription state: ${state.name}")
-        if (state.hasValidSubscription) {
-            setPurchaseButtonState(PurchaseButtonState.PURCHASED)
-        } else {
-            setPurchaseButtonState(PurchaseButtonState.NOT_PURCHASED)
-        }
-    }
-
-    private fun setPurchaseButtonState(state: PurchaseButtonState) {
-        when (state) {
-            PurchaseButtonState.PURCHASED -> {
-                b.subscribeButton.text = getString(R.string.rpn_purchased_state)
-                b.subscribeButton.isEnabled = false
+        // when Play returns ITEM_ALREADY_OWNED the handler silently restores
+        // the purchase; dismiss the "Processing" sheet and acknowledge the restore so the user
+        // is never left staring at a spinner. The resulting Active state drives the success UI.
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                InAppBillingHandler.itemAlreadyOwnedFlow.collect {
+                    Logger.d(Logger.LOG_IAB, "$TAG: item already owned, restoring")
+                    dismissProcessingBottomSheet()
+                    showTransactionError(getString(R.string.item_already_owned_restoring))
+                }
             }
-            PurchaseButtonState.NOT_PURCHASED -> {
-                updateSubscribeButtonText(viewModel.selectedProductType.value, isResubscribeState)
-                b.subscribeButton.isEnabled = true
+        }
+
+        // observe server-side API errors (401 unauthorized / 409 conflict) surfaced during
+        // the purchase lifecycle (device registration, entitlement/ack queries). The purchase
+        // screen is the active surface during a buy flow, so surface these in-app here instead
+        // of only via a background notification. Without this, a 401/409 leaves the processing
+        // sheet stuck until the 60s timeout fires with a misleading "processing timeout".
+        InAppBillingHandler.serverApiErrorLiveData.observe(owner) { error ->
+            if (error == null) return@observe
+            InAppBillingHandler.serverApiErrorLiveData.value = null
+            purchaseInFlight = false
+            cancelProcessingTimeout()
+            dismissProcessingBottomSheet()
+            when (error) {
+                is ServerApiError.Unauthorized401 -> {
+                    showTransactionError(getString(R.string.subscription_action_failed))
+                }
+
+                is ServerApiError.Conflict409 -> {
+                    showTransactionError(getString(R.string.subscription_action_failed))
+                }
+
+                else -> {
+                    /* GenericError / NetworkError / DeviceNotRegistered handled elsewhere or via toast */
+                }
+            }
+        }
+        // Google Play services interrupted / fatal billing error. Surface a
+        // user-friendly error (full-screen, retryable) instead of only a transient toast.
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                InAppBillingHandler.playServicesInterruptedFlow.collect { code ->
+                    if (code <= 0) return@collect
+                    Logger.w(Logger.LOG_IAB, "$TAG: playServicesInterrupted code=$code")
+                    viewModel.onPlayServicesError(code)
+                }
             }
         }
     }
@@ -397,9 +454,14 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             is SubscriptionUiState.Loading -> showLoading()
             is SubscriptionUiState.Ready -> showReady(state.products, state.isResubscribe, state.availabilityData)
             is SubscriptionUiState.Processing -> showProcessing(state.message)
-            is SubscriptionUiState.PendingPurchase -> showPendingPurchase()
+            is SubscriptionUiState.PendingPurchase -> showPendingPurchase(state.message)
+            is SubscriptionUiState.PendingTimeout -> showPendingTimeout(state.message)
+            is SubscriptionUiState.NoInternet -> showNoInternet(state.message)
             is SubscriptionUiState.Success -> showSuccess(state.productId, state.isExtend)
             is SubscriptionUiState.Error -> showError(state.title, state.message, state.isRetryable)
+            is SubscriptionUiState.ServerAckPending -> showServerAckPending(state.message)
+            is SubscriptionUiState.AcknowledgementFailed ->
+                showAcknowledgementFailed(state.title, state.message, state.canRetry, state.refundInitiated)
             is SubscriptionUiState.AlreadySubscribed -> navigateToDashboard(state.productId)
             is SubscriptionUiState.Available -> showConnectionInfo(state)
         }
@@ -417,6 +479,10 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         isResubscribe: Boolean,
         availabilityData: SubscriptionUiState.Available?
     ) {
+        // A transition back to Ready (e.g., Expired/Canceled state restoring the
+        // purchase screen) must clear purchaseInFlight so the buy button is not
+        // silently blocked by a prior failed purchase attempt.
+        purchaseInFlight = false
         hideAllContainers()
         stopShimmer()
 
@@ -436,7 +502,15 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         b.subscribeButton.isEnabled = true
 
         if (adapter == null) {
-            adapter = GooglePlaySubsAdapter(this, requireContext(), products, 1, false)
+            val selection = viewModel.selectedProduct.value
+            adapter = GooglePlaySubsAdapter(
+                this,
+                requireContext(),
+                products,
+                selection?.first,
+                selection?.second,
+                false
+            )
             b.subscriptionPlans.adapter = adapter
         } else {
             adapter?.setData(products)
@@ -465,9 +539,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
 
         if (state.asorg.isNotEmpty()) {
             b.ispContainer.isVisible = true
-            b.connectionIsp.text =
-                if (state.asorg.length > 20) getString(R.string.truncated_text, state.asorg.take(17))
-                else state.asorg
+            b.connectionIsp.text = state.asorg
         } else {
             b.ispContainer.isVisible = false
         }
@@ -479,10 +551,46 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         startProcessingTimeout()
     }
 
-    private fun showPendingPurchase() {
+    private fun showPendingPurchase(message: String) {
         purchaseInFlight = true
-        showProcessingBottomSheet(PurchaseProcessingBottomSheet.ProcessingState.PendingVerification, null)
+        val display = message.ifBlank { getString(R.string.verifying_with_play_store) }
+        showProcessingBottomSheet(PurchaseProcessingBottomSheet.ProcessingState.PendingVerification, display)
         startProcessingTimeout()
+    }
+
+    /**
+     * Pending-purchase polling timed out. Show a sheet with a
+     * "Check Status" action that re-queries Google Play.
+     */
+    private fun showPendingTimeout(message: String) {
+        purchaseInFlight = false
+        cancelProcessingTimeout()
+        val display = message.ifBlank { getString(R.string.pending_timeout_message) }
+        showProcessingBottomSheet(PurchaseProcessingBottomSheet.ProcessingState.PendingTimeout, display)
+        processingBottomSheet?.primaryActionListener = { viewModel.checkPendingStatus() }
+    }
+
+    private fun showNoInternet(message: String) {
+        purchaseInFlight = false
+        cancelProcessingTimeout()
+        dismissProcessingBottomSheet()
+        hideAllContainers()
+        stopShimmer()
+        b.errorContainer.isVisible = true
+        b.errorIcon.setImageResource(R.drawable.ic_error_state)
+        b.errorTitle.text = getString(R.string.no_internet_title)
+        b.errorMessage.text = message.ifBlank { getString(R.string.no_internet_premium_msg) }
+        b.retryButton.isVisible = true
+    }
+
+    private fun showServerAckPending(message: String) {
+        purchaseInFlight = false
+        cancelProcessingTimeout()
+        val displayMessage = message.ifBlank { getString(R.string.server_ack_pending_message) }
+        showProcessingBottomSheet(
+            PurchaseProcessingBottomSheet.ProcessingState.ServerAckPending,
+            displayMessage
+        )
     }
 
     private fun showSuccess(productId: String, isExtend: Boolean = false) {
@@ -518,7 +626,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            delay(1500)
+            delay(1500.milliseconds)
             if (isExtend) {
                 navigateBackToDashboard()
             } else {
@@ -538,6 +646,35 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         b.errorTitle.text = title
         b.errorMessage.text = message
         b.retryButton.isVisible = isRetryable
+    }
+
+    /**
+     * Both acknowledgement systems (our server and Google Play) failed
+     * Shows a full-screen error with the title/message and
+     * a retry action. Appends a refund note when the purchase is being auto-refunded.
+     */
+    private fun showAcknowledgementFailed(
+        title: String,
+        message: String,
+        canRetry: Boolean,
+        refundInitiated: Boolean
+    ) {
+        purchaseInFlight = false
+        cancelProcessingTimeout()
+        dismissProcessingBottomSheet()
+        hideAllContainers()
+        stopShimmer()
+
+        val fullMessage = if (refundInitiated) {
+            "$message\n\n${getString(R.string.ack_refund_initiated)}"
+        } else {
+            message
+        }
+
+        b.errorContainer.isVisible = true
+        b.errorTitle.text = title
+        b.errorMessage.text = fullMessage
+        b.retryButton.isVisible = canRetry
     }
 
     private fun showTransactionError(message: String) {
@@ -569,7 +706,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     }
 
     /**
-     * Pop back to the caller (typically [RpnDashboardFragment]) after an extend-mode purchase.
+     * Pop back to the caller ([RethinkPlusDashboardFragment]) after an extend-mode purchase.
      * The dashboard auto-refreshes on resume via its own state observation, so no extra
      * data-passing is needed.
      */
@@ -620,6 +757,17 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             return
         }
 
+        // check connectivity before launching the purchase flow so the
+        // user gets a clear "No internet" message instead of a spinner-then-generic-error.
+        if (!isOnline()) {
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.no_internet_purchase_msg),
+                Toast.LENGTH_LONG
+            )
+            return
+        }
+
         val (productId, planId) = selection
         lifecycleScope.launch {
             when (viewModel.selectedProductType.value) {
@@ -641,6 +789,13 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         state: PurchaseProcessingBottomSheet.ProcessingState,
         message: String?
     ) {
+        // Reuse a sheet that the FragmentManager restored across a config change
+        // (our field is nulled on onDestroyView) to avoid creating a second sheet
+        // or losing the reference and re-enabling the buy button mid-flight.
+        if (processingBottomSheet == null) {
+            processingBottomSheet =
+                childFragmentManager.findFragmentByTag("processing") as? PurchaseProcessingBottomSheet
+        }
         if (processingBottomSheet == null || processingBottomSheet?.isAdded != true) {
             processingBottomSheet = PurchaseProcessingBottomSheet.newInstance(state, message)
             processingBottomSheet?.show(childFragmentManager, "processing")
@@ -663,7 +818,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     private fun startProcessingTimeout() {
         cancelProcessingTimeout()
         processingTimeoutJob = viewLifecycleOwner.lifecycleScope.launch {
-            delay(PROCESSING_TIMEOUT_MS)
+            delay(PROCESSING_TIMEOUT_MS.milliseconds)
             if (isAdded && processingBottomSheet?.isAdded == true) {
                 Logger.w(Logger.LOG_IAB, "$TAG: processing timeout, dismissing sheet")
                 purchaseInFlight = false
@@ -677,6 +832,76 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     private fun cancelProcessingTimeout() {
         processingTimeoutJob?.cancel()
         processingTimeoutJob = null
+    }
+
+    /**
+     * Maps a [com.celzero.bravedns.iab.BillingResponse] to a user-friendly message.
+     */
+    private fun friendlyBillingMessage(response: com.celzero.bravedns.iab.BillingResponse): String {
+        return when (response.rawCode) {
+            com.android.billingclient.api.BillingClient.BillingResponseCode.SERVICE_UNAVAILABLE ->
+                getString(R.string.billing_err_service_unavailable)
+            com.android.billingclient.api.BillingClient.BillingResponseCode.BILLING_UNAVAILABLE ->
+                getString(R.string.billing_err_billing_unavailable)
+            com.android.billingclient.api.BillingClient.BillingResponseCode.ITEM_UNAVAILABLE ->
+                getString(R.string.billing_err_item_unavailable)
+            com.android.billingclient.api.BillingClient.BillingResponseCode.SERVICE_TIMEOUT ->
+                getString(R.string.billing_err_service_timeout)
+            com.android.billingclient.api.BillingClient.BillingResponseCode.DEVELOPER_ERROR ->
+                getString(R.string.billing_err_developer_error)
+            com.android.billingclient.api.BillingClient.BillingResponseCode.FEATURE_NOT_SUPPORTED ->
+                getString(R.string.billing_err_feature_not_supported)
+            com.android.billingclient.api.BillingClient.BillingResponseCode.ITEM_NOT_OWNED ->
+                getString(R.string.billing_err_item_not_owned)
+            else -> getString(R.string.billing_err_generic_retry)
+        }
+    }
+
+    /**
+     * Whether the device currently has network connectivity
+     */
+    private fun isOnline(): Boolean {
+        return try {
+            val cm = requireContext()
+                .getSystemService(android.content.Context.CONNECTIVITY_SERVICE)
+                as? android.net.ConnectivityManager
+            val network = cm?.activeNetwork
+            val caps = network?.let { cm.getNetworkCapabilities(it) }
+            caps != null && caps.hasCapability(
+                android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET
+            )
+        } catch (e: Exception) {
+            Logger.w(Logger.LOG_IAB, "$TAG: connectivity check failed: ${e.message}")
+            true // fail-open so a transient SystemService error does not block purchase
+        }
+    }
+
+    /**
+     * Explicitly restore purchases. Re-queries Google Play; the resulting
+     * state-machine transition drives the UI.
+     */
+    private fun restorePurchases() {
+        if (!isOnline()) {
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.no_internet_purchase_msg),
+                Toast.LENGTH_LONG
+            )
+            return
+        }
+        lifecycleScope.launch(Dispatchers.IO) {
+            InAppBillingHandler.fetchPurchases(
+                listOf(
+                    com.android.billingclient.api.BillingClient.ProductType.SUBS,
+                    com.android.billingclient.api.BillingClient.ProductType.INAPP
+                )
+            )
+        }
+        Utilities.showToastUiCentered(
+            requireContext(),
+            getString(R.string.pending_checking_status),
+            Toast.LENGTH_SHORT
+        )
     }
 
 

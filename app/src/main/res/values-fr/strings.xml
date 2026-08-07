@@ -202,7 +202,6 @@
     <string name="hsf_exclude_error">Exclusion impossible en mode confinement VPN</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy supprimé</string>
     <string name="hsf_whats_new_remove_text">Fermeture…</string>
-    <string name="hsf_proxy_chip_remove_text">Arrêt…</string>
     <string name="hsf_blocklist_updating_text">Activation…</string>
     <string name="hsf_chip_appearance">Thème : %1$s</string>
     <string name="dc_entries">%1$s entrées »</string>
@@ -913,7 +912,7 @@
     <string name="add_peer" translatable="true">Ajouter Pair</string>
     <string name="cloudflare_family_dns_desc" translatable="true">Bloque les logiciels malveillants et le contenu pour adultes. Utilise le point de terminaison DNS 1.1.1.3 de Cloudflare.</string>
     <string name="crypt_quad9_security_desc" translatable="true">Quad9 (anycast) dnssec/no-log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112.112.112</string>
-    <string name="lbl_save" translatable="true">enregistrer</string>
+    <string name="lbl_save" translatable="true">Enregistrer</string>
     <string name="cd_deleted_toast" translatable="true">Toutes les règles de domaine ont étés supprimées</string>
     <string name="lbl_optional" translatable="true">(facultatif)</string>
     <string name="settings_go_log_desc" translatable="true">À des fins de débogage</string>
@@ -971,11 +970,9 @@
     <string name="lbl_private" translatable="true">Privé</string>
     <string name="lbl_secure" translatable="true">Sécurisé</string>
     <string name="lbl_peer" translatable="true">Pair</string>
-    <string name="failed_using_default" translatable="true">Échec : utilisation du DNS de secours</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">Supprimer le point de terminaison DoT ?</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">Supprimer le point de terminaison DNS over TLS de la configuration enregistrée.</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Acheminez le propre trafic de Rethink, comme les téléchargements de listes de blocage, les vérifications de connectivité, les connexions DNS, dans le tunnel.</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Loopback (expérimental)</string>
     <string name="cd_toast_edit" translatable="true">Modifié</string>
     <string name="one_wg_apps_added" translatable="true">Routage de toutes les applications</string>
     <string name="lbl_cache" translatable="true">Cache</string>
@@ -990,7 +987,6 @@
     <string name="catch_all_wg_dialog_title" translatable="true">Toujours en marche</string>
     <string name="routing_remaining_apps" translatable="true">Routage des applications restantes</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Routage du trafic propre à Rethink à travers le tunnel. À moins que vous sachiez ce que vous faites, désactivez cette fonction.</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Active également le réglage <!--settings_network_all_networks--> %1$s. Voulez-vous poursuivre ?</string>
     <string name="one_wg_dialog_desc" translatable="true">Toutes les connexions de toutes les applications, y compris les DNS, seront acheminées vers un seul VPN WireGuard actif. Les autres VPN actifs de WireGuard, s\'il y en a, seront arrêtés.</string>
     <string name="cd_dialog_edit_title" translatable="true">Modifier la règle du domaine</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">Toutes les connexions et applications qui ne sont pas acheminées par d\'autres VPN de WireGuard seront acheminées par celui-ci.</string>
@@ -1035,7 +1031,7 @@
     <string name="lbl_service_providers" translatable="true">Fournisseurs de service</string>
     <string name="lbl_hop" translatable="true">Relais</string>
     <string name="lbl_manual" translatable="true">Manuel</string>
-    <string name="lbl_fallback" translatable="true">Alternative</string>
+    <string name="lbl_bootstrap" translatable="true">Alternative</string>
     <string name="settings_biometric_dialog_option_0" translatable="true">Aucun</string>
     <string name="settings_biometric_dialog_option_1" translatable="true">Immédiatement</string>
     <string name="ac_split_tcp" translatable="true">TCP</string>
@@ -1069,8 +1065,6 @@
     <string name="dc_filtering_heading" translatable="true">filtrage</string>
     <string name="cd_split_dns_heading" translatable="true">Séparer le DNS (expérimental)</string>
     <string name="cd_split_dns_desc" translatable="true">Transférer les requêtes DNS des applications proxy vers les serveurs DNS du proxy.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">Traiter les règles DNS comme règles de pare-feu (expérimental)</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">Le blocage DNS sera contourné lors de la résolution ; la décision sera prise au moment de la connexion.</string>
     <string name="univ_firewall_rule_11" translatable="true">Bloquer toutes les connexions locales</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">Supprimer toutes les règles de domaine ?</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">Supprimer ces règles permettrait à n\'importe quelle application de se connecter aux domaines actuellement bloqués.</string>

@@ -20,11 +20,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.WindowInsetsControllerCompat
+import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.BottomSheetBlockFreeDnsModeBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
@@ -39,7 +39,6 @@ class BlockFreeDnsModeBottomSheet : BottomSheetDialogFragment() {
 
     companion object {
         const val FRAGMENT_RESULT_KEY = "block_free_dns_mode_updated"
-
     }
 
     enum class BlockFreeDnsMode(val mode: Int) {
@@ -49,7 +48,7 @@ class BlockFreeDnsModeBottomSheet : BottomSheetDialogFragment() {
 
         companion object {
             fun fromMode(mode: Int): BlockFreeDnsMode =
-                entries.find { it.mode == mode } ?: FALLBACK
+                entries.find { it.mode == mode } ?: AUTO
         }
     }
 
@@ -59,7 +58,7 @@ class BlockFreeDnsModeBottomSheet : BottomSheetDialogFragment() {
     }
 
     override fun getTheme(): Int =
-        Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        Themes.getBottomSheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -78,11 +77,7 @@ class BlockFreeDnsModeBottomSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.let { window ->
-            if (isAtleastQ()) {
-                val controller = WindowInsetsControllerCompat(window, window.decorView)
-                controller.isAppearanceLightNavigationBars = false
-                window.isNavigationBarContrastEnforced = false
-            }
+            Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
         }
         initView()
         initClickListeners()
@@ -99,19 +94,40 @@ class BlockFreeDnsModeBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun initView() {
-        // If splitDns is enabled, pre-select AUTO; otherwise use the persisted mode (default FALLBACK).
-        val currentMode = if (persistentState.splitDns) {
-            BlockFreeDnsMode.AUTO
-        } else {
-            BlockFreeDnsMode.fromMode(persistentState.blockFreeDnsMode)
-        }
+        val currentMode = BlockFreeDnsMode.fromMode(persistentState.blockFreeDnsMode)
         updateSelection(currentMode)
+        if (persistentState.splitDns) {
+            b.bfdmDesc.text = getString(R.string.bfdm_desc)
+        } else {
+            val defaultMode = if (isAtleastR()) BlockFreeDnsMode.AUTO else BlockFreeDnsMode.FALLBACK
+            val modeLabel = when (defaultMode) {
+                BlockFreeDnsMode.FALLBACK -> getString(R.string.bfdm_option_bootstrap_label)
+                BlockFreeDnsMode.GLOBAL -> getString(R.string.bfdm_option_global_label)
+                BlockFreeDnsMode.AUTO -> getString(R.string.bfdm_option_auto_label)
+            }
+            b.bfdmDesc.text = getString(R.string.two_argument_dot, getString(R.string.bfdm_split_dns_disabled), modeLabel)
+            disableOptions()
+        }
     }
 
     private fun initClickListeners() {
+        if (!persistentState.splitDns) return
+
         b.bfdmOptionFallbackRl.setOnClickListener { selectMode(BlockFreeDnsMode.FALLBACK) }
         b.bfdmOptionGlobalRl.setOnClickListener { selectMode(BlockFreeDnsMode.GLOBAL) }
         b.bfdmOptionNoneRl.setOnClickListener { selectMode(BlockFreeDnsMode.AUTO) }
+    }
+
+    private fun disableOptions() {
+        b.bfdmOptionFallbackRl.isEnabled = false
+        b.bfdmOptionFallbackRb.isEnabled = false
+        b.bfdmOptionGlobalRl.isEnabled = false
+        b.bfdmOptionGlobalRb.isEnabled = false
+        b.bfdmOptionNoneRl.isEnabled = false
+        b.bfdmOptionNoneRb.isEnabled = false
+        b.bfdmOptionFallbackRl.alpha = 0.5f
+        b.bfdmOptionGlobalRl.alpha = 0.5f
+        b.bfdmOptionNoneRl.alpha = 0.5f
     }
 
     private fun selectMode(mode: BlockFreeDnsMode) {

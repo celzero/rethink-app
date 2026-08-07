@@ -18,11 +18,15 @@ package com.celzero.bravedns.database
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
+import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
+import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_5
+import com.celzero.bravedns.util.Utilities
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -82,9 +86,11 @@ class DnsLog {
     }
 
     fun wallTime(): String {
-        val date = Date(this.time)
-        val format = SimpleDateFormat(Constants.DATE_FORMAT_PATTERN, Locale.ROOT)
-        return format.format(date)
+        return if (DEBUG) {
+            Utilities.convertLongToTime(this.time, TIME_FORMAT_5)
+        } else {
+            Utilities.convertLongToTime(this.time, TIME_FORMAT_1)
+        }
     }
 
     fun groundedQuery(): Boolean {

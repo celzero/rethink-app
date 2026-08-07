@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.download
 
-import Logger
-import Logger.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_DOWNLOAD
 import android.content.Context
 import com.celzero.bravedns.customdownloader.IBlocklistDownload
 import com.celzero.bravedns.customdownloader.RetrofitManager
@@ -111,11 +111,24 @@ class BlocklistDownloadHelper {
             val dir = File(blocklistCanonicalPath(context, which))
             if (!dir.exists()) return
 
+            val activeName = timestamp.toString()
+            val tempName = (-1L * timestamp).toString()
             dir.listFiles()?.forEach {
-                logd("delete blocklist list residue for $which, dir: ${it.name}")
-                // delete all the dir other than current timestamp dir
-                if (it.name != timestamp.toString()) {
-                    deleteRecursive(it)
+                when (it.name) {
+                    // preserve the active blocklist dir for the current timestamp
+                    activeName -> {
+                        logd("delete blocklist residue for $which, keeping active: ${it.name}")
+                    }
+                    // delete the temp dir (named with negative timestamp) used during download
+                    tempName -> {
+                        logd("delete blocklist residue for $which, deleting temp: ${it.name}")
+                        deleteRecursive(it)
+                    }
+                    // delete any other residue dir from prior downloads
+                    else -> {
+                        logd("delete blocklist residue for $which, deleting: ${it.name}")
+                        deleteRecursive(it)
+                    }
                 }
             }
         }

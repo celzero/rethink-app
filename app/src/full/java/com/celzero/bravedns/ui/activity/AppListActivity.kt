@@ -30,7 +30,6 @@ import android.view.animation.RotateAnimation
 import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import com.celzero.bravedns.ui.BaseActivity
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.content.ContextCompat
@@ -49,6 +48,7 @@ import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.ActivityAppListBinding
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.bottomsheet.FirewallAppFilterBottomSheet
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
@@ -214,7 +214,7 @@ class AppListActivity :
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
 
@@ -476,7 +476,7 @@ class AppListActivity :
 
     private fun showBulkRulesUpdateDialog(title: String, message: String, type: BlockType) {
         val builder =
-            AlertDialog.Builder(this)
+            MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
                 .setTitle(title)
                 .setMessage(message)
                 .setPositiveButton(getString(R.string.lbl_apply)) { _, _ -> updateBulkRules(type) }

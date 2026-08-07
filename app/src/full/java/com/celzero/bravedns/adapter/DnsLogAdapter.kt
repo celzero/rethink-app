@@ -16,9 +16,9 @@ limitations under the License.
 
 package com.celzero.bravedns.adapter
 
-import Logger
-import Logger.LOG_TAG_DNS
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -32,12 +32,14 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 import com.bumptech.glide.request.target.CustomViewTarget
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.adapter.DnsLogAdapter.DnsLogViewHolder
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.ListItemDnsLogBinding
@@ -101,7 +103,6 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
             b.dnsQueryType.text = ""
             b.dnsUnicodeHint.text = ""
             b.dnsStatusIndicator.visibility = View.INVISIBLE
-            b.dnsSummaryLl.visibility = View.GONE
         }
 
         fun setTag(log: DnsLog?) {
@@ -167,7 +168,26 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
             b.dnsQueryType.text = log.typeName
         }
 
+        // always called after #displayTransactionDetails(), as there is check of the values which
+        // are updated as part of displayTransactionDetails method.
         private fun displayUnicodeIfNeeded(log: DnsLog) {
+            if (DEBUG) {
+                val msg = log.msg.split(";").firstOrNull() ?: ""
+                if (msg.isNotEmpty() && msg == Backend.OriginInternal) {
+                    b.dnsUnicodeHint.text = context.getString(
+                        R.string.ci_desc,
+                        b.dnsUnicodeHint.text,
+                        "🪃"
+                    )
+                }
+            }
+
+            // no need to show Unicode hints for failed transactions as the hints are relevant only
+            // for complete transactions and can be misleading in case of failed transactions
+            if (Transaction.Status.COMPLETE.name != log.status) {
+                return
+            }
+
             // rtt -> show rocket if less than 20ms, treat it as rtt
             if (isRoundTripShorter(log.latency, log.isBlocked)) {
                 b.dnsUnicodeHint.text =
@@ -246,7 +266,16 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                 }
             }
 
-            if (b.dnsUnicodeHint.text.isEmpty() && b.dnsQueryType.text.isEmpty()) {
+            if (log.isEch) {
+                b.dnsUnicodeHint.text =
+                    context.getString(
+                        R.string.ci_desc,
+                        b.dnsUnicodeHint.text,
+                        context.getString(R.string.symbol_seal)
+                    )
+            }
+
+            if (b.dnsUnicodeHint.text.isEmpty() && b.dnsQueryType.text.isEmpty() && b.dnsLatency.text.isEmpty()) {
                 b.dnsSummaryLl.visibility = View.GONE
             } else {
                 b.dnsSummaryLl.visibility = View.VISIBLE
@@ -414,16 +443,18 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
             val duckduckgoDomainURL = FavIconDownloader.getDomainUrlFromFdqnDuckduckgo(trim)
             try {
                 val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
-                Glide.with(context.applicationContext)
+                var request = Glide.with(context.applicationContext)
                     .load(nextDnsUrl)
                     .onlyRetrieveFromCache(true)
                     .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                    .error(
-                        // on error, check if the icon is stored in the name of duckduckgo url
-                        displayDuckduckgoFavIcon(duckduckGoUrl, duckduckgoDomainURL)
-                    )
                     .transition(withCrossFade(factory))
-                    .into(
+
+                val errorRequest = displayDuckduckgoFavIcon(duckduckGoUrl, duckduckgoDomainURL)
+                if (errorRequest != null) {
+                    request = request.error(errorRequest)
+                }
+
+                request.into(
                         object : CustomViewTarget<ImageView, Drawable>(b.dnsFavIcon) {
                             override fun onLoadFailed(errorDrawable: Drawable?) {
                                 showFlag()
@@ -446,7 +477,27 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                     )
             } catch (_: Exception) {
                 Logger.d(LOG_TAG_DNS, "err loading icon, load flag instead")
-                displayDuckduckgoFavIcon(duckduckGoUrl, duckduckgoDomainURL)
+                displayDuckduckgoFavIcon(duckduckGoUrl, duckduckgoDomainURL)?.into(
+                    object : CustomViewTarget<ImageView, Drawable>(b.dnsFavIcon) {
+                        override fun onLoadFailed(errorDrawable: Drawable?) {
+                            showFlag()
+                            hideFavIcon()
+                        }
+
+                        override fun onResourceReady(
+                            resource: Drawable,
+                            transition: Transition<in Drawable>?
+                        ) {
+                            hideFlag()
+                            showFavIcon(resource)
+                        }
+
+                        override fun onResourceCleared(placeholder: Drawable?) {
+                            hideFavIcon()
+                            showFlag()
+                        }
+                    }
+                )
             }
         }
 
@@ -457,8 +508,8 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
         *
         * This method will be executed only when show fav icon setting is turned on.
         */
-        private fun displayDuckduckgoFavIcon(url: String, subDomainURL: String) {
-            try {
+        private fun displayDuckduckgoFavIcon(url: String, subDomainURL: String): RequestBuilder<Drawable>? {
+            return try {
                 val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
                 Glide.with(context.applicationContext)
                     .load(url)
@@ -470,31 +521,8 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                             .onlyRetrieveFromCache(true)
                     )
                     .transition(withCrossFade(factory))
-                    .into(
-                        object : CustomViewTarget<ImageView, Drawable>(b.dnsFavIcon) {
-                            override fun onLoadFailed(errorDrawable: Drawable?) {
-                                showFlag()
-                                hideFavIcon()
-                            }
-
-                            override fun onResourceReady(
-                                resource: Drawable,
-                                transition: Transition<in Drawable>?
-                            ) {
-                                hideFlag()
-                                showFavIcon(resource)
-                            }
-
-                            override fun onResourceCleared(placeholder: Drawable?) {
-                                hideFavIcon()
-                                showFlag()
-                            }
-                        }
-                    )
-            } catch (_: Exception) {
-                Logger.d(LOG_TAG_DNS, "$TAG err loading icon, load flag instead")
-                showFlag()
-                hideFavIcon()
+            } catch (e: Exception) {
+                null
             }
         }
 

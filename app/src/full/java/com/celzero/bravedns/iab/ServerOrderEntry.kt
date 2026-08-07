@@ -60,7 +60,9 @@ data class ServerOrderEntry(
 ) {
     companion object {
         const val KIND_SUBSCRIPTION = "androidpublisher#subscriptionPurchaseV2"
-        const val KIND_OTP = "androidpublisher#productPurchase"
+        /** Covers both legacy "productPurchase" and the newer "productPurchaseV2" kind. */
+        const val KIND_OTP         = "androidpublisher#productPurchaseV2"
+        const val KIND_OTP_LEGACY  = "androidpublisher#productPurchase"
 
         // Subscription state constants (Google Play SubscriptionPurchaseV2)
         const val STATE_ACTIVE    = "SUBSCRIPTION_STATE_ACTIVE"
@@ -69,6 +71,11 @@ data class ServerOrderEntry(
         const val STATE_PAUSED    = "SUBSCRIPTION_STATE_PAUSED"
         const val STATE_ON_HOLD   = "SUBSCRIPTION_STATE_IN_ACCOUNT_HOLD"
         const val STATE_PENDING   = "SUBSCRIPTION_STATE_PENDING"
+
+        // One-time purchase state integers (Google Play ProductPurchaseV2 / ProductPurchase)
+        const val PURCHASE_STATE_PURCHASED = 0
+        const val PURCHASE_STATE_CANCELLED = 1
+        const val PURCHASE_STATE_PENDING   = 2
     }
 }
 

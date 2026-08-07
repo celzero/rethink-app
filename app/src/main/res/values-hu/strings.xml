@@ -86,7 +86,6 @@
     <string name="settings_app_notification_persistent_desc" translatable="true">Állandó (nem eltüntethető) értesítés beállítása</string>
     <string name="settings_rinr_heading" translatable="true">Visszacsatolási (loopback) mód (kísérleti)</string>
     <string name="settings_rinr_desc_enabled" translatable="true">A Rethink saját forgalmának átirányítása az alagúton. Ha nem tudja, mit csinál, kapcsolja ki.</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Ez a művelet engedélyezi a <!--settings_network_all_networks--> %1$s beállítást is. Szeretné folytatni?</string>
     <string name="settings_dns_proxy_dialog_port_number" translatable="true">Portszám</string>
     <string name="settings_ip_dialog_ipv6" translatable="true">IPv6 (kísérleti)</string>
     <string name="settings_ip_text_ipv46" translatable="true">Automatikus</string>
@@ -268,7 +267,6 @@
     <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">várakozás</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">hibás</string>
     <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">védett</string>
-    <string name="failed_using_default" translatable="true">Sikertelen: tartalék DNS használata</string>
     <string name="status_app_error" translatable="true">alkalmazás hiba</string>
     <string name="status_no_internet" translatable="true">nincs internet</string>
     <string name="status_protected_with_proxy_private_dns" translatable="true">proxy és privát DNS segítségével védett</string>
@@ -352,7 +350,6 @@
     <string name="settings_network_all_networks_desc" translatable="true">Ha engedélyezve van, a RethinkDNS az összes elérhető hálózatot használja az internethez való csatlakozáshoz. Ha nem, akkor azt a hálózatot használja, amelyet az Android a <i>aktívnak ítél</i>.</string>
     <string name="settings_check_update_desc" translatable="true">Hetente egyszer automatikusan ellenőrizze az alkalmazásfrissítéseket.</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Irányítsa vissza a Rethink saját forgalmát – például a tiltólista letöltéseket, kapcsolatellenőrzéseket, DNS-kapcsolatokat – az alagúton (VPN-en) keresztül.</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Visszacsatolási (loopback) mód (kísérleti)</string>
     <string name="settings_http_proxy_dialog_title" translatable="true">Egyéni kiszolgáló URL</string>
     <string name="settings_http_proxy_error_text1" translatable="true">A porttartománynak 1024-65535 között kell lennie</string>
     <string name="settings_http_proxy_error_text2" translatable="true">Érvénytelen Port</string>
@@ -425,7 +422,6 @@
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">RDNS+ engedélyezése</string>
     <string name="hsf_exclude_error" translatable="true">Zárolt VPN módban, a kizárás nem lehetséges</string>
     <string name="hsf_proxy_chip_removed_toast" translatable="true">Proxy eltávolítva</string>
-    <string name="hsf_proxy_chip_remove_text" translatable="true">Leállítás…</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Csomagrögzítés letiltva</string>
     <string name="hsf_whats_new_remove_text" translatable="true">Bezárás…</string>
     <string name="hsf_blocklist_updating_text" translatable="true">Engedélyezés…</string>
@@ -1054,8 +1050,6 @@
     <string name="dc_filtering_heading" translatable="true">szűrés</string>
     <string name="cd_split_dns_heading" translatable="true">Split DNS (kísérleti)</string>
     <string name="cd_split_dns_desc" translatable="true">A proxyn keresztül irányított alkalmazások DNS-lekérdezéseinek továbbítása a proxy DNS-kiszolgálóihoz.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">A DNS-szabályok kezelése tűzfalszabályként (kísérleti)</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">A DNS-blokkolás a feloldás során nem érvényesül; a kapcsolódáskor dől el, hogy engedélyezett-e.</string>
     <string name="univ_firewall_rule_11" translatable="true">Helyi kapcsolatok blokkolása</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">Összes tartományszabály törlése?</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">A szabályok törlésével bármely alkalmazás csatlakozhatna az eddig blokkolt tartományokhoz.</string>
@@ -1067,7 +1061,7 @@
     <string name="wireguard_title" translatable="true">Biztonságos internetkapcsolat WireGuarddal</string>
     <string name="lbl_hop" translatable="true">Átjátszó</string>
     <string name="lbl_manual" translatable="true">Kézikönyv</string>
-    <string name="lbl_fallback" translatable="true">Tartalék</string>
+    <string name="lbl_bootstrap" translatable="true">Tartalék</string>
     <string name="settings_biometric_dialog_option_0" translatable="true">Egyik sem</string>
     <string name="ac_title" translatable="true">Cenzúraellenes mód</string>
     <string name="ac_desc" translatable="true">A cenzúra megkerülésére szolgáló eszközök szabadságot nyújthatnak az interneten, de nem minden hálózati környezetben működnek. Csak olyan kapcsolatokon használhatók, amelyek nem proxy mögött futnak.</string>

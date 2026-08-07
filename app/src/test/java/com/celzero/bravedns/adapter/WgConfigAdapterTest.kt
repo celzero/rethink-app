@@ -25,23 +25,38 @@ import com.celzero.bravedns.adapter.OneWgConfigAdapter.DnsStatusListener
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.database.WgHopMap
 import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.wireguard.WgHopManager
 import com.celzero.bravedns.wireguard.WgInterface
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.service.EventLogger
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.Runs
+import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import org.junit.Assert.*
-import java.util.*
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.unmockkAll
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,6 +64,7 @@ import org.koin.core.context.GlobalContext
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.robolectric.RobolectricTestRunner
+import java.util.Optional
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
@@ -109,9 +125,9 @@ class WgConfigAdapterTest : KoinTest {
         every { WgHopManager.getMapBySrc(any<String>()) } returns emptyList()
         every { WgHopManager.getMapByHop(any<String>()) } returns emptyList()
         every { VpnController.hasTunnel() } returns true
-        coEvery { VpnController.getProxyStatusById(any<String>()) } returns Pair(1L, "OK")
+        coEvery { VpnController.getProxyStatusById(any<String>()) } returns Pair(1, "OK")
         coEvery { VpnController.getSupportedIpVersion(any<String>()) } returns Pair(true, false)
-        coEvery { VpnController.getDnsStatus(any<String>()) } returns 1L
+        coEvery { VpnController.getDnsStatus(any<String>()) } returns 1
         coEvery { VpnController.isSplitTunnelProxy(any<String>(), any()) } returns false
 
         // Don't mock getProxyStats in setup - let individual tests handle it
@@ -311,7 +327,7 @@ class WgConfigAdapterTest : KoinTest {
         // Test getProxyStatusById with String parameter - SUSPEND FUNCTION
         val status = VpnController.getProxyStatusById("1001")
         assertNotNull("Expected status", status)
-        assertEquals("Expected status pair", Pair(1L, "OK"), status)
+        assertEquals("Expected status pair", Pair(1, "OK"), status)
 
         // Test getSupportedIpVersion with String parameter - SUSPEND FUNCTION
         val ipVersion = VpnController.getSupportedIpVersion("1001")
@@ -435,16 +451,16 @@ class WgConfigAdapterTest : KoinTest {
     @Test
     fun `test status update scenarios`() = testScope.runTest {
         // Test different proxy statuses
-        coEvery { VpnController.getProxyStatusById("1001") } returns Pair(1L, "Connected")
-        coEvery { VpnController.getProxyStatusById("1002") } returns Pair(2L, "Connecting")
+        coEvery { VpnController.getProxyStatusById("1001") } returns Pair(1, "Connected")
+        coEvery { VpnController.getProxyStatusById("1002") } returns Pair(2, "Connecting")
         coEvery { VpnController.getProxyStatusById("1003") } returns Pair(null, "Error")
 
         val status1 = VpnController.getProxyStatusById("1001")
         val status2 = VpnController.getProxyStatusById("1002")
         val status3 = VpnController.getProxyStatusById("1003")
 
-        assertEquals("Expected connected status", Pair(1L, "Connected"), status1)
-        assertEquals("Expected connecting status", Pair(2L, "Connecting"), status2)
+        assertEquals("Expected connected status", Pair(1, "Connected"), status1)
+        assertEquals("Expected connecting status", Pair(2, "Connecting"), status2)
         assertEquals("Expected error status", Pair(null, "Error"), status3)
     }
 
@@ -622,10 +638,10 @@ class WgConfigAdapterTest : KoinTest {
 
         configIds.forEach { configId ->
             val proxyId = ID_WG_BASE + configId
-            coEvery { VpnController.getProxyStatusById(proxyId.toString()) } returns Pair(1L, "OK")
+            coEvery { VpnController.getProxyStatusById(proxyId.toString()) } returns Pair(1, "OK")
 
             val status = VpnController.getProxyStatusById(proxyId.toString())
-            assertEquals("Expected status for config $configId", Pair(1L, "OK"), status)
+            assertEquals("Expected status for config $configId", Pair(1, "OK"), status)
         }
     }
 }

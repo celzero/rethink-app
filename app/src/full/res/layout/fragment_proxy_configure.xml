@@ -24,6 +24,7 @@
             android:paddingStart="10dp"
             android:paddingTop="10dp"
             android:paddingEnd="10dp"
+            android:gravity="center_vertical"
             android:paddingBottom="10dp"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp"
@@ -35,7 +36,8 @@
         <RelativeLayout
             android:id="@+id/rpn_header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="55dp">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/rpn_title"
@@ -43,12 +45,25 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="55dp"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/rpn_refresh"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="5dp"
                 android:padding="5dp"
                 android:text="@string/rpn_title"
                 android:textColor="?attr/colorPrimary" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/rpn_refresh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:layout_gravity="center"
+                android:layout_marginEnd="20dp"
+                android:padding="5dp"
+                android:src="@drawable/ic_refresh_white" />
 
         </RelativeLayout>
 
@@ -157,6 +172,7 @@
                 android:layout_gravity="center"
                 android:layout_marginEnd="20dp"
                 android:padding="5dp"
+                android:visibility="gone"
                 android:src="@drawable/ic_refresh_white" />
 
         </RelativeLayout>

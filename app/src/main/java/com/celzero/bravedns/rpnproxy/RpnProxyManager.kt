@@ -15,11 +15,10 @@
  */
 package com.celzero.bravedns.rpnproxy
 
-import Logger
-import Logger.LOG_IAB
-import Logger.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_IAB
+import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import android.content.Context
-import android.text.format.DateUtils
 import com.android.billingclient.api.BillingClient
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.SsidItem
@@ -32,11 +31,13 @@ import com.celzero.bravedns.database.SubscriptionStatusRepository
 import com.celzero.bravedns.iab.BillingBackendClient
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.PurchaseDetail
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.DnsMode.Companion.setFromCsv
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.DnsMode.Companion.tunTypesFromSet
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.activateRpn
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.deactivateRpn
-import com.celzero.bravedns.rpnproxy.RpnProxyManager.enableWinServer
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.ensureAutoServerExists
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.fetchAndConstructWinLocations
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.load
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.registerProxy
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.serverRemovedEvent
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.stopProxy
@@ -50,8 +51,11 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.RPN_PROXY_FOLDER_NAME
 import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.UIUtils.getRelativeTimeSpan
 import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.backend.Backend
+import com.celzero.firestack.backend.RouterStats
+import com.celzero.firestack.backend.RpnEntitlement
 import com.celzero.firestack.backend.RpnServers
 import com.celzero.firestack.settings.Settings
 import kotlinx.coroutines.CoroutineScope
@@ -62,15 +66,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeout
 import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
-import java.time.Instant
-import java.util.concurrent.ConcurrentHashMap
+import kotlin.time.Duration.Companion.milliseconds
 
 object RpnProxyManager : KoinComponent {
     private val applicationContext: Context by inject()
@@ -87,13 +92,65 @@ object RpnProxyManager : KoinComponent {
     private const val WIN_NAME = "WIN"
     private const val WIN_ENTITLEMENT_FILE_NAME = "win_response.json"
     private const val WIN_STATE_FILE_NAME = "win_state.json"
+
+    /**
+     * RPN encrypted-file storage migration (external -> internal) files dir
+     */
+    private const val RPN_STORAGE_MIGRATION_VERSION = 2
     const val MAX_WIN_SERVERS = 5
     const val AUTO_SERVER_ID   = "AUTO"
     const val AUTO_COUNTRY_CODE = "AUTO"
 
+    /**
+     * Per-call bound for [registerProxy]'s tunnel registration call
+     * (registerAndFetchWinConfig). Normal registration takes 1-5s; 15s is a generous
+     * ceiling. This guards against a single hung attempt (e.g. a transient
+     * suspension-point stall in getDeviceId/registerWin) blocking that one caller
+     * indefinitely; on timeout the attempt returns false and the caller retries on
+     * the next cycle. It does NOT block other callers — [registerProxy] holds no mutex.
+     *
+     * NOTE: withTimeout interrupts at suspension points; it cannot preempt a purely
+     * synchronous, never-returning gomobile call mid-flight.
+     */
+    private const val WIN_REGISTRATION_TIMEOUT_MS = 15_000L
+
     // In-memory cache for WIN servers (CountryConfig as unified model).
     private val winServersCache = mutableListOf<CountryConfig>()
     private val winCacheMutex = Mutex()
+
+    // Single-flight guard for the WIN tunnel-registration critical section ONLY
+    // (isWinRegistered check + registerWin Go call + config persist, ~3s).
+    // Held by BOTH registerProxy (check-then-register) and resetAndRefetchRpn
+    // (force re-register with fresh entitlement), so the two paths cannot invoke
+    // registerWin concurrently — the TOCTOU this mutex was introduced to prevent
+    // (both observing win()==null before either completes). NOT held during the
+    // recovery ladder (entitlement re-derivation, server queries), the
+    // server-location fetch, reset's unregisterWin(), or the deviceId resolution
+    // (billingBackendClient.getDeviceId(), which can block on identityMutex /
+    // issue a network identity refresh) — those remain parallel. The prior
+    // winRegistrationMutex locked the entire function (including the slow recovery
+    // ladder), causing ~15s stalls; this narrow lock avoids that.
+    private val winRegistrationMutex = Mutex()
+
+    // Serializes the delete-then-write sequence to the two RPN internal encrypted
+    // files (WIN state + entitlement in File(filesDir, RPN_PROXY_FOLDER_NAME)).
+    // EncryptedFileManager.write is non-atomic (deleteFile then writeInternal), and
+    // updateWinConfigState adds its own file.delete() before that, so two concurrent
+    // writers to the SAME path can interleave their delete+write steps and leave a
+    // missing/corrupt file, or let stale bytes overwrite fresh ones. The writers that
+    // touch these paths — migrateOneRpnFile (runs once during load() on app upgrade),
+    // storeWinEntitlement (payment / registerProxy recovery), and updateWinConfigState
+    // (registerProxy / resetAndRefetchRpn) — all run on Dispatchers.IO with nothing
+    // gating registration on load() completion, so they can overlap during startup.
+    // Readers (getWinEntitlement / getWinExistingStateData) are intentionally NOT
+    // locked: their delete-on-key-mismatch only fires on already-corrupt files and
+    // EncryptedFileManager.write tolerates a missing target, so reader-vs-writer races
+    // are not dangerous; only write-vs-write interleaving is.
+    //
+    // Lock ordering: winRegistrationMutex -> winFileMutex (only updateWinConfigState
+    // nests both, and always in that order); nothing acquires them in reverse, so the
+    // pair is deadlock-safe.
+    private val winFileMutex = Mutex()
 
     /**
      * Emits a list of [CountryConfig] objects that were selected by the user but are
@@ -104,15 +161,6 @@ object RpnProxyManager : KoinComponent {
         extraBufferCapacity = 1
     )
     val serverRemovedEvent: SharedFlow<List<CountryConfig>> = _serverRemovedEvent.asSharedFlow()
-
-    data class ServerKeyMeta(
-        val selectedAt: Long
-    )
-
-    // Tracks per-server-key metadata (selection time, last tunnel-start ts, cached client IPs).
-    // Populated from CountryConfig.lastModified on startup; overwritten on every runtime
-    // enable/disable; sinceTs / ip[46]Meta updated by RpnConfigDetailActivity after each poll.
-    private val serverKeyMeta = ConcurrentHashMap<String, ServerKeyMeta>()
 
     private val subscriptionStateMachine: SubscriptionStateMachineV2 by inject()
     private val stateObserverJob = SupervisorJob()
@@ -274,7 +322,6 @@ object RpnProxyManager : KoinComponent {
 
         // no need to check the state, as user can manually deactivate RPN
         persistentState.rpnState = RpnState.DISABLED.id
-        serverKeyMeta.clear()
     }
 
     /**
@@ -315,7 +362,6 @@ object RpnProxyManager : KoinComponent {
         setRpnMode(RpnMode.ANTI_CENSORSHIP)
         setRpnState(RpnState.ENABLED)
         VpnController.handleRpnProxies()
-        serverKeyMeta.clear()
         Logger.i(LOG_TAG_PROXY, "$TAG; startProxy: proxy routing started (mode=ANTI_CENSORSHIP)")
     }
 
@@ -419,16 +465,29 @@ object RpnProxyManager : KoinComponent {
         try {
             val ws = extractWsObject(payload) ?: return null
             val ent = VpnController.getEntitlementDetails(ws, billingBackendClient.getDeviceId())
-            val expiryStr = ent?.expiry()
-            if (expiryStr.isNullOrEmpty()) return null
-            // 2028-05-09T05:01:46.547Z, sample
-            val timestamp: Long = Instant.parse(expiryStr).toEpochMilli()
+            val timestamp = ent?.expiry()
             Logger.i(LOG_TAG_PROXY, "$TAG; expiry parsed from payload: $timestamp")
             return timestamp
         } catch (e: Exception) {
             Logger.w(LOG_TAG_PROXY, "$TAG; error parsing expiry from payload: ${e.message}")
         }
         return null
+    }
+
+    suspend fun getEntitlementDetails(): RpnEntitlement? {
+        val entitlement = getWinEntitlement()
+        if (entitlement == null) {
+            Logger.d(LOG_TAG_PROXY, "$TAG; getEntitlementDetails: null entitlement, querying server for refresh")
+            return null
+        }
+
+        return try {
+            val entitlement = VpnController.getEntitlementDetails(getWinEntitlement(), billingBackendClient.getDeviceId())
+            return entitlement
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; getEntitlementDetails: ${e.message}")
+            null
+        }
     }
 
     suspend fun getIsTestEntitlement(retryAttempt: Int = 0): Boolean {
@@ -593,15 +652,29 @@ object RpnProxyManager : KoinComponent {
         }
 
         val entitlementBytes = getWinEntitlement()
-        val prevRegistrationBytes = getWinExistingData()
+        val prevRegistrationBytes = getWinExistingStateData()
+
         val registrationBytes = try {
-            VpnController.registerAndFetchWinConfig(entitlementBytes, billingBackendClient.getDeviceId())
-                ?: VpnController.registerAndFetchWinConfig(prevRegistrationBytes, billingBackendClient.getDeviceId())
+            winRegistrationMutex.withLock {
+                val regBytes = registerAndFetchWinWithTimeout(
+                    entitlementBytes, prevRegistrationBytes, deviceId, "reset"
+                )
+                if (regBytes != null) {
+                    updateWinConfigState(regBytes)
+                }
+                regBytes
+            }
         } catch (e: Exception) {
             Logger.e(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: tunnel registration failed: ${e.message}", e)
             return ResetResult.Failure("Failed to register with tunnel")
         }
-        updateWinConfigState(registrationBytes)
+        if (registrationBytes == null) {
+            Logger.e(
+                LOG_TAG_PROXY,
+                "$TAG; resetAndRefetchRpn: tunnel registration failed (timed out or tunnel returned null after ${WIN_REGISTRATION_TIMEOUT_MS}ms)"
+            )
+            return ResetResult.Failure("Failed to register with tunnel")
+        }
         Logger.i(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: re-registered with tunnel")
 
         // Clear all user-specific server state (selections, favourites, selection counts)
@@ -612,7 +685,7 @@ object RpnProxyManager : KoinComponent {
             // between the DB write and the cache rebuild inside syncWinServers().
             winCacheMutex.withLock {
                 winServersCache.forEach { server ->
-                    if (server.id != AUTO_SERVER_ID) {
+                    if (!server.id.equals(AUTO_SERVER_ID, true)) {
                         server.isEnabled = false
                         server.isFavourite = false
                     }
@@ -749,31 +822,24 @@ object RpnProxyManager : KoinComponent {
             }
 
             val fileName = getJsonResponseFileName(WIN_ID)
-            val folder = applicationContext.getExternalFilesDir(RPN_PROXY_FOLDER_NAME)
+            val folder = getRpnFolder()
             if (folder == null) {
-                Logger.e(LOG_TAG_PROXY, "$TAG; storeWinEntitlement: failed to get external files dir")
+                Logger.e(LOG_TAG_PROXY, "$TAG; storeWinEntitlement: failed to get rpn folder")
                 return
             }
 
-            if (!folder.exists()) {
-                val created = try {
-                    folder.mkdirs()
+            val file = File(folder, fileName)
+            // Serialize against concurrent migrateOneRpnFile / updateWinConfigState writers
+            // targeting the same internal path (EncryptedFileManager.write is non-atomic
+            // delete-then-write; interleaving can leave a corrupt/missing file or let stale
+            // migration bytes overwrite fresh payment bytes).
+            val res = winFileMutex.withLock {
+                try {
+                    EncryptedFileManager.write(applicationContext, ws, file)
                 } catch (e: Exception) {
-                    Logger.e(LOG_TAG_PROXY, "$TAG; storeWinEntitlement: exception creating folder: ${e.message}", e)
+                    Logger.e(LOG_TAG_PROXY, "$TAG; storeWinEntitlement: exception writing file: ${e.message}", e)
                     false
                 }
-                if (!created) {
-                    Logger.e(LOG_TAG_PROXY, "$TAG; storeWinEntitlement: failed to create folder: ${folder.absolutePath}")
-                    return
-                }
-            }
-
-            val file = File(folder, fileName)
-            val res = try {
-                EncryptedFileManager.write(applicationContext, ws, file)
-            } catch (e: Exception) {
-                Logger.e(LOG_TAG_PROXY, "$TAG; storeWinEntitlement: exception writing file: ${e.message}", e)
-                false
             }
 
             if (!res) {
@@ -844,12 +910,12 @@ object RpnProxyManager : KoinComponent {
         }
     }
 
-    data class RpnProps(val id: String, val status: Long, val type: String, val kids: String, val addr: String, val created: Long, val expires: Long, val who: String, val locations: RpnServers) {
+    data class RpnProps(val id: String, val status: Int, val type: String, val addr: String, val created: Long, val expires: Long, val who: String, val locations: RpnServers) {
         override fun toString(): String {
             val cts = getTime(created)
             val ets = getTime(expires)
             val s = applicationContext.getString(UIUtils.getProxyStatusStringRes(status))
-            return "id = $id\nstatus = $s\ntype = $type\nkids = $kids\naddr = $addr\ncreated = $cts\nexpires = $ets\nwho = $who\nlocations = $locations"
+            return "id = $id\nstatus = $s\ntype = $type\naddr = $addr\ncreated = $cts\nexpires = $ets\nwho = $who\nlocations = $locations"
         }
     }
 
@@ -860,7 +926,17 @@ object RpnProxyManager : KoinComponent {
     suspend fun load(): Int {
         // need to read the filepath from database and load the file
         // there will be an entry in the database for each RPN proxy
-        serverKeyMeta.clear()
+
+        // One-time relocation of WIN encrypted files from external to internal storage.
+        // Runs before we iterate the proxies so the DB paths are already repointed by
+        // the time the load loop reads them. Failures are swallowed internally and do
+        // not block startup.
+        try {
+            migrateRpnFilesToInternalIfNeeded()
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; load: rpn storage migration threw, continuing: ${e.message}", e)
+        }
+
         val rp = try {
             db.getAllProxies()
         } catch (e: Exception) {
@@ -891,8 +967,18 @@ object RpnProxyManager : KoinComponent {
                         val entitlement = if (entitlementFile.exists()) {
                             try {
                                 EncryptedFileManager.readByteArray(applicationContext, entitlementFile)
+                            } catch (e: EncryptionException.DecryptionFailed) {
+                                // Keyset mismatch (signing-key change / keyset reset / cross-file
+                                // cascade). Delete the orphaned file so it is not re-read and
+                                // re-failed on every load; registerProxy will re-derive it from
+                                // the DB payload / server on the next registration cycle.
+                                Logger.w(LOG_TAG_PROXY, "$TAG; load, win entitlement file (key mismatch), deleting: ${entitlementFile.absolutePath}", e)
+                                if (!entitlementFile.delete()) {
+                                    Logger.w(LOG_TAG_PROXY, "$TAG; load, failed to delete win entitlement file (key mismatch): ${entitlementFile.absolutePath}")
+                                }
+                                byteArrayOf()
                             } catch (e: Exception) {
-                                Logger.e(LOG_TAG_PROXY, "$TAG; load, error reading win entitlement file: ${e.message}", e)
+                                Logger.e(LOG_TAG_PROXY, "$TAG; load, error reading win entitlement file: ${e.message}")
                                 byteArrayOf()
                             }
                         } else {
@@ -905,8 +991,16 @@ object RpnProxyManager : KoinComponent {
                         val state = if (cfgFile.exists()) {
                             try {
                                 EncryptedFileManager.readByteArray(applicationContext, cfgFile)
+                            } catch (e: EncryptionException.DecryptionFailed) {
+                                // Same keyset-mismatch handling as the entitlement file: delete
+                                // the orphaned state file so the next registration rewrites it.
+                                Logger.w(LOG_TAG_PROXY, "$TAG; load, win state file (key mismatch), deleting: ${cfgFile.absolutePath}", e)
+                                if (!cfgFile.delete()) {
+                                    Logger.w(LOG_TAG_PROXY, "$TAG; load, failed to delete win state file (key mismatch): ${cfgFile.absolutePath}")
+                                }
+                                byteArrayOf()
                             } catch (e: Exception) {
-                                Logger.e(LOG_TAG_PROXY, "$TAG; load, error reading win state file: ${e.message}", e)
+                                Logger.e(LOG_TAG_PROXY, "$TAG; load, error reading win state file (${cfgFile.absolutePath}): ${e.message}")
                                 byteArrayOf()
                             }
                         } else {
@@ -940,97 +1034,167 @@ object RpnProxyManager : KoinComponent {
         return rp.size
     }
 
-    // This function is called from RpnProxiesUpdateWorker
+    // This function is also called from RpnProxiesUpdateWorker
     suspend fun registerProxy(type: RpnType): Boolean {
         // in case of update failure, call register with null
+        Logger.i(LOG_TAG_PROXY, "$TAG; registerProxy: ENTER, type=$type")
         when (type) {
             RpnType.WIN -> {
                 // check if state is there if not, fetch the entitlement
-                var bytes = getWinExistingData() // fetch existing win state
-                if (bytes == null) {
-                    Logger.i(LOG_TAG_PROXY, "$TAG; win state is null, fetching entitlement")
-                    bytes = getWinEntitlement()
-                }
-                if (bytes == null || bytes.isEmpty()) {
-                    // This handles the case where:
-                    //   (a) the entitlement file was never written (race between activateRpn
-                    //       and registerProxy on first launch), OR
-                    //   (b) external storage was cleared / the file was deleted.
-                    // We pull the developerPayload from the DB subscription row (written by
-                    // the state machine during handlePaymentSuccessful) and re-store it,
-                    // which populates winConfig so the tunnel can be registered.
-                    Logger.w(LOG_TAG_PROXY, "$TAG; registerProxy: both state and entitlement files absent, attempting DB payload recovery")
-                    val dbPayload = try {
-                        subscriptionStatusRepository.getCurrentSubscription()?.developerPayload.orEmpty()
-                    } catch (e: Exception) {
-                        Logger.e(LOG_TAG_PROXY, "$TAG; registerProxy: failed to read DB developerPayload: ${e.message}", e)
-                        ""
+                val stateBytes = getWinExistingStateData() // fetch existing win state
+                var entitlementBytes = getWinEntitlement() // fetch existing win entitlement
+                Logger.i(LOG_TAG_PROXY, "$TAG; registerProxy: state sz${stateBytes?.size ?: "null"}, entitlement sz=${entitlementBytes?.size ?: "null"}")
+                var isEntitlementBytesAvailable = entitlementBytes != null && entitlementBytes.isNotEmpty()
+                if (!isEntitlementBytesAvailable) {
+                    Logger.w(
+                        LOG_TAG_PROXY, "$TAG; registerProxy: state/entitlement payload is empty, querying server entitlement")
+                    val sub = try {
+                        subscriptionStatusRepository.getCurrentSubscription()
+                    } catch (_: Exception) {
+                        null
                     }
-                    if (dbPayload.isNotEmpty()) {
-                        Logger.i(LOG_TAG_PROXY, "$TAG; registerProxy: found DB payload (len=${dbPayload.length}), re-storing entitlement")
+                    val accountId = sub?.accountId.orEmpty()
+                    Logger.i(LOG_TAG_PROXY, "$TAG; registerProxy: server-entitlement sub=${if (sub != null) "present" else "null"}, accountIdLen=${accountId.length}, purchaseTokenLen=${sub?.purchaseToken?.length ?: 0}")
+                    // sub.deviceId holds only the sentinel indicator "pip/identity.json"
+                    val deviceId = billingBackendClient.getDeviceId(accountId)
+                    val purchaseToken = sub?.purchaseToken.orEmpty()
+                    if (accountId.isNotEmpty() && purchaseToken.isNotEmpty()) {
+                        Logger.i(
+                            LOG_TAG_PROXY,
+                            "$TAG; registerProxy: accountId+purchaseToken present, calling queryEntitlementFromServer"
+                        )
                         try {
-                            storeWinEntitlement(dbPayload)
-                            bytes = getWinEntitlement()
-                        } catch (e: Exception) {
-                            Logger.e(LOG_TAG_PROXY, "$TAG; registerProxy: error re-storing entitlement from DB: ${e.message}", e)
-                        }
-                    }
-
-                    if (bytes == null || bytes.isEmpty()) {
-                        // DB also had no usable payload.  Try a live server query as last resort.
-                        Logger.w(LOG_TAG_PROXY, "$TAG; registerProxy: DB payload also empty, querying server entitlement")
-                        val sub = try { subscriptionStatusRepository.getCurrentSubscription() } catch (e: Exception) { null }
-                        val accountId = sub?.accountId.orEmpty()
-                        // sub.deviceId holds only the sentinel indicator "pip/identity.json"
-                        val deviceId = billingBackendClient.getDeviceId(accountId)
-                        val purchaseToken = sub?.purchaseToken.orEmpty()
-                        if (accountId.isNotEmpty() && purchaseToken.isNotEmpty()) {
-                            try {
-                                val fakePurchase = PurchaseDetail(
-                                    productId = sub?.productId.orEmpty(),
-                                    planId = sub?.planId.orEmpty(),
-                                    productTitle = sub?.productTitle.orEmpty(),
-                                    planTitle = sub?.productTitle.orEmpty(),
-                                    state = sub?.state ?: 0,
-                                    purchaseToken = purchaseToken,
-                                    productType = if ((sub?.productId.orEmpty()).contains("onetime", ignoreCase = true)) BillingClient.ProductType.INAPP else BillingClient.ProductType.SUBS,
-                                    purchaseTime = "",
-                                    purchaseTimeMillis = sub?.purchaseTime ?: 0L,
-                                    isAutoRenewing = false,
-                                    accountId = accountId,
-                                    // Store only the sentinel
-                                    // Callers that need the actual ID use billingBackendClient.getDeviceId().
-                                    deviceId = if (deviceId.isNotBlank()) SubscriptionStatus.DEVICE_ID_INDICATOR else "",
-                                    payload = "",
-                                    expiryTime = sub?.billingExpiry ?: 0L,
-                                    status = sub?.status ?: 0,
-                                    windowDays = sub?.windowDays ?: 0,
-                                    orderId = sub?.orderId.orEmpty()
+                            val fakePurchase = PurchaseDetail(
+                                productId = sub?.productId.orEmpty(),
+                                planId = sub?.planId.orEmpty(),
+                                productTitle = sub?.productTitle.orEmpty(),
+                                planTitle = sub?.productTitle.orEmpty(),
+                                state = sub?.state ?: 0,
+                                purchaseToken = purchaseToken,
+                                productType = if ((sub?.productId.orEmpty()).contains(
+                                        "onetime",
+                                        ignoreCase = true
+                                    )
+                                ) BillingClient.ProductType.INAPP else BillingClient.ProductType.SUBS,
+                                purchaseTime = "",
+                                purchaseTimeMillis = sub?.purchaseTime ?: 0L,
+                                isAutoRenewing = false,
+                                accountId = accountId,
+                                // Store only the sentinel
+                                // Callers that need the actual ID use billingBackendClient.getDeviceId().
+                                deviceId = if (deviceId.isNotBlank()) SubscriptionStatus.DEVICE_ID_INDICATOR else "",
+                                payload = "",
+                                expiryTime = sub?.billingExpiry ?: 0L,
+                                status = sub?.status ?: 0,
+                                windowDays = sub?.windowDays ?: 0,
+                                orderId = sub?.orderId.orEmpty()
+                            )
+                            val updated = InAppBillingHandler.queryEntitlementFromServer(
+                                accountId,
+                                deviceId,
+                                fakePurchase
+                            )
+                            Logger.i(
+                                LOG_TAG_PROXY,
+                                "$TAG; registerProxy: queryEntitlementFromServer returned payloadLen=${updated.payload.length}"
+                            )
+                            if (updated.payload.isNotEmpty()) {
+                                Logger.i(
+                                    LOG_TAG_PROXY,
+                                    "$TAG; registerProxy: server query succeeded, storing entitlement"
                                 )
-                                val updated = InAppBillingHandler.queryEntitlementFromServer(accountId, deviceId, fakePurchase)
-                                if (updated.payload.isNotEmpty()) {
-                                    Logger.i(LOG_TAG_PROXY, "$TAG; registerProxy: server query succeeded, storing entitlement")
-                                    storeWinEntitlement(updated.payload)
-                                    bytes = getWinEntitlement()
+                                // Same keyset-mismatch fallback as the DB-payload branch:
+                                // capture the in-memory entitlement bytes before the
+                                // encrypted-disk round-trip so registration can proceed
+                                // even when the read-back fails after an install/update.
+                                val wsBytesFallback = extractWsObject(updated.payload)
+                                storeWinEntitlement(updated.payload)
+                                entitlementBytes = getWinEntitlement()
+                                if ((entitlementBytes == null || entitlementBytes.isEmpty()) && wsBytesFallback != null) {
+                                    Logger.w(
+                                        LOG_TAG_PROXY,
+                                        "$TAG; registerProxy: encrypted read-back null after server re-store (keyset mismatch?), using in-memory entitlement bytes (len=${wsBytesFallback.size}) as fallback"
+                                    )
+                                    entitlementBytes = wsBytesFallback
                                 }
-                            } catch (e: Exception) {
-                                Logger.e(LOG_TAG_PROXY, "$TAG; registerProxy: server entitlement query failed: ${e.message}", e)
+                            } else {
+                                Logger.w(
+                                    LOG_TAG_PROXY,
+                                    "$TAG; registerProxy: server query returned empty payload, cannot recover entitlement"
+                                )
                             }
+                        } catch (e: Exception) {
+                            Logger.e(
+                                LOG_TAG_PROXY,
+                                "$TAG; registerProxy: server entitlement query failed: ${e.message}",
+                                e
+                            )
                         }
+                    } else {
+                        Logger.w(
+                            LOG_TAG_PROXY,
+                            "$TAG; registerProxy: accountId or purchaseToken empty, skipping server entitlement query (accountIdEmpty=${accountId.isEmpty()}, purchaseTokenEmpty=${purchaseToken.isEmpty()})"
+                        )
                     }
+                }
+                isEntitlementBytesAvailable = entitlementBytes != null && entitlementBytes.isNotEmpty()
 
-                    if (bytes == null || bytes.isEmpty()) {
-                        Logger.e(LOG_TAG_PROXY, "$TAG; registerProxy: win entitlement unavailable after all recovery attempts, cannot register")
-                        return false
+                if (!isEntitlementBytesAvailable) {
+                    Logger.e(LOG_TAG_PROXY, "$TAG; registerProxy: win entitlement unavailable after all recovery attempts, cannot register")
+                    return false
+                }
+
+                Logger.i(LOG_TAG_PROXY, "$TAG; registerProxy: calling VpnController.isWinRegistered()")
+                var ok = true
+                // Resolve the device ID BEFORE acquiring winRegistrationMutex.
+                // getDeviceId() can block on identityMutex (contended by concurrent
+                // refreshIdentity / reconcileDidForCid calls) and may issue a network
+                // identity refresh (createOrRegisterDid / refreshIdentityLocked) when no
+                // DID is stored — running it inside the lock would stall every queued
+                // registerProxy caller for its full duration, reintroducing the convoy
+                // the narrow lock is meant to avoid. The DID is independent of the
+                // check-then-register critical section (it does not depend on
+                // isWinRegistered state), so resolving it in parallel is safe;
+                // identityMutex already serializes identity mutations internally.
+                val deviceId = billingBackendClient.getDeviceId()
+                Logger.i(
+                    LOG_TAG_PROXY,
+                    "$TAG; registerProxy: getDeviceId() returned len=${deviceId.length} (ent bytes=${entitlementBytes?.size}, state bytes=${stateBytes?.size})"
+                )
+                // Single-flight: serialize ONLY the check-then-register critical section so
+                // concurrent callers coalesce into one registerWin Go call. The recovery
+                // ladder above ran unlocked (parallel); the server fetch below also runs
+                // unlocked. The second caller waits ~3s (the registerWin duration), then
+                // re-checks isWinRegistered under the lock, finds WIN registered, and exits.
+                winRegistrationMutex.withLock {
+                    // Re-check under the lock: a concurrent caller that held the mutex
+                    // before us may have just registered WIN.
+                    val alreadyRegistered = VpnController.isWinRegistered()
+                    if (!alreadyRegistered) {
+                        Logger.i(
+                            LOG_TAG_PROXY,
+                            "$TAG; registerProxy: isWinRegistered()=false, calling registerAndFetchWinConfig"
+                        )
+                        val regBytes = registerAndFetchWinWithTimeout(entitlementBytes, stateBytes, deviceId, "first")
+                        if (regBytes == null && !VpnController.isWinRegistered()) {
+                            // Genuinely failed: no bytes AND WIN still not registered.
+                            Logger.e(
+                                LOG_TAG_PROXY,
+                                "$TAG; registerProxy: registration failed (bytes null and WIN not registered), cannot proceed"
+                            )
+                            ok = false
+                            return@withLock
+                        }
+                        // regBytes may be null here only when a concurrent call registered
+                        // WIN in the race window; that is a success, so skip updateWinConfigState(null).
+                        if (regBytes != null) {
+                            ok = updateWinConfigState(regBytes)
+                        }
+                    } else {
+                        Logger.i(LOG_TAG_PROXY, "$TAG; registerProxy: isWinRegistered()=true, WIN already registered, skipping tunnel register call")
                     }
                 }
-                var currBytes = VpnController.registerAndFetchWinConfig(bytes, billingBackendClient.getDeviceId())
-                if (currBytes == null) {
-                    // try registering with null
-                    Logger.w(LOG_TAG_PROXY, "$TAG; win registration failed with existing bytes, trying with no prev bytes")
-                    currBytes = VpnController.registerAndFetchWinConfig(null, billingBackendClient.getDeviceId())
-                }
-                val ok = updateWinConfigState(currBytes)
+                if (!ok) return false
                 // Fetch servers from API and sync to database and cache
                 val (servers, removedSelectedIds) = fetchAndConstructWinLocations()
                 if (servers.isEmpty()) {
@@ -1046,11 +1210,46 @@ object RpnProxyManager : KoinComponent {
                 }
                 return ok
             }
+
             else -> {
                 Logger.e(LOG_TAG_PROXY, "$TAG; err; invalid type for register: $type")
                 return false
             }
         }
+    }
+
+    /**
+     * Calls [VpnController.registerAndFetchWinConfig] bounded by [WIN_REGISTRATION_TIMEOUT_MS].
+     * Returns the registration bytes, or null on timeout / tunnel failure. On a null return
+     * the caller must distinguish "concurrent call already registered WIN" (re-check
+     * [VpnController.isWinRegistered]) from a genuine failure.
+     *
+     * Holds no lock: a timeout here never blocks other callers.
+     */
+    private suspend fun registerAndFetchWinWithTimeout(
+        entitlementBytes: ByteArray?,
+        stateBytes: ByteArray?,
+        deviceId: String,
+        label: String
+    ): ByteArray? {
+        val start = System.currentTimeMillis()
+        val result = try {
+            withTimeout(WIN_REGISTRATION_TIMEOUT_MS.milliseconds) {
+                VpnController.registerAndFetchWinConfig(entitlementBytes, stateBytes, deviceId)
+            }
+        } catch (e: TimeoutCancellationException) {
+            Logger.e(
+                LOG_TAG_PROXY,
+                "$TAG; registerProxy: $label registerAndFetchWinConfig timed out after ${WIN_REGISTRATION_TIMEOUT_MS}ms (non-fatal for other callers): ${e.message}",
+                e
+            )
+            null
+        }
+        Logger.i(
+            LOG_TAG_PROXY,
+            "$TAG; registerProxy: $label registerAndFetchWinConfig returned ${result?.size ?: "null"} bytes in ${System.currentTimeMillis() - start}ms"
+        )
+        return result
     }
 
     suspend fun retryLocationFetch() {
@@ -1066,7 +1265,7 @@ object RpnProxyManager : KoinComponent {
                 }
                 break
             }
-            delay(1000L)
+            delay(1000L.milliseconds)
         }
     }
 
@@ -1080,7 +1279,7 @@ object RpnProxyManager : KoinComponent {
     suspend fun getWinServers(): List<CountryConfig> {
         // Return cached list only if it contains real (non-AUTO) servers.
         winCacheMutex.withLock {
-            val realCached = winServersCache.filter { it.id != AUTO_SERVER_ID }
+            val realCached = winServersCache.filter { !it.id.equals(AUTO_SERVER_ID, true) }
             if (realCached.isNotEmpty()) {
                 Logger.v(LOG_TAG_PROXY, "$TAG; returning cached win servers, size: ${winServersCache.size} (real=${realCached.size})")
                 return winServersCache.toList()
@@ -1089,7 +1288,7 @@ object RpnProxyManager : KoinComponent {
 
         // Try DB, same rule: only use it when real (non-AUTO) rows exist.
         val dbServers = countryConfigRepo.getAllConfigs()
-        val realDbServers = dbServers.filter { it.id != AUTO_SERVER_ID }
+        val realDbServers = dbServers.filter { !it.id.equals(AUTO_SERVER_ID, true) }
         if (realDbServers.isNotEmpty()) {
             winCacheMutex.withLock {
                 winServersCache.clear()
@@ -1126,6 +1325,15 @@ object RpnProxyManager : KoinComponent {
                 if (DEBUG) Logger.d(LOG_TAG_PROXY, "$TAG; getWinEntitlement: read entitlement bytes from file, bytes: $bytes, len: ${bytes.size}")
                 bytes
             } else null
+        } catch (e: EncryptionException.DecryptionFailed) {
+            // entitlement file (key mismatch, see getWinExistingStateData). Delete so
+            // storeWinEntitlement() can write a fresh one; returning null makes the caller
+            // fall back to DB / server recovery.
+            Logger.w(LOG_TAG_PROXY, "$TAG; getWinEntitlement: entitlement file (key mismatch), deleting: ${file.absolutePath}", e)
+            if (!file.delete()) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; getWinEntitlement: failed to delete file (key mismatch): ${file.absolutePath}")
+            }
+            null
         } catch (e: EncryptionException) {
             // File is corrupted, encrypted with an invalidated key, or unreadable.
             // Return null so the caller falls back to fetching fresh entitlement from the API.
@@ -1324,8 +1532,8 @@ object RpnProxyManager : KoinComponent {
         //   (b) DB developerPayload is also not usable, OR accountExpiry hasn't been confirmed
         //       from the server yet (0 = never queried, or lags > 10 days behind billingExpiry).
         val needsFreshEntitlement = !existingPayloadValid && !dbPayloadValid
-            || (accExpiry == 0L && billingExpiry > 0L)
-            || (billingExpiry > 0L && billingExpiry != Long.MAX_VALUE && accExpiry < billingExpiry - tenDaysMs)
+                || (accExpiry == 0L && billingExpiry > 0L)
+                || (billingExpiry > 0L && billingExpiry != Long.MAX_VALUE && accExpiry < billingExpiry - tenDaysMs)
 
         var effectivePurchase = purchase
 
@@ -1360,12 +1568,17 @@ object RpnProxyManager : KoinComponent {
                             )
                         }
 
-                        // Update state machine with fresh payload
+                        // Update state machine and DB with fresh payload
                         val subsData = subscriptionStateMachine.getSubscriptionData()
                         if (subsData != null) {
                             subsData.subscriptionStatus.developerPayload = updatedPurchase.payload
                             val updatedSubsData = subsData.copy(purchaseDetail = updatedPurchase)
                             subscriptionStateMachine.stateMachine.updateData(updatedSubsData)
+                            subscriptionStatusRepository.updateDeveloperPayload(
+                                subsData.subscriptionStatus.id,
+                                updatedPurchase.payload,
+                                System.currentTimeMillis()
+                            )
                         } else {
                             Logger.w(LOG_TAG_PROXY, "$TAG; processRpnPurchase: subscription data is null, cannot update payload in state machine")
                         }
@@ -1590,16 +1803,6 @@ object RpnProxyManager : KoinComponent {
         }
     }
 
-    /**
-     * Returns the epoch-millisecond timestamp at which [key] was last selected
-     * (i.e. [enableWinServer] succeeded), or the [CountryConfig.lastModified] value
-     * that was seeded from the database on startup.  Returns 0 if the key is not
-     * currently selected.
-     */
-    fun getSelectedSinceTs(key: String): Long {
-        return serverKeyMeta[key]?.selectedAt ?: 0L
-    }
-
     suspend fun getEnabledConfigs(): Set<CountryConfig> {
         return winCacheMutex.withLock {
             val es = winServersCache.filter { it.isEnabled }.toSet()
@@ -1608,14 +1811,12 @@ object RpnProxyManager : KoinComponent {
     }
 
     /**
-     *
      * Full update pipeline:
      *  1. Ask the tunnel to refresh and return updated WIN state bytes
      *     ([VpnController.updateWin]).
      *  2a. If the tunnel returns bytes → persist them with [updateWinConfigState].
-     *  2b. If the tunnel returns null → fall back to [registerProxy] (full re-register)
-     *     and retry [VpnController.updateWin] once more.  If that also fails return null
-     *     so callers can show an error.
+     *  2b. If the tunnel returns null → fall back to [registerProxy] (full re-register).
+     *     If that also fails return null so callers can show an error.
      *  3. Fetch server locations from the tunnel ([fetchAndConstructWinLocations]).
      *     If empty, retry up to 3 times with 1 s back-off.
      *  4. Sync fetched locations to DB + in-memory cache ([syncWinServers]).
@@ -1630,32 +1831,38 @@ object RpnProxyManager : KoinComponent {
      *                 success, show retry / await next cycle.
      *  - non-empty → full success; contains the refreshed [CountryConfig] list.
      */
-    suspend fun updateWinProxy(userRequest: Boolean): List<CountryConfig>? {
+    suspend fun updateWinProxy(): List<CountryConfig>? {
         Logger.i(LOG_TAG_PROXY, "$TAG; updateWinProxy: starting WIN proxy update")
 
-        val currTs = System.currentTimeMillis()
-        val lastUpdatedTs = VpnController.getWinLastUpdatedTs() ?: 0
-        val fifteenMins = 15 * 60 * 1000
 
-        // do not perform the update, if last update is less than 15 mins and not user req
-        if (currTs - lastUpdatedTs < fifteenMins && !userRequest) {
-            Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: last update was less than 10 mins ago, return curr servers")
-            val currentServers = winCacheMutex.withLock { winServersCache.toList() }
-            return currentServers
-        }
+        val isRpnRegistered = VpnController.isWinRegistered()
+        if (!isRpnRegistered) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: WIN not registered, delegating to registerProxy")
+            val registered = registerProxy(RpnType.WIN)
+            if (!registered) {
+                Logger.e(LOG_TAG_PROXY, "$TAG; updateWinProxy: registration attempt failed, cannot proceed with update")
+                return null
+            }
+            Logger.i(LOG_TAG_PROXY, "$TAG; updateWinProxy: WIN registered successfully, falling through to server sync")
+            // registerProxy already synced the server list; fall through so enabled
+            // servers are re-added to the tunnel by the loop below.
+        } else {
+            val bytes: ByteArray? = VpnController.updateWin()
 
-        val bytes: ByteArray? = VpnController.updateWin()
+            if (bytes == null) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: updateWin() returned null")
+                return null
+            }
 
-        if (bytes == null) {
-            Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: updateWin() returned null, attempting re-register")
-            return null
-        }
-
-        val persisted = updateWinConfigState(bytes)
-        if (!persisted) {
-            // Log the failure but do NOT return null; the in-memory state is already
-            // updated by updateWinConfigState before it touches the DB.
-            Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: failed to persist WIN config state (continuing)")
+            val persisted = updateWinConfigState(bytes)
+            if (!persisted) {
+                // Log the failure but do NOT return null; the in-memory state is already
+                // updated by updateWinConfigState before it touches the DB.
+                Logger.w(
+                    LOG_TAG_PROXY,
+                    "$TAG; updateWinProxy: failed to persist WIN config state (continuing)"
+                )
+            }
         }
 
         var fetchResult: Pair<Set<CountryConfig>, List<String>> = Pair(emptySet(), emptyList())
@@ -1696,7 +1903,7 @@ object RpnProxyManager : KoinComponent {
 
         // Read enabled configs from the freshly-synced cache so we never re-add stale keys.
         val enabledConfigs = winCacheMutex.withLock {
-            winServersCache.filter { it.isEnabled && it.id != AUTO_SERVER_ID }.toList()
+            winServersCache.filter { it.isEnabled && !it.id.equals(AUTO_SERVER_ID, true) }.toList()
         }
 
         for (config in enabledConfigs) {
@@ -1730,7 +1937,7 @@ object RpnProxyManager : KoinComponent {
             // display country names / flags in ServerRemovalNotificationBottomSheet.
             val removedConfigs = try {
                 countryConfigRepo.getAllConfigs()
-                    .filter { removedSelectedIds.contains(it.id) && it.id != AUTO_SERVER_ID }
+                    .filter { removedSelectedIds.contains(it.id) && !it.id.equals(AUTO_SERVER_ID, true) }
             } catch (e: Exception) {
                 Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: could not resolve removed configs: ${e.message}")
                 emptyList()
@@ -1767,7 +1974,166 @@ object RpnProxyManager : KoinComponent {
         }
     }
 
-    suspend fun getWinExistingData(): ByteArray? {
+    /**
+     * Canonical folder for encrypted RPN files: app-internal storage.
+     *
+     * Returns the folder, creating it if necessary. Returns null only if mkdirs() fails.
+     */
+    private fun getRpnFolder(): File? {
+        val folder = File(applicationContext.filesDir, RPN_PROXY_FOLDER_NAME)
+        if (folder.exists()) return folder
+        return if (folder.mkdirs()) folder else null
+    }
+
+    /**
+     * One-time migration of WIN encrypted files from external storage
+     * ([Context.getExternalFilesDir]) to internal storage ([Context.filesDir]).
+     */
+    private suspend fun migrateRpnFilesToInternalIfNeeded() {
+        if (persistentState.rpnInternalStorageMigrationVersion >= RPN_STORAGE_MIGRATION_VERSION) return
+
+        val internalFolder = getRpnFolder()
+        if (internalFolder == null) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: internal folder unavailable, will retry next launch")
+            return
+        }
+        val externalFolder = try {
+            applicationContext.getExternalFilesDir(RPN_PROXY_FOLDER_NAME)
+        } catch (_: Exception) {
+            null
+        }
+
+        // migrate (and clean up) both legacy files. each result tells us whether it is
+        // safe to repoint that file's DB path to internal storage.
+        val stateResult = migrateOneRpnFile(externalFolder, internalFolder, WIN_STATE_FILE_NAME)
+        val entResult = migrateOneRpnFile(externalFolder, internalFolder, WIN_ENTITLEMENT_FILE_NAME)
+
+        // if either readable file could not be written to internal storage, keep its
+        // external path in the DB and retry the whole migration next launch.
+        if (!stateResult.repointToInternal || !entResult.repointToInternal) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: one or more files not fully migrated (state=${stateResult.summary}, entitlement=${entResult.summary}); will retry next launch")
+            return
+        }
+
+        // DB paths to internal storage (the canonical location now).
+        val proxy = try {
+            db.getProxyById(WIN_ID)
+        } catch (e: Exception) {
+            // no usable row (fresh install, cleared DB, etc.). legacy external junk
+            // was already cleaned up above; mark migration done.
+            Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: no WIN proxy row, marking migration done (state=${stateResult.summary}, entitlement=${entResult.summary})", e)
+            persistentState.rpnInternalStorageMigrationVersion = RPN_STORAGE_MIGRATION_VERSION
+            return
+        }
+
+        if (proxy != null) {
+            val newState = File(internalFolder, WIN_STATE_FILE_NAME).absolutePath
+            val newEnt = File(internalFolder, WIN_ENTITLEMENT_FILE_NAME).absolutePath
+            var changed = false
+            if (proxy.configPath != newState) {
+                proxy.configPath = newState
+                changed = true
+            }
+            if (proxy.serverResPath != newEnt) {
+                proxy.serverResPath = newEnt
+                changed = true
+            }
+            if (changed) {
+                try {
+                    proxy.modifiedTs = System.currentTimeMillis()
+                    db.update(proxy)
+                    Logger.i(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: repointed WIN proxy paths to internal (state=${stateResult.summary}, entitlement=${entResult.summary})")
+                } catch (e: Exception) {
+                    Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: DB update failed, will retry next launch: ${e.message}", e)
+                    return // do NOT set the flag; retry next launch
+                }
+            }
+        }
+
+        persistentState.rpnInternalStorageMigrationVersion = RPN_STORAGE_MIGRATION_VERSION
+        Logger.i(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: migration complete (state=${stateResult.summary}, entitlement=${entResult.summary})")
+    }
+
+    private data class RpnMigrateResult(val repointToInternal: Boolean, val summary: String)
+
+    /**
+     * Migrates a single legacy RPN encrypted file from [externalFolder] to [internalFolder].
+     */
+    private suspend fun migrateOneRpnFile(
+        externalFolder: File?,
+        internalFolder: File,
+        fileName: String
+    ): RpnMigrateResult {
+        val internalFile = File(internalFolder, fileName)
+
+        if (externalFolder == null) return RpnMigrateResult(true, "no-external-folder")
+
+        val externalFile = File(externalFolder, fileName)
+        if (!externalFile.exists()) return RpnMigrateResult(true, "no-legacy-file")
+
+        val bytes = try {
+            EncryptedFileManager.readByteArray(applicationContext, externalFile)
+        } catch (e: EncryptionException.DecryptionFailed) {
+            // encrypted with a keyset that no longer exists (and never will
+            // again). The data is irrecoverable, but fully reconstructable from the
+            // entitlement / play billing / server via registerProxy() recovery. delete
+            // the junk so the legacy external folder is left clean.
+            Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: (key mismatch), deleting legacy external file", e)
+            if (!externalFile.delete()) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: could not delete external file: ${externalFile.absolutePath}")
+            }
+            return RpnMigrateResult(true, "mismatch-deleted")
+        } catch (e: EncryptionException) {
+            // unreadable for another crypto reason; also unrecoverable. delete
+            Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: unreadable (${e::class.simpleName}), deleting legacy external file", e)
+            if (!externalFile.delete()) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: could not delete unreadable external file: ${externalFile.absolutePath}")
+            }
+            return RpnMigrateResult(true, "unreadable-deleted")
+        } catch (e: Exception) {
+            // not a known failure, do NOT delete the file
+            Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: unexpected read error, will retry next launch: ${e.message}", e)
+            return RpnMigrateResult(false, "read-error-retry")
+        }
+
+        if (bytes.isEmpty()) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: external file empty, deleting legacy external file")
+            externalFile.delete()
+            return RpnMigrateResult(true, "empty-deleted")
+        }
+
+        // Re-encrypt into internal storage. EncryptedFileManager.write deletes any
+        // pre-existing target first, so a partial earlier attempt is handled.
+        // Serialize against concurrent storeWinEntitlement / updateWinConfigState writers
+        // targeting the same internal path: EncryptedFileManager.write is non-atomic
+        // (delete-then-write), so unsynchronized concurrent writes can interleave and
+        // leave a corrupt/missing file, or let these stale (legacy) bytes overwrite a
+        // fresh payment-derived entitlement written moments earlier. The external-file
+        // read above is independent of internal writers and stays unlocked.
+        val ok = winFileMutex.withLock {
+            try {
+                EncryptedFileManager.write(applicationContext, bytes, internalFile)
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: internal write failed, keeping readable external file, will retry next launch: ${e.message}", e)
+                return@withLock false
+            }
+        }
+        if (!ok) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: internal write returned false, keeping readable external file, will retry next launch")
+            return RpnMigrateResult(false, "write-failed-retry")
+        }
+
+        // Internal write succeeded; remove the legacy external copy. If the delete
+        // fails (possible on FUSE external storage) we still repoint the DB - the
+        // external file is now a stale duplicate and harmless.
+        if (!externalFile.delete()) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: migrated but could not delete external copy (harmless): ${externalFile.absolutePath}")
+        }
+        Logger.i(LOG_TAG_PROXY, "$TAG; migrateRpnFiles: $fileName: relocated to internal storage (${bytes.size} bytes)")
+        return RpnMigrateResult(true, "relocated")
+    }
+
+    suspend fun getWinExistingStateData(): ByteArray? {
         val proxy = db.getProxyById(WIN_ID) ?: return null
         val cfg = proxy.configPath
         if (cfg.isEmpty()) return null
@@ -1776,8 +2142,16 @@ object RpnProxyManager : KoinComponent {
         return try {
             val bytes = EncryptedFileManager.readByteArray(applicationContext, file)
             if (bytes.isNotEmpty()) bytes else null
+        } catch (e: EncryptionException.DecryptionFailed) {
+            // The file is an entitlement file: encrypted with a keyset that no longer exists
+            // reconstruct from the entitlement file / play billing / server.
+            Logger.w(LOG_TAG_PROXY, "$TAG; getWinExistingStateData: win state file (key mismatch), deleting: ${file.absolutePath}", e)
+            if (!file.delete()) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; getWinExistingStateData: failed to delete file(key mismatch): ${file.absolutePath}")
+            }
+            null
         } catch (e: EncryptionException) {
-            Logger.w(LOG_TAG_PROXY, "$TAG; getWinExistingData: encrypted file unreadable (${e::class.simpleName}), returning null", e)
+            Logger.w(LOG_TAG_PROXY, "$TAG; getWinExistingStateData: encrypted file unreadable (${e::class.simpleName}), returning null", e)
             null
         }
     }
@@ -1789,31 +2163,25 @@ object RpnProxyManager : KoinComponent {
         }
         return try {
             val fileName = getConfigFileName(WIN_ID)
-            val folder = applicationContext.getExternalFilesDir(RPN_PROXY_FOLDER_NAME)
+            val folder = getRpnFolder()
             if (folder == null) {
-                Logger.e(LOG_TAG_PROXY, "$TAG; updateWinConfigState: failed to get external files dir")
+                Logger.e(LOG_TAG_PROXY, "$TAG; updateWinConfigState: failed to get rpn folder")
                 return false
             }
 
-            if (!folder.exists()) {
-                val created = try {
-                    folder.mkdirs()
+            val file = File(folder, fileName)
+            // Hold winFileMutex across the manual delete + EncryptedFileManager.write so
+            // a concurrent migrateOneRpnFile / storeWinEntitlement writer cannot interleave
+            // its own delete+write against this same path (EncryptedFileManager.write is
+            // non-atomic delete-then-write).
+            val ok = winFileMutex.withLock {
+                if (file.exists()) file.delete()
+                try {
+                    EncryptedFileManager.write(applicationContext, byteArray, file)
                 } catch (e: Exception) {
-                    Logger.e(LOG_TAG_PROXY, "$TAG; updateWinConfigState: exception creating folder: ${e.message}", e)
+                    Logger.e(LOG_TAG_PROXY, "$TAG; updateWinConfigState: exception writing file: ${e.message}", e)
                     false
                 }
-                if (!created) {
-                    Logger.e(LOG_TAG_PROXY, "$TAG; updateWinConfigState: failed to create folder: ${folder.absolutePath}")
-                    return false
-                }
-            }
-
-            val file = File(folder, fileName)
-            val ok = try {
-                EncryptedFileManager.write(applicationContext, byteArray, file)
-            } catch (e: Exception) {
-                Logger.e(LOG_TAG_PROXY, "$TAG; updateWinConfigState: exception writing file: ${e.message}", e)
-                false
             }
 
             if (!ok) {
@@ -1883,21 +2251,21 @@ object RpnProxyManager : KoinComponent {
      */
     suspend fun fetchAndConstructWinLocations(): Pair<Set<CountryConfig>, List<String>> {
          // Fetch from API
-         val winPropsResult = try {
-             VpnController.getRpnProps(RpnType.WIN)
+         val locationsRes = try {
+             VpnController.getRpnLocations(RpnType.WIN)
          } catch (e: Exception) {
              Logger.e(LOG_TAG_PROXY, "$TAG; fetchAndConstructWinLocations: exception getting RPN props: ${e.message}", e)
              return Pair(emptySet(), emptyList())
          }
 
-         val winProps = winPropsResult.first
-         if (winProps == null) {
+         val locations = locationsRes.first
+         if (locations == null) {
              Logger.w(LOG_TAG_PROXY, "$TAG; err; win props is null")
              return Pair(emptySet(), emptyList())
          }
 
          val count = try {
-             winProps.locations.len()
+             locations.len()
          } catch (e: Exception) {
              Logger.e(LOG_TAG_PROXY, "$TAG; fetchAndConstructWinLocations: exception getting locations count: ${e.message}", e)
              return Pair(emptySet(), emptyList())
@@ -1911,7 +2279,7 @@ object RpnProxyManager : KoinComponent {
          val newServers = mutableSetOf<CountryConfig>()
          for(i in 0 until count) {
              try {
-                 val loc = winProps.locations.get(i)
+                 val loc = locations.get(i)
                  if (loc == null) {
                      Logger.w(LOG_TAG_PROXY, "$TAG; err; location is null at index $i")
                      continue
@@ -1966,22 +2334,14 @@ object RpnProxyManager : KoinComponent {
          // Check if any removed servers were in the selected list
          val removedSelectedIds = mutableListOf<String>()
          if (removedIds.isNotEmpty()) {
-             // Snapshot the cached country codes under the lock to avoid a bare read.
-             val cachedCcs = winCacheMutex.withLock { winServersCache.map { it.cc }.toSet() }
-             val countryCodesToRemove = mutableSetOf<String>()
+             val keysToRemove = mutableSetOf<String>()
              for (removedId in removedIds) {
                  val removed = existingServers.firstOrNull { it.id == removedId }
-                 if (removed != null && cachedCcs.contains(removed.cc)) {
+                 if (removed != null) {
                      removedSelectedIds.add(removedId)
-                     // Collect country codes to remove
-                     countryCodesToRemove.add(removed.cc)
-                     Logger.w(LOG_TAG_PROXY, "$TAG; removed server $removedId (${removed.cc}) was in selected list")
+                     keysToRemove.add(removed.key)
+                     Logger.w(LOG_TAG_PROXY, "$TAG; removed server $removedId (key=${removed.key}) was in tunnel")
                  }
-             }
-             // Remove all at once to avoid ConcurrentModificationException
-             if (countryCodesToRemove.isNotEmpty()) {
-                 countryCodesToRemove.forEach { serverKeyMeta.remove(it) }
-                 Logger.i(LOG_TAG_PROXY, "$TAG; removed ${countryCodesToRemove.size} country codes from selected list")
              }
          }
 
@@ -2031,10 +2391,6 @@ object RpnProxyManager : KoinComponent {
                 countryConfigRepo.update(config)
                 // Record the selection for frequent-country tracking and refresh chips.
                 countryConfigRepo.incrementSelectionCount(config.key)
-                val now = System.currentTimeMillis()
-                val existing = serverKeyMeta[key]
-                serverKeyMeta[key] = existing?.copy(selectedAt = now)
-                    ?: ServerKeyMeta(selectedAt = now)
                 Logger.i(LOG_TAG_PROXY, "$TAG; enableWinServer: enabled rpn: $key")
             } catch (e: Exception) {
                 Logger.e(LOG_TAG_PROXY, "$TAG; enableWinServer: failed to update DB for $key: ${e.message}", e)
@@ -2192,6 +2548,10 @@ object RpnProxyManager : KoinComponent {
                 }
             }
         }
+
+        if (config.isEnabled) {
+            VpnController.refreshOrPauseOrResumeOrReAddProxies()
+        }
     }
 
     suspend fun setSsidEnabledForWinServer(key: String, ssidEnabled: Boolean) {
@@ -2230,6 +2590,10 @@ object RpnProxyManager : KoinComponent {
                 }
             }
         }
+
+        if (config.isEnabled) {
+            VpnController.refreshOrPauseOrResumeOrReAddProxies()
+        }
     }
 
     suspend fun disableWinServer(key: String): Pair<Boolean, String> {
@@ -2267,7 +2631,6 @@ object RpnProxyManager : KoinComponent {
             }
                 try {
                     countryConfigRepo.update(config)
-                    serverKeyMeta.remove(key)
                     Logger.i(LOG_TAG_PROXY, "$TAG; disableWinServer: disabled rpn: $key")
                 } catch (e: Exception) {
                     Logger.e(LOG_TAG_PROXY, "$TAG; disableWinServer: failed to update DB for $key: ${e.message}", e)
@@ -2276,10 +2639,6 @@ object RpnProxyManager : KoinComponent {
                         winServersCache.filter { it.key == key }.forEach { it.isEnabled = true }
                     }
                     config.isEnabled = true
-                    val now = System.currentTimeMillis()
-                    val existing = serverKeyMeta[key]
-                    serverKeyMeta[key] = existing?.copy(selectedAt = now)
-                        ?: ServerKeyMeta(selectedAt = now)
                     return Pair(false, "Failed to update database: ${e.message}")
                 }
         } else {
@@ -2294,7 +2653,7 @@ object RpnProxyManager : KoinComponent {
      */
     suspend fun ensureAutoServerExists() {
         try {
-            val autoServer = countryConfigRepo.getById(AUTO_SERVER_ID)
+            val autoServer = countryConfigRepo.getById(AUTO_SERVER_ID) ?: countryConfigRepo.getById(AUTO_SERVER_ID.lowercase())
             if (autoServer == null) {
                 Logger.i(LOG_TAG_PROXY, "$TAG; ensureAutoServerExists: AUTO server not found, creating...")
                 val newAutoServer = createAutoServer()
@@ -2308,7 +2667,7 @@ object RpnProxyManager : KoinComponent {
                 Logger.v(LOG_TAG_PROXY, "$TAG; ensureAutoServerExists: AUTO server already exists")
                 // Ensure it's in the cache
                 winCacheMutex.withLock {
-                    if (winServersCache.none { it.id == AUTO_SERVER_ID }) {
+                    if (winServersCache.none { it.id.equals(AUTO_SERVER_ID, true) }) {
                         winServersCache.add(autoServer)
                     }
                 }
@@ -2356,15 +2715,15 @@ object RpnProxyManager : KoinComponent {
     suspend fun getAutoServer(): CountryConfig? {
         return try {
             val cached = winCacheMutex.withLock {
-                winServersCache.find { it.id == AUTO_SERVER_ID }
+                winServersCache.find { it.id.equals(AUTO_SERVER_ID, true) }
             }
             if (cached != null) return cached
 
-            val fromDb = countryConfigRepo.getById(AUTO_SERVER_ID)
+            val fromDb = countryConfigRepo.getById(AUTO_SERVER_ID) ?: countryConfigRepo.getById(AUTO_SERVER_ID.lowercase())
             if (fromDb != null) {
                 // Opportunistically warm the cache so subsequent calls hit the fast path.
                 winCacheMutex.withLock {
-                    if (winServersCache.none { it.id == AUTO_SERVER_ID }) {
+                    if (winServersCache.none { it.id.equals(AUTO_SERVER_ID, true) }) {
                         winServersCache.add(fromDb)
                     }
                 }
@@ -2375,8 +2734,8 @@ object RpnProxyManager : KoinComponent {
             ensureAutoServerExists()
 
             winCacheMutex.withLock {
-                winServersCache.find { it.id == AUTO_SERVER_ID }
-            } ?: countryConfigRepo.getById(AUTO_SERVER_ID)
+                winServersCache.find { it.id.equals(AUTO_SERVER_ID, true) }
+            } ?: countryConfigRepo.getById(AUTO_SERVER_ID) ?: countryConfigRepo.getById(AUTO_SERVER_ID.lowercase())
         } catch (e: Exception) {
             Logger.e(LOG_TAG_PROXY, "$TAG; getAutoServer: err: ${e.message}", e)
             null
@@ -2412,6 +2771,15 @@ object RpnProxyManager : KoinComponent {
              // Ensure AUTO server exists before syncing
              ensureAutoServerExists()
 
+             // get the current server list before sync so we can find removed servers
+             // and clean up their ProxyApplicationMapping entries.
+             val serversBefore = try {
+                 countryConfigRepo.getAllConfigs()
+             } catch (e: Exception) {
+                 Logger.w(LOG_TAG_PROXY, "$TAG; syncWinServers: could not read pre-sync servers: ${e.message}")
+                 emptyList()
+             }
+
              // Sync to database (this handles insertions, updates, and deletions)
              val syncServerList = if (servers.isEmpty()) {
                  Logger.w(LOG_TAG_PROXY, "$TAG; syncWinServers: empty server list, clearing DB except AUTO")
@@ -2422,6 +2790,18 @@ object RpnProxyManager : KoinComponent {
 
              // Sync to database (AUTO server is protected in the repository method)
              countryConfigRepo.syncServers(syncServerList)
+
+             // clean up proxy-app mappings for every server that was removed from the DB.
+             val newServerKeys = servers.map { it.key }.toSet()
+             val removedServers = serversBefore.filter {
+                 it.id != AUTO_SERVER_ID && !newServerKeys.contains(it.key)
+             }
+             if (removedServers.isNotEmpty()) {
+                 removedServers.forEach { removed ->
+                     ProxyManager.removeProxyId(Backend.RpnWin + removed.key)
+                     Logger.i(LOG_TAG_PROXY, "$TAG; syncWinServers: removed proxy mapping for stale server key=${removed.key}")
+                 }
+             }
 
              // Read back from DB to ensure consistency
              val existingServers = try {
@@ -2439,7 +2819,7 @@ object RpnProxyManager : KoinComponent {
                  }
              }
 
-             Logger.i(LOG_TAG_PROXY, "$TAG; syncWinServers: synced ${servers.size} servers to DB, ${existingServers.size} in cache")
+             Logger.i(LOG_TAG_PROXY, "$TAG; syncWinServers: synced ${servers.size} servers to DB, ${existingServers.size} in cache, ${removedServers.size} proxy mappings cleaned")
          } catch (e: Exception) {
              Logger.e(LOG_TAG_PROXY, "$TAG; syncWinServers: error - ${e.message}", e)
          }
@@ -2466,7 +2846,7 @@ object RpnProxyManager : KoinComponent {
              syncWinServers(newServers)
 
              // Find the actual removed server objects for notification
-             val removedServers = existingServers.filter { removedSelectedIds.contains(it.id) && it.id != AUTO_SERVER_ID }
+             val removedServers = existingServers.filter { removedSelectedIds.contains(it.id) && it.id.equals(AUTO_SERVER_ID, true) }
 
              Logger.i(LOG_TAG_PROXY, "$TAG; refreshWinServers: refreshed ${newServers.size} servers, ${removedServers.size} selected servers removed")
              // Return the cache populated by syncWinServers (read from DB) instead of the
@@ -2481,6 +2861,20 @@ object RpnProxyManager : KoinComponent {
          }
      }
 
+    private suspend fun isAnyProxyLockdown(proxies: List<String>): Boolean {
+        var lockdown = false
+        proxies.forEach { pid ->
+            val config = winCacheMutex.withLock {
+                if (pid == Backend.RpnWin || pid.equals(AUTO_SERVER_ID, true)) winServersCache.find { pid.equals(AUTO_SERVER_ID, true) }
+                else winServersCache.find { it.id == pid || it.key == pid }
+            }
+            lockdown = config?.lockdown ?: false
+            if (lockdown) return true
+        }
+
+        return lockdown
+    }
+
     suspend fun getAllPossibleConfigIdsForApp(
         uid: Int,
         ip: String,
@@ -2489,9 +2883,9 @@ object RpnProxyManager : KoinComponent {
         usesMobileNw: Boolean,
         ssid: String
     ): List<String> {
-        val block = Backend.Block
         val proxyIds: MutableList<String> = mutableListOf()
 
+        Logger.vv(LOG_TAG_PROXY, "$TAG; getAllPossibleConfigIdsForApp: init $uid, $ip, $port, $domain, $usesMobileNw, $ssid")
         // collect all proxy-ids for this uid
         val allProxyIdsForApp = try {
             ProxyManager.getProxyIdsForApp(uid)
@@ -2507,35 +2901,21 @@ object RpnProxyManager : KoinComponent {
         // app-specific configs may be empty if the app is not configured
         if (rpnProxyIdsForApp.isNotEmpty()) {
             for (pid in rpnProxyIdsForApp) {
-                val appProxyPair = canUseConfig(pid, "app($uid)", usesMobileNw, ssid)
-                if (!appProxyPair.second) {
-                    // lockdown or block; honor it and stop further processing
-                    proxyIds.clear()
-                    if (appProxyPair.first == block) {
-                        proxyIds.add(block)
-                    } else if (appProxyPair.first.isNotEmpty()) {
-                        var id = appProxyPair.first
-                        if (id == AUTO_SERVER_ID) {
-                            id = VpnController.getWinByKey("")?.id() ?: block
-                            proxyIds.add(id)
-                        } else {
-                            proxyIds.add(appProxyPair.first)
-                        }
-                    }
-                    Logger.i(LOG_TAG_PROXY, "$TAG lockdown wg for app($uid) => return $proxyIds")
-                    return proxyIds
-                }
-                if (appProxyPair.first.isNotEmpty()) {
-                    // add eligible app-specific config in the order we see them
-                    var id = appProxyPair.first
-                    if (id == AUTO_SERVER_ID) {
-                        id = VpnController.getWinByKey("")?.id() ?: block
-                        proxyIds.add(id)
+                val canUse = canUseConfig(pid, "app($uid)", usesMobileNw, ssid)
+                if (canUse) {
+                    if (pid.contains(AUTO_SERVER_ID, true)) {
+                        val id = VpnController.getWinByKey("")?.id()
+                        if (id != null) proxyIds.add(id)
                     } else {
-                        proxyIds.add(appProxyPair.first)
+                        proxyIds.add(pid)
                     }
                 }
             }
+        }
+
+        if (isAnyProxyLockdown(proxyIds)) {
+            Logger.i(LOG_TAG_PROXY, "$TAG lockdown rpn for app($uid) => return $proxyIds")
+            return proxyIds
         }
 
         // once the app-specific config is added, check if any catch-all config is enabled
@@ -2553,19 +2933,18 @@ object RpnProxyManager : KoinComponent {
         cac.forEach {
             try {
                 val configId = Backend.RpnWin + it.key
-                if ((checkEligibilityBasedOnNw(it.id, usesMobileNw) &&
-                            checkEligibilityBasedOnSsid(it.id, ssid)) &&
+                if (isEligibleForNetwork(it.id, usesMobileNw, ssid, it.mobileOnly, it.ssidBased) &&
                     !proxyIds.contains(configId)
                 ) {
-                    val key = if (it.id == AUTO_SERVER_ID) {
-                        VpnController.getWinByKey("")?.id() ?: block
+                    val id = if (configId.contains(AUTO_SERVER_ID, true)) {
+                        VpnController.getWinByKey("")?.id()
                     } else {
                         configId
                     }
-                    proxyIds.add(key)
+                    if (id != null) proxyIds.add(id)
                     Logger.i(
                         LOG_TAG_PROXY,
-                        "$TAG catch-all config is active: ${it.id}, ${it.name} => add $key"
+                        "$TAG catch-all config is active: ${it.id}, ${it.name} => add $id"
                     )
                 }
             } catch (e: Exception) {
@@ -2580,153 +2959,69 @@ object RpnProxyManager : KoinComponent {
         return proxyIds
     }
 
+    private suspend fun isEligibleForNetwork(id: String, usesMobileNw: Boolean, ssid: String, mobileOnlySetting: Boolean, ssidEnabled: Boolean): Boolean {
+        if (!mobileOnlySetting && !ssidEnabled) return true
+
+        val passMobileOnly = mobileOnlySetting && usesMobileNw
+        val passSsid = ssidEnabled && !usesMobileNw && matchesSsidListForConfig(id, ssid)
+        return passMobileOnly || passSsid
+    }
+
+    // returns true if the current ssid is allowed by the SSID list configured for the wireguard.
+    // when the config is not found, returns false (fail-closed).
+    private suspend fun matchesSsidListForConfig(id: String, ssid: String): Boolean {
+        val config = winCacheMutex.withLock {
+            if (id == Backend.RpnWin || id.equals(AUTO_SERVER_ID, true)) winServersCache.find { it.id.equals(AUTO_SERVER_ID, true) }
+            else winServersCache.find { it.id == id || it.key == id }
+        }
+        if (config == null) {
+            Logger.e(LOG_TAG_PROXY, "matchesSsidListForConfig: config is null for id: $id")
+            return false
+        }
+        return matchesSsidList(config.ssids, ssid)
+    }
+
     private suspend fun canUseConfig(
         id: String,
         type: String,
-        usesMtrdNw: Boolean,
+        usesMobileNw: Boolean,
         ssid: String
-    ): Pair<String, Boolean> {
+    ): Boolean {
         if (id.isEmpty()) {
-            return Pair("", true)
+            return false
         }
         val actualId = id.substringAfter(Backend.RpnWin)
 
         val config = winCacheMutex.withLock {
-            winServersCache.find { it.id == actualId || it.key == actualId }
+            if (actualId == Backend.RpnWin || actualId.equals(AUTO_SERVER_ID, true)) winServersCache.find { it.id.equals(AUTO_SERVER_ID, true) }
+            else winServersCache.find { it.id == id || it.id == actualId || it.key == id || it.key == actualId }
         }
 
         if (config == null) {
-            Logger.d(LOG_TAG_PROXY, "$TAG; config null($actualId) no need to proceed, return empty")
-            winCacheMutex.withLock {
-                winServersCache.forEach {
-                    Logger.d(LOG_TAG_PROXY, "$TAG; cached wg: ${it.id}, ${it.key}, active: ${it.isEnabled}, lockdown: ${it.lockdown}")
-                }
-            }
-            return Pair("", true)
+            Logger.e(LOG_TAG_PROXY, "$TAG; config null($actualId) no need to proceed, return empty")
+            return false
         }
 
         Logger.vv(LOG_TAG_PROXY, "$TAG; config-details: $config")
 
+        val lockdown = config.lockdown
+
+        if (lockdown && isEligibleForNetwork(id, usesMobileNw, ssid, config.mobileOnly, config.ssidBased)) {
+            Logger.d(LOG_TAG_PROXY, "$TAG; lockdown wg for $type => return $id")
+            return true // no need to proceed further for lockdown
+        }
+
         // check if the config is active and if it can be used on this network
-        if (config.isEnabled && (checkEligibilityBasedOnNw(
-                id,
-                usesMtrdNw
-            ) && checkEligibilityBasedOnSsid(id, ssid))
-        ) {
+        if (config.isEnabled && isEligibleForNetwork(id, usesMobileNw, ssid, config.mobileOnly, config.ssidBased)) {
             Logger.d(LOG_TAG_PROXY, "$TAG active wg for $type => add $id")
-            return Pair(id, true)
+            return true
         }
 
         Logger.v(
             LOG_TAG_PROXY,
-            "$TAG wg for $type not active or not eligible nw, return empty, for id: $id, usesMtrdNw: $usesMtrdNw, ssid: $ssid"
+            "$TAG wg for $type not active or not eligible nw, return empty, for id: $id, usesMobileNw: $usesMobileNw, ssid: $ssid"
         )
-        return Pair("", true)
-    }
-
-    // only when config is set to use on mobile network and current network is not mobile
-    // then return false, all other cases return true
-    private suspend fun checkEligibilityBasedOnNw(id: String, usesMobileNw: Boolean): Boolean {
-        if (id.isEmpty()) {
-            Logger.w(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnNw: id is empty")
-            return false
-        }
-
-        val actualId = id.substringAfter(Backend.RpnWin)
-        val config = winCacheMutex.withLock {
-            winServersCache.find { it.id == id || it.id == actualId || it.key == id || it.key == actualId }
-        }
-
-        if (config == null) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnNw: wg not found, id: $id, actualId: $actualId, cache size: ${winServersCache.size}")
-            return false
-        }
-
-        if (config.mobileOnly && !usesMobileNw) {
-            Logger.i(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnNw: mobileOnly is true for ${config.key}, but not mobile nw")
-            return false
-        }
-
-        Logger.d(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnNw: eligible for mobile nw: $usesMobileNw, key: ${config.key}")
-        return true
-    }
-
-    private suspend fun checkEligibilityBasedOnSsid(id: String, ssid: String): Boolean {
-        if (id.isEmpty()) {
-            Logger.w(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnSsid: id is empty")
-            return false
-        }
-
-        val actualId = id.substringAfter(Backend.RpnWin)
-        val config = winCacheMutex.withLock {
-            winServersCache.find { it.id == id || it.id == actualId || it.key == id || it.key == actualId }
-        }
-
-        if (config == null) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; checkEligibilityBasedOnSsid: wg not found, id: $id, actualId: $actualId, cache size: ${winServersCache.size}")
-            return false
-        }
-
-        if (config.ssidBased) {
-            val ssids = "" //config.ssidList
-            val ssidItems = SsidItem.parseStorageList(ssids)
-            if (ssidItems.isEmpty()) { // treat empty as match all
-                Logger.d(
-                    LOG_TAG_PROXY,
-                    "checkEligibilityBasedOnSsid: ssidEnabled is true, but ssid list is empty, match all"
-                )
-                return true
-            }
-
-            val notEqualItems = ssidItems.filter { !it.type.isEqual }
-            val notEqualMatch = notEqualItems.any { ssidItem ->
-                when {
-                    ssidItem.type.isExact -> {
-                        ssidItem.name.equals(ssid, ignoreCase = true)
-                    }
-
-                    else -> { // wildcard
-                        matchesWildcard(ssidItem.name, ssid)
-                    }
-                }
-            }
-
-            if (notEqualMatch) {
-                Logger.d(LOG_TAG_PROXY, "checkEligibilityBasedOnSsid: ssid matched in NOT_EQUAL items, return false")
-                return false
-            }
-
-            val equalItems = ssidItems.filter { it.type.isEqual }
-            // If there are only NOT_EQUAL items and none matched, return true
-            if (equalItems.isEmpty() && notEqualItems.isNotEmpty()) {
-                Logger.d(
-                    LOG_TAG_PROXY,
-                    "checkEligibilityBasedOnSsid: only NOT_EQUAL items present and none matched, return true"
-                )
-                return true
-            }
-
-            // Check EQUAL items (exact or wildcard)
-            val equalMatch = equalItems.any { ssidItem ->
-                when {
-                    ssidItem.type.isExact -> {
-                        ssidItem.name.equals(ssid, ignoreCase = true)
-                    }
-
-                    else -> { // wildcard
-                        matchesWildcard(ssidItem.name, ssid)
-                    }
-                }
-            }
-
-            if (!equalMatch) {
-                Logger.d(LOG_TAG_PROXY, "checkEligibilityBasedOnSsid: ssid did not match in EQUAL items, return false")
-                return false
-            }
-        }
-
-        Logger.d(LOG_TAG_PROXY, "checkEligibilityBasedOnSsid: eligible for ssid: $ssid")
-        return true
+        return false
     }
 
     private fun matchesWildcard(pattern: String, text: String): Boolean {
@@ -2873,11 +3168,9 @@ object RpnProxyManager : KoinComponent {
             val keyExists = winCacheMutex.withLock { winServersCache.any { it.key == key } }
             if (keyExists) {
                 try {
-                    if (ssidBased) {
+                    if (oldValue != ssidBased) {
                         VpnController.notifyConnectionMonitor(enforcePolicyChange = true)
                     }
-                    // Refresh proxies to immediately pause/resume based on new SSID setting
-                    VpnController.refreshOrPauseOrResumeOrReAddProxies()
                 } catch (e: Exception) {
                     Logger.e(LOG_TAG_PROXY, "$TAG; updateSsidBased: failed to refresh proxies: ${e.message}", e)
                     // Don't revert DB change if only the VPN controller refresh failed
@@ -2893,6 +3186,11 @@ object RpnProxyManager : KoinComponent {
                     winServersCache.add(cachedConfig.copy(ssidBased = oldValue))
                 }
             }
+        }
+
+        if (config.isEnabled) {
+            // Refresh proxies to immediately pause/resume based on new SSID setting
+            VpnController.refreshOrPauseOrResumeOrReAddProxies()
         }
     }
 
@@ -2943,7 +3241,6 @@ object RpnProxyManager : KoinComponent {
             if (keyExists && isSsidBased) {
                 try {
                     VpnController.notifyConnectionMonitor(enforcePolicyChange = true)
-                    VpnController.refreshOrPauseOrResumeOrReAddProxies()
                 } catch (e: Exception) {
                     Logger.e(LOG_TAG_PROXY, "$TAG; updateSsids: failed to refresh proxies: ${e.message}", e)
                     // Don't revert DB change if only the VPN controller refresh failed
@@ -2959,6 +3256,11 @@ object RpnProxyManager : KoinComponent {
                     winServersCache.add(cachedConfig.copy(ssids = oldSsids))
                 }
             }
+        }
+
+        if (config.isEnabled) {
+            // refresh proxies to immediately pause/resume based on new SSID setting
+            VpnController.refreshOrPauseOrResumeOrReAddProxies()
         }
     }
 
@@ -2986,6 +3288,7 @@ object RpnProxyManager : KoinComponent {
         }
     }
 
+    data class RpnStats(val routerStats: RouterStats?, val mtu: Long?, val ip4: Boolean?, val ip6: Boolean?, val addr: String?)
     suspend fun stats(): String {
         val sb = StringBuilder()
         sb.append("   Rpn active: ${isRpnActive()}\n\n")
@@ -3002,7 +3305,15 @@ object RpnProxyManager : KoinComponent {
             val stats = VpnController.getRpnStats(id)
             val routerStats = stats?.routerStats
             sb.append("   id: ${it.id}, name: ${it.name}\n")
-            sb.append("   addr: ${routerStats?.addrs}").append("\n")
+            sb.append("   always-on? ${it.catchAll}\n")
+            sb.append("   lockdown? ${it.lockdown}\n")
+            sb.append("   mobile-only? ${it.mobileOnly}\n")
+            sb.append("   ssid-only? ${it.ssidBased}")
+            if (it.ssidBased) {
+                sb.append(", ssids: ${it.ssids}")
+            }
+            sb.append("\n")
+            sb.append("   ifaddr: ${routerStats?.addrs}").append("\n")
             sb.append("   mtu: ${stats?.mtu}\n")
             sb.append("   status: ${routerStats?.status}\n")
             sb.append("   statusReason: ${routerStats?.statusReason}\n")
@@ -3017,12 +3328,13 @@ object RpnProxyManager : KoinComponent {
             sb.append("   lastRxErr: ${routerStats?.lastRxErr}\n")
             sb.append("   lastTxErr: ${routerStats?.lastTxErr}\n")
             sb.append("   lastOk: ${getRelativeTimeSpan(routerStats?.lastOK)}\n")
+            sb.append("   lastOpen: ${getRelativeTimeSpan(routerStats?.lastOpen)}\n")
+            sb.append("   hdl: ${routerStats?.hdl}\n")
             sb.append("   since: ${getRelativeTimeSpan(routerStats?.since)}\n")
+            sb.append("   addr: ${stats?.addr ?: "N/A"}\n")
             sb.append("   errRx: ${routerStats?.errRx}\n")
             sb.append("   errTx: ${routerStats?.errTx}\n")
-            sb.append("   extra: ${routerStats?.extra}\n")
-            sb.append("   client4: ${stats?.clientV4}\n")
-            sb.append("   client6: ${stats?.clientV6}\n\n")
+            sb.append("   extra: ${routerStats?.extra}\n\n")
             val s = sb.toString()
             Logger.d(LOG_TAG_PROXY, "$TAG; id: $id stats:\n$s")
         }
@@ -3032,19 +3344,7 @@ object RpnProxyManager : KoinComponent {
         return sb.toString()
     }
 
-    private fun getRelativeTimeSpan(t: Long?): CharSequence? {
-        if (t == null) return "0"
+    data class ActiveRpnAddlInfo(val key: String, val name: String, val cc: String, val city: String, val addr: String, val pubPub: String, val load: Int, val allowed: String, val count: Int, val excluded: Boolean, val link: Int, val premium: Boolean)
 
-        if (t < 0) return "-1"
-
-        val now = System.currentTimeMillis()
-        // returns a string describing 'time' as a time relative to 'now'
-        return DateUtils.getRelativeTimeSpanString(
-            t,
-            now,
-            DateUtils.SECOND_IN_MILLIS,
-            DateUtils.FORMAT_ABBREV_RELATIVE
-        )
-    }
 
 }

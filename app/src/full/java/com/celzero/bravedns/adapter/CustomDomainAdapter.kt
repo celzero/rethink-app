@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.adapter
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -53,13 +53,13 @@ import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.ui.bottomsheet.CustomDomainRulesBtmSheet
 import com.celzero.bravedns.ui.bottomsheet.CustomDomainRulesBtmSheet.ToggleBtnUi
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.SnackbarHelper.italic
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.net.URI
 
 class CustomDomainAdapter(
     val context: Context,
@@ -468,7 +468,7 @@ class CustomDomainAdapter(
                     b.customDomainStatusTv.text =
                         context.getString(
                             R.string.ci_desc,
-                            context.getString(R.string.ci_trust_txt),
+                            context.getString(R.string.ci_trust_txt).italic(),
                             time
                         )
                 }
@@ -478,7 +478,7 @@ class CustomDomainAdapter(
                     b.customDomainStatusTv.text =
                         context.getString(
                             R.string.ci_desc,
-                            context.getString(R.string.lbl_blocked),
+                            context.getString(R.string.lbl_blocked).italic(),
                             time
                         )
                 }
@@ -488,7 +488,7 @@ class CustomDomainAdapter(
                     b.customDomainStatusTv.text =
                         context.getString(
                             R.string.ci_desc,
-                            context.getString(R.string.cd_no_rule_txt),
+                            context.getString(R.string.cd_no_rule_txt).italic(),
                             time
                         )
                 }
@@ -579,7 +579,7 @@ class CustomDomainAdapter(
                     b.customDomainStatusTv.text =
                         context.getString(
                             R.string.ci_desc,
-                            context.getString(R.string.ci_trust_rule),
+                            context.getString(R.string.ci_trust_rule).italic(),
                             time
                         )
                 }
@@ -589,7 +589,7 @@ class CustomDomainAdapter(
                     b.customDomainStatusTv.text =
                         context.getString(
                             R.string.ci_desc,
-                            context.getString(R.string.lbl_blocked),
+                            context.getString(R.string.lbl_blocked).italic(),
                             time
                         )
                 }
@@ -599,7 +599,7 @@ class CustomDomainAdapter(
                     b.customDomainStatusTv.text =
                         context.getString(
                             R.string.ci_desc,
-                            context.getString(R.string.cd_no_rule_txt),
+                            context.getString(R.string.cd_no_rule_txt).italic(),
                             time
                         )
                 }

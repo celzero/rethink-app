@@ -7,9 +7,9 @@
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
     android:minHeight="64dp"
-    android:paddingStart="8dp"
+    android:paddingStart="12dp"
     android:paddingTop="8dp"
-    android:paddingEnd="8dp"
+    android:paddingEnd="12dp"
     android:paddingBottom="8dp">
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -28,7 +28,7 @@
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:padding="5dp"
-        android:src="@drawable/ic_rpn_auto_2"
+        android:src="@drawable/ic_rpn_auto"
         android:tint="?attr/primaryTextColor"
         android:alpha="0.8"
         android:visibility="gone"
@@ -44,7 +44,7 @@
         android:layout_marginStart="8dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@id/stats_layout"
-        app:layout_constraintEnd_toStartOf="@id/info_icon"
+        app:layout_constraintEnd_toStartOf="@id/refresh_stop_icon"
         app:layout_constraintStart_toEndOf="@id/tv_flag"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -67,35 +67,94 @@
                 tools:text="United States" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/latency_badge"
+                android:id="@+id/tv_server_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
                 android:layout_marginStart="4dp"
                 android:layout_marginEnd="4dp"
-                android:alpha="0.6"
-                android:fontFamily="sans-serif-medium"
+                android:textColor="?attr/accentGood"
                 android:textSize="11sp"
-                tools:text="1.0 Gbps · 20%"
-                tools:textColor="?attr/chipTextPositive" />
+                tools:text="Active" />
 
         </LinearLayout>
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_server_ip"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:layout_marginTop="2dp"
-            android:ellipsize="end"
             android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
-            android:fontFamily="monospace"
-            android:maxLines="1"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="12sp"
-            android:alpha="0.85"
-            tools:visibility="visible"
-            android:visibility="gone"
-            tools:text="100.82.27.93 · Cloudflare" />
+            android:layout_marginEnd="4dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_country_code"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="monospace"
+                android:maxLines="1"
+                android:layout_gravity="center"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="12sp"
+                android:alpha="0.85"
+                tools:visibility="visible"
+                tools:text="US" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_cc_sep"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="5dp"
+                android:text="@string/lbl_separator_dot"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="11sp"
+                android:visibility="visible" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_server_ip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="monospace"
+                android:maxLines="1"
+                android:layout_gravity="center"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="12sp"
+                android:alpha="0.85"
+                tools:visibility="visible"
+                android:visibility="gone"
+                tools:text="100.82.27.93" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_uptime_sep"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="5dp"
+                android:text="@string/lbl_separator_dot"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="11sp"
+                android:visibility="visible" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_uptime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:maxLines="1"
+                android:textSize="12sp"
+                android:alpha="0.85"
+                android:layout_gravity="center"
+                android:textColor="?attr/primaryLightColorText"
+                tools:visibility="visible"
+                android:visibility="gone"
+                tools:text="2 min ago" />
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -119,14 +178,13 @@
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_server_status"
+                android:id="@+id/latency_badge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:maxLines="1"
-                android:textColor="?attr/accentGood"
+                android:alpha="0.6"
                 android:textSize="11sp"
-                tools:text="Active" />
+                tools:text="1.0 Gbps · 20%"
+                tools:textColor="?attr/chipTextPositive" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_status_sep"
@@ -151,47 +209,10 @@
                 tools:text="3 apps" />
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_rx_tx"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="11sp"
-                android:visibility="visible"
-                tools:text="↑ 1.2 MB  ↓ 4.5 MB" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_uptime_sep"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="5dp"
-                android:text="@string/lbl_separator_dot"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="11sp"
-                android:visibility="visible" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_uptime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="11sp"
-                android:visibility="gone"
-                tools:text="2 min ago" />
-        </LinearLayout>
-
     </LinearLayout>
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/info_icon"
+        android:id="@+id/refresh_stop_icon"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:background="?attr/selectableItemBackgroundBorderless"

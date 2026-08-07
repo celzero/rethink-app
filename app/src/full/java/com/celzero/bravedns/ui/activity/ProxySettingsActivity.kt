@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import Logger
-import Logger.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -36,6 +36,7 @@ import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -45,6 +46,7 @@ import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.database.ProxyEndpoint.Companion.DEFAULT_PROXY_TYPE
+import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.DialogSetProxyBinding
 import com.celzero.bravedns.databinding.FragmentProxyConfigureBinding
@@ -65,6 +67,7 @@ import com.celzero.bravedns.ui.fragment.ServerSelectionFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
+import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.openUrl
@@ -77,11 +80,11 @@ import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.RouterStats
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.util.concurrent.TimeUnit
 
 class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
     private val b by viewBinding(FragmentProxyConfigureBinding::bind)
@@ -90,6 +93,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
     private val appConfig by inject<AppConfig>()
     private val orbotHelper by inject<OrbotHelper>()
     private val eventLogger by inject<EventLogger>()
+    private val rdb by inject<RefreshDatabase>()
     private lateinit var animation: Animation
 
     companion object {
@@ -114,7 +118,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
 
@@ -148,7 +152,10 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
     private fun initView() {
         b.settingsActivityHttpProxyProgress.visibility = View.GONE
 
-        displayRpnUi()
+        if (Utilities.isFdroidFlavour()) {
+            b.rpnHeader.visibility = View.GONE
+            b.settingsActivityRpnContainer.visibility = View.GONE
+        }
         displayHttpProxyUi()
         displaySocks5Ui()
     }
@@ -157,7 +164,9 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
 
         b.settingsActivityRpnContainer.setOnClickListener { openRpnScreen() }
 
-        b.wgRefresh.setOnClickListener { refresh() }
+        b.rpnRefresh.setOnClickListener { refresh(b.rpnRefresh) }
+
+        b.wgRefresh.setOnClickListener { refresh(b.wgRefresh) }
 
         b.settingsActivitySocks5Rl.setOnClickListener {
             b.settingsActivitySocks5Switch.isChecked = !b.settingsActivitySocks5Switch.isChecked
@@ -191,6 +200,8 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 return@setOnCheckedChangeListener
             }
             io {
+                // initiate the refresh database, so that newly added apps can be listed
+                rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE)
                 val endpoint = appConfig.getSocks5ProxyDetails()
                 if (endpoint == null) {
                     uiCtx {
@@ -265,6 +276,8 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 return@setOnCheckedChangeListener
             }
             io {
+                // initiate the refresh database, so that newly added apps can be listed
+                rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE)
                 val endpoint =
                     try {
                         appConfig.getHttpProxyDetails()
@@ -308,14 +321,21 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         }
     }
 
-    private fun refresh() {
-        b.wgRefresh.isEnabled = false
-        b.wgRefresh.animation = animation
-        b.wgRefresh.startAnimation(animation)
-        io { VpnController.refreshOrPauseOrResumeOrReAddProxies() }
+    private fun refresh(iv: AppCompatImageView) {
+        iv.isEnabled = false
+        iv.animation = animation
+        iv.startAnimation(animation)
+        io {
+            if (RpnProxyManager.isRpnActive()) {
+                VpnController.refreshRpnProxy(Backend.RpnWin)
+            }
+            VpnController.refreshOrPauseOrResumeOrReAddProxies()
+        }
         delay(REFRESH_TIMEOUT, lifecycleScope) {
-            b.wgRefresh.isEnabled = true
-            b.wgRefresh.clearAnimation()
+            if (isFinishing) return@delay
+
+            iv.isEnabled = true
+            iv.clearAnimation()
             showToastUiCentered(this, getString(R.string.dc_refresh_toast), Toast.LENGTH_SHORT)
         }
     }
@@ -473,12 +493,13 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
     private fun displayRpnUi() {
         val isEnabled = RpnProxyManager.isRpnEnabled()
         val hasValidSub = RpnProxyManager.hasValidSubscription()
+        val isActive = RpnProxyManager.isRpnActive()
 
         when {
-            isEnabled && RpnProxyManager.isRpnActive() -> {
+            isEnabled && isActive -> {
                 io {
                     val selectedConfigs = RpnProxyManager.getSelectedCCs()
-                    val ccs = selectedConfigs.map { if (it.city == AUTO_SERVER_ID) it.city.capitalizeWords() else it.city.capitalizeWords() + ":" + it.cc.uppercase() }
+                    val ccs = selectedConfigs.map { if (it.city.equals(AUTO_SERVER_ID, true)) it.city.capitalizeWords() else it.city.capitalizeWords() + ":" + it.cc.uppercase() }
                     val desc =
                         if (selectedConfigs.isNotEmpty()) {
                             val countryList =
@@ -498,6 +519,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                     uiCtx {
                         b.settingsActivityRpnDesc.text = desc
                         b.settingsActivityRpnIcon.alpha = 1.0f
+                        b.wgRefresh.visibility = View.GONE
                     }
                 }
             }
@@ -505,10 +527,12 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 // Subscription valid but proxy not yet active
                 b.settingsActivityRpnDesc.text = getString(R.string.rpn_title)
                 b.settingsActivityRpnIcon.alpha = 1.0f
+                b.wgRefresh.visibility = View.GONE
             }
             else -> {
                 b.settingsActivityRpnDesc.text = getString(R.string.proxy_rpn_desc_inactive)
                 b.settingsActivityRpnIcon.alpha = 0.5f
+                b.wgRefresh.visibility = View.VISIBLE
             }
         }
     }
@@ -570,7 +594,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         }
     }
 
-    private fun isDnsError(statusId: Long?): Boolean {
+    private fun isDnsError(statusId: Int?): Boolean {
         if (statusId == null) return true
 
         val s = Transaction.Status.fromId(statusId)
@@ -583,7 +607,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             s == Transaction.Status.TRANSPORT_ERROR
     }
 
-    private fun getProxyStatusText(statusPair: Pair<Long?, String>, stats: RouterStats?): String {
+    private fun getProxyStatusText(statusPair: Pair<Int?, String>, stats: RouterStats?): String {
         val status = UIUtils.ProxyStatus.entries.find { it.id == statusPair.first }
 
         return getStatusText(status, stats, statusPair.second)
@@ -937,14 +961,12 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             b.settingsActivityWireguardContainer.alpha = 1f
             b.settingsActivitySocks5Rl.alpha = 1f
             b.settingsActivityHttpProxyContainer.alpha = 1f
-            b.wgRefresh.visibility = View.VISIBLE
         } else {
             b.settingsActivityOrbotContainer.alpha = 0.5f
             b.settingsActivityWireguardContainer.alpha = 0.5f
             b.settingsActivityVpnLockdownDesc.visibility = View.VISIBLE
             b.settingsActivitySocks5Rl.alpha = 0.5f
             b.settingsActivityHttpProxyContainer.alpha = 0.5f
-            b.wgRefresh.visibility = View.GONE
         }
 
         // Wireguard

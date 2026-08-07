@@ -16,7 +16,7 @@
 
 package com.celzero.bravedns.util
 
-import Logger.LOG_BATCH_LOGGER
+import com.celzero.bravedns.util.Logger.LOG_BATCH_LOGGER
 import android.util.Log
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.time.Duration.Companion.milliseconds
 
 // channel buffer receives batched entries of batchsize or once every waitms from a batching
 // producer or a time-based monitor (signal) running in a single-threaded co-routine context.
@@ -92,14 +93,22 @@ class NetLogBatcher<T, V>(
     private suspend fun consumeAdd() =
         withContext(Dispatchers.IO + ncons) {
             for (y in buffersCh) {
-                processor(y)
+                try {
+                    processor(y)
+                } catch (e: Exception) {
+                    Log.e(LOG_BATCH_LOGGER, "$tag; consumeAdd error: ${e.message}")
+                }
             }
         }
 
     private suspend fun consumeUpdate() =
         withContext(Dispatchers.IO + ncons) {
             for (y in updatesCh) {
-                updator(y)
+                try {
+                    updator(y)
+                } catch (e: Exception) {
+                    Log.e(LOG_BATCH_LOGGER, "$tag; consumeUpdate error: ${e.message}")
+                }
             }
         }
 
@@ -109,6 +118,10 @@ class NetLogBatcher<T, V>(
     }
 
     private suspend fun txswap(reason: String) {
+        if (closed.get()) {
+            logd("txswap skip, closed; reason: $reason")
+            return
+        }
         // increment lsn before any potential suspension or delays; because add() and update()
         // only signals the current lsn when the buffer size is 1, and might end up racing
         lsn = (lsn + 1)
@@ -120,7 +133,7 @@ class NetLogBatcher<T, V>(
             buffersCh.send(b)
         }
         if (u.isNotEmpty()) {
-            delay(waitms / 5)
+            delay((waitms / 5).milliseconds)
             updatesCh.send(u)
         }
 
@@ -129,6 +142,10 @@ class NetLogBatcher<T, V>(
 
     suspend fun add(payload: T) =
         withContext(looper + nprod) {
+            if (closed.get()) {
+                logd("add skip, closed")
+                return@withContext
+            }
             val b = batches.get()
             b.add(payload)
             // if the batch size is met, dispatch it to the consumer
@@ -141,6 +158,10 @@ class NetLogBatcher<T, V>(
 
     suspend fun update(payload: V) =
         withContext(looper + nprod) {
+            if (closed.get()) {
+                logd("update skip, closed")
+                return@withContext
+            }
             val u = updates.get()
             u.add(payload)
             if (u.size >= batchSize) {
@@ -171,7 +192,7 @@ class NetLogBatcher<T, V>(
                 }
 
                 // wait for 'batch' to dispatch
-                delay(waitms)
+                delay(waitms.milliseconds)
                 logd("signal wait over, sz(b: ${b.size}, u: ${u.size}) / cur(${lsn}), track(${tracklsn})")
 
                 // 'l' is the current buffer, that is, 'l == i',

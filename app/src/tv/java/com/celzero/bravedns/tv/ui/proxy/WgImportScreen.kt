@@ -203,9 +203,7 @@ fun WgImportScreen(navController: NavController? = null) {
                         error = null
                         scope.launch(Dispatchers.IO) {
                             try {
-                                if (!WireguardManager.isLoaded()) {
-                                    WireguardManager.load(false)
-                                }
+                                WireguardManager.load(false)
                                 val parsed = Config.parse(BufferedReader(StringReader(configText)))
                                 WireguardManager.addConfig(parsed, name = tunnelName.trim())
                                 withContext(Dispatchers.Main) {

@@ -18,6 +18,7 @@ import com.celzero.bravedns.util.Constants
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
@@ -26,6 +27,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     private var topLevelFilter = AppListActivity.TopLevelFilter.ALL
     private var firewallFilter = AppListActivity.FirewallFilter.ALL
     private var search: String = ""
+    private val rethinkUid = android.os.Process.myUid()
 
     init {
         filter.value = ""
@@ -43,7 +45,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     private fun debounceFilter(searchString: String) {
         debounceJob?.cancel()
         debounceJob = viewModelScope.launch {
-            delay(300) // 300ms debounce delay
+            delay(300.milliseconds) // 300ms debounce delay
             filter.value = searchString
         }
     }
@@ -172,6 +174,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         val appList = getFilteredApps()
         appList
             .distinctBy { it.uid }
+            .filter { it.uid != rethinkUid }
             .forEach {
                 val connStatus = FirewallManager.connectionStatus(it.uid)
                 val appStatus = getAppStateForWifi(blocked, connStatus)
@@ -183,6 +186,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         val appList = getFilteredApps()
         appList
             .distinctBy { it.uid }
+            .filter { it.uid != rethinkUid }
             .forEach {
                 val connStatus = FirewallManager.connectionStatus(it.uid)
                 val appStatus = getAppStateForMobileData(blocked, connStatus)
@@ -209,6 +213,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
             }
         appList
             .distinctBy { it.uid }
+            .filter { it.uid != rethinkUid }
             .forEach { FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid) }
     }
 
@@ -231,6 +236,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
             }
         appList
             .distinctBy { it.uid }
+            .filter { it.uid != rethinkUid }
             .forEach { FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid) }
     }
 
@@ -253,6 +259,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
             }
         appList
             .distinctBy { it.uid }
+            .filter { it.uid != rethinkUid }
             .forEach { FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid) }
     }
 
@@ -276,6 +283,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
         appList
             .distinctBy { it.uid }
+            .filter { it.uid != rethinkUid }
             .forEach { FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid) }
     }
 

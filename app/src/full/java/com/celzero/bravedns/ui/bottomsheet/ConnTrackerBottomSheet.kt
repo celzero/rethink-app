@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
-import Logger
-import Logger.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_FIREWALL
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
@@ -34,7 +34,6 @@ import android.widget.AdapterView
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
@@ -62,7 +61,6 @@ import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
-import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -107,7 +105,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     override fun getTheme(): Int =
-        Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        Themes.getBottomSheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     private val persistentState by inject<PersistentState>()
     private val eventLogger by inject<EventLogger>()
@@ -116,11 +114,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         super.onViewCreated(view, savedInstanceState)
 
         dialog?.window?.let { window ->
-            if (isAtleastQ()) {
-                val controller = WindowInsetsControllerCompat(window, window.decorView)
-                controller.isAppearanceLightNavigationBars = false
-                window.isNavigationBarContrastEnforced = false
-            }
+            Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
         }
 
         val data = arguments?.getString(INSTANCE_STATE_IPDETAILS)
@@ -311,28 +305,43 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         b.bsConnConnTypeSecondary.visibility = View.GONE
         // show connId and message if the log level is less than DEBUG
         if (Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt())
-                ?.isLessThan(Logger.LoggerLevel.DEBUG) == true
+                ?.isLessThanOrEqualTo(Logger.LoggerLevel.DEBUG) == true
         ) {
             b.connectionMessage.text = "${info?.proxyDetails}; ${info?.rpid}; ${info?.connId}; ${info?.message}; ${info?.synack}"
         } else {
             b.connectionMessage.text = info?.message
         }
 
-        val currentInfo = info
-        if (currentInfo != null && VpnController.hasCid(currentInfo.connId, currentInfo.uid)) {
-            b.bsConnConnDuration.text =
-                getString(
-                    R.string.two_argument_space,
-                    getString(R.string.lbl_active),
-                    getString(R.string.symbol_green_circle)
-                )
-        } else {
-            b.bsConnConnDuration.text =
-                getString(
-                    R.string.two_argument_space,
-                    getString(R.string.symbol_hyphen),
-                    getString(R.string.symbol_clock)
-                )
+        io {
+            val currentInfo = info
+            val hasCid = currentInfo != null && VpnController.hasCid(currentInfo.connId, currentInfo.uid)
+            uiCtx {
+                if (hasCid) {
+                    b.bsConnConnDuration.text =
+                        getString(
+                            R.string.two_argument_space,
+                            getString(R.string.lbl_active),
+                            getString(R.string.symbol_green_circle)
+                        )
+                } else {
+                    val duration = UIUtils.getDurationInHumanReadableFormat(requireContext(), info?.duration ?: 0)
+                    if (duration.isEmpty()) {
+                        b.bsConnConnDuration.text =
+                            getString(
+                                R.string.two_argument_space,
+                                getString(R.string.symbol_hyphen),
+                                getString(R.string.symbol_clock)
+                            )
+                    } else {
+                        b.bsConnConnDuration.text =
+                            getString(
+                                R.string.two_argument_space,
+                                duration,
+                                getString(R.string.symbol_clock)
+                            )
+                    }
+                }
+            }
         }
 
         val connType = ConnectionTracker.ConnType.get(info?.connType)
@@ -378,9 +387,6 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
         b.bsConnConnUpload.text = uploadBytes
         b.bsConnConnDownload.text = downloadBytes
-        val duration = UIUtils.getDurationInHumanReadableFormat(requireContext(), info?.duration ?: 0)
-        b.bsConnConnDuration.text =
-            getString(R.string.two_argument_space, duration, getString(R.string.symbol_clock))
     }
 
     private fun lightenUpChip() {
@@ -589,8 +595,6 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         firewallStatus: FirewallManager.FirewallStatus,
         connStatus: FirewallManager.ConnectionStatus
     ) {
-        // no need to update the state if it's untracked
-        if (firewallStatus.isUntracked()) return
 
         when (firewallStatus) {
             FirewallManager.FirewallStatus.NONE -> {
@@ -620,9 +624,6 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             }
             FirewallManager.FirewallStatus.EXCLUDE -> {
                 b.bsConnFirewallSpinner.setSelection(7, true)
-            }
-            else -> {
-                // no-op
             }
         }
     }
@@ -785,5 +786,5 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
     private fun io(f: suspend () -> Unit) = lifecycleScope.launch(Dispatchers.IO) { f() }
 
-    private suspend fun uiCtx(f: suspend () -> Unit) = withContext(Dispatchers.Main) { f() }
+    private suspend fun uiCtx(f: suspend () -> Unit) = withContext(Dispatchers.Main) { if (isAdded) f() }
 }

@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.customdownloader
 
-import Logger
-import Logger.LOG_IAB
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_IAB
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody

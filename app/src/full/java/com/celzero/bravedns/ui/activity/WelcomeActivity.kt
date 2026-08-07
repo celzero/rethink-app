@@ -17,14 +17,17 @@ package com.celzero.bravedns.ui.activity
 
 import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
@@ -37,7 +40,6 @@ import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.android.ext.android.inject
 
 class WelcomeActivity : BaseActivity(R.layout.activity_welcome) {
@@ -50,6 +52,7 @@ class WelcomeActivity : BaseActivity(R.layout.activity_welcome) {
         R.layout.welcome_slide4
     )
     private val persistentState by inject<PersistentState>()
+    private lateinit var dots: Array<View>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
@@ -58,9 +61,7 @@ class WelcomeActivity : BaseActivity(R.layout.activity_welcome) {
         handleFrostEffectIfNeeded(persistentState.theme)
 
         // Edge-to-edge support
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        window.statusBarColor = Color.TRANSPARENT
-        window.navigationBarColor = Color.TRANSPARENT
+        enableEdgeToEdge()
 
         ViewCompat.setOnApplyWindowInsetsListener(b.root) { _, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -77,15 +78,14 @@ class WelcomeActivity : BaseActivity(R.layout.activity_welcome) {
             insets
         }
 
-        // Initialize adapter
+        // Initialize adapter and dots
         b.viewPager.adapter = WelcomePagerAdapter(layouts)
-
-        // Set up ViewPager2 with TabLayout for dots
-        TabLayoutMediator(b.layoutDots, b.viewPager) { _, _ -> }.attach()
+        setupDots()
 
         b.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
+                updateDots(position)
                 if (position >= layouts.count() - 1) {
                     b.btnNext.text = getString(R.string.finish)
                     b.btnSkip.visibility = View.INVISIBLE
@@ -112,6 +112,37 @@ class WelcomeActivity : BaseActivity(R.layout.activity_welcome) {
                 launchHomeScreen()
             }
         })
+    }
+
+    private fun setupDots() {
+        val density = resources.displayMetrics.density
+        val dotSize = (8 * density).toInt()
+        val dotMargin = (4 * density).toInt()
+        dots = Array(layouts.size) { index ->
+            View(this).also { dot ->
+                dot.layoutParams = LinearLayout.LayoutParams(dotSize, dotSize).apply {
+                    setMargins(dotMargin, 0, dotMargin, 0)
+                }
+                dot.background = dotDrawable(active = index == 0)
+                b.layoutDots.addView(dot)
+            }
+        }
+    }
+
+    private fun updateDots(selectedIndex: Int) {
+        dots.forEachIndexed { index, dot ->
+            dot.background = dotDrawable(active = index == selectedIndex)
+        }
+    }
+
+    private fun dotDrawable(active: Boolean): GradientDrawable {
+        val tv = TypedValue()
+        theme.resolveAttribute(R.attr.svgStrokeColor, tv, true)
+        val color = tv.data
+        return GradientDrawable().apply {
+            shape = GradientDrawable.OVAL
+            setColor(if (active) color else ColorUtils.setAlphaComponent(color, 80))
+        }
     }
 
     private fun isDarkThemeOn(): Boolean {

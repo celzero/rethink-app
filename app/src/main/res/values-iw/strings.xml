@@ -292,7 +292,6 @@
     <string name="lbl_idle" translatable="true">במנוחה</string>
     <string name="lbl_anonymous" translatable="true">אנונימי</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">מוגן! מחובר ל- DNS + Firewall + proxy.</string>
-    <string name="failed_using_default" translatable="true">נכשל: משתמש בDNS חלופי</string>
     <string name="lbl_unselected" translatable="true">לא נבחר</string>
     <string name="lbl_on_device" translatable="true">on-device</string>
     <string name="lbl_secure" translatable="true">מאובטח</string>
@@ -394,8 +393,6 @@
     <string name="settings_http_proxy_dialog_title" translatable="true">כתובת שרת מותאם אישית</string>
     <string name="settings_http_proxy_toast_success" translatable="true">פרוקסי HTTP קבועה</string>
     <string name="settings_rinr_heading" translatable="true">לולאה חוזרת (ניסיוני)</string>
-    <string name="settings_rinr_dialog_title" translatable="true">לולאה חוזרת (ניסיוני)</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">גם מאפשר <!--settings_network_all_networks-->%1$s. האם אתה רוצה להמשיך?</string>
     <string name="settings_dns_proxy_dialog_port_number" translatable="true">מספר פִּתְחָה</string>
     <string name="settings_http_proxy_error_text2" translatable="true">פִּתְחָה לא תקפה</string>
     <string name="settings_http_proxy_error_text3" translatable="true">שם המארח ריק</string>
@@ -427,7 +424,6 @@
     <string name="firewall_status_block_metered" translatable="true">חסום ברשתות מדודות (סלולריות).</string>
     <string name="hsf_vpn_dialog_message" translatable="true">Rethink זקוק להרשאה להגדיר VPN מקומי כדי להצפין את בקשות ה-DNS של המכשיר, לפקח על הרשת ולאכוף כללי חומת אש.\n\nRethink לא אוסף שום מידע ולא מרגל אחרי משתמשים בשום צורה.</string>
     <string name="hsf_vpn_prepare_failure" translatable="true">או שהרשאת VPN חסרה, או שאפליקציה אחרת נמצאת במצב VPN תמיד פועל.</string>
-    <string name="hsf_proxy_chip_remove_text" translatable="true">עוצר…</string>
     <string name="about_settings" translatable="true">מערכת</string>
     <string name="about_settings_app_info" translatable="true">מידע על האפליקציה</string>
     <string name="cd_dns_crypt_relay_heading" translatable="true">ממסר</string>

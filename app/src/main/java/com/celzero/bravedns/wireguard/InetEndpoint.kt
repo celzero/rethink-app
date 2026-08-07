@@ -27,6 +27,10 @@ import java.time.Duration
 import java.time.Instant
 import java.util.Optional
 import java.util.regex.Pattern
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
 /**
  * An external endpoint (host and port) used to connect to a WireGuard [Peer].
@@ -35,7 +39,7 @@ import java.util.regex.Pattern
  */
 class InetEndpoint
 private constructor(val host: String, private val isResolved: Boolean, val port: Int) {
-    private val lock = Any()
+    private val mutex = Mutex()
     private var lastResolution = Instant.EPOCH
     private var resolved: InetEndpoint? = null
 
@@ -52,29 +56,30 @@ private constructor(val host: String, private val isResolved: Boolean, val port:
      *
      * @return the resolved endpoint, or [Optional.empty]
      */
-    fun getResolved(): Optional<InetEndpoint> {
+    suspend fun getResolved(): Optional<InetEndpoint> {
         if (isResolved) return Optional.of(this)
-        synchronized(lock) {
-
-            // TODO(zx2c4): Implement a real timeout mechanism using DNS TTL
-            if (Duration.between(lastResolution, Instant.now()).toMinutes() > 1) {
-                try {
-                    // Prefer v4 endpoints over v6 to work around DNS64 and IPv6 NAT issues.
-                    val candidates = InetAddress.getAllByName(host)
-                    var address = candidates[0]
-                    for (candidate in candidates) {
-                        if (candidate is Inet4Address) {
-                            address = candidate
-                            break
+        return mutex.withLock {
+            // TODO: Implement a real timeout mechanism using DNS TTL
+            if (Duration.between(lastResolution, Instant.now()).toSeconds() > 5) {
+                withContext(Dispatchers.IO) {
+                    try {
+                        // Prefer v4 endpoints over v6 to work around DNS64 and IPv6 NAT issues.
+                        val candidates = InetAddress.getAllByName(host)
+                        var address = candidates[0]
+                        for (candidate in candidates) {
+                            if (candidate is Inet4Address) {
+                                address = candidate
+                                break
+                            }
                         }
+                        resolved = InetEndpoint(address.hostAddress ?: "", true, port)
+                        lastResolution = Instant.now()
+                    } catch (_: UnknownHostException) {
+                        resolved = null
                     }
-                    resolved = InetEndpoint(address.hostAddress ?: "", true, port)
-                    lastResolution = Instant.now()
-                } catch (e: UnknownHostException) {
-                    resolved = null
                 }
             }
-            return Optional.ofNullable(resolved)
+            Optional.ofNullable(resolved)
         }
     }
 

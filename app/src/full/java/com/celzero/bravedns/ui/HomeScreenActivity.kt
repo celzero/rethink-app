@@ -15,16 +15,16 @@
  */
 package com.celzero.bravedns.ui
 
-import Logger
-import Logger.LOG_TAG_APP_UPDATE
-import Logger.LOG_TAG_BACKUP_RESTORE
-import Logger.LOG_TAG_DOWNLOAD
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_APP_UPDATE
+import com.celzero.bravedns.util.Logger.LOG_TAG_BACKUP_RESTORE
+import com.celzero.bravedns.util.Logger.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.app.UiModeManager
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
@@ -57,10 +57,10 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.InAppMessageProvider
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
@@ -78,10 +78,10 @@ import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_REGENERATION_PERIOD_DAYS
 import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.RemoteFileTagUtil
+import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.getPackageMetadata
 import com.celzero.bravedns.util.Utilities.getRandomString
 import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
 import com.celzero.bravedns.util.Utilities.isAtleastQ
@@ -93,15 +93,16 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.milliseconds
 
 class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
     private val persistentState by inject<PersistentState>()
-    private val appInfoDb by inject<AppInfoRepository>()
     private val appUpdateManager by inject<AppUpdater>()
     private val inAppMessageProvider by inject<InAppMessageProvider>()
     private val rdb by inject<RefreshDatabase>()
@@ -133,7 +134,7 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
 
@@ -196,8 +197,10 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
             intent.scheme?.equals(INTENT_SCHEME) == true &&
             intent.data?.path?.contains(BACKUP_FILE_EXTN) == true
         ) {
+            Logger.i(LOG_TAG_UI, "handleIntent: backup intent")
             handleRestoreProcess(intent.data)
         } else if (intent.scheme?.equals(INTENT_SCHEME) == true) {
+            Logger.i(LOG_TAG_UI, "handleIntent: restore intent")
             showToastUiCentered(
                 this,
                 getString(R.string.brbs_restore_no_uri_toast),
@@ -295,6 +298,11 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
                     Toast.LENGTH_SHORT
                 )
                 workManager.pruneWork()
+                // restart the app so that Room gets fresh SQLite connections
+                lifecycleScope.launch {
+                    delay(1000.milliseconds)
+                    restartApp()
+                }
             } else if (
                 WorkInfo.State.CANCELLED == workInfo.state ||
                 WorkInfo.State.FAILED == workInfo.state
@@ -312,6 +320,15 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
         }
     }
 
+    private fun restartApp() {
+        val pm: PackageManager = packageManager
+        val intent = pm.getLaunchIntentForPackage(packageName) ?: return
+        val mainIntent = Intent.makeRestartActivityTask(intent.component)
+        mainIntent.putExtra(INTENT_RESTART_APP, true)
+        startActivity(mainIntent)
+        Runtime.getRuntime().exit(0)
+    }
+
     private fun observeAppState() {
         VpnController.connectionStatus.observe(this) {
             if (it == BraveVPNService.State.PAUSED) {
@@ -322,16 +339,7 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
     }
 
     private fun removeThisMethod() {
-        // set allowBypass to false for all versions, overriding the user's preference.
-        // the default was true for Play Store and website versions, and false for F-Droid.
-        // when allowBypass is true, some OEMs bypass the VPN service, causing connections
-        // to fail due to the "Block connections without VPN" option.
-        persistentState.allowBypass = false
-
-        io {
-            appInfoDb.setRethinkToBypassDnsAndFirewall()
-            appInfoDb.setRethinkToBypassProxy(true)
-        }
+        persistentState.goMaxMemory = -1L
 
         // change the persistent state for defaultDnsUrl, if its google.com (only for v055d)
         // TODO: remove this post v054.
@@ -400,6 +408,7 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
     private fun updateNewVersion() {
         if (!isNewVersion()) return
 
+        val prevVersion = persistentState.appVersion
         // no need to show new settings on first time launch
         if (persistentState.appVersion != 0) {
             // if app version is not 0, then it means the app is updated
@@ -412,6 +421,15 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
         persistentState.showWhatsNewChip = true
         persistentState.appUpdateTimeTs = System.currentTimeMillis()
 
+        // 53-v055u, exempt rethink as the firewall rules is now stricter compared to prev versions.
+        // remove this if we have a proper ui to communicate those to users.
+        if (prevVersion <= 53) {
+            val rethinkUid = android.os.Process.myUid()
+            io {
+                FirewallManager.exemptRethinkApp(rethinkUid)
+            }
+        }
+
         // FIXME: remove this post v054
         removeThisMethod()
     }
@@ -423,17 +441,8 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
     }
 
     private fun getLatestVersion(): Int {
-        val pInfo: PackageInfo? = getPackageMetadata(this.packageManager, this.packageName)
-        // TODO: modify this to use the latest version code api
-        @Suppress("DEPRECATION")
-        val v = pInfo?.versionCode ?: 0
-        // latest version has apk variant (baseAbiVersionCode * 10000000 + variant.versionCode)
-        // so we need to mod the version code by 10000000 to get the actual version code
-        // for example: 10000000 + 45 = 10000045, so the version code is 1
-        // see build.gradle (:app), #project.ext.versionCodes
-        val latestVersionCode = v % 10000000 // 10000000 is the base version code
-        Logger.i(LOG_TAG_UI, "latest version code: $latestVersionCode")
-        return latestVersionCode
+        Logger.i(LOG_TAG_UI, "base version code: ${BuildConfig.BASE_VERSION_CODE}")
+        return BuildConfig.BASE_VERSION_CODE
     }
 
     // FIXME - Move it to Android's built-in WorkManager

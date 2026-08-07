@@ -58,7 +58,6 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:fontFamily="sans-serif-medium"
-                android:maxLines="1"
                 android:textColor="?attr/primaryTextColor"
                 android:textIsSelectable="true"
                 android:textSize="@dimen/extra_large_font_text_view" />

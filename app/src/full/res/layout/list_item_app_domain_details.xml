@@ -13,24 +13,39 @@
         android:animateLayoutChanges="true"
         android:minHeight="50dp">
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/acd_flag"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+        <LinearLayout
+            android:id="@+id/acd_icon_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_gravity="center"
-            android:layout_marginStart="5dp"
-            android:alpha="0.75"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginBottom="5dp"
-            android:ellipsize="none"
-            android:gravity="center"
-            android:minWidth="32dp"
-            android:singleLine="true"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            android:textSize="26sp" />
+            android:alpha="0.9">
 
+            <ImageView
+                android:id="@+id/acd_icon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="start|center_vertical"
+                android:layout_margin="5dp"
+                android:contentDescription="@string/fav_icon"
+                android:minWidth="32dp"
+                android:src="@android:color/transparent"
+                android:visibility="gone" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/acd_flag"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:ellipsize="none"
+                android:gravity="center"
+                android:singleLine="true"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                android:textSize="26sp" />
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/acd_top_layout_ll"
@@ -38,7 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toStartOf="@id/acd_count"
-            android:layout_toEndOf="@id/acd_flag"
+            android:layout_toEndOf="@id/acd_icon_container"
             android:baselineAligned="false"
             android:gravity="center"
             android:orientation="vertical">

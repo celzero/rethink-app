@@ -16,7 +16,7 @@
 @file:Suppress("DEPRECATION")
 package com.celzero.bravedns.service
 
-import Logger
+import com.celzero.bravedns.util.Logger
 import android.content.Context
 import android.security.keystore.KeyPermanentlyInvalidatedException
 import android.security.keystore.UserNotAuthenticatedException
@@ -25,19 +25,14 @@ import androidx.security.crypto.MasterKey
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
-import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
-import com.celzero.bravedns.wireguard.Config
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileNotFoundException
-import java.io.InputStream
-import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.security.GeneralSecurityException
 import javax.crypto.AEADBadTagException
+import androidx.core.content.edit
 
 /**
  * Critical encryption exceptions that indicate unrecoverable keystore failures.
@@ -76,6 +71,16 @@ sealed class EncryptionException(message: String, cause: Throwable? = null) : Ex
 object EncryptedFileManager : KoinComponent {
     private const val LOG_TAG = "EncryptedFileManager"
 
+    // Constants for clearing Tink keyset stored in SharedPreferences.
+    // These match the package-private constants in androidx.security.crypto.EncryptedFile
+    // (KEYSET_PREF_NAME and KEYSET_ALIAS) used via AndroidKeysetManager.
+    private const val TINK_KEYSET_PREF_NAME = "__androidx_security_crypto_encrypted_file_pref__"
+    private const val TINK_KEYSET_KEY = "__androidx_security_crypto_encrypted_file_keyset__"
+
+    // Suffix used for the temp-file fallback when a target cannot be deleted in place
+    // (see [write] / [writeViaTempFile]).
+    private const val TEMP_FILE_SUFFIX = ".write.tmp"
+
     // Inject EventLogger for critical failure logging
     private val eventLogger by inject<EventLogger>()
 
@@ -104,7 +109,18 @@ object EncryptedFileManager : KoinComponent {
                 EncryptionException.KeystoreError(e)
             }
             is java.io.IOException -> {
-                EncryptionException.IOError(e)
+                // Tink wraps streaming-AEAD decryption failures (ciphertext encrypted
+                // with a key that is no longer in the keyset, e.g. after a keyset reset
+                // caused by a dev/reinstall that wiped SharedPreferences) in plain
+                // java.io.IOException with messages like: "No matching key found for the
+                // ciphertext in the stream." That is a decryption/key-mismatch failure, NOT
+                // a disk I/O failure, so classify it as DecryptionFailed so callers can treat the
+                // file as a key mismatch file and recover from authoritative sources.
+                if (isTinkDecryptionFailure(e)) {
+                    EncryptionException.DecryptionFailed(e)
+                } else {
+                    EncryptionException.IOError(e)
+                }
             }
             else -> {
                 // Unknown exception - wrap as keystore error
@@ -112,82 +128,65 @@ object EncryptedFileManager : KoinComponent {
             }
         }
 
-        // Log critical failures to event system
-        val message = "$operation failed for file: $file"
+        // a DecryptionFailed (key mismatch / corrupt ciphertext after a signing-key change,
+        // keyset reset, or the cross-file cascade) or a generic I/O error is RECOVERABLE
+        //
+        // callers delete the stale file and re-derive from authoritative sources (DB / Play
+        // billing / server).
+        val isRecoverable = cryptoException is EncryptionException.DecryptionFailed
+                || cryptoException is EncryptionException.IOError
+
+        val verb = if (isRecoverable) "unreadable (recoverable, will regenerate)" else "failed"
+        val message = "$operation $verb for file: $file"
         val details = "${cryptoException::class.simpleName}: ${cryptoException.message}\nCause: ${e::class.simpleName}: ${e.message}"
 
-        eventLogger.log(
-            type = EventType.PROXY_ERROR,
-            severity = Severity.CRITICAL,
-            message = message,
-            source = EventSource.SYSTEM,
-            userAction = false,
-            details = details
-        )
-
-        Logger.e(LOG_TAG, "$message - ${cryptoException.message}", e)
+        if (isRecoverable) {
+            // Expected during app install/update cycles; log at LOW for traceability,
+            // not as an error.
+            eventLogger.log(
+                type = EventType.PROXY_ERROR,
+                severity = Severity.LOW,
+                message = message,
+                source = EventSource.SYSTEM,
+                userAction = false,
+                details = details
+            )
+            Logger.w(LOG_TAG, "$message: ${cryptoException.message}")
+        } else {
+            eventLogger.log(
+                type = EventType.PROXY_ERROR,
+                severity = Severity.CRITICAL,
+                message = message,
+                source = EventSource.SYSTEM,
+                userAction = false,
+                details = details
+            )
+            Logger.e(LOG_TAG, "$message: ${cryptoException.message}")
+        }
         return cryptoException
     }
 
     /**
-     * Reads and parses a WireGuard config from encrypted storage.
+     * Clears the corrupted Tink keyset from SharedPreferences so that subsequent
+     * [write] operations can succeed with a freshly generated keyset.
      *
-     * @throws EncryptionException.KeyInvalidated if encryption key was invalidated
-     * @throws EncryptionException.DecryptionFailed if decryption fails
-     * @throws EncryptionException.KeystoreError for other crypto failures
-     * @throws EncryptionException.IOError for file I/O failures
-     * @return Parsed WireGuard config or null if parsing fails (not encryption failure)
+     * After clearing, all existing encrypted files become permanently unreadable
+     * because they were encrypted with the old (now-discarded) keyset. Callers must
+     * regenerate their data from authoritative sources (backend, Play billing, etc.).
      */
-    @Throws(EncryptionException::class)
-    fun readWireguardConfig(ctx: Context, fileToRead: String): Config? {
-        var inputStream: InputStream? = null
-        var ist: ByteArrayInputStream? = null
-        var bos: ByteArrayOutputStream? = null
+    private fun destroyCorruptedKeyset(ctx: Context) {
         try {
-            val dir = File(fileToRead)
-            val masterKey =
-                MasterKey.Builder(ctx.applicationContext)
-                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                    .build()
-            val encryptedFile =
-                EncryptedFile.Builder(
-                        ctx.applicationContext,
-                        dir,
-                        masterKey,
-                        EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
-                    )
-                    .build()
-
-            Logger.d(LOG_TAG, "Reading encrypted WireGuard config: ${dir.absolutePath}")
-            inputStream = encryptedFile.openFileInput()
-            bos = ByteArrayOutputStream()
-            var nextByte: Int = inputStream.read()
-            while (nextByte != -1) {
-                bos.write(nextByte)
-                nextByte = inputStream.read()
+            val prefs = ctx.applicationContext.getSharedPreferences(
+                TINK_KEYSET_PREF_NAME,
+                Context.MODE_PRIVATE
+            )
+            if (prefs.contains(TINK_KEYSET_KEY)) {
+                prefs.edit { remove(TINK_KEYSET_KEY) }
+                Logger.w(LOG_TAG, "Cleared corrupted Tink keyset from SharedPreferences; " +
+                        "future writes will create a fresh keyset, existing encrypted files are unrecoverable")
             }
-
-            val plaintext: ByteArray = bos.toByteArray()
-            ist = ByteArrayInputStream(plaintext)
-
-            // Config parsing failure is not an encryption error
-            return Config.parse(ist)
         } catch (e: Exception) {
-            if (isKeysetCorruption(e)) {
-                Logger.w(LOG_TAG, "Keyset corruption detected reading WireGuard config: $fileToRead, " +
-                        "clearing corrupted state for future writes", e)
-                resetEncryptedFileState(ctx, File(fileToRead))
-            }
-            throw handleCriticalException(e, "Read WireGuard config", fileToRead)
-        } finally {
-            try {
-                inputStream?.close()
-                ist?.close()
-                bos?.flush()
-                bos?.close()
-            } catch (_: Exception) {
-                // Ignore cleanup errors
-            }
+            Logger.e(LOG_TAG, "Failed to clear corrupted Tink keyset", e)
         }
     }
 
@@ -199,7 +198,7 @@ object EncryptedFileManager : KoinComponent {
     @Throws(EncryptionException::class)
     fun read(ctx: Context, file: File): String {
         val bytes = readByteArray(ctx, file)
-        return bytes.toString(Charset.defaultCharset())
+        return bytes.toString(StandardCharsets.UTF_8)
     }
 
     /**
@@ -236,40 +235,13 @@ object EncryptedFileManager : KoinComponent {
                 it.readBytes()
             }
         } catch (e: Exception) {
-            // If keyset is corrupted, clear the corrupted state so writes can recover.
-            // The data itself is permanently lost, callers must regenerate it.
             if (isKeysetCorruption(e)) {
                 Logger.w(LOG_TAG, "Keyset corruption detected during read of ${file.absolutePath}, " +
                         "clearing corrupted state for future writes", e)
-                resetEncryptedFileState(ctx, file)
+                destroyCorruptedKeyset(ctx)
             }
             throw handleCriticalException(e, "Read file", file.absolutePath)
         }
-    }
-
-    /**
-     * Writes WireGuard config to encrypted file.
-     *
-     * @throws EncryptionException for any encryption failures
-     */
-    @Throws(EncryptionException::class)
-    fun writeWireguardConfig(ctx: Context, cfg: String, fileName: String) {
-        val dir =
-            File(
-                ctx.filesDir.canonicalPath +
-                    File.separator +
-                    WIREGUARD_FOLDER_NAME +
-                    File.separator
-            )
-        if (!dir.exists()) {
-            dir.mkdirs()
-        }
-        val fileToWrite = File(dir, fileName)
-        if (!fileToWrite.exists()) {
-            fileToWrite.createNewFile()
-        }
-        val bytes = cfg.toByteArray(StandardCharsets.UTF_8)
-        write(ctx, bytes, fileToWrite)
     }
 
     /**
@@ -291,9 +263,6 @@ object EncryptedFileManager : KoinComponent {
             dir.mkdirs()
         }
         val fileToWrite = File(dir, fileName)
-        if (!fileToWrite.exists()) {
-            fileToWrite.createNewFile()
-        }
         write(ctx, cfg, fileToWrite)
     }
 
@@ -311,16 +280,12 @@ object EncryptedFileManager : KoinComponent {
     /**
      * Writes ByteArray data to encrypted file.
      *
-     * If the Tink keyset stored in SharedPreferences is corrupted (e.g. after an OS
-     * update, factory reset without data wipe, or Keystore invalidation), the
-     * [EncryptedFile.Builder.build] call will throw [AEADBadTagException].  When this
-     * happens, this method automatically:
-     *   1. Clears the corrupted keyset from SharedPreferences.
-     *   2. Deletes the encrypted file on disk (it cannot be decrypted anyway).
-     *   3. Retries the write with a freshly-created keyset.
-     *
-     * The old encrypted data is permanently lost, but the alternative is a permanent
-     * brick where *all* encrypted-file operations fail until the user clears app data.
+     * androidx.security.crypto.EncryptedFile is *write-once*: [EncryptedFile.openFileOutput]
+     * throws "output file already exists" if the target is already present. So any existing
+     * file is deleted first (verified), and if that delete cannot take effect - e.g. an old
+     * file lingering after a restore on external/FUSE storage - the write falls back to a
+     * fresh temp file that is then atomically renamed over the target, guaranteeing the old
+     * contents are replaced with the new ones.
      *
      * @throws EncryptionException.KeyInvalidated if encryption key was invalidated
      * @throws EncryptionException.AuthRequired if authentication is required
@@ -329,31 +294,121 @@ object EncryptedFileManager : KoinComponent {
      */
     @Throws(EncryptionException::class)
     fun write(ctx: Context, data: ByteArray, file: File): Boolean {
-        try {
-            Logger.d(LOG_TAG, "write into $file")
-            return writeInternal(ctx, data, file)
+        Logger.d(LOG_TAG, "write into ${file.absolutePath}")
+        return try {
+            // Delete any existing file first; EncryptedFile refuses to overwrite it.
+            deleteFile(file)
+            writeInternal(ctx, data, file)
         } catch (e: Exception) {
-            // Check if this is a recoverable keyset-corruption error.
-            // AEADBadTagException happens inside EncryptedFile.Builder.build() when
-            // the Tink keyset in SharedPreferences can't be decrypted by the current
-            // Android Keystore key, the keyset is permanently unreadable.
+            // The prior delete did not take effect (silent File.delete() failure on
+            // external/FUSE storage). Replace the target via temp-file + atomic rename.
+            if (isOutputFileAlreadyExists(e)) {
+                Logger.w(LOG_TAG, "Target still exists after delete for ${file.absolutePath}; " +
+                        "using temp-file rename fallback to replace it", e)
+                return writeViaTempFile(ctx, data, file)
+            }
+            // Recoverable keyset-corruption error. AEADBadTagException happens inside
+            // EncryptedFile.Builder.build(); reset the keyset and retry the write.
             if (isKeysetCorruption(e)) {
-                Logger.w(LOG_TAG, "Keyset corruption detected for ${file.absolutePath}, " +
-                        "clearing corrupted state and retrying write", e)
-                try {
-                    resetEncryptedFileState(ctx, file)
-                    return writeInternal(ctx, data, file)
-                } catch (retryEx: Exception) {
-                    Logger.e(LOG_TAG, "Retry after keyset reset also failed for ${file.absolutePath}", retryEx)
-                    throw handleCriticalException(retryEx, "Write file (retry)", file.absolutePath)
-                }
+                return resetKeysetAndWrite(ctx, data, file)
             }
             throw handleCriticalException(e, "Write file", file.absolutePath)
         }
     }
 
     /**
-     * Core write logic: creates MasterKey + EncryptedFile, deletes old file, writes data.
+     * Best-effort, *verified* deletion of [file]. [File.delete] only returns a boolean and
+     * never throws, so the result must be checked; directories need [File.deleteRecursively].
+     * Returns true when the file is gone afterwards.
+     */
+    private fun deleteFile(file: File): Boolean {
+        if (!file.exists()) return true
+        if (file.delete()) return true
+        if (file.isDirectory && file.deleteRecursively()) return true
+        // One more attempt - the first failure is sometimes transient on FUSE storage.
+        if (file.delete()) return true
+        val gone = !file.exists()
+        if (!gone) {
+            Logger.w(LOG_TAG, "Unable to delete existing file: ${file.absolutePath}")
+        }
+        return gone
+    }
+
+    /**
+     * Writes [data] to a fresh temporary file, then atomically renames it over [file]. This
+     * replaces a pre-existing [file] that [EncryptedFile] refuses to overwrite and that
+     * [deleteFile] could not remove in place. The temp file is written by the same shared
+     * keyset, so the renamed file remains a valid encrypted file.
+     */
+    private fun writeViaTempFile(ctx: Context, data: ByteArray, file: File): Boolean {
+        val parent = file.parentFile
+        if (parent == null || (!parent.exists() && !parent.mkdirs())) {
+            throw EncryptionException.IOError(
+                java.io.IOException("Cannot access parent dir for temp write: ${file.parent}")
+            )
+        }
+        val temp = File(parent, file.name + TEMP_FILE_SUFFIX)
+        // Clear any stale temp file left by a previously crashed attempt.
+        deleteFile(temp)
+        try {
+            writeInternal(ctx, data, temp)
+        } catch (e: Exception) {
+            deleteFile(temp)
+            // Keyset reset is handled by the caller; surface any other failure here.
+            throw handleCriticalException(e, "Write file (temp fallback)", file.absolutePath)
+        }
+
+        // Replace the existing target with the freshly written temp file.
+        deleteFile(file)
+        if (temp.renameTo(file)) return true
+        Logger.w(LOG_TAG, "First rename failed for ${file.absolutePath}; retrying after delete")
+        deleteFile(file)
+        if (temp.renameTo(file)) return true
+
+        // Could not replace the target; clean up the temp file and surface the failure.
+        deleteFile(temp)
+        throw EncryptionException.IOError(
+            java.io.IOException("Failed to replace file via temp rename: ${file.absolutePath}")
+        )
+    }
+
+    /**
+     * Clears a corrupted Tink keyset and retries the write to [file] with the fresh keyset.
+     */
+    private fun resetKeysetAndWrite(ctx: Context, data: ByteArray, file: File): Boolean {
+        Logger.w(LOG_TAG, "Keyset corruption detected for ${file.absolutePath}, " +
+                "clearing corrupted state and retrying write")
+        destroyCorruptedKeyset(ctx)
+        return try {
+            deleteFile(file)
+            writeInternal(ctx, data, file)
+        } catch (retryEx: Exception) {
+            Logger.e(LOG_TAG, "Retry after keyset reset also failed for ${file.absolutePath}", retryEx)
+            throw handleCriticalException(retryEx, "Write file (retry)", file.absolutePath)
+        }
+    }
+
+    /**
+     * Detects the "output file already exists" error thrown by [EncryptedFile.openFileOutput]
+     * when a target could not be removed prior to writing. Walks the cause chain since the
+     * library may wrap the exception.
+     */
+    private fun isOutputFileAlreadyExists(e: Throwable?): Boolean {
+        var current: Throwable? = e
+        while (current != null) {
+            if (current is java.io.IOException) {
+                val msg = current.message
+                if (msg != null && msg.contains("already exists")) {
+                    return true
+                }
+            }
+            current = current.cause
+        }
+        return false
+    }
+
+    /**
+     * Core write logic: creates MasterKey + EncryptedFile, writes data.
      */
     private fun writeInternal(ctx: Context, data: ByteArray, file: File): Boolean {
         val masterKey =
@@ -368,11 +423,6 @@ object EncryptedFileManager : KoinComponent {
                     EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
                 )
                 .build()
-
-        if (file.exists()) {
-            val isDeleted = file.delete()
-            Logger.vv(LOG_TAG, "Deleted existing file before write: ${file.absolutePath}, success?$isDeleted")
-        }
 
         encryptedFile.openFileOutput().apply {
             write(data)
@@ -409,52 +459,31 @@ object EncryptedFileManager : KoinComponent {
     }
 
     /**
-     * Clears the corrupted Tink keyset and the on-disk encrypted file so that the
-     * next [writeInternal] call starts fresh.
+     * Detects a Tink streaming-AEAD decryption failure that is reported as a plain
+     * [java.io.IOException] (Tink's [InputStreamDecrypter] throws IOException when no key
+     * in the keyset can decrypt the ciphertext stream). The canonical message is:
+     *   "No matching key found for the ciphertext in the stream."
      *
-     * EncryptedFile stores its Tink keyset in SharedPreferences named
-     * `__androidx_security_crypto_encrypted_file_pref__`.  Each file gets a keyset
-     * entry keyed by the file's canonical path.  We clear the entire SharedPreferences
-     * rather than guessing the exact key, because:
-     *   - If one keyset entry is corrupted, others encrypted with the same MasterKey
-     *     are likely corrupted too.
-     *   - A partial clear could leave orphaned keysets that are also unreadable.
-     *
-     * **Data loss**: all currently-encrypted files become unreadable after this reset.
-     * Callers (PipKeyManager, WireguardManager) must be prepared to regenerate their
-     * data from authoritative sources (backend, Play billing, etc.).
+     * This signals that the ciphertext was produced by a *different* (now-discarded)
+     * keyset than the one currently in SharedPreferences - a key-mismatch, not a disk
+     * error. Distinct from [isKeysetCorruption]: there the keyset itself is unreadable;
+     * here the keyset is fine but the ciphertext is not.
      */
-    private fun resetEncryptedFileState(ctx: Context, file: File) {
-        // 1. Clear the Tink keyset SharedPreferences
-        val keysetPrefsName = "__androidx_security_crypto_encrypted_file_pref__"
-        try {
-            val prefs = ctx.applicationContext.getSharedPreferences(keysetPrefsName, Context.MODE_PRIVATE)
-            val cleared = prefs.edit().clear().commit()
-            Logger.w(LOG_TAG, "Cleared keyset SharedPreferences ($keysetPrefsName): success=$cleared")
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG, "Failed to clear keyset SharedPreferences: ${e.message}", e)
-        }
-
-        // 2. Delete the corrupted encrypted file on disk
-        try {
-            if (file.exists()) {
-                val deleted = file.delete()
-                Logger.w(LOG_TAG, "Deleted corrupted file ${file.absolutePath}: success=$deleted")
+    private fun isTinkDecryptionFailure(e: Throwable?): Boolean {
+        var current: Throwable? = e
+        while (current != null) {
+            if (current is java.io.IOException) {
+                val msg = current.message
+                // Match Tink's InputStreamDecrypter / StreamingAeadThroughIOConnection
+                // signatures without being brittle to minor wording changes.
+                if (msg != null && (msg.contains("No matching key")
+                            || msg.contains("ciphertext in the stream")
+                            || msg.contains("decryption failed"))) {
+                    return true
+                }
             }
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG, "Failed to delete corrupted file ${file.absolutePath}: ${e.message}", e)
+            current = current.cause
         }
-
-        // Log the recovery event
-        eventLogger.log(
-            type = EventType.PROXY_ERROR,
-            severity = Severity.CRITICAL,
-            message = "Keyset corruption auto-recovered for ${file.name}",
-            source = EventSource.SYSTEM,
-            userAction = false,
-            details = "Cleared corrupted Tink keyset and deleted encrypted file. " +
-                    "Data will be regenerated from authoritative sources. " +
-                    "File: ${file.absolutePath}"
-        )
+        return false
     }
 }

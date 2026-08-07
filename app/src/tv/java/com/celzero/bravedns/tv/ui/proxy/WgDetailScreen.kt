@@ -86,10 +86,8 @@ fun WgDetailScreen(configId: Int) {
     var reloadKey by remember { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
-        if (!WireguardManager.isLoaded()) {
-            withContext(Dispatchers.IO) { WireguardManager.load(false) }
-            reloadKey++
-        }
+        withContext(Dispatchers.IO) { WireguardManager.load(false) }
+        reloadKey++
     }
 
     val mapping by produceState<WgConfigFilesImmutable?>(initialValue = null, configId, reloadKey) {

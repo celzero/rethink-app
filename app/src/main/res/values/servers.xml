@@ -3,13 +3,13 @@
     <!-- Each DOH server is defined by a URL (which is the actual DOH endpoint).  However, Google DNS
      was previously configured by domain, in early versions of Intra.-->
     <string name="url0" translatable="false">https://basic.rethinkdns.com/</string>
-    <string name="ips0" translatable="false">172.67.162.27,104.21.10.13</string>
+    <string name="ips0" translatable="false">172.67.70.254,104.26.14.30,104.26.15.30,2606:4700:20::681a:e1e,2606:4700:20::ac43:46fe,2606:4700:20::681a:f1e</string>
     <string name="url1" translatable="false">https://sky.rethinkdns.com/</string>
-    <string name="ips1" translatable="false">172.67.214.246,104.21.83.62,2606:4700:3030::ac43:d6f6,2606:4700:3030::6815:533e</string>
+    <string name="ips1" translatable="false">172.67.70.254,104.26.14.30,104.26.15.30,2606:4700:20::ac43:46fe,2606:4700:20::681a:f1e,2606:4700:20::681a:e1e</string>
     <string name="url2" translatable="false">https://max.rethinkdns.com/</string>
     <string name="ips2" translatable="false">137.66.7.89,2a09:8280:1::1:7432</string>
     <string name="url3" translatable="false">https://zero.rethinkdns.com/</string>
-    <string name="ips3" translatable="false">104.21.83.62,172.67.214.246,2606:4700:3030::6815:533e,2606:4700:3030::ac43:d6f6</string>
+    <string name="ips3" translatable="false">104.21.83.62,104.26.15.30,172.67.70.254,2606:4700:20::ac43:46fe,2606:4700:20::681a:f1e,2606:4700:20::681a:e1e</string>
     <string name="url4" translatable="false">https://dns.google/dns-query</string>
     <string name="ips4" translatable="false">8.8.8.8,8.8.4.4,2001:4860:4860::8888,2001:4860:4860::8844</string>
     <string name="url5" translatable="false">https://cloudflare-dns.com/dns-query</string>

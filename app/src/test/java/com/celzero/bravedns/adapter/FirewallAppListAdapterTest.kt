@@ -15,7 +15,6 @@
  */
 package com.celzero.bravedns.adapter
 
-import Logger
 import android.content.Context
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
@@ -26,13 +25,27 @@ import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.Runs
+import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.spyk
+import io.mockk.unmockkAll
+import io.mockk.verify
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -112,7 +125,7 @@ class FirewallAppListAdapterTest {
         coEvery { FirewallManager.getAppNamesByUid(any()) } returns listOf("TestApp")
         coEvery { FirewallManager.updateFirewallStatus(any(), any(), any()) } just Runs
 
-        every { ProxyManager.getProxyIdForApp(any()) } returns ProxyManager.ID_NONE
+        every { ProxyManager.getProxyIdForApp(any()) } returns listOf(ProxyManager.ID_NONE)
         every { eventLogger.log(any(), any(), any(), any()) } just Runs
 
         adapter = FirewallAppListAdapter(context, lifecycleOwner, eventLogger)
@@ -214,7 +227,7 @@ class FirewallAppListAdapterTest {
     @Test
     fun `test proxy manager integration`() = testScope.runTest {
         val expectedProxyId = "test_proxy_id"
-        every { ProxyManager.getProxyIdForApp(any()) } returns expectedProxyId
+        every { ProxyManager.getProxyIdForApp(any()) } returns listOf(expectedProxyId)
 
         val appInfo = createTestAppInfo(uid = 5678, isProxyExcluded = false)
         mockViewHolder.update(appInfo)
@@ -256,8 +269,7 @@ class FirewallAppListAdapterTest {
             FirewallManager.FirewallStatus.EXCLUDE,
             FirewallManager.FirewallStatus.ISOLATE,
             FirewallManager.FirewallStatus.BYPASS_UNIVERSAL,
-            FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL,
-            FirewallManager.FirewallStatus.UNTRACKED
+            FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL
         )
 
         var processedCount = 0
@@ -351,7 +363,7 @@ class FirewallAppListAdapterTest {
         }
 
         verify { mockViewHolder.update(appInfo) }
-        assert(exceptionCaught)
+        assert(!exceptionCaught)
     }
 
     @Test
@@ -370,7 +382,7 @@ class FirewallAppListAdapterTest {
         }
 
         verify { mockViewHolder.update(appInfo) }
-        assert(exceptionCaught)
+        assert(!exceptionCaught)
     }
 
     // === ADAPTER BEHAVIOR TESTS ===

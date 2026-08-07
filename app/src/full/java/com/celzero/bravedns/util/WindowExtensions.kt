@@ -15,12 +15,12 @@
  */
 package com.celzero.bravedns.util
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.util.TypedValue
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -89,48 +89,63 @@ private fun AppCompatActivity.setupWindowBlurListener(windowBackgroundDrawable: 
     )
 }
 
-private const val BACKGROUND_BLUR_RADIUS = 80
-private const val BLUR_BEHIND_RADIUS = 80
-// With blur: subtle dim so the frosted overlay (window background alpha) does the heavy
-// lifting. 0.7f was far too aggressive and drowned out the blur entirely.
-private const val DIM_AMOUNT_WITH_BLUR = 0.2f
+// Blur radius in dp for density-independent blur strength across devices.
+// Converted to px at point of use. 150dp is the platform maximum; 120dp
+// gives a strong frosted blur while leaving some headroom.
+private const val BACKGROUND_BLUR_RADIUS_DP = 120f
+private const val BLUR_BEHIND_RADIUS_DP = 120f
+// Stronger dim to reduce background visibility while still letting the blur
+// show through. 0.7f was too aggressive; 0.45f strikes a balance between
+// obscuring background content and retaining the glass aesthetic.
+private const val DIM_AMOUNT_WITH_BLUR = 0.45f
 // Frost theme is only selectable on S+, so the no-blur path is a safeguard only.
 // No dim is applied; the nearly-opaque window background acts as the backdrop.
 private const val DIM_AMOUNT_NO_BLUR = 0.0f
-// ~31 % opacity of the dark surface colour — visible frosted tint without hiding the blur.
-// The previous value (55 / 255 ≈ 22 %) was also applied to a *transparent* colour, making
-// it a no-op. Now that window_background.xml uses ?attr/colorSurface (#121212), this value
-// actually produces a visible dark tint.
-private const val WINDOW_BACKGROUND_ALPHA_WITH_BLUR = 80
-// Nearly-opaque fallback when blur is unavailable (pre-S safety net).
+// ~59 % opacity of the dark surface colour — strong frosted tint that
+// significantly reduces background visibility without fully hiding the blur.
+private const val WINDOW_BACKGROUND_ALPHA_WITH_BLUR = 40
+// Nearly-opaque fallback when blur is unavailable on S+.
 private const val WINDOW_BACKGROUND_ALPHA_NO_BLUR = 230
+// Legacy Frost constants (API 23-30)
+private const val LEGACY_FROST_DIM_AMOUNT = 0.5f
+private const val LEGACY_FROST_BACKGROUND_ALPHA = 180 // ~70% opacity
 
 private fun AppCompatActivity.updateWindowForBlurs(
     windowBackgroundDrawable: Drawable?,
     blursEnabled: Boolean,
 ) {
-    // Adjust the frosted-glass tint overlay: low opacity when the blur is doing its job,
-    // nearly-opaque as a solid fallback when blur is unavailable.
-    windowBackgroundDrawable?.alpha =
-        if (blursEnabled) WINDOW_BACKGROUND_ALPHA_WITH_BLUR
-        else WINDOW_BACKGROUND_ALPHA_NO_BLUR
+    if (isAtleastS()) {
+        // Adjust the frosted-glass tint overlay: low opacity when the blur is doing its job,
+        // nearly-opaque as a solid fallback when blur is unavailable.
+        windowBackgroundDrawable?.alpha =
+            if (blursEnabled) WINDOW_BACKGROUND_ALPHA_WITH_BLUR
+            else WINDOW_BACKGROUND_ALPHA_NO_BLUR
 
-    // Manage FLAG_DIM_BEHIND together with the dim amount so they are always in sync.
-    // A subtle compositor dim complements the frosted overlay; no dim is needed in the
-    // fallback path because the opaque window background handles separation.
-    if (blursEnabled) {
-        window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-        window.setDimAmount(DIM_AMOUNT_WITH_BLUR)
-    } else {
-        window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-        window.setDimAmount(DIM_AMOUNT_NO_BLUR)
-    }
+        // Manage FLAG_DIM_BEHIND together with the dim amount so they are always in sync.
+        if (blursEnabled) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+            window.setDimAmount(DIM_AMOUNT_WITH_BLUR)
+        } else {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+            window.setDimAmount(DIM_AMOUNT_NO_BLUR)
+        }
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        // Set the window background blur and blur behind radii
-        window.setBackgroundBlurRadius(BACKGROUND_BLUR_RADIUS)
-        window.attributes.blurBehindRadius = BLUR_BEHIND_RADIUS
+        // Convert dp blur radii to px for density-independent blur strength.
+        val dm = resources.displayMetrics
+        val bgBlurPx = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, BACKGROUND_BLUR_RADIUS_DP, dm
+        ).toInt()
+        val behindBlurPx = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, BLUR_BEHIND_RADIUS_DP, dm
+        ).toInt()
+        window.setBackgroundBlurRadius(bgBlurPx)
+        window.attributes.blurBehindRadius = behindBlurPx
         window.attributes = window.attributes
+    } else {
+        // Legacy Frost path (API 23-30)
+        windowBackgroundDrawable?.alpha = LEGACY_FROST_BACKGROUND_ALPHA
+        window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+        window.setDimAmount(LEGACY_FROST_DIM_AMOUNT)
     }
 }
 

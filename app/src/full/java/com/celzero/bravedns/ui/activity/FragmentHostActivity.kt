@@ -15,18 +15,18 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
-import com.celzero.bravedns.ui.BaseActivity
 import androidx.fragment.app.Fragment
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import org.koin.android.ext.android.inject

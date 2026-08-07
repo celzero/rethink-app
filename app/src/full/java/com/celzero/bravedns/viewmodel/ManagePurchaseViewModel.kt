@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.celzero.bravedns.iab.InAppBillingHandler
@@ -127,6 +127,12 @@ class ManagePurchaseViewModel : ViewModel() {
                 }
 
                 emit(OperationState.InProgress(isCancel, Step.UPDATING_LOCAL))
+
+                if (isCancel) {
+                    RpnProxyManager.handleUserCancellation()
+                } else {
+                    RpnProxyManager.handleSubscriptionRevoked()
+                }
 
                 emit(OperationState.InProgress(isCancel, Step.REFRESHING))
                 try {

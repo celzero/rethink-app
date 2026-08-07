@@ -15,40 +15,37 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.animation.ValueAnimator
 import android.content.ClipData
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.DrawableWrapper
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.core.graphics.withRotation
 import android.os.Bundle
-import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.LinearInterpolator
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.format.DateUtils
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
-import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.LinearInterpolator
 import android.widget.LinearLayout
 import android.widget.Toast
-import com.celzero.bravedns.ui.BaseActivity
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.graphics.withRotation
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.data.SsidItem
 import com.celzero.bravedns.database.CountryConfig
@@ -57,9 +54,10 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_RPN
 import com.celzero.bravedns.ui.activity.RpnConfigDetailActivity.Companion.STATS_POLL_MS
-import com.celzero.bravedns.ui.dialog.CountrySsidDialog
+import com.celzero.bravedns.ui.dialog.RpnSsidDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.SnackbarHelper
@@ -86,6 +84,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Locale
 import kotlin.math.abs
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Detail screen for a server-provided WireGuard / WIN proxy.
@@ -102,6 +101,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
     private var configKey: String = ""
     private var countryConfig: CountryConfig? = null
+    private var pubPub: String = ""
 
     /** Coroutine that polls VpnController every [STATS_POLL_MS] ms. */
     private var statsJob: Job? = null
@@ -112,7 +112,14 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     private val ssidPermissionCallback = object : SsidPermissionManager.PermissionCallback {
         override fun onPermissionsGranted() {
             Logger.vv(LOG_TAG_UI, "ssid-callback permissions granted")
-            ui { refreshSsidSection() }
+            // Check if we need background location too
+            if (isAtleastQ() && !SsidPermissionManager.hasBackgroundLocationPermission(this@RpnConfigDetailActivity)) {
+                showLocationDisclosureDialog {
+                    SsidPermissionManager.requestBackgroundLocationPermission(this@RpnConfigDetailActivity)
+                }
+            } else {
+                ui { refreshSsidSection() }
+            }
         }
         override fun onPermissionsDenied() {
             Logger.vv(LOG_TAG_UI, "ssid-callback permissions denied")
@@ -120,7 +127,9 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         }
         override fun onPermissionsRationale() {
             Logger.vv(LOG_TAG_UI, "ssid-callback permissions rationale")
-            showSsidPermissionExplanationDialog()
+            showLocationDisclosureDialog {
+                SsidPermissionManager.requestSsidPermissions(this@RpnConfigDetailActivity)
+            }
         }
     }
 
@@ -130,6 +139,10 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
         /** Polling interval for live stats. */
         private const val STATS_POLL_MS = 2_000L
+
+        // Emoji accents used in the compact stats meta line (kept subtle via RelativeSizeSpan).
+        private const val HANDSHAKE_EMOJI = "🤝"
+        private const val RECONNECT_EMOJI = "🔃"
     }
 
     private fun Context.isDarkThemeOn(): Boolean =
@@ -144,7 +157,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
         if (isAtleastQ()) {
             WindowInsetsControllerCompat(window, window.decorView)
-                .isAppearanceLightNavigationBars = false
+                .isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
 
@@ -178,14 +191,32 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
     private fun init() {
         io {
-            val proxy = if (configKey.isBlank() || configKey.contains(AUTO_SERVER_ID, ignoreCase = true))
-                VpnController.getWinByKey("")
-            else
-                VpnController.getWinByKey(configKey)
+            val isAuto = configKey.isBlank() || configKey.contains(AUTO_SERVER_ID, ignoreCase = true)
+            var proxy = VpnController.getWinByKey(if (isAuto) "" else configKey)
+
+            // Recovery: if the proxy isn't present in the tunnel, attempt to register/fork
+            // it once. AUTO server → enable RPN via startProxy(); specific server → fork it
+            // via addNewWinServer() (idempotent if the server is already added).
+            if (proxy == null) {
+                val recovered = try {
+                    if (isAuto) {
+                        RpnProxyManager.startProxy()
+                        true
+                    } else {
+                        VpnController.addNewWinServer(configKey).first
+                    }
+                } catch (e: Exception) {
+                    Logger.w(LOG_TAG_UI, "rpn recovery attempt failed for key=$configKey: ${e.message}")
+                    false
+                }
+                if (recovered) {
+                    proxy = VpnController.getWinByKey(if (isAuto) "" else configKey)
+                }
+            }
 
             uiCtx {
-                if (configKey.isBlank() || proxy == null) {
-                    showInvalidConfigDialog()
+                if (proxy == null) {
+                    showRecoveryDialog()
                     return@uiCtx
                 }
                 populateHeroBanner()
@@ -243,11 +274,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         // Placeholder while we fetch from DB.
         b.configNameText.text = ""
         b.tvHeroCity.text = ""
-        b.tvHeroFlag.text = "\uD83C\uDF10" // globe
-        b.tvHeroWho.text = ""
-        b.tvHeroWho.visibility = View.GONE
+        b.tvHeroFlag.visibility = View.GONE
         b.chipHeroStats.visibility = View.GONE
-        b.rowHeroRxtx.visibility = View.GONE
 
         // Show inline shimmer for client IPs (stats table is already visible).
         showClientIpShimmer()
@@ -263,14 +291,21 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 setupSsidSection(configKey)
                 // Banner.
                 if (config != null) {
-                    b.tvHeroFlag.text = config.flagEmoji
+                    if (configKey.equals(AUTO_SERVER_ID, true)) {
+                        b.tvHeroFlag.visibility = View.GONE
+                        b.ivHeroFlag.visibility = View.VISIBLE
+                    } else {
+                        b.ivHeroFlag.visibility = View.GONE
+                        b.tvHeroFlag.visibility = View.VISIBLE
+                        b.tvHeroFlag.text = config.flagEmoji
+                    }
                     b.configNameText.text = config.countryName
                     val city = config.city.ifBlank { config.serverLocation }
                     b.tvHeroCity.text = city.ifBlank { config.cc }
                 } else {
-                    b.tvHeroFlag.text = "\uD83C\uDF10"
+                    b.tvHeroFlag.visibility = View.GONE
                     b.configNameText.text = configKey.ifBlank { getString(R.string.lbl_server_config) }
-                    b.tvHeroCity.text     = ""
+                    b.tvHeroCity.text = ""
                 }
                 // Update the collapsing toolbar title now that we have the real config name.
                 b.collapsingToolbar.title = b.configNameText.text
@@ -278,6 +313,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 startStatsPolling(configKey)
             }
 
+            showServerInfo(configKey)
             resolveClientIps(configKey)
         }
     }
@@ -288,7 +324,6 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
      */
     private suspend fun resolveClientIps(id: String) {
         var ip4Meta: IPMetadata? = null
-        var ip6Meta: IPMetadata? = null
         var sinceTs: Long
         try {
             val pid = if (id.contains(AUTO_SERVER_ID, ignoreCase = true)) {
@@ -305,12 +340,46 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             // GoVpnAdapter handles AUTO and empty-string ids centrally; pass id as-is.
             val client = VpnController.getRpnClientInfoById(id)
             ip4Meta = client?.iP4()
-            ip6Meta = client?.iP6()
-            Logger.v(LOG_TAG_UI, "client ips resolved for $id: ip4=${ip4Meta?.ip} ip6=${ip6Meta?.ip}, sinceTs=$sinceTs")
+            Logger.v(LOG_TAG_UI, "client ips resolved for $id: ip4=${ip4Meta?.ip}, sinceTs=$sinceTs")
         } catch (e: Exception) {
             Logger.w(LOG_TAG_UI, "failed to resolve client ips: ${e.message}")
         }
-        uiCtx { applyClientIps(ip4Meta, ip6Meta) }
+        uiCtx { applyClientIps(ip4Meta) }
+    }
+
+    private fun showServerInfo(key: String) {
+        io {
+            val addlInfo = VpnController.getRpnAddlInfo(key)
+            uiCtx {
+                // Server endpoint is shown as a single muted line in the hero banner.
+                // The IP (second part of addr) is intentionally discarded.
+                val endpoint = addlInfo?.let { serverEndpoint(it) }
+                if (addlInfo == null || endpoint.isNullOrBlank()) {
+                    b.valueAddlInfo.visibility = View.GONE
+                    b.tvHeroPub.visibility = View.GONE
+                    pubPub = ""
+                } else {
+                    pubPub = addlInfo.pubPub
+                    b.tvHeroPub.visibility = View.VISIBLE
+                    b.tvHeroPub.text = pubPub
+                    b.valueAddlInfo.visibility = View.VISIBLE
+                    b.valueAddlInfo.text = endpoint
+                    // update load if available
+                    buildLoadSpeedText(addlInfo.load, addlInfo.link)
+                    if (key.isEmpty() || key.equals(AUTO_SERVER_ID, true)) {
+                        b.tvHeroCity.text = addlInfo.city + ", " + addlInfo.cc
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns the single endpoint (hostname) portion of [info.addr], discarding the
+     * IP address. `addr` is formatted as "endpoint, ip"; only the first part is kept.
+     */
+    private fun serverEndpoint(info: RpnProxyManager.ActiveRpnAddlInfo): String {
+        return info.addr.split(",").firstOrNull()?.trim()?.takeIf { it.isNotEmpty() } ?: ""
     }
 
     /** Show inline shimmer placeholders for client IPv4/IPv6 value cells. */
@@ -318,17 +387,13 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         b.shimmerIpv4.visibility = View.VISIBLE
         b.shimmerIpv4.startShimmer()
         b.valueIpv4.visibility = View.GONE
-
-        b.shimmerIpv6.visibility = View.VISIBLE
-        b.shimmerIpv6.startShimmer()
-        b.valueIpv6.visibility = View.GONE
     }
 
     /**
      * Replaces the inline shimmer with rich IP + metadata text.
      * ASN / location / providerUrl are embedded inside
      */
-    private fun applyClientIps(ip4: IPMetadata?, ip6: IPMetadata?) {
+    private fun applyClientIps(ip4: IPMetadata?) {
         val na = getString(R.string.lbl_not_available_short)
 
         // IPv4
@@ -339,18 +404,6 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             ?.takeIf { it.ip?.isNotBlank() == true }
             ?.let { buildIpDetailSpan(it) }
             ?: na
-
-        // ipv6, hide the entire row if unavailable
-        b.shimmerIpv6.stopShimmer()
-        b.shimmerIpv6.visibility = View.GONE
-        val ip6Addr = ip6?.ip?.takeIf { it.isNotBlank() }
-        if (ip6 != null && ip6Addr != null) {
-            b.rowIpv6.visibility = View.VISIBLE
-            b.valueIpv6.visibility = View.VISIBLE
-            b.valueIpv6.text = buildIpDetailSpan(ip6)
-        } else {
-            b.rowIpv6.visibility = View.GONE
-        }
     }
 
     /**
@@ -370,7 +423,6 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         fun styleLabel(start: Int, end: Int) {
             sb.setSpan(ForegroundColorSpan(labelColor), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             sb.setSpan(RelativeSizeSpan(0.80f), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            sb.setSpan(StyleSpan(Typeface.BOLD), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
 
         fun appendLine(label: String, value: String) {
@@ -379,47 +431,39 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             val ls = sb.length
             sb.append(label)
             styleLabel(ls, sb.length)
-            sb.append("  $value")
+            val vs = sb.length
+            sb.append(value)
+            sb.setSpan(TypefaceSpan("monospace"), vs, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            sb.setSpan(RelativeSizeSpan(1.07f), vs, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
 
         // ip
         val ipStart = 0
         sb.append(meta.ip ?: "")
         val ipEnd = sb.length
-        sb.setSpan(StyleSpan(Typeface.BOLD),  ipStart, ipEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         sb.setSpan(TypefaceSpan("monospace"), ipStart, ipEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        sb.setSpan(RelativeSizeSpan(1.07f),   ipStart, ipEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        sb.setSpan(RelativeSizeSpan(1.07f), ipStart, ipEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
         // asn
         val asnParts = buildList {
             val asn = meta.asn ?: ""
             val org = meta.asnOrg ?: ""
             val dom = meta.asnDom ?: ""
-            if (asn.isNotBlank()) add("AS$asn")
+            if (asn.isNotBlank()) add(asn)
             if (org.isNotBlank()) add(org)
             if (dom.isNotBlank()) add(dom)
         }
-        if (asnParts.isNotEmpty()) appendLine("ASN", asnParts.joinToString("  ·  "))
+        if (asnParts.isNotEmpty()) appendLine("", asnParts.joinToString(" · "))
 
-        // loc
-        val locParts = buildList {
+        // loc, do not show client location for now as it is confusing
+        /* val locParts = buildList {
             val city = meta.city ?: ""
             val lat = meta.lat
             val lon = meta.lon
             if (city.isNotBlank()) add(city)
             if (lat != 0.0 || lon != 0.0) add(String.format(Locale.US, "%.4f°, %.4f°", lat, lon))
         }
-        if (locParts.isNotEmpty()) appendLine("LOC", locParts.joinToString("  ·  "))
-
-        // provider url
-        val providerUrl = meta.providerURL ?: ""
-        if (providerUrl.isNotBlank()) {
-            val display = providerUrl
-                .removePrefix("https://")
-                .removePrefix("http://")
-                .trimEnd('/')
-            appendLine("VIA", display)
-        }
+        if (asnParts.isNotEmpty()) appendLine("ASN", asnParts.joinToString(" · ")) */
 
         return sb
     }
@@ -444,7 +488,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 } catch (e: Exception) {
                     Logger.w(LOG_TAG_UI, "stats poll error: ${e.message}")
                 }
-                delay(STATS_POLL_MS)
+                delay(STATS_POLL_MS.milliseconds)
             }
         }
     }
@@ -459,15 +503,12 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         }
         val statusPair = VpnController.getProxyStatusById(pid)
         val stats = VpnController.getProxyStats(pid)
-        val who = VpnController.getWinIdentifier()
         val config = countryConfig
         // Use the time when this server key was selected by the user, not the VPN uptime.
-        val selectedSinceTs = RpnProxyManager.getSelectedSinceTs(id)
-
-        resolveClientIps(id)
+        val selectedSinceTs = stats?.since ?: 0L
 
         uiCtx {
-            applyStats(statusPair, stats, config, who, selectedSinceTs)
+            applyStats(statusPair, stats, config, selectedSinceTs)
         }
     }
 
@@ -479,38 +520,56 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
      *   (supplied by [RpnProxyManager.getSelectedSinceTs]); shown as the "active since" value.
      */
     private fun applyStats(
-        statusPair: Pair<Long?, String>,
+        statusPair: Pair<Int?, String>,
         stats: RouterStats?,
         config: CountryConfig?,
-        who: String?,
         selectedSinceTs: Long
     ) {
         val ps = UIUtils.ProxyStatus.entries.find { it.id == statusPair.first }
-        val statusText = buildStatusText(ps, stats, statusPair.second)
-        val statusColor = buildStatusColor(ps, stats)
-        b.valueStatus.text = statusText
-        b.valueStatus.setTextColor(fetchColor(this, statusColor))
+        val statusColor = fetchColor(this, buildStatusColor(ps))
 
-        if (who.isNullOrEmpty()) {
-            b.tvHeroWho.visibility = View.GONE
-        } else {
-            b.tvHeroWho.visibility = View.VISIBLE
-            b.tvHeroWho.text = who
-        }
+        b.valueStatus.text = getString(R.string.lbl_active)
 
         val rx = stats?.rx ?: 0L
         val tx = stats?.tx ?: 0L
+        b.valueRx.visibility = View.VISIBLE
+        b.valueTx.visibility = View.VISIBLE
         b.valueRx.text = getString(R.string.symbol_download, Utilities.humanReadableByteCount(rx, true))
         b.valueTx.text = getString(R.string.symbol_upload, Utilities.humanReadableByteCount(tx, true))
-        b.rowHeroRxtx.visibility = View.VISIBLE
 
+        // e.g. "Connected · 🤝 1m · 🔃 12m"
+        val statusText = buildStatusText(ps, statusPair.second)
         val lastOK = stats?.lastOK ?: 0L
-        b.valueLastOk.text = if (lastOK > 0L)
+        val lastOpen = stats?.lastOpen ?: 0L
+        val okTxt = if (lastOK > 0L)
             DateUtils.getRelativeTimeSpanString(
                 lastOK, System.currentTimeMillis(),
                 DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE
             )
         else getString(R.string.lbl_never)
+        val openTxt = if (lastOpen > 0L)
+            DateUtils.getRelativeTimeSpanString(
+                lastOpen, System.currentTimeMillis(),
+                DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE
+            )
+        else getString(R.string.lbl_never)
+        val meta = SpannableStringBuilder(
+            getString(R.string.rpn_meta_last_times, statusText, okTxt, openTxt)
+        )
+        // The status word is always the prefix of the formatted string.
+        if (statusText.isNotEmpty()) {
+            meta.setSpan(
+                ForegroundColorSpan(statusColor),
+                0, statusText.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+        // Render the two emojis noticeably smaller than the surrounding timestamp text
+        // so they stay subtle. Color emoji glyphs ignore ForegroundColorSpan, so size is
+        // the reliable lever here.
+        shrinkEmoji(meta, HANDSHAKE_EMOJI, 0.70f)
+        shrinkEmoji(meta, RECONNECT_EMOJI, 0.70f)
+        b.valueLastOk.text = meta
 
         // Show when the user selected this server, not the VPN tunnel's uptime.
         b.valueSince.text = if (selectedSinceTs > 0L)
@@ -520,9 +579,11 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             )
         else getString(R.string.lbl_never)
 
-        val loadPct = config?.load ?: 0
-        val linkMbps = config?.link ?: 0
-        buildLoadSpeedText(loadPct, linkMbps)
+        if (!config?.id.equals(AUTO_SERVER_ID, true)) {
+            val loadPct = config?.load ?: 0
+            val linkMbps = config?.link ?: 0
+            buildLoadSpeedText(loadPct, linkMbps)
+        }
 
         // only shown when proxy is in a failing state.
         val isFailing = isFailing(ps)
@@ -539,7 +600,6 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
     private fun buildStatusText(
         status  : UIUtils.ProxyStatus?,
-        stats   : RouterStats?,
         errMsg  : String?
     ): String {
         if (status == null) {
@@ -560,7 +620,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         return base
     }
 
-    private fun buildStatusColor(status: UIUtils.ProxyStatus?, stats: RouterStats?): Int {
+    private fun buildStatusColor(status: UIUtils.ProxyStatus?): Int {
         return when {
             status == null -> R.attr.primaryLightColorText
             isFailing(status) -> R.attr.chipTextNegative
@@ -592,6 +652,25 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     }
 
     /**
+     * Applies a [RelativeSizeSpan] of [proportion] to every occurrence of [emoji] in [sb].
+     * Used to render the emoji accents in the compact meta line smaller than the surrounding
+     * timestamp text, since colour emoji glyphs ignore [ForegroundColorSpan].
+     */
+    private fun shrinkEmoji(sb: SpannableStringBuilder, emoji: String, proportion: Float) {
+        var start = 0
+        while (true) {
+            val idx = sb.indexOf(emoji, start)
+            if (idx < 0) break
+            sb.setSpan(
+                RelativeSizeSpan(proportion),
+                idx, idx + emoji.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            start = idx + emoji.length
+        }
+    }
+
+    /**
      * Returns a human-readable combined load + speed string, e.g.
      * "35% · Normal"
      * "1 Gbps · Fast"
@@ -599,14 +678,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     private fun buildLoadSpeedText(loadPct: Int, linkMbps: Int) {
         val healthText: String
         if (loadPct >= 0) {
-            val tier = when {
-                loadPct <= 20 -> getString(R.string.server_load_light)
-                loadPct <= 40 -> getString(R.string.server_load_normal)
-                loadPct <= 60 -> getString(R.string.server_load_busy)
-                loadPct <= 80 -> getString(R.string.server_load_very_busy)
-                else -> getString(R.string.server_load_overloaded)
-            }
-            healthText = "$loadPct% · $tier"
+            healthText = "$loadPct%"
         } else {
             healthText = getString(R.string.lbl_not_available_short)
         }
@@ -639,9 +711,11 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         }
     }
 
-    private fun observeAppCount(proxyId: String) {
-        if (proxyId.isBlank()) return
-        mappingViewModel.getAppCountById(proxyId).observe(this) { count ->
+    private fun observeAppCount(configKey: String) {
+        if (configKey.isBlank()) return
+        // proxyId stored in ProxyApplicationMapping is always Backend.RpnWin + configKey.
+        val pid = Backend.RpnWin + configKey
+        mappingViewModel.getAppCountById(pid).observe(this) { count ->
             // Don't override the "All apps" state when catch-all is active
             if (b.catchAllCheck.isChecked) return@observe
             val c = count ?: 0
@@ -676,12 +750,13 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                         b.appsLabel.setTextColor(fetchColor(this, R.attr.primaryTextColor))
                         b.appsLabel.text = getString(R.string.lbl_all_apps)
                     }
-                    if (config.id == AUTO_SERVER_ID) {
+                    if (config.id.equals(AUTO_SERVER_ID, true)) {
                         // Hide hop settings for AUTO since it will be the src for all other
                         // configs
                         b.hopRl.visibility = View.GONE
                     }
                 } else {
+                    // this should never happen
                     showInvalidConfigDialog()
                 }
                 setupClickListeners(key)
@@ -694,20 +769,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         b.hopBtn.setOnClickListener { openHopDialog() }
         b.logsBtn.setOnClickListener { openLogsDialog(key) }
 
-        b.configIdText.setOnClickListener {
-            initiateReconnect(key)
-        }
-        b.valueWho.setOnClickListener(null)
-        b.tvHeroWho.setOnClickListener {
-            val text = b.tvHeroWho.text?.toString().orEmpty()
-            if (text.isBlank()) return@setOnClickListener
-            val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-            clipboard.setPrimaryClip(ClipData.newPlainText("who", text))
-            Utilities.showToastUiCentered(
-                this,
-                getString(R.string.copied_clipboard),
-                Toast.LENGTH_SHORT
-            )
+        b.refreshChip.setOnClickListener {
+            initiateRefresh(key)
         }
 
         if (configKey.isBlank()) {
@@ -779,20 +842,31 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
         b.catchAllRl.setOnClickListener { b.catchAllCheck.performClick() }
         b.useMobileRl.setOnClickListener { b.useMobileCheck.performClick() }
+        b.tvHeroPub.setOnClickListener {
+            val text = b.tvHeroPub.text?.toString().orEmpty()
+            if (text.isBlank()) return@setOnClickListener
+            val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+            clipboard.setPrimaryClip(ClipData.newPlainText("pubPub", text))
+            Utilities.showToastUiCentered(
+                this,
+                getString(R.string.copied_clipboard),
+                Toast.LENGTH_SHORT
+            )
+        }
         // ssidFilterRl click listener and ssidCheck listener are managed by setupSsidSectionUI
     }
 
-    private fun initiateReconnect(key: String) {
-        setRefreshReconnectEnabled(false)
+    private fun initiateRefresh(key: String) {
+        setRefreshUiEnabled(false)
         io {
             // GoVpnAdapter handles AUTO and empty-string ids centrally
             val reconnect = if (key.contains(AUTO_SERVER_ID, ignoreCase = true)) {
-                VpnController.reconnectRpnProxy("")
+                VpnController.refreshRpnProxy("")
             } else {
-                VpnController.reconnectRpnProxy(key)
+                VpnController.refreshRpnProxy(key)
             }
             uiCtx {
-                setRefreshReconnectEnabled(true)
+                setRefreshUiEnabled(true)
                 if (reconnect) {
                     Utilities.showToastUiCentered(this, getString(R.string.dc_refresh_toast), Toast.LENGTH_SHORT)
                 } else {
@@ -802,19 +876,19 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         }
     }
 
-    private fun setRefreshReconnectEnabled(enabled: Boolean) {
+    private fun setRefreshUiEnabled(enabled: Boolean) {
         val targetAlpha = if (enabled) 1f else 0.40f
-        b.configIdText.isEnabled = enabled
-        b.configIdText.isClickable = enabled
-        b.configIdText.animate().alpha(targetAlpha).setDuration(160).start()
+        b.refreshChip.isEnabled = enabled
+        b.refreshChip.isClickable = enabled
+        b.refreshChip.animate().alpha(targetAlpha).setDuration(160).start()
         if (enabled) stopChipIconAnimation() else startChipIconAnimation()
     }
 
     /** Starts a continuous clockwise spin on the chip's icon only. */
     private fun startChipIconAnimation() {
         chipAnimator?.cancel()
-        val raw = b.configIdText.chipIcon
-        val spinning: RotatingDrawable = raw as? RotatingDrawable ?: RotatingDrawable(raw ?: return).also { b.configIdText.chipIcon = it }
+        val raw = b.refreshChip.chipIcon
+        val spinning: RotatingDrawable = raw as? RotatingDrawable ?: RotatingDrawable(raw ?: return).also { b.refreshChip.chipIcon = it }
         spinning.rotation = 0f
         chipAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
             duration = 700L
@@ -833,7 +907,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     private fun stopChipIconAnimation() {
         chipAnimator?.cancel()
         chipAnimator = null
-        val icon = b.configIdText.chipIcon as? RotatingDrawable ?: return
+        val icon = b.refreshChip.chipIcon as? RotatingDrawable ?: return
         ValueAnimator.ofFloat(icon.rotation, 0f).apply {
             duration = 200L
             interpolator = AccelerateDecelerateInterpolator()
@@ -867,6 +941,21 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             .setMessage(getString(R.string.config_invalid_desc))
             .setCancelable(false)
             .setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { _, _ -> finish() }
+            .create().show()
+    }
+
+    /**
+     * Shown when the proxy could not be registered or fetched in [init]. Offers a Retry
+     * (re-runs [init]) and a Close (finishes the activity) action so the user can recover
+     * without leaving and re-opening the screen.
+     */
+    private fun showRecoveryDialog() {
+        MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+            .setTitle(getString(R.string.rpn_recovery_title))
+            .setMessage(getString(R.string.rpn_recovery_desc))
+            .setCancelable(false)
+            .setPositiveButton(getString(R.string.retry)) { _, _ -> init() }
+            .setNegativeButton(getString(R.string.close)) { _, _ -> finish() }
             .create().show()
     }
 
@@ -908,9 +997,16 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             Logger.e(LOG_TAG_UI, "openAppsDialog: configKey blank or proxy null")
             return
         }
-        val proxyId = configKey
-        val proxyName = configKey
+        val proxyId = Backend.RpnWin + configKey
+        val cc = countryConfig
+        val proxyName = when {
+            cc != null && cc.city.isNotBlank() -> "${cc.cc} - ${cc.city}"
+            cc != null && cc.name.isNotBlank() -> cc.name
+            else -> configKey
+        }
         val adapter = WgIncludeAppsAdapter(this, proxyId, proxyName)
+        // Remove any observers registered by previous openAppsDialog()
+        mappingViewModel.apps.removeObservers(this)
         mappingViewModel.apps.observe(this) { adapter.submitData(lifecycle, it) }
         var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         if (Themes.isFrostTheme(themeId)) themeId = R.style.App_Dialog_NoDim
@@ -1008,13 +1104,24 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         updateErrorLayouts(hasPermissions, isLocationEnabled, permissionErrorLayout, locationErrorLayout)
 
         sw.setOnCheckedChangeListener { _, isChecked ->
-            val currentHasPermissions = SsidPermissionManager.hasRequiredPermissions(this)
+            val hasForeground = SsidPermissionManager.hasForegroundPermissions(this)
+            val hasBackground = SsidPermissionManager.hasBackgroundLocationPermission(this)
             val currentLocationEnabled = SsidPermissionManager.isLocationEnabled(this)
 
-            if (isChecked && !currentHasPermissions) {
-                SsidPermissionManager.checkAndRequestPermissions(this, ssidPermissionCallback)
-                Logger.d(LOG_TAG_UI, "SSID permissions not granted, requesting...")
-                return@setOnCheckedChangeListener
+            if (isChecked) {
+                if (!hasForeground) {
+                    showLocationDisclosureDialog {
+                        SsidPermissionManager.requestSsidPermissions(this@RpnConfigDetailActivity)
+                    }
+                    Logger.d(LOG_TAG_UI, "SSID foreground permissions not granted, requesting...")
+                    return@setOnCheckedChangeListener
+                } else if (isAtleastQ() && !hasBackground) {
+                    showLocationDisclosureDialog {
+                        SsidPermissionManager.requestBackgroundLocationPermission(this@RpnConfigDetailActivity)
+                    }
+                    Logger.d(LOG_TAG_UI, "SSID background permissions not granted, requesting...")
+                    return@setOnCheckedChangeListener
+                }
             }
 
             if (isChecked && !currentLocationEnabled) {
@@ -1026,7 +1133,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             // Persist the new state
             io { RpnProxyManager.updateSsidBased(configKey, isChecked) }
 
-            if (isChecked && currentHasPermissions && currentLocationEnabled) {
+            if (isChecked && SsidPermissionManager.hasRequiredPermissions(this) && currentLocationEnabled) {
                 if (persistentState.enableStabilityDependentSettings()) {
                     SnackbarHelper.showStabilityProgram(b.root, persistentState)
                 }
@@ -1053,7 +1160,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 Logger.i(LOG_TAG_UI, "SSID feature disabled for configKey: $configKey")
             }
 
-            updateErrorLayouts(currentHasPermissions, currentLocationEnabled, permissionErrorLayout, locationErrorLayout)
+            updateErrorLayouts(SsidPermissionManager.hasRequiredPermissions(this), currentLocationEnabled, permissionErrorLayout, locationErrorLayout)
         }
 
         layout.setOnClickListener { sw.performClick() }
@@ -1132,7 +1239,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         if (configKey.isBlank() || countryConfig == null) return
         var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         if (Themes.isFrostTheme(themeId)) themeId = R.style.App_Dialog_NoDim
-        val dlg = CountrySsidDialog(
+        val dlg = RpnSsidDialog(
             this, themeId, configKey,
             countryConfig?.countryName ?: configKey,
             countryConfig?.ssids.orEmpty()
@@ -1154,32 +1261,31 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         dlg.show()
     }
 
-    private fun showLocationEnableDialog() {
-        MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
-            .setTitle(getString(R.string.ssid_location_error))
-            .setMessage(getString(R.string.location_enable_explanation, getString(R.string.lbl_ssids)))
-            .setCancelable(true)
-            .setPositiveButton(getString(R.string.ssid_location_error_action)) { dlg, _ ->
-                SsidPermissionManager.requestLocationEnable(this); dlg.dismiss()
-            }
-            .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
-                b.ssidCheck.isChecked = false
-                io {
-                    RpnProxyManager.updateSsidBased(configKey, false)
-                }
-            }
-            .create().show()
+    private fun showLocationDisclosureDialog(onContinue: () -> Unit) {
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+        builder.setTitle(getString(R.string.location_disclosure_title))
+        builder.setMessage(getString(R.string.location_disclosure_message))
+        builder.setCancelable(true)
+        builder.setPositiveButton(getString(R.string.location_disclosure_positive)) { dialog, _ ->
+            onContinue()
+            dialog.dismiss()
+        }
+        builder.setNegativeButton(getString(R.string.location_disclosure_negative)) { _, _ ->
+            b.ssidCheck.isChecked = false
+            io { RpnProxyManager.updateSsidBased(configKey, false) }
+        }
+        builder.create().show()
     }
 
-    private fun showSsidPermissionExplanationDialog() {
+    private fun showLocationEnableDialog() {
         MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
-            .setTitle(getString(R.string.ssid_permission_error_action))
-            .setMessage(getString(R.string.ssid_permission_explanation, getString(R.string.lbl_ssids)))
+            .setTitle(getString(R.string.location_disclosure_title))
+            .setMessage(getString(R.string.location_disclosure_message))
             .setCancelable(true)
-            .setPositiveButton(getString(R.string.ssid_permission_error_action)) { dlg, _ ->
-                SsidPermissionManager.requestSsidPermissions(this); dlg.dismiss()
+            .setPositiveButton(getString(R.string.location_disclosure_positive)) { dlg, _ ->
+                SsidPermissionManager.requestLocationEnable(this); dlg.dismiss()
             }
-            .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
+            .setNegativeButton(getString(R.string.location_disclosure_negative)) { _, _ ->
                 b.ssidCheck.isChecked = false
                 io {
                     RpnProxyManager.updateSsidBased(configKey, false)

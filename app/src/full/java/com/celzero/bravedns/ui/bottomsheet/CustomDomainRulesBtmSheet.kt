@@ -1,7 +1,7 @@
 package com.celzero.bravedns.ui.bottomsheet
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.content.res.Configuration
@@ -15,7 +15,6 @@ import android.widget.ImageView
 import android.widget.RadioButton
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
@@ -31,11 +30,11 @@ import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
-import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
+import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -58,7 +57,7 @@ class CustomDomainRulesBtmSheet :
     private lateinit var cd: CustomDomain
 
     override fun getTheme(): Int =
-        getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        getBottomSheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     private fun isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
@@ -109,11 +108,7 @@ class CustomDomainRulesBtmSheet :
         }
 
         dialog?.window?.let { window ->
-            if (isAtleastQ()) {
-                val controller = WindowInsetsControllerCompat(window, window.decorView)
-                controller.isAppearanceLightNavigationBars = false
-                window.isNavigationBarContrastEnforced = false
-            }
+            Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
         }
 
         Logger.v(LOG_TAG_UI, "$TAG, view created for ${cd.domain}")
@@ -125,8 +120,10 @@ class CustomDomainRulesBtmSheet :
         val uid = cd.uid
         io {
             if (uid == UID_EVERYBODY) {
-                b.customDomainAppNameTv.text =
-                    getString(R.string.firewall_act_universal_tab).replaceFirstChar(Char::titlecase)
+                uiCtx {
+                    b.customDomainAppNameTv.text =
+                        getString(R.string.firewall_act_universal_tab).replaceFirstChar(Char::titlecase)
+                }
             } else {
                 val appNames = FirewallManager.getAppNamesByUid(cd.uid)
                 val appName = getAppName(cd.uid, appNames)
@@ -380,7 +377,9 @@ class CustomDomainRulesBtmSheet :
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (_binding != null) { f() }
+        }
     }
 
     override fun onDismissCC(obj: Any?) {

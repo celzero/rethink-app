@@ -15,22 +15,33 @@
  */
 package com.celzero.bravedns.adapter
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.target.CustomViewTarget
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
+import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.databinding.ListItemAppDomainDetailsBinding
+import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.bottomsheet.AppDomainRulesBottomSheet
@@ -75,8 +86,6 @@ class AppWiseDomainsAdapter(
         private const val PERCENTAGE_MULTIPLIER = 100
     }
 
-    private lateinit var adapter: AppWiseDomainsAdapter
-
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -87,7 +96,6 @@ class AppWiseDomainsAdapter(
                 parent,
                 false
             )
-        adapter = this
         return ConnectionDetailsViewHolder(itemBinding)
     }
 
@@ -137,14 +145,14 @@ class AppWiseDomainsAdapter(
                 } else {
                     b.acdIpAddress.text = conn.appOrDnsName
                 }
-                b.acdFlag.visibility = View.VISIBLE
-                b.acdFlag.text = conn.flag
+                showFlagOrIcon(conn.appOrDnsName, conn.flag)
                 return
             }
 
             b.acdCount.text = conn.count.toString()
             b.acdDomain.text = conn.appOrDnsName
-            b.acdFlag.text = conn.flag
+            //b.acdFlag.text = conn.flag
+            showFlagOrIcon(conn.appOrDnsName, conn.flag)
             if (conn.ipAddress.isNotEmpty()) {
                 b.acdIpAddress.visibility = View.VISIBLE
                 b.acdIpAddress.text = beautifyIpString(conn.ipAddress)
@@ -152,6 +160,139 @@ class AppWiseDomainsAdapter(
                 b.acdIpAddress.visibility = View.GONE
             }
             updateStatusUi(conn)
+        }
+
+        private fun showFlagOrIcon(query: String?, flag: String? = null) {
+            b.acdFlag.text = flag
+            if (query == null) {
+                hideFavIcon()
+                showFlag()
+                return
+            }
+            val query = query.dropLastWhile { it == ',' }
+
+            // no need to check in glide cache if the value is available in failed
+            // cache
+            if (FavIconDownloader.isUrlAvailableInFailedCache(query) != null) {
+                hideFavIcon()
+                showFlag()
+            } else {
+                // Glide will cache the icons against the urls. To extract the fav
+                // icon from the cache, first verify that the cache is available with
+                // the next dns url. If it is not available then glide will throw an
+                // error, do the duckduckgo url check in that case.
+                displayNextDnsFavIcon(query)
+            }
+        }
+
+        private fun displayNextDnsFavIcon(query: String) {
+            // url to check if the icon is cached from nextdns
+            val nextDnsUrl = FavIconDownloader.constructFavIcoUrlNextDns(query)
+            // url to check if the icon is cached from duckduckgo
+            val duckDuckGoUrl = FavIconDownloader.constructFavUrlDuckDuckGo(query)
+            // subdomain to check if the icon is cached from duckduckgo
+            val duckduckgoDomainURL = FavIconDownloader.getDomainUrlFromFdqnDuckduckgo(query)
+            try {
+                val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
+                var request = Glide.with(context.applicationContext)
+                    .load(nextDnsUrl)
+                    .onlyRetrieveFromCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                    .transition(DrawableTransitionOptions.withCrossFade(factory))
+
+                val errorRequest = displayDuckduckgoFavIcon(duckDuckGoUrl, duckduckgoDomainURL)
+                if (errorRequest != null) {
+                    request = request.error(errorRequest)
+                }
+
+                request.into(
+                    object : CustomViewTarget<ImageView, Drawable>(b.acdIcon) {
+                        override fun onLoadFailed(errorDrawable: Drawable?) {
+                            showFlag()
+                            hideFavIcon()
+                        }
+
+                        override fun onResourceReady(
+                            resource: Drawable,
+                            transition: Transition<in Drawable>?
+                        ) {
+                            hideFlag()
+                            showFavIcon(resource)
+                        }
+
+                        override fun onResourceCleared(placeholder: Drawable?) {
+                            hideFavIcon()
+                            showFlag()
+                        }
+                    }
+                )
+            } catch (_: Exception) {
+                Logger.d(LOG_TAG_DNS, "err loading icon, load flag instead")
+                displayDuckduckgoFavIcon(duckDuckGoUrl, duckduckgoDomainURL)?.into(
+                    object : CustomViewTarget<ImageView, Drawable>(b.acdIcon) {
+                        override fun onLoadFailed(errorDrawable: Drawable?) {
+                            showFlag()
+                            hideFavIcon()
+                        }
+
+                        override fun onResourceReady(
+                            resource: Drawable,
+                            transition: Transition<in Drawable>?
+                        ) {
+                            hideFlag()
+                            showFavIcon(resource)
+                        }
+
+                        override fun onResourceCleared(placeholder: Drawable?) {
+                            hideFavIcon()
+                            showFlag()
+                        }
+                    }
+                )
+            }
+        }
+
+        /**
+         * Loads the fav icons from the cache, the icons are cached by favIconDownloader. On
+         * failure, will check if there is a icon for top level domain is available in cache. Else,
+         * will show the Flag.
+         *
+         * This method will be executed only when show fav icon setting is turned on.
+         */
+        private fun displayDuckduckgoFavIcon(url: String, subDomainURL: String): RequestBuilder<Drawable>? {
+            return try {
+                val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
+                Glide.with(context.applicationContext)
+                    .load(url)
+                    .onlyRetrieveFromCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                    .error(
+                        Glide.with(context.applicationContext)
+                            .load(subDomainURL)
+                            .onlyRetrieveFromCache(true)
+                    )
+                    .transition(DrawableTransitionOptions.withCrossFade(factory))
+            } catch (e: Exception) {
+                null
+            }
+        }
+
+        private fun showFavIcon(drawable: Drawable) {
+            b.acdIcon.visibility = View.VISIBLE
+            b.acdIcon.setImageDrawable(drawable)
+        }
+
+        private fun hideFavIcon() {
+            b.acdIcon.visibility = View.GONE
+            b.acdIcon.setImageDrawable(null)
+        }
+
+        private fun showFlag() {
+            b.acdFlag.visibility = View.VISIBLE
+        }
+
+        private fun hideFlag() {
+            b.acdFlag.visibility = View.GONE
         }
 
         private fun setupClickListeners(conn: AppConnection) {
@@ -171,10 +312,6 @@ class AppWiseDomainsAdapter(
                 return
             }
 
-            /*if (isRethink) {
-                Logger.i(LOG_TAG_UI, "$TAG rethink connection - no close connection dialog")
-                return
-            }*/
             Logger.v(LOG_TAG_UI, "$TAG show close connection dialog for uid: $uid")
             val dialog = MaterialAlertDialogBuilder(context, R.style.App_Dialog_NoDim)
                 .setTitle(context.getString(R.string.close_conns_dialog_title))
@@ -205,11 +342,6 @@ class AppWiseDomainsAdapter(
                 return
             }
 
-            /*if (isRethink) {
-                Logger.i(LOG_TAG_UI, "$TAG rethink connection - no bottom sheet")
-                return
-            }*/
-
             if (isActiveConn) {
                 Logger.i(LOG_TAG_UI, "$TAG active connection - no bottom sheet")
                 return
@@ -228,11 +360,11 @@ class AppWiseDomainsAdapter(
             // Fix: Validate position before passing to avoid IndexOutOfBoundsException
             val currentPosition = absoluteAdapterPosition
             if (currentPosition != RecyclerView.NO_POSITION) {
-                bottomSheetFragment.dismissListener(adapter, currentPosition)
+                bottomSheetFragment.dismissListener(this@AppWiseDomainsAdapter, currentPosition)
             } else {
                 // Position is invalid, pass -1 to indicate refresh should be used
                 Logger.w(LOG_TAG_UI, "$TAG invalid adapter position when opening bottom sheet")
-                bottomSheetFragment.dismissListener(adapter, RecyclerView.NO_POSITION)
+                bottomSheetFragment.dismissListener(this@AppWiseDomainsAdapter, RecyclerView.NO_POSITION)
             }
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
@@ -282,19 +414,10 @@ class AppWiseDomainsAdapter(
     }
 
     override fun notifyDataset(position: Int) {
-        // Fix: IndexOutOfBoundsException - validate position before notifying
-        try {
-            if (position in 0..<itemCount) {
-                notifyItemChanged(position)
-            } else {
-                // Position is invalid, refresh the entire dataset instead
-                Logger.w(LOG_TAG_UI, "$TAG invalid position: $position, itemCount: $itemCount, refreshing adapter")
-                refresh()
-            }
-        } catch (e: Exception) {
-            // If notification fails, refresh the adapter to ensure consistency
-            Logger.e(LOG_TAG_UI, "$TAG error notifying position $position: ${e.message}", e)
-            refresh()
-        }
+        // PagingDataAdapter does not support manual notifyItem* calls.
+        // Calling notifyItemChanged on a PagingDataAdapter can cause
+        // RecyclerView inconsistency crashes (IndexOutOfBoundsException).
+        // Always use refresh() to reload the current data from the PagingSource.
+        refresh()
     }
 }

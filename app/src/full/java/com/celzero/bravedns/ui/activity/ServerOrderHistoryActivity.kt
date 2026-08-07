@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -37,6 +37,7 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Themes.Companion.isActivityLightTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
@@ -79,7 +80,8 @@ class ServerOrderHistoryActivity : BaseActivity(R.layout.activity_server_order_h
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars =
+                isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
 
@@ -204,7 +206,11 @@ class ServerOrderHistoryActivity : BaseActivity(R.layout.activity_server_order_h
             b.fetchProgress.animate().alpha(1f).setDuration(200).start()
         } else {
             b.fetchProgress.animate().alpha(0f).setDuration(400)
-                .withEndAction { b.fetchProgress.isVisible = false }
+                .withEndAction {
+                    if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                        b.fetchProgress.isVisible = false
+                    }
+                }
                 .start()
         }
     }
@@ -216,6 +222,7 @@ class ServerOrderHistoryActivity : BaseActivity(R.layout.activity_server_order_h
     private fun animateCountBadge(newValue: String) {
         if (b.tvOrderCount.text == newValue) return
         b.tvOrderCount.animate().alpha(0f).setDuration(150).withEndAction {
+            if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) return@withEndAction
             b.tvOrderCount.text = newValue
             b.tvOrderCount.animate().alpha(1f).setDuration(200).start()
         }.start()

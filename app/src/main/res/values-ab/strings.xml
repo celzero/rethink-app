@@ -334,7 +334,6 @@
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">RDNS+ аиаануршәала</string>
     <string name="hsf_exclude_error" translatable="true">VPN-акәыжә аусура ашьҭамла аҿы ашьҭаамбжьылара азымхыҵырҩуа</string>
     <string name="hsf_proxy_chip_removed_toast" translatable="true">Анцәахәы иахккаауа</string>
-    <string name="hsf_proxy_chip_remove_text" translatable="true">Иаххәышьәахәахәа…</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Апаҟа ашьапынтәи еизырхымх шəыцəыцəахара</string>
     <string name="hsf_whats_new_remove_text" translatable="true">Аҟәалоит…</string>
     <string name="hsf_blocklist_updating_text" translatable="true">Активрара…</string>
@@ -952,8 +951,6 @@
     <string name="settings_rinr_heading" translatable="true">Аҧсуа-аҧсуа (ашәахәы ҳәа еилахәысуа)</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Rethink\'s аҧсуа иҧшьаҭақәа амҩа анелхәахтә амоуп. Уи уара уахәа лымумзаргьы, уи аукҵәа ауеит.</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Ашәахара Ашәырпыла ақәымтә, аурыжьшәашьҭақәа шьақәыргылара, анаԥшьашьҭақәа адгылара, DNS анаԥшьашьҭақәа ашәырпыла ашҟа ашәырпыла ашәырпыла ашәырпыла ашәырпыла ашәырпыла ашәырпыла ашәырпыла ашәырпыла ашәырпыла ашәырпыла</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Алагьба (ашәашәаҿы акәымкәа)</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Апаҟа шасырхәоит<!--settings_network_all_networks--> %1$s ашәахә. Уи аусура шәаԥхьоума?</string>
     <string name="cd_dialog_edit_title" translatable="true">Алишьадара даҟәылара аҿыцреи arra</string>
     <string name="cd_toast_edit" translatable="true">Адаптиракьыра</string>
     <string name="one_wg_apps_added" translatable="true">Апхылаққәа зегьы р маршрутизациа</string>
@@ -970,7 +967,6 @@
     <string name="lbl_secure" translatable="true">sante</string>
     <string name="lbl_anonymous" translatable="true">ашәахьамыз</string>
     <string name="lbl_peer" translatable="true">Аҧхьа</string>
-    <string name="failed_using_default" translatable="true">Мшä: ахарҭаа ашьцыраамҭала аицлак</string>
     <string name="routing_remaining_apps" translatable="true">Аҧсшьа ақәымчқәа рызцәажәаратә</string>
     <string name="lbl_remaining_apps" translatable="true">Ашәахәқәрақәла еи оста</string>
     <string name="remaining_apps_dialog_title" translatable="true">Ацәырҵәра зцу ақәымтәқәа зегьы еилаг&lt;ctrl63&gt;</string>
@@ -1018,8 +1014,6 @@
     <string name="dc_filtering_heading" translatable="true">фильтрациа</string>
     <string name="cd_split_dns_heading" translatable="true">Split DNS (ашәахcharт ашқәа)</string>
     <string name="cd_split_dns_desc" translatable="true">Аԥсшәа:\nАԥсоуп DNS ашәҟәы иахәаԥкны анхацәа рҟны ианызсыжьуа апрокси арҿы апрокси а DNS хылаԥшҩцәа рҟны.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">DNS рашқәа ашәахтә рашәақәа еиԥш ишьақәымзар (аҿыц аԥышәа)</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">А DNS-шьыжьхаракы адҵәыклыхлара аихгара аамҭазы аиххалап; аҟәыжәра ашәахәы аамҭазы адҵәыклыхлара нагӡаҭахоит.</string>
     <string name="univ_firewall_rule_11" translatable="true">Уабыжьым иҟны аҧҵәаны аҿацәқәрақә зегьы рыцхраамла</string>
     <string name="firewall_rule_private_dns" translatable="true">Апачәы DNS</string>
     <string name="firewall_rule_bypass_proxy" translatable="true">ПшьэрыгъэмылIэ Апхъыжь</string>
@@ -1093,7 +1087,7 @@
     <string name="smart_dns_desc" translatable="true"><i>Smart DNS</i> адырланыра дырхәылаауа ашәышаз дырхәымҵәаауа а DNS резолверқәа:</string>
     <string name="hop_error_toast_msg_3" translatable="true">Адаҟьа амо ҟаҵа, аицклаҩқәа хәыҬны иалагаларазы</string>
     <string name="wg_mobile_only_hop_err" translatable="true">Аупшәа-плшьымбара уалынала Ашәахьчаразы адгылара раамҭакала ауни</string>
-    <string name="lbl_fallback" translatable="true">Ацәырԥшра</string>
+    <string name="lbl_bootstrap" translatable="true">Ацәырԥшра</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">Адомэинқәепхақәрақәа зегьы анушьалаа?</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">Ари ҳәын-ҳәатәқәа шьҧк ахәҭыхлара ирызвоит зегьы акьыр𝗌 «адәиҭыхны иаарҧшны» аҵыхәтә хаҭарак аҿы аҧсҭазаара.</string>
     <string name="vpn_policy_auto_desc" translatable="true">Ашәашәоит а 네트워크 аҿы ауал аҟаҵа аҿыц аҭакрақәа рзы.</string>

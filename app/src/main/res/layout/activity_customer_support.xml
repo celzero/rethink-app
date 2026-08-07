@@ -155,7 +155,7 @@
                             android:id="@+id/chip_other"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/support_category_other"
+                            android:text="@string/category_name_others"
                             android:checkable="true"
                             style="@style/Widget.Material3.Chip.Filter" />
 

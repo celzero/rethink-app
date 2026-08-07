@@ -15,22 +15,23 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.os.Process
 import android.text.format.DateUtils
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
-import com.celzero.bravedns.ui.BaseActivity
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -53,6 +54,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_NONE
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_PACKAGE
@@ -92,6 +94,13 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     private var connStatus = FirewallManager.ConnectionStatus.ALLOW
 
     private var showBypassToolTip: Boolean = true
+    private var isWarningAcknowledged: Boolean = false
+
+    private val warningBackCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            finish()
+        }
+    }
 
     companion object {
         const val INTENT_UID = "UID"
@@ -104,6 +113,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         private const val MILLIS_PER_MINUTE = 60
         private const val MILLIS_PER_SECOND = 1000L
         private const val ALPHA_DISABLED = 0.5f
+        private const val IS_WARNING_ACKNOWLEDGED = "IS_WARNING_ACKNOWLEDGED"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -112,18 +122,62 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         handleFrostEffectIfNeeded(persistentState.theme)
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
+            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
 
         uid = intent.getIntExtra(INTENT_UID, INVALID_UID)
         Logger.d(LOG_TAG_UI, "AppInfoActivity, intent uid: $uid")
+        onBackPressedDispatcher.addCallback(this, warningBackCallback)
+
+        if (savedInstanceState?.getBoolean(IS_WARNING_ACKNOWLEDGED, false) == true) {
+            isWarningAcknowledged = true
+        }
+
+        if (shouldShowRethinkWarning()) {
+            showRethinkWarning()
+        } else {
+            proceedWithInit()
+        }
+    }
+
+    private fun shouldShowRethinkWarning(): Boolean {
+        return !isWarningAcknowledged && uid == Process.myUid()
+    }
+
+    private fun showRethinkWarning() {
+        b.aadRethinkWarningContainer.visibility = View.VISIBLE
+        warningBackCallback.isEnabled = true
+        hideContentBehindWarning(true)
+
+        b.aadRethinkWarningProceed.setOnClickListener {
+            proceedWithInit()
+        }
+    }
+
+    private fun proceedWithInit() {
+        isWarningAcknowledged = true
+        b.aadRethinkWarningContainer.visibility = View.GONE
+        warningBackCallback.isEnabled = false
+        hideContentBehindWarning(false)
+
         ipRulesViewModel.setUid(uid)
         domainRulesViewModel.setUid(uid)
         networkLogsViewModel.setUid(uid)
         init()
         observeAppRules()
         setupClickListeners()
+    }
+
+    private fun hideContentBehindWarning(hide: Boolean) {
+        val visibility = if (hide) View.GONE else View.VISIBLE
+        b.aadAppParentRl.visibility = visibility
+
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(IS_WARNING_ACKNOWLEDGED, isWarningAcknowledged)
     }
 
     private fun observeAppRules() {
@@ -194,12 +248,12 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
     private fun displayProxyStatus() {
         val proxy = ProxyManager.getProxyIdForApp(uid)
-        if (proxy.isEmpty() || proxy == ID_NONE) {
+        if (proxy.isEmpty() || (proxy.size == 1 && proxy[0] == ID_NONE)) {
             b.aadProxyDetails.visibility = View.GONE
             return
         }
         b.aadProxyDetails.visibility = View.VISIBLE
-        b.aadProxyDetails.text = getString(R.string.wireguard_apps_proxy_map_desc, proxy)
+        b.aadProxyDetails.text = getString(R.string.wireguard_apps_proxy_map_desc, proxy.filter { it != ID_NONE })
     }
 
     private fun openCustomIpScreen() {
@@ -283,9 +337,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                     }
                 }
                 disableWhitelistExcludeUi()
-            }
-            FirewallManager.FirewallStatus.UNTRACKED -> {
-                // no-op
             }
         }
     }
@@ -511,10 +562,17 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     private fun updateExcludeProxyStatus(isExcluded: Boolean) {
         io {
             FirewallManager.updateIsProxyExcluded(uid, isExcluded)
-            logEvent(
-                "proxy exclude change",
-                "Proxy exclude status changed for ${appInfo.appName} (${appInfo.uid}), new status: $isExcluded"
-            )
+            if (::appInfo.isInitialized) {
+                logEvent(
+                    "proxy exclude change",
+                    "Proxy exclude status changed for ${appInfo.appName} (${appInfo.uid}), new status: $isExcluded"
+                )
+            } else {
+                logEvent(
+                    "proxy exclude change",
+                    "Proxy exclude status changed for uid: $uid, new status: $isExcluded"
+                )
+            }
         }
     }
 
@@ -532,10 +590,17 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                     updateTempAllowDescription(false, 0)
                 }
             }
-            logEvent(
-                "temp allow change",
-                "Temporary allow status changed for ${appInfo.appName} (${appInfo.uid}), new status: $isAllowed"
-            )
+            if (::appInfo.isInitialized) {
+                logEvent(
+                    "temp allow change",
+                    "Temporary allow status changed for ${appInfo.appName} (${appInfo.uid}), new status: $isAllowed"
+                )
+            } else {
+                logEvent(
+                    "temp allow change",
+                    "Temporary allow status changed for uid: $uid, new status: $isAllowed"
+                )
+            }
         }
     }
 
@@ -723,7 +788,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             io {
                 val pkg = FirewallManager.getPackageNameByAppName(appNames[position])
                 uiCtx {
-                    Logger.i(Logger.LOG_TAG_UI, "AppInfoActivity, package name: $pkg")
+                    Logger.i(LOG_TAG_UI, "AppInfoActivity, package name: $pkg")
                     openAndroidAppInfo(ctx, pkg)
                 }
             }
@@ -931,7 +996,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             FirewallManager.FirewallStatus.ISOLATE -> getString(R.string.ada_app_status_isolate)
             FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL ->
                 getString(R.string.ada_app_status_bypass_dns_firewall)
-            FirewallManager.FirewallStatus.UNTRACKED -> getString(R.string.ada_app_status_unknown)
         }
     }
 
@@ -1021,6 +1085,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
+        if (isDestroyed) return
         Glide.with(this).load(drawable).error(Utilities.getDefaultIcon(this)).into(mIconImageView)
     }
 
@@ -1043,7 +1108,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun logEvent(msg: String, details: String) {
-        eventLogger.log(EventType.FW_RULE_MODIFIED, Severity.LOW, msg, EventSource.UI, false, details)
+        eventLogger.log(EventType.FW_RULE_MODIFIED, Severity.LOW, msg, EventSource.UI, true, details)
     }
 
     private fun io(f: suspend () -> Unit): Job {
@@ -1051,6 +1116,8 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (!isFinishing) f()
+        }
     }
 }

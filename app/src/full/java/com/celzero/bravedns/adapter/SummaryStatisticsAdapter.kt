@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.adapter
 
-import Logger
-import Logger.LOG_TAG_DNS
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
@@ -31,6 +31,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.target.CustomViewTarget
@@ -628,16 +629,18 @@ class SummaryStatisticsAdapter(
             val duckduckgoDomainURL = FavIconDownloader.getDomainUrlFromFdqnDuckduckgo(query)
             try {
                 val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
-                Glide.with(context.applicationContext)
+                var request = Glide.with(context.applicationContext)
                     .load(nextDnsUrl)
                     .onlyRetrieveFromCache(true)
                     .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                    .error(
-                        // on error, check if the icon is stored in the name of duckduckgo url
-                        displayDuckduckgoFavIcon(duckDuckGoUrl, duckduckgoDomainURL)
-                    )
                     .transition(DrawableTransitionOptions.withCrossFade(factory))
-                    .into(
+
+                val errorRequest = displayDuckduckgoFavIcon(duckDuckGoUrl, duckduckgoDomainURL)
+                if (errorRequest != null) {
+                    request = request.error(errorRequest)
+                }
+
+                request.into(
                         object : CustomViewTarget<ImageView, Drawable>(itemBinding.ssIcon) {
                             override fun onLoadFailed(errorDrawable: Drawable?) {
                                 showFlag()
@@ -660,7 +663,27 @@ class SummaryStatisticsAdapter(
                     )
             } catch (_: Exception) {
                 Logger.d(LOG_TAG_DNS, "err loading icon, load flag instead")
-                displayDuckduckgoFavIcon(duckDuckGoUrl, duckduckgoDomainURL)
+                displayDuckduckgoFavIcon(duckDuckGoUrl, duckduckgoDomainURL)?.into(
+                    object : CustomViewTarget<ImageView, Drawable>(itemBinding.ssIcon) {
+                        override fun onLoadFailed(errorDrawable: Drawable?) {
+                            showFlag()
+                            hideFavIcon()
+                        }
+
+                        override fun onResourceReady(
+                            resource: Drawable,
+                            transition: Transition<in Drawable>?
+                        ) {
+                            hideFlag()
+                            showFavIcon(resource)
+                        }
+
+                        override fun onResourceCleared(placeholder: Drawable?) {
+                            hideFavIcon()
+                            showFlag()
+                        }
+                    }
+                )
             }
         }
 
@@ -671,8 +694,8 @@ class SummaryStatisticsAdapter(
          *
          * This method will be executed only when show fav icon setting is turned on.
          */
-        private fun displayDuckduckgoFavIcon(url: String, subDomainURL: String) {
-            try {
+        private fun displayDuckduckgoFavIcon(url: String, subDomainURL: String): RequestBuilder<Drawable>? {
+            return try {
                 val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
                 Glide.with(context.applicationContext)
                     .load(url)
@@ -684,31 +707,8 @@ class SummaryStatisticsAdapter(
                             .onlyRetrieveFromCache(true)
                     )
                     .transition(DrawableTransitionOptions.withCrossFade(factory))
-                    .into(
-                        object : CustomViewTarget<ImageView, Drawable>(itemBinding.ssIcon) {
-                            override fun onLoadFailed(errorDrawable: Drawable?) {
-                                showFlag()
-                                hideFavIcon()
-                            }
-
-                            override fun onResourceReady(
-                                resource: Drawable,
-                                transition: Transition<in Drawable>?
-                            ) {
-                                hideFlag()
-                                showFavIcon(resource)
-                            }
-
-                            override fun onResourceCleared(placeholder: Drawable?) {
-                                hideFavIcon()
-                                showFlag()
-                            }
-                        }
-                    )
-            } catch (_: Exception) {
-                Logger.d(LOG_TAG_DNS, "err loading icon, load flag instead")
-                showFlag()
-                hideFavIcon()
+            } catch (e: Exception) {
+                null
             }
         }
 

@@ -16,13 +16,17 @@
 package com.celzero.bravedns.ui
 
 import androidx.appcompat.app.AlertDialog
+import androidx.test.espresso.accessibility.AccessibilityChecks
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -36,6 +40,7 @@ import org.junit.runner.RunWith
  * - Modal behavior (setCancelable(false))
  * - Button configuration
  * - User interaction
+ * - Accessibility (TalkBack, touch targets, etc.)
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -48,6 +53,7 @@ class HomeScreenActivityDialogInstrumentedTest {
 
     @Before
     fun setUp() {
+        AccessibilityChecks.enable()
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
     }
 

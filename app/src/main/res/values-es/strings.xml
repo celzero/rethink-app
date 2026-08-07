@@ -455,7 +455,6 @@
     <string name="hsf_proxy_chip_text">Proxy activo</string>
     <string name="hsf_blocklist_chip_text_no_data">Activar RDNS+</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy eliminado</string>
-    <string name="hsf_proxy_chip_remove_text">Parando…</string>
     <string name="hsf_whats_new_remove_text">Cerrando…</string>
     <string name="hsf_blocklist_updating_text">Activando…</string>
     <string name="hsf_chip_appearance">Tema: %1$s</string>
@@ -1050,12 +1049,9 @@
     <string name="lbl_stopped" translatable="true">Detenido</string>
     <string name="lbl_secure" translatable="true">seguro</string>
     <string name="lbl_cache" translatable="true">Cache</string>
-    <string name="failed_using_default" translatable="true">Falló: usando DNS alternativas</string>
     <string name="one_wg_apps_added" translatable="true">Enrutar todas las aplicaciones</string>
     <string name="catch_all_wg_dialog_title" translatable="true">Siempre activo</string>
     <string name="routing_remaining_apps" translatable="true">Enrutamiento de las aplicaciones restantes</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Bucle invertido (experimental)</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">También activa el ajuste <!--settings_network_all_networks--> de %1$s. ¿Quiere proceder?</string>
     <string name="wg_apps_dialog_title_exclude" translatable="true">Excluye %1$s aplicaciones</string>
     <string name="wireguard_disable_title" translatable="true">Detener WireGuard</string>
     <string name="lbl_remaining_apps" translatable="true">Aplicaciones restantes</string>
@@ -1141,7 +1137,7 @@
     <string name="lbl_action" translatable="true">Acción</string>
     <string name="lbl_connect" translatable="true">Conectar</string>
     <string name="lbl_criteria" translatable="true">Parámetro</string>
-    <string name="lbl_fallback" translatable="true">Alternativa</string>
+    <string name="lbl_bootstrap" translatable="true">Alternativa</string>
     <string name="lbl_hop" translatable="true">Relés</string>
     <string name="settings_theme_dialog_themes_5" translatable="true">Claro Plus</string>
     <string name="settings_theme_dialog_themes_6" translatable="true">Oscuro Plus</string>
@@ -1150,8 +1146,6 @@
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Usar el DNS del sistema para dominios no delegados como <i>.lan</i>, <i>.internal</i>, etc.</string>
     <string name="cd_split_dns_heading" translatable="true">DNS dividido (experimental)</string>
     <string name="cd_split_dns_desc" translatable="true">Reenviar las consultas DNS de las aplicaciones proxificadas a los servidores DNS del proxy.</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">Tratar las reglas DNS como reglas de cortafuegos (experimental)</string>
-    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">El bloqueo DNS se omitirá durante la resolución; la decisión se tomará en el momento de la conexión.</string>
     <string name="dns_record_types_auto_mode_status" translatable="true">Automático (Todos los tipos)</string>
     <string name="univ_firewall_rule_11" translatable="true">Bloquear todas las conexiones al host local</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">Eliminar estas reglas permitiría que cualquier aplicación se conecte a los dominios que están bloqueados actualmente.</string>

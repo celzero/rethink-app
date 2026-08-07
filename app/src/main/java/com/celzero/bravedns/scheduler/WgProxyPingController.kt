@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.scheduler
 
-import Logger
-import Logger.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.VpnController
 import com.celzero.firestack.backend.Backend
@@ -28,6 +28,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.time.Duration.Companion.milliseconds
 
 class WgProxyPingController(private val scope: CoroutineScope) {
     private val activeProxies = ConcurrentHashMap<String, PingConfig>()
@@ -87,7 +88,7 @@ class WgProxyPingController(private val scope: CoroutineScope) {
 
             while (isActive && activeProxies.isNotEmpty()) {
                 val delayMs = nextTick - System.currentTimeMillis()
-                if (delayMs > 0) delay(delayMs)
+                if (delayMs > 0) delay(delayMs.milliseconds)
 
                 tick(System.currentTimeMillis())
 
@@ -152,10 +153,6 @@ class WgProxyPingController(private val scope: CoroutineScope) {
 
     private suspend fun pingProxy(proxyId: String) {
         when {
-            proxyId.startsWith(ID_WG_BASE) -> {
-                VpnController.initiateWgPing(proxyId)
-            }
-
             // spl-case: for auto proxy send empty proxyId which will ping main proxy
             proxyId == Backend.RpnWin -> {
                 VpnController.initiateRpnPing("")
@@ -163,6 +160,10 @@ class WgProxyPingController(private val scope: CoroutineScope) {
 
             proxyId.startsWith(Backend.RpnWin) -> {
                 VpnController.initiateRpnPing(proxyId)
+            }
+
+            proxyId.startsWith(ID_WG_BASE) -> {
+                VpnController.initiateWgPing(proxyId)
             }
         }
 

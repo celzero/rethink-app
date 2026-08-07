@@ -15,11 +15,12 @@
  */
 package com.celzero.bravedns.service
 
-import Logger
-import Logger.LOG_GO_LOGGER
-import Logger.LOG_TAG_BUG_REPORT
-import Logger.LOG_TAG_VPN
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_GO_LOGGER
+import com.celzero.bravedns.util.Logger.LOG_TAG_BUG_REPORT
+import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import android.app.NotificationManager
+import android.app.NotificationChannel
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -28,6 +29,8 @@ import android.system.Os
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.ConsoleLog
+import com.celzero.bravedns.database.ConsoleLogRepository
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.BraveVPNService.Companion.NW_ENGINE_NOTIFICATION_ID
 import com.celzero.bravedns.ui.activity.AppLockActivity
@@ -37,10 +40,14 @@ import com.celzero.bravedns.util.UIUtils.getAccentColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.backend.LogConsumer
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.BufferedOutputStream
 import java.io.FileDescriptor
 import java.io.FileOutputStream
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Implements [LogConsumer] to drain Go runtime logs from a shared-memory file descriptor.
@@ -50,8 +57,8 @@ import java.io.FileOutputStream
  *
  * ## Buffer layout (Go contract)
  *
- * The buffer is divided into fixed **800-byte slots**. `start` and `end` are always multiples
- * of [SLOT_SIZE]. Within each slot:
+ * The buffer is divided into slotSize. `start` and `end` are always multiples
+ * of [slotSize]. Within each slot:
  *
  * ```
  *   slot[0]          → Go log-level character ('Y'/'V'/'D'/'I'/'W'/'E'/'F'/'U')
@@ -60,40 +67,61 @@ import java.io.FileOutputStream
  * ```
  *
  */
-class GoMemLogConsumer(
-    private val appContext: Context,
-    private val scope: CoroutineScope,
-) : LogConsumer {
+class GoMemLogConsumer(private val appContext: Context, private val scope: CoroutineScope, private val slotSize: Int) : LogConsumer, KoinComponent {
 
-    // Single-thread background dispatcher; all buffer processing is serialised here so
-    // prevLogLevel and tombstoneStream need no additional synchronisation.
+    // bulk-inserts (see flushBatch()) instead of routing through NetLogBatcher, because the
+    // Go logs already pre-batched per [drain] call and the batcher's ~2.5s flush delay +
+    // per-line coroutine launches only add latency and dropping logs.
+    private val consoleLogRepository by inject<ConsoleLogRepository>()
+
+    // Single-thread background dispatcher; all buffer processing is serialized here so
+    // prevLogLevel and tombstoneStream need no additional synchronization.
     private val processor = Daemons.make("goMemLog")
 
     // Inherited log level for continuation lines that carry no level prefix.
     // Mutated only on [processor].
-    private var prevLogLevel: Logger.LoggerLevel = Logger.LoggerLevel.VERY_VERBOSE
+    private var prevLogLevel: Logger.LoggerLevel = Logger.LoggerLevel.INFO
 
     // Tombstone file stream opened lazily on first stacktrace slot, closed in onClose().
     // Accessed only on [processor].
     private var tombstoneStream: BufferedOutputStream? = null
 
-    private var cachedFd: FileDescriptor? = null
-    private var cachedFdInt: Int = -1
+    // @Volatile: drain() runs on Go JNI callback threads and concurrent drains
+    // (buffer A and B can be consumed in parallel from separate goroutines) can
+    // race on these cache fields. Volatile guarantees visibility across threads;
+    // a duplicate wrapper allocation on a lost race is harmless since the fd is
+    // never closed by us.
+    @Volatile private var cachedFd: FileDescriptor? = null
+    @Volatile private var cachedFdInt: Int = -1
 
     companion object {
         private const val TAG = "GoMemLog"
         private const val WARNING_CHANNEL_ID = "warning"
 
-        /**
-         * Fixed slot size guaranteed by the Go side.
-         * [drain] start/end offsets are always multiples of this value.
-         */
-        private const val SLOT_SIZE = 800
-
         /** Safety cap: never read more than this per [drain] call. */
         private const val MAX_DRAIN_BYTES = 512 * 1024
 
         private val NEWLINE_BYTE: Byte = '\n'.code.toByte()
+
+        fun getInstance(appContext: Context?, scope: CoroutineScope?, fda: Long, fdb: Long, slotSize: Int): LogConsumer? {
+            if (appContext == null) {
+                Logger.w(LOG_TAG_BUG_REPORT, "$TAG getInstance: appContext null")
+                return null
+            }
+            if (scope == null) {
+                Logger.w(LOG_TAG_BUG_REPORT, "$TAG getInstance: scope null")
+                return null
+            }
+
+            val goMem = GoMemLogConsumer(appContext, scope, slotSize)
+
+            scope.launch {
+                goMem.ensureTombstoneStreamReady()
+            }
+
+            return goMem
+        }
+
     }
 
     /**
@@ -113,9 +141,9 @@ class GoMemLogConsumer(
 
         val rawLength = (end - start).coerceAtMost(MAX_DRAIN_BYTES.toLong()).toInt()
         // Round down to the nearest complete slot, a partial slot must never be processed.
-        val length = (rawLength / SLOT_SIZE) * SLOT_SIZE
+        val length = (rawLength / slotSize) * slotSize
         if (length == 0) {
-            Logger.vv(LOG_TAG_BUG_REPORT, "$TAG drain: no complete slots fd=$fd [$start,$end) rawLen=$rawLength")
+            Logger.vv(LOG_TAG_BUG_REPORT, "$TAG drain: no complete slots fd=$fd [$start,$end) rawLen=$rawLength, slotSize=$slotSize")
             return 0L
         }
 
@@ -159,11 +187,14 @@ class GoMemLogConsumer(
      * guarantees slot alignment so this is only a last-resort safety net.
      */
     private fun processBuffer(buffer: ByteArray, bytesRead: Int) {
+        val batch = ArrayList<ConsoleLog>(bytesRead / slotSize)
         var slotOffset = 0
-        while (slotOffset + SLOT_SIZE <= bytesRead) {
-            processSlot(buffer, slotOffset)
-            slotOffset += SLOT_SIZE
+        while (slotOffset + slotSize <= bytesRead) {
+            val consoleLog = processSlot(buffer, slotOffset)
+            if (consoleLog != null) batch.add(consoleLog)
+            slotOffset += slotSize
         }
+        if (batch.isNotEmpty()) flushBatch(batch)
     }
 
     /**
@@ -174,8 +205,12 @@ class GoMemLogConsumer(
      *   buffer[offset+1 .. NL-1]   → payload bytes
      *   buffer[NL .. offset+799]   → garbage padding (ignored)
      * ```
+     *
+     * @return a [ConsoleLog] row for normal-level slots (may be `null` when filtered out by the
+     *   [Logger.LoggerLevel] UI gate); `null` for stacktrace / user-level slots, whose handling is
+     *   purely side-effectual (tombstone file write / notification + VPN stop).
      */
-    private fun processSlot(buffer: ByteArray, offset: Int) {
+    private fun processSlot(buffer: ByteArray, offset: Int): ConsoleLog? {
         // Byte 0: Go level character.
         val levelChar = (buffer[offset].toInt() and 0xFF).toChar()
         val goLevel = Logger.LoggerLevel.fromChar(levelChar)
@@ -190,7 +225,7 @@ class GoMemLogConsumer(
         }
 
         // Scan for '\n' to find where real content ends; everything after it is padding.
-        val slotEnd = offset + SLOT_SIZE
+        val slotEnd = offset + slotSize
         var newlinePos = slotEnd // default: no '\n' found → treat full slot as content
         for (i in (offset + 1) until slotEnd) {
             if (buffer[i] == NEWLINE_BYTE) {
@@ -208,6 +243,7 @@ class GoMemLogConsumer(
                 // Write level byte + payload bytes directly no String created.
                 ensureTombstoneStreamReady()
                 writeBytesToTombstone(buffer, offset, newlinePos - offset)
+                return null
             }
             level.user() -> {
                 // Notification API requires a String; unavoidable.
@@ -216,13 +252,41 @@ class GoMemLogConsumer(
                 else ""
                 showNwEngineNotification(msg)
                 VpnController.stop("goNotif", appContext, userInitiated = false)
+                return null
             }
             else -> {
                 // String created here, on the processor thread, never inside drain().
                 val payload = if (payloadLength > 0)
                     String(buffer, payloadStart, payloadLength, Charsets.UTF_8)
                 else ""
-                Logger.goLog3(payload, level)
+                // Build the DB row (centralized formatting + uiLogLevel gate live in
+                // Logger.goLog3); the row is collected by processBuffer and bulk-inserted
+                // as one batch, avoiding the per-line NetLogBatcher coroutine + flush delay.
+                return Logger.goLog3(payload, level)
+            }
+        }
+    }
+
+    /**
+     * Bulk-inserts a batch of normal-level Go log rows into the ConsoleLog DB on an IO dispatcher.
+     *
+     * Unlike the per-line [NetLogBatcher] path used by other console-log sources, Go logs arrive
+     * already grouped per [drain] call, so routing each row through the batcher would only add its
+     * ~2.5s timed flush plus a coroutine launch per line. Room serializes writes on the same DB
+     * connection, so this direct insert stays safe alongside concurrent batcher inserts.
+     */
+    private fun flushBatch(batch: List<ConsoleLog>) {
+        io {
+            try {
+                consoleLogRepository.insertBatch(batch)
+            } catch (e: CancellationException) {
+            throw e
+            } catch (e: Exception) {
+                Logger.e(
+                    LOG_TAG_BUG_REPORT,
+                    "$TAG flushBatch: insertBatch failed (size=${batch.size}): ${e.message}",
+                    e
+                )
             }
         }
     }
@@ -291,6 +355,18 @@ class GoMemLogConsumer(
         }
         val notificationManager =
             appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        // The "warning" channel is normally created lazily by BraveVPNService
+        // (notifyUserOnVpnFailure / showIpMismatchNotification). Since a Go USR
+        // log can in principle arrive before any of those paths have run, ensure
+        // the channel exists here so the notification is not silently dropped
+        // on API 26+ (posting to a non-existent channel is a no-op).
+        if (Utilities.isAtleastO()) {
+            val name = appContext.getString(R.string.notif_channel_vpn_failure)
+            val channel = NotificationChannel(WARNING_CHANNEL_ID, name, NotificationManager.IMPORTANCE_HIGH).apply {
+                description = appContext.getString(R.string.notif_channel_desc_vpn_failure)
+            }
+            notificationManager.createNotificationChannel(channel)
+        }
         val pendingIntent = Utilities.getActivityPendingIntent(
             appContext,
             Intent(appContext, AppLockActivity::class.java),
@@ -306,6 +382,10 @@ class GoMemLogConsumer(
         builder.color = ContextCompat.getColor(appContext, getAccentColor(Themes.SYSTEM_DEFAULT.id))
         notificationManager.notify(NW_ENGINE_NOTIFICATION_ID, builder.build())
         Logger.w(LOG_TAG_VPN, "$TAG nw eng notification: $msg")
+    }
+
+    private fun io (fn: suspend CoroutineScope.() -> Unit) {
+        scope.launch(Dispatchers.IO) { fn() }
     }
 }
 

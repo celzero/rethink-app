@@ -127,7 +127,6 @@
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Chráněno! Připojeno k DNS + Firewall + Proxy.</string>
     <string name="pause_mode_notification_title" translatable="true">Pozastaveno! Blokované aplikace budou nadále firewallovány.</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">selhává</string>
-    <string name="failed_using_default" translatable="true">Selhalo: používá se záložní DNS</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">Připojeno k RethinkDNS a Firewallu</string>
     <string name="firewall_mode_info_explanation_new" translatable="true">Monitorujte síťovou aktivitu a firewallujte jakoukoli aplikaci nebo IP adresu.</string>
     <string name="dns_explanation_dns_connected" translatable="true">Připojeno k RethinkDNS</string>
@@ -228,7 +227,6 @@
     <string name="settings_app_notification_a13_desc" translatable="true">Povolte oprávnění pro oznámení aplikace</string>
     <string name="settings_theme_heading" translatable="true">Vzhled</string>
     <string name="settings_rinr_heading" translatable="true">Loopback (experimentální)</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Loopback (experimentální)</string>
     <string name="settings_default_dns_heading" translatable="true">Vybrat záložní DNS</string>
     <string name="hsf_start_dialog_positive" translatable="true">Spustit</string>
     <string name="about_mail_subject" translatable="true">[Rethink]:</string>
@@ -345,7 +343,6 @@
     <string name="settings_go_log_heading" translatable="true">Úroveň logů</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Směřovat vlastní provoz Rethink (stahování blokovacích seznamů, kontroly připojení, DNS) zpět do tunelu.</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Rethink směřuje vlastní provoz přes tunel. Pokud nevíte, co děláte, raději to vypněte.</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Tím se také povolí<!--settings_network_all_networks--> %1$s. Chcete pokračovat?</string>
     <string name="settings_http_proxy_desc" translatable="true">Přesměrování na %1$s</string>
     <string name="settings_dns_proxy_dialog_header" translatable="true">Nastavit SOCKS5 Proxy</string>
     <string name="settings_http_proxy_dialog_title" translatable="true">Vlastní URL serveru</string>
@@ -420,7 +417,6 @@
     <string name="hsf_whats_new_chip_text" translatable="true">Co je nového</string>
     <string name="hsf_exclude_error" translatable="true">Vyloučení není možné v režimu VPN lockdown</string>
     <string name="hsf_proxy_chip_removed_toast" translatable="true">Proxy bylo vypnuto</string>
-    <string name="hsf_proxy_chip_remove_text" translatable="true">Zastavuji…</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Zachytávání paketů zakázáno</string>
     <string name="hsf_whats_new_remove_text" translatable="true">Zavírám…</string>
     <string name="hsf_blocklist_updating_text" translatable="true">Povoluji…</string>

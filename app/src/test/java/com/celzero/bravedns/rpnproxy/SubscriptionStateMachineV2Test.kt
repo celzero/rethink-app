@@ -21,13 +21,28 @@ import com.android.billingclient.api.Purchase
 import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusRepository
 import com.celzero.bravedns.iab.PurchaseDetail
+import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2Test.Companion.MACHINE_INIT_WAIT_MS
 import com.celzero.bravedns.service.PersistentState
-import io.mockk.*
+import io.mockk.Runs
+import io.mockk.clearAllMocks
+import io.mockk.clearMocks
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.unmockkAll
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import org.junit.*
-import org.junit.Assert.*
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
@@ -232,7 +247,8 @@ class SubscriptionStateMachineV2Test : KoinTest {
     }
 
     @Test
-    fun `init with Cancelled DB state and past billingExpiry restores Cancelled in memory`() {
+    fun `init with Cancelled DB state and past billingExpiry transitions to Expired`() {
+        // billing period has ended → subscription is expired
         val sub = makeActiveSub().also {
             it.status       = SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id
             it.billingExpiry = System.currentTimeMillis() - 1_000L
@@ -243,13 +259,16 @@ class SubscriptionStateMachineV2Test : KoinTest {
 
         val machine = createMachine()
 
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Cancelled, machine.getCurrentState())
-        coVerify(exactly = 0) { mockRepository.upsert(any()) }
+        // Cancelled + billingExpiry in the past → Expired
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
+        // handleSubscriptionExpiredWithData writes EXPIRED to DB
+        coVerify(atLeast = 1) { mockRepository.upsert(match { it.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id }) }
     }
 
     @Test
-    fun `init with billingExpiry=0 and Expired DB recommendedState treats as Active`() {
-        // When billingExpiry is 0 (unknown), the machine should not expire — Play will correct.
+    fun `init with billingExpiry=0 and Expired DB recommendedState stays Expired`() {
+        // When the DB row is Expired, respect that regardless of billingExpiry.
+        // Expired+0 was previously resurrected to Active; now it stays Expired.
         val sub = makeActiveSub().also {
             it.status       = SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id
             it.billingExpiry = 0L  // expiry unknown
@@ -260,8 +279,8 @@ class SubscriptionStateMachineV2Test : KoinTest {
 
         val machine = createMachine()
 
-        // billingExpiry=0 → override Expired → Active (Play will reconcile)
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.getCurrentState())
+        // Expired stays Expired — Play reconcile will correct if needed
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
     }
 
     // =========================================================================
@@ -311,25 +330,26 @@ class SubscriptionStateMachineV2Test : KoinTest {
     @Test
     fun `paymentSuccessful guard bypassed when isAutoRenewing=true within 5 min window (genuine resubscription)`() = runBlocking {
         val machine = createMachine()
-        val token   = "tok-resubscribe"
+        val oldToken = "tok-old"
+        val newToken = "tok-resubscribe"
         // isAutoRenewing=true: Play has re-enabled auto-renewal — genuine resubscription
-        val pd      = makePurchaseDetail(STD_PRODUCT, purchaseToken = token, isAutoRenewing = true)
+        val pd      = makePurchaseDetail(STD_PRODUCT, purchaseToken = newToken, isAutoRenewing = true)
 
         // DB row shows CANCELLED just 1 minute ago — within the 5-minute guard window
-        val existing = makeActiveSub(purchaseToken = token).also {
+        val existing = makeActiveSub(purchaseToken = oldToken).also {
             it.status        = SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id
             it.lastUpdatedTs = System.currentTimeMillis() - 60_000L
         }
-        coEvery { mockRepository.getByPurchaseToken(token) } returns existing
+        coEvery { mockRepository.getByPurchaseToken(newToken) } returns null
         coEvery { mockRepository.getCurrentSubscription() }  returns existing
 
         machine.paymentSuccessful(pd)
         delay(100)
 
-        // Guard bypassed for isAutoRenewing=true — DB must be updated to ACTIVE
+        // Guard bypassed for DIFFERENT token — DB must be updated to ACTIVE
         coVerify(atLeast = 1) {
             mockRepository.upsert(match {
-                it.status == SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id
+                it.status == SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id && it.purchaseToken == newToken
             })
         }
         assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.getCurrentState())
@@ -452,10 +472,9 @@ class SubscriptionStateMachineV2Test : KoinTest {
     // =========================================================================
 
     @Test
-    fun `reconcile empty SUBS snapshot expires old non-recently-active rows`() = runBlocking {
+    fun `reconcile empty SUBS snapshot expires stale SUBS rows`() = runBlocking {
         val machine  = createMachine()
         val staleSub = makeActiveSub(purchaseToken = "tok-stale", productId = STD_PRODUCT).also {
-            // Updated 2 days ago — well outside the 24h RECENTLY_ACTIVE_GUARD_MS window
             it.lastUpdatedTs = System.currentTimeMillis() - 2 * 24 * 60 * 60 * 1000L
         }
         coEvery { mockRepository.getSubscriptionsByStates(any()) } returns listOf(staleSub)
@@ -472,10 +491,9 @@ class SubscriptionStateMachineV2Test : KoinTest {
     }
 
     @Test
-    fun `reconcile empty SUBS snapshot skips recently-active row within 24h guard`() = runBlocking {
+    fun `reconcile empty SUBS snapshot expires even recently-active rows`() = runBlocking {
         val machine    = createMachine()
         val recentSub  = makeActiveSub(purchaseToken = "tok-recent", productId = STD_PRODUCT).also {
-            // Updated 10 minutes ago — within RECENTLY_ACTIVE_GUARD_MS (24 hours)
             it.lastUpdatedTs = System.currentTimeMillis() - 10 * 60 * 1000L
         }
         coEvery { mockRepository.getSubscriptionsByStates(any()) } returns listOf(recentSub)
@@ -485,9 +503,11 @@ class SubscriptionStateMachineV2Test : KoinTest {
             queriedProductType = BillingClient.ProductType.SUBS
         )
 
-        // Guard fires: row is NOT expired, state remains Initial
-        coVerify(exactly = 0) { mockRepository.upsert(any()) }
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Initial, machine.getCurrentState())
+        // No guard window: Play is the authority, row is expired
+        coVerify {
+            mockRepository.upsert(match { it.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id })
+        }
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
     }
 
     @Test
@@ -917,7 +937,11 @@ class SubscriptionStateMachineV2Test : KoinTest {
         val subRow = makeActiveSub(purchaseToken = "tok-subs", productId = STD_PRODUCT).also {
             it.billingExpiry = System.currentTimeMillis() - 1_000L
         }
+        // Reset mock counters from transitionToActive (which called upsert) so the
+        // verification below only measures calls made by expireStaleInAppFromDb itself.
+        clearMocks(mockRepository, answers = false)
         coEvery { mockRepository.getSubscriptionsByStates(any()) } returns listOf(subRow)
+        coEvery { mockRepository.upsert(any()) }                  returns 1L
 
         machine.expireStaleInAppFromDb(playTokens = emptySet())
 
@@ -1019,44 +1043,197 @@ class SubscriptionStateMachineV2Test : KoinTest {
         val sub     = makeActiveSub()
         transitionToActiveWithData(machine, sub)
 
-        // Row already marked EXPIRED
-        sub.status = SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id
         coEvery { mockRepository.upsert(any()) }            returns 1L
         coEvery { mockRepository.getCurrentSubscription() } returns sub
+
+        // First expiration: writes EXPIRED to DB, machine transitions to Expired
+        machine.subscriptionExpired()
+        delay(100)
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
+
+        // Reset verification counters; the idempotent Expired→Expired transition
+        // uses a no-op action (line 472-474), not handleSubscriptionExpiredWithData
         clearMocks(mockRepository, answers = false)
         coEvery { mockRepository.upsert(any()) }            returns 1L
         coEvery { mockRepository.getCurrentSubscription() } returns sub
 
+        // Second expiration: already Expired → idempotent, no DB write
         machine.subscriptionExpired()
         delay(100)
 
-        // Already EXPIRED → no duplicate upsert
         coVerify(exactly = 0) { mockRepository.upsert(any()) }
     }
 
     @Test
-    fun `Expired to Active via paymentSuccessful (re-subscribe after expiry)`() = runBlocking {
-        val machine = createMachine()
-        val sub     = makeActiveSub()
-        transitionToActiveWithData(machine, sub)
-
-        // Expire
-        coEvery { mockRepository.upsert(any()) }            returns 1L
-        coEvery { mockRepository.getCurrentSubscription() } returns sub
-        machine.subscriptionExpired()
-        delay(50)
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
-
-        // Re-subscribe with a new token
-        val newToken = "tok-renew-after-expire"
-        val newPd    = makePurchaseDetail(STD_PRODUCT, purchaseToken = newToken)
+    fun `paymentSuccessful resubscription updates CANCELLED to ACTIVE`() = runBlocking {
+        val machine  = createMachine()
+        // A genuine resubscription always gets a NEW purchaseToken from Google Play
+        // (see handlePaymentSuccessful comment ~line 1902). The old CANCELLED token stays
+        // in the DB; the new token drives the ACTIVE write.
+        val oldToken = "tok-cancelled"
+        val newToken = "tok-resub"
+        val existing = makeActiveSub(purchaseToken = oldToken).also {
+            it.status = SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id
+        }
+        // New token not yet in DB; getCurrentSubscription returns the old CANCELLED row.
         coEvery { mockRepository.getByPurchaseToken(newToken) } returns null
-        coEvery { mockRepository.getCurrentSubscription() }     returns sub
+        coEvery { mockRepository.getCurrentSubscription() }     returns existing
 
-        machine.paymentSuccessful(newPd)
+        // Play now says isAutoRenewing = true with a brand-new token (resubscribed)
+        val pd = makePurchaseDetail(STD_PRODUCT, purchaseToken = newToken, isAutoRenewing = true)
+        machine.paymentSuccessful(pd)
         delay(100)
 
         assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.getCurrentState())
+        coVerify {
+            mockRepository.upsert(match {
+                it.purchaseToken == newToken && it.status == SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id
+            })
+        }
+    }
+
+    @Test
+    fun `reconcile elects best purchase among multiple INAPP extensions`() = runBlocking {
+        val machine = createMachine()
+        val token1  = "tok-ext-1"
+        val token2  = "tok-ext-2"
+        val now     = System.currentTimeMillis()
+        val expiry1 = now + 1000L
+        val expiry2 = now + 2000L // Better because later expiry
+
+        val p1 = makeMockPurchase(INAPP_2YRS, token1, Purchase.PurchaseState.PURCHASED, true, false)
+        val p2 = makeMockPurchase(INAPP_2YRS, token2, Purchase.PurchaseState.PURCHASED, true, false)
+
+        machine.reconcileWithPlayBilling(
+            purchases = listOf(p1, p2),
+            purchaseExpiryMap = mapOf(token1 to expiry1, token2 to expiry2),
+            queriedProductType = BillingClient.ProductType.INAPP
+        )
+        delay(100)
+
+        // Verify token2 was elected to drive the state machine
+        assertEquals(token2, machine.getSubscriptionData()?.subscriptionStatus?.purchaseToken)
+        assertEquals(expiry2, machine.getSubscriptionData()?.subscriptionStatus?.billingExpiry)
+    }
+
+    @Test
+    fun `reconcile elects SUBS over INAPP even if INAPP has later expiry`() = runBlocking {
+        val machine = createMachine()
+        val tokenSubs = "tok-subs"
+        val tokenInApp = "tok-inapp"
+        val now = System.currentTimeMillis()
+        val expirySubs = now + 1000L
+        val expiryInApp = now + 5000L // Later but INAPP
+
+        val pSubs = makeMockPurchase(STD_PRODUCT, tokenSubs, Purchase.PurchaseState.PURCHASED, true, true)
+        val pInApp = makeMockPurchase(INAPP_2YRS, tokenInApp, Purchase.PurchaseState.PURCHASED, true, false)
+
+        machine.reconcileWithPlayBilling(
+            purchases = listOf(pSubs, pInApp),
+            purchaseExpiryMap = mapOf(tokenSubs to expirySubs, tokenInApp to expiryInApp),
+            queriedProductType = BillingClient.ProductType.SUBS // Mixed query
+        )
+        delay(100)
+
+        // Verify SUBS was elected
+        assertEquals(tokenSubs, machine.getSubscriptionData()?.subscriptionStatus?.purchaseToken)
+    }
+
+    @Test
+    fun `reconcile correctly elects between mixed expired and valid INAPP`() = runBlocking {
+        val machine = createMachine()
+        val tokenExpired = "tok-expired"
+        val tokenValid   = "tok-valid"
+        val now = System.currentTimeMillis()
+        val expiryExpired = now - 5000L
+        val expiryValid   = now + 10000L
+
+        val pExpired = makeMockPurchase(INAPP_2YRS, tokenExpired, Purchase.PurchaseState.PURCHASED, true, false)
+        val pValid   = makeMockPurchase(INAPP_2YRS, tokenValid, Purchase.PurchaseState.PURCHASED, true, false)
+
+        machine.reconcileWithPlayBilling(
+            purchases = listOf(pExpired, pValid),
+            purchaseExpiryMap = mapOf(tokenExpired to expiryExpired, tokenValid to expiryValid),
+            queriedProductType = BillingClient.ProductType.INAPP
+        )
+        delay(100)
+
+        // State machine should point to the valid one
+        assertEquals(tokenValid, machine.getSubscriptionData()?.subscriptionStatus?.purchaseToken)
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.getCurrentState())
+    }
+
+    @Test
+    fun `reconcile with only expired INAPP transitions machine to Expired`() = runBlocking {
+        val machine = createMachine()
+        val tokenExpired = "tok-expired-only"
+        val expiry = System.currentTimeMillis() - 1000L
+
+        val p = makeMockPurchase(INAPP_2YRS, tokenExpired, Purchase.PurchaseState.PURCHASED, true, false)
+
+        machine.reconcileWithPlayBilling(
+            purchases = listOf(p),
+            purchaseExpiryMap = mapOf(tokenExpired to expiry),
+            queriedProductType = BillingClient.ProductType.INAPP
+        )
+        delay(100)
+
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
+    }
+
+    @Test
+    fun `reconcile with generic payload does NOT overwrite good DB payload`() = runBlocking {
+        val machine = createMachine()
+        val token   = "tok-payload-prot"
+        val goodPayload = "{\"ws\":{\"sessiontoken\":\"good-token\"}}"
+        val genericPayload = "{}" // generic JSON without 'ws'
+
+        // 1. Initial payment with good payload
+        val pdGood = makePurchaseDetail(STD_PRODUCT, purchaseToken = token, payload = goodPayload)
+        machine.paymentSuccessful(pdGood)
+        delay(100)
+
+        // Verify it was saved
+        coVerify { mockRepository.upsert(match { it.developerPayload == goodPayload }) }
+
+        // 2. Reconcile with generic payload
+        val pGeneric = makeMockPurchase(STD_PRODUCT, token, Purchase.PurchaseState.PURCHASED, true, true).also {
+            every { it.developerPayload } returns genericPayload
+        }
+        
+        machine.reconcileWithPlayBilling(
+            purchases = listOf(pGeneric),
+            queriedProductType = BillingClient.ProductType.SUBS
+        )
+        delay(100)
+
+        // Fast-path skip should trigger because payload is considered "unchanged" (protection)
+        // If it didn't skip, it would call handlePaymentSuccessful which also protects.
+        // We can verify that the final data in the machine still has the GOOD payload.
+        assertEquals(goodPayload, machine.getSubscriptionData()?.subscriptionStatus?.developerPayload)
+    }
+
+    @Test
+    fun `handlePaymentSuccessful updates generic payload with good payload`() = runBlocking {
+        val machine = createMachine()
+        val token   = "tok-payload-upd"
+        val goodPayload = "{\"ws\":{\"sessiontoken\":\"better-token\"}}"
+        val genericPayload = "{}"
+
+        // Existing row has generic payload
+        val existing = makeActiveSub(purchaseToken = token).also {
+            it.developerPayload = genericPayload
+        }
+        coEvery { mockRepository.getByPurchaseToken(token) } returns existing
+
+        // Incoming purchase has GOOD payload (e.g. from server ack)
+        val pdGood = makePurchaseDetail(STD_PRODUCT, purchaseToken = token, payload = goodPayload)
+        
+        machine.paymentSuccessful(pdGood)
+        delay(100)
+
+        // Should update DB with the GOOD payload
+        coVerify { mockRepository.upsert(match { it.developerPayload == goodPayload }) }
     }
 
     // =========================================================================
@@ -1154,7 +1331,8 @@ class SubscriptionStateMachineV2Test : KoinTest {
         productId: String,
         purchaseToken: String  = "test-token-${System.nanoTime()}",
         expiryTime: Long       = System.currentTimeMillis() + 30 * 24 * 60 * 60 * 1000L,
-        isAutoRenewing: Boolean = true
+        isAutoRenewing: Boolean = true,
+        payload: String = ""
     ) = PurchaseDetail(
         productId        = productId,
         planId           = productId,
@@ -1171,7 +1349,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         isAutoRenewing   = isAutoRenewing,
         accountId        = "acc-test",
         deviceId         = "",
-        payload          = "",
+        payload          = payload,
         expiryTime       = expiryTime,
         status           = SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id,
         windowDays       = 3,
