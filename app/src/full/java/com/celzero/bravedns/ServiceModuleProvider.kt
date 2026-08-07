@@ -52,7 +52,7 @@ private val appDownloadManagerModule = module {
     single { AppDownloadManager(androidContext(), get()) }
 }
 
-private val workerModule = module { single { WorkScheduler(androidContext()) } }
+private val workerModule = module { single { WorkScheduler(androidContext(), get()) } }
 
 private val schedulerModule = module { single { ScheduleManager(androidContext()) } }
 

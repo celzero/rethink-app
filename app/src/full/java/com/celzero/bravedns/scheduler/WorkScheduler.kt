@@ -25,6 +25,8 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequest
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.LogLifespan
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
@@ -33,7 +35,7 @@ import com.google.common.util.concurrent.ListenableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
-class WorkScheduler(val context: Context) {
+class WorkScheduler(val context: Context, val persistentState: PersistentState) {
     companion object {
         const val APP_EXIT_INFO_ONE_TIME_JOB_TAG = "OnDemandCollectAppExitInfoJob"
         const val APP_EXIT_INFO_JOB_TAG = "ScheduledCollectAppExitInfoJob"
@@ -42,9 +44,7 @@ class WorkScheduler(val context: Context) {
         const val BLOCKLIST_UPDATE_CHECK_JOB_TAG = "ScheduledBlocklistUpdateCheckJob"
         const val DATA_USAGE_JOB_TAG = "ScheduledDataUsageJob"
         const val CONSOLE_LOG_SAVE_JOB_TAG = "ConsoleLogSaveJob"
-
         const val APP_EXIT_INFO_JOB_TIME_INTERVAL_DAYS: Long = 7
-        const val PURGE_LOGS_TIME_INTERVAL_HOURS: Long = 4
         const val PURGE_CONSOLE_LOGS_TIME_INTERVAL_HOURS: Long = 3
         const val BLOCKLIST_UPDATE_CHECK_INTERVAL_DAYS: Long = 3
         const val DATA_USAGE_TIME_INTERVAL_MINS: Long = 20
@@ -125,11 +125,17 @@ class WorkScheduler(val context: Context) {
     }
 
     fun schedulePurgeConnectionsLog() {
+        val logLifespan = persistentState.logLifespan
+        val purgeInterval = LogLifespan.getPurgeInterval(logLifespan)
+        val timeUnit = when(logLifespan) {
+            LogLifespan.ONE_HOUR.id -> TimeUnit.MINUTES
+            else -> TimeUnit.HOURS
+        }
         val purgeLogs =
             PeriodicWorkRequest.Builder(
                 PurgeConnectionLogs::class.java,
-                PURGE_LOGS_TIME_INTERVAL_HOURS,
-                TimeUnit.HOURS
+                purgeInterval,
+                timeUnit
             )
                 .addTag(PURGE_CONNECTION_LOGS_JOB_TAG)
                 .build()
