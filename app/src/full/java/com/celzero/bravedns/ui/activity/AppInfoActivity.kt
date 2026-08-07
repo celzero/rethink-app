@@ -1130,7 +1130,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         editText.setLines(4)
 
         val dialog = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
-            .setTitle(R.string.title_notes)
+            .setTitle(R.string.lbl_notes)
             .setView(editText)
             .setPositiveButton(R.string.lbl_save) { _, _ ->
                 appNotes = editText.text.toString()
@@ -1147,8 +1147,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun saveNotesToDatabase() {
-        appInfo.notes = appNotes
-        appInfoViewModel.updateAppNotes(appInfo)
+        appInfoViewModel.updateAppNotes(appInfo.uid, appNotes)
     }
 
     private fun showNotesChip() {

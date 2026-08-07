@@ -204,7 +204,10 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp">
+                    android:layout_marginEnd="10dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"

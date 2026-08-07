@@ -15,7 +15,6 @@ limitations under the License.
 */
 package com.celzero.bravedns.database
 
-//import Logger.LOG_TAG_APP_DB
 import android.database.Cursor
 import androidx.paging.PagingSource
 import androidx.room.Dao
@@ -31,6 +30,9 @@ import com.celzero.bravedns.data.DataUsage
 interface AppInfoDAO {
 
     @Update fun update(appInfo: AppInfo): Int
+
+    @Query("update AppInfo set notes = :notes, modifiedTs = :modifiedTs where uid = :uid")
+    fun updateNotes(uid: Int, notes: String, modifiedTs: Long): Int
 
     @Query(
         "update AppInfo set firewallStatus = :firewallStatus, connectionStatus = :connectionStatus, modifiedTs = :modifiedTs where uid = :uid"

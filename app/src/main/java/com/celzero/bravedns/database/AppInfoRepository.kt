@@ -153,6 +153,10 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         appInfoDAO.updateProxyExcluded(uid, isProxyExcluded, System.currentTimeMillis())
     }
 
+    suspend fun updateNotes(uid: Int, notes: String) {
+        appInfoDAO.updateNotes(uid, notes, System.currentTimeMillis())
+    }
+
     suspend fun getAppInfoUidForPackageName(packageName: String): Int {
         return appInfoDAO.getAppInfoUidForPackageName(packageName)
     }
