@@ -224,7 +224,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                     Utilities.getIcon(this, appInfo.packageName, appInfo.appName),
                     b.aadAppDetailIcon
                 )
-                showNotesChip()
 
                 if (appInfo.packageName == RETHINK_PACKAGE) {
                     updateFirewallStatusUi(appStatus, connStatus)
@@ -1134,7 +1133,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             .setView(editText)
             .setPositiveButton(R.string.lbl_save) { _, _ ->
                 appNotes = editText.text.toString()
-                showNotesChip()
                 saveNotesToDatabase()
                 logEvent(
                     "app notes updated",
@@ -1148,11 +1146,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
     private fun saveNotesToDatabase() {
         appInfoViewModel.updateAppNotes(appInfo.uid, appNotes)
-    }
-
-    private fun showNotesChip() {
-        // Always show the chip, regardless of whether notes are empty or not
-        b.aadNotesChip.visibility = View.VISIBLE
     }
 
     private fun io(f: suspend () -> Unit): Job {
