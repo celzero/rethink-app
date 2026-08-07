@@ -998,6 +998,8 @@ object FirewallManager : KoinComponent {
     suspend fun updateAppNotes(uid: Int, notes: String) {
         try {
             db.updateNotes(uid, notes)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Logger.w(LOG_TAG_FIREWALL, "updateAppNotes db failed for uid $uid", e)
             return
