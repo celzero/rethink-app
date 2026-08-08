@@ -45,7 +45,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.Collections
@@ -1008,9 +1007,7 @@ object FirewallManager : KoinComponent {
         cacheUpdate: (AppInfo) -> Unit
     ) {
         try {
-            withContext(Dispatchers.IO) {
-                dbUpdate()
-            }
+            dbUpdate()
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
