@@ -291,8 +291,10 @@ class ConnectionTrackerAdapter(private val context: Context) :
                         } else {
                             if (blocked) {
                                 b.connectionDuration.text = context.getString(R.string.symbol_red_circle)
+                                b.connectionDuration.alpha = 0.7f
                             } else {
                                 b.connectionDuration.text = ""
+                                b.connectionDuration.alpha = 1f
                             }
                             b.connectionDataUsage.text = ""
                         }
@@ -329,9 +331,11 @@ class ConnectionTrackerAdapter(private val context: Context) :
 
                     if (blocked) {
                         b.connectionDuration.text = context.getString(R.string.symbol_red_circle)
+                        b.connectionDuration.alpha = 0.7f
                     } else {
                         val duration = getDurationInHumanReadableFormat(context, ct.duration)
                         b.connectionDuration.text = context.getString(R.string.single_argument, duration)
+                        b.connectionDuration.alpha = 1f
                     }
 
                     b.connectionSummaryLl.visibility = View.VISIBLE

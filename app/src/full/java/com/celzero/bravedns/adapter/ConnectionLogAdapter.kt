@@ -337,9 +337,11 @@ class ConnectionLogAdapter(private val context: Context) :
                         } else {
                             if (blocked) {
                                 b.connectionDuration.text = context.getString(R.string.symbol_red_circle)
+                                b.connectionDuration.alpha = 0.7f
                                 hasMinSummary = true
                             } else {
                                 b.connectionDuration.text = ""
+                                b.connectionDuration.alpha = 1f
                             }
                             b.connectionDataUsage.text = ""
                         }
@@ -377,7 +379,9 @@ class ConnectionLogAdapter(private val context: Context) :
                     b.connectionSummaryLl.visibility = View.VISIBLE
                     if (blocked) {
                         b.connectionDuration.text = context.getString(R.string.symbol_red_circle)
+                        b.connectionDuration.alpha = 0.7f
                     } else {
+                        b.connectionDuration.alpha = 1f
                         val duration = getDurationInHumanReadableFormat(context, log.duration)
                         b.connectionDuration.text =
                             context.getString(R.string.single_argument, duration)
