@@ -69,15 +69,27 @@ class TunDnsManagerTest {
 
     private val persistentState = mockk<PersistentState>(relaxed = true)
     private val appConfig = mockk<AppConfig>(relaxed = true)
-    private val netLogTracker = mockk<NetLogTracker>(relaxed = true)
     private val rdb = mockk<RefreshDatabase>(relaxed = true)
     private val connectivityManager = mockk<ConnectivityManager>(relaxed = true)
     private val keyguardManager = mockk<KeyguardManager>(relaxed = true)
 
     private val rethinkUid = 10000
 
+    companion object {
+        // TunDnsManager is a process-lifetime `object`; its `by inject<NetLogTracker>()`
+        // delegate caches ONE NetLogTracker for the whole JVM. Robolectric runs every test in a
+        // single JVM, so a per-test mock would be stale after the first resolve and the test's
+        // own instance would never match the one production calls -> verify{} would fail.
+        // Share a single mock across all tests (the cached delegate and the verified instance
+        // become the same object); recorded calls are cleared in @Before for per-test isolation.
+        private val netLogTracker = mockk<NetLogTracker>(relaxed = true)
+    }
+
     @Before
     fun setUp() {
+        // reset recorded calls/verifications so each test starts clean (counts matter for
+        // verify(exactly = N)); answers/relaxed behaviour are unaffected.
+        clearMocks(netLogTracker)
         startKoin {
             modules(module {
                 single { persistentState }
@@ -86,9 +98,10 @@ class TunDnsManagerTest {
                 single { rdb }
             })
         }
+        // gomobile's DNSOpts() constructor NPEs under Robolectric (native seq, not interceptable
+        // by shadow or mockkConstructor); substitute a relaxed mock so production's dnsOptsFactory()
+        // returns a safe object whose getters yield "" (matching the assertEquals("", ...) asserts).
         TunDnsManager.setDnsOptsFactoryForTest { mockk(relaxed = true) }
-        TunDnsManager.setNetLogTrackerForTest(netLogTracker)
-        TunDnsManager.resetState()
         TunFirewallManager.setRethinkUidForTest(rethinkUid)
         mockkObject(FirewallManager)
         mockkObject(IpRulesManager)
@@ -114,8 +127,7 @@ class TunDnsManagerTest {
 
     @After
     fun tearDown() {
-        TunDnsManager.setDnsOptsFactoryForTest(::DNSOpts)
-        TunDnsManager.setNetLogTrackerForTest(mockk(relaxed = true)) // reset override
+        TunDnsManager.setDnsOptsFactoryForTest(::DNSOpts) // restore real constructor
         stopKoin()
         unmockkObject(FirewallManager)
         unmockkObject(IpRulesManager)
@@ -897,27 +909,6 @@ class TunDnsManagerTest {
         assertEquals(ConnectionTracker.ConnType.UNMETERED.value, connInfo.connType)
     }
 
-    // endregion
-
-    // region resetState and isUidPresentInAnyDnsRequest tests
-
-    @Test
-    fun `isUidPresentInAnyDnsRequest starts false and resetState keeps it false`() {
-        TunDnsManager.resetState()
-        assertFalse(TunDnsManager.isUidPresentInAnyDnsRequestForTest())
-    }
-
-    @Test
-    fun `resetState clears isUidPresentInAnyDnsRequest when previously set`() {
-        TunDnsManager.setIsUidPresentInAnyDnsRequestForTest(true)
-        assertTrue(TunDnsManager.isUidPresentInAnyDnsRequestForTest())
-        TunDnsManager.resetState()
-        assertFalse(TunDnsManager.isUidPresentInAnyDnsRequestForTest())
-    }
-
-    // endregion
-
-    // region Helper methods
 
     private fun createDnsSummary(
         id: String = "Preferred",
