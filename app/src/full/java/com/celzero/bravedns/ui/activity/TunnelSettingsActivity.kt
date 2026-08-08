@@ -138,7 +138,6 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         val text = getString(R.string.two_argument, getString(R.string.orbot_status_arg_2), getString(R.string.lbl_ip))
         b.settingsActivityTcpText.text = text.uppercase()
         b.dvWgAllowIncomingTxt.text = getString(R.string.two_argument_space, getString(R.string.settings_allow_incoming_wg_packets), getString(R.string.lbl_experimental))
-        b.settingsUseMaxMtuHeading.text = getString(R.string.two_argument_space, getString(R.string.settings_jumbo_packets), getString(R.string.lbl_experimental))
 
         // use multiple networks
         b.settingsActivityAllNetworkSwitch.isChecked = persistentState.useMultipleNetworks
@@ -281,11 +280,6 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
             _: CompoundButton,
             bool: Boolean ->
             persistentState.useMultipleNetworks = bool
-            if (bool) {
-                if (persistentState.enableStabilityDependentSettings()) {
-                    SnackbarHelper.showStabilityProgram(b.root, persistentState)
-                }
-            }
             if (!bool && persistentState.routeRethinkInRethink) {
                 persistentState.routeRethinkInRethink = false
                 displayRethinkInRethinkUi()
@@ -370,11 +364,6 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
             _: CompoundButton,
             checked: Boolean ->
             persistentState.privateIps = checked
-            if (checked) {
-                if (persistentState.enableStabilityDependentSettings()) {
-                    SnackbarHelper.showStabilityProgram(b.root, persistentState)
-                }
-            }
             b.settingsActivityLanTrafficSwitch.isEnabled = false
 
             Utilities.delay(TimeUnit.SECONDS.toMillis(1L), lifecycleScope) {
@@ -933,10 +922,8 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
             val protocolType = InternetProtocol.getInternetProtocol(selectedItem)
             persistentState.internetProtocolType = protocolType.id
 
-            // Enable experimental-dependent settings for IPv6, IPv46, and ALWAYSv46 (experimental protocols)
-            if (protocolType.id == InternetProtocol.IPv6.id ||
-                protocolType.id == InternetProtocol.IPv46.id ||
-                protocolType.id == InternetProtocol.ALWAYSv46.id) {
+            // enable experimental-dependent settings for ALWAYSv46 (experimental)
+            if (protocolType.id == InternetProtocol.ALWAYSv46.id) {
                 if (persistentState.enableStabilityDependentSettings()) {
                     SnackbarHelper.showStabilityProgram(b.root, persistentState)
                 }

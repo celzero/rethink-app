@@ -517,12 +517,6 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.dcFaviconSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcFaviconSwitch)
             persistentState.fetchFavIcon = enabled
-            if (enabled) {
-                // Enable experimental-dependent settings when experimental features are enabled
-                if (persistentState.enableStabilityDependentSettings()) {
-                    SnackbarHelper.showStabilityProgram(b.root, persistentState)
-                }
-            }
             logEvent("fav icon? $enabled", "User changed fav icon setting to $enabled")
         }
 

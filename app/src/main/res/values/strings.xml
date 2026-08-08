@@ -524,7 +524,7 @@
     <string name="settings_connectivity_checks" translatable="true">Perform connectivity checks</string>
     <string name="settings_connectivity_checks_desc" translatable="true">Connectivity checks are sent to ascertain reachability.</string>
 
-    <string name="settings_allow_lan_heading" translatable="true">Do not route Private IPs (experimental)</string>
+    <string name="settings_allow_lan_heading" translatable="true">Do not route Private IPs</string>
     <string name="settings_allow_lan_desc" translatable="true">Exclude LAN, loopback, multicast, link-local routes from Rethink\'s VPN tunnel.</string>
 
     <string name="settings_mobile_metered_heading" translatable="true">Meter mobile networks</string>
@@ -609,7 +609,7 @@
     <string name="settings_autostart_bootup_heading" translatable="true">Auto-start on power-up (experimental)</string>
     <string name="settings_autostart_bootup_desc" translatable="true">On device power-up, start Rethink if it was running before shut down.</string>
 
-    <string name="settings_network_all_networks" translatable="true">Use all available networks (experimental)</string>
+    <string name="settings_network_all_networks" translatable="true">Use all available networks</string>
     <string name="settings_network_all_networks_desc" translatable="true">When enabled, Rethink uses all available networks to connect to Internet. If not, it uses whichever network is deemed <i>active</i> by Android.</string>
 
     <string name="settings_check_update_heading" translatable="true">Check for app updates</string>
@@ -694,8 +694,8 @@
 
     <string name="settings_ip_dialog_title" translatable="true">Choose IP version</string>
     <string name="settings_ip_dialog_ipv4" translatable="true">IPv4 (default)</string>
-    <string name="settings_ip_dialog_ipv6" translatable="true">IPv6 (experimental)</string>
-    <string name="settings_ip_dialog_ipv46" translatable="true">Auto (experimental)</string>
+    <string name="settings_ip_dialog_ipv6" translatable="true">IPv6</string>
+    <string name="settings_ip_dialog_ipv46" translatable="true">Auto</string>
     <string name="settings_ip_text_ipv4" translatable="true">IPv4</string>
     <string name="settings_ip_text_ipv6" translatable="true">IPv6</string>
     <string name="settings_ip_text_ipv46" translatable="true">Auto</string>
@@ -841,7 +841,7 @@
 
     <string name="dc_custom_block_heading" translatable="true">Domain rules</string>
 
-    <string name="dc_dns_website_heading" translatable="true">Show website icon in DNS logs (experimental)</string>
+    <string name="dc_dns_website_heading" translatable="true">Show website icon in DNS logs</string>
     <string name="dc_dns_website_desc" translatable="true">Fetches website icons from <i>nextdns.io</i> and <i>duckduckgo.com</i>. Consumes up to 350 mb in disk space</string>
 
     <string name="dc_dns_leaks_heading" translatable="true">Prevent DNS leaks</string>
