@@ -1149,7 +1149,8 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun saveNotesToDatabase() {
-        appInfoViewModel.updateAppNotes(uid, appNotes)
+        val packageName = appInfo.packageName
+        appInfoViewModel.updateAppNotes(uid, packageName, appNotes)
     }
 
     private fun io(f: suspend () -> Unit): Job {

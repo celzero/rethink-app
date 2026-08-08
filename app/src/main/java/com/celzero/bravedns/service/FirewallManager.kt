@@ -980,16 +980,16 @@ object FirewallManager : KoinComponent {
 
     fun updateIsProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
         io {
-            updateAppInfoField(uid, "isProxyExcluded", isProxyExcluded, 
+            updateAppInfoField(uid, "isProxyExcluded", isProxyExcluded, null,
                 dbUpdate = suspend { db.updateProxyExcluded(uid, isProxyExcluded) },
                 cacheUpdate = { appInfo -> appInfo.isProxyExcluded = isProxyExcluded }
             )
         }
     }
 
-    suspend fun updateAppNotes(uid: Int, notes: String) {
-        updateAppInfoField(uid, "notes", notes,
-            dbUpdate = suspend { db.updateNotes(uid, notes) },
+    suspend fun updateAppNotes(uid: Int, packageName: String, notes: String) {
+        updateAppInfoField(uid, "notes", notes, packageName,
+            dbUpdate = suspend { db.updateNotes(uid, packageName, notes) },
             cacheUpdate = { appInfo -> appInfo.notes = notes }
         )
     }
@@ -998,6 +998,7 @@ object FirewallManager : KoinComponent {
         uid: Int,
         fieldName: String,
         value: Any?,
+        packageName: String?,
         dbUpdate: suspend () -> Unit,
         cacheUpdate: (AppInfo) -> Unit
     ) {
@@ -1014,9 +1015,18 @@ object FirewallManager : KoinComponent {
 
         val now = System.currentTimeMillis()
         mutex.withLock {
-            appInfos.get(uid).forEach { appInfo ->
-                cacheUpdate(appInfo)
-                appInfo.modifiedTs = now
+            if (packageName != null) {
+                // Exact match: uid + packageName (for per-app fields like notes)
+                appInfos.get(uid).find { it.packageName == packageName }?.let { appInfo ->
+                    cacheUpdate(appInfo)
+                    appInfo.modifiedTs = now
+                }
+            } else {
+                // All apps with this uid (for shared fields like isProxyExcluded)
+                appInfos.get(uid).forEach { appInfo ->
+                    cacheUpdate(appInfo)
+                    appInfo.modifiedTs = now
+                }
             }
         }
         informObservers()
