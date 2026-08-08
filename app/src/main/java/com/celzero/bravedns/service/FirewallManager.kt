@@ -980,10 +980,16 @@ object FirewallManager : KoinComponent {
 
     fun updateIsProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
         io {
-            updateAppInfoField(uid, "isProxyExcluded", null,
-                dbUpdate = suspend { db.updateProxyExcluded(uid, isProxyExcluded) },
-                cacheUpdate = { appInfo -> appInfo.isProxyExcluded = isProxyExcluded }
-            )
+            try {
+                updateAppInfoField(uid, "isProxyExcluded", null,
+                    dbUpdate = suspend { db.updateProxyExcluded(uid, isProxyExcluded) },
+                    cacheUpdate = { appInfo -> appInfo.isProxyExcluded = isProxyExcluded }
+                )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_FIREWALL, "updateIsProxyExcluded db failed for uid $uid", e)
+            }
         }
     }
 
