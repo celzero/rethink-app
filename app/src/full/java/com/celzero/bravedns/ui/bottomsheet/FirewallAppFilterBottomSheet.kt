@@ -207,6 +207,9 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
             if (isSelected) {
                 filters.sort = value
                 colorUpChipIcon(chip)
+            } else {
+                chip.checkedIcon?.colorFilter = null
+                chip.chipIcon?.colorFilter = null
             }
         }
 
