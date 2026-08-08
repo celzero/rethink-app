@@ -530,6 +530,12 @@ object WireguardManager : KoinComponent {
         return lockdown
     }
 
+    private fun isLockdownConfig(idStr: String): Boolean {
+        val confId = convertStringIdToId(idStr)
+        val conf = mappings.find { it.id == confId }
+        return conf?.isLockdown ?: false
+    }
+
     // no need to check for app excluded from proxy here, expected to call this fn after that
     suspend fun getAllPossibleConfigIdsForApp(uid: Int, ip: String, port: Int, domain: String, usesMobileNw: Boolean, ssid: String, default: String): List<String> {
         val proxyIds: MutableList<String> = mutableListOf()
@@ -561,6 +567,14 @@ object WireguardManager : KoinComponent {
                     proxyIds.add(pid)
                 }
             }
+        }
+
+        // if any of the app-specific config is a lockdown config but none of them can be
+        // used on this network, then the traffic must be blocked; lockdown overrides the
+        // catch-all configs and the default proxy
+        if (wgProxyIdsForApp.any { isLockdownConfig(it) } && proxyIds.none { isLockdownConfig(it) }) {
+            Logger.i(LOG_TAG_PROXY, "lockdown wg for app($uid) not eligible on this nw, return block")
+            return listOf(Backend.Block)
         }
 
         // if any of the chosen proxy is lockdown, then no need to proceed further
@@ -620,7 +634,9 @@ object WireguardManager : KoinComponent {
         if (!mobileOnlySetting && !ssidEnabled) return true
 
         val passMobileOnly = mobileOnlySetting && usesMobileNw
-        val passSsid = ssidEnabled && !usesMobileNw && matchesSsidListForConfig(id, ssid)
+        // On mobile the SSID rule is bypassed (mobile has no SSID context); ssidEnabled
+        // should not make a config ineligible on mobile data.
+        val passSsid = ssidEnabled && (usesMobileNw || matchesSsidListForConfig(id, ssid))
         return passMobileOnly || passSsid
     }
 

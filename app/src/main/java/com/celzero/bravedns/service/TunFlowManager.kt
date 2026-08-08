@@ -1167,9 +1167,14 @@ object TunFlowManager : KoinComponent {
             //   - in lockdown mode, traffic is blocked if not active, apply rule#17
             // the above comment is not true now as the checks for canRoute is happening in
             // go, see if this is needed for the global proxy lockdown else remove the below check
-            if (wgs.equals(Backend.Block)) {
+            // wg manager returns Backend.Block when an app-specific lockdown config exists
+            // but is not usable on the current network; such traffic must be blocked
+            // (rule#17) and not returned as a normal proxy list
+            if (wgs.contains(Backend.Block)) {
                 connTracker.isBlocked = true
                 connTracker.blockedByRule = FirewallRuleset.RULE17.id
+                logd("flow/upstream: wg lockdown not eligible, block $connId, $uid, ${connTracker.query}, ${connTracker.destIP}")
+                return persistAndConstructFlowResponse(ctx, connTracker, Backend.Block, connId, uid, forUpstreamAnswer)
             }
 
             val ids = (rpnIds + wgs).joinToString(",")
