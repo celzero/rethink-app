@@ -73,11 +73,6 @@ object WireguardManager : KoinComponent {
     // retrieve last added config id
     private var lastAddedConfigId = 0
 
-    // let the error code be a string, so that it can be concatenated with the error message
-    const val ERR_CODE_VPN_NOT_ACTIVE = "1"
-    const val ERR_CODE_VPN_NOT_FULL = "2"
-    const val ERR_CODE_OTHER_WG_ACTIVE = "3"
-    const val ERR_CODE_WG_INVALID = "4"
 
     // invalid config id
     const val INVALID_CONF_ID = -1
@@ -395,6 +390,20 @@ object WireguardManager : KoinComponent {
 
     fun isAnyOtherOneWgEnabled(id: Int): Boolean {
         return mappings.any { it.oneWireGuard && it.isActive && it.id != id }
+    }
+
+    // disables every active One-WireGuard config except the one with id == currentId
+    suspend fun disableOtherOneWireGuardConfigs(currentId: Int) {
+        val others = mappings.filter { it.oneWireGuard && it.isActive && it.id != currentId }
+        if (others.isEmpty()) return
+        Logger.i(
+            LOG_TAG_PROXY,
+            "disable other one-wg configs: ${others.map { it.id }}, keep: $currentId"
+        )
+        others.forEach {
+            disableConfig(it)
+            updateOneWireGuardConfig(it.id, false)
+        }
     }
 
     fun canDisableConfig(map: WgConfigFilesImmutable): Boolean {
