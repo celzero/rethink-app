@@ -980,7 +980,7 @@ object FirewallManager : KoinComponent {
 
     fun updateIsProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
         io {
-            updateAppInfoField(uid, "isProxyExcluded", isProxyExcluded, null,
+            updateAppInfoField(uid, "isProxyExcluded", null,
                 dbUpdate = suspend { db.updateProxyExcluded(uid, isProxyExcluded) },
                 cacheUpdate = { appInfo -> appInfo.isProxyExcluded = isProxyExcluded }
             )
@@ -988,7 +988,7 @@ object FirewallManager : KoinComponent {
     }
 
     suspend fun updateAppNotes(uid: Int, packageName: String, notes: String) {
-        updateAppInfoField(uid, "notes", notes, packageName,
+        updateAppInfoField(uid, "notes", packageName,
             dbUpdate = suspend { db.updateNotes(uid, packageName, notes) },
             cacheUpdate = { appInfo -> appInfo.notes = notes }
         )
@@ -997,7 +997,6 @@ object FirewallManager : KoinComponent {
     private suspend fun updateAppInfoField(
         uid: Int,
         fieldName: String,
-        value: Any?,
         packageName: String?,
         dbUpdate: suspend () -> Unit,
         cacheUpdate: (AppInfo) -> Unit
@@ -1010,7 +1009,7 @@ object FirewallManager : KoinComponent {
             throw e
         } catch (e: Exception) {
             Logger.w(LOG_TAG_FIREWALL, "updateAppInfoField ($fieldName) db failed for uid $uid", e)
-            return
+            throw e
         }
 
         val now = System.currentTimeMillis()

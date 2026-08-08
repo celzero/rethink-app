@@ -172,7 +172,14 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         networkLogsViewModel.setUid(uid)
         init()
         observeAppRules()
+        observeNotesErrors()
         setupClickListeners()
+    }
+
+    private fun observeNotesErrors() {
+        appInfoViewModel.notesErrorEvent.observe(this) { errorMessage ->
+            showToastUiCentered(this, errorMessage, Toast.LENGTH_SHORT)
+        }
     }
 
     private fun hideContentBehindWarning(hide: Boolean) {
@@ -1136,8 +1143,8 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             .setTitle(R.string.lbl_notes)
             .setView(editText)
             .setPositiveButton(R.string.lbl_save) { _, _ ->
-                appNotes = editText.text.toString()
-                saveNotesToDatabase()
+                val newNotes = editText.text.toString()
+                saveNotesToDatabase(newNotes)
                 logEvent(
                     "app notes updated",
                     "Notes updated for $appName ($uid)"
@@ -1148,9 +1155,10 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         dialog.show()
     }
 
-    private fun saveNotesToDatabase() {
+    private fun saveNotesToDatabase(newNotes: String) {
         val packageName = appInfo.packageName
-        appInfoViewModel.updateAppNotes(uid, packageName, appNotes)
+        appInfoViewModel.updateAppNotes(uid, packageName, newNotes)
+        appNotes = newNotes
     }
 
     private fun io(f: suspend () -> Unit): Job {
