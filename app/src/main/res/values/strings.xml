@@ -1693,6 +1693,11 @@
     <string name="exclude_all_app_wg_dialog_desc" translatable="true">Exclude all apps from this WireGuard VPN?</string>
 
     <string name="wireguard_enabled_failure" translatable="true">Stop other active proxies to enable WireGuard</string>
+    <string name="wireguard_dns_mode_conflict" translatable="true">WireGuard cannot be enabled in DNS-only mode. Switch to Firewall or DNS+Firewall mode.</string>
+    <string name="wireguard_one_wg_active_conflict" translatable="true">An active One-WireGuard configuration is in use. Disable it first to use individual WireGuard configurations.</string>
+    <string name="wireguard_invalid_config_title" translatable="true">Invalid WireGuard configuration</string>
+    <string name="wireguard_invalid_config_message" translatable="true">The selected WireGuard configuration is invalid or missing. Edit or re-import the configuration and try again.</string>
+    <string name="wireguard_replaced_active_config" translatable="true">Replaced the previously active WireGuard configuration</string>
     <string name="wireguard_disable_failure" translatable="true">\"Always-on WireGuard\" cannot be turned off</string>
     <string name="wireguard_disable_failure_relay" translatable="true">\"Relay WireGuard\" cannot be turned off</string>
 
@@ -2091,7 +2096,7 @@
     <string name="lockdown_check_socks5" translatable="false">SOCKS5 Proxy</string>
     <string name="lockdown_check_socks5_desc" translatable="false">SOCKS5 proxy with app (%1$s) conflicts with lockdown mode.</string>
     <string name="lockdown_check_ac" translatable="false">Anti-Censorship</string>
-    <string name="lockdown_check_ac_desc" translatable="false">Anti-censorship auto-proxy with retry conflicts with lockdown.</string>
+    <string name="lockdown_check_ac_desc" translatable="false">Only the \&quot;Hybrid\&quot; dial strategy with \&quot;never retry\&quot; is compatible; disable anti-censorship otherwise.</string>
     <string name="lockdown_check_ok" translatable="false">Compatible</string>
     <string name="lockdown_check_conflict" translatable="false">Conflict</string>
     <string name="lockdown_check_disable_switch" translatable="false">Disable incompatible options</string>
@@ -2099,6 +2104,8 @@
     <string name="lockdown_check_apply" translatable="false">Apply</string>
     <string name="lockdown_check_cancel" translatable="false">Cancel</string>
     <string name="lockdown_check_all_ok" translatable="false">All checks passed. No conflicts detected.</string>
+    <string name="lockdown_check_setting_disabled" translatable="false">Proxy Lockdown is enabled. This setting cannot be changed.</string>
+    <string name="lockdown_check_proxy_options_disabled" translatable="false">Proxy Lockdown is enabled. Orbot, HTTP and SOCKS5 proxies cannot be used.</string>
     <string name="lockdown_check_no_proxy" translatable="false">No Proxy Enabled</string>
     <string name="lockdown_check_no_proxy_desc" translatable="false">No proxy (HTTP, SOCKS5, WireGuard, RPN, or Orbot) is enabled. Lockdown mode will block all non-VPN traffic.</string>
     <string name="lockdown_check_rethink_bypass" translatable="false">Rethink Bypass</string>
@@ -2211,7 +2218,7 @@
 
     <!-- Item already owned / restore feedback -->
     <string name="item_already_owned_restoring" translatable="false">This item is already owned. Restoring your purchase…</string>
-    <string name="restore_purchases" translatable="false">Restore Purchases</string>
+    <string name="restore_purchases" translatable="false">Restore Purchase</string>
     <string name="restore_purchases_hint" translatable="false">Didn\'t get your purchase? Tap here to restore.</string>
     <string name="restore_purchases_success" translatable="false">Purchase restored successfully.</string>
     <string name="restore_purchases_none" translatable="false">No previous purchases were found.</string>
@@ -2240,6 +2247,16 @@
     <string name="billing_err_feature_not_supported" translatable="false">This feature is not supported on your device.</string>
     <string name="billing_err_item_not_owned" translatable="false">This item is not currently owned.</string>
     <string name="billing_err_payment_declined" translatable="false">Your payment couldn\'t be completed. Please try a different payment method or contact your bank.</string>
+
+    <!-- Product fetch error reasons (shown below the primary error message in RethinkPlusFragment) -->
+    <string name="error_reason" translatable="false">Reason</string>
+    <string name="product_fetch_err_network" translatable="false">No internet connection. Check your network and try again.</string>
+    <string name="product_fetch_err_timeout" translatable="false">Google Play did not respond in time. Please try again.</string>
+    <string name="product_fetch_err_empty" translatable="false">No subscription plans were returned. Please try again.</string>
+    <string name="product_fetch_err_auth" translatable="false">Configuration error. Please contact support.</string>
+    <string name="product_fetch_err_billing_unavailable" translatable="false">In-app purchases are not available on this device.</string>
+    <string name="product_fetch_err_server" translatable="false">Google Play is temporarily unavailable. Please try again.</string>
+    <string name="product_fetch_err_unknown" translatable="false">An unexpected error occurred. Please try again.</string>
 
     <!-- Server sync pending banner -->
     <string name="server_sync_pending_msg" translatable="false">Purchase verified, but server sync is pending. Your access is active and will sync shortly.</string>
