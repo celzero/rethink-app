@@ -1138,7 +1138,7 @@
     <!-- Firewall -->
     <string name="fapps_filter_filter_heading" translatable="true">Type</string>
     <string name="fapps_filter_categories_heading" translatable="true">Categories</string>
-    <string name="fapps_filter_sort_heading">Sort by</string>
+<string name="fapps_filter_sort_heading" translatable="true">Sort by</string>
 
     <string name="fapps_filter_clear_btn" translatable="true">Clear</string>
 
