@@ -1345,6 +1345,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         }
 
         b.settingsActivityLanTrafficRl.isEnabled = !isSystemLockdown
+        b.settingsActivityLanTrafficSwitch.isEnabled = !isSystemLockdown
     }
 
     private fun logEvent(msg: String, details: String) {
