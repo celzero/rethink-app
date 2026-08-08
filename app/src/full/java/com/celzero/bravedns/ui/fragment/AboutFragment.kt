@@ -112,6 +112,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.NonCancellable
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -678,9 +679,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 goResult.errorMessage, destTreeUri
             )
 
-            withContext(Dispatchers.Main) {
+            withContext(NonCancellable + Dispatchers.Main) {
                 // Notification always fires — uses app context, not fragment.
-                showMemoryProfileNotification(ctx, theme, jvmOutcome, goOutcome)
+                showMemoryProfileNotification(appCtx, theme, jvmOutcome, goOutcome)
                 // Toast only if the fragment is still attached.
                 if (isAdded) {
                     val msg = buildProfileResultMessage(jvmOutcome, goOutcome)
