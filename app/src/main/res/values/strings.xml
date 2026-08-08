@@ -1359,9 +1359,9 @@
     <string name="category_name_installed" translatable="true">Installed Apps</string>
 
     <!-- Sort constants -->
-    <string name="fapps_filter_sort_name">Name</string>
-    <string name="fapps_filter_sort_package">Package name</string>
-    <string name="fapps_filter_sort_uid">UID</string>
+<string name="fapps_filter_sort_name" translatable="true">Name</string>
+    <string name="fapps_filter_sort_package" translatable="true">Package name</string>
+    <string name="fapps_filter_sort_uid" translatable="true">UID</string>
 
     <!-- Build flavor constants -->
     <string name="build__flavor_website" translatable="true">website</string>
