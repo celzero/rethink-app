@@ -981,14 +981,18 @@ object FirewallManager : KoinComponent {
     fun updateIsProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
         io {
             try {
-                updateSharedUidAppInfoField(uid, "isProxyExcluded",
-                    dbUpdate = suspend { db.updateProxyExcluded(uid, isProxyExcluded) },
-                    cacheUpdate = { appInfo -> appInfo.isProxyExcluded = isProxyExcluded }
-                )
+                withContext(Dispatchers.IO) {
+                    db.updateProxyExcluded(uid, isProxyExcluded)
+                }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 Logger.w(LOG_TAG_FIREWALL, "updateIsProxyExcluded db failed for uid $uid", e)
+                return@io
+            }
+
+            updateSharedUidCacheField(uid) { appInfo ->
+                appInfo.isProxyExcluded = isProxyExcluded
             }
         }
     }
@@ -1043,14 +1047,10 @@ object FirewallManager : KoinComponent {
         }
     }
 
-    private suspend fun updateSharedUidAppInfoField(
+    private suspend fun updateSharedUidCacheField(
         uid: Int,
-        fieldName: String,
-        dbUpdate: suspend () -> Unit,
         cacheUpdate: (AppInfo) -> Unit
     ) {
-        runDbUpdate(uid, fieldName, dbUpdate)
-
         val now = System.currentTimeMillis()
         mutex.withLock {
             appInfos.get(uid).forEach { appInfo ->
