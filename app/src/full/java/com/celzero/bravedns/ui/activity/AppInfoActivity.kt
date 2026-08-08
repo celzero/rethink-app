@@ -101,7 +101,10 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
     private var showBypassToolTip: Boolean = true
     private var isWarningAcknowledged: Boolean = false
-    private var appNotes: String = ""
+    private var notesDraft: String = ""
+    private var shouldRestoreNotesDialog: Boolean = false
+    private var notesDialog: AlertDialog? = null
+    private var notesEditText: EditText? = null
 
     private val warningBackCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
@@ -122,6 +125,8 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         private const val ALPHA_DISABLED = 0.5f
         private const val IS_WARNING_ACKNOWLEDGED = "IS_WARNING_ACKNOWLEDGED"
         private const val MAX_NOTE_LENGTH = 500
+        private const val NOTES_DRAFT = "NOTES_DRAFT"
+        private const val IS_NOTES_DIALOG_OPEN = "IS_NOTES_DIALOG_OPEN"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -141,6 +146,8 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         if (savedInstanceState?.getBoolean(IS_WARNING_ACKNOWLEDGED, false) == true) {
             isWarningAcknowledged = true
         }
+        notesDraft = savedInstanceState?.getString(NOTES_DRAFT).orEmpty()
+        shouldRestoreNotesDialog = savedInstanceState?.getBoolean(IS_NOTES_DIALOG_OPEN, false) == true
 
         if (shouldShowRethinkWarning()) {
             showRethinkWarning()
@@ -176,13 +183,14 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         observeAppRules()
         observeNotesEvents()
         setupClickListeners()
+        restoreNotesDialogIfNeeded()
     }
 
     private fun observeNotesEvents() {
         appInfoViewModel.notesSaveSuccessEvent.observe(this) { event ->
             event.getIfNotHandled()?.let { savedNotes ->
-                appNotes = savedNotes
                 if (::appInfo.isInitialized) {
+                    appInfo.notes = savedNotes
                     logEvent(
                         "app notes updated",
                         "Notes updated for ${appInfo.appName} ($uid)"
@@ -209,6 +217,20 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean(IS_WARNING_ACKNOWLEDGED, isWarningAcknowledged)
+        val isDialogOpen = notesDialog?.isShowing == true
+        outState.putBoolean(IS_NOTES_DIALOG_OPEN, isDialogOpen)
+        if (isDialogOpen) {
+            outState.putString(NOTES_DRAFT, notesEditText?.text?.toString().orEmpty())
+        } else {
+            outState.putString(NOTES_DRAFT, "")
+        }
+    }
+
+    private fun restoreNotesDialogIfNeeded() {
+        if (!shouldRestoreNotesDialog) return
+        val draft = notesDraft
+        shouldRestoreNotesDialog = false
+        showNotesDialog(draft)
     }
 
     private fun observeAppRules() {
@@ -233,7 +255,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             connStatus = FirewallManager.connectionStatus(appInfo.uid)
             uiCtx {
                 this.appInfo = appInfo
-                appNotes = appInfo.notes
 
                 b.aadAppDetailName.text = appName(packages.count())
                 b.aadPkgName.text = getString(R.string.app_id_package, appInfo.uid, appInfo.packageName)
@@ -1148,25 +1169,36 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         eventLogger.log(EventType.FW_RULE_MODIFIED, Severity.LOW, msg, EventSource.UI, true, details)
     }
 
-    private fun showNotesDialog() {
+    private fun showNotesDialog(draftText: String? = null) {
+        val initialText = draftText ?: if (::appInfo.isInitialized) appInfo.notes else ""
         val editText = EditText(this).apply {
-            setText(appNotes)
+            setText(initialText)
             hint = getString(R.string.hint_notes)
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
             setMinLines(4)
             setMaxLines(10)
             filters = arrayOf(InputFilter.LengthFilter(MAX_NOTE_LENGTH))
         }
+        notesEditText = editText
 
         val dialog = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
             .setTitle(R.string.lbl_notes)
             .setView(editText)
             .setPositiveButton(R.string.lbl_save) { _, _ ->
                 val newNotes = editText.text.toString().trim()
+                notesDraft = ""
                 saveNotesToDatabase(newNotes)
             }
-            .setNegativeButton(R.string.lbl_cancel, null)
+            .setNegativeButton(R.string.lbl_cancel) { _, _ ->
+                notesDraft = ""
+            }
             .create()
+        dialog.setOnDismissListener {
+            notesDialog = null
+            notesEditText = null
+            shouldRestoreNotesDialog = false
+        }
+        notesDialog = dialog
         dialog.show()
     }
 

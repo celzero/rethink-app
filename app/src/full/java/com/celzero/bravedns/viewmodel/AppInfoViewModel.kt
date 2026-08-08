@@ -15,6 +15,7 @@ import com.celzero.bravedns.database.AppInfoDAO
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.util.Constants
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -473,11 +474,12 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
     fun updateAppNotes(uid: Int, packageName: String, notes: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+            try {
                 FirewallManager.updateAppNotes(uid, packageName, notes)
-            }.onSuccess {
                 _notesSaveSuccessEvent.postValue(OneTimeEvent(notes))
-            }.onFailure { e ->
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
                 _notesErrorEvent.postValue(OneTimeEvent("Failed to save notes: ${e.message}"))
             }
         }

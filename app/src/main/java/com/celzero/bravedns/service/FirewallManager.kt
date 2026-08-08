@@ -45,6 +45,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.Collections
@@ -980,14 +981,18 @@ object FirewallManager : KoinComponent {
     fun updateIsProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
         io {
             try {
-                updateSharedUidAppInfoField(uid, "isProxyExcluded",
-                    dbUpdate = suspend { db.updateProxyExcluded(uid, isProxyExcluded) },
-                    cacheUpdate = { appInfo -> appInfo.isProxyExcluded = isProxyExcluded }
-                )
+                withContext(Dispatchers.IO) {
+                    db.updateProxyExcluded(uid, isProxyExcluded)
+                }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 Logger.w(LOG_TAG_FIREWALL, "updateIsProxyExcluded db failed for uid $uid", e)
+                return@io
+            }
+
+            updateSharedUidCacheField(uid) { appInfo ->
+                appInfo.isProxyExcluded = isProxyExcluded
             }
         }
     }
@@ -1005,7 +1010,9 @@ object FirewallManager : KoinComponent {
         dbUpdate: suspend () -> Unit
     ) {
         try {
-            dbUpdate()
+            withContext(Dispatchers.IO) {
+                dbUpdate()
+            }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -1024,26 +1031,26 @@ object FirewallManager : KoinComponent {
         runDbUpdate(uid, fieldName, dbUpdate)
 
         val now = System.currentTimeMillis()
+        var cacheUpdated = false
         mutex.withLock {
             appInfos.get(uid).find { it.packageName == packageName }?.let { appInfo ->
                 cacheUpdate(appInfo)
                 appInfo.modifiedTs = now
+                cacheUpdated = true
             } ?: Logger.w(
                 LOG_TAG_FIREWALL,
                 "updatePerAppInfoField ($fieldName) cache miss for uid $uid, package $packageName"
             )
         }
-        informObservers()
+        if (cacheUpdated) {
+            informObservers()
+        }
     }
 
-    private suspend fun updateSharedUidAppInfoField(
+    private suspend fun updateSharedUidCacheField(
         uid: Int,
-        fieldName: String,
-        dbUpdate: suspend () -> Unit,
         cacheUpdate: (AppInfo) -> Unit
     ) {
-        runDbUpdate(uid, fieldName, dbUpdate)
-
         val now = System.currentTimeMillis()
         mutex.withLock {
             appInfos.get(uid).forEach { appInfo ->
