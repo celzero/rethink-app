@@ -179,16 +179,24 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun observeNotesEvents() {
-        appInfoViewModel.notesSaveSuccessEvent.observe(this) { savedNotes ->
-            appNotes = savedNotes
-            logEvent(
-                "app notes updated",
-                "Notes updated for ${appInfo.appName} ($uid)"
-            )
+        appInfoViewModel.notesSaveSuccessEvent.observe(this) { event ->
+            event.getIfNotHandled()?.let { savedNotes ->
+                appNotes = savedNotes
+                if (::appInfo.isInitialized) {
+                    logEvent(
+                        "app notes updated",
+                        "Notes updated for ${appInfo.appName} ($uid)"
+                    )
+                } else {
+                    Logger.w(LOG_TAG_UI, "notes save success received before appInfo init for uid: $uid")
+                }
+            }
         }
 
-        appInfoViewModel.notesErrorEvent.observe(this) { errorMessage ->
-            showToastUiCentered(this, errorMessage, Toast.LENGTH_SHORT)
+        appInfoViewModel.notesErrorEvent.observe(this) { event ->
+            event.getIfNotHandled()?.let { errorMessage ->
+                showToastUiCentered(this, errorMessage, Toast.LENGTH_SHORT)
+            }
         }
     }
 
@@ -1163,6 +1171,15 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun saveNotesToDatabase(newNotes: String) {
+        if (!::appInfo.isInitialized) {
+            Logger.w(LOG_TAG_UI, "AppInfo not initialized in saveNotesToDatabase, uid: $uid")
+            showToastUiCentered(
+                this,
+                this.getString(R.string.ctbs_app_info_not_available_toast),
+                Toast.LENGTH_SHORT
+            )
+            return
+        }
         val packageName = appInfo.packageName
         appInfoViewModel.updateAppNotes(uid, packageName, newNotes)
     }
