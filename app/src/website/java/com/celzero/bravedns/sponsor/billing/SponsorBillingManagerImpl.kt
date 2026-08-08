@@ -155,7 +155,7 @@ class SponsorBillingManagerImpl(context: Context) : SponsorBillingManager {
                 return@queryProductDetailsAsync
             }
 
-            // Match the offer by id (purchaseOptionId first, then offerId), falling
+            // match the offer by id (purchaseOptionId first, then offerId), falling
             // back to the first available offer if the exact tier is somehow missing.
             val offers = productDetails.oneTimePurchaseOfferDetailsList.orEmpty()
             val offer = offers.firstOrNull { (it.purchaseOptionId ?: it.offerId) == targetOfferId }
