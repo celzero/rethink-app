@@ -24,6 +24,7 @@ import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Process
+import android.text.InputFilter
 import android.text.InputType
 import android.text.format.DateUtils
 import android.view.View
@@ -120,6 +121,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         private const val MILLIS_PER_SECOND = 1000L
         private const val ALPHA_DISABLED = 0.5f
         private const val IS_WARNING_ACKNOWLEDGED = "IS_WARNING_ACKNOWLEDGED"
+        private const val MAX_NOTE_LENGTH = 500
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -1144,6 +1146,8 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             hint = getString(R.string.hint_notes)
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
             setMinLines(4)
+            setMaxLines(10)
+            filters = arrayOf(InputFilter.LengthFilter(MAX_NOTE_LENGTH))
         }
 
         val dialog = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
