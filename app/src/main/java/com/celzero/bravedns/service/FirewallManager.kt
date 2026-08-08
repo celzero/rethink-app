@@ -980,40 +980,43 @@ object FirewallManager : KoinComponent {
 
     fun updateIsProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
         io {
-            try {
-                db.updateProxyExcluded(uid, isProxyExcluded)
-            } catch (e: Exception) {
-                Logger.w(LOG_TAG_FIREWALL, "updateIsProxyExcluded db failed for uid $uid", e)
-                return@io
-            }
-            val now = System.currentTimeMillis()
-            mutex.withLock {
-                appInfos.get(uid).forEach {
-                    it.isProxyExcluded = isProxyExcluded
-                    it.modifiedTs = now
-                }
-            }
-            informObservers()
+            updateAppInfoField(uid, "isProxyExcluded", isProxyExcluded, 
+                dbUpdate = suspend { db.updateProxyExcluded(uid, isProxyExcluded) },
+                cacheUpdate = { appInfo -> appInfo.isProxyExcluded = isProxyExcluded }
+            )
         }
     }
 
     suspend fun updateAppNotes(uid: Int, notes: String) {
+        updateAppInfoField(uid, "notes", notes,
+            dbUpdate = suspend { db.updateNotes(uid, notes) },
+            cacheUpdate = { appInfo -> appInfo.notes = notes }
+        )
+    }
+
+    private suspend fun updateAppInfoField(
+        uid: Int,
+        fieldName: String,
+        value: Any?,
+        dbUpdate: suspend () -> Unit,
+        cacheUpdate: (AppInfo) -> Unit
+    ) {
         try {
             withContext(Dispatchers.IO) {
-                db.updateNotes(uid, notes)
+                dbUpdate()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            Logger.w(LOG_TAG_FIREWALL, "updateAppNotes db failed for uid $uid", e)
+            Logger.w(LOG_TAG_FIREWALL, "updateAppInfoField ($fieldName) db failed for uid $uid", e)
             return
         }
 
         val now = System.currentTimeMillis()
         mutex.withLock {
-            appInfos.get(uid).forEach {
-                it.notes = notes
-                it.modifiedTs = now
+            appInfos.get(uid).forEach { appInfo ->
+                cacheUpdate(appInfo)
+                appInfo.modifiedTs = now
             }
         }
         informObservers()
