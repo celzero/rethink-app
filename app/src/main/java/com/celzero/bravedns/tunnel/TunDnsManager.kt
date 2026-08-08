@@ -1,36 +1,68 @@
 package com.celzero.bravedns.tunnel
 
+import android.app.KeyguardManager
+import android.net.ConnectivityManager
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.data.ConnTrackerMetaData
+import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
+import com.celzero.bravedns.service.ConnectionMonitor
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.FirewallManager
+import com.celzero.bravedns.service.FirewallRuleset
+import com.celzero.bravedns.service.IpRulesManager
+import com.celzero.bravedns.service.NetLogTracker
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.ProxyManager.isAnyUserSetProxy
+import com.celzero.bravedns.service.TunFirewallManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.bottomsheet.BlockFreeDnsModeBottomSheet
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
+import com.celzero.bravedns.util.KnownPorts
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import com.celzero.bravedns.util.ResourceRecordTypes
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.DNSOpts
+import com.celzero.firestack.backend.DNSSummary
+import com.celzero.firestack.intra.Mark
+import kotlinx.coroutines.CoroutineScope
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.Locale
 
 object TunDnsManager: KoinComponent {
     private const val TAG = "TunDnsManager"
     data class DnsParams(val origin: String, val uidStr: String?, val fqdn: String, val qtype: Long, val isLockdown: Boolean, val ssid: String?, val isIfaceCellular: Boolean)
 
+    data class UpstreamAnswerParams(
+        val scope: CoroutineScope,
+        val id: String,
+        val smm: DNSSummary,
+        val rcvdDnsOpts: DNSOpts,
+        val ipcsv: String,
+        val isLockdown: Boolean,
+        val isDeviceLocked: Boolean,
+        val underlyingNetworks: ConnectionMonitor.UnderlyingNetworks?,
+        val keyguardManager: KeyguardManager?,
+        val connectivityManager: ConnectivityManager,
+        val accessibilityServiceFunctional: Boolean,
+        val isSpecialApp: suspend (Int) -> Boolean,
+        val isConnectionMetered: (String) -> Boolean,
+        val determineProxyDetails: suspend (ConnTrackerMetaData, Boolean, Boolean) -> Mark,
+        val onDeviceLocked: (() -> Unit)?,
+        val onAccessibilityFailure: (() -> Unit)?
+    )
+
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
+    private val netLogTracker by inject<NetLogTracker>()
 
     private val rethinkUid = android.os.Process.myUid()
 
@@ -38,6 +70,17 @@ object TunDnsManager: KoinComponent {
     // only when this flag is true, ensuring unknown app DNS requests are blocked and avoiding
     // issues when Android omits uid in dns requests
     private var isUidPresentInAnyDnsRequest: Boolean = false
+
+    // gomobile's DNSOpts() constructor invokes native seq code which cannot run under JVM
+    // (Robolectric) tests; the constructor itself NPEs and cannot be intercepted by a shadow or
+    // mockkConstructor. Indirection lets tests supply a relaxed mock while production uses the
+    // real constructor.
+    @Volatile
+    private var dnsOptsFactory: () -> DNSOpts = ::DNSOpts
+
+    fun setDnsOptsFactoryForTest(factory: () -> DNSOpts) {
+        dnsOptsFactory = factory
+    }
 
     private fun logv(msg: String) {
         Logger.v(LOG_TAG_VPN, "$TAG $msg")
@@ -218,7 +261,7 @@ object TunDnsManager: KoinComponent {
                 logd("onQuery: makeNsOpts(no-uid-trusted) for $fqdn")
                 return opts
             }
-            val globalBlock = getDomainRule(fqdn, UID_EVERYBODY).first == DomainRulesManager.Status.BLOCK
+            val globalBlock = DomainRulesManager.getAggregatedDomainRule(fqdn, UID_EVERYBODY).first == DomainRulesManager.Status.BLOCK
             logd("onQuery: getDomainRule(UID_EVERYBODY) for $fqdn")
             if (globalBlock) {
                 val opts = makeNsOpts(uid, Pair(Backend.BlockAll, ""), fqdn, false, isIfaceCellular, ssid)
@@ -261,7 +304,7 @@ object TunDnsManager: KoinComponent {
                 return opts
             }
 
-            val appDomainRule = getDomainRule(fqdn, uid).first
+            val appDomainRule = DomainRulesManager.getAggregatedDomainRule(fqdn, uid).first
             logd("onQuery: getDomainRule($fqdn, uid=$uid) for $fqdn")
             when (appDomainRule) {
                 DomainRulesManager.Status.TRUST -> {
@@ -279,8 +322,8 @@ object TunDnsManager: KoinComponent {
 
             // disable global rules check, see #onUpstreamAnswer() for more details.
             val skipGlobalRules = true
-            if (skipGlobalRules) {
-                val globalDomainRule = getDomainRule(fqdn, UID_EVERYBODY).first
+            if (!skipGlobalRules) {
+                val globalDomainRule = DomainRulesManager.getAggregatedDomainRule(fqdn, UID_EVERYBODY).first
                 logd("onQuery: getDomainRule($fqdn, UID_EVERYBODY) for $fqdn")
                 when (globalDomainRule) {
                     DomainRulesManager.Status.TRUST -> {
@@ -685,53 +728,226 @@ object TunDnsManager: KoinComponent {
         }
     }
 
-    private fun getDomainRule(domain: String?, uid: Int): Pair<DomainRulesManager.Status, String?> {
-        if (domain.isNullOrEmpty()) {
-            return Pair(DomainRulesManager.Status.NONE, "")
+    fun handleOnResponse(summary: DNSSummary?, onRegionUpdate: (String?) -> Unit) {
+        if (summary == null) {
+            log("received null summary for dns")
+            return
         }
-
-        val domains = if (isAtleastR()) {
-            // on Android R and above, go will give the first domain as accurate domain so
-            // no need to check further domains
-            val d = domain.lowercase(Locale.getDefault()).split(",").firstOrNull()
-            if (d.isNullOrEmpty()) return Pair(DomainRulesManager.Status.NONE, "")
-            listOf(d)
-        } else {
-            domain.lowercase(Locale.getDefault()).split(",")
-        }
-
-        if (domains.isEmpty()) {
-            return Pair(DomainRulesManager.Status.NONE, "")
-        }
-
-        var hasTrustedDomain = false
-        var trustedDomain = ""
-        var hasBlockedDomain = false
-        var blockedDomain = ""
-        for (d in domains) {
-            val status = DomainRulesManager.status(d, uid)
-            when (status) {
-                DomainRulesManager.Status.TRUST -> {
-                    hasTrustedDomain = true
-                    trustedDomain = d
-                }
-
-                DomainRulesManager.Status.BLOCK -> {
-                    hasBlockedDomain = true
-                    blockedDomain = d
-                }
-
-                else -> {
-                    // no-op
-                }
+        logd("onResponse: $summary, rethinkUid: $rethinkUid")
+        Logger.vv(
+            LOG_TAG_VPN,
+            "onResponse obj: " +
+                    "id: ${summary.id}, " +
+                    "type: ${summary.type}, " +
+                    "uid: ${summary.uid}, " +
+                    "lat: ${summary.latency}, " +
+                    "qname: ${summary.qName}, " +
+                    "qtype: ${summary.qType}, " +
+                    "targets: ${summary.targets}, " +
+                    "cached: ${summary.cached}, " +
+                    "rdata: ${summary.rData}, " +
+                    "rcode: ${summary.rCode}, " +
+                    "rttl: ${summary.rTtl}, " +
+                    "server: ${summary.server}, " +
+                    "pid: ${summary.pid}, " +
+                    "rpid: ${summary.rpid}, " +
+                    "status: ${summary.status}, " +
+                    "blocklists: ${summary.blocklists}, " +
+                    "blockedTarget: ${summary.blockedTarget}, " +
+                    "upstreamBlocks: ${summary.upstreamBlocks}, " +
+                    "do: ${summary.`do`}, " +
+                    "ad: ${summary.ad}, " +
+                    "msg: ${summary.msg}, " +
+                    "region: ${summary.region}"
+        )
+        if (!DEBUG) {
+            if (summary.id.contains(Backend.Fixed)) {
+                return
             }
         }
+        netLogTracker.processDnsLog(summary)
+        onRegionUpdate(summary.region)
+    }
 
-        when {
-            hasTrustedDomain -> return Pair(DomainRulesManager.Status.TRUST, trustedDomain)
-            hasBlockedDomain -> return Pair(DomainRulesManager.Status.BLOCK, blockedDomain)
+    suspend fun handleOnUpstreamAnswer(params: UpstreamAnswerParams): DNSOpts {
+        // There are scenarios that need to be handled before this is safe.
+        //
+        // For example, an app may have a port-based allow rule while also being
+        // configured to use Isolate. At this stage, only the destination IP address
+        // is known; the destination port is not available until the connection is
+        // established. Applying the Isolate rule here would incorrectly block the
+        // app, even though a matching port-based allow rule may exist.
+        //
+        // We should defer rule evaluation or skip it here whenever a port-based rule
+        // exists for either the app or the universal firewall rules.
+
+        val uid = try {
+            params.smm.uid.toInt()
+        } catch (e: NumberFormatException) {
+            Logger.e(
+                LOG_TAG_VPN,
+                "onUpstreamAnswer: invalid uid ${params.smm.uid}, error: ${e.message}"
+            )
+            return dnsOptsFactory()
         }
 
-        return Pair(DomainRulesManager.Status.NONE, "")
+        val isAnyPortRule = IpRulesManager.isPortRuleSetForIp(params.ipcsv, uid) ||
+            IpRulesManager.isPortRuleSetForIp(params.ipcsv, UID_EVERYBODY)
+        if (isAnyPortRule) {
+            Logger.i(LOG_TAG_VPN, "onUpstreamAnswer: port-based rule exists for ip: ${params.ipcsv}, returning prev DNSOpts()")
+            return dnsOptsFactory()
+        }
+        Logger.vv(
+            LOG_TAG_VPN,
+            "onUpstreamAnswer: init, ${params.id}, sum: ${params.smm}, ipcsv: ${params.ipcsv}, opts: ${params.rcvdDnsOpts}"
+        )
+        if (params.ipcsv.isEmpty()) {
+            Logger.e(LOG_TAG_VPN, "onUpstreamAnswer: empty ipcsv, returning prev DNSOpts()")
+            return dnsOptsFactory()
+        }
+        if (appConfig.getBraveMode().isDnsMode()) {
+            return dnsOptsFactory()
+        }
+
+        val isTransportDnsFixed =
+            params.rcvdDnsOpts.tidcsv.contains(Backend.Fixed) || params.rcvdDnsOpts.tidseccsv.contains(Backend.Fixed)
+        if (isTransportDnsFixed) {
+            Logger.i(LOG_TAG_VPN, "onUpstreamAnswer: fixed transport, returning prev DNSOpts()")
+            return dnsOptsFactory()
+        }
+
+        if (uid == INVALID_UID && persistentState.blockDnsForUnknownApp) {
+            val id = Pair(params.rcvdDnsOpts.tidcsv, params.rcvdDnsOpts.tidseccsv)
+            val result = dnsOptsFactory().apply {
+                tidcsv = Backend.BlockAll
+                noblock = false
+                Logger.vv(
+                    LOG_TAG_VPN,
+                    "onUpstreamAnswer: block dns for unknown app, original tid: $id, bypass tid: [$tidcsv, $tidseccsv], ipcsv: ${params.ipcsv}"
+                )
+            }
+            return result
+        }
+
+        val firstDestIp = params.ipcsv.split(",").firstOrNull()
+        if (firstDestIp.isNullOrEmpty()) {
+            Logger.e(
+                LOG_TAG_VPN,
+                "onUpstreamAnswer: empty rdata for ${params.smm.qName}, ipcsv: ${params.ipcsv} uid: $uid"
+            )
+            return dnsOptsFactory()
+        }
+        val userId = FirewallManager.userId(uid)
+        val srcIp = ""
+        val srcPort = 0
+        val dstPort = 0
+        val protocol = KnownPorts.DNS_PORT
+        val blocklists = params.smm.blocklists
+        val connId = ""
+        val isSplApp = params.isSpecialApp(uid)
+        val domain = params.smm.qName.orEmpty()
+        val anyRealIpBlocked = false
+        val connType =
+            if (params.isConnectionMetered(firstDestIp)) {
+                ConnectionTracker.ConnType.METERED
+            } else {
+                ConnectionTracker.ConnType.UNMETERED
+            }
+
+        val rinr = persistentState.routeRethinkInRethink
+        val connInfo = ConnTrackerMetaData(
+            uid,
+            userId,
+            srcIp,
+            srcPort,
+            params.ipcsv,
+            dstPort,
+            System.currentTimeMillis(),
+            false,
+            "",
+            "",
+            blocklists.orEmpty(),
+            protocol,
+            domain,
+            connId,
+            connType.value
+        )
+        logd("onUpstreamAnswer: connInfo: $connInfo, domain: $domain, anyRealIpBlocked: $anyRealIpBlocked, isSplApp: $isSplApp, rinr: $rinr")
+        val firewallParams = TunFirewallManager.FirewallParameters(
+            scope = params.scope,
+            connInfo = connInfo,
+            domains = domain,
+            anyRealIpBlocked = anyRealIpBlocked,
+            isSplApp = isSplApp,
+            rinr = rinr,
+            isAlg = false,
+            forUpstreamAnswer = true,
+            isDeviceLocked = params.isDeviceLocked,
+            onDeviceLocked = params.onDeviceLocked,
+            underlyingNetworks = params.underlyingNetworks,
+            isLockdown = params.isLockdown,
+            isAppPaused = VpnController.isAppPaused(),
+            accessibilityServiceFunctional = params.accessibilityServiceFunctional,
+            onAccessibilityFailure = params.onAccessibilityFailure,
+            keyguardManager = params.keyguardManager,
+            connectivityManager = params.connectivityManager
+        )
+        val rule = TunFirewallManager.firewall(firewallParams)
+        val blocked = FirewallRuleset.ground(rule)
+        if (blocked) {
+            logd("onUpstreamAnswer: blocked by firewall, rule: $rule, connInfo: $connInfo, ipcsv: ${params.ipcsv}")
+            return dnsOptsFactory().apply {
+                tidcsv = Backend.BlockAll
+                noblock = false
+            }
+        }
+        // special case: in case of bypass rule for domain or ip, if the app is set to isolate
+        // that should be treated as allowed rule instead of bypass rule, so no need to use
+        // the blockfree / default transport. Avoid sending the same transport id back,
+        // instead send DNSOpts() object. Sending the same transport id again will make the tun
+        // to start the resolve process again which is not needed
+        val isAppIsolated = FirewallManager.appStatus(uid).isIsolate()
+        val isDmnOrIpTrusted = rule == FirewallRuleset.RULE2F || rule == FirewallRuleset.RULE2B
+        if (isAppIsolated && isDmnOrIpTrusted) {
+            logd("onUpstreamAnswer: app is isolate and domain/ip is trusted, treat as allowed, rule: $rule, connInfo: $connInfo, ipcsv: ${params.ipcsv}")
+            return dnsOptsFactory()
+        }
+        val isBypass = FirewallRuleset.isBypassRule(rule)
+        if (isBypass) {
+            // use the same pid for non-blocking case, as the decision is already made in onQuery
+            // and the same pid will be used in tunnel for the upstream query
+            // For tid, based on the useFallbackDnsToBypass settings, the blockfree, default
+            // will be used, else the same tid from onQuery will be used
+            val result = dnsOptsFactory().apply {
+                val id = Pair(params.rcvdDnsOpts.tidcsv, params.rcvdDnsOpts.tidseccsv)
+                val tidPair = getTransportIdToBypass(id, params.isLockdown)
+                if (tidPair == id) {
+                    logd("onUpstreamAnswer: no bypass transport needed, rule: $rule")
+                    return dnsOptsFactory()
+                }
+                val tid = tidPair.first.split(",").joinToString(",") { appendDnsCacheIfNeeded(it) }
+                val tidSec = if (tidPair.second.isEmpty()) "" else tidPair.second.split(",")
+                    .joinToString(",") { appendDnsCacheIfNeeded(it) }
+                val mark = params.determineProxyDetails(
+                    connInfo,
+                    persistentState.routeRethinkInRethink,
+                    true
+                )
+                val pidCsv = mark.pidcsv
+                tidcsv = buildTidCsv(tid, pidCsv)
+                tidseccsv = buildTidCsv(tidSec, pidCsv)
+
+                noblock = true
+                Logger.vv(
+                    LOG_TAG_VPN,
+                    "onUpstreamAnswer: bypass rule: $rule, original tid: $id, bypass tid: [$tidcsv], [$tidseccsv], pid: $pidCsv connInfo: $connInfo, ipcsv: ${params.ipcsv}"
+                )
+            }
+            return result
+        }
+
+        if (DEBUG) logd("onUpstreamAnswer: ${params.smm}, ipcsv: ${params.ipcsv}")
+        logd("onUpstreamAnswer: no action needed, default DNSOpts")
+        return dnsOptsFactory()
     }
 }
