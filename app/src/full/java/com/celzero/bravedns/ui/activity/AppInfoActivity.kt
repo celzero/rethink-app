@@ -24,6 +24,7 @@ import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Process
+import android.text.InputType
 import android.text.format.DateUtils
 import android.view.View
 import android.view.ViewGroup
@@ -171,7 +172,14 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         networkLogsViewModel.setUid(uid)
         init()
         observeAppRules()
+        observeNotesErrors()
         setupClickListeners()
+    }
+
+    private fun observeNotesErrors() {
+        appInfoViewModel.notesErrorEvent.observe(this) { errorMessage ->
+            showToastUiCentered(this, errorMessage, Toast.LENGTH_SHORT)
+        }
     }
 
     private fun hideContentBehindWarning(hide: Boolean) {
@@ -224,7 +232,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                     Utilities.getIcon(this, appInfo.packageName, appInfo.appName),
                     b.aadAppDetailIcon
                 )
-                showNotesChip()
 
                 if (appInfo.packageName == RETHINK_PACKAGE) {
                     updateFirewallStatusUi(appStatus, connStatus)
@@ -1124,21 +1131,23 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun showNotesDialog() {
-        val editText = EditText(this)
-        editText.setText(appNotes)
-        editText.hint = getString(R.string.hint_notes)
-        editText.setLines(4)
+        val appName = appInfo.appName
+        val editText = EditText(this).apply {
+            setText(appNotes)
+            hint = getString(R.string.hint_notes)
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            setMinLines(4)
+        }
 
         val dialog = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
             .setTitle(R.string.lbl_notes)
             .setView(editText)
             .setPositiveButton(R.string.lbl_save) { _, _ ->
-                appNotes = editText.text.toString()
-                showNotesChip()
-                saveNotesToDatabase()
+                val newNotes = editText.text.toString()
+                saveNotesToDatabase(newNotes)
                 logEvent(
                     "app notes updated",
-                    "Notes updated for ${appInfo.appName} (${appInfo.uid})"
+                    "Notes updated for $appName ($uid)"
                 )
             }
             .setNegativeButton(R.string.lbl_cancel, null)
@@ -1146,13 +1155,10 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         dialog.show()
     }
 
-    private fun saveNotesToDatabase() {
-        appInfoViewModel.updateAppNotes(appInfo.uid, appNotes)
-    }
-
-    private fun showNotesChip() {
-        // Always show the chip, regardless of whether notes are empty or not
-        b.aadNotesChip.visibility = View.VISIBLE
+    private fun saveNotesToDatabase(newNotes: String) {
+        val packageName = appInfo.packageName
+        appInfoViewModel.updateAppNotes(uid, packageName, newNotes)
+        appNotes = newNotes
     }
 
     private fun io(f: suspend () -> Unit): Job {

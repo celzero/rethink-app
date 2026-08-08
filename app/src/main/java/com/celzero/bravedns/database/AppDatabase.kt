@@ -1237,10 +1237,14 @@ abstract class AppDatabase : RoomDatabase() {
             object : Migration(30, 31) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     if (!doesColumnExistInTable(db, "AppInfo", "notes")) {
-                        db.execSQL(
-                            "ALTER TABLE AppInfo ADD COLUMN notes TEXT NOT NULL DEFAULT ''"
-                        )
-                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_30_31: added notes column to AppInfo")
+                        try {
+                            db.execSQL(
+                                "ALTER TABLE AppInfo ADD COLUMN notes TEXT NOT NULL DEFAULT ''"
+                            )
+                            Logger.i(LOG_TAG_APP_DB, "MIGRATION_30_31: added notes column to AppInfo")
+                        } catch (e: Exception) {
+                            Logger.e(LOG_TAG_APP_DB, "MIGRATION_30_31: failed to add notes column", e)
+                        }
                     } else {
                         Logger.i(LOG_TAG_APP_DB, "MIGRATION_30_31: notes column already exists in AppInfo")
                     }

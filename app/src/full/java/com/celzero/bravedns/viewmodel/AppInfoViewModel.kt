@@ -30,6 +30,9 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     private var search: String = ""
     private val rethinkUid = android.os.Process.myUid()
     private var sort: AppListActivity.SortOption = AppListActivity.SortOption.NAME
+    
+    private val _notesErrorEvent = MutableLiveData<String>()
+    val notesErrorEvent: LiveData<String> = _notesErrorEvent
 
     init {
         filter.value = ""
@@ -456,9 +459,13 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         }
     }
 
-    fun updateAppNotes(uid: Int, notes: String) {
+    fun updateAppNotes(uid: Int, packageName: String, notes: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            FirewallManager.updateAppNotes(uid, notes)
+            runCatching {
+                FirewallManager.updateAppNotes(uid, packageName, notes)
+            }.onFailure { e ->
+                _notesErrorEvent.postValue("Failed to save notes: ${e.message}")
+            }
         }
     }
 }

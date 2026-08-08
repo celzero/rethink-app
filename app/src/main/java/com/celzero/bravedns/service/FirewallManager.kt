@@ -38,12 +38,14 @@ import com.google.common.cache.RemovalCause
 import com.google.common.cache.RemovalListener
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.Collections
@@ -978,40 +980,52 @@ object FirewallManager : KoinComponent {
 
     fun updateIsProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
         io {
-            try {
-                db.updateProxyExcluded(uid, isProxyExcluded)
-            } catch (e: Exception) {
-                Logger.w(LOG_TAG_FIREWALL, "updateIsProxyExcluded db failed for uid $uid", e)
-                return@io
-            }
-            val now = System.currentTimeMillis()
-            mutex.withLock {
-                appInfos.get(uid).forEach {
-                    it.isProxyExcluded = isProxyExcluded
-                    it.modifiedTs = now
-                }
-            }
-            informObservers()
+            updateAppInfoField(uid, "isProxyExcluded", null,
+                dbUpdate = suspend { db.updateProxyExcluded(uid, isProxyExcluded) },
+                cacheUpdate = { appInfo -> appInfo.isProxyExcluded = isProxyExcluded }
+            )
         }
     }
 
-    suspend fun updateAppNotes(uid: Int, notes: String) {
+    suspend fun updateAppNotes(uid: Int, packageName: String, notes: String) {
+        updateAppInfoField(uid, "notes", packageName,
+            dbUpdate = suspend { db.updateNotes(uid, packageName, notes) },
+            cacheUpdate = { appInfo -> appInfo.notes = notes }
+        )
+    }
+
+    private suspend fun updateAppInfoField(
+        uid: Int,
+        fieldName: String,
+        packageName: String?,
+        dbUpdate: suspend () -> Unit,
+        cacheUpdate: (AppInfo) -> Unit
+    ) {
         try {
             withContext(Dispatchers.IO) {
-                db.updateNotes(uid, notes)
+                dbUpdate()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            Logger.w(LOG_TAG_FIREWALL, "updateAppNotes db failed for uid $uid", e)
-            return
+            Logger.w(LOG_TAG_FIREWALL, "updateAppInfoField ($fieldName) db failed for uid $uid", e)
+            throw e
         }
 
         val now = System.currentTimeMillis()
         mutex.withLock {
-            appInfos.get(uid).forEach {
-                it.notes = notes
-                it.modifiedTs = now
+            if (packageName != null) {
+                // Exact match: uid + packageName (for per-app fields like notes)
+                appInfos.get(uid).find { it.packageName == packageName }?.let { appInfo ->
+                    cacheUpdate(appInfo)
+                    appInfo.modifiedTs = now
+                }
+            } else {
+                // All apps with this uid (for shared fields like isProxyExcluded)
+                appInfos.get(uid).forEach { appInfo ->
+                    cacheUpdate(appInfo)
+                    appInfo.modifiedTs = now
+                }
             }
         }
         informObservers()
