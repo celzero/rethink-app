@@ -21,6 +21,16 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
+class OneTimeEvent<out T>(private val content: T) {
+    private var handled = false
+
+    fun getIfNotHandled(): T? {
+        if (handled) return null
+        handled = true
+        return content
+    }
+}
+
 class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
     private val filter: MutableLiveData<String> = MutableLiveData()
@@ -31,8 +41,10 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     private val rethinkUid = android.os.Process.myUid()
     private var sort: AppListActivity.SortOption = AppListActivity.SortOption.NAME
     
-    private val _notesErrorEvent = MutableLiveData<String>()
-    val notesErrorEvent: LiveData<String> = _notesErrorEvent
+    private val _notesErrorEvent = MutableLiveData<OneTimeEvent<String>>()
+    val notesErrorEvent: LiveData<OneTimeEvent<String>> = _notesErrorEvent
+    private val _notesSaveSuccessEvent = MutableLiveData<OneTimeEvent<String>>()
+    val notesSaveSuccessEvent: LiveData<OneTimeEvent<String>> = _notesSaveSuccessEvent
 
     init {
         filter.value = ""
@@ -463,8 +475,10 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 FirewallManager.updateAppNotes(uid, packageName, notes)
+            }.onSuccess {
+                _notesSaveSuccessEvent.postValue(OneTimeEvent(notes))
             }.onFailure { e ->
-                _notesErrorEvent.postValue("Failed to save notes: ${e.message}")
+                _notesErrorEvent.postValue(OneTimeEvent("Failed to save notes: ${e.message}"))
             }
         }
     }

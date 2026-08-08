@@ -24,6 +24,7 @@ import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Process
+import android.text.InputFilter
 import android.text.InputType
 import android.text.format.DateUtils
 import android.view.View
@@ -120,6 +121,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         private const val MILLIS_PER_SECOND = 1000L
         private const val ALPHA_DISABLED = 0.5f
         private const val IS_WARNING_ACKNOWLEDGED = "IS_WARNING_ACKNOWLEDGED"
+        private const val MAX_NOTE_LENGTH = 500
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -172,13 +174,29 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         networkLogsViewModel.setUid(uid)
         init()
         observeAppRules()
-        observeNotesErrors()
+        observeNotesEvents()
         setupClickListeners()
     }
 
-    private fun observeNotesErrors() {
-        appInfoViewModel.notesErrorEvent.observe(this) { errorMessage ->
-            showToastUiCentered(this, errorMessage, Toast.LENGTH_SHORT)
+    private fun observeNotesEvents() {
+        appInfoViewModel.notesSaveSuccessEvent.observe(this) { event ->
+            event.getIfNotHandled()?.let { savedNotes ->
+                appNotes = savedNotes
+                if (::appInfo.isInitialized) {
+                    logEvent(
+                        "app notes updated",
+                        "Notes updated for ${appInfo.appName} ($uid)"
+                    )
+                } else {
+                    Logger.w(LOG_TAG_UI, "notes save success received before appInfo init for uid: $uid")
+                }
+            }
+        }
+
+        appInfoViewModel.notesErrorEvent.observe(this) { event ->
+            event.getIfNotHandled()?.let { errorMessage ->
+                showToastUiCentered(this, errorMessage, Toast.LENGTH_SHORT)
+            }
         }
     }
 
@@ -1131,24 +1149,21 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun showNotesDialog() {
-        val appName = appInfo.appName
         val editText = EditText(this).apply {
             setText(appNotes)
             hint = getString(R.string.hint_notes)
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
             setMinLines(4)
+            setMaxLines(10)
+            filters = arrayOf(InputFilter.LengthFilter(MAX_NOTE_LENGTH))
         }
 
         val dialog = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
             .setTitle(R.string.lbl_notes)
             .setView(editText)
             .setPositiveButton(R.string.lbl_save) { _, _ ->
-                val newNotes = editText.text.toString()
+                val newNotes = editText.text.toString().trim()
                 saveNotesToDatabase(newNotes)
-                logEvent(
-                    "app notes updated",
-                    "Notes updated for $appName ($uid)"
-                )
             }
             .setNegativeButton(R.string.lbl_cancel, null)
             .create()
@@ -1156,9 +1171,17 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun saveNotesToDatabase(newNotes: String) {
+        if (!::appInfo.isInitialized) {
+            Logger.w(LOG_TAG_UI, "AppInfo not initialized in saveNotesToDatabase, uid: $uid")
+            showToastUiCentered(
+                this,
+                this.getString(R.string.ctbs_app_info_not_available_toast),
+                Toast.LENGTH_SHORT
+            )
+            return
+        }
         val packageName = appInfo.packageName
         appInfoViewModel.updateAppNotes(uid, packageName, newNotes)
-        appNotes = newNotes
     }
 
     private fun io(f: suspend () -> Unit): Job {

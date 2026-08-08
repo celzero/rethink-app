@@ -1244,6 +1244,7 @@ abstract class AppDatabase : RoomDatabase() {
                             Logger.i(LOG_TAG_APP_DB, "MIGRATION_30_31: added notes column to AppInfo")
                         } catch (e: Exception) {
                             Logger.e(LOG_TAG_APP_DB, "MIGRATION_30_31: failed to add notes column", e)
+                            throw e
                         }
                     } else {
                         Logger.i(LOG_TAG_APP_DB, "MIGRATION_30_31: notes column already exists in AppInfo")

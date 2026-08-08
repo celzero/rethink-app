@@ -45,7 +45,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.Collections
@@ -980,52 +979,76 @@ object FirewallManager : KoinComponent {
 
     fun updateIsProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
         io {
-            updateAppInfoField(uid, "isProxyExcluded", null,
-                dbUpdate = suspend { db.updateProxyExcluded(uid, isProxyExcluded) },
-                cacheUpdate = { appInfo -> appInfo.isProxyExcluded = isProxyExcluded }
-            )
+            try {
+                updateSharedUidAppInfoField(uid, "isProxyExcluded",
+                    dbUpdate = suspend { db.updateProxyExcluded(uid, isProxyExcluded) },
+                    cacheUpdate = { appInfo -> appInfo.isProxyExcluded = isProxyExcluded }
+                )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_FIREWALL, "updateIsProxyExcluded db failed for uid $uid", e)
+            }
         }
     }
 
     suspend fun updateAppNotes(uid: Int, packageName: String, notes: String) {
-        updateAppInfoField(uid, "notes", packageName,
+        updatePerAppInfoField(uid, packageName, "notes",
             dbUpdate = suspend { db.updateNotes(uid, packageName, notes) },
             cacheUpdate = { appInfo -> appInfo.notes = notes }
         )
     }
 
-    private suspend fun updateAppInfoField(
+    private suspend fun runDbUpdate(
         uid: Int,
         fieldName: String,
-        packageName: String?,
-        dbUpdate: suspend () -> Unit,
-        cacheUpdate: (AppInfo) -> Unit
+        dbUpdate: suspend () -> Unit
     ) {
         try {
-            withContext(Dispatchers.IO) {
-                dbUpdate()
-            }
+            dbUpdate()
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             Logger.w(LOG_TAG_FIREWALL, "updateAppInfoField ($fieldName) db failed for uid $uid", e)
             throw e
         }
+    }
+
+    private suspend fun updatePerAppInfoField(
+        uid: Int,
+        packageName: String,
+        fieldName: String,
+        dbUpdate: suspend () -> Unit,
+        cacheUpdate: (AppInfo) -> Unit
+    ) {
+        runDbUpdate(uid, fieldName, dbUpdate)
 
         val now = System.currentTimeMillis()
         mutex.withLock {
-            if (packageName != null) {
-                // Exact match: uid + packageName (for per-app fields like notes)
-                appInfos.get(uid).find { it.packageName == packageName }?.let { appInfo ->
-                    cacheUpdate(appInfo)
-                    appInfo.modifiedTs = now
-                }
-            } else {
-                // All apps with this uid (for shared fields like isProxyExcluded)
-                appInfos.get(uid).forEach { appInfo ->
-                    cacheUpdate(appInfo)
-                    appInfo.modifiedTs = now
-                }
+            appInfos.get(uid).find { it.packageName == packageName }?.let { appInfo ->
+                cacheUpdate(appInfo)
+                appInfo.modifiedTs = now
+            } ?: Logger.w(
+                LOG_TAG_FIREWALL,
+                "updatePerAppInfoField ($fieldName) cache miss for uid $uid, package $packageName"
+            )
+        }
+        informObservers()
+    }
+
+    private suspend fun updateSharedUidAppInfoField(
+        uid: Int,
+        fieldName: String,
+        dbUpdate: suspend () -> Unit,
+        cacheUpdate: (AppInfo) -> Unit
+    ) {
+        runDbUpdate(uid, fieldName, dbUpdate)
+
+        val now = System.currentTimeMillis()
+        mutex.withLock {
+            appInfos.get(uid).forEach { appInfo ->
+                cacheUpdate(appInfo)
+                appInfo.modifiedTs = now
             }
         }
         informObservers()
