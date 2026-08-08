@@ -15,8 +15,6 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.animation.ObjectAnimator
 import android.graphics.Color
 import android.os.Bundle
@@ -39,20 +37,22 @@ import com.celzero.bravedns.adapter.GooglePlaySubsAdapter
 import com.celzero.bravedns.databinding.FragmentRethinkPlusPremiumBinding
 import com.celzero.bravedns.iab.BillingListener
 import com.celzero.bravedns.iab.InAppBillingHandler
-import com.celzero.bravedns.iab.ServerApiError
 import com.celzero.bravedns.iab.ProductDetail
 import com.celzero.bravedns.iab.PurchaseDetail
+import com.celzero.bravedns.iab.ServerApiError
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
 import com.celzero.bravedns.ui.bottomsheet.PurchaseProcessingBottomSheet
 import com.celzero.bravedns.ui.dialog.SubscriptionAnimDialog
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.RethinkPlusViewModel
 import com.celzero.bravedns.viewmodel.SubscriptionUiState
 import com.facebook.shimmer.Shimmer
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -164,11 +164,6 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             iconTint = android.content.res.ColorStateList.valueOf(htxtClr)
         }
 
-        b.btnContactSupport.apply {
-            setTextColor(lightText)
-            iconTint = android.content.res.ColorStateList.valueOf(lightText)
-        }
-
         b.retryButton.apply {
             backgroundTintList = android.content.res.ColorStateList.valueOf(accentGood)
             setTextColor(htxtClr)
@@ -192,6 +187,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             text = updateHtmlEncodedText(getString(R.string.rethink_terms))
             movementMethod = LinkMovementMethod.getInstance()
             highlightColor = Color.TRANSPARENT
+            setLinkTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryLightColorText))
         }
     }
 
@@ -458,7 +454,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             is SubscriptionUiState.PendingTimeout -> showPendingTimeout(state.message)
             is SubscriptionUiState.NoInternet -> showNoInternet(state.message)
             is SubscriptionUiState.Success -> showSuccess(state.productId, state.isExtend)
-            is SubscriptionUiState.Error -> showError(state.title, state.message, state.isRetryable)
+            is SubscriptionUiState.Error -> showError(state.title, state.message, state.isRetryable, state.reason)
             is SubscriptionUiState.ServerAckPending -> showServerAckPending(state.message)
             is SubscriptionUiState.AcknowledgementFailed ->
                 showAcknowledgementFailed(state.title, state.message, state.canRetry, state.refundInitiated)
@@ -580,6 +576,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         b.errorIcon.setImageResource(R.drawable.ic_error_state)
         b.errorTitle.text = getString(R.string.no_internet_title)
         b.errorMessage.text = message.ifBlank { getString(R.string.no_internet_premium_msg) }
+        b.errorReason.isVisible = false
         b.retryButton.isVisible = true
     }
 
@@ -635,7 +632,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         }
     }
 
-    private fun showError(title: String, message: String, isRetryable: Boolean) {
+    private fun showError(title: String, message: String, isRetryable: Boolean, reason: String = "") {
         purchaseInFlight = false
         cancelProcessingTimeout()
         dismissProcessingBottomSheet()
@@ -645,6 +642,10 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         b.errorContainer.isVisible = true
         b.errorTitle.text = title
         b.errorMessage.text = message
+        // Render the specific failure cause (if any) in a small text element directly below
+        // the primary error message so the user understands why the fetch failed.
+        b.errorReason.text = reason
+        b.errorReason.isVisible = reason.isNotEmpty()
         b.retryButton.isVisible = isRetryable
     }
 
@@ -674,6 +675,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         b.errorContainer.isVisible = true
         b.errorTitle.text = title
         b.errorMessage.text = fullMessage
+        b.errorReason.isVisible = false
         b.retryButton.isVisible = canRetry
     }
 
@@ -950,7 +952,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     }
 
     override fun productResult(isSuccess: Boolean, productList: List<ProductDetail>) {
-        viewModel.onProductsFetched(isSuccess, productList)
+        viewModel.onProductsFetched(isSuccess, productList, InAppBillingHandler.lastProductQueryResponseCode)
     }
 
     override fun onSubscriptionSelected(productId: String, planId: String) {
