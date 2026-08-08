@@ -236,6 +236,10 @@ object VpnController : KoinComponent {
         rvpn?.memProfile(filepath)
     }
 
+    suspend fun cpuProfile(filepath: String) {
+        rvpn?.cpuProfile(filepath)
+    }
+
     suspend fun getRpnStats(id: String): RpnProxyManager.RpnStats? {
         return rvpn?.getRpnStats(id)
     }
