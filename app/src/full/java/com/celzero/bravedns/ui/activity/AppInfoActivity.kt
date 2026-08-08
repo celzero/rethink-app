@@ -101,7 +101,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
     private var showBypassToolTip: Boolean = true
     private var isWarningAcknowledged: Boolean = false
-    private var appNotes: String = ""
     private var notesDraft: String = ""
     private var shouldRestoreNotesDialog: Boolean = false
     private var notesDialog: AlertDialog? = null
@@ -190,8 +189,8 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     private fun observeNotesEvents() {
         appInfoViewModel.notesSaveSuccessEvent.observe(this) { event ->
             event.getIfNotHandled()?.let { savedNotes ->
-                appNotes = savedNotes
                 if (::appInfo.isInitialized) {
+                    appInfo.notes = savedNotes
                     logEvent(
                         "app notes updated",
                         "Notes updated for ${appInfo.appName} ($uid)"
@@ -256,7 +255,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             connStatus = FirewallManager.connectionStatus(appInfo.uid)
             uiCtx {
                 this.appInfo = appInfo
-                appNotes = appInfo.notes
 
                 b.aadAppDetailName.text = appName(packages.count())
                 b.aadPkgName.text = getString(R.string.app_id_package, appInfo.uid, appInfo.packageName)
@@ -1172,7 +1170,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun showNotesDialog(draftText: String? = null) {
-        val initialText = draftText ?: appNotes
+        val initialText = draftText ?: if (::appInfo.isInitialized) appInfo.notes else ""
         val editText = EditText(this).apply {
             setText(initialText)
             hint = getString(R.string.hint_notes)
