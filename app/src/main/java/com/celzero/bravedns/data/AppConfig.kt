@@ -1247,7 +1247,7 @@ internal constructor(
 
         sb.append("DNS \n")
         sb.append("   dns type: ${getDnsType()}\n")
-        sb.append("   connected dns: ${persistentState.connectedDnsName}\n")
+        sb.append("   preferred: ${persistentState.connectedDnsName}\n")
         sb.append("   alg: ${persistentState.enableDnsAlg}\n")
         sb.append("   split: ${persistentState.splitDns}\n")
         sb.append("   local blocklist enabled: ${persistentState.blocklistEnabled}\n")
@@ -1257,7 +1257,7 @@ internal constructor(
         sb.append("   never proxy dns: ${!persistentState.proxyDns}\n")
         sb.append("   prevent dns leaks: ${persistentState.preventDnsLeaks}\n")
         sb.append("   block dns from unknown src: ${persistentState.blockDnsForUnknownApp}\n")
-        sb.append("   use sys dns for undelegated dms: ${persistentState.useSystemDnsForUndelegatedDomains}\n")
+        sb.append("   use sys dns for undelegated domains: ${persistentState.useSystemDnsForUndelegatedDomains}\n")
         sb.append("   bypass-dns-mode: ${BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.fromMode(persistentState.blockFreeDnsMode).name}\n")
 
         sb.append("Proxy \n")
