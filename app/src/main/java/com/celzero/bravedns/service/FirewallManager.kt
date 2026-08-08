@@ -1019,7 +1019,10 @@ object FirewallManager : KoinComponent {
                 appInfos.get(uid).find { it.packageName == packageName }?.let { appInfo ->
                     cacheUpdate(appInfo)
                     appInfo.modifiedTs = now
-                }
+                } ?: Logger.w(
+                    LOG_TAG_FIREWALL,
+                    "updateAppInfoField ($fieldName) cache miss for uid $uid, package $packageName"
+                )
             } else {
                 // All apps with this uid (for shared fields like isProxyExcluded)
                 appInfos.get(uid).forEach { appInfo ->
