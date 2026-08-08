@@ -1154,7 +1154,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             .setTitle(R.string.lbl_notes)
             .setView(editText)
             .setPositiveButton(R.string.lbl_save) { _, _ ->
-                val newNotes = editText.text.toString()
+                val newNotes = editText.text.toString().trim()
                 saveNotesToDatabase(newNotes)
             }
             .setNegativeButton(R.string.lbl_cancel, null)
