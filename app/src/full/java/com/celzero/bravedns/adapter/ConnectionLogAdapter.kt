@@ -62,16 +62,20 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Collections
 import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
 
 class ConnectionLogAdapter(private val context: Context) :
     PagingDataAdapter<MergedConnectionLog, ConnectionLogAdapter.ConnectionLogViewHolder>(
         DIFF_CALLBACK
     ) {
 
-    // Per-uid cache of package names, invalidated on each new page submission.
-    private val packageNameCache = Collections.synchronizedMap(HashMap<Int, List<String>>())
+    // Per-uid cache of package names (immutable snapshots), living for the adapter's
+    // lifetime (recreated with the fragment; uids are stable across paging pages).
+    // ConcurrentHashMap: lock-free reads, non-blocking writes. Compute-on-miss cannot
+    // be atomic (computeIfAbsent's lambda is not suspendable), so a rare duplicate
+    // compute for the same uid is benign: the values are idempotent and immutable.
+    private val packageNameCache = ConcurrentHashMap<Int, List<String>>()
 
     companion object {
         private val DIFF_CALLBACK =
@@ -232,7 +236,12 @@ class ConnectionLogAdapter(private val context: Context) :
         private fun displayAppDetails(log: MergedConnectionLog) {
             launchBinding {
                 val apps = packageNameCache.getOrPut(log.uid) {
-                    FirewallManager.getPackageNamesByUid(log.uid)
+                    // Guard against iterator faults from Guava's HashMultimap in
+                    // FirewallManager (see snapshotAppInfos fallbacks). On failure the
+                    // entry is not cached, so the next bind retries; empty list is
+                    // rendered as the default icon by the caller.
+                    runCatching { FirewallManager.getPackageNamesByUid(log.uid) }
+                        .getOrDefault(emptyList())
                 }
                 val count = apps.count()
                 val pkgName = log.packageName ?: ""

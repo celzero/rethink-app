@@ -46,7 +46,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.Collections
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -296,8 +296,18 @@ object FirewallManager : KoinComponent {
 
         var appInfos: Multimap<Int, AppInfo> = HashMultimap.create()
 
-        // TODO: protect access to the foregroundUids (read/write)
-        @Volatile var foregroundUids: MutableSet<Int> = Collections.synchronizedSet(HashSet())
+        // ConcurrentHashMap-backed key set:
+        // - reads (contains) are lock-free volatile reads -> safe on the VPN packet path
+        //   (TunFirewallManager.isAppForeground runs on the Go bridge dispatchers).
+        // - writes (add/clear) are thread-safe, non-blocking and work from both coroutine
+        //   (trackForegroundApp on Dispatchers.IO) and binder (accessibility service) contexts.
+        // - @Volatile is unnecessary: the reference is never reassigned and CHM provides
+        //   its own visibility guarantees for the contents.
+        // A Mutex is the right tool only when both sides are suspendable. Here, one side is a raw
+        // callback thread (accessibility binder) and the other is a non-suspend packet-path
+        // function — a lock-free concurrent collection is the only fit that is both thread-safe
+        // and non-blocking.
+        val foregroundUids: MutableSet<Int> = ConcurrentHashMap.newKeySet()
 
         var appInfosLiveData: MutableLiveData<Collection<AppInfo>> = MutableLiveData()
 
