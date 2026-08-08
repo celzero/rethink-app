@@ -1024,16 +1024,20 @@ object FirewallManager : KoinComponent {
         runDbUpdate(uid, fieldName, dbUpdate)
 
         val now = System.currentTimeMillis()
+        var cacheUpdated = false
         mutex.withLock {
             appInfos.get(uid).find { it.packageName == packageName }?.let { appInfo ->
                 cacheUpdate(appInfo)
                 appInfo.modifiedTs = now
+                cacheUpdated = true
             } ?: Logger.w(
                 LOG_TAG_FIREWALL,
                 "updatePerAppInfoField ($fieldName) cache miss for uid $uid, package $packageName"
             )
         }
-        informObservers()
+        if (cacheUpdated) {
+            informObservers()
+        }
     }
 
     private suspend fun updateSharedUidAppInfoField(
