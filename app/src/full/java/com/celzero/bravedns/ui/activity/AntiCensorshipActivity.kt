@@ -40,6 +40,7 @@ import com.celzero.bravedns.util.Utilities.isOsVersionAbove412
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.firestack.settings.Settings
 import org.koin.android.ext.android.inject
+import androidx.core.view.isVisible
 
 class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
     val b by viewBinding(ActivityAntiCensorshipBinding::bind)
@@ -54,6 +55,10 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
 
     companion object {
         private const val DESYNC_SUPPORTED_VERSION = "4.12"
+
+        // Alpha values for UI elements
+        private const val ALPHA_ENABLED = 1f
+        private const val ALPHA_DISABLED = 0.5f
     }
 
     enum class DialStrategies(val mode: Int) {
@@ -92,6 +97,34 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
         }
         initView()
         setupClickListeners()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        handleProxyLockdownRestrictions()
+    }
+
+    /**
+     * under proxy lockdown, only "Never Split" and "Hybrid" (TCP_PROXY) dial strategies,
+     * and only "Never Retry" are compatible (see TunnelSettingsActivity.collectLockdownChecks).
+     * grey out the incompatible rows so the user can see which options are unavailable. the
+     * functional guards in [handleAcMode] and [handleRetryMode] provide the actual enforcement.
+     */
+    private fun handleProxyLockdownRestrictions() {
+        val isLockdown = persistentState.wgGlobalLockdown
+        val alpha = if (isLockdown) ALPHA_DISABLED else ALPHA_ENABLED
+
+        // Incompatible dial strategy rows
+        b.acSplitAutoRl.alpha = alpha
+        b.acSplitTcpRl.alpha = alpha
+        b.acSplitTlsRl.alpha = alpha
+        if (b.acDesyncRl.isVisible) {
+            b.acDesyncRl.alpha = alpha
+        }
+
+        // Incompatible retry strategy rows
+        b.acRetryWithSplitRl.alpha = alpha
+        b.acRetryAfterSplitRl.alpha = alpha
     }
 
     private fun initView() {
@@ -259,6 +292,24 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
 
     private fun handleAcMode(isSelected: Boolean, ds: DialStrategies) {
         if (isSelected) {
+            // proxy lockdown guard: only Never Split and Hybrid (TCP Proxy) are compatible.
+            // block incompatible selections, show a toast, and revert the radio button.
+            if (persistentState.wgGlobalLockdown
+                && ds != DialStrategies.TCP_PROXY && ds != DialStrategies.NEVER_SPLIT) {
+                Utilities.showToastUiCentered(
+                    this,
+                    getString(R.string.lockdown_check_setting_disabled),
+                    Toast.LENGTH_SHORT
+                )
+                when (ds) {
+                    DialStrategies.SPLIT_AUTO -> b.acRadioSplitAuto.isChecked = false
+                    DialStrategies.SPLIT_TCP -> b.acRadioSplitTcp.isChecked = false
+                    DialStrategies.SPLIT_TCP_TLS -> b.acRadioSplitTls.isChecked = false
+                    DialStrategies.DESYNC -> b.acRadioDesync.isChecked = false
+                    else -> {}
+                }
+                return
+            }
             // set auto proxy to true if split auto is selected (Settings.AutoModeRemote)
             persistentState.autoProxyEnabled = ds == DialStrategies.TCP_PROXY
             persistentState.dialStrategy = ds.mode
@@ -267,8 +318,13 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
                 // disable retry radio buttons for never split
                 handleRetryMode(true, RetryStrategies.RETRY_NEVER.mode, showToast = false)
             } else if (ds == DialStrategies.SPLIT_AUTO || ds == DialStrategies.TCP_PROXY) {
-                // set retry to retry with split for split auto and tcp proxy by default
-                handleRetryMode(true, RetryStrategies.RETRY_WITH_SPLIT.mode, showToast = false)
+                // set retry to retry with split for split auto and tcp proxy by default;
+                // under proxy lockdown, hybrid (TCP_PROXY) must use never retry
+                val defaultRetry = if (persistentState.wgGlobalLockdown)
+                    RetryStrategies.RETRY_NEVER.mode
+                else
+                    RetryStrategies.RETRY_WITH_SPLIT.mode
+                handleRetryMode(true, defaultRetry, showToast = false)
             }
             logEvent("Anti-censorship dial strategy changed to ${ds.mode}")
         } else {
@@ -277,6 +333,24 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
     }
 
     private fun handleRetryMode(isSelected: Boolean, mode: Int, showToast: Boolean = true) {
+        // proxy lockdown guard: only Never Retry is compatible. Block incompatible selections,
+        // show a toast and revert.
+        if (isSelected && persistentState.wgGlobalLockdown
+            && mode != RetryStrategies.RETRY_NEVER.mode) {
+            if (showToast) {
+                Utilities.showToastUiCentered(
+                    this,
+                    getString(R.string.lockdown_check_setting_disabled),
+                    Toast.LENGTH_SHORT
+                )
+            }
+            when (mode) {
+                RetryStrategies.RETRY_WITH_SPLIT.mode -> b.acRadioRetryWithSplit.isChecked = false
+                RetryStrategies.RETRY_AFTER_SPLIT.mode -> b.acRadioRetryAfterSplit.isChecked = false
+            }
+            return
+        }
+
         var m = mode
         var shouldShowToast = false
         if (DialStrategies.NEVER_SPLIT.mode == persistentState.dialStrategy && mode != RetryStrategies.RETRY_NEVER.mode) {

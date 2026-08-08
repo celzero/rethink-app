@@ -851,6 +851,17 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
     }
 
     private fun setNetworkDns() {
+        // Under proxy lockdown, system DNS cannot be enabled because it bypasses the
+        // lockdown proxy. Block the change and revert the radio button selection.
+        if (persistentState.wgGlobalLockdown) {
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.lockdown_check_setting_disabled),
+                Toast.LENGTH_SHORT
+            )
+            updateSelectedDns()
+            return
+        }
         // set network dns
         io { appConfig.enableSystemDns() }
     }
