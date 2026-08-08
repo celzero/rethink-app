@@ -33,6 +33,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     
     private val _notesErrorEvent = MutableLiveData<String>()
     val notesErrorEvent: LiveData<String> = _notesErrorEvent
+    private val _notesSaveSuccessEvent = MutableLiveData<String>()
+    val notesSaveSuccessEvent: LiveData<String> = _notesSaveSuccessEvent
 
     init {
         filter.value = ""
@@ -463,6 +465,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 FirewallManager.updateAppNotes(uid, packageName, notes)
+            }.onSuccess {
+                _notesSaveSuccessEvent.postValue(notes)
             }.onFailure { e ->
                 _notesErrorEvent.postValue("Failed to save notes: ${e.message}")
             }
