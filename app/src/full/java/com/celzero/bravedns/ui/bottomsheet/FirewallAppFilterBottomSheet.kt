@@ -79,17 +79,20 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
         val f = AppListActivity.filters.value
 
         remakeParentFilterChipsUi()
-        if (f == null) {
-            remakeSortChipsUi()
-            applyParentFilter(AppListActivity.TopLevelFilter.ALL.id)
-            return
-        } else {
+
+        if (f != null) {
             this.filters.firewallFilter = f.firewallFilter
             this.filters.categoryFilters.addAll(f.categoryFilters)
             this.filters.sort = f.sort
         }
 
         remakeSortChipsUi()
+
+        if (f == null) {
+            applyParentFilter(AppListActivity.TopLevelFilter.ALL.id)
+            return
+        }
+
         applyParentFilter(f.topLevelFilter.id)
         setFilter(f.topLevelFilter, f.categoryFilters)
     }
