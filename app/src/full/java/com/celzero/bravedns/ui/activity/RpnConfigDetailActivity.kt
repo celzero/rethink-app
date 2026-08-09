@@ -553,12 +553,15 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE
             )
         else getString(R.string.lbl_never)
-        val meta = SpannableStringBuilder(
-            getString(R.string.rpn_meta_last_times, statusText, okTxt, openTxt)
+        val metaOk = SpannableStringBuilder(
+            getString(R.string.rpn_meta_last_ok, statusText, okTxt)
+        )
+        val metaOpen = SpannableStringBuilder(
+            getString(R.string.rpn_meta_last_open, openTxt)
         )
         // The status word is always the prefix of the formatted string.
         if (statusText.isNotEmpty()) {
-            meta.setSpan(
+            metaOk.setSpan(
                 ForegroundColorSpan(statusColor),
                 0, statusText.length,
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -567,9 +570,10 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         // Render the two emojis noticeably smaller than the surrounding timestamp text
         // so they stay subtle. Color emoji glyphs ignore ForegroundColorSpan, so size is
         // the reliable lever here.
-        shrinkEmoji(meta, HANDSHAKE_EMOJI, 0.70f)
-        shrinkEmoji(meta, RECONNECT_EMOJI, 0.70f)
-        b.valueLastOk.text = meta
+        shrinkEmoji(metaOk, HANDSHAKE_EMOJI, 0.70f)
+        shrinkEmoji(metaOpen, RECONNECT_EMOJI, 0.70f)
+        b.valueLastOk.text = metaOk
+        b.valueLastOpen.text = metaOpen
 
         // Show when the user selected this server, not the VPN tunnel's uptime.
         b.valueSince.text = if (selectedSinceTs > 0L)
