@@ -54,6 +54,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
+import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
 
 class FirewallAppListAdapter(
     private val context: Context,
