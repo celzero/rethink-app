@@ -2963,9 +2963,9 @@ class GoVpnAdapter : KoinComponent {
             Logger.vv(LOG_TAG_PROXY, "initiating reconnect for id: $iid")
             val p = tunnel.proxies.rpn().win().fork(iid)
             // track the re-add so that the global proxy handler keeps monitoring it
-            GlobalProxyHandler.track(iid)
-            Logger.i(LOG_TAG_PROXY, "$TAG reconnected rpn proxy: ${iid}")
-            logEvent(Severity.LOW, "reconnect rpn proxy", "reconnected rpn proxy: ${iid}")
+            GlobalProxyHandler.track(if (iid.startsWith(Backend.RpnWin)) iid else Backend.RpnWin + iid)
+            Logger.i(LOG_TAG_PROXY, "$TAG reconnected rpn proxy: $iid")
+            logEvent(Severity.LOW, "reconnect rpn proxy", "reconnected rpn proxy: $iid")
             true
         } catch (e: Exception) {
             Logger.w(LOG_TAG_PROXY, "$TAG err reconnect rpn proxy: ${e.message}")

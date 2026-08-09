@@ -625,22 +625,24 @@ internal constructor(
      * proxyId is not backed by a live WG config or RPN server.
      */
     private suspend fun purgeGhostProxyMappings() {
-        val validWgIds = WireguardManager.getAllMappings()
-            .map { ProxyManager.ID_WG_BASE + it.id }
-            .toSet()
+        try {
+            val validWgIds = WireguardManager.getAllMappings()
+                .map { ProxyManager.ID_WG_BASE + it.id }
+                .toSet()
 
-        val validRpnIds = try {
-            RpnProxyManager.getCachedWinServerKeys()
+            val validRpnIds = RpnProxyManager.getCachedWinServerKeys()
                 .map { ProxyManager.ID_RPN_WIN + it }
                 .toSet()
+            // always add AUTO which will never be deleted
+            val auto = RpnProxyManager.AUTO_SERVER_ID
+            validRpnIds.plus(auto)
+
+            val purged = ProxyManager.purgeGhostMappings(validWgIds, validRpnIds)
+            if (purged > 0) {
+                logEvent(Severity.LOW, "proxy ghost cleanup", "removed $purged stale proxy-app mapping(s) referencing deleted WG/RPN proxies")
+            }
         } catch (e: Exception) {
             Logger.w(LOG_TAG_APP_DB, "purgeGhostProxyMappings: could not read RPN server keys: ${e.message}")
-            emptySet()
-        }
-
-        val purged = ProxyManager.purgeGhostMappings(validWgIds, validRpnIds)
-        if (purged > 0) {
-            logEvent(Severity.LOW, "proxy ghost cleanup", "removed $purged stale proxy-app mapping(s) referencing deleted WG/RPN proxies")
         }
     }
 
