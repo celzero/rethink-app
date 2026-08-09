@@ -49,6 +49,7 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.Collections
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -59,6 +60,7 @@ object FirewallManager : KoinComponent {
     private val persistentState by inject<PersistentState>()
 
     private val mutex = Mutex()
+    private val appUpdateLocks = ConcurrentHashMap<String, Mutex>()
 
     const val NOTIF_CHANNEL_ID_FIREWALL_ALERTS = "Firewall_Alerts"
 
@@ -980,19 +982,22 @@ object FirewallManager : KoinComponent {
 
     fun updateIsProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
         io {
-            try {
-                withContext(Dispatchers.IO) {
-                    db.updateProxyExcluded(uid, isProxyExcluded)
+            val updateMutex = getAppUpdateMutex(uid)
+            updateMutex.withLock {
+                try {
+                    withContext(Dispatchers.IO) {
+                        db.updateProxyExcluded(uid, isProxyExcluded)
+                    }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Logger.w(LOG_TAG_FIREWALL, "updateIsProxyExcluded db failed for uid $uid", e)
+                    return@withLock
                 }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                Logger.w(LOG_TAG_FIREWALL, "updateIsProxyExcluded db failed for uid $uid", e)
-                return@io
-            }
 
-            updateSharedUidCacheField(uid) { appInfo ->
-                appInfo.isProxyExcluded = isProxyExcluded
+                updateSharedUidCacheField(uid) { appInfo ->
+                    appInfo.isProxyExcluded = isProxyExcluded
+                }
             }
         }
     }
@@ -1028,46 +1033,54 @@ object FirewallManager : KoinComponent {
         dbUpdate: suspend () -> Int,
         cacheUpdate: (AppInfo) -> Unit
     ) {
-        val rowsUpdated = runDbUpdate(uid, fieldName, dbUpdate)
-        if (rowsUpdated <= 0) {
-            Logger.w(
-                LOG_TAG_FIREWALL,
-                "updatePerAppInfoField ($fieldName) no rows updated for uid $uid, package $packageName"
-            )
-            throw IllegalStateException("No rows updated for uid $uid, package $packageName")
-        }
-
-        val now = System.currentTimeMillis()
-        var cacheUpdated = false
-        mutex.withLock {
-            appInfos.get(uid).find { it.packageName == packageName }?.let { appInfo ->
-                cacheUpdate(appInfo)
-                appInfo.modifiedTs = now
-                cacheUpdated = true
-            } ?: Logger.w(
-                LOG_TAG_FIREWALL,
-                "updatePerAppInfoField ($fieldName) cache miss for uid $uid, package $packageName"
-            )
-        }
-
-        if (!cacheUpdated) {
-            val refreshedAppInfo = withContext(Dispatchers.IO) { db.getAppInfoByUidAndPackage(uid, packageName) }
-            if (refreshedAppInfo != null) {
-                mutex.withLock {
-                    appInfos.put(uid, refreshedAppInfo)
-                    cacheUpdated = true
-                }
-            } else {
+        val updateMutex = getAppUpdateMutex(uid)
+        updateMutex.withLock {
+            val rowsUpdated = runDbUpdate(uid, fieldName, dbUpdate)
+            if (rowsUpdated <= 0) {
                 Logger.w(
                     LOG_TAG_FIREWALL,
-                    "updatePerAppInfoField ($fieldName) db reload miss for uid $uid, package $packageName"
+                    "updatePerAppInfoField ($fieldName) no rows updated for uid $uid, package $packageName"
+                )
+                throw IllegalStateException("No rows updated for uid $uid, package $packageName")
+            }
+
+            val now = System.currentTimeMillis()
+            var cacheUpdated = false
+            mutex.withLock {
+                appInfos.get(uid).find { it.packageName == packageName }?.let { appInfo ->
+                    cacheUpdate(appInfo)
+                    appInfo.modifiedTs = now
+                    cacheUpdated = true
+                } ?: Logger.w(
+                    LOG_TAG_FIREWALL,
+                    "updatePerAppInfoField ($fieldName) cache miss for uid $uid, package $packageName"
                 )
             }
-        }
 
-        if (cacheUpdated) {
-            informObservers()
+            if (!cacheUpdated) {
+                val refreshedAppInfo = withContext(Dispatchers.IO) { db.getAppInfoByUidAndPackage(uid, packageName) }
+                if (refreshedAppInfo != null) {
+                    mutex.withLock {
+                        appInfos.put(uid, refreshedAppInfo)
+                        cacheUpdated = true
+                    }
+                } else {
+                    Logger.w(
+                        LOG_TAG_FIREWALL,
+                        "updatePerAppInfoField ($fieldName) db reload miss for uid $uid, package $packageName"
+                    )
+                }
+            }
+
+            if (cacheUpdated) {
+                informObservers()
+            }
         }
+    }
+
+    private fun getAppUpdateMutex(uid: Int): Mutex {
+        val key = uid.toString()
+        return appUpdateLocks.getOrPut(key) { Mutex() }
     }
 
     private suspend fun updateSharedUidCacheField(
