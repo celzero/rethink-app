@@ -1042,6 +1042,22 @@ object FirewallManager : KoinComponent {
                 "updatePerAppInfoField ($fieldName) cache miss for uid $uid, package $packageName"
             )
         }
+
+        if (!cacheUpdated) {
+            val refreshedAppInfo = withContext(Dispatchers.IO) { db.getAppInfoByUidAndPackage(uid, packageName) }
+            if (refreshedAppInfo != null) {
+                mutex.withLock {
+                    appInfos.put(uid, refreshedAppInfo)
+                    cacheUpdated = true
+                }
+            } else {
+                Logger.w(
+                    LOG_TAG_FIREWALL,
+                    "updatePerAppInfoField ($fieldName) db reload miss for uid $uid, package $packageName"
+                )
+            }
+        }
+
         if (cacheUpdated) {
             informObservers()
         }

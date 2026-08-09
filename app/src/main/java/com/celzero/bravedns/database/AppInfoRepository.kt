@@ -88,6 +88,10 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.getAppInfoByUid(uid)
     }
 
+    suspend fun getAppInfoByUidAndPackage(uid: Int, packageName: String): AppInfo? {
+        return appInfoDAO.isUidPkgExist(uid, packageName)
+    }
+
     suspend fun updateFirewallStatusByUid(uid: Int, firewallStatus: Int, connectionStatus: Int) {
         appInfoDAO.updateFirewallStatusByUid(uid, firewallStatus, connectionStatus, System.currentTimeMillis())
     }
