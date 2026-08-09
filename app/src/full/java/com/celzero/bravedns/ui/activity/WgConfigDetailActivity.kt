@@ -56,10 +56,6 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.service.WireguardManager.ERR_CODE_OTHER_WG_ACTIVE
-import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_ACTIVE
-import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_FULL
-import com.celzero.bravedns.service.WireguardManager.ERR_CODE_WG_INVALID
 import com.celzero.bravedns.service.WireguardManager.INVALID_CONF_ID
 import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
 import com.celzero.bravedns.ui.BaseActivity
@@ -235,7 +231,6 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
             Logger.i(LOG_TAG_PROXY, "VPN not active, config may not be available")
             Utilities.showToastUiCentered(
                 this,
-                ERR_CODE_VPN_NOT_ACTIVE +
                         getString(R.string.settings_socks5_vpn_disabled_error),
                 Toast.LENGTH_LONG
             )
@@ -915,7 +910,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
                 uiCtx {
                     Utilities.showToastUiCentered(
                         this,
-                        ERR_CODE_VPN_NOT_ACTIVE + getString(R.string.settings_socks5_vpn_disabled_error),
+                        getString(R.string.settings_socks5_vpn_disabled_error),
                         Toast.LENGTH_LONG
                     )
                     b.catchAllCheck.isChecked = !enabled
@@ -923,6 +918,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
                 return@io
             }
 
+            // checks only for app mode, so show appropriate error message if not enabled
             if (!WireguardManager.canEnableProxy()) {
                 Logger.i(
                     LOG_TAG_PROXY,
@@ -933,7 +929,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
                     b.catchAllCheck.isChecked = false
                     Utilities.showToastUiCentered(
                         this,
-                        ERR_CODE_VPN_NOT_FULL + getString(R.string.wireguard_enabled_failure),
+                        getString(R.string.wireguard_dns_mode_conflict),
                         Toast.LENGTH_LONG
                     )
                 }
@@ -948,9 +944,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
                     b.catchAllCheck.isChecked = false
                     Utilities.showToastUiCentered(
                         this,
-                        ERR_CODE_OTHER_WG_ACTIVE + getString(
-                            R.string.wireguard_enabled_failure
-                        ),
+                        getString(R.string.wireguard_one_wg_active_conflict),
                         Toast.LENGTH_LONG
                     )
                 }
@@ -964,11 +958,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
                 uiCtx {
                     // reset the check box
                     b.catchAllCheck.isChecked = false
-                    Utilities.showToastUiCentered(
-                        this,
-                        ERR_CODE_WG_INVALID + getString(R.string.wireguard_enabled_failure),
-                        Toast.LENGTH_LONG
-                    )
+                    showInvalidConfigInfoDialog()
                 }
                 return@io
             }
@@ -1050,6 +1040,18 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
         hopDialog.setCanceledOnTouchOutside(false)
         hopDialog.setOnDismissListener { refreshHopStatus() }
         hopDialog.show()
+    }
+
+    private fun showInvalidConfigInfoDialog() {
+        if (isFinishing) return
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+        builder.setTitle(getString(R.string.wireguard_invalid_config_title))
+        builder.setMessage(getString(R.string.wireguard_invalid_config_message))
+        builder.setCancelable(true)
+        builder.setPositiveButton(getString(R.string.lbl_dismiss)) { _, _ ->
+            // no-op
+        }
+        builder.create().show()
     }
 
     private fun showDeleteInterfaceDialog() {

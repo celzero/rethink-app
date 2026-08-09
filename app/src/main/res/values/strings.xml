@@ -524,7 +524,7 @@
     <string name="settings_connectivity_checks" translatable="true">Perform connectivity checks</string>
     <string name="settings_connectivity_checks_desc" translatable="true">Connectivity checks are sent to ascertain reachability.</string>
 
-    <string name="settings_allow_lan_heading" translatable="true">Do not route Private IPs (experimental)</string>
+    <string name="settings_allow_lan_heading" translatable="true">Do not route Private IPs</string>
     <string name="settings_allow_lan_desc" translatable="true">Exclude LAN, loopback, multicast, link-local routes from Rethink\'s VPN tunnel.</string>
 
     <string name="settings_mobile_metered_heading" translatable="true">Meter mobile networks</string>
@@ -609,7 +609,7 @@
     <string name="settings_autostart_bootup_heading" translatable="true">Auto-start on power-up (experimental)</string>
     <string name="settings_autostart_bootup_desc" translatable="true">On device power-up, start Rethink if it was running before shut down.</string>
 
-    <string name="settings_network_all_networks" translatable="true">Use all available networks (experimental)</string>
+    <string name="settings_network_all_networks" translatable="true">Use all available networks</string>
     <string name="settings_network_all_networks_desc" translatable="true">When enabled, Rethink uses all available networks to connect to Internet. If not, it uses whichever network is deemed <i>active</i> by Android.</string>
 
     <string name="settings_check_update_heading" translatable="true">Check for app updates</string>
@@ -694,8 +694,8 @@
 
     <string name="settings_ip_dialog_title" translatable="true">Choose IP version</string>
     <string name="settings_ip_dialog_ipv4" translatable="true">IPv4 (default)</string>
-    <string name="settings_ip_dialog_ipv6" translatable="true">IPv6 (experimental)</string>
-    <string name="settings_ip_dialog_ipv46" translatable="true">Auto (experimental)</string>
+    <string name="settings_ip_dialog_ipv6" translatable="true">IPv6</string>
+    <string name="settings_ip_dialog_ipv46" translatable="true">Auto</string>
     <string name="settings_ip_text_ipv4" translatable="true">IPv4</string>
     <string name="settings_ip_text_ipv6" translatable="true">IPv6</string>
     <string name="settings_ip_text_ipv46" translatable="true">Auto</string>
@@ -796,6 +796,9 @@
 
     <string name="hsf_notification_permission_failure" translatable="true">Enable notification permission from Settings screen</string>
 
+    <string name="hsf_local_network_permission_dialog_heading" translatable="true">Local Network Permission</string>
+    <string name="hsf_local_network_permission_dialog_message" translatable="true">%1$s requires the Local Network permission for some features to function. The VPN has been disabled. Grant the permission from the app settings and try again.</string>
+
     <string name="hsf_start_dialog_header" translatable="true">Start %1$s</string>
     <string name="hsf_start_dialog_message" translatable="true">You are one step away from safe and secure Android: Instantly see network activity, block websites, IPs, and badly behaving apps.</string>
     <string name="hsf_start_dialog_positive" translatable="true">Start</string>
@@ -841,7 +844,7 @@
 
     <string name="dc_custom_block_heading" translatable="true">Domain rules</string>
 
-    <string name="dc_dns_website_heading" translatable="true">Show website icon in DNS logs (experimental)</string>
+    <string name="dc_dns_website_heading" translatable="true">Show website icon in DNS logs</string>
     <string name="dc_dns_website_desc" translatable="true">Fetches website icons from <i>nextdns.io</i> and <i>duckduckgo.com</i>. Consumes up to 350 mb in disk space</string>
 
     <string name="dc_dns_leaks_heading" translatable="true">Prevent DNS leaks</string>
@@ -1693,6 +1696,11 @@
     <string name="exclude_all_app_wg_dialog_desc" translatable="true">Exclude all apps from this WireGuard VPN?</string>
 
     <string name="wireguard_enabled_failure" translatable="true">Stop other active proxies to enable WireGuard</string>
+    <string name="wireguard_dns_mode_conflict" translatable="true">WireGuard cannot be enabled in DNS-only mode. Switch to Firewall or DNS+Firewall mode.</string>
+    <string name="wireguard_one_wg_active_conflict" translatable="true">An active One-WireGuard configuration is in use. Disable it first to use individual WireGuard configurations.</string>
+    <string name="wireguard_invalid_config_title" translatable="true">Invalid WireGuard configuration</string>
+    <string name="wireguard_invalid_config_message" translatable="true">The selected WireGuard configuration is invalid or missing. Edit or re-import the configuration and try again.</string>
+    <string name="wireguard_replaced_active_config" translatable="true">Replaced the previously active WireGuard configuration</string>
     <string name="wireguard_disable_failure" translatable="true">\"Always-on WireGuard\" cannot be turned off</string>
     <string name="wireguard_disable_failure_relay" translatable="true">\"Relay WireGuard\" cannot be turned off</string>
 
@@ -2091,7 +2099,7 @@
     <string name="lockdown_check_socks5" translatable="false">SOCKS5 Proxy</string>
     <string name="lockdown_check_socks5_desc" translatable="false">SOCKS5 proxy with app (%1$s) conflicts with lockdown mode.</string>
     <string name="lockdown_check_ac" translatable="false">Anti-Censorship</string>
-    <string name="lockdown_check_ac_desc" translatable="false">Anti-censorship auto-proxy with retry conflicts with lockdown.</string>
+    <string name="lockdown_check_ac_desc" translatable="false">Only the \&quot;Hybrid\&quot; dial strategy with \&quot;never retry\&quot; is compatible; disable anti-censorship otherwise.</string>
     <string name="lockdown_check_ok" translatable="false">Compatible</string>
     <string name="lockdown_check_conflict" translatable="false">Conflict</string>
     <string name="lockdown_check_disable_switch" translatable="false">Disable incompatible options</string>
@@ -2099,6 +2107,8 @@
     <string name="lockdown_check_apply" translatable="false">Apply</string>
     <string name="lockdown_check_cancel" translatable="false">Cancel</string>
     <string name="lockdown_check_all_ok" translatable="false">All checks passed. No conflicts detected.</string>
+    <string name="lockdown_check_setting_disabled" translatable="false">Proxy Lockdown is enabled. This setting cannot be changed.</string>
+    <string name="lockdown_check_proxy_options_disabled" translatable="false">Proxy Lockdown is enabled. Orbot, HTTP and SOCKS5 proxies cannot be used.</string>
     <string name="lockdown_check_no_proxy" translatable="false">No Proxy Enabled</string>
     <string name="lockdown_check_no_proxy_desc" translatable="false">No proxy (HTTP, SOCKS5, WireGuard, RPN, or Orbot) is enabled. Lockdown mode will block all non-VPN traffic.</string>
     <string name="lockdown_check_rethink_bypass" translatable="false">Rethink Bypass</string>
@@ -2169,7 +2179,7 @@
 
     <string name="payment_processing" translatable="false">Payment processing</string>
     <string name="payment_processing_desc" translatable="false">Your payment is being processed. You’ll get access once it completes.</string>
-    <string name="rethink_terms" translatable="false">By subscribing to RPN you agree to the &lt;a href="https://rethinkdns.com/terms"&gt;Rethink Terms of Service&lt;/a&gt; and &lt;a href="https://rethinkdns.com/privacy"&gt;Privacy Policy&lt;/a&gt;. Powered by Windscribe</string>
+    <string name="rethink_terms" translatable="false">By purchasing you agree to the &lt;a href="https://rethinkdns.com/terms"&gt;Terms of Service&lt;/a&gt; and &lt;a href="https://rethinkdns.com/privacy"&gt;Privacy Policy&lt;/a&gt;. Powered by Windscribe.</string>
 
     <!-- Subscription UI Strings -->
     <string name="premium_subtitle" translatable="false">Enhanced privacy, speed, and security</string>
@@ -2211,7 +2221,7 @@
 
     <!-- Item already owned / restore feedback -->
     <string name="item_already_owned_restoring" translatable="false">This item is already owned. Restoring your purchase…</string>
-    <string name="restore_purchases" translatable="false">Restore Purchases</string>
+    <string name="restore_purchases" translatable="false">Restore Purchase</string>
     <string name="restore_purchases_hint" translatable="false">Didn\'t get your purchase? Tap here to restore.</string>
     <string name="restore_purchases_success" translatable="false">Purchase restored successfully.</string>
     <string name="restore_purchases_none" translatable="false">No previous purchases were found.</string>
@@ -2240,6 +2250,16 @@
     <string name="billing_err_feature_not_supported" translatable="false">This feature is not supported on your device.</string>
     <string name="billing_err_item_not_owned" translatable="false">This item is not currently owned.</string>
     <string name="billing_err_payment_declined" translatable="false">Your payment couldn\'t be completed. Please try a different payment method or contact your bank.</string>
+
+    <!-- Product fetch error reasons (shown below the primary error message in RethinkPlusFragment) -->
+    <string name="error_reason" translatable="false">Reason</string>
+    <string name="product_fetch_err_network" translatable="false">No internet connection. Check your network and try again.</string>
+    <string name="product_fetch_err_timeout" translatable="false">Google Play did not respond in time. Please try again.</string>
+    <string name="product_fetch_err_empty" translatable="false">No subscription plans were returned. Please try again.</string>
+    <string name="product_fetch_err_auth" translatable="false">Configuration error. Please contact support.</string>
+    <string name="product_fetch_err_billing_unavailable" translatable="false">In-app purchases are not available on this device.</string>
+    <string name="product_fetch_err_server" translatable="false">Google Play is temporarily unavailable. Please try again.</string>
+    <string name="product_fetch_err_unknown" translatable="false">An unexpected error occurred. Please try again.</string>
 
     <!-- Server sync pending banner -->
     <string name="server_sync_pending_msg" translatable="false">Purchase verified, but server sync is pending. Your access is active and will sync shortly.</string>
@@ -2281,8 +2301,8 @@
     <string name="vpn_status_disconnected" translatable="false">Disconnected</string>
 
     <plurals name="server_count">
-        <item quantity="one">%1$d server</item>
-        <item quantity="other">%1$d servers</item>
+        <item quantity="one">%1$d location</item>
+        <item quantity="other">%1$d locations</item>
     </plurals>
 
     <!-- Server Removal Notification -->
@@ -2405,7 +2425,7 @@
     <string name="server_settings_config_auto_hint" translatable="false">The app automatically selects the port, identity, and configuration</string>
     <string name="server_settings_config_manual_hint" translatable="false">Manually control the identity, port, and configuration mode</string>
     <string name="server_settings_identity_title" translatable="false">Always Change Identity</string>
-    <string name="server_settings_identity_desc" translatable="false">Request a new server identity for each connection attempt</string>
+    <string name="server_settings_identity_desc" translatable="false">Request a new client identity for each connection attempt</string>
     <string name="server_settings_port_title" translatable="false">Connection Port</string>
     <string name="server_settings_port_desc" translatable="false">Port used for tunnel server connections</string>
     <string name="server_settings_permanent_config_title" translatable="false">Permanent Configuration</string>
@@ -2485,6 +2505,11 @@
     <string name="server_order_id_fmt" translatable="false">Order: %1$s</string>
     <string name="server_order_desc" translatable="false">View orders fetched from server</string>
     <string name="server_order_open_error" translatable="false">Could not open order history</string>
+
+    <string name="rpn_desc_one" translatable="true">Unlimited bandwidth • 100+ cities</string>
+    <string name="rpn_desc_two" translatable="true">Connect up to 5 cities at once</string>
+    <string name="rpn_desc_three" translatable="true">Ad-free browsing</string>
+    <string name="rpn_desc_four" translatable="true">Multi-hop • Double encryption</string>
 
     <!-- ProxySettingsActivity RPN section -->
     <string name="proxy_rpn_heading" translatable="false">Rethink Proxy Network</string>
@@ -2677,6 +2702,7 @@
 
     <!-- Sponsor feature strings -->
     <string name="sponsor_community_sponsor" translatable="false">Sponsor</string>
+    <string name="sponsor_community_sponsor_desc" translatable="false">Sponsor the development of the Rethink DNS + Firewall open source project, on which 2 engineers work full-time. As of August 2026, our costs are $1500 per month.</string>
     <string name="sponsor_contribution_title" translatable="false">Choose your contribution</string>
     <string name="sponsor_contribution_description" translatable="false">More options coming soon</string>
     <string name="sponsor_contribution_subtitle" translatable="false">Drag to set any amount from $1 to $100.</string>

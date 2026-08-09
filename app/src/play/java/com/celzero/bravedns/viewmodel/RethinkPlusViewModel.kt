@@ -21,6 +21,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.billingclient.api.BillingClient.ProductType
+import com.android.billingclient.api.BillingClient.BillingResponseCode
 import com.celzero.bravedns.R
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.ProductDetail
@@ -747,17 +748,31 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
     }
 
     /**
-     * Handle product details result
+     * Handle product details result.
+     *
+     * [responseCode] is the most severe Google Play Billing response code observed during
+     * the fetch (see [InAppBillingHandler.lastProductQueryResponseCode]). It is mapped to a
+     * [ProductFetchError] so the user sees the specific cause (timeout, empty response,
+     * billing unavailable, authentication/configuration error, etc.) instead of a generic
+     * "try again".
      */
-    fun onProductsFetched(isSuccess: Boolean, productList: List<ProductDetail>) {
+    fun onProductsFetched(
+        isSuccess: Boolean,
+        productList: List<ProductDetail>,
+        responseCode: Int = BillingResponseCode.OK
+    ) {
         cancelLoadingWatchdog()
         isBillingInitializing.set(false)
         if (!isSuccess || productList.isEmpty()) {
-            setUi(SubscriptionUiState.Error(
-                title = "Products Unavailable",
-                message = "Unable to load plans. Please try again.",
-                isRetryable = true
-            ))
+            val error = ProductFetchError.from(responseCode, isOffline())
+            setUi(
+                SubscriptionUiState.Error(
+                    title = "Products Unavailable",
+                    message = "Unable to load plans. Please try again.",
+                    isRetryable = error.isRetryable,
+                    reason = getApplication<Application>().getString(error.reasonRes)
+                )
+            )
         } else {
             setProducts(productList)
         }
@@ -893,7 +908,13 @@ sealed class SubscriptionUiState {
     data class Error(
         val title: String,
         val message: String,
-        val isRetryable: Boolean
+        val isRetryable: Boolean,
+        /**
+         * Optional specific cause of the failure (e.g. "Google Play did not respond in time.").
+         * Rendered in a small text element directly below [message]. Empty when the cause is
+         * not known or not applicable (e.g. non-product-fetch errors).
+         */
+        val reason: String = ""
     ) : SubscriptionUiState()
 
     data class ServerAckPending(val message: String = "") : SubscriptionUiState()
@@ -912,4 +933,59 @@ sealed class SubscriptionUiState {
     ) : SubscriptionUiState()
 
     data class AlreadySubscribed(val productId: String) : SubscriptionUiState()
+}
+
+/**
+ * Specific failure modes that can occur while fetching Rethink Plus product details from
+ * Google Play. Each value maps a Google Play Billing response code (or a device-level
+ * condition such as "no network") to a user-facing reason string and a retry policy, so the
+ * UI can communicate *why* the fetch failed instead of a generic "try again".
+ */
+enum class ProductFetchError(val reasonRes: Int, val isRetryable: Boolean) {
+    /** Device has no internet connectivity. */
+    NETWORK_UNAVAILABLE(R.string.product_fetch_err_network, true),
+
+    /** Google Play Billing did not respond within the query timeout. */
+    REQUEST_TIMEOUT(R.string.product_fetch_err_timeout, true),
+
+    /** Play responded OK but returned no products for the configured SKUs. */
+    EMPTY_RESPONSE(R.string.product_fetch_err_empty, true),
+
+    /** Billing misconfiguration / DEVELOPER_ERROR (closest analogue to an auth failure). */
+    AUTHENTICATION_FAILURE(R.string.product_fetch_err_auth, false),
+
+    /** In-app purchases are not available on this device / account (BILLING_UNAVAILABLE). */
+    BILLING_UNAVAILABLE(R.string.product_fetch_err_billing_unavailable, false),
+
+    /** Play is temporarily unavailable (SERVICE_UNAVAILABLE / generic ERROR). */
+    SERVER_ERROR(R.string.product_fetch_err_server, true),
+
+    /** Unrecognized failure. */
+    UNKNOWN(R.string.product_fetch_err_unknown, true);
+
+    companion object {
+        /**
+         * Map a Google Play [BillingResponseCode] (and the device offline state) to the most
+         * specific [ProductFetchError]. The offline check runs first because Play cannot be
+         * reached without connectivity, regardless of the (possibly stale) response code.
+         */
+        fun from(responseCode: Int, isOffline: Boolean): ProductFetchError {
+            if (isOffline) return NETWORK_UNAVAILABLE
+            return when (responseCode) {
+                BillingResponseCode.SERVICE_TIMEOUT -> REQUEST_TIMEOUT
+                BillingResponseCode.SERVICE_UNAVAILABLE,
+                BillingResponseCode.ERROR -> SERVER_ERROR
+                BillingResponseCode.BILLING_UNAVAILABLE -> BILLING_UNAVAILABLE
+                BillingResponseCode.DEVELOPER_ERROR -> AUTHENTICATION_FAILURE
+                BillingResponseCode.OK -> EMPTY_RESPONSE
+                BillingResponseCode.SERVICE_DISCONNECTED -> SERVER_ERROR
+                BillingResponseCode.FEATURE_NOT_SUPPORTED -> SERVER_ERROR
+                BillingResponseCode.ITEM_UNAVAILABLE -> SERVER_ERROR
+                BillingResponseCode.ITEM_ALREADY_OWNED -> SERVER_ERROR
+                BillingResponseCode.USER_CANCELED -> SERVER_ERROR
+                BillingResponseCode.ITEM_NOT_OWNED -> SERVER_ERROR
+                else -> UNKNOWN
+            }
+        }
+    }
 }

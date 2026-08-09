@@ -23,7 +23,9 @@ import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
@@ -32,6 +34,7 @@ import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.PurchaseDetail
 import com.celzero.bravedns.iab.RegisterDeviceResult
 import com.celzero.bravedns.iab.ServerApiError
+import com.celzero.bravedns.iab.SubscriptionCheckWorker
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.scheduler.RpnProxyUpdateWorker.Companion.INTERVAL_MINUTES
 import com.celzero.bravedns.service.PersistentState
@@ -138,6 +141,10 @@ class RpnProxyUpdateWorker(
                 return@withContext Result.success()
             }
 
+            // Ensure the subscription/billing reconciliation worker runs periodically.
+            // KEEP makes this a no-op if a SubscriptionCheckWorker is already enqueued or running.
+            enqueueSubscriptionCheckIfNeeded()
+
             try {
                 // TODO: Duplicate implementation exists in RpnProxyUpdateWorker and
                 // SubscriptionCheckWorker. Extract this into a shared utility or manager.
@@ -191,6 +198,26 @@ class RpnProxyUpdateWorker(
                     Result.retry()
                 }
             }
+        }
+    }
+
+    /**
+     * Enqueues [SubscriptionCheckWorker] (billing fetch, reconcile, device registration)
+     * using [ExistingWorkPolicy.KEEP]. if the one-time enqueue at VPN start was missed,
+     * exhausted its WorkManager retries, or RPN was enabled mid-session,
+     * the subscription check is re-triggered here.
+     */
+    private fun enqueueSubscriptionCheckIfNeeded() {
+        try {
+            val workRequest = OneTimeWorkRequestBuilder<SubscriptionCheckWorker>().build()
+            WorkManager.getInstance(applicationContext).enqueueUniqueWork(
+                SubscriptionCheckWorker.WORK_NAME,
+                ExistingWorkPolicy.KEEP,
+                workRequest
+            )
+            Logger.i(LOG_TAG_PROXY, "$TAG; enqueued SubscriptionCheckWorker")
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; enqueueSubscriptionCheckIfNeeded failed (non-fatal): ${e.message}")
         }
     }
 

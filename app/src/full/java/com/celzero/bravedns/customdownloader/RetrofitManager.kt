@@ -15,6 +15,9 @@
  */
 package com.celzero.bravedns.customdownloader
 
+import android.content.Context
+import android.net.Uri
+import com.celzero.bravedns.R
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_OKHTTP
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
@@ -29,10 +32,12 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.dnsoverhttps.DnsOverHttps
 import retrofit2.Retrofit
+import org.koin.core.context.GlobalContext
 import java.net.InetAddress
 import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
 import kotlin.enums.enumEntries
+import androidx.core.net.toUri
 
 class RetrofitManager {
 
@@ -127,7 +132,7 @@ class RetrofitManager {
             return b.build()
         }
 
-        // Attempts DNS providers in priority order: Quad9 → Cloudflare → Google → System → Fallback.
+        // Attempts DNS providers in priority order: Quad9 → Cloudflare → Google → System.
         // If a provider fails to construct or resolve, the next is tried transparently at runtime.
         private fun customDns(bootstrapClient: OkHttpClient): Dns? {
             val providers = mutableListOf<Dns>()
@@ -187,21 +192,87 @@ class RetrofitManager {
             }
         }
 
+        // The custom DNS resolver. For hosts with pinned IPs (dl/svc.rethinkdns.com from
+        // R.array.urls / R.array.ips) those IPs are placed first in the returned list, ahead of
+        // the provider-cascade result; OkHttp (with retryOnConnectionFailure(true)) connects to
+        // the pinned IPs first and only falls back to the resolved addresses if a pinned IP fails
+        // at the socket layer. For non-pinned hosts this behaves as a plain provider cascade.
         private class FallbackDns(private val providers: List<Dns>) : Dns {
             override fun lookup(hostname: String): List<InetAddress> {
+                val pinnedIps = pinnedHosts[hostname] ?: emptyList()
                 for (provider in providers) {
                     try {
                         val result = provider.lookup(hostname)
                         if (result.isNotEmpty()) {
-                            return result
+                            return pinnedIps + result
                         }
                     } catch (_: Exception) {
                     }
                 }
+                if (pinnedIps.isNotEmpty()) return pinnedIps
                 throw UnknownHostException(
                     "All DNS providers failed for $hostname"
                 )
             }
+        }
+
+        /**
+         * Hostname -> pinned IP addresses, read once from R.array.urls / R.array.ips -- the same
+         * table that backs GoVpnAdapter.getIpString. Matched by exact host so that, e.g.,
+         * dl.rethinkdns.com does not collide with basic.rethinkdns.com. Empty when the table
+         * cannot be read or Koin is not yet up (in which case OkHttp simply resolves normally).
+         */
+        private val pinnedHosts: Map<String, List<InetAddress>> by lazy { readPinnedHosts() }
+
+        private fun readPinnedHosts(): Map<String, List<InetAddress>> {
+            val ctx: Context = try {
+                GlobalContext.get().get<Context>()
+            } catch (e: Exception) {
+                Logger.e(
+                    Logger.LOG_TAG_DOWNLOAD,
+                    "err; koin context unavailable, skip host pinning: ${e.message}",
+                    e
+                )
+                return emptyMap()
+            }
+            val urls: Array<String>
+            val ips: Array<String>
+            try {
+                urls = ctx.resources.getStringArray(R.array.urls)
+                ips = ctx.resources.getStringArray(R.array.ips)
+            } catch (e: Exception) {
+                Logger.e(Logger.LOG_TAG_DOWNLOAD, "err; reading server table: ${e.message}", e)
+                return emptyMap()
+            }
+            if (urls.size != ips.size) {
+                // Mismatched arrays would misalign host<->IP; bail out rather than guess.
+                Logger.e(
+                    Logger.LOG_TAG_DOWNLOAD,
+                    "err; urls (${urls.size}) / ips (${ips.size}) length mismatch; skip host pinning"
+                )
+                return emptyMap()
+            }
+            val out = mutableMapOf<String, List<InetAddress>>()
+            for (i in urls.indices) {
+                val host = urls[i].toUri().host ?: continue
+                if (host.isEmpty() || out.containsKey(host)) continue
+                // getByName does NOT perform a lookup for literal IP strings; it parses them
+                // directly (same assumption the existing getByIp helper relies on). Skip any
+                // malformed entry instead of failing the whole table.
+                val parsed = ips[i].split(',').mapNotNull { token ->
+                    val t = token.trim()
+                    if (t.isEmpty()) return@mapNotNull null
+                    try {
+                        // If a literal IP address is supplied, only the validity of the address
+                        // format is checked.
+                        InetAddress.getByName(t)
+                    } catch (_: Exception) {
+                        null
+                    }
+                }
+                if (parsed.isNotEmpty()) out[host] = parsed
+            }
+            return out
         }
     }
 }

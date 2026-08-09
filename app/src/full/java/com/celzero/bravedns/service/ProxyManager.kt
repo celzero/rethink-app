@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.service
 
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import com.celzero.bravedns.database.AppInfo
@@ -30,6 +31,7 @@ import java.util.concurrent.CopyOnWriteArraySet
 object ProxyManager : KoinComponent {
 
     private val db: ProxyAppMappingRepository by inject()
+    private val appConfig: AppConfig by inject()
 
     const val ID_ORBOT_BASE = "ORBOT"
     const val ID_WG_BASE = "wg"
@@ -113,19 +115,38 @@ object ProxyManager : KoinComponent {
         return pamSet.map { FirewallManager.AppInfoTuple(it.uid, it.packageName) }.toMutableSet()
     }
 
+    // ensure the proxyId="" base row exists for (uid, packageName). base row is what makes an
+    // app visible in the "All Apps" pager query (proxyId = :proxyId OR proxyId = '') even when the
+    // app is not assigned to any specific proxy.
+    private suspend fun ensureBaseRow(uid: Int, packageName: String, appName: String) {
+        val baseTuple = ProxyAppMapTuple(uid, packageName, "")
+        if (pamSet.contains(baseTuple)) return
+        pamSet.add(baseTuple)
+        val pam = ProxyApplicationMapping(uid, packageName, appName, "", true, "")
+        db.insert(pam)
+        Logger.i(LOG_TAG_PROXY, "ensureBaseRow: created base row for $packageName ($uid)")
+    }
+
     suspend fun setProxyIdForAllApps(proxyId: String, proxyName: String) {
         if (!isValidProxyPrefix(proxyId)) {
             Logger.e(LOG_TAG_PROXY, "Invalid proxy id: $proxyId")
             return
         }
-        // add this proxy to every app that does not already have it
-        val toAdd = trackedApps()
+        // FirewallManager is the source of truth for "all apps"; iterate it instead of the proxy
+        // cache (trackedApps) so that apps missing from the proxy mapping are also backfilled.
+        val toAdd = FirewallManager.getAllApps()
         toAdd.forEach { app ->
+            val ai = FirewallManager.getAppInfoByUidAndPackage(app.uid, app.packageName)
+                ?: return@forEach
+
+            if (ai.tombstoneTs > 0L) return@forEach // skip uninstalled/tombstoned
+            // concurrently removed; will be reconciled on next refresh
+            // make sure the app is visible in app-lists even if not assigned to a proxy
+            ensureBaseRow(app.uid, app.packageName, ai.appName)
             val tuple = ProxyAppMapTuple(app.uid, app.packageName, proxyId)
             if (!pamSet.contains(tuple)) {
                 pamSet.add(tuple)
-                val appName = FirewallManager.getAppInfoByPackage(app.packageName)?.appName.orEmpty()
-                val pam = ProxyApplicationMapping(app.uid, app.packageName, appName, proxyName, true, proxyId)
+                val pam = ProxyApplicationMapping(app.uid, app.packageName, ai.appName, proxyName, true, proxyId)
                 db.insert(pam)
             }
         }
@@ -142,14 +163,17 @@ object ProxyManager : KoinComponent {
             Logger.e(LOG_TAG_PROXY, "Invalid proxy id: $proxyId")
             return
         }
-        // add this proxy only to apps that do not yet have it
-        val toAdd = trackedApps()
+        // add this proxy only to apps that do not yet have it. Iterate FirewallManager (source of
+        // truth) instead of the proxy cache so missing apps are backfilled too.
+        val toAdd = FirewallManager.getAllApps()
         toAdd.forEach { app ->
+            val ai = FirewallManager.getAppInfoByUidAndPackage(app.uid, app.packageName) ?: return@forEach
             val existing = pamSet.any { it.uid == app.uid && it.packageName == app.packageName && it.proxyId == proxyId }
             if (!existing) {
+                // ensure visibility even if the base row was lost
+                ensureBaseRow(app.uid, app.packageName, ai.appName)
                 pamSet.add(ProxyAppMapTuple(app.uid, app.packageName, proxyId))
-                val appName = FirewallManager.getAppInfoByPackage(app.packageName)?.appName.orEmpty()
-                val pam = ProxyApplicationMapping(app.uid, app.packageName, appName, proxyName, true, proxyId)
+                val pam = ProxyApplicationMapping(app.uid, app.packageName, ai.appName, proxyName, true, proxyId)
                 db.insert(pam)
             }
         }
@@ -210,7 +234,14 @@ object ProxyManager : KoinComponent {
             if (pamSet.any { it.packageName == packageName }) {
                 return
             }
-            Logger.e(LOG_TAG_PROXY, "updateApp: map not found for $packageName")
+            // No mapping exists for this package (the proxyId="" base row was lost).
+            val ai = FirewallManager.getAppInfoByUidAndPackage(uid, packageName)
+            if (ai == null) {
+                Logger.w(LOG_TAG_PROXY, "updateApp: no map and no fw app for $packageName ($uid); skip")
+                return
+            }
+            Logger.w(LOG_TAG_PROXY, "updateApp: map not found for $packageName; creating base row for uid=$uid")
+            ensureBaseRow(uid, packageName, ai.appName)
             return
         }
 
@@ -245,9 +276,9 @@ object ProxyManager : KoinComponent {
                 appInfo.uid,
                 appInfo.packageName,
                 appInfo.appName,
-                proxyId,
+                proxyName,
                 true,
-                proxyName
+                proxyId
             )
         val pamTuple = ProxyAppMapTuple(appInfo.uid, appInfo.packageName, proxyId)
         pamSet.add(pamTuple)
@@ -378,16 +409,22 @@ object ProxyManager : KoinComponent {
     data class ProxyStats(val routerStats: RouterStats?, val ip4: Boolean?, val ip6: Boolean?, val addr: String?)
     suspend fun stats(): String {
         val sb = StringBuilder()
-        val localProxies = listOf(Backend.Exit, Backend.Base)
-        localProxies.forEach {
+        val proxies = buildList {
+            add(Backend.Exit)
+            add(Backend.Base)
+
+            when {
+                appConfig.isOrbotProxyEnabled() -> add(ID_ORBOT_BASE)
+                appConfig.isCustomSocks5Enabled() -> add(ID_S5_BASE)
+                appConfig.isCustomHttpProxyEnabled() -> add(ID_HTTP_BASE)
+            }
+        }
+        proxies.forEach {
             sb.append("$it\n")
             val stats = VpnController.getLocalProxyStatsById(it)
             val routerStats = stats?.routerStats
-            sb.append("   status: ${routerStats?.status}\n")
-            sb.append("   status-reason: ${routerStats?.statusReason}\n")
             sb.append("   ip4: ${stats?.ip4}\n")
             sb.append("   ip6: ${stats?.ip6}\n")
-            sb.append("   hdl: ${routerStats?.hdl}\n")
             sb.append("   since: ${getRelativeTimeSpan(routerStats?.since)}\n")
             sb.append("   addr: ${stats?.addr ?: "N/A"}\n\n")
         }

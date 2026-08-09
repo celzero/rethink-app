@@ -46,10 +46,6 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.service.WireguardManager.ERR_CODE_OTHER_WG_ACTIVE
-import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_ACTIVE
-import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_FULL
-import com.celzero.bravedns.service.WireguardManager.ERR_CODE_WG_INVALID
 import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
@@ -69,6 +65,7 @@ import kotlinx.coroutines.withContext
 import kotlin.time.Duration.Companion.milliseconds
 import androidx.core.view.isVisible
 import com.celzero.bravedns.service.IpRulesManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class WgConfigAdapter(private val context: Context, private val listener: DnsStatusListener, private val splitDns: Boolean, private val eventLogger: EventLogger) :
     PagingDataAdapter<WgConfigFiles, WgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
@@ -604,7 +601,6 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 uiCtx {
                     Utilities.showToastUiCentered(
                         context,
-                        ERR_CODE_VPN_NOT_ACTIVE +
                             context.getString(R.string.settings_socks5_vpn_disabled_error),
                         Toast.LENGTH_LONG
                     )
@@ -649,7 +645,6 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 uiCtx {
                     Utilities.showToastUiCentered(
                         context,
-                        ERR_CODE_VPN_NOT_ACTIVE +
                             context.getString(R.string.settings_socks5_vpn_disabled_error),
                         Toast.LENGTH_LONG
                     )
@@ -659,6 +654,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 return
             }
 
+            // checks only for app mode, so show appropriate error message if not enabled
             if (!WireguardManager.canEnableProxy()) {
                 Logger.i(LOG_TAG_PROXY, "$TAG not in DNS+Firewall mode, cannot enable WireGuard")
                 uiCtx {
@@ -666,8 +662,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                     b.interfaceSwitch.isChecked = false
                     Utilities.showToastUiCentered(
                         context,
-                        ERR_CODE_VPN_NOT_FULL +
-                            context.getString(R.string.wireguard_enabled_failure),
+                        context.getString(R.string.wireguard_dns_mode_conflict),
                         Toast.LENGTH_LONG
                     )
                 }
@@ -682,8 +677,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                     b.interfaceSwitch.isChecked = false
                     Utilities.showToastUiCentered(
                         context,
-                        ERR_CODE_OTHER_WG_ACTIVE +
-                            context.getString(R.string.wireguard_enabled_failure),
+                        context.getString(R.string.wireguard_one_wg_active_conflict),
                         Toast.LENGTH_LONG
                     )
                 }
@@ -695,11 +689,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 uiCtx {
                     // reset the check box
                     b.interfaceSwitch.isChecked = false
-                    Utilities.showToastUiCentered(
-                        context,
-                        ERR_CODE_WG_INVALID + context.getString(R.string.wireguard_enabled_failure),
-                        Toast.LENGTH_LONG
-                    )
+                    showInvalidConfigDialog()
                 }
                 return
             }
@@ -707,6 +697,26 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             WireguardManager.enableConfig(cfg)
             logEvent("Wireguard enable", "Enabled WireGuard config: ${cfg.name} (id: ${cfg.id})")
             uiCtx { listener.onDnsStatusChanged() }
+        }
+
+        // Shows an "invalid config" AlertDialog when an Activity context is
+        // available; otherwise falls back to a toast so the error is never silently dropped.
+        private fun showInvalidConfigDialog() {
+            val ctx = context
+            if (ctx is android.app.Activity && !ctx.isFinishing) {
+                MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
+                    .setTitle(R.string.wireguard_invalid_config_title)
+                    .setMessage(R.string.wireguard_invalid_config_message)
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.lbl_dismiss) { d, _ -> d.dismiss() }
+                    .show()
+            } else {
+                Utilities.showToastUiCentered(
+                    context,
+                    context.getString(R.string.wireguard_invalid_config_message),
+                    Toast.LENGTH_LONG
+                )
+            }
         }
 
         private fun launchConfigDetail(id: Int) {
