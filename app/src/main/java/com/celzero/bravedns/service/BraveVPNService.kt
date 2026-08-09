@@ -2174,10 +2174,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     }
 
     private fun notifyConnectionStateChangeIfNeeded() {
-        // Case: Set state to working in case of Firewall mode
-        if (appConfig.getBraveMode().isFirewallMode()) {
-            VpnController.onConnectionStateChanged(State.WORKING)
-        }
+        // Signal that the tunnel has been (re)established. This must fire in every brave
+        // mode (DNS, Firewall, DNS+Firewall): this method is only ever called *after* a
+        // successful adapter create/update (see restartVpn / updateTun), so by this point
+        // VpnController.hasTunnel() is already true.
+        VpnController.onConnectionStateChanged(State.WORKING)
     }
 
     private fun informVpnControllerForProtoChange(protos: Pair<Boolean, Boolean>) {
