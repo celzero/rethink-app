@@ -2178,6 +2178,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         // mode (DNS, Firewall, DNS+Firewall): this method is only ever called *after* a
         // successful adapter create/update (see restartVpn / updateTun), so by this point
         // VpnController.hasTunnel() is already true.
+        //
+        // Previously this was gated to Firewall mode only. As a result, in DNS and
+        // DNS+Firewall mode the connection-status LiveData was never updated after the
+        // tunnel came up, so observers relying on it (e.g. HomeScreenFragment's shimmer,
+        // which stops only when hasTunnel() is true) were never re-evaluated until the
+        // next onResume() — i.e. the home screen shimmer kept animating until the user
+        // navigated away and back. See HomeScreenFragment.handleShimmer().
         VpnController.onConnectionStateChanged(State.WORKING)
     }
 
