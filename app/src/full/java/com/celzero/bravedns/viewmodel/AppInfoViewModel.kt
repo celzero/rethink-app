@@ -1,6 +1,6 @@
 package com.celzero.bravedns.viewmodel
 
-import com.celzero.bravedns.util.Logger
+import Logger
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
