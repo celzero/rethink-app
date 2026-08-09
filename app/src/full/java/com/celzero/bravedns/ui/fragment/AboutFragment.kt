@@ -265,7 +265,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.fossImg.setOnClickListener(this)
         b.flossFundsImg.setOnClickListener(this)
         b.aboutAppUpdate.setOnClickListener(this)
-        b.aboutWhatsNew.setOnClickListener(this)
         b.aboutAppInfo.setOnClickListener(this)
         b.aboutAppNotification.setOnClickListener(this)
         b.aboutVpnProfile.setOnClickListener(this)
@@ -327,10 +326,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     private fun updateVersionInfo() {
         try {
             val version = getVersionName()
-            // take first 7 characters of the version name, as the version has build number
-            // appended to it, which is not required for the user to see.
-            val slicedVersion = version.slice(0..VERSION_SLICE_END_INDEX)
-            b.aboutWhatsNew.text = getString(R.string.about_whats_new, slicedVersion)
 
             // complete version name along with the source of installation
             val v = getString(R.string.about_version_install_source, version, getDownloadSource())
@@ -512,9 +507,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 (requireContext() as HomeScreenActivity).checkForUpdate(
                     AppUpdater.UserPresent.INTERACTIVE
                 )
-            }
-            b.aboutWhatsNew -> {
-                showNewFeaturesDialog()
             }
             b.aboutAppInfo -> {
                 openAppInfo(requireContext())
@@ -1705,6 +1697,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         }
     }
 
+    // unused, remove after removing the string
     private fun showNewFeaturesDialog() {
         val binding =
             DialogWhatsnewBinding.inflate(LayoutInflater.from(requireContext()), null, false)
