@@ -123,11 +123,15 @@ class FirewallAppListAdapter(
                         b.firewallAppLabelTv.setTextColor(userAppColor)
                     } */
                     b.firewallAppLabelTv.text = appInfo.appName
+<<<<<<< HEAD
 b.firewallAppInfo.text = if (appInfo.packageName.startsWith(NO_PACKAGE_PREFIX)) {
                         context.getString(R.string.app_id_uid_only, appInfo.uid)
                     } else {
                         context.getString(R.string.app_id_package, appInfo.uid, appInfo.packageName)
                     }
+=======
+                    b.firewallAppInfo.text = context.getString(R.string.app_id_package, appInfo.packageName, appInfo.uid)
+>>>>>>> 5a6e73d6b (FIX: added a string in the xml and fixed more formatting)
                     b.firewallAppToggleOther.text = getFirewallText(appStatus, connStatus)
                     displayIcon(
                         getIcon(context, appInfo.packageName, appInfo.appName), b.firewallAppIconIv)
