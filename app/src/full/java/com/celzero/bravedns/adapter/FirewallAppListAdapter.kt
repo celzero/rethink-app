@@ -123,7 +123,11 @@ class FirewallAppListAdapter(
                         b.firewallAppLabelTv.setTextColor(userAppColor)
                     } */
                     b.firewallAppLabelTv.text = appInfo.appName
-                    b.firewallAppInfo.text = context.getString(R.string.app_id_package, appInfo.uid, appInfo.packageName)
+                    b.firewallAppInfo.text = if (appInfo.packageName.startsWith(NO_PACKAGE_PREFIX)) {
+                        context.getString(R.string.app_id_uid_only, appInfo.uid)
+                    } else {
+                        context.getString(R.string.app_id_package, appInfo.uid, appInfo.packageName)
+                    }
                     b.firewallAppToggleOther.text = getFirewallText(appStatus, connStatus)
                     displayIcon(
                         getIcon(context, appInfo.packageName, appInfo.appName), b.firewallAppIconIv)
