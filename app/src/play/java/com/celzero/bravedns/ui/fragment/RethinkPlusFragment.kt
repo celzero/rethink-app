@@ -309,10 +309,6 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         b.btnContactSupportError.setOnClickListener {
             openHelpAndSupport()
         }
-
-        b.btnRestorePurchases.setOnClickListener {
-            restorePurchases()
-        }
     }
 
     private fun openHelpAndSupport() {
