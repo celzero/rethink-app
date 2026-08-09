@@ -1004,13 +1004,13 @@ object FirewallManager : KoinComponent {
         )
     }
 
-    private suspend fun runDbUpdate(
+    private suspend fun <T> runDbUpdate(
         uid: Int,
         fieldName: String,
-        dbUpdate: suspend () -> Unit
-    ) {
+        dbUpdate: suspend () -> T
+    ): T {
         try {
-            withContext(Dispatchers.IO) {
+            return withContext(Dispatchers.IO) {
                 dbUpdate()
             }
         } catch (e: CancellationException) {
@@ -1025,10 +1025,17 @@ object FirewallManager : KoinComponent {
         uid: Int,
         packageName: String,
         fieldName: String,
-        dbUpdate: suspend () -> Unit,
+        dbUpdate: suspend () -> Int,
         cacheUpdate: (AppInfo) -> Unit
     ) {
-        runDbUpdate(uid, fieldName, dbUpdate)
+        val rowsUpdated = runDbUpdate(uid, fieldName, dbUpdate)
+        if (rowsUpdated <= 0) {
+            Logger.w(
+                LOG_TAG_FIREWALL,
+                "updatePerAppInfoField ($fieldName) no rows updated for uid $uid, package $packageName"
+            )
+            throw IllegalStateException("No rows updated for uid $uid, package $packageName")
+        }
 
         val now = System.currentTimeMillis()
         var cacheUpdated = false
