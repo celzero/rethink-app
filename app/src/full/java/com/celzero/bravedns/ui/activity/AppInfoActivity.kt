@@ -202,8 +202,8 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         }
 
         appInfoViewModel.notesErrorEvent.observe(this) { event ->
-            event.getIfNotHandled()?.let { errorMessage ->
-                showToastUiCentered(this, errorMessage, Toast.LENGTH_SHORT)
+            event.getIfNotHandled()?.let {
+                showToastUiCentered(this, getString(R.string.ctbs_app_notes_save_failed), Toast.LENGTH_SHORT)
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.celzero.bravedns.viewmodel
 
+import Logger
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -42,8 +43,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     private val rethinkUid = android.os.Process.myUid()
     private var sort: AppListActivity.SortOption = AppListActivity.SortOption.NAME
     
-    private val _notesErrorEvent = MutableLiveData<OneTimeEvent<String>>()
-    val notesErrorEvent: LiveData<OneTimeEvent<String>> = _notesErrorEvent
+    private val _notesErrorEvent = MutableLiveData<OneTimeEvent<Unit>>()
+    val notesErrorEvent: LiveData<OneTimeEvent<Unit>> = _notesErrorEvent
     private val _notesSaveSuccessEvent = MutableLiveData<OneTimeEvent<String>>()
     val notesSaveSuccessEvent: LiveData<OneTimeEvent<String>> = _notesSaveSuccessEvent
 
@@ -480,7 +481,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _notesErrorEvent.postValue(OneTimeEvent("Failed to save notes: ${e.message}"))
+                Logger.w("AppInfoViewModel", "Failed to save notes for uid $uid, package $packageName", e)
+                _notesErrorEvent.postValue(OneTimeEvent(Unit))
             }
         }
     }
