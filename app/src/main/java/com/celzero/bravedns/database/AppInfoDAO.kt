@@ -29,7 +29,7 @@ import com.celzero.bravedns.data.DataUsage
 @Dao
 interface AppInfoDAO {
     companion object {
-        const val SORT_ORDER =
+private const val SORT_ORDER =
             " order by case when :sort = 'name' then lower(appName) end asc," +
                 " case when :sort = 'package' then lower(packageName) end asc," +
                 " case when :sort = 'uid' then uid end asc," +
