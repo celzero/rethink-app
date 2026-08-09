@@ -1172,7 +1172,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun showNotesDialog(draftText: String? = null) {
-        val initialText = draftText ?: if (::appInfo.isInitialized) appInfo.notes else ""
+        val initialText = (draftText ?: if (::appInfo.isInitialized) appInfo.notes else "").take(MAX_NOTE_LENGTH)
         val editText = EditText(this).apply {
             setText(initialText)
             hint = getString(R.string.hint_notes)
