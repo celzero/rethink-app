@@ -103,6 +103,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     private var isWarningAcknowledged: Boolean = false
     private var notesDraft: String = ""
     private var shouldRestoreNotesDialog: Boolean = false
+    private var isNotesSaveInFlight: Boolean = false
     private var notesDialog: AlertDialog? = null
     private var notesEditText: EditText? = null
 
@@ -188,9 +189,14 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     private fun observeNotesEvents() {
         appInfoViewModel.notesSaveSuccessEvent.observe(this) { event ->
             event.getIfNotHandled()?.let { savedNotes ->
+                isNotesSaveInFlight = false
                 if (::appInfo.isInitialized) {
                     appInfo.notes = savedNotes
                     notesDraft = ""
+                    if (notesDialog?.isShowing == true) {
+                        notesEditText?.setText(savedNotes)
+                        notesEditText?.setSelection(savedNotes.length)
+                    }
                     logEvent(
                         "app notes updated",
                         "Notes updated for ${appInfo.appName} ($uid)"
@@ -203,6 +209,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
         appInfoViewModel.notesErrorEvent.observe(this) { event ->
             event.getIfNotHandled()?.let {
+                isNotesSaveInFlight = false
                 showToastUiCentered(this, getString(R.string.ctbs_app_notes_save_failed), Toast.LENGTH_SHORT)
             }
         }
@@ -614,6 +621,10 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         }
 
         b.aadNotesChip.setOnClickListener {
+            if (isNotesSaveInFlight) {
+                showToastUiCentered(this, getString(R.string.lbl_saving), Toast.LENGTH_SHORT)
+                return@setOnClickListener
+            }
             guardAppInfoInitialized("aadNotesChip") {
                 showNotesDialog()
             }
@@ -1214,7 +1225,12 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             )
             return
         }
+        if (isNotesSaveInFlight) {
+            showToastUiCentered(this, getString(R.string.lbl_saving), Toast.LENGTH_SHORT)
+            return
+        }
         val packageName = appInfo.packageName
+        isNotesSaveInFlight = true
         appInfoViewModel.updateAppNotes(uid, packageName, newNotes)
     }
 
