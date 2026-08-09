@@ -333,46 +333,47 @@ object WireguardManager : KoinComponent {
     }
 
     suspend fun enableConfig(unmapped: WgConfigFilesImmutable) {
-        val map = mappings.find { it.id == unmapped.id }
-        if (map == null) {
-            Logger.e(
-                LOG_TAG_PROXY,
-                "enableConfig: wg not found, id: ${unmapped.id}, ${mappings.size}"
-            )
-            return
-        }
+        io {
+            val map = mappings.find { it.id == unmapped.id }
+            if (map == null) {
+                Logger.e(
+                    LOG_TAG_PROXY,
+                    "enableConfig: wg not found, id: ${unmapped.id}, ${mappings.size}"
+                )
+                return@io
+            }
 
-        val config = configs.find { it.getId() == map.id }
-        if (config == null) {
-            Logger.w(LOG_TAG_PROXY, "config not found: ${map.id}")
-            return
-        }
+            val config = configs.find { it.getId() == map.id }
+            if (config == null) {
+                Logger.w(LOG_TAG_PROXY, "config not found: ${map.id}")
+                return@io
+            }
 
-        mappings.remove(map)
-        val newMap =
-            WgConfigFilesImmutable(
-                map.id,
-                map.name,
-                map.configPath,
-                map.serverResponse,
-                true,
-                map.isCatchAll,
-                map.isLockdown,
-                map.oneWireGuard,
-                map.useOnlyOnMetered,
-                map.isDeletable,
-                map.ssidEnabled,
-                map.ssids
-            )
-        mappings.add(newMap)
-        val dbMap = WgConfigFiles.fromImmutable(newMap)
-        db.update(dbMap)
-        val proxyType = AppConfig.ProxyType.WIREGUARD
-        val proxyProvider = AppConfig.ProxyProvider.WIREGUARD
-        appConfig.addProxy(proxyType, proxyProvider)
-        VpnController.addWireGuardProxy(ID_WG_BASE + map.id)
-        Logger.i(LOG_TAG_PROXY, "enable wg config: ${map.id}, ${map.name}")
-        return
+            mappings.remove(map)
+            val newMap =
+                WgConfigFilesImmutable(
+                    map.id,
+                    map.name,
+                    map.configPath,
+                    map.serverResponse,
+                    true,
+                    map.isCatchAll,
+                    map.isLockdown,
+                    map.oneWireGuard,
+                    map.useOnlyOnMetered,
+                    map.isDeletable,
+                    map.ssidEnabled,
+                    map.ssids
+                )
+            mappings.add(newMap)
+            val dbMap = WgConfigFiles.fromImmutable(newMap)
+            db.update(dbMap)
+            val proxyType = AppConfig.ProxyType.WIREGUARD
+            val proxyProvider = AppConfig.ProxyProvider.WIREGUARD
+            appConfig.addProxy(proxyType, proxyProvider)
+            VpnController.addWireGuardProxy(ID_WG_BASE + map.id)
+            Logger.i(LOG_TAG_PROXY, "enable wg config: ${map.id}, ${map.name}")
+        }
     }
 
     fun canEnableProxy(): Boolean {

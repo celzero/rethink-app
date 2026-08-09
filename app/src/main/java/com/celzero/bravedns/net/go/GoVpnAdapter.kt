@@ -3213,7 +3213,7 @@ class GoVpnAdapter : KoinComponent {
 
             Logger.d(LOG_TAG_PROXY, "$TAG init add new win(rpn) server: $key")
             // track the add so that the global proxy handler can re-add if it goes missing
-            GlobalProxyHandler.track(key)
+            GlobalProxyHandler.track(if (key.startsWith(Backend.RpnWin)) key else Backend.RpnWin + key)
             val res = win.fork(key)
             logEvent(Severity.MEDIUM, "add new win(rpn) server", "Added new server: $key, id? ${res.id()}")
             return Pair(true, "Added new server: $key")
