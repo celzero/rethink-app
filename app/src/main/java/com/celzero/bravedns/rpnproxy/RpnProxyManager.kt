@@ -1811,6 +1811,27 @@ object RpnProxyManager : KoinComponent {
     }
 
     /**
+     * Returns the set of WIN server keys currently held in the in-memory cache (excluding the
+     * AUTO sentinel), without triggering any DB read or network fetch.
+     *
+     * Used by the ghost-cleanup in [com.celzero.bravedns.database.RefreshDatabase] (via
+     * [com.celzero.bravedns.service.ProxyManager.purgeGhostMappings]) to determine which RPN
+     * proxyIds are still backed by a live server.
+     *
+     * A disabled-but-present server is NOT a ghost — the user may have temporarily toggled it
+     * off while keeping per-app assignments — so this returns every cached server regardless of
+     * its [CountryConfig.isEnabled] state.
+     */
+    suspend fun getCachedWinServerKeys(): Set<String> {
+        return winCacheMutex.withLock {
+            winServersCache
+                .filter { !it.id.equals(AUTO_SERVER_ID, ignoreCase = true) }
+                .map { it.key }
+                .toSet()
+        }
+    }
+
+    /**
      * Full update pipeline:
      *  1. Ask the tunnel to refresh and return updated WIN state bytes
      *     ([VpnController.updateWin]).

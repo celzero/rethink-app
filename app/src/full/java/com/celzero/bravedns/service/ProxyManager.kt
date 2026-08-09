@@ -138,6 +138,8 @@ object ProxyManager : KoinComponent {
         toAdd.forEach { app ->
             val ai = FirewallManager.getAppInfoByUidAndPackage(app.uid, app.packageName)
                 ?: return@forEach
+
+            if (ai.tombstoneTs > 0L) return@forEach // skip uninstalled/tombstoned
             // concurrently removed; will be reconciled on next refresh
             // make sure the app is visible in app-lists even if not assigned to a proxy
             ensureBaseRow(app.uid, app.packageName, ai.appName)
@@ -465,5 +467,46 @@ object ProxyManager : KoinComponent {
         if (toRemove.isEmpty()) return
         pamSet.removeAll(toRemove.toSet())
         db.deleteMapping(uid, packageName, proxyId)
+    }
+
+    /**
+     * Removes "ghost" entries from the in-memory [pamSet] and the persisted DB whose [proxyId]
+     * references a proxy that no longer exists (e.g., a deleted WireGuard config or a removed
+     * RPN server). Such stale rows cause [AppInfoActivity] to show wrong proxy names and inflate
+     * per-proxy app counts.
+     *
+     * Base rows ([proxyId] == "") are never purged; they are the visibility markers that make an
+     * app appear in the "All Apps" pager query.
+     *
+     * @param validWgProxyIds  existing WG proxyIds, e.g. {"wg0", "wg1"}
+     * @param validRpnProxyIds existing RPN proxyIds, e.g. {"wgyrpnsrv-us-ny-abc"}
+     * @return number of ghost entries removed
+     */
+    suspend fun purgeGhostMappings(validWgProxyIds: Set<String>, validRpnProxyIds: Set<String>): Int {
+        val ghosts = pamSet.filter { tuple ->
+            val pid = tuple.proxyId
+            if (pid.isEmpty()) return@filter false // base row — always keep
+            // RPN prefix must be checked BEFORE WG prefix (see method kdoc)
+            if (pid.startsWith(ID_RPN_WIN)) {
+                return@filter pid !in validRpnProxyIds
+            }
+            if (pid.startsWith(ID_WG_BASE)) {
+                return@filter pid !in validWgProxyIds
+            }
+            // Orbot / SOCKS5 / HTTP / TCP — persistent per-app assignments, never ghosts
+            false
+        }.toSet()
+
+        if (ghosts.isEmpty()) return 0
+
+        // update cache first, then DB (consistent with removeProxyFromApp / deleteApp)
+        pamSet.removeAll(ghosts)
+        ghosts.forEach { db.deleteMapping(it.uid, it.packageName, it.proxyId) }
+        Logger.i(
+            LOG_TAG_PROXY,
+            "purgeGhostMappings: removed ${ghosts.size} ghost proxy entries: " +
+                ghosts.joinToString(";") { "(${it.uid},${it.packageName},${it.proxyId})" }
+        )
+        return ghosts.size
     }
 }

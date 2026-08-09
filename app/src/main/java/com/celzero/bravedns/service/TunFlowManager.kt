@@ -584,7 +584,7 @@ object TunFlowManager : KoinComponent {
             return
         }
 
-        cm.proxyDetails = mark.pidcsv
+        cm.proxyDetails = mark.pidcsv // pidcsv will always return single proxy (chosen) in flowing
         cm.destIP = mark.ip
         val isNotLocalProxy = isNotLocalAndRpnProxy(mark.pidcsv)
         if (mark.pidcsv.isNotEmpty() && isNotLocalProxy) {

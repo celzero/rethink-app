@@ -521,6 +521,10 @@ internal constructor(
         packagesToDelete: Set<FirewallManager.AppInfoTuple>,
         restore: Boolean = false
     ) {
+        // purge ghost proxy mappings first: ProxyApplicationMapping rows whose proxyId references
+        // a WireGuard config or RPN server that no longer exists.
+        purgeGhostProxyMappings()
+
         // trackedApps is empty, the installed apps are yet to be added to the database; and so,
         // there's no need to refresh these mappings as apps tracked by FirewallManager is empty
         if (trackedApps.isEmpty()) {
@@ -600,6 +604,12 @@ internal constructor(
             val appInfo = fwSnapshot[it.uid to it.packageName]
             if (appInfo != null) {
                 ProxyManager.addNewApp(appInfo)
+            } else {
+                // expected only when addMissingPackages() skipped this app (e.g. the package
+                // could not be resolved by PackageManager at insert time); no-op here keeps the
+                // proxy mapping consistent with FirewallManager. Logged for parity with the
+                // add-set above and to surface silent skips during diagnosis.
+                Logger.w(LOG_TAG_APP_DB, "skip proxy add: app not in fw snapshot; uid: ${it.uid}, pkg: ${it.packageName}")
             }
         }
 
@@ -607,6 +617,31 @@ internal constructor(
             LOG_TAG_APP_DB,
             "refreshing proxy mapping, size: ${pxm.size}, trackedApps: ${trackedApps.size}, currentFwApps: ${currentFwApps.size}"
         )
+    }
+
+    /**
+     * Builds the set of currently-valid WireGuard and RPN proxy ids and asks
+     * [ProxyManager.purgeGhostMappings] to remove stale ProxyApplicationMapping rows whose
+     * proxyId is not backed by a live WG config or RPN server.
+     */
+    private suspend fun purgeGhostProxyMappings() {
+        val validWgIds = WireguardManager.getAllMappings()
+            .map { ProxyManager.ID_WG_BASE + it.id }
+            .toSet()
+
+        val validRpnIds = try {
+            RpnProxyManager.getCachedWinServerKeys()
+                .map { ProxyManager.ID_RPN_WIN + it }
+                .toSet()
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_APP_DB, "purgeGhostProxyMappings: could not read RPN server keys: ${e.message}")
+            emptySet()
+        }
+
+        val purged = ProxyManager.purgeGhostMappings(validWgIds, validRpnIds)
+        if (purged > 0) {
+            logEvent(Severity.LOW, "proxy ghost cleanup", "removed $purged stale proxy-app mapping(s) referencing deleted WG/RPN proxies")
+        }
     }
 
     private suspend fun insertUnknownApp(uid: Int) {

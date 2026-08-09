@@ -2384,7 +2384,7 @@ class GoVpnAdapter : KoinComponent {
                 )
             }
             Logger.e(LOG_TAG_VPN, "$TAG could not set local-blocklist: ${ex.message}", ex)
-            logEvent(Severity.HIGH, "set local-blocklist failed", "Error: ${ex.message}")
+            logEvent(Severity.HIGH, "set local-blocklist failed", "Error: ${ex.message}, enabled: ${persistentState.blocklistEnabled}")
         }
     }
 
@@ -2963,10 +2963,9 @@ class GoVpnAdapter : KoinComponent {
             Logger.vv(LOG_TAG_PROXY, "initiating reconnect for id: $iid")
             val p = tunnel.proxies.rpn().win().fork(iid)
             // track the re-add so that the global proxy handler keeps monitoring it
-            val trackedId = if (iid == Backend.RpnWin) Backend.RpnWin else Backend.RpnWin + iid
-            GlobalProxyHandler.track(trackedId)
-            Logger.i(LOG_TAG_PROXY, "$TAG reconnected rpn proxy: ${p.id()}")
-            logEvent(Severity.LOW, "reconnect rpn proxy", "reconnected rpn proxy: ${p.id()}")
+            GlobalProxyHandler.track(iid)
+            Logger.i(LOG_TAG_PROXY, "$TAG reconnected rpn proxy: ${iid}")
+            logEvent(Severity.LOW, "reconnect rpn proxy", "reconnected rpn proxy: ${iid}")
             true
         } catch (e: Exception) {
             Logger.w(LOG_TAG_PROXY, "$TAG err reconnect rpn proxy: ${e.message}")
@@ -3214,7 +3213,7 @@ class GoVpnAdapter : KoinComponent {
 
             Logger.d(LOG_TAG_PROXY, "$TAG init add new win(rpn) server: $key")
             // track the add so that the global proxy handler can re-add if it goes missing
-            GlobalProxyHandler.track(Backend.RpnWin + key)
+            GlobalProxyHandler.track(key)
             val res = win.fork(key)
             logEvent(Severity.MEDIUM, "add new win(rpn) server", "Added new server: $key, id? ${res.id()}")
             return Pair(true, "Added new server: $key")
@@ -3301,7 +3300,7 @@ class GoVpnAdapter : KoinComponent {
             val win = tunnel.proxies.rpn().win()
             val res = win.purge(key)
             // the server is no longer in the tunnel, do not re-add it
-            GlobalProxyHandler.untrack(Backend.RpnWin + key)
+            GlobalProxyHandler.untrack(key)
             Logger.i(LOG_TAG_PROXY, "$TAG remove win(rpn) server: $res")
             logEvent(Severity.MEDIUM, "remove win(rpn) server", "Removed server: $key")
             return Pair(true, "Removed server: $key")

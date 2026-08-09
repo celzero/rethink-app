@@ -680,7 +680,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             )
 
             withContext(NonCancellable + Dispatchers.Main) {
-                // Notification always fires — uses app context, not fragment.
+                // Notification always fires uses app context, not fragment.
                 showMemoryProfileNotification(appCtx, theme, jvmOutcome, goOutcome)
                 // Toast only if the fragment is still attached.
                 if (isAdded) {

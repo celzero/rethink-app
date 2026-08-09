@@ -880,7 +880,7 @@ object TunDnsManager: KoinComponent {
             anyRealIpBlocked = anyRealIpBlocked,
             isSplApp = isSplApp,
             rinr = rinr,
-            isAlg = false,
+            isAlg = true, // see rules for multiple available ips
             forUpstreamAnswer = true,
             isDeviceLocked = params.isDeviceLocked,
             onDeviceLocked = params.onDeviceLocked,

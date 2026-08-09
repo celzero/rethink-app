@@ -237,11 +237,11 @@ object DomainRulesManager : KoinComponent {
         val domains = if (isAtleastR()) {
             // on Android R and above, go will give the first domain as the accurate domain so
             // no need to check further domains
-            val d = domain.lowercase(Locale.getDefault()).split(",").firstOrNull()
+            val d = domain.lowercase(Locale.ROOT).split(",").firstOrNull()
             if (d.isNullOrEmpty()) return Pair(Status.NONE, "")
             listOf(d)
         } else {
-            domain.lowercase(Locale.getDefault()).split(",")
+            domain.lowercase(Locale.ROOT).split(",")
         }
 
         if (domains.isEmpty()) {

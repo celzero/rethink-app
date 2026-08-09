@@ -42,4 +42,8 @@
     <string name="ips18" translatable="false">76.76.2.4,76.76.10.4,2606:1a40::4,2606:1a40:1::4</string>
     <string name="url19" translatable="false">tls://p1.freedns.controld.com</string>
     <string name="ips19" translatable="false">76.76.2.1,76.76.10.1,2606:1a40::1,2606:1a40:1::1</string>
+    <string name="url20" translatable="false">https://dl.rethinkdns.com</string>
+    <string name="ips20" translatable="false">172.67.70.254,104.26.14.30,104.26.15.30,2606:4700:20::681a:e1e,2606:4700:20::ac43:46fe,2606:4700:20::681a:f1e</string>
+    <string name="url21" translatable="false">https://svc.rethinkdns.com</string>
+    <string name="ips21" translatable="false">172.67.70.254,104.26.14.30,104.26.15.30,2606:4700:20::ac43:46fe,2606:4700:20::681a:f1e,2606:4700:20::681a:e1e</string>
 </resources>

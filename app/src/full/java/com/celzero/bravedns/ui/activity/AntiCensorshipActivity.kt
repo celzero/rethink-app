@@ -229,6 +229,10 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
         }
 
         b.acSplitAutoRl.setOnClickListener {
+            if (persistentState.wgGlobalLockdown) {
+                Utilities.showToastUiCentered(this, getString(R.string.lockdown_check_setting_disabled), Toast.LENGTH_SHORT)
+                return@setOnClickListener
+            }
             // Only toggle if not already checked
             if (!b.acRadioSplitAuto.isChecked) {
                 b.acRadioSplitAuto.isChecked = true
@@ -236,6 +240,10 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
         }
 
         b.acSplitTcpRl.setOnClickListener {
+            if (persistentState.wgGlobalLockdown) {
+                Utilities.showToastUiCentered(this, getString(R.string.lockdown_check_setting_disabled), Toast.LENGTH_SHORT)
+                return@setOnClickListener
+            }
             // Only toggle if not already checked
             if (!b.acRadioSplitTcp.isChecked) {
                 b.acRadioSplitTcp.isChecked = true
@@ -243,6 +251,10 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
         }
 
         b.acSplitTlsRl.setOnClickListener {
+            if (persistentState.wgGlobalLockdown) {
+                Utilities.showToastUiCentered(this, getString(R.string.lockdown_check_setting_disabled), Toast.LENGTH_SHORT)
+                return@setOnClickListener
+            }
             // Only toggle if not already checked
             if (!b.acRadioSplitTls.isChecked) {
                 b.acRadioSplitTls.isChecked = true
@@ -250,6 +262,10 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
         }
 
         b.acDesyncRl.setOnClickListener {
+            if (persistentState.wgGlobalLockdown) {
+                Utilities.showToastUiCentered(this, getString(R.string.lockdown_check_setting_disabled), Toast.LENGTH_SHORT)
+                return@setOnClickListener
+            }
             // Only toggle if not already checked
             if (!b.acRadioDesync.isChecked) {
                 b.acRadioDesync.isChecked = true
@@ -269,6 +285,10 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
         }
 
         b.acRetryWithSplitRl.setOnClickListener {
+            if (persistentState.wgGlobalLockdown) {
+                Utilities.showToastUiCentered(this, getString(R.string.lockdown_check_setting_disabled), Toast.LENGTH_SHORT)
+                return@setOnClickListener
+            }
             // Only toggle if not already checked
             if (!b.acRadioRetryWithSplit.isChecked) {
                 b.acRadioRetryWithSplit.isChecked = true
@@ -283,6 +303,10 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
         }
 
         b.acRetryAfterSplitRl.setOnClickListener {
+            if (persistentState.wgGlobalLockdown) {
+                Utilities.showToastUiCentered(this, getString(R.string.lockdown_check_setting_disabled), Toast.LENGTH_SHORT)
+                return@setOnClickListener
+            }
             // Only toggle if not already checked
             if (!b.acRadioRetryAfterSplit.isChecked) {
                 b.acRadioRetryAfterSplit.isChecked = true
@@ -301,13 +325,7 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
                     getString(R.string.lockdown_check_setting_disabled),
                     Toast.LENGTH_SHORT
                 )
-                when (ds) {
-                    DialStrategies.SPLIT_AUTO -> b.acRadioSplitAuto.isChecked = false
-                    DialStrategies.SPLIT_TCP -> b.acRadioSplitTcp.isChecked = false
-                    DialStrategies.SPLIT_TCP_TLS -> b.acRadioSplitTls.isChecked = false
-                    DialStrategies.DESYNC -> b.acRadioDesync.isChecked = false
-                    else -> {}
-                }
+                updateDialStrategy(persistentState.dialStrategy)
                 return
             }
             // set auto proxy to true if split auto is selected (Settings.AutoModeRemote)
@@ -344,10 +362,7 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
                     Toast.LENGTH_SHORT
                 )
             }
-            when (mode) {
-                RetryStrategies.RETRY_WITH_SPLIT.mode -> b.acRadioRetryWithSplit.isChecked = false
-                RetryStrategies.RETRY_AFTER_SPLIT.mode -> b.acRadioRetryAfterSplit.isChecked = false
-            }
+            updateRetryStrategy(persistentState.retryStrategy)
             return
         }
 

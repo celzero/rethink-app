@@ -169,15 +169,6 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         b.wgRefresh.setOnClickListener { refresh(b.wgRefresh) }
 
         b.settingsActivitySocks5Rl.setOnClickListener {
-            // Proxy lockdown: SOCKS5 cannot be toggled. Inform instead of silently ignoring.
-            if (persistentState.wgGlobalLockdown) {
-                showToastUiCentered(
-                    this,
-                    getString(R.string.lockdown_check_setting_disabled),
-                    Toast.LENGTH_SHORT,
-                )
-                return@setOnClickListener
-            }
             b.settingsActivitySocks5Switch.isChecked = !b.settingsActivitySocks5Switch.isChecked
         }
 
@@ -187,6 +178,11 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             // Proxy lockdown: SOCKS5 cannot be toggled at all (enforcement; the row click
             // listener and handleProxyUi() already prevent user interaction).
             if (persistentState.wgGlobalLockdown) {
+                showToastUiCentered(
+                    this,
+                    getString(R.string.lockdown_check_setting_disabled),
+                    Toast.LENGTH_SHORT,
+                )
                 return@setOnCheckedChangeListener
             }
             if (!checked) {
@@ -261,15 +257,6 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         b.settingsActivityWireguardImg.setOnClickListener { openWireguardActivity() }
 
         b.settingsActivityHttpProxyContainer.setOnClickListener {
-            // Proxy lockdown: HTTP proxy cannot be toggled. Inform instead of silently ignoring.
-            if (persistentState.wgGlobalLockdown) {
-                showToastUiCentered(
-                    this,
-                    getString(R.string.lockdown_check_setting_disabled),
-                    Toast.LENGTH_SHORT,
-                )
-                return@setOnClickListener
-            }
             b.settingsActivityHttpProxySwitch.isChecked =
                 !b.settingsActivityHttpProxySwitch.isChecked
         }
@@ -277,9 +264,13 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         b.settingsActivityHttpProxySwitch.setOnCheckedChangeListener {
             _: CompoundButton,
             checked: Boolean ->
-            // Proxy lockdown: HTTP proxy cannot be toggled at all (enforcement; the row click
-            // listener and handleProxyUi() already prevent user interaction).
+            // Proxy lockdown: HTTP proxy cannot be toggled. Inform instead of silently ignoring.
             if (persistentState.wgGlobalLockdown) {
+                showToastUiCentered(
+                    this,
+                    getString(R.string.lockdown_check_setting_disabled),
+                    Toast.LENGTH_SHORT,
+                )
                 return@setOnCheckedChangeListener
             }
             if (!checked) {

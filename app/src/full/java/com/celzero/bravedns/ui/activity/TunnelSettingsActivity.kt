@@ -1177,7 +1177,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         // HTTP proxy cannot be used in lockdown (any HTTP proxy conflicts, not just
         // app-bound ones), since it would override the lockdown proxy.
         if (appConfig.isCustomHttpProxyEnabled()) {
-            val appName = appConfig.getConnectedHttpProxy()?.proxyAppName
+            val appName = appConfig.getConnectedHttpProxy()?.proxyAppName ?: ""
             checks.add(
                 LockdownCheckItem(
                     label = getString(R.string.lockdown_check_http_proxy),
@@ -1192,7 +1192,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         // SOCKS5 proxy cannot be used in lockdown (any SOCKS5 proxy conflicts, not
         // just app-bound ones), since it would override the lockdown proxy.
         if (appConfig.isCustomSocks5Enabled()) {
-            val appName = appConfig.getConnectedSocks5Proxy()?.proxyAppName
+            val appName = appConfig.getConnectedSocks5Proxy()?.proxyAppName ?: ""
             checks.add(
                 LockdownCheckItem(
                     label = getString(R.string.lockdown_check_socks5),
