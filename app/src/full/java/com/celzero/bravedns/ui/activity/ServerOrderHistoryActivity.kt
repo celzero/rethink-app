@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
@@ -35,6 +36,7 @@ import com.celzero.bravedns.databinding.ActivityServerOrderHistoryBinding
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.isActivityLightTheme
@@ -157,7 +159,6 @@ class ServerOrderHistoryActivity : BaseActivity(R.layout.activity_server_order_h
                             b.rvOrders.isVisible = true
 
                             adapter.submitList(state.orders)
-                            animateCountBadge(state.orders.size.toString())
 
                             b.rvOrders.alpha = 0f
                             b.rvOrders.animate().alpha(1f).setDuration(280).start()
@@ -169,7 +170,6 @@ class ServerOrderHistoryActivity : BaseActivity(R.layout.activity_server_order_h
                             b.rvOrders.isVisible = false
                             b.errorState.isVisible = false
                             b.emptyState.isVisible = true
-                            animateCountBadge("0")
 
                             b.tvEmptySubtitle.text = if (state.isNoCredentials)
                                 getString(R.string.server_order_empty_no_credentials)
@@ -183,7 +183,6 @@ class ServerOrderHistoryActivity : BaseActivity(R.layout.activity_server_order_h
                             b.rvOrders.isVisible = false
                             b.emptyState.isVisible = false
                             b.errorState.isVisible = true
-                            animateCountBadge("-")
 
                             val msg = state.message.take(160)
                             b.tvErrorMessage.text = msg
@@ -215,25 +214,11 @@ class ServerOrderHistoryActivity : BaseActivity(R.layout.activity_server_order_h
         }
     }
 
-    /**
-     * Cross-fades the order-count badge from its current value to [newValue].
-     * The animation prevents a jarring number pop when data arrives.
-     */
-    private fun animateCountBadge(newValue: String) {
-        if (b.tvOrderCount.text == newValue) return
-        b.tvOrderCount.animate().alpha(0f).setDuration(150).withEndAction {
-            if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) return@withEndAction
-            b.tvOrderCount.text = newValue
-            b.tvOrderCount.animate().alpha(1f).setDuration(200).start()
-        }.start()
-    }
-
     private fun showShimmer() {
         b.shimmer.isVisible = true
         b.emptyState.isVisible = false
         b.errorState.isVisible = false
         b.rvOrders.isVisible = false
-        b.tvOrderCount.text = "-"
         startShimmer()
     }
 
@@ -241,8 +226,16 @@ class ServerOrderHistoryActivity : BaseActivity(R.layout.activity_server_order_h
         io {
             val deviceId = InAppBillingHandler.getObfuscatedDeviceId()
             val subtitle = buildHeroSubtitle(deviceId)
+            val expiry = VpnController.getWinExpiryTs()
+            val hex = expiry?.toString(16)
             uiCtx {
                 b.tvHeroSubtitle.text = subtitle
+                if (hex == null) {
+                    b.tvHeroExpiry.visibility = View.GONE
+                } else {
+                    b.tvHeroExpiry.visibility = View.VISIBLE
+                    b.tvHeroExpiry.text = hex
+                }
             }
         }
     }

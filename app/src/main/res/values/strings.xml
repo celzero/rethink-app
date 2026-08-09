@@ -796,6 +796,9 @@
 
     <string name="hsf_notification_permission_failure" translatable="true">Enable notification permission from Settings screen</string>
 
+    <string name="hsf_local_network_permission_dialog_heading" translatable="true">Local network access required</string>
+    <string name="hsf_local_network_permission_dialog_message" translatable="true">%1$s needs the local network access permission to start the VPN. The VPN has been disabled. Grant the permission from the app settings and try again.</string>
+
     <string name="hsf_start_dialog_header" translatable="true">Start %1$s</string>
     <string name="hsf_start_dialog_message" translatable="true">You are one step away from safe and secure Android: Instantly see network activity, block websites, IPs, and badly behaving apps.</string>
     <string name="hsf_start_dialog_positive" translatable="true">Start</string>
@@ -2298,8 +2301,8 @@
     <string name="vpn_status_disconnected" translatable="false">Disconnected</string>
 
     <plurals name="server_count">
-        <item quantity="one">%1$d server</item>
-        <item quantity="other">%1$d servers</item>
+        <item quantity="one">%1$d location</item>
+        <item quantity="other">%1$d locations</item>
     </plurals>
 
     <!-- Server Removal Notification -->
@@ -2422,7 +2425,7 @@
     <string name="server_settings_config_auto_hint" translatable="false">The app automatically selects the port, identity, and configuration</string>
     <string name="server_settings_config_manual_hint" translatable="false">Manually control the identity, port, and configuration mode</string>
     <string name="server_settings_identity_title" translatable="false">Always Change Identity</string>
-    <string name="server_settings_identity_desc" translatable="false">Request a new server identity for each connection attempt</string>
+    <string name="server_settings_identity_desc" translatable="false">Request a new client identity for each connection attempt</string>
     <string name="server_settings_port_title" translatable="false">Connection Port</string>
     <string name="server_settings_port_desc" translatable="false">Port used for tunnel server connections</string>
     <string name="server_settings_permanent_config_title" translatable="false">Permanent Configuration</string>

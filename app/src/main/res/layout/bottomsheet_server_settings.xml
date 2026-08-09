@@ -55,19 +55,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:text="@string/server_settings_title"
+                android:text="@string/title_settings"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="20sp"
                 android:textStyle="bold" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:alpha="0.7"
-                android:text="@string/server_settings_sheet_subtitle"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="13sp" />
 
         </LinearLayout>
 
@@ -392,60 +383,6 @@
                     android:layout_height="wrap_content"
                     android:background="?attr/cardBackgroundColor"
                     android:orientation="vertical">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingStart="16dp"
-                        android:paddingTop="16dp"
-                        android:paddingEnd="16dp"
-                        android:paddingBottom="8dp">
-
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:layout_marginEnd="10dp"
-                            android:alpha="0.7"
-                            android:src="@drawable/ic_configure"
-                            android:tint="?attr/svgStrokeColor" />
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="sans-serif-medium"
-                                android:text="@string/server_settings_config_handling_section"
-                                android:textColor="?attr/primaryTextColor"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:alpha="0.6"
-                                android:text="@string/server_settings_config_handling_desc"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="12sp" />
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginStart="12dp"
-                        android:layout_marginEnd="12dp"
-                        android:alpha="0.12"
-                        android:background="?attr/primaryTextColor" />
 
                     <LinearLayout
                         android:id="@+id/config_mode_row"
