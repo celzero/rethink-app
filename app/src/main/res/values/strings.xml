@@ -2702,6 +2702,7 @@
 
     <!-- Sponsor feature strings -->
     <string name="sponsor_community_sponsor" translatable="false">Sponsor</string>
+    <string name="sponsor_community_sponsor_desc" translatable="false">Sponsor the development of the Rethink DNS + Firewall open source project, on which 2 engineers work full-time. As of August 2026, our costs are $1500 per month.</string>
     <string name="sponsor_contribution_title" translatable="false">Choose your contribution</string>
     <string name="sponsor_contribution_description" translatable="false">More options coming soon</string>
     <string name="sponsor_contribution_subtitle" translatable="false">Drag to set any amount from $1 to $100.</string>

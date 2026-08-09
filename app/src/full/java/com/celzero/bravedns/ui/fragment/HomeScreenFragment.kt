@@ -70,6 +70,7 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
+import com.celzero.bravedns.sponsor.provider.SponsorProvider
 import com.celzero.bravedns.sponsor.repository.SponsorRepository
 import com.celzero.bravedns.ui.activity.AlertsActivity
 import com.celzero.bravedns.ui.activity.AppInfoActivity
@@ -133,6 +134,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val workScheduler by inject<WorkScheduler>()
     private val eventLogger by inject<EventLogger>()
     private val sponsorRepository by inject<SponsorRepository>()
+    private val sponsorProvider by inject<SponsorProvider>()
 
     private var isVpnActivated: Boolean = false
 
@@ -491,8 +493,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun applySponsorState(sponsored: Boolean) {
         b.fhsSponsorBadge.isVisible = sponsored
         b.fhsSponsor.visibility = if (sponsored) View.GONE else View.VISIBLE
-        b.fhsSponsorBottom.setOnClickListener(null)
-        b.fhsSponsor.setOnClickListener(null)
+        if (!sponsored) {
+            b.fhsSponsorBottom.setOnClickListener(null)
+            b.fhsSponsor.setOnClickListener(null)
+        }
     }
 
     private fun logEvent(type: EventType, msg: String, details: String) {
@@ -530,7 +534,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         usageTxt.text = msg
 
         sponsorBtn.setOnClickListener {
-            openUrl(requireContext(), RETHINKDNS_SPONSOR_LINK)
+            //openUrl(requireContext(), RETHINKDNS_SPONSOR_LINK)
+            sponsorProvider.openSponsor(requireContext())
         }
         dialog.show()
     }
