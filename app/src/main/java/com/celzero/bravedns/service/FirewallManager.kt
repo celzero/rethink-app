@@ -1016,7 +1016,7 @@ object FirewallManager : KoinComponent {
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            Logger.w(LOG_TAG_FIREWALL, "updateAppInfoField ($fieldName) db failed for uid $uid", e)
+            Logger.w(LOG_TAG_FIREWALL, "runDbUpdate ($fieldName) failed for uid $uid", e)
             throw e
         }
     }
