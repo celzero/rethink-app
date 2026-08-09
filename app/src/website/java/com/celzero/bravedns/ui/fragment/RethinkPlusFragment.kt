@@ -309,10 +309,6 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         b.btnContactSupportError.setOnClickListener {
             openHelpAndSupport()
         }
-
-        b.btnRestorePurchases.setOnClickListener {
-            restorePurchases()
-        }
     }
 
     private fun openHelpAndSupport() {
@@ -535,9 +531,11 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
 
         if (state.asorg.isNotEmpty()) {
             b.ispContainer.isVisible = true
+            b.vDivider.isVisible = true
             b.connectionIsp.text = state.asorg
         } else {
             b.ispContainer.isVisible = false
+            b.vDivider.isVisible = false
         }
     }
 
@@ -876,34 +874,6 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             Logger.w(Logger.LOG_IAB, "$TAG: connectivity check failed: ${e.message}")
             true // fail-open so a transient SystemService error does not block purchase
         }
-    }
-
-    /**
-     * Explicitly restore purchases. Re-queries Google Play; the resulting
-     * state-machine transition drives the UI.
-     */
-    private fun restorePurchases() {
-        if (!isOnline()) {
-            Utilities.showToastUiCentered(
-                requireContext(),
-                getString(R.string.no_internet_purchase_msg),
-                Toast.LENGTH_LONG
-            )
-            return
-        }
-        lifecycleScope.launch(Dispatchers.IO) {
-            InAppBillingHandler.fetchPurchases(
-                listOf(
-                    com.android.billingclient.api.BillingClient.ProductType.SUBS,
-                    com.android.billingclient.api.BillingClient.ProductType.INAPP
-                )
-            )
-        }
-        Utilities.showToastUiCentered(
-            requireContext(),
-            getString(R.string.pending_checking_status),
-            Toast.LENGTH_SHORT
-        )
     }
 
 

@@ -796,8 +796,8 @@
 
     <string name="hsf_notification_permission_failure" translatable="true">Enable notification permission from Settings screen</string>
 
-    <string name="hsf_local_network_permission_dialog_heading" translatable="true">Local network access required</string>
-    <string name="hsf_local_network_permission_dialog_message" translatable="true">%1$s needs the local network access permission to start the VPN. The VPN has been disabled. Grant the permission from the app settings and try again.</string>
+    <string name="hsf_local_network_permission_dialog_heading" translatable="true">Local Network Permission</string>
+    <string name="hsf_local_network_permission_dialog_message" translatable="true">%1$s requires the Local Network permission for some features to function. The VPN has been disabled. Grant the permission from the app settings and try again.</string>
 
     <string name="hsf_start_dialog_header" translatable="true">Start %1$s</string>
     <string name="hsf_start_dialog_message" translatable="true">You are one step away from safe and secure Android: Instantly see network activity, block websites, IPs, and badly behaving apps.</string>
@@ -2179,7 +2179,7 @@
 
     <string name="payment_processing" translatable="false">Payment processing</string>
     <string name="payment_processing_desc" translatable="false">Your payment is being processed. You’ll get access once it completes.</string>
-    <string name="rethink_terms" translatable="false">By subscribing to RPN you agree to the &lt;a href="https://rethinkdns.com/terms"&gt;Rethink Terms of Service&lt;/a&gt; and &lt;a href="https://rethinkdns.com/privacy"&gt;Privacy Policy&lt;/a&gt;. Powered by Windscribe</string>
+    <string name="rethink_terms" translatable="false">By purchasing you agree to the &lt;a href="https://rethinkdns.com/terms"&gt;Terms of Service&lt;/a&gt; and &lt;a href="https://rethinkdns.com/privacy"&gt;Privacy Policy&lt;/a&gt;. Powered by Windscribe.</string>
 
     <!-- Subscription UI Strings -->
     <string name="premium_subtitle" translatable="false">Enhanced privacy, speed, and security</string>
@@ -2506,6 +2506,11 @@
     <string name="server_order_desc" translatable="false">View orders fetched from server</string>
     <string name="server_order_open_error" translatable="false">Could not open order history</string>
 
+    <string name="rpn_desc_one" translatable="true">Unlimited bandwidth • 100+ cities</string>
+    <string name="rpn_desc_two" translatable="true">Connect up to 5 cities at once</string>
+    <string name="rpn_desc_three" translatable="true">Ad-free browsing</string>
+    <string name="rpn_desc_four" translatable="true">Multi-hop • Double encryption</string>
+
     <!-- ProxySettingsActivity RPN section -->
     <string name="proxy_rpn_heading" translatable="false">Rethink Proxy Network</string>
     <string name="proxy_rpn_desc_inactive" translatable="false">Subscribe to route traffic through Rethink servers</string>
@@ -2518,8 +2523,7 @@
     <string name="lbl_server_info" translatable="false">Endpoint</string>
     <string name="lbl_never" translatable="false">Never</string>
 
-    <string name="rpn_meta_last_ok" translatable="false">%1$s · 🤝 %2$s</string>
-    <string name="rpn_meta_last_open" translatable="false">🔃 %1$s</string>
+    <string name="rpn_meta_last_times" translatable="false">%1$s · 🤝 %2$s · 🔃 %3$s</string>
 
     <!-- Emoji icons used in the privacy exposure card -->
     <string name="emoji_eye" translatable="false">👁️</string>

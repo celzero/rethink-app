@@ -1740,6 +1740,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             // which requests the permission exactly once.
             if (isAtleast37() && !hasLocalNetworkPermission()) {
                 Logger.i(LOG_TAG_VPN, "skip auto-start: local network permission missing")
+                // Reset the VPN controller and persisted activation state so the
+                // home-screen button reflects that the VPN is off. Without this,
+                // isVpnActivated stays true (the persisted flag was set before the
+                // VPN died) and the button shows STOP — but VpnController.isOn()
+                // is false, so the first user tap tries to stop an already-stopped
+                // VPN and the button never flips to START.
+                VpnController.stop("auto-start-permission-missing", requireContext())
+                persistentState.setVpnEnabled(false)
                 return
             }
             // this case will happen when the app is updated or crashed
