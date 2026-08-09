@@ -91,6 +91,7 @@ import com.celzero.bravedns.ui.tour.TourOverlayController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.NotificationActionType
+import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.UIUtils.openAppInfo
@@ -571,12 +572,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             updateCardsUi()
             syncDnsStatus()
             handleRethinkAppStatus()
+            handleShimmer()
         }
 
         VpnController.connectionStatus.observe(viewLifecycleOwner) {
             // No need to handle states in Home screen fragment for pause state
             if (VpnController.isAppPaused()) return@observe
 
+            syncDnsStatus()
             handleShimmer()
         }
     }
@@ -769,6 +772,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             while (isAdded && view != null) {
                 val checkStart = SystemClock.elapsedRealtime()
                 updateUiWithDnsStatusPolled()
+                syncDnsStatus()
                 val elapsed = SystemClock.elapsedRealtime() - checkStart
                 val nextDelay = elapsed.coerceIn(MIN_POLL_DELAY_MS, MAX_PROXY_POLL_DELAY_MS)
                 Logger.v(LOG_TAG_UI, "$TAG dns poll: check took ${elapsed}ms, next delay ${nextDelay}ms")
@@ -796,7 +800,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         uiCtx {
             if (isAdded && view != null) {
-                syncDnsStatus(status)
+                updateUiWithDnsStates(status)
             }
         }
     }
@@ -1231,11 +1235,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
         dnsObserverActive = true
 
-        appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner) {
-            Logger.vv(LOG_TAG_UI, "$TAG connectedDns changed to $it")
-            updateUiWithDnsStates(it)
-        }
-
         VpnController.getRegionLiveData().distinctUntilChanged().observe(viewLifecycleOwner) {
             Logger.vv(LOG_TAG_UI, "$TAG region changed to $it")
             if (it != null) {
@@ -1244,69 +1243,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
     }
 
-    private fun updateUiWithDnsStates(dnsName: String) {
+    private fun updateUiWithDnsStates(dnsStatus: Int? = null) {
         // Check if view is available before accessing binding
         if (view == null || !isAdded) return
 
-        var dns = dnsName
-        val preferredId = if (appConfig.isSystemDns()) {
-            Backend.System
-        } else if (appConfig.isSmartDnsEnabled()) {
-            Backend.Plus
-        } else {
-            Backend.Preferred
-        }
-        // get the status from go to check if the dns transport is added or not
-        val id =
-            if (WireguardManager.oneWireGuardEnabled()) {
-                val id = WireguardManager.getOneWireGuardProxyId()
-                if (id == null) {
-                    preferredId
-                } else {
-                    dns = getString(R.string.lbl_wireguard)
-                    "${ProxyManager.ID_WG_BASE}${id}"
-                }
-            } else {
-                if (persistentState.splitDns && WireguardManager.isAdvancedWgActive()) {
-                    dns += ", " + resources.getString(R.string.lbl_wireguard)
-                }
 
-                preferredId
-            }
+        val statusId = UIUtils.getDnsStatusStringRes(dnsStatus)
 
-        @Suppress("DEPRECATION")
-        if (VpnController.isOn()) {
-            io {
-                var failing = false
-                repeat(5) {
-                    val status = VpnController.getDnsStatus(id)
-                    if (status != null) {
-                        uiCtx {
-                            if (isAdded && view != null) {
-                                b.fhsCardDnsLatency.visibility = View.VISIBLE
-                                b.fhsCardDnsFailure.visibility = View.INVISIBLE
-                            }
-                        }
-                        return@io
-                    }
-                    // status null means the dns transport is not active / different id is used
-                    kotlinx.coroutines.delay(MIN_POLL_DELAY_MS.milliseconds)
-                    failing = true
-                }
-                uiCtx {
-                    if (failing && isAdded && view != null) {
-                        b.fhsCardDnsLatency.visibility = View.INVISIBLE
-                        b.fhsCardDnsFailure.visibility = View.VISIBLE
-                        b.fhsCardDnsFailure.text = getString(R.string.status_failing)
-                    }
-                }
-            }
-        }
-
-        // Final check before accessing binding
-        if (view == null || !isAdded) return
-
-        b.fhsCardDnsConnectedDns.text = dns
+        b.fhsCardDnsConnectedDns.text = getString(statusId).lowercase().capitalizeWords()
         b.fhsCardDnsConnectedDns.isSelected = true
     }
 
@@ -2216,7 +2160,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     // Sets the UI DNS status on/off.
-    private fun syncDnsStatus(dnsStatus: Int? = null) {
+    private fun syncDnsStatus() {
         if (canRethinkBlockItself) {
             b.fhsProtectionLevelTxt.setTextColor(fetchTextColor(R.attr.accentWarning))
             b.fhsProtectionLevelTxt.text = getString(R.string.rethink_home_screen_warning).lowercase()
@@ -2233,12 +2177,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             statusId = if (appConfig.getBraveMode().isFirewallMode()) {
                 UIUtils.getDnsStatusStringRes(Transaction.Status.COMPLETE.id)
             } else {
-                val s = UIUtils.getDnsStatusStringRes(dnsStatus)
-                if (s == R.string.dns_connected) {
-                    R.string.status_protected
-                } else {
-                    s
-                }
+                R.string.status_protected
             }
         } else if (isVpnActivated) {
             colorId = fetchTextColor(R.color.accentBad)
@@ -2299,53 +2238,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         }
 
-        // flag whether to show the with "Private DNS/RPN/WireGuard/Proxy" on failing cases, as it
-        // is misunderstood by some of the users
-        val showAddlInfoOnError = false
-
-        if (statusId == R.string.status_no_internet || statusId == R.string.status_failing) {
-            val message = getString(statusId)
-            colorId = fetchTextColor(R.color.accentBad)
-            var string = message
-            if (showAddlInfoOnError) {
-                if (RpnProxyManager.isRpnActive()) {
-                    statusId = R.string.status_protected_with_rpn
-                } else if (appConfig.isCustomSocks5Enabled() && appConfig.isCustomHttpProxyEnabled()) {
-                    statusId = R.string.status_protected_with_proxy
-                } else if (appConfig.isCustomSocks5Enabled()) {
-                    statusId = R.string.status_protected_with_socks5
-                } else if (appConfig.isCustomHttpProxyEnabled()) {
-                    statusId = R.string.status_protected_with_http
-                } else if (appConfig.isWireGuardEnabled()) {
-                    statusId = R.string.status_protected_with_wg
-                } else if (isPrivateDnsActive(requireContext())) {
-                    statusId = R.string.status_protected_with_private_dns
-                }
-                // replace the string "protected" with appropriate string
-                // FIXME: spilt the string literals to separate strings
-                string =
-                    getString(statusId).
-                        replaceFirst(getString(R.string.status_protected), message, true).lowercase()
-            }
-            if (persistentState.wgGlobalLockdown) {
-                val s = string.replaceFirst(getString(R.string.status_protected), getString(R.string.firewall_rule_global_lockdown).lowercase(), true)
-                b.fhsProtectionLevelTxt.setTextColor(colorId)
-                b.fhsProtectionLevelTxt.text = s
-            } else {
-                b.fhsProtectionLevelTxt.setTextColor(colorId)
-                b.fhsProtectionLevelTxt.text = string
-            }
+        if (persistentState.wgGlobalLockdown) {
+            val stat = getString(statusId).lowercase()
+            val s  = stat.replaceFirst(getString(R.string.status_protected), getString(R.string.firewall_rule_global_lockdown).lowercase(), true)
+            b.fhsProtectionLevelTxt.setTextColor(colorId)
+            b.fhsProtectionLevelTxt.text = s
         } else {
-            if (persistentState.wgGlobalLockdown) {
-                val stat = getString(statusId).lowercase()
-                val s  = stat.replaceFirst(getString(R.string.status_protected), getString(R.string.firewall_rule_global_lockdown).lowercase(), true)
-                b.fhsProtectionLevelTxt.setTextColor(colorId)
-                b.fhsProtectionLevelTxt.text = s
-            } else {
-                b.fhsProtectionLevelTxt.setTextColor(colorId)
-                val s = getString(statusId).lowercase()
-                b.fhsProtectionLevelTxt.text = s
-            }
+            b.fhsProtectionLevelTxt.setTextColor(colorId)
+            val s = getString(statusId).lowercase()
+            b.fhsProtectionLevelTxt.text = s
         }
         val isUnderlyingVpnNwEmpty = VpnController.isUnderlyingVpnNetworkEmpty()
         if (isUnderlyingVpnNwEmpty) {
