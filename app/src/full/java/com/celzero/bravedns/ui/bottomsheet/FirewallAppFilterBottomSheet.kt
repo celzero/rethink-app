@@ -82,6 +82,7 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
 
         if (f != null) {
             this.filters.firewallFilter = f.firewallFilter
+            this.filters.categoryFilters.clear()
             this.filters.categoryFilters.addAll(f.categoryFilters)
             this.filters.sort = f.sort
             this.filters.searchString = f.searchString
