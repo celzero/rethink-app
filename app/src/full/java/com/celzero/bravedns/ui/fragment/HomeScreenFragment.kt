@@ -30,6 +30,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.TrafficStats
 import android.net.VpnService
+import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.provider.Settings
@@ -40,6 +41,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -91,12 +93,14 @@ import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
+import com.celzero.bravedns.util.UIUtils.openAppInfo
 import com.celzero.bravedns.util.UIUtils.openNetworkSettings
 import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.getPrivateDnsMode
+import com.celzero.bravedns.util.Utilities.isAtleast37
 import com.celzero.bravedns.util.Utilities.isAtleastN
 import com.celzero.bravedns.util.Utilities.isAtleastP
 import com.celzero.bravedns.util.Utilities.isAtleastR
@@ -134,6 +138,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private lateinit var themeNames: Array<String>
     private lateinit var startForResult: ActivityResultLauncher<Intent>
     private lateinit var notificationPermissionResult: ActivityResultLauncher<String>
+    private lateinit var localNetworkPermissionResult: ActivityResultLauncher<String>
 
     private val batteryPermissionHelper = BatteryPermissionHelper.getInstance()
 
@@ -1784,6 +1789,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     @Suppress("DEPRECATION")
     private fun maybeAutoStartVpn() {
         if (isVpnActivated && !VpnController.isOn()) {
+            // On API 37+, the local network permission is mandatory. Do not auto-start
+            // (which is invoked from onResume and would otherwise re-prompt for the
+            // permission on every resume, causing a dialog loop) when the permission is
+            // missing. The user must explicitly start the VPN from the home screen button,
+            // which requests the permission exactly once.
+            if (isAtleast37() && !hasLocalNetworkPermission()) {
+                Logger.i(LOG_TAG_VPN, "skip auto-start: local network permission missing")
+                return
+            }
             // this case will happen when the app is updated or crashed
             // generate the bug report and start the vpn
             triggerBugReport()
@@ -1917,6 +1931,20 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun prepareAndStartVpn() {
+        // On Android 16 (SDK 37)+ the local network access permission is mandatory for the
+        // VPN tunnel to function. Request it *before* establishing the VPN; if the user denies
+        // it, the VPN is not started. The flow resumes from proceedWithVpnStart() once the
+        // permission result is delivered.
+        if (isAtleast37() && !hasLocalNetworkPermission()) {
+            requestLocalNetworkPermission()
+            return
+        }
+        proceedWithVpnStart()
+    }
+
+    // Resumes the VPN start flow (VpnService.prepare + start) once the local network
+    // permission requirement has been satisfied (or is not required).
+    private fun proceedWithVpnStart() {
         if (prepareVpnService()) {
             startVpnService()
         }
@@ -1943,6 +1971,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun startVpnService() {
+        // Hard gate: never start the VPN service without the mandatory local network
+        // permission on API 37+. This is the single choke point that invokes
+        // VpnController.start(), so guarding here makes the denial final regardless of
+        // which caller (button, auto-start, or VPN-consent result) reached us.
+        if (isAtleast37() && !hasLocalNetworkPermission()) {
+            Logger.w(LOG_TAG_VPN, "startVpnService aborted: local network permission missing")
+            handleLocalNetworkPermissionDenied()
+            return
+        }
         // runtime permission for notification (Android 13)
         getNotificationPermissionIfNeeded()
         VpnController.start(requireContext(), true)
@@ -2105,6 +2142,77 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         .show()
                 }
             }
+
+        localNetworkPermissionResult =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+                if (granted) {
+                    Logger.i(LOG_TAG_UI, "User accepted local network permission")
+                    // Permission granted; resume the VPN start flow that was deferred in
+                    // prepareAndStartVpn().
+                    proceedWithVpnStart()
+                } else {
+                    Logger.w(LOG_TAG_UI, "User rejected local network permission")
+                    handleLocalNetworkPermissionDenied()
+                }
+            }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.CINNAMON_BUN)
+    private fun hasLocalNetworkPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.ACCESS_LOCAL_NETWORK
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    @RequiresApi(Build.VERSION_CODES.CINNAMON_BUN)
+    private fun requestLocalNetworkPermission() {
+        Logger.i(LOG_TAG_UI, "Requesting local network permission before starting VPN")
+        localNetworkPermissionResult.launch(Manifest.permission.ACCESS_LOCAL_NETWORK)
+    }
+
+    /**
+     * Handles the case where the mandatory local network access permission (API 37+) has been
+     * denied. The VPN cannot function without it, so this:
+     *  1. Disables the VPN itself - stopping the service if running and resetting the persistent
+     *     activation flag so the UI reflects the actual (disabled) state and auto-start does not
+     *     loop on the next resume.
+     *  2. Shows an explanatory dialog offering to open the app's permission settings, since once
+     *     the user has selected "Don't ask again" the system permission prompt can no longer be
+     *     shown and granting must happen from Settings.
+     */
+    private fun handleLocalNetworkPermissionDenied() {
+        Logger.w(LOG_TAG_VPN, "Local network permission denied; disabling VPN")
+        // Disable the VPN itself: stop the service if it is running and reset the persistent
+        // activation flag. setVpnEnabled(false) posts to vpnEnabledLiveData, which observeVpnState
+        // consumes to set isVpnActivated = false (button flips back to START) and prevents
+        // maybeAutoStartVpn() from re-driving the permission prompt on the next onResume.
+        VpnController.stop("local-network-permission-denied", requireContext())
+        persistentState.setVpnEnabled(false)
+        showLocalNetworkPermissionDialog()
+    }
+
+    private fun showLocalNetworkPermissionDialog() {
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+        builder.setTitle(R.string.hsf_local_network_permission_dialog_heading)
+        val appName = if (Utilities.isAlphaBuild()) getString(R.string.app_name_alpha) else getString(R.string.app_name)
+        builder.setMessage(
+            getString(
+                R.string.hsf_local_network_permission_dialog_message,
+                appName
+            )
+        )
+        builder.setCancelable(false)
+        builder.setPositiveButton(R.string.lbl_proceed) { _, _ ->
+            // Route the user to the app's permission settings page so they can grant the
+            // permission; the in-app system prompt may no longer be shown if "Don't ask again"
+            // was selected.
+            openAppInfo(requireContext())
+        }
+        builder.setNegativeButton(R.string.lbl_dismiss) { _, _ ->
+            // no-op; the VPN remains disabled until the user grants the permission and starts it.
+        }
+        builder.create().show()
     }
 
     // Sets the UI DNS status on/off.
