@@ -60,7 +60,8 @@ object FirewallManager : KoinComponent {
     private val persistentState by inject<PersistentState>()
 
     private val mutex = Mutex()
-    private val appUpdateLocks = ConcurrentHashMap<String, Mutex>()
+    private data class AppUpdateLock(val mutex: Mutex = Mutex(), var refCount: Int = 0)
+    private val appUpdateLocks = ConcurrentHashMap<Int, AppUpdateLock>()
 
     const val NOTIF_CHANNEL_ID_FIREWALL_ALERTS = "Firewall_Alerts"
 
@@ -824,13 +825,15 @@ object FirewallManager : KoinComponent {
     }
 
     suspend fun updateFirewalledApps(uid: Int, connectionStatus: ConnectionStatus) {
-        try {
-            db.updateFirewallStatusByUid(uid, FirewallStatus.NONE.id, connectionStatus.id)
-        } catch (e: Exception) {
-            Logger.w(LOG_TAG_FIREWALL, "updateFirewalledApps db failed for uid $uid", e)
-            return
+        withAppUpdateLock(uid) {
+            try {
+                db.updateFirewallStatusByUid(uid, FirewallStatus.NONE.id, connectionStatus.id)
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_FIREWALL, "updateFirewalledApps db failed for uid $uid", e)
+                return@withAppUpdateLock
+            }
+            invalidateFirewallStatus(uid, FirewallStatus.NONE, connectionStatus)
         }
-        invalidateFirewallStatus(uid, FirewallStatus.NONE, connectionStatus)
     }
 
     suspend fun updateFirewallStatus(
@@ -847,13 +850,15 @@ object FirewallManager : KoinComponent {
             return
         }
 
-        try {
-            db.updateFirewallStatusByUid(uid, firewallStatus.id, connectionStatus.id)
-        } catch (e: Exception) {
-            Logger.w(LOG_TAG_FIREWALL, "updateFirewallStatus db failed for uid $uid", e)
-            return
+        withAppUpdateLock(uid) {
+            try {
+                db.updateFirewallStatusByUid(uid, firewallStatus.id, connectionStatus.id)
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_FIREWALL, "updateFirewallStatus db failed for uid $uid", e)
+                return@withAppUpdateLock
+            }
+            invalidateFirewallStatus(uid, firewallStatus, connectionStatus)
         }
-        invalidateFirewallStatus(uid, firewallStatus, connectionStatus)
     }
 
     suspend fun updateTempAllowStatus(uid: Int, durationMinutes: Int = TEMP_ALLOW_DEFAULT_MINUTES) {
@@ -982,8 +987,7 @@ object FirewallManager : KoinComponent {
 
     fun updateIsProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
         io {
-            val updateMutex = getAppUpdateMutex(uid)
-            updateMutex.withLock {
+            withAppUpdateLock(uid) {
                 try {
                     withContext(Dispatchers.IO) {
                         db.updateProxyExcluded(uid, isProxyExcluded)
@@ -992,7 +996,7 @@ object FirewallManager : KoinComponent {
                     throw e
                 } catch (e: Exception) {
                     Logger.w(LOG_TAG_FIREWALL, "updateIsProxyExcluded db failed for uid $uid", e)
-                    return@withLock
+                    return@withAppUpdateLock
                 }
 
                 updateSharedUidCacheField(uid) { appInfo ->
@@ -1033,8 +1037,7 @@ object FirewallManager : KoinComponent {
         dbUpdate: suspend () -> Int,
         cacheUpdate: (AppInfo) -> Unit
     ) {
-        val updateMutex = getAppUpdateMutex(uid)
-        updateMutex.withLock {
+        withAppUpdateLock(uid) {
             val rowsUpdated = runDbUpdate(uid, fieldName, dbUpdate)
             if (rowsUpdated <= 0) {
                 Logger.w(
@@ -1078,9 +1081,25 @@ object FirewallManager : KoinComponent {
         }
     }
 
-    private fun getAppUpdateMutex(uid: Int): Mutex {
-        val key = uid.toString()
-        return appUpdateLocks.getOrPut(key) { Mutex() }
+    private suspend fun <T> withAppUpdateLock(uid: Int, block: suspend () -> T): T {
+        val lock = appUpdateLocks.compute(uid) { _, existing ->
+            (existing ?: AppUpdateLock()).also { it.refCount += 1 }
+        }!!
+
+        try {
+            return lock.mutex.withLock { block() }
+        } finally {
+            appUpdateLocks.compute(uid) { _, existing ->
+                if (existing == null) {
+                    null
+                } else if (existing === lock) {
+                    existing.refCount -= 1
+                    if (existing.refCount <= 0) null else existing
+                } else {
+                    existing
+                }
+            }
+        }
     }
 
     private suspend fun updateSharedUidCacheField(

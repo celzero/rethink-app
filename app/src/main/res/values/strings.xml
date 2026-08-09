@@ -48,6 +48,8 @@
     <string name="lbl_domain_rules" translatable="true">Domain Rules</string>
     <string name="lbl_notes" translatable="true">Notes</string>
     <string name="hint_notes" translatable="true">Add notes about this app</string>
+    <string name="ctbs_note_char_counter" translatable="true">%1$d/%2$d</string>
+    <string name="ctbs_app_notes_too_long" translatable="true">Notes can be at most 500 characters</string>
     <string name="ctbs_app_notes_save_failed" translatable="true">Failed to save notes</string>
     <string name="lbl_delete" translatable="true">Delete</string>
     <string name="lbl_proceed" translatable="true">Proceed</string>

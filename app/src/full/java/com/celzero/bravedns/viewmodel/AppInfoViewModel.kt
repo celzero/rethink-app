@@ -1,6 +1,7 @@
 package com.celzero.bravedns.viewmodel
 
 import Logger
+import android.database.sqlite.SQLiteConstraintException
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,6 +14,7 @@ import androidx.paging.cachedIn
 import androidx.paging.liveData
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoDAO
+import com.celzero.bravedns.R
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.util.Constants
@@ -43,8 +45,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     private val rethinkUid = android.os.Process.myUid()
     private var sort: AppListActivity.SortOption = AppListActivity.SortOption.NAME
     
-    private val _notesErrorEvent = MutableLiveData<OneTimeEvent<Unit>>()
-    val notesErrorEvent: LiveData<OneTimeEvent<Unit>> = _notesErrorEvent
+    private val _notesErrorEvent = MutableLiveData<OneTimeEvent<Int>>()
+    val notesErrorEvent: LiveData<OneTimeEvent<Int>> = _notesErrorEvent
     private val _notesSaveSuccessEvent = MutableLiveData<OneTimeEvent<String>>()
     val notesSaveSuccessEvent: LiveData<OneTimeEvent<String>> = _notesSaveSuccessEvent
 
@@ -480,9 +482,12 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                 _notesSaveSuccessEvent.postValue(OneTimeEvent(notes))
             } catch (e: CancellationException) {
                 throw e
+            } catch (e: SQLiteConstraintException) {
+                Logger.w("AppInfoViewModel", "Notes length constraint hit for uid $uid, package $packageName", e)
+                _notesErrorEvent.postValue(OneTimeEvent(R.string.ctbs_app_notes_too_long))
             } catch (e: Exception) {
                 Logger.w("AppInfoViewModel", "Failed to save notes for uid $uid, package $packageName", e)
-                _notesErrorEvent.postValue(OneTimeEvent(Unit))
+                _notesErrorEvent.postValue(OneTimeEvent(R.string.ctbs_app_notes_save_failed))
             }
         }
     }

@@ -47,7 +47,7 @@ interface AppInfoDAO {
     fun updateUid(oldUid: Int, pkg: String, newUid: Int, modifiedTs: Long): Int
 
     @Query("select * from AppInfo where uid = :uid and packageName = :pkg")
-    fun isUidPkgExist(uid: Int, pkg: String): AppInfo?
+    suspend fun isUidPkgExist(uid: Int, pkg: String): AppInfo?
 
     @Query("select * from AppInfo where uid = :uid limit 1")
     suspend fun getAppInfoByUid(uid: Int): AppInfo?
