@@ -54,7 +54,7 @@ import com.celzero.bravedns.util.Constants
         SubscriptionStateHistory::class,
         CountryConfig::class
     ],
-    version = 31,
+    version = 32,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -64,6 +64,7 @@ abstract class AppDatabase : RoomDatabase() {
         const val DATABASE_NAME = "bravedns.db"
         private const val DATABASE_PATH = "database/rethink_v22.db"
         private const val PRAGMA = "pragma wal_checkpoint(full)"
+        private const val APP_NOTES_MAX_LENGTH = 500
 
         // setJournalMode() is added as part of issue #344
         // modified the journal mode from TRUNCATE to AUTOMATIC.
@@ -106,12 +107,14 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_28_29)
                 .addMigrations(MIGRATION_29_30)
                 .addMigrations(MIGRATION_30_31)
+                .addMigrations(MIGRATION_31_32)
                 .build()
 
         private val roomCallback: Callback =
             object : Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
+                    createAppInfoNotesLengthTriggers(db)
                     Logger.i(LOG_TAG_APP_DB, "Database created, ${db.version}")
                 }
 
@@ -1251,6 +1254,33 @@ abstract class AppDatabase : RoomDatabase() {
                     }
                 }
             }
+
+        private val MIGRATION_31_32: Migration =
+            object : Migration(31, 32) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    createAppInfoNotesLengthTriggers(db)
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_31_32: enforced AppInfo.notes max length")
+                }
+            }
+
+        private fun createAppInfoNotesLengthTriggers(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "CREATE TRIGGER IF NOT EXISTS trg_appinfo_notes_length_insert " +
+                    "BEFORE INSERT ON AppInfo " +
+                    "WHEN length(NEW.notes) > $APP_NOTES_MAX_LENGTH " +
+                    "BEGIN " +
+                    "SELECT RAISE(ABORT, 'AppInfo.notes exceeds $APP_NOTES_MAX_LENGTH characters'); " +
+                    "END"
+            )
+            db.execSQL(
+                "CREATE TRIGGER IF NOT EXISTS trg_appinfo_notes_length_update " +
+                    "BEFORE UPDATE OF notes ON AppInfo " +
+                    "WHEN length(NEW.notes) > $APP_NOTES_MAX_LENGTH " +
+                    "BEGIN " +
+                    "SELECT RAISE(ABORT, 'AppInfo.notes exceeds $APP_NOTES_MAX_LENGTH characters'); " +
+                    "END"
+            )
+        }
 
         // ref: stackoverflow.com/a/57204285
         private fun doesColumnExistInTable(

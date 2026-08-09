@@ -212,9 +212,9 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         }
 
         appInfoViewModel.notesErrorEvent.observe(this) { event ->
-            event.getIfNotHandled()?.let {
+            event.getIfNotHandled()?.let { messageResId ->
                 isNotesSaveInFlight = false
-                showToastUiCentered(this, getString(R.string.ctbs_app_notes_save_failed), Toast.LENGTH_SHORT)
+                showToastUiCentered(this, getString(messageResId), Toast.LENGTH_SHORT)
             }
         }
     }
@@ -1187,7 +1187,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun showNotesDialog(draftText: String? = null) {
-        val initialText = (draftText ?: if (::appInfo.isInitialized) appInfo.notes else "").take(MAX_NOTE_LENGTH)
+        val initialText = draftText ?: if (::appInfo.isInitialized) appInfo.notes else ""
         val editText = EditText(this).apply {
             setText(initialText)
             hint = getString(R.string.hint_notes)
