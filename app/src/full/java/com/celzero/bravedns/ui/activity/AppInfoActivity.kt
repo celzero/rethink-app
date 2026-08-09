@@ -183,7 +183,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         observeAppRules()
         observeNotesEvents()
         setupClickListeners()
-        restoreNotesDialogIfNeeded()
     }
 
     private fun observeNotesEvents() {
@@ -191,6 +190,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             event.getIfNotHandled()?.let { savedNotes ->
                 if (::appInfo.isInitialized) {
                     appInfo.notes = savedNotes
+                    notesDraft = ""
                     logEvent(
                         "app notes updated",
                         "Notes updated for ${appInfo.appName} ($uid)"
@@ -295,6 +295,8 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                     b.aadAppSettingsExclude.alpha = 1.0f
                     b.aadAppSettingsExclude.isEnabled = true
                 }
+
+                restoreNotesDialogIfNeeded()
             }
         }
     }
@@ -1186,7 +1188,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             .setView(editText)
             .setPositiveButton(R.string.lbl_save) { _, _ ->
                 val newNotes = editText.text.toString().trim()
-                notesDraft = ""
+                notesDraft = newNotes
                 saveNotesToDatabase(newNotes)
             }
             .setNegativeButton(R.string.lbl_cancel) { _, _ ->
