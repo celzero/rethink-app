@@ -731,7 +731,6 @@
     <string name="firewall_status_unknown" translatable="true">unknown</string>
     <string name="app_id_package" translatable="false">%2$s (%1$d)</string>
 
-
     <!--Connection tracker bottom sheet -->
     <string name="ct_bs_app_info_error" translatable="true">App Info not found</string>
 
