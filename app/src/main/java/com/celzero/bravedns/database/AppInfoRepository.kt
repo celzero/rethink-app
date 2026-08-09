@@ -88,6 +88,10 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.getAppInfoByUid(uid)
     }
 
+    suspend fun getAppInfoByUidAndPackage(uid: Int, packageName: String): AppInfo? {
+        return appInfoDAO.isUidPkgExist(uid, packageName)
+    }
+
     suspend fun updateFirewallStatusByUid(uid: Int, firewallStatus: Int, connectionStatus: Int) {
         appInfoDAO.updateFirewallStatusByUid(uid, firewallStatus, connectionStatus, System.currentTimeMillis())
     }
@@ -153,8 +157,8 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         appInfoDAO.updateProxyExcluded(uid, isProxyExcluded, System.currentTimeMillis())
     }
 
-    suspend fun updateNotes(uid: Int, packageName: String, notes: String) {
-        appInfoDAO.updateNotes(uid, packageName, notes, System.currentTimeMillis())
+    suspend fun updateNotes(uid: Int, packageName: String, notes: String): Int {
+        return appInfoDAO.updateNotes(uid, packageName, notes, System.currentTimeMillis())
     }
 
     suspend fun getAppInfoUidForPackageName(packageName: String): Int {

@@ -183,7 +183,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         observeAppRules()
         observeNotesEvents()
         setupClickListeners()
-        restoreNotesDialogIfNeeded()
     }
 
     private fun observeNotesEvents() {
@@ -191,6 +190,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             event.getIfNotHandled()?.let { savedNotes ->
                 if (::appInfo.isInitialized) {
                     appInfo.notes = savedNotes
+                    notesDraft = ""
                     logEvent(
                         "app notes updated",
                         "Notes updated for ${appInfo.appName} ($uid)"
@@ -202,8 +202,8 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         }
 
         appInfoViewModel.notesErrorEvent.observe(this) { event ->
-            event.getIfNotHandled()?.let { errorMessage ->
-                showToastUiCentered(this, errorMessage, Toast.LENGTH_SHORT)
+            event.getIfNotHandled()?.let {
+                showToastUiCentered(this, getString(R.string.ctbs_app_notes_save_failed), Toast.LENGTH_SHORT)
             }
         }
     }
@@ -295,6 +295,8 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                     b.aadAppSettingsExclude.alpha = 1.0f
                     b.aadAppSettingsExclude.isEnabled = true
                 }
+
+                restoreNotesDialogIfNeeded()
             }
         }
     }
@@ -1170,7 +1172,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun showNotesDialog(draftText: String? = null) {
-        val initialText = draftText ?: if (::appInfo.isInitialized) appInfo.notes else ""
+        val initialText = (draftText ?: if (::appInfo.isInitialized) appInfo.notes else "").take(MAX_NOTE_LENGTH)
         val editText = EditText(this).apply {
             setText(initialText)
             hint = getString(R.string.hint_notes)
@@ -1186,7 +1188,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             .setView(editText)
             .setPositiveButton(R.string.lbl_save) { _, _ ->
                 val newNotes = editText.text.toString().trim()
-                notesDraft = ""
+                notesDraft = newNotes
                 saveNotesToDatabase(newNotes)
             }
             .setNegativeButton(R.string.lbl_cancel) { _, _ ->
