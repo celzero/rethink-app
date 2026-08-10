@@ -15,14 +15,18 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import Logger
+import com.celzero.bravedns.util.Logger
 import android.content.res.Configuration
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import android.widget.TextView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -36,6 +40,7 @@ import com.celzero.bravedns.databinding.DialogSetDnsCryptBinding
 import com.celzero.bravedns.databinding.FragmentDnsCryptListBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.dialog.DnsCryptRelaysDialog
+import com.celzero.bravedns.util.RecyclerViewSpacingDecoration
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.viewmodel.DnsCryptEndpointViewModel
 import com.celzero.bravedns.viewmodel.DnsCryptRelayEndpointViewModel
@@ -52,17 +57,21 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
 
-    // Dnscrypt UI elements
     private lateinit var dnsCryptRecyclerAdapter: DnsCryptEndpointAdapter
     private var dnsCryptLayoutManager: RecyclerView.LayoutManager? = null
     private val dnsCryptViewModel: DnsCryptEndpointViewModel by viewModel()
 
-    // Dnscrypt relay adapter and viewModel
     private lateinit var dnsCryptRelayRecyclerAdapter: DnsCryptRelayEndpointAdapter
     private val dnsCryptRelayViewModel: DnsCryptRelayEndpointViewModel by viewModel()
 
     companion object {
         fun newInstance() = DnsCryptListFragment()
+
+        private val dpToPx: Float by lazy {
+            Resources.getSystem().displayMetrics.density
+        }
+
+        private val spacing4dp: Int by lazy { (4 * dpToPx).toInt() }
     }
 
     private fun isDarkThemeOn(): Boolean {
@@ -72,28 +81,61 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         initView()
         initClickListeners()
+        applyEdgeToEdge()
     }
 
     private fun initView() {
         dnsCryptLayoutManager = LinearLayoutManager(requireContext())
         b.recyclerDnsCryptConnections.layoutManager = dnsCryptLayoutManager
+        b.recyclerDnsCryptConnections.addItemDecoration(
+            RecyclerViewSpacingDecoration(spacing4dp, spacing4dp)
+        )
 
         dnsCryptRecyclerAdapter = DnsCryptEndpointAdapter(requireContext(), get())
         dnsCryptViewModel.dnsCryptEndpointList.observe(viewLifecycleOwner) {
             dnsCryptRecyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
         b.recyclerDnsCryptConnections.adapter = dnsCryptRecyclerAdapter
+
+        dnsCryptRecyclerAdapter.addLoadStateListener { loadStates ->
+            val isEmpty = loadStates.source.refresh is LoadState.NotLoading &&
+                    dnsCryptRecyclerAdapter.itemCount == 0
+            val isLoading = loadStates.source.refresh is LoadState.Loading
+
+            b.dnsCryptEmptyState.visibility = if (isEmpty) View.VISIBLE else View.GONE
+            b.dnsCryptLoadingIndicator.visibility = if (isLoading && dnsCryptRecyclerAdapter.itemCount == 0) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+            b.recyclerDnsCryptConnections.visibility = if (isLoading && dnsCryptRecyclerAdapter.itemCount == 0) {
+                View.GONE
+            } else {
+                View.VISIBLE
+            }
+        }
     }
 
     private fun initClickListeners() {
         b.addRelayBtn.setOnClickListener { openDnsCryptRelaysDialog() }
 
-        // see CustomIpFragment#setupClickListeners#bringToFront()
         b.dohFabAddServerIcon.bringToFront()
         b.dohFabAddServerIcon.setOnClickListener { showAddDnsCryptDialog() }
+    }
+
+    private fun applyEdgeToEdge() {
+        ViewCompat.setOnApplyWindowInsetsListener(b.recyclerDnsCryptConnections) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(
+                v.paddingLeft,
+                v.paddingTop,
+                v.paddingRight,
+                v.paddingBottom + systemBars.bottom
+            )
+            insets
+        }
     }
 
     private fun openDnsCryptRelaysDialog() {
@@ -145,8 +187,6 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
         var dnscryptNextIndex = 0
         var relayNextIndex = 0
 
-        // Fetch the count from repository and increment by 1 to show the
-        // next doh name in the dialog
         io {
             dnscryptNextIndex = appConfig.getDnscryptCount().plus(1)
             relayNextIndex = appConfig.getDnscryptRelayCount().plus(1)
@@ -185,9 +225,9 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
 
             val mode =
                 if (radioServer.isChecked) {
-                    0 // Selected radio button - DNS Crypt
+                    0
                 } else {
-                    1 // Selected radio button - DNS Crypt Relay
+                    1
                 }
             if (urlStamp.isBlank()) {
                 isValid = false
@@ -195,7 +235,6 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
             }
 
             if (isValid) {
-                // Do the DNS Crypt setting there
                 if (mode == 0) {
                     insertDNSCryptServer(name, urlStamp, desc)
                 } else {

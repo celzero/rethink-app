@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.download
 
-import Logger
-import Logger.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_DOWNLOAD
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters

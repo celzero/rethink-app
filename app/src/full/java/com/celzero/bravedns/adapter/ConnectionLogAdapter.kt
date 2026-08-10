@@ -16,29 +16,25 @@ limitations under the License.
 
 package com.celzero.bravedns.adapter
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.os.Process
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.MergedConnectionLog
-import com.celzero.bravedns.database.RethinkLog
 import com.celzero.bravedns.database.toConnectionTracker
 import com.celzero.bravedns.database.toRethinkLog
 import com.celzero.bravedns.databinding.ListItemConnTrackBinding
@@ -58,15 +54,28 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
 
 class ConnectionLogAdapter(private val context: Context) :
     PagingDataAdapter<MergedConnectionLog, ConnectionLogAdapter.ConnectionLogViewHolder>(
         DIFF_CALLBACK
     ) {
+
+    // Per-uid cache of package names (immutable snapshots), living for the adapter's
+    // lifetime (recreated with the fragment; uids are stable across paging pages).
+    // ConcurrentHashMap: lock-free reads, non-blocking writes. Compute-on-miss cannot
+    // be atomic (computeIfAbsent's lambda is not suspendable), so a rare duplicate
+    // compute for the same uid is benign: the values are idempotent and immutable.
+    private val packageNameCache = ConcurrentHashMap<Int, List<String>>()
 
     companion object {
         private val DIFF_CALLBACK =
@@ -122,7 +131,26 @@ class ConnectionLogAdapter(private val context: Context) :
     inner class ConnectionLogViewHolder(private val b: ListItemConnTrackBinding) :
         RecyclerView.ViewHolder(b.root) {
 
+        private var bindingScope: CoroutineScope? = null
+
+        private fun cancelBinding() {
+            bindingScope?.cancel()
+            bindingScope = null
+        }
+
+        /** Launches [block] on IO in [bindingScope]. Cancelling [bindingScope]
+         *  via [cancelBinding] will cancel all active children. */
+        private fun launchBinding(block: suspend CoroutineScope.() -> Unit): Job? {
+            val owner = context as? LifecycleOwner ?: return null
+            if (bindingScope == null) {
+                val parentJob = owner.lifecycleScope.coroutineContext[Job]
+                bindingScope = CoroutineScope(Dispatchers.IO + SupervisorJob(parentJob))
+            }
+            return bindingScope?.launch(block = block)
+        }
+
         fun clear() {
+            cancelBinding()
             b.connectionResponseTime.text = ""
             b.connectionFlag.text = ""
             b.connectionIpAddress.text = ""
@@ -136,10 +164,11 @@ class ConnectionLogAdapter(private val context: Context) :
         }
 
         fun update(log: MergedConnectionLog) {
+            cancelBinding()
+
             displayTransactionDetails(log)
             displayProtocolDetails(log.port, log.protocol)
             displayAppDetails(log)
-            displaySummaryDetails(log)
             val blocked = if (log.blockedByRule == FirewallRuleset.RULE12.id) {
                 log.proxyDetails.isEmpty()
             } else {
@@ -150,6 +179,7 @@ class ConnectionLogAdapter(private val context: Context) :
             } else {
                 log.blockedByRule
             }
+            displaySummaryDetails(blocked, log)
             displayFirewallRulesetHint(blocked, rule)
 
             b.connectionParentLayout.setOnClickListener { openBottomSheet(log) }
@@ -204,34 +234,43 @@ class ConnectionLogAdapter(private val context: Context) :
         }
 
         private fun displayAppDetails(log: MergedConnectionLog) {
-            io {
-                uiCtx {
-                    val apps = FirewallManager.getPackageNamesByUid(log.uid)
-                    val count = apps.count()
-                    val pkgName = log.packageName ?: ""
+            launchBinding {
+                val apps = packageNameCache.getOrPut(log.uid) {
+                    // Guard against iterator faults from Guava's HashMultimap in
+                    // FirewallManager (see snapshotAppInfos fallbacks). On failure the
+                    // entry is not cached, so the next bind retries; empty list is
+                    // rendered as the default icon by the caller.
+                    runCatching { FirewallManager.getPackageNamesByUid(log.uid) }
+                        .getOrDefault(emptyList())
+                }
+                val count = apps.count()
+                val pkgName = log.packageName ?: ""
 
-                    val appName = when {
-                        log.usrId != NO_USER_ID -> context.getString(
-                            R.string.about_version_install_source,
-                            log.appName,
-                            log.usrId.toString()
-                        )
+                val appName = when {
+                    log.usrId != NO_USER_ID -> context.getString(
+                        R.string.about_version_install_source,
+                        log.appName,
+                        log.usrId.toString()
+                    )
 
-                        count > 1 -> context.getString(
-                            R.string.ctbs_app_other_apps,
-                            log.appName,
-                            "${count - 1}"
-                        )
+                    count > 1 -> context.getString(
+                        R.string.ctbs_app_other_apps,
+                        log.appName,
+                        "${count - 1}"
+                    )
 
-                        else -> log.appName
-                    }
+                    else -> log.appName
+                }
 
+                withContext(Dispatchers.Main.immediate) {
+                    if (!isActive) return@withContext
                     b.connectionAppName.text = appName
-                    if (apps.isEmpty() || pkgName.isEmpty() || pkgName == EMPTY_PACKAGE_NAME) {
-                        loadAppIcon(getDefaultIcon(context))
+                    val icon = if (apps.isEmpty() || pkgName.isEmpty() || pkgName == EMPTY_PACKAGE_NAME) {
+                        getDefaultIcon(context)
                     } else {
-                        loadAppIcon(getIcon(context, apps[0]))
+                        getIcon(context, apps[0])
                     }
+                    b.connectionAppIcon.setImageDrawable(icon)
                 }
             }
         }
@@ -282,11 +321,13 @@ class ConnectionLogAdapter(private val context: Context) :
             }
         }
 
-        private fun displaySummaryDetails(log: MergedConnectionLog) {
-            io {
+        private fun displaySummaryDetails(blocked: Boolean, log: MergedConnectionLog) {
+            launchBinding {
                 val hasCid = VpnController.hasCid(log.connId, log.uid)
                 val connType = ConnectionTracker.ConnType.get(log.connType)
-                uiCtx {
+
+                withContext(Dispatchers.Main.immediate) {
+                    if (!isActive) return@withContext
                     b.connectionDataUsage.text = ""
                     b.connectionDelay.text = ""
                     if (
@@ -303,8 +344,15 @@ class ConnectionLogAdapter(private val context: Context) :
                             b.connectionDelay.text = ""
                             hasMinSummary = true
                         } else {
+                            if (blocked) {
+                                b.connectionDuration.text = context.getString(R.string.symbol_red_circle)
+                                b.connectionDuration.alpha = 0.7f
+                                hasMinSummary = true
+                            } else {
+                                b.connectionDuration.text = ""
+                                b.connectionDuration.alpha = 1f
+                            }
                             b.connectionDataUsage.text = ""
-                            b.connectionDuration.text = ""
                         }
                         if (connType.isMetered()) {
                             b.connectionDelay.text = context.getString(R.string.symbol_currency)
@@ -334,12 +382,19 @@ class ConnectionLogAdapter(private val context: Context) :
                         if (!hasMinSummary) {
                             b.connectionSummaryLl.visibility = View.GONE
                         }
-                        return@uiCtx
+                        return@withContext
                     }
 
                     b.connectionSummaryLl.visibility = View.VISIBLE
-                    val duration = getDurationInHumanReadableFormat(context, log.duration)
-                    b.connectionDuration.text = context.getString(R.string.single_argument, duration)
+                    if (blocked) {
+                        b.connectionDuration.text = context.getString(R.string.symbol_red_circle)
+                        b.connectionDuration.alpha = 0.7f
+                    } else {
+                        b.connectionDuration.alpha = 1f
+                        val duration = getDurationInHumanReadableFormat(context, log.duration)
+                        b.connectionDuration.text =
+                            context.getString(R.string.single_argument, duration)
+                    }
                     val download =
                         context.getString(
                             R.string.symbol_download,
@@ -412,8 +467,10 @@ class ConnectionLogAdapter(private val context: Context) :
                     if (b.connectionDelay.text.isEmpty() && b.connectionDataUsage.text.isEmpty()) {
                         b.connectionSummaryLl.visibility = View.GONE
                     }
+
                 }
             }
+
         }
 
         private fun isRoundTripShorter(rtt: Long, blocked: Boolean): Boolean {
@@ -446,28 +503,7 @@ class ConnectionLogAdapter(private val context: Context) :
         }
 
         private fun loadAppIcon(drawable: Drawable?) {
-            Glide.with(context)
-                .load(drawable)
-                .error(getDefaultIcon(context))
-                .into(b.connectionAppIcon)
-        }
-    }
-
-    private fun io(f: suspend () -> Unit) {
-        val owner = context as? LifecycleOwner ?: return
-
-        owner.lifecycleScope.launch(Dispatchers.IO) { f() }
-    }
-
-    private suspend fun uiCtx(f: suspend () -> Unit) {
-        val owner = context as? LifecycleOwner ?: return
-
-        withContext(Dispatchers.Main.immediate) {
-            if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
-                return@withContext
-            }
-
-            f()
+            b.connectionAppIcon.setImageDrawable(drawable)
         }
     }
 }

@@ -15,7 +15,7 @@
  */
 package com.celzero.bravedns.adapter
 
-import Logger
+import com.celzero.bravedns.util.Logger
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup

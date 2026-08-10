@@ -15,8 +15,7 @@
  */
 package com.celzero.bravedns.util
 
-import Logger
-import Logger.LOG_FIREBASE
+import com.celzero.bravedns.util.Logger.LOG_FIREBASE
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Utilities.getRandomString
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -48,10 +47,10 @@ object FirebaseErrorReporting : KoinComponent {
                 val newToken = getRandomString(TOKEN_LENGTH)
                 persistentState.firebaseUserToken = newToken
                 persistentState.firebaseUserTokenTimestamp = System.currentTimeMillis()
-                crashlytics.setUserId(newToken)
+                setUserId(newToken)
                 Logger.i(LOG_FIREBASE, "generated new firebase token: $newToken")
             } else {
-                crashlytics.setUserId(token)
+                setUserId(token)
                 Logger.i(LOG_FIREBASE, "existing firebase token found: $token")
             }
             setEnabled(persistentState.firebaseErrorReportingEnabled)
@@ -116,6 +115,7 @@ object FirebaseErrorReporting : KoinComponent {
         try {
             val crashlytics = FirebaseCrashlytics.getInstance()
             crashlytics.setUserId(userId)
+            Logger.d(LOG_FIREBASE, "crashlytics user-id set to: $userId")
         } catch (e: Exception) {
             Logger.w(LOG_FIREBASE, "err; set user-id crashlytics: ${e.message}")
         }

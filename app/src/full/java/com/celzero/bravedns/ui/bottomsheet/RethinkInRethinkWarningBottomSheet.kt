@@ -25,6 +25,7 @@ class RethinkInRethinkWarningBottomSheet : BottomSheetDialogFragment() {
     private var dismissedByAction = false
 
     var onProceed: (() -> Unit)? = null
+    var onUnderstand: (() -> Unit)? = null
     var onCancel: (() -> Unit)? = null
 
     override fun getTheme(): Int =
@@ -64,6 +65,12 @@ class RethinkInRethinkWarningBottomSheet : BottomSheetDialogFragment() {
         binding.btnExemptRethink.setOnClickListener {
             dismissedByAction = true
             onProceed?.invoke()
+            dismissAllowingStateLoss()
+        }
+
+        binding.btnUnderstand.setOnClickListener {
+            dismissedByAction = true
+            onUnderstand?.invoke()
             dismissAllowingStateLoss()
         }
     }

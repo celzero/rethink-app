@@ -85,7 +85,7 @@
     <string name="lbl_service_providers" translatable="true">සේවා සපයන්නෝ</string>
     <string name="lbl_hop" translatable="true">රිලේස් (relays)</string>
     <string name="lbl_manual" translatable="true">මැනුවල්</string>
-    <string name="lbl_fallback" translatable="true">පසුපසට යන්න</string>
+    <string name="lbl_bootstrap" translatable="true">පසුපසට යන්න</string>
     <string name="lbl_default" translatable="true">පෙරනිමි</string>
     <string name="lbl_action" translatable="true">ක්‍රියාව</string>
     <string name="lbl_connect" translatable="true">සම්බන්ධ</string>
@@ -118,7 +118,6 @@
     <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">බලාසිටීම</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">අසමත් වෙමින් ඇත</string>
     <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">ආරක්ෂිතයි</string>
-    <string name="failed_using_default" translatable="true">අසමත්: ආපස්සට DNS භාවිතා කරයි</string>
     <string name="status_app_error" translatable="true">යෙදුමේ දෝෂයකි</string>
     <string name="status_dns_error" translatable="true">DNS දෝෂය</string>
     <string name="status_dns_server_down" translatable="true">DNS server එක down වි ඇත</string>

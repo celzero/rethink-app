@@ -16,7 +16,7 @@ limitations under the License.
 
 package com.celzero.bravedns.service
 
-import Logger
+import com.celzero.bravedns.util.Logger
 import android.app.PendingIntent
 import android.app.UiModeManager
 import android.content.Intent

@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.scheduler
 
-import Logger
-import Logger.LOG_TAG_BUG_REPORT
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_BUG_REPORT
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters

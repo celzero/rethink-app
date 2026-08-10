@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -24,6 +25,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.SummaryStatisticsAdapter
@@ -33,6 +35,7 @@ import com.celzero.bravedns.databinding.ActivityDetailedStatisticsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
@@ -126,12 +129,27 @@ class DetailedStatisticsActivity : BaseActivity(R.layout.activity_detailed_stati
         b.dsaRecycler.setHasFixedSize(true)
         val layoutManager = LinearLayoutManager(this)
         b.dsaRecycler.layoutManager = layoutManager
+        b.dsaRecycler.itemAnimator = null
 
         val recyclerAdapter = SummaryStatisticsAdapter(this, persistentState, appConfig, type)
+        recyclerAdapter.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         recyclerAdapter.setTimeCategory(timeCategory)
 
         viewModel.timeCategoryChanged(timeCategory)
-        handleStatType(type).observe(this) { recyclerAdapter.submitData(this.lifecycle, it) }
+        handleStatType(type).observe(this) {
+            recyclerAdapter.submitData(this.lifecycle, it)
+            b.dsaRecycler.post {
+                try {
+                    if (recyclerAdapter.itemCount > 0) {
+                        recyclerAdapter.stateRestorationPolicy =
+                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
+                    }
+                } catch (_: Exception) {
+                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
+                }
+            }
+        }
 
         // remove the view if there is no data
         recyclerAdapter.addLoadStateListener {

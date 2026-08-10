@@ -16,8 +16,8 @@
 
 package com.celzero.bravedns.scheduler
 
-import Logger
-import Logger.LOG_TAG_SCHEDULER
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_SCHEDULER
 import android.content.Context
 import androidx.work.BackoffPolicy
 import androidx.work.Data

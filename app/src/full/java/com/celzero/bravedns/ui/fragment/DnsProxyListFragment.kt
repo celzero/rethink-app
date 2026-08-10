@@ -15,14 +15,18 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import Logger
+import com.celzero.bravedns.util.Logger
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.TextView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -36,6 +40,7 @@ import com.celzero.bravedns.databinding.FragmentDnsProxyListBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.util.RecyclerViewSpacingDecoration
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.DnsProxyEndpointViewModel
@@ -55,24 +60,33 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
     private val rdb by inject<RefreshDatabase>()
     private val persistentState by inject<PersistentState>()
 
-    // DNS Proxy UI Elements
     private lateinit var dnsProxyRecyclerAdapter: DnsProxyEndpointAdapter
     private var dnsProxyLayoutManager: RecyclerView.LayoutManager? = null
     private val dnsProxyViewModel: DnsProxyEndpointViewModel by viewModel()
 
     companion object {
         fun newInstance() = DnsProxyListFragment()
+
+        private val dpToPx: Float by lazy {
+            Resources.getSystem().displayMetrics.density
+        }
+
+        private val spacing4dp: Int by lazy { (4 * dpToPx).toInt() }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         init()
         initClickListeners()
+        applyEdgeToEdge()
     }
 
     private fun init() {
         dnsProxyLayoutManager = LinearLayoutManager(requireContext())
         b.recyclerDnsProxyConnections.layoutManager = dnsProxyLayoutManager
+        b.recyclerDnsProxyConnections.addItemDecoration(
+            RecyclerViewSpacingDecoration(spacing4dp, spacing4dp)
+        )
 
         dnsProxyRecyclerAdapter =
             DnsProxyEndpointAdapter(requireContext(), viewLifecycleOwner, get())
@@ -80,6 +94,24 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
             dnsProxyRecyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
         b.recyclerDnsProxyConnections.adapter = dnsProxyRecyclerAdapter
+
+        dnsProxyRecyclerAdapter.addLoadStateListener { loadStates ->
+            val isEmpty = loadStates.source.refresh is LoadState.NotLoading &&
+                    dnsProxyRecyclerAdapter.itemCount == 0
+            val isLoading = loadStates.source.refresh is LoadState.Loading
+
+            b.dnsProxyEmptyState.visibility = if (isEmpty) View.VISIBLE else View.GONE
+            b.dnsProxyLoadingIndicator.visibility = if (isLoading && dnsProxyRecyclerAdapter.itemCount == 0) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+            b.recyclerDnsProxyConnections.visibility = if (isLoading && dnsProxyRecyclerAdapter.itemCount == 0) {
+                View.GONE
+            } else {
+                View.VISIBLE
+            }
+        }
     }
 
     private fun initClickListeners() {
@@ -96,6 +128,19 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
                 val nextIndex = appConfig.getDnsProxyCount().plus(1)
                 uiCtx { showAddDnsProxyDialog(appNames, nextIndex) }
             }
+        }
+    }
+
+    private fun applyEdgeToEdge() {
+        ViewCompat.setOnApplyWindowInsetsListener(b.recyclerDnsProxyConnections) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(
+                v.paddingLeft,
+                v.paddingTop,
+                v.paddingRight,
+                v.paddingBottom + systemBars.bottom
+            )
+            insets
         }
     }
 

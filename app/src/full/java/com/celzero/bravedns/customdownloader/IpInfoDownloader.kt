@@ -15,10 +15,9 @@
  */
 package com.celzero.bravedns.customdownloader
 
-import Logger
-import Logger.LOG_TAG_DOWNLOAD
-import Logger.LOG_TAG_VPN
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import com.celzero.bravedns.database.IpInfo
 import com.celzero.bravedns.database.IpInfoRepository
 import com.celzero.bravedns.service.PersistentState
@@ -144,8 +143,6 @@ object IpInfoDownloader: KoinComponent {
 
 
     private suspend fun performIpInfoDownload(ipToLookup: String): Boolean {
-        if (DEBUG) OkHttpDebugLogging.enableHttp2()
-        if (DEBUG) OkHttpDebugLogging.enableTaskRunner()
 
         if (System.currentTimeMillis() < retryAfterTimestamp) {
             val remainingTime = retryAfterTimestamp - System.currentTimeMillis()
@@ -205,6 +202,19 @@ object IpInfoDownloader: KoinComponent {
             Logger.i(LOG_TAG_DOWNLOAD, "$TAG; err while download: ${e.localizedMessage}")
             false
         }
+    }
+
+    suspend fun getIpInfo(ip: String): IpInfo? {
+        if (!persistentState.downloadIpInfo) return null
+
+        val isLanIp = isLanIp(ip)
+        if (isLanIp == null || isLanIp) return null
+
+        val existing = db.getIpInfo(ip)
+        if (existing != null) return existing
+
+        fetchIpInfoIfRequired(ip)
+        return null
     }
 
     private fun parseIpInfoFromJson(ipInfoJson: JsonObject): IpInfo? {

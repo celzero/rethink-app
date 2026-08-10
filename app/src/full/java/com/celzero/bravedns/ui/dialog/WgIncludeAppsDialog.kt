@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.ui.dialog
 
-import Logger
-import Logger.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import android.app.Activity
 import android.app.Dialog
 import android.graphics.PorterDuff

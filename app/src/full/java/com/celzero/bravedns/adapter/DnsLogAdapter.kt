@@ -16,9 +16,9 @@ limitations under the License.
 
 package com.celzero.bravedns.adapter
 
-import Logger
-import Logger.LOG_TAG_DNS
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -264,6 +264,15 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                             context.getString(R.string.symbol_unlock)
                         )
                 }
+            }
+
+            if (log.isEch) {
+                b.dnsUnicodeHint.text =
+                    context.getString(
+                        R.string.ci_desc,
+                        b.dnsUnicodeHint.text,
+                        context.getString(R.string.symbol_seal)
+                    )
             }
 
             if (b.dnsUnicodeHint.text.isEmpty() && b.dnsQueryType.text.isEmpty() && b.dnsLatency.text.isEmpty()) {

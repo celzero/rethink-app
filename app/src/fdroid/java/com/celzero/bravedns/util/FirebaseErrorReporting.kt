@@ -15,8 +15,7 @@
  */
 package com.celzero.bravedns.util
 
-import android.content.Context
-import Logger.LOG_FIREBASE
+import com.celzero.bravedns.util.Logger.LOG_FIREBASE
 import org.koin.core.component.KoinComponent
 
 /**

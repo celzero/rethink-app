@@ -15,8 +15,7 @@
  */
 package com.celzero.bravedns.util
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.Manifest
 import android.app.Activity
 import android.content.Context
@@ -27,6 +26,7 @@ import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 
 /**
  * Utility class to handle SSID-related permissions and operations.
@@ -61,14 +61,36 @@ object SsidPermissionManager {
     }
 
     /**
-     * Check if all required permissions for SSID access are granted
+     * Check if all required foreground permissions for SSID access are granted
+     * @param context The context to check permissions
+     * @return true if all foreground permissions are granted, false otherwise
+     */
+    fun hasForegroundPermissions(context: Context): Boolean {
+        return REQUIRED_PERMISSIONS.all { permission ->
+            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+        }
+    }
+
+    /**
+     * Check if background location permission is granted
+     * @param context The context to check permission
+     * @return true if granted or not needed (below Android Q), false otherwise
+     */
+    fun hasBackgroundLocationPermission(context: Context): Boolean {
+        return if (isAtleastQ()) {
+            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
+        } else {
+            true
+        }
+    }
+
+    /**
+     * Check if all required permissions for SSID access are granted (foreground + background on Q+)
      * @param context The context to check permissions
      * @return true if all permissions are granted, false otherwise
      */
     fun hasRequiredPermissions(context: Context): Boolean {
-        return REQUIRED_PERMISSIONS.all { permission ->
-            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
-        }
+        return hasForegroundPermissions(context) && hasBackgroundLocationPermission(context)
     }
 
     /**
@@ -92,6 +114,20 @@ object SsidPermissionManager {
             REQUIRED_PERMISSIONS,
             SSID_PERMISSION_REQUEST_CODE
         )
+    }
+
+    /**
+     * Request background location permission
+     * @param activity The activity to request permission from
+     */
+    fun requestBackgroundLocationPermission(activity: Activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ActivityCompat.requestPermissions(
+                activity,
+                arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
+                SSID_PERMISSION_REQUEST_CODE
+            )
+        }
     }
 
     /**

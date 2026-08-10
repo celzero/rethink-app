@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.scheduler
 
-import Logger
-import Logger.LOG_IAB
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_IAB
 import android.content.Context
 import android.os.SystemClock
 import androidx.work.CoroutineWorker
@@ -94,7 +94,7 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
             // TODO: no need of this fn now
             val response = retrofitInterface.acknowledgePurchase(referenceId, "", "", purchaseToken, persistentState.appVersion.toString())
             Logger.d(
-                Logger.LOG_IAB,
+                LOG_IAB,
                 "getPaymentStatusFromServer: ${response?.headers()}, ${response?.message()}, ${response?.raw()?.request?.url}"
             )
 
@@ -106,7 +106,7 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
                     TcpProxyHelper.PaymentStatus.entries.find { it.name == paymentStatusString }
                         ?: TcpProxyHelper.PaymentStatus.NOT_PAID
                 Logger.i(
-                    Logger.LOG_IAB,
+                    LOG_IAB,
                     "getPaymentStatusFromServer: status: $status, paymentStatus: $paymentStatus"
                 )
                 if (paymentStatus.isPaid() || paymentStatus.isFailed()) {
@@ -115,13 +115,13 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
                 return paymentStatus
             } else {
                 Logger.w(
-                    Logger.LOG_IAB,
+                    LOG_IAB,
                     "unsuccessful response for ${response?.raw()?.request?.url}"
                 )
             }
         } catch (e: Exception) {
             Logger.w(
-                Logger.LOG_IAB,
+                LOG_IAB,
                 "getPaymentStatusFromServer: exception while checking payment status",
                 e
             )

@@ -1,7 +1,7 @@
 package com.celzero.bravedns.scheduler
 
-import Logger
-import Logger.LOG_BATCH_LOGGER
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_BATCH_LOGGER
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters

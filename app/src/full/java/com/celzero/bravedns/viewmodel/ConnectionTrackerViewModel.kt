@@ -30,10 +30,6 @@ import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.MergedConnectionLog
 import com.celzero.bravedns.ui.fragment.ConnectionTrackerFragment
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.milliseconds
 
 class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTrackerDAO) :
     ViewModel() {
@@ -55,12 +51,12 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
         _filterString.value = ""
         pagingConfig =
             PagingConfig(
-                enablePlaceholders = true,
-                prefetchDistance = 3,
+                enablePlaceholders = false,
+                prefetchDistance = 15,
                 initialLoadSize = LIVEDATA_PAGE_SIZE * 2,
-                maxSize = LIVEDATA_PAGE_SIZE * 3,
-                pageSize = LIVEDATA_PAGE_SIZE * 2,
-                jumpThreshold = 5
+                maxSize = LIVEDATA_PAGE_SIZE * 6,
+                pageSize = LIVEDATA_PAGE_SIZE,
+                jumpThreshold = LIVEDATA_PAGE_SIZE * 3
             )
     }
 
@@ -69,28 +65,13 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
     val connectionTrackerListMerged =
         filterString.switchMap { input -> fetchMergedNetworkLogs(input) }
 
-    private fun setFilterWithDebounce(searchString: String) {
-        viewModelScope.launch {
-            debounceFilter(searchString)
-        }
-    }
-
-    private var debounceJob: Job? = null
-    private fun debounceFilter(searchString: String) {
-        debounceJob?.cancel()
-        debounceJob = viewModelScope.launch {
-            delay(300.milliseconds) // 300ms debounce delay
-            _filterString.value = searchString
-        }
-    }
-
     fun setFilter(searchString: String, filter: Set<String>, type: TopLevelFilter) {
         filterRules.clear()
 
         filterRules.addAll(filter)
         filterType = type
 
-        setFilterWithDebounce(searchString)
+        _filterString.value = searchString
     }
 
     private fun fetchNetworkLogs(input: String): LiveData<PagingData<ConnectionTracker>> {

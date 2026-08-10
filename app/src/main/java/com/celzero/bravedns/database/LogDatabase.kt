@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.database
 
-import Logger
-import Logger.LOG_TAG_APP_DB
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_APP_DB
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteException
@@ -32,7 +32,7 @@ import com.celzero.bravedns.util.Utilities
 
 @Database(
     entities = [ConnectionTracker::class, DnsLog::class, RethinkLog::class, IpInfo::class, Event::class],
-    version = 14,
+    version = 15,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -77,6 +77,7 @@ abstract class LogDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_11_12)
                 .addMigrations(MIGRATION_12_13)
                 .addMigrations(MIGRATION_13_14)
+                .addMigrations(MIGRATION_14_15)
                 .fallbackToDestructiveMigration() // recreate the database if no migration is found
                 .build()
         }
@@ -360,16 +361,16 @@ abstract class LogDatabase : RoomDatabase() {
                     db.execSQL("CREATE INDEX IF NOT EXISTS index_Events_source ON Events(source)")
                     db.execSQL("ALTER TABLE DnsLogs ADD COLUMN blockedTarget TEXT NOT NULL DEFAULT ''")
 
-                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_13_14: created Events table with indices")
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_12_13: created Events table with indices")
                 } catch (e: Exception) {
-                    Logger.e(LOG_TAG_APP_DB, "MIGRATION_13_14: error creating Events table: ${e.message}")
+                    Logger.e(LOG_TAG_APP_DB, "MIGRATION_12_13: error creating Events table: ${e.message}")
                 }
                 try {
                     // Add blockedTarget column to DnsLogs table
                     db.execSQL("ALTER TABLE DnsLogs ADD COLUMN blockedTarget TEXT NOT NULL DEFAULT ''")
-                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_14_15: added blockedTarget column to DnsLogs")
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_12_13: added blockedTarget column to DnsLogs")
                 } catch (e: Exception) {
-                    Logger.e(LOG_TAG_APP_DB, "MIGRATION_14_15: blockedTarget column already exists or error: ${e.message}", e)
+                    Logger.e(LOG_TAG_APP_DB, "MIGRATION_12_13: blockedTarget column already exists or error: ${e.message}", e)
                 }
             }
         }
@@ -384,6 +385,20 @@ abstract class LogDatabase : RoomDatabase() {
                         Logger.i(LOG_TAG_APP_DB, "MIGRATION_13_14: added isEch to DnsLogs")
                     } catch (e: Exception) {
                         Logger.e(LOG_TAG_APP_DB, "MIGRATION_13_14: isEch already exists, ignore", e)
+                    }
+                }
+            }
+
+        private val MIGRATION_14_15: Migration =
+            object : Migration(14, 15) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    try {
+                        db.execSQL(
+                            "CREATE INDEX IF NOT EXISTS index_RethinkLog_timeStamp ON RethinkLog(timeStamp DESC)"
+                        )
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_14_15: added timeStamp index on RethinkLog")
+                    } catch (e: Exception) {
+                        Logger.e(LOG_TAG_APP_DB, "MIGRATION_14_15: index may already exist: ${e.message}", e)
                     }
                 }
             }

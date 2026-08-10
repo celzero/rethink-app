@@ -15,7 +15,7 @@
  */
 package com.celzero.bravedns.service
 
-import Logger
+import com.celzero.bravedns.util.Logger
 import android.content.Context
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
 import java.io.File

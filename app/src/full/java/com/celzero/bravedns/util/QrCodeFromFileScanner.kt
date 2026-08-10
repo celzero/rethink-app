@@ -18,8 +18,7 @@
  */
 package com.celzero.bravedns.util
 
-import Logger
-import Logger.LOG_QR_CODE
+import com.celzero.bravedns.util.Logger.LOG_QR_CODE
 import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory

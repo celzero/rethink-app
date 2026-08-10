@@ -15,8 +15,7 @@
  */
 package com.celzero.bravedns.util
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -69,7 +68,7 @@ import java.util.regex.Pattern
 object UIUtils {
 
     fun getDnsStatusStringRes(status: Int?): Int {
-        if (status == null) return R.string.failed_using_default
+        if (status == null) return R.string.status_failing
 
         return when (Transaction.Status.fromId(status)) {
             Transaction.Status.START -> {
@@ -142,21 +141,30 @@ object UIUtils {
     }
 
     fun formatToRelativeTime(context: Context, timestamp: Long): String {
-        val now = System.currentTimeMillis()
         return if (DateUtils.isToday(timestamp)) {
             context.getString(R.string.relative_time_today)
         } else if (isYesterday(Date(timestamp))) {
             context.getString(R.string.relative_time_yesterday)
         } else {
-            val d =
-                DateUtils.getRelativeTimeSpanString(
-                    timestamp,
-                    now,
-                    DateUtils.MINUTE_IN_MILLIS,
-                    DateUtils.FORMAT_ABBREV_RELATIVE
-                )
-            d.toString()
+            relativeTimeSpanString(timestamp, DateUtils.MINUTE_IN_MILLIS).toString()
         }
+    }
+
+    fun getRelativeTimeSpan(t: Long?): CharSequence? {
+        if (t == null || t <= 0L) return "0"
+        return relativeTimeSpanString(t)
+    }
+
+    private fun relativeTimeSpanString(
+        timestamp: Long,
+        minResolution: Long = DateUtils.SECOND_IN_MILLIS
+    ): CharSequence {
+        return DateUtils.getRelativeTimeSpanString(
+            timestamp,
+            System.currentTimeMillis(),
+            minResolution,
+            DateUtils.FORMAT_ABBREV_RELATIVE
+        )
     }
 
     // ref: https://stackoverflow.com/a/3006423

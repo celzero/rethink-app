@@ -15,9 +15,9 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import Logger
-import Logger.LOG_TAG_BUG_REPORT
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_BUG_REPORT
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
@@ -92,13 +92,23 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
         private const val CRASH_CODE = "**CRASH0**"
         private const val DONT_PANIC_CODE = "**CRASH1**"
         private const val PANIC_CRASH_CODE = "**CRASH2**"
+        // Upper bound on the in-memory frozen snapshot held while paused. The
+        // DB query is ORDER BY id DESC (newest first), so take(N) keeps the most
+        // recent N entries;
+        private const val MAX_PAUSED_SNAPSHOT_SIZE = 5000
     }
 
     // Guard against rapid double-taps on share buttons while a job is in-progress
     private var isShareInProgress = false
 
-    // When true, ignore updates from the database so the ui
+    // When true, ignore live DB generations so the ui freezes on the currently
+    // displayed logs (lets the user scroll/search a stable snapshot).
     private var isPaused: Boolean = false
+
+    // Frozen snapshot of the currently displayed logs, captured the moment the
+    // stream is paused. While paused, search/level filters are applied to this
+    // list locally (via PagingData.from) instead of re-querying the DB.
+    private var pausedSnapshot: List<ConsoleLog> = emptyList()
 
     private var currentFilter: String = ""
 
@@ -210,9 +220,7 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
             // update path to produce the IndexOutOfBoundsException in ConsoleLogAdapter
             // reported as #2591 ("v055u: IndexOutOfBoundsException ConsoleLogAdapter").
             // The existing try/catch above SWALLOWS the exception when it does fire;
-            // this prevents the race that causes it. Trade-off: marginally slower
-            // scroll because the next item is bound on-demand instead of one-frame
-            // ahead. For a debug log view that's a non-issue.
+            // this prevents the race that causes it.
             //
             // Note: ConnectionTrackerFragment / DnsLogFragment elsewhere in this app
             // explicitly enable prefetch (lm.isItemPrefetchEnabled = true). The
@@ -231,31 +239,50 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
         }
     }
 
-    private var lastPagingData: PagingData<ConsoleLog>? = null
-
     private fun observeLog() {
         viewModel.logs.observe(this) { pagingData ->
-            lastPagingData = pagingData
-            val toSubmit = applyLocalFilter(pagingData)
-            recyclerAdapter?.submitData(lifecycle, toSubmit)
+            // While paused, freeze the visible list: ignore live DB generations so
+            // the user can scroll/search a stable snapshot. Paused search/filter is
+            // served from [pausedSnapshot] via [reapplyLocalFilter].
+            if (isPaused) return@observe
+            recyclerAdapter?.submitData(lifecycle, applyLocalFilter(pagingData))
         }
     }
 
-    private fun applyLocalFilter(pagingData: PagingData<ConsoleLog>): PagingData<ConsoleLog> {
+    // Predicate shared by both the live PagingData filter and the paused-snapshot
+    // filter so search/level semantics stay identical across the two modes.
+    private fun ConsoleLog.matchesLocalFilter(): Boolean {
         val q = currentFilter
         val lvl = currentMinLevel
-        if (q.isEmpty() && lvl <= 0) return pagingData
-        return pagingData.filter { log ->
-            val matchesText = q.isEmpty() || log.message.contains(q, ignoreCase = true)
-            val matchesLevel = lvl <= 0 || log.level >= lvl
-            matchesText && matchesLevel
-        }
+        val matchesText = q.isEmpty() || message.contains(q, ignoreCase = true)
+        val matchesLevel = lvl <= 0 || level >= lvl
+        return matchesText && matchesLevel
     }
 
-    private fun reapplyLocalFilter() {
-        val pd = lastPagingData ?: return
-        recyclerAdapter?.submitData(lifecycle, applyLocalFilter(pd))
+    private fun hasActiveLocalFilter(): Boolean =
+        currentFilter.isNotEmpty() || currentMinLevel > 0
+
+    private fun applyLocalFilter(pagingData: PagingData<ConsoleLog>): PagingData<ConsoleLog> {
+        if (!hasActiveLocalFilter()) return pagingData
+        return pagingData.filter { it.matchesLocalFilter() }
     }
+
+    private suspend fun reapplyLocalFilter() {
+        // Only meaningful while paused; when live, the observer already forwards
+        // freshly (DB)filtered generations to the adapter.
+        if (!isPaused) return
+        val snapshot = pausedSnapshot
+        // Filter the frozen snapshot on a background dispatcher
+        val filtered = if (hasActiveLocalFilter()) {
+            withContext(Dispatchers.Default) {
+                snapshot.filter { it.matchesLocalFilter() }
+            }
+        } else {
+            snapshot
+        }
+        recyclerAdapter?.submitData(lifecycle, PagingData.from(filtered))
+    }
+
     private fun setupClickListener() {
 
         b.consoleLogShare.setOnClickListener {
@@ -305,11 +332,33 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
     private fun togglePause() {
         isPaused = !isPaused
         if (isPaused) {
+            // Freeze what is currently on screen so it can be scrolled/searched
+            // without new logs pushing the content around. Placeholders are off,
+            // so snapshot() yields only the rendered ConsoleLog items.
+            val all = recyclerAdapter?.snapshot()?.filterNotNull() ?: emptyList()
+            // Cap the frozen set: the DB query is ORDER BY id DESC (newest
+            // first) and snapshot() preserves presented order, so take(N) keeps
+            // the most recent N entries. Bounds memory on verbose/stack-trace
+            // sessions where the presented set can reach the tens of thousands.
+            pausedSnapshot = if (all.size > MAX_PAUSED_SNAPSHOT_SIZE) {
+                Logger.i(
+                    LOG_TAG_BUG_REPORT,
+                    "console log snapshot capped: ${all.size} -> $MAX_PAUSED_SNAPSHOT_SIZE"
+                )
+                all.take(MAX_PAUSED_SNAPSHOT_SIZE)
+            } else {
+                all
+            }
             b.pauseIcon.setImageResource(R.drawable.ic_prevent_dns_proxy)
-            Logger.i(LOG_TAG_BUG_REPORT, "console log stream paused")
+            Logger.i(
+                LOG_TAG_BUG_REPORT,
+                "console log stream paused, frozen ${pausedSnapshot.size} items"
+            )
         } else {
+            pausedSnapshot = emptyList()
             b.pauseIcon.setImageResource(R.drawable.ic_pause)
-            // fresh stream of data is emitted, which the observer will forward to the adapter.
+            // Restart the stream so a fresh generation is emitted and forwarded
+            // to the adapter by observeLog(), replacing the frozen snapshot.
             viewModel.restartLogStream()
             Logger.i(LOG_TAG_BUG_REPORT, "console log stream resumed")
         }
@@ -344,7 +393,7 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
             if (isPaused) {
                 // apply the level filter on the local paging data only; do not
                 // refetch from the DB while paused.
-                reapplyLocalFilter()
+                lifecycleScope.launch { reapplyLocalFilter() }
             } else {
                 viewModel.setLogLevel(which.toLong())
             }
@@ -366,7 +415,7 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
             )
             currentMinLevel = Logger.uiLogLevel.toInt()
             if (isPaused) {
-                reapplyLocalFilter()
+                lifecycleScope.launch { reapplyLocalFilter() }
             } else {
                 viewModel.setLogLevel(Logger.uiLogLevel)
             }

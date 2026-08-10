@@ -15,7 +15,7 @@
  */
 package com.celzero.bravedns.ui.dialog
 
-import Logger
+import com.celzero.bravedns.util.Logger
 import android.app.Activity
 import android.app.Dialog
 import android.os.Bundle

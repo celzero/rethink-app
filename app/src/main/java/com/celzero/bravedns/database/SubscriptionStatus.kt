@@ -15,7 +15,7 @@
  */
 package com.celzero.bravedns.database
 
-import Logger
+import com.celzero.bravedns.util.Logger
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.celzero.bravedns.database.SubscriptionStatus.Companion.DEVICE_ID_INDICATOR

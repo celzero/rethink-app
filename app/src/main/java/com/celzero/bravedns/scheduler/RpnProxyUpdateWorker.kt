@@ -15,15 +15,17 @@
  */
 package com.celzero.bravedns.scheduler
 
-import Logger
-import Logger.LOG_IAB
-import Logger.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_IAB
+import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import android.content.Context
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
@@ -32,6 +34,7 @@ import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.PurchaseDetail
 import com.celzero.bravedns.iab.RegisterDeviceResult
 import com.celzero.bravedns.iab.ServerApiError
+import com.celzero.bravedns.iab.SubscriptionCheckWorker
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.scheduler.RpnProxyUpdateWorker.Companion.INTERVAL_MINUTES
 import com.celzero.bravedns.service.PersistentState
@@ -103,7 +106,7 @@ class RpnProxyUpdateWorker(
                 request
             )
 
-            Logger.i(LOG_TAG_PROXY, "$TAG; scheduled: first run in ${INTERVAL_MINUTES}m, then every ${INTERVAL_MINUTES}m (CANCEL_AND_REENQUEUE — fresh timer from registration)")
+            Logger.i(LOG_TAG_PROXY, "$TAG; scheduled: first run in ${INTERVAL_MINUTES}m, then every ${INTERVAL_MINUTES}m (CANCEL_AND_REENQUEUE; fresh timer from registration)")
         }
 
         /** Cancel the periodic worker (e.g. when RPN is disabled). */
@@ -137,6 +140,10 @@ class RpnProxyUpdateWorker(
                 Logger.i(LOG_TAG_PROXY, "$TAG; doWork: RPN not active, skipping update (attempt $attempt)")
                 return@withContext Result.success()
             }
+
+            // Ensure the subscription/billing reconciliation worker runs periodically.
+            // KEEP makes this a no-op if a SubscriptionCheckWorker is already enqueued or running.
+            enqueueSubscriptionCheckIfNeeded()
 
             try {
                 // TODO: Duplicate implementation exists in RpnProxyUpdateWorker and
@@ -191,6 +198,26 @@ class RpnProxyUpdateWorker(
                     Result.retry()
                 }
             }
+        }
+    }
+
+    /**
+     * Enqueues [SubscriptionCheckWorker] (billing fetch, reconcile, device registration)
+     * using [ExistingWorkPolicy.KEEP]. if the one-time enqueue at VPN start was missed,
+     * exhausted its WorkManager retries, or RPN was enabled mid-session,
+     * the subscription check is re-triggered here.
+     */
+    private fun enqueueSubscriptionCheckIfNeeded() {
+        try {
+            val workRequest = OneTimeWorkRequestBuilder<SubscriptionCheckWorker>().build()
+            WorkManager.getInstance(applicationContext).enqueueUniqueWork(
+                SubscriptionCheckWorker.WORK_NAME,
+                ExistingWorkPolicy.KEEP,
+                workRequest
+            )
+            Logger.i(LOG_TAG_PROXY, "$TAG; enqueued SubscriptionCheckWorker")
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; enqueueSubscriptionCheckIfNeeded failed (non-fatal): ${e.message}")
         }
     }
 

@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.service
 
-import Logger
-import Logger.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_FIREWALL
 import android.app.KeyguardManager
 import android.content.Context
 import android.content.Intent
@@ -48,7 +48,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -301,8 +300,18 @@ object FirewallManager : KoinComponent {
 
         var appInfos: Multimap<Int, AppInfo> = HashMultimap.create()
 
-        // TODO: protect access to the foregroundUids (read/write)
-        @Volatile var foregroundUids: MutableSet<Int> = Collections.synchronizedSet(HashSet())
+        // ConcurrentHashMap-backed key set:
+        // - reads (contains) are lock-free volatile reads -> safe on the VPN packet path
+        //   (TunFirewallManager.isAppForeground runs on the Go bridge dispatchers).
+        // - writes (add/clear) are thread-safe, non-blocking and work from both coroutine
+        //   (trackForegroundApp on Dispatchers.IO) and binder (accessibility service) contexts.
+        // - @Volatile is unnecessary: the reference is never reassigned and CHM provides
+        //   its own visibility guarantees for the contents.
+        // A Mutex is the right tool only when both sides are suspendable. Here, one side is a raw
+        // callback thread (accessibility binder) and the other is a non-suspend packet-path
+        // function — a lock-free concurrent collection is the only fit that is both thread-safe
+        // and non-blocking.
+        val foregroundUids: MutableSet<Int> = ConcurrentHashMap.newKeySet()
 
         var appInfosLiveData: MutableLiveData<Collection<AppInfo>> = MutableLiveData()
 
@@ -400,7 +409,8 @@ object FirewallManager : KoinComponent {
     }
 
     suspend fun isUidFirewalled(uid: Int): Boolean {
-        return connectionStatus(uid) != ConnectionStatus.ALLOW
+        // see if the UID is firewalled in both metered and unmetered
+        return connectionStatus(uid) == ConnectionStatus.BOTH
     }
 
     suspend fun isUidSystemApp(uid: Int): Boolean {
@@ -414,6 +424,11 @@ object FirewallManager : KoinComponent {
             // return all apps including tombstoned ones; callers filter if needed
             return appInfos.values().map { AppInfoTuple(it.uid, it.packageName) }.toSet()
         }
+    }
+
+    // snapshot of the full AppInfo collection (uid+packageName -> AppInfo)
+    suspend fun getAppInfoSnapshot(): Map<Pair<Int, String>, AppInfo> {
+        return snapshotAppInfos().associateBy { Pair(it.uid, it.packageName) }
     }
 
     suspend fun tombstoneApp(uid: Int, packageName: String?, ts: Long = System.currentTimeMillis()) {
@@ -634,6 +649,17 @@ object FirewallManager : KoinComponent {
         if (packageName.isNullOrBlank()) return null
         mutex.withLock {
             return appInfos.values().firstOrNull { it.packageName == packageName }
+        }
+    }
+
+    // resolve the AppInfo that matches BOTH uid and packageName. This is required because the same
+    // packageName can legitimately exist under multiple uids (work-profile / cloned / dual-messenger
+    // apps, or shared-uid apps). getAppInfoByPackage() only returns the first match and must not be
+    // used when the caller already knows the uid, otherwise sibling uid entries get dropped.
+    suspend fun getAppInfoByUidAndPackage(uid: Int, packageName: String?): AppInfo? {
+        if (packageName.isNullOrBlank()) return null
+        mutex.withLock {
+            return appInfos.get(uid).firstOrNull { it.packageName == packageName }
         }
     }
 

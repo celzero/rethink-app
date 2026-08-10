@@ -15,7 +15,7 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import Logger
+import com.celzero.bravedns.util.Logger
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
@@ -49,6 +49,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import kotlin.time.Duration.Companion.milliseconds
 
 class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
     private val b by viewBinding(ActivityPingTestBinding::bind)
@@ -277,12 +278,6 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
     }
 
     private fun performTest() {
-        // Guard: RPN must be enabled
-        if (!RpnProxyManager.isRpnEnabled()) {
-            Toast.makeText(this, getString(R.string.ping_reach_rpn_disabled), Toast.LENGTH_LONG).show()
-            return
-        }
-
         val rawInput = b.reachInput.text?.toString()?.trim().orEmpty()
         val csv = if (rawInput.isEmpty() || rawInput == getString(R.string.lbl_auto)) {
             ""
@@ -290,6 +285,12 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
             rawInput
         }
         val domains = csv.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+
+        // Guard: RPN must be enabled
+        if (!RpnProxyManager.isRpnEnabled() && csv.isNotEmpty()) {
+            Toast.makeText(this, getString(R.string.ping_reach_rpn_disabled), Toast.LENGTH_LONG).show()
+            return
+        }
 
         b.reachInputLayout.error = null
 
@@ -302,7 +303,7 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
 
         io {
             try {
-                if (!RpnProxyManager.isRpnActive()) {
+                if (!RpnProxyManager.isRpnActive() && csv.isNotEmpty()) {
                     uiCtx { showNoProxyState() }
                     return@io
                 }
@@ -328,7 +329,7 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
                     // Honour minimum animation duration for UX
                     val elapsed = System.currentTimeMillis() - testStartTime
                     if (elapsed < MIN_TEST_DURATION_MS) {
-                        delay(MIN_TEST_DURATION_MS - elapsed)
+                        delay((MIN_TEST_DURATION_MS - elapsed).milliseconds)
                     }
 
                     val allOk = results.all { it.second }

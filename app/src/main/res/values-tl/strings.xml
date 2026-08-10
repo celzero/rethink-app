@@ -29,7 +29,7 @@
     <string name="slide_2_desc" translatable="true">Ang Rethink ay ang pinakamadaling paraan upang magmonitor ng network activity, mag-bypass ng Internet censorship, at firewall apps sa iyong Android device.</string>
     <string name="slide_1_title" translatable="true">Libre at Open Source</string>
     <string name="slide_1_desc" translatable="true">Ang Rethink ay isang open source na software na sinusuportahan ng programa ng Mozilla Builders MVP.</string>
-    <string name="rdns_plus" translatable="true">RDNS Plus</string>
+    <string name="rdns_plus" translatable="false">RDNS Plus</string>
     <string name="allow" translatable="true">pahintulutan</string>
     <string name="block" translatable="true">harangan</string>
     <string name="title_settings" translatable="true">Mga Setting</string>
@@ -42,19 +42,19 @@
     <string name="firewall_act_universal_tab" translatable="true">pangkalahatan</string>
     <string name="search_universal_ips" translatable="true"><font size="12">Maghanap ng mga IP</font></string>
     <string name="firewall_rule_block_univ_ip" translatable="true">IP / Port (Pangkalahatan)</string>
-    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Malagpasan ba ang universal DNS &amp; firewall na mga patakaran para sa mga <i>nakalista</i> na mga apps\?</string>
+    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Malagpasan ba ang universal DNS &amp; firewall na mga patakaran para sa mga <i>nakalista</i> na mga apps?</string>
     <string name="firewall_rule_bypass_universal_ip" translatable="true">Na-bypass ang IP</string>
     <string name="firewall_status_whitelisted" translatable="true">nakakalusot sa pangkalahatang mga patakaran ng firewall</string>
     <string name="firewall_card_universal_rules" translatable="true">%1$s (mga) patakaran ng universal</string>
     <string name="fapps_firewall_filter_bypass_universal" translatable="true">Nalampasan</string>
     <string name="fapps_info_bypass_msg" translatable="true">Iwasan ang mga patakaran ng Universal na firewall.</string>
-    <string name="fapps_bypass_block_dialog_message" translatable="true">Mag-bypass ng universal firewall rules para sa <i>naka-lista</i> na mga apps\?</string>
+    <string name="fapps_bypass_block_dialog_message" translatable="true">Mag-bypass ng universal firewall rules para sa <i>naka-lista</i> na mga apps?</string>
     <string name="firewall_rule_univ_block_metered" translatable="true">Naka-meter (Pangkalahatan)</string>
-    <string name="firewall_rule_new_app_desc" translatable="true">Ito ang <i>unang</i> pagkakataon na nagpakabit ang app na ito ng koneksyon.<br/><br/> Upang magbago, pumunta sa tab na <i>Universal</i>.</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true">Ang isang universal na patakaran ng firewall na iniset ng user ay nag-block ng <i>app</i> na ito habang nagtatangka itong kumonekta sa <i>Metered</i> (Mobile) na network. <br/> <br/> Upang baguhin, pumunta sa tab na <i>Universal</i>.</string>
-    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Nagbabawal sa isang app na kumonekta sa Internet. \n<u>#2</u>: Nagbabawal sa anumang app na kumonekta sa partikular na IP. \n<u>#3</u>: Nagbabawal sa lahat ng mga koneksyon kapag nakalock ang device (Universal Firewall). \n<u>#4</u>: Nagbabawal sa anumang app na hindi ginagamit (Universal Firewall). \n<u>#5</u>: Nagbabawal ng mga koneksyon kapag ang pinagmulan ng app ay hindi kilala (Universal Firewall). \n<u>#6</u>: Nagbabawal sa lahat ng UDP traffic maliban sa DNS (Universal Firewall). \n<u>#7</u>: Nagbabawal ng mga koneksyon kapag ang DNS ay hindi sinusunod (Universal Firewall).</string>
-    <string name="firewall_rule_block_ip_univ_desc" translatable="true">Isang user-set na firewall rule ang nag-block sa <i>destination IP / Port</i>.<br/><br/> Upang baguhin, pumunta sa tab na <i>Universal</i>.</string>
-    <string name="firewall_rule_bypass_universal_ip_desc" translatable="true">Pinapayagan ang koneksyong ito dahil ang <i>destination IP</i> ay nakatakda upang makaiwas sa lahat ng pangkalahatang patakaran ng firewall.<br/><br/> Upang baguhin, pumunta sa <i>IP Rules</i> sa tab na <i>Universal</i>.</string>
+    <string name="firewall_rule_new_app_desc" translatable="true"><![CDATA[Ito ang <i>unang</i> pagkakataon na nagpakabit ang app na ito ng koneksyon.<br/><br/> Upang magbago, pumunta sa tab na <i>Universal</i>.]]></string>
+    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true"><![CDATA[Ang isang universal na patakaran ng firewall na iniset ng user ay nag-block ng <i>app</i> na ito habang nagtatangka itong kumonekta sa <i>Metered</i> (Mobile) na network. <br/> <br/> Upang baguhin, pumunta sa tab na <i>Universal</i>.]]></string>
+    <string name="bsct_conn_rule_explanation" translatable="true">&lt;u&gt;#1&lt;/u&gt;: Nagbabawal sa isang app na kumonekta sa Internet. \n&lt;u&gt;#2&lt;/u&gt;: Nagbabawal sa anumang app na kumonekta sa partikular na IP. \n&lt;u&gt;#3&lt;/u&gt;: Nagbabawal sa lahat ng mga koneksyon kapag nakalock ang device (Universal Firewall). \n&lt;u&gt;#4&lt;/u&gt;: Nagbabawal sa anumang app na hindi ginagamit (Universal Firewall). \n&lt;u&gt;#5&lt;/u&gt;: Nagbabawal ng mga koneksyon kapag ang pinagmulan ng app ay hindi kilala (Universal Firewall). \n&lt;u&gt;#6&lt;/u&gt;: Nagbabawal sa lahat ng UDP traffic maliban sa DNS (Universal Firewall). \n&lt;u&gt;#7&lt;/u&gt;: Nagbabawal ng mga koneksyon kapag ang DNS ay hindi sinusunod (Universal Firewall).</string>
+    <string name="firewall_rule_block_ip_univ_desc" translatable="true"><![CDATA[Isang user-set na firewall rule ang nag-block sa <i>destination IP / Port</i>.<br/><br/> Upang baguhin, pumunta sa tab na <i>Universal</i>.]]></string>
+    <string name="firewall_rule_bypass_universal_ip_desc" translatable="true"><![CDATA[Pinapayagan ang koneksyong ito dahil ang <i>destination IP</i> ay nakatakda upang makaiwas sa lahat ng pangkalahatang patakaran ng firewall.<br/><br/> Upang baguhin, pumunta sa <i>IP Rules</i> sa tab na <i>Universal</i>.]]></string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">protektado</string>
     <string name="hybrid_mode_notification_title" translatable="true">Nakaseguro! Nakakonekta sa DNS + Firewall.</string>
     <string name="status_app_error" translatable="true">error ng aplikasyon</string>
@@ -84,37 +84,31 @@
     <string name="dns_mode_info_explanation_new" translatable="true">Bantayan, hadlangan, at mag-encrypt ng mga DNS request.</string>
     <string name="dns_firewall_mode_info_explanation_new" translatable="true">Lahat ng nasa itaas + bypass ang Internet censorship.</string>
     <string name="alert_permission_accessibility" translatable="true">Pahintulot - Accessibility</string>
-    <string name="alert_firewall_accessibility_explanation" translatable="true">Ang RethinkDNS ay gumagamit ng accessibility service upang matukoy kung aling mga apps ang kasalukuyang ginagamit (foreground) at kung alin ang hindi ginagamit (background).
-\n
-\nHindi nagsusumikap ang RethinkDNS na mangolekta ng anumang impormasyon o maniktik sa inyo sa anumang paraan.</string>
-    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Nakapagpapahinto o bumagsak na ang serbisyong pang-accessibility ng RethinkDNS. <i><b>Pumunta sa Settings at Force Stop</b></i> RethinkDNS at simulan itong muli upang magamit ang feature na <i>I-block ang anumang app na hindi ginagamit</i>.
-\n
-\nGinagamit ng RethinkDNS ang serbisyong pang-accessibility upang ma-track kung aling mga app ang ginagamit (foreground) at kung alin ang hindi (background).</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Ang RethinkDNS ay gumagamit ng accessibility service upang matukoy kung aling mga apps ang kasalukuyang ginagamit (foreground) at kung alin ang hindi ginagamit (background). \n \nHindi nagsusumikap ang RethinkDNS na mangolekta ng anumang impormasyon o maniktik sa inyo sa anumang paraan.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Nakapagpapahinto o bumagsak na ang serbisyong pang-accessibility ng RethinkDNS. <i><b>Pumunta sa Settings at Force Stop</b></i> RethinkDNS at simulan itong muli upang magamit ang feature na <i>I-block ang anumang app na hindi ginagamit</i>. \n \nGinagamit ng RethinkDNS ang serbisyong pang-accessibility upang ma-track kung aling mga app ang ginagamit (foreground) at kung alin ang hindi (background).</string>
     <string name="alert_firewall_accessibility_exception" translatable="true">Pagkabigo sa pagbukas ng Settings ng Accessibility. Subukan muli mamaya!</string>
     <string name="always_on_dialog_neutral" translatable="true">Mga Settings</string>
     <string name="private_dns_dialog_heading" translatable="true">I-off ang Pribadong DNS</string>
-    <string name="private_dns_dialog_desc" translatable="true">Ang mga setting ng DNS ng Rethink ay na-override ng Pribadong DNS ng Android.
-\n
-\nPara gamitin ang Rethink\'s DNS pumunta sa Android Settings at i-off ang \"Private DNS.\"</string>
+    <string name="private_dns_dialog_desc" translatable="true">Ang mga setting ng DNS ng Rethink ay na-override ng Pribadong DNS ng Android. \n \nPara gamitin ang Rethink\'s DNS pumunta sa Android Settings at i-off ang \"Private DNS.\"</string>
     <string name="private_dns_dialog_positive" translatable="true">Pumunta sa Mga Setting</string>
     <string name="firewall_act_network_monitor_tab" translatable="true">Network</string>
     <string name="dns_act_configure_tab" translatable="true">I-configure</string>
-    <string name="univ_firewall_dialog_title" translatable="true">Tanggalin ang IP Rule\?</string>
-    <string name="univ_firewall_dialog_message" translatable="true">Pagtanggal ng patakaran na ito ay magpapahintulot sa anumang app na kumonekta sa IP na ito. Gusto mo bang magpatuloy\?</string>
-    <string name="doh_custom_url_remove_dialog_title" translatable="true">I-delete ang endpoint ng DoH\?</string>
+    <string name="univ_firewall_dialog_title" translatable="true">Tanggalin ang IP Rule?</string>
+    <string name="univ_firewall_dialog_message" translatable="true">Pagtanggal ng patakaran na ito ay magpapahintulot sa anumang app na kumonekta sa IP na ito. Gusto mo bang magpatuloy?</string>
+    <string name="doh_custom_url_remove_dialog_title" translatable="true">I-delete ang endpoint ng DoH?</string>
     <string name="doh_custom_url_remove_success" translatable="true">Tinanggal ang endpoint.</string>
     <string name="doh_custom_url_remove_dialog_message" translatable="true">Alisin ang endpoint ng DNS over Https mula sa nakalagay na konfigurasyon.</string>
-    <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">Tanggalin ang DNSCrypt resolver\?</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">Tanggalin ang DNSCrypt resolver?</string>
     <string name="dns_crypt_url_remove_dialog_message" translatable="true">Tanggalin ang DNSCrypt resolver mula sa mga na-save na konfigurasyon.</string>
     <string name="dns_crypt_url_remove_success" translatable="true">Ang DNSCrypt resolver ay tinanggal.</string>
-    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">Tanggalin ang DNSCrypt Relay\?</string>
+    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">Tanggalin ang DNSCrypt Relay?</string>
     <string name="dns_crypt_relay_remove_dialog_message" translatable="true">Tanggalin ang DNSCrypt relay mula sa naka-save na konfigurasyon.</string>
     <string name="dns_crypt_relay_remove_success" translatable="true">Ang DNSCrypt Relay ay tinanggal.</string>
-    <string name="dns_proxy_remove_dialog_title" translatable="true">Tanggalin ang DNS Proxy\?</string>
+    <string name="dns_proxy_remove_dialog_title" translatable="true">Tanggalin ang DNS Proxy?</string>
     <string name="dns_proxy_remove_dialog_message" translatable="true">Tanggalin ang DNS Proxy mula sa naka-save na konfigurasyon.</string>
     <string name="dns_proxy_remove_success" translatable="true">Tinanggal ang DNS Proxy.</string>
     <string name="local_blocklist_download" translatable="true">I-download ang Mga Blocklist</string>
-    <string name="local_blocklist_download_desc" translatable="true">Mag-download ng mga blocklist (mga 60MB) para magamit ang feature na ito\?</string>
+    <string name="local_blocklist_download_desc" translatable="true">Mag-download ng mga blocklist (mga 60MB) para magamit ang feature na ito?</string>
     <string name="local_blocklist_redownload" translatable="true">Napapanahon!</string>
     <string name="local_blocklist_redownload_desc" translatable="true">Ang mga blocklist sa device ay nasa pinakabagong bersyon na v%1$s.</string>
     <string name="blocklist_update_check_failure" translatable="true">May nangyaring mali. Pakisubukan muli mamaya!</string>

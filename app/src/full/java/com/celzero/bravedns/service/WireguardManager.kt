@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.service
 
-import Logger
-import Logger.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import android.content.Context
 import android.text.format.DateUtils
 import com.celzero.bravedns.backup.BackupHelper.Companion.TEMP_WG_DIR
@@ -27,13 +27,13 @@ import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.database.WgConfigFilesRepository
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
+import com.celzero.bravedns.util.UIUtils.getRelativeTimeSpan
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.WgHopManager
 import com.celzero.bravedns.wireguard.WgInterface
 import com.celzero.firestack.backend.Backend
-import com.celzero.firestack.backend.IPMetadata
 import com.celzero.firestack.backend.RouterStats
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -73,11 +73,6 @@ object WireguardManager : KoinComponent {
     // retrieve last added config id
     private var lastAddedConfigId = 0
 
-    // let the error code be a string, so that it can be concatenated with the error message
-    const val ERR_CODE_VPN_NOT_ACTIVE = "1"
-    const val ERR_CODE_VPN_NOT_FULL = "2"
-    const val ERR_CODE_OTHER_WG_ACTIVE = "3"
-    const val ERR_CODE_WG_INVALID = "4"
 
     // invalid config id
     const val INVALID_CONF_ID = -1
@@ -338,46 +333,47 @@ object WireguardManager : KoinComponent {
     }
 
     suspend fun enableConfig(unmapped: WgConfigFilesImmutable) {
-        val map = mappings.find { it.id == unmapped.id }
-        if (map == null) {
-            Logger.e(
-                LOG_TAG_PROXY,
-                "enableConfig: wg not found, id: ${unmapped.id}, ${mappings.size}"
-            )
-            return
-        }
+        io {
+            val map = mappings.find { it.id == unmapped.id }
+            if (map == null) {
+                Logger.e(
+                    LOG_TAG_PROXY,
+                    "enableConfig: wg not found, id: ${unmapped.id}, ${mappings.size}"
+                )
+                return@io
+            }
 
-        val config = configs.find { it.getId() == map.id }
-        if (config == null) {
-            Logger.w(LOG_TAG_PROXY, "config not found: ${map.id}")
-            return
-        }
+            val config = configs.find { it.getId() == map.id }
+            if (config == null) {
+                Logger.w(LOG_TAG_PROXY, "config not found: ${map.id}")
+                return@io
+            }
 
-        mappings.remove(map)
-        val newMap =
-            WgConfigFilesImmutable(
-                map.id,
-                map.name,
-                map.configPath,
-                map.serverResponse,
-                true,
-                map.isCatchAll,
-                map.isLockdown,
-                map.oneWireGuard,
-                map.useOnlyOnMetered,
-                map.isDeletable,
-                map.ssidEnabled,
-                map.ssids
-            )
-        mappings.add(newMap)
-        val dbMap = WgConfigFiles.fromImmutable(newMap)
-        db.update(dbMap)
-        val proxyType = AppConfig.ProxyType.WIREGUARD
-        val proxyProvider = AppConfig.ProxyProvider.WIREGUARD
-        appConfig.addProxy(proxyType, proxyProvider)
-        VpnController.addWireGuardProxy(ID_WG_BASE + map.id)
-        Logger.i(LOG_TAG_PROXY, "enable wg config: ${map.id}, ${map.name}")
-        return
+            mappings.remove(map)
+            val newMap =
+                WgConfigFilesImmutable(
+                    map.id,
+                    map.name,
+                    map.configPath,
+                    map.serverResponse,
+                    true,
+                    map.isCatchAll,
+                    map.isLockdown,
+                    map.oneWireGuard,
+                    map.useOnlyOnMetered,
+                    map.isDeletable,
+                    map.ssidEnabled,
+                    map.ssids
+                )
+            mappings.add(newMap)
+            val dbMap = WgConfigFiles.fromImmutable(newMap)
+            db.update(dbMap)
+            val proxyType = AppConfig.ProxyType.WIREGUARD
+            val proxyProvider = AppConfig.ProxyProvider.WIREGUARD
+            appConfig.addProxy(proxyType, proxyProvider)
+            VpnController.addWireGuardProxy(ID_WG_BASE + map.id)
+            Logger.i(LOG_TAG_PROXY, "enable wg config: ${map.id}, ${map.name}")
+        }
     }
 
     fun canEnableProxy(): Boolean {
@@ -395,6 +391,20 @@ object WireguardManager : KoinComponent {
 
     fun isAnyOtherOneWgEnabled(id: Int): Boolean {
         return mappings.any { it.oneWireGuard && it.isActive && it.id != id }
+    }
+
+    // disables every active One-WireGuard config except the one with id == currentId
+    suspend fun disableOtherOneWireGuardConfigs(currentId: Int) {
+        val others = mappings.filter { it.oneWireGuard && it.isActive && it.id != currentId }
+        if (others.isEmpty()) return
+        Logger.i(
+            LOG_TAG_PROXY,
+            "disable other one-wg configs: ${others.map { it.id }}, keep: $currentId"
+        )
+        others.forEach {
+            disableConfig(it)
+            updateOneWireGuardConfig(it.id, false)
+        }
     }
 
     fun canDisableConfig(map: WgConfigFilesImmutable): Boolean {
@@ -521,9 +531,14 @@ object WireguardManager : KoinComponent {
         return lockdown
     }
 
+    private fun isLockdownConfig(idStr: String): Boolean {
+        val confId = convertStringIdToId(idStr)
+        val conf = mappings.find { it.id == confId }
+        return conf?.isLockdown ?: false
+    }
+
     // no need to check for app excluded from proxy here, expected to call this fn after that
     suspend fun getAllPossibleConfigIdsForApp(uid: Int, ip: String, port: Int, domain: String, usesMobileNw: Boolean, ssid: String, default: String): List<String> {
-        val block = Backend.Block
         val proxyIds: MutableList<String> = mutableListOf()
 
         if (oneWireGuardEnabled()) {
@@ -543,7 +558,7 @@ object WireguardManager : KoinComponent {
 
         // collect all proxy-ids for this uid and keep only WireGuard ones (wgX)
         val allProxyIdsForApp = ProxyManager.getProxyIdsForApp(uid)
-        val wgProxyIdsForApp = allProxyIdsForApp.filter { it.startsWith(ID_WG_BASE) }
+        val wgProxyIdsForApp = allProxyIdsForApp.filter { isWgProxyId(it) }
 
         // app-specific configs may be empty if the app is not configured
         if (wgProxyIdsForApp.isNotEmpty()) {
@@ -553,6 +568,14 @@ object WireguardManager : KoinComponent {
                     proxyIds.add(pid)
                 }
             }
+        }
+
+        // if any of the app-specific config is a lockdown config but none of them can be
+        // used on this network, then the traffic must be blocked; lockdown overrides the
+        // catch-all configs and the default proxy
+        if (wgProxyIdsForApp.any { isLockdownConfig(it) } && proxyIds.none { isLockdownConfig(it) }) {
+            Logger.i(LOG_TAG_PROXY, "lockdown wg for app($uid) not eligible on this nw, return block")
+            return listOf(Backend.Block)
         }
 
         // if any of the chosen proxy is lockdown, then no need to proceed further
@@ -601,11 +624,20 @@ object WireguardManager : KoinComponent {
         return proxyIds
     }
 
+    fun isWgProxyId(pid: String): Boolean {
+        if (!pid.startsWith(ID_WG_BASE, ignoreCase = true)) return false
+        val suffix = pid.removePrefix(ID_WG_BASE)
+        return suffix.isNotEmpty() && suffix.toIntOrNull() != null
+    }
+
+
     private fun isEligibleForNetwork(id: Int, usesMobileNw: Boolean, ssid: String, mobileOnlySetting: Boolean, ssidEnabled: Boolean): Boolean {
         if (!mobileOnlySetting && !ssidEnabled) return true
 
-        val passMobileOnly = mobileOnlySetting && (usesMobileNw && ssid.isEmpty())
-        val passSsid = ssidEnabled && !usesMobileNw && matchesSsidListForConfig(id, ssid)
+        val passMobileOnly = mobileOnlySetting && usesMobileNw
+        // On mobile the SSID rule is bypassed (mobile has no SSID context); ssidEnabled
+        // should not make a config ineligible on mobile data.
+        val passSsid = ssidEnabled && (usesMobileNw || matchesSsidListForConfig(id, ssid))
         return passMobileOnly || passSsid
     }
 
@@ -1138,7 +1170,7 @@ object WireguardManager : KoinComponent {
         }
     }
 
-    data class WgStats(val routerStats: RouterStats?, val mtu: Long?, val status: Int?, val ip4: Boolean?, val ip6: Boolean?, val clientV4: IPMetadata?, val clientV6: IPMetadata?)
+    data class WgStats(val routerStats: RouterStats?, val mtu: Long?, val ip4: Boolean?, val ip6: Boolean?, val addr: String?)
     suspend fun stats(): String {
         val sb = StringBuilder()
         mappings.filter { it.isActive }.forEach {
@@ -1146,7 +1178,15 @@ object WireguardManager : KoinComponent {
             val stats = VpnController.getWireGuardStats(id)
             val routerStats = stats?.routerStats
             sb.append("   id: ${it.id}, name: ${it.name}\n")
-            sb.append("   addr: ${routerStats?.addrs}").append("\n")
+            sb.append("   always-on? ${it.isCatchAll}\n")
+            sb.append("   lockdown? ${it.isLockdown}\n")
+            sb.append("   mobile-only? ${it.useOnlyOnMetered}\n")
+            sb.append("   ssid-only? ${it.ssidEnabled}")
+            if (it.ssidEnabled) {
+                sb.append(", ssids: ${it.ssids}")
+            }
+            sb.append("\n")
+            sb.append("   ifaddr: ${routerStats?.addrs}").append("\n")
             sb.append("   mtu: ${stats?.mtu}\n")
             sb.append("   status: ${routerStats?.status}\n")
             sb.append("   status-reason: ${routerStats?.statusReason}\n")
@@ -1164,31 +1204,17 @@ object WireguardManager : KoinComponent {
             sb.append("   lastOpen: ${getRelativeTimeSpan(routerStats?.lastOpen)}\n")
             sb.append("   hdl: ${routerStats?.hdl}\n")
             sb.append("   since: ${getRelativeTimeSpan(routerStats?.since)}\n")
+            sb.append("   addr: ${stats?.addr ?: "N/A"}\n")
             sb.append("   errRx: ${routerStats?.errRx}\n")
             sb.append("   errTx: ${routerStats?.errTx}\n")
             sb.append("   extra: ${routerStats?.extra}\n")
-            sb.append("   clientV4: ${stats?.clientV4?.toString()}\n")
-            sb.append("   clientV6: ${stats?.clientV6?.toString()}\n\n")
         }
         if (sb.isEmpty()) {
-            sb.append("   N/A\n\n")
+            sb.append("   N/A\n")
         }
         val s = sb.toString()
         Logger.d(LOG_TAG_PROXY, "wg stats: $s")
         return sb.toString()
-    }
-
-    private fun getRelativeTimeSpan(t: Long?): CharSequence? {
-        if (t == null || t <= 0L) return "0"
-
-        val now = System.currentTimeMillis()
-        // returns a string describing 'time' as a time relative to 'now'
-        return DateUtils.getRelativeTimeSpanString(
-            t,
-            now,
-            DateUtils.SECOND_IN_MILLIS,
-            DateUtils.FORMAT_ABBREV_RELATIVE
-        )
     }
 
     private fun getConfigFilePath(): String {

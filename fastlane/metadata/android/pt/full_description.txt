@@ -1,0 +1,31 @@
+Diga olá a um Android mais seguro, transparente e protegido.
+
+VPN: Conecta-se a várias VPNs WireGuard da sua escolha.
+
+Seguro: Revela a atividade de rede de apps instaladas e permite que os desative, desinstale ou ponha no firewall.
+
+Seguro: Primeira linha de defesa contra spyware, ransomware e malware que roubam informações pessoais e assumem o controlo de contas. Protege contra a manipulação de DNS normalmente empregada para censurar sites, médias sociais e apps de mensagens.
+
+Rápido: Servidores DNS implantados em mais que 300 locais em todo o mundo para garantir que a sua Internet seja a mais rápida e altamente disponível possível.
+
+Aberto: Código aberto e livre de qualquer rastreador.
+
+***Funcionalidades***
+
+Firewall: Impede que apps conectem à Internet. Bloqueie spyware, malware, ransomware e muito mais.
+     
+Um firewall bloqueia qualquer app que conecte à Internet por WiFi ou dados móveis. Como a maioria das formas de vigilância exige que os dados sejam enviados pela rede a um servidor, o firewall reduz efetivamente a ameaça (gestores de ficheiros, despertadores e calculadoras são alguns exemplos de apps que não exigem acesso à Internet para funcionar). O recurso de firewall usa o Accessibility Service para detetar e bloquear apps em segundo plano.
+
+Monitoramento: Mantém o controlo do tráfego de entrada e saída da Internet. 
+
+Se ativados, os registos de conectividade são coletados e analisados. Relatórios automatizados sinalizam conexões anteriormente desconhecidas ou suspeitas e revelam a extensão da tentativa de roubo de dados por redes de spyware. Nos nossos testes, cerca de 60% do tráfego é sinalizado e relatado como ser iniciado por spyware conhecido. Os logs gerados são disponibilizados em tempo quase real para o utilizador fazer a sua própria análise.
+
+WireGuard: Protege o tráfego de saída da Internet.
+
+A app usa o protocolo WireGuard, rápido, moderno, leve e seguro, para criptografar as conexões de saída com qualquer provedor de VPN compatível da sua escolha.
+
+Anti-censura: 
+
+A app criptografa a sua conexão com a Internet para o servidor DNS (Domain Name System) administrado pela Rethink, presente em mais que 300 localidades em todo o mundo. Os servidores DNS são o catálogo de endereços da Internet: Um servidor DNS fornece os endereços exatos que precisa para visitar um site ou abrir uma app.
+
+Monitor de dados: Rastreie o uso de dados móveis ou WiFi por app e por conexão.

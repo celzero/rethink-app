@@ -15,7 +15,7 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import Logger
+import com.celzero.bravedns.util.Logger
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.celzero.bravedns.data.AllowedAppInfo

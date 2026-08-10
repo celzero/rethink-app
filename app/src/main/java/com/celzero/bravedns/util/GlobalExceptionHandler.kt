@@ -15,8 +15,7 @@
  */
 package com.celzero.bravedns.util
 
-import Logger
-import Logger.LOG_TAG_APP
+import com.celzero.bravedns.util.Logger.LOG_TAG_APP
 import android.content.Context
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.PersistentState
@@ -111,11 +110,13 @@ class GlobalExceptionHandler private constructor(
     private fun logExceptionContext(thread: Thread, exception: Throwable) {
         try {
             val stackTrace = exception.stackTraceToString()
-            @Suppress("DEPRECATION")
-            val threadInfo = "Thread: ${thread.name} (ID: ${thread.id}, State: ${thread.state})"
+            val threadInfo = "Thread: ${thread.name} (State: ${thread.state})"
 
             val stringBuilder = StringBuilder()
             stringBuilder.appendLine("---Uncaught Exception ${thread.name}---")
+            stringBuilder.appendLine("Date: ${Utilities.convertLongToTime(System.currentTimeMillis(),
+                Constants.TIME_FORMAT_3)}")
+            stringBuilder.appendLine("App version: ${persistentState.appVersion}")
             stringBuilder.appendLine("Exception Type: ${exception.javaClass.name}")
             stringBuilder.appendLine("Exception Message: ${exception.message}")
             stringBuilder.appendLine(threadInfo)

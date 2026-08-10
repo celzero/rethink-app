@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.res.Configuration
 import android.graphics.Paint
 import android.os.Bundle
@@ -210,6 +210,8 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
                     (subscriptionState.state().isExpired || subscriptionState.state().isCancelled || subscriptionState.state().isRevoked)
 
             if (!hasSubscription && !isKnownExpiredOrCancelledOrRevoked) {
+                showToastUiCentered(requireContext(), getString(R.string.error_loading_manage_subscription), Toast.LENGTH_SHORT)
+                dismissAllowingStateLoss()
                 return
             }
 
@@ -242,6 +244,7 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
             is SubscriptionStateMachineV2.SubscriptionState.Expired -> getString(R.string.lbl_expired) to colorBad
             is SubscriptionStateMachineV2.SubscriptionState.Revoked -> getString(R.string.status_revoked) to colorBad
             is SubscriptionStateMachineV2.SubscriptionState.Paused -> getString(R.string.lbl_paused) to colorDim
+            is SubscriptionStateMachineV2.SubscriptionState.OnHold -> getString(R.string.lbl_paused) to colorDim
             else -> getString(R.string.placeholder_dash) to colorDim
         }
         b.tvSubStatus.text = statusText
@@ -283,33 +286,67 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
         b.btnRevoke.setOnClickListener { showDialogConfirmCancelOrRevoke(isCancel = false) }
         b.btnCancel.setOnClickListener { showDialogConfirmCancelOrRevoke(isCancel = true) }
         b.btnResubscribe.setOnClickListener { launchResubscribe() }
+        b.btnExtend.setOnClickListener { launchExtend() }
         b.btnConsumePurchase.setOnClickListener { io { RpnProxyManager.consumePurchaseIfTest() } }
     }
 
     private fun showCancelOrRevokeButton() {
         try {
+            val state = RpnProxyManager.getSubscriptionState()
+            val subscriptionData = RpnProxyManager.getSubscriptionData()
+            val planId  = subscriptionData?.purchaseDetail?.planId.orEmpty()
+            val isInApp = isInAppProduct(subscriptionData?.purchaseDetail?.productId.orEmpty(), planId)
             io {
                 val isTestEntitlement = RpnProxyManager.getIsTestEntitlement() && persistentState.appTestMode
                 uiCtx {
-                    b.btnConsumePurchase.isVisible = isTestEntitlement
+                    b.btnConsumePurchase.isVisible = isTestEntitlement && isInApp
                 }
             }
-            val state = RpnProxyManager.getSubscriptionState()
-            val subscriptionData = RpnProxyManager.getSubscriptionData()
 
             b.btnCancel.isVisible = false
             b.btnRevoke.isVisible = false
             b.btnResubscribe.isVisible = false
+            b.btnExtend.isVisible = false
             b.cancelNoteCard.isVisible = false
 
-            val planId  = subscriptionData?.purchaseDetail?.planId.orEmpty()
-            val isInApp = isInAppProduct(subscriptionData?.purchaseDetail?.productId.orEmpty(), planId)
-
             if (!state.state().isActive) {
-                when {
-                    state.state().isCancelled && !isInApp -> b.btnResubscribe.isVisible = true
-                    state.state().isRevoked -> b.btnResubscribe.isVisible = true
-                    else -> { /* expired / no subscription, nothing to show */ }
+                if (isInApp) {
+                    // One-time access is finite and cannot be "resubscribed" via the Play
+                    // subscription page. Offer extend (re-purchase) so the user can buy
+                    // more time even from a cancelled/expired/revoked one-time purchase.
+                    b.btnExtend.isVisible = true
+                } else {
+                    when {
+                        state.state().isCancelled -> b.btnResubscribe.isVisible = true
+                        state.state().isRevoked -> b.btnResubscribe.isVisible = true
+                        else -> { /* expired / no subscription, nothing to show */ }
+                    }
+                }
+                return
+            }
+
+            b.tvManageSubscriptionOnGooglePlay.isVisible = !isInApp
+
+            if (isInApp) {
+                // Active one-time purchase: cannot be cancelled (no auto-renewal), but its
+                // access is finite. Primary action is "Extend access" (extend mode).
+                // Keep the refund (revoke) option only while still within the revoke window.
+                b.btnExtend.isVisible = true
+                if (canRevoke(subscriptionData)) {
+                    b.btnRevoke.isVisible = true
+                    b.cancelNoteCard.isVisible = true
+                    b.tvCancelNote.text = getString(R.string.revoke_subscription_note)
+                } else {
+                    // Show an informative note with the access-expiry date.
+                    val expiry = subscriptionData?.subscriptionStatus?.billingExpiry ?: 0L
+                    b.cancelNoteCard.isVisible = expiry > 0L && expiry != Long.MAX_VALUE
+                    if (b.cancelNoteCard.isVisible) {
+                        val fmt = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
+                        b.tvCancelNote.text = getString(
+                            R.string.extend_access_note,
+                            fmt.format(Date(expiry))
+                        )
+                    }
                 }
                 return
             }
@@ -322,8 +359,6 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
             if (isDbCancelled && !isInApp) {
                 b.btnResubscribe.isVisible = true
             }
-
-            b.tvManageSubscriptionOnGooglePlay.isVisible = !isInApp
 
             if (canRevoke(subscriptionData)) {
                 b.btnRevoke.isVisible = true
@@ -350,16 +385,30 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
         }
         // show the revoke only for active subscriptions
         val status = subscriptionData.subscriptionStatus.status
-        if (status != SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id ||
-            status == SubscriptionStatus.SubscriptionState.STATE_PURCHASED.id) {
+        if (status != SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id) {
             return false
         }
         val planId = subscriptionData.purchaseDetail?.planId.orEmpty()
-        val revokeWindowMs = when (planId) {
-            InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> REVOKE_WINDOW_ONE_TIME_2YRS_DAYS * ONE_DAY_MS
-            InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> REVOKE_WINDOW_ONE_TIME_5YRS_DAYS * ONE_DAY_MS
-            InAppBillingHandler.SUBS_PRODUCT_YEARLY -> REVOKE_WINDOW_SUBS_YEARLY_DAYS   * ONE_DAY_MS
-            else -> REVOKE_WINDOW_SUBS_MONTHLY_DAYS  * ONE_DAY_MS
+        val productId = subscriptionData.purchaseDetail?.productId.orEmpty()
+        // Resolve the revoke window by productId first (one-time SKUs are unambiguous),
+        // then planId, then a conservative default. This mirrors the server-side handler's
+        // resolveOneTimeRevokeDays and avoids mis-granting a 3-day (subs) window to an
+        // INAPP purchase that merely has a blank planId.
+        val revokeWindowMs = when {
+            productId == InAppBillingHandler.ONE_TIME_PRODUCT_2YRS ||
+                planId == InAppBillingHandler.ONE_TIME_PRODUCT_2YRS ->
+                REVOKE_WINDOW_ONE_TIME_2YRS_DAYS * ONE_DAY_MS
+            productId == InAppBillingHandler.ONE_TIME_PRODUCT_5YRS ||
+                planId == InAppBillingHandler.ONE_TIME_PRODUCT_5YRS ->
+                REVOKE_WINDOW_ONE_TIME_5YRS_DAYS * ONE_DAY_MS
+            productId == InAppBillingHandler.SUBS_PRODUCT_YEARLY ||
+                planId == InAppBillingHandler.SUBS_PRODUCT_YEARLY ->
+                REVOKE_WINDOW_SUBS_YEARLY_DAYS * ONE_DAY_MS
+            productId == InAppBillingHandler.SUBS_PRODUCT_MONTHLY ||
+                planId == InAppBillingHandler.SUBS_PRODUCT_MONTHLY ->
+                REVOKE_WINDOW_SUBS_MONTHLY_DAYS * ONE_DAY_MS
+            isInAppProduct(productId, planId) -> REVOKE_WINDOW_ONE_TIME_2YRS_DAYS * ONE_DAY_MS
+            else -> REVOKE_WINDOW_SUBS_MONTHLY_DAYS * ONE_DAY_MS
         }
         return (System.currentTimeMillis() - purchaseTs) < revokeWindowMs
     }
@@ -407,6 +456,31 @@ class ManageRpnPurchaseBtmSht : BottomSheetDialogFragment() {
         } catch (e: Exception) {
             Logger.e(LOG_TAG_UI, "$TAG: navigate to resubscribe failed: ${e.message}", e)
             showToastUiCentered(requireContext(), getString(R.string.resubscribe_error), Toast.LENGTH_SHORT)
+        }
+    }
+
+    /**
+     * Launches the extend (re-purchase) flow for a one-time (INAPP) purchase.
+     * One-time access is finite and cannot be "resubscribed" via the Play subscription
+     * page (that deep-link targets SUBS SKUs and is a dead end for INAPP). Instead we
+     * open [RethinkPlusFragment] in extend mode, which pre-selects the ONE_TIME tab and
+     * bypasses the "already subscribed" guard so the user can stack more access time.
+     */
+    private fun launchExtend() {
+        try {
+            val intent = FragmentHostActivity.createIntent(
+                context = requireContext(),
+                fragmentClass = RethinkPlusFragment::class.java,
+                args = Bundle().apply {
+                    putString("ARG_KEY", "Launch_Rethink_Plus_Extend")
+                    putBoolean("arg_extend_mode", true)
+                }
+            )
+            startActivity(intent)
+            dismissAllowingStateLoss()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "$TAG: navigate to extend failed: ${e.message}", e)
+            showToastUiCentered(requireContext(), getString(R.string.error_loading_manage_subscription), Toast.LENGTH_SHORT)
         }
     }
 

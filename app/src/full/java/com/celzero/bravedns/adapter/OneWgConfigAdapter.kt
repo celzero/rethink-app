@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.adapter
 
-import Logger
-import Logger.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import android.content.Context
 import android.content.Intent
 import android.text.format.DateUtils
@@ -32,6 +32,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
+import com.celzero.bravedns.customdownloader.IpInfoDownloader
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
@@ -39,13 +40,10 @@ import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.databinding.ListItemWgOneInterfaceBinding
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.EventLogger
+import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.service.WireguardManager.ERR_CODE_OTHER_WG_ACTIVE
-import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_ACTIVE
-import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_FULL
-import com.celzero.bravedns.service.WireguardManager.ERR_CODE_WG_INVALID
 import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity.Companion.INTENT_EXTRA_WG_TYPE
@@ -54,6 +52,8 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.backend.RouterStats
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import inet.ipaddr.HostName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -125,6 +125,9 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             val isWgActive = config.isActive && VpnController.hasTunnel()
             b.oneWgCheck.isChecked = isWgActive
             setupClickListeners(config)
+            io {
+                updateFlag(null, config.id)
+            }
             if (isWgActive) {
                 keepStatusUpdated(config)
             } else {
@@ -199,6 +202,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             val pair = VpnController.getSupportedIpVersion(id)
             val c = WireguardManager.getConfigById(config.id)
             val stats = VpnController.getProxyStats(id)
+            val addr = VpnController.getProxyAddrById(id)
             val dnsStatusId = VpnController.getDnsStatus(ProxyManager.ID_WG_BASE + config.id)
             val isSplitTunnel =
                 if (c?.getPeers()?.isNotEmpty() == true) {
@@ -210,6 +214,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                 updateStatusUi(config, statusPair, dnsStatusId, stats)
                 updateProtocolChip(pair)
                 updateSplitTunnelChip(isSplitTunnel)
+                if (!b.interfaceFlagText.isVisible) io { updateFlag(addr, config.id) }
             }
         }
 
@@ -329,6 +334,37 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                 context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
         }
 
+        private fun stripPort(addr: String): String {
+            return IpRulesManager.splitHostPort(addr).first
+        }
+
+        private suspend fun updateFlag(addr: String?, configId: Int) {
+            var ip: String? = addr?.split(",")?.firstOrNull()?.trim()?.let { stripPort(it) }
+
+            if (ip.isNullOrBlank()) {
+                val c = WireguardManager.getConfigById(configId)
+                val host = c?.getPeers()?.getOrNull(0)?.getEndpoint()?.orElse(null)?.host
+                if (!host.isNullOrBlank() && HostName(host).asAddress() != null) {
+                    ip = host
+                }
+            }
+
+            if (ip.isNullOrBlank()) {
+                uiCtx { b.interfaceFlagText.visibility = View.GONE }
+                return
+            }
+
+            val ipInfo = IpInfoDownloader.getIpInfo(ip)
+            uiCtx {
+                if (ipInfo != null && ipInfo.countryCode.isNotEmpty()) {
+                    b.interfaceFlagText.text = Utilities.getFlag(ipInfo.countryCode)
+                    b.interfaceFlagText.visibility = View.VISIBLE
+                } else {
+                    b.interfaceFlagText.visibility = View.GONE
+                }
+            }
+        }
+
         private fun getUpTime(stats: RouterStats?): CharSequence {
             if (stats == null) {
                 return ""
@@ -399,7 +435,6 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                 uiCtx {
                     Utilities.showToastUiCentered(
                         context,
-                        ERR_CODE_VPN_NOT_ACTIVE +
                             context.getString(R.string.settings_socks5_vpn_disabled_error),
                         Toast.LENGTH_LONG
                     )
@@ -409,6 +444,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                 return
             }
 
+            // checks only for app mode, so show appropriate error message if not enabled
             if (!WireguardManager.canEnableProxy()) {
                 Logger.i(LOG_TAG_PROXY, "not in DNS+Firewall mode, cannot enable WireGuard")
                 uiCtx {
@@ -416,23 +452,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                     b.oneWgCheck.isChecked = false
                     Utilities.showToastUiCentered(
                         context,
-                        ERR_CODE_VPN_NOT_FULL +
-                            context.getString(R.string.wireguard_enabled_failure),
-                        Toast.LENGTH_LONG
-                    )
-                }
-                return
-            }
-
-            if (WireguardManager.isAnyOtherOneWgEnabled(config.id)) {
-                Logger.i(LOG_TAG_PROXY, "another WireGuard is already enabled")
-                uiCtx {
-                    // reset the check box
-                    b.oneWgCheck.isChecked = false
-                    Utilities.showToastUiCentered(
-                        context,
-                        ERR_CODE_OTHER_WG_ACTIVE +
-                            context.getString(R.string.wireguard_enabled_failure),
+                        context.getString(R.string.wireguard_dns_mode_conflict),
                         Toast.LENGTH_LONG
                     )
                 }
@@ -444,21 +464,55 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                 uiCtx {
                     // reset the check box
                     b.oneWgCheck.isChecked = false
-                    Utilities.showToastUiCentered(
-                        context,
-                        ERR_CODE_WG_INVALID + context.getString(R.string.wireguard_enabled_failure),
-                        Toast.LENGTH_LONG
-                    )
+                    showInvalidConfigDialog()
                 }
                 return
+            }
+
+            // One-WireGuard is mutually exclusive: if another one-wg config is active, swap it
+            // out for the newly selected one rather than blocking the user with an error.
+            var replacedOthers = false
+            if (WireguardManager.isAnyOtherOneWgEnabled(config.id)) {
+                Logger.i(LOG_TAG_PROXY, "another one-wg config is active; replacing it")
+                WireguardManager.disableOtherOneWireGuardConfigs(config.id)
+                replacedOthers = true
             }
 
             Logger.i(LOG_TAG_PROXY, "enabling WireGuard, id: ${config.id}")
             WireguardManager.updateOneWireGuardConfig(config.id, owg = true)
             config.oneWireGuard = true
             WireguardManager.enableConfig(config.toImmutable())
-            uiCtx { listener.onDnsStatusChanged() }
+            uiCtx {
+                listener.onDnsStatusChanged()
+                if (replacedOthers) {
+                    Utilities.showToastUiCentered(
+                        context,
+                        context.getString(R.string.wireguard_replaced_active_config),
+                        Toast.LENGTH_SHORT
+                    )
+                }
+            }
             logEvent("One-WireGuard enabled", "WG ID: ${config.id}")
+        }
+
+        // Shows an "invalid config" AlertDialog when an Activity context is
+        // available; otherwise falls back to a toast so the error is never silently dropped.
+        private fun showInvalidConfigDialog() {
+            val ctx = context
+            if (ctx is android.app.Activity && !ctx.isFinishing) {
+                MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
+                    .setTitle(R.string.wireguard_invalid_config_title)
+                    .setMessage(R.string.wireguard_invalid_config_message)
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.lbl_dismiss) { d, _ -> d.dismiss() }
+                    .show()
+            } else {
+                Utilities.showToastUiCentered(
+                    context,
+                    context.getString(R.string.wireguard_invalid_config_message),
+                    Toast.LENGTH_LONG
+                )
+            }
         }
 
         private suspend fun disableWgIfPossible(config: WgConfigFiles) {
@@ -468,9 +522,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                     // reset the check box
                     b.oneWgCheck.isChecked = true
                     Utilities.showToastUiCentered(
-                        context,
-                        ERR_CODE_VPN_NOT_ACTIVE +
-                            context.getString(R.string.settings_socks5_vpn_disabled_error),
+                        context, context.getString(R.string.settings_socks5_vpn_disabled_error),
                         Toast.LENGTH_LONG
                     )
                 }

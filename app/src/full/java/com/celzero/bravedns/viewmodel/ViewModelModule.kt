@@ -15,6 +15,8 @@
  */
 package com.celzero.bravedns.viewmodel
 
+import com.celzero.bravedns.sponsor.viewmodel.SponsorViewModel
+import org.koin.android.ext.koin.androidApplication
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -53,6 +55,8 @@ object ViewModelModule {
         viewModel { ManagePurchaseViewModel() }
         viewModel { ServerOrderHistoryViewModel(get()) }
         viewModel { ServerSelectionViewModel() }
+        viewModel { EntitlementDetailViewModel() }
+        viewModel { SponsorViewModel(androidApplication(), get(), get()) }
     }
 
     val modules = listOf(modelModules)

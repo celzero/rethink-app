@@ -19,8 +19,6 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.fragment.app.Fragment
-import androidx.viewpager2.adapter.FragmentStateAdapter
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityConfigureOtherDnsBinding
@@ -34,7 +32,6 @@ import com.celzero.bravedns.ui.fragment.ODoHListFragment
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.android.ext.android.inject
 
 class ConfigureOtherDnsActivity : BaseActivity(R.layout.activity_configure_other_dns) {
@@ -100,37 +97,28 @@ class ConfigureOtherDnsActivity : BaseActivity(R.layout.activity_configure_other
     }
 
     private fun init() {
+        b.dnsDetailHeading.text = getDnsTypeName(dnsType)
 
-        b.dnsDetailActViewpager.adapter =
-            object : FragmentStateAdapter(this) {
-                override fun createFragment(position: Int): Fragment {
-                    return when (DnsScreen.getDnsType(dnsType)) {
-                        DnsScreen.DNS_CRYPT -> DnsCryptListFragment.newInstance()
-                        DnsScreen.DNS_PROXY -> DnsProxyListFragment.newInstance()
-                        DnsScreen.DOH -> DohListFragment.newInstance()
-                        DnsScreen.DOT -> DoTListFragment.newInstance()
-                        DnsScreen.ODOH -> ODoHListFragment.newInstance()
-                    }
-                }
+        val fragment = when (DnsScreen.getDnsType(dnsType)) {
+            DnsScreen.DNS_CRYPT -> DnsCryptListFragment.newInstance()
+            DnsScreen.DNS_PROXY -> DnsProxyListFragment.newInstance()
+            DnsScreen.DOH -> DohListFragment.newInstance()
+            DnsScreen.DOT -> DoTListFragment.newInstance()
+            DnsScreen.ODOH -> ODoHListFragment.newInstance()
+        }
 
-                override fun getItemCount(): Int {
-                    return 1
-                }
-            }
-
-        TabLayoutMediator(b.dnsDetailActTabLayout, b.dnsDetailActViewpager) { tab, _ ->
-                tab.text = getDnsTypeName(dnsType)
-            }
-            .attach()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.dns_detail_fragment_container, fragment)
+            .commit()
     }
 
     private fun getDnsTypeName(type: Int): String {
         return when (DnsScreen.getDnsType(type)) {
-            DnsScreen.DOH -> getString(R.string.other_dns_list_tab1)
-            DnsScreen.DNS_CRYPT -> getString(R.string.dc_dns_crypt)
-            DnsScreen.DNS_PROXY -> getString(R.string.other_dns_list_tab3)
-            DnsScreen.DOT -> getString(R.string.lbl_dot)
-            DnsScreen.ODOH -> getString(R.string.lbl_odoh)
+            DnsScreen.DOH -> getString(R.string.dc_doh)
+            DnsScreen.DNS_CRYPT -> getString(R.string.lbl_dc_abbr)
+            DnsScreen.DNS_PROXY -> getString(R.string.lbl_dp_abbr)
+            DnsScreen.DOT -> getString(R.string.lbl_dot_abbr)
+            DnsScreen.ODOH -> getString(R.string.lbl_odoh_abbr)
         }
     }
 }
