@@ -15,9 +15,9 @@
  */
 package com.celzero.bravedns.rpnproxy
 
-import Logger
-import Logger.LOG_IAB
-import Logger.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_IAB
+import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import android.content.Context
 import com.celzero.bravedns.customdownloader.IBillingServerApi
 import com.celzero.bravedns.customdownloader.RetrofitManager

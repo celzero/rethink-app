@@ -15,12 +15,16 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import android.widget.TextView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -30,6 +34,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DoTEndpoint
 import com.celzero.bravedns.databinding.DialogSetCustomDohBinding
 import com.celzero.bravedns.databinding.FragmentDotListBinding
+import com.celzero.bravedns.util.RecyclerViewSpacingDecoration
 import com.celzero.bravedns.viewmodel.DoTEndpointViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -50,27 +55,68 @@ class DoTListFragment : Fragment(R.layout.fragment_dot_list) {
 
     companion object {
         fun newInstance() = DoTListFragment()
+
+        private val dpToPx: Float by lazy {
+            Resources.getSystem().displayMetrics.density
+        }
+
+        private val spacing4dp: Int by lazy { (4 * dpToPx).toInt() }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
         initClickListeners()
+        applyEdgeToEdge()
     }
 
     private fun initView() {
         layoutManager = LinearLayoutManager(requireContext())
         b.recyclerDot.layoutManager = layoutManager
+        b.recyclerDot.addItemDecoration(
+            RecyclerViewSpacingDecoration(spacing4dp, spacing4dp)
+        )
 
         adapter = DoTEndpointAdapter(requireContext(), get())
         viewModel.dohEndpointList.observe(viewLifecycleOwner) {
             adapter!!.submitData(viewLifecycleOwner.lifecycle, it)
         }
         b.recyclerDot.adapter = adapter
+
+        adapter!!.addLoadStateListener { loadStates ->
+            val isEmpty = loadStates.source.refresh is LoadState.NotLoading &&
+                    adapter!!.itemCount == 0
+            val isLoading = loadStates.source.refresh is LoadState.Loading
+
+            b.dotEmptyState.visibility = if (isEmpty) View.VISIBLE else View.GONE
+            b.dotLoadingIndicator.visibility = if (isLoading && adapter!!.itemCount == 0) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+            b.recyclerDot.visibility = if (isLoading && adapter!!.itemCount == 0) {
+                View.GONE
+            } else {
+                View.VISIBLE
+            }
+        }
     }
 
     private fun initClickListeners() {
         b.dotFabAdd.setOnClickListener { showAddDialog() }
+    }
+
+    private fun applyEdgeToEdge() {
+        ViewCompat.setOnApplyWindowInsetsListener(b.recyclerDot) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(
+                v.paddingLeft,
+                v.paddingTop,
+                v.paddingRight,
+                v.paddingBottom + systemBars.bottom
+            )
+            insets
+        }
     }
 
     private fun showAddDialog() {

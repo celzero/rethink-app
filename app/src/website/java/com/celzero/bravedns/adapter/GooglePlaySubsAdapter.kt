@@ -15,9 +15,9 @@
  */
 package com.celzero.bravedns.adapter
 
-import Logger
-import Logger.LOG_IAB
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_IAB
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
@@ -225,16 +225,29 @@ class GooglePlaySubsAdapter(
                 binding.billingInfo.text = billingText
             }
 
-            if (discountedPrice.isNotEmpty()) {
-                val pct = calculateSavings(currentPrice, discountedPrice)
-                if (pct > 0) {
-                    binding.savingsText.visibility = View.VISIBLE
-                    binding.savingsText.text = context.getString(R.string.save_percentage, "${pct}%")
+            if (isInApp) {
+                binding.savingsText.visibility = View.VISIBLE
+                val duration = getInAppDurationMonths(prod.planId)
+                if (duration == 60) {
+                    binding.savingsText.text =
+                        context.getString(R.string.save_percentage, "45%")
+                } else {
+                    binding.savingsText.text =
+                        context.getString(R.string.save_percentage, "35%")
+                }
+            } else {
+                if (discountedPrice.isNotEmpty()) {
+                    val pct = calculateSavings(currentPrice, discountedPrice)
+                    if (pct > 0) {
+                        binding.savingsText.visibility = View.VISIBLE
+                        binding.savingsText.text =
+                            context.getString(R.string.save_percentage, "${pct}%")
+                    } else {
+                        binding.savingsText.visibility = View.GONE
+                    }
                 } else {
                     binding.savingsText.visibility = View.GONE
                 }
-            } else {
-                binding.savingsText.visibility = View.GONE
             }
 
             // selection via card stroke only (no radio button)

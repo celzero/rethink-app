@@ -15,8 +15,8 @@ limitations under the License.
 */
 package com.celzero.bravedns.database
 
-import Logger
-import Logger.LOG_TAG_APP_DB
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_APP_DB
 import android.database.Cursor
 import android.database.sqlite.SQLiteConstraintException
 import com.celzero.bravedns.data.DataUsage

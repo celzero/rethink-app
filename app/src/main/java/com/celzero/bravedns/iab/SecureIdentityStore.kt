@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.iab
 
-import Logger
-import Logger.LOG_IAB
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_IAB
 import android.content.Context
 import com.celzero.bravedns.service.EncryptedFileManager
 import com.celzero.bravedns.service.EncryptionException
@@ -174,7 +174,7 @@ class SecureIdentityStore(private val context: Context) {
         val alreadyPresent = try {
             if (envFile.exists()) {
                 val raw  = EncryptedFileManager.read(context, envFile)
-                val json = org.json.JSONObject(raw)
+                val json = JSONObject(raw)
                 val existingAcc = json.optString(KEY_ACCOUNT_ID, "")
                 val existingDev = json.optString(KEY_DEVICE_ID,  "")
                 existingAcc.isNotBlank() && existingDev.isNotBlank()

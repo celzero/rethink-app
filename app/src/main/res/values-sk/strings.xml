@@ -76,7 +76,6 @@
     <string name="dns_mode_notification_title" translatable="true">Ste Chránený! Pripojený k Rýchlemu a Bezpečnému DNS.</string>
     <string name="pause_mode_notification_title" translatable="true">Pozastavené! Zablokované aplikácie budú naďalej chránené bránou firewall.</string>
     <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">čakám</string>
-    <string name="failed_using_default" translatable="true">Zlyhanie: používa sa záložné DNS</string>
     <string name="status_app_error" translatable="true">chyba aplikácie</string>
     <string name="status_dns_error" translatable="true">chyba DNS</string>
     <string name="status_dns_server_down" translatable="true">DNS server nefunguje</string>
@@ -118,9 +117,9 @@
     <string name="dns_query_clear_logs_title" translatable="true">Odstrániť všetky DNS záznamy?</string>
     <string name="dns_query_clear_logs_message" translatable="true">Týmto sa odstránia DNS záznamy na zariadení. Táto operácia je nezvratná. Chcete pokračovať?</string>
     <string name="bsct_app_info" translatable="true">Info o Aplikácií</string>
-    <string name="bsct_block_domain" translatable="true">Blokovať, dôveru <u>doménam</u> pre <u>túto aplikáciu</u></string>
-    <string name="bsct_block_ip" translatable="true">Blokovať, dôveru <u>tejto IP adrese</u> pre <u>túto aplikáciu</u></string>
-    <string name="bsct_block" translatable="true">Zablokujte, vynechajte, vylúčte, izolujte <u>túto aplikáciu</u></string>
+    <string name="bsct_block_domain" translatable="true">Blokovať, dôveru &lt;u&gt;doménam&lt;/u&gt; pre &lt;u&gt;túto aplikáciu&lt;/u&gt;</string>
+    <string name="bsct_block_ip" translatable="true">Blokovať, dôveru &lt;u&gt;tejto IP adrese&lt;/u&gt; pre &lt;u&gt;túto aplikáciu&lt;/u&gt;</string>
+    <string name="bsct_block" translatable="true">Zablokujte, vynechajte, vylúčte, izolujte &lt;u&gt;túto aplikáciu&lt;/u&gt;</string>
     <string name="bsct_conn_block_desc" translatable="true">zablokovaná %1$s používateľom %2$s</string>
     <string name="bsct_conn_block_desc_device" translatable="true">zablokovaný %1$s na zariadení</string>
     <string name="bsct_conn_desc_allowed" translatable="true">povolené na %1$s %2$s</string>
@@ -133,9 +132,7 @@
     <string name="always_on_dialog_positive" translatable="true">Zastaviť</string>
     <string name="always_on_dialog_neutral" translatable="true">Nastavenia</string>
     <string name="private_dns_dialog_heading" translatable="true">Vypni Súkromné DNS</string>
-    <string name="private_dns_dialog_desc" translatable="true">Nastavenia Rethink DNS sú prepísané súkromným DNS systému Android.
-\n
-\nAk chcete použiť Rethink DNS, prejdite do nastavení systému Android a vypnite možnosť „Súkromné DNS“.</string>
+    <string name="private_dns_dialog_desc" translatable="true">Nastavenia Rethink DNS sú prepísané súkromným DNS systému Android. \n \nAk chcete použiť Rethink DNS, prejdite do nastavení systému Android a vypnite možnosť „Súkromné DNS“.</string>
     <string name="private_dns_dialog_positive" translatable="true">Chodte do Nastavení</string>
     <string name="firewall_act_universal_tab" translatable="true">univerzálny</string>
     <string name="firewall_act_network_monitor_tab" translatable="true">Sieť</string>
@@ -164,14 +161,10 @@
     <string name="untracked" translatable="true">nesleduj</string>
     <string name="firewall_mode_info_explanation_new" translatable="true">Monitorujte sieťovú aktivitu a firewall akejkoľvek aplikácie alebo IP adresy.</string>
     <string name="dns_mode_info_explanation_new" translatable="true">Monitorujte, blokujte a šifrujte požiadavky DNS.</string>
-    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink využíva službu dostupnosti na sledovanie, ktoré aplikácie sa používajú (v popredí) a ktoré nepoužívajú (na pozadí).
-\n
-\nRethink nezhromažďuje žiadne informácie ani vás žiadnym spôsobom nešpehuje.</string>
-    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Rethink služba dostupnosti zastavila alebo zlyhala. <i><b>Prejdite na Nastavenia a Vynútené zastavenie</b></i> Rethink a znova spustite <i>Zablokovať akúkoľvek nepoužívanú aplikáciu</i>.
-\n
-\nRethink využíva službu dostupnosti na sledovanie, ktoré aplikácie sa používajú (v popredí) a ktoré nepoužívajú (na pozadí).</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink využíva službu dostupnosti na sledovanie, ktoré aplikácie sa používajú (v popredí) a ktoré nepoužívajú (na pozadí). \n \nRethink nezhromažďuje žiadne informácie ani vás žiadnym spôsobom nešpehuje.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Rethink služba dostupnosti zastavila alebo zlyhala. <i><b>Prejdite na Nastavenia a Vynútené zastavenie</b></i> Rethink a znova spustite <i>Zablokovať akúkoľvek nepoužívanú aplikáciu</i>. \n \nRethink využíva službu dostupnosti na sledovanie, ktoré aplikácie sa používajú (v popredí) a ktoré nepoužívajú (na pozadí).</string>
     <string name="always_on_dialog_lockdown_stop_message" translatable="true">Rethink používa VPN v režime <i>Uzamknutie</i>. Jeho zastavenie by viedlo k strate internetového pripojenia v tomto užívateľskom profile. Chcete napriek tomu pokračovať?</string>
-    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Blokuje pripojenie aplikácie k internetu. \n<u>#2</u>: Blokuje pripojenie akejkoľvek aplikácie ku konkrétnej adrese IP. \n<u>#3</u>: Blokuje všetky pripojenia, keď je zariadenie uzamknuté (Universal Firewall). \n<u>#4</u>: Blokuje všetky nepoužívané aplikácie (Universal Firewall). \n<u>#5</u>: Blokuje pripojenia, keď je zdrojová aplikácia neznáma (Universal Firewall). \n<u>#6</u>: Blokuje všetku komunikáciu UDP okrem DNS (Universal Firewall). \n<u>#7</u>: Blokovať pripojenia pri obídení DNS (Universal Firewall).</string>
+    <string name="bsct_conn_rule_explanation" translatable="true">&lt;u&gt;#1&lt;/u&gt;: Blokuje pripojenie aplikácie k internetu. \n&lt;u&gt;#2&lt;/u&gt;: Blokuje pripojenie akejkoľvek aplikácie ku konkrétnej adrese IP. \n&lt;u&gt;#3&lt;/u&gt;: Blokuje všetky pripojenia, keď je zariadenie uzamknuté (Universal Firewall). \n&lt;u&gt;#4&lt;/u&gt;: Blokuje všetky nepoužívané aplikácie (Universal Firewall). \n&lt;u&gt;#5&lt;/u&gt;: Blokuje pripojenia, keď je zdrojová aplikácia neznáma (Universal Firewall). \n&lt;u&gt;#6&lt;/u&gt;: Blokuje všetku komunikáciu UDP okrem DNS (Universal Firewall). \n&lt;u&gt;#7&lt;/u&gt;: Blokovať pripojenia pri obídení DNS (Universal Firewall).</string>
     <string name="doh_custom_url_remove_dialog_title" translatable="true">Odstrániť DoH pripojenie?</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">Odstrániť DoT pripojenie?</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">Odstrániť DNS cez TLS z uložených nastavení.</string>
@@ -234,7 +227,7 @@
     <string name="settings_enable_logs_desc" translatable="true">Uložte DNS a Firewall záznamy lokálne na zariadení.</string>
     <string name="settings_enable_logs" translatable="true">Zapni záznamy na zariadení</string>
     <string name="app_mode_choose" translatable="true">Vyberte si režim</string>
-    <string name="whats_new_version_update" translatable="true">&lt;b&gt;Chirayu Desai&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nová funkcia&lt;/i&gt;: Podpora pre anonymizáciu &lt;i&gt;Nevšímavý DNS-over-HTTPS&lt;/i&gt;.&lt;br/&gt; 2. &lt;i&gt;Nová funkcia&lt;/i&gt;: Podpora pre &lt;i&gt;DNS-over-TLS&lt;/i&gt;.&lt;br/&gt; 3. &lt;i&gt;Nová funkcia&lt;/i&gt;: Jednoduchý a pokročilý režim WireGuard.&lt; br/&gt; 4. &lt;i&gt;Nová funkcia&lt;/i&gt;: Zobrazenie šírky pásma na obrazovke so štatistikami.&lt;br/&gt; 5. &lt;i&gt;Nová funkcia&lt;/i&gt;: Podpora všetkých proxy serverov vrátane Orbot aj v &lt;i&gt;uzamknutí VPN&lt; /i&gt; režim.&lt;br/&gt; 6. &lt;i&gt;Nová funkcia&lt;/i&gt;: Monitorujte sieťovú prevádzku spoločnosti Rethink pomocou funkcie Rethink!&lt;br/&gt; 7. &lt;i&gt;Nová funkcia&lt;/i&gt;: Preposielanie DNS cez aktívne proxy servery, napr. WireGuard.&lt;br/&gt; 8. &lt;i&gt;Nová funkcia&lt;/i&gt;: Rovnaká verzia zálohovania a obnovy medzi zariadeniami.&lt;br/&gt; 9. Vylepšené generovanie &lt;i&gt;hlásenia o chybe&lt;/i&gt;.&lt;br/&gt; 10. Lepšie spracovanie sietí IP s dvomi zásobníkmi.&lt;br/&gt; 11. &lt;i&gt;Oprava chyby&lt;/i&gt;: Opravy menších chýb pri práci s multicast DNS.&lt;br/&gt; 12. &lt;i&gt;Oprava chyby&lt;/i&gt;: Automatické obnovenie pripojenia pre WireGuard VPN.&lt;br/&gt; 13. &lt;i&gt;Oprava chyby&lt;/i&gt;: Opravte nesprávne zablokované upozornenia aplikácií.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns. com/r/translate&gt;Pomôžte s prekladom tejto aplikácie&lt;/a&gt;</string>
+    <string name="whats_new_version_update" translatable="false"><![CDATA[<b>Chirayu Desai</b><br/><br/> 1. <i>Nová funkcia</i>: Podpora pre anonymizáciu <i>Nevšímavý DNS-over-HTTPS</i>.<br/> 2. <i>Nová funkcia</i>: Podpora pre <i>DNS-over-TLS</i>.<br/> 3. <i>Nová funkcia</i>: Jednoduchý a pokročilý režim WireGuard.< br/> 4. <i>Nová funkcia</i>: Zobrazenie šírky pásma na obrazovke so štatistikami.<br/> 5. <i>Nová funkcia</i>: Podpora všetkých proxy serverov vrátane Orbot aj v <i>uzamknutí VPN< /i> režim.<br/> 6. <i>Nová funkcia</i>: Monitorujte sieťovú prevádzku spoločnosti Rethink pomocou funkcie Rethink!<br/> 7. <i>Nová funkcia</i>: Preposielanie DNS cez aktívne proxy servery, napr. WireGuard.<br/> 8. <i>Nová funkcia</i>: Rovnaká verzia zálohovania a obnovy medzi zariadeniami.<br/> 9. Vylepšené generovanie <i>hlásenia o chybe</i>.<br/> 10. Lepšie spracovanie sietí IP s dvomi zásobníkmi.<br/> 11. <i>Oprava chyby</i>: Opravy menších chýb pri práci s multicast DNS.<br/> 12. <i>Oprava chyby</i>: Automatické obnovenie pripojenia pre WireGuard VPN.<br/> 13. <i>Oprava chyby</i>: Opravte nesprávne zablokované upozornenia aplikácií.<br/><br/> <a href=https://svc.rethinkdns. com/r/translate>Pomôžte s prekladom tejto aplikácie</a>]]></string>
     <string name="connection_http3" translatable="true">HTTP3</string>
     <string name="settings_ptrans_heading" translatable="true">Vynúť IPv4 výstup</string>
     <string name="relative_time_today" translatable="true">Dnes</string>
@@ -277,7 +270,7 @@
     <string name="orbot_bs_status_trying_connect" translatable="true">Nastavujem Orbot ..</string>
     <string name="orbot_stop_dialog_dns_message" translatable="true">Rethink je nastavený k pre-posielaniu DNS žiadostí cez Orbot. Zmeň ako potrebuješ.</string>
     <string name="orbot_stop_dialog_negative" translatable="true">Zastav Orbot</string>
-    <string name="orbot_explanation" translatable="true">Orbot je bezplatná aplikácia proxy, ktorá iným aplikáciám umožňuje používať internet <u>bezpečnejšie</u>. \nOrbot používa <u>Tor</u> na šifrovanie vašej internetovej prevádzky, čo vám pomáha <u>obísť cenzúru</u> a brániť sa pred formami <u>sledovania siete</u>, ktoré ohrozujú osobnú slobodu a súkromie. \n<u>TCP Proxy</u>: Rethink posiela iba TCP spojenia <i>zahrnutých</i> aplikácií do Orbotu. \n<u>HTTP Proxy</u>: Rethink <i>vytvorí</i> tunel HTTP CONNECT do Orbotu a pošle iba TCP spojenia <i>zahrnutých</i> aplikácií.</string>
+    <string name="orbot_explanation" translatable="true">Orbot je bezplatná aplikácia proxy, ktorá iným aplikáciám umožňuje používať internet &lt;u&gt;bezpečnejšie&lt;/u&gt;. \nOrbot používa &lt;u&gt;Tor&lt;/u&gt; na šifrovanie vašej internetovej prevádzky, čo vám pomáha &lt;u&gt;obísť cenzúru&lt;/u&gt; a brániť sa pred formami &lt;u&gt;sledovania siete&lt;/u&gt;, ktoré ohrozujú osobnú slobodu a súkromie. \n&lt;u&gt;TCP Proxy&lt;/u&gt;: Rethink posiela iba TCP spojenia &lt;i&gt;zahrnutých&lt;/i&gt; aplikácií do Orbotu. \n&lt;u&gt;HTTP Proxy&lt;/u&gt;: Rethink &lt;i&gt;vytvorí&lt;/i&gt; tunel HTTP CONNECT do Orbotu a pošle iba TCP spojenia &lt;i&gt;zahrnutých&lt;/i&gt; aplikácií.</string>
     <string name="orbot_status_arg_2" translatable="true">TCP</string>
     <string name="orbot_install_dialog_positive" translatable="true">Inštalovať</string>
     <string name="orbot_install_dialog_neutral" translatable="true">webstránka</string>

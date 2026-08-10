@@ -20,6 +20,7 @@ import com.celzero.bravedns.data.DataModule
 import com.celzero.bravedns.database.DatabaseModule
 import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.iab.BillingModule
+import com.celzero.bravedns.sponsor.SponsorModule
 import com.celzero.bravedns.rpnproxy.StateMachineDatabaseSyncService
 import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2
 import com.celzero.bravedns.scheduler.ScheduleManager
@@ -76,5 +77,6 @@ val AppModules: List<Module> by lazy {
         add(orbotHelperModule)
         add(appDownloadManagerModule)
         add(BillingModule.billingModules)
+        addAll(SponsorModule.modules)
     }
 }

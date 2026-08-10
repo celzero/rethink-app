@@ -7,21 +7,22 @@
     <RelativeLayout
         android:id="@+id/recycler_dns_crypt_connections_header"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingBottom="30dp">
+        android:layout_height="wrap_content"
+        android:paddingBottom="30dp"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/recycler_dns_crypt_servers_title"
-            style="@style/TextAppearance.Material3.BodyLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="20dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="5dp"
             android:layout_toStartOf="@id/add_relay_btn"
             android:padding="5dp"
             android:text="@string/cd_dns_crypt_title"
+            android:textAppearance="?attr/textAppearanceTitleSmall"
             android:textColor="?attr/colorPrimary"
             android:visibility="visible" />
 
@@ -31,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="12dp"
-            android:layout_marginEnd="15dp"
+            android:layout_marginEnd="25dp"
             android:background="@drawable/rectangle_border_background"
             android:drawablePadding="5dp"
             android:fontFamily="sans-serif-smallcaps"
@@ -41,8 +42,8 @@
             android:paddingEnd="10dp"
             android:paddingBottom="5dp"
             android:text="@string/cd_dnscrypt_relay_heading"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
             android:textColor="?attr/secondaryTextColor"
-            android:textSize="@dimen/large_font_text_view"
             app:drawableEndCompat="@drawable/ic_right_arrow_secondary" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -53,20 +54,69 @@
             android:layout_marginTop="10dp"
             android:clipToPadding="false"
             android:nestedScrollingEnabled="true"
-            android:paddingBottom="50dp" />
+            android:paddingBottom="80dp" />
 
     </RelativeLayout>
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/dns_crypt_loading_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/dns_crypt_empty_state"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@null"
+            android:src="@drawable/illustrations_no_record"
+            app:tint="?attr/colorPrimary" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/dns_crypt_empty_state_title"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textColor="?attr/primaryTextColor" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center"
+            android:text="@string/dns_crypt_empty_state_desc"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?attr/primaryLightColorText" />
+
+    </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/doh_fab_add_server_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
-        android:layout_margin="30dp"
+        android:layout_margin="16dp"
         android:clickable="true"
         android:contentDescription="@string/lbl_create"
         android:focusable="true"
-        android:padding="10dp"
         android:src="@drawable/ic_fab_without_border"
         app:fabSize="normal"
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"

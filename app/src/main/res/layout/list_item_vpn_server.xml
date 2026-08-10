@@ -7,9 +7,9 @@
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
     android:minHeight="64dp"
-    android:paddingStart="8dp"
+    android:paddingStart="12dp"
     android:paddingTop="8dp"
-    android:paddingEnd="8dp"
+    android:paddingEnd="12dp"
     android:paddingBottom="8dp">
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -85,8 +85,8 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="2dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp">
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_country_code"
@@ -162,7 +162,7 @@
         android:id="@+id/stats_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="50dp"
+        android:layout_marginStart="48dp"
         android:layout_marginBottom="4dp"
         android:gravity="center_vertical"
         android:orientation="vertical"

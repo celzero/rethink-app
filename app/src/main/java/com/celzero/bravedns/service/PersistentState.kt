@@ -97,7 +97,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         // e.g. "default", "privacy,family", "privacy,family,security"
         const val RPN_DNS_TUN_TYPES = "rpn_dns_tun_types"
 
-        const val ADV_SETTINGS_FORCE_PT_MODE = "adv_setting_force_pt_mode"
+        // -1 = no override; other values = ProtoTranslationMode.id override
+        const val ADV_SETTINGS_FORCE_PT_MODE_ID = "adv_setting_force_pt_mode_id"
 
         // Guided tour version bump this constant to re-show the tour after major UI changes.
         // Any stored version lower than this will cause the tour to re-trigger.
@@ -111,6 +112,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val INCLUDE_FILE_TRACE = "include_file_trace"
 
         const val GO_MAX_MEMORY = "go_max_memory"
+
+        // SAF tree URI (content://...) of the directory chosen by the user to store
+        // memory-profile heap dumps. Empty when the user hasn't picked a location yet.
+        const val MEMORY_PROFILE_DIR_URI = "memory_profile_dir_uri"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -408,19 +413,15 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // 0 - auto, 1 - relaxed, 2 - aggressive, 3 - fixed
     var vpnBuilderPolicy by intPref("tun_network_handling_policy").withDefault<Int>(0)
 
-    // whether to use default dns for trusted ips and domains
-    // TODO: remove this variable as it should not be used, BlockFreeDnsMode should be used instead
-    //  to decide the dns bypass mode for trusted ips and domains
-    var useFallbackDnsToBypass by booleanPref("use_fallback_dns_to_bypass").withDefault<Boolean>(true)
-
     // Block-free DNS: stored as "TYPE::url" e.g. "DOH::https://dns.google/dns-query"
     // Empty string means no block-free DNS configured
     var blockFreeDns by stringPref("block_free_dns").withDefault<String>("")
 
     // DNS bypass mode for block-free DNS: 1=fallback, 2=global, 3=auto
-    // Default is 3 (auto) which means use dns will be decided based on other dns settings
+    // Default is FALLBACK on Android < 11 (API < 30), AUTO on Android 11+
     var blockFreeDnsMode by intPref("block_free_dns_mode").withDefault<Int>(
-        BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.AUTO.mode)
+        if (isAtleastR()) BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.AUTO.mode
+        else BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.FALLBACK.mode)
 
     // Firebase error reporting enabled (only for play and website variants)
     var firebaseErrorReportingEnabled by booleanPref("firebase_error_reporting").withDefault<Boolean>(Utilities.isPlayStoreFlavour())
@@ -435,6 +436,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // Name of the last tombstone file that was successfully reported to Firebase Crashlytics.
     // Used on app restart to skip files already uploaded and to decide which files to delete.
     var lastReportedTombstoneFile by stringPref("last_reported_tombstone_file").withDefault("")
+
+    // Persisted SAF tree URI of the directory where memory-profile heap dumps are written.
+    // Empty string means the user has not yet chosen a location.
+    var memoryProfileDirUri by stringPref(MEMORY_PROFILE_DIR_URI).withDefault("")
 
     // experimental feature to use max mtu
     var useMaxMtu by booleanPref("use_max_mtu").withDefault<Boolean>(false)
@@ -451,9 +456,13 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // true once the encrypted wireguard config files have been migrated to plain files
     var wireguardPlainFileMigrationDone by booleanPref("wg_plain_file_migration_done").withDefault<Boolean>(false)
 
+    // RPN encrypted-file storage migration (external -> internal).
+    var rpnInternalStorageMigrationVersion by intPref("rpn_internal_storage_migration_version").withDefault<Int>(0)
+
     var appTestMode by booleanPref("app_test_mode").withDefault<Boolean>(false)
 
-    var advSettingForcePTMode by booleanPref("adv_setting_force_pt_mode").withDefault<Boolean>(false)
+    // -1 = no override; any other value is a ProtoTranslationMode.id to force in DEBUG mode
+    var advSettingForcePTModeId by intPref("adv_setting_force_pt_mode_id").withDefault<Int>(-1)
 
     var floodWireGuard by booleanPref("flood_wireguard").withDefault(false)
 
@@ -711,7 +720,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         }.toSet()
     }
 
-    // SE Proxy for Anti-Censorship
+    // Anti-censor: true when DialStrategies.TCP_PROXY and RetryStrategies.Retry is set to NEVER
     var autoProxyEnabled by booleanPref(AUTO_PROXY_ENABLED).withDefault<Boolean>(false)
 
     // Custom LAN IP configuration mode: 0 = AUTO (default), 1 = MANUAL

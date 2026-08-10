@@ -15,8 +15,7 @@
  */
 package com.celzero.bravedns.util
 
-import Logger
-import Logger.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.Logger.LOG_TAG_FIREWALL
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -56,7 +55,7 @@ object BubbleHelper {
     // Bump the channel id to escape persisted OEM/user channel state where canBubble remains false.
     // Once a NotificationChannel exists, many attributes and the effective canBubble are controlled
     // by the system/user and can get stuck. A new channel id gives a fresh start.
-    private const val BUBBLE_CHANNEL_ID = "firewall_bubble_channel_v2"
+    private const val BUBBLE_CHANNEL_ID = "firewall_bubble_channel"
     private const val BUBBLE_NOTIFICATION_ID = 1234
     private const val BUBBLE_SHORTCUT_ID = "firewall_bubble_shortcut"
 
@@ -82,7 +81,7 @@ object BubbleHelper {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             @Suppress("DEPRECATION")
             if (!notificationManager.areBubblesAllowed()) {
-                Logger.w(LOG_TAG_FIREWALL, "Bubbles are not allowed globally")
+                Logger.w(LOG_TAG_FIREWALL, "bubbles are not allowed globally")
                 bubblesAllowed = false
             }
         }
@@ -91,7 +90,7 @@ object BubbleHelper {
         val channel = notificationManager.getNotificationChannel(BUBBLE_CHANNEL_ID)
         if (channel != null) {
             if (!channel.canBubble()) {
-                Logger.w(LOG_TAG_FIREWALL, "Bubble channel does not allow bubbles")
+                Logger.w(LOG_TAG_FIREWALL, "bubble channel does not allow bubbles")
                 bubblesAllowed = false
             }
         }
@@ -121,13 +120,13 @@ object BubbleHelper {
                 existing.setShowBadge(true)
                 nm.createNotificationChannel(existing)
             } catch (e: Exception) {
-                Logger.w(LOG_TAG_FIREWALL, "Unable to update existing bubble channel: ${e.message}")
+                Logger.w(LOG_TAG_FIREWALL, "unable to update existing bubble channel: ${e.message}")
             }
 
             nm.getNotificationChannel(BUBBLE_CHANNEL_ID)?.let { refreshed ->
                 Logger.i(
                     LOG_TAG_FIREWALL,
-                    "Bubble channel exists: importance=${refreshed.importance}, canBubble=${refreshed.canBubble()}, showBadge=${refreshed.canShowBadge()}"
+                    "bubble channel exists: importance=${refreshed.importance}, canBubble=${refreshed.canBubble()}, showBadge=${refreshed.canShowBadge()}"
                 )
             }
             return
@@ -144,12 +143,12 @@ object BubbleHelper {
         }
 
         nm.createNotificationChannel(channel)
-        Logger.i(LOG_TAG_FIREWALL, "Bubble notification channel created")
+        Logger.i(LOG_TAG_FIREWALL, "bubble notification channel created")
 
         nm.getNotificationChannel(BUBBLE_CHANNEL_ID)?.let { created ->
             Logger.i(
                 LOG_TAG_FIREWALL,
-                "Bubble channel after create: importance=${created.importance}, canBubble=${created.canBubble()}, showBadge=${created.canShowBadge()}"
+                "bubble channel after create: importance=${created.importance}, canBubble=${created.canBubble()}, showBadge=${created.canShowBadge()}"
             )
         }
     }
@@ -161,7 +160,7 @@ object BubbleHelper {
     @RequiresApi(Build.VERSION_CODES.Q)
     fun createBubbleShortcut(context: Context) {
         if (isBubbleShortcutExists(context)) {
-            Logger.v(LOG_TAG_FIREWALL, "Bubble shortcut already exists")
+            Logger.v(LOG_TAG_FIREWALL, "bubble shortcut already exists")
             return
         }
 
@@ -186,14 +185,14 @@ object BubbleHelper {
             .build()
 
         ShortcutManagerCompat.pushDynamicShortcut(context, shortcut)
-        Logger.i(LOG_TAG_FIREWALL, "Bubble shortcut created")
+        Logger.i(LOG_TAG_FIREWALL, "bubble shortcut created")
     }
 
     private fun isBubbleShortcutExists(context: Context): Boolean {
         return try {
             ShortcutManagerCompat.getDynamicShortcuts(context).any { it.id == BUBBLE_SHORTCUT_ID }
         } catch (e: Exception) {
-            Logger.w(LOG_TAG_FIREWALL, "Unable to query dynamic shortcuts: ${e.message}")
+            Logger.w(LOG_TAG_FIREWALL, "unable to query dynamic shortcuts: ${e.message}")
             false
         }
     }
@@ -221,14 +220,21 @@ object BubbleHelper {
     /**
      * Show the bubble notification.
      *
-     * IMPORTANT (platform contract): A bubble is always backed by a notification.
-     * If you don't want to see anything in the notification shade, use
-     * BubbleMetadata#setSuppressNotification(true).
+     * Bubble is always backed by a notification.
+     * We always call BubbleMetadata#setSuppressNotification(true); the system then
+     * hides the shade entry iff it is actually rendering the bubble, and surfaces
+     * the notification in the shade as a fallback prompt only when it cannot
+     * bubble (e.g. permission missing, channel disallowed).
      *
-     * @return true if the bubble was shown (system allows bubbles), false otherwise.
-     *         When false, a one-time fallback notification is posted so the user can
-     *         navigate to system settings and enable bubbles. That notification is
-     *         dismissed as soon as the user accepts/declines the permission.
+     * To avoid shade-entry flicker on VPN restart / observer ticks, this method
+     * short-circuits and returns true when the bubble notification is already
+     * active and the system is currently eligible to bubble.
+     *
+     * @return true if the bubble is eligible / live (system allows bubbles),
+     *         false otherwise. When false, the notification that was just posted
+     *         serves as the fallback permission prompt and stays visible until
+     *         the user grants permission (which is detected on the next call,
+     *         e.g. on VPN restart or toggle change).
      */
     @RequiresApi(Build.VERSION_CODES.Q)
     fun showBubble(context: Context, persistentState: PersistentState? = null): Boolean {
@@ -249,6 +255,22 @@ object BubbleHelper {
         if (!isNotificationPermissionGranted(context)) {
             Logger.w(LOG_TAG_FIREWALL, "Notification permission not granted; cannot show bubble")
             return false
+        }
+
+        // if a bubble notification is already live AND we are currently eligible, do not re-post.
+        // Re-posting on every VPN restart / observer tick causes the shade entry to flicker back
+        // into view on some OEMs even when the bubble is functioning correctly. The existing live
+        // notification will continue to be updated by updateBubble(); no need to overwrite it here
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val alreadyActive = try {
+            nm.activeNotifications.any { it.id == BUBBLE_NOTIFICATION_ID }
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_FIREWALL, "unable to query active notifications: ${e.message}")
+            false
+        }
+        if (alreadyActive && isBubbleEligible(context)) {
+            Logger.i(LOG_TAG_FIREWALL, "bubble already active and eligible; skipping re-post")
+            return true
         }
 
         createBubbleNotificationChannel(context)
@@ -280,16 +302,23 @@ object BubbleHelper {
 
         val deleteIntent = buildBubbleDeletePendingIntent(context)
 
-        // When eligible, hide the backing notification from the shade so only the bubble is
-        // visible. On Android 10 the platform ignores suppression, so a shade entry is
-        // unavoidable there; we still make it dismissible via the delete intent.
+        // ALWAYS request suppression and let the platform decide. Per the Bubble API
+        // contract, when setSuppressNotification(true) is set the system hides the shade
+        // entry iff it is actually rendering the bubble; if it cannot render the bubble
+        // (e.g. permission missing, channel disallowed), the notification surfaces in the
+        // shade as the fallback prompt. Coupling suppression to our own `eligible` check
+        // is both redundant and brittle: any OEM / channel-state quirk that makes
+        // `canBubble()` or `importance` report falsey would otherwise leak the shade
+        // entry alongside a perfectly functional bubble.
+        // On Android 10 the platform ignores suppression, so a shade entry is unavoidable
+        // there; we still make it dismissible via the delete intent.
         val bubbleData = NotificationCompat.BubbleMetadata.Builder(
             bubblePendingIntent,
             bubbleIcon(context)
         )
             .setDesiredHeight(600)
             .setAutoExpandBubble(false)
-            .setSuppressNotification(eligible)
+            .setSuppressNotification(true)
             .build()
 
         val messagingStyle = NotificationCompat.MessagingStyle(
@@ -304,7 +333,12 @@ object BubbleHelper {
         val messageText = if (eligible) {
             context.getString(R.string.firewall_bubble_text)
         } else {
-            context.getString(R.string.firewall_bubble_enable_prompt_text)
+            val channel = nm.getNotificationChannel(BUBBLE_CHANNEL_ID)
+            if (channel != null && channel.canBubble() && channel.importance < NotificationManager.IMPORTANCE_HIGH) {
+                context.getString(R.string.firewall_bubble_enable_importance_prompt_text)
+            } else {
+                context.getString(R.string.firewall_bubble_enable_prompt_text)
+            }
         }
 
         messagingStyle.addMessage(
@@ -325,15 +359,14 @@ object BubbleHelper {
             .setOnlyAlertOnce(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setBubbleMetadata(bubbleData)
+            .setDeleteIntent(deleteIntent) // Add delete intent to both cases to handle dismissal
 
         if (eligible) {
             // Actual bubble: content opens BubbleActivity, swipe/delete disables feature.
             builder.setContentIntent(bubblePendingIntent)
-            builder.setDeleteIntent(deleteIntent)
             builder.addAction(0, context.getString(R.string.firewall_bubble_action_disable), disableIntent)
         } else {
             // Fallback prompt: content + "Enable bubbles" action open settings.
-            // No delete intent — swiping just dismisses the notification without disabling.
             val enableBubblesPendingIntent = buildEnableBubblesPendingIntent(context)
             builder.setContentIntent(enableBubblesPendingIntent)
             builder.addAction(
@@ -341,17 +374,22 @@ object BubbleHelper {
                 context.getString(R.string.firewall_bubble_action_enable_bubbles),
                 enableBubblesPendingIntent
             )
+            // Also add a explicit dismiss action that turns off the toggle
+            builder.addAction(
+                0,
+                context.getString(R.string.firewall_bubble_action_dismiss),
+                disableIntent
+            )
         }
 
-        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         try {
             nm.notify(BUBBLE_NOTIFICATION_ID, builder.build())
         } catch (e: SecurityException) {
-            Logger.e(LOG_TAG_FIREWALL, "SecurityException posting bubble notification: ${e.message}", e)
+            Logger.e(LOG_TAG_FIREWALL, "err posting bubble notification: ${e.message}", e)
             return false
         }
 
-        Logger.i(LOG_TAG_FIREWALL, "Bubble notification posted (eligible=$eligible)")
+        Logger.i(LOG_TAG_FIREWALL, "bubble notification posted (eligible?$eligible)")
         return eligible
     }
 
@@ -373,23 +411,33 @@ object BubbleHelper {
     ) {
         try {
             if (!areBubblesSupported()) {
-                Logger.w(LOG_TAG_FIREWALL, "Bubbles not supported")
+                Logger.w(LOG_TAG_FIREWALL, "bubbles not supported")
                 persistentState?.let {
                     if (it.firewallBubbleEnabled) {
                         it.firewallBubbleEnabled = false
-                        Logger.i(LOG_TAG_FIREWALL, "Bubble feature disabled in settings (not supported)")
+                        Logger.i(LOG_TAG_FIREWALL, "bubble feature disabled in settings (not supported)")
                     }
                 }
                 return
             }
 
             if (!isNotificationPermissionGranted(context)) {
-                Logger.w(LOG_TAG_FIREWALL, "Notification permission not granted; cannot update bubble")
+                Logger.w(LOG_TAG_FIREWALL, "notification permission not granted; cannot update bubble")
+                return
+            }
+
+            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+            // Check if the notification is still active before updating.
+            // If the user has dismissed the bubble, we should not resurrect it here.
+            val isActive = nm.activeNotifications.any { it.id == BUBBLE_NOTIFICATION_ID }
+            if (!isActive) {
+                Logger.v(LOG_TAG_FIREWALL, "bubble notification no longer active; skipping update")
                 return
             }
 
             if (!isBubbleEligible(context)) {
-                Logger.w(LOG_TAG_FIREWALL, "Bubble no longer eligible; stopping updates")
+                Logger.w(LOG_TAG_FIREWALL, "bubble no longer eligible; stopping updates")
                 dismissBubble(context)
                 return
             }
@@ -460,10 +508,9 @@ object BubbleHelper {
                 .addAction(0, context.getString(R.string.firewall_bubble_action_disable), disableIntent)
                 .build()
 
-            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             nm.notify(BUBBLE_NOTIFICATION_ID, notification)
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_FIREWALL, "Error updating bubble: ${e.message}", e)
+            Logger.e(LOG_TAG_FIREWALL, "err updating bubble: ${e.message}")
         }
     }
 
@@ -494,15 +541,15 @@ object BubbleHelper {
 
             // Remove the dynamic shortcut
             ShortcutManagerCompat.removeDynamicShortcuts(context, listOf(BUBBLE_SHORTCUT_ID))
-            Logger.i(LOG_TAG_FIREWALL, "Bubble shortcut removed")
+            Logger.i(LOG_TAG_FIREWALL, "bubble shortcut removed")
 
             // Do NOT delete the channel here.
             // Deleting and recreating channels makes OEM Settings UIs flaky and can hide "Allow bubbles"
             // again. Also, users may have explicitly enabled bubbles on the channel; deleting loses that.
 
-            Logger.i(LOG_TAG_FIREWALL, "Bubble state reset")
+            Logger.i(LOG_TAG_FIREWALL, "bubble state reset")
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_FIREWALL, "Error resetting bubble state: ${e.message}", e)
+            Logger.e(LOG_TAG_FIREWALL, "err resetting bubble state: ${e.message}")
         }
     }
 
@@ -553,21 +600,21 @@ object BubbleHelper {
 
         Logger.i(
             LOG_TAG_FIREWALL,
-            "Bubble eligibility: channelId=$BUBBLE_CHANNEL_ID, importance=${channel.importance}, canBubble=${channel.canBubble()}, showBadge=${channel.canShowBadge()}"
+            "bubble eligibility: channelId=$BUBBLE_CHANNEL_ID, importance=${channel.importance}, canBubble=${channel.canBubble()}, showBadge=${channel.canShowBadge()}"
         )
 
         if (channel.importance < NotificationManager.IMPORTANCE_HIGH) {
-            Logger.w(LOG_TAG_FIREWALL, "Bubble ineligible: channel importance too low")
+            Logger.w(LOG_TAG_FIREWALL, "bubble ineligible: channel importance too low")
         }
         if (!channel.canBubble()) {
-            Logger.w(LOG_TAG_FIREWALL, "Bubble ineligible: channel bubbles disabled")
+            Logger.w(LOG_TAG_FIREWALL, "bubble ineligible: channel bubbles disabled")
             Logger.w(
                 LOG_TAG_FIREWALL,
-                "To enable: Settings → Notifications → ${context.getString(R.string.firewall_bubble_channel_name)} → Allow bubbles"
+                "to enable: settings → notifications → ${context.getString(R.string.firewall_bubble_channel_name)} → allow bubbles"
             )
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && globalAllowed == false) {
-            Logger.w(LOG_TAG_FIREWALL, "Bubble ineligible: bubbles disabled globally")
+            Logger.w(LOG_TAG_FIREWALL, "bubble ineligible: bubbles disabled globally")
         }
     }
 
@@ -651,7 +698,7 @@ object BubbleHelper {
                 IconCompat.createWithResource(context, R.drawable.ic_firewall_bubble)
             }
         } catch (e: Exception) {
-            Logger.w(LOG_TAG_FIREWALL, "Failed to create adaptive bubble icon: ${e.message}")
+            Logger.w(LOG_TAG_FIREWALL, "err creating adaptive bubble icon: ${e.message}")
             IconCompat.createWithResource(context, R.drawable.ic_firewall_bubble)
         }
     }

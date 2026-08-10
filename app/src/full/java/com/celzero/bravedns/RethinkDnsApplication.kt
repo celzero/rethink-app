@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns
 
-import Logger
-import Logger.LOG_TAG_SCHEDULER
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_SCHEDULER
 import android.app.Application
 import android.content.pm.ApplicationInfo
 import android.os.StrictMode

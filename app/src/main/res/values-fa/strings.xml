@@ -10,7 +10,7 @@
     <string name="pause_mode_notification_title">متوقف شد! برنامه های مسدود شده همچنان دیوار آتش می شوند.</string>
     <string name="orbot_install_dialog_message">Orbot ویژگی ها و عملکرد Tor را به اندروید می آورد.</string>
     <string name="pause_text">متوقف شده</string>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name" translatable="false">RethinkDNS</string>
     <string name="settings_title_desc">DNS و فایروال بسیار قابل تنظیم</string>
     <string name="orbot_install_dialog_positive">نصب</string>
     <string name="about_title_desc">شناسایی و مسدود کردن تهدیدات امنیتی شبکه</string>
@@ -35,7 +35,7 @@
     <string name="slide_1_title">رایگان و متن‌باز</string>
     <string name="hybrid_mode_info_title">DNS + دیوار آتش</string>
     <string name="dns_mode_info_title">DNS</string>
-    <string name="app_name_small_case">rethink</string>
+    <string name="app_name_small_case" translatable="false">rethink</string>
     <string name="firewall_mode_info_title">دیوار آتش</string>
     <string name="status_protected_with_tor_private_dns">محافظت شده با tor و dns خصوصی</string>
     <string name="block">مسدود کردن</string>
@@ -50,7 +50,7 @@
     <string name="notification_action_dns_mode">DNS</string>
     <string name="skip">رد شدن</string>
     <string name="apps_info_title">برنامه ها</string>
-    <string name="rdns_plus">RDNS پلاس</string>
+    <string name="rdns_plus" translatable="false">RDNS پلاس</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">dns خصوصی فعال است</string>
     <string name="status_protected_with_http" translatable="true">محافظت شده با http پروکسی</string>
     <string name="lbl_rules" translatable="true">قوانین</string>
@@ -88,8 +88,8 @@
     <string name="default_dns_name" translatable="true">RDNS پیش فرض</string>
     <string name="dns_query_clear_logs_title" translatable="true">همه گزارش‌های DNS حذف شوند؟</string>
     <string name="bsct_app_info" translatable="true">اطلاعات برنامه</string>
-    <string name="bsct_block_ip" translatable="true">مسدود کنید، به <u>این IP</u> برای <u>این برنامه</u> اعتماد کنید</string>
-    <string name="bsct_block_domain" translatable="true">برای <u>این برنامه</u> دامنه(های) <u/> را مسدود کنید، اعتماد کنید</string>
+    <string name="bsct_block_ip" translatable="true">مسدود کنید، به &lt;u&gt;این IP&lt;/u&gt; برای &lt;u&gt;این برنامه&lt;/u&gt; اعتماد کنید</string>
+    <string name="bsct_block_domain" translatable="true">برای &lt;u&gt;این برنامه&lt;/u&gt; دامنه(های) &lt;u/&gt; را مسدود کنید، اعتماد کنید</string>
     <string name="bsct_conn_block_desc" translatable="true">%1$s توسط %2$s مسدود شد</string>
     <string name="bsct_conn_desc_blocked" translatable="true">مسدود شده در %1$s %2$s</string>
     <string name="always_on_dialog" translatable="true">\"VPN همیشه روشن\" در این دستگاه فعال است. برای شروع Rethink، لطفاً به برنامه تنظیمات بروید و «VPN همیشه روشن» را غیرفعال کنید.</string>
@@ -104,17 +104,13 @@
     <string name="status_protected_with_tor" translatable="true">محافظت شده توسط تور</string>
     <string name="alert_permission_accessibility" translatable="true">مجوز-دسترسی</string>
     <string name="dns_query_clear_logs_message" translatable="true">این عمل گزارش‌های DNS روی دستگاه را حذف می‌کند و برگشت پذیر نیست. آیا می خواهید ادامه دهید؟</string>
-    <string name="bsct_block" translatable="true">مسدود کردن، دور زدن، مستثنی کردن، انزوای <u>این برنامه</u></string>
+    <string name="bsct_block" translatable="true">مسدود کردن، دور زدن، مستثنی کردن، انزوای &lt;u&gt;این برنامه&lt;/u&gt;</string>
     <string name="exclude" translatable="true">مستثنی</string>
     <string name="always_on_dialog_heading" translatable="true">VPN همیشه روشن را غیرفعال کنید</string>
     <string name="untracked" translatable="true">ردیابی نشده</string>
-    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink از سرویس دسترسی برای ردیابی برنامه هایی که در حال استفاده هستند (پیش زمینه) در برابر برنامه هایی که در حال استفاده نیستند (پس زمینه) استفاده می کند.
-\n
-\nRethink هیچ اطلاعاتی را جمع آوری نکرده و به هیچ وجه از شما جاسوسی نمی کند.</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink از سرویس دسترسی برای ردیابی برنامه هایی که در حال استفاده هستند (پیش زمینه) در برابر برنامه هایی که در حال استفاده نیستند (پس زمینه) استفاده می کند. \n \nRethink هیچ اطلاعاتی را جمع آوری نکرده و به هیچ وجه از شما جاسوسی نمی کند.</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">متصل به DNS و دیوار آتش Rethink</string>
-    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">سرویس دسترسی RethinkDNS متوقف شده یا از کار افتاده است. <i><b>به تنظیمات رفته و RethinkDNS را اجباراً متوقف کنید</b></i> و دوباره آن را برای استفاده از <i>ویژگی مسدود کردن هر برنامه‌ای که از آن</i> استفاده نمی‌کنید، راه‌اندازی کنید.
-\n
-\nRethinkDNS از سرویس دسترسی برای ردیابی برنامه هایی که در حال استفاده هستند (پیش زمینه) در برابر برنامه هایی که در حال استفاده نیستند (پس زمینه) استفاده می کند.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">سرویس دسترسی RethinkDNS متوقف شده یا از کار افتاده است. <i><b>به تنظیمات رفته و RethinkDNS را اجباراً متوقف کنید</b></i> و دوباره آن را برای استفاده از <i>ویژگی مسدود کردن هر برنامه‌ای که از آن</i> استفاده نمی‌کنید، راه‌اندازی کنید. \n \nRethinkDNS از سرویس دسترسی برای ردیابی برنامه هایی که در حال استفاده هستند (پیش زمینه) در برابر برنامه هایی که در حال استفاده نیستند (پس زمینه) استفاده می کند.</string>
     <string name="bsct_conn_rule_explanation" translatable="true">&lt;u&gt;#1&lt;/u&gt;: اتصال یک برنامه به اینترنت را مسدود می‌کند.\n.&lt;/u&gt;&lt;u&gt;#2&lt;/u&gt;: اتصال هر برنامه ای را به یک IP خاص مسدود می کند.\n.&lt;u&gt;#3&lt;/u&gt;: وقتی دستگاه قفل است، همه اتصالات را مسدود می‌کند (دیوار آتش کلی).\n.&lt;u&gt;#4&lt;/u&gt;: هر برنامه ای را که استفاده نمی شود، مسدود می کند (دیوار آتش کلی).\n.&lt;u&gt;#5&lt;/u&gt;: هنگامی که منبع برنامه ناشناخته باشد، اتصالات را مسدود می کند (دیوار آتش کلی). \n.&lt;u&gt;#6&lt;/u&gt;: تمام ترافیک UDP به جز DNS (دیوار آتش کلی) را مسدود می کند.\n.&lt;u&gt;#7&lt;/u&gt;: هنگامی که DNS دور زده می‌شود، اتصالات را مسدود کنید (دیوار آتش کلی).</string>
     <string name="always_on_dialog_stop_message" translatable="true">VPN همیشه روشن برای Rethink فعال است. آیا مطمئنید که در هر صورت می‌خواهید Rethink را متوقف کنید؟</string>
     <string name="always_on_dialog_positive" translatable="true">توقف</string>
@@ -123,9 +119,7 @@
     <string name="dns_crypt_url_remove_dialog_message" translatable="true">برطرف کننده DNSCrypt را از پیکربندی ذخیره شده حذف کنید.</string>
     <string name="dns_crypt_relay_remove_dialog_message" translatable="true">رله DNSCrypt را از پیکربندی ذخیره شده حذف کنید.</string>
     <string name="private_dns_dialog_heading" translatable="true">DNS خصوصی را خاموش کنید</string>
-    <string name="private_dns_dialog_desc" translatable="true">تنظیمات DNS Rethink توسط DNSخصوصی اندروید لغو شده است.
-\n
-\nبرای استفاده از DNS Rethink به تنظیمات اندروید بروید و \"DNS خصوصی\" را خاموش کنید.</string>
+    <string name="private_dns_dialog_desc" translatable="true">تنظیمات DNS Rethink توسط DNSخصوصی اندروید لغو شده است. \n \nبرای استفاده از DNS Rethink به تنظیمات اندروید بروید و \"DNS خصوصی\" را خاموش کنید.</string>
     <string name="private_dns_dialog_positive" translatable="true">برو به تنظیمات</string>
     <string name="firewall_act_network_monitor_tab" translatable="true">شبکه</string>
     <string name="dns_act_configure_tab" translatable="true">پیکربندی</string>
@@ -182,17 +176,7 @@
     <string name="settings_enable_logs" translatable="true">فعال کردن گزارش‌گیری روی دستگاه</string>
     <string name="app_mode_choose" translatable="true">حالت را انتخاب کنید</string>
     <string name="download_update_dialog_title" translatable="true">به‌روزرسانی جدید!</string>
-    <string name="whats_new_version_update" translatable="true"><b>حداکثر تلاش</b> \u0020 \u0020 
-\n \u0020 \u0020 
-\n 1. معرفی یک حل‌کننده خصوصی‌تر Rethink، <i>Max</i>. \u0020 \u0020 
-\n 2. IPv6 را به عنوان آزمایشی علامت گذاری کنید. به طور پیش فرض به IPv4 تغییر دهید. \u0020 \u0020 
-\n 3. <i>ویژگی جدید</i>: پشتیبان گیری و بازیابی تنظیمات برنامه. \u0020 \u0020 
-\n 4. <i>ویژگی جدید</i>: حالت قفل برنامه. \u0020 \u0020 
-\n 5. <i>ویژگی جدید</i>: حالت قفل جهانی. \u0020 \u0020 
-\n 6. <i>ویژگی جدید</i>: قوانین فایروال را روی شماره پورت اعمال کنید. \u0020 \u0020 
-\n 7. <i>ویژگی جدید</i>: قوانین فایروال برنامه را به صورت دسته ای اعمال کنید. \u0020 \u0020 
-\n 8. تازه سازی UI جزئی. \u0020 \u0020 
-\n 9. رفع حافظه و خرابی دیگر.</string>
+    <string name="whats_new_version_update" translatable="false"><![CDATA[<b>حداکثر تلاش</b> \u0020 \u0020 \n \u0020 \u0020 \n 1. معرفی یک حل‌کننده خصوصی‌تر Rethink، <i>Max</i>. \u0020 \u0020 \n 2. IPv6 را به عنوان آزمایشی علامت گذاری کنید. به طور پیش فرض به IPv4 تغییر دهید. \u0020 \u0020 \n 3. <i>ویژگی جدید</i>: پشتیبان گیری و بازیابی تنظیمات برنامه. \u0020 \u0020 \n 4. <i>ویژگی جدید</i>: حالت قفل برنامه. \u0020 \u0020 \n 5. <i>ویژگی جدید</i>: حالت قفل جهانی. \u0020 \u0020 \n 6. <i>ویژگی جدید</i>: قوانین فایروال را روی شماره پورت اعمال کنید. \u0020 \u0020 \n 7. <i>ویژگی جدید</i>: قوانین فایروال برنامه را به صورت دسته ای اعمال کنید. \u0020 \u0020 \n 8. تازه سازی UI جزئی. \u0020 \u0020 \n 9. رفع حافظه و خرابی دیگر.]]></string>
     <string name="connection_http3" translatable="true">HTTP3</string>
     <string name="relative_time_today" translatable="true">امروز</string>
     <string name="relative_time_yesterday" translatable="true">دیروز</string>
@@ -228,9 +212,7 @@
     <string name="orbot_bs_status_3" translatable="true">ارسال %1$s به Orbot، پروکسی HTTP نیز تنظیم شده است.</string>
     <string name="orbot_stop_dialog_title" translatable="true">مداخله دستی لازم است</string>
     <string name="orbot_app_issue" translatable="true">Orbot اجرا نشد. آیا نصب شده است؟</string>
-    <string name="orbot_stop_dialog_message_combo" translatable="true">%1$s
-\n
-\n%2$s</string>
+    <string name="orbot_stop_dialog_message_combo" translatable="false">%1$s \n \n%2$s</string>
     <string name="orbot_status_arg_2" translatable="true">TCP</string>
     <string name="orbot_title" translatable="true">Orbot و پروکسی ها</string>
     <string name="orbot_stop_dialog_dns_message" translatable="true">RethinkDNS برای ارسال DNS queries به Orbot تنظیم شده است. در صورت نیاز تغییر دهید.</string>
@@ -312,10 +294,7 @@
     <string name="settings_network_all_networks_desc" translatable="true">When enabled, Rethink uses all available networks to connect to Internet. If not, it uses whichever network is deemed <i>active</i> by Android.</string>
     <string name="public_key_copy_toast_msg" translatable="true">Public key copied.</string>
     <string name="settings_orbot_header" translatable="true">اوربات</string>
-    <string name="orbot_explanation" translatable="true">Orbot یک برنامه پراکسی رایگان است که به سایر برنامه‌ها اجازه می‌دهد تا &lt;u&gt;ایمن‌تر&lt;/u&gt; از اینترنت استفاده کنند.
-\n Orbot از &lt;u&gt;Tor&lt;/u&gt; برای رمزگذاری ترافیک اینترنت شما استفاده می کند که به شما کمک می کند &lt;u&gt;سانسور را دور بزنید&lt;/u&gt; و در برابر اشکال &lt;u&gt;نظارت شبکه&lt;/u&gt; که آزادی و حریم خصوصی شخصی را تهدید می کند، دفاع کنید.
-\n &lt;u&gt;پراکسی TCP&lt;/u&gt;: فقط اتصالات TCP برنامه‌های &lt;i&gt;شامل شده&lt;/i&gt; را مجدداً به Orbot فوروارد کنید.
-\n &lt;u&gt;پراکسی HTTP&lt;/u&gt;: دوباره فکر کنید &lt;i&gt;تونل HTTP CONNECT را به Orbot ایجاد می کند و فقط اتصالات TCP برنامه های &lt;i&gt;شامل&lt;/i&gt; را ارسال می کند.</string>
+    <string name="orbot_explanation" translatable="true">Orbot یک برنامه پراکسی رایگان است که به سایر برنامه‌ها اجازه می‌دهد تا &lt;u&gt;ایمن‌تر&lt;/u&gt; از اینترنت استفاده کنند. \n Orbot از &lt;u&gt;Tor&lt;/u&gt; برای رمزگذاری ترافیک اینترنت شما استفاده می کند که به شما کمک می کند &lt;u&gt;سانسور را دور بزنید&lt;/u&gt; و در برابر اشکال &lt;u&gt;نظارت شبکه&lt;/u&gt; که آزادی و حریم خصوصی شخصی را تهدید می کند، دفاع کنید. \n &lt;u&gt;پراکسی TCP&lt;/u&gt;: فقط اتصالات TCP برنامه‌های &lt;i&gt;شامل شده&lt;/i&gt; را مجدداً به Orbot فوروارد کنید. \n &lt;u&gt;پراکسی HTTP&lt;/u&gt;: دوباره فکر کنید &lt;i&gt;تونل HTTP CONNECT را به Orbot ایجاد می کند و فقط اتصالات TCP برنامه های &lt;i&gt;شامل&lt;/i&gt; را ارسال می کند.</string>
     <string name="settings_general_customize" translatable="true">customize</string>
     <string name="settings_orbot_notification_content" translatable="true">Failure starting Tor-as-a-Proxy. Open the Orbot app to start it manually.</string>
     <string name="about_settings_app_info" translatable="true">اطلاعات برنامه</string>
@@ -346,7 +325,6 @@
     <string name="dot_custom_url_remove_dialog_title" translatable="true">نقطه پایانی DoTحذف شود؟</string>
     <string name="orbot_no_app_toast" translatable="true">برای فعال کردن Orbot حداقل یک برنامه اضافه کنید</string>
     <string name="settings_rinr_heading" translatable="true">Loopback (تجربی)</string>
-    <string name="failed_using_default" translatable="true">بازگشتی DNS ناموفق: استفاده از</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">وقتی غیرفعال است، برنامه‌های ارسال‌کننده پروکسی (SOCKS5، HTTP، DNS) را از تونل VPN Rethink مستثنی می‌کند.</string>
     <string name="settings_connectivity_checks" translatable="true">بررسی های اتصال را انجام دهید</string>
     <string name="settings_connectivity_checks_desc" translatable="true">بررسی های اتصال برای اطمینان از قابلیت دسترسی ارسال می شود.</string>
@@ -393,9 +371,7 @@
     <string name="dns_card_latency_active" translatable="true">%1$s پیامک</string>
     <string name="hsf_vpn_dialog_header" translatable="true">توجه!</string>
     <string name="settings_socks5_dialog_hint_password" translatable="true">رمز (اختیاری)</string>
-    <string name="settings_notification_dialog_option_2" translatable="true">"
-\nDNS / DNS + دیوارهٔ آتش:
-\nدو دکمه را برای تغییر سریع بین حالت ذخیرهٔ-باتری DNS و حالت عادی DNS + دیوارهٔ آتش نشان می دهد."</string>
+    <string name="settings_notification_dialog_option_2" translatable="true">\n\nDNS / DNS + دیوارهٔ آتش:\n\nدو دکمه را برای تغییر سریع بین حالت ذخیرهٔ-باتری DNS و حالت عادی DNS + دیوارهٔ آتش نشان می دهد.</string>
     <string name="firewall_status_blocked" translatable="true">مسدود</string>
     <string name="settings_socks_forwarding_default_desc" translatable="true">انتقال اتصالات به SOCKS5 endpoint.</string>
     <string name="dns_card_latency_inactive" translatable="true">روشن کردن حالت DNS.</string>
@@ -404,10 +380,7 @@
     <string name="settings_biometeric_heading" translatable="true">فعال کردن قفل برنامه</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">خاموش (پیش‌فرض)</string>
     <string name="settings_notification_desc1" translatable="true">مکث / توقف (پیش‌فرض)</string>
-    <string name="settings_notification_dialog_option_3" translatable="true">"
-\nهیچ کدام:
-\nهیچ دکمه ای را نشان نمی‌دهد.
-\n"</string>
+    <string name="settings_notification_dialog_option_3" translatable="true">\n\nهیچ کدام:\n\nهیچ دکمه ای را نشان نمی‌دهد.\n\n</string>
     <string name="settings_locale_heading" translatable="true">تغییر زبان</string>
     <string name="settings_selected_theme" translatable="true">پوستهٔ فعلی: %1$s</string>
     <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
@@ -422,9 +395,7 @@
     <string name="hsf_downtime" translatable="true">(غیر فعال از %1$s)</string>
     <string name="settings_theme_dialog_themes_1" translatable="true">تنظیم شده توسط System</string>
     <string name="settings_notification_desc2" translatable="true">DNS / DNS + دیوارهٔ آتش</string>
-    <string name="settings_notification_dialog_option_1" translatable="true">"
-\nمکث / توقف (پیش‌فرض):
-\nدو دکمه را نشان می دهد تا به سرعت مکث کرده و Rethink را متوقف کنید."</string>
+    <string name="settings_notification_dialog_option_1" translatable="true">\n\nمکث / توقف (پیش‌فرض):\n\nدو دکمه را نشان می دهد تا به سرعت مکث کرده و Rethink را متوقف کنید.</string>
     <string name="settings_locale_desc" translatable="true">زبان مورد نظرتان را انتخاب کنید</string>
     <string name="firewall_card_status_active" translatable="true">%1$s برنامه</string>
     <string name="hsf_start_btn_state" translatable="true">آغاز</string>
@@ -516,7 +487,7 @@
     <string name="lbl_service_providers" translatable="true">ارائه دهندگان خدمات</string>
     <string name="lbl_hop" translatable="true">رله‌ها</string>
     <string name="lbl_manual" translatable="true">دستی</string>
-    <string name="lbl_fallback" translatable="true">عقب‌گرد</string>
+    <string name="lbl_bootstrap" translatable="true">عقب‌گرد</string>
     <string name="lbl_default" translatable="true">پیش‌فرض</string>
     <string name="lbl_action" translatable="true">عمل</string>
     <string name="lbl_connect" translatable="true">اتصال</string>
@@ -794,7 +765,7 @@ href="https://central.sonatype.com/">Sonatype</a><br/> ]]></string>
     <string name="brbs_restore_title" translatable="true">بازیابی</string>
     <string name="brbs_title" translatable="true">پشتیبان‌گیری و بازیابی</string>
     <string name="bsac_title_desc" translatable="true">قوانین فقط برای این برنامه اعمال می‌شود.</string>
-    <string name="bsdl_block_desc" translatable="true">مسدود کردن، اعتماد به <u>این دامنه</u></string>
+    <string name="bsdl_block_desc" translatable="true">مسدود کردن، اعتماد به &lt;u&gt;این دامنه&lt;/u&gt;</string>
     <string name="bsrf_clear_filter" translatable="true">پاک کردن</string>
     <string name="build__flavor_website" translatable="true">وب‌سایت</string>
     <string name="bsrf_sub_group_heading" translatable="true">زیرگروه</string>

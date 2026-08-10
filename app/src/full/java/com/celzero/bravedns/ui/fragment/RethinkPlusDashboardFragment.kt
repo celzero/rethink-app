@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -27,13 +27,13 @@ import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusDao
 import com.celzero.bravedns.databinding.ActivityRethinkPlusDashboardBinding
+import com.celzero.bravedns.iab.AckFailureInfo
 import com.celzero.bravedns.iab.DeviceNotRegisteredNotifier
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.PurchaseConflictNotifier
@@ -50,6 +50,7 @@ import com.celzero.bravedns.ui.bottomsheet.DeviceNotRegisteredBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.EntitlementDetailBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.ManageRpnPurchaseBtmSht
 import com.celzero.bravedns.ui.bottomsheet.PurchaseConflictBottomSheet
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -66,9 +67,9 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
 
     companion object {
         private const val TAG = "RPNDashFrag"
+        private const val GOOGLE_PLAY_SUBS = "https://play.google.com/store/account/subscriptions"
         /** Show "expiring soon" banner when fewer than this many days remain for an INAPP purchase. */
         private const val EXPIRING_SOON_THRESHOLD_DAYS = 30L
-        private const val ONE_DAY_MS = 24 * 60 * 60 * 1000L
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -78,17 +79,15 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
         setupClickListeners()
         setupServerErrorObserver()
         observeSubscriptionState()
+        if (!Utilities.isFdroidFlavour()) {
+            observeAckFailureState()
+        }
         applyScrollPadding()
     }
 
     private fun initView() {
         setupToolbar()
         loadSubscriptionBanner()
-        if (DEBUG) {
-            b.entitlementRl.visibility = View.VISIBLE
-        } else {
-            b.entitlementRl.visibility = View.GONE
-        }
     }
 
     private fun applyScrollPadding() {
@@ -188,6 +187,51 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
 
         // Expiring-soon banner - only for active INAPP purchases within 30 days of expiry
         updateExpiringBanner(subscriptionData, state)
+
+        // warn when the subscription is in Grace or OnHold
+        // (payment failing / on hold) so the user knows to update their payment method.
+        updateGraceBanner(state)
+
+        // re-apply any sticky acknowledgement-failure banner so it
+        // survives the frequent banner refreshes driven by observeSubscriptionState().
+        if (!Utilities.isFdroidFlavour()) {
+            updateAckFailureBanner(InAppBillingHandler.ackFailureFlow.value)
+        }
+    }
+
+    /**
+     * Shows a warning banner when the subscription is in [Grace] or [OnHold]
+     * Hidden for all other states.
+     */
+    private fun updateGraceBanner(state: SubscriptionStateMachineV2.SubscriptionState) {
+        try {
+            val isGrace = state is SubscriptionStateMachineV2.SubscriptionState.Grace
+            val isOnHold = state is SubscriptionStateMachineV2.SubscriptionState.OnHold
+            if (isGrace || isOnHold) {
+                b.graceBannerCard.isVisible = true
+                b.tvGraceBanner.text = if (isGrace) {
+                    getString(R.string.grace_period_banner_msg)
+                } else {
+                    getString(R.string.on_hold_banner_msg)
+                }
+                b.btnGraceUpdate.setOnClickListener {
+                    // Deep-link into Google Play's subscription management.
+                    try {
+                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                            data = android.net.Uri.parse(GOOGLE_PLAY_SUBS)
+                        }
+                        startActivity(intent)
+                    } catch (e: Exception) {
+                        Logger.w(LOG_TAG_UI, "$TAG open play subscriptions failed: ${e.message}")
+                    }
+                }
+                Logger.i(LOG_TAG_UI, "$TAG grace banner shown (state=${state.name})")
+            } else {
+                b.graceBannerCard.isVisible = false
+            }
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_UI, "$TAG updateGraceBanner error (non-fatal): ${e.message}")
+        }
     }
 
     /**
@@ -211,26 +255,17 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
                 return
             }
 
-            val billingExpiry = sub.billingExpiry
-            if (billingExpiry > 0L && billingExpiry != Long.MAX_VALUE) {
-                val days = (billingExpiry - System.currentTimeMillis()) / ONE_DAY_MS
-                if (days in 0..EXPIRING_SOON_THRESHOLD_DAYS) {
-                    b.expiringBannerCard.isVisible = true
-                    b.tvExpiringBanner.text = getString(R.string.inapp_expiry_soon, days.coerceAtLeast(0L))
-                    b.btnExtendAccess.setOnClickListener { navigateToOneTimePurchase() }
-                }
-            }
-
             io {
                 val remainingDays = InAppBillingHandler.getRemainingDaysForInAppSuspend()
                 uiCtx {
                     if (remainingDays == null) {
                         Logger.w(LOG_TAG_UI, "$TAG could not fetch remaining days for INAPP expiry banner")
+                        b.expiringBannerCard.isVisible = false
                         return@uiCtx
                     }
                     val isExpiringSoon = remainingDays in 0..EXPIRING_SOON_THRESHOLD_DAYS
-                    b.expiringBannerCard.isVisible = isExpiringSoon || DEBUG
-                    if (isExpiringSoon || DEBUG) {
+                    b.expiringBannerCard.isVisible = isExpiringSoon
+                    if (isExpiringSoon) {
                         val days = remainingDays.coerceAtLeast(0L)
                         b.tvExpiringBanner.text = getString(R.string.inapp_expiry_soon, days)
                         b.btnExtendAccess.setOnClickListener { navigateToOneTimePurchase() }
@@ -298,8 +333,54 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
         return productId in inAppIds || planId in inAppIds
     }
 
+    /**
+     * Observes the process-wide [InAppBillingHandler.ackFailureFlow] and shows a
+     * persistent banner when a payment was taken but acknowledgement / verification failed on our
+     * server and/or Google Play. The flow lives on the singleton billing handler, so unlike the
+     * per-fragment [RethinkPlusViewModel.lastUnresolved] record it survives the destruction of
+     * [RethinkPlusFragment] and is visible here on the dashboard regardless of ViewModel instance.
+     */
+    private fun observeAckFailureState() {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+            InAppBillingHandler.ackFailureFlow.collect { info ->
+                updateAckFailureBanner(info)
+            }
+        }
+    }
+
+    /**
+     * Shows / hides the acknowledgement-failure banner from the sticky [info]. When [info] is
+     * null (the failure resolved or was retried successfully) the banner is hidden. The retry
+     * button re-runs verification against Play + server; support opens the help dashboard.
+     */
+    private fun updateAckFailureBanner(info: AckFailureInfo?) {
+        try {
+            if (info == null) {
+                b.ackFailureBannerCard.isVisible = false
+                return
+            }
+            val sub = info.message.ifBlank { getString(R.string.purchase_failed) }
+            b.tvAckFailureBanner.text = info.title
+            b.tvAckFailureBannerSub.text = sub
+            b.ackFailureBannerCard.isVisible = true
+            b.btnAckFailureRetry.isVisible = info.canRetry
+            b.btnAckFailureRetry.setOnClickListener {
+                // Re-verify Play + server status for the in-flight purchase. The billing
+                // handler drives the state machine, which re-publishes ackFailureFlow on result.
+                InAppBillingHandler.reverifyAfterFailure { success ->
+                    if (success) {
+                        io { loadSubscriptionBanner() }
+                    }
+                }
+            }
+            Logger.i(LOG_TAG_UI, "$TAG ack-failure banner shown: title=${info.title}")
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_UI, "$TAG updateAckFailureBanner error (non-fatal): ${e.message}")
+        }
+    }
+
     private fun observeSubscriptionState() {
-        io {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             RpnProxyManager.collectSubscriptionState().collect { state ->
                 val sub = runCatching { subscriptionStatusDao.getCurrentSubscription() }.getOrNull()
                 val deviceId = runCatching { InAppBillingHandler.getObfuscatedDeviceId() }.getOrDefault("")
@@ -326,6 +407,15 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
                 )
                 is ServerApiError.None -> { /* no-op */ }
             }
+        }
+
+        // warn when the active Google account differs from the account
+        // used for the stored purchase (e.g. the user switched accounts in Google Play).
+        InAppBillingHandler.accountMismatchLiveData.observe(viewLifecycleOwner) {
+            if (!isAdded || !isResumed) return@observe
+            InAppBillingHandler.accountMismatchLiveData.value = null
+            Logger.w(LOG_TAG_UI, "$TAG account mismatch detected; showing warning")
+            showToastUiCentered(requireContext(), getString(R.string.account_mismatch_msg), Toast.LENGTH_LONG)
         }
     }
 

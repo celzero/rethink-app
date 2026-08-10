@@ -17,6 +17,7 @@ package com.celzero.bravedns.util
 
 import android.app.ActivityManager
 import android.content.Context
+import android.os.Build
 import android.os.Debug
 import java.text.DecimalFormat
 import kotlin.math.log10
@@ -24,44 +25,60 @@ import kotlin.math.pow
 
 object MemoryUtils {
 
-    // Constants for memory calculations
     private const val BYTES_TO_KB = 1024L
-    private const val PERCENTAGE_MULTIPLIER = 100.0
     private const val MEMORY_UNIT_BASE = 1024.0
 
     data class MemoryStats(
-        val availMem: String, // Available memory in the system
-        val threshold: String, // Threshold for low memory warning
-        val usedMemPercent: Double, // Percentage of used memory
-        val thresholdPercent: Double, // Percentage threshold for low memory warning
-        val largeMemoryClassMB: Int, // Large memory class of the device
-        val memoryClassMB: Int, // Normal memory class of the device
+        // ActivityManager.MemoryInfo
+        val totalMem: String,
+        val availMem: String,
+        val threshold: String,
+        val lowMemory: Boolean,
 
-        // --- App Java Heap (Virtual Machine) ---
-        val appHeapUsed: String,       // Actual objects in memory
-        val appHeapAllocated: String,  // Total size of current heap (used + free inside heap)
-        val appHeapMax: String,        // Hard limit before OOM
+        // Debug.MemoryInfo direct fields
+        val totalPss: String,
+        val totalPrivateDirty: String,
+        val totalSharedDirty: String,
+        val totalPrivateClean: String,
+        val totalSharedClean: String,
+        val totalSwappablePss: String,
 
-        // --- App Physical RAM (PSS Breakdown) ---
-        val appTotalPss: String,       // Total Physical RAM used by app (The main "RAM Usage" number)
-        val appNativeRamUsed: String,  // C++ / Native (often Bitmaps on Android 8+)
-        val appDalvikPss: String,      // Dalvik heap (Java/Kotlin objects)
-        val appOtherPss: String,       // Other PSS (not native or dalvik)
-        val appGraphicsRamUsed: String,// OpenGL, Textures, SurfaceFlinger
-        val appCodeRamUsed: String,    // .so, .jar, .apk, .dex code memory
-        val appStackRamUsed: String,   // Thread stacks
-        val appUnknownRamUsed: String, // Other/Unknown (Private Other)
+        val dalvikPss: String,
+        val dalvikPrivateDirty: String,
+        val dalvikSharedDirty: String,
 
-        val appNativePrivateDirty: String, // Native pages modified, cannot be shared
-        val appNativeSharedDirty: String,  // Native pages modified, shared with other processes
-        val appNativeSharedClean: String,  // Native pages unmodified, shared with other processes
-        val appNativeHeapTotal: String,    // Sum of native PSS + private dirty + shared dirty + shared clean
+        val nativePss: String,
+        val nativePrivateDirty: String,
+        val nativeSharedDirty: String,
 
-        // --- System Wide Stats ---
-        val systemTotalRam: String,
-        val systemAvailableRam: String,
-        val isLowMemory: Boolean,
+        val otherPss: String,
+        val otherPrivateDirty: String,
+        val otherSharedDirty: String,
 
+        // Debug.MemoryInfo.getMemoryStat() summary keys
+        val summaryJavaHeap: String,
+        val summaryNativeHeap: String,
+        val summaryCode: String,
+        val summaryStack: String,
+        val summaryGraphics: String,
+        val summaryPrivateOther: String,
+        val summarySystem: String,
+        val summaryTotalPss: String,
+        val summaryTotalSwap: String,
+        val summaryPrivateDirty: String,
+        val summaryPrivateClean: String,
+        val summarySwapPss: String,
+        val summaryHeapSize: String,
+        val summaryHeapAlloc: String,
+        val summaryHeapFree: String,
+
+        // Runtime
+        val javaHeapUsed: String,
+        val javaHeapAllocated: String,
+        val javaHeapMax: String,
+
+        val largeMemoryClassMB: Int,
+        val memoryClassMB: Int,
         val coreCount: Int
     )
 
@@ -69,81 +86,74 @@ object MemoryUtils {
      * Returns detailed memory statistics.
      */
     fun getDetailedMemoryInfo(context: Context): MemoryStats {
-        // 1. System-wide Memory Info
         val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         val systemMemInfo = ActivityManager.MemoryInfo()
         activityManager.getMemoryInfo(systemMemInfo)
 
-        // mem info values are in bytes
-        val totalMemBytes = systemMemInfo.totalMem
-        val availMemBytes = systemMemInfo.availMem
-        val thresholdBytes = systemMemInfo.threshold
-        val usedMemBytes = totalMemBytes - availMemBytes
-        val usedMemPercent = (usedMemBytes.toDouble() / totalMemBytes.toDouble()) * PERCENTAGE_MULTIPLIER
-        val thresholdPercent = (thresholdBytes.toDouble() / totalMemBytes.toDouble()) * PERCENTAGE_MULTIPLIER
-        val largeMemoryClassMB = activityManager.largeMemoryClass
-        val memoryClassMB = activityManager.memoryClass
-
-        // 2. App-specific Physical RAM (PSS)
         val debugMemInfo = Debug.MemoryInfo()
         Debug.getMemoryInfo(debugMemInfo)
 
-        val totalPssBytes = debugMemInfo.totalPss * 1024L
+        fun summaryStat(key: String): Long =
+            (debugMemInfo.getMemoryStat(key)?.toLongOrNull() ?: 0L) * BYTES_TO_KB
 
-        val nativePssBytes = debugMemInfo.nativePss * 1024L
-        val dalvikPssBytes = debugMemInfo.dalvikPss * 1024L
-        val otherPssBytes = debugMemInfo.otherPss * 1024L
-
-        val nativePrivateDirtyBytes = debugMemInfo.nativePrivateDirty * 1024L
-        val nativeSharedDirtyBytes = debugMemInfo.nativeSharedDirty * 1024L
-        val nativeSharedCleanBytes = (debugMemInfo.getMemoryStat("summary.shared-clean")?.toLongOrNull() ?: 0L) * BYTES_TO_KB
-        val nativeHeapTotalBytes = nativePssBytes + nativePrivateDirtyBytes + nativeSharedDirtyBytes + nativeSharedCleanBytes
-
-        // "summary.native-heap" etc return values in KB
-        val graphicsPssBytes = (debugMemInfo.getMemoryStat("summary.graphics")?.toLongOrNull() ?: 0L) * BYTES_TO_KB
-        val codePssBytes = (debugMemInfo.getMemoryStat("summary.code")?.toLongOrNull() ?: 0L) * BYTES_TO_KB
-        val stackPssBytes = (debugMemInfo.getMemoryStat("summary.stack")?.toLongOrNull() ?: 0L) * BYTES_TO_KB
-        val unknownPssBytes = (debugMemInfo.getMemoryStat("summary.private-other")?.toLongOrNull() ?: 0L) * BYTES_TO_KB
-
-        // 3. App-specific Java Heap
         val runtime = Runtime.getRuntime()
-        val heapTotal = runtime.totalMemory() // Allocated size
+        val heapTotal = runtime.totalMemory()
         val heapFree = runtime.freeMemory()
-        val heapUsed = heapTotal - heapFree
-        val heapMax = runtime.maxMemory()
 
-        val cores = runtime.availableProcessors()
+        val totalSwappablePss = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            debugMemInfo.totalSwappablePss * BYTES_TO_KB
+        } else {
+            0L
+        }
 
         return MemoryStats(
-            availMem = formatBytes(availMemBytes),
-            threshold = formatBytes(thresholdBytes),
-            usedMemPercent = usedMemPercent,
-            thresholdPercent = thresholdPercent,
-            largeMemoryClassMB = largeMemoryClassMB,
-            memoryClassMB = memoryClassMB,
+            totalMem = formatBytes(systemMemInfo.totalMem),
+            availMem = formatBytes(systemMemInfo.availMem),
+            threshold = formatBytes(systemMemInfo.threshold),
+            lowMemory = systemMemInfo.lowMemory,
 
-            // --- App Java Heap (Virtual Memory) ---
-            appHeapUsed = formatBytes(heapUsed),
-            appHeapAllocated = formatBytes(heapTotal),
-            appHeapMax = formatBytes(heapMax),
+            totalPss = formatBytes(debugMemInfo.totalPss * BYTES_TO_KB),
+            totalPrivateDirty = formatBytes(debugMemInfo.totalPrivateDirty * BYTES_TO_KB),
+            totalSharedDirty = formatBytes(debugMemInfo.totalSharedDirty * BYTES_TO_KB),
+            totalPrivateClean = formatBytes(debugMemInfo.totalPrivateClean * BYTES_TO_KB),
+            totalSharedClean = formatBytes(debugMemInfo.totalSharedClean * BYTES_TO_KB),
+            totalSwappablePss = formatBytes(totalSwappablePss),
 
-            appTotalPss = formatBytes(totalPssBytes),
-            appNativeRamUsed = formatBytes(nativePssBytes),
-            appDalvikPss = formatBytes(dalvikPssBytes),
-            appOtherPss = formatBytes(otherPssBytes),
-            appGraphicsRamUsed = formatBytes(graphicsPssBytes),
-            appCodeRamUsed = formatBytes(codePssBytes),
-            appStackRamUsed = formatBytes(stackPssBytes),
-            appUnknownRamUsed = formatBytes(unknownPssBytes),
-            appNativePrivateDirty = formatBytes(nativePrivateDirtyBytes),
-            appNativeSharedDirty = formatBytes(nativeSharedDirtyBytes),
-            appNativeSharedClean = formatBytes(nativeSharedCleanBytes),
-            appNativeHeapTotal = formatBytes(nativeHeapTotalBytes),
+            dalvikPss = formatBytes(debugMemInfo.dalvikPss * BYTES_TO_KB),
+            dalvikPrivateDirty = formatBytes(debugMemInfo.dalvikPrivateDirty * BYTES_TO_KB),
+            dalvikSharedDirty = formatBytes(debugMemInfo.dalvikSharedDirty * BYTES_TO_KB),
 
-            systemTotalRam = formatBytes(systemMemInfo.totalMem),
-            systemAvailableRam = formatBytes(systemMemInfo.availMem),
-            isLowMemory = systemMemInfo.lowMemory,
-            coreCount = cores
+            nativePss = formatBytes(debugMemInfo.nativePss * BYTES_TO_KB),
+            nativePrivateDirty = formatBytes(debugMemInfo.nativePrivateDirty * BYTES_TO_KB),
+            nativeSharedDirty = formatBytes(debugMemInfo.nativeSharedDirty * BYTES_TO_KB),
+
+            otherPss = formatBytes(debugMemInfo.otherPss * BYTES_TO_KB),
+            otherPrivateDirty = formatBytes(debugMemInfo.otherPrivateDirty * BYTES_TO_KB),
+            otherSharedDirty = formatBytes(debugMemInfo.otherSharedDirty * BYTES_TO_KB),
+
+            summaryJavaHeap = formatBytes(summaryStat("summary.java-heap")),
+            summaryNativeHeap = formatBytes(summaryStat("summary.native-heap")),
+            summaryCode = formatBytes(summaryStat("summary.code")),
+            summaryStack = formatBytes(summaryStat("summary.stack")),
+            summaryGraphics = formatBytes(summaryStat("summary.graphics")),
+            summaryPrivateOther = formatBytes(summaryStat("summary.private-other")),
+            summarySystem = formatBytes(summaryStat("summary.system")),
+            summaryTotalPss = formatBytes(summaryStat("summary.total-pss")),
+            summaryTotalSwap = formatBytes(summaryStat("summary.total-swap")),
+            summaryPrivateDirty = formatBytes(summaryStat("summary.private-dirty")),
+            summaryPrivateClean = formatBytes(summaryStat("summary.private-clean")),
+            summarySwapPss = formatBytes(summaryStat("summary.swap-pss")),
+            summaryHeapSize = formatBytes(summaryStat("summary.heap-size")),
+            summaryHeapAlloc = formatBytes(summaryStat("summary.heap-alloc")),
+            summaryHeapFree = formatBytes(summaryStat("summary.heap-free")),
+
+            javaHeapUsed = formatBytes(heapTotal - heapFree),
+            javaHeapAllocated = formatBytes(heapTotal),
+            javaHeapMax = formatBytes(runtime.maxMemory()),
+
+            largeMemoryClassMB = activityManager.largeMemoryClass,
+            memoryClassMB = activityManager.memoryClass,
+            coreCount = runtime.availableProcessors()
         )
     }
 
@@ -151,32 +161,48 @@ object MemoryUtils {
         val stats = getDetailedMemoryInfo(context)
         val sb = StringBuilder()
         sb.appendLine("\nMem info:")
-        sb.appendLine("   Available Memory: ${stats.availMem}")
-        sb.appendLine("   Threshold Memory: ${stats.threshold}")
-        sb.appendLine("   Used Memory: ${"%.2f".format(stats.usedMemPercent)}%")
-        sb.appendLine("   Threshold Percent: ${"%.2f".format(stats.thresholdPercent)}%")
-        sb.appendLine("   Large Memory Class: ${stats.largeMemoryClassMB} MB")
-        sb.appendLine("   Memory Class: ${stats.memoryClassMB} MB")
-        sb.appendLine("App (Physical RAM/PSS):")
-        sb.appendLine("   Total Used: ${stats.appTotalPss}")
-        sb.appendLine("   Native: ${stats.appNativeRamUsed}")
-        sb.appendLine("     Private Dirty: ${stats.appNativePrivateDirty}")
-        sb.appendLine("     Shared Dirty: ${stats.appNativeSharedDirty}")
-        sb.appendLine("     Shared Clean: ${stats.appNativeSharedClean}")
-        sb.appendLine("     Total: ${stats.appNativeHeapTotal}")
-        sb.appendLine("   Dalvik: ${stats.appDalvikPss}")
-        sb.appendLine("   Other: ${stats.appOtherPss}")
-        sb.appendLine("   Graphics: ${stats.appGraphicsRamUsed}")
-        sb.appendLine("   Code: ${stats.appCodeRamUsed}")
-        sb.appendLine("   Stack/Other: ${stats.appUnknownRamUsed}")
-        sb.appendLine("Java Heap (Virtual Memory):")
-        sb.appendLine("   Used: ${stats.appHeapUsed}")
-        sb.appendLine("   Allocated: ${stats.appHeapAllocated}")
-        sb.appendLine("   Max Limit: ${stats.appHeapMax}")
-        sb.appendLine("System Status:")
-        sb.appendLine("   RAM Free: ${stats.systemAvailableRam} / ${stats.systemTotalRam}")
-        sb.appendLine("   Is Low Memory: ${stats.isLowMemory}")
-        sb.appendLine("   CPU Cores: ${stats.coreCount}\n")
+        sb.appendLine("   totalMem: ${stats.totalMem}")
+        sb.appendLine("   availMem: ${stats.availMem}")
+        sb.appendLine("   threshold: ${stats.threshold}")
+        sb.appendLine("   lowMemory: ${stats.lowMemory}")
+        sb.appendLine("   largeMemoryClass: ${stats.largeMemoryClassMB} MB")
+        sb.appendLine("   memoryClass: ${stats.memoryClassMB} MB")
+        sb.appendLine("App (Debug.MemoryInfo):")
+        sb.appendLine("   totalPss: ${stats.totalPss}")
+        sb.appendLine("   totalPrivateDirty: ${stats.totalPrivateDirty}")
+        sb.appendLine("   totalSharedDirty: ${stats.totalSharedDirty}")
+        sb.appendLine("   totalPrivateClean: ${stats.totalPrivateClean}")
+        sb.appendLine("   totalSharedClean: ${stats.totalSharedClean}")
+        sb.appendLine("   totalSwappablePss: ${stats.totalSwappablePss}")
+        sb.appendLine("   dalvikPss: ${stats.dalvikPss}")
+        sb.appendLine("   dalvikPrivateDirty: ${stats.dalvikPrivateDirty}")
+        sb.appendLine("   dalvikSharedDirty: ${stats.dalvikSharedDirty}")
+        sb.appendLine("   nativePss: ${stats.nativePss}")
+        sb.appendLine("   nativePrivateDirty: ${stats.nativePrivateDirty}")
+        sb.appendLine("   nativeSharedDirty: ${stats.nativeSharedDirty}")
+        sb.appendLine("   otherPss: ${stats.otherPss}")
+        sb.appendLine("   otherPrivateDirty: ${stats.otherPrivateDirty}")
+        sb.appendLine("   otherSharedDirty: ${stats.otherSharedDirty}")
+        sb.appendLine("   summary.java-heap: ${stats.summaryJavaHeap}")
+        sb.appendLine("   summary.native-heap: ${stats.summaryNativeHeap}")
+        sb.appendLine("   summary.code: ${stats.summaryCode}")
+        sb.appendLine("   summary.stack: ${stats.summaryStack}")
+        sb.appendLine("   summary.graphics: ${stats.summaryGraphics}")
+        sb.appendLine("   summary.private-other: ${stats.summaryPrivateOther}")
+        sb.appendLine("   summary.system: ${stats.summarySystem}")
+        sb.appendLine("   summary.total-pss: ${stats.summaryTotalPss}")
+        sb.appendLine("   summary.total-swap: ${stats.summaryTotalSwap}")
+        sb.appendLine("   summary.private-dirty: ${stats.summaryPrivateDirty}")
+        sb.appendLine("   summary.private-clean: ${stats.summaryPrivateClean}")
+        sb.appendLine("   summary.swap-pss: ${stats.summarySwapPss}")
+        sb.appendLine("   summary.heap-size: ${stats.summaryHeapSize}")
+        sb.appendLine("   summary.heap-alloc: ${stats.summaryHeapAlloc}")
+        sb.appendLine("   summary.heap-free: ${stats.summaryHeapFree}")
+        sb.appendLine("Java Heap (Runtime):")
+        sb.appendLine("   used: ${stats.javaHeapUsed}")
+        sb.appendLine("   allocated: ${stats.javaHeapAllocated}")
+        sb.appendLine("   max: ${stats.javaHeapMax}")
+        sb.appendLine("   cores: ${stats.coreCount}\n")
         return sb.toString()
     }
 

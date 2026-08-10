@@ -33,6 +33,7 @@
             android:layout_marginStart="10dp"
             android:alpha="0.8"
             android:maxLines="10"
+            android:textIsSelectable="true"
             android:layout_centerVertical="true"
             android:layout_toEndOf="@id/log_timestamp"
             android:textColor="?attr/primaryLightColorText"

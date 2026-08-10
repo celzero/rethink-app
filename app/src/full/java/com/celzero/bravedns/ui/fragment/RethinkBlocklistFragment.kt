@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -198,7 +198,25 @@ class RethinkBlocklistFragment :
         selectedFileTags.observe(viewLifecycleOwner) {
             if (it == null) return@observe
 
-            io { modifiedStamp = getStamp(it, type) }
+            io {
+                val recomputed = getStamp(it, type)
+                if (recomputed.isNotEmpty()) {
+                    modifiedStamp = recomputed
+                } else if (it.isNotEmpty()) {
+                    // RDNS unavailable (e.g. Remote DNS configured while the VPN
+                    // is stopped). Keep the previously known good stamp instead
+                    // of overwriting it with "" and losing the user's selection.
+                    // The authoritative selection set is `selectedFileTags`; the
+                    // stamp is recomputed at Apply time (see setStamp/Apply).
+                    Logger.w(
+                        LOG_TAG_UI,
+                        "skip stamp overwrite: ${it.size} tags selected but stamp encode failed for ${type.name}; keeping modifiedStamp='${modifiedStamp.take(32)}'"
+                    )
+                } else {
+                    // user genuinely cleared the selection
+                    modifiedStamp = recomputed
+                }
+            }
         }
 
         filters.observe(viewLifecycleOwner) {
@@ -334,9 +352,23 @@ class RethinkBlocklistFragment :
         }
 
         b.lbBlocklistApplyBtn.setOnClickListener {
-            // update rethink stamp
-            setStamp(modifiedStamp)
-            requireActivity().finish()
+            // update rethink stamp. Recompute from the authoritative selection
+            // set so that an empty `modifiedStamp` (caused by RDNS being briefly
+            // unavailable while toggling) does not discard the user's selections.
+            io {
+                val tags = getSelectedFileTags()
+                val stampToApply =
+                    if (modifiedStamp.isNotEmpty()) modifiedStamp
+                    else getStamp(tags, type).also { modifiedStamp = it }
+
+                if (stampToApply.isEmpty() && tags.isNotEmpty()) {
+                    Logger.w(
+                        LOG_TAG_UI,
+                        "Apply: cannot encode ${tags.size} selected tags for ${type.name}; stamp stays empty"
+                    )
+                }
+                uiCtx { setStamp(stampToApply); requireActivity().finish() }
+            }
         }
 
         b.lbBlocklistCancelBtn.setOnClickListener {
@@ -474,8 +506,13 @@ class RethinkBlocklistFragment :
         builder.setMessage(getString(R.string.rt_dialog_message))
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.lbl_apply)) { _, _ ->
-            setStamp(modifiedStamp)
-            requireActivity().finish()
+            io {
+                val tags = getSelectedFileTags()
+                val stampToApply =
+                    if (modifiedStamp.isNotEmpty()) modifiedStamp
+                    else getStamp(tags, type).also { modifiedStamp = it }
+                uiCtx { setStamp(stampToApply); requireActivity().finish() }
+            }
         }
         builder.setNeutralButton(getString(R.string.rt_dialog_neutral)) { _, _ ->
             // no-op
@@ -636,12 +673,15 @@ class RethinkBlocklistFragment :
             RethinkBlocklistManager.clearTagsSelectionLocal()
             RethinkBlocklistManager.updateFiletagsLocal(selectedTags, 1 /* isSelected: true */)
             val list = RethinkBlocklistManager.getSelectedFileTagsLocal().toSet()
-            updateFileTagList(list)
+            // guard: never replace a non-empty selection with an empty read
+            // (happens when the stamp contained a phantom "0" or when RDNS was
+            // unavailable while decoding). Keep the caller's selection intact.
+            updateFileTagList(if (list.isEmpty()) selectedTags.toSet() else list)
         } else {
             RethinkBlocklistManager.clearTagsSelectionRemote()
             RethinkBlocklistManager.updateFiletagsRemote(selectedTags, 1 /* isSelected: true */)
             val list = RethinkBlocklistManager.getSelectedFileTagsRemote().toSet()
-            updateFileTagList(list)
+            updateFileTagList(if (list.isEmpty()) selectedTags.toSet() else list)
         }
     }
 

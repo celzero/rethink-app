@@ -15,8 +15,7 @@
  */
 package com.celzero.bravedns.util
 
-import Logger
-import Logger.LOG_TAG_VPN
+import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import inet.ipaddr.IPAddress
 import java.net.InetAddress

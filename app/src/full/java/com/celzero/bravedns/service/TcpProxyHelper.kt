@@ -1,7 +1,7 @@
 package com.celzero.bravedns.service
 
-import Logger
-import Logger.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import android.content.Context
 import android.os.SystemClock
 import androidx.work.BackoffPolicy

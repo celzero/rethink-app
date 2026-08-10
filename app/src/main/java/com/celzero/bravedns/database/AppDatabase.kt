@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.database
 
-import Logger
-import Logger.LOG_TAG_APP_DB
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_APP_DB
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
@@ -25,6 +25,8 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.celzero.bravedns.sponsor.database.SponsorDao
+import com.celzero.bravedns.sponsor.database.SponsorEntity
 import com.celzero.bravedns.util.Constants
 
 @Database(
@@ -52,7 +54,8 @@ import com.celzero.bravedns.util.Constants
         WgHopMap::class,
         SubscriptionStatus::class,
         SubscriptionStateHistory::class,
-        CountryConfig::class
+        CountryConfig::class,
+        SponsorEntity::class
     ],
     version = 31,
     exportSchema = false
@@ -62,7 +65,13 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         const val DATABASE_NAME = "bravedns.db"
-        private const val DATABASE_PATH = "database/rethink_v22.db"
+        // Pre-packaged asset at the current schema version (31). Because the asset's
+        // user_version matches @Database.version and its room_master_table identity_hash
+        // matches the hash Room 2.8.1 computes for v31, Room opens it with NO migration
+        // and NO schema validation at first launch. This avoids the 22->31 migration path
+        // running on the freshly-copied asset, which was a source of the
+        // "Bad database header" failure seen after clearing app storage.
+        private const val DATABASE_PATH = "database/rethink_v31.db"
         private const val PRAGMA = "pragma wal_checkpoint(full)"
 
         // setJournalMode() is added as part of issue #344
@@ -71,8 +80,47 @@ abstract class AppDatabase : RoomDatabase() {
         // Otherwise, WRITE_AHEAD_LOGGING will be used.
         // Ref:
         // https://developer.android.com/reference/android/arch/persistence/room/RoomDatabase.JournalMode#automatic
-        fun buildDatabase(context: Context) =
-            Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DATABASE_NAME)
+        // A valid SQLite database file is at least 100 bytes (the header page) and begins
+        // with the 16-byte magic string "SQLite format 3\0". Files failing this check are
+        // treated as corrupt/truncated so the pre-packaged asset can be re-copied by Room's
+        // createFromAsset() instead of being reused as-is.
+        private fun isValidSQLiteFile(file: java.io.File): Boolean {
+            if (file.length() < 100) return false
+            return try {
+                java.io.RandomAccessFile(file, "r").use { raf ->
+                    val magic = ByteArray(16)
+                    raf.readFully(magic)
+                    String(magic, Charsets.ISO_8859_1).startsWith("SQLite format 3")
+                }
+            } catch (_: Exception) {
+                false
+            }
+        }
+
+        fun buildDatabase(context: Context): AppDatabase {
+            // Self-heal: if a corrupt/truncated bravedns.db is present on disk (e.g. a
+            // 0-byte file left behind by a premature ATTACH in LogDatabase.populateDatabase
+            // after the user clears app storage via Android settings), delete it so that
+            // Room's createFromAsset() re-copies the pre-packaged asset and the seed data
+            // (default DoH/DNSCrypt/RDNS/DoT/ODoH rows) is restored. Without this, Room sees
+            // that the file already exists and skips the asset copy, failing with:
+            //   "Bad database header, unable to read 4 bytes at offset 60" (user_version).
+            val dbFile = context.applicationContext.getDatabasePath(DATABASE_NAME)
+            if (dbFile.exists() && !isValidSQLiteFile(dbFile)) {
+                Logger.i(
+                    LOG_TAG_APP_DB,
+                    "Corrupt DB file detected (${dbFile.length()} bytes); deleting to allow asset re-copy"
+                )
+                dbFile.delete()
+                // remove sidecar files so a stale wal/shm cannot resurrect broken state
+                context.applicationContext.getDatabasePath("$DATABASE_NAME-wal").delete()
+                context.applicationContext.getDatabasePath("$DATABASE_NAME-shm").delete()
+            }
+            return Room.databaseBuilder(
+                context.applicationContext,
+                AppDatabase::class.java,
+                DATABASE_NAME
+            )
                 .createFromAsset(DATABASE_PATH)
                 .addCallback(roomCallback)
                 .setJournalMode(JournalMode.AUTOMATIC)
@@ -107,6 +155,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_29_30)
                 .addMigrations(MIGRATION_30_31)
                 .build()
+        }
 
         private val roomCallback: Callback =
             object : Callback() {
@@ -126,7 +175,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_1_2: Migration =
+        internal val MIGRATION_1_2: Migration =
             object : Migration(1, 2) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL("DELETE from AppInfo")
@@ -137,7 +186,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_2_3: Migration =
+        internal val MIGRATION_2_3: Migration =
             object : Migration(2, 3) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL("DELETE from AppInfo ")
@@ -152,7 +201,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_3_4: Migration =
+        internal val MIGRATION_3_4: Migration =
             object : Migration(3, 4) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
@@ -215,7 +264,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_4_5: Migration =
+        internal val MIGRATION_4_5: Migration =
             object : Migration(4, 5) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL("DELETE from DNSProxyEndpoint")
@@ -262,7 +311,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_5_6: Migration =
+        internal val MIGRATION_5_6: Migration =
             object : Migration(5, 6) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
@@ -299,7 +348,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_6_7: Migration =
+        internal val MIGRATION_6_7: Migration =
             object : Migration(6, 7) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
@@ -317,7 +366,7 @@ abstract class AppDatabase : RoomDatabase() {
          * is added as default and not used. Now the UID=0(ANDROID) is added to the non-app
          * category.
          */
-        private val MIGRATION_7_8: Migration =
+        internal val MIGRATION_7_8: Migration =
             object : Migration(7, 8) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
@@ -330,7 +379,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_8_9: Migration =
+        internal val MIGRATION_8_9: Migration =
             object : Migration(8, 9) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
@@ -339,7 +388,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_9_10: Migration =
+        internal val MIGRATION_9_10: Migration =
             object : Migration(9, 10) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
@@ -348,7 +397,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_10_11: Migration =
+        internal val MIGRATION_10_11: Migration =
             object : Migration(10, 11) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
@@ -360,7 +409,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_11_12: Migration =
+        internal val MIGRATION_11_12: Migration =
             object : Migration(11, 12) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     addMoreDohToList(db)
@@ -535,7 +584,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_12_13: Migration =
+        internal val MIGRATION_12_13: Migration =
             object : Migration(12, 13) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
@@ -545,7 +594,7 @@ abstract class AppDatabase : RoomDatabase() {
             }
 
         // migration part of v053k
-        private val MIGRATION_13_14: Migration =
+        internal val MIGRATION_13_14: Migration =
             object : Migration(13, 14) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     // modify the default blocklist to OISD
@@ -560,7 +609,7 @@ abstract class AppDatabase : RoomDatabase() {
             }
 
         // migration part of v053l
-        private val MIGRATION_14_15: Migration =
+        internal val MIGRATION_14_15: Migration =
             object : Migration(14, 15) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL("ALTER TABLE RethinkLocalFileTag add column pack TEXT DEFAULT ''")
@@ -575,7 +624,7 @@ abstract class AppDatabase : RoomDatabase() {
             }
 
         // migration part of v053m
-        private val MIGRATION_15_16: Migration =
+        internal val MIGRATION_15_16: Migration =
             object : Migration(15, 16) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     modifyAppInfo(db)
@@ -613,7 +662,7 @@ abstract class AppDatabase : RoomDatabase() {
             }
 
         // migration part of v054
-        private val MIGRATION_16_17: Migration =
+        internal val MIGRATION_16_17: Migration =
             object : Migration(16, 17) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL("DROP table if exists CustomDomain")
@@ -691,7 +740,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_17_18: Migration =
+        internal val MIGRATION_17_18: Migration =
             object : Migration(17, 18) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     with(db) {
@@ -711,7 +760,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_18_19: Migration =
+        internal val MIGRATION_18_19: Migration =
             object : Migration(18, 19) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     with(db) {
@@ -803,7 +852,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_19_20: Migration =
+        internal val MIGRATION_19_20: Migration =
             object : Migration(19, 20) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     // quad9
@@ -818,7 +867,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_20_21: Migration =
+        internal val MIGRATION_20_21: Migration =
             object : Migration(20, 21) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
@@ -913,7 +962,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_21_22: Migration =
+        internal val MIGRATION_21_22: Migration =
             object : Migration(21, 22) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     // fix: migration with the WgConfigFiles seen in play store crash
@@ -950,7 +999,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_22_23: Migration =
+        internal val MIGRATION_22_23: Migration =
             object : Migration(22, 23) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
@@ -960,7 +1009,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_23_24: Migration =
+        internal val MIGRATION_23_24: Migration =
             object : Migration(23, 24) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
@@ -970,7 +1019,7 @@ abstract class AppDatabase : RoomDatabase() {
             }
 
         // migration part of v055o
-        private val MIGRATION_24_25: Migration =
+        internal val MIGRATION_24_25: Migration =
             object : Migration(24, 25) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
@@ -1064,7 +1113,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_25_26: Migration =
+        internal val MIGRATION_25_26: Migration =
             object : Migration(25, 26) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     try {
@@ -1081,7 +1130,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_26_27: Migration =
+        internal val MIGRATION_26_27: Migration =
             object : Migration(26, 27) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     // delete the column isLockdown from WgConfigFiles
@@ -1110,7 +1159,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_27_28: Migration =
+        internal val MIGRATION_27_28: Migration =
             object : Migration(27, 28) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     // Add modifiedTs column to AppInfo table to track when firewall/proxy rules change
@@ -1124,7 +1173,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_28_29: Migration =
+        internal val MIGRATION_28_29: Migration =
             object : Migration(28, 29) {
                 override fun migrate(db: SupportSQLiteDatabase) {
 
@@ -1210,7 +1259,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_29_30: Migration =
+        internal val MIGRATION_29_30: Migration =
             object : Migration(29, 30) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     try {
@@ -1320,6 +1369,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun subscriptionStatusDao(): SubscriptionStatusDao
 
     abstract fun subscriptionStateHistoryDao(): SubscriptionStateHistoryDao
+
+    abstract fun sponsorDao(): SponsorDao
 
     abstract fun countryConfigDAO(): CountryConfigDAO
 

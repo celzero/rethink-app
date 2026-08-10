@@ -16,15 +16,13 @@
 
 package com.celzero.bravedns.service
 
-import Logger
-import Logger.LOG_TAG_VPN
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import android.content.Context
-import android.os.SystemClock
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.net.doh.Transaction
-import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants.Companion.EMPTY_PACKAGE_NAME
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
@@ -59,19 +57,6 @@ internal constructor(
         val DNS_TTL_GRACE_SEC = TimeUnit.MINUTES.toSeconds(5L)
         private const val RDATA_MAX_LENGTH = 100
         private const val EMPTY_RESPONSE = "--"
-    }
-
-    private val vpnStateMap = HashMap<Transaction.Status, BraveVPNService.State>()
-
-    init {
-        vpnStateMap[Transaction.Status.COMPLETE] = BraveVPNService.State.WORKING
-        vpnStateMap[Transaction.Status.SEND_FAIL] = BraveVPNService.State.NO_INTERNET
-        vpnStateMap[Transaction.Status.NO_RESPONSE] = BraveVPNService.State.DNS_SERVER_DOWN
-        vpnStateMap[Transaction.Status.TRANSPORT_ERROR] = BraveVPNService.State.DNS_SERVER_DOWN
-        vpnStateMap[Transaction.Status.BAD_QUERY] = BraveVPNService.State.DNS_ERROR
-        vpnStateMap[Transaction.Status.CLIENT_ERROR] = BraveVPNService.State.DNS_ERROR
-        vpnStateMap[Transaction.Status.BAD_RESPONSE] = BraveVPNService.State.DNS_ERROR
-        vpnStateMap[Transaction.Status.INTERNAL_ERROR] = BraveVPNService.State.APP_ERROR
     }
 
     fun processOnResponse(summary: DNSSummary): Transaction {
@@ -256,38 +241,6 @@ internal constructor(
         @Suppress("UNCHECKED_CAST")
         val dnsLogs = (logs as? List<DnsLog>) ?: return
         dnsLogRepository.insertBatch(dnsLogs)
-    }
-
-    fun updateVpnConnectionState(transaction: Transaction?) {
-        if (transaction == null) return
-
-        // Update the connection state.  If the transaction succeeded, then the connection is
-        // working.
-        // If the transaction failed, then the connection is not working.
-        // commented the code for reporting good or bad network.
-        // Connection state will be unknown if the transaction is blocked locally in that case,
-        // transaction status will be set as complete. So introduced check while
-        // setting the connection state.
-        if (transaction.status === Transaction.Status.COMPLETE) {
-            // skip updating the connection state if the transaction was resolved locally.
-            // locally resolved transaction has no server name, indicating it was blocked
-            // by a local rule either a firewall rule or the local DNS blocklist.
-
-            if (isLocallyResolved(transaction)) return
-
-            VpnController.onConnectionStateChanged(BraveVPNService.State.WORKING)
-            // only update the server name if it is not empty as its only used to show ech
-            VpnController.onEchUpdate(transaction.isEch)
-        } else {
-            val vpnState = vpnStateMap[transaction.status] ?: BraveVPNService.State.FAILING
-            VpnController.onConnectionStateChanged(vpnState)
-        }
-    }
-
-    private fun isLocallyResolved(transaction: Transaction?): Boolean {
-        if (transaction == null) return false
-
-        return transaction.serverName.isEmpty()
     }
 
     private fun io(f: suspend () -> Unit) {

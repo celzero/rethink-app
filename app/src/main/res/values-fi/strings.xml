@@ -104,7 +104,6 @@
     <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">suojattu</string>
     <string name="universal_firewall_explanation" translatable="true">Käytä palomuurisääntöjä kaikissa sovelluksissa laitteen tapahtumien perusteella, esimerkiksi kun laite on lukittu tai kun tietty sovellus ei ole käytössä.</string>
     <string name="dns_mode_info_title" translatable="true">DNS</string>
-    <string name="failed_using_default" translatable="true">Epäonnistui: käytetään vara-DNS:ää</string>
     <string name="status_protected_with_tor" translatable="true">suojattu Torilla</string>
     <string name="notification_action_pause_vpn" translatable="true">Keskeytä</string>
     <string name="status_protected_with_proxy" translatable="true">suojattu välityspalvelimella</string>
@@ -134,9 +133,7 @@
     <string name="firewall_rules" translatable="true">Verkkosäännöt</string>
     <string name="firewall_mode_info_explanation_new" translatable="true">Valvo verkkotoimintaa ja käytä palomuuria mille tahansa sovellukselle tai IP-osoitteelle.</string>
     <string name="alert_permission_accessibility" translatable="true">Käyttöoikeus – Esteettömyys</string>
-    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink käyttää esteettömyyspalvelua seuratakseen, mitkä sovellukset ovat käytössä (etualalla) ja mitkä sovellukset eivät ole käytössä (taustalla).
-\n
-\nRethink ei kerää tietoja tai vakoile sinua millään tavalla.</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink käyttää esteettömyyspalvelua seuratakseen, mitkä sovellukset ovat käytössä (etualalla) ja mitkä sovellukset eivät ole käytössä (taustalla). \n \nRethink ei kerää tietoja tai vakoile sinua millään tavalla.</string>
     <string name="status_no_internet" translatable="true">ei internetiä</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">ei suojattu</string>
     <string name="firewall_mode_info_title" translatable="true">Palomuuri</string>
@@ -155,6 +152,6 @@
     <string name="dns_query_clear_logs_title" translatable="true">Poista kaikki DNS-lokit?</string>
     <string name="dns_query_clear_logs_message" translatable="true">Tämä poistaa kaikki laitteella olevat DNS-lokit. Tätä ei voi kumota. Haluatko jatkaa?</string>
     <string name="bsct_app_info" translatable="true">Tietoa sovelluksesta</string>
-    <string name="bsct_block_ip" translatable="true">Estä, luota <u>tähän IP-osoitteeseen</u> <u>tälle sovellukselle</u></string>
+    <string name="bsct_block_ip" translatable="true">Estä, luota &lt;u&gt;tähän IP-osoitteeseen&lt;/u&gt; &lt;u&gt;tälle sovellukselle&lt;/u&gt;</string>
     <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Käytettävyyspalvelu on pysähtynyt tai kaatunut. <i><b>Mene asetuksiin ja pakota Rethinkin lopetus</b></i> \u0020ja käynnistä se uudelleen <i>Estä mikä tahansa sovellus, jota ei käytetä.</i>\n\nRethink käyttää saavutettavuuspalvelua seuraamaan, mitkä sovellukset ovat käytössä (etualalla) verrattuna niihin, jotka eivät ole käytössä (taustalla).</string>
 </resources>

@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import Logger
-import Logger.LOG_TAG_DNS
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -42,7 +42,6 @@ import com.celzero.bravedns.scheduler.WorkScheduler.Companion.BLOCKLIST_UPDATE_C
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
@@ -51,11 +50,9 @@ import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.bottomsheet.BlockFreeDnsModeBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.DnsRecordTypesBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.LocalBlocklistsBottomSheet
-import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.SnackbarHelper
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
@@ -128,11 +125,11 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         // use system dns for undelegated domains
         b.dcUndelegatedDomainsSwitch.isChecked = persistentState.useSystemDnsForUndelegatedDomains
         b.connectedStatusTitle.text = getConnectedDnsType()
-        b.dcUseFallbackToBypassSwitch.isChecked = persistentState.useFallbackDnsToBypass
         b.dcBlockUnknownSwitch.isChecked = persistentState.blockDnsForUnknownApp
         b.dcPreventDnsLeaksSwitch.isChecked = persistentState.preventDnsLeaks
         showSplitDnsUi()
         updateAllowedRecordTypesUi()
+        updateBlockFreeDnsUi()
     }
 
     private suspend fun handleProxyDnsUi() {
@@ -256,12 +253,15 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
 
     private fun updateLatency(dnsType: String = b.connectedStatusTitleUrl.text.toString()) {
         io {
-            val prefId = if (appConfig.isSmartDnsEnabled()) {
+            var prefId = if (appConfig.isSmartDnsEnabled()) {
                 Backend.Plus
             } else if (appConfig.isSystemDns()) {
                 Backend.System
             } else {
                 Backend.Preferred
+            }
+            if (persistentState.enableDnsCache) {
+                prefId = Backend.CT + prefId
             }
             val p50 = VpnController.p50(prefId)
             if (p50 <= 0L) return@io
@@ -276,25 +276,48 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
 
     private fun showSplitDnsUi() {
         if (isAtleastR()) {
-            // show split dns by default only if the device is running on Android 12 or above
-            b.dcSplitDnsRl.visibility = View.VISIBLE
-            b.dividerSplitDns.visibility = View.VISIBLE
+            // show split dns by default only if the device is running on Android 11 or above
+            enableSplitDnsUi()
             b.dcSplitDnsSwitch.isChecked = persistentState.splitDns
         } else {
             if (persistentState.enableDnsAlg) {
-                b.dcSplitDnsRl.visibility = View.VISIBLE
-                b.dividerSplitDns.visibility = View.VISIBLE
+                enableSplitDnsUi()
                 b.dcSplitDnsSwitch.isChecked = persistentState.splitDns
             } else {
-                b.dcSplitDnsRl.visibility = View.GONE
-                b.dividerSplitDns.visibility = View.GONE
+                // below R without ALG: show split DNS as enabled so user can toggle it on,
+                // which will auto-enable ALG as a dependency
+                b.dcSplitDnsRl.visibility = View.VISIBLE
+                b.dividerSplitDns.visibility = View.VISIBLE
+                enableSplitDnsUi()
+                b.dcSplitDnsSwitch.isChecked = persistentState.splitDns
             }
         }
     }
 
+    private fun enableSplitDnsUi() {
+        b.dcSplitDnsTxt.alpha = 1f
+        b.dcSplitDnsDesc.alpha = 1f
+        b.dcSplitDnsRl.isEnabled = true
+        b.dcSplitDnsRl.isClickable = true
+        b.dcSplitDnsSwitch.isChecked = true
+        b.dcSplitDnsSwitch.isEnabled = true
+        b.dcSplitDnsSwitch.isClickable = true
+    }
+
+    private fun disableSplitDnsUi() {
+        b.dcSplitDnsTxt.alpha = 0.5f
+        b.dcSplitDnsDesc.alpha = 0.5f
+        b.dcSplitDnsIcon.alpha = 0.25f
+        b.dcSplitDnsRl.isEnabled = false
+        b.dcSplitDnsRl.isClickable = false
+        b.dcSplitDnsSwitch.isChecked = false
+        b.dcSplitDnsSwitch.isEnabled = false
+        b.dcSplitDnsSwitch.isClickable = false
+    }
+
     private fun updateSpiltDns() {
         if (isAtleastR()) {
-            // no-op, no need to depend of alg when device is running on Android 12 or above
+            // no-op, no need to depend of alg when device is running on Android 11 or above
             // as split dns option is shown to user regardless of dns alg
             b.dcSplitDnsRl.visibility = View.VISIBLE
             b.dividerSplitDns.visibility = View.VISIBLE
@@ -494,12 +517,6 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.dcFaviconSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcFaviconSwitch)
             persistentState.fetchFavIcon = enabled
-            if (enabled) {
-                // Enable experimental-dependent settings when experimental features are enabled
-                if (persistentState.enableStabilityDependentSettings()) {
-                    SnackbarHelper.showStabilityProgram(b.root, persistentState)
-                }
-            }
             logEvent("fav icon? $enabled", "User changed fav icon setting to $enabled")
         }
 
@@ -585,7 +602,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             b.dcRefresh.isEnabled = false
             b.dcRefresh.animation = animation
             b.dcRefresh.startAnimation(animation)
-            io { VpnController.refresh() }
+            io { VpnController.refreshResolvers() }
             Utilities.delay(REFRESH_TIMEOUT, lifecycleScope) {
                 if (isAdded) {
                     b.dcRefresh.isEnabled = true
@@ -606,12 +623,18 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.dcSplitDnsSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.splitDns = isChecked
             if (isChecked) {
+                // below Android R, split DNS requires ALG; auto-enable it
+                if (!isAtleastR() && !persistentState.enableDnsAlg) {
+                    persistentState.enableDnsAlg = true
+                    b.dcAlgSwitch.isChecked = true
+                }
                 // Enable experimental-dependent settings when experimental features are enabled
                 if (persistentState.enableStabilityDependentSettings()) {
                     SnackbarHelper.showStabilityProgram(b.root, persistentState)
                 }
             }
             updateConnectedStatus(persistentState.connectedDnsName)
+            updateBlockFreeDnsUi()
             logEvent(
                 "split dns? $isChecked",
                 "User changed split dns setting to $isChecked"
@@ -643,18 +666,6 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
                 "undelegated domains? $isChecked",
                 "User changed use system dns for undelegated domains setting to $isChecked"
             )
-        }
-
-        b.dcUseFallbackToBypassSwitch.setOnCheckedChangeListener { _, isChecked ->
-            persistentState.useFallbackDnsToBypass = isChecked
-            logEvent(
-                "use fallback to bypass? $isChecked",
-                "User changed use fallback dns to bypass setting to $isChecked"
-            )
-        }
-
-        b.dcUseFallbackToBypassHeading.setOnClickListener {
-            b.dcUseFallbackToBypassSwitch.isChecked = !b.dcUseFallbackToBypassSwitch.isChecked
         }
 
         b.dcAllowedRecordTypesRl.setOnClickListener {
@@ -809,15 +820,42 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
     }
 
     private fun updateBlockFreeDnsUi() {
-        val mode = BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.fromMode(persistentState.blockFreeDnsMode)
-        b.dcBlockFreeDnsDesc.text = when (mode) {
-            BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.FALLBACK -> getString(R.string.bfdm_option_fallback_label)
+        b.dcBlockFreeDnsRl.isEnabled = true
+        b.dcBlockFreeDnsRl.isClickable = true
+        b.dcBlockFreeDnsRl.alpha = 1f
+        val blockFreeMode = if (persistentState.splitDns) {
+            BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.fromMode(persistentState.blockFreeDnsMode)
+        } else {
+            if (isAtleastR()) {
+                BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.AUTO
+            } else {
+                BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.FALLBACK
+            }
+        }
+        val modeLabel = when (blockFreeMode) {
+            BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.FALLBACK -> getString(R.string.bfdm_option_bootstrap_label)
             BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.GLOBAL -> getString(R.string.bfdm_option_global_label)
             BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.AUTO -> getString(R.string.bfdm_option_auto_label)
+        }
+        b.dcBlockFreeDnsDesc.text = if (persistentState.splitDns) {
+            modeLabel
+        } else {
+            getString(R.string.two_argument_dot, getString(R.string.bfdm_split_dns_disabled), modeLabel)
         }
     }
 
     private fun setNetworkDns() {
+        // Under proxy lockdown, system DNS cannot be enabled because it bypasses the
+        // lockdown proxy. Block the change and revert the radio button selection.
+        if (persistentState.wgGlobalLockdown) {
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.lockdown_check_setting_disabled),
+                Toast.LENGTH_SHORT
+            )
+            updateSelectedDns()
+            return
+        }
         // set network dns
         io { appConfig.enableSystemDns() }
     }

@@ -7,11 +7,11 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/dialog_custom_url_top"
-        style="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:textSize="@dimen/large_font_text_view"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
+        android:textColor="?attr/primaryTextColor"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
@@ -23,87 +23,67 @@
         app:hintTextColor="?attr/accentGood"
         app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_top">
 
-        <androidx.appcompat.widget.AppCompatEditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/dialog_custom_name_edit_text"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
             android:inputType="textNoSuggestions"
             android:maxLines="2"
-            android:padding="10dp"
             android:textColor="?attr/primaryTextColor"
-            android:textSize="@dimen/large_font_text_view"
-            app:layout_constraintRight_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_top" />
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/text_input_layout1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:hint="@string/settings_proxy_header"
         app:hintTextColor="?attr/accentGood"
         app:layout_constraintTop_toBottomOf="@id/text_input_layout_name">
 
-        <androidx.appcompat.widget.AppCompatEditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/dialog_custom_proxy_edit_text"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
             android:inputType="textUri"
             android:maxLines="2"
-            android:padding="10dp"
             android:textColor="?attr/primaryTextColor"
-            android:textSize="@dimen/large_font_text_view"
-            app:layout_constraintRight_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_input_layout_name" />
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/text_input_layout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:hint="@string/cd_doh_dialog_resolver_url"
         app:hintTextColor="?attr/accentGood"
         app:layout_constraintTop_toBottomOf="@id/text_input_layout1">
 
-        <androidx.appcompat.widget.AppCompatEditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/dialog_custom_resolver_edit_text"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
             android:inputType="textUri"
             android:maxLines="2"
-            android:padding="10dp"
             android:text="https://"
             android:textColor="?attr/primaryTextColor"
-            android:textSize="@dimen/large_font_text_view"
-            app:layout_constraintRight_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_input_layout_name" />
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/dialog_custom_url_failure_text"
-        style="@style/TextAppearance.AppCompat.Body1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:padding="5dp"
         android:text="@string/settings_http_proxy_error_text4"
+        android:textAppearance="?attr/textAppearanceBodyMedium"
         android:textColor="?attr/colorError"
-        android:textSize="@dimen/default_font_text_view"
         android:visibility="invisible"
         app:layout_constraintTop_toBottomOf="@id/text_input_layout2" />
 
@@ -112,13 +92,12 @@
         style="@style/Widget.Material3.Button.TextButton.Dialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:text="@string/lbl_add"
         android:textColor="?attr/accentGood"
-        android:textSize="@dimen/large_font_text_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_failure_text" />
 
@@ -133,11 +112,10 @@
         android:gravity="center"
         android:text="@string/lbl_cancel"
         android:textColor="?attr/accentGood"
-        android:textSize="@dimen/large_font_text_view"
         app:layout_constraintEnd_toStartOf="@id/dialog_custom_url_ok_btn"
         app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_failure_text" />
 
-    <ProgressBar
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/dialog_custom_url_loading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -145,6 +123,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="10dp"
+        android:indeterminate="true"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_failure_text" />

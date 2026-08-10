@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.customdownloader
 
-import Logger
-import Logger.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_DOWNLOAD
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent

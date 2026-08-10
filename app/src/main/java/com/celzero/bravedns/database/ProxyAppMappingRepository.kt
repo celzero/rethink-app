@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.database
 
-import Logger
-import Logger.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import android.database.sqlite.SQLiteConstraintException
 
 class ProxyAppMappingRepository(
@@ -56,6 +56,10 @@ class ProxyAppMappingRepository(
     }
 
     suspend fun updateUidForApp(oldUid: Int, newUid: Int, packageName: String) {
+        if (oldUid == newUid) {
+            Logger.w(LOG_TAG_PROXY, "updateUidForApp: oldUid == newUid ($oldUid) for $packageName; skipping")
+            return
+        }
         try {
             proxyApplicationMappingDAO.updateUidForApp(oldUid, newUid, packageName)
         } catch (_: SQLiteConstraintException) {

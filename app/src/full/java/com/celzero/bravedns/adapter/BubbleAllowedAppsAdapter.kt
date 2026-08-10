@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AllowedAppInfo
 import com.celzero.bravedns.databinding.ItemAllowedAppBinding
+import com.celzero.bravedns.util.UIUtils
 
 class BubbleAllowedAppsAdapter(
     private val onRemoveClick: (AllowedAppInfo) -> Unit
@@ -43,7 +44,6 @@ class BubbleAllowedAppsAdapter(
         private const val ALLOWED_DURATION_MINUTES = 15
         private const val MILLIS_PER_MINUTE = 60
         private const val MILLIS_PER_SECOND = 1000
-        private const val SINGLE_MINUTE = 1L
     }
 
     inner class ViewHolder(private val binding: ItemAllowedAppBinding) :
@@ -56,15 +56,22 @@ class BubbleAllowedAppsAdapter(
             // appName is already decorated ("App + N other apps") by paging source.
             binding.allowedAppName.text = app.appName
 
-            // Calculate time remaining
             val now = System.currentTimeMillis()
-            val expiresAt = app.allowedAt + (ALLOWED_DURATION_MINUTES * MILLIS_PER_MINUTE * MILLIS_PER_SECOND) // 15 minutes
-            val remaining = (expiresAt - now) / MILLIS_PER_SECOND / MILLIS_PER_MINUTE // minutes
+            val duration = (now - app.allowedAt)
+            val minutesAgo = duration / (MILLIS_PER_SECOND * MILLIS_PER_MINUTE)
+            val expiresAt = app.allowedAt + (ALLOWED_DURATION_MINUTES * MILLIS_PER_MINUTE * MILLIS_PER_SECOND)
 
-            binding.allowedTimeRemaining.text = if (remaining > 0) {
-                "$remaining min${if (remaining != SINGLE_MINUTE) "s" else ""} remaining"
+            val context = binding.root.context
+            if (now < expiresAt) {
+                binding.allowedTimeRemaining.setTextColor(UIUtils.fetchColor(context, R.attr.accentGood))
+                if (minutesAgo <= 0) {
+                    binding.allowedTimeRemaining.text = context.getString(R.string.bubble_time_just_now)
+                } else {
+                    binding.allowedTimeRemaining.text = context.getString(R.string.bubble_time_minutes_ago, minutesAgo.toInt())
+                }
             } else {
-                "Expired"
+                binding.allowedTimeRemaining.text = context.getString(R.string.lbl_expired)
+                binding.allowedTimeRemaining.setTextColor(UIUtils.fetchColor(context, R.attr.accentBad))
             }
 
             // Load app icon

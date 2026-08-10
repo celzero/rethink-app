@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import Logger
-import Logger.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -320,10 +320,6 @@ class WgMainActivity :
                         dnsNames += ", "
                     }
                     dnsNames += activeConfigs.joinToString(",") { it.getName() }
-                }
-                // add fallback to the list as it can be used to bypass trusted ip/domains/apps
-                if (persistentState.useFallbackDnsToBypass) {
-                    dnsNames += ", " + getString(R.string.lbl_fallback)
                 }
                 b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, dnsNames)
             }

@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.iab
 
-import Logger
-import Logger.LOG_IAB
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_IAB
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -377,7 +377,7 @@ class SubscriptionCheckWorker(
             val accountId = purchase.accountId
             val deviceId  = billingBackendClient.getDeviceId()
             if (accountId.isNotEmpty() && purchase.purchaseToken.isNotEmpty()) {
-                Logger.d(LOG_IAB, "$TAG; $mname: tunnel unavailable, querying server entitlement " +
+                Logger.d(LOG_IAB, "$TAG; $mname: tunnel entitlement unavailable, querying server entitlement " +
                     "for token=${purchase.purchaseToken.take(8)}")
                 when (val result = billingBackendClient.queryEntitlement(
                     accountId, deviceId, purchase, purchase.purchaseToken

@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.iab
 
-import Logger
-import Logger.LOG_IAB
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_IAB
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.ConsumeParams
 import com.android.billingclient.api.ProductDetails

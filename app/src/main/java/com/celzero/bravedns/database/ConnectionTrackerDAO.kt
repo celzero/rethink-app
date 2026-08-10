@@ -26,8 +26,6 @@ import androidx.room.Update
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.data.DataUsage
 import com.celzero.bravedns.data.DataUsageSummary
-import com.celzero.bravedns.util.Constants.Companion.MAX_LOGS
-
 private const val CT_COLUMNS =
     "id, 'ct' as source, appName, uid, packageName, usrId, ipAddress, port, protocol, isBlocked, blockedByRule, blocklists, proxyDetails, flag, dnsQuery, timeStamp, connId, downloadBytes, uploadBytes, duration, synack, rpid, message, connType"
 private const val RLOG_COLUMNS =
@@ -78,24 +76,21 @@ interface ConnectionTrackerDAO {
 
     @Delete fun delete(connectionTracker: ConnectionTracker)
 
-    // replace order by timeStamp desc with order by id desc, as order by timeStamp desc is building
-    // the query with temporary index on the table. This is causing the query to be slow.
-    // ref: https://stackoverflow.com/a/50776662 (auto covering index)
-    // explain QUERY plan SELECT * from ConnectionTracker ORDER by timeStamp desc
-    // add LIMIT 35000 (Constants.MAX_LOGS) to the query to avoid the query to be slow
-    @Query("select * from ConnectionTracker order by id desc LIMIT $MAX_LOGS")
+    // PagingSource handles LIMIT/OFFSET; no hard-coded cap needed.
+    // Purge-by-age (PurgeConnectionLogs) bounds the table size.
+    @Query("select * from ConnectionTracker order by id desc")
     fun getConnectionTrackerByName(): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select * from ConnectionTracker where (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query or proxyDetails like :query or connId like :query) order by id desc LIMIT $MAX_LOGS"
+        "select * from ConnectionTracker where (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query or proxyDetails like :query or connId like :query) order by id desc"
     )
     fun getConnectionTrackerByName(query: String): PagingSource<Int, ConnectionTracker>
 
-    @Query("select * from ConnectionTracker where isBlocked = 1 order by id desc LIMIT $MAX_LOGS")
+    @Query("select * from ConnectionTracker where isBlocked = 1 order by id desc")
     fun getBlockedConnections(): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select * from ConnectionTracker where  (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query or proxyDetails like :query or connId like :query) and isBlocked = 1 order by id desc LIMIT $MAX_LOGS"
+        "select * from ConnectionTracker where  (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query or proxyDetails like :query or connId like :query) and isBlocked = 1 order by id desc"
     )
     fun getBlockedConnections(query: String): PagingSource<Int, ConnectionTracker>
 
@@ -115,17 +110,17 @@ interface ConnectionTrackerDAO {
     fun getAppIpLogsFiltered(uid: Int, to: Long, query: String): PagingSource<Int, AppConnection>
 
     @Query(
-        "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 order by id desc LIMIT $MAX_LOGS"
+        "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 order by id desc"
     )
     fun getBlockedConnectionsFiltered(filter: Set<String>): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select * from ConnectionTracker where protocol = :protocol order by id desc LIMIT $MAX_LOGS"
+        "select * from ConnectionTracker where protocol = :protocol order by id desc"
     )
     fun getProtocolFilteredConnections(protocol: String): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select * from ConnectionTracker where protocol = :protocol and blockedByRule in (:filter) order by id desc LIMIT $MAX_LOGS"
+        "select * from ConnectionTracker where protocol = :protocol and blockedByRule in (:filter) order by id desc"
     )
     fun getProtocolFilteredConnections(
         protocol: String,
@@ -133,7 +128,7 @@ interface ConnectionTrackerDAO {
     ): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 and (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query or proxyDetails like :query or connId like :query) order by id desc LIMIT $MAX_LOGS"
+        "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 and (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query or proxyDetails like :query or connId like :query) order by id desc"
     )
     fun getBlockedConnectionsFiltered(
         query: String,
@@ -145,32 +140,32 @@ interface ConnectionTrackerDAO {
     // Column list must match MergedConnectionLog in name/order.
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where isBlocked = 1 UNION ALL select $RLOG_COLUMNS from RethinkLog where isBlocked = 1 order by timeStamp desc, id desc LIMIT $MAX_LOGS"
+        "select $CT_COLUMNS from ConnectionTracker where isBlocked = 1 UNION ALL select $RLOG_COLUMNS from RethinkLog where isBlocked = 1 order by timeStamp desc, id desc"
     )
     fun getMergedBlockedConnections(): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where isBlocked = 1 and $SEARCH_PREDICATE UNION ALL select $RLOG_COLUMNS from RethinkLog where isBlocked = 1 and $SEARCH_PREDICATE order by timeStamp desc, id desc LIMIT $MAX_LOGS"
+        "select $CT_COLUMNS from ConnectionTracker where isBlocked = 1 and $SEARCH_PREDICATE UNION ALL select $RLOG_COLUMNS from RethinkLog where isBlocked = 1 and $SEARCH_PREDICATE order by timeStamp desc, id desc"
     )
     fun getMergedBlockedConnections(query: String): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where isBlocked = 0 UNION ALL select $RLOG_COLUMNS from RethinkLog where isBlocked = 0 order by timeStamp desc, id desc LIMIT $MAX_LOGS"
+        "select $CT_COLUMNS from ConnectionTracker where isBlocked = 0 UNION ALL select $RLOG_COLUMNS from RethinkLog where isBlocked = 0 order by timeStamp desc, id desc"
     )
     fun getMergedAllowedConnections(): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where isBlocked = 0 and $SEARCH_PREDICATE UNION ALL select $RLOG_COLUMNS from RethinkLog where isBlocked = 0 and $SEARCH_PREDICATE order by timeStamp desc, id desc LIMIT $MAX_LOGS"
+        "select $CT_COLUMNS from ConnectionTracker where isBlocked = 0 and $SEARCH_PREDICATE UNION ALL select $RLOG_COLUMNS from RethinkLog where isBlocked = 0 and $SEARCH_PREDICATE order by timeStamp desc, id desc"
     )
     fun getMergedAllowedConnections(query: String): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 UNION ALL select $RLOG_COLUMNS from RethinkLog where blockedByRule in (:filter) and isBlocked = 1 order by timeStamp desc, id desc LIMIT $MAX_LOGS"
+        "select $CT_COLUMNS from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 UNION ALL select $RLOG_COLUMNS from RethinkLog where blockedByRule in (:filter) and isBlocked = 1 order by timeStamp desc, id desc"
     )
     fun getMergedBlockedConnectionsFiltered(filter: Set<String>): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 and $SEARCH_PREDICATE UNION ALL select $RLOG_COLUMNS from RethinkLog where blockedByRule in (:filter) and isBlocked = 1 and $SEARCH_PREDICATE order by timeStamp desc, id desc LIMIT $MAX_LOGS"
+        "select $CT_COLUMNS from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 and $SEARCH_PREDICATE UNION ALL select $RLOG_COLUMNS from RethinkLog where blockedByRule in (:filter) and isBlocked = 1 and $SEARCH_PREDICATE order by timeStamp desc, id desc"
     )
     fun getMergedBlockedConnectionsFiltered(
         query: String,
@@ -178,12 +173,12 @@ interface ConnectionTrackerDAO {
     ): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 0 UNION ALL select $RLOG_COLUMNS from RethinkLog where blockedByRule in (:filter) and isBlocked = 0 order by timeStamp desc, id desc LIMIT $MAX_LOGS"
+        "select $CT_COLUMNS from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 0 UNION ALL select $RLOG_COLUMNS from RethinkLog where blockedByRule in (:filter) and isBlocked = 0 order by timeStamp desc, id desc"
     )
     fun getMergedAllowedConnectionsFiltered(filter: Set<String>): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 0 and $SEARCH_PREDICATE UNION ALL select $RLOG_COLUMNS from RethinkLog where blockedByRule in (:filter) and isBlocked = 0 and $SEARCH_PREDICATE order by timeStamp desc, id desc LIMIT $MAX_LOGS"
+        "select $CT_COLUMNS from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 0 and $SEARCH_PREDICATE UNION ALL select $RLOG_COLUMNS from RethinkLog where blockedByRule in (:filter) and isBlocked = 0 and $SEARCH_PREDICATE order by timeStamp desc, id desc"
     )
     fun getMergedAllowedConnectionsFiltered(
         query: String,
@@ -191,12 +186,12 @@ interface ConnectionTrackerDAO {
     ): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where protocol = :protocol UNION ALL select $RLOG_COLUMNS from RethinkLog where protocol = :protocol order by timeStamp desc, id desc LIMIT $MAX_LOGS"
+        "select $CT_COLUMNS from ConnectionTracker where protocol = :protocol UNION ALL select $RLOG_COLUMNS from RethinkLog where protocol = :protocol order by timeStamp desc, id desc"
     )
     fun getMergedProtocolFilteredConnections(protocol: String): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where protocol = :protocol and blockedByRule in (:filter) UNION ALL select $RLOG_COLUMNS from RethinkLog where protocol = :protocol and blockedByRule in (:filter) order by timeStamp desc, id desc LIMIT $MAX_LOGS"
+        "select $CT_COLUMNS from ConnectionTracker where protocol = :protocol and blockedByRule in (:filter) UNION ALL select $RLOG_COLUMNS from RethinkLog where protocol = :protocol and blockedByRule in (:filter) order by timeStamp desc, id desc"
     )
     fun getMergedProtocolFilteredConnections(
         protocol: String,
@@ -204,12 +199,12 @@ interface ConnectionTrackerDAO {
     ): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker UNION ALL select $RLOG_COLUMNS from RethinkLog order by timeStamp desc, id desc LIMIT $MAX_LOGS"
+        "select $CT_COLUMNS from ConnectionTracker UNION ALL select $RLOG_COLUMNS from RethinkLog order by timeStamp desc, id desc"
     )
     fun getMergedConnectionTrackerByName(): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where $SEARCH_PREDICATE UNION ALL select $RLOG_COLUMNS from RethinkLog where $SEARCH_PREDICATE order by timeStamp desc, id desc LIMIT $MAX_LOGS"
+        "select $CT_COLUMNS from ConnectionTracker where $SEARCH_PREDICATE UNION ALL select $RLOG_COLUMNS from RethinkLog where $SEARCH_PREDICATE order by timeStamp desc, id desc"
     )
     fun getMergedConnectionTrackerByName(query: String): PagingSource<Int, MergedConnectionLog>
 
@@ -225,20 +220,20 @@ interface ConnectionTrackerDAO {
     @Query("DELETE FROM ConnectionTracker WHERE  timeStamp < :date") fun purgeLogsByDate(date: Long)
 
     @Query(
-        "select * from ConnectionTracker where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query or proxyDetails like :query or connId like :query) order by id desc LIMIT $MAX_LOGS"
+        "select * from ConnectionTracker where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query or proxyDetails like :query or connId like :query) order by id desc"
     )
     fun getAllowedConnections(query: String): PagingSource<Int, ConnectionTracker>
 
-    @Query("select * from ConnectionTracker where isBlocked = 0 order by id desc LIMIT $MAX_LOGS")
+    @Query("select * from ConnectionTracker where isBlocked = 0 order by id desc")
     fun getAllowedConnections(): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select * from ConnectionTracker where isBlocked = 0 and blockedByRule in (:filter) order by id desc LIMIT $MAX_LOGS"
+        "select * from ConnectionTracker where isBlocked = 0 and blockedByRule in (:filter) order by id desc"
     )
     fun getAllowedConnectionsFiltered(filter: Set<String>): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select * from ConnectionTracker where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query or proxyDetails like :query or connId like :query) and blockedByRule in (:filter) order by id desc LIMIT $MAX_LOGS"
+        "select * from ConnectionTracker where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query or proxyDetails like :query or connId like :query) and blockedByRule in (:filter) order by id desc"
     )
     fun getAllowedConnectionsFiltered(
         query: String,

@@ -152,7 +152,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_pt_mode_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -172,10 +172,10 @@
                         android:src="@drawable/ic_ip_network" />
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/dv_pt_mode_switch"
+                        android:layout_toStartOf="@id/settings_pt_mode_value_txt"
                         android:layout_toEndOf="@id/settings_pt_mode_icon"
                         android:orientation="vertical">
 
@@ -192,18 +192,19 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
-                            android:text="Off: PTMODENO46, On: PTMODAUTO"
+                            android:text="No override"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
-                    <com.google.android.material.materialswitch.MaterialSwitch
-                        android:id="@+id/dv_pt_mode_switch"
-                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/settings_pt_mode_value_txt"
+                        style="@style/TextAppearance.AppCompat.Body2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:padding="10dp" />
+                        android:padding="10dp"
+                        android:textColor="?attr/colorPrimary" />
 
                 </RelativeLayout>
 

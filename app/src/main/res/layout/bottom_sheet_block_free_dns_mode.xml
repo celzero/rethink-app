@@ -74,7 +74,7 @@
                     style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/bfdm_option_fallback_label"
+                    android:text="@string/bfdm_option_bootstrap_label"
                     android:textColor="?attr/colorOnSurface" />
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -82,7 +82,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="@string/bfdm_option_fallback_desc"
+                    android:text="@string/bfdm_option_bootstrap_desc"
                     android:textColor="?attr/colorOnSurfaceVariant" />
             </LinearLayout>
         </RelativeLayout>

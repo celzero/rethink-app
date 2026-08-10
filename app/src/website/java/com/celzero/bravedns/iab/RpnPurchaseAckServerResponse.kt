@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.iab
 
-import Logger
-import Logger.LOG_IAB
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_IAB
 import org.json.JSONObject
 
 // ref: github.com/celzero/redir: PlayErr / PlayOk classes in src/d.js

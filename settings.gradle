@@ -1,2 +1,3 @@
-rootProject.name='Bravedns'
-include ':app',':tun2socks'
+rootProject.name='rethink'
+include ':app'
+include ':benchmark'

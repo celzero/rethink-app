@@ -15,8 +15,8 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui.fragment
 
-import Logger
-import Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.view.View
@@ -27,6 +27,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -63,6 +64,7 @@ class ConnectionTrackerFragment :
 
     private var layoutManager: RecyclerView.LayoutManager? = null
     private val viewModel: ConnectionTrackerViewModel by viewModel()
+    private var lastScrollHeaderUpdateMs = 0L
 
     private var filterQuery: String = ""
     private val filterCategories: MutableSet<String> = mutableSetOf()
@@ -166,6 +168,7 @@ class ConnectionTrackerFragment :
 
     private fun setupRecyclerView() {
         b.recyclerConnection.setHasFixedSize(true)
+        b.recyclerConnection.setItemViewCacheSize(6)
         layoutManager = LinearLayoutManager(requireContext())
         layoutManager?.isItemPrefetchEnabled = true
         b.recyclerConnection.layoutManager = layoutManager
@@ -193,8 +196,16 @@ class ConnectionTrackerFragment :
 
         recyclerAdapter.addLoadStateListener { loadState ->
             val isEmpty = recyclerAdapter.itemCount < 1
+
+            if (loadState.refresh is LoadState.Loading && isEmpty) {
+                b.connectionListLogsDisabledTv.text = getString(R.string.loading)
+                b.connectionListLogsDisabledTv.visibility = View.VISIBLE
+                b.recyclerConnection.visibility = View.GONE
+                return@addLoadStateListener
+            }
+
             if (loadState.append.endOfPaginationReached && isEmpty) {
-                if (fromUniversalFirewallScreen || fromWireGuardScreen) {
+                if (fromUniversalFirewallScreen || fromWireGuardScreen || fromRpnScreen) {
                     b.connectionListLogsDisabledTv.text = getString(R.string.ada_ip_no_connection)
                     b.connectionListLogsDisabledTv.visibility = View.VISIBLE
                     b.connectionCardViewTop.visibility = View.GONE
@@ -207,7 +218,7 @@ class ConnectionTrackerFragment :
             } else {
                 b.connectionListLogsDisabledTv.visibility = View.GONE
                 if (!b.recyclerConnection.isVisible) b.recyclerConnection.visibility = View.VISIBLE
-                if (fromUniversalFirewallScreen || fromWireGuardScreen) {
+                if (fromUniversalFirewallScreen || fromWireGuardScreen || fromRpnScreen) {
                     b.connectionCardViewTop.visibility = View.GONE
                 } else {
                     b.connectionCardViewTop.visibility = View.VISIBLE
@@ -240,8 +251,17 @@ class ConnectionTrackerFragment :
 
         recyclerAdapter.addLoadStateListener { loadState ->
             val isEmpty = recyclerAdapter.itemCount < 1
+
+            // Show loading indicator during initial load
+            if (loadState.refresh is LoadState.Loading && isEmpty) {
+                b.connectionListLogsDisabledTv.text = getString(R.string.loading)
+                b.connectionListLogsDisabledTv.visibility = View.VISIBLE
+                b.recyclerConnection.visibility = View.GONE
+                return@addLoadStateListener
+            }
+
             if (loadState.append.endOfPaginationReached && isEmpty) {
-                if (fromUniversalFirewallScreen || fromWireGuardScreen) {
+                if (fromUniversalFirewallScreen || fromWireGuardScreen || fromRpnScreen) {
                     b.connectionListLogsDisabledTv.text = getString(R.string.ada_ip_no_connection)
                     b.connectionListLogsDisabledTv.visibility = View.VISIBLE
                     b.connectionCardViewTop.visibility = View.GONE
@@ -254,7 +274,7 @@ class ConnectionTrackerFragment :
             } else {
                 b.connectionListLogsDisabledTv.visibility = View.GONE
                 if (!b.recyclerConnection.isVisible) b.recyclerConnection.visibility = View.VISIBLE
-                if (fromUniversalFirewallScreen || fromWireGuardScreen) {
+                if (fromUniversalFirewallScreen || fromWireGuardScreen || fromRpnScreen) {
                     b.connectionCardViewTop.visibility = View.GONE
                 } else {
                     b.connectionCardViewTop.visibility = View.VISIBLE
@@ -299,6 +319,10 @@ class ConnectionTrackerFragment :
 
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
+
+                    val now = System.currentTimeMillis()
+                    if (now - lastScrollHeaderUpdateMs < 100L) return
+                    lastScrollHeaderUpdateMs = now
 
                     val firstChild = recyclerView.getChildAt(0)
                     if (firstChild == null) {

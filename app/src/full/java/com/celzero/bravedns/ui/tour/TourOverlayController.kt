@@ -15,7 +15,7 @@
  */
 package com.celzero.bravedns.ui.tour
 
-import Logger
+import com.celzero.bravedns.util.Logger
 import android.app.Activity
 import android.graphics.Rect
 import android.util.TypedValue
