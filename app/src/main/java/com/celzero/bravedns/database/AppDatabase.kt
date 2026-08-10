@@ -57,7 +57,7 @@ import com.celzero.bravedns.util.Constants
         CountryConfig::class,
         SponsorEntity::class
     ],
-    version = 31,
+    version = 32,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -155,6 +155,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_28_29)
                 .addMigrations(MIGRATION_29_30)
                 .addMigrations(MIGRATION_30_31)
+                .addMigrations(MIGRATION_31_32)
                 .build()
         }
 
@@ -1321,6 +1322,21 @@ abstract class AppDatabase : RoomDatabase() {
                         """.trimIndent()
                     )
                     Logger.i(LOG_TAG_APP_DB, "MIGRATION_30_31: created Sponsor table")
+                }
+            }
+        private val MIGRATION_31_32: Migration =
+            object : Migration(31, 32) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.execSQL(
+                        "ALTER TABLE AppInfo ADD COLUMN notes TEXT NOT NULL DEFAULT ''"
+                    )
+
+                    createAppInfoNotesLengthTriggers(db)
+
+                    Logger.i(
+                        LOG_TAG_APP_DB,
+                        "MIGRATION_31_32: added AppInfo.notes and enforced max length"
+                    )
                 }
             }
 
