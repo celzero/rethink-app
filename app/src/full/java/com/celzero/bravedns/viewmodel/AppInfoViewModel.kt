@@ -1,6 +1,6 @@
 package com.celzero.bravedns.viewmodel
 
-import Logger
+import com.celzero.bravedns.util.Logger
 import android.database.sqlite.SQLiteConstraintException
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

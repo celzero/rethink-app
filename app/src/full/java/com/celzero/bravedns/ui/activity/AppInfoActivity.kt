@@ -31,6 +31,7 @@ import android.text.TextWatcher
 import android.text.format.DateUtils
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageView

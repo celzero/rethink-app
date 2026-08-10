@@ -77,6 +77,16 @@
                     android:textColor="?attr/colorOnSurfaceVariant"
                     tools:text="10 MB 🔺 / 20 MB 🔻" />
 
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/firewall_app_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    tools:text="com.android.chrome (10123)" />
+
             </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -176,6 +176,25 @@ abstract class AppDatabase : RoomDatabase() {
                     Logger.i(LOG_TAG_APP_DB, "Database opened, ${db.version}")
                 }
             }
+        private fun createAppInfoNotesLengthTriggers(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "CREATE TRIGGER IF NOT EXISTS trg_appinfo_notes_length_insert " +
+                        "BEFORE INSERT ON AppInfo " +
+                        "WHEN length(NEW.notes) > $APP_NOTES_MAX_LENGTH " +
+                        "BEGIN " +
+                        "SELECT RAISE(ABORT, 'AppInfo.notes exceeds $APP_NOTES_MAX_LENGTH characters'); " +
+                        "END"
+            )
+
+            db.execSQL(
+                "CREATE TRIGGER IF NOT EXISTS trg_appinfo_notes_length_update " +
+                        "BEFORE UPDATE OF notes ON AppInfo " +
+                        "WHEN length(NEW.notes) > $APP_NOTES_MAX_LENGTH " +
+                        "BEGIN " +
+                        "SELECT RAISE(ABORT, 'AppInfo.notes exceeds $APP_NOTES_MAX_LENGTH characters'); " +
+                        "END"
+            )
+        }
 
         internal val MIGRATION_1_2: Migration =
             object : Migration(1, 2) {
