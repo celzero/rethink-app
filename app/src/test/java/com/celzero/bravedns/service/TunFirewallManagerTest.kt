@@ -292,7 +292,7 @@ class TunFirewallManagerTest : KoinTest {
     fun `RULE2E - Domain blocked`() = runTest {
         val uid = 10123
         val domains = "blocked.com"
-        every { DomainRulesManager.status("blocked.com", uid) } returns DomainRulesManager.Status.BLOCK
+        every { DomainRulesManager.getAggregatedDomainRule("blocked.com", uid) } returns Pair(DomainRulesManager.Status.BLOCK, "blocked.com")
         
         val connInfo = createConnInfo(uid = uid)
         val result = TunFirewallManager.firewall(createParams(connInfo = connInfo, domains = domains))
@@ -304,7 +304,7 @@ class TunFirewallManagerTest : KoinTest {
     fun `RULE2F - Domain trusted`() = runTest {
         val uid = 10123
         val domains = "trusted.com"
-        every { DomainRulesManager.status("trusted.com", uid) } returns DomainRulesManager.Status.TRUST
+        every { DomainRulesManager.getAggregatedDomainRule("trusted.com", uid) } returns Pair(DomainRulesManager.Status.TRUST, "trusted.com")
         
         val connInfo = createConnInfo(uid = uid)
         val result = TunFirewallManager.firewall(createParams(connInfo = connInfo, domains = domains))
@@ -317,9 +317,9 @@ class TunFirewallManagerTest : KoinTest {
         every { Utilities.isAtleastR() } returns false
         val uid = 10123
         val domains = "trusted.com,blocked.com"
-        every { DomainRulesManager.status("trusted.com", uid) } returns DomainRulesManager.Status.TRUST
-        every { DomainRulesManager.status("blocked.com", uid) } returns DomainRulesManager.Status.BLOCK
-        
+        every { DomainRulesManager.getAggregatedDomainRule("trusted.com", uid) } returns Pair(DomainRulesManager.Status.TRUST, "trusted.com")
+        every { DomainRulesManager.getAggregatedDomainRule("blocked.com", uid) } returns Pair(DomainRulesManager.Status.BLOCK, "blocked.com")
+
         val result = TunFirewallManager.firewall(createParams(createConnInfo(uid = uid), domains = domains))
         assertEquals(FirewallRuleset.RULE2F, result)
     }
@@ -421,7 +421,7 @@ class TunFirewallManagerTest : KoinTest {
     @Test
     fun `RULE2H - Global domain blocked`() = runTest {
         val domains = "global-blocked.com"
-        every { DomainRulesManager.status("global-blocked.com", UID_EVERYBODY) } returns DomainRulesManager.Status.BLOCK
+        every { DomainRulesManager.getAggregatedDomainRule("global-blocked.com", UID_EVERYBODY) } returns Pair(DomainRulesManager.Status.BLOCK, "global-blocked.com")
         
         val result = TunFirewallManager.firewall(createParams(domains = domains))
         assertEquals(FirewallRuleset.RULE2H, result)
@@ -430,7 +430,7 @@ class TunFirewallManagerTest : KoinTest {
     @Test
     fun `RULE2I - Global domain trusted`() = runTest {
         val domains = "global-trusted.com"
-        every { DomainRulesManager.status("global-trusted.com", UID_EVERYBODY) } returns DomainRulesManager.Status.TRUST
+        every { DomainRulesManager.getAggregatedDomainRule("global-trusted.com", UID_EVERYBODY) } returns Pair(DomainRulesManager.Status.TRUST, "global-trusted.com")
         
         val result = TunFirewallManager.firewall(createParams(domains = domains))
         assertEquals(FirewallRuleset.RULE2I, result)
@@ -558,7 +558,7 @@ class TunFirewallManagerTest : KoinTest {
         every { appStatus.bypassDnsFirewall() } returns false
         coEvery { FirewallManager.appStatus(uid) } returns appStatus
         
-        every { DomainRulesManager.status("trusted.com", uid) } returns DomainRulesManager.Status.TRUST
+        every { DomainRulesManager.getAggregatedDomainRule("trusted.com", uid) } returns Pair(DomainRulesManager.Status.TRUST, "trusted.com")
         
         val result = TunFirewallManager.firewall(createParams(connInfo = createConnInfo(uid = uid), domains = domains))
         assertEquals(FirewallRuleset.RULE2F, result)
@@ -573,7 +573,7 @@ class TunFirewallManagerTest : KoinTest {
         every { appStatus.bypassDnsFirewall() } returns false
         coEvery { FirewallManager.appStatus(uid) } returns appStatus
         
-        every { DomainRulesManager.status("blocked.com", uid) } returns DomainRulesManager.Status.BLOCK
+        every { DomainRulesManager.getAggregatedDomainRule("blocked.com", uid) } returns Pair(DomainRulesManager.Status.BLOCK, "blocked.com")
         
         val result = TunFirewallManager.firewall(createParams(connInfo = createConnInfo(uid = uid), domains = domains))
         assertEquals(FirewallRuleset.RULE2E, result)
@@ -588,8 +588,8 @@ class TunFirewallManagerTest : KoinTest {
         every { appStatus.bypassDnsFirewall() } returns false
         coEvery { FirewallManager.appStatus(uid) } returns appStatus
         
-        every { DomainRulesManager.status("global-trusted.com", uid) } returns DomainRulesManager.Status.NONE
-        every { DomainRulesManager.status("global-trusted.com", UID_EVERYBODY) } returns DomainRulesManager.Status.TRUST
+        every { DomainRulesManager.getAggregatedDomainRule("global-trusted.com", uid) } returns Pair(DomainRulesManager.Status.NONE, "")
+        every { DomainRulesManager.getAggregatedDomainRule("global-trusted.com", UID_EVERYBODY) } returns Pair(DomainRulesManager.Status.TRUST, "global-trusted.com")
         
         val result = TunFirewallManager.firewall(createParams(connInfo = createConnInfo(uid = uid), domains = domains))
         assertEquals(FirewallRuleset.RULE1G, result)
@@ -604,7 +604,7 @@ class TunFirewallManagerTest : KoinTest {
         every { appStatus.bypassDnsFirewall() } returns false
         coEvery { FirewallManager.appStatus(uid) } returns appStatus
         
-        every { DomainRulesManager.status(any(), any()) } returns DomainRulesManager.Status.NONE
+        every { DomainRulesManager.getAggregatedDomainRule(any(), any()) } returns Pair(DomainRulesManager.Status.NONE, "")
         every { IpRulesManager.hasRule(any(), any(), any()) } returns IpRulesManager.IpRuleStatus.NONE
         
         val result = TunFirewallManager.firewall(createParams(connInfo = createConnInfo(uid = uid), domains = domains))
@@ -633,7 +633,7 @@ class TunFirewallManagerTest : KoinTest {
         every { appStatus.bypassUniversal() } returns true
         coEvery { FirewallManager.appStatus(uid) } returns appStatus
         
-        every { DomainRulesManager.status(domains, UID_EVERYBODY) } returns DomainRulesManager.Status.TRUST
+        every { DomainRulesManager.getAggregatedDomainRule(domains, UID_EVERYBODY) } returns Pair(DomainRulesManager.Status.TRUST, domains)
         
         val result = TunFirewallManager.firewall(createParams(connInfo = createConnInfo(uid = uid), domains = domains, anyRealIpBlocked = true))
         assertEquals(FirewallRuleset.RULE8, result)
@@ -666,8 +666,7 @@ class TunFirewallManagerTest : KoinTest {
     fun `isALG=true mutation test for domains`() = runTest {
         val uid = 10123
         val domains = "none.com,blocked.com"
-        every { DomainRulesManager.status("none.com", uid) } returns DomainRulesManager.Status.NONE
-        every { DomainRulesManager.status("blocked.com", uid) } returns DomainRulesManager.Status.BLOCK
+        every { DomainRulesManager.getAggregatedDomainRule(domains, uid) } returns Pair(DomainRulesManager.Status.BLOCK, "blocked.com")
         
         val connInfo = createConnInfo(uid = uid)
         TunFirewallManager.firewall(createParams(connInfo = connInfo, domains = domains, isAlg = true))

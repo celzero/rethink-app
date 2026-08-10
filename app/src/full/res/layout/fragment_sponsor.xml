@@ -24,7 +24,6 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
                 app:cardCornerRadius="28dp"
                 app:cardElevation="0dp"
                 app:contentPadding="0dp"
@@ -36,12 +35,12 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:paddingHorizontal="24dp"
-                    android:paddingVertical="36dp">
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="16dp">
 
                     <FrameLayout
-                        android:layout_width="88dp"
-                        android:layout_height="88dp">
+                        android:layout_width="60dp"
+                        android:layout_height="60dp">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="match_parent"
@@ -60,14 +59,14 @@
                     </FrameLayout>
 
                     <TextView
-                        android:id="@+id/hero_title"
+                        android:id="@+id/hero_title_desc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
                         android:gravity="center"
-                        android:text="@string/sponsor_community_sponsor"
-                        android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
-                        android:textStyle="bold" />
+                        android:layout_marginTop="16dp"
+                        android:text="@string/sponsor_community_sponsor_desc"
+                        android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
 
                 </LinearLayout>
 
@@ -105,8 +104,7 @@
                 android:id="@+id/contribution_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                android:layout_marginTop="10dp"
                 app:cardCornerRadius="28dp"
                 app:cardElevation="0dp"
                 app:contentPadding="24dp"

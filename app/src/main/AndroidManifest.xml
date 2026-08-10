@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:versionCode="65"
-    android:versionName="v055z"> <!-- 65 for v055z -->
+    android:versionCode="67"
+    android:versionName="v056"> <!-- 67 for v056 -->
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
@@ -33,6 +33,8 @@
         android:name="android.permission.INTERACT_ACROSS_USERS"
         tools:ignore="ProtectedPermissions" />
 
+    <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
+
     <!-- https://github.com/celzero/rethink-app/issues/786 set memtagMode to off -->
     <application
         android:name=".RethinkDnsApplication"
@@ -45,6 +47,8 @@
         android:allowNativeHeapPointerTagging="false"
         android:gwpAsanMode="never"
         android:memtagMode="off"
+        android:pageSizeCompat="enabled"
+        android:enableOnBackInvokedCallback="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:networkSecurityConfig="@xml/network_security_config"

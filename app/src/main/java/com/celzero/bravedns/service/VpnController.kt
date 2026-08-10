@@ -236,6 +236,10 @@ object VpnController : KoinComponent {
         rvpn?.memProfile(filepath)
     }
 
+    suspend fun cpuProfile(filepath: String) {
+        rvpn?.cpuProfile(filepath)
+    }
+
     suspend fun getRpnStats(id: String): RpnProxyManager.RpnStats? {
         return rvpn?.getRpnStats(id)
     }
@@ -341,6 +345,18 @@ object VpnController : KoinComponent {
         rvpn?.refreshOrPauseOrResumeOrReAddProxies()
     }
 
+    suspend fun readdCustomProxy() {
+        rvpn?.readdCustomProxy()
+    }
+
+    suspend fun readdSocks5Proxy() {
+        rvpn?.readdSocks5Proxy()
+    }
+
+    suspend fun readdHttpProxy() {
+        rvpn?.readdHttpProxy()
+    }
+
     fun closeConnectionsIfNeeded(uid: Int = INVALID_UID, reason: String) {
         rvpn?.closeConnectionsIfNeeded(uid, reason)
     }
@@ -392,6 +408,14 @@ object VpnController : KoinComponent {
 
     suspend fun onRpnOptsChange() {
         rvpn?.onRpnOptsChange()
+    }
+
+    suspend fun hasProxy(id: String): Boolean {
+        return rvpn?.hasProxy(id) ?: false
+    }
+
+    suspend fun hasRpnProxy(id: String): Boolean {
+        return rvpn?.hasRpnProxy(id) ?: false
     }
 
     suspend fun getWinExpiryTs(): Long? {

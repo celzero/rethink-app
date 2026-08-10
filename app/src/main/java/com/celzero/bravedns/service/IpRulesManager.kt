@@ -175,7 +175,17 @@ object IpRulesManager : KoinComponent {
         val pair = hostAddr(ipstr)
         val ipAddr = pair.first
         return if (ipstr.contains("*")) {
-            ipAddr.assignPrefixForSingleBlock()?.toCanonicalString()
+            val singleBlock = ipAddr.assignPrefixForSingleBlock()
+            if (singleBlock == null) {
+                // The wildcard range cannot be expressed as a single CIDR block
+                // (e.g. *.255.255.255 varies high-order bits while fixing low-order
+                // bits, the opposite of CIDR structure). The rule is preserved in
+                // the database (see padAndNormalize) but cannot be matched by the
+                // CIDR-only ip trie, so it will not be enforced until edited to a
+                // CIDR-able form.
+                Logger.w(LOG_TAG_FIREWALL, "wildcard '$ipstr' has no single CIDR block; rule stored but not enforced")
+            }
+            singleBlock?.toCanonicalString()
         } else {
             ipAddr.toNormalizedString()
         }
@@ -588,7 +598,16 @@ object IpRulesManager : KoinComponent {
                 ipStr = padIpv4Cidr(ipaddr.toNormalizedString())
             }
             val pair = hostAddr(ipStr)
-            return normalize(pair.first).orEmpty()
+            // normalize() (which delegates to treeKey) returns null for wildcard
+            // patterns whose range cannot be expressed as a single CIDR block —
+            // e.g. *.255.255.255 because assignPrefixForSingleBlock()
+            // returns null for such addresses. Collapsing to "" here would
+            // silently corrupt the stored rule (empty ipAddress, displayed as
+            // ":0", and an empty edit field). Fall back to the padded string so
+            // the user-supplied wildcard is preserved in the database.  The rule
+            // will simply be skipped by the CIDR-only ip trie (treeKey returns
+            // null) rather than being silently destroyed.
+            return normalize(pair.first) ?: ipStr
         } catch (e: NullPointerException) {
             Logger.e(Logger.LOG_TAG_VPN, "Invalid IP address added", e)
         }
@@ -692,18 +711,20 @@ object IpRulesManager : KoinComponent {
 
         val prevIpaddr = pair.first
         val prevPort = pair.second
-        val prevIpAddrStr = normalize(prevIpaddr)
+        // normalize() returns null for non-CIDR-able wildcards (e.g. *.255.255.255).
+        // Fall back to the raw stored string so the old DB row can still be located
+        // and deleted during an edit, otherwise the replacement silently leaks the
+        // stale rule.
+        val prevIpAddrStr = normalize(prevIpaddr) ?: prevRule.ipAddress
         val newIpAddrStr = padAndNormalize(ipaddr)
         Logger.i(
             LOG_TAG_FIREWALL,
             "ip rule, replace (${prevRule.uid}); ${prevIpAddrStr}:${prevPort}; new: $ipaddr:$port, ${newStatus.name}"
         )
-        if (prevIpAddrStr != null) { // prev addr should never be null
-            val isDeleted = db.deleteRule(prevRule.uid, prevIpAddrStr, prevRule.port)
-            if (isDeleted == 0) {
-                // delete didn't occur with normalized addr, use ip from prevRule obj
-                db.deleteRule(prevRule.uid, prevRule.ipAddress, prevRule.port)
-            }
+        val isDeleted = db.deleteRule(prevRule.uid, prevIpAddrStr, prevRule.port)
+        if (isDeleted == 0) {
+            // delete didn't occur with normalized addr, use ip from prevRule obj
+            db.deleteRule(prevRule.uid, prevRule.ipAddress, prevRule.port)
         }
         val newRule = makeCustomIp(prevRule.uid, newIpAddrStr, port, newStatus, wildcard = false, proxyId, proxyCC)
         db.insert(newRule)

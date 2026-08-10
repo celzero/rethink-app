@@ -113,6 +113,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val INCLUDE_FILE_TRACE = "include_file_trace"
 
         const val GO_MAX_MEMORY = "go_max_memory"
+
+        // SAF tree URI (content://...) of the directory chosen by the user to store
+        // memory-profile heap dumps. Empty when the user hasn't picked a location yet.
+        const val MEMORY_PROFILE_DIR_URI = "memory_profile_dir_uri"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -436,6 +440,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // Name of the last tombstone file that was successfully reported to Firebase Crashlytics.
     // Used on app restart to skip files already uploaded and to decide which files to delete.
     var lastReportedTombstoneFile by stringPref("last_reported_tombstone_file").withDefault("")
+
+    // Persisted SAF tree URI of the directory where memory-profile heap dumps are written.
+    // Empty string means the user has not yet chosen a location.
+    var memoryProfileDirUri by stringPref(MEMORY_PROFILE_DIR_URI).withDefault("")
 
     // experimental feature to use max mtu
     var useMaxMtu by booleanPref("use_max_mtu").withDefault<Boolean>(false)

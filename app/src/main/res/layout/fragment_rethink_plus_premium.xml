@@ -74,24 +74,128 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="16dp"
                 android:visibility="gone"
-                app:cardCornerRadius="16dp"
+                app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
-                app:strokeWidth="1dp"
-                app:strokeColor="?attr/accentBad"
+                app:strokeWidth="1.5dp"
+                app:strokeColor="?attr/divider"
                 app:cardBackgroundColor="?attr/background"
                 tools:visibility="visible">
 
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:padding="10dp">
 
                     <LinearLayout
+                        android:id="@+id/ll_benefits"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:orientation="vertical"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" >
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="10dp">
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_tick"
+                                app:tint="?attr/primaryLightColorText" />
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:text="@string/rpn_desc_one"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="12sp"
+                                android:alpha="0.85" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="10dp">
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_tick"
+                                app:tint="?attr/primaryLightColorText" />
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:text="@string/rpn_desc_two"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="12sp"
+                                android:alpha="0.85" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="10dp">
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_tick"
+                                app:tint="?attr/primaryLightColorText" />
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:text="@string/rpn_desc_three"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="12sp"
+                                android:alpha="0.85" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_tick"
+                                app:tint="?attr/primaryLightColorText" />
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:text="@string/rpn_desc_four"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="12sp"
+                                android:alpha="0.85" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:id="@+id/v_divider"
+                        android:layout_width="match_parent"
+                        android:layout_height="1.5dp"
+                        android:layout_marginTop="10dp"
+                        android:background="?attr/border"
+                        android:alpha="0.15"
+                        app:layout_constraintTop_toBottomOf="@id/ll_benefits" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/isp_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginStart="4dp"
+                        app:layout_constraintTop_toBottomOf="@id/v_divider">
 
                         <View
                             android:id="@+id/privacy_status_dot"
@@ -99,99 +203,63 @@
                             android:layout_height="10dp"
                             android:background="@drawable/ic_circle"
                             android:backgroundTint="?attr/accentBad"
-                            android:layout_marginEnd="10dp" />
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/connection_ip"
+                            app:layout_constraintBottom_toBottomOf="@id/connection_ip" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/connection_ip"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:textColor="?attr/primaryTextColor"
-                            android:textSize="17sp"
-                            android:textStyle="bold"
+                            android:layout_marginStart="16dp"
                             android:fontFamily="monospace"
-                            android:maxLines="1"
-                            android:ellipsize="end"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/privacy_status_dot"
+                            app:layout_constraintTop_toTopOf="parent"
                             tools:text="2401:4900:cad3:ab93" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginTop="6dp"
-                        android:layout_marginStart="21dp">
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/connection_location"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
                             android:textColor="?attr/primaryLightColorText"
-                            android:textSize="12sp"
-                            android:maxLines="1"
-                            android:ellipsize="end"
+                            android:textSize="@dimen/small_font_text_view"
+                            app:layout_constraintStart_toStartOf="@id/connection_ip"
+                            app:layout_constraintTop_toBottomOf="@id/connection_ip"
                             tools:text="New Delhi, IN" />
 
                         <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_sep"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:layout_marginEnd="6dp"
                             android:text="@string/lbl_separator_dot"
                             android:textColor="?attr/primaryLightColorText"
-                            android:textSize="12sp"
-                            android:layout_marginStart="6dp"
-                            android:layout_marginEnd="6dp" />
+                            app:layout_constraintBottom_toBottomOf="@id/connection_location"
+                            app:layout_constraintStart_toEndOf="@id/connection_location"
+                            app:layout_constraintTop_toTopOf="@id/connection_location" />
 
-                        <LinearLayout
-                            android:id="@+id/isp_container"
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/connection_isp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="@dimen/small_font_text_view"
+                            app:layout_constraintBottom_toBottomOf="@id/connection_location"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/tv_sep"
+                            app:layout_constraintTop_toTopOf="@id/connection_location"
+                            tools:text="Bharti Airtel" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/connection_isp"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="12sp"
-                                android:maxLines="1"
-                                android:ellipsize="end"
-                                tools:text="Bharti Airtel" />
-                        </LinearLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    </LinearLayout>
-
-                </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
-
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/plans_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/choose_plan"
-                android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/extra_large_font_text_view"
-                android:textStyle="bold"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginBottom="4dp" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/plans_subtitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/choose_plan_subtitle"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="13sp"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginBottom="8dp"
-                android:visibility="gone" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/extend_mode_banner"
@@ -199,14 +267,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
-                android:layout_marginBottom="12dp"
                 android:visibility="gone"
                 app:cardCornerRadius="14dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="1.5dp"
                 app:strokeColor="?attr/accentGood"
-                app:cardBackgroundColor="?attr/background"
-                tools:visibility="gone">
+                app:cardBackgroundColor="?attr/background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -258,22 +324,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:singleSelection="true"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginStart="40dp"
+                android:layout_marginEnd="40dp"
                 app:selectionRequired="true">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_subscription"
                     style="@style/toggleButtonNoStyle"
                     android:layout_width="0dp"
-                    android:layout_height="48dp"
+                    android:layout_height="42dp"
                     android:layout_weight="1"
                     android:text="@string/lbl_plan"
                     android:textAllCaps="false"
-                    android:textStyle="bold"
-                    android:textSize="14sp"
-                    app:cornerRadius="16dp"
+                    android:textSize="@dimen/default_font_text_view"
+                    app:cornerRadius="8dp"
                     android:layout_marginEnd="1dp"
                     app:checkedIcon="@null" />
 
@@ -281,14 +345,13 @@
                     android:id="@+id/btn_one_time"
                     style="@style/toggleButtonNoStyle"
                     android:layout_width="0dp"
-                    android:layout_height="48dp"
+                    android:layout_height="42dp"
                     android:layout_weight="1"
                     android:text="@string/one_time_label"
                     android:layout_marginStart="1dp"
                     android:textAllCaps="false"
-                    android:textStyle="bold"
-                    android:textSize="14sp"
-                    app:cornerRadius="16dp"
+                    android:textSize="@dimen/default_font_text_view"
+                    app:cornerRadius="8dp"
                     app:checkedIcon="@null" />
 
             </com.google.android.material.button.MaterialButtonToggleGroup>
@@ -299,7 +362,6 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:paddingTop="4dp"
                 android:clipToPadding="false"
                 android:nestedScrollingEnabled="false"
                 android:overScrollMode="never"
@@ -350,23 +412,8 @@
                 app:iconSize="20dp"
                 app:cornerRadius="28dp" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_contact_support"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="6dp"
-                android:text="@string/contact_support_title"
-                android:textAllCaps="false"
-                android:textSize="13sp"
-                app:icon="@drawable/ic_rethink_plus"
-                app:iconSize="16dp"
-                app:iconGravity="textStart"
-                app:cornerRadius="22dp"
-                app:strokeWidth="1dp" />
-
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/btn_restore_purchases"
+                android:id="@+id/btn_contact_support"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -375,7 +422,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:text="@string/restore_purchases_hint"
+                android:text="@string/contact_support_title"
                 android:textAlignment="center"
                 android:textColor="?attr/secondaryTextColor"
                 android:textSize="12sp" />
@@ -391,7 +438,9 @@
                 android:text="@string/rethink_terms"
                 android:textAlignment="center"
                 android:textColor="?attr/primaryLightColorText"
-                android:textSize="11sp"
+                android:textColorLink="?attr/primaryLightColorText"
+                android:alpha="0.8"
+                android:textSize="@dimen/small_font_text_view"
                 android:lineSpacingMultiplier="1.3" />
 
         </LinearLayout>
@@ -468,6 +517,21 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/error_reason"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/error_reason"
+            android:textAlignment="center"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/small_font_text_view"
+            android:lineSpacingMultiplier="1.2"
+            android:layout_marginTop="6dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/error_message"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/retry_button"
             android:layout_width="wrap_content"
@@ -478,7 +542,7 @@
             android:textColor="?attr/homeScreenHeaderTextColor"
             android:textSize="@dimen/large_font_text_view"
             app:cornerRadius="28dp"
-            app:layout_constraintTop_toBottomOf="@id/error_message"
+            app:layout_constraintTop_toBottomOf="@id/error_reason"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

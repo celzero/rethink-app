@@ -25,8 +25,11 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.SystemClock
+import android.provider.DocumentsContract
+import android.provider.OpenableColumns
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.system.Os
@@ -43,6 +46,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.net.toUri
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
@@ -107,6 +112,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.NonCancellable
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -132,6 +138,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     // Canceled in onDestroyView.
     private var profileScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
+    // Storage Access Framework launcher that lets the user pick a directory where heap
+    // dumps are stored. Requires NO storage permissions: the picker grants a persistable
+    // URI permission which we retain across launches. Initialized in onCreate (must be
+    // registered before the fragment reaches STARTED, per ActivityResult API contract).
+    private lateinit var memoryProfileDirLauncher: ActivityResultLauncher<Uri?>
+
     companion object {
         private const val SCHEME_PACKAGE = "package"
 
@@ -151,6 +163,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
         private const val TAP_THRESHOLD_MS = 2000L // reset if too slow
         private const val REQUIRED_TAPS = 7
+
+        // MIME type used when creating heap-dump documents via SAF. octet-stream keeps the
+        // profiler's file extension (.pprof) intact without SAF appending its own.
+        private const val HEAP_DUMP_MIME = "application/octet-stream"
     }
 
     private var tapCount = 0
@@ -163,6 +179,33 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             profileScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         }
         initView()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Register the SAF directory picker before the fragment is STARTED so it survives
+        // configuration changes (matches the pattern used by other fragments).
+        memoryProfileDirLauncher =
+            registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri: Uri? ->
+                val ctx = context
+                if (uri == null) {
+                    if (ctx != null) {
+                        showToastUiCentered(ctx, "No location selected", Toast.LENGTH_SHORT)
+                    }
+                    return@registerForActivityResult
+                }
+                try {
+                    requireContext().contentResolver.takePersistableUriPermission(
+                        uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    )
+                } catch (e: SecurityException) {
+                    Logger.w(LOG_TAG_UI, "Could not persist URI permission for $uri", e)
+                }
+                persistentState.memoryProfileDirUri = uri.toString()
+                performMemoryProfileCapture(uri)
+            }
     }
 
     override fun onResume() {
@@ -222,7 +265,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.fossImg.setOnClickListener(this)
         b.flossFundsImg.setOnClickListener(this)
         b.aboutAppUpdate.setOnClickListener(this)
-        b.aboutWhatsNew.setOnClickListener(this)
         b.aboutAppInfo.setOnClickListener(this)
         b.aboutAppNotification.setOnClickListener(this)
         b.aboutVpnProfile.setOnClickListener(this)
@@ -284,10 +326,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     private fun updateVersionInfo() {
         try {
             val version = getVersionName()
-            // take first 7 characters of the version name, as the version has build number
-            // appended to it, which is not required for the user to see.
-            val slicedVersion = version.slice(0..VERSION_SLICE_END_INDEX)
-            b.aboutWhatsNew.text = getString(R.string.about_whats_new, slicedVersion)
 
             // complete version name along with the source of installation
             val v = getString(R.string.about_version_install_source, version, getDownloadSource())
@@ -470,9 +508,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                     AppUpdater.UserPresent.INTERACTIVE
                 )
             }
-            b.aboutWhatsNew -> {
-                showNewFeaturesDialog()
-            }
             b.aboutAppInfo -> {
                 openAppInfo(requireContext())
             }
@@ -572,49 +607,224 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     private fun openMemoryProfile() {
         if (!DEBUG) return
         val ctx = context ?: return
+
+        // If the user already chose a directory (and it is still reachable), reuse it.
+        val stored = persistentState.memoryProfileDirUri
+        if (stored.isNotEmpty()) {
+            val uri = stored.toUri()
+            if (isTreeUriAccessible(ctx, uri)) {
+                performMemoryProfileCapture(uri)
+                return
+            }
+            // Persisted URI is no longer accessible (revoked / deleted); forget it and
+            // prompt the user to pick again.
+            persistentState.memoryProfileDirUri = ""
+        }
+
+        launchMemoryProfileDirPicker(ctx)
+    }
+
+    /**
+     * Opens the system directory picker (Storage Access Framework). No storage permission
+     * is required: the picker grants a persistable URI permission that we retain across
+     * launches. The result is handled by [memoryProfileDirLauncher].
+     */
+    private fun launchMemoryProfileDirPicker(ctx: android.content.Context) {
+        try {
+            // OpenDocumentTree builds its own Intent; pass null to start at the default
+            // location (optionally a previously-known URI could be passed as the initial dir).
+            memoryProfileDirLauncher.launch(null)
+        } catch (e: ActivityNotFoundException) {
+            Logger.e(LOG_TAG_UI, "No activity found to handle OPEN_DOCUMENT_TREE: ${e.message}")
+            showToastUiCentered(ctx, "No file picker available", Toast.LENGTH_LONG)
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "err opening directory picker: ${e.message}")
+            showToastUiCentered(ctx, "Could not open file picker", Toast.LENGTH_LONG)
+        }
+    }
+
+    /**
+     * Captures both heap dumps (into internal staging files), copies them into the
+     * user-selected SAF directory [destTreeUri], deletes the staging files, and fires a
+     * notification + toast with the outcome.
+     */
+    private fun performMemoryProfileCapture(destTreeUri: Uri) {
+        val ctx = context ?: return
+        // Use the application context so ContentResolver operations remain valid even if
+        // the fragment view is torn down mid-capture.
+        val appCtx = ctx.applicationContext
         val theme = UIUtils.getAccentColor(persistentState.theme)
         showToastUiCentered(ctx, "Capturing memory profiles...", Toast.LENGTH_SHORT)
         profileScope.launch {
-            val jvmResult = MemoryProfiler.captureHeapDump(ctx)
-            val goResult = GoMemoryProfiler.captureGoHeapDump(ctx)
-            withContext(Dispatchers.Main) {
-                // Notification always fires — uses app context, not fragment.
-                showMemoryProfileNotification(ctx, theme, jvmResult, goResult)
+            // Stage the dumps in the internal mem_profile dir (unavoidable: both
+            // Debug.dumpHprofData and the Go memProfile API require a file path, not a stream).
+            val jvmResult = MemoryProfiler.captureHeapDump(appCtx)
+            val goResult = GoMemoryProfiler.captureGoHeapDump(appCtx)
+
+            // Copy each staging file into the user-chosen directory and clean up the staging copy.
+            val jvmOutcome = publishStagedProfile(
+                appCtx, "JVM", jvmResult.success, jvmResult.file,
+                jvmResult.errorMessage, destTreeUri
+            )
+            val goOutcome = publishStagedProfile(
+                appCtx, "Go", goResult.success, goResult.file,
+                goResult.errorMessage, destTreeUri
+            )
+
+            withContext(NonCancellable + Dispatchers.Main) {
+                // Notification always fires uses app context, not fragment.
+                showMemoryProfileNotification(appCtx, theme, jvmOutcome, goOutcome)
                 // Toast only if the fragment is still attached.
                 if (isAdded) {
-                    val msg = buildProfileResultMessage(jvmResult, goResult)
+                    val msg = buildProfileResultMessage(jvmOutcome, goOutcome)
                     showToastUiCentered(ctx, msg, Toast.LENGTH_LONG)
                 }
             }
         }
     }
 
+    /**
+     * Final outcome of a single heap dump after it has been (attempted to be) written to
+     * the user-selected directory.
+     */
+    private data class ProfileOutcome(
+        val label: String,
+        val success: Boolean,
+        val fileName: String?,
+        val sizeBytes: Long,
+        val errorMessage: String?
+    )
+
+    /**
+     * Copies [stagingFile] (the internal dump produced by a profiler) into the SAF tree
+     * [destTreeUri] and deletes the staging file. Returns a [ProfileOutcome] describing the
+     * final result visible to the user.
+     */
+    private fun publishStagedProfile(
+        appCtx: android.content.Context,
+        label: String,
+        captureOk: Boolean,
+        stagingFile: File,
+        captureError: String?,
+        destTreeUri: Uri
+    ): ProfileOutcome {
+        // If capture failed, there is nothing to copy. Still best-effort clean any partial file.
+        if (!captureOk) {
+            runCatching { if (stagingFile.exists()) stagingFile.delete() }
+            return ProfileOutcome(label, false, null, 0L, captureError)
+        }
+        return try {
+            val destName = copyFileToTree(
+                appCtx.contentResolver, destTreeUri, stagingFile, stagingFile.name
+            )
+            ProfileOutcome(
+                label = label,
+                success = destName != null,
+                fileName = destName ?: stagingFile.name,
+                sizeBytes = stagingFile.length(),
+                errorMessage = if (destName == null) "Failed to save to selected folder" else null
+            )
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "err copying $label heap dump to selected dir: ${e.message}", e)
+            ProfileOutcome(label, false, stagingFile.name, stagingFile.length(), "Copy failed: ${e.message}")
+        } finally {
+            // The staging file is always a transient artifact once the copy has been attempted.
+            runCatching { if (stagingFile.exists()) stagingFile.delete() }
+        }
+    }
+
+    /**
+     * Creates a new document named [displayName] inside the SAF tree [treeUri] and copies the
+     * contents of [src] into it. Returns the (possibly renamed) display name, or null on failure.
+     * Uses [DocumentsContract] directly so no extra androidx.documentfile dependency is needed.
+     */
+    private fun copyFileToTree(
+        contentResolver: android.content.ContentResolver,
+        treeUri: Uri,
+        src: File,
+        displayName: String
+    ): String? {
+        if (!src.exists() || src.length() <= 0) return null
+        val treeDocId = DocumentsContract.getTreeDocumentId(treeUri)
+        val treeDocUri = DocumentsContract.buildDocumentUriUsingTree(treeUri, treeDocId)
+        // createDocument may rename the file on name collision (e.g. "name (1).pprof").
+        val childUri = DocumentsContract.createDocument(
+            contentResolver, treeDocUri, HEAP_DUMP_MIME, displayName
+        ) ?: return null
+        // createDocument has already materialized a (zero-byte) document in the user's
+        // chosen directory. If the write below fails for any reason, delete that orphan
+        // so the user is not left with empty or truncated .pprof files in their folder.
+        var written = false
+        try {
+            contentResolver.openOutputStream(childUri).use { out ->
+                if (out == null) return null
+                src.inputStream().use { input -> input.copyTo(out) }
+                out.flush()
+            }
+            written = true
+        } finally {
+            if (!written) {
+                runCatching { DocumentsContract.deleteDocument(contentResolver, childUri) }
+                    .onFailure {
+                        Logger.w(
+                            LOG_TAG_UI,
+                            "could not delete orphaned profile doc: $childUri",
+                            it as? Exception
+                        )
+                    }
+            }
+        }
+        if (!written) return null
+        // Resolve the final display name (SAF may have changed it) for reporting.
+        var name = displayName
+        contentResolver.query(
+            childUri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null
+        )?.use { c ->
+            if (c.moveToFirst()) {
+                val idx = c.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (idx >= 0) name = c.getString(idx) ?: displayName
+            }
+        }
+        return name
+    }
+
+    /**
+     * Returns true if the SAF tree [uri] can still be queried (i.e. permission is held and the
+     * document still exists). Used to validate a persisted directory before reusing it.
+     */
+    private fun isTreeUriAccessible(ctx: android.content.Context, uri: Uri): Boolean {
+        return try {
+            val treeDocId = DocumentsContract.getTreeDocumentId(uri)
+            val treeDocUri = DocumentsContract.buildDocumentUriUsingTree(uri, treeDocId)
+            ctx.contentResolver.query(
+                treeDocUri,
+                arrayOf(DocumentsContract.Document.COLUMN_MIME_TYPE),
+                null, null, null
+            )?.use { c -> c.moveToFirst() } ?: false
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_UI, "memory profile dir uri not accessible: $uri", e)
+            false
+        }
+    }
+
     private fun buildProfileResultMessage(
-        jvmResult: MemoryProfiler.ProfileResult,
-        goResult: GoMemoryProfiler.ProfileResult
+        jvm: ProfileOutcome,
+        go: ProfileOutcome
     ): String {
         val parts = mutableListOf<String>()
-        if (jvmResult.success) {
-            parts.add("JVM: ${jvmResult.file.name}")
-        } else {
-            parts.add("JVM failed")
-        }
-        if (goResult.success) {
-            parts.add("Go: ${goResult.file.name}")
-        } else {
-            parts.add("Go failed")
-        }
+        parts.add(if (jvm.success) "JVM: ${jvm.fileName}" else "JVM failed")
+        parts.add(if (go.success) "Go: ${go.fileName}" else "Go failed")
         return parts.joinToString(" | ")
     }
 
     private fun showMemoryProfileNotification(
         context: android.content.Context,
         theme: Int,
-        jvmResult: MemoryProfiler.ProfileResult,
-        goResult: GoMemoryProfiler.ProfileResult
+        jvm: ProfileOutcome,
+        go: ProfileOutcome
     ) {
-        val jvmOk = jvmResult.success
-        val goOk = goResult.success
+        val jvmOk = jvm.success
+        val goOk = go.success
         val bothOk = jvmOk && goOk
         val bothFailed = !jvmOk && !goOk
 
@@ -626,14 +836,14 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
         val contentText = buildString {
             if (jvmOk) {
-                appendLine("JVM: ${jvmResult.file.name} (${formatFileSize(jvmResult.file.length())})")
+                appendLine("JVM: ${jvm.fileName} (${formatFileSize(jvm.sizeBytes)})")
             } else {
-                appendLine("JVM: ${jvmResult.errorMessage ?: "failed"}")
+                appendLine("JVM: ${jvm.errorMessage ?: "failed"}")
             }
             if (goOk) {
-                appendLine("Go: ${goResult.file.name} (${formatFileSize(goResult.file.length())})")
+                appendLine("Go: ${go.fileName} (${formatFileSize(go.sizeBytes)})")
             } else {
-                appendLine("Go: ${goResult.errorMessage ?: "failed"}")
+                appendLine("Go: ${go.errorMessage ?: "failed"}")
             }
         }.trimEnd()
 
@@ -1487,6 +1697,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         }
     }
 
+    // unused, remove after removing the string
     private fun showNewFeaturesDialog() {
         val binding =
             DialogWhatsnewBinding.inflate(LayoutInflater.from(requireContext()), null, false)

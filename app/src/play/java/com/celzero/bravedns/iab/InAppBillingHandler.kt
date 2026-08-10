@@ -257,6 +257,20 @@ object InAppBillingHandler : KoinComponent {
     // repopulate of productDetails / storeProductDetails.
     private val productCacheMutex = kotlinx.coroutines.sync.Mutex()
 
+    /**
+     * Most severe Google Play Billing response code observed during the last
+     * [queryProductDetails] / [queryProductDetailsWithTimeout] run. Read by
+     * [com.celzero.bravedns.viewmodel.RethinkPlusViewModel.onProductsFetched] to surface a
+     * specific failure reason (timeout, empty response, billing unavailable, etc.) instead
+     * of a generic error.
+     *
+     * Volatile + assigned on the same coroutine that notifies [billingListener] of the
+     * product result, so it is already populated by the time the listener (and hence the
+     * ViewModel) reads it.
+     */
+    @Volatile
+    var lastProductQueryResponseCode: Int = BillingResponseCode.OK
+
     // state tracking. Idempotency guard for initiate(): compareAndSet guarantees
     // startStateObserver() and subscriptionStateMachine.initialize() run exactly once
     // even if initiate() is invoked concurrently (Dispatchers.IO is a pool); a plain
@@ -811,7 +825,7 @@ object InAppBillingHandler : KoinComponent {
                     queryPurchases(queriedProductType, false)
                     return
                 }
-                logd(mname, "INAPP query returned empty, threshold reached ($consecutiveEmptyInAppQueries/$EMPTY_QUERY_THRESHOLD), expire old purchases...")
+                logd(mname, "INAPP query returned empty, threshold reached ($consecutiveEmptyInAppQueries/$EMPTY_QUERY_THRESHOLD), confirm with server...")
 
                 consecutiveEmptyInAppQueries = 0
 
@@ -1872,6 +1886,8 @@ object InAppBillingHandler : KoinComponent {
 
         if (result == null) {
             loge(mname, "product details query timed out after ${timeout}ms")
+            // Mark the failure as a timeout so the ViewModel surfaces REQUEST_TIMEOUT.
+            lastProductQueryResponseCode = BillingResponseCode.SERVICE_TIMEOUT
             withContext(Dispatchers.Main) {
                 billingListener?.productResult(false, emptyList())
             }
@@ -1884,6 +1900,10 @@ object InAppBillingHandler : KoinComponent {
             // launch INAPP and SUBS queries concurrently and await both.
             val inAppResult = kotlinx.coroutines.CompletableDeferred<List<ProductDetails>>()
             val subsResult  = kotlinx.coroutines.CompletableDeferred<List<ProductDetails>>()
+            // Capture the response code from each query so the most severe one can be surfaced
+            // to the user via lastProductQueryResponseCode (used by RethinkPlusViewModel).
+            val inAppResponseCode = java.util.concurrent.atomic.AtomicInteger(BillingResponseCode.OK)
+            val subsResponseCode  = java.util.concurrent.atomic.AtomicInteger(BillingResponseCode.OK)
 
         val inAppParams = QueryProductDetailsParams.newBuilder()
             .setProductList(
@@ -1898,6 +1918,7 @@ object InAppBillingHandler : KoinComponent {
         logd(mname, "launching INAPP product query")
         billingClient.queryProductDetailsAsync(inAppParams) { br, result ->
             logd(mname, "INAPP result: code=${br.responseCode}, items=${result.productDetailsList.size}")
+            inAppResponseCode.set(br.responseCode)
             if (br.responseCode == BillingResponseCode.OK) {
                 inAppResult.complete(result.productDetailsList)
             } else {
@@ -1919,6 +1940,7 @@ object InAppBillingHandler : KoinComponent {
         logd(mname, "launching SUBS product query")
         billingClient.queryProductDetailsAsync(subsParams) { br, result ->
             logd(mname, "SUBS result: code=${br.responseCode}, items=${result.productDetailsList.size}")
+            subsResponseCode.set(br.responseCode)
             if (br.responseCode == BillingResponseCode.OK) {
                 subsResult.complete(result.productDetailsList)
             } else {
@@ -1943,6 +1965,13 @@ object InAppBillingHandler : KoinComponent {
 
 
         val merged = productDetails.toList()
+        // Surface the most severe (first non-OK) response code so the ViewModel can show a
+        // specific failure reason. When both queries succeed this stays OK.
+        lastProductQueryResponseCode = if (inAppResponseCode.get() != BillingResponseCode.OK) {
+            inAppResponseCode.get()
+        } else {
+            subsResponseCode.get()
+        }
         logd(mname, "product query complete: ${merged.size} total products (inApp=${inAppList.size}, subs=${subsList.size})")
         withContext(Dispatchers.Main) {
             productDetailsLiveData.postValue(merged)
@@ -3109,20 +3138,19 @@ object InAppBillingHandler : KoinComponent {
                 // the user is not left in a broken state.
                 val linked = result.linkedPurchaseId
                 if (!linked.isNullOrBlank()) {
+                    // The revoked purchase may have been superseded by an older one that is
+                    // still valid. Attempt to reactivate it so the user is not left in a
+                    // broken state.
                     loge(mname, "queryEntitlement server business error for token=${pt.take(8)}; linkedPurchaseId present, attempting reactivation of linkedToken=${linked.take(8)}")
                     try {
                         RpnProxyManager.tryReactivateLinkedPurchase(accountId, deviceId, linked)
                     } catch (e: Exception) {
                         loge(mname, "tryReactivateLinkedPurchase threw for linkedToken=${linked.take(8)}: ${e.message}", e)
                     }
-                    result.purchase
                 } else {
-                    // server informed that this purchase has failed with nothing to fall back on.
-                    // Treat the same as Expired: clear the payload and zero the expiry so
-                    // downstream callers stop treating this as a valid entitlement.
-                    loge(mname, "queryEntitlement server business error for token=${pt.take(8)}; no linkedPurchaseId, expiring local purchase")
-                    result.purchase.copy(expiryTime = 0L, payload = "")
+                    loge(mname, "queryEntitlement server business error for token=${pt.take(8)}; no linkedPurchaseId, preserving local purchase (fail-safe)")
                 }
+                result.purchase
             }
             is QueryEntitlementResult.Expired -> {
                 // Server has authoritatively confirmed the subscription is expired.
