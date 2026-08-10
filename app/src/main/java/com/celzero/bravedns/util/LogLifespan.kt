@@ -5,12 +5,12 @@ import com.celzero.bravedns.R
 
 enum class LogLifespan (val id: Long, val lifespanResId: Int, val lifespanHours: Int, val purgeInterval: Long) {
     ONE_HOUR(0, R.string.settings_log_lifespan_dialog_option_0, 1, 30L),
-    THREE_HOURS(1, R.string.settings_log_lifespan_dialog_option_1, 3, 1L),
-    SIX_HOURS(2, R.string.settings_log_lifespan_dialog_option_2, 6, 3L),
-    TWELVE_HOURS(3, R.string.settings_log_lifespan_dialog_option_3, 12, 6L),
-    ONE_DAY(4, R.string.settings_log_lifespan_dialog_option_4, 24, 12L),
-    THREE_DAYS(5, R.string.settings_log_lifespan_dialog_option_5, 72, 24L),
-    SEVEN_DAYS(6, R.string.settings_log_lifespan_dialog_option_6, 168, 24L);
+    THREE_HOURS(1, R.string.settings_log_lifespan_dialog_option_1, 3, 60L),
+    SIX_HOURS(2, R.string.settings_log_lifespan_dialog_option_2, 6, 180L),
+    TWELVE_HOURS(3, R.string.settings_log_lifespan_dialog_option_3, 12, 360L),
+    ONE_DAY(4, R.string.settings_log_lifespan_dialog_option_4, 24, 720L),
+    THREE_DAYS(5, R.string.settings_log_lifespan_dialog_option_5, 72, 1440L),
+    SEVEN_DAYS(6, R.string.settings_log_lifespan_dialog_option_6, 168, 1440L);
 
     companion object {
         fun getLogLifespan(id: Long): LogLifespan {

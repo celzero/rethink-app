@@ -127,15 +127,11 @@ class WorkScheduler(val context: Context, val persistentState: PersistentState) 
     fun schedulePurgeConnectionsLog() {
         val logLifespan = persistentState.logLifespan
         val purgeInterval = LogLifespan.getPurgeInterval(logLifespan)
-        val timeUnit = when(logLifespan) {
-            LogLifespan.ONE_HOUR.id -> TimeUnit.MINUTES
-            else -> TimeUnit.HOURS
-        }
         val purgeLogs =
             PeriodicWorkRequest.Builder(
                 PurgeConnectionLogs::class.java,
                 purgeInterval,
-                timeUnit
+                TimeUnit.MINUTES
             )
                 .addTag(PURGE_CONNECTION_LOGS_JOB_TAG)
                 .build()
