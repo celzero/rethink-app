@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_marginBottom="1dp"
     android:animateLayoutChanges="true"
     android:background="?attr/background"
@@ -117,25 +118,50 @@
                     android:id="@+id/firewall_app_toggle_mobile_data"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:maxWidth="24dp"
-                    android:maxHeight="24dp"
-                    android:padding="5dp"
-                    android:src="@drawable/ic_firewall_data_on" />
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    tools:text="10 MB 🔺 / 20 MB 🔻" />
 
-            </RelativeLayout>
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/firewall_app_info"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginEnd="5dp"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:textColor="?attr/secondaryTextColor"
+                            android:textSize="@dimen/default_font_text_view"
+                            tools:text="com.android.chrome(10123)" />
 
-        </LinearLayout>
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+                </androidx.appcompat.widget.LinearLayoutCompat>
 
-    </LinearLayout>
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/firewall_app_toggle_wifi"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/bg_firewall_action_outlined"
+            android:foreground="?android:attr/selectableItemBackgroundBorderless"
+            android:padding="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/firewall_app_toggle_mobile_data"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_firewall_wifi_on" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?attr/divider" />
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/firewall_app_toggle_mobile_data"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_firewall_action_outlined"
+            android:foreground="?android:attr/selectableItemBackgroundBorderless"
+            android:padding="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_firewall_data_on" />
 
-</LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

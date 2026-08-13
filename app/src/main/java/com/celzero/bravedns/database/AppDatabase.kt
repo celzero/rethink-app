@@ -1304,24 +1304,22 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        val MIGRATION_30_31: Migration =
+        private val MIGRATION_30_31: Migration =
             object : Migration(30, 31) {
                 override fun migrate(db: SupportSQLiteDatabase) {
-                    db.execSQL(
-                        """
-                        CREATE TABLE IF NOT EXISTS Sponsor (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                            purchase_token TEXT NOT NULL,
-                            product_id TEXT NOT NULL,
-                            purchase_time INTEGER NOT NULL,
-                            sponsor_since INTEGER NOT NULL,
-                            consumed INTEGER NOT NULL DEFAULT 1,
-                            contribution_count INTEGER NOT NULL DEFAULT 1,
-                            last_contribution_time INTEGER NOT NULL DEFAULT 0
-                        )
-                        """.trimIndent()
-                    )
-                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_30_31: created Sponsor table")
+                    if (!doesColumnExistInTable(db, "AppInfo", "notes")) {
+                        try {
+                            db.execSQL(
+                                "ALTER TABLE AppInfo ADD COLUMN notes TEXT NOT NULL DEFAULT ''"
+                            )
+                            Logger.i(LOG_TAG_APP_DB, "MIGRATION_30_31: added notes column to AppInfo")
+                        } catch (e: Exception) {
+                            Logger.e(LOG_TAG_APP_DB, "MIGRATION_30_31: failed to add notes column", e)
+                            throw e
+                        }
+                    } else {
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_30_31: notes column already exists in AppInfo")
+                    }
                 }
             }
         private val MIGRATION_31_32: Migration =
