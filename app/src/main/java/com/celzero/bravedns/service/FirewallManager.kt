@@ -851,12 +851,12 @@ object FirewallManager : KoinComponent {
     }
 
     suspend fun updateFirewalledApps(uid: Int, connectionStatus: ConnectionStatus) {
-        withAppUpdateLock(uid) {
+        getAppUpdateMutex(uid).withLock {
             try {
                 db.updateFirewallStatusByUid(uid, FirewallStatus.NONE.id, connectionStatus.id)
             } catch (e: Exception) {
                 Logger.w(LOG_TAG_FIREWALL, "updateFirewalledApps db failed for uid $uid", e)
-                return@withAppUpdateLock
+                return@withLock
             }
             invalidateFirewallStatus(uid, FirewallStatus.NONE, connectionStatus)
         }
@@ -876,12 +876,12 @@ object FirewallManager : KoinComponent {
             return
         }
 
-        withAppUpdateLock(uid) {
+        getAppUpdateMutex(uid).withLock {
             try {
                 db.updateFirewallStatusByUid(uid, firewallStatus.id, connectionStatus.id)
             } catch (e: Exception) {
                 Logger.w(LOG_TAG_FIREWALL, "updateFirewallStatus db failed for uid $uid", e)
-                return@withAppUpdateLock
+                return@withLock
             }
             invalidateFirewallStatus(uid, firewallStatus, connectionStatus)
         }
