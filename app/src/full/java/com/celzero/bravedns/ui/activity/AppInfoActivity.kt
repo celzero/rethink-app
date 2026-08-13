@@ -27,10 +27,13 @@ import android.os.Process
 import android.text.InputFilter
 import android.text.InputType
 import android.text.format.DateUtils
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback

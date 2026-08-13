@@ -57,7 +57,7 @@ import com.celzero.bravedns.util.Constants
         CountryConfig::class,
         SponsorEntity::class
     ],
-    version = 31,
+    version = 32,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -73,6 +73,7 @@ abstract class AppDatabase : RoomDatabase() {
         // "Bad database header" failure seen after clearing app storage.
         private const val DATABASE_PATH = "database/rethink_v31.db"
         private const val PRAGMA = "pragma wal_checkpoint(full)"
+        private const val APP_NOTES_MAX_LENGTH = 500
 
         // setJournalMode() is added as part of issue #344
         // modified the journal mode from TRUNCATE to AUTOMATIC.
@@ -154,6 +155,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_28_29)
                 .addMigrations(MIGRATION_29_30)
                 .addMigrations(MIGRATION_30_31)
+                .addMigrations(MIGRATION_31_32)
                 .build()
         }
 
@@ -161,6 +163,7 @@ abstract class AppDatabase : RoomDatabase() {
             object : Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
+                    createAppInfoNotesLengthTriggers(db)
                     Logger.i(LOG_TAG_APP_DB, "Database created, ${db.version}")
                 }
 
@@ -174,6 +177,25 @@ abstract class AppDatabase : RoomDatabase() {
                     Logger.i(LOG_TAG_APP_DB, "Database opened, ${db.version}")
                 }
             }
+        private fun createAppInfoNotesLengthTriggers(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "CREATE TRIGGER IF NOT EXISTS trg_appinfo_notes_length_insert " +
+                        "BEFORE INSERT ON AppInfo " +
+                        "WHEN length(NEW.notes) > $APP_NOTES_MAX_LENGTH " +
+                        "BEGIN " +
+                        "SELECT RAISE(ABORT, 'AppInfo.notes exceeds $APP_NOTES_MAX_LENGTH characters'); " +
+                        "END"
+            )
+
+            db.execSQL(
+                "CREATE TRIGGER IF NOT EXISTS trg_appinfo_notes_length_update " +
+                        "BEFORE UPDATE OF notes ON AppInfo " +
+                        "WHEN length(NEW.notes) > $APP_NOTES_MAX_LENGTH " +
+                        "BEGIN " +
+                        "SELECT RAISE(ABORT, 'AppInfo.notes exceeds $APP_NOTES_MAX_LENGTH characters'); " +
+                        "END"
+            )
+        }
 
         internal val MIGRATION_1_2: Migration =
             object : Migration(1, 2) {
@@ -1298,6 +1320,21 @@ abstract class AppDatabase : RoomDatabase() {
                     } else {
                         Logger.i(LOG_TAG_APP_DB, "MIGRATION_30_31: notes column already exists in AppInfo")
                     }
+                }
+            }
+        private val MIGRATION_31_32: Migration =
+            object : Migration(31, 32) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.execSQL(
+                        "ALTER TABLE AppInfo ADD COLUMN notes TEXT NOT NULL DEFAULT ''"
+                    )
+
+                    createAppInfoNotesLengthTriggers(db)
+
+                    Logger.i(
+                        LOG_TAG_APP_DB,
+                        "MIGRATION_31_32: added AppInfo.notes and enforced max length"
+                    )
                 }
             }
 

@@ -851,13 +851,15 @@ object FirewallManager : KoinComponent {
     }
 
     suspend fun updateFirewalledApps(uid: Int, connectionStatus: ConnectionStatus) {
-        try {
-            db.updateFirewallStatusByUid(uid, FirewallStatus.NONE.id, connectionStatus.id)
-        } catch (e: Exception) {
-            Logger.w(LOG_TAG_FIREWALL, "updateFirewalledApps db failed for uid $uid", e)
-            return
+        withAppUpdateLock(uid) {
+            try {
+                db.updateFirewallStatusByUid(uid, FirewallStatus.NONE.id, connectionStatus.id)
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_FIREWALL, "updateFirewalledApps db failed for uid $uid", e)
+                return@withAppUpdateLock
+            }
+            invalidateFirewallStatus(uid, FirewallStatus.NONE, connectionStatus)
         }
-        invalidateFirewallStatus(uid, FirewallStatus.NONE, connectionStatus)
     }
 
     suspend fun updateFirewallStatus(
@@ -874,13 +876,15 @@ object FirewallManager : KoinComponent {
             return
         }
 
-        try {
-            db.updateFirewallStatusByUid(uid, firewallStatus.id, connectionStatus.id)
-        } catch (e: Exception) {
-            Logger.w(LOG_TAG_FIREWALL, "updateFirewallStatus db failed for uid $uid", e)
-            return
+        withAppUpdateLock(uid) {
+            try {
+                db.updateFirewallStatusByUid(uid, firewallStatus.id, connectionStatus.id)
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_FIREWALL, "updateFirewallStatus db failed for uid $uid", e)
+                return@withAppUpdateLock
+            }
+            invalidateFirewallStatus(uid, firewallStatus, connectionStatus)
         }
-        invalidateFirewallStatus(uid, firewallStatus, connectionStatus)
     }
 
     suspend fun updateTempAllowStatus(uid: Int, durationMinutes: Int = TEMP_ALLOW_DEFAULT_MINUTES) {
