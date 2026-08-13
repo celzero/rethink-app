@@ -24,8 +24,10 @@ import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Process
+import android.text.Editable
 import android.text.InputFilter
 import android.text.InputType
+import android.text.TextWatcher
 import android.text.format.DateUtils
 import android.view.Gravity
 import android.view.View
@@ -105,6 +107,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     private var isWarningAcknowledged: Boolean = false
     private var notesDraft: String = ""
     private var shouldRestoreNotesDialog: Boolean = false
+    private var isNotesSaveInFlight: Boolean = false
     private var notesDialog: AlertDialog? = null
     private var notesEditText: EditText? = null
 
@@ -190,9 +193,14 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     private fun observeNotesEvents() {
         appInfoViewModel.notesSaveSuccessEvent.observe(this) { event ->
             event.getIfNotHandled()?.let { savedNotes ->
+                isNotesSaveInFlight = false
                 if (::appInfo.isInitialized) {
                     appInfo.notes = savedNotes
                     notesDraft = ""
+                    if (notesDialog?.isShowing == true) {
+                        notesEditText?.setText(savedNotes)
+                        notesEditText?.setSelection(savedNotes.length)
+                    }
                     logEvent(
                         "app notes updated",
                         "Notes updated for ${appInfo.appName} ($uid)"
@@ -204,8 +212,9 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         }
 
         appInfoViewModel.notesErrorEvent.observe(this) { event ->
-            event.getIfNotHandled()?.let {
-                showToastUiCentered(this, getString(R.string.ctbs_app_notes_save_failed), Toast.LENGTH_SHORT)
+            event.getIfNotHandled()?.let { messageResId ->
+                isNotesSaveInFlight = false
+                showToastUiCentered(this, getString(messageResId), Toast.LENGTH_SHORT)
             }
         }
     }
@@ -616,6 +625,10 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         }
 
         b.aadNotesChip.setOnClickListener {
+            if (isNotesSaveInFlight) {
+                showToastUiCentered(this, getString(R.string.lbl_saving), Toast.LENGTH_SHORT)
+                return@setOnClickListener
+            }
             guardAppInfoInitialized("aadNotesChip") {
                 showNotesDialog()
             }
@@ -1175,7 +1188,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun showNotesDialog(draftText: String? = null) {
-        val initialText = (draftText ?: if (::appInfo.isInitialized) appInfo.notes else "").take(MAX_NOTE_LENGTH)
+        val initialText = draftText ?: if (::appInfo.isInitialized) appInfo.notes else ""
         val editText = EditText(this).apply {
             setText(initialText)
             hint = getString(R.string.hint_notes)
@@ -1184,11 +1197,45 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             setMaxLines(10)
             filters = arrayOf(InputFilter.LengthFilter(MAX_NOTE_LENGTH))
         }
+        val counterText = TextView(this).apply {
+            gravity = Gravity.END
+            text = getString(R.string.ctbs_note_char_counter, initialText.length, MAX_NOTE_LENGTH)
+        }
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            val horizontalPadding = (24 * resources.displayMetrics.density).toInt()
+            setPadding(horizontalPadding, 0, horizontalPadding, 0)
+            addView(
+                editText,
+                LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            )
+            addView(
+                counterText,
+                LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            )
+        }
+        editText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+
+            override fun afterTextChanged(s: Editable?) {
+                val currentLength = s?.length ?: 0
+                counterText.text = getString(R.string.ctbs_note_char_counter, currentLength, MAX_NOTE_LENGTH)
+            }
+        })
+
         notesEditText = editText
 
         val dialog = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
             .setTitle(R.string.lbl_notes)
-            .setView(editText)
+            .setView(container)
             .setPositiveButton(R.string.lbl_save) { _, _ ->
                 val newNotes = editText.text.toString().trim()
                 notesDraft = newNotes
@@ -1217,7 +1264,12 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             )
             return
         }
+        if (isNotesSaveInFlight) {
+            showToastUiCentered(this, getString(R.string.lbl_saving), Toast.LENGTH_SHORT)
+            return
+        }
         val packageName = appInfo.packageName
+        isNotesSaveInFlight = true
         appInfoViewModel.updateAppNotes(uid, packageName, newNotes)
     }
 
