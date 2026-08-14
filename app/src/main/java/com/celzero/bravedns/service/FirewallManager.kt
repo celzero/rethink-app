@@ -1064,7 +1064,7 @@ object FirewallManager : KoinComponent {
         cacheUpdate: (AppInfo) -> Unit
     ) {
         withAppUpdateLock(uid) {
-        val rowsUpdated = runDbUpdate(uid, fieldName, dbUpdate)
+            val rowsUpdated = runDbUpdate(uid, fieldName, dbUpdate)
             if (rowsUpdated <= 0) {
                 Logger.w(
                     LOG_TAG_FIREWALL,
