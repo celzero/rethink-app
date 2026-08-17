@@ -45,6 +45,7 @@ import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_NONE
 import com.celzero.bravedns.ui.activity.AppInfoActivity
+import com.celzero.bravedns.ui.activity.AppInfoActivity.Companion.INTENT_PACKAGE_NAME
 import com.celzero.bravedns.ui.activity.AppInfoActivity.Companion.INTENT_UID
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
@@ -302,17 +303,17 @@ class FirewallAppListAdapter(
 
             b.firewallAppTextLl.setOnClickListener {
                 enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.firewallAppTextLl)
-                openAppDetailActivity(appInfo.uid)
+                openAppDetailActivity(appInfo.uid, appInfo.packageName)
             }
 
             b.firewallAppIconIv.setOnClickListener {
                 enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.firewallAppIconIv)
-                openAppDetailActivity(appInfo.uid)
+                openAppDetailActivity(appInfo.uid, appInfo.packageName)
             }
 
             b.firewallAppDetailsLl.setOnClickListener {
                 enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.firewallAppIconIv)
-                openAppDetailActivity(appInfo.uid)
+                openAppDetailActivity(appInfo.uid, appInfo.packageName)
             }
 
             b.firewallAppToggleWifi.setOnClickListener {
@@ -415,9 +416,10 @@ class FirewallAppListAdapter(
             logEvent("UID: ${appInfo.uid}, App: ${appInfo.appName}, New FW status: ${FirewallManager.connectionStatus(appInfo.uid)}")
         }
 
-        private fun openAppDetailActivity(uid: Int) {
+        private fun openAppDetailActivity(uid: Int, packageName: String) {
             val intent = Intent(context, AppInfoActivity::class.java)
             intent.putExtra(INTENT_UID, uid)
+            intent.putExtra(INTENT_PACKAGE_NAME, packageName)
             context.startActivity(intent)
         }
 

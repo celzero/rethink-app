@@ -98,6 +98,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     private val networkLogsViewModel: AppConnectionsViewModel by viewModel()
 
     private var uid: Int = INVALID_UID
+    private var requestedPackageName: String? = null
     private lateinit var appInfo: AppInfo
 
     private var appStatus = FirewallManager.FirewallStatus.NONE
@@ -119,6 +120,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
     companion object {
         const val INTENT_UID = "UID"
+        const val INTENT_PACKAGE_NAME = "PACKAGE_NAME"
         const val INTENT_ACTIVE_CONNS = "ACTIVE_CONNS"
         const val INTENT_ASN = "ASN"
         private const val TAG = "AppInfoActivity"
@@ -145,7 +147,8 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         }
 
         uid = intent.getIntExtra(INTENT_UID, INVALID_UID)
-        Logger.d(LOG_TAG_UI, "AppInfoActivity, intent uid: $uid")
+        requestedPackageName = intent.getStringExtra(INTENT_PACKAGE_NAME)
+        Logger.d(LOG_TAG_UI, "AppInfoActivity, intent uid: $uid, package: $requestedPackageName")
         onBackPressedDispatcher.addCallback(this, warningBackCallback)
 
         if (savedInstanceState?.getBoolean(IS_WARNING_ACKNOWLEDGED, false) == true) {
@@ -254,7 +257,12 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
     private fun init() {
         io {
-            val appInfo = FirewallManager.getAppInfoByUid(uid)
+            val appInfo = if (requestedPackageName.isNullOrBlank()) {
+                FirewallManager.getAppInfoByUid(uid)
+            } else {
+                FirewallManager.getAppInfoByUidAndPackage(uid, requestedPackageName)
+                    ?: FirewallManager.getAppInfoByUid(uid)
+            }
             // case: app is uninstalled but still available in RethinkDNS database
             if (appInfo == null || uid == INVALID_UID || appInfo.tombstoneTs > 0) {
                 uiCtx { showNoAppFoundDialog() }
@@ -1270,7 +1278,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         }
         val packageName = appInfo.packageName
         isNotesSaveInFlight = true
-        appInfoViewModel.updateAppNotes(uid, packageName, newNotes)
+        appInfoViewModel.updateAppNotes(appInfo.uid, packageName, newNotes)
     }
 
     private fun io(f: suspend () -> Unit): Job {
