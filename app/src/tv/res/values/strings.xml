@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  rethink-tv fork: TV-flavor string resources.
+
+  Overrides app_name for the `tv` Gradle flavor so the Android TV launcher
+  surfaces "Rethink TV" rather than the upstream phone-app label.
+-->
+<resources>
+    <string name="app_name" translatable="false">Rethink TV</string>
+</resources>
