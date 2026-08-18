@@ -203,16 +203,19 @@ android {
                     // ABI-specific output: assign the correct per-ABI version code
                     // eg for arm64-v8a: 3 * 10000000 + versionCode
                     def v = project.ext.versionCodes.get(abi) * 10000000 + output.versionCode.get()
+                    println("versionCode: $v")
                     output.versionCode.set(v)
                 } else {
                     // universal APK: preserve existing production behaviour (arm64-v8a multiplier)
                     // so installed universal APKs are not treated as a downgrade
                     // when splits are disabled (e.g. alpha builds), firstAbi is null; fall back to
                     // the arm64-v8a multiplier (3) so versionCode arithmetic still works
-                    def firstAbi = variant.outputs.find { it.filters.any { f -> f.filterType == FilterConfiguration.FilterType.ABI } }
-                            ?.filters?.find { it.filterType == FilterConfiguration.FilterType.ABI }?.identifier
+                    def firstAbi = variant.outputs.first().getFilter(FilterConfiguration.FilterType.ABI)
+                    /* variant.outputs.find { it.filters.any { f -> f.filterType == FilterConfiguration.FilterType.ABI } }
+                       ?.filters?.find { it.filterType == FilterConfiguration.FilterType.ABI }?.identifier */
                     def multiplier = firstAbi != null ? project.ext.versionCodes.get(firstAbi) : project.ext.versionCodes.get('arm64-v8a')
                     def v = multiplier * 10000000 + output.versionCode.get()
+                    println("univ-versionCode: $v")
                     output.versionCode.set(v)
                 }
             }
@@ -391,9 +394,17 @@ android {
     // is the flavor's primary manifest — see that file for the rationale
     // (it currently mirrors full's manifest and adds the TV launcher).
     sourceSets {
-        tv {
-            java.srcDirs += ['src/full/java']
-            res.srcDirs += ['src/full/res']
+        // rethink-tv fork: the `full` flavor's java + res trees have been moved
+        // into `main` (see git history), so every variant — `full` and `tv`
+        // alike — compiles them via `main`. `full`'s source set no longer owns
+        // `src/full/res`; `main` includes it as an additional resource dir so the
+        // overlay semantics (main + full resources) are preserved for all
+        // variants, including `tv`.
+        main {
+            res.srcDirs += 'src/full/res'
+        }
+        full {
+            res.srcDirs = []
         }
     }
     lint {
