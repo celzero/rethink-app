@@ -1,15 +1,14 @@
 plugins {
     id 'com.android.test'
-    id 'org.jetbrains.kotlin.android'
 }
 
 android {
     namespace 'com.celzero.bravedns.benchmark'
-    compileSdk 36
+    compileSdk 37
 
     defaultConfig {
         minSdk 23
-        targetSdk 35
+        targetSdk 37
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
