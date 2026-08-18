@@ -246,7 +246,12 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             if (isInvalidProxyDetails()) {
                 b.bsConnTrackAppInfo.text = getString(getFirewallRule(FirewallRuleset.RULE18.id)?.title ?: R.string.firewall_rule_no_rule)
             } else {
-                b.bsConnTrackAppInfo.text = getFirewallRule(rule)?.title?.let { getString(it) }
+                val allowReason =
+                    if (info?.isBlocked == false) FirewallRuleset.getAllowReason(rule) else null
+                b.bsConnTrackAppInfo.text =
+                    allowReason?.title?.let {
+                        getString(R.string.bsct_allow_reason, getString(it))
+                    } ?: getFirewallRule(rule)?.title?.let { getString(it) }
             }
         }
     }

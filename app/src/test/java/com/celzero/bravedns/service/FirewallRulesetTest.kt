@@ -2,6 +2,8 @@ package com.celzero.bravedns.service
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
 import org.junit.Test
 
 /**
@@ -10,6 +12,25 @@ import org.junit.Test
  * was not increasing due to incorrect rule ID filtering.
  */
 class FirewallRulesetTest {
+
+    @Test
+    fun testGetAllowReason() {
+        assertNull(FirewallRuleset.getAllowReason(null))
+        assertNull(FirewallRuleset.getAllowReason("Unknown rule"))
+
+        assertSame(
+            FirewallRuleset.RULE2B,
+            FirewallRuleset.getAllowReason(FirewallRuleset.RULE2B.id)
+        )
+        assertSame(
+            FirewallRuleset.RULE8,
+            FirewallRuleset.getAllowReason(FirewallRuleset.RULE8.id)
+        )
+
+        assertNull(FirewallRuleset.getAllowReason(FirewallRuleset.RULE1B.id))
+        assertNull(FirewallRuleset.getAllowReason(FirewallRuleset.RULE2H.id))
+        assertNull(FirewallRuleset.getAllowReason(FirewallRuleset.RULE9.id))
+    }
 
     /**
      * Test that RULE1B and RULE8 have different IDs.
