@@ -169,6 +169,10 @@ class ProxyManagerTest : KoinTest {
         coEvery { FirewallManager.getAppInfoByPackage(pkg2)  } returns buildAppInfo(uid2,  pkg2,  name2)
         coEvery { FirewallManager.getAppInfoByPackage(null)  } returns null
         coEvery { FirewallManager.getAppInfoByPackage("")    } returns null
+        // bulk ops (setProxyIdForAllApps / setProxyIdForUnselectedApps) and updateApp now consult
+        // FirewallManager as the source of truth; default to empty/null, individual tests override.
+        coEvery { FirewallManager.getAllApps() } returns emptySet()
+        coEvery { FirewallManager.getAppInfoByUidAndPackage(any(), any()) } returns null
 
         appInfo1 = buildAppInfo(uid1, pkg1, name1)
         appInfo2 = buildAppInfo(uid2, pkg2, name2)
@@ -197,6 +201,18 @@ class ProxyManagerTest : KoinTest {
     /** Convenience factory for ProxyApplicationMapping test rows. */
     private fun pam(uid: Int, pkg: String, proxyId: String, proxyName: String = "") =
         ProxyApplicationMapping(uid, pkg, "", proxyName, true, proxyId)
+
+    /**
+     * Stub FirewallManager (the source of truth for bulk proxy ops) to expose the given apps.
+     * setProxyIdForAllApps / setProxyIdForUnselectedApps / updateApp iterate FirewallManager, so
+     * tests exercising them must declare which apps FirewallManager knows about.
+     */
+    private fun stubFwApps(vararg apps: FirewallManager.AppInfoTuple) {
+        coEvery { FirewallManager.getAllApps() } returns apps.toSet()
+        apps.forEach { t ->
+            coEvery { FirewallManager.getAppInfoByUidAndPackage(t.uid, t.packageName) } returns buildAppInfo(t.uid, t.packageName, "name${t.uid}")
+        }
+    }
 
     /**
      * Reset ProxyManager's in-memory CopyOnWriteArraySet<ProxyAppMapTuple> to an empty state.
@@ -276,13 +292,14 @@ class ProxyManagerTest : KoinTest {
     }
 
     /**
-     * ANOMALY: addNewApp swaps proxyId and proxyName in the PAM entity constructor.
-     * PAM constructor signature: (uid, pkg, appName, proxyName, isActive, proxyId)
-     * addNewApp passes:  4th=proxyId, 6th=proxyName  (should be the other way round).
-     * The in-memory pamSet (ProxyAppMapTuple) is constructed correctly and is unaffected.
+     * addNewApp stores proxyId and proxyName in the correct PAM constructor slots
+     * (uid, pkg, appName, proxyName, isActive, proxyId). Previously these two were swapped, which
+     * stored proxyName in the proxyId column -- breaking the (proxyId = :proxyId OR proxyId = '')
+     * pager-query match and risking PK collisions, making apps vanish from WgIncludeAppsAdapter.
+     * The in-memory pamSet (ProxyAppMapTuple) was always correct.
      */
     @Test
-    fun `ANOMALY addNewApp swaps proxyId and proxyName in DB entity`() = runBlocking {
+    fun `addNewApp stores proxyId and proxyName in correct columns`() = runBlocking {
         val capturedPam = slot<ProxyApplicationMapping>()
         coEvery { mockDb.insert(capture(capturedPam)) } returns 1L
 
@@ -291,8 +308,8 @@ class ProxyManagerTest : KoinTest {
         assertTrue("In-memory cache must be correct", ProxyManager.getProxyIdsForApp(uid1).contains(wgProxyId0))
 
         val stored = capturedPam.captured
-        assertEquals("ANOMALY: proxyId value stored in pam.proxyName", wgProxyId0, stored.proxyName)
-        assertEquals("ANOMALY: proxyName value stored in pam.proxyId", "Tunnel0",  stored.proxyId)
+        assertEquals("proxyId must be stored in pam.proxyId", wgProxyId0, stored.proxyId)
+        assertEquals("proxyName must be stored in pam.proxyName", "Tunnel0", stored.proxyName)
     }
 
     @Test
@@ -529,6 +546,10 @@ class ProxyManagerTest : KoinTest {
     @Test
     fun `setProxyIdForAllApps adds proxy to every tracked app`() = runBlocking {
         loadMappings(pam(uid1, pkg1, ""), pam(uid2, pkg2, ""))
+        stubFwApps(
+            FirewallManager.AppInfoTuple(uid1, pkg1),
+            FirewallManager.AppInfoTuple(uid2, pkg2)
+        )
         ProxyManager.setProxyIdForAllApps(wgProxyId0, "T0")
         assertTrue(ProxyManager.getProxyIdsForApp(uid1).contains(wgProxyId0))
         assertTrue(ProxyManager.getProxyIdsForApp(uid2).contains(wgProxyId0))
@@ -538,6 +559,10 @@ class ProxyManagerTest : KoinTest {
     @Test
     fun `setProxyIdForAllApps skips apps already assigned to that proxy`() = runBlocking {
         loadMappings(pam(uid1, pkg1, wgProxyId0), pam(uid2, pkg2, ""))
+        stubFwApps(
+            FirewallManager.AppInfoTuple(uid1, pkg1),
+            FirewallManager.AppInfoTuple(uid2, pkg2)
+        )
         ProxyManager.setProxyIdForAllApps(wgProxyId0, "T0")
         coVerify(exactly = 1) { mockDb.insert(match { it.uid == uid2 && it.proxyId == wgProxyId0 }) }
         coVerify(exactly = 0) { mockDb.insert(match { it.uid == uid1 && it.proxyId == wgProxyId0 }) }
@@ -546,6 +571,7 @@ class ProxyManagerTest : KoinTest {
     @Test
     fun `setProxyIdForAllApps rejects invalid proxyId`() = runBlocking {
         loadMappings(pam(uid1, pkg1, ""))
+        stubFwApps(FirewallManager.AppInfoTuple(uid1, pkg1))
         ProxyManager.setProxyIdForAllApps("INVALID_PREFIX", "bad")
         coVerify(exactly = 0) { mockDb.insert(any()) }
     }
@@ -553,6 +579,10 @@ class ProxyManagerTest : KoinTest {
     @Test
     fun `setProxyIdForAllApps with RPN proxyId adds entry for every app`() = runBlocking {
         loadMappings(pam(uid1, pkg1, ""), pam(uid2, pkg2, ""))
+        stubFwApps(
+            FirewallManager.AppInfoTuple(uid1, pkg1),
+            FirewallManager.AppInfoTuple(uid2, pkg2)
+        )
         ProxyManager.setProxyIdForAllApps(rpnProxyId, rpnServerKey)
         coVerify(exactly = 2) { mockDb.insert(match { it.proxyId == rpnProxyId }) }
     }
@@ -564,6 +594,10 @@ class ProxyManagerTest : KoinTest {
     @Test
     fun `setProxyIdForUnselectedApps only adds to apps not yet in that proxy`() = runBlocking {
         loadMappings(pam(uid1, pkg1, wgProxyId0), pam(uid2, pkg2, ""))
+        stubFwApps(
+            FirewallManager.AppInfoTuple(uid1, pkg1),
+            FirewallManager.AppInfoTuple(uid2, pkg2)
+        )
         ProxyManager.setProxyIdForUnselectedApps(wgProxyId0, "T0")
         coVerify(exactly = 0) { mockDb.insert(match { it.uid == uid1 && it.proxyId == wgProxyId0 }) }
         coVerify(exactly = 1) { mockDb.insert(match { it.uid == uid2 && it.proxyId == wgProxyId0 }) }
@@ -644,6 +678,56 @@ class ProxyManagerTest : KoinTest {
         loadMappings(pam(uid1, pkg1, ""))
         ProxyManager.updateApp(uid1, pkg1)
         coVerify(exactly = 0) { mockDb.updateUidForApp(any(), any(), any()) }
+    }
+
+    // Regression: when an app exists in FirewallManager but has NO ProxyApplicationMapping row at all
+    // (base row lost earlier, e.g. by a refresh race), updateApp must self-heal by creating the
+    // proxyId="" base row instead of silently returning. Previously it logged "map not found" and
+    // left the app permanently invisible in WgIncludeAppsAdapter.
+    @Test
+    fun `updateApp self-heals base row when no mapping exists`() = runBlocking {
+        // no loadMappings(...) -> pamSet has nothing for (uid1, pkg1)
+        stubFwApps(FirewallManager.AppInfoTuple(uid1, pkg1))
+
+        ProxyManager.updateApp(uid1, pkg1)
+
+        // a proxyId="" base row must now exist for the app
+        assertTrue(
+            ProxyManager.trackedApps().any { it.uid == uid1 && it.packageName == pkg1 }
+        )
+        coVerify(exactly = 1) { mockDb.insert(match { it.uid == uid1 && it.packageName == pkg1 && it.proxyId == "" }) }
+        // no uid update should be issued (there was nothing to reassign)
+        coVerify(exactly = 0) { mockDb.updateUidForApp(any(), any(), any()) }
+    }
+
+    @Test
+    fun `updateApp does not self-heal when FirewallManager has no such app`() = runBlocking {
+        // no mapping AND FirewallManager doesn't know the app -> skip (avoid orphan rows)
+        ProxyManager.updateApp(uid1, pkg1)
+        coVerify(exactly = 0) { mockDb.insert(any()) }
+        coVerify(exactly = 0) { mockDb.updateUidForApp(any(), any(), any()) }
+    }
+
+    // Regression: setProxyIdForAllApps must backfill the proxyId="" base row for apps that lost it,
+    // so they reappear in the "All Apps" pager query.
+    @Test
+    fun `setProxyIdForAllApps backfills missing base row`() = runBlocking {
+        // uid1 has only a wg-specific row, NO base row; uid2 has only a base row
+        loadMappings(pam(uid1, pkg1, wgProxyId0), pam(uid2, pkg2, ""))
+        stubFwApps(
+            FirewallManager.AppInfoTuple(uid1, pkg1),
+            FirewallManager.AppInfoTuple(uid2, pkg2)
+        )
+
+        ProxyManager.setProxyIdForAllApps(wgProxyId0, "T0")
+
+        // uid1 must now also have a proxyId="" base row
+        val baseRowInserted = mutableListOf<ProxyApplicationMapping>()
+        coVerify { mockDb.insert(capture(baseRowInserted)) }
+        assertTrue(
+            "uid1 base row must be backfilled",
+            baseRowInserted.any { it.uid == uid1 && it.proxyId == "" }
+        )
     }
 
     // ========================================================================
@@ -962,6 +1046,359 @@ class ProxyManagerTest : KoinTest {
     fun `addApps silently skips null entries`() = runBlocking {
         ProxyManager.addApps(listOf(appInfo1, null, appInfo2))
         coVerify(exactly = 2) { mockDb.insert(any()) }
+    }
+
+    // ========================================================================
+    // 27. Sync invariant: AppInfo (FirewallManager) <-> ProxyApplicationMapping
+    //     Every app that FirewallManager tracks must end up with at least a
+    //     proxyId="" base row in the proxy mapping so it is visible in the
+    //     WgIncludeAppsAdapter "All Apps" pager query
+    //     (proxyId = :proxyId OR proxyId = '').
+    // ========================================================================
+
+    /**
+     * Capture every PAM written to the mock DB so assertions can inspect column-level correctness
+     * (in particular that proxyId/proxyName are NOT swapped, and that the base row proxyId == "").
+     */
+    private fun captureInserted(): MutableList<ProxyApplicationMapping> {
+        val captured = mutableListOf<ProxyApplicationMapping>()
+        coEvery { mockDb.insert(capture(captured)) } returns 1L
+        return captured
+    }
+
+    @Test
+    fun `addNewApp creates exactly one base row with proxyId empty`() = runBlocking {
+        val captured = captureInserted()
+        ProxyManager.addNewApp(appInfo1)
+        assertEquals(1, captured.size)
+        val row = captured[0]
+        assertEquals(uid1, row.uid)
+        assertEquals(pkg1, row.packageName)
+        assertEquals("base row proxyId must be empty", "", row.proxyId)
+        assertEquals(name1, row.appName)
+    }
+
+    @Test
+    fun `addNewApp with explicit proxyId stores it in the proxyId column (not swapped)`() = runBlocking {
+        val captured = captureInserted()
+        ProxyManager.addNewApp(appInfo1, proxyId = wgProxyId0, proxyName = "T0")
+        assertEquals(1, captured.size)
+        assertEquals("proxyId must be in proxyId column", wgProxyId0, captured[0].proxyId)
+        assertEquals("proxyName must be in proxyName column", "T0", captured[0].proxyName)
+    }
+
+    @Test
+    fun `trackedApps reflects every uid-pkg that has any proxy row`() = runBlocking {
+        loadMappings(
+            pam(uid1, pkg1, ""), pam(uid1, pkg1, wgProxyId0),
+            pam(uid2, pkg2, "")
+        )
+        val tracked = ProxyManager.trackedApps().map { it.uid to it.packageName }.toSet()
+        // uid1 and uid2 each appear once even though uid1 has 2 rows
+        assertEquals(setOf(uid1 to pkg1, uid2 to pkg2), tracked)
+    }
+
+    @Test
+    fun `getProxyIdForApp returns SYSTEM when app has only the base row`() {
+        loadMappings(pam(uid1, pkg1, ""))
+        val ids = ProxyManager.getProxyIdForApp(uid1)
+        assertEquals(listOf(ProxyManager.ID_NONE), ids)
+    }
+
+    @Test
+    fun `addProxyToApp creates only the proxy-specific row, leaving any base row intact`() = runBlocking {
+        loadMappings(pam(uid1, pkg1, ""))
+        ProxyManager.addProxyToApp(uid1, pkg1, wgProxyId0, "T0")
+        assertTrue(ProxyManager.getProxyIdsForApp(uid1).contains(wgProxyId0))
+        // base row tuple still present
+        assertTrue(pamSetContains(uid1, pkg1, ""))
+    }
+
+    @Test
+    fun `removeProxyFromApp removes only the targeted proxy, not the base row`() = runBlocking {
+        loadMappings(pam(uid1, pkg1, ""), pam(uid1, pkg1, wgProxyId0))
+        ProxyManager.removeProxyFromApp(uid1, pkg1, wgProxyId0)
+        assertFalse(ProxyManager.getProxyIdsForApp(uid1).contains(wgProxyId0))
+        assertTrue("base row must survive proxy removal", pamSetContains(uid1, pkg1, ""))
+        coVerify(exactly = 1) { mockDb.deleteMapping(uid1, pkg1, wgProxyId0) }
+        coVerify(exactly = 0) { mockDb.deleteMapping(uid1, pkg1, "") }
+    }
+
+    // --- bulk ops backfill missing apps from FirewallManager -----------------------------
+
+    @Test
+    fun `setProxyIdForAllApps backfills apps known to FirewallManager but missing from proxy cache`() = runBlocking {
+        // uid1 has a base row in proxy cache; uid2 is known to FirewallManager but has NO proxy row
+        loadMappings(pam(uid1, pkg1, ""))
+        stubFwApps(
+            FirewallManager.AppInfoTuple(uid1, pkg1),
+            FirewallManager.AppInfoTuple(uid2, pkg2)
+        )
+        ProxyManager.setProxyIdForAllApps(wgProxyId0, "T0")
+        // uid2 must now have both a base row AND the wg0 row
+        assertTrue("missing app backfilled with wg0", ProxyManager.getProxyIdsForApp(uid2).contains(wgProxyId0))
+        assertTrue("missing app also gets base row", pamSetContains(uid2, pkg2, ""))
+    }
+
+    @Test
+    fun `setProxyIdForUnselectedApps backfills apps known to FirewallManager but missing from proxy cache`() = runBlocking {
+        loadMappings(pam(uid1, pkg1, wgProxyId0))
+        stubFwApps(
+            FirewallManager.AppInfoTuple(uid1, pkg1),
+            FirewallManager.AppInfoTuple(uid2, pkg2)
+        )
+        ProxyManager.setProxyIdForUnselectedApps(wgProxyId0, "T0")
+        assertTrue(ProxyManager.getProxyIdsForApp(uid2).contains(wgProxyId0))
+        assertTrue("base row backfilled too", pamSetContains(uid2, pkg2, ""))
+    }
+
+    @Test
+    fun `setProxyIdForAllApps ignores apps that FirewallManager does not track`() = runBlocking {
+        // proxy cache has a stale uid, but FirewallManager only knows uid1 -> stale uid gets no
+        // base row fixup and no spurious wg0 row from this op (it iterates FW, not the cache).
+        val staleUid = 10999
+        loadMappings(pam(staleUid, "com.stale", ""))
+        stubFwApps(FirewallManager.AppInfoTuple(uid1, pkg1))
+        ProxyManager.setProxyIdForAllApps(wgProxyId0, "T0")
+        assertFalse("stale cache-only app must not gain wg0", ProxyManager.getProxyIdsForApp(staleUid).contains(wgProxyId0))
+    }
+
+    // --- updateApp self-healing (see also Section 10 for the core self-heal tests) -------
+
+    @Test
+    fun `updateApp self-heal uses uid-aware lookup so work-profile apps are handled`() = runBlocking {
+        // same package under two uids; only one is being updated
+        stubFwApps(
+            FirewallManager.AppInfoTuple(uid1, pkg1),
+            FirewallManager.AppInfoTuple(uid1b, pkg1)
+        )
+        ProxyManager.updateApp(uid1b, pkg1)
+        assertTrue("work-profile uid got its own base row", pamSetContains(uid1b, pkg1, ""))
+    }
+
+    // --- full sync comparison after compound operations ---------------------------------
+
+    @Test
+    fun `sync after addNewApp then addProxyToApp - base and proxy rows coexist`() = runBlocking {
+        ProxyManager.addNewApp(appInfo1)                                  // base row
+        ProxyManager.addProxyToApp(uid1, pkg1, wgProxyId0, "T0")         // proxy row
+        val ids = ProxyManager.getProxyIdsForApp(uid1)
+        assertTrue(ids.contains(wgProxyId0))
+        assertTrue("base row preserved", pamSetContains(uid1, pkg1, ""))
+    }
+
+    @Test
+    fun `sync after assign-all then remove-all leaves only base rows`() = runBlocking {
+        stubFwApps(
+            FirewallManager.AppInfoTuple(uid1, pkg1),
+            FirewallManager.AppInfoTuple(uid2, pkg2)
+        )
+        ProxyManager.setProxyIdForAllApps(wgProxyId0, "T0")
+        ProxyManager.setNoProxyForAllAppsForProxy(wgProxyId0)
+        assertFalse(ProxyManager.getProxyIdsForApp(uid1).contains(wgProxyId0))
+        assertFalse(ProxyManager.getProxyIdsForApp(uid2).contains(wgProxyId0))
+        // base rows survive so apps stay visible in the include list
+        assertTrue("uid1 base row intact", pamSetContains(uid1, pkg1, ""))
+        assertTrue("uid2 base row intact", pamSetContains(uid2, pkg2, ""))
+    }
+
+    @Test
+    fun `sync after tombstone - rows move to negative uid and DB tombstone is invoked`() = runBlocking {
+        ProxyManager.addNewApp(appInfo1)
+        ProxyManager.addProxyToApp(uid1, pkg1, wgProxyId0, "T0")
+        // tombstoneApp calls load() at the end; stub getApps to return the tombstoned entries so
+        // the in-memory cache reflects post-tombstone state.
+        val neg = -uid1
+        coEvery { mockDb.getApps() } returns listOf(
+            ProxyApplicationMapping(neg, pkg1, name1, "", true, ""),
+            ProxyApplicationMapping(neg, pkg1, name1, "T0", true, wgProxyId0)
+        )
+        ProxyManager.tombstoneApp(uid1)
+        // DB tombstone was invoked
+        coVerify(exactly = 1) { mockDb.tombstoneApp(uid1, neg) }
+        // positive uid gone from reloaded cache
+        assertFalse(pamSetContains(uid1, pkg1, ""))
+        // negative uid has both base and proxy rows in reloaded cache
+        assertTrue("base row survives tombstone under negative uid", pamSetContains(neg, pkg1, ""))
+        assertTrue("proxy row survives tombstone under negative uid", pamSetContains(neg, pkg1, wgProxyId0))
+    }
+
+    @Test
+    fun `sync after delete removes all rows for that uid and package`() = runBlocking {
+        ProxyManager.addNewApp(appInfo1)
+        ProxyManager.addProxyToApp(uid1, pkg1, wgProxyId0, "T0")
+        ProxyManager.deleteApp(uid1, pkg1)
+        assertTrue("no rows remain", ProxyManager.trackedApps().none { it.uid == uid1 })
+        coVerify(exactly = 1) { mockDb.deleteApp(uid1, pkg1) }
+    }
+
+    @Test
+    fun `proxyId and proxyName are never swapped across operations`() = runBlocking {
+        val captured = captureInserted()
+        ProxyManager.addNewApp(appInfo1, proxyId = wgProxyId0, proxyName = "Tunnel0")
+        ProxyManager.addProxyToApp(uid1, pkg1, rpnProxyId, rpnServerKey)
+        // every captured row must have proxyId in proxyId and proxyName in proxyName
+        captured.forEach { row ->
+            assertTrue("proxyId column must not hold a name: ${row.proxyId}", row.proxyId != "Tunnel0" && row.proxyId != rpnServerKey)
+        }
+        assertEquals(wgProxyId0, captured[0].proxyId)
+        assertEquals("Tunnel0", captured[0].proxyName)
+        assertEquals(rpnProxyId, captured[1].proxyId)
+        assertEquals(rpnServerKey, captured[1].proxyName)
+    }
+
+    // ========================================================================
+    // 28. purgeGhostMappings — remove entries referencing deleted WG/RPN proxies
+    // ========================================================================
+
+    @Test
+    fun `purgeGhostMappings removes stale WG proxy entries from cache and DB`() = runBlocking {
+        loadMappings(
+            pam(uid1, pkg1, ""),            // base row
+            pam(uid1, pkg1, wgProxyId0),    // valid WG
+            pam(uid1, pkg1, wgProxyId1),    // ghost WG (config deleted)
+            pam(uid2, pkg2, "")             // another app base row
+        )
+        val purged = ProxyManager.purgeGhostMappings(
+            validWgProxyIds = setOf(wgProxyId0),   // only wg0 still exists
+            validRpnProxyIds = emptySet()
+        )
+        assertEquals(1, purged)
+        assertTrue("valid WG survives", pamSetContains(uid1, pkg1, wgProxyId0))
+        assertFalse("ghost WG removed from cache", pamSetContains(uid1, pkg1, wgProxyId1))
+        assertTrue("base rows untouched", pamSetContains(uid1, pkg1, ""))
+        assertTrue("base rows untouched", pamSetContains(uid2, pkg2, ""))
+        coVerify(exactly = 1) { mockDb.deleteMapping(uid1, pkg1, wgProxyId1) }
+    }
+
+    @Test
+    fun `purgeGhostMappings removes stale RPN proxy entries from cache and DB`() = runBlocking {
+        loadMappings(
+            pam(uid1, pkg1, ""),
+            pam(uid1, pkg1, rpnProxyId),     // valid RPN
+            pam(uid1, pkg1, rpnProxyId2),    // ghost RPN (server removed)
+            pam(uid2, pkg2, rpnProxyId2)     // ghost RPN on another app
+        )
+        val purged = ProxyManager.purgeGhostMappings(
+            validWgProxyIds = emptySet(),
+            validRpnProxyIds = setOf(rpnProxyId)  // only first server still exists
+        )
+        assertEquals(2, purged)
+        assertTrue("valid RPN survives", pamSetContains(uid1, pkg1, rpnProxyId))
+        assertFalse("ghost RPN removed", pamSetContains(uid1, pkg1, rpnProxyId2))
+        assertFalse("ghost RPN removed on uid2", pamSetContains(uid2, pkg2, rpnProxyId2))
+        coVerify(exactly = 1) { mockDb.deleteMapping(uid1, pkg1, rpnProxyId2) }
+        coVerify(exactly = 1) { mockDb.deleteMapping(uid2, pkg2, rpnProxyId2) }
+    }
+
+    @Test
+    fun `purgeGhostMappings does NOT misclassify RPN ids as WG despite shared prefix`() = runBlocking {
+        // Backend.RpnWin = "wgyrpn" starts with ID_WG_BASE = "wg"; the purge must check RPN
+        // before WG so a valid RPN id is never evaluated against the WG valid-set.
+        loadMappings(
+            pam(uid1, pkg1, ""),
+            pam(uid1, pkg1, rpnProxyId),    // valid RPN, must survive
+            pam(uid1, pkg1, wgProxyId0)     // valid WG, must survive
+        )
+        val purged = ProxyManager.purgeGhostMappings(
+            validWgProxyIds = setOf(wgProxyId0),
+            validRpnProxyIds = setOf(rpnProxyId)
+        )
+        assertEquals(0, purged)
+        assertTrue(pamSetContains(uid1, pkg1, rpnProxyId))
+        assertTrue(pamSetContains(uid1, pkg1, wgProxyId0))
+    }
+
+    @Test
+    fun `purgeGhostMappings retains Orbot SOCKS5 HTTP TCP assignments regardless of valid sets`() = runBlocking {
+        loadMappings(
+            pam(uid1, pkg1, ""),
+            pam(uid1, pkg1, orbotProxyId),
+            pam(uid1, pkg1, s5ProxyId),
+            pam(uid1, pkg1, httpProxyId),
+            pam(uid1, pkg1, tcpProxyId)
+        )
+        // pass EMPTY valid sets — none of these proxy types should be purged
+        val purged = ProxyManager.purgeGhostMappings(
+            validWgProxyIds = emptySet(),
+            validRpnProxyIds = emptySet()
+        )
+        assertEquals(0, purged)
+        assertTrue(pamSetContains(uid1, pkg1, orbotProxyId))
+        assertTrue(pamSetContains(uid1, pkg1, s5ProxyId))
+        assertTrue(pamSetContains(uid1, pkg1, httpProxyId))
+        assertTrue(pamSetContains(uid1, pkg1, tcpProxyId))
+    }
+
+    @Test
+    fun `purgeGhostMappings never removes base rows`() = runBlocking {
+        loadMappings(
+            pam(uid1, pkg1, ""),
+            pam(uid2, pkg2, ""),
+            pam(uid2, pkg2, wgProxyId0)     // ghost WG
+        )
+        val purged = ProxyManager.purgeGhostMappings(
+            validWgProxyIds = emptySet(),
+            validRpnProxyIds = emptySet()
+        )
+        assertEquals(1, purged)
+        assertTrue("base row kept", pamSetContains(uid1, pkg1, ""))
+        assertTrue("base row kept", pamSetContains(uid2, pkg2, ""))
+        assertFalse("ghost WG purged", pamSetContains(uid2, pkg2, wgProxyId0))
+    }
+
+    @Test
+    fun `purgeGhostMappings returns 0 and is a no-op when there are no ghosts`() = runBlocking {
+        loadMappings(
+            pam(uid1, pkg1, ""),
+            pam(uid1, pkg1, wgProxyId0),
+            pam(uid1, pkg1, rpnProxyId)
+        )
+        val purged = ProxyManager.purgeGhostMappings(
+            validWgProxyIds = setOf(wgProxyId0),
+            validRpnProxyIds = setOf(rpnProxyId)
+        )
+        assertEquals(0, purged)
+        coVerify(exactly = 0) { mockDb.deleteMapping(any(), any(), any()) }
+    }
+
+    @Test
+    fun `purgeGhostMappings handles empty pamSet`() = runBlocking {
+        val purged = ProxyManager.purgeGhostMappings(
+            validWgProxyIds = setOf(wgProxyId0),
+            validRpnProxyIds = setOf(rpnProxyId)
+        )
+        assertEquals(0, purged)
+    }
+
+    @Test
+    fun `purgeGhostMappings clears ghost from getProxyIdForApp so AppInfoActivity shows correct proxies`() = runBlocking {
+        // simulates the user-reported bug: AppInfoActivity.displayProxyStatus shows a deleted WG
+        loadMappings(
+            pam(uid1, pkg1, ""),
+            pam(uid1, pkg1, wgProxyId0),    // live
+            pam(uid1, pkg1, wgProxyId1)     // deleted tunnel, still in DB
+        )
+        // before purge, getProxyIdForApp returns the ghost
+        assertTrue(ProxyManager.getProxyIdForApp(uid1).contains(wgProxyId1))
+
+        ProxyManager.purgeGhostMappings(setOf(wgProxyId0), emptySet())
+
+        // after purge, only the live proxy remains
+        val proxies = ProxyManager.getProxyIdForApp(uid1)
+        assertTrue(proxies.contains(wgProxyId0))
+        assertFalse("ghost proxy no longer reported", proxies.contains(wgProxyId1))
+    }
+
+    // --- helper -------------------------------------------------------------------------
+
+    /** True if the in-memory pamSet contains the given (uid, packageName, proxyId) tuple. */
+    private fun pamSetContains(uid: Int, pkg: String, proxyId: String): Boolean {
+        val field = ProxyManager::class.java.getDeclaredField("pamSet")
+        field.isAccessible = true
+        @Suppress("UNCHECKED_CAST")
+        val set = field.get(ProxyManager) as CopyOnWriteArraySet<ProxyManager.ProxyAppMapTuple>
+        return set.any { it.uid == uid && it.packageName == pkg && it.proxyId == proxyId }
     }
 }
 

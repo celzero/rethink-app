@@ -45,8 +45,9 @@ on:
   # Use pull_request_target instead of pull_request so that secrets are
   # available even for PRs from forks. This is safe because the reusable
   # action only reads the diff and does not execute any code from the PR.
-  pull_request_target:
-    types: [opened, synchronize, reopened]
+  # too expensive, commenting it for now.
+  # pull_request_target:
+  #  types: [opened, synchronize, reopened]
   issue_comment:
     types: [created]
 

@@ -146,6 +146,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
         // Setup basic UI immediately (lightweight operations)
         b.bsdlDomainRuleDesc.text = htmlToSpannedText(getString(R.string.bsdl_block_desc))
+        b.bsdlAppDomainRuleDesc.text = htmlToSpannedText(getString(R.string.bsdl_app_block_desc))
         b.dnsBlockUrl.text = "${log?.queryStr.orEmpty()}      ❯"
         b.dnsBlockIpAddress.text = getResponseIp()
         b.dnsBlockConnectionFlag.text = log?.flag.orEmpty()
@@ -177,6 +178,9 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
         // Update app details (already uses background thread)
         updateAppDetails(log)
+
+        // Set up app-specific domain rule option (visible only if an app is associated)
+        setupAppSpecificDomainRule()
 
         // Defer heavy operations to prevent ANR
         // This allows the UI to render immediately while heavy operations run after first frame
@@ -326,6 +330,86 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
                 status
             )
             logEvent("DNS domain rule change", "${currentLog.queryStr} to ${status.name}")
+        }
+    }
+
+    /**
+     * Sets up the app-specific domain rule spinner. The section is shown only when the
+     * DNS request originates from a real app (i.e. the uid resolves to an app in
+     * the FirewallManager cache). Rules added here are persisted against the app's uid and
+     * therefore appear under the app's CustomDomainFragment (app-specific rules) tab.
+     */
+    private fun setupAppSpecificDomainRule() {
+        val currentLog = log ?: return
+        val uid = currentLog.uid
+        // skip if the uid does not belong to a real app
+        if (uid == Constants.INVALID_UID || uid == Constants.UID_EVERYBODY) return
+
+        io {
+            val hasApp = FirewallManager.hasUid(uid)
+            if (!hasApp) return@io
+
+            val domain = currentLog.queryStr.dropLastWhile { it == '.' }.lowercase()
+            val status = DomainRulesManager.getDomainRule(domain, uid)
+
+            uiCtx {
+                if (_binding == null) return@uiCtx
+
+                b.bsdlAppDomainRuleSpinner.adapter =
+                    FirewallStatusSpinnerAdapter(
+                        requireContext(),
+                        DomainRulesManager.Status.getLabel(requireContext())
+                    )
+                // set the initial selection before attaching the listener so that the
+                // adapter's default position-0 callback does not clobber an existing rule
+                b.bsdlAppDomainRuleSpinner.setSelection(status.id)
+                b.bsdlAppDomainRuleSpinner.onItemSelectedListener =
+                    object : AdapterView.OnItemSelectedListener {
+                        override fun onItemSelected(
+                            parent: AdapterView<*>?,
+                            view: View?,
+                            position: Int,
+                            id: Long
+                        ) {
+                            val iv = view?.findViewById<AppCompatImageView>(R.id.spinner_icon)
+                            iv?.visibility = View.VISIBLE
+                            val ruleStatus = DomainRulesManager.Status.getStatus(position)
+
+                            // no need to apply rule, if prev selection and current selection are same
+                            val queryStr = log?.queryStr ?: return
+                            if (DomainRulesManager.getDomainRule(queryStr, uid) == ruleStatus) {
+                                return
+                            }
+
+                            applyAppDnsRule(ruleStatus, uid)
+                        }
+
+                        override fun onNothingSelected(parent: AdapterView<*>?) {}
+                    }
+
+                b.bsdlAppDomainRuleLl.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun applyAppDnsRule(status: DomainRulesManager.Status, uid: Int) {
+        val currentLog = log
+        if (currentLog == null) {
+            Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to apply app dns rules")
+            return
+        }
+        io {
+            DomainRulesManager.changeStatus(
+                currentLog.queryStr,
+                uid,
+                currentLog.responseIps,
+                DomainRulesManager.DomainType.DOMAIN,
+                status
+            )
+            logEvent(
+                "DNS app domain rule change",
+                "${currentLog.queryStr} to ${status.name} for uid $uid"
+            )
         }
     }
 

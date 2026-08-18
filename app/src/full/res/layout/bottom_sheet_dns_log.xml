@@ -281,6 +281,46 @@
                 tools:listitem="@layout/spinner_item_firewall_status" />
 
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/bsdl_app_domain_rule_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bsdl_domain_rule_ll"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:visibility="gone"
+            android:weightSum="1">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/bsdl_app_domain_rule_desc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.6"
+                android:padding="5dp"
+                android:text="@string/bsdl_app_block_desc"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/bsdl_app_domain_rule_spinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.4"
+                android:background="@drawable/spinner_outline"
+                android:popupBackground="@drawable/spinner_outline_with_bg"
+                android:spinnerMode="dropdown"
+                tools:listitem="@layout/spinner_item_firewall_status" />
+
+        </LinearLayout>
     </RelativeLayout>
 
     <LinearLayout

@@ -3,7 +3,7 @@
     <string name="txt_home">Hjem</string>
     <string name="block">blokker</string>
     <string name="slide_2_title">Velkommen</string>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name" translatable="false">RethinkDNS</string>
     <string name="title_settings">Innstillinger</string>
     <string name="title_about">Om</string>
     <string name="pause_title_desc">tar en lur …</string>
@@ -20,7 +20,7 @@
     <string name="notification_action_pause_vpn">Pause</string>
     <string name="firewall_rules">Nettverksregler</string>
     <string name="firewall_mode_info_title">Brannmur</string>
-    <string name="conn_track_clear_logs_title">Slett alle nettverkslogger\?</string>
+    <string name="conn_track_clear_logs_title">Slett alle nettverkslogger?</string>
     <string name="info_dialog_copy_toast_msg">IP-adresse kopiert.</string>
     <string name="orbot_status_arg_2">TCP</string>
     <string name="notification_action_dns_mode">DNS</string>
@@ -33,7 +33,7 @@
     <string name="slide_2_desc">Rethink lar deg holde øye med din nettverksaktivitet, omgå sensur på Internett, og legge til brannmur for programmer.</string>
     <string name="slide_1_title">Fri programvare</string>
     <string name="slide_1_desc">Rethink er fri programvare sponset av Mozilla Builders MVP.</string>
-    <string name="rdns_plus">RDNS Plus</string>
+    <string name="rdns_plus" translatable="false">RDNS Plus</string>
     <string name="dns_explanation_dns_connected">Tilkoblet til Rethink</string>
     <string name="dns_explanation_firewall_connected">Tilkoblet til brannmur</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">Tilkoblet til Rethink og brannmur</string>
@@ -45,16 +45,16 @@
     <string name="brave_dns_connect_mode_change_firewall">Velg modus.</string>
     <string name="brave_dns_connect_mode_change_dns">Velg modus.</string>
     <string name="custom_url_error_invalid_url">Ugyldig nettadresse</string>
-    <string name="dns_query_clear_logs_title">Slett alle DNS-logger\?</string>
+    <string name="dns_query_clear_logs_title">Slett alle DNS-logger?</string>
     <string name="bsct_app_info">Programinfo</string>
     <string name="bsct_conn_desc_allowed">Tillat på %1$s %2$s</string>
     <string name="always_on_dialog_positive_btn">Gå til innstillingene</string>
     <string name="always_on_dialog_positive">Stopp</string>
     <string name="firewall_act_network_monitor_tab">Nettverkslogger</string>
     <string name="dns_act_configure_tab">Sett opp</string>
-    <string name="univ_firewall_dialog_title">Slett IP-regel\?</string>
-    <string name="doh_custom_url_remove_dialog_title">Slett DoH-endepunkt\?</string>
-    <string name="doh_custom_url_remove_success">Endepunkt slettet\?</string>
+    <string name="univ_firewall_dialog_title">Slett IP-regel?</string>
+    <string name="doh_custom_url_remove_dialog_title">Slett DoH-endepunkt?</string>
+    <string name="doh_custom_url_remove_success">Endepunkt slettet?</string>
     <string name="http_proxy_dialog_heading">Sett HTTP(S)-mellomtjener</string>
     <string name="app_mode_dns">DNS</string>
     <string name="app_mode_firewall">Brannmur</string>
@@ -70,19 +70,17 @@
     <string name="orbot_http">HTTP-mellomtjener</string>
     <string name="orbot_both">TCP + HTTP-mellomtjener</string>
     <string name="orbot_both_desc">Alt ovenfor.</string>
-    <string name="orbot_app_issue">Kunne ikke starte Orbot. Er det installert\?</string>
+    <string name="orbot_app_issue">Kunne ikke starte Orbot. Er det installert?</string>
     <string name="orbot_bs_status_trying_connect">Setter opp Orbot …</string>
-    <string name="orbot_stop_dialog_message_combo">%1$s
-\n
-\n%2$s</string>
+    <string name="orbot_stop_dialog_message_combo" translatable="false">%1$s \n \n%2$s</string>
     <string name="orbot_stop_dialog_neutral">Endre DNS</string>
     <string name="orbot_title">Orbot og mellomtjenere</string>
-    <string name="orbot_install_dialog_title">Installer Orbot\?</string>
+    <string name="orbot_install_dialog_title">Installer Orbot?</string>
     <string name="orbot_install_dialog_positive">Installer</string>
     <string name="orbot_install_dialog_neutral">Nettside</string>
-    <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
-    <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
-    <string name="orbot_install_activity_error">Noe gikk galt. Prøv igjen senere.</string>
+    <string name="orbot_website_link" translatable="false">https://guardianproject.info/apps/org.torproject.android/</string>
+    <string name="orbot_download_link_website" translatable="false">https://github.com/guardianproject/orbot/releases</string>
+    <string name="orbot_install_activity_error" translatable="false">Noe gikk galt. Prøv igjen senere.</string>
     <string name="settings_orbot_heading">Sett opp Orbot</string>
     <string name="settings_orbot_install_desc">Trykk her for å installere Orbot</string>
     <string name="settings_socks5_vpn_disabled_error">Start Rethink for å fortsette.</string>
@@ -117,7 +115,7 @@
     <string name="settings_ip_dialog_ipv46">Auto (eksperimentelt)</string>
     <string name="settings_ip_text_ipv4">IPv4</string>
     <string name="settings_ip_text_ipv46">Auto</string>
-    <string name="settings_selected_ip_desc">%1$s</string>
+    <string name="settings_selected_ip_desc" translatable="false">%1$s</string>
     <string name="settings_notification_heading">Velg merknadshandling</string>
     <string name="apps_icon_content_desc">Programikon</string>
     <string name="dns_card_latency_active">Forsinkelse: %1$s ms</string>
@@ -148,19 +146,19 @@
     <string name="about_mail_bugreport_subject">[Rethink]: Bug report</string>
     <string name="about_mail_bugreport_text">Send denne e-posten til: hello@celzero.com</string>
     <string name="about_mail_bugreport_share_title">Velg e-posttilbyder</string>
-    <string name="about_telegram_link">https://telegram.me/rethinkdns</string>
-    <string name="about_docs_link">https://docs.rethinkdns.com/</string>
-    <string name="about_faq_link">https://www.rethinkdns.com/faq</string>
-    <string name="about_github_link">https://github.com/celzero/rethink-app</string>
-    <string name="about_website_link">https://www.rethinkdns.com/</string>
-    <string name="about_version">v%1$s</string>
-    <string name="about_version_install_source">v%1$s (%2$s)</string>
+    <string name="about_telegram_link" translatable="false">https://telegram.me/rethinkdns</string>
+    <string name="about_docs_link" translatable="false">https://docs.rethinkdns.com/</string>
+    <string name="about_faq_link" translatable="false">https://www.rethinkdns.com/faq</string>
+    <string name="about_github_link" translatable="false">https://github.com/celzero/rethink-app</string>
+    <string name="about_website_link" translatable="false">https://www.rethinkdns.com/</string>
+    <string name="about_version" translatable="false">v%1$s</string>
+    <string name="about_version_install_source" translatable="false">v%1$s (%2$s)</string>
     <string name="download_update_dialog_failure_title">Noe gikk galt.</string>
     <string name="settings_vpn_heading">VPN</string>
     <string name="univ_ip_delete_dialog_positive">Slett alle</string>
     <string name="univ_ip_delete_toast_success">Slettet alle IP-regler.</string>
     <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
-    <string name="univ_delete_firewall_dialog_title">Slett alle IP-regler\?</string>
+    <string name="univ_delete_firewall_dialog_title">Slett alle IP-regler?</string>
     <string name="error_loading_log_file">Kunne ikke laste inn loggfil</string>
     <string name="cd_custom_doh_dialog_title">Egendefinert tjener-nettadresse</string>
     <string name="cd_dns_crypt_name_default">DNSCrypt</string>
@@ -186,20 +184,20 @@
     <string name="configure_dns_connected_dns_proxy_status">DNS-mellomtjener</string>
     <string name="search_firewall_all_apps"><font size="12">Søk etter programmer</font></string>
     <string name="search_dns_logs"><font size="12">Søk etter domenenavn eller IP-er</font></string>
-    <string name="cd_custom_dns_proxy_default_ip">127.0.0.1</string>
+    <string name="cd_custom_dns_proxy_default_ip" translatable="false">127.0.0.1</string>
     <string name="blocklist_update_check_failure">Noe gikk galt. Prøv igjen senere.</string>
     <string name="cd_custom_dns_proxy_title">Egendefinert DNS-mellomtjener</string>
     <string name="configure_dns_connected_doh_status">DNS over HTTPS</string>
     <string name="settings_socks5_disabled_error">Tilkoblet til %1$s. Skru det av for å fortsette.</string>
-    <string name="dns_proxy_remove_dialog_title">Slett DNS-mellomtjener\?</string>
+    <string name="dns_proxy_remove_dialog_title">Slett DNS-mellomtjener?</string>
     <string name="search_rethinkplus_file_tag"><font size="12">Søk etter svartelister</font></string>
     <string name="orbot_stop_dialog_negative">Stopp Orbot</string>
-    <string name="about_mozilla_alumni_link">https://builders.mozilla.community/alumni.html</string>
+    <string name="about_mozilla_alumni_link" translatable="false">https://builders.mozilla.community/alumni.html</string>
     <string name="about_email">E-post</string>
     <string name="cd_custom_dns_proxy_name_default">Mellomtjener</string>
     <string name="cd_dns_proxy_error_text_1">Ugyldig IP-adresse</string>
     <string name="cd_doh_dialog_heading">Legg til DNS over HTTPS</string>
-    <string name="ct_ip_details">%1$s (%2$s)</string>
+    <string name="ct_ip_details" translatable="false">%1$s (%2$s)</string>
     <string name="dns_log_dialog_positive">Slett loggføring</string>
     <string name="dns_info_neutral">Kopier</string>
     <string name="univ_firewall_rule_4">Blokker UDP unntatt DNS og NTP</string>
@@ -208,14 +206,10 @@
     <string name="status_protected_with_http">Beskyttet med HTTP-mellomtjener</string>
     <string name="status_dns_error">DNS-feil</string>
     <string name="about_web">Lenker</string>
-    <string name="dns_proxy_dialog_message">Programnavn: %1$s
-\n
-\nIP: %2$s
-\n
-\nPort: %3$s</string>
+    <string name="dns_proxy_dialog_message">Programnavn: %1$s \n \nIP: %2$s \n \nPort: %3$s</string>
     <string name="fapps_filter_filter_heading">Type</string>
     <string name="fapps_filter_parent_system">System</string>
-    <string name="unicode_question_sign">❔</string>
+    <string name="unicode_question_sign" translatable="false">❔</string>
     <string name="settings_local_blocklist_dialog_positive">Last ned</string>
     <string name="status_protected_with_http_private_dns">Beskyttet med HTTP-mellomtjener og privat DNS</string>
     <string name="dns_mode_notification_title">Beskyttet. Tilkoblet til rask og sikker DNS.</string>
@@ -251,7 +245,7 @@
     <string name="fapps_filter_parent_installed">Installerte</string>
     <string name="rules_load_failure_desc">Fant ingen brannmursregler</string>
     <string name="other_dns_list_tab3">DNS-mellomtjener</string>
-    <string name="cd_remove_dialog_title">Slett domene\?</string>
+    <string name="cd_remove_dialog_title">Slett domene?</string>
     <string name="status_protected_with_private_dns">Beskyttet med privat DNS</string>
     <string name="hsf_blocklist_chip_text_no_data">Skru på Rethink+</string>
     <string name="dc_dns_website_heading">Vis nettsideikon i DNS-loggføring (eksperimentelt)</string>
@@ -273,14 +267,14 @@
     <string name="hsf_start_dialog_positive">Start</string>
     <string name="about_website">Rethinkdns.com</string>
     <string name="about_connect">Kontaktinfo</string>
-    <string name="about_twitter_handle">https://twitter.com/rethinkdns</string>
+    <string name="about_twitter_handle" translatable="false">https://twitter.com/rethinkdns</string>
     <string name="cd_custom_dns_proxy_default_app">Ingen</string>
     <string name="cd_dns_proxy_mode_external">Ekstern</string>
     <string name="firewall_rule_no_rule">Ingen regel</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">Venter</string>
     <string name="fapps_filter_categories_heading">Kategorier</string>
     <string name="fapps_filter_clear_btn">Tøm</string>
-    <string name="unicode_warning_sign">⚠</string>
+    <string name="unicode_warning_sign" translatable="false">⚠</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">Ikke beskyttet</string>
     <string name="cd_dns_proxy_mode_internal">Intern</string>
     <string name="coming_soon_toast">Kommer snart</string>
@@ -304,16 +298,14 @@
     <string name="firewall_rule_block_ip">IP/port</string>
     <string name="notif_channel_download">Nedlastningsvarler</string>
     <string name="category_name_non_app_sys">Systemtjenester</string>
-    <string name="dns_crypt_custom_url_remove_dialog_title">Slett DNSCrypt-utleder\?</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title">Slett DNSCrypt-utleder?</string>
     <string name="orbot_none">Ingen (forvalg)</string>
-    <string name="dns_proxy_dialog_message_no_app">IP: %1$s
-\n
-\nPort: %2$s</string>
+    <string name="dns_proxy_dialog_message_no_app">IP: %1$s \n \nPort: %2$s</string>
     <string name="notif_dialog_pause_dialog_neutral">Vis</string>
     <string name="about_app">Program</string>
     <string name="about_mozilla">Rethink er en del av Mozilla Builders MVP-programmet.</string>
-    <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
-    <string name="dns_proxy_desc_no_app">%1$s:%2$s</string>
+    <string name="dns_proxy_desc" translatable="false">%1$s:%2$s, %3$s</string>
+    <string name="dns_proxy_desc_no_app" translatable="false">%1$s:%2$s</string>
     <string name="dns_query_latency">%1$s ms</string>
     <string name="firewall_rule_block_app_exception">Feil</string>
     <string name="firewall_rule_exempt_app_bypass_univ">Omgått program</string>
@@ -322,7 +314,7 @@
     <string name="vpn_profile_error">Kunne ikke igangsette VPN-profil.</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Advarsel: Rethink har blitt avslått</string>
     <string name="dc_custom_block_heading">Tillat eller nekt individuelle domener</string>
-    <string name="fapps_firewall_filter_desc_category">Viser <u>%1$s</u> %2$s programmer i kategorier: %3$s</string>
+    <string name="fapps_firewall_filter_desc_category"><![CDATA[Viser <u>%1$s</u> %2$s programmer i kategorier: %3$s]]></string>
     <string name="orbot_toast_parameter">Tor-som-mellomtjener</string>
     <string name="cd_toast_deleted">Domene fjernet fra egendefinert liste</string>
     <string name="status_protected_with_tor_private_dns">Beskyttet med Tor og privat DNS</string>
@@ -336,13 +328,13 @@
     <string name="dns_connected">Tilkoblet</string>
     <string name="dns_info_positive">OK</string>
     <string name="update_complete_snack_message">Ny versjon nedlastet.</string>
-    <string name="fapps_firewall_filter_desc">Viser <u>%1$s</u> %2$s programmer</string>
+    <string name="fapps_firewall_filter_desc"><![CDATA[Viser <u>%1$s</u> %2$s programmer]]></string>
     <string name="cd_toast_added">Domene lagt til</string>
     <string name="cd_dialog_edittext_hint">Skriv inn %1$s</string>
     <string name="always_on_dialog_heading">Skru av «Alltid påslått VPN»</string>
     <string name="ada_ip_connection_count">Tilkoblet %1$s IP(er)</string>
     <string name="settings_enable_logs_desc">Lagre DNS- og brannmursloggføring lokalt på enheten.</string>
-    <string name="fav_icon">fav_icon</string>
+    <string name="fav_icon" translatable="false">fav_icon</string>
     <string name="firewall_rule_device_lock">Enhet låst</string>
     <string name="ci_no_rule_txt">Ingen regel</string>
     <string name="always_on_dialog_stop_heading">Alltid påslått VPN</string>
@@ -377,7 +369,7 @@
     <string name="notif_channel_firewall_alerts">Brannmursvarsler</string>
     <string name="notif_download_failure_content">Kunne ikke laste ned. Prøv igjen.</string>
     <string name="rbl_privacy">Personvern</string>
-    <string name="dc_dns_crypt">DNSCrypt</string>
+    <string name="dc_dns_crypt" translatable="false">DNSCrypt</string>
     <string name="brbs_backup_desc">Sikkerhetskopier programinnstillinger, nettverks- og DNS-loggføring</string>
     <string name="orbot_bs_status_1">Videresender %1$s tilkoblinger til Orbot.</string>
     <string name="orbot_bs_status_4">Ett-klikks oppsett av «Tor-som-mellomtjener (Orbot).</string>
@@ -385,7 +377,7 @@
     <string name="univ_firewall_rule_7">Blokker IPv4 i IPv6 (eksperimentelt)</string>
     <string name="new_app_notification_action_toast_allow">Nettverkstilkobling tillatt for programmet</string>
     <string name="ci_dialog_added_success">IP lagt til i listen</string>
-    <string name="dc_dns_proxy">DNS-mellomtjener</string>
+    <string name="dc_dns_proxy" translatable="false">DNS-mellomtjener</string>
     <string name="lbbs_configure">Sett opp</string>
     <string name="brbs_backup_dialog_positive">Sikkerhetskopier</string>
     <string name="dns_connected_no_count">Tilkoblet</string>
@@ -397,7 +389,7 @@
     <string name="brbs_restore_dialog_failure_title">Gjenoppretting mislyktes</string>
     <string name="ada_app_unmetered">Fri bruk</string>
     <string name="orbot_stop_dialog_dns_message">Rethink er satt opp til å videresende DNS-spørringer til Orbot. Endre som du vil.</string>
-    <string name="dns_query_clear_logs_message">Slett DNS-loggføring på enheten for godt\?</string>
+    <string name="dns_query_clear_logs_message">Slett DNS-loggføring på enheten for godt?</string>
     <string name="univ_firewall_rule_9">Blokker på kvotebasert (mobil-) nettverk</string>
     <string name="univ_accessibility_dialog_negative">Nekt</string>
     <string name="rbl_security">Sikkerhet</string>
@@ -409,18 +401,18 @@
     <string name="settings_custom_downloader_desc">Ellers vil Androids innebygde <i>Nedlastingshåndterer</i> brukes.</string>
     <string name="settings_notification_desc3">Ingen</string>
     <string name="univ_firewall_rule_8">Blokker port 80 (usikker HTTP-) trafikk</string>
-    <string name="dns_btm_resolved_crypt">utledet <u>anonymt</u> %1$s av %2$s</string>
+    <string name="dns_btm_resolved_crypt">utledet &lt;u&gt;anonymt&lt;/u&gt; %1$s av %2$s</string>
     <string name="radio_max_btn">🪂 Maks</string>
     <string name="brbs_restore_complete_toast">Gjenoppretting fullført. Starter programmet igjen …</string>
     <string name="always_on_dialog">«Alltid påslått VPN» er påskrudd på enheten. Start Rethink ved å skru av «Alltid påslått VPN» i innstillingene.</string>
     <string name="settings_allow_bypass_heading">Tillat omgåelse</string>
     <string name="orbot_stop_dialog_message">Rethink har sluttet å videresende tilkoblinger til Orbot, men kanskje Orbot kjører i bakgrunnen.</string>
-    <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
+    <string name="dns_btm_sheet_dialog_ips"><Data> %1$s %2$s &lt;br/&gt;</Data></string>
     <string name="fapps_unmetered_unblock_dialog_title">Tillat for fri bruk</string>
     <string name="rt_download_start">Laster ned svartelister …</string>
-    <string name="brbs_backup_dialog_failure_message">Kunne ikke sikkerhetskopiere. Prøv igjen\?</string>
-    <string name="app_name_small_case">rethink</string>
-    <string name="always_on_dialog_stop_message">«Alltid påslått VPN» er påslått for Rethink. Vil du stoppe Rethink likevel\?</string>
+    <string name="brbs_backup_dialog_failure_message">Kunne ikke sikkerhetskopiere. Prøv igjen?</string>
+    <string name="app_name_small_case" translatable="false">rethink</string>
+    <string name="always_on_dialog_stop_message">«Alltid påslått VPN» er påslått for Rethink. Vil du stoppe Rethink likevel?</string>
     <string name="settings_ip_network_desc">Velg mellom Internett-protokollversjoner.</string>
     <string name="settings_http_proxy_error_text4">Kunne ikke koble til vert. Prøv igjen.</string>
     <string name="fapps_firewall_filter_bypass_universal">Omgått</string>
@@ -428,7 +420,7 @@
     <string name="orbot_install_dialog_message">Orbot gir Tor-rutingsfunksjonalitet.</string>
     <string name="fapps_firewall_filter_isolate">Nedlåst</string>
     <string name="notif_channel_vpn_notification">Aktiv VPN</string>
-    <string name="dc_doh">DNS over HTTPS</string>
+    <string name="dc_doh" translatable="false">DNS over HTTPS</string>
     <string name="brbs_backup_title">Sikkerhetskopiering</string>
     <string name="app_mode_dns_low_battery">DNS (sparer batteri)</string>
     <string name="settings_enable_logs">Skru på loggføring på enheten</string>
@@ -444,7 +436,7 @@
     <string name="rt_re_download">Last ned svartelister igjen</string>
     <string name="brbs_restore_desc">Gjenopprett fra sikkerhetskopifil</string>
     <string name="brbs_restore_dialog_title">Gjenopprett sikkerhetskopi</string>
-    <string name="brbs_restore_dialog_failure_message">Kunne ikke gjenopprette. Prøv igjen\?</string>
+    <string name="brbs_restore_dialog_failure_message">Kunne ikke gjenopprette. Prøv igjen?</string>
     <string name="settings_https_disabled_error">Tilkoblet til %1$s. Skru det av for å fortsette.</string>
     <string name="univ_firewall_rule_5">Blokker når DNS er omgått</string>
     <string name="univ_accessibility_dialog_positive">Innvilg</string>
@@ -466,13 +458,13 @@
     <string name="dns_connected_rethink_plus">Tilkoblet. %1$s svartelister i bruk.</string>
     <string name="ada_ip_connection_count_zero">0 IP-er</string>
     <string name="bsrf_clear_filter">Tøm</string>
-    <string name="bsct_conn_rule_explanation"><u>#1</u>: Blokker alle programmer fra å koble til Internett \n <u>#2</u>: Blokkerer alle programmer fra å koble til en gitt IP. \n <u>#3</u>: Blokkerer alle tilkoblinger når enheten er låst (universell brannmur). \n <u>#4</u>: Blokkerer alle tilkoblinger når kildeprogrammet er ukjent (universell brannmur). \n <u>#5</u>: Blokkerer tilkoblinger når kildeprogrammet er ukjent (universell brannmur). \n <u>#6</u>: Blokkerer all UDP-trafikk, unntatt DNS (universell brannmur). \n <u>#7</u>: Blokkerer tilkoblinger når DNS omgås (universell brannmur).</string>
+    <string name="bsct_conn_rule_explanation">&lt;u&gt;#1&lt;/u&gt;: Blokker alle programmer fra å koble til Internett \n &lt;u&gt;#2&lt;/u&gt;: Blokkerer alle programmer fra å koble til en gitt IP. \n &lt;u&gt;#3&lt;/u&gt;: Blokkerer alle tilkoblinger når enheten er låst (universell brannmur). \n &lt;u&gt;#4&lt;/u&gt;: Blokkerer alle tilkoblinger når kildeprogrammet er ukjent (universell brannmur). \n &lt;u&gt;#5&lt;/u&gt;: Blokkerer tilkoblinger når kildeprogrammet er ukjent (universell brannmur). \n &lt;u&gt;#6&lt;/u&gt;: Blokkerer all UDP-trafikk, unntatt DNS (universell brannmur). \n &lt;u&gt;#7&lt;/u&gt;: Blokkerer tilkoblinger når DNS omgås (universell brannmur).</string>
     <string name="dc_dns_website_desc">Henter nettsideikon fra <i>duckduckgo.com</i>. Bruker ca. 350 MB plass.</string>
-    <string name="contributors_list">&lt;i&gt;Rethink-prosjektet&lt;/i&gt; finnes fordi bidragsytere har brukt utallige timer på utviklingen av det.&lt;br/&gt; &lt;br/&gt;🛡️ Android-programmet &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Nettverksmotoren &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Utlederen &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Gemenskapsmodder &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list"><![CDATA[<i>Rethink-prosjektet</i> finnes fordi bidragsytere har brukt utallige timer på utviklingen av det.<br/> <br/>🛡️ Android-programmet <br/> <a href=https://github.com/BayLee4>BayLee4</a><br/> <a href=https://github.com/Ch4t4r>Ch4t4r</a><br/> <a href=https://github.com/HrBDev>HrBDev</a><br/> <a href=https://github.com/hussainmohd-a>hussainmohd-a</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/markwmuller>markwmuller</a><br/> <a href=https://github.com/Poussinou>Poussinou</a><br/> <a href=https://github.com/pjosingh>pjosingh</a><br/> <br/>🚂 Nettverksmotoren <br/> <a href=https://github.com/alalamav>alalamav</a><br/> <a href=https://github.com/bemasc>bemasc</a><br/> <a href=https://github.com/dmcardle>dmcardle</a><br/> <a href=https://github.com/fortuna>fortuna</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/PeterDaveHello>PeterDaveHello</a><br/> <a href=https://github.com/SeanBurford>SeanBurford</a><br/> <br/>📚 Utlederen <br/> <a href=https://github.com/ahmed-tasaly>ahmed-tasaly</a><br/> <a href=https://github.com/amithm7>amithm7</a><br/> <a href=https://github.com/arfshl>arfshl</a><br/> <a href=https://github.com/badmojr>badmojr</a><br/> <a href=https://github.com/bongochong>bongochong</a><br/> <a href=https://github.com/elliotwutingfeng>elliotwutingfeng</a><br/> <a href=https://github.com/georgyo>georgyo</a><br/> <a href=https://github.com/harish83a>harish83a</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/MasterKia>MasterKia</a><br/> <a href=https://github.com/mtxadmin>mtxadmin</a><br/> <a href=https://github.com/neneeen>neneeen</a><br/> <a href=https://github.com/PeterDaveHello>PeterDaveHello</a><br/> <a href=https://github.com/santhosh-ponnusamy>santhosh-ponnusamy</a><br/> <a href=https://github.com/shruuub>shruuub</a><br/> <a href=https://github.com/shuvashish76>shuvashish76</a><br/> <br/>⚜ Gemenskapsmodder <br/> <a href=https://t.me/amithm7>amithm7</a><br/> <a href=https://t.me/ppatra>ppatra</a><br/> <a href=https://t.me/InFamous23>InFamous23</a><br/> <a href=https://t.me/TheTr1ckst3r>TheTr1ckst3r</a><br/> <a href=https://t.me/Ch4t4r>Ch4t4r</a><br/> <a href=https://t.me/Billi_ance>Billi_ance</a><br/> <a href=https://t.me/kaliangel>kaliangel</a><br/> <a href=https://github.com/PoneyClairDeLune>PoneyClairDeLune</a><br/>]]></string>
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="download_update_dialog_message_success">Svarteliste nedlastet.</string>
     <string name="about_bravedns_toreport_text">Hjelp og tilbakemeldinger</string>
-    <string name="download_update_dialog_message">Last ned ny versjon av programmet fra nettsiden\?</string>
+    <string name="download_update_dialog_message">Last ned ny versjon av programmet fra nettsiden?</string>
     <string name="collecting_logs_progress_text">Loggfører …</string>
     <string name="hsf_whats_new_chip_text">Nyheter</string>
     <string name="orbot_socks5">Kun-TCP-mellomtjener</string>
@@ -489,7 +481,7 @@
     <string name="ctbs_app_other_apps">%1$s og %2$s program(mer) til</string>
     <string name="configure_dns_crypt">DNSCrypt: %1$s utledere</string>
     <string name="download_update_dialog_message_ok">Du har allerede nyeste versjon.</string>
-    <string name="firewall_rule_block_app_desc">En brukervalgt brannmursregel blokkerte dette <i>programmet</i>.<br/><br/> Endre dette fra <i>Alle programmer</i>-fanen.</string>
+    <string name="firewall_rule_block_app_desc"><![CDATA[En brukervalgt brannmursregel blokkerte dette <i>programmet</i>.<br/><br/> Endre dette fra <i>Alle programmer</i>-fanen.]]></string>
     <string name="orbot_bs_status_3">Videresender %1$s til Orbot. HTTP-mellomtjener også satt.</string>
     <string name="dc_other_dns_heading">Type</string>
     <string name="dc_check_update_desc">Se etter endringer i svartelister hver <i>tredje</i> dag</string>
@@ -503,7 +495,7 @@
     <string name="univ_firewall_rule_1">Blokker alle programmer når enheten er låst</string>
     <string name="dns_crypt_relay_error_toast">Ingen utleder valgt</string>
     <string name="hs_download_positive_play_store">Fullfør installasjon</string>
-    <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s svarteliste(r)&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
+    <string name="dns_btm_sheet_dialog_message"><Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s svarteliste(r)&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data></string>
     <string name="dc_check_update_heading">Spør om oppdatering av svartelister</string>
     <string name="settings_selected_theme">Iført drakt: %1$s</string>
     <string name="firewall_status_excluded">utelatt fra DNS og brannmur</string>
@@ -516,7 +508,7 @@
     <string name="firewall_status_unknown">ukjent</string>
     <string name="apps_card_ips_count">%1$s IP- og portregler</string>
     <string name="private_dns_dialog_positive">Gå til innstillinger</string>
-    <string name="univ_firewall_dialog_message">Fortsett ved å slette denne regelen og la ethvert program koble til denne IP-en\?</string>
+    <string name="univ_firewall_dialog_message">Fortsett ved å slette denne regelen og la ethvert program koble til denne IP-en?</string>
     <string name="download_update_dialog_trylater_title">Kan ikke oppdatere akkurat nå</string>
     <string name="download_update_dialog_trylater_message">Oppdateringen kan ikke kjøres akkurat nå. Prøv igjen senere.</string>
     <string name="settings_app_notification_a13_heading">Programmerknad</string>

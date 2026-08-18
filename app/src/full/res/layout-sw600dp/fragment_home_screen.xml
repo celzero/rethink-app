@@ -73,13 +73,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
-                    android:baselineAligned="true"
+                    android:baselineAligned="false"
                     android:orientation="horizontal"
                     android:weightSum="1">
 
                     <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="0.5"
                         android:orientation="vertical">
 
@@ -104,9 +104,14 @@
                                 android:drawablePadding="12dp"
                                 android:fontFamily="sans-serif-medium"
                                 android:gravity="center_vertical"
+                                android:maxLines="1"
                                 android:text="@string/dns_mode_info_title"
                                 android:textColor="?attr/homeScreenHeaderTextColor"
                                 android:textSize="18sp"
+                                app:autoSizeMaxTextSize="18sp"
+                                app:autoSizeMinTextSize="12sp"
+                                app:autoSizeStepGranularity="1sp"
+                                app:autoSizeTextType="uniform"
                                 app:drawableStartCompat="@drawable/dns_home_screen"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
@@ -163,8 +168,7 @@
                                 android:marqueeRepeatLimit="marquee_forever"
                                 android:maxLines="1"
                                 android:singleLine="true"
-                                android:textSize="13sp"
-                                android:visibility="gone"
+                                android:textSize="12sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent" />
@@ -176,7 +180,7 @@
 
                     <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="0.5"
                         android:orientation="vertical">
 
@@ -201,9 +205,14 @@
                                 android:drawablePadding="12dp"
                                 android:fontFamily="sans-serif-medium"
                                 android:gravity="center_vertical"
+                                android:maxLines="1"
                                 android:text="@string/firewall_mode_info_title"
                                 android:textColor="?attr/homeScreenHeaderTextColor"
                                 android:textSize="18sp"
+                                app:autoSizeMaxTextSize="18sp"
+                                app:autoSizeMinTextSize="12sp"
+                                app:autoSizeStepGranularity="1sp"
+                                app:autoSizeTextType="uniform"
                                 app:drawableStartCompat="@drawable/firewall_home_screen"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
@@ -259,7 +268,7 @@
                                 android:ellipsize="marquee"
                                 android:marqueeRepeatLimit="marquee_forever"
                                 android:singleLine="true"
-                                android:textSize="15sp"
+                                android:textSize="12sp"
                                 android:visibility="gone"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
@@ -277,7 +286,7 @@
                     android:layout_below="@id/fhs_card_top_ll"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
-                    android:baselineAligned="true"
+                    android:baselineAligned="false"
                     android:orientation="horizontal"
                     android:weightSum="1">
 
@@ -285,7 +294,6 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="0.5"
-                        android:baselineAligned="true"
                         android:orientation="vertical">
 
                         <com.google.android.material.card.MaterialCardView
@@ -309,9 +317,14 @@
                                 android:drawablePadding="12dp"
                                 android:fontFamily="sans-serif-medium"
                                 android:gravity="center_vertical"
+                                android:maxLines="1"
                                 android:text="@string/cd_custom_dns_proxy_name_default"
                                 android:textColor="?attr/homeScreenHeaderTextColor"
                                 android:textSize="18sp"
+                                app:autoSizeMaxTextSize="18sp"
+                                app:autoSizeMinTextSize="12sp"
+                                app:autoSizeStepGranularity="1sp"
+                                app:autoSizeTextType="uniform"
                                 app:drawableStartCompat="@drawable/ic_vpn"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
@@ -339,7 +352,7 @@
                                 android:ellipsize="marquee"
                                 android:marqueeRepeatLimit="marquee_forever"
                                 android:singleLine="true"
-                                android:textSize="15sp"
+                                android:textSize="12sp"
                                 android:visibility="visible"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
@@ -351,7 +364,7 @@
 
                     <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="0.5"
                         android:orientation="vertical">
 
@@ -376,9 +389,14 @@
                                 android:drawablePadding="12dp"
                                 android:fontFamily="sans-serif-medium"
                                 android:gravity="center_vertical"
+                                android:maxLines="1"
                                 android:text="@string/lbl_logs"
                                 android:textColor="?attr/homeScreenHeaderTextColor"
                                 android:textSize="18sp"
+                                app:autoSizeMaxTextSize="18sp"
+                                app:autoSizeMinTextSize="12sp"
+                                app:autoSizeStepGranularity="1sp"
+                                app:autoSizeTextType="uniform"
                                 app:drawableStartCompat="@drawable/ic_logs_accent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
@@ -421,7 +439,7 @@
                                 android:ellipsize="marquee"
                                 android:marqueeRepeatLimit="marquee_forever"
                                 android:singleLine="true"
-                                android:textSize="13sp"
+                                android:textSize="12sp"
                                 android:visibility="gone"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
@@ -448,7 +466,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:baselineAligned="true"
+                android:baselineAligned="false"
                 android:orientation="horizontal"
                 android:weightSum="1">
 
@@ -473,9 +491,14 @@
                             android:drawablePadding="12dp"
                             android:fontFamily="sans-serif-medium"
                             android:gravity="center_vertical"
+                            android:maxLines="1"
                             android:text="@string/apps_info_title"
                             android:textColor="?attr/homeScreenHeaderTextColor"
                             android:textSize="18sp"
+                            app:autoSizeMaxTextSize="18sp"
+                            app:autoSizeMinTextSize="12sp"
+                            app:autoSizeStepGranularity="1sp"
+                            app:autoSizeTextType="uniform"
                             app:drawableStartCompat="@drawable/ic_app_info_accent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -739,10 +762,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:layout_weight="0.3"
                 android:layout_marginLeft="30dp"
                 android:layout_marginRight="30dp"
                 android:layout_marginBottom="100dp"
-                android:layout_weight="0.3"
                 android:gravity="bottom|center"
                 android:orientation="vertical">
 
@@ -787,6 +810,7 @@
                             android:paddingStart="25dp"
                             android:paddingTop="18dp"
                             android:paddingEnd="25dp"
+                            android:textAllCaps="true"
                             android:paddingBottom="18dp"
                             android:letterSpacing="0.2"
                             android:textSize="16sp"

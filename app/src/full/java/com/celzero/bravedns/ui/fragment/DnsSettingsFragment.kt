@@ -517,12 +517,6 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.dcFaviconSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcFaviconSwitch)
             persistentState.fetchFavIcon = enabled
-            if (enabled) {
-                // Enable experimental-dependent settings when experimental features are enabled
-                if (persistentState.enableStabilityDependentSettings()) {
-                    SnackbarHelper.showStabilityProgram(b.root, persistentState)
-                }
-            }
             logEvent("fav icon? $enabled", "User changed fav icon setting to $enabled")
         }
 
@@ -851,6 +845,17 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
     }
 
     private fun setNetworkDns() {
+        // Under proxy lockdown, system DNS cannot be enabled because it bypasses the
+        // lockdown proxy. Block the change and revert the radio button selection.
+        if (persistentState.wgGlobalLockdown) {
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.lockdown_check_setting_disabled),
+                Toast.LENGTH_SHORT
+            )
+            updateSelectedDns()
+            return
+        }
         // set network dns
         io { appConfig.enableSystemDns() }
     }

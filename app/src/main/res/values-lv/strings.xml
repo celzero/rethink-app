@@ -8,7 +8,7 @@
     <string name="lbl_cancel" translatable="true">Atcelt</string>
     <string name="lbl_dismiss" translatable="true">Noraidīt</string>
     <string name="lbl_allowed" translatable="true">Atļauts</string>
-    <string name="lbl_blocked" translatable="true">Bloķēts</string>
+    <string name="lbl_blocked" translatable="true">Aizturēts</string>
     <string name="lbl_disabled" translatable="true">Atspējots</string>
     <string name="lbl_domain" translatable="true">Domēns</string>
     <string name="lbl_wildcard" translatable="true">Aizstājējzīme</string>
@@ -43,8 +43,8 @@
     <string name="lbl_status" translatable="true">Statuss</string>
     <string name="lbl_remove" translatable="true">Noņemt</string>
     <string name="settings_title_desc" translatable="true">Ļoti pielāgojams DNS un ugunsmūris</string>
-    <string name="about_title_desc" translatable="true">Atklāj un bloķē tīkla drošības draudus</string>
-    <string name="lbl_maybe_blocked" translatable="true">Varbūt bloķēts</string>
+    <string name="about_title_desc" translatable="true">Atklāj un aiztur tīkla drošības draudus</string>
+    <string name="lbl_maybe_blocked" translatable="true">Varbūt aizturēts</string>
     <string name="lbl_http_socks5" translatable="true">HTTPS un SOCKS5</string>
     <string name="lbl_qr_code" translatable="true">QR kods</string>
     <string name="lbl_dns_servers" translatable="true">DNS serveri</string>

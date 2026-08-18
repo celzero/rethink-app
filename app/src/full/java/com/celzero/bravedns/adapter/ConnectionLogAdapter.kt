@@ -62,16 +62,20 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Collections
 import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
 
 class ConnectionLogAdapter(private val context: Context) :
     PagingDataAdapter<MergedConnectionLog, ConnectionLogAdapter.ConnectionLogViewHolder>(
         DIFF_CALLBACK
     ) {
 
-    // Per-uid cache of package names, invalidated on each new page submission.
-    private val packageNameCache = Collections.synchronizedMap(HashMap<Int, List<String>>())
+    // Per-uid cache of package names (immutable snapshots), living for the adapter's
+    // lifetime (recreated with the fragment; uids are stable across paging pages).
+    // ConcurrentHashMap: lock-free reads, non-blocking writes. Compute-on-miss cannot
+    // be atomic (computeIfAbsent's lambda is not suspendable), so a rare duplicate
+    // compute for the same uid is benign: the values are idempotent and immutable.
+    private val packageNameCache = ConcurrentHashMap<Int, List<String>>()
 
     companion object {
         private val DIFF_CALLBACK =
@@ -165,7 +169,6 @@ class ConnectionLogAdapter(private val context: Context) :
             displayTransactionDetails(log)
             displayProtocolDetails(log.port, log.protocol)
             displayAppDetails(log)
-            displaySummaryDetails(log)
             val blocked = if (log.blockedByRule == FirewallRuleset.RULE12.id) {
                 log.proxyDetails.isEmpty()
             } else {
@@ -176,6 +179,7 @@ class ConnectionLogAdapter(private val context: Context) :
             } else {
                 log.blockedByRule
             }
+            displaySummaryDetails(blocked, log)
             displayFirewallRulesetHint(blocked, rule)
 
             b.connectionParentLayout.setOnClickListener { openBottomSheet(log) }
@@ -232,7 +236,12 @@ class ConnectionLogAdapter(private val context: Context) :
         private fun displayAppDetails(log: MergedConnectionLog) {
             launchBinding {
                 val apps = packageNameCache.getOrPut(log.uid) {
-                    FirewallManager.getPackageNamesByUid(log.uid)
+                    // Guard against iterator faults from Guava's HashMultimap in
+                    // FirewallManager (see snapshotAppInfos fallbacks). On failure the
+                    // entry is not cached, so the next bind retries; empty list is
+                    // rendered as the default icon by the caller.
+                    runCatching { FirewallManager.getPackageNamesByUid(log.uid) }
+                        .getOrDefault(emptyList())
                 }
                 val count = apps.count()
                 val pkgName = log.packageName ?: ""
@@ -312,7 +321,7 @@ class ConnectionLogAdapter(private val context: Context) :
             }
         }
 
-        private fun displaySummaryDetails(log: MergedConnectionLog) {
+        private fun displaySummaryDetails(blocked: Boolean, log: MergedConnectionLog) {
             launchBinding {
                 val hasCid = VpnController.hasCid(log.connId, log.uid)
                 val connType = ConnectionTracker.ConnType.get(log.connType)
@@ -335,8 +344,15 @@ class ConnectionLogAdapter(private val context: Context) :
                             b.connectionDelay.text = ""
                             hasMinSummary = true
                         } else {
+                            if (blocked) {
+                                b.connectionDuration.text = context.getString(R.string.symbol_red_circle)
+                                b.connectionDuration.alpha = 0.7f
+                                hasMinSummary = true
+                            } else {
+                                b.connectionDuration.text = ""
+                                b.connectionDuration.alpha = 1f
+                            }
                             b.connectionDataUsage.text = ""
-                            b.connectionDuration.text = ""
                         }
                         if (connType.isMetered()) {
                             b.connectionDelay.text = context.getString(R.string.symbol_currency)
@@ -370,8 +386,15 @@ class ConnectionLogAdapter(private val context: Context) :
                     }
 
                     b.connectionSummaryLl.visibility = View.VISIBLE
-                    val duration = getDurationInHumanReadableFormat(context, log.duration)
-                    b.connectionDuration.text = context.getString(R.string.single_argument, duration)
+                    if (blocked) {
+                        b.connectionDuration.text = context.getString(R.string.symbol_red_circle)
+                        b.connectionDuration.alpha = 0.7f
+                    } else {
+                        b.connectionDuration.alpha = 1f
+                        val duration = getDurationInHumanReadableFormat(context, log.duration)
+                        b.connectionDuration.text =
+                            context.getString(R.string.single_argument, duration)
+                    }
                     val download =
                         context.getString(
                             R.string.symbol_download,

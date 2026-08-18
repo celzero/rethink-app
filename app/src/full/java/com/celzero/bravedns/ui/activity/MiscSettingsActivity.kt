@@ -61,6 +61,7 @@ import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.ActivityMiscSettingsBinding
 import com.celzero.bravedns.net.go.GoVpnAdapter
+import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
@@ -74,6 +75,7 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_REGENERATION_PERIOD_DAYS
+import com.celzero.bravedns.util.LogLifespan
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.SnackbarHelper
@@ -110,6 +112,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
     private val appConfig by inject<AppConfig>()
     private val rdb by inject<RefreshDatabase>()
     private val eventLogger by inject<EventLogger>()
+    private val workScheduler by inject<WorkScheduler>()
 
     private var isThemeChanged: Boolean = false
     private var isHandlingBubbleToggle: Boolean = false
@@ -221,7 +224,8 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
         b.genSettingsGoLogDesc.text =
             Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt())?.name?.lowercase()
                 ?.replaceFirstChar(Char::titlecase)?.replace("_", " ")
-
+        // set log lifespan name in the description
+        b.genSettingsLogLifespanDesc.text = LogLifespan.getLifespanString(persistentState.logLifespan, this)
 
         // for app locale (default system/user selected locale)
         if (isAtleastT()) {
@@ -586,6 +590,10 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
             logEvent("Check for app update set to $b")
         }
 
+        b.settingsLogLifespanRl.setOnClickListener {
+            enableAfterDelay(CLICK_DELAY_SHORT_MS, b.settingsLogLifespanRl)
+            showLogLifespanDialog()
+        }
 
         b.settingsGoLogRl.setOnClickListener {
             enableAfterDelay(CLICK_DELAY_SHORT_MS, b.settingsGoLogRl)
@@ -784,6 +792,28 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
         persistentState.firewallBubbleEnabled = false
         BubbleHelper.resetBubbleState(this)
         logEvent("Firewall bubble disabled")
+    }
+
+    private fun showLogLifespanDialog() {
+        val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+        alertBuilder.setTitle(getString(R.string.settings_log_lifespan_heading))
+        val items = LogLifespan.getLifespanStrings(this)
+        val checkedItem = persistentState.logLifespan.toInt()
+        alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
+            dialog.dismiss()
+            if (checkedItem == which) {
+                return@setSingleChoiceItems
+            }
+
+            persistentState.logLifespan = which.toLong()
+            workScheduler.schedulePurgeConnectionsLog()
+            val selectedItem = items[which]
+            b.genSettingsLogLifespanDesc.text = selectedItem
+            logEvent("Log lifespan set to ${selectedItem}")
+
+        }
+
+        alertBuilder.create().show()
     }
 
     private fun showGoLoggerDialog() {

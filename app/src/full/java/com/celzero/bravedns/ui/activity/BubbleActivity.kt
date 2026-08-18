@@ -269,8 +269,8 @@ class BubbleActivity : BaseActivity(R.layout.activity_bubble) {
             try {
                 Logger.i(TAG, "Removing temp allow for app: ${allowedApp.appName} (uid: ${allowedApp.uid})")
 
-                // Clear temp allow status
-                appInfoRepository.clearTempAllowByUid(allowedApp.uid)
+                // clear temp allow status
+                FirewallManager.updateTempAllow(allowedApp.uid, false)
 
                 uiCtx {
                     if (!isFinishing && !isDestroyed) {

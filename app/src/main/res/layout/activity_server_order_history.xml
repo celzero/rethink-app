@@ -36,16 +36,34 @@
                 android:layout_gravity="bottom"
                 android:layout_marginStart="24dp"
                 android:layout_marginEnd="24dp"
-                android:layout_marginBottom="18dp"
-                android:textSize="13sp"
-                android:textColor="?attr/primaryTextColor"
-                android:alpha="0.7"
-                android:ellipsize="end"
+                android:fontFamily="monospace"
+                android:alpha="0.75"
+                android:layout_marginBottom="28dp"
                 android:maxLines="1"
-                android:fontFamily="sans-serif"
+                android:textColor="?attr/homeScreenHeaderTextColor"
+                android:textSize="@dimen/small_font_text_view"
+                android:ellipsize="end"
                 app:layout_collapseMode="parallax"
                 app:layout_collapseParallaxMultiplier="0.6"
-                tools:text="kgnknnfnkjdgaeop… · abc123 • a1b2" />
+                tools:text="RPN Standard · 74b4c00217"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_hero_expiry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:fontFamily="monospace"
+                android:alpha="0.75"
+                android:layout_marginBottom="10dp"
+                android:maxLines="1"
+                android:textColor="?attr/homeScreenHeaderTextColor"
+                android:textSize="@dimen/small_font_text_view"
+                android:ellipsize="end"
+                app:layout_collapseMode="parallax"
+                app:layout_collapseParallaxMultiplier="0.6"
+                tools:text="RPN Standard · 74b4c00217" />
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
@@ -91,73 +109,6 @@
             android:textSize="@dimen/large_font_text_view"
             android:alpha="0.75"
             android:textColor="?attr/chipTextPositive" />
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/card_summary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginTop="16dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
-            app:strokeWidth="0dp"
-            app:cardBackgroundColor="?attr/chipBgColorPositive">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="16dp"
-                android:gravity="center_vertical">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:src="@drawable/ic_rethink_plus_sparkle"
-                    android:tint="?attr/accentGood"
-                    android:padding="4dp" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginStart="12dp">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/server_order_summary_title"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium"
-                        android:textColor="?attr/primaryTextColor" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="@string/server_order_summary_subtitle"
-                        android:textSize="12sp"
-                        android:textColor="?attr/primaryLightColorText" />
-
-                </LinearLayout>
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tv_order_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:minWidth="32dp"
-                    android:gravity="center"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:fontFamily="sans-serif-medium"
-                    android:textColor="?attr/accentGood" />
-
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_orders"
