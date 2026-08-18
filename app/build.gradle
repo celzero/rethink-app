@@ -393,8 +393,8 @@ android {
     // (it currently mirrors full's manifest and adds the TV launcher).
     sourceSets {
         tv {
-            java.srcDirs += ['src/full/java']
-            res.srcDirs += ['src/full/res']
+            java.srcDir 'src/full/java'
+            res.srcDir 'src/full/res'
         }
     }
     lint {
