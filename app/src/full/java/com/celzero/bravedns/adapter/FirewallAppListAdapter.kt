@@ -45,6 +45,7 @@ import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_NONE
 import com.celzero.bravedns.ui.activity.AppInfoActivity
+import com.celzero.bravedns.ui.activity.AppInfoActivity.Companion.INTENT_PACKAGE_NAME
 import com.celzero.bravedns.ui.activity.AppInfoActivity.Companion.INTENT_UID
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
@@ -54,6 +55,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
+import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
 
 class FirewallAppListAdapter(
     private val context: Context,
@@ -114,7 +116,6 @@ class FirewallAppListAdapter(
                 val appStatus = FirewallManager.appStatus(appInfo.uid)
                 val connStatus = FirewallManager.connectionStatus(appInfo.uid)
                 uiCtx {
-                    b.firewallAppLabelTv.text = appInfo.appName
                     // setting the appname with different color for system and user apps
                     // causes conflict with the firewall status like blocked and isolated
                     // so removing the color change for now
@@ -123,6 +124,12 @@ class FirewallAppListAdapter(
                     } else {
                         b.firewallAppLabelTv.setTextColor(userAppColor)
                     } */
+                    b.firewallAppLabelTv.text = appInfo.appName
+                    b.firewallAppInfo.text = if (appInfo.packageName.startsWith(NO_PACKAGE_PREFIX)) {
+                        context.getString(R.string.app_id_uid_only, appInfo.uid)
+                    } else {
+                        context.getString(R.string.app_id_package, appInfo.uid, appInfo.packageName)
+                    }
                     b.firewallAppToggleOther.text = getFirewallText(appStatus, connStatus)
                     displayIcon(
                         getIcon(context, appInfo.packageName, appInfo.appName), b.firewallAppIconIv)
@@ -296,17 +303,17 @@ class FirewallAppListAdapter(
 
             b.firewallAppTextLl.setOnClickListener {
                 enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.firewallAppTextLl)
-                openAppDetailActivity(appInfo.uid)
+                openAppDetailActivity(appInfo.uid, appInfo.packageName)
             }
 
             b.firewallAppIconIv.setOnClickListener {
                 enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.firewallAppIconIv)
-                openAppDetailActivity(appInfo.uid)
+                openAppDetailActivity(appInfo.uid, appInfo.packageName)
             }
 
             b.firewallAppDetailsLl.setOnClickListener {
                 enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.firewallAppIconIv)
-                openAppDetailActivity(appInfo.uid)
+                openAppDetailActivity(appInfo.uid, appInfo.packageName)
             }
 
             b.firewallAppToggleWifi.setOnClickListener {
@@ -409,9 +416,10 @@ class FirewallAppListAdapter(
             logEvent("UID: ${appInfo.uid}, App: ${appInfo.appName}, New FW status: ${FirewallManager.connectionStatus(appInfo.uid)}")
         }
 
-        private fun openAppDetailActivity(uid: Int) {
+        private fun openAppDetailActivity(uid: Int, packageName: String) {
             val intent = Intent(context, AppInfoActivity::class.java)
             intent.putExtra(INTENT_UID, uid)
+            intent.putExtra(INTENT_PACKAGE_NAME, packageName)
             context.startActivity(intent)
         }
 

@@ -38,12 +38,14 @@ import com.google.common.cache.RemovalCause
 import com.google.common.cache.RemovalListener
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.concurrent.ConcurrentHashMap
@@ -57,6 +59,8 @@ object FirewallManager : KoinComponent {
     private val persistentState by inject<PersistentState>()
 
     private val mutex = Mutex()
+    private data class AppUpdateLock(val mutex: Mutex = Mutex(), var refCount: Int = 0)
+    private val appUpdateLocks = ConcurrentHashMap<Int, AppUpdateLock>()
 
     const val NOTIF_CHANNEL_ID_FIREWALL_ALERTS = "Firewall_Alerts"
 
@@ -847,13 +851,15 @@ object FirewallManager : KoinComponent {
     }
 
     suspend fun updateFirewalledApps(uid: Int, connectionStatus: ConnectionStatus) {
-        try {
-            db.updateFirewallStatusByUid(uid, FirewallStatus.NONE.id, connectionStatus.id)
-        } catch (e: Exception) {
-            Logger.w(LOG_TAG_FIREWALL, "updateFirewalledApps db failed for uid $uid", e)
-            return
+        withAppUpdateLock(uid) {
+            try {
+                db.updateFirewallStatusByUid(uid, FirewallStatus.NONE.id, connectionStatus.id)
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_FIREWALL, "updateFirewalledApps db failed for uid $uid", e)
+                return@withAppUpdateLock
+            }
+            invalidateFirewallStatus(uid, FirewallStatus.NONE, connectionStatus)
         }
-        invalidateFirewallStatus(uid, FirewallStatus.NONE, connectionStatus)
     }
 
     suspend fun updateFirewallStatus(
@@ -870,13 +876,15 @@ object FirewallManager : KoinComponent {
             return
         }
 
-        try {
-            db.updateFirewallStatusByUid(uid, firewallStatus.id, connectionStatus.id)
-        } catch (e: Exception) {
-            Logger.w(LOG_TAG_FIREWALL, "updateFirewallStatus db failed for uid $uid", e)
-            return
+        withAppUpdateLock(uid) {
+            try {
+                db.updateFirewallStatusByUid(uid, firewallStatus.id, connectionStatus.id)
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_FIREWALL, "updateFirewallStatus db failed for uid $uid", e)
+                return@withAppUpdateLock
+            }
+            invalidateFirewallStatus(uid, firewallStatus, connectionStatus)
         }
-        invalidateFirewallStatus(uid, firewallStatus, connectionStatus)
     }
 
     suspend fun updateTempAllowStatus(uid: Int, durationMinutes: Int = TEMP_ALLOW_DEFAULT_MINUTES) {
@@ -1005,21 +1013,134 @@ object FirewallManager : KoinComponent {
 
     fun updateIsProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
         io {
-            try {
-                db.updateProxyExcluded(uid, isProxyExcluded)
-            } catch (e: Exception) {
-                Logger.w(LOG_TAG_FIREWALL, "updateIsProxyExcluded db failed for uid $uid", e)
-                return@io
-            }
-            val now = System.currentTimeMillis()
-            mutex.withLock {
-                appInfos.get(uid).forEach {
-                    it.isProxyExcluded = isProxyExcluded
-                    it.modifiedTs = now
+            withAppUpdateLock(uid) {
+                try {
+                    withContext(Dispatchers.IO) {
+                        db.updateProxyExcluded(uid, isProxyExcluded)
+                    }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Logger.w(LOG_TAG_FIREWALL, "updateIsProxyExcluded db failed for uid $uid", e)
+                    return@withAppUpdateLock
+                }
+
+                updateSharedUidCacheField(uid) { appInfo ->
+                    appInfo.isProxyExcluded = isProxyExcluded
                 }
             }
-            informObservers()
         }
+    }
+
+    suspend fun updateAppNotes(uid: Int, packageName: String, notes: String) {
+        updatePerAppInfoField(uid, packageName, "notes",
+            dbUpdate = suspend { db.updateNotes(uid, packageName, notes) },
+            cacheUpdate = { appInfo -> appInfo.notes = notes }
+        )
+    }
+
+    private suspend fun <T> runDbUpdate(
+        uid: Int,
+        fieldName: String,
+        dbUpdate: suspend () -> T
+    ): T {
+        try {
+            return withContext(Dispatchers.IO) {
+                dbUpdate()
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_FIREWALL, "runDbUpdate ($fieldName) failed for uid $uid", e)
+            throw e
+        }
+    }
+
+    private suspend fun updatePerAppInfoField(
+        uid: Int,
+        packageName: String,
+        fieldName: String,
+        dbUpdate: suspend () -> Int,
+        cacheUpdate: (AppInfo) -> Unit
+    ) {
+        withAppUpdateLock(uid) {
+            val rowsUpdated = runDbUpdate(uid, fieldName, dbUpdate)
+            if (rowsUpdated <= 0) {
+                Logger.w(
+                    LOG_TAG_FIREWALL,
+                    "updatePerAppInfoField ($fieldName) no rows updated for uid $uid, package $packageName"
+                )
+                throw IllegalStateException("No rows updated for uid $uid, package $packageName")
+            }
+
+            val now = System.currentTimeMillis()
+            var cacheUpdated = false
+            mutex.withLock {
+                appInfos.get(uid).find { it.packageName == packageName }?.let { appInfo ->
+                    cacheUpdate(appInfo)
+                    appInfo.modifiedTs = now
+                    cacheUpdated = true
+                } ?: Logger.w(
+                    LOG_TAG_FIREWALL,
+                    "updatePerAppInfoField ($fieldName) cache miss for uid $uid, package $packageName"
+                )
+            }
+
+            if (!cacheUpdated) {
+                val refreshedAppInfo = withContext(Dispatchers.IO) { db.getAppInfoByUidAndPackage(uid, packageName) }
+                if (refreshedAppInfo != null) {
+                    mutex.withLock {
+                        appInfos.put(uid, refreshedAppInfo)
+                        cacheUpdated = true
+                    }
+                } else {
+                    Logger.w(
+                        LOG_TAG_FIREWALL,
+                        "updatePerAppInfoField ($fieldName) db reload miss for uid $uid, package $packageName"
+                    )
+                }
+            }
+
+            if (cacheUpdated) {
+                informObservers()
+            }
+        }
+    }
+
+    private suspend fun <T> withAppUpdateLock(uid: Int, block: suspend () -> T): T {
+        val lock = appUpdateLocks.compute(uid) { _, existing ->
+            (existing ?: AppUpdateLock()).also { it.refCount += 1 }
+        }!!
+
+        try {
+            return lock.mutex.withLock { block() }
+        } finally {
+            appUpdateLocks.compute(uid) { _, existing ->
+                if (existing == null) {
+                    null
+                } else if (existing === lock) {
+                    existing.refCount -= 1
+                    if (existing.refCount <= 0) null else existing
+                } else {
+                    existing
+                }
+            }
+        }
+    }
+
+
+    private suspend fun updateSharedUidCacheField(
+        uid: Int,
+        cacheUpdate: (AppInfo) -> Unit
+    ) {
+        val now = System.currentTimeMillis()
+        mutex.withLock {
+            appInfos.get(uid).forEach { appInfo ->
+                cacheUpdate(appInfo)
+                appInfo.modifiedTs = now
+            }
+        }
+        informObservers()
     }
 
     suspend fun getTombstoneApps(): List<AppInfo> {

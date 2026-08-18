@@ -79,12 +79,20 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
         val f = AppListActivity.filters.value
 
         remakeParentFilterChipsUi()
+
+        if (f != null) {
+            this.filters.firewallFilter = f.firewallFilter
+            this.filters.categoryFilters.clear()
+            this.filters.categoryFilters.addAll(f.categoryFilters)
+            this.filters.sort = f.sort
+            this.filters.searchString = f.searchString
+        }
+
+        remakeSortChipsUi()
+
         if (f == null) {
             applyParentFilter(AppListActivity.TopLevelFilter.ALL.id)
             return
-        } else {
-            this.filters.firewallFilter = f.firewallFilter
-            this.filters.categoryFilters.addAll(f.categoryFilters)
         }
 
         applyParentFilter(f.topLevelFilter.id)
@@ -105,6 +113,7 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
             }
             new.categoryFilters.clear()
             new.topLevelFilter = AppListActivity.TopLevelFilter.ALL
+            new.sort = AppListActivity.SortOption.NAME
             AppListActivity.filters.postValue(new)
             this.dismiss()
         }
@@ -170,6 +179,42 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
             } else {
                 // no-op
                 // no action needed for checkState: false
+            }
+        }
+
+        return chip
+    }
+
+    private fun remakeSortChipsUi() {
+        b.fsSortChipGroup.removeAllViews()
+        b.fsSortChipGroup.addView(makeSortChip(AppListActivity.SortOption.NAME, getString(R.string.fapps_filter_sort_name)))
+        b.fsSortChipGroup.addView(makeSortChip(AppListActivity.SortOption.PACKAGE, getString(R.string.fapps_filter_sort_package)))
+        b.fsSortChipGroup.addView(makeSortChip(AppListActivity.SortOption.UID, getString(R.string.fapps_filter_sort_uid)))
+    }
+
+    private fun makeSortChip(
+        value: AppListActivity.SortOption,
+        label: String
+    ): Chip {
+        val chip =
+            layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
+
+        chip.id = View.generateViewId()
+        chip.tag = value
+        chip.text = label
+        chip.isChecked = filters.sort == value
+
+        if (chip.isChecked) {
+            colorUpChipIcon(chip)
+        }
+
+        chip.setOnCheckedChangeListener { _, isSelected: Boolean ->
+            if (isSelected) {
+                filters.sort = value
+                colorUpChipIcon(chip)
+            } else {
+                chip.checkedIcon?.colorFilter = null
+                chip.chipIcon?.colorFilter = null
             }
         }
 

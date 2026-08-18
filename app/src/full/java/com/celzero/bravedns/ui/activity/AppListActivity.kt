@@ -66,6 +66,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import androidx.paging.LoadState
 
 class AppListActivity :
     BaseActivity(R.layout.activity_app_list), SearchView.OnQueryTextListener {
@@ -77,6 +78,8 @@ class AppListActivity :
     private val refreshDatabase by inject<RefreshDatabase>()
 
     private var layoutManager: RecyclerView.LayoutManager? = null
+    private var scrollToTopAfterSort = false
+    private var previousSort = SortOption.NAME
 
     private var showBypassToolTip = true
 
@@ -194,11 +197,19 @@ class AppListActivity :
         }
     }
 
+    enum class SortOption(val value: String) {
+        NAME("name"),
+        PACKAGE("package"),
+        UID("uid")
+    }
+
     class Filters {
         var categoryFilters: MutableSet<String> = mutableSetOf()
         var topLevelFilter = TopLevelFilter.ALL
         var firewallFilter = FirewallFilter.ALL
         var searchString: String = ""
+
+        var sort: SortOption = SortOption.NAME
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -234,6 +245,11 @@ class AppListActivity :
     private fun initObserver() {
         filters.observe(this) {
             if (it == null) return@observe
+
+            if (it.sort != previousSort) {
+                scrollToTopAfterSort = true
+                previousSort = it.sort
+            }
 
             appInfoViewModel.setFilter(it)
             updateFilterText(it)
@@ -811,14 +827,32 @@ class AppListActivity :
 
     private fun initListAdapter() {
         val recyclerAdapter = FirewallAppListAdapter(this, this, eventLogger)
+
         b.ffaAppList.setHasFixedSize(true)
+
         layoutManager = LinearLayoutManager(this)
         b.ffaAppList.layoutManager = layoutManager
+
         recyclerAdapter.stateRestorationPolicy =
             RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
+        recyclerAdapter.addLoadStateListener { loadStates ->
+            if (
+                scrollToTopAfterSort &&
+                loadStates.refresh is LoadState.NotLoading &&
+                recyclerAdapter.itemCount > 0
+            ) {
+                (b.ffaAppList.layoutManager as? LinearLayoutManager)
+                    ?.scrollToPositionWithOffset(0, 0)
+
+                scrollToTopAfterSort = false
+            }
+        }
+
         appInfoViewModel.appInfo.observe(this) {
-            b.ffaAppList.post { recyclerAdapter.submitData(lifecycle, it) }
+            b.ffaAppList.post {
+                recyclerAdapter.submitData(lifecycle, it)
+            }
         }
 
         b.ffaAppList.adapter = recyclerAdapter
