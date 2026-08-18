@@ -1247,6 +1247,149 @@ class ProxyManagerTest : KoinTest {
         assertEquals(rpnServerKey, captured[1].proxyName)
     }
 
+    // ========================================================================
+    // 28. purgeGhostMappings — remove entries referencing deleted WG/RPN proxies
+    // ========================================================================
+
+    @Test
+    fun `purgeGhostMappings removes stale WG proxy entries from cache and DB`() = runBlocking {
+        loadMappings(
+            pam(uid1, pkg1, ""),            // base row
+            pam(uid1, pkg1, wgProxyId0),    // valid WG
+            pam(uid1, pkg1, wgProxyId1),    // ghost WG (config deleted)
+            pam(uid2, pkg2, "")             // another app base row
+        )
+        val purged = ProxyManager.purgeGhostMappings(
+            validWgProxyIds = setOf(wgProxyId0),   // only wg0 still exists
+            validRpnProxyIds = emptySet()
+        )
+        assertEquals(1, purged)
+        assertTrue("valid WG survives", pamSetContains(uid1, pkg1, wgProxyId0))
+        assertFalse("ghost WG removed from cache", pamSetContains(uid1, pkg1, wgProxyId1))
+        assertTrue("base rows untouched", pamSetContains(uid1, pkg1, ""))
+        assertTrue("base rows untouched", pamSetContains(uid2, pkg2, ""))
+        coVerify(exactly = 1) { mockDb.deleteMapping(uid1, pkg1, wgProxyId1) }
+    }
+
+    @Test
+    fun `purgeGhostMappings removes stale RPN proxy entries from cache and DB`() = runBlocking {
+        loadMappings(
+            pam(uid1, pkg1, ""),
+            pam(uid1, pkg1, rpnProxyId),     // valid RPN
+            pam(uid1, pkg1, rpnProxyId2),    // ghost RPN (server removed)
+            pam(uid2, pkg2, rpnProxyId2)     // ghost RPN on another app
+        )
+        val purged = ProxyManager.purgeGhostMappings(
+            validWgProxyIds = emptySet(),
+            validRpnProxyIds = setOf(rpnProxyId)  // only first server still exists
+        )
+        assertEquals(2, purged)
+        assertTrue("valid RPN survives", pamSetContains(uid1, pkg1, rpnProxyId))
+        assertFalse("ghost RPN removed", pamSetContains(uid1, pkg1, rpnProxyId2))
+        assertFalse("ghost RPN removed on uid2", pamSetContains(uid2, pkg2, rpnProxyId2))
+        coVerify(exactly = 1) { mockDb.deleteMapping(uid1, pkg1, rpnProxyId2) }
+        coVerify(exactly = 1) { mockDb.deleteMapping(uid2, pkg2, rpnProxyId2) }
+    }
+
+    @Test
+    fun `purgeGhostMappings does NOT misclassify RPN ids as WG despite shared prefix`() = runBlocking {
+        // Backend.RpnWin = "wgyrpn" starts with ID_WG_BASE = "wg"; the purge must check RPN
+        // before WG so a valid RPN id is never evaluated against the WG valid-set.
+        loadMappings(
+            pam(uid1, pkg1, ""),
+            pam(uid1, pkg1, rpnProxyId),    // valid RPN, must survive
+            pam(uid1, pkg1, wgProxyId0)     // valid WG, must survive
+        )
+        val purged = ProxyManager.purgeGhostMappings(
+            validWgProxyIds = setOf(wgProxyId0),
+            validRpnProxyIds = setOf(rpnProxyId)
+        )
+        assertEquals(0, purged)
+        assertTrue(pamSetContains(uid1, pkg1, rpnProxyId))
+        assertTrue(pamSetContains(uid1, pkg1, wgProxyId0))
+    }
+
+    @Test
+    fun `purgeGhostMappings retains Orbot SOCKS5 HTTP TCP assignments regardless of valid sets`() = runBlocking {
+        loadMappings(
+            pam(uid1, pkg1, ""),
+            pam(uid1, pkg1, orbotProxyId),
+            pam(uid1, pkg1, s5ProxyId),
+            pam(uid1, pkg1, httpProxyId),
+            pam(uid1, pkg1, tcpProxyId)
+        )
+        // pass EMPTY valid sets — none of these proxy types should be purged
+        val purged = ProxyManager.purgeGhostMappings(
+            validWgProxyIds = emptySet(),
+            validRpnProxyIds = emptySet()
+        )
+        assertEquals(0, purged)
+        assertTrue(pamSetContains(uid1, pkg1, orbotProxyId))
+        assertTrue(pamSetContains(uid1, pkg1, s5ProxyId))
+        assertTrue(pamSetContains(uid1, pkg1, httpProxyId))
+        assertTrue(pamSetContains(uid1, pkg1, tcpProxyId))
+    }
+
+    @Test
+    fun `purgeGhostMappings never removes base rows`() = runBlocking {
+        loadMappings(
+            pam(uid1, pkg1, ""),
+            pam(uid2, pkg2, ""),
+            pam(uid2, pkg2, wgProxyId0)     // ghost WG
+        )
+        val purged = ProxyManager.purgeGhostMappings(
+            validWgProxyIds = emptySet(),
+            validRpnProxyIds = emptySet()
+        )
+        assertEquals(1, purged)
+        assertTrue("base row kept", pamSetContains(uid1, pkg1, ""))
+        assertTrue("base row kept", pamSetContains(uid2, pkg2, ""))
+        assertFalse("ghost WG purged", pamSetContains(uid2, pkg2, wgProxyId0))
+    }
+
+    @Test
+    fun `purgeGhostMappings returns 0 and is a no-op when there are no ghosts`() = runBlocking {
+        loadMappings(
+            pam(uid1, pkg1, ""),
+            pam(uid1, pkg1, wgProxyId0),
+            pam(uid1, pkg1, rpnProxyId)
+        )
+        val purged = ProxyManager.purgeGhostMappings(
+            validWgProxyIds = setOf(wgProxyId0),
+            validRpnProxyIds = setOf(rpnProxyId)
+        )
+        assertEquals(0, purged)
+        coVerify(exactly = 0) { mockDb.deleteMapping(any(), any(), any()) }
+    }
+
+    @Test
+    fun `purgeGhostMappings handles empty pamSet`() = runBlocking {
+        val purged = ProxyManager.purgeGhostMappings(
+            validWgProxyIds = setOf(wgProxyId0),
+            validRpnProxyIds = setOf(rpnProxyId)
+        )
+        assertEquals(0, purged)
+    }
+
+    @Test
+    fun `purgeGhostMappings clears ghost from getProxyIdForApp so AppInfoActivity shows correct proxies`() = runBlocking {
+        // simulates the user-reported bug: AppInfoActivity.displayProxyStatus shows a deleted WG
+        loadMappings(
+            pam(uid1, pkg1, ""),
+            pam(uid1, pkg1, wgProxyId0),    // live
+            pam(uid1, pkg1, wgProxyId1)     // deleted tunnel, still in DB
+        )
+        // before purge, getProxyIdForApp returns the ghost
+        assertTrue(ProxyManager.getProxyIdForApp(uid1).contains(wgProxyId1))
+
+        ProxyManager.purgeGhostMappings(setOf(wgProxyId0), emptySet())
+
+        // after purge, only the live proxy remains
+        val proxies = ProxyManager.getProxyIdForApp(uid1)
+        assertTrue(proxies.contains(wgProxyId0))
+        assertFalse("ghost proxy no longer reported", proxies.contains(wgProxyId1))
+    }
+
     // --- helper -------------------------------------------------------------------------
 
     /** True if the in-memory pamSet contains the given (uid, packageName, proxyId) tuple. */

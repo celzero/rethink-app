@@ -125,7 +125,6 @@ class ConnectionTrackerAdapter(private val context: Context) :
             displayTransactionDetails(connTracker)
             displayProtocolDetails(connTracker.port, connTracker.protocol)
             displayAppDetails(connTracker)
-            displaySummaryDetails(connTracker)
             // case: when the rule is set to RULE12 but no proxy is set, consider this as error
             // handle this as special case, and display the RULE1C hint
             // RULE1C is the hint for RULE12 with no proxy set.
@@ -140,6 +139,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
                 connTracker.blockedByRule
             }
             displayFirewallRulesetHint(blocked, rule)
+            displaySummaryDetails(blocked, connTracker)
 
             b.connectionParentLayout.setOnClickListener { openBottomSheet(connTracker) }
         }
@@ -268,7 +268,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
             }
         }
 
-        private fun displaySummaryDetails(ct: ConnectionTracker) {
+        private fun displaySummaryDetails(blocked: Boolean, ct: ConnectionTracker) {
             io {
                 val hasCid = VpnController.hasCid(ct.connId, ct.uid)
                 val connType = ConnectionTracker.ConnType.get(ct.connType)
@@ -289,8 +289,14 @@ class ConnectionTrackerAdapter(private val context: Context) :
                             b.connectionDelay.text = ""
                             hasMinSummary = true
                         } else {
+                            if (blocked) {
+                                b.connectionDuration.text = context.getString(R.string.symbol_red_circle)
+                                b.connectionDuration.alpha = 0.7f
+                            } else {
+                                b.connectionDuration.text = ""
+                                b.connectionDuration.alpha = 1f
+                            }
                             b.connectionDataUsage.text = ""
-                            b.connectionDuration.text =""
                         }
                         if (connType.isMetered()) {
                             b.connectionDelay.text = context.getString(R.string.symbol_currency)
@@ -323,9 +329,16 @@ class ConnectionTrackerAdapter(private val context: Context) :
                         return@uiCtx
                     }
 
+                    if (blocked) {
+                        b.connectionDuration.text = context.getString(R.string.symbol_red_circle)
+                        b.connectionDuration.alpha = 0.7f
+                    } else {
+                        val duration = getDurationInHumanReadableFormat(context, ct.duration)
+                        b.connectionDuration.text = context.getString(R.string.single_argument, duration)
+                        b.connectionDuration.alpha = 1f
+                    }
+
                     b.connectionSummaryLl.visibility = View.VISIBLE
-                    val duration = getDurationInHumanReadableFormat(context, ct.duration)
-                    b.connectionDuration.text = context.getString(R.string.single_argument, duration)
                     // add unicode for download and upload
                     val download =
                         context.getString(

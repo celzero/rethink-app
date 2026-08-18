@@ -521,6 +521,7 @@ internal constructor(
         packagesToDelete: Set<FirewallManager.AppInfoTuple>,
         restore: Boolean = false
     ) {
+
         // trackedApps is empty, the installed apps are yet to be added to the database; and so,
         // there's no need to refresh these mappings as apps tracked by FirewallManager is empty
         if (trackedApps.isEmpty()) {
@@ -534,7 +535,10 @@ internal constructor(
         // this will just sync the proxy mapping with the app info repository
         val pxm = ProxyManager.trackedApps()
 
-        val currentFwApps = FirewallManager.getAllApps()
+        // snapshot FirewallManager's AppInfo derive currentFwApps from it.
+        val fwSnapshot = FirewallManager.getAppInfoSnapshot()
+        val currentFwApps =
+            fwSnapshot.keys.map { FirewallManager.AppInfoTuple(it.first, it.second) }.toSet()
 
         val tombstoneApps = findPackagesToTombstone(pxm, currentFwApps, !restore && canTombstone)
         // apps which are tombstone, but not yet deleted will be deleted now
@@ -542,13 +546,15 @@ internal constructor(
         // Compare proxy state against current state so uid changes are detected correctly.
         val update = findPackagesToUpdate(pxm, currentFwApps, restore)
         val add =
-            findPackagesToAdd(pxm, currentFwApps).map {
-                val appInfo = FirewallManager.getAppInfoByPackage(it.packageName)
+            findPackagesToAdd(pxm, currentFwApps).mapNotNull {
+                // resolve from the snapshot; also uid-aware so that
+                // packages existing under multiple uids (work-profile / cloned apps) are each added.
+                val appInfo = fwSnapshot[it.uid to it.packageName]
                 if (appInfo == null) {
-                    Logger.w(LOG_TAG_APP_DB, "invalid app info for ${it.packageName}")
+                    Logger.w(LOG_TAG_APP_DB, "invalid app info for ${it.uid}, ${it.packageName}")
                 }
                 appInfo
-            }.filterNotNull()
+            }
         printAll(pxm, "px: tracked apps")
         printAll(packageToAdd, "px: add apps")
         printAll(update, "px: update apps")
@@ -591,9 +597,16 @@ internal constructor(
         }
 
         packageToAdd.forEach {
-            val appInfo = FirewallManager.getAppInfoByPackage(it.packageName)
+            // use the tuple's uid so sibling uids for the same package are each added
+            val appInfo = fwSnapshot[it.uid to it.packageName]
             if (appInfo != null) {
                 ProxyManager.addNewApp(appInfo)
+            } else {
+                // expected only when addMissingPackages() skipped this app (e.g. the package
+                // could not be resolved by PackageManager at insert time); no-op here keeps the
+                // proxy mapping consistent with FirewallManager. Logged for parity with the
+                // add-set above and to surface silent skips during diagnosis.
+                Logger.w(LOG_TAG_APP_DB, "skip proxy add: app not in fw snapshot; uid: ${it.uid}, pkg: ${it.packageName}")
             }
         }
 

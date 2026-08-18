@@ -20,7 +20,10 @@ import android.net.ConnectivityManager
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.ConnTrackerMetaData
 import com.celzero.bravedns.database.ConnectionTracker
+import com.celzero.bravedns.database.RefreshDatabase
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.ConnectionMonitor
+import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.IpRulesManager
@@ -28,6 +31,7 @@ import com.celzero.bravedns.service.NetLogTracker
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TunFirewallManager
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.shadows.ShadowBackend
 import com.celzero.bravedns.shadows.ShadowDNSOpts
 import com.celzero.bravedns.shadows.ShadowDNSSummary
@@ -65,44 +69,74 @@ class TunDnsManagerTest {
 
     private val persistentState = mockk<PersistentState>(relaxed = true)
     private val appConfig = mockk<AppConfig>(relaxed = true)
-    private val netLogTracker = mockk<NetLogTracker>(relaxed = true)
+    private val rdb = mockk<RefreshDatabase>(relaxed = true)
     private val connectivityManager = mockk<ConnectivityManager>(relaxed = true)
     private val keyguardManager = mockk<KeyguardManager>(relaxed = true)
 
     private val rethinkUid = 10000
 
+    companion object {
+        // TunDnsManager is a process-lifetime `object`; its `by inject<NetLogTracker>()`
+        // delegate caches ONE NetLogTracker for the whole JVM. Robolectric runs every test in a
+        // single JVM, so a per-test mock would be stale after the first resolve and the test's
+        // own instance would never match the one production calls -> verify{} would fail.
+        // Share a single mock across all tests (the cached delegate and the verified instance
+        // become the same object); recorded calls are cleared in @Before for per-test isolation.
+        private val netLogTracker = mockk<NetLogTracker>(relaxed = true)
+    }
+
     @Before
     fun setUp() {
+        // reset recorded calls/verifications so each test starts clean (counts matter for
+        // verify(exactly = N)); answers/relaxed behaviour are unaffected.
+        clearMocks(netLogTracker)
         startKoin {
             modules(module {
                 single { persistentState }
                 single { appConfig }
                 single { netLogTracker }
+                single { rdb }
             })
         }
+        // gomobile's DNSOpts() constructor NPEs under Robolectric (native seq, not interceptable
+        // by shadow or mockkConstructor); substitute a relaxed mock so production's dnsOptsFactory()
+        // returns a safe object whose getters yield "" (matching the assertEquals("", ...) asserts).
         TunDnsManager.setDnsOptsFactoryForTest { mockk(relaxed = true) }
-        TunDnsManager.setNetLogTrackerForTest(netLogTracker)
         TunFirewallManager.setRethinkUidForTest(rethinkUid)
         mockkObject(FirewallManager)
         mockkObject(IpRulesManager)
         mockkObject(TunFirewallManager)
         mockkObject(VpnController)
         mockkObject(Utilities)
+        mockkObject(DomainRulesManager)
+        mockkObject(WireguardManager)
+        mockkObject(RpnProxyManager)
 
         every { Utilities.isAtleastR() } returns true
         every { Utilities.isMissingOrInvalidUid(any()) } answers { it.invocation.args[0] as Int == INVALID_UID }
+        every { DomainRulesManager.getDomainRule(any(), any()) } returns DomainRulesManager.Status.NONE
+        every { DomainRulesManager.getAggregatedDomainRule(any(), any()) } returns Pair(DomainRulesManager.Status.NONE, "")
+        every { DomainRulesManager.isDomainTrusted(any()) } returns false
+        every { WireguardManager.getOneWireGuardProxyId() } returns null
+        every { RpnProxyManager.isRpnActive() } returns false
+        every { persistentState.routeRethinkInRethink } returns false
+        coEvery { FirewallManager.isTempAllowed(any()) } returns false
+        coEvery { FirewallManager.connectionStatus(any()) } returns FirewallManager.ConnectionStatus.ALLOW
+        coEvery { FirewallManager.appStatus(any()) } returns mockk<FirewallManager.FirewallStatus>(relaxed = true)
     }
 
     @After
     fun tearDown() {
-        TunDnsManager.setDnsOptsFactoryForTest(::DNSOpts)
-        TunDnsManager.setNetLogTrackerForTest(mockk(relaxed = true)) // reset override
+        TunDnsManager.setDnsOptsFactoryForTest(::DNSOpts) // restore real constructor
         stopKoin()
         unmockkObject(FirewallManager)
         unmockkObject(IpRulesManager)
         unmockkObject(TunFirewallManager)
         unmockkObject(VpnController)
         unmockkObject(Utilities)
+        unmockkObject(DomainRulesManager)
+        unmockkObject(WireguardManager)
+        unmockkObject(RpnProxyManager)
     }
 
     // region handleOnResponse tests
@@ -875,9 +909,6 @@ class TunDnsManagerTest {
         assertEquals(ConnectionTracker.ConnType.UNMETERED.value, connInfo.connType)
     }
 
-    // endregion
-
-    // region Helper methods
 
     private fun createDnsSummary(
         id: String = "Preferred",

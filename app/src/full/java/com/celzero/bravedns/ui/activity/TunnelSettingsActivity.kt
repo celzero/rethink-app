@@ -138,7 +138,6 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         val text = getString(R.string.two_argument, getString(R.string.orbot_status_arg_2), getString(R.string.lbl_ip))
         b.settingsActivityTcpText.text = text.uppercase()
         b.dvWgAllowIncomingTxt.text = getString(R.string.two_argument_space, getString(R.string.settings_allow_incoming_wg_packets), getString(R.string.lbl_experimental))
-        b.settingsUseMaxMtuHeading.text = getString(R.string.two_argument_space, getString(R.string.settings_jumbo_packets), getString(R.string.lbl_experimental))
 
         // use multiple networks
         b.settingsActivityAllNetworkSwitch.isChecked = persistentState.useMultipleNetworks
@@ -281,11 +280,6 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
             _: CompoundButton,
             bool: Boolean ->
             persistentState.useMultipleNetworks = bool
-            if (bool) {
-                if (persistentState.enableStabilityDependentSettings()) {
-                    SnackbarHelper.showStabilityProgram(b.root, persistentState)
-                }
-            }
             if (!bool && persistentState.routeRethinkInRethink) {
                 persistentState.routeRethinkInRethink = false
                 displayRethinkInRethinkUi()
@@ -305,6 +299,14 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         }
 
         b.settingsActivityExcludeProxyAppsRl.setOnClickListener {
+            if (persistentState.wgGlobalLockdown) {
+                showToastUiCentered(
+                    this,
+                    getString(R.string.lockdown_check_setting_disabled),
+                    Toast.LENGTH_SHORT
+                )
+                return@setOnClickListener
+            }
             b.settingsActivityExcludeProxyAppsSwitch.isChecked = !b.settingsActivityExcludeProxyAppsSwitch.isChecked
         }
 
@@ -362,11 +364,6 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
             _: CompoundButton,
             checked: Boolean ->
             persistentState.privateIps = checked
-            if (checked) {
-                if (persistentState.enableStabilityDependentSettings()) {
-                    SnackbarHelper.showStabilityProgram(b.root, persistentState)
-                }
-            }
             b.settingsActivityLanTrafficSwitch.isEnabled = false
 
             Utilities.delay(TimeUnit.SECONDS.toMillis(1L), lifecycleScope) {
@@ -501,22 +498,18 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         }
 
         b.dvWgLockdownSwitch.setOnCheckedChangeListener { _, isChecked ->
-            persistentState.wgGlobalLockdown = isChecked
-            logEvent(
-                "proxy global lockdown",
-                "proxy global lockdown mode set to: $isChecked"
-            )
-            // commenting out the below code, for v055z, reenable and fix the missing things
-            // in heuristics.
-            /*if (isChecked) {
+            if (isChecked) {
+                // do not flip the state yet; the compatibility dialog is responsible for
+                // committing the change (on Apply/Proceed) or reverting it (on Cancel).
                 showLockdownCheckDialog()
             } else {
                 persistentState.wgGlobalLockdown = false
                 logEvent(
-                    "wg global lockdown",
-                    "WireGuard global lockdown mode set to: false"
+                    "proxy global lockdown",
+                    "proxy global lockdown mode set to: false"
                 )
-            }*/
+                handleLockdownModeIfNeeded()
+            }
         }
 
         b.dvWgLockdownRl.setOnClickListener {
@@ -658,19 +651,29 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
     private fun showDefaultDnsDialog() {
         val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         alertBuilder.setTitle(getString(R.string.settings_default_dns_heading))
-        val items = Constants.DEFAULT_DNS_LIST.map { it.name }.toTypedArray()
+
+        // under proxy lockdown, the "System" (None) bootstrap DNS is not allowed because system
+        // dns cannot be proxied through wireguard. exclude it from the list entirely so it can
+        // neither be pre-selected (when the saved url is empty/unknown, the old "?: 0" fallback
+        // picked index 0 = System) nor clicked
+        val dnsList = if (persistentState.wgGlobalLockdown) {
+            Constants.DEFAULT_DNS_LIST.filter { it.url.isNotEmpty() }
+        } else {
+            Constants.DEFAULT_DNS_LIST
+        }
+        val items = dnsList.map { it.name }.toTypedArray()
         // get the index of the default dns url
         // if the default dns url is not in the list, then select the first item
         val checkedItem =
-            Constants.DEFAULT_DNS_LIST.firstOrNull { it.url == persistentState.defaultDnsUrl }
-                ?.let { Constants.DEFAULT_DNS_LIST.indexOf(it) } ?: 0
+            dnsList.firstOrNull { it.url == persistentState.defaultDnsUrl }
+                ?.let { dnsList.indexOf(it) } ?: 0
         alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, pos ->
             dialog.dismiss()
             // update the default dns url
-            persistentState.defaultDnsUrl = Constants.DEFAULT_DNS_LIST[pos].url
+            persistentState.defaultDnsUrl = dnsList[pos].url
             logEvent(
                 "default dns changed",
-                "Default DNS changed to: ${Constants.DEFAULT_DNS_LIST[pos].name}"
+                "Default DNS changed to: ${dnsList[pos].name}"
             )
         }
         val dialog = alertBuilder.create()
@@ -919,10 +922,8 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
             val protocolType = InternetProtocol.getInternetProtocol(selectedItem)
             persistentState.internetProtocolType = protocolType.id
 
-            // Enable experimental-dependent settings for IPv6, IPv46, and ALWAYSv46 (experimental protocols)
-            if (protocolType.id == InternetProtocol.IPv6.id ||
-                protocolType.id == InternetProtocol.IPv46.id ||
-                protocolType.id == InternetProtocol.ALWAYSv46.id) {
+            // enable experimental-dependent settings for ALWAYSv46 (experimental)
+            if (protocolType.id == InternetProtocol.ALWAYSv46.id) {
                 if (persistentState.enableStabilityDependentSettings()) {
                     SnackbarHelper.showStabilityProgram(b.root, persistentState)
                 }
@@ -1060,17 +1061,19 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                         }
                         persistentState.wgGlobalLockdown = true
                         logEvent(
-                            "wg global lockdown",
-                            "WireGuard global lockdown mode set to: true"
+                            "proxy global lockdown",
+                            "proxy global lockdown mode set to: true"
                         )
+                        handleLockdownModeIfNeeded()
                         d.dismiss()
                     }
                     .setNeutralButton(getString(R.string.lbl_proceed)) { d, _ ->
                         persistentState.wgGlobalLockdown = true
                         logEvent(
-                            "wg global lockdown",
-                            "WireGuard global lockdown mode set to: true (forced)"
+                            "proxy global lockdown",
+                            "proxy global lockdown mode set to: true (forced)"
                         )
+                        handleLockdownModeIfNeeded()
                         d.dismiss()
                     }
                     .setNegativeButton(getString(R.string.lockdown_check_cancel)) { d, _ ->
@@ -1080,7 +1083,6 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                     }
                     .setCancelable(false)
                     .create()
-
                 dialog.setOnShowListener {
                     if (hasConflicts) {
                         dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).isEnabled = disableSwitch.isChecked
@@ -1172,52 +1174,52 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         }
 
         // 5. HTTP Proxy check
+        // HTTP proxy cannot be used in lockdown (any HTTP proxy conflicts, not just
+        // app-bound ones), since it would override the lockdown proxy.
         if (appConfig.isCustomHttpProxyEnabled()) {
-            val httpDetails = appConfig.getHttpProxyDetails()
-            val appName = httpDetails?.proxyAppName
-            val hasConflict = !appName.isNullOrBlank()
+            val appName = appConfig.getConnectedHttpProxy()?.proxyAppName ?: ""
             checks.add(
                 LockdownCheckItem(
                     label = getString(R.string.lockdown_check_http_proxy),
-                    description = if (hasConflict) {
-                        getString(R.string.lockdown_check_http_proxy_desc, appName)
-                    } else {
-                        getString(R.string.lockdown_check_http_proxy)
-                    },
-                    hasConflict = hasConflict,
+                    description = getString(R.string.lockdown_check_http_proxy_desc, appName),
+                    hasConflict = true,
                     type = CheckType.HTTP_PROXY
                 )
             )
         }
 
         // 6. SOCKS5 Proxy check
+        // SOCKS5 proxy cannot be used in lockdown (any SOCKS5 proxy conflicts, not
+        // just app-bound ones), since it would override the lockdown proxy.
         if (appConfig.isCustomSocks5Enabled()) {
-            val socks5Details = appConfig.getSocks5ProxyDetails()
-            val appName = socks5Details?.proxyAppName
-            val hasConflict = !appName.isNullOrBlank()
+            val appName = appConfig.getConnectedSocks5Proxy()?.proxyAppName ?: ""
             checks.add(
                 LockdownCheckItem(
                     label = getString(R.string.lockdown_check_socks5),
-                    description = if (hasConflict) {
-                        getString(R.string.lockdown_check_socks5_desc, appName)
-                    } else {
-                        getString(R.string.lockdown_check_socks5)
-                    },
-                    hasConflict = hasConflict,
+                    description = getString(R.string.lockdown_check_socks5_desc, appName),
+                    hasConflict = true,
                     type = CheckType.SOCKS5
                 )
             )
         }
 
         // 7. Anti-Censorship check
-        if (persistentState.autoProxyEnabled) {
-            val retryNeverMode = AntiCensorshipActivity.RetryStrategies.RETRY_NEVER.mode
-            val isRetryNever = persistentState.retryStrategy == retryNeverMode
+        // disable anti-censorship, else only "hybrid" (TCP_PROXY) dial strategy with
+        // "never retry" (RETRY_NEVER) is compatible. NEVER_SPLIT (no packet alteration) is also
+        // treated as compatible since it does not alter/bypass routing. Any other dial strategy
+        // or a non-never retry can bypass the lockdown proxy and so is a conflict.
+        run {
+            val dialStrategy = persistentState.dialStrategy
+            val retryStrategy = persistentState.retryStrategy
+            val isAcDisabled = dialStrategy == AntiCensorshipActivity.DialStrategies.NEVER_SPLIT.mode
+            val isHybridDial = dialStrategy == AntiCensorshipActivity.DialStrategies.TCP_PROXY.mode
+            val isNeverRetry = retryStrategy == AntiCensorshipActivity.RetryStrategies.RETRY_NEVER.mode
+            val hasConflict = !isAcDisabled && !(isHybridDial && isNeverRetry)
             checks.add(
                 LockdownCheckItem(
                     label = getString(R.string.lockdown_check_ac),
                     description = getString(R.string.lockdown_check_ac_desc),
-                    hasConflict = !isRetryNever,
+                    hasConflict = hasConflict,
                     type = CheckType.ANTI_CENSORSHIP
                 )
             )
@@ -1287,7 +1289,13 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                         }
                     }
                     CheckType.ANTI_CENSORSHIP -> {
-                        persistentState.autoProxyEnabled = false
+                        // Set anti-censorship to the lockdown-compatible "hybrid" state:
+                        // TCP_PROXY (hybrid) dial strategy with RETRY_NEVER retry strategy.
+                        // This keeps anti-censorship functional while remaining compatible
+                        // with proxy lockdown (see collectLockdownChecks compatibility rule).
+                        persistentState.dialStrategy = AntiCensorshipActivity.DialStrategies.TCP_PROXY.mode
+                        persistentState.retryStrategy = AntiCensorshipActivity.RetryStrategies.RETRY_NEVER.mode
+                        persistentState.autoProxyEnabled = true
                     }
                     CheckType.NO_PROXY -> {
                         // No automatic fix; user must enable a proxy
@@ -1310,17 +1318,34 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
     }
 
     private fun handleLockdownModeIfNeeded() {
-        val isLockdown = VpnController.isVpnLockdown()
-        if (isLockdown) {
-            b.settingsActivityVpnLockdownDesc.visibility = View.VISIBLE
-            b.settingsActivityExcludeProxyAppsRl.alpha = ALPHA_DISABLED
-        } else {
-            b.settingsActivityVpnLockdownDesc.visibility = View.GONE
-            b.settingsActivityExcludeProxyAppsRl.alpha = ALPHA_ENABLED
+        val isSystemLockdown = VpnController.isVpnLockdown()
+        val isProxyLockdown = persistentState.wgGlobalLockdown
+
+        b.settingsActivityVpnLockdownDesc.visibility = if (isSystemLockdown) View.VISIBLE else View.GONE
+
+        // "Exclude apps in proxy" is incompatible with both the system VPN lockdown and the
+        // proxy lockdown: in proxy lockdown, apps excluded from the proxy are blocked instead of
+        // bypassed (see TunFlowManager), so allowing this toggle would silently break traffic.
+        when {
+            isSystemLockdown -> {
+                b.settingsActivityExcludeProxyAppsRl.alpha = ALPHA_DISABLED
+                b.settingsActivityExcludeProxyAppsSwitch.isEnabled = false
+                b.settingsActivityExcludeProxyAppsRl.isEnabled = false
+            }
+            isProxyLockdown -> {
+                b.settingsActivityExcludeProxyAppsRl.alpha = ALPHA_DISABLED
+                b.settingsActivityExcludeProxyAppsSwitch.isEnabled = false
+                b.settingsActivityExcludeProxyAppsRl.isEnabled = true
+            }
+            else -> {
+                b.settingsActivityExcludeProxyAppsRl.alpha = ALPHA_ENABLED
+                b.settingsActivityExcludeProxyAppsSwitch.isEnabled = true
+                b.settingsActivityExcludeProxyAppsRl.isEnabled = true
+            }
         }
-        b.settingsActivityLanTrafficRl.isEnabled = !isLockdown
-        b.settingsActivityExcludeProxyAppsSwitch.isEnabled = !isLockdown
-        b.settingsActivityExcludeProxyAppsRl.isEnabled = !isLockdown
+
+        b.settingsActivityLanTrafficRl.isEnabled = !isSystemLockdown
+        b.settingsActivityLanTrafficSwitch.isEnabled = !isSystemLockdown
     }
 
     private fun logEvent(msg: String, details: String) {

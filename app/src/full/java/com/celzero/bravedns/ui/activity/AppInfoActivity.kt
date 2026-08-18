@@ -24,10 +24,18 @@ import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Process
+import android.text.Editable
+import android.text.InputFilter
+import android.text.InputType
+import android.text.TextWatcher
 import android.text.format.DateUtils
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -67,6 +75,7 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
+import com.celzero.bravedns.viewmodel.AppInfoViewModel
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -83,11 +92,13 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     private val persistentState by inject<PersistentState>()
     private val eventLogger by inject<EventLogger>()
 
+    private val appInfoViewModel: AppInfoViewModel by viewModel()
     private val ipRulesViewModel: CustomIpViewModel by viewModel()
     private val domainRulesViewModel: CustomDomainViewModel by viewModel()
     private val networkLogsViewModel: AppConnectionsViewModel by viewModel()
 
     private var uid: Int = INVALID_UID
+    private var requestedPackageName: String? = null
     private lateinit var appInfo: AppInfo
 
     private var appStatus = FirewallManager.FirewallStatus.NONE
@@ -95,6 +106,11 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
     private var showBypassToolTip: Boolean = true
     private var isWarningAcknowledged: Boolean = false
+    private var notesDraft: String = ""
+    private var shouldRestoreNotesDialog: Boolean = false
+    private var isNotesSaveInFlight: Boolean = false
+    private var notesDialog: AlertDialog? = null
+    private var notesEditText: EditText? = null
 
     private val warningBackCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
@@ -104,6 +120,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
     companion object {
         const val INTENT_UID = "UID"
+        const val INTENT_PACKAGE_NAME = "PACKAGE_NAME"
         const val INTENT_ACTIVE_CONNS = "ACTIVE_CONNS"
         const val INTENT_ASN = "ASN"
         private const val TAG = "AppInfoActivity"
@@ -114,6 +131,9 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         private const val MILLIS_PER_SECOND = 1000L
         private const val ALPHA_DISABLED = 0.5f
         private const val IS_WARNING_ACKNOWLEDGED = "IS_WARNING_ACKNOWLEDGED"
+        private const val MAX_NOTE_LENGTH = 500
+        private const val NOTES_DRAFT = "NOTES_DRAFT"
+        private const val IS_NOTES_DIALOG_OPEN = "IS_NOTES_DIALOG_OPEN"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -127,12 +147,15 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         }
 
         uid = intent.getIntExtra(INTENT_UID, INVALID_UID)
-        Logger.d(LOG_TAG_UI, "AppInfoActivity, intent uid: $uid")
+        requestedPackageName = intent.getStringExtra(INTENT_PACKAGE_NAME)
+        Logger.d(LOG_TAG_UI, "AppInfoActivity, intent uid: $uid, package: $requestedPackageName")
         onBackPressedDispatcher.addCallback(this, warningBackCallback)
 
         if (savedInstanceState?.getBoolean(IS_WARNING_ACKNOWLEDGED, false) == true) {
             isWarningAcknowledged = true
         }
+        notesDraft = savedInstanceState?.getString(NOTES_DRAFT).orEmpty()
+        shouldRestoreNotesDialog = savedInstanceState?.getBoolean(IS_NOTES_DIALOG_OPEN, false) == true
 
         if (shouldShowRethinkWarning()) {
             showRethinkWarning()
@@ -166,7 +189,37 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         networkLogsViewModel.setUid(uid)
         init()
         observeAppRules()
+        observeNotesEvents()
         setupClickListeners()
+    }
+
+    private fun observeNotesEvents() {
+        appInfoViewModel.notesSaveSuccessEvent.observe(this) { event ->
+            event.getIfNotHandled()?.let { savedNotes ->
+                isNotesSaveInFlight = false
+                if (::appInfo.isInitialized) {
+                    appInfo.notes = savedNotes
+                    notesDraft = ""
+                    if (notesDialog?.isShowing == true) {
+                        notesEditText?.setText(savedNotes)
+                        notesEditText?.setSelection(savedNotes.length)
+                    }
+                    logEvent(
+                        "app notes updated",
+                        "Notes updated for ${appInfo.appName} ($uid)"
+                    )
+                } else {
+                    Logger.w(LOG_TAG_UI, "notes save success received before appInfo init for uid: $uid")
+                }
+            }
+        }
+
+        appInfoViewModel.notesErrorEvent.observe(this) { event ->
+            event.getIfNotHandled()?.let { messageResId ->
+                isNotesSaveInFlight = false
+                showToastUiCentered(this, getString(messageResId), Toast.LENGTH_SHORT)
+            }
+        }
     }
 
     private fun hideContentBehindWarning(hide: Boolean) {
@@ -178,6 +231,20 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean(IS_WARNING_ACKNOWLEDGED, isWarningAcknowledged)
+        val isDialogOpen = notesDialog?.isShowing == true
+        outState.putBoolean(IS_NOTES_DIALOG_OPEN, isDialogOpen)
+        if (isDialogOpen) {
+            outState.putString(NOTES_DRAFT, notesEditText?.text?.toString().orEmpty())
+        } else {
+            outState.putString(NOTES_DRAFT, "")
+        }
+    }
+
+    private fun restoreNotesDialogIfNeeded() {
+        if (!shouldRestoreNotesDialog) return
+        val draft = notesDraft
+        shouldRestoreNotesDialog = false
+        showNotesDialog(draft)
     }
 
     private fun observeAppRules() {
@@ -190,7 +257,12 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
     private fun init() {
         io {
-            val appInfo = FirewallManager.getAppInfoByUid(uid)
+            val appInfo = if (requestedPackageName.isNullOrBlank()) {
+                FirewallManager.getAppInfoByUid(uid)
+            } else {
+                FirewallManager.getAppInfoByUidAndPackage(uid, requestedPackageName)
+                    ?: FirewallManager.getAppInfoByUid(uid)
+            }
             // case: app is uninstalled but still available in RethinkDNS database
             if (appInfo == null || uid == INVALID_UID || appInfo.tombstoneTs > 0) {
                 uiCtx { showNoAppFoundDialog() }
@@ -204,7 +276,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                 this.appInfo = appInfo
 
                 b.aadAppDetailName.text = appName(packages.count())
-                b.aadPkgName.text = appInfo.packageName
+                b.aadPkgName.text = getString(R.string.app_id_package, appInfo.uid, appInfo.packageName)
                 b.excludeProxySwitch.isChecked = appInfo.isProxyExcluded
                 
                 // Set temporary allow toggle state
@@ -242,6 +314,8 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                     b.aadAppSettingsExclude.alpha = 1.0f
                     b.aadAppSettingsExclude.isEnabled = true
                 }
+
+                restoreNotesDialogIfNeeded()
             }
         }
     }
@@ -556,6 +630,16 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             }
 
             showCloseConnectionDialog(uid, appInfo.appName)
+        }
+
+        b.aadNotesChip.setOnClickListener {
+            if (isNotesSaveInFlight) {
+                showToastUiCentered(this, getString(R.string.lbl_saving), Toast.LENGTH_SHORT)
+                return@setOnClickListener
+            }
+            guardAppInfoInitialized("aadNotesChip") {
+                showNotesDialog()
+            }
         }
     }
 
@@ -1109,6 +1193,92 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
     private fun logEvent(msg: String, details: String) {
         eventLogger.log(EventType.FW_RULE_MODIFIED, Severity.LOW, msg, EventSource.UI, true, details)
+    }
+
+    private fun showNotesDialog(draftText: String? = null) {
+        val initialText = draftText ?: if (::appInfo.isInitialized) appInfo.notes else ""
+        val editText = EditText(this).apply {
+            setText(initialText)
+            hint = getString(R.string.hint_notes)
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            setMinLines(4)
+            setMaxLines(10)
+            filters = arrayOf(InputFilter.LengthFilter(MAX_NOTE_LENGTH))
+        }
+        val counterText = TextView(this).apply {
+            gravity = Gravity.END
+            text = getString(R.string.ctbs_note_char_counter, initialText.length, MAX_NOTE_LENGTH)
+        }
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            val horizontalPadding = (24 * resources.displayMetrics.density).toInt()
+            setPadding(horizontalPadding, 0, horizontalPadding, 0)
+            addView(
+                editText,
+                LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            )
+            addView(
+                counterText,
+                LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            )
+        }
+        editText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+
+            override fun afterTextChanged(s: Editable?) {
+                val currentLength = s?.length ?: 0
+                counterText.text = getString(R.string.ctbs_note_char_counter, currentLength, MAX_NOTE_LENGTH)
+            }
+        })
+
+        notesEditText = editText
+
+        val dialog = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+            .setTitle(R.string.lbl_notes)
+            .setView(container)
+            .setPositiveButton(R.string.lbl_save) { _, _ ->
+                val newNotes = editText.text.toString().trim()
+                notesDraft = newNotes
+                saveNotesToDatabase(newNotes)
+            }
+            .setNegativeButton(R.string.lbl_cancel) { _, _ ->
+                notesDraft = ""
+            }
+            .create()
+        dialog.setOnDismissListener {
+            notesDialog = null
+            notesEditText = null
+            shouldRestoreNotesDialog = false
+        }
+        notesDialog = dialog
+        dialog.show()
+    }
+
+    private fun saveNotesToDatabase(newNotes: String) {
+        if (!::appInfo.isInitialized) {
+            Logger.w(LOG_TAG_UI, "AppInfo not initialized in saveNotesToDatabase, uid: $uid")
+            showToastUiCentered(
+                this,
+                this.getString(R.string.ctbs_app_info_not_available_toast),
+                Toast.LENGTH_SHORT
+            )
+            return
+        }
+        if (isNotesSaveInFlight) {
+            showToastUiCentered(this, getString(R.string.lbl_saving), Toast.LENGTH_SHORT)
+            return
+        }
+        val packageName = appInfo.packageName
+        isNotesSaveInFlight = true
+        appInfoViewModel.updateAppNotes(appInfo.uid, packageName, newNotes)
     }
 
     private fun io(f: suspend () -> Unit): Job {

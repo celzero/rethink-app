@@ -55,7 +55,7 @@ import kotlin.coroutines.CoroutineContext
  *    state between app launches; it is always reconciled against Play on connect.
  * 2. **Expiry comes exclusively from Play** via [InAppBillingHandler.calculateExpiryTime].
  */
-class SubscriptionStateMachineV2 : KoinComponent {
+open class SubscriptionStateMachineV2 : KoinComponent {
 
     private val subscriptionDb by inject<SubscriptionStatusRepository>()
     private val dbSyncService: StateMachineDatabaseSyncService by inject()
@@ -763,7 +763,7 @@ class SubscriptionStateMachineV2 : KoinComponent {
         val lastUpdated: Long = System.currentTimeMillis()
     )
 
-    val currentState: StateFlow<SubscriptionState> = stateMachine.currentState
+    open val currentState: StateFlow<SubscriptionState> get() = stateMachine.currentState
 
     private suspend fun processEventSafely(event: SubscriptionEvent) {
         // Reentrancy guard: see [StateLockMarker]. If this coroutine is already executing
@@ -813,7 +813,7 @@ class SubscriptionStateMachineV2 : KoinComponent {
         processEventSafely(SubscriptionEvent.PaymentSuccessful(purchaseDetail))
     }
 
-    suspend fun purchaseFailed(error: String, billingResultCode: Int? = null) {
+    open suspend fun purchaseFailed(error: String, billingResultCode: Int? = null) {
         processEventSafely(SubscriptionEvent.PurchaseFailed(error, billingResultCode))
     }
 
@@ -825,7 +825,7 @@ class SubscriptionStateMachineV2 : KoinComponent {
         processEventSafely(SubscriptionEvent.UserCancelled)
     }
 
-    suspend fun subscriptionExpired() {
+    open suspend fun subscriptionExpired() {
         processEventSafely(SubscriptionEvent.SubscriptionExpired)
     }
 
@@ -1521,12 +1521,12 @@ class SubscriptionStateMachineV2 : KoinComponent {
         }
     }
 
-    fun getCurrentState(): SubscriptionState = stateMachine.getCurrentState()
-    fun getSubscriptionData(): SubscriptionData? = stateMachine.getCurrentData()
-    fun canMakePurchase(): Boolean = stateMachine.getCurrentState().canMakePurchase
-    fun hasValidSubscription(): Boolean = stateMachine.getCurrentState().hasValidSubscription
-    fun isSubscriptionActive(): Boolean = stateMachine.getCurrentState().isActive
-    fun getStatistics(): StateMachineStatistics = stateMachine.getStatistics()
+    open fun getCurrentState(): SubscriptionState = stateMachine.getCurrentState()
+    open fun getSubscriptionData(): SubscriptionData? = stateMachine.getCurrentData()
+    open fun canMakePurchase(): Boolean = stateMachine.getCurrentState().canMakePurchase
+    open fun hasValidSubscription(): Boolean = stateMachine.getCurrentState().hasValidSubscription
+    open fun isSubscriptionActive(): Boolean = stateMachine.getCurrentState().isActive
+    open fun getStatistics(): StateMachineStatistics = stateMachine.getStatistics()
 
     /**
      * Returns the effective billing expiry for the user's active INAPP (one-time) purchase(s).

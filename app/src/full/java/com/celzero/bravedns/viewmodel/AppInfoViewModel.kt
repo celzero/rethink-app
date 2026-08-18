@@ -1,5 +1,6 @@
 package com.celzero.bravedns.viewmodel
 
+import android.database.sqlite.SQLiteConstraintException
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,13 +13,27 @@ import androidx.paging.cachedIn
 import androidx.paging.liveData
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoDAO
+import com.celzero.bravedns.R
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Logger
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
+
+class OneTimeEvent<out T>(private val content: T) {
+    private var handled = false
+
+    fun getIfNotHandled(): T? {
+        if (handled) return null
+        handled = true
+        return content
+    }
+}
 
 class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
@@ -28,6 +43,13 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     private var firewallFilter = AppListActivity.FirewallFilter.ALL
     private var search: String = ""
     private val rethinkUid = android.os.Process.myUid()
+    private var sort: AppListActivity.SortOption = AppListActivity.SortOption.NAME
+
+    private val _notesErrorEvent = MutableLiveData<OneTimeEvent<Int>>()
+    val notesErrorEvent: LiveData<OneTimeEvent<Int>> = _notesErrorEvent
+
+    private val _notesSaveSuccessEvent = MutableLiveData<OneTimeEvent<String>>()
+    val notesSaveSuccessEvent: LiveData<OneTimeEvent<String>> = _notesSaveSuccessEvent
 
     init {
         filter.value = ""
@@ -56,6 +78,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
         this.firewallFilter = filters.firewallFilter
         this.topLevelFilter = filters.topLevelFilter
+        this.sort = filters.sort
 
         this.search = filters.searchString
         setFilterWithDebounce(filters.searchString)
@@ -93,7 +116,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         "%$searchString%",
                         firewallFilter.getFilter(),
                         firewallFilter.getConnectionStatusFilter(),
-                        includeProxyBypass
+                        includeProxyBypass,
+                        sort.value
                     )
                 }
                 .liveData
@@ -105,7 +129,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         category,
                         firewallFilter.getFilter(),
                         firewallFilter.getConnectionStatusFilter(),
-                        includeProxyBypass
+                        includeProxyBypass,
+                        sort.value
                     )
                 }
                 .liveData
@@ -121,7 +146,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         "%$search%",
                         firewallFilter.getFilter(),
                         firewallFilter.getConnectionStatusFilter(),
-                        includeProxyBypass
+                        includeProxyBypass,
+                        sort.value
                     )
                 }
                 .liveData
@@ -133,7 +159,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         category,
                         firewallFilter.getFilter(),
                         firewallFilter.getConnectionStatusFilter(),
-                        includeProxyBypass
+                        includeProxyBypass,
+                        sort.value
                     )
                 }
                 .liveData
@@ -149,7 +176,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         "%$search%",
                         firewallFilter.getFilter(),
                         firewallFilter.getConnectionStatusFilter(),
-                        includeProxyBypass
+                        includeProxyBypass,
+                        sort.value
                     )
                 }
                 .liveData
@@ -161,7 +189,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         category,
                         firewallFilter.getFilter(),
                         firewallFilter.getConnectionStatusFilter(),
-                        includeProxyBypass
+                        includeProxyBypass,
+                        sort.value
                     )
                 }
                 .liveData
@@ -432,7 +461,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                 "%$search%",
                 firewallFilter.getFilter(),
                 appType,
-                firewallFilter.getConnectionStatusFilter()
+                firewallFilter.getConnectionStatusFilter(),
+                sort.value
             )
         } else {
             appInfoDAO.getFilteredApps(
@@ -440,8 +470,26 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                 category,
                 firewallFilter.getFilter(),
                 appType,
-                firewallFilter.getConnectionStatusFilter()
+                firewallFilter.getConnectionStatusFilter(),
+                sort.value
             )
+        }
+    }
+
+    fun updateAppNotes(uid: Int, packageName: String, notes: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                FirewallManager.updateAppNotes(uid, packageName, notes)
+                _notesSaveSuccessEvent.postValue(OneTimeEvent(notes))
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: SQLiteConstraintException) {
+                Logger.w("AppInfoViewModel", "Notes length constraint hit for uid $uid, package $packageName", e)
+                _notesErrorEvent.postValue(OneTimeEvent(R.string.ctbs_app_notes_too_long))
+            } catch (e: Exception) {
+                Logger.w("AppInfoViewModel", "Failed to save notes for uid $uid, package $packageName", e)
+                _notesErrorEvent.postValue(OneTimeEvent(R.string.ctbs_app_notes_save_failed))
+            }
         }
     }
 }

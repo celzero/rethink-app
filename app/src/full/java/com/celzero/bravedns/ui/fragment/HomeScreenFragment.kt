@@ -30,6 +30,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.TrafficStats
 import android.net.VpnService
+import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.provider.Settings
@@ -40,6 +41,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -68,6 +70,7 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
+import com.celzero.bravedns.sponsor.provider.SponsorProvider
 import com.celzero.bravedns.sponsor.repository.SponsorRepository
 import com.celzero.bravedns.ui.activity.AlertsActivity
 import com.celzero.bravedns.ui.activity.AppInfoActivity
@@ -89,14 +92,17 @@ import com.celzero.bravedns.ui.tour.TourOverlayController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.NotificationActionType
+import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
+import com.celzero.bravedns.util.UIUtils.openAppInfo
 import com.celzero.bravedns.util.UIUtils.openNetworkSettings
 import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.getPrivateDnsMode
+import com.celzero.bravedns.util.Utilities.isAtleast37
 import com.celzero.bravedns.util.Utilities.isAtleastN
 import com.celzero.bravedns.util.Utilities.isAtleastP
 import com.celzero.bravedns.util.Utilities.isAtleastR
@@ -128,12 +134,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val workScheduler by inject<WorkScheduler>()
     private val eventLogger by inject<EventLogger>()
     private val sponsorRepository by inject<SponsorRepository>()
+    private val sponsorProvider by inject<SponsorProvider>()
 
     private var isVpnActivated: Boolean = false
 
     private lateinit var themeNames: Array<String>
     private lateinit var startForResult: ActivityResultLauncher<Intent>
     private lateinit var notificationPermissionResult: ActivityResultLauncher<String>
+    private lateinit var localNetworkPermissionResult: ActivityResultLauncher<String>
 
     private val batteryPermissionHelper = BatteryPermissionHelper.getInstance()
 
@@ -485,8 +493,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun applySponsorState(sponsored: Boolean) {
         b.fhsSponsorBadge.isVisible = sponsored
         b.fhsSponsor.visibility = if (sponsored) View.GONE else View.VISIBLE
-        b.fhsSponsorBottom.setOnClickListener(null)
-        b.fhsSponsor.setOnClickListener(null)
+        if (!sponsored) {
+            b.fhsSponsorBottom.setOnClickListener(null)
+            b.fhsSponsor.setOnClickListener(null)
+        }
     }
 
     private fun logEvent(type: EventType, msg: String, details: String) {
@@ -524,7 +534,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         usageTxt.text = msg
 
         sponsorBtn.setOnClickListener {
-            openUrl(requireContext(), RETHINKDNS_SPONSOR_LINK)
+            //openUrl(requireContext(), RETHINKDNS_SPONSOR_LINK)
+            sponsorProvider.openSponsor(requireContext())
         }
         dialog.show()
     }
@@ -566,12 +577,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             updateCardsUi()
             syncDnsStatus()
             handleRethinkAppStatus()
+            handleShimmer()
         }
 
         VpnController.connectionStatus.observe(viewLifecycleOwner) {
             // No need to handle states in Home screen fragment for pause state
             if (VpnController.isAppPaused()) return@observe
 
+            syncDnsStatus()
             handleShimmer()
         }
     }
@@ -764,6 +777,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             while (isAdded && view != null) {
                 val checkStart = SystemClock.elapsedRealtime()
                 updateUiWithDnsStatusPolled()
+                syncDnsStatus()
                 val elapsed = SystemClock.elapsedRealtime() - checkStart
                 val nextDelay = elapsed.coerceIn(MIN_POLL_DELAY_MS, MAX_PROXY_POLL_DELAY_MS)
                 Logger.v(LOG_TAG_UI, "$TAG dns poll: check took ${elapsed}ms, next delay ${nextDelay}ms")
@@ -791,7 +805,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         uiCtx {
             if (isAdded && view != null) {
-                syncDnsStatus(status)
+                updateUiWithDnsStates(status)
             }
         }
     }
@@ -1226,11 +1240,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
         dnsObserverActive = true
 
-        appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner) {
-            Logger.vv(LOG_TAG_UI, "$TAG connectedDns changed to $it")
-            updateUiWithDnsStates(it)
-        }
-
         VpnController.getRegionLiveData().distinctUntilChanged().observe(viewLifecycleOwner) {
             Logger.vv(LOG_TAG_UI, "$TAG region changed to $it")
             if (it != null) {
@@ -1239,69 +1248,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
     }
 
-    private fun updateUiWithDnsStates(dnsName: String) {
+    private fun updateUiWithDnsStates(dnsStatus: Int? = null) {
         // Check if view is available before accessing binding
         if (view == null || !isAdded) return
 
-        var dns = dnsName
-        val preferredId = if (appConfig.isSystemDns()) {
-            Backend.System
-        } else if (appConfig.isSmartDnsEnabled()) {
-            Backend.Plus
-        } else {
-            Backend.Preferred
-        }
-        // get the status from go to check if the dns transport is added or not
-        val id =
-            if (WireguardManager.oneWireGuardEnabled()) {
-                val id = WireguardManager.getOneWireGuardProxyId()
-                if (id == null) {
-                    preferredId
-                } else {
-                    dns = getString(R.string.lbl_wireguard)
-                    "${ProxyManager.ID_WG_BASE}${id}"
-                }
-            } else {
-                if (persistentState.splitDns && WireguardManager.isAdvancedWgActive()) {
-                    dns += ", " + resources.getString(R.string.lbl_wireguard)
-                }
 
-                preferredId
-            }
+        val statusId = UIUtils.getDnsStatusStringRes(dnsStatus)
 
-        @Suppress("DEPRECATION")
-        if (VpnController.isOn()) {
-            io {
-                var failing = false
-                repeat(5) {
-                    val status = VpnController.getDnsStatus(id)
-                    if (status != null) {
-                        uiCtx {
-                            if (isAdded && view != null) {
-                                b.fhsCardDnsLatency.visibility = View.VISIBLE
-                                b.fhsCardDnsFailure.visibility = View.INVISIBLE
-                            }
-                        }
-                        return@io
-                    }
-                    // status null means the dns transport is not active / different id is used
-                    kotlinx.coroutines.delay(MIN_POLL_DELAY_MS.milliseconds)
-                    failing = true
-                }
-                uiCtx {
-                    if (failing && isAdded && view != null) {
-                        b.fhsCardDnsLatency.visibility = View.INVISIBLE
-                        b.fhsCardDnsFailure.visibility = View.VISIBLE
-                        b.fhsCardDnsFailure.text = getString(R.string.status_failing)
-                    }
-                }
-            }
-        }
-
-        // Final check before accessing binding
-        if (view == null || !isAdded) return
-
-        b.fhsCardDnsConnectedDns.text = dns
+        b.fhsCardDnsConnectedDns.text = getString(statusId).lowercase().capitalizeWords()
         b.fhsCardDnsConnectedDns.isSelected = true
     }
 
@@ -1784,6 +1738,23 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     @Suppress("DEPRECATION")
     private fun maybeAutoStartVpn() {
         if (isVpnActivated && !VpnController.isOn()) {
+            // On API 37+, the local network permission is mandatory. Do not auto-start
+            // (which is invoked from onResume and would otherwise re-prompt for the
+            // permission on every resume, causing a dialog loop) when the permission is
+            // missing. The user must explicitly start the VPN from the home screen button,
+            // which requests the permission exactly once.
+            if (isAtleast37() && !hasLocalNetworkPermission()) {
+                Logger.i(LOG_TAG_VPN, "skip auto-start: local network permission missing")
+                // Reset the VPN controller and persisted activation state so the
+                // home-screen button reflects that the VPN is off. Without this,
+                // isVpnActivated stays true (the persisted flag was set before the
+                // VPN died) and the button shows STOP — but VpnController.isOn()
+                // is false, so the first user tap tries to stop an already-stopped
+                // VPN and the button never flips to START.
+                VpnController.stop("auto-start-permission-missing", requireContext())
+                persistentState.setVpnEnabled(false)
+                return
+            }
             // this case will happen when the app is updated or crashed
             // generate the bug report and start the vpn
             triggerBugReport()
@@ -1917,6 +1888,20 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun prepareAndStartVpn() {
+        // On Android 16 (SDK 37)+ the local network access permission is mandatory for the
+        // VPN tunnel to function. Request it *before* establishing the VPN; if the user denies
+        // it, the VPN is not started. The flow resumes from proceedWithVpnStart() once the
+        // permission result is delivered.
+        if (isAtleast37() && !hasLocalNetworkPermission()) {
+            requestLocalNetworkPermission()
+            return
+        }
+        proceedWithVpnStart()
+    }
+
+    // Resumes the VPN start flow (VpnService.prepare + start) once the local network
+    // permission requirement has been satisfied (or is not required).
+    private fun proceedWithVpnStart() {
         if (prepareVpnService()) {
             startVpnService()
         }
@@ -1943,6 +1928,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun startVpnService() {
+        // Hard gate: never start the VPN service without the mandatory local network
+        // permission on API 37+. This is the single choke point that invokes
+        // VpnController.start(), so guarding here makes the denial final regardless of
+        // which caller (button, auto-start, or VPN-consent result) reached us.
+        if (isAtleast37() && !hasLocalNetworkPermission()) {
+            Logger.w(LOG_TAG_VPN, "startVpnService aborted: local network permission missing")
+            handleLocalNetworkPermissionDenied()
+            return
+        }
         // runtime permission for notification (Android 13)
         getNotificationPermissionIfNeeded()
         VpnController.start(requireContext(), true)
@@ -2105,10 +2099,81 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         .show()
                 }
             }
+
+        localNetworkPermissionResult =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+                if (granted) {
+                    Logger.i(LOG_TAG_UI, "User accepted local network permission")
+                    // Permission granted; resume the VPN start flow that was deferred in
+                    // prepareAndStartVpn().
+                    proceedWithVpnStart()
+                } else {
+                    Logger.w(LOG_TAG_UI, "User rejected local network permission")
+                    handleLocalNetworkPermissionDenied()
+                }
+            }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.CINNAMON_BUN)
+    private fun hasLocalNetworkPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.ACCESS_LOCAL_NETWORK
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    @RequiresApi(Build.VERSION_CODES.CINNAMON_BUN)
+    private fun requestLocalNetworkPermission() {
+        Logger.i(LOG_TAG_UI, "Requesting local network permission before starting VPN")
+        localNetworkPermissionResult.launch(Manifest.permission.ACCESS_LOCAL_NETWORK)
+    }
+
+    /**
+     * Handles the case where the mandatory local network access permission (API 37+) has been
+     * denied. The VPN cannot function without it, so this:
+     *  1. Disables the VPN itself - stopping the service if running and resetting the persistent
+     *     activation flag so the UI reflects the actual (disabled) state and auto-start does not
+     *     loop on the next resume.
+     *  2. Shows an explanatory dialog offering to open the app's permission settings, since once
+     *     the user has selected "Don't ask again" the system permission prompt can no longer be
+     *     shown and granting must happen from Settings.
+     */
+    private fun handleLocalNetworkPermissionDenied() {
+        Logger.w(LOG_TAG_VPN, "Local network permission denied; disabling VPN")
+        // Disable the VPN itself: stop the service if it is running and reset the persistent
+        // activation flag. setVpnEnabled(false) posts to vpnEnabledLiveData, which observeVpnState
+        // consumes to set isVpnActivated = false (button flips back to START) and prevents
+        // maybeAutoStartVpn() from re-driving the permission prompt on the next onResume.
+        VpnController.stop("local-network-permission-denied", requireContext())
+        persistentState.setVpnEnabled(false)
+        showLocalNetworkPermissionDialog()
+    }
+
+    private fun showLocalNetworkPermissionDialog() {
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+        builder.setTitle(R.string.hsf_local_network_permission_dialog_heading)
+        val appName = if (Utilities.isAlphaBuild()) getString(R.string.app_name_alpha) else getString(R.string.app_name)
+        builder.setMessage(
+            getString(
+                R.string.hsf_local_network_permission_dialog_message,
+                appName
+            )
+        )
+        builder.setCancelable(false)
+        builder.setPositiveButton(R.string.lbl_proceed) { _, _ ->
+            // Route the user to the app's permission settings page so they can grant the
+            // permission; the in-app system prompt may no longer be shown if "Don't ask again"
+            // was selected.
+            openAppInfo(requireContext())
+        }
+        builder.setNegativeButton(R.string.lbl_dismiss) { _, _ ->
+            // no-op; the VPN remains disabled until the user grants the permission and starts it.
+        }
+        builder.create().show()
     }
 
     // Sets the UI DNS status on/off.
-    private fun syncDnsStatus(dnsStatus: Int? = null) {
+    private fun syncDnsStatus() {
         if (canRethinkBlockItself) {
             b.fhsProtectionLevelTxt.setTextColor(fetchTextColor(R.attr.accentWarning))
             b.fhsProtectionLevelTxt.text = getString(R.string.rethink_home_screen_warning).lowercase()
@@ -2125,12 +2190,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             statusId = if (appConfig.getBraveMode().isFirewallMode()) {
                 UIUtils.getDnsStatusStringRes(Transaction.Status.COMPLETE.id)
             } else {
-                val s = UIUtils.getDnsStatusStringRes(dnsStatus)
-                if (s == R.string.dns_connected) {
-                    R.string.status_protected
-                } else {
-                    s
-                }
+                R.string.status_protected
             }
         } else if (isVpnActivated) {
             colorId = fetchTextColor(R.color.accentBad)
@@ -2191,53 +2251,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         }
 
-        // flag whether to show the with "Private DNS/RPN/WireGuard/Proxy" on failing cases, as it
-        // is misunderstood by some of the users
-        val showAddlInfoOnError = false
-
-        if (statusId == R.string.status_no_internet || statusId == R.string.status_failing) {
-            val message = getString(statusId)
-            colorId = fetchTextColor(R.color.accentBad)
-            var string = message
-            if (showAddlInfoOnError) {
-                if (RpnProxyManager.isRpnActive()) {
-                    statusId = R.string.status_protected_with_rpn
-                } else if (appConfig.isCustomSocks5Enabled() && appConfig.isCustomHttpProxyEnabled()) {
-                    statusId = R.string.status_protected_with_proxy
-                } else if (appConfig.isCustomSocks5Enabled()) {
-                    statusId = R.string.status_protected_with_socks5
-                } else if (appConfig.isCustomHttpProxyEnabled()) {
-                    statusId = R.string.status_protected_with_http
-                } else if (appConfig.isWireGuardEnabled()) {
-                    statusId = R.string.status_protected_with_wg
-                } else if (isPrivateDnsActive(requireContext())) {
-                    statusId = R.string.status_protected_with_private_dns
-                }
-                // replace the string "protected" with appropriate string
-                // FIXME: spilt the string literals to separate strings
-                string =
-                    getString(statusId).
-                        replaceFirst(getString(R.string.status_protected), message, true).lowercase()
-            }
-            if (persistentState.wgGlobalLockdown) {
-                val s = string.replaceFirst(getString(R.string.status_protected), getString(R.string.firewall_rule_global_lockdown).lowercase(), true)
-                b.fhsProtectionLevelTxt.setTextColor(colorId)
-                b.fhsProtectionLevelTxt.text = s
-            } else {
-                b.fhsProtectionLevelTxt.setTextColor(colorId)
-                b.fhsProtectionLevelTxt.text = string
-            }
+        if (persistentState.wgGlobalLockdown) {
+            val stat = getString(statusId).lowercase()
+            val s  = stat.replaceFirst(getString(R.string.status_protected), getString(R.string.firewall_rule_global_lockdown).lowercase(), true)
+            b.fhsProtectionLevelTxt.setTextColor(colorId)
+            b.fhsProtectionLevelTxt.text = s
         } else {
-            if (persistentState.wgGlobalLockdown) {
-                val stat = getString(statusId).lowercase()
-                val s  = stat.replaceFirst(getString(R.string.status_protected), getString(R.string.firewall_rule_global_lockdown).lowercase(), true)
-                b.fhsProtectionLevelTxt.setTextColor(colorId)
-                b.fhsProtectionLevelTxt.text = s
-            } else {
-                b.fhsProtectionLevelTxt.setTextColor(colorId)
-                val s = getString(statusId).lowercase()
-                b.fhsProtectionLevelTxt.text = s
-            }
+            b.fhsProtectionLevelTxt.setTextColor(colorId)
+            val s = getString(statusId).lowercase()
+            b.fhsProtectionLevelTxt.text = s
         }
         val isUnderlyingVpnNwEmpty = VpnController.isUnderlyingVpnNetworkEmpty()
         if (isUnderlyingVpnNwEmpty) {
