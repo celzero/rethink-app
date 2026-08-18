@@ -5,7 +5,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 plugins {
     id 'com.android.application'
     id 'com.google.devtools.ksp'
-    id 'kotlin-android'
     // rethink-tv fork: Compose Compiler plugin for the `tv` flavor's
     // Compose-for-TV UI. Safe to apply project-wide — phone variants
     // contain no @Composable and the plugin then no-ops.
