@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+gradlew binary linguist-generated
+gradlew.bat binary linguist-generated
