@@ -29,6 +29,7 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.InternetProtocol
+import com.celzero.bravedns.util.LogLifespan
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.ResourceRecordTypes
 import com.celzero.bravedns.util.Utilities
@@ -326,6 +327,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // go logger level, default 3 -> info
     var goLoggerLevel by longPref("go_logger_level").withDefault<Long>(3)
+
+    // log lifespan, default 7 days
+    var logLifespan by longPref("log_lifespan").withDefault<Long>(LogLifespan.SEVEN_DAYS.id)
 
     // firewall bubble feature toggle
     var firewallBubbleEnabled by booleanPref("pref_firewall_bubble_enabled").withDefault<Boolean>(false)

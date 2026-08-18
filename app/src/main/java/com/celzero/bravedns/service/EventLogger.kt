@@ -54,8 +54,8 @@ class EventLogger(private val eventDao: EventDao) {
 
     companion object {
         private const val LOG_TAG = "EventLogger"
-        private const val DEFAULT_PURGE_DAYS = 4
-        private const val MILLIS_PER_DAY = 24L * 60L * 60L * 1000L
+        private const val DEFAULT_PURGE_HOURS = 168
+        private const val MILLIS_PER_HOUR = 60L * 60L * 1000L
     }
 
     // Single-threaded dispatcher ensures log ordering is preserved
@@ -158,17 +158,17 @@ class EventLogger(private val eventDao: EventDao) {
     }
 
     /**
-     * Deletes all events older than the specified number of days.
+     * Deletes all events older than the specified number of hours.
      * This operation is asynchronous and non-blocking.
      *
-     * @param days Number of days to keep logs (default: 4)
+     * @param hours Number of hours to keep logs (default: 168 / 7 days)
      */
-    fun purgeOld(days: Int = DEFAULT_PURGE_DAYS) {
+    fun purgeOld(hours: Int = DEFAULT_PURGE_HOURS) {
         scope.launch {
             try {
-                val cutoffTime = System.currentTimeMillis() - (days * MILLIS_PER_DAY)
+                val cutoffTime = System.currentTimeMillis() - (hours.toLong() * MILLIS_PER_HOUR)
                 val deletedCount = eventDao.deleteOlderThan(cutoffTime)
-                Logger.i(LOG_TAG, "Purged $deletedCount events older than $days days")
+                Logger.i(LOG_TAG, "Purged $deletedCount events older than $hours hours")
             } catch (e: Exception) {
                 Logger.e(LOG_TAG, "Failed to purge old events: ${e.message}", e)
             }
@@ -179,11 +179,11 @@ class EventLogger(private val eventDao: EventDao) {
      * Schedules automatic purging of old logs.
      * This is typically called when the app starts or when VPN starts.
      *
-     * @param days Number of days to keep logs (default: 4)
+     * @param hours Number of hours to keep logs (default: 168 / 7 days)
      */
-    fun scheduleAutoPurge(days: Int = DEFAULT_PURGE_DAYS) {
+    fun scheduleAutoPurge(hours: Int = DEFAULT_PURGE_HOURS) {
         // Purge immediately on schedule
-        purgeOld(days)
+        purgeOld(hours)
     }
 
     /**
