@@ -32,7 +32,7 @@ class RethinkLocalFileTagViewModel(private val rethinkLocalDao: RethinkLocalFile
     ViewModel() {
 
     private val list: MutableLiveData<String> = MutableLiveData()
-    private var blocklistFilter: RethinkBlocklistFragment.Filters? = null
+    private var blocklistFilter: RethinkBlocklistViewModel.Filters? = null
 
     init {
         list.value = ""
@@ -46,24 +46,26 @@ class RethinkLocalFileTagViewModel(private val rethinkLocalDao: RethinkLocalFile
                 val subg = blocklistFilter?.subGroups ?: mutableSetOf()
 
                 if (subg.isNotEmpty()) {
-                    Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                    Pager(PagingConfig(LIVEDATA_PAGE_SIZE, enablePlaceholders = false)) {
                             rethinkLocalDao.getLocalFileTagsSubg(query, selected, subg)
                         }
                         .liveData
                         .cachedIn(viewModelScope)
                 } else {
-                    Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                    Pager(PagingConfig(LIVEDATA_PAGE_SIZE, enablePlaceholders = false)) {
                             rethinkLocalDao.getLocalFileTagsWithFilter(query, selected)
                         }
                         .liveData
                         .cachedIn(viewModelScope)
                 }
             } else if (input.isBlank()) {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) { rethinkLocalDao.getLocalFileTags() }
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE, enablePlaceholders = false)) {
+                        rethinkLocalDao.getLocalFileTags()
+                    }
                     .liveData
                     .cachedIn(viewModelScope)
             } else {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE, enablePlaceholders = false)) {
                         rethinkLocalDao.getLocalFileTagsWithFilter("%$input%", getSelectedFilter())
                     }
                     .liveData
@@ -74,7 +76,7 @@ class RethinkLocalFileTagViewModel(private val rethinkLocalDao: RethinkLocalFile
     private fun getSelectedFilter(): MutableSet<Int> {
         if (
             blocklistFilter?.filterSelected ==
-                RethinkBlocklistFragment.BlocklistSelectionFilter.SELECTED
+                RethinkBlocklistViewModel.BlocklistSelectionFilter.SELECTED
         ) {
             return mutableSetOf(1)
         }
@@ -89,7 +91,7 @@ class RethinkLocalFileTagViewModel(private val rethinkLocalDao: RethinkLocalFile
         list.value = searchText
     }
 
-    fun setFilter(filter: RethinkBlocklistFragment.Filters) {
+    fun setFilter(filter: RethinkBlocklistViewModel.Filters) {
         this.blocklistFilter = filter
         list.value = filter.query
     }

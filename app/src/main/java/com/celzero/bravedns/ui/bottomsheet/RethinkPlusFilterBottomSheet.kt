@@ -29,6 +29,7 @@ import com.celzero.bravedns.data.FileTag
 import com.celzero.bravedns.databinding.BottomSheetRethinkPlusFilterBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.fragment.RethinkBlocklistFragment
+import com.celzero.bravedns.viewmodel.RethinkBlocklistViewModel
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -45,7 +46,7 @@ class RethinkPlusFilterBottomSheet : BottomSheetDialogFragment() {
 
     private val persistentState by inject<PersistentState>()
 
-    private var filters: RethinkBlocklistFragment.Filters? = null
+    private var filters: RethinkBlocklistViewModel.Filters? = null
 
     // Store activity reference (not in constructor to allow no-arg constructor)
     private var fragmentActivity: RethinkBlocklistFragment? = null
@@ -125,7 +126,7 @@ class RethinkPlusFilterBottomSheet : BottomSheetDialogFragment() {
         }
 
         b.rpfClear.setOnClickListener {
-            fragmentActivity?.filterObserver()?.postValue(RethinkBlocklistFragment.Filters())
+            fragmentActivity?.filterObserver()?.postValue(RethinkBlocklistViewModel.Filters())
             this.dismiss()
         }
     }
@@ -160,7 +161,7 @@ class RethinkPlusFilterBottomSheet : BottomSheetDialogFragment() {
 
     private fun applySubgroupFilter(tag: String) {
         if (filters == null) {
-            filters = RethinkBlocklistFragment.Filters()
+            filters = RethinkBlocklistViewModel.Filters()
         }
         filters?.subGroups?.add(tag)
     }
