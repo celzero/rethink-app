@@ -16,7 +16,6 @@
 package com.celzero.bravedns.adapter
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,6 +28,7 @@ import com.celzero.bravedns.databinding.ListItemRethinkBlocklistAdvBinding
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.ui.fragment.RethinkBlocklistFragment
 import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.UIUtils.openUrl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -104,38 +104,35 @@ class LocalAdvancedViewAdapter(val context: Context) :
             setEntries(filetag)
             b.crpCheckBox.isChecked = filetag.isSelected
             setCardBackground(filetag.isSelected)
+
+            // show level indicator
+            val level = filetag.level?.getOrNull(0) ?: 0
+            showLevelIndicator(b.crpLevelIndicator, level)
         }
 
-        private fun setEntries(filetag: RethinkLocalFileTag) {
-            b.crpDescEntriesTv.text =
-                context.getString(R.string.dc_entries, filetag.entries.toString())
-
-            if (filetag.level.isNullOrEmpty()) return
-
-            val level = filetag.level?.get(0) ?: return
+        private fun showLevelIndicator(mIconIndicator: View, level: Int) {
             when (level) {
                 0 -> {
-                    val color = fetchColor(context, R.attr.chipTextPositive)
-                    val bgColor = fetchColor(context, R.attr.chipBgColorPositive)
-                    b.crpDescEntriesTv.setTextColor(color)
-                    b.crpDescEntriesTv.chipBackgroundColor = ColorStateList.valueOf(bgColor)
+                    val color = fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnBg)
+                    mIconIndicator.setBackgroundColor(color)
                 }
                 1 -> {
-                    val color = fetchColor(context, R.attr.chipTextNeutral)
-                    val bgColor = fetchColor(context, R.attr.chipBgColorNeutral)
-                    b.crpDescEntriesTv.setTextColor(color)
-                    b.crpDescEntriesTv.chipBackgroundColor = ColorStateList.valueOf(bgColor)
+                    val color = fetchToggleBtnColors(context, R.color.firewallWhiteListToggleBtnTxt)
+                    mIconIndicator.setBackgroundColor(color)
                 }
                 2 -> {
-                    val color = fetchColor(context, R.attr.chipTextNegative)
-                    val bgColor = fetchColor(context, R.attr.chipBgColorNegative)
-                    b.crpDescEntriesTv.setTextColor(color)
-                    b.crpDescEntriesTv.chipBackgroundColor = ColorStateList.valueOf(bgColor)
+                    val color = fetchToggleBtnColors(context, R.color.firewallBlockToggleBtnTxt)
+                    mIconIndicator.setBackgroundColor(color)
                 }
                 else -> {
                     /* no-op */
                 }
             }
+        }
+
+        private fun setEntries(filetag: RethinkLocalFileTag) {
+            b.crpDescEntriesTv.text =
+                context.getString(R.string.dc_entries, filetag.entries.toString())
         }
 
         // handle the group name (filetag.json)

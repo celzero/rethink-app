@@ -77,18 +77,6 @@
                                 android:orientation="vertical">
 
                                 <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center_vertical"
-                                    android:gravity="center_vertical"
-                                    android:layout_marginStart="-4dp"
-                                    android:drawableTint="?attr/primaryTextColor"
-                                    android:drawableStart="@drawable/ic_rethink_plus"
-                                    android:text="@string/proxy_rpn_heading"
-                                    android:textColor="?attr/homeScreenHeaderTextColor"
-                                    android:textSize="@dimen/small_font_text_view" />
-
-                                <androidx.appcompat.widget.AppCompatTextView
                                     android:id="@+id/tv_current_country"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"

@@ -143,7 +143,7 @@ class LocalSimpleViewAdapter(val context: Context) :
             showLevelIndicator(b.crpLevelIndicator, map.level)
         }
 
-        private fun showLevelIndicator(mIconIndicator: TextView, level: Int) {
+        private fun showLevelIndicator(mIconIndicator: View, level: Int) {
             when (level) {
                 0 -> {
                     val color = fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnBg)

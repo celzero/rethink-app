@@ -1471,7 +1471,7 @@
                         android:layout_marginBottom="5dp"
                         android:alpha="0.5"
                         android:padding="10dp"
-                        android:src="@drawable/ic_ip_network" />
+                        android:src="@drawable/ic_protocol_translations" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"

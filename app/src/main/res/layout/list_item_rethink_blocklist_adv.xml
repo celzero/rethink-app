@@ -1,120 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/transparent">
+    android:orientation="vertical">
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/crp_title_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        android:visibility="gone"
+        tools:visibility="visible">
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/crp_blocktype_heading_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:padding="10dp"
+            android:textAppearance="?attr/textAppearanceTitleLarge"
             android:textColor="?attr/accentBad"
-            android:textSize="@dimen/home_screen_stat_text"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="Security" />
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/crp_blocktype_desc_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/crp_blocktype_heading_tv"
+            android:layout_marginTop="4dp"
             android:alpha="0.75"
             android:gravity="center"
-            android:paddingStart="5dp"
-            android:paddingEnd="5dp"
-            android:paddingBottom="5dp"
+            android:textAppearance="?attr/textAppearanceBodySmall"
             android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/default_font_text_view" />
+            tools:text="Blocks domains known to spread malware or phishing." />
 
-    </RelativeLayout>
+    </LinearLayout>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/crp_card"
+        style="?attr/materialCardViewElevatedStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/crp_title_ll"
-        app:cardCornerRadius="2dp"
-        app:cardUseCompatPadding="true">
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginVertical="6dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp">
 
-        <RelativeLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/transparent">
+            android:layout_height="wrap_content">
 
-            <androidx.appcompat.widget.AppCompatCheckBox
+            <View
+                android:id="@+id/crp_level_indicator"
+                android:layout_width="6dp"
+                android:layout_height="0dp"
+                android:background="?attr/accentGood"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/crp_check_box"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layoutDirection="rtl"
-                android:minWidth="0dp"
-                android:minHeight="0dp" />
+                android:layout_marginEnd="12dp"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/crp_label_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="?attr/primaryTextColor"
+                app:layout_constraintEnd_toStartOf="@+id/crp_check_box"
+                app:layout_constraintStart_toEndOf="@id/crp_level_indicator"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Malware Blocklist" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/crp_desc_group_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:alpha="0.7"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/primaryTextColor"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/crp_desc_entries_tv"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toEndOf="@id/crp_level_indicator"
+                app:layout_constraintTop_toBottomOf="@id/crp_label_tv"
+                tools:text="Security" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/crp_desc_entries_tv"
+                style="@style/ThinnerChip.Action"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignTop="@+id/crp_check_box"
-                android:layout_alignParentStart="true"
-                android:layout_marginStart="13dp"
-                android:layout_toStartOf="@+id/crp_check_box"
-                android:ellipsize="end"
-                android:padding="3dp"
-                android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/extra_large_font_text_view" />
+                android:layout_marginStart="8dp"
+                android:alpha="0.8"
+                app:layout_constraintBottom_toBottomOf="@id/crp_desc_group_tv"
+                app:layout_constraintEnd_toStartOf="@+id/crp_check_box"
+                app:layout_constraintStart_toEndOf="@id/crp_desc_group_tv"
+                app:layout_constraintTop_toTopOf="@id/crp_desc_group_tv"
+                tools:text="120 entries" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/crp_label_tv"
-                android:layout_alignParentStart="true"
-                android:layout_marginStart="5dp"
-                android:layout_marginBottom="3dp"
-                android:layout_toEndOf="@+id/crp_check_box"
-                android:background="@android:color/transparent">
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/crp_desc_group_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="5dp"
-                    android:alpha="0.6"
-                    android:ellipsize="end"
-                    android:paddingStart="10dp"
-                    android:paddingTop="5dp"
-                    android:paddingEnd="10dp"
-                    android:paddingBottom="5dp"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/default_font_text_view" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/crp_desc_entries_tv"
-                    style="@style/ThinnerChip.Action"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:alpha="0.6"
-                    android:background="@drawable/rectangle_border_background"
-                    android:ellipsize="end"
-                    android:padding="5dp"
-                    android:paddingStart="10dp"
-                    android:paddingTop="5dp"
-                    android:paddingEnd="10dp"
-                    android:paddingBottom="5dp"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/default_font_text_view" />
-            </LinearLayout>
-
-
-        </RelativeLayout>
     </com.google.android.material.card.MaterialCardView>
-</RelativeLayout>
+
+</LinearLayout>
