@@ -178,6 +178,8 @@
     <string name="symbol_clock" translatable="false">🕒</string>
     <string name="symbol_rocket" translatable="false">🚀</string>
     <string name="symbol_bunny" translatable="false">🐇</string>
+    <string name="symbol_globe" translatable="false">🌏</string>
+    <string name="symbol_tv" translatable="false">📺</string>
     <string name="symbol_sparkle" translatable="false">✨</string>
     <string name="symbol_hyphen" translatable="false">-</string>
     <string name="symbol_slash" translatable="false">/</string>
@@ -2206,14 +2208,17 @@
     <string name="payment_processing" translatable="false">Payment processing</string>
     <string name="payment_processing_desc" translatable="false">Your payment is being processed. You’ll get access once it completes.</string>
     <string name="rethink_terms" translatable="false">By purchasing you agree to the &lt;a href="https://rethinkdns.com/terms"&gt;Terms of Service&lt;/a&gt; and &lt;a href="https://rethinkdns.com/privacy"&gt;Privacy Policy&lt;/a&gt;. Powered by Windscribe.</string>
+    <string name="money_back" translatable="false">MONEY-BACK</string>
+    <string name="money_back_guarantee" translatable="false">GUARANTEE</string>
+    <string name="day" translatable="false">DAY</string>
+    <string name="days" translatable="false">DAYS</string>
 
     <!-- Subscription UI Strings -->
     <string name="premium_subtitle" translatable="false">Enhanced privacy, speed, and security</string>
     <string name="choose_plan" translatable="false">Choose Your Plan</string>
     <string name="choose_plan_subtitle" translatable="false">Select the plan that works best for you.</string>
-    <string name="subscribe_now" translatable="false">Subscribe Now</string>
-    <string name="purchase_now" translatable="false">Purchase Now</string>
-    <string name="one_time_label" translatable="false">One-Time</string>
+    <string name="get_rpn" translatable="false">Get RPN</string>
+    <string name="one_time_label" translatable="false">One-time</string>
     <string name="monthly_plan" translatable="false">Monthly</string>
     <string name="price_placeholder" translatable="false">$0.00</string>
     <string name="original_price" translatable="false">Was %1$s</string>
@@ -2294,15 +2299,15 @@
     <string name="server_selection_title" translatable="false">Choose Countries</string>
     <string name="server_selection_search_hint" translatable="false">Search countries or locations…</string>
     <string name="server_selection_clear_search" translatable="false">Clear search</string>
-    <string name="server_selection_max_info" translatable="false">Select up to 5 servers</string>
-    <string name="server_selection_max_reached" translatable="false">Maximum %1$d servers can be selected</string>
-    <string name="server_selection_no_servers" translatable="false">No servers found</string>
+    <string name="server_selection_max_info" translatable="false">Select up to 5 locations</string>
+    <string name="server_selection_max_reached" translatable="false">Maximum %1$d locations can be selected</string>
+    <string name="server_selection_no_servers" translatable="false">No locations found</string>
     <string name="server_selection_no_servers_desc" translatable="false">Try adjusting your search or check back later.</string>
     <string name="server_selection_error_title" translatable="false">Error fetching locations</string>
-    <string name="server_selection_error_message" translatable="false">There was a problem fetching server locations. This is usually a temporary issue.</string>
+    <string name="server_selection_error_message" translatable="false">There was a problem fetching locations. This is usually a temporary issue.</string>
     <string name="server_selection_error_hint" translatable="false">Check your connection or try again in a moment.</string>
     <string name="server_selection_error_retry" translatable="false">Try Again</string>
-    <string name="server_selection_proxy_unavailable" translatable="false">Could not load server locations. Proxy may not be ready yet.</string>
+    <string name="server_selection_proxy_unavailable" translatable="false">Could not load locations. Proxy may not be ready yet.</string>
 
     <!-- RPN reset progress dialog (dialog_server_loading layout) -->
     <string name="server_loading_dialog_status_timeout" translatable="false">Taking a bit longer than expected…</string>
@@ -2559,9 +2564,6 @@
 
     <!-- GooglePlaySubsAdapter billing text & trial -->
     <string name="billing_no_recurring" translatable="false">No recurring charges</string>
-    <string name="billing_monthly_cancel" translatable="false">Billed monthly</string>
-    <string name="billing_annually_cancel" translatable="false">Billed annually</string>
-    <string name="billing_sub_cancel" translatable="false">Recurring \u2022 Cancel anytime</string>
     <string name="trial_days_format" translatable="false">%1$d days free trial</string>
 
     <!-- RethinkPlusDashboardFragment hero banner -->

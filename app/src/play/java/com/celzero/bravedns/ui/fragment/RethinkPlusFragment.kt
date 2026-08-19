@@ -48,6 +48,7 @@ import com.celzero.bravedns.ui.dialog.SubscriptionAnimDialog
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
+import java.util.Locale
 import com.celzero.bravedns.viewmodel.RethinkPlusViewModel
 import com.celzero.bravedns.viewmodel.SubscriptionUiState
 import com.facebook.shimmer.Shimmer
@@ -251,20 +252,6 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
                 }
             }
         }
-        updateSubscribeButtonText(selectedType, isResubscribeState)
-    }
-
-    private fun updateSubscribeButtonText(
-        productType: RethinkPlusViewModel.ProductTypeFilter,
-        isResubscribe: Boolean = false
-    ) {
-        b.subscribeButton.text = when (productType) {
-            RethinkPlusViewModel.ProductTypeFilter.SUBSCRIPTION ->
-                if (isResubscribe) getString(R.string.resubscribe_title)
-                else getString(R.string.subscribe_now)
-            RethinkPlusViewModel.ProductTypeFilter.ONE_TIME ->
-                getString(R.string.purchase_now)
-        }
     }
 
     // whether the current state is a resubscription (canceled / expired).
@@ -341,6 +328,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.selectedProduct.collect { selection ->
                     adapter?.setSelectedProduct(selection?.first, selection?.second)
+                    updateMoneyBackBadge(selection?.first, selection?.second)
                 }
             }
         }
@@ -488,7 +476,6 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         availabilityData?.let { showConnectionInfo(it) }
 
         isResubscribeState = isResubscribe
-        updateSubscribeButtonText(viewModel.selectedProductType.value, isResubscribe)
 
         // reset subscribe button state in case it was locked by a previous PURCHASED state.
         b.subscribeButton.isEnabled = true
@@ -953,5 +940,27 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
 
     override fun onSubscriptionSelected(productId: String, planId: String) {
         viewModel.selectProduct(productId, planId)
+    }
+
+    private fun updateMoneyBackBadge(productId: String?, planId: String?) {
+        var days = when (productId) {
+            InAppBillingHandler.SUBS_PRODUCT_MONTHLY -> InAppBillingHandler.MONEYBACK_WINDOW_SUBS_MONTHLY_DAYS
+            InAppBillingHandler.SUBS_PRODUCT_YEARLY -> InAppBillingHandler.MONEYBACK_WINDOW_SUBS_YEARLY_DAYS
+            InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> InAppBillingHandler.MONEYBACK_WINDOW_ONE_TIME_2YRS_DAYS
+            InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> InAppBillingHandler.MONEYBACK_WINDOW_ONE_TIME_5YRS_DAYS
+            else -> 0
+        }
+
+        if (days == 0) {
+            days = when (planId) {
+                InAppBillingHandler.SUBS_PRODUCT_MONTHLY -> InAppBillingHandler.MONEYBACK_WINDOW_SUBS_MONTHLY_DAYS
+                InAppBillingHandler.SUBS_PRODUCT_YEARLY -> InAppBillingHandler.MONEYBACK_WINDOW_SUBS_YEARLY_DAYS
+                InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> InAppBillingHandler.MONEYBACK_WINDOW_ONE_TIME_2YRS_DAYS
+                InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> InAppBillingHandler.MONEYBACK_WINDOW_ONE_TIME_5YRS_DAYS
+                else -> 7
+            }
+        }
+
+        b.moneyBackBadge.setDays(days)
     }
 }

@@ -133,6 +133,11 @@ object InAppBillingHandler : KoinComponent {
     const val REVOKE_WINDOW_ONE_TIME_2YRS_DAYS = 2 * 7
     const val REVOKE_WINDOW_ONE_TIME_5YRS_DAYS = 5 * 7
 
+    const val MONEYBACK_WINDOW_SUBS_MONTHLY_DAYS = 15
+    const val MONEYBACK_WINDOW_SUBS_YEARLY_DAYS = 30
+    const val MONEYBACK_WINDOW_ONE_TIME_2YRS_DAYS = 3 * 15
+    const val MONEYBACK_WINDOW_ONE_TIME_5YRS_DAYS = 5 * 15
+
     private lateinit var queryUtils: QueryUtils
     private val productDetails: CopyOnWriteArrayList<ProductDetail> = CopyOnWriteArrayList()
     private val storeProductDetails: CopyOnWriteArrayList<QueryProductDetail> =
