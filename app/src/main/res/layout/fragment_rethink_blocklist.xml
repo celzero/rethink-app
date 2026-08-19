@@ -243,7 +243,7 @@
             android:layout_marginTop="20dp"
             android:layout_marginEnd="50dp"
             android:layout_marginBottom="20dp"
-            android:src="@drawable/illustrations_download" />
+            android:src="@drawable/illustrations_no_record" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/lb_download_desc"
