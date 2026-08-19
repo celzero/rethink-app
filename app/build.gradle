@@ -477,26 +477,26 @@ def firestackDependency = { ->
 
 dependencies {
     def room_version = "2.8.4"
-    def paging_version = "3.5.0"
+    def paging_version = "3.5.1"
 
-    implementation 'com.google.guava:guava:33.6.0-android'
+    implementation 'com.google.guava:guava:33.7.1-android'
 
     // https://developer.android.com/studio/write/java8-support
     // included to fix issues with Android 6 support, issue#563
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
     fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.21'
-    fullImplementation 'androidx.appcompat:appcompat:1.7.1'
+    fullImplementation 'androidx.appcompat:appcompat:1.8.0'
     fullImplementation 'androidx.core:core-ktx:1.19.0'
     implementation 'androidx.preference:preference-ktx:1.2.1'
-    fullImplementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+    fullImplementation 'androidx.constraintlayout:constraintlayout:2.2.2'
     fullImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0'
 
     fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0'
     fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0'
 
     // LiveData
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.10.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.11.0'
 
     implementation 'com.google.code.gson:gson:2.14.0'
 
@@ -505,24 +505,24 @@ dependencies {
     implementation "androidx.room:room-ktx:$room_version"
     implementation "androidx.room:room-paging:$room_version"
 
-    fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0'
-    fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.10.0'
+    fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.0'
+    fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.11.0'
 
     // Pagers Views
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-    fullImplementation 'androidx.fragment:fragment-ktx:1.8.9'
+    fullImplementation 'androidx.fragment:fragment-ktx:1.9.0'
     implementation 'com.google.android.material:material:1.14.0'
     fullImplementation 'androidx.viewpager2:viewpager2:1.1.0'
 
-    fullImplementation 'com.squareup.okhttp3:okhttp:5.3.2'
-    fullImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:5.3.2'
+    fullImplementation 'com.squareup.okhttp3:okhttp:5.5.0'
+    fullImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:5.5.0'
 
     fullImplementation 'com.squareup.retrofit2:retrofit:3.0.0'
     fullImplementation 'com.squareup.retrofit2:converter-gson:3.0.0'
 
-    implementation 'com.squareup.okio:okio-jvm:3.17.0'
+    implementation 'com.squareup.okio:okio-jvm:3.18.1'
     // Glide
-    fullImplementation('com.github.bumptech.glide:glide:5.0.7') {
+    fullImplementation('com.github.bumptech.glide:glide:5.0.9') {
         exclude group: 'glide-parent'
     }
     fullImplementation('com.github.bumptech.glide:okhttp3-integration:5.0.9') {
@@ -536,11 +536,11 @@ dependencies {
     fullImplementation 'com.facebook.shimmer:shimmer:0.5.0'
 
     // Koin core
-    download 'io.insert-koin:koin-core:4.2.1'
-    implementation 'io.insert-koin:koin-core:4.2.1'
+    download 'io.insert-koin:koin-core:4.2.2'
+    implementation 'io.insert-koin:koin-core:4.2.2'
     // Koin main (Scope, ViewModel ...)
-    download 'io.insert-koin:koin-android:4.2.1'
-    implementation 'io.insert-koin:koin-android:4.2.1'
+    download 'io.insert-koin:koin-android:4.2.2'
+    implementation 'io.insert-koin:koin-android:4.2.2'
 
     download 'hu.autsoft:krate:2.0.0'
     implementation 'hu.autsoft:krate:2.0.0'
@@ -582,12 +582,12 @@ dependencies {
     testImplementation 'androidx.arch.core:core-testing:2.2.0'
 
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0'
-    testImplementation 'io.insert-koin:koin-test:4.2.1'
-    testImplementation 'io.insert-koin:koin-test-junit4:4.2.1'
-    androidTestImplementation 'io.insert-koin:koin-test:4.2.1'
-    androidTestImplementation 'io.insert-koin:koin-test-junit4:4.2.1'
-    androidTestImplementation 'io.insert-koin:koin-test:4.1.1'
-    androidTestImplementation 'io.insert-koin:koin-test-junit4:4.1.1'
+    testImplementation 'io.insert-koin:koin-test:4.2.2'
+    testImplementation 'io.insert-koin:koin-test-junit4:4.2.2'
+    androidTestImplementation 'io.insert-koin:koin-test:4.2.2'
+    androidTestImplementation 'io.insert-koin:koin-test-junit4:4.2.2'
+    androidTestImplementation 'io.insert-koin:koin-test:4.2.2'
+    androidTestImplementation 'io.insert-koin:koin-test-junit4:4.2.2'
 
     testImplementation 'androidx.work:work-testing:2.11.2'
     androidTestImplementation 'io.mockk:mockk-android:1.14.11'
@@ -614,34 +614,34 @@ dependencies {
     // each combined variant (e.g. `fdroidTv`) already picks up firestack
     // via `fdroidImplementation`. Mirroring here would double-add it.
     // ------------------------------------------------------------------
-    tvImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20'
-    tvImplementation 'androidx.appcompat:appcompat:1.7.1'
-    tvImplementation 'androidx.core:core-ktx:1.17.0'
-    tvImplementation 'androidx.constraintlayout:constraintlayout:2.2.1'
-    tvImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
-    tvImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2'
-    tvImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2'
-    tvImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4'
-    tvImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.9.4'
-    tvImplementation 'androidx.fragment:fragment-ktx:1.8.9'
+    tvImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.21'
+    tvImplementation 'androidx.appcompat:appcompat:1.8.0'
+    tvImplementation 'androidx.core:core-ktx:1.19.0'
+    tvImplementation 'androidx.constraintlayout:constraintlayout:2.2.2'
+    tvImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0'
+    tvImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0'
+    tvImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0'
+    tvImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.0'
+    tvImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.11.0'
+    tvImplementation 'androidx.fragment:fragment-ktx:1.9.0'
     tvImplementation 'androidx.viewpager2:viewpager2:1.1.0'
-    tvImplementation 'com.squareup.okhttp3:okhttp:5.3.2'
-    tvImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:5.3.2'
-    tvImplementation 'com.squareup.okhttp3:logging-interceptor:5.3.2'
+    tvImplementation 'com.squareup.okhttp3:okhttp:5.5.0'
+    tvImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:5.5.0'
+    tvImplementation 'com.squareup.okhttp3:logging-interceptor:5.5.0'
     tvImplementation 'com.squareup.retrofit2:retrofit:3.0.0'
     tvImplementation 'com.squareup.retrofit2:converter-gson:3.0.0'
-    tvImplementation('com.github.bumptech.glide:glide:5.0.5') {
+    tvImplementation('com.github.bumptech.glide:glide:5.0.9') {
         exclude group: 'glide-parent'
     }
-    tvImplementation('com.github.bumptech.glide:okhttp3-integration:5.0.5') {
+    tvImplementation('com.github.bumptech.glide:okhttp3-integration:5.0.9') {
         exclude group: 'glide-parent'
     }
-    kspTv 'com.github.bumptech.glide:compiler:5.0.5'
+    kspTv 'com.github.bumptech.glide:compiler:5.0.9'
     tvImplementation 'com.facebook.shimmer:shimmer:0.5.0'
     tvImplementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.9'
     tvImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
-    tvImplementation 'androidx.navigation:navigation-fragment-ktx:2.9.6'
-    tvImplementation 'androidx.navigation:navigation-ui-ktx:2.9.6'
+    tvImplementation 'androidx.navigation:navigation-fragment-ktx:2.9.8'
+    tvImplementation 'androidx.navigation:navigation-ui-ktx:2.9.8'
     tvImplementation 'androidx.biometric:biometric:1.1.0'
     tvImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
     tvImplementation 'com.simplecityapps:recyclerview-fastscroll:2.0.1'
@@ -660,10 +660,10 @@ dependencies {
     // Cost to phone variants: ~250 KB of unused Compose runtime classes,
     // which never get loaded because phone code never invokes @Composable.
     // ------------------------------------------------------------------
-    implementation platform('androidx.compose:compose-bom:2024.12.01')
+    implementation platform('androidx.compose:compose-bom:2026.08.00')
     implementation 'androidx.compose.runtime:runtime'
 
-    tvImplementation platform('androidx.compose:compose-bom:2024.12.01')
+    tvImplementation platform('androidx.compose:compose-bom:2026.08.00')
     tvImplementation 'androidx.compose.ui:ui'
     tvImplementation 'androidx.compose.ui:ui-tooling-preview'
     tvImplementation 'androidx.compose.foundation:foundation'
@@ -671,20 +671,20 @@ dependencies {
     tvImplementation 'androidx.compose.material3:material3'
     // TV-styled Material 3 components (focusable Surface / Button /
     // Card with the focus borders Android TV users expect).
-    tvImplementation 'androidx.tv:tv-material:1.0.0'
-    tvImplementation 'androidx.activity:activity-compose:1.9.3'
-    tvImplementation 'androidx.lifecycle:lifecycle-runtime-compose:2.8.7'
-    tvImplementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7'
+    tvImplementation 'androidx.tv:tv-material:1.1.0'
+    tvImplementation 'androidx.activity:activity-compose:1.13.0'
+    tvImplementation 'androidx.lifecycle:lifecycle-runtime-compose:2.11.0'
+    tvImplementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.11.0'
     // Koin's Compose extensions (`koinInject` / `koinViewModel`) so the TV
     // UI can pull `PersistentState` and other injected singletons without
     // hand-wiring KoinComponent into every Composable.
-    tvImplementation 'io.insert-koin:koin-androidx-compose:4.1.1'
+    tvImplementation 'io.insert-koin:koin-androidx-compose:4.2.2'
     // Compose Navigation drives the TV NavHost. Used in tandem with the
     // tv-material NavigationDrawer to host every TV destination
     // (Home / DNS / Firewall / Apps / Proxy / Logs / Stats / Settings)
     // inside a single Activity, avoiding new <activity> declarations in
     // the TV-flavor manifest.
-    tvImplementation 'androidx.navigation:navigation-compose:2.8.5'
+    tvImplementation 'androidx.navigation:navigation-compose:2.9.8'
     // Material Icons Extended supplies the leanback iconography
     // (Shield, Dns, Apps, Hub, Article, Insights, Settings, Home) that
     // the TV nav rail needs. Scoped to `tvImplementation` so phone
@@ -696,7 +696,7 @@ dependencies {
     // verbatim, so we don't have to recreate the upstream paging
     // pipeline. Scoped to tvImplementation; phone variants use their
     // existing Fragment + Paging-Runtime adapter.
-    tvImplementation 'androidx.paging:paging-compose:3.3.5'
+    tvImplementation 'androidx.paging:paging-compose:3.5.1'
 
     playImplementation 'com.google.android.play:app-update:2.1.0'
     playImplementation 'com.google.android.play:app-update-ktx:2.1.0'
@@ -718,8 +718,8 @@ dependencies {
     }
 
     // for in-app purchases
-    playImplementation 'com.android.billingclient:billing:8.3.0'
-    websiteImplementation 'com.android.billingclient:billing:8.3.0'
+    playImplementation 'com.android.billingclient:billing:9.1.0'
+    websiteImplementation 'com.android.billingclient:billing:9.1.0'
     // for stripe payment gateway
     //websiteImplementation 'com.stripe:stripe-android:21.21.0'
     //fdroidImplementation 'com.stripe:stripe-android:21.21.0'
@@ -749,11 +749,11 @@ dependencies {
     implementation 'com.waseemsabir:betterypermissionhelper:1.0.3'
 
     // Firebase dependencies for error reporting (website and play variants only)
-    websiteImplementation platform('com.google.firebase:firebase-bom:34.14.1')
+    websiteImplementation platform('com.google.firebase:firebase-bom:34.17.0')
     websiteImplementation 'com.google.firebase:firebase-crashlytics'
     websiteImplementation 'com.google.firebase:firebase-crashlytics-ndk'
 
-    playImplementation platform('com.google.firebase:firebase-bom:34.14.1')
+    playImplementation platform('com.google.firebase:firebase-bom:34.17.0')
     playImplementation 'com.google.firebase:firebase-crashlytics'
     playImplementation 'com.google.firebase:firebase-crashlytics-ndk'
 }
