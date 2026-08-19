@@ -340,7 +340,7 @@ class GooglePlaySubsAdapter(
             if (productType == ProductType.INAPP) {
                 return context.getString(R.string.billing_no_recurring)
             }
-            return context.getString(R.string.billing_sub_cancel)
+            return context.getString(R.string.billing_info)
         }
     }
 
