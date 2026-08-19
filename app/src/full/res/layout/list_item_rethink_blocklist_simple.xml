@@ -1,98 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/background">
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/crp_title_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        android:visibility="gone"
+        tools:visibility="visible">
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/crp_blocktype_heading_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:paddingStart="5dp"
-            android:paddingTop="5dp"
-            android:paddingEnd="5dp"
+            android:textAppearance="?attr/textAppearanceTitleLarge"
             android:textColor="?attr/accentBad"
-            android:textSize="@dimen/home_screen_stat_text"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="Parental Control" />
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/crp_blocktype_desc_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:alpha="0.75"
             android:gravity="center"
-            android:paddingStart="5dp"
-            android:paddingEnd="5dp"
-            android:paddingBottom="5dp"
+            android:textAppearance="?attr/textAppearanceBodySmall"
             android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/default_font_text_view" />
+            tools:text="Filters content inappropriate for children." />
 
     </LinearLayout>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/crp_card"
+        style="?attr/materialCardViewElevatedStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/crp_title_ll"
-        app:cardBackgroundColor="?attr/background"
-        app:cardCornerRadius="2dp"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginVertical="6dp"
+        app:cardCornerRadius="16dp"
         app:cardElevation="2dp">
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/crp_level_indicator"
-            android:layout_width="2.5dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:background="?attr/accentGood" />
-
-        <RelativeLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="10dp">
+            android:layout_height="wrap_content">
 
-            <androidx.appcompat.widget.AppCompatCheckBox
+            <View
+                android:id="@+id/crp_level_indicator"
+                android:layout_width="6dp"
+                android:layout_height="0dp"
+                android:background="?attr/accentGood"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/crp_check_box"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layoutDirection="rtl"
+                android:layout_marginEnd="12dp"
                 android:minWidth="48dp"
-                android:minHeight="48dp" />
+                android:minHeight="48dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/crp_label_tv"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/crp_check_box"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
                 android:ellipsize="end"
-                android:padding="5dp"
-                android:textColor="?attr/secondaryTextColor"
-                android:textSize="@dimen/extra_large_font_text_view" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/crp_desc_group_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/crp_label_tv"
-                android:layout_alignParentStart="true"
-                android:alpha="0.75"
-                android:ellipsize="end"
-                android:padding="5dp"
+                android:maxLines="1"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
                 android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/large_font_text_view" />
+                app:layout_constraintEnd_toStartOf="@+id/crp_check_box"
+                app:layout_constraintStart_toEndOf="@id/crp_level_indicator"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Family Filter" />
 
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/crp_desc_group_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="16dp"
+                android:alpha="0.7"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/primaryTextColor"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/crp_check_box"
+                app:layout_constraintStart_toEndOf="@id/crp_level_indicator"
+                app:layout_constraintTop_toBottomOf="@id/crp_label_tv"
+                tools:text="Blocks adult content, gambling, and more." />
 
-        </RelativeLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
     </com.google.android.material.card.MaterialCardView>
-</RelativeLayout>
+
+</LinearLayout>
