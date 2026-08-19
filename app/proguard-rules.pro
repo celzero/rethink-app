@@ -17,8 +17,6 @@
 # debugging stack traces.
 #-keepattributes SourceFile,LineNumberTable
 
--dontoptimize
-
 #Dont obfuscate
 -dontobfuscate
 -printmapping obfuscation/mapping.txt
