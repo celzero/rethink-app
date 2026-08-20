@@ -46,6 +46,24 @@ jobs:
             rethink-izzyondroid.jks.asc \
             app/rethinkIzzyOnDroid.jks
 
+      - name: Validate signing key
+        env:
+          IZZYONDROID_KS_ALIAS: ${{ vars.IZZYONDROID_KS_ALIAS }}
+          IZZYONDROID_KS_PASSWORD: ${{ secrets.IZZYONDROID_KS_PASSWORD }}
+          IZZYONDROID_KS_KEY_PASSWORD: ${{ secrets.IZZYONDROID_KS_KEY_PASSWORD }}
+        run: |
+          keytool -importkeystore \
+            -srckeystore app/rethinkIzzyOnDroid.jks \
+            -srcstorepass "$IZZYONDROID_KS_PASSWORD" \
+            -srcalias "$IZZYONDROID_KS_ALIAS" \
+            -srckeypass "$IZZYONDROID_KS_KEY_PASSWORD" \
+            -destkeystore /tmp/test-izzy.jks \
+            -deststorepass "temporary-test-password" \
+            -destalias "test-izzy" \
+            -destkeypass "temporary-test-password"
+
+          echo "Signing key validation successful."
+
       # Build the F-Droid variant using the IzzyOnDroid signing key
       - name: Build
         run: |
