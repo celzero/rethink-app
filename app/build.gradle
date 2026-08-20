@@ -247,8 +247,10 @@ android {
                 }
             }
             if (isWebsiteDegoogled) {
+                println("IzzyOnDroid build: using izzyondroid signing config")
                 signingConfig signingConfigs.izzyondroid
             } else {
+                println("Normal build: using config signing config")
                 signingConfig signingConfigs.config
             }
         }
