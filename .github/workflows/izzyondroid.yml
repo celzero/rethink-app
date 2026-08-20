@@ -1,0 +1,90 @@
+name: Build IzzyOnDroid
+
+on:
+  # push:
+  #   tags:
+  #     - 'v*' # Run when a tag beginning with v is pushed.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build IzzyOnDroid Release
+    runs-on: ubuntu-latest
+
+    env:
+      IZZY_BUILD_VARIANT: "assembleFdroidFullRelease"
+      IZZY_BUILD_OUT: "./app/build/outputs/apk/**/*.apk"
+
+    steps:
+      # source code.
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      # Java 17 required to build the app
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # IzzyOnDroid signing keystore (encrypted)
+      - name: Keystore
+        run: |
+          echo "${{ secrets.IZZYONDROID_KS_ASC }}" > rethink-izzyondroid.jks.asc
+
+          gpg -d \
+            --passphrase "${{ secrets.IZZYONDROID_KS_PASSPHRASE }}" \
+            --batch \
+            rethink-izzyondroid.jks.asc > app/rethinkIzzyOnDroid.jks
+
+          wc -wcl \
+            rethink-izzyondroid.jks.asc \
+            app/rethinkIzzyOnDroid.jks
+
+      # Build the F-Droid variant using the IzzyOnDroid signing key
+      - name: Build
+        run: |
+          ./gradlew ${IZZY_BUILD_VARIANT} -PisWebsiteDegoogled=true --info --warning-mode all
+        env:
+          IZZYONDROID_KS_ALIAS: ${{ vars.IZZYONDROID_KS_ALIAS }}
+          IZZYONDROID_KS_FILE: app/rethinkIzzyOnDroid.jks
+          IZZYONDROID_KS_PASSWORD: ${{ secrets.IZZYONDROID_KS_PASSWORD }}
+          IZZYONDROID_KS_KEY_PASSWORD: ${{ secrets.IZZYONDROID_KS_KEY_PASSWORD }}
+
+      # Find the APK generated
+      - name: Find
+        run: |
+          find "$PWD" -type f -iname '*.apk'
+
+          APKFILE=$(find app/build/outputs/apk -type f -name '*.apk' | head -n 1)
+
+          if [ -z "$APKFILE" ]; then
+            echo "::error::APK not found"
+            exit 1
+          fi
+
+          echo "APKFILE=$APKFILE" >> "$GITHUB_ENV"
+          echo "APK found:"
+          echo "$APKFILE"
+
+      # Upload the APKs as a GitHub Actions artifact.
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: rethink-izzyondroid-${{ github.sha }}
+          path: ${{ env.IZZY_BUILD_OUT }}
+          if-no-files-found: error
+          retention-days: 72
+          compression-level: 9
+
+      # Remove the temporary signing keystore from the runner.
+      - name: Cleanup signing key
+        if: always()
+        run: |
+          rm -f app/rethinkIzzyOnDroid.jks
+          rm -f rethink-izzyondroid.jks.asc
