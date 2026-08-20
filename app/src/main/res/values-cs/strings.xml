@@ -1179,4 +1179,9 @@
     <string name="fs_configure_advanced_desc" translatable="true">Vývojářské nástroje a diagnostika</string>
     <string name="fs_configure_logs_desc" translatable="true">Zkontrolovat DNS dotazy a protokoly připojení</string>
     <string name="sponsor_continue" translatable="true">Pokračovat</string>
+    <string name="settings_biometric_dialog_option_0" translatable="true">Žádné</string>
+    <string name="lbl_always" translatable="true">Vždy</string>
+    <string name="about_terms_of_service" translatable="true">Smluvní podmínky</string>
+    <string name="processing_dialog_title" translatable="true">Zpracování</string>
+    <string name="vpn_policy_relaxed" translatable="true">Uvolněný</string>
 </resources>
