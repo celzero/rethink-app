@@ -170,7 +170,7 @@ android {
         }
         izzyondroid {
             keyAlias System.getenv("IZZYONDROID_KS_ALIAS")
-            keyPassword System.getenv("IZZYONDROID_KS_KEY_PASSWORD")
+            keyPassword System.getenv("IZZYONDROID_KS_PASSWORD")
             storeFile file(String.valueOf(System.getenv("IZZYONDROID_KS_FILE")))
             storePassword System.getenv("IZZYONDROID_KS_PASSWORD")
         }
