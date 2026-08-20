@@ -32,7 +32,7 @@ class RethinkRemoteFileTagViewModel(private val rethinkRemoteDao: RethinkRemoteF
     ViewModel() {
 
     private val list: MutableLiveData<String> = MutableLiveData()
-    private var blocklistFilter: RethinkBlocklistFragment.Filters? = null
+    private var blocklistFilter: RethinkBlocklistViewModel.Filters? = null
 
     init {
         list.value = ""
@@ -46,24 +46,26 @@ class RethinkRemoteFileTagViewModel(private val rethinkRemoteDao: RethinkRemoteF
                 val subg = blocklistFilter?.subGroups ?: mutableSetOf()
 
                 if (subg.isNotEmpty()) {
-                    Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                    Pager(PagingConfig(LIVEDATA_PAGE_SIZE, enablePlaceholders = false)) {
                             rethinkRemoteDao.getRemoteFileTagsSubg(query, selected, subg)
                         }
                         .liveData
                         .cachedIn(viewModelScope)
                 } else {
-                    Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                    Pager(PagingConfig(LIVEDATA_PAGE_SIZE, enablePlaceholders = false)) {
                             rethinkRemoteDao.getRemoteFileTagsWithFilter(query, selected)
                         }
                         .liveData
                         .cachedIn(viewModelScope)
                 }
             } else if (input.isBlank()) {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) { rethinkRemoteDao.getRemoteFileTags() }
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE, enablePlaceholders = false)) {
+                        rethinkRemoteDao.getRemoteFileTags()
+                    }
                     .liveData
                     .cachedIn(viewModelScope)
             } else {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE, enablePlaceholders = false)) {
                         rethinkRemoteDao.getRemoteFileTagsWithFilter(
                             "%$input%",
                             getSelectedFilter()
@@ -77,7 +79,7 @@ class RethinkRemoteFileTagViewModel(private val rethinkRemoteDao: RethinkRemoteF
     private fun getSelectedFilter(): MutableSet<Int> {
         if (
             blocklistFilter?.filterSelected ==
-                RethinkBlocklistFragment.BlocklistSelectionFilter.SELECTED
+                RethinkBlocklistViewModel.BlocklistSelectionFilter.SELECTED
         ) {
             return mutableSetOf(1)
         }
@@ -92,7 +94,7 @@ class RethinkRemoteFileTagViewModel(private val rethinkRemoteDao: RethinkRemoteF
         list.value = searchText
     }
 
-    fun setFilter(filter: RethinkBlocklistFragment.Filters) {
+    fun setFilter(filter: RethinkBlocklistViewModel.Filters) {
         this.blocklistFilter = filter
         list.value = filter.query
     }

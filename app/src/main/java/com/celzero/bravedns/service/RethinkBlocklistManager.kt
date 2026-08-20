@@ -370,6 +370,8 @@ object RethinkBlocklistManager : KoinComponent {
     }
 
     suspend fun getStamp(fileValues: Set<Int>, type: RethinkBlocklistType): String {
+        if (fileValues.isEmpty()) return ""
+
         return try {
             val flags = convertListToCsv(fileValues)
             val rdns = getRDNS(type)

@@ -19,7 +19,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -35,7 +34,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class LocalSimpleViewAdapter(val context: Context) :
+class LocalSimpleViewAdapter(val context: Context, private val fragment: RethinkBlocklistFragment) :
     PagingDataAdapter<LocalBlocklistPacksMap, LocalSimpleViewAdapter.RethinkSimpleViewHolder>(
         DIFF_CALLBACK
     ) {
@@ -109,8 +108,9 @@ class LocalSimpleViewAdapter(val context: Context) :
             io {
                 RethinkBlocklistManager.updateFiletagsLocal(tagIds.toSet(), selected)
                 val selectedTags = RethinkBlocklistManager.getSelectedFileTagsLocal().toSet()
-                RethinkBlocklistFragment.updateFileTagList(selectedTags)
-                ui { notifyDataSetChanged() }
+                ui {
+                    fragment.updateFileTagList(selectedTags)
+                }
             }
         }
 
@@ -119,7 +119,8 @@ class LocalSimpleViewAdapter(val context: Context) :
 
             // check to show the title and desc, as of now these values are predefined so checking
             // with those pre defined values.
-            if (position == 0 || getItem(position - 1)?.group != map.group) {
+            val prevGroup = if (position > 0) peek(position - 1)?.group else null
+            if (position == 0 || prevGroup != map.group) {
                 b.crpTitleLl.visibility = View.VISIBLE
                 b.crpBlocktypeHeadingTv.text = getGroupName(map.group)
                 b.crpBlocktypeDescTv.text = getTitleDesc(map.group)
@@ -134,7 +135,7 @@ class LocalSimpleViewAdapter(val context: Context) :
                     map.blocklistIds.size.toString()
                 )
 
-            val selectedTags = RethinkBlocklistFragment.getSelectedFileTags()
+            val selectedTags = fragment.getSelectedFileTags()
             // enable the check box if the stamp contains all the values
             b.crpCheckBox.isChecked = selectedTags.containsAll(map.blocklistIds)
             setCardBackground(b.crpCard, b.crpCheckBox.isChecked)

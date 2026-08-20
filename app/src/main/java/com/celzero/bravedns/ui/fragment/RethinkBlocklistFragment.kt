@@ -15,8 +15,7 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_TAG_UI
+import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -29,6 +28,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.paging.filter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -41,7 +41,6 @@ import com.celzero.bravedns.adapter.LocalSimpleViewAdapter
 import com.celzero.bravedns.adapter.RemoteAdvancedViewAdapter
 import com.celzero.bravedns.adapter.RemoteSimpleViewAdapter
 import com.celzero.bravedns.customdownloader.LocalBlocklistCoordinator.Companion.CUSTOM_DOWNLOAD
-import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.FileTag
 import com.celzero.bravedns.databinding.FragmentRethinkBlocklistBinding
 import com.celzero.bravedns.download.AppDownloadManager
@@ -50,27 +49,23 @@ import com.celzero.bravedns.download.DownloadConstants.Companion.FILE_TAG
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.RethinkBlocklistManager.RethinkBlocklistType.Companion.getType
-import com.celzero.bravedns.service.RethinkBlocklistManager.getStamp
-import com.celzero.bravedns.service.RethinkBlocklistManager.getTagsFromStamp
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_NAME
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_TYPE
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_URL
 import com.celzero.bravedns.ui.bottomsheet.RethinkPlusFilterBottomSheet
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.DEAD_PACK
-import com.celzero.bravedns.util.Constants.Companion.DEFAULT_RDNS_REMOTE_DNS_NAMES
-import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
-import com.celzero.bravedns.util.Constants.Companion.RETHINK_STAMP_VERSION
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
-import com.celzero.bravedns.util.Utilities.getRemoteBlocklistStamp
 import com.celzero.bravedns.util.Utilities.hasLocalBlocklists
 import com.celzero.bravedns.util.Utilities.hasRemoteBlocklists
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.LocalBlocklistPacksMapViewModel
 import com.celzero.bravedns.viewmodel.RemoteBlocklistPacksMapViewModel
+import com.celzero.bravedns.viewmodel.RethinkBlocklistViewModel
 import com.celzero.bravedns.viewmodel.RethinkLocalFileTagViewModel
 import com.celzero.bravedns.viewmodel.RethinkRemoteFileTagViewModel
 import com.google.android.material.button.MaterialButton
@@ -82,7 +77,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.regex.Pattern
 
 class RethinkBlocklistFragment :
     Fragment(R.layout.fragment_rethink_blocklist), SearchView.OnQueryTextListener {
@@ -90,14 +84,8 @@ class RethinkBlocklistFragment :
 
     private val persistentState by inject<PersistentState>()
     private val appDownloadManager by inject<AppDownloadManager>()
-    private val appConfig by inject<AppConfig>()
 
-    private var type: RethinkBlocklistManager.RethinkBlocklistType =
-        RethinkBlocklistManager.RethinkBlocklistType.REMOTE
-    private var remoteName: String = ""
-    private var remoteUrl: String = ""
-
-    private val filters = MutableLiveData<Filters>()
+    private val viewModel: RethinkBlocklistViewModel by viewModel()
 
     private var advanceRemoteViewAdapter: RemoteAdvancedViewAdapter? = null
     private var advanceLocalViewAdapter: LocalAdvancedViewAdapter? = null
@@ -109,20 +97,7 @@ class RethinkBlocklistFragment :
     private val remoteBlocklistPacksMapViewModel: RemoteBlocklistPacksMapViewModel by viewModel()
     private val localBlocklistPacksMapViewModel: LocalBlocklistPacksMapViewModel by viewModel()
 
-    private var modifiedStamp: String = ""
-
-    enum class BlocklistSelectionFilter(val id: Int) {
-        ALL(0),
-        SELECTED(1)
-    }
-
-    class Filters {
-        var query: String = "%%"
-        var filterSelected: BlocklistSelectionFilter = BlocklistSelectionFilter.ALL
-        var subGroups: MutableSet<String> = mutableSetOf()
-    }
-
-    enum class BlocklistView(val tag: String) {
+    private enum class BlocklistView(val tag: String) {
         PACKS("1"),
         ADVANCED("2");
 
@@ -139,29 +114,16 @@ class RethinkBlocklistFragment :
         }
     }
 
+    fun updateFileTagList(fileTags: Set<Int>) {
+        viewModel.updateSelectedFileTags(fileTags)
+    }
+
+    fun getSelectedFileTags(): Set<Int> {
+        return viewModel.selectedFileTags.value ?: emptySet()
+    }
+
     companion object {
         fun newInstance() = RethinkBlocklistFragment()
-
-        private val selectedFileTags: MutableLiveData<MutableSet<Int>> = MutableLiveData()
-
-        fun updateFileTagList(fileTags: Set<Int>) {
-            selectedFileTags.postValue(fileTags.toMutableSet())
-        }
-
-        fun getSelectedFileTags(): Set<Int> {
-            return selectedFileTags.value ?: emptySet()
-        }
-
-        // base64 stamp: appears as a URL path segment, e.g. https://max.rethinkdns.com/1:IAAgAA==
-        // anchored with / before and end-of-string/. / ? / # after so it can't match mid-path
-        private val BASE64_STAMP_REGEX =
-            Pattern.compile("/1:([A-Za-z0-9+/=]+)(?:[.?#]|$)")
-
-        // base32 stamp: appears as a subdomain prefix, e.g. //1-acaabaa.max.rethinkdns.com
-        // or 1-acaabaa.max.rethinkdns.com (bare); an optional subdomain (max/sky) sits
-        // between the stamp and .rethinkdns.com
-        private val BASE32_STAMP_REGEX =
-            Pattern.compile("(?:^|//)1-([a-z2-7]+)(?:\\.[^/]+)?\\.rethinkdns\\.com")
     }
 
     override fun onCreateView(
@@ -170,15 +132,16 @@ class RethinkBlocklistFragment :
         savedInstanceState: Bundle?
     ): View? {
         val bundle = this.arguments
-        type =
+        val type =
             getType(
                 bundle?.getInt(
                     RETHINK_BLOCKLIST_TYPE,
                     RethinkBlocklistManager.RethinkBlocklistType.REMOTE.ordinal
                 ) ?: RethinkBlocklistManager.RethinkBlocklistType.REMOTE.ordinal
             )
-        remoteName = bundle?.getString(RETHINK_BLOCKLIST_NAME, "") ?: ""
-        remoteUrl = bundle?.getString(RETHINK_BLOCKLIST_URL, "") ?: ""
+        val remoteName = bundle?.getString(RETHINK_BLOCKLIST_NAME, "") ?: ""
+        val remoteUrl = bundle?.getString(RETHINK_BLOCKLIST_URL, "") ?: ""
+        viewModel.configure(type, remoteName, remoteUrl)
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
@@ -190,65 +153,38 @@ class RethinkBlocklistFragment :
         initClickListeners()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun initObservers() {
-        if (type.isLocal()) {
+        if (viewModel.isLocal()) {
             observeWorkManager()
         }
 
-        selectedFileTags.observe(viewLifecycleOwner) {
-            if (it == null) return@observe
-
-            io {
-                val recomputed = getStamp(it, type)
-                if (recomputed.isNotEmpty()) {
-                    modifiedStamp = recomputed
-                } else if (it.isNotEmpty()) {
-                    // RDNS unavailable (e.g. Remote DNS configured while the VPN
-                    // is stopped). Keep the previously known good stamp instead
-                    // of overwriting it with "" and losing the user's selection.
-                    // The authoritative selection set is `selectedFileTags`; the
-                    // stamp is recomputed at Apply time (see setStamp/Apply).
-                    Logger.w(
-                        LOG_TAG_UI,
-                        "skip stamp overwrite: ${it.size} tags selected but stamp encode failed for ${type.name}; keeping modifiedStamp='${modifiedStamp.take(32)}'"
-                    )
-                } else {
-                    // user genuinely cleared the selection
-                    modifiedStamp = recomputed
-                }
-            }
+        viewModel.selectedFileTags.observe(viewLifecycleOwner) {
+            localSimpleViewAdapter?.notifyDataSetChanged()
+            remoteSimpleViewAdapter?.notifyDataSetChanged()
         }
 
-        filters.observe(viewLifecycleOwner) {
+        viewModel.filters.observe(viewLifecycleOwner) {
             if (it == null) return@observe
 
-            if (type.isRemote()) {
+            if (viewModel.isRemote()) {
                 remoteFileTagViewModel.setFilter(it)
-                b.lbAdvancedRecycler.smoothScrollToPosition(0)
             } else {
                 localFileTagViewModel.setFilter(it)
-                b.lbAdvancedRecycler.smoothScrollToPosition(0)
             }
             updateFilteredTxtUi(it)
         }
     }
 
     private fun init() {
-        modifiedStamp = getStamp()
-
         val typeName =
-            if (type.isLocal()) {
+            if (viewModel.isLocal()) {
                 getString(R.string.lbl_on_device)
             } else {
                 getString(R.string.rdns_plus)
             }
         b.lbBlocklistApplyBtn.text =
             getString(R.string.ct_ip_details, getString(R.string.lbl_apply), typeName)
-
-        io {
-            val flags = getTagsFromStamp(modifiedStamp, type)
-            updateFileTagList(flags)
-        }
 
         // update ui based on blocklist availability
         hasBlocklist()
@@ -260,7 +196,7 @@ class RethinkBlocklistFragment :
         remakeFilterChipsUi()
     }
 
-    private fun updateFilteredTxtUi(filter: Filters) {
+    private fun updateFilteredTxtUi(filter: RethinkBlocklistViewModel.Filters) {
         if (filter.subGroups.isEmpty()) {
             b.lbAdvancedFilterLabelTv.text =
                 htmlToSpannedText(
@@ -298,7 +234,7 @@ class RethinkBlocklistFragment :
     }
 
     private fun hasBlocklists(): Boolean {
-        return if (type.isLocal()) {
+        return if (viewModel.isLocal()) {
             hasLocalBlocklists(requireContext(), persistentState.localBlocklistTimestamp)
         } else {
             hasRemoteBlocklists(requireContext(), persistentState.remoteBlocklistTimestamp)
@@ -306,11 +242,11 @@ class RethinkBlocklistFragment :
     }
 
     private fun showDownloadUi() {
-        if (type.isLocal()) {
+        if (viewModel.isLocal()) {
             b.lbDownloadLayout.visibility = View.VISIBLE
         } else {
             b.lbDownloadProgressRemote.visibility = View.VISIBLE
-            downloadBlocklist(type)
+            downloadBlocklist(viewModel.getType())
         }
     }
 
@@ -327,23 +263,12 @@ class RethinkBlocklistFragment :
         b.lbConfigureLayout.visibility = View.GONE
     }
 
-    private fun isStampChanged(): Boolean {
-        // no need to check on the stamp when the remote name is in the default list
-        // eg., rec, sec, pec etc
-        if (DEFAULT_RDNS_REMOTE_DNS_NAMES.contains(remoteName)) {
-            return false
-        }
-
-        // user modified the blocklists
-        return getStamp() != modifiedStamp
-    }
-
     private fun initClickListeners() {
         b.lbDownloadBtn.setOnClickListener {
             b.lbDownloadBtn.isEnabled = false
             b.lbDownloadBtn.isClickable = false
 
-            downloadBlocklist(type)
+            downloadBlocklist(viewModel.getType())
         }
 
         b.lbCancelDownloadBtn.setOnClickListener {
@@ -352,37 +277,14 @@ class RethinkBlocklistFragment :
         }
 
         b.lbBlocklistApplyBtn.setOnClickListener {
-            // update rethink stamp. Recompute from the authoritative selection
-            // set so that an empty `modifiedStamp` (caused by RDNS being briefly
-            // unavailable while toggling) does not discard the user's selections.
-            io {
-                val tags = getSelectedFileTags()
-                val stampToApply =
-                    if (modifiedStamp.isNotEmpty()) modifiedStamp
-                    else getStamp(tags, type).also { modifiedStamp = it }
-
-                if (stampToApply.isEmpty() && tags.isNotEmpty()) {
-                    Logger.w(
-                        LOG_TAG_UI,
-                        "Apply: cannot encode ${tags.size} selected tags for ${type.name}; stamp stays empty"
-                    )
-                }
-                uiCtx { setStamp(stampToApply); requireActivity().finish() }
-            }
+            viewModel.applyStamp()
+            requireActivity().finish()
         }
 
         b.lbBlocklistCancelBtn.setOnClickListener {
             // close the activity associated with the fragment after reverting to old stamp
-            io {
-                val stamp = getStamp()
-                val list = RethinkBlocklistManager.getTagsFromStamp(stamp, type)
-                updateSelectedFileTags(list.toMutableSet())
-                setStamp(stamp)
-                Logger.i(LOG_TAG_UI, "revert to old stamp for blocklist type: ${type.name}, $stamp, $list")
-                uiCtx {
-                    requireActivity().finish()
-                }
-            }
+            viewModel.revertStamp()
+            requireActivity().finish()
         }
 
         b.lbListToggleGroup.addOnButtonCheckedListener(listViewToggleListener)
@@ -395,7 +297,7 @@ class RethinkBlocklistFragment :
             // fixme: show dialog if the user selects/unselects from the list and try to close
             // the fragment before saving
 
-            if (!isStampChanged()) {
+            if (!viewModel.isStampChanged()) {
                 requireActivity().finish()
                 return@addCallback
             }
@@ -416,7 +318,7 @@ class RethinkBlocklistFragment :
             return
         }
 
-        proceedWithBlocklistDownload(type)
+        proceedWithBlocklistDownload()
     }
 
     private fun showLockdownDownloadDialog(type: RethinkBlocklistManager.RethinkBlocklistType) {
@@ -432,14 +334,14 @@ class RethinkBlocklistFragment :
         builder.setNegativeButton(R.string.lbl_cancel) { dialog, _ ->
             dialog.dismiss()
             // Proceed with Android download manager (useCustomDownloadManager stays false)
-            proceedWithBlocklistDownload(type)
+            proceedWithBlocklistDownload()
         }
         builder.create().show()
     }
 
-    private fun proceedWithBlocklistDownload(type: RethinkBlocklistManager.RethinkBlocklistType) {
+    private fun proceedWithBlocklistDownload() {
         ui {
-            if (type.isLocal()) {
+            if (viewModel.isLocal()) {
                 var status = AppDownloadManager.DownloadManagerStatus.NOT_STARTED
                 ioCtx {
                     status =
@@ -506,13 +408,8 @@ class RethinkBlocklistFragment :
         builder.setMessage(getString(R.string.rt_dialog_message))
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.lbl_apply)) { _, _ ->
-            io {
-                val tags = getSelectedFileTags()
-                val stampToApply =
-                    if (modifiedStamp.isNotEmpty()) modifiedStamp
-                    else getStamp(tags, type).also { modifiedStamp = it }
-                uiCtx { setStamp(stampToApply); requireActivity().finish() }
-            }
+            viewModel.applyStamp()
+            requireActivity().finish()
         }
         builder.setNeutralButton(getString(R.string.rt_dialog_neutral)) { _, _ ->
             // no-op
@@ -521,41 +418,6 @@ class RethinkBlocklistFragment :
             requireActivity().finish()
         }
         builder.create().show()
-    }
-
-    private fun setStamp(stamp: String?) {
-        Logger.i(LOG_TAG_UI, "set stamp for blocklist type: ${type.name} with $stamp")
-        if (stamp == null) {
-            Logger.i(LOG_TAG_UI, "stamp is null")
-            return
-        }
-
-        io {
-            val blocklistCount = getTagsFromStamp(stamp, type).size
-            if (type.isLocal()) {
-                persistentState.localBlocklistStamp = stamp
-                persistentState.numberOfLocalBlocklists = blocklistCount
-                persistentState.blocklistEnabled = true
-                Logger.i(LOG_TAG_UI, "set stamp for local blocklist with $stamp, $blocklistCount")
-            } else {
-                // set stamp for remote blocklist
-                appConfig.updateRethinkEndpoint(
-                    Constants.RETHINK_DNS_PLUS,
-                    getRemoteUrl(stamp),
-                    blocklistCount
-                )
-                appConfig.enableRethinkDnsPlus()
-                Logger.i(LOG_TAG_UI, "set stamp for remote blocklist with $stamp, $blocklistCount")
-            }
-        }
-    }
-
-    private fun getRemoteUrl(stamp: String): String {
-        return if (remoteUrl.contains(MAX_ENDPOINT)) {
-            Constants.RETHINK_BASE_URL_MAX + stamp
-        } else {
-            Constants.RETHINK_BASE_URL_SKY + stamp
-        }
     }
 
     private val listViewToggleListener =
@@ -599,16 +461,13 @@ class RethinkBlocklistFragment :
     }
 
     private fun setListAdapter() {
-        io {
-            processSelectedFileTags(getStamp())
-            uiCtx {
-                if (type.isLocal()) {
-                    setLocalAdapter()
-                } else {
-                    setRemoteAdapter()
-                }
-                showList(b.lbSimpleToggleBtn.tag.toString())
+        ui {
+            if (viewModel.isLocal()) {
+                setLocalAdapter()
+            } else {
+                setRemoteAdapter()
             }
+            showList(b.lbSimpleToggleBtn.tag.toString())
         }
     }
 
@@ -646,128 +505,37 @@ class RethinkBlocklistFragment :
     }
 
     private fun setSimpleAdapter() {
-        if (type.isLocal()) {
+        if (viewModel.isLocal()) {
             setLocalSimpleViewAdapter()
         } else {
             setRemoteSimpleViewAdapter()
         }
     }
 
-    private suspend fun processSelectedFileTags(stamp: String) {
-        val list = RethinkBlocklistManager.getTagsFromStamp(stamp, type)
-        updateSelectedFileTags(list.toMutableSet())
-    }
-
-    private suspend fun updateSelectedFileTags(selectedTags: MutableSet<Int>) {
-        // clear the residues if the selected tags are empty
-        if (selectedTags.isEmpty()) {
-            if (type.isLocal()) {
-                RethinkBlocklistManager.clearTagsSelectionLocal()
-            } else {
-                RethinkBlocklistManager.clearTagsSelectionRemote()
-            }
-            return
-        }
-
-        if (type.isLocal()) {
-            RethinkBlocklistManager.clearTagsSelectionLocal()
-            RethinkBlocklistManager.updateFiletagsLocal(selectedTags, 1 /* isSelected: true */)
-            val list = RethinkBlocklistManager.getSelectedFileTagsLocal().toSet()
-            // guard: never replace a non-empty selection with an empty read
-            // (happens when the stamp contained a phantom "0" or when RDNS was
-            // unavailable while decoding). Keep the caller's selection intact.
-            updateFileTagList(if (list.isEmpty()) selectedTags.toSet() else list)
-        } else {
-            RethinkBlocklistManager.clearTagsSelectionRemote()
-            RethinkBlocklistManager.updateFiletagsRemote(selectedTags, 1 /* isSelected: true */)
-            val list = RethinkBlocklistManager.getSelectedFileTagsRemote().toSet()
-            updateFileTagList(if (list.isEmpty()) selectedTags.toSet() else list)
-        }
-    }
-
-    private fun getStamp(): String {
-        return if (type.isLocal()) {
-            persistentState.localBlocklistStamp
-        } else {
-            getRemoteBlocklistStamp(remoteUrl)
-        }
-    }
-
     override fun onQueryTextSubmit(query: String): Boolean {
-        if (isRethinkStampSearch(query)) {
-            return false
+        if (viewModel.isRethinkStampSearch(query)) {
+            viewModel.restoreStamp(query)
+            showToastUiCentered(requireContext(), "Blocklists restored", Toast.LENGTH_SHORT)
+            return true
         }
-        addQueryToFilters(query)
+        viewModel.addQueryToFilters(query)
         return false
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        if (isRethinkStampSearch(query)) {
+        if (viewModel.isRethinkStampSearch(query)) {
             return false
         }
-        addQueryToFilters(query)
+        viewModel.addQueryToFilters(query)
         return false
     }
 
-    private fun isRethinkStampSearch(t: String): Boolean {
-        Logger.vv(LOG_TAG_UI, "isRethinkStampSearch: $t")
-        // do not proceed if rethinkdns.com is not available
-        if (!t.contains(Constants.RETHINKDNS_DOMAIN)) {
-            Logger.d(LOG_TAG_UI, "rethinkdns.com is not available")
-            return false
-        }
-
-        val stamp = extractStamp(t) ?: return false
-
-        io { processSelectedFileTags(stamp) }
-        showToastUiCentered(requireContext(), "Blocklists restored", Toast.LENGTH_SHORT)
-        return true
-    }
-
-    private fun extractStamp(t: String): String? {
-        Logger.vv(LOG_TAG_UI, "extractStamp: $t")
-        // format 1: https://max.rethinkdns.com/1:IAAgAA== (base64 after ":")
-        // format 2: //1-acaabaa.max.rethinkdns.com (base32 after "-")
-        val base64Match = BASE64_STAMP_REGEX.matcher(t)
-        if (base64Match.find()) {
-            Logger.d(LOG_TAG_UI, "extract base64 stamp: ${base64Match.group(1)}")
-            return "$RETHINK_STAMP_VERSION:${base64Match.group(1)}"
-        }
-
-        val base32Match = BASE32_STAMP_REGEX.matcher(t)
-        if (base32Match.find()) {
-            Logger.d(LOG_TAG_UI, "extract base32 stamp: ${base32Match.group(1)}")
-            return "$RETHINK_STAMP_VERSION-${base32Match.group(1)}"
-        }
-
-        Logger.d(LOG_TAG_UI, "extract stamp failed for $t")
-        return null
-    }
-
-    fun filterObserver(): MutableLiveData<Filters> {
-        return filters
-    }
-
-    private fun addQueryToFilters(query: String) {
-        val a = filterObserver()
-        if (a.value == null) {
-            val temp = Filters()
-            temp.query = formatQuery(query)
-            filters.postValue(temp)
-            return
-        }
-
-        // asserting, as there is a null check
-        a.value!!.query = formatQuery(query)
-        filters.postValue(a.value)
-    }
-
-    private fun formatQuery(q: String): String {
-        return "%$q%"
+    fun filterObserver(): MutableLiveData<RethinkBlocklistViewModel.Filters> {
+        return viewModel.filters
     }
 
     private fun setLocalSimpleViewAdapter() {
-        localSimpleViewAdapter = LocalSimpleViewAdapter(requireContext())
+        localSimpleViewAdapter = LocalSimpleViewAdapter(requireContext(), this)
         val layoutManager = LinearLayoutManager(requireContext())
         b.lbSimpleRecyclerPacks.layoutManager = layoutManager
 
@@ -780,7 +548,7 @@ class RethinkBlocklistFragment :
     }
 
     private fun setRemoteSimpleViewAdapter() {
-        remoteSimpleViewAdapter = RemoteSimpleViewAdapter(requireContext())
+        remoteSimpleViewAdapter = RemoteSimpleViewAdapter(requireContext(), this)
         val layoutManager = LinearLayoutManager(requireContext())
         b.lbSimpleRecyclerPacks.layoutManager = layoutManager
 
@@ -795,10 +563,10 @@ class RethinkBlocklistFragment :
     private fun remakeFilterChipsUi() {
         b.filterChipGroup.removeAllViews()
 
-        val all = makeChip(BlocklistSelectionFilter.ALL.id, getString(R.string.lbl_all), true)
+        val all = makeChip(RethinkBlocklistViewModel.BlocklistSelectionFilter.ALL.id, getString(R.string.lbl_all), true)
         val selected =
             makeChip(
-                BlocklistSelectionFilter.SELECTED.id,
+                RethinkBlocklistViewModel.BlocklistSelectionFilter.SELECTED.id,
                 getString(R.string.rt_filter_parent_selected),
                 false
             )
@@ -823,17 +591,9 @@ class RethinkBlocklistFragment :
     }
 
     private fun applyFilter(tag: Any) {
-        val a = filterObserver().value ?: Filters()
-
-        when (tag) {
-            BlocklistSelectionFilter.ALL.id -> {
-                a.filterSelected = BlocklistSelectionFilter.ALL
-            }
-            BlocklistSelectionFilter.SELECTED.id -> {
-                a.filterSelected = BlocklistSelectionFilter.SELECTED
-            }
+        if (tag is Int) {
+            viewModel.applySelectionFilter(tag)
         }
-        filters.postValue(a)
     }
 
     private fun openFilterBottomSheet() {
@@ -844,7 +604,7 @@ class RethinkBlocklistFragment :
     }
 
     private suspend fun getAllList(): List<FileTag> {
-        return if (type.isLocal()) {
+        return if (viewModel.isLocal()) {
             localFileTagViewModel.allFileTags()
         } else {
             remoteFileTagViewModel.allFileTags()
@@ -854,12 +614,17 @@ class RethinkBlocklistFragment :
     private fun setRemoteAdapter() {
         if (advanceRemoteViewAdapter != null) return
 
-        advanceRemoteViewAdapter = RemoteAdvancedViewAdapter(requireContext())
+        advanceRemoteViewAdapter = RemoteAdvancedViewAdapter(requireContext(), this)
         val layoutManager = LinearLayoutManager(requireContext())
         b.lbAdvancedRecycler.layoutManager = layoutManager
 
         remoteFileTagViewModel.remoteFileTags.observe(viewLifecycleOwner) {
-            advanceRemoteViewAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
+            advanceRemoteViewAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
+        }
+        advanceRemoteViewAdapter?.addLoadStateListener { loadState ->
+            if (loadState.refresh is LoadState.NotLoading) {
+                b.lbAdvancedRecycler.scrollToPosition(0)
+            }
         }
         b.lbAdvancedRecycler.adapter = advanceRemoteViewAdapter
         setupRecyclerScrollListener(b.lbAdvancedRecycler, BlocklistView.ADVANCED)
@@ -868,19 +633,24 @@ class RethinkBlocklistFragment :
         // ref:
         // https://stackoverflow.com/questions/32949971/how-can-i-make-sticky-headers-in-recyclerview-without-external-lib
         /*b.lbAdvancedRecycler.addItemDecoration(HeaderItemDecoration(b.lbAdvancedRecycler) { itemPosition ->
-            itemPosition >= 0 && itemPosition < advanceRemoteListAdapter!!.itemCount
+            itemPosition >= 0 && itemPosition < advanceRemoteListAdapter?.itemCount
         })*/
     }
 
     private fun setLocalAdapter() {
         if (advanceLocalViewAdapter != null) return
 
-        advanceLocalViewAdapter = LocalAdvancedViewAdapter(requireContext())
+        advanceLocalViewAdapter = LocalAdvancedViewAdapter(requireContext(), this)
         val layoutManager = LinearLayoutManager(requireContext())
         b.lbAdvancedRecycler.layoutManager = layoutManager
 
         localFileTagViewModel.localFiletags.observe(viewLifecycleOwner) {
-            advanceLocalViewAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
+            advanceLocalViewAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
+        }
+        advanceLocalViewAdapter?.addLoadStateListener { loadState ->
+            if (loadState.refresh is LoadState.NotLoading) {
+                b.lbAdvancedRecycler.scrollToPosition(0)
+            }
         }
         b.lbAdvancedRecycler.adapter = advanceLocalViewAdapter
         setupRecyclerScrollListener(b.lbAdvancedRecycler, BlocklistView.ADVANCED)

@@ -34,7 +34,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class RemoteAdvancedViewAdapter(val context: Context) :
+class RemoteAdvancedViewAdapter(val context: Context, private val fragment: RethinkBlocklistFragment) :
     PagingDataAdapter<
         RethinkRemoteFileTag,
         RemoteAdvancedViewAdapter.RethinkRemoteFileTagViewHolder
@@ -127,7 +127,8 @@ class RemoteAdvancedViewAdapter(val context: Context) :
                     mIconIndicator.setBackgroundColor(color)
                 }
                 else -> {
-                    /* no-op */
+                    val color = fetchColor(context, R.attr.background)
+                    mIconIndicator.setBackgroundColor(color)
                 }
             }
         }
@@ -168,12 +169,13 @@ class RemoteAdvancedViewAdapter(val context: Context) :
                 filetag.isSelected = selected
                 RethinkBlocklistManager.updateFiletagRemote(filetag)
                 val list = RethinkBlocklistManager.getSelectedFileTagsRemote().toSet()
-                RethinkBlocklistFragment.updateFileTagList(list)
+                fragment.updateFileTagList(list)
             }
         }
 
         private fun displayHeaderIfNeeded(filetag: RethinkRemoteFileTag, position: Int) {
-            if (position == 0 || getItem(position - 1)?.group != filetag.group) {
+            val prevGroup = if (position > 0) peek(position - 1)?.group else null
+            if (position == 0 || prevGroup != filetag.group) {
                 b.crpTitleLl.visibility = View.VISIBLE
                 b.crpBlocktypeHeadingTv.text = getGroupName(filetag.group)
                 b.crpBlocktypeDescTv.text = getTitleDesc(filetag.group)

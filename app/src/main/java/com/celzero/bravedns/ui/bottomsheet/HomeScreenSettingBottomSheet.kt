@@ -34,6 +34,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.BottomSheetHomeScreenBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
@@ -67,6 +68,7 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     private val appConfig by inject<AppConfig>()
     private val persistentState by inject<PersistentState>()
     private val eventLogger by inject<EventLogger>()
+    private val rdb by inject<RefreshDatabase>()
 
     private lateinit var animation: Animation
 
@@ -234,6 +236,7 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
                     // completes almost instantly
                     val start = System.currentTimeMillis()
                     ioCtx {
+                        rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE)
                         VpnController.refreshResolvers()
                         VpnController.refreshProxies()
                     }
