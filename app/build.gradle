@@ -168,6 +168,12 @@ android {
             storeFile file(String.valueOf(System.getenv("ALPHA_KS_FILE"))) // rdnsAlpha.jks in app/
             storePassword System.getenv("ALPHA_KS_STORE_PASSPHRASE")
         }
+        izzyondroid {
+            keyAlias System.getenv("IZZYONDROID_KS_ALIAS")
+            keyPassword System.getenv("IZZYONDROID_KS_KEY_PASSWORD")
+            storeFile file(String.valueOf(System.getenv("IZZYONDROID_KS_FILE")))
+            storePassword System.getenv("IZZYONDROID_KS_PASSWORD")
+        }
     }
 
     // https://developer.android.com/studio/build/configure-apk-splits
@@ -203,7 +209,6 @@ android {
                     // ABI-specific output: assign the correct per-ABI version code
                     // eg for arm64-v8a: 3 * 10000000 + versionCode
                     def v = project.ext.versionCodes.get(abi) * 10000000 + output.versionCode.get()
-                    println("versionCode: $v")
                     output.versionCode.set(v)
                 } else {
                     // universal APK: preserve existing production behaviour (arm64-v8a multiplier)
@@ -215,7 +220,6 @@ android {
                        ?.filters?.find { it.filterType == FilterConfiguration.FilterType.ABI }?.identifier */
                     def multiplier = firstAbi != null ? project.ext.versionCodes.get(firstAbi) : project.ext.versionCodes.get('arm64-v8a')
                     def v = multiplier * 10000000 + output.versionCode.get()
-                    println("univ-versionCode: $v")
                     output.versionCode.set(v)
                 }
             }
@@ -241,6 +245,11 @@ android {
                     // Enable processing and uploading of native symbols to Firebase servers.
                     nativeSymbolUploadEnabled true
                 }
+            }
+            if (isWebsiteDegoogled) {
+                signingConfig signingConfigs.izzyondroid
+            } else {
+                signingConfig signingConfigs.config
             }
         }
         leakCanary {

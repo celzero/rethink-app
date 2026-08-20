@@ -34,7 +34,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class LocalAdvancedViewAdapter(val context: Context) :
+class LocalAdvancedViewAdapter(val context: Context, private val fragment: RethinkBlocklistFragment) :
     PagingDataAdapter<RethinkLocalFileTag, LocalAdvancedViewAdapter.RethinkLocalFileTagViewHolder>(
         DIFF_CALLBACK
     ) {
@@ -125,7 +125,8 @@ class LocalAdvancedViewAdapter(val context: Context) :
                     mIconIndicator.setBackgroundColor(color)
                 }
                 else -> {
-                    /* no-op */
+                    val color = fetchColor(context, R.attr.background)
+                    mIconIndicator.setBackgroundColor(color)
                 }
             }
         }
@@ -167,12 +168,13 @@ class LocalAdvancedViewAdapter(val context: Context) :
                 filetag.isSelected = selected
                 RethinkBlocklistManager.updateFiletagLocal(filetag)
                 val list = RethinkBlocklistManager.getSelectedFileTagsLocal().toSet()
-                RethinkBlocklistFragment.updateFileTagList(list)
+                fragment.updateFileTagList(list)
             }
         }
 
         private fun displayHeaderIfNeeded(filetag: RethinkLocalFileTag, position: Int) {
-            if (position == 0 || getItem(position - 1)?.group != filetag.group) {
+            val prevGroup = if (position > 0) peek(position - 1)?.group else null
+            if (position == 0 || prevGroup != filetag.group) {
                 b.crpTitleLl.visibility = View.VISIBLE
                 b.crpBlocktypeHeadingTv.text = getGroupName(filetag.group)
                 b.crpBlocktypeDescTv.text = getTitleDesc(filetag.group)

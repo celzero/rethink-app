@@ -37,7 +37,7 @@ class RemoteBlocklistPacksMapViewModel(
 
     val simpleTags =
         filter.switchMap {
-            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE, enablePlaceholders = false)) {
                     remoteBlocklistPacksMapDao.getTags()
                 }
                 .liveData
