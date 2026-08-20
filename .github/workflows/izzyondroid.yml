@@ -52,7 +52,7 @@ jobs:
           ./gradlew ${IZZY_BUILD_VARIANT} -PwebsiteDegoogled=true --info --warning-mode all
         env:
           IZZYONDROID_KS_ALIAS: ${{ vars.IZZYONDROID_KS_ALIAS }}
-          IZZYONDROID_KS_FILE: app/rethinkIzzyOnDroid.jks
+          IZZYONDROID_KS_FILE: rethinkIzzyOnDroid.jks
           IZZYONDROID_KS_PASSWORD: ${{ secrets.IZZYONDROID_KS_PASSWORD }}
           IZZYONDROID_KS_KEY_PASSWORD: ${{ secrets.IZZYONDROID_KS_KEY_PASSWORD }}
 
