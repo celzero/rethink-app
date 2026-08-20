@@ -1,0 +1,30 @@
+Pozdravte bezpečnější, transparentní a zabezpečený Android.
+
+VPN: Připojuje k více WireGuard VPN dle vašeho výběru.
+
+Bezpečnost: Odhaluje síťovou aktivitu nainstalovaných aplikací a umožňuje je zakázat, odinstalovat nebo zablokovat bránou firewall.
+
+Zabezpečení: První linie obrany proti spywaru, ransomwaru a malwaru, které kradou osobní údaje a přebírají účty. Chrání před manipulací DNS, běžně používanou k cenzuře webových stránek, sociálních sítí a messengerů.
+
+Rychlost: DNS servery rozmístěné na 300+ místech po celém světě zajišťují maximální rychlost a dostupnost internetu.
+
+Otevřenost: Open source a bez jakýchkoli sledovacích prvků.
+
+***Funkce***
+
+Firewall: Zabraňte aplikacím v připojení k internetu. Blokujte spyware, malware, ransomware a další.
+     
+Firewall blokuje jakoukoli aplikaci připojující se k internetu přes WiFi nebo mobilní data. Jelikož většina forem sledování vyžaduje odeslání dat přes síť na server, jejich zablokování efektivně eliminuje hrozbu (Správce souborů, Budík, Kalkulačka jsou příklady aplikací, které k fungování nepotřebují přístup k internetu). Funkce firewall využívá Accessibility Service k detekci a blokování aplikací na pozadí.
+Monitorování: Sledujte příchozí a odchozí internetový provoz.
+
+Pokud je povoleno, protokoly připojení jsou shromažďovány a analyzovány. Automatizované zprávy označují dříve neznámá nebo podezřelá připojení a odhalují rozsah pokusů o krádež dat ze strany spywarových sítí. V našich testech bylo přibližně 60 % provozu označeno a nahlášeno jako iniciováno známým spywarem. Vygenerované protokoly jsou uživateli k dispozici téměř v reálném čase pro vlastní analýzu.
+
+WireGuard: Zabezpečte odchozí internetový provoz.
+
+Aplikace využívá rychlý, moderní, odlehčený a bezpečný protokol WireGuard k šifrování odchozích připojení k jakémukoli kompatibilnímu VPN poskytovateli dle vašeho výběru.
+
+Ochrana proti cenzuře:
+
+Aplikace šifruje vaše internetové připojení k serveru Domain Name System (DNS) provozovanému společností Rethink, přítomné na 300+ místech po celém světě. DNS servery jsou adresářem internetu: DNS server poskytuje přesné adresy potřebné k návštěvě webové stránky nebo spuštění aplikace.
+
+Monitor dat: Sledujte spotřebu mobilních nebo WiFi dat pro jednotlivé aplikace a připojení.
