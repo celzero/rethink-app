@@ -369,7 +369,7 @@
     <string name="ada_app_status_isolate">ist isoliert; nur vertrauenswürdige IPs und Domains erlaubt</string>
     <string name="ada_app_status_unknown">ist unbekannt</string>
     <string name="ada_app_status_whitelist">umgeht die universellen Firewall-Regeln</string>
-    <string name="rbl_parental_control" description="The text appears as part of the blocklist setup screen as categories or headlines">Elterliche Kontrolle</string>
+    <string name="rbl_parental_control" description="The text appears as part of the blocklist setup screen as categories or headlines">Kindersicherung</string>
     <string name="rbl_privacy" description="The text appears as part of the blocklist setup screen as categories or headlines">Datenschutz</string>
     <string name="notif_download_cancel_content">Download abgebrochen.</string>
     <string name="notif_download_success_content">Download erfolgreich.</string>
@@ -896,7 +896,7 @@
     <string name="include_all_app_wg_dialog_desc">Alle Apps durch diesen Tunnel tunneln?</string>
     <string name="key_length_error" translatable="true">Falsche Schlüssellänge</string>
     <string name="config_delete_dialog_title">Konfiguration löschen</string>
-    <string name="logs_card_duration" translatable="true">da %1$s</string>
+    <string name="logs_card_duration" translatable="true">seit %1$s</string>
     <string name="config_delete_dialog_desc">Bist du sicher, dass du diese Konfiguration löschen möchten?</string>
     <string name="new_warp_config_desc" translatable="true">WARP-Konfiguration vom Server abrufen</string>
     <string name="parse_error_generic" translatable="true">Zeichenkette</string>
@@ -1179,4 +1179,9 @@
     <string name="fs_configure_apps_desc" translatable="true">Firewallregeln und Netzwerkrichtlinien pro App</string>
     <string name="lbl_grace_period" translatable="true">Gnadenfrist</string>
     <string name="lbl_expires_on" translatable="true">Gültig bis</string>
+    <string name="lbl_notes" translatable="true">Notizen</string>
+    <string name="hint_notes" translatable="true">Notizen über die App hinzufügen</string>
+    <string name="ctbs_note_char_counter" translatable="true">%1$d/%2$d</string>
+    <string name="ctbs_app_notes_too_long" translatable="true">Notizen dürfen maximal 500 Zeichen lang sein</string>
+    <string name="ip_mismatch_notification_content" translatable="true">Dein ausgewähltes IP-Protokoll steht in dem aktuellen Netzwerk nicht zur Verfügung. Wechsle zum Modus „IPv4 &amp; IPv6“ oder „Auto“, um verbunden zu bleiben.</string>
 </resources>
