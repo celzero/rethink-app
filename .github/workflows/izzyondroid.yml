@@ -72,7 +72,6 @@ jobs:
           IZZYONDROID_KS_ALIAS: ${{ vars.IZZYONDROID_KS_ALIAS }}
           IZZYONDROID_KS_FILE: rethinkIzzyOnDroid.jks
           IZZYONDROID_KS_PASSWORD: ${{ secrets.IZZYONDROID_KS_PASSWORD }}
-          IZZYONDROID_KS_KEY_PASSWORD: ${{ secrets.IZZYONDROID_KS_KEY_PASSWORD }}
 
       # Find the APK generated
       - name: Find
