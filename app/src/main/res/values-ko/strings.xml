@@ -176,7 +176,7 @@
     <string name="settings_socks5_vpn_disabled_error" translatable="true">계속하려면 Rethink를 시작하세요.</string>
     <string name="settings_https_disabled_error" translatable="true">%1$s에 연결되었습니다. 계속하려면 끄세요.</string>
     <string name="settings_orbot_notification_content" translatable="true">프록시로 Tor 사용 시작이 실패했습니다. Orbot 앱을 열어 수동으로 시작해주세요.</string>
-    <string name="settings_network_all_networks" translatable="true">사용 가능한 모든 네트워크 사용 (실험적)</string>
+    <string name="settings_network_all_networks" translatable="true">사용 가능한 모든 네트워크 사용</string>
     <string name="settings_app_notification_a13_desc" translatable="true">이 앱의 알림 권한을 활성화 하기</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">알림을 지속적으로 만들기</string>
     <string name="settings_theme_heading" translatable="true">외관</string>
@@ -322,7 +322,7 @@
     <string name="show_logs_disabled_dns_message" translatable="true">DNS 요청 로깅이 비활성화 되었습니다. 다시 활성화하려면 <i>설정</i>으로 이동하여 <i>기기 내 로깅 활성화</i>를 켜세요</string>
     <string name="http_proxy_dialog_desc" translatable="true">다음 양식의 URL을 설정하세요, &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt;. 예시: http://proxy.example.com:8080/</string>
     <string name="search_firewall_all_apps" translatable="true"><font size="12">uid, 이름으로 앱 검색</font></string>
-    <string name="settings_allow_lan_heading" translatable="true">사설 IP를 라우팅 하지 않기 (실험적)</string>
+    <string name="settings_allow_lan_heading" translatable="true">사설 IP를 라우팅하지 않기</string>
     <string name="settings_lock_down_mode_desc" translatable="true">VPN이 락다운 모드일 때 특정 옵션이 꺼집니다. <u>VPN 설정을 보세요</u>.</string>
     <string name="orbot_stop_dialog_dns_message" translatable="true">Rethink는 Orbot으로 DNS 쿼리를 포워딩하게 설정되었습니다. 필요하다면 변경하세요.</string>
     <string name="orbot_explanation" translatable="true">Orbot은 다른 앱이 인터넷을 더 &lt;u&gt;안전하게&lt;/u&gt; 사용할 수 있도록 지원하는 무료 프록시 앱입니다.\nOrbot은 &lt;u&gt;Tor&lt;/u&gt;로 인터넷 트래픽을 암호화하여 &lt;u&gt;검열을 우회&lt;/u&gt;하고 개인의 자유와 사생활을 위협하는 &lt;u&gt;네트워크 감시&lt;/u&gt;로부터 방어할 수 있습니다.\n&lt;u&gt;TCP 프록시&lt;/u&gt;: Rethink는 &lt;i&gt;포함된&lt;/i&gt; 앱의 TCP 연결만 Orbot으로 전달합니다.\n&lt;u&gt;HTTP 프록시&lt;/u&gt;: Rethink는 Orbot으로 HTTP CONNECT 터널을 &lt;i&gt;설정&lt;/i&gt;하고 &lt;i&gt;포함된&lt;/i&gt; 앱의 TCP 연결만 전달합니다.</string>
@@ -377,7 +377,7 @@
     <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
     <string name="settings_socks5_dialog_hint_username" translatable="true">사용자이름 (선택)</string>
     <string name="settings_theme_dialog_themes_3" translatable="true">어둡게</string>
-    <string name="settings_ip_dialog_ipv46" translatable="true">자동 (실험적)</string>
+    <string name="settings_ip_dialog_ipv46" translatable="true">자동</string>
     <string name="settings_notification_desc1" translatable="true">일시 정지/중지(기본값)</string>
     <string name="firewall_status_whitelisted" translatable="true">전역 방화벽 규칙 우회</string>
     <string name="firewall_act_universal_tab" translatable="true">전역</string>
@@ -411,7 +411,7 @@
     <string name="settings_theme_dialog_themes_4" translatable="true">검정</string>
     <string name="settings_ip_dialog_title" translatable="true">IP 버전 선택</string>
     <string name="settings_ip_dialog_ipv4" translatable="true">IPv4(기본값)</string>
-    <string name="settings_ip_dialog_ipv6" translatable="true">IPv6(실험적)</string>
+    <string name="settings_ip_dialog_ipv6" translatable="true">IPv6</string>
     <string name="settings_ip_text_ipv4" translatable="true">IPv4</string>
     <string name="settings_ip_text_ipv46" translatable="true">자동</string>
     <string name="settings_notification_heading" translatable="true">알림 작업 선택</string>
@@ -469,7 +469,7 @@
     <string name="dc_local_block_desc_1" translatable="true">195개 이상의 차단 목록 중에서 선택하세요. 차단 목록을 다운로드하거나 구성하려면 여기를 클릭하십시오.</string>
     <string name="dc_custom_block_heading" translatable="true">도메인 규칙</string>
     <string name="dc_local_block_heading" translatable="true">기기 내 차단 목록</string>
-    <string name="dc_dns_website_heading" translatable="true">DNS 로그에 웹사이트 아이콘 표시(실험)</string>
+    <string name="dc_dns_website_heading" translatable="true">DNS 로그에 웹사이트 아이콘 표시</string>
     <string name="dc_dns_website_desc" translatable="true"><i>nextdns.io</i> 및 <i>duckduckgo.com</i>에서 웹사이트 아이콘을 가져옵니다. 최대 350MB의 디스크 공간을 사용합니다</string>
     <string name="dc_dns_leaks_heading" translatable="true">DNS 유출 방지</string>
     <string name="dc_dns_leaks_desc" translatable="true">활성화되면, Rethink는 포트 53에서 모든 패킷을 캡처하고 사용자가 설정한 DNS 엔드포인트로 전달합니다</string>
@@ -1117,7 +1117,7 @@
     <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[이 연결은 <i>소스 앱</i>에 <i>프록시 우회</i> 규칙이 설정되었기 때문에 허용되었습니다.<br/><br/> 변경하려면 <i>앱별 방화벽</i> 화면으로 이동하세요.]]></string>
     <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[이 연결은 앱에 대한 <i>프록시</i>가 선택되지 않았기 때문에 차단되었습니다.<br/><br/> 변경하려면 <i>설정</i> 화면에서 <i>프록시</i>로 이동합니다.]]></string>
     <plurals name="server_count">
-        <item quantity="other">서버 %1$d개</item>
+        <item quantity="other">위치 %1$d곳</item>
     </plurals>
     <string name="tour_step_counter">%1$d / %2$d</string>
     <plurals name="peer_count">
@@ -1178,4 +1178,35 @@
     <string name="rpn_recovery_desc" translatable="true">서버를 등록하거나 가져올 수 없습니다. VPN이 연결되었는지 확인하고 다시 시도하세요. 계속 실패한다면, 서버를 제거했다가 다시 추가해 보세요.</string>
     <string name="use_bootstrap_dns_to_bypass" translatable="true">우회 시 부트스트랩 DNS 사용</string>
     <string name="settings_rinr_btmsht_desc" translatable="true">루프백 모드에서는, Rethink가 자체 네트워크 트래픽을 재라우팅할 수 있습니다. 즉 다른 일반 애플리케이션처럼 Rethink에도 자체 트래픽에 IP 및 도메인 규칙, 전역 방화벽 규칙, 프록시 규칙을 적용할 수 있습니다. 루프백 모드는 사용자에게 더 많은 제어 권한을 주지만, 항상 원하는 대로 동작하지 않을 수도 있습니다.\n\n\nRethink를 방화벽, DNS, 프록시 규칙에서 제외하는 것이 좋습니다. 이렇게 해도 네트워크 모니터링이나 로깅에는 영향을 끼치지 않고, 규칙만 변경됩니다.\n\n\n지금은, 루프백 모드에서 프록시 락다운이 강제되지 않습니다.</string>
+    <string name="bsdl_app_block_desc" translatable="true">이 앱에서 &lt;u&gt;이 도메인&lt;/u&gt; 차단, 신뢰</string>
+    <string name="wireguard_dns_mode_conflict" translatable="true">DNS 전용 모드에서는 WireGuard를 켤 수 없습니다. 방화벽 또는 DNS+방화벽 모드로 전환하십시오.</string>
+    <string name="wireguard_invalid_config_title" translatable="true">잘못된 WireGuard 설정</string>
+    <string name="wireguard_invalid_config_message" translatable="true">선택한 WireGuard 설정이 잘못되었거나 누락되었습니다. 설정을 편집하거나 다시 가져온 뒤 다시 시도하세요.</string>
+    <string name="wireguard_replaced_active_config" translatable="true">이전에 사용하던 WireGuard 설정을 대체함</string>
+    <string name="rpn_desc_one" translatable="true">무제한 대역폭 • 도시 100곳 이상</string>
+    <string name="rpn_desc_two" translatable="true">한 번에 최대 5곳 이상의 도시에 연결</string>
+    <string name="rpn_desc_three" translatable="true">광고 없이 탐색</string>
+    <string name="rpn_desc_four" translatable="true">멀티홉 • 이중 암호화</string>
+    <string name="hsf_local_network_permission_dialog_heading" translatable="true">로컬 네트워크 권한</string>
+    <string name="hsf_local_network_permission_dialog_message" translatable="true">%1$s의 일부 기능이 작동하려면 로컬 네트워크 권한이 필요합니다. VPN이 비활성화되었습니다. 앱 설정에서 권한을 부여한 뒤 다시 시도하세요.</string>
+    <string name="wireguard_one_wg_active_conflict" translatable="true">단일 WireGuard 설정을 사용 중입니다. 개별 WireGuard 설정을 사용하기 전 비활성화하세요.</string>
+    <string name="lbl_notes" translatable="true">노트</string>
+    <string name="hint_notes" translatable="true">이 앱에 대한 노트 추가</string>
+    <string name="ctbs_note_char_counter" translatable="true">%1$d/%2$d</string>
+    <string name="ctbs_app_notes_too_long" translatable="true">노트는 최대 500자입니다</string>
+    <string name="ctbs_app_notes_save_failed" translatable="true">노트 저장 실패</string>
+    <string name="settings_log_lifespan_heading" translatable="true">로그 보관 기간</string>
+    <string name="settings_log_lifespan_desc_default" translatable="true">7일 (기본값)</string>
+    <string name="settings_log_lifespan_dialog_option_0" translatable="true">1시간</string>
+    <string name="settings_log_lifespan_dialog_option_1" translatable="true">3시간</string>
+    <string name="settings_log_lifespan_dialog_option_2" translatable="true">6시간</string>
+    <string name="settings_log_lifespan_dialog_option_3" translatable="true">12시간</string>
+    <string name="settings_log_lifespan_dialog_option_4" translatable="true">1일</string>
+    <string name="settings_log_lifespan_dialog_option_5" translatable="true">3일</string>
+    <string name="settings_log_lifespan_dialog_option_6" translatable="true">7일</string>
+    <string name="fapps_filter_sort_heading" translatable="true">정렬 기준</string>
+    <string name="bsct_allow_reason" translatable="true">허용 사유: %1$s</string>
+    <string name="fapps_filter_sort_name" translatable="true">이름</string>
+    <string name="fapps_filter_sort_package" translatable="true">패키지 이름</string>
+    <string name="fapps_filter_sort_uid" translatable="true">UID</string>
 </resources>
