@@ -6,10 +6,10 @@ on:
       - 'v*' # Run when a tag beginning with v is pushed.
 
   # Allow the workflow to be started manually
-  workflow_dispatch:
+  # workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
