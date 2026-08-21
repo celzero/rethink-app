@@ -74,40 +74,41 @@ jobs:
           echo "$APKFILE"
 
       # Rename the generated APKs to the IzzyOnDroid naming convention.
-      - name: Rename
+      - name: Rename APKs
         run: |
           mkdir -p izzy-release
 
-          for apk in app/build/outputs/apk/**/*.apk; do
-            filename=$(basename "$apk")
+          find app/build/outputs/apk -type f -name '*.apk' -print0 | while IFS= read -r -d '' apk; do
+          filename=$(basename "$apk")
 
-            case "$filename" in
-              *arm64-v8a*)
-                abi="arm64-v8a"
-                ;;
-              *armeabi-v7a*)
-                abi="armeabi-v7a"
-                ;;
-              *x86_64*)
-                abi="x86_64"
-                ;;
-              *x86*)
-                abi="x86"
-                ;;
-              *universal*)
-                abi="universal"
-                ;;
-              *)
-                echo "Unknown APK: $filename"
-                exit 1
-                ;;
-            esac
+          case "$filename" in
+            *arm64-v8a*)
+              abi="arm64-v8a"
+              ;;
+            *armeabi-v7a*)
+              abi="armeabi-v7a"
+              ;;
+            *x86_64*)
+              abi="x86_64"
+              ;;
+            *x86*)
+              abi="x86"
+              ;;
+            *universal*)
+              abi="universal"
+              ;;
+            *)
+              echo "Unknown APK: $filename"
+              exit 1
+              ;;
+          esac
+          
+          new_name="rethink-${GITHUB_REF_NAME}-izzy-${abi}.apk"
 
-            new_name="rethink-${GITHUB_REF_NAME}-izzy-${abi}.apk"
+          echo "$filename -> $new_name"
 
-            echo "$filename -> $new_name"
-
-            cp "$apk" "izzy-release/$new_name"
+          cp "$apk" "izzy-release/$new_name"
+        
           done
 
           echo "Generated IzzyOnDroid APKs:"
@@ -117,8 +118,8 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: rethink-izzyondroid-${{ github.sha }}
-          path: ${{ env.IZZY_BUILD_OUT }}
+          name: rethink-${{ github.ref_name }}-izzy
+          path: izzy-release/*.apk
           if-no-files-found: error
           retention-days: 72
           compression-level: 9
