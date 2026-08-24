@@ -54,8 +54,11 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clipChildren="false"
                 android:gravity="center"
                 android:orientation="vertical"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp">
 
@@ -218,7 +221,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clipChildren="false"
                 android:orientation="vertical"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp">
 
@@ -244,7 +250,7 @@
 
                     <LinearLayout
                         android:id="@+id/dc_local_blocklist_container"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_local_blocklist_img"
@@ -256,8 +262,6 @@
                             style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginEnd="5dp"
                             android:text="@string/dc_local_block_heading" />
 
                         <androidx.appcompat.widget.AppCompatTextView
@@ -321,7 +325,7 @@
                         android:src="@drawable/ic_update" />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_downloader_switch"
@@ -385,7 +389,7 @@
                         android:src="@drawable/ic_blocklist_update_check" />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_check_update_switch"
@@ -446,7 +450,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clipChildren="false"
                 android:orientation="vertical"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp">
 
@@ -472,7 +479,7 @@
                         android:src="@drawable/ic_adv_dns_filter" />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_alg_switch"
@@ -537,7 +544,7 @@
                         android:src="@drawable/ic_split_dns" />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_split_dns_switch"
@@ -604,7 +611,7 @@
                         android:src="@drawable/ic_allow_dns_records" />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_allowed_record_types_count"
@@ -667,7 +674,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clipChildren="false"
                 android:orientation="vertical"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
                 android:paddingTop="5dp"
                 android:paddingBottom="10dp">
 
@@ -693,7 +703,7 @@
                         android:src="@drawable/ic_fav_icon" />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_favicon_switch"
@@ -757,7 +767,7 @@
                         android:src="@drawable/ic_auto_start" />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_enable_cache_switch"
@@ -821,7 +831,7 @@
                         android:src="@drawable/ic_prevent_dns_proxy" />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_proxy_dns_switch"
@@ -884,7 +894,7 @@
                         android:src="@drawable/ic_prevent_dns_leaks" />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_prevent_dns_leaks_switch"
@@ -949,7 +959,7 @@
                         android:src="@drawable/ic_block_unknown_dns" />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_block_unknown_switch"
@@ -1022,7 +1032,7 @@
                         android:src="@drawable/ic_undelegated_domain" />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_undelegated_domains_switch"
@@ -1087,7 +1097,7 @@
                         android:src="@drawable/ic_use_fallback_bypass" />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_block_free_dns_arrow"

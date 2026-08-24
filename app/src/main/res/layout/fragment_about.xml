@@ -54,13 +54,18 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clipChildren="false"
                 android:orientation="vertical">
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:clipChildren="false"
                     android:orientation="vertical"
-                    android:padding="5dp">
+                    android:paddingStart="6dp"
+                    android:paddingTop="5dp"
+                    android:paddingEnd="6dp"
+                    android:paddingBottom="5dp">
 
                     <androidx.appcompat.widget.AppCompatTextView
                         style="@style/TextAppearance.AppCompat.Subhead"
@@ -71,9 +76,9 @@
                         android:elevation="10dp"
                         android:gravity="center_vertical"
                         android:lineSpacingExtra="5dp"
-                        android:paddingLeft="20dp"
+                        android:paddingStart="20dp"
                         android:paddingTop="10dp"
-                        android:paddingRight="20dp"
+                        android:paddingEnd="20dp"
                         android:text="@string/about_bravedns_explantion"
                         android:textSize="@dimen/large_font_text_view" />
 
@@ -84,8 +89,8 @@
                         android:layout_marginBottom="20dp"
                         android:gravity="center_vertical"
                         android:lineSpacingExtra="5dp"
-                        android:paddingLeft="20dp"
-                        android:paddingRight="20dp"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
                         android:text="@string/about_bravedns_whoarewe"
                         android:textSize="@dimen/large_font_text_view" />
 
@@ -97,8 +102,8 @@
                         android:layout_marginBottom="10dp"
                         android:gravity="center_vertical"
                         android:lineSpacingExtra="5dp"
-                        android:paddingLeft="20dp"
-                        android:paddingRight="20dp"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
                         android:textSize="@dimen/large_font_text_view" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -148,6 +153,7 @@
                     android:paddingTop="12dp"
                     android:paddingEnd="16dp"
                     android:paddingBottom="12dp"
+                    android:visibility="gone"
                     android:text="Manage RPN"
                     android:textColor="?attr/secondaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
@@ -156,6 +162,7 @@
                     android:id="@+id/about_community_sponsor"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:clipChildren="false"
                     android:gravity="center"
                     android:orientation="vertical"
                     android:padding="24dp"
@@ -222,6 +229,8 @@
             android:layout_marginTop="20dp"
             android:layout_marginBottom="10dp"
             android:baselineAligned="true"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:elevation="10dp"
             android:orientation="horizontal"
             android:weightSum="1">
@@ -232,6 +241,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="5dp"
                 android:layout_weight="0.5"
+                android:clipChildren="false"
                 android:orientation="vertical">
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -273,6 +283,7 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="20dp"
                 android:layout_weight="0.5"
+                android:clipChildren="false"
                 android:orientation="vertical">
 
                 <RelativeLayout
