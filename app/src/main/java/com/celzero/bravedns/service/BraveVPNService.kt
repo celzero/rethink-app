@@ -592,6 +592,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             logd("builder: set metered: ${persistentState.setVpnBuilderToMetered}")
         }
 
+        // let apps that explicitly request it (ex: Android Auto's wireless transport)
+        // bypass the tunnel; ignored in lockdown mode as the platform disallows bypass
+        // (VpnService.isLockdownEnabled)
+        if (!vpnLockdown && persistentState.allowBypass) {
+            builder.allowBypass()
+            logd("builder: allow bypass: true")
+        }
+
         // route rethink traffic in rethink based on the user selection
         if (!persistentState.routeRethinkInRethink) {
             Logger.i(LOG_TAG_VPN, "builder: exclude rethink app from builder")
@@ -1605,6 +1613,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             PersistentState.PRIVATE_IPS -> {
                 // restart vpn to enable/disable route lan traffic
                 val reason = "routeLanTraffic: ${persistentState.privateIps}"
+                vpnRestartTrigger.value = reason
+            }
+
+            PersistentState.ALLOW_BYPASS -> {
+                // restart vpn to allow/disallow apps to bypass the tunnel
+                val reason = "allowBypass: ${persistentState.allowBypass}"
                 vpnRestartTrigger.value = reason
             }
 

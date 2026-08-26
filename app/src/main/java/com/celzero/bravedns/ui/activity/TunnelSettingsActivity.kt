@@ -143,6 +143,8 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         b.settingsActivityAllNetworkSwitch.isChecked = persistentState.useMultipleNetworks
         // route lan traffic
         b.settingsActivityLanTrafficSwitch.isChecked = persistentState.privateIps
+        // allow apps to bypass the tunnel
+        b.settingsActivityAllowBypassSwitch.isChecked = persistentState.allowBypass
         // show ping ips
         b.settingsActivityPingIpsBtn.visibility = if (persistentState.connectivityChecks) View.VISIBLE else View.GONE
         // exclude apps in proxy
@@ -372,6 +374,21 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
             logEvent(
                 "route lan traffic",
                 "Route LAN traffic: $checked"
+            )
+        }
+
+        b.settingsActivityAllowBypassRl.setOnClickListener {
+            b.settingsActivityAllowBypassSwitch.isChecked =
+                !b.settingsActivityAllowBypassSwitch.isChecked
+        }
+
+        b.settingsActivityAllowBypassSwitch.setOnCheckedChangeListener {
+            _: CompoundButton,
+            checked: Boolean ->
+            persistentState.allowBypass = checked
+            logEvent(
+                "allow bypass",
+                "Allow apps to bypass the tunnel: $checked"
             )
         }
 
