@@ -1,0 +1,23 @@
+name: Sync Upstream
+
+on:
+  schedule:
+    # Every day at 03:00 UTC (08:30 IST)
+    - cron: "0 3 * * *"
+
+  # Allows you to manually run it from Actions
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Sync main with upstream
+        run: gh repo sync "$REPOSITORY" --branch main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
