@@ -215,12 +215,14 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
     }
 
 
-    /** Renders the anti-censorship dialer timeout as a human-readable label. */progressSec: Int) {
+    /** Renders the anti-censorship dialer timeout as a human-readable label. */
+    private fun displayDialerTimeOutUi(progressSec: Int) {
         val displayText = formatTimeShort(progressSec)
         b.dvTimeoutValue.text = displayText
     }
 
-    /** Formats seconds as a compact h/m/s string (empty parts skipped). */totalSeconds: Int): String {
+    /** Formats seconds as a compact h/m/s string (empty parts skipped). */
+    private fun formatTimeShort(totalSeconds: Int): String {
         val hours = totalSeconds / SECONDS_PER_HOUR
         val minutes = (totalSeconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE
         val seconds = totalSeconds % SECONDS_PER_MINUTE
@@ -234,18 +236,21 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         return if (parts.isEmpty()) getString(R.string.lbl_disabled) else parts.joinToString(" ")
     }
 
-    /** Persists the dialer timeout (minutes) and refreshes its label. */valueMin: Int) {
+    /** Persists the dialer timeout (minutes) and refreshes its label. */
+    private fun updateDialerTimeOut(valueMin: Int) {
         val inSec = valueMin * SECONDS_PER_MINUTE
         persistentState.dialTimeoutSec = inSec
         displayDialerTimeOutUi(inSec)
     }
 
-    /** Renders the socket buffer size as a human-readable label. */bytes: Int) {
+    /** Renders the socket buffer size as a human-readable label. */
+    private fun displaySocketBufferSizeUi(bytes: Int) {
         val displayText = formatSocketBufferSize(bytes)
         b.dvSocketBufferSizeValue.text = displayText
     }
 
-    /** Formats a byte count as KB/MB for display. */bytes: Int): String {
+    /** Formats a byte count as KB/MB for display. */
+    private fun formatSocketBufferSize(bytes: Int): String {
         val kb = bytes / 1024
         return if (kb >= 1024) {
             "${kb / 1024} MB"
