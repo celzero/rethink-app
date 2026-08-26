@@ -128,6 +128,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
             Configuration.UI_MODE_NIGHT_YES
     }
 
+    /** Re-evaluates lockdown-dependent row states when the screen returns to the foreground. */
     override fun onResume() {
         super.onResume()
         handleLockdownModeIfNeeded()
@@ -265,6 +266,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         displaySocketBufferSizeUi(bytes)
     }
 
+    /** Shows the socket-buffer-size chooser, an advanced TCP/UDP tuning preference. */
     private fun suggestSocketBufferSize() {
         if (persistentState.socketBufferSizeBytes < FOUR_MB_IN_BYTES) {
             val progress = socketBufferSizeToProgress(FOUR_MB_IN_BYTES)
