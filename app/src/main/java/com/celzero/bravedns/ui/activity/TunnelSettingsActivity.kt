@@ -133,6 +133,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         handleLockdownModeIfNeeded()
     }
 
+    /** Hydrates all tunnel-setting rows (switches, labels, visibility) from [persistentState]. */
     private fun initView() {
         b.settingsActivityWireguardText.text = getString(R.string.settings_proxy_header)
         val text = getString(R.string.two_argument, getString(R.string.orbot_status_arg_2), getString(R.string.lbl_ip))
@@ -272,6 +273,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         }
     }
 
+    /** Wires row clicks and switch listeners; most write straight to [persistentState], which the VPN service observes. */
     private fun setupClickListeners() {
         b.settingsActivityAllNetworkRl.setOnClickListener {
             b.settingsActivityAllNetworkSwitch.isChecked =

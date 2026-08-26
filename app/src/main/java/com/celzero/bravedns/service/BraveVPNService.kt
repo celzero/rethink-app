@@ -571,6 +571,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         this.protect(fd.toInt())
     }
 
+    /**
+     * Builds the [Builder] for the VPN interface from the current persistent state:
+     * underlying networks, meteredness, app exclusions, and the allow-bypass flag
+     * (skipped in lockdown mode as the platform disallows bypass then). The caller
+     * ([establishVpn]) chains routes, DNS, and addresses onto this before
+     * [Builder.establish].
+     */
     private suspend fun newBuilder(): Builder {
         val builder = Builder()
         val underlyingNws = getUnderlays()
@@ -1462,6 +1469,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         notifyConnectionStateChangeIfNeeded()
     }
 
+    /**
+     * Reacts to [PersistentState] changes: builder-affecting preferences (ex:
+     * [PersistentState.PRIVATE_IPS], [PersistentState.ALLOW_BYPASS]) request a
+     * debounced tunnel restart so the new builder takes effect; others update
+     * DNS, firewall, or notification state in place.
+     */
     override fun onSharedPreferenceChanged(preferences: SharedPreferences?, key: String?) {
         /* TODO Check on the Persistent State variable
         Check on updating the values for Package change and for mode change.
