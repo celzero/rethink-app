@@ -106,6 +106,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         private const val FOUR_MB_IN_BYTES = 4 * 1024 * 1024
     }
 
+    /** Applies the persisted theme and inflates the tunnel-settings screen. */
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         //setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
@@ -123,6 +124,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         setupClickListeners()
     }
 
+    /** Returns true when the system is in dark mode. */
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
             Configuration.UI_MODE_NIGHT_YES
@@ -213,12 +215,12 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
     }
 
 
-    private fun displayDialerTimeOutUi(progressSec: Int) {
+    /** Renders the anti-censorship dialer timeout as a human-readable label. */progressSec: Int) {
         val displayText = formatTimeShort(progressSec)
         b.dvTimeoutValue.text = displayText
     }
 
-    private fun formatTimeShort(totalSeconds: Int): String {
+    /** Formats seconds as a compact h/m/s string (empty parts skipped). */totalSeconds: Int): String {
         val hours = totalSeconds / SECONDS_PER_HOUR
         val minutes = (totalSeconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE
         val seconds = totalSeconds % SECONDS_PER_MINUTE
@@ -232,18 +234,18 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         return if (parts.isEmpty()) getString(R.string.lbl_disabled) else parts.joinToString(" ")
     }
 
-    private fun updateDialerTimeOut(valueMin: Int) {
+    /** Persists the dialer timeout (minutes) and refreshes its label. */valueMin: Int) {
         val inSec = valueMin * SECONDS_PER_MINUTE
         persistentState.dialTimeoutSec = inSec
         displayDialerTimeOutUi(inSec)
     }
 
-    private fun displaySocketBufferSizeUi(bytes: Int) {
+    /** Renders the socket buffer size as a human-readable label. */bytes: Int) {
         val displayText = formatSocketBufferSize(bytes)
         b.dvSocketBufferSizeValue.text = displayText
     }
 
-    private fun formatSocketBufferSize(bytes: Int): String {
+    /** Formats a byte count as KB/MB for display. */bytes: Int): String {
         val kb = bytes / 1024
         return if (kb >= 1024) {
             "${kb / 1024} MB"
