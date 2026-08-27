@@ -250,16 +250,17 @@ class PurchaseProcessingBottomSheet : BottomSheetDialogFragment() {
         _binding = null
     }
 
-    enum class ProcessingState : Serializable {
-    companion object {
-        private const val serialVersionUID = 1L
-    }
+        enum class ProcessingState : java.io.Serializable {
         Processing,
         PendingVerification,
         Success,
         Error,
         ServerAckPending,
         PendingTimeout,
-        PaymentDeclined
+        PaymentDeclined;
+
+        companion object {
+            private const val serialVersionUID = 1L
+        }
     }
 }
