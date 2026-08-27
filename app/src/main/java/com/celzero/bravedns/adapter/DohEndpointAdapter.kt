@@ -207,13 +207,14 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
 
         private fun showExplanationOnImageClick(endpoint: DoHEndpoint) {
             if (endpoint.isDeletable()) showDeleteDnsDialog(endpoint.id)
-            else showDohMetadataDialog(endpoint.dohName, endpoint.dohURL, endpoint.dohExplanation)
+            else showDohMetadataDialog(endpoint.dohName, endpoint.dohURL, endpoint.dohIp, endpoint.dohExplanation)
         }
 
-        private fun showDohMetadataDialog(title: String, url: String, message: String?) {
+        private fun showDohMetadataDialog(title: String, url: String, ips: String?, message: String?) {
             val builder = MaterialAlertDialogBuilder(context, R.style.App_Dialog_NoDim)
             builder.setTitle(title)
-            builder.setMessage(url + "\n\n" + getDnsDesc(message))
+            val msg = url + if (!ips.isNullOrEmpty()) "\n\n$ips" else "" + "\n\n" + getDnsDesc(message)
+            builder.setMessage(msg)
             builder.setCancelable(true)
             builder.setPositiveButton(context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
                 dialogInterface.dismiss()

@@ -57,7 +57,7 @@ import com.celzero.bravedns.util.Constants
         CountryConfig::class,
         SponsorEntity::class
     ],
-    version = 32,
+    version = 33,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -172,6 +172,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_29_30)
                 .addMigrations(MIGRATION_30_31)
                 .addMigrations(MIGRATION_31_32)
+                .addMigrations(MIGRATION_32_33)
                 .build()
 
         private val roomCallback: Callback =
@@ -1350,6 +1351,33 @@ abstract class AppDatabase : RoomDatabase() {
                         LOG_TAG_APP_DB,
                         "MIGRATION_31_32: added AppInfo.notes and enforced max length"
                     )
+                }
+            }
+
+        private val MIGRATION_32_33: Migration =
+            object : Migration(32, 33) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    if (!doesColumnExistInTable(db, "DoHEndpoint", "dohIp")) {
+                        try {
+                            db.execSQL("ALTER TABLE DoHEndpoint ADD COLUMN dohIp TEXT")
+                            Logger.i(
+                                LOG_TAG_APP_DB,
+                                "MIGRATION_32_33: added dohIp column to DoHEndpoint"
+                            )
+                        } catch (e: Exception) {
+                            Logger.e(
+                                LOG_TAG_APP_DB,
+                                "MIGRATION_32_33: failed to add dohIp column",
+                                e
+                            )
+                            throw e
+                        }
+                    } else {
+                        Logger.i(
+                            LOG_TAG_APP_DB,
+                            "MIGRATION_32_33: dohIp column already exists in DoHEndpoint"
+                        )
+                    }
                 }
             }
 
