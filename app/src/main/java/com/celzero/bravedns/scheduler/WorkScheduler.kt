@@ -54,14 +54,13 @@ class WorkScheduler(val context: Context, val persistentState: PersistentState) 
             val statuses: ListenableFuture<List<WorkInfo>> = instance.getWorkInfosByTag(tag)
             Logger.i(LOG_TAG_SCHEDULER, "Job $tag already running check")
             return try {
-                var running = false
                 val workInfos = statuses.get()
 
                 if (workInfos.isNullOrEmpty()) return false
 
-                for (workStatus in workInfos) {
-                    running = workStatus.state == WorkInfo.State.RUNNING
-                }
+                // any-of semantics: finished WorkInfos linger until pruned, so the state of
+                // a *single* (eg, last) entry must not shadow an actually-running one.
+                val running = workInfos.any { it.state == WorkInfo.State.RUNNING }
                 Logger.i(LOG_TAG_SCHEDULER, "Job $tag already running? $running")
                 running
             } catch (e: ExecutionException) {
@@ -80,18 +79,19 @@ class WorkScheduler(val context: Context, val persistentState: PersistentState) 
             val statuses: ListenableFuture<List<WorkInfo>> = instance.getWorkInfosByTag(tag)
             Logger.i(LOG_TAG_SCHEDULER, "Job $tag already scheduled check")
             return try {
-                var running = false
                 val workInfos = statuses.get()
 
                 if (workInfos.isNullOrEmpty()) return false
 
-                for (workStatus in workInfos) {
-                    running =
-                        workStatus.state == WorkInfo.State.RUNNING ||
-                                workStatus.state == WorkInfo.State.ENQUEUED
+                // any-of semantics; BLOCKED counts because chained workers stay BLOCKED
+                // until their predecessor finishes, yet the chain is very much scheduled.
+                val scheduled = workInfos.any {
+                    it.state == WorkInfo.State.RUNNING ||
+                            it.state == WorkInfo.State.ENQUEUED ||
+                            it.state == WorkInfo.State.BLOCKED
                 }
-                Logger.i(LOG_TAG_SCHEDULER, "Job $tag already scheduled? $running")
-                running
+                Logger.i(LOG_TAG_SCHEDULER, "Job $tag already scheduled? $scheduled")
+                scheduled
             } catch (e: ExecutionException) {
                 Logger.e(LOG_TAG_SCHEDULER, "error on status check ${e.message}", e)
                 false

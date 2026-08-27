@@ -41,6 +41,7 @@ import com.celzero.bravedns.download.DownloadConstants
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
 import com.celzero.bravedns.ui.fragment.DnsSettingsFragment
 import com.celzero.bravedns.util.Constants
@@ -76,6 +77,10 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     private val appDownloadManager by inject<AppDownloadManager>()
 
     private var dismissListener: OnBottomSheetDialogFragmentDismiss? = null
+
+    // work observers are attached once per sheet instance, either when the sheet opens
+    // with a download already running, or when the user starts one from this sheet
+    private var workObserversRegistered = false
 
     companion object {
         // Alpha values for button states
@@ -131,8 +136,35 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         Logger.i(LOG_TAG_DNS, "$TAG; onViewCreated")
         updateLocalBlocklistUi()
         init()
+        reflectOngoingDownloadUi()
         initializeObservers()
         initializeClickListeners()
+    }
+
+    private fun isLocalDownloadActive(): Boolean {
+        val ctx = requireContext()
+        return WorkScheduler.isWorkScheduled(ctx, LocalBlocklistCoordinator.CUSTOM_DOWNLOAD) ||
+            WorkScheduler.isWorkScheduled(ctx, DownloadConstants.DOWNLOAD_TAG) ||
+            WorkScheduler.isWorkScheduled(ctx, DownloadConstants.FILE_TAG)
+    }
+
+    // If a download is already running (started from another screen or a previous
+    // session), show progress and disable the action buttons instead of offering
+    // stale download/redownload buttons that would fail with a misleading toast.
+    private fun reflectOngoingDownloadUi() {
+        if (!isLocalDownloadActive()) return
+
+        b.lbbsDownload.isEnabled = false
+        b.lbbsRedownload.isEnabled = false
+        b.lbbsCheckDownload.isEnabled = false
+        onDownloadProgress()
+        registerWorkObserversOnce()
+    }
+
+    private fun registerWorkObserversOnce() {
+        if (workObserversRegistered) return
+        workObserversRegistered = true
+        observeWorkManager()
     }
 
     private fun init() {
@@ -152,7 +184,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
                 )
             )
 
-        if (persistentState.newestRemoteBlocklistTimestamp == INIT_TIME_MS) {
+        if (persistentState.newestLocalBlocklistTimestamp == INIT_TIME_MS) {
             showCheckUpdateUi()
             return
         }
@@ -322,6 +354,13 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
 
     private fun proceedWithDownload(isRedownload: Boolean) {
         ui {
+            // a download is already in flight; do not enqueue a duplicate, just track it
+            if (isLocalDownloadActive()) {
+                registerWorkObserversOnce()
+                onDownloadProgress()
+                return@ui
+            }
+
             var status = AppDownloadManager.DownloadManagerStatus.NOT_STARTED
             b.lbbsDownload.isEnabled = false
             b.lbbsRedownload.isEnabled = false
@@ -370,7 +409,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
             AppDownloadManager.DownloadManagerStatus.STARTED -> {
                 // the job of download status stops after initiating the work manager observer
                 ui {
-                    observeWorkManager()
+                    registerWorkObserversOnce()
                     showCheckDownloadProgressUi()
                 }
             }

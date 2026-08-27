@@ -30,6 +30,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import androidx.work.workDataOf
+import com.celzero.bravedns.R
 import com.celzero.bravedns.customdownloader.LocalBlocklistCoordinator
 import com.celzero.bravedns.customdownloader.RemoteBlocklistCoordinator
 import com.celzero.bravedns.download.BlocklistDownloadHelper.Companion.checkBlocklistUpdate
@@ -57,10 +58,108 @@ class AppDownloadManager(
 ) {
 
     private lateinit var downloadManager: DownloadManager
+    private val workManager = WorkManager.getInstance(context)
 
     // live data to initiate the download, contains time stamp if the download is required,
     // else will have
     val downloadRequired: MutableLiveData<DownloadManagerStatus> = MutableLiveData()
+
+    sealed interface DownloadState {
+        data object Idle : DownloadState
+        data object Starting : DownloadState
+        data class Downloading(val progress: Int) : DownloadState
+        data object Processing : DownloadState
+        data object Success : DownloadState
+        data class Error(val reason: String) : DownloadState
+    }
+
+    val downloadState: MutableLiveData<DownloadState> = MutableLiveData(DownloadState.Idle)
+
+    fun resetDownloadState() {
+        downloadState.postValue(DownloadState.Idle)
+        persistentState.lastDownloadFailureReason = ""
+    }
+
+    private fun mapWorkInfoToDownloadState(tag: String, workInfo: androidx.work.WorkInfo): DownloadState {
+        return when (workInfo.state) {
+            androidx.work.WorkInfo.State.ENQUEUED, androidx.work.WorkInfo.State.RUNNING -> {
+                val progress = workInfo.progress.getInt("progress", -1)
+                val processing = workInfo.progress.getBoolean("processing", false)
+                if (processing || tag == FILE_TAG) {
+                    DownloadState.Processing
+                } else if (progress >= 0) {
+                    DownloadState.Downloading(progress)
+                } else {
+                    DownloadState.Starting
+                }
+            }
+            androidx.work.WorkInfo.State.SUCCEEDED -> {
+                if (tag == FILE_TAG || tag == LocalBlocklistCoordinator.CUSTOM_DOWNLOAD || tag == RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER) {
+                    DownloadState.Success
+                } else {
+                    // DOWNLOAD_TAG succeeded, wait for FILE_TAG
+                    DownloadState.Processing
+                }
+            }
+            androidx.work.WorkInfo.State.FAILED, androidx.work.WorkInfo.State.CANCELLED -> {
+                val reason = persistentState.lastDownloadFailureReason
+                DownloadState.Error(reason.ifEmpty { context.getString(R.string.download_err_internal) })
+            }
+            else -> DownloadState.Idle
+        }
+    }
+
+    fun observeWorkManager(lifecycleOwner: androidx.lifecycle.LifecycleOwner) {
+        val tags = listOf(DOWNLOAD_TAG, FILE_TAG, LocalBlocklistCoordinator.CUSTOM_DOWNLOAD, RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER)
+        tags.forEach { tag ->
+            workManager.getWorkInfosByTagLiveData(tag).observe(lifecycleOwner) { workInfoList ->
+                // Finished WorkInfos linger in WorkManager until pruned; they must not
+                // shadow a newer attempt for the same tag (a stale FAILED entry would
+                // replay the error dialog over a live download and, once current, block
+                // any further transition via shouldUpdateState). Prefer an in-flight info.
+                val active = workInfoList?.firstOrNull {
+                    it.state == androidx.work.WorkInfo.State.ENQUEUED ||
+                            it.state == androidx.work.WorkInfo.State.RUNNING ||
+                            it.state == androidx.work.WorkInfo.State.BLOCKED
+                }
+                val workInfo = active ?: workInfoList?.lastOrNull() ?: return@observe
+                val newState = mapWorkInfoToDownloadState(tag, workInfo)
+                val currentState = downloadState.value
+                if (shouldUpdateState(currentState, newState)) {
+                    downloadState.postValue(newState)
+                    if (newState is DownloadState.Error || newState is DownloadState.Success) {
+                        // Drop finished entries (incl. stale ones) so terminal states
+                        // cannot be re-delivered as duplicate/spurious dialogs later.
+                        workManager.pruneWork()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun shouldUpdateState(current: DownloadState?, next: DownloadState): Boolean {
+        if (current == null) return true
+        // Only transition *into* Error/Success once. This avoids re-triggering the error
+        // dialog (or success toast) when multiple WorkManager tag-observers each report the
+        // same terminal state.
+        if (next is DownloadState.Error) return current !is DownloadState.Error
+        if (next is DownloadState.Success) return current !is DownloadState.Success
+        if (current is DownloadState.Error || current is DownloadState.Success) return false
+
+        return when (current) {
+            is DownloadState.Idle -> next !is DownloadState.Idle
+            is DownloadState.Starting -> next !is DownloadState.Starting && next !is DownloadState.Idle
+            is DownloadState.Downloading -> {
+                if (next is DownloadState.Downloading) {
+                    next.progress >= current.progress
+                } else {
+                    next is DownloadState.Processing
+                }
+            }
+            is DownloadState.Processing -> next is DownloadState.Processing
+            else -> false
+        }
+    }
 
     // various download status used as part of Work manager.
     enum class DownloadManagerStatus(val id: Int) {
@@ -149,22 +248,29 @@ class AppDownloadManager(
     }
 
     private fun cancelAndroidDownloadManagerDownloads() {
+        val idsStr = persistentState.androidDownloadManagerIds
+        if (idsStr.isEmpty()) {
+            Logger.i(LOG_TAG_DOWNLOAD, "no andr-down-mgr downloads to cancel")
+            return
+        }
+        val ids = idsStr.split(",").mapNotNull { it.toLongOrNull() }
+        cancelAndroidDownloadManagerDownloads(ids)
+        persistentState.androidDownloadManagerIds = ""
+    }
+
+    /**
+     * Cancels a specific set of Android Download Manager downloads (e.g. partially-enqueued
+     * orphans) without touching [PersistentState.androidDownloadManagerIds].
+     */
+    private fun cancelAndroidDownloadManagerDownloads(ids: List<Long>) {
+        if (ids.isEmpty()) {
+            Logger.i(LOG_TAG_DOWNLOAD, "no valid download IDs provided to cancel")
+            return
+        }
         try {
-            val downloadIdsStr = persistentState.androidDownloadManagerIds
-            if (downloadIdsStr.isEmpty()) {
-                Logger.i(LOG_TAG_DOWNLOAD, "no andr-down-mgr downloads to cancel")
-                return
-            }
-
-            val downloadIds = downloadIdsStr.split(",").mapNotNull { it.toLongOrNull() }
-            if (downloadIds.isEmpty()) {
-                Logger.i(LOG_TAG_DOWNLOAD, "no valid download IDs found to cancel")
-                return
-            }
-
             downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             var cancelledCount = 0
-            downloadIds.forEach { downloadId ->
+            ids.forEach { downloadId ->
                 try {
                     val removed = downloadManager.remove(downloadId)
                     if (removed > 0) {
@@ -175,8 +281,6 @@ class AppDownloadManager(
                     Logger.w(LOG_TAG_DOWNLOAD, "failed to cancel download id: $downloadId", e)
                 }
             }
-
-            persistentState.androidDownloadManagerIds = ""
             Logger.i(LOG_TAG_DOWNLOAD, "cancelled $cancelledCount andr-down-mgr downloads")
         } catch (e: Exception) {
             Logger.e(LOG_TAG_DOWNLOAD, "err cancelling andr-down-mgr downloads", e)
@@ -214,16 +318,20 @@ class AppDownloadManager(
     ): DownloadManagerStatus {
         // local blocklist available only in fdroid and website version
         if (!Utilities.isWebsiteFlavour() && !Utilities.isFdroidFlavour()) {
+            val msg = context.getString(R.string.download_err_flavor_not_supported)
+            downloadState.postValue(DownloadState.Error(msg))
             return DownloadManagerStatus.FAILURE
         }
 
         val response = checkBlocklistUpdate(currentTs, persistentState.appVersion, retryCount = 0, persistentState.routeRethinkInRethink)
         // if received response for update is null
         if (response == null) {
+            val msg = context.getString(R.string.download_err_network)
             Logger.w(
                 LOG_TAG_DNS,
                 "local blocklist update check is null, ts: $currentTs, app version: ${persistentState.appVersion}"
             )
+            downloadState.postValue(DownloadState.Error(msg))
             return DownloadManagerStatus.FAILURE
         }
 
@@ -236,11 +344,16 @@ class AppDownloadManager(
                 LOG_TAG_DNS,
                 "local blocklist update not required, current ts: $currentTs, updatable ts: $updatableTs"
             )
+            downloadState.postValue(DownloadState.Idle)
             return DownloadManagerStatus.NOT_REQUIRED
         } else {
             // no-op
         }
 
+        // A download is about to start; publish the Starting state only now (posting it
+        // earlier would make the Idle transitions above get rejected by shouldUpdateState,
+        // leaving the UI stuck on "Starting").
+        downloadState.postValue(DownloadState.Starting)
         if (persistentState.useCustomDownloadManager) {
             Logger.i(LOG_TAG_DNS, "initiating local blocklist download with custom download mgr")
             return initiateCustomDownloadManager(updatableTs)
@@ -257,21 +370,50 @@ class AppDownloadManager(
                 WorkScheduler.isWorkScheduled(context, FILE_TAG)
         ) {
             Logger.i(LOG_TAG_DNS, "local blocklist download is already in progress, returning")
+            // downloadState will be updated by observeWorkManager
             return DownloadManagerStatus.FAILURE
+        }
+
+        // If a previous run left stale download IDs (e.g. the app/process died before the
+        // worker ran, or the device rebooted), those downloads are orphaned and will never be
+        // processed by FileHandleWorker. Cancel and clear them so we start clean.
+        if (persistentState.androidDownloadManagerIds.isNotEmpty()) {
+            Logger.w(
+                LOG_TAG_DNS,
+                "stale android-download-mgr ids found at start; clearing orphans"
+            )
+            cancelAndroidDownloadManagerDownloads()
         }
 
         Logger.i(LOG_TAG_DNS, "local blocklist download is not in progress, starting the download")
         purge(context, timestamp, DownloadType.LOCAL)
         val downloadIds = LongArray(ONDEVICE_BLOCKLISTS_ADM.count())
+        val enqueued = mutableListOf<Long>()
+        var enqueueFailed = false
         ONDEVICE_BLOCKLISTS_ADM.forEachIndexed { i, it ->
             val fileName = it.filename
             // url: https://dl.rethinkdns.com/update/blocklists?tstamp=1696197375609&vcode=33
-            Logger.d(LOG_TAG_DOWNLOAD, "v: ($timestamp), f: $fileName, u: $it.url")
-            downloadIds[i] = enqueueDownload(it.url, fileName, timestamp.toString())
-            if (downloadIds[i] == INVALID_DOWNLOAD_ID) {
-                return DownloadManagerStatus.FAILURE
+            Logger.d(LOG_TAG_DOWNLOAD, "v: ($timestamp), f: $fileName, u: ${it.url}")
+            val id = enqueueDownload(it.url, fileName, timestamp.toString())
+            if (id == INVALID_DOWNLOAD_ID) {
+                enqueueFailed = true
+                return@forEachIndexed
             }
+            enqueued.add(id)
+            downloadIds[i] = id
         }
+
+        if (enqueueFailed) {
+            // A partial enqueue would leave already-started downloads running with no worker
+            // observing them. Cancel the ones we managed to start before reporting failure.
+            Logger.w(LOG_TAG_DNS, "partial local blocklist enqueue; cancelling orphans")
+            cancelAndroidDownloadManagerDownloads(enqueued)
+            val msg = context.getString(R.string.download_err_system_manager)
+            downloadState.postValue(DownloadState.Error(msg))
+            persistentState.lastDownloadFailureReason = msg
+            return DownloadManagerStatus.FAILURE
+        }
+
         // Store download IDs for later cancellation
         persistentState.androidDownloadManagerIds = downloadIds.joinToString(",")
         initiateDownloadStatusCheck(downloadIds, timestamp)
@@ -290,11 +432,12 @@ class AppDownloadManager(
     }
 
     suspend fun downloadRemoteBlocklist(currentTs: Long, isRedownload: Boolean): Boolean {
-
         val response = checkBlocklistUpdate(currentTs, persistentState.appVersion, retryCount = 0, persistentState.routeRethinkInRethink)
         // if received response for update is null
         if (response == null) {
+            val msg = context.getString(R.string.download_err_network)
             Logger.w(LOG_TAG_DNS, "remote blocklist update check is null")
+            downloadState.postValue(DownloadState.Error(msg))
             downloadRequired.postValue(DownloadManagerStatus.FAILURE)
             return false
         }
@@ -303,7 +446,9 @@ class AppDownloadManager(
 
         // Guard: an INIT_TIME_MS (0) timestamp means the server returned an unexpected version.
         if (updatableTs == INIT_TIME_MS) {
+            val msg = context.getString(R.string.download_err_internal)
             Logger.w(LOG_TAG_DNS, "remote blocklist: updatableTs is (0), aborting download")
+            downloadState.postValue(DownloadState.Error(msg))
             return false
         }
 
@@ -312,11 +457,16 @@ class AppDownloadManager(
                 LOG_TAG_DNS,
                 "remote blocklist update not required, current ts: $currentTs, updatable ts: $updatableTs"
             )
+            downloadState.postValue(DownloadState.Idle)
             return false
         } else {
             // no-op
         }
 
+        // A download is about to start; publish the Starting state only now (posting it
+        // earlier would make the Idle transition above get rejected by shouldUpdateState,
+        // leaving the UI stuck on "Starting").
+        downloadState.postValue(DownloadState.Starting)
         return initiateRemoteBlocklistDownload(updatableTs)
     }
 
@@ -379,6 +529,7 @@ class AppDownloadManager(
         val data = Data.Builder()
         data.putLong("workerStartTime", SystemClock.elapsedRealtime())
         data.putLongArray("downloadIds", downloadIds)
+        data.putLong("blocklistTimestamp", timestamp)
 
         val downloadWatcher =
             OneTimeWorkRequestBuilder<DownloadWatcher>()
@@ -392,7 +543,10 @@ class AppDownloadManager(
                 .setInitialDelay(WORK_INITIAL_DELAY_SECONDS, TimeUnit.SECONDS)
                 .build()
 
-        val timestampWorkerData = workDataOf("blocklistDownloadInitiatedTime" to timestamp)
+        val timestampWorkerData = workDataOf(
+            "blocklistDownloadInitiatedTime" to timestamp,
+            "blocklistTimestamp" to timestamp
+        )
 
         val fileHandler =
             OneTimeWorkRequestBuilder<FileHandleWorker>()

@@ -253,6 +253,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var customDownloaderLastGeneratedId by
         longPref("custom_downloader_last_generated_id").withDefault<Long>(0)
 
+    // last download failure reason
+    var lastDownloadFailureReason by
+        stringPref("last_download_failure_reason").withDefault<String>("")
+
     // android download manager's active download ids (comma-separated)
     var androidDownloadManagerIds by
         stringPref("android_download_manager_ids").withDefault<String>("")
@@ -320,7 +324,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var enableDnsCache by booleanPref("dns_cache").withDefault<Boolean>(true)
 
     // private ips, default false (route private ips to tunnel)
-    var privateIps by booleanPref("private_ips").withDefault<Boolean>(false)
+    var privateIps by booleanPref("private_ips").withDefault<Boolean>(Utilities.isPlayStoreFlavour())
 
     // biometric last auth time
     var biometricAuthTime by longPref("biometric_auth_time").withDefault<Long>(INIT_TIME_MS)
