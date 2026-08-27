@@ -28,9 +28,7 @@ import java.io.InputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
-class BackupHelper {
-
-    companion object {
+object BackupHelper {
         // MIME type is used for unknown binary files (if stored locally)
         const val INTENT_TYPE_OCTET = "application/octet-stream"
 
@@ -116,7 +114,6 @@ class BackupHelper {
         fun deleteResidue(backupFile: File) {
             if (backupFile.exists()) {
                 backupFile.delete()
-            }
         }
 
         fun unzip(inputStream: InputStream?, path: String): Boolean {
@@ -141,7 +138,6 @@ class BackupHelper {
                     fout.close()
                     zis.closeEntry()
                     ze = zis.nextEntry
-                }
             } catch (e: Exception) {
                 return false
             } finally {
@@ -152,6 +148,5 @@ class BackupHelper {
 
         fun getFileNameFromPath(file: String): String {
             return file.substring(file.lastIndexOf("/") + 1)
-        }
     }
 }

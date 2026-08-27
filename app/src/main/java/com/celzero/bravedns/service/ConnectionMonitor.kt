@@ -1,3 +1,4 @@
+@file:Suppress("SwallowedException")
 /*
  * Copyright 2021 RethinkDNS and its authors
  *
@@ -757,6 +758,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 val diagnosticMgr = DiagnosticsManager(context, scope, this)
                 diagnosticMgr.register()
             } catch (e: Exception) {
+                com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
                 Logger.w(LOG_TAG_CONNECTION, "DiagnosticsManager; err while getting connectivity diagnostics manager")
             }
         }
@@ -1429,6 +1431,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
          *
          * @param opPrefs The operation preferences, which include settings like whether to test
          */
+        @Suppress("CyclomaticComplexMethod")
         private suspend fun repopulateTrackedNetworks(
             opPrefs: OpPrefs,
             nwProps: LinkedHashSet<NetworkProperties>

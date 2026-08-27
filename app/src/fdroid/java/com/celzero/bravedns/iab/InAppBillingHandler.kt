@@ -1,3 +1,4 @@
+@file:Suppress("FunctionOnlyReturningConstant", "UnusedParameter")
 /*
  * Copyright 2026 RethinkDNS and its authors
  *
@@ -78,6 +79,7 @@ object InAppBillingHandler {
     @Suppress("UNUSED_PARAMETER")
     fun initiate(context: Context, billingListener: Any? = null) { /* no-op */ }
 
+    @Suppress("FunctionOnlyReturningConstant")
     fun isBillingClientSetup(): Boolean = false
 
     @Suppress("UNUSED_PARAMETER")
@@ -88,8 +90,10 @@ object InAppBillingHandler {
     fun fetchPurchases(productType: List<String>) { /* no-op */ }
 
     /** Convenience overload: fetches all purchase types. No-op in this build. */
+    @Suppress("FunctionOnlyReturningConstant")
     fun fetchAllPurchases() { /* no-op */ }
 
+    @Suppress("FunctionOnlyReturningConstant")
     suspend fun getObfuscatedDeviceId(): String = ""
 
     fun getRemainingDaysForInApp(): Long? = null
@@ -161,13 +165,16 @@ object InAppBillingHandler {
 
     /** Returns the unchanged [purchase]: F-Droid build has no server entitlements. */
     @Suppress("UNUSED_PARAMETER")
+    @Suppress("FunctionParameterNaming")
+    @Suppress("UnusedParameter")
     suspend fun queryEntitlementFromServer(
         accountId: String,
         deviceId: String,
         purchase: PurchaseDetail
     ): PurchaseDetail = purchase
 
-    fun getProductType(purchase: com.android.billingclient.api.Purchase, pt: String? = null): String {
+    @Suppress("FunctionParameterNaming")
+    fun getProductType(_: com.android.billingclient.api.Purchase, _: String? = null): String {
         return PRODUCT_TYPE_SUBS
     }
 

@@ -86,6 +86,7 @@ object TunFirewallManager : KoinComponent {
         Logger.d(LOG_TAG_VPN, "TunFirewallManager; $msg")
     }
 
+    @Suppress("CyclomaticComplexMethod")
     internal suspend fun firewall(params: FirewallParameters): FirewallRuleset {
         val connId = params.connInfo.connId
         val skipUnknownAppRule = params.forUpstreamAnswer && !persistentState.splitDns

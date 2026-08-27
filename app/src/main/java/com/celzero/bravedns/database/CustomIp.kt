@@ -32,6 +32,9 @@ import java.io.Serializable
  */
 @Entity(primaryKeys = ["uid", "ipAddress", "port", "protocol"], tableName = "CustomIp")
 class CustomIp : Serializable {
+    companion object {
+        private const val serialVersionUID = 1L
+    }
     var uid: Int = UID_EVERYBODY
     var ipAddress: String = ""
     var port: Int = UNSPECIFIED_PORT

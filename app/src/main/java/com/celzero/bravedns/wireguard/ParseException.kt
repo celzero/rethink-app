@@ -20,6 +20,9 @@ package com.celzero.bravedns.wireguard
 
 /**  */
 class ParseException
+    companion object {
+        private const val serialVersionUID = 1L
+    }
 @JvmOverloads
 constructor(
     val parsingClass: Class<*>,
@@ -32,5 +35,5 @@ constructor(
         parsingClass: Class<*>,
         text: CharSequence,
         cause: Throwable?
-    ) : this(parsingClass, text, null, cause) {}
+    ) : this(parsingClass, text, null, cause)
 }

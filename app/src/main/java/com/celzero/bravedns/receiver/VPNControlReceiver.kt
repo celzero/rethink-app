@@ -30,7 +30,7 @@ import com.celzero.bravedns.util.Utilities.isAtleastU
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class VpnControlReceiver: BroadcastReceiver(), KoinComponent {
+class VPNControlReceiver: BroadcastReceiver(), KoinComponent {
     private val persistentState by inject<PersistentState>()
     companion object {
         private const val TAG = "VpnCtrlRecr"

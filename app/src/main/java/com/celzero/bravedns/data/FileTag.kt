@@ -70,7 +70,11 @@ data class FileTag(
     val entries: Int,
     var simpleTagId: Int = INVALID_SIMPLE_TAG_ID,
     var isSelected: Boolean = false
-) : Serializable
+) : Serializable {
+    companion object {
+        private const val serialVersionUID: Long = 1L
+    }
+}
 
 private const val INVALID_SIMPLE_TAG_ID = -1
 
@@ -80,6 +84,9 @@ private const val INVALID_SIMPLE_TAG_ID = -1
 // the object type and converts accordingly.
 // ref: https://stackoverflow.com/a/28325108
 class FileTagDeserializer : JsonDeserializer<FileTag?> {
+    companion object {
+        private const val serialVersionUID = 1L
+    }
     @Throws(JsonParseException::class)
     override fun deserialize(
         json: JsonElement,

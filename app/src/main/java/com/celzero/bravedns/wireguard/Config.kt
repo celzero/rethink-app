@@ -1,3 +1,4 @@
+@file:Suppress("ThrowsCount")
 /*
  * Copyright 2023 RethinkDNS and its authors
  *

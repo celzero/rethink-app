@@ -1,3 +1,5 @@
+@file:Suppress("SwallowedException")
+@file:Suppress("ThrowsCount")
 /*
  * Copyright 2023 RethinkDNS and its authors
  *
@@ -76,6 +78,7 @@ object InetAddresses {
         } catch (e: IllegalArgumentException) {
             throw ParseException(InetAddress::class.java, address, e)
         } catch (e: Exception) {
+            com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
             val cause = e.cause
             // Re-throw parsing exceptions with the original type, as callers might try to catch
             // them. On the other hand, callers cannot be expected to handle reflection failures.

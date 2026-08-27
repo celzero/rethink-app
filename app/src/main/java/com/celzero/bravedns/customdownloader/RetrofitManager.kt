@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.enums.enumEntries
 import androidx.core.net.toUri
 
-class RetrofitManager {
+object RetrofitManager {
 
     init {
         // enable the OkHttp's logging only in debug mode for testing
@@ -47,7 +47,7 @@ class RetrofitManager {
         if (DEBUG) OkHttpDebugLogging.enableTaskRunner()
     }
 
-    companion object {
+    // companion object
         private const val CONNECT_TIMEOUT_MINUTES = 1L
         private const val READ_TIMEOUT_MINUTES = 20L
         private const val WRITE_TIMEOUT_MINUTES = 5L

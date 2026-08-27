@@ -16,9 +16,7 @@
 @file:Suppress("MagicNumber")
 package com.celzero.bravedns.util
 
-class KnownPorts {
-
-    companion object {
+object KnownPorts {
         const val DNS_PORT: Int = 53
         private const val NTP_PORT: Int = 123
         const val HTTP_PORT: Int = 80

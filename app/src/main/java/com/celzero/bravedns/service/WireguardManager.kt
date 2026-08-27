@@ -521,7 +521,7 @@ object WireguardManager : KoinComponent {
 
     private fun isAnyProxyLockdown(proxies: List<String>): Boolean {
         var lockdown = false
-        proxies.forEach { it ->
+        proxies.forEach {
             val confId = convertStringIdToId(it)
             val conf = mappings.find { it.id == confId }
             lockdown = conf?.isLockdown ?: false

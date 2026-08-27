@@ -621,6 +621,7 @@ object DomainRulesManager : KoinComponent {
                     val uri = java.net.URI(trimmedInput)
                     uri.host?.removePrefix("www.") // remove 'www.' prefix if present
                 } catch (e: Exception) {
+                    com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
                     null
                 }
             }

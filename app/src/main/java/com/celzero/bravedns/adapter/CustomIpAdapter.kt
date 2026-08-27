@@ -1,3 +1,4 @@
+@file:Suppress("SwallowedException")
 /*
  * Copyright 2023 RethinkDNS and its authors
  *
@@ -346,6 +347,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
             val inetAddr = try {
                 IPAddressString(ip.ipAddress).hostAddress.toInetAddress()
             } catch (e: Exception) {
+                com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
                 null // invalid ip
             }
 

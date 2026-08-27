@@ -527,7 +527,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                     }
                 }
 
-                override fun onNothingSelected(parent: AdapterView<*>?) {}
+                override fun onNothingSelected(parent: AdapterView<*>?) { /* no-op */ }
             }
 
         b.bsConnIpRuleSpinner.adapter =
@@ -550,7 +550,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                     applyIpRule(fid)
                 }
 
-                override fun onNothingSelected(parent: AdapterView<*>?) {}
+                override fun onNothingSelected(parent: AdapterView<*>?) { /* no-op */ }
             }
 
         b.bsConnDomainSpinner.adapter =
@@ -585,7 +585,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                     applyDomainRule(fid)
                 }
 
-                override fun onNothingSelected(parent: AdapterView<*>?) {}
+                override fun onNothingSelected(parent: AdapterView<*>?) { /* no-op */ }
             }
     }
 

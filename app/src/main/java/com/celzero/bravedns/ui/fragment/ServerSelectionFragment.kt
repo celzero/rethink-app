@@ -1300,9 +1300,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
     private fun setupSearchBar() {
         b.searchBar.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { /* no-op */ }
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { filterServers(s.toString()) }
-            override fun afterTextChanged(s: Editable?) {}
+            override fun afterTextChanged(s: Editable?) { /* no-op */ }
         })
         b.searchClearBtn.setOnClickListener {
             b.searchBar.text?.clear()
@@ -1477,7 +1477,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 val refreshed = RpnProxyManager.updateWinProxy()
                 if (!refreshed.isNullOrEmpty()) refreshed
                 else RpnProxyManager.getWinServers()
-            } catch (t: Throwable) {
+            } catch (t: Exception) {
                 Logger.e(LOG_TAG_UI, "$TAG.retryLoadingServers: tunnel error (non-fatal): ${t.message}")
                 // Fall back to whatever is in the DB/cache so the screen is not blank.
                 try { RpnProxyManager.getWinServers() } catch (_: Exception) { emptyList() }

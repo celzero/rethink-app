@@ -1394,6 +1394,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
         locationErrorLayout.visibility = View.GONE
     }
 
+    @Suppress("UnusedParameter")
     private fun updateSsidPermissionState(hasPermissions: Boolean) {
         // This method can be used to update UI state when permissions change
         // Currently handled by setupSsidSection being called from callback

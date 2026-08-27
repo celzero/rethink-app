@@ -1,3 +1,4 @@
+@file:Suppress("SwallowedException")
 /*
  * Copyright 2021 RethinkDNS and its authors
  *
@@ -61,6 +62,7 @@ class Converters {
         return try {
             EventType.valueOf(value)
         } catch (e: IllegalArgumentException) {
+            com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
             EventType.SYSTEM_EVENT // Default fallback
         }
     }

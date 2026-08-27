@@ -1,3 +1,4 @@
+@file:Suppress("MatchingDeclarationName")
 /*
  * Copyright 2026 RethinkDNS and its authors
  *

@@ -1,3 +1,4 @@
+@file:Suppress("MatchingDeclarationName")
 /*
  * Copyright 2026 ezelab
  *
@@ -322,6 +323,7 @@ private fun Drawable.toSafeBitmap(sizeDp: Int): Bitmap? = try {
             bmp
         }
     }
-} catch (t: Throwable) {
+} catch (t: Exception) {
+    com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${t.message}", t)
     null
 }

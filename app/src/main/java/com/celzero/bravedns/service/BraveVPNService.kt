@@ -1,3 +1,4 @@
+@file:Suppress("FunctionParameterNaming")
 /*
  * Copyright 2019 Jigsaw Operations LLC
  * Copyright 2020 RethinkDNS and its authors
@@ -1454,6 +1455,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         notifyConnectionStateChangeIfNeeded()
     }
 
+    @Suppress("CyclomaticComplexMethod")
     override fun onSharedPreferenceChanged(preferences: SharedPreferences?, key: String?) {
         /* TODO Check on the Persistent State variable
         Check on updating the values for Package change and for mode change.

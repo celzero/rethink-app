@@ -289,28 +289,29 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
                     Logger.LOG_TAG_DOWNLOAD,
                     "WorkManager state: ${workInfo.state} for ${RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER}"
                 )
-                if (
-                    WorkInfo.State.ENQUEUED == workInfo.state ||
-                        WorkInfo.State.RUNNING == workInfo.state
-                ) {
-                } else if (WorkInfo.State.SUCCEEDED == workInfo.state) {
-                    hideProgress()
-                    onDownloadSuccess()
-                    workManager.pruneWork()
-                } else if (
-                    WorkInfo.State.CANCELLED == workInfo.state ||
-                        WorkInfo.State.FAILED == workInfo.state
-                ) {
-                    hideProgress()
-                    onRemoteDownloadFailure()
-                    Utilities.showToastUiCentered(
-                        requireContext(),
-                        getString(R.string.blocklist_update_check_failure),
-                        Toast.LENGTH_SHORT
-                    )
-                    workManager.pruneWork()
-                    workManager.cancelAllWorkByTag(LocalBlocklistCoordinator.CUSTOM_DOWNLOAD)
-                } else {
+                when (workInfo.state) {
+                    WorkInfo.State.ENQUEUED, WorkInfo.State.RUNNING -> {
+                        // In progress, do nothing
+                    }
+                    WorkInfo.State.SUCCEEDED -> {
+                        hideProgress()
+                        onDownloadSuccess()
+                        workManager.pruneWork()
+                    }
+                    WorkInfo.State.CANCELLED, WorkInfo.State.FAILED -> {
+                        hideProgress()
+                        onRemoteDownloadFailure()
+                        Utilities.showToastUiCentered(
+                            requireContext(),
+                            getString(R.string.blocklist_update_check_failure),
+                            Toast.LENGTH_SHORT
+                        )
+                        workManager.pruneWork()
+                        workManager.cancelAllWorkByTag(LocalBlocklistCoordinator.CUSTOM_DOWNLOAD)
+                    }
+                    else -> {
+                        // no-op
+                    }
                 }
             }
 

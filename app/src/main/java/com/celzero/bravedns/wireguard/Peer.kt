@@ -284,6 +284,7 @@ class Peer private constructor(builder: Builder) {
                 setUnresolvedEndpoint(d)
                 this
             } catch (e: Exception) {
+                com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
                 setUnresolvedEndpoint(d)
                 this
             }

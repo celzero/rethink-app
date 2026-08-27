@@ -722,6 +722,7 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
         try {
             appUpdateManager.unregisterListener(installStateUpdatedListener)
         } catch (e: IllegalArgumentException) {
+            com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
             Logger.w(LOG_TAG_DOWNLOAD, "Unregister receiver exception")
         }
         // mark that app is going to background

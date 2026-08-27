@@ -277,6 +277,7 @@ class AppWiseDomainsAdapter(
                     )
                     .transition(DrawableTransitionOptions.withCrossFade(factory))
             } catch (e: Exception) {
+                com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
                 null
             }
         }

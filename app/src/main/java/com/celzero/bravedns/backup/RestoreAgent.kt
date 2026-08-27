@@ -519,6 +519,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             try {
                 input?.close()
             } catch (e: IOException) {
+                com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
                 // no-op
             }
         }

@@ -251,6 +251,9 @@ class PurchaseProcessingBottomSheet : BottomSheetDialogFragment() {
     }
 
     enum class ProcessingState : Serializable {
+    companion object {
+        private const val serialVersionUID = 1L
+    }
         Processing,
         PendingVerification,
         Success,

@@ -1,3 +1,4 @@
+@file:Suppress("SwallowedException")
 /*
 Copyright 2020 RethinkDNS and its authors
 
@@ -311,7 +312,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
                     applyDnsRule(status)
                 }
 
-                override fun onNothingSelected(parent: AdapterView<*>?) {}
+                override fun onNothingSelected(parent: AdapterView<*>?) { /* no-op */ }
             }
     }
 
@@ -384,7 +385,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
                             applyAppDnsRule(ruleStatus, uid)
                         }
 
-                        override fun onNothingSelected(parent: AdapterView<*>?) {}
+                        override fun onNothingSelected(parent: AdapterView<*>?) { /* no-op */ }
                     }
 
                 b.bsdlAppDomainRuleLl.visibility = View.VISIBLE
@@ -454,6 +455,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
             b.dnsBlockIpsChip.setOnClickListener { showIpsDialog() }
         } catch (e: Exception) {
+            com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
             b.dnsBlockIpsChip.text = getString(R.string.dns_btm_sheet_chip_no_answer)
             return
         }

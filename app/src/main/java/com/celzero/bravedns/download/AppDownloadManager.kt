@@ -263,11 +263,11 @@ class AppDownloadManager(
         Logger.i(LOG_TAG_DNS, "local blocklist download is not in progress, starting the download")
         purge(context, timestamp, DownloadType.LOCAL)
         val downloadIds = LongArray(ONDEVICE_BLOCKLISTS_ADM.count())
-        ONDEVICE_BLOCKLISTS_ADM.forEachIndexed { i, it ->
-            val fileName = it.filename
+        ONDEVICE_BLOCKLISTS_ADM.forEachIndexed { i, item ->
+            val fileName = item.filename
             // url: https://dl.rethinkdns.com/update/blocklists?tstamp=1696197375609&vcode=33
-            Logger.d(LOG_TAG_DOWNLOAD, "v: ($timestamp), f: $fileName, u: $it.url")
-            downloadIds[i] = enqueueDownload(it.url, fileName, timestamp.toString())
+            Logger.d(LOG_TAG_DOWNLOAD, "v: ($timestamp), f: $fileName, u: ${item.url}")
+            downloadIds[i] = enqueueDownload(item.url, fileName, timestamp.toString())
             if (downloadIds[i] == INVALID_DOWNLOAD_ID) {
                 return DownloadManagerStatus.FAILURE
             }

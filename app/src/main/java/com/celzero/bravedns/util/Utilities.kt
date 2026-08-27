@@ -581,6 +581,7 @@ object Utilities {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
     }
 
+    @Suppress("FunctionNaming")
     fun isAtleastO_MR1(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1
     }
@@ -670,6 +671,7 @@ object Utilities {
                 ctx.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
             }
         } catch (e: PackageManager.NameNotFoundException) {
+            com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
             Logger.w(LOG_TAG_FIREWALL, "no app info for package name: $packageName")
             null
         }

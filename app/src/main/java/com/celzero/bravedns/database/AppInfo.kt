@@ -26,6 +26,9 @@ import java.io.Serializable
 
 @Entity(primaryKeys = ["uid", "packageName"], tableName = "AppInfo")
 class AppInfo : Serializable {
+    companion object {
+        private const val serialVersionUID = 1L
+    }
     var packageName: String = ""
     var appName: String = ""
     var uid: Int = 0

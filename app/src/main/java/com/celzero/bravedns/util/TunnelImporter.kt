@@ -107,7 +107,7 @@ object TunnelImporter : KoinComponent {
                             }
                             try {
                                     Config.parse(reader)
-                                } catch (e: Throwable) {
+                                } catch (e: Exception) {
                                     throwables.add(e)
                                     null
                                 }
@@ -139,7 +139,7 @@ object TunnelImporter : KoinComponent {
                 withContext(Dispatchers.Main.immediate) {
                     onTunnelImportFinished(throwables, messageCallback)
                 }
-            } catch (e: Throwable) {
+            } catch (e: Exception) {
                 withContext(Dispatchers.Main.immediate) {
                     onTunnelImportFinished(listOf(e), messageCallback)
                 }
@@ -155,7 +155,7 @@ object TunnelImporter : KoinComponent {
                         ByteArrayInputStream(configText.toByteArray(StandardCharsets.UTF_8))
                     )
                 WireguardManager.addConfig(config)
-            } catch (e: Throwable) {
+            } catch (e: Exception) {
                 onTunnelImportFinished(listOf(e), messageCallback)
             }
         }

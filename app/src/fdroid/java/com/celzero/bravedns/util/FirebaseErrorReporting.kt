@@ -1,3 +1,4 @@
+@file:Suppress("UnusedParameter", "FunctionOnlyReturningConstant", "EmptyFunctionBlock")
 /*
  * Copyright 2025 RethinkDNS and its authors
  *

@@ -15,12 +15,9 @@
  */
 package com.celzero.bravedns.download
 
-class DownloadConstants {
-
-    companion object {
+object DownloadConstants {
         const val OUTPUT_FILES = "FILES_OUTPUT"
 
         const val FILE_TAG = "FILE_WORKER"
         const val DOWNLOAD_TAG = "DOWNLOAD_WORKER"
-    }
 }

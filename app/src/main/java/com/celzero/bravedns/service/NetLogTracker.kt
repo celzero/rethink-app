@@ -212,5 +212,5 @@ internal constructor(
 
     private fun serializer(s: String, e: ExecutorCoroutineDispatcher, f: suspend () -> Unit) =
         scope?.launch(CoroutineName(s) + e) { f() }
-            ?: Log.e(LOG_BATCH_LOGGER, "scope is null", Exception())
+            ?: Log.e(LOG_BATCH_LOGGER, "scope is null", Exception("NetLogTracker scope is null"))
 }

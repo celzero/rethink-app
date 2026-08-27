@@ -103,6 +103,7 @@ class GoMemLogConsumer(private val appContext: Context, private val scope: Corou
 
         private val NEWLINE_BYTE: Byte = '\n'.code.toByte()
 
+        @Suppress("UnusedParameter")
         fun getInstance(appContext: Context?, scope: CoroutineScope?, fda: Long, fdb: Long, slotSize: Int): LogConsumer? {
             if (appContext == null) {
                 Logger.w(LOG_TAG_BUG_REPORT, "$TAG getInstance: appContext null")

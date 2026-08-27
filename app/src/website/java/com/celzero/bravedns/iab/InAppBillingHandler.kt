@@ -786,6 +786,7 @@ object InAppBillingHandler : KoinComponent {
             }
         }
 
+    @Suppress("CyclomaticComplexMethod")
     private suspend fun handlePurchase(
         purchasesList: List<Purchase>?,
         queriedProductType: String? = null
@@ -2565,6 +2566,7 @@ object InAppBillingHandler : KoinComponent {
      * needs to post to [serverApiErrorLiveData] which is a UI-bound [MutableLiveData]
      * owned by this object.
      */
+    @Suppress("UnusedParameter")
     private suspend fun handleConflict409(
         operation: ServerApiError.Operation,
         accountId: String,

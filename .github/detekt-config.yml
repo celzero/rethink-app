@@ -20,6 +20,14 @@ style:
   ReturnCount:
     active: false
 
+  LoopWithTooManyJumpStatements:
+    active: false
+
+naming:
+  FunctionNaming:
+    active: true
+    ignoreAnnotated:
+      - 'Composable'
 
 exceptions:
   TooGenericExceptionCaught:
@@ -28,11 +36,9 @@ exceptions:
       - Throwable
       - Error
 
-
 coroutines:
   RedundantSuspendModifier:
     active: false
-
 
 complexity:
   TooManyFunctions:
@@ -47,3 +53,15 @@ complexity:
   LongMethod:
     active: false
 
+  ComplexCondition:
+    active: false
+
+  NestedBlockDepth:
+    active: false
+
+  CyclomaticComplexMethod:
+    active: true
+    allowedComplexity: 35
+    ignoreSingleWhenExpression: true
+    ignoreSimpleWhenEntries: true
+    ignoreNestingFunctions: true

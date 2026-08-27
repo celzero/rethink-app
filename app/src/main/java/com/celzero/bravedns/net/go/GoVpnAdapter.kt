@@ -1,3 +1,4 @@
+@file:Suppress("UnusedParameter", "FunctionParameterNaming")
 /*
  * Copyright 2021 RethinkDNS and its authors
  * Copyright 2019 Jigsaw Operations LLC
@@ -2430,6 +2431,7 @@ class GoVpnAdapter : KoinComponent {
                 val fragment = uri.rawFragment?.let { "#$it" }.orEmpty()
                 "$scheme://$ipHost$portPart$path$query$fragment"
             } catch (e: Exception) {
+                com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
                 url
             }
         }
@@ -3691,6 +3693,8 @@ class GoVpnAdapter : KoinComponent {
         return false
     }
 
+    @Suppress("FunctionParameterNaming")
+    @Suppress("UnusedParameter")
     fun performAutoConnectivityCheck(controller: Controller, id: String, mode: String): Boolean {
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip auto connectivity check")
@@ -3708,7 +3712,7 @@ class GoVpnAdapter : KoinComponent {
         return false
     }
 
-    fun setPlusStrategy(option: Long): Tunnel {
+    fun setPlusStrategy(_: Long): Tunnel {
         // Settings.PlusFilterSafest, Settings.PlusOrderFastest
         // default value for PlusStrategy is Safest, which is the safest strategy
         // fastest is another strategy, which is not used for now (v055n)

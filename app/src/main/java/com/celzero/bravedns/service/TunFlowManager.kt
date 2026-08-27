@@ -1,3 +1,4 @@
+@file:Suppress("FunctionParameterNaming")
 /*
  * Copyright 2026 RethinkDNS and its authors
  *
@@ -1080,6 +1081,7 @@ object TunFlowManager : KoinComponent {
         return mark
     }
 
+    @Suppress("CyclomaticComplexMethod")
     suspend fun determineProxyDetails(
         ctx: FlowContext,
         connTracker: ConnTrackerMetaData,

@@ -459,7 +459,7 @@ class VpnServerAdapter(
 
                     applyStats(config, statusPair, stats)
                 }
-            } catch (t: Throwable) {
+            } catch (t: Exception) {
                 Logger.w(LOG_TAG_UI, "VpnServerAdapter fetchAndApplyStats[${group.key}]: ${t.message}")
                 // If stats fetch fails (e.g. tunnel not up yet), keep the "Checking…"
                 // pulse visible and retry after the next poll interval.
@@ -480,7 +480,7 @@ class VpnServerAdapter(
                     runCatching { VpnController.getRpnClientInfoById(key) }.getOrNull()
                 }
                 runCatching { client?.iP4() }.getOrNull()
-            } catch (t: Throwable) {
+            } catch (t: Exception) {
                 Logger.w(LOG_TAG_UI, "VpnServerAdapter fetchIpForGroup[${group.key}]: ${t.message}")
                 null
             }

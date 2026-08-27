@@ -166,6 +166,7 @@ internal constructor(
                 inetAddress
             }
         } catch (e: Exception) {
+            com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
             Logger.w(LOG_TAG_FIREWALL, "err while converting IP to InetAddress: $ip")
         }
         return null
