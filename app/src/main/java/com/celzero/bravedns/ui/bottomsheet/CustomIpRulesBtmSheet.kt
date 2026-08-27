@@ -107,7 +107,7 @@ class CustomIpRulesBtmSheet :
             arguments?.getSerializable(ARG_CUSTOM_IP, CustomIp::class.java)
         } else {
             @Suppress("DEPRECATION")
-            arguments?.getSerializable(ARG_CUSTOM_IP) as? CustomIp
+@Suppress("DEPRECATION")            arguments?.getSerializable(ARG_CUSTOM_IP) as? CustomIp
         } ?: run {
             Logger.e(LOG_TAG_UI, "$TAG: CustomIp not found in arguments, dismissing")
             dismiss()

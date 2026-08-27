@@ -102,7 +102,7 @@ class RethinkPlusFilterBottomSheet : BottomSheetDialogFragment() {
     private fun initView() {
         filters = fragmentActivity?.filterObserver()?.value
         @Suppress("UNCHECKED_CAST", "DEPRECATION")
-        val fileTags = (arguments?.getSerializable(ARG_FILE_TAGS) as? ArrayList<FileTag>) ?: emptyList()
+@Suppress("UNCHECKED_CAST", "DEPRECATION")        val fileTags = (arguments?.getSerializable(ARG_FILE_TAGS) as? ArrayList<FileTag>) ?: emptyList()
         makeChipSubGroup(fileTags)
     }
 

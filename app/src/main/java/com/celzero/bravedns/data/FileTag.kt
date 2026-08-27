@@ -70,7 +70,11 @@ data class FileTag(
     val entries: Int,
     var simpleTagId: Int = INVALID_SIMPLE_TAG_ID,
     var isSelected: Boolean = false
-) : Serializable
+) : Serializable {
+    companion object {
+        private const val serialVersionUID: Long = 1L
+    }
+}
 
 private const val INVALID_SIMPLE_TAG_ID = -1
 

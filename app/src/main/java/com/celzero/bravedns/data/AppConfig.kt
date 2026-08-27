@@ -443,7 +443,7 @@ internal constructor(
                 Logger.crash(
                     LOG_TAG_VPN,
                     "invalid brave mode: ${persistentState.braveMode}",
-                    Exception()
+                    Exception("Invalid brave mode")
                 )
                 TunDnsMode.NONE
             }

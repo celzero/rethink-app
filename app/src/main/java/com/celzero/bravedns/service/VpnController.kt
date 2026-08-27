@@ -149,7 +149,7 @@ object VpnController : KoinComponent {
     }
 
     @Suppress("DEPRECATION")
-    fun state(): VpnState {
+@Suppress("DEPRECATION")    fun state(): VpnState {
         val requested: Boolean = persistentState.getVpnEnabled()
         val b = rvpn
         val cs = vpnState

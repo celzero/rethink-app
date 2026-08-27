@@ -109,6 +109,7 @@ class NonStoreAppUpdater(
                                 listener.onUpdateAvailable(AppUpdater.InstallSource.OTHER)
                             }
                         } catch (e: Exception) {
+                            com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
                             listener.onUpdateCheckFailed(
                                 AppUpdater.InstallSource.OTHER,
                                 isInteractive

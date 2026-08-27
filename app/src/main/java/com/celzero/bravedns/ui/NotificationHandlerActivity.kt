@@ -112,7 +112,7 @@ class NotificationHandlerActivity: BaseActivity() {
     // In two-cases (accessibility failure/new app install action), the app directly launches
     // firewall activity from notification action. Need to handle the pause state for those cases
     @Suppress("DEPRECATION")
-    private fun handleNotificationIntent(intent: Intent) {
+@Suppress("DEPRECATION")    private fun handleNotificationIntent(intent: Intent) {
         // app not started launch home screen
         if (!VpnController.isOn()) {
             trampoline(TrampolineType.NONE, intent)

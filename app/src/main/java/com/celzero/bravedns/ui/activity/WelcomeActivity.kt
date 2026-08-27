@@ -168,7 +168,7 @@ class WelcomeActivity : BaseActivity(R.layout.activity_welcome) {
             return ViewHolder(view)
         }
 
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {}
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) { /* no-op */ }
 
         override fun getItemCount(): Int = layouts.size
 

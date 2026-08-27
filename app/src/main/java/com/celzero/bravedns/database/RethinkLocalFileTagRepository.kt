@@ -1,4 +1,4 @@
-/*
+@file:Suppress("UnusedParameter", "FunctionParameterNaming")/*
 Copyright 2022 RethinkDNS and its authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,11 +31,13 @@ class RethinkLocalFileTagRepository(private val rethinkLocalFileTagDao: RethinkL
         return rethinkLocalFileTagDao.update(fileTag)
     }
 
-    fun contentInsert(fileTag: RethinkLocalFileTag): Long {
+    @Suppress("UnusedParameter")
+@Suppress("UnusedParameter")    fun contentInsert(fileTag: RethinkLocalFileTag): Long {
         return rethinkLocalFileTagDao.insert(fileTag)
     }
 
-    fun contentDelete(id: Int): Int {
+    @Suppress("FunctionParameterNaming")
+@Suppress("FunctionParameterNaming")    fun contentDelete(id: Int): Int {
         return rethinkLocalFileTagDao.contentDelete(id)
     }
 
@@ -75,7 +77,8 @@ class RethinkLocalFileTagRepository(private val rethinkLocalFileTagDao: RethinkL
         return rethinkLocalFileTagDao.getFileTags()
     }
 
-    fun contentGetAllFileTags(): Cursor {
+    @Suppress("UnusedParameter")
+@Suppress("FunctionParameterNaming", "UnusedParameter")    fun contentGetAllFileTags(): Cursor {
         return rethinkLocalFileTagDao.getFileTags()
     }
 

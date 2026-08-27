@@ -1,4 +1,4 @@
-/*
+@file:Suppress("SwallowedException")/*
  * Copyright 2021 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -388,7 +388,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             }
 
             @Suppress("DEPRECATION")
-            val wifiInfo: WifiInfo? = wm.connectionInfo
+@Suppress("DEPRECATION")            val wifiInfo: WifiInfo? = wm.connectionInfo
             if (wifiInfo == null) {
                 Logger.v(LOG_TAG_CONNECTION, "getNetworkSSID: WifiInfo is null")
                 return null
@@ -757,6 +757,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 val diagnosticMgr = DiagnosticsManager(context, scope, this)
                 diagnosticMgr.register()
             } catch (e: Exception) {
+                com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
                 Logger.w(LOG_TAG_CONNECTION, "DiagnosticsManager; err while getting connectivity diagnostics manager")
             }
         }
@@ -828,7 +829,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
         }
         // TODO: process after a delay to avoid processing multiple network changes in short bursts
         @Suppress("OPT_IN_USAGE")
-        if (DEBUG) Logger.v(LOG_TAG_CONNECTION, "sendNetworkChanges, channel closed? ${channel.isClosedForSend} msg: ${msg.msgType}, test: ${msg.testReachability}, stall: ${msg.stallOnNoNetwork}, useAutoChecks: ${msg.useAutoConnectivityChecks}, networks: ${msg.networkSet.size}")
+@Suppress("OPT_IN_USAGE")        if (DEBUG) Logger.v(LOG_TAG_CONNECTION, "sendNetworkChanges, channel closed? ${channel.isClosedForSend} msg: ${msg.msgType}, test: ${msg.testReachability}, stall: ${msg.stallOnNoNetwork}, useAutoChecks: ${msg.useAutoConnectivityChecks}, networks: ${msg.networkSet.size}")
         try {
             channel.send(msg)
         } catch (e: Exception) {
@@ -1429,7 +1430,8 @@ class ConnectionMonitor(private val context: Context, private val networkListene
          *
          * @param opPrefs The operation preferences, which include settings like whether to test
          */
-        private suspend fun repopulateTrackedNetworks(
+        @Suppress("CyclomaticComplexMethod")
+@Suppress("CyclomaticComplexMethod")        private suspend fun repopulateTrackedNetworks(
             opPrefs: OpPrefs,
             nwProps: LinkedHashSet<NetworkProperties>
         ) {
@@ -1748,7 +1750,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 if (networkSet.isEmpty()) {
                     Logger.d(LOG_TAG_CONNECTION, "networkSet is empty")
                     @Suppress("DEPRECATION")
-                    cm.allNetworks
+@Suppress("DEPRECATION")                    cm.allNetworks
                 } else {
                     Logger.d(LOG_TAG_CONNECTION, "networkSet size: ${networkSet.size}")
                     networkSet.map { it.network }.toTypedArray()

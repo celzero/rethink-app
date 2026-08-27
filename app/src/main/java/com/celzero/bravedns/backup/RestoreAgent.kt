@@ -356,7 +356,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     }
 
     @Suppress("DEPRECATION")
-    private fun getLatestVersion(): Int {
+@Suppress("DEPRECATION")    private fun getLatestVersion(): Int {
         val pInfo: PackageInfo? =
             Utilities.getPackageMetadata(context.packageManager, context.packageName)
         return pInfo?.versionCode ?: 0
@@ -414,7 +414,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             input = ObjectInputStream(FileInputStream(prefsBackupFile))
 
             @Suppress("UNCHECKED_CAST")
-            val pref: Map<String, *> = input.readObject() as Map<String, *>
+@Suppress("UNCHECKED_CAST")            val pref: Map<String, *> = input.readObject() as Map<String, *>
 
             for (e in pref.entries) {
                 val v: Any? = e.value
@@ -482,7 +482,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             val prefsEditor = currentSharedPreferences.edit()
             prefsEditor.clear()
             @Suppress("UNCHECKED_CAST")
-            val pref: Map<String, *> = input.readObject() as Map<String, *>
+@Suppress("UNCHECKED_CAST")            val pref: Map<String, *> = input.readObject() as Map<String, *>
 
             for (e in pref.entries) {
                 if (!shouldRestorePref(e.key)) {
@@ -519,6 +519,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             try {
                 input?.close()
             } catch (e: IOException) {
+                com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
                 // no-op
             }
         }

@@ -1,4 +1,4 @@
-/*
+@file:Suppress("EmptyFunctionBlock")/*
  * Copyright 2023 RethinkDNS and its authors
  *
  * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.
@@ -32,5 +32,5 @@ constructor(
         parsingClass: Class<*>,
         text: CharSequence,
         cause: Throwable?
-    ) : this(parsingClass, text, null, cause) {}
+    ) : this(parsingClass, text, null, cause)
 }

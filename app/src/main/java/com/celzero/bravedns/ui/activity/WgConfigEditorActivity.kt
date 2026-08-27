@@ -225,7 +225,7 @@ class WgConfigEditorActivity : BaseActivity(R.layout.activity_wg_config_editor) 
                     .build()
             wgConfig = WireguardManager.addOrUpdateInterface(configId, name, wgInterface)
             return wgConfig
-        } catch (e: Throwable) {
+        } catch (e: Exception) {
             val error = ErrorMessages[this, e]
             val ex = throwableToException(e)
             Logger.e(LOG_TAG_PROXY, "err while parsing wg interface: $error", ex)

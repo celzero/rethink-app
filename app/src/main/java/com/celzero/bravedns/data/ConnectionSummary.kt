@@ -30,4 +30,8 @@ data class ConnectionSummary(
     val message: String,
     val targetIp: String?,
     var flag: String?
-) : Serializable
+) : Serializable {
+    companion object {
+        private const val serialVersionUID = 1L
+    }
+}

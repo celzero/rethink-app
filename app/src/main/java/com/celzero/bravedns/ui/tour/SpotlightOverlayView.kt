@@ -1,4 +1,4 @@
-/*
+@file:Suppress("SwallowedException")/*
  * Copyright 2024 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -270,6 +270,8 @@ class SpotlightOverlayView @JvmOverloads constructor(
                 tv.data
             } else {
                 try { context.resources.getColor(tv.resourceId, context.theme) } catch (e: Exception) { fallback }
+                    com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
+                    com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
             }
         } else {
             fallback

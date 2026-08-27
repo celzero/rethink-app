@@ -1,4 +1,4 @@
-/*
+@file:Suppress("SerialVersionUIDInSerializableClass")/*
  * Copyright 2021 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +24,9 @@ import java.io.Serializable
 
 @Entity(primaryKeys = ["domain", "uid"], tableName = "CustomDomain")
 class CustomDomain : Serializable {
+    companion object {
+        private const val serialVersionUID: Long = 1L
+    }
     var domain: String = ""
     var uid: Int = Constants.UID_EVERYBODY
     var ips: String = ""

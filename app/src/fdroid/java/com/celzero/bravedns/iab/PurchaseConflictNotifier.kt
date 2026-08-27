@@ -28,6 +28,6 @@ object PurchaseConflictNotifier {
     const val EXTRA_SKU            = "conflict_sku"
 
     @Suppress("UNUSED_PARAMETER")
-    fun cancel(context: Context) { /* no-op */ }
+@Suppress("UNUSED_PARAMETER")    fun cancel(context: Context) { /* no-op */ }
 }
 

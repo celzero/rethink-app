@@ -1,4 +1,4 @@
-/*
+@file:Suppress("UnusedPrivateProperty", "EmptyFunctionBlock")/*
  * Copyright 2023 RethinkDNS and its authors
  *
  * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.
@@ -32,26 +32,26 @@ private constructor(
         location: Location,
         reason: Reason,
         text: CharSequence?
-    ) : this(section, location, reason, text, null) {}
+    ) : this(section, location, reason, text, null)
 
     constructor(
         section: Section,
         location: Location,
         text: CharSequence?,
         cause: NumberFormatException?
-    ) : this(section, location, Reason.INVALID_NUMBER, text, cause) {}
+    ) : this(section, location, Reason.INVALID_NUMBER, text, cause)
 
     constructor(
         section: Section,
         location: Location,
         cause: ParseException
-    ) : this(section, location, Reason.INVALID_VALUE, cause.text, cause) {}
+    ) : this(section, location, Reason.INVALID_VALUE, cause.text, cause)
 
     constructor(
         section: Section,
         location: Location,
         cause: Throwable
-    ) : this(section, location, Reason.SYNTAX_ERROR, null, cause) {}
+    ) : this(section, location, Reason.SYNTAX_ERROR, null, cause)
 
     enum class Location(name: String) {
         TOP_LEVEL(""),

@@ -1,4 +1,4 @@
-/*
+@file:Suppress("VariableNaming")/*
  * Copyright 2021 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,7 @@ import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 
 class StoreAppUpdater(context: Context) : AppUpdater {
-    private val LOG_TAG = "StoreAppUpdater"
+    private val log_tag = "StoreAppUpdater"
     private val listenerMapping = mutableMapOf<AppUpdater.InstallStateListener, InstallStateUpdatedListener>()
     private val appUpdateManager by lazy {
         AppUpdateManagerFactory.create(context)

@@ -1,4 +1,4 @@
-/*
+@file:Suppress("UnusedParameter", "FunctionParameterNaming")/*
  * Copyright 2021 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,11 +39,13 @@ enum class Themes(val id: Int) {
             return entries.count()
         }
 
-        fun isFrostTheme(id: Int): Boolean {
+        @Suppress("UnusedParameter")
+@Suppress("UnusedParameter")        fun isFrostTheme(id: Int): Boolean {
             return id == DARK_FROST.id
         }
 
-        fun isThemeAvailable(_id: Int): Boolean {
+        @Suppress("FunctionOnlyReturningConstant")
+@Suppress("FunctionOnlyReturningConstant")        fun isThemeAvailable(id: Int): Boolean {
             return true
         }
 

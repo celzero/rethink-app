@@ -1,0 +1,65 @@
+I'll retrieve the job logs to identify the failure and provide you with a solution.Now let me examine the failing files to understand the issues:# Solution for Failing Job
+
+The build is failing due to **Kotlin compilation errors** in several database files. Here are the issues and fixes:
+
+## Issues Found
+
+1. **Duplicate `companion object` in `CustomDomain.kt`** (Line 100-106)
+   - The class has two companion object declarations, which is invalid
+   - Line 27-29 has an empty companion object, and lines 100-106 has the actual implementation with `CURRENT_VERSION`
+
+2. **Duplicate `@Suppress` annotations in `LogDatabase.kt`** (Line 56-57)
+   - The annotation is repeated twice on the same function
+
+3. **Duplicate `@Suppress` annotations in `RefreshDatabase.kt`** (Line 764-765)
+   - The annotation is repeated twice on the same function
+
+## Fixes
+
+### Fix 1: CustomDomain.kt
+Remove the empty companion object at line 27-29:
+
+```kotlin
+@Entity(primaryKeys = ["domain", "uid"], tableName = "CustomDomain")
+class CustomDomain : Serializable {
+    var domain: String = ""
+    var uid: Int = Constants.UID_EVERYBODY
+    var ips: String = ""
+    var status: Int = 0
+    var type: Int = 0
+    var proxyId: String = ""
+    var proxyCC: String = ""
+    var modifiedTs: Long = SystemClock.elapsedRealtime()
+    var deletedTs: Long = SystemClock.elapsedRealtime()
+    var version: Long = getCurrentVersion()
+
+    // ... rest of code ...
+
+    companion object {
+        private const val CURRENT_VERSION: Long = 1L
+
+        fun getCurrentVersion(): Long {
+            return CURRENT_VERSION
+        }
+    }
+    // ... rest of code ...
+}
+```
+
+### Fix 2: LogDatabase.kt (Line 56-57)
+Remove the duplicate `@Suppress("DEPRECATION")`:
+
+```kotlin
+@Suppress("DEPRECATION")
+fun buildDatabase(context: Context): LogDatabase {
+```
+
+### Fix 3: RefreshDatabase.kt (Line 764-765)
+Remove the duplicate `@Suppress("DEPRECATION")`:
+
+```kotlin
+@Suppress("DEPRECATION")
+if (!VpnController.isOn()) return
+```
+
+These are straightforward fixes—simply remove the duplicate/empty companion object and deduplicate the `@Suppress` annotations.

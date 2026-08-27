@@ -252,6 +252,6 @@ class GlobalProxyHandlerTest : KoinTest {
         }
         field!!.isAccessible = true
         @Suppress("UNCHECKED_CAST")
-        return field.get(obj) as T
+@Suppress("UNCHECKED_CAST")        return field.get(obj) as T
     }
 }

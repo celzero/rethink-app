@@ -40,4 +40,8 @@ data class ConnTrackerMetaData(
     var uploadBytes: Long = 0,
     var duration: Int = 0,
     var synack: Long = 0 // treat it as rtt (round trip time
-) : Serializable
+) : Serializable {
+    companion object {
+        private const val serialVersionUID = 1L
+    }
+}

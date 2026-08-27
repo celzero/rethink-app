@@ -124,7 +124,7 @@ class RpnProxyManagerTest : KoinTest {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T> getPrivateField(obj: Any, fieldName: String): T {
+@Suppress("UNCHECKED_CAST")    private fun <T> getPrivateField(obj: Any, fieldName: String): T {
         val field: Field = obj.javaClass.getDeclaredField(fieldName)
         field.isAccessible = true
         return field.get(obj) as T

@@ -99,7 +99,7 @@ class PurchaseProcessingBottomSheet : BottomSheetDialogFragment() {
             arguments?.getSerializable(ARG_STATE, ProcessingState::class.java)
         } else {
             @Suppress("DEPRECATION")
-            arguments?.getSerializable(ARG_STATE) as? ProcessingState
+@Suppress("DEPRECATION")            arguments?.getSerializable(ARG_STATE) as? ProcessingState
         } ?: ProcessingState.Processing
 
         val message = arguments?.getString(ARG_MESSAGE)
@@ -250,13 +250,13 @@ class PurchaseProcessingBottomSheet : BottomSheetDialogFragment() {
         _binding = null
     }
 
-    enum class ProcessingState : Serializable {
+        enum class ProcessingState : java.io.Serializable {
         Processing,
         PendingVerification,
         Success,
         Error,
         ServerAckPending,
         PendingTimeout,
-        PaymentDeclined
+        PaymentDeclined;
     }
 }

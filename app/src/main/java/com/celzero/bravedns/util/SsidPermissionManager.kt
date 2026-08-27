@@ -137,7 +137,8 @@ object SsidPermissionManager {
      * @param grantResults The grant results
      * @param callback The callback to handle the result
      */
-    fun handlePermissionResult(
+    @Suppress("UnusedParameter")
+@Suppress("UnusedParameter")    fun handlePermissionResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray,
@@ -162,6 +163,7 @@ object SsidPermissionManager {
             intent.data = android.net.Uri.fromParts("package", context.packageName, null)
             context.startActivity(intent)
         } catch (e: Exception) {
+            com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
             // Fallback to general app settings if specific intent fails
             try {
                 val fallbackIntent = Intent(android.provider.Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS)

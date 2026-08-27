@@ -30,7 +30,7 @@ import com.celzero.bravedns.util.Utilities.isAtleastU
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class VpnControlReceiver: BroadcastReceiver(), KoinComponent {
+class VPNControlReceiver: BroadcastReceiver(), KoinComponent {
     private val persistentState by inject<PersistentState>()
     companion object {
         private const val TAG = "VpnCtrlRecr"
@@ -72,7 +72,7 @@ class VpnControlReceiver: BroadcastReceiver(), KoinComponent {
     }
 
     @Suppress("DEPRECATION")
-    private fun handleVpnStart(context: Context) {
+@Suppress("DEPRECATION")    private fun handleVpnStart(context: Context) {
         if (VpnController.isOn()) {
             Logger.i(LOG_TAG_VPN, "$TAG VPN is already running, ignoring start intent")
             return
@@ -97,7 +97,7 @@ class VpnControlReceiver: BroadcastReceiver(), KoinComponent {
     }
 
     @Suppress("DEPRECATION")
-    private fun handleVpnStop(context: Context) {
+@Suppress("DEPRECATION")    private fun handleVpnStop(context: Context) {
         if (!VpnController.isOn()) {
             Logger.i(LOG_TAG_VPN, "$TAG VPN is not running, ignoring stop intent")
             return
@@ -184,7 +184,7 @@ class VpnControlReceiver: BroadcastReceiver(), KoinComponent {
 
         for (key in extras.keySet()) {
             @Suppress("DEPRECATION")
-            sb.append("  $key -> ${extras.get(key)}\n")
+@Suppress("DEPRECATION")            sb.append("  $key -> ${extras.get(key)}\n")
         }
 
         Logger.i(LOG_TAG_VPN, "$TAG $sb")

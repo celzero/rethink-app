@@ -1,0 +1,8 @@
+﻿2026-08-27T04:51:39.1627008Z ##[group]Run chmod +x gradlew
+2026-08-27T04:51:39.1627609Z [36;1mchmod +x gradlew[0m
+2026-08-27T04:51:39.1673334Z shell: /usr/bin/bash -e {0}
+2026-08-27T04:51:39.1673814Z env:
+2026-08-27T04:51:39.1674216Z   VARIANT: assembleWebsiteFullDebug
+2026-08-27T04:51:39.1674791Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-1/x64
+2026-08-27T04:51:39.1675489Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-1/x64
+2026-08-27T04:51:39.1676061Z ##[endgroup]

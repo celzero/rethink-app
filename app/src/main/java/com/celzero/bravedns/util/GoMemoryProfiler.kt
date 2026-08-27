@@ -117,6 +117,7 @@ object GoMemoryProfiler {
                 ProfileResult(file, false, msg)
             }
         } catch (e: TimeoutCancellationException) {
+            com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
             val msg = "Go memory profile timed out after ${FILE_WRITE_TIMEOUT_MS}ms"
             if (file.exists() && file.length() == 0L) file.delete()
             ProfileResult(file, false, msg)

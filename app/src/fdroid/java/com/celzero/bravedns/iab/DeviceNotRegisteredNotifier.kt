@@ -24,6 +24,6 @@ object DeviceNotRegisteredNotifier {
     const val EXTRA_DEVICE_ID_PREFIX = "dnr_device_id_prefix"
 
     @Suppress("UNUSED_PARAMETER")
-    fun cancel(context: Context) { /* no-op */ }
+@Suppress("UNUSED_PARAMETER")    fun cancel(context: Context) { /* no-op */ }
 }
 

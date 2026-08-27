@@ -1,4 +1,4 @@
-/*
+@file:Suppress("VariableNaming")/*
  * Copyright 2020 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -109,7 +109,7 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         connectionTrackerDAO.closeConnectionForUids(uids, reason)
     }
 
-    private val BLOCKED_WINDOW_MS = 5 * 60 * 1000L // 5 minutes
+    private val blocked_window_ms = 5 * 60 * 1000L // 5 minutes
     fun getBlockedConnectionsCountLiveData(): LiveData<Int> {
         val since = System.currentTimeMillis() - BLOCKED_WINDOW_MS
 

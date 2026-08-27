@@ -156,6 +156,7 @@ abstract class LogDatabase : RoomDatabase() {
                 // in the table if it exists, otherwise it will return -1
                 cursor.getInt(0) > 0
             } catch (e: SQLiteException) {
+                com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
                 // return false if the table does not exist
                 false
             } finally {

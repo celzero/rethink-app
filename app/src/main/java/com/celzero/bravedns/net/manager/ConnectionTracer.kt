@@ -177,7 +177,7 @@ class ConnectionTracer(ctx: Context) {
         Logger.d(LOG_TAG_VPN, "getUidQ: addUidToCache; cache put: $uid, $key")
         try {
             uidCache.put(key, uid)
-        } catch (t: Throwable) {
+        } catch (t: Exception) {
             Logger.w(LOG_TAG_VPN, "getUidQ: err addUidToCache: " + t.message)
         }
     }

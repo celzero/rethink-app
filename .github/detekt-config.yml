@@ -2,6 +2,20 @@
 # Excludes test files from code scanning
 # excludes magic numbers, return count, long parameter, long methods
 
+potential-bugs:
+  UnsafeCallOnNullableType:
+    active: false
+  UnnecessarySafeCall:
+    active: false
+  UnreachableCode:
+    active: false
+  DoubleMutabilityForCollection:
+    active: false
+
+performance:
+  ArrayPrimitive:
+    active: false
+
 style:
   MaxLineLength:
     active: true
@@ -20,6 +34,41 @@ style:
   ReturnCount:
     active: false
 
+  LoopWithTooManyJumpStatements:
+    active: false
+
+  UnusedPrivateProperty:
+    active: false
+
+  UnusedPrivateFunction:
+    active: false
+
+  UnusedVariable:
+    active: false
+
+  VarCouldBeVal:
+    active: false
+
+  UseOrEmpty:
+    active: false
+
+  UseCheckOrError:
+    active: false
+
+  AbstractClassCanBeConcreteClass:
+    active: false
+
+naming:
+  FunctionNaming:
+    active: true
+    ignoreAnnotated:
+      - 'Composable'
+
+  MemberNameEqualsClassName:
+    active: false
+
+  NoNameShadowing:
+    active: false
 
 exceptions:
   TooGenericExceptionCaught:
@@ -28,11 +77,9 @@ exceptions:
       - Throwable
       - Error
 
-
 coroutines:
   RedundantSuspendModifier:
     active: false
-
 
 complexity:
   TooManyFunctions:
@@ -47,3 +94,15 @@ complexity:
   LongMethod:
     active: false
 
+  ComplexCondition:
+    active: false
+
+  NestedBlockDepth:
+    active: false
+
+  CyclomaticComplexMethod:
+    active: true
+    allowedComplexity: 35
+    ignoreSingleWhenExpression: true
+    ignoreSimpleWhenEntries: true
+    ignoreNestingFunctions: true

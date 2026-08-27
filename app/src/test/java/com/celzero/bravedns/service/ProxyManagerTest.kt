@@ -222,7 +222,7 @@ class ProxyManagerTest : KoinTest {
         val field = ProxyManager::class.java.getDeclaredField("pamSet")
         field.isAccessible = true
         @Suppress("UNCHECKED_CAST")
-        (field.get(ProxyManager) as CopyOnWriteArraySet<*>).clear()
+@Suppress("UNCHECKED_CAST")        (field.get(ProxyManager) as CopyOnWriteArraySet<*>).clear()
     }
 
     /**
@@ -236,7 +236,7 @@ class ProxyManagerTest : KoinTest {
         val field = ProxyManager::class.java.getDeclaredField("pamSet")
         field.isAccessible = true
         @Suppress("UNCHECKED_CAST")
-        val pamSet = field.get(ProxyManager) as CopyOnWriteArraySet<ProxyManager.ProxyAppMapTuple>
+@Suppress("UNCHECKED_CAST")        val pamSet = field.get(ProxyManager) as CopyOnWriteArraySet<ProxyManager.ProxyAppMapTuple>
         rows.forEach { row ->
             pamSet.add(ProxyManager.ProxyAppMapTuple(row.uid, row.packageName, row.proxyId))
         }
@@ -246,7 +246,7 @@ class ProxyManagerTest : KoinTest {
         val field = ProxyManager::class.java.getDeclaredField("pamSet")
         field.isAccessible = true
         @Suppress("UNCHECKED_CAST")
-        return (field.get(ProxyManager) as CopyOnWriteArraySet<*>).size
+@Suppress("UNCHECKED_CAST")        return (field.get(ProxyManager) as CopyOnWriteArraySet<*>).size
     }
 
     // ========================================================================
@@ -1397,7 +1397,7 @@ class ProxyManagerTest : KoinTest {
         val field = ProxyManager::class.java.getDeclaredField("pamSet")
         field.isAccessible = true
         @Suppress("UNCHECKED_CAST")
-        val set = field.get(ProxyManager) as CopyOnWriteArraySet<ProxyManager.ProxyAppMapTuple>
+@Suppress("UNCHECKED_CAST")        val set = field.get(ProxyManager) as CopyOnWriteArraySet<ProxyManager.ProxyAppMapTuple>
         return set.any { it.uid == uid && it.packageName == pkg && it.proxyId == proxyId }
     }
 }

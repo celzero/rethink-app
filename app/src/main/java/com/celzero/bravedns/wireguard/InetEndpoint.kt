@@ -1,4 +1,4 @@
-/*
+@file:Suppress("ThrowsCount")/*
  * Copyright 2023 RethinkDNS and its authors
  *
  * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.
@@ -44,7 +44,7 @@ private constructor(val host: String, private val isResolved: Boolean, val port:
     private var resolved: InetEndpoint? = null
 
     @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-    override fun equals(obj: Any?): Boolean {
+@Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")    override fun equals(obj: Any?): Boolean {
         if (obj !is InetEndpoint) return false
         return host == obj.host && port == obj.port
     }

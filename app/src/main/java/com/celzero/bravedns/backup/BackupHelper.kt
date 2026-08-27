@@ -1,4 +1,4 @@
-/*
+@file:Suppress("UtilityClassWithPublicConstructor")/*
  * Copyright 2022 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -143,6 +143,7 @@ class BackupHelper {
                     ze = zis.nextEntry
                 }
             } catch (e: Exception) {
+                Logger.w(LOG_TAG_BACKUP_RESTORE, "Unzip failed: ${e.message}", e)
                 return false
             } finally {
                 zis?.close()

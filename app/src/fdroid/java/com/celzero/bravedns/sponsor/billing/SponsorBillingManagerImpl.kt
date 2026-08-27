@@ -33,9 +33,9 @@ class SponsorBillingManagerImpl : SponsorBillingManager {
     private val _isBillingReady = MutableStateFlow(false)
     override val isBillingReady: Flow<Boolean> = _isBillingReady.asStateFlow()
 
-    override fun initialize() {}
-    override fun queryProducts() {}
-    override fun launchBillingFlow(activity: Activity, amount: Int) {}
-    override fun consumePurchase(purchaseToken: String) {}
-    override fun destroy() {}
+    override fun initialize() { /* no-op */ }
+    override fun queryProducts() { /* no-op */ }
+    override fun launchBillingFlow(activity: Activity, amount: Int) { /* no-op */ }
+    override fun consumePurchase(purchaseToken: String) { /* no-op */ }
+    override fun destroy() { /* no-op */ }
 }

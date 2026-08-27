@@ -1,4 +1,4 @@
-/*
+@file:Suppress("SwallowedException")/*
 Copyright 2021 RethinkDNS and its authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -97,10 +97,11 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
         try {
             val file = futureTarget.get()
             if (file == null || file.length() <= 0) {
-                throw Exception("Empty file, likely 404")
+                throw java.io.IOException("Empty file, likely 404")
             }
             Logger.d(LOG_TAG_DNS, "Glide, load success from nextdns for url: $url")
         } catch (e: Exception) {
+            com.celzero.bravedns.util.Logger.w(com.celzero.bravedns.util.Logger.LOG_TAG_UI, "Caught exception: ${e.message}", e)
             // on exception, initiate the download of fav icon from duckduckgo
             Logger.i(LOG_TAG_DNS, "Glide, load failure from nextdns $subUrl")
             updateImage(
@@ -125,7 +126,7 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
         try {
             val file = futureTarget.get()
             if (file == null || file.length() <= 0) {
-                throw Exception("Empty file, likely 404")
+                throw java.io.IOException("Empty file, likely 404")
             }
             Logger.d(LOG_TAG_DNS, "Glide, downloaded from duckduckgo $subUrl, $url")
         } catch (e: Exception) {
