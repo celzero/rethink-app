@@ -1,3 +1,4 @@
+@file:Suppress("UnusedPrivateProperty", "EmptyFunctionBlock")
 /*
  * Copyright 2023 RethinkDNS and its authors
  *
@@ -19,9 +20,6 @@
 package com.celzero.bravedns.wireguard
 
 class BadConfigException
-    companion object {
-        private const val serialVersionUID = 1L
-    }
 private constructor(
     val section: Section,
     val location: Location,

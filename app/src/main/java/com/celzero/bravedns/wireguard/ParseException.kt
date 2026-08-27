@@ -1,3 +1,4 @@
+@file:Suppress("EmptyFunctionBlock")
 /*
  * Copyright 2023 RethinkDNS and its authors
  *
@@ -20,9 +21,6 @@ package com.celzero.bravedns.wireguard
 
 /**  */
 class ParseException
-    companion object {
-        private const val serialVersionUID = 1L
-    }
 @JvmOverloads
 constructor(
     val parsingClass: Class<*>,

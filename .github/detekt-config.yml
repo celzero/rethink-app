@@ -5,6 +5,16 @@
 potential-bugs:
   UnsafeCallOnNullableType:
     active: false
+  UnnecessarySafeCall:
+    active: false
+  UnreachableCode:
+    active: false
+  DoubleMutabilityForCollection:
+    active: false
+
+performance:
+  ArrayPrimitive:
+    active: false
 
 style:
   MaxLineLength:
@@ -30,11 +40,35 @@ style:
   UnusedPrivateProperty:
     active: false
 
+  UnusedPrivateFunction:
+    active: false
+
+  UnusedVariable:
+    active: false
+
+  VarCouldBeVal:
+    active: false
+
+  UseOrEmpty:
+    active: false
+
+  UseCheckOrError:
+    active: false
+
+  AbstractClassCanBeConcreteClass:
+    active: false
+
 naming:
   FunctionNaming:
     active: true
     ignoreAnnotated:
       - 'Composable'
+
+  MemberNameEqualsClassName:
+    active: false
+
+  NoNameShadowing:
+    active: false
 
 exceptions:
   TooGenericExceptionCaught:
