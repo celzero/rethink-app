@@ -64,7 +64,7 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 @Suppress("FunctionParameterNaming")
-fun AppDetailScreen(uid: Int, _: NavController? = null) {
+fun AppDetailScreen(uid: Int, navController: NavController? = null) {
     val scope = rememberCoroutineScope()
 
     // Re-fetch on `uid` so navigating to a sibling redraws the screen.

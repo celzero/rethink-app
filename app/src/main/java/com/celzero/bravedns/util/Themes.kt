@@ -47,7 +47,7 @@ enum class Themes(val id: Int) {
         }
 
         @Suppress("FunctionOnlyReturningConstant")
-        fun isThemeAvailable(_: Int): Boolean {
+        fun isThemeAvailable(id: Int): Boolean {
             return true
         }
 

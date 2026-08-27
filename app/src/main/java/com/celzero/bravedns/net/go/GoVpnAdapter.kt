@@ -3712,7 +3712,7 @@ class GoVpnAdapter : KoinComponent {
         return false
     }
 
-    fun setPlusStrategy(_: Long): Tunnel {
+    fun setPlusStrategy(strategy: Long): Tunnel {
         // Settings.PlusFilterSafest, Settings.PlusOrderFastest
         // default value for PlusStrategy is Safest, which is the safest strategy
         // fastest is another strategy, which is not used for now (v055n)

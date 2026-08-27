@@ -1,0 +1,259 @@
+﻿2026-08-27T04:05:00.5813286Z ##[group]Run ./gradlew \
+2026-08-27T04:05:00.5813567Z [36;1m./gradlew \[0m
+2026-08-27T04:05:00.5813783Z [36;1m  ${VARIANT} \[0m
+2026-08-27T04:05:00.5814039Z [36;1m  --no-daemon \[0m
+2026-08-27T04:05:00.5814286Z [36;1m  --warning-mode all[0m
+2026-08-27T04:05:00.5853378Z shell: /usr/bin/bash -e {0}
+2026-08-27T04:05:00.5853651Z env:
+2026-08-27T04:05:00.5853878Z   VARIANT: assembleFdroidFullDebug
+2026-08-27T04:05:00.5854262Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-8/x64
+2026-08-27T04:05:00.5854753Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-8/x64
+2026-08-27T04:05:00.5855217Z   CODEQL_ACTION_JOB_RUN_UUID: 0ff421c6-db5a-4835-9f8b-0fc3b0e18e04
+2026-08-27T04:05:00.5855593Z   CODEQL_ACTION_FEATURE_MULTI_LANGUAGE: false
+2026-08-27T04:05:00.5855894Z   CODEQL_ACTION_FEATURE_SANDWICH: false
+2026-08-27T04:05:00.5856182Z   CODEQL_ACTION_FEATURE_SARIF_COMBINE: true
+2026-08-27T04:05:00.5856612Z   CODEQL_ACTION_FEATURE_WILL_UPLOAD: true
+2026-08-27T04:05:00.5856939Z   CODEQL_ACTION_VERSION: 4.37.9
+2026-08-27T04:05:00.5857203Z   CODEQL_ACTION_INIT_HAS_RUN: true
+2026-08-27T04:05:00.5857532Z   CODEQL_ACTION_ANALYSIS_KEY: .github/workflows/codeql.yml:analyze
+2026-08-27T04:05:00.5857928Z   CODEQL_WORKFLOW_STARTED_AT: 2026-08-27T04:04:49.185Z
+2026-08-27T04:05:00.5858230Z   CODEQL_RAM: 14575
+2026-08-27T04:05:00.5858444Z   CODEQL_THREADS: 4
+2026-08-27T04:05:00.5858743Z   CODEQL_SCRATCH_DIR: /home/runner/work/_temp/codeql_databases/working
+2026-08-27T04:05:00.5859119Z   CODEQL_VERBOSITY: warnings
+2026-08-27T04:05:00.5859417Z   CODEQL_DIST: /opt/hostedtoolcache/CodeQL/2.26.3/x64/codeql
+2026-08-27T04:05:00.5859746Z   CODEQL_PLATFORM: linux64
+2026-08-27T04:05:00.5859999Z   CODEQL_PLATFORM_DLL_EXTENSION: .so
+2026-08-27T04:05:00.5860405Z   CODEQL_JAVA_HOME: /opt/hostedtoolcache/CodeQL/2.26.3/x64/codeql/tools/linux64/java
+2026-08-27T04:05:00.5860954Z   CODEQL_EXTRACTOR_JAVA_ROOT: /opt/hostedtoolcache/CodeQL/2.26.3/x64/codeql/java
+2026-08-27T04:05:00.5861485Z   CODEQL_EXTRACTOR_JAVA_WIP_DATABASE: /home/runner/work/_temp/codeql_databases/java
+2026-08-27T04:05:00.5862142Z   CODEQL_EXTRACTOR_JAVA_DIAGNOSTIC_DIR: /home/runner/work/_temp/codeql_databases/java/diagnostic/extractors/java
+2026-08-27T04:05:00.5862782Z   CODEQL_EXTRACTOR_JAVA_LOG_DIR: /home/runner/work/_temp/codeql_databases/java/log
+2026-08-27T04:05:00.5863320Z   CODEQL_EXTRACTOR_JAVA_SCRATCH_DIR: /home/runner/work/_temp/codeql_databases/java/working
+2026-08-27T04:05:00.5863884Z   CODEQL_EXTRACTOR_JAVA_TRAP_DIR: /home/runner/work/_temp/codeql_databases/java/trap/java
+2026-08-27T04:05:00.5864455Z   CODEQL_EXTRACTOR_JAVA_SOURCE_ARCHIVE_DIR: /home/runner/work/_temp/codeql_databases/java/src
+2026-08-27T04:05:00.5864904Z   CODEQL_EXTRACTOR_JAVA_BUILD_MODE: manual
+2026-08-27T04:05:00.5865200Z   CODEQL_EXTRACTOR_JAVA_THREADS: 4
+2026-08-27T04:05:00.5865467Z   CODEQL_EXTRACTOR_JAVA_RAM: 14575
+2026-08-27T04:05:00.5865846Z   CODEQL_TRACER_LOG: /home/runner/work/_temp/codeql_databases/log/build-tracer.log
+2026-08-27T04:05:00.5866386Z   CODEQL_TRACER_DIAGNOSTICS_DIR: /home/runner/work/_temp/codeql_databases/diagnostic/tracer
+2026-08-27T04:05:00.5866983Z   CODEQL_TRACER_LANGUAGES: java
+2026-08-27T04:05:00.5867657Z   SEMMLE_PRELOAD_libtrace: /opt/hostedtoolcache/CodeQL/2.26.3/x64/codeql/tools/linux64/${LIB}_${PLATFORM}_trace.so
+2026-08-27T04:05:00.5868355Z   SEMMLE_PRELOAD_libtrace32: /opt/hostedtoolcache/CodeQL/2.26.3/x64/codeql/tools/linux64/lib32trace.so
+2026-08-27T04:05:00.5868991Z   SEMMLE_PRELOAD_libtrace64: /opt/hostedtoolcache/CodeQL/2.26.3/x64/codeql/tools/linux64/lib64trace.so
+2026-08-27T04:05:00.5869592Z   CODEQL_RUNNER: /opt/hostedtoolcache/CodeQL/2.26.3/x64/codeql/tools/linux64/runner
+2026-08-27T04:05:00.5870168Z   LD_PRELOAD: /opt/hostedtoolcache/CodeQL/2.26.3/x64/codeql/tools/linux64/${LIB}_${PLATFORM}_trace.so
+2026-08-27T04:05:00.5870606Z ##[endgroup]
+2026-08-27T04:05:01.3622493Z Fetching distribution.
+2026-08-27T04:05:01.3623317Z Downloading https://services.gradle.org/distributions/gradle-9.5.1-bin.zip
+2026-08-27T04:05:04.0386438Z .............10%.............20%..............30%.............40%.............50%..............60%.............70%..............80%.............90%.............100%
+2026-08-27T04:05:05.6265959Z 
+2026-08-27T04:05:05.6267538Z Welcome to Gradle 9.5.1!
+2026-08-27T04:05:05.6268450Z 
+2026-08-27T04:05:05.6270866Z Here are the highlights of this release:
+2026-08-27T04:05:05.6279233Z  - Task provenance in reports and failure messages
+2026-08-27T04:05:05.6280520Z  - Type-safe accessors for precompiled Kotlin Settings plugins
+2026-08-27T04:05:05.6281205Z 
+2026-08-27T04:05:05.6282320Z For more details see https://docs.gradle.org/9.5.1/release-notes.html
+2026-08-27T04:05:05.6282988Z 
+2026-08-27T04:05:05.7259597Z To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.5.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+2026-08-27T04:05:06.9257523Z Daemon will be stopped at the end of the build 
+2026-08-27T04:05:08.3265418Z Calculating task graph as no cached configuration is available for tasks: assembleFdroidFullDebug
+2026-08-27T04:05:12.2260404Z 
+2026-08-27T04:05:12.2267861Z > Configure project :
+2026-08-27T04:05:12.2268734Z app-task names: 'assemblefdroidfulldebug'
+2026-08-27T04:05:12.2269732Z app; deGoogled? true (fdroidBuild: true, fdroidBuildServer: false, apkBuild: true)
+2026-08-27T04:05:33.7261252Z 
+2026-08-27T04:05:33.7287831Z > Configure project :app
+2026-08-27T04:05:33.7307613Z app-task names: 'assemblefdroidfulldebug'
+2026-08-27T04:05:33.7310759Z gradle deGoogled? true (fdroidBuild: true, fdroidBuildServer: false, apkBuild: true)
+2026-08-27T04:05:33.7312017Z gradle alphaBuild? false, should split? true
+2026-08-27T04:05:33.7312714Z app firebase plugins SKIPPED
+2026-08-27T04:05:33.9277620Z Build file '/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle': line 145
+2026-08-27T04:05:33.9329420Z Properties should be assigned using the 'propName = value' syntax. Setting a property via the Gradle-generated 'propName value' or 'propName(value)' syntax in Groovy DSL has been deprecated. This is scheduled to be removed in Gradle 10. Use assignment ('namespace = <value>') instead. Consult the upgrading guide for further information: https://docs.gradle.org/9.5.1/userguide/upgrading_version_8.html#groovy_space_assignment_syntax
+2026-08-27T04:05:33.9339587Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:145)
+2026-08-27T04:05:33.9347722Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:33.9348993Z 	at build_4itmkzza00v2z5tf20ncwpv0a.run(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:142)
+2026-08-27T04:05:33.9350266Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.1260329Z split apks and universal apk (splits enabled)
+2026-08-27T04:05:34.1261448Z Build file '/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle': line 188
+2026-08-27T04:05:34.1264772Z Properties should be assigned using the 'propName = value' syntax. Setting a property via the Gradle-generated 'propName value' or 'propName(value)' syntax in Groovy DSL has been deprecated. This is scheduled to be removed in Gradle 10. Use assignment ('enable = <value>') instead. Consult the upgrading guide for further information: https://docs.gradle.org/9.5.1/userguide/upgrading_version_8.html#groovy_space_assignment_syntax
+2026-08-27T04:05:34.1285866Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure13.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:188)
+2026-08-27T04:05:34.1287594Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.1288970Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:182)
+2026-08-27T04:05:34.1290367Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.1291789Z Build file '/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle': line 193
+2026-08-27T04:05:34.1294893Z Properties should be assigned using the 'propName = value' syntax. Setting a property via the Gradle-generated 'propName value' or 'propName(value)' syntax in Groovy DSL has been deprecated. This is scheduled to be removed in Gradle 10. Use assignment ('universalApk = <value>') instead. Consult the upgrading guide for further information: https://docs.gradle.org/9.5.1/userguide/upgrading_version_8.html#groovy_space_assignment_syntax
+2026-08-27T04:05:34.1298401Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure13.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:193)
+2026-08-27T04:05:34.1299803Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.1301129Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:182)
+2026-08-27T04:05:34.1302459Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.1303509Z Build file '/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle': line 234
+2026-08-27T04:05:34.1306662Z Properties should be assigned using the 'propName = value' syntax. Setting a property via the Gradle-generated 'propName value' or 'propName(value)' syntax in Groovy DSL has been deprecated. This is scheduled to be removed in Gradle 10. Use assignment ('shrinkResources = <value>') instead. Consult the upgrading guide for further information: https://docs.gradle.org/9.5.1/userguide/upgrading_version_8.html#groovy_space_assignment_syntax
+2026-08-27T04:05:34.1310202Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure15$_closure32.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:234)
+2026-08-27T04:05:34.1311662Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.1313064Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure15.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:230)
+2026-08-27T04:05:34.1314452Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.1315511Z Build file '/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle': line 238
+2026-08-27T04:05:34.1318704Z Properties should be assigned using the 'propName = value' syntax. Setting a property via the Gradle-generated 'propName value' or 'propName(value)' syntax in Groovy DSL has been deprecated. This is scheduled to be removed in Gradle 10. Use assignment ('debugSymbolLevel = <value>') instead. Consult the upgrading guide for further information: https://docs.gradle.org/9.5.1/userguide/upgrading_version_8.html#groovy_space_assignment_syntax
+2026-08-27T04:05:34.1322317Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure15$_closure32$_closure36.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:238)
+2026-08-27T04:05:34.1323828Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.1347998Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure15$_closure32.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:236)
+2026-08-27T04:05:34.1354834Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.1355771Z Normal build: using config signing config
+2026-08-27T04:05:34.1356870Z Build file '/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle': line 254
+2026-08-27T04:05:34.1360102Z Properties should be assigned using the 'propName = value' syntax. Setting a property via the Gradle-generated 'propName value' or 'propName(value)' syntax in Groovy DSL has been deprecated. This is scheduled to be removed in Gradle 10. Use assignment ('signingConfig = <value>') instead. Consult the upgrading guide for further information: https://docs.gradle.org/9.5.1/userguide/upgrading_version_8.html#groovy_space_assignment_syntax
+2026-08-27T04:05:34.1363696Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure15$_closure32.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:254)
+2026-08-27T04:05:34.1365156Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.1366696Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure15.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:230)
+2026-08-27T04:05:34.1368109Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.2255609Z Build file '/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle': line 265
+2026-08-27T04:05:34.2269748Z Properties should be assigned using the 'propName = value' syntax. Setting a property via the Gradle-generated 'propName value' or 'propName(value)' syntax in Groovy DSL has been deprecated. This is scheduled to be removed in Gradle 10. Use assignment ('shrinkResources = <value>') instead. Consult the upgrading guide for further information: https://docs.gradle.org/9.5.1/userguide/upgrading_version_8.html#groovy_space_assignment_syntax
+2026-08-27T04:05:34.2273291Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure15$_closure34.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:265)
+2026-08-27T04:05:34.2274867Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.2276369Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure15.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:261)
+2026-08-27T04:05:34.2278053Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.2280075Z Build file '/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle': line 266
+2026-08-27T04:05:34.2283116Z Properties should be assigned using the 'propName = value' syntax. Setting a property via the Gradle-generated 'propName value' or 'propName(value)' syntax in Groovy DSL has been deprecated. This is scheduled to be removed in Gradle 10. Use assignment ('signingConfig = <value>') instead. Consult the upgrading guide for further information: https://docs.gradle.org/9.5.1/userguide/upgrading_version_8.html#groovy_space_assignment_syntax
+2026-08-27T04:05:34.2286713Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure15$_closure34.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:266)
+2026-08-27T04:05:34.2288218Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.2289647Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure15.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:261)
+2026-08-27T04:05:34.2291064Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.2292118Z Build file '/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle': line 274
+2026-08-27T04:05:34.2295234Z Properties should be assigned using the 'propName = value' syntax. Setting a property via the Gradle-generated 'propName value' or 'propName(value)' syntax in Groovy DSL has been deprecated. This is scheduled to be removed in Gradle 10. Use assignment ('shrinkResources = <value>') instead. Consult the upgrading guide for further information: https://docs.gradle.org/9.5.1/userguide/upgrading_version_8.html#groovy_space_assignment_syntax
+2026-08-27T04:05:34.2299176Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure15$_closure35.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:274)
+2026-08-27T04:05:34.2300690Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.2301994Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure15.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:270)
+2026-08-27T04:05:34.2303309Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.2304292Z Build file '/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle': line 275
+2026-08-27T04:05:34.2307444Z Properties should be assigned using the 'propName = value' syntax. Setting a property via the Gradle-generated 'propName value' or 'propName(value)' syntax in Groovy DSL has been deprecated. This is scheduled to be removed in Gradle 10. Use assignment ('signingConfig = <value>') instead. Consult the upgrading guide for further information: https://docs.gradle.org/9.5.1/userguide/upgrading_version_8.html#groovy_space_assignment_syntax
+2026-08-27T04:05:34.2310588Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure15$_closure35.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:275)
+2026-08-27T04:05:34.2311953Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.2313231Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure15.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:270)
+2026-08-27T04:05:34.2314668Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.2315828Z Build file '/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle': line 279
+2026-08-27T04:05:34.2319396Z Properties should be assigned using the 'propName = value' syntax. Setting a property via the Gradle-generated 'propName value' or 'propName(value)' syntax in Groovy DSL has been deprecated. This is scheduled to be removed in Gradle 10. Use assignment ('debugSymbolLevel = <value>') instead. Consult the upgrading guide for further information: https://docs.gradle.org/9.5.1/userguide/upgrading_version_8.html#groovy_space_assignment_syntax
+2026-08-27T04:05:34.2323142Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure15$_closure35$_closure38.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:279)
+2026-08-27T04:05:34.2332956Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.2334546Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure15$_closure35.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:277)
+2026-08-27T04:05:34.2336060Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.2337364Z Build file '/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle': line 326
+2026-08-27T04:05:34.2340350Z Properties should be assigned using the 'propName = value' syntax. Setting a property via the Gradle-generated 'propName value' or 'propName(value)' syntax in Groovy DSL has been deprecated. This is scheduled to be removed in Gradle 10. Use assignment ('viewBinding = <value>') instead. Consult the upgrading guide for further information: https://docs.gradle.org/9.5.1/userguide/upgrading_version_8.html#groovy_space_assignment_syntax
+2026-08-27T04:05:34.2343660Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure18.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:326)
+2026-08-27T04:05:34.2345050Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.2346364Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:325)
+2026-08-27T04:05:34.2348163Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.2349179Z Build file '/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle': line 327
+2026-08-27T04:05:34.2352039Z Properties should be assigned using the 'propName = value' syntax. Setting a property via the Gradle-generated 'propName value' or 'propName(value)' syntax in Groovy DSL has been deprecated. This is scheduled to be removed in Gradle 10. Use assignment ('buildConfig = <value>') instead. Consult the upgrading guide for further information: https://docs.gradle.org/9.5.1/userguide/upgrading_version_8.html#groovy_space_assignment_syntax
+2026-08-27T04:05:34.2355156Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure18.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:327)
+2026-08-27T04:05:34.2356819Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.2358058Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:325)
+2026-08-27T04:05:34.2359294Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.3277957Z Build file '/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle': line 332
+2026-08-27T04:05:34.3281255Z Properties should be assigned using the 'propName = value' syntax. Setting a property via the Gradle-generated 'propName value' or 'propName(value)' syntax in Groovy DSL has been deprecated. This is scheduled to be removed in Gradle 10. Use assignment ('compose = <value>') instead. Consult the upgrading guide for further information: https://docs.gradle.org/9.5.1/userguide/upgrading_version_8.html#groovy_space_assignment_syntax
+2026-08-27T04:05:34.3301585Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure18.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:332)
+2026-08-27T04:05:34.3303083Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.3304539Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:325)
+2026-08-27T04:05:34.3305944Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.3307203Z Build file '/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle': line 333
+2026-08-27T04:05:34.3310379Z Properties should be assigned using the 'propName = value' syntax. Setting a property via the Gradle-generated 'propName value' or 'propName(value)' syntax in Groovy DSL has been deprecated. This is scheduled to be removed in Gradle 10. Use assignment ('resValues = <value>') instead. Consult the upgrading guide for further information: https://docs.gradle.org/9.5.1/userguide/upgrading_version_8.html#groovy_space_assignment_syntax
+2026-08-27T04:05:34.3313728Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure18.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:333)
+2026-08-27T04:05:34.3314955Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.3316233Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:325)
+2026-08-27T04:05:34.3317700Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.3318690Z Build file '/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle': line 337
+2026-08-27T04:05:34.3321370Z Properties should be assigned using the 'propName = value' syntax. Setting a property via the Gradle-generated 'propName value' or 'propName(value)' syntax in Groovy DSL has been deprecated. This is scheduled to be removed in Gradle 10. Use assignment ('coreLibraryDesugaringEnabled = <value>') instead. Consult the upgrading guide for further information: https://docs.gradle.org/9.5.1/userguide/upgrading_version_8.html#groovy_space_assignment_syntax
+2026-08-27T04:05:34.3324962Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure19.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:337)
+2026-08-27T04:05:34.3327041Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.3328371Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:336)
+2026-08-27T04:05:34.3329635Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.4267924Z Build file '/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle': line 422
+2026-08-27T04:05:34.4271101Z Properties should be assigned using the 'propName = value' syntax. Setting a property via the Gradle-generated 'propName value' or 'propName(value)' syntax in Groovy DSL has been deprecated. This is scheduled to be removed in Gradle 10. Use assignment ('abortOnError = <value>') instead. Consult the upgrading guide for further information: https://docs.gradle.org/9.5.1/userguide/upgrading_version_8.html#groovy_space_assignment_syntax
+2026-08-27T04:05:34.4275102Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6$_closure24.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:422)
+2026-08-27T04:05:34.4276319Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.4277593Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure6.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:421)
+2026-08-27T04:05:34.4307348Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.5269745Z rethink-tv: TV_RELEASE_KS_* env vars NOT set; 'release' builds will be unsigned (upstream default)
+2026-08-27T04:05:34.5271519Z Build file '/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle': line 469
+2026-08-27T04:05:34.5274282Z Properties should be assigned using the 'propName = value' syntax. Setting a property via the Gradle-generated 'propName value' or 'propName(value)' syntax in Groovy DSL has been deprecated. This is scheduled to be removed in Gradle 10. Use assignment ('transitive = <value>') instead. Consult the upgrading guide for further information: https://docs.gradle.org/9.5.1/userguide/upgrading_version_8.html#groovy_space_assignment_syntax
+2026-08-27T04:05:34.5281018Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure7$_closure52.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:469)
+2026-08-27T04:05:34.5282354Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:34.5283630Z 	at build_4itmkzza00v2z5tf20ncwpv0a$_run_closure7.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/app/build.gradle:468)
+2026-08-27T04:05:34.5284920Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:36.4259672Z 
+2026-08-27T04:05:36.4264991Z > Configure project :benchmark
+2026-08-27T04:05:36.4265974Z Build file '/home/runner/work/RethinkDNS/RethinkDNS/benchmark/build.gradle': line 6
+2026-08-27T04:05:36.4269457Z Properties should be assigned using the 'propName = value' syntax. Setting a property via the Gradle-generated 'propName value' or 'propName(value)' syntax in Groovy DSL has been deprecated. This is scheduled to be removed in Gradle 10. Use assignment ('namespace = <value>') instead. Consult the upgrading guide for further information: https://docs.gradle.org/9.5.1/userguide/upgrading_version_8.html#groovy_space_assignment_syntax
+2026-08-27T04:05:36.4273342Z 	at build_2zm5ixvqjs9tju1g0tig5ayxp$_run_closure1.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/benchmark/build.gradle:6)
+2026-08-27T04:05:36.4274762Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:36.4275990Z 	at build_2zm5ixvqjs9tju1g0tig5ayxp.run(/home/runner/work/RethinkDNS/RethinkDNS/benchmark/build.gradle:5)
+2026-08-27T04:05:36.4277510Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:36.4278606Z Build file '/home/runner/work/RethinkDNS/RethinkDNS/benchmark/build.gradle': line 20
+2026-08-27T04:05:36.4282155Z Properties should be assigned using the 'propName = value' syntax. Setting a property via the Gradle-generated 'propName value' or 'propName(value)' syntax in Groovy DSL has been deprecated. This is scheduled to be removed in Gradle 10. Use assignment ('signingConfig = <value>') instead. Consult the upgrading guide for further information: https://docs.gradle.org/9.5.1/userguide/upgrading_version_8.html#groovy_space_assignment_syntax
+2026-08-27T04:05:36.4285678Z 	at build_2zm5ixvqjs9tju1g0tig5ayxp$_run_closure1$_closure4$_closure5.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/benchmark/build.gradle:20)
+2026-08-27T04:05:36.4287790Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:05:36.4289378Z 	at build_2zm5ixvqjs9tju1g0tig5ayxp$_run_closure1$_closure4.doCall$original(/home/runner/work/RethinkDNS/RethinkDNS/benchmark/build.gradle:18)
+2026-08-27T04:05:36.4291299Z 	(Run with --stacktrace to get the full stack trace of this deprecation warning.)
+2026-08-27T04:06:04.9269639Z 
+2026-08-27T04:06:04.9296371Z > Task :app:preBuild UP-TO-DATE
+2026-08-27T04:06:04.9366392Z > Task :app:generateFdroidFullDebugAssets UP-TO-DATE
+2026-08-27T04:06:04.9370176Z > Task :app:preFdroidFullDebugBuild UP-TO-DATE
+2026-08-27T04:06:04.9380990Z > Task :app:mergeFdroidFullDebugNativeDebugMetadata NO-SOURCE
+2026-08-27T04:06:05.0255053Z > Task :app:generateFdroidFullDebugBuildConfig
+2026-08-27T04:06:05.1287742Z > Task :app:generateFdroidFullDebugResValues
+2026-08-27T04:06:05.1317502Z > Task :app:generateFdroidFullDebugResources
+2026-08-27T04:06:06.1255028Z > Task :app:javaPreCompileFdroidFullDebug
+2026-08-27T04:06:09.2273752Z > Task :app:processFdroidFullDebugNavigationResources
+2026-08-27T04:06:09.3268652Z > Task :app:dataBindingMergeDependencyArtifactsFdroidFullDebug
+2026-08-27T04:06:10.5257438Z > Task :app:packageFdroidFullDebugResources
+2026-08-27T04:06:11.0258796Z > Task :app:mergeFdroidFullDebugAssets
+2026-08-27T04:06:11.6307457Z > Task :app:compressFdroidFullDebugAssets
+2026-08-27T04:06:12.1267607Z > Task :app:parseFdroidFullDebugLocalResources
+2026-08-27T04:06:12.4277777Z > Task :app:generateFdroidFullDebugRFile
+2026-08-27T04:06:15.8269361Z > Task :app:generateFdroidFullDebugGlobalSynthetics
+2026-08-27T04:06:17.4282998Z > Task :app:checkFdroidFullDebugDuplicateClasses
+2026-08-27T04:06:18.0254999Z > Task :app:mergeLibDexFdroidFullDebug
+2026-08-27T04:06:18.4262437Z > Task :app:checkFdroidFullDebugAarMetadata
+2026-08-27T04:06:18.4287299Z > Task :app:mapFdroidFullDebugSourceSetPaths
+2026-08-27T04:06:18.6255182Z > Task :app:compileFdroidFullDebugNavigationResources
+2026-08-27T04:06:18.7267634Z > Task :app:createFdroidFullDebugCompatibleScreenManifests
+2026-08-27T04:06:18.7297354Z > Task :app:extractDeepLinksFdroidFullDebug
+2026-08-27T04:06:19.9255672Z > Task :app:processFdroidFullDebugMainManifest
+2026-08-27T04:06:20.4267543Z > Task :app:processFdroidFullDebugManifest
+2026-08-27T04:06:20.4297437Z > Task :app:processFdroidFullDebugManifestForPackage
+2026-08-27T04:06:20.4327421Z > Task :app:mergeFdroidFullDebugJniLibFolders
+2026-08-27T04:06:20.6287638Z > Task :app:desugarFdroidFullDebugFileDependencies
+2026-08-27T04:06:21.5257558Z > Task :app:mergeFdroidFullDebugNativeLibs
+2026-08-27T04:06:21.7277900Z > Task :app:mergeFdroidFullDebugResources
+2026-08-27T04:06:21.9277583Z > Task :app:stripFdroidFullDebugDebugSymbols
+2026-08-27T04:06:25.4269535Z > Task :app:dataBindingGenBaseClassesFdroidFullDebug
+2026-08-27T04:06:37.3267600Z > Task :app:l8DexDesugarLibFdroidFullDebug
+2026-08-27T04:06:39.9280115Z > Task :app:processFdroidFullDebugResources
+2026-08-27T04:06:39.9367394Z > Task :app:writeFdroidFullDebugAppMetadata
+2026-08-27T04:06:39.9397573Z > Task :app:writeFdroidFullDebugSigningConfigVersions
+2026-08-27T04:06:41.3297915Z > Task :app:validateSigningFdroidFullDebug
+2026-08-27T04:06:50.6277494Z > Task :app:mergeExtDexFdroidFullDebug
+2026-08-27T04:06:55.4257610Z > Task :app:kspFdroidFullDebugKotlin
+2026-08-27T04:07:32.8267991Z e: [ksp] java.lang.IllegalStateException: No property named value was found in annotation Query
+2026-08-27T04:07:32.8296822Z 
+2026-08-27T04:07:32.8327291Z > Task :app:kspFdroidFullDebugKotlin FAILED
+2026-08-27T04:07:50.0253526Z 
+2026-08-27T04:07:50.0278630Z 
+2026-08-27T04:07:50.0279794Z [Incubating] Problems report is available at: file:///home/runner/work/RethinkDNS/RethinkDNS/build/reports/problems/problems-report.html
+2026-08-27T04:07:50.0281391Z FAILURE: Build failed with an exception.
+2026-08-27T04:07:50.0281883Z 35 actionable tasks: 35 executed
+2026-08-27T04:07:50.0282435Z 
+2026-08-27T04:07:50.0282780Z * What went wrong:
+2026-08-27T04:07:50.0283786Z Execution failed for task ':app:kspFdroidFullDebugKotlin' (registered by plugin 'com.android.internal.application').
+2026-08-27T04:07:50.0285201Z > A failure occurred while executing com.google.devtools.ksp.gradle.KspAAWorkerAction
+2026-08-27T04:07:50.0286935Z    > No property named value was found in annotation Query
+2026-08-27T04:07:50.0287534Z 
+2026-08-27T04:07:50.0287848Z * Try:
+2026-08-27T04:07:50.0288424Z > Run with --stacktrace option to get the stack trace.
+2026-08-27T04:07:50.0289223Z > Run with --info or --debug option to get more log output.
+2026-08-27T04:07:50.0290140Z > Run with --scan to get full insights from a Build Scan (powered by Develocity).
+2026-08-27T04:07:50.0291034Z > Get more help at https://help.gradle.org.
+2026-08-27T04:07:50.0291560Z 
+2026-08-27T04:07:50.0291897Z BUILD FAILED in 2m 49s
+2026-08-27T04:07:50.1277783Z Configuration cache entry stored.
+2026-08-27T04:07:50.3816401Z ##[error]Process completed with exit code 1.

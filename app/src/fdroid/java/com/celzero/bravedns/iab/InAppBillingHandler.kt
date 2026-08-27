@@ -174,7 +174,7 @@ object InAppBillingHandler {
     ): PurchaseDetail = purchase
 
     @Suppress("FunctionParameterNaming")
-    fun getProductType(_: com.android.billingclient.api.Purchase, _: String? = null): String {
+    fun getProductType(purchase: com.android.billingclient.api.Purchase, sku: String? = null): String {
         return PRODUCT_TYPE_SUBS
     }
 

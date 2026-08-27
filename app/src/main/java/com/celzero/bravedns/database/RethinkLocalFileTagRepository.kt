@@ -38,7 +38,7 @@ class RethinkLocalFileTagRepository(private val rethinkLocalFileTagDao: RethinkL
     }
 
     @Suppress("FunctionParameterNaming")
-    fun contentDelete(_: Int): Int {
+    fun contentDelete(id: Int): Int {
         return rethinkLocalFileTagDao.contentDelete(id)
     }
 
@@ -84,7 +84,7 @@ class RethinkLocalFileTagRepository(private val rethinkLocalFileTagDao: RethinkL
         return rethinkLocalFileTagDao.getFileTags()
     }
 
-    fun contentGetFileTagById(_: Int): Cursor {
+    fun contentGetFileTagById(id: Int): Cursor {
         return rethinkLocalFileTagDao.getFileTags()
     }
 }
