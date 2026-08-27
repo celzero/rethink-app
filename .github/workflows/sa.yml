@@ -15,7 +15,7 @@ jobs:
       - name: 🥏 Checkout
         uses: actions/checkout@v4
       - name: ☕️ JREv17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
           # default: jdk
           java-package: 'jre'
