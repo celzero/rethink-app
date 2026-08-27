@@ -138,7 +138,7 @@ object SsidPermissionManager {
      * @param callback The callback to handle the result
      */
     @Suppress("UnusedParameter")
-    fun handlePermissionResult(
+@Suppress("UnusedParameter")    fun handlePermissionResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray,

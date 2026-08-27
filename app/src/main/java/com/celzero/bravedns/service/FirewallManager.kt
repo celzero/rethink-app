@@ -319,7 +319,7 @@ object FirewallManager : KoinComponent {
         // Note: Do not use this map anymore. Kept for backward binary compatibility; may be removed later.
         @Deprecated("Use tempAllowCache")
         @Suppress("unused")
-        @Volatile var tempAllowedUids: MutableMap<Int, Long> = mutableMapOf()
+@Suppress("unused")        @Volatile var tempAllowedUids: MutableMap<Int, Long> = mutableMapOf()
     }
 
     // ---- Temp Allow (15 min) cache + DB (source of truth) ----

@@ -1,5 +1,4 @@
-@file:Suppress("FunctionOnlyReturningConstant", "UnusedParameter")
-/*
+@file:Suppress("FunctionOnlyReturningConstant", "UnusedParameter")/*
  * Copyright 2026 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,11 +30,11 @@ class BillingBackendClient(
 ) {
     companion object {
         @Suppress("UNUSED_PRIVATE_PROPERTY")
-        private const val TAG = "BillingBackendClient(stub)"
+@Suppress("UNUSED_PRIVATE_PROPERTY")        private const val TAG = "BillingBackendClient(stub)"
     }
 
     @Suppress("FunctionOnlyReturningConstant")
-    suspend fun getAccountId(): String = ""
+@Suppress("FunctionOnlyReturningConstant")    suspend fun getAccountId(): String = ""
 
     suspend fun getDeviceId(@Suppress("UNUSED_PARAMETER") recvCid: String = ""): String = ""
 
@@ -65,7 +64,7 @@ class BillingBackendClient(
     ): Pair<Boolean, String> = Pair(false, "Not supported in F-Droid build")
 
     @Suppress("FunctionOnlyReturningConstant")
-    suspend fun revokePurchase(
+@Suppress("FunctionOnlyReturningConstant")    suspend fun revokePurchase(
         @Suppress("UNUSED_PARAMETER") accountId: String,
         @Suppress("UNUSED_PARAMETER") deviceId: String,
         @Suppress("UNUSED_PARAMETER") sku: String,

@@ -1,0 +1,58 @@
+I'll analyze the failing job for you. Let me fetch the logs and details.Now let me check the files mentioned in the error messages:## Problem
+
+The Kotlin compilation is failing with **"This annotation is not repeatable"** errors on three files:
+
+1. `InAppBillingHandler.kt` line 168
+2. `Themes.kt` line 2
+3. `InetAddresses.kt` line 2
+
+The issue is that you're using multiple `@file:Suppress` annotations on the same file, which is not allowed in Kotlin unless the annotation is marked as `@Repeatable`.
+
+## Solution
+
+Combine all suppression rules into a single `@file:Suppress` annotation on each file:
+
+### Fix for `Themes.kt`
+**Current (lines 1-2):**
+```kotlin
+@file:Suppress("UnusedParameter", "FunctionParameterNaming")
+@file:Suppress("FunctionParameterNaming")
+```
+
+**Replace with:**
+```kotlin
+@file:Suppress("UnusedParameter", "FunctionParameterNaming")
+```
+
+[Source: app/src/main/java/com/celzero/bravedns/util/Themes.kt](https://github.com/varunagarwal1/RethinkDNS/blob/1e418c669930517f0c2b2ae91093c59512660a49/app/src/main/java/com/celzero/bravedns/util/Themes.kt)
+
+### Fix for `InetAddresses.kt`
+**Current (lines 1-2):**
+```kotlin
+@file:Suppress("SwallowedException")
+@file:Suppress("ThrowsCount")
+```
+
+**Replace with:**
+```kotlin
+@file:Suppress("SwallowedException", "ThrowsCount")
+```
+
+[Source: app/src/main/java/com/celzero/bravedns/wireguard/InetAddresses.kt](https://github.com/varunagarwal1/RethinkDNS/blob/1e418c669930517f0c2b2ae91093c59512660a49/app/src/main/java/com/celzero/bravedns/wireguard/InetAddresses.kt)
+
+### Fix for `InAppBillingHandler.kt`
+**Current (lines 167-169):**
+```kotlin
+    @Suppress("UNUSED_PARAMETER")
+    @Suppress("FunctionParameterNaming")
+    @Suppress("UnusedParameter")
+```
+
+**Replace with:**
+```kotlin
+    @Suppress("UNUSED_PARAMETER", "FunctionParameterNaming", "UnusedParameter")
+```
+
+[Source: app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt](https://github.com/varunagarwal1/RethinkDNS/blob/1e418c669930517f0c2b2ae91093c59512660a49/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt)
+
+After consolidating the suppression annotations into single instances, the Kotlin compiler will successfully compile these files.

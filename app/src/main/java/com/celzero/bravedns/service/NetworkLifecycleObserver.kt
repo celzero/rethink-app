@@ -223,7 +223,7 @@ class NetworkLifecycleObserver(
             // and runs on the binder callback thread; best-effort and never blocks
             // start()/stop() (which do not touch WifiManager).
             @Suppress("DEPRECATION")
-            val wifiInfo = wm?.connectionInfo
+@Suppress("DEPRECATION")            val wifiInfo = wm?.connectionInfo
             if (wifiInfo != null) {
                 extractCleanSsid(wifiInfo.ssid)?.let { return it }
             }

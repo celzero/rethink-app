@@ -1,6 +1,4 @@
-@file:Suppress("SwallowedException")
-@file:Suppress("ThrowsCount")
-/*
+@file:Suppress("SwallowedException", "ThrowsCount")/*
  * Copyright 2023 RethinkDNS and its authors
  *
  * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.

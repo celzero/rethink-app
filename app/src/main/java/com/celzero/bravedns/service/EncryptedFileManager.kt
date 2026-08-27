@@ -1,5 +1,4 @@
-@file:Suppress("ThrowsCount")
-/*
+@file:Suppress("ThrowsCount")/*
  * Copyright 2023 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:Suppress("DEPRECATION")
-package com.celzero.bravedns.service
+@file:Suppress("DEPRECATION")package com.celzero.bravedns.service
 
 import com.celzero.bravedns.util.Logger
 import android.content.Context

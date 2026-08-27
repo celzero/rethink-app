@@ -141,7 +141,7 @@ class WireguardManagerTest : KoinTest {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun clearWireguardManagerState() {
+@Suppress("UNCHECKED_CAST")    private fun clearWireguardManagerState() {
         try {
             val mappingsField = WireguardManager::class.java.getDeclaredField("mappings")
             mappingsField.isAccessible = true
@@ -200,7 +200,7 @@ class WireguardManagerTest : KoinTest {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun addConfigToManager(configFiles: WgConfigFilesImmutable, config: WgConfig) {
+@Suppress("UNCHECKED_CAST")    private fun addConfigToManager(configFiles: WgConfigFilesImmutable, config: WgConfig) {
         try {
             val mappingsField = WireguardManager::class.java.getDeclaredField("mappings")
             mappingsField.isAccessible = true
@@ -669,7 +669,7 @@ class WireguardManagerTest : KoinTest {
             val configsField = WireguardManager::class.java.getDeclaredField("configs")
             configsField.isAccessible = true
             @Suppress("UNCHECKED_CAST")
-            val configs = configsField.get(WireguardManager) as java.util.concurrent.CopyOnWriteArraySet<WgConfig>
+@Suppress("UNCHECKED_CAST")            val configs = configsField.get(WireguardManager) as java.util.concurrent.CopyOnWriteArraySet<WgConfig>
             configs.add(setupMockConfig(1))
         } catch (e: Exception) {
             println("⚠️ Warning: Could not add config without mapping: ${e.message}")

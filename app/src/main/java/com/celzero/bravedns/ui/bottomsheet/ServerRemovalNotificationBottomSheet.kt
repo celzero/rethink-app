@@ -99,7 +99,7 @@ class ServerRemovalNotificationBottomSheet : BottomSheetDialogFragment() {
 
         // Extract removed servers from arguments
         @Suppress("UNCHECKED_CAST", "DEPRECATION")
-        removedServers = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+@Suppress("UNCHECKED_CAST", "DEPRECATION")        removedServers = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             arguments?.getParcelableArrayList(ARG_REMOVED_SERVERS, CountryConfig::class.java) as? List<CountryConfig> ?: emptyList()
         } else {
             arguments?.getParcelableArrayList<CountryConfig>(ARG_REMOVED_SERVERS) ?: emptyList()

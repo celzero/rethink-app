@@ -1,5 +1,4 @@
-@file:Suppress("UnusedPrivateProperty", "EmptyFunctionBlock")
-/*
+@file:Suppress("UnusedPrivateProperty", "EmptyFunctionBlock")/*
  * Copyright 2023 RethinkDNS and its authors
  *
  * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.

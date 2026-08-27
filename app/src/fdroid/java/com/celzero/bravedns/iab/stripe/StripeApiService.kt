@@ -1,5 +1,4 @@
-@file:Suppress("ConstructorParameterNaming")
-package com.celzero.bravedns.iab.stripe
+@file:Suppress("ConstructorParameterNaming")package com.celzero.bravedns.iab.stripe
 
 import com.google.gson.annotations.SerializedName
 import okhttp3.FormBody

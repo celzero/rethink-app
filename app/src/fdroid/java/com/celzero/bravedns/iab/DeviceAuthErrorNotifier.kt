@@ -28,9 +28,9 @@ object DeviceAuthErrorNotifier {
     const val EXTRA_DEVICE_ID_PREFIX = "auth_error_device_id_prefix"
 
     @Suppress("UNUSED_PARAMETER")
-    fun notify(context: Context, error: ServerApiError.Unauthorized401, theme: Int) { /* no-op */ }
+@Suppress("UNUSED_PARAMETER")    fun notify(context: Context, error: ServerApiError.Unauthorized401, theme: Int) { /* no-op */ }
 
     @Suppress("UNUSED_PARAMETER")
-    fun cancel(context: Context) { /* no-op */ }
+@Suppress("UNUSED_PARAMETER")    fun cancel(context: Context) { /* no-op */ }
 }
 

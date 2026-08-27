@@ -136,7 +136,7 @@ class ProxyCountriesBtmSheet :
             }
         } else {
             @Suppress("DEPRECATION")
-            arguments?.getSerializable(ARG_OBJECT)
+@Suppress("DEPRECATION")            arguments?.getSerializable(ARG_OBJECT)
         }
 
         confs = arguments?.getStringArrayList(ARG_CONFS) ?: emptyList()

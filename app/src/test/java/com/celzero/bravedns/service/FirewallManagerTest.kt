@@ -259,13 +259,13 @@ class FirewallManagerTest : KoinTest {
             val appInfosField = globalVariableClass.getDeclaredField("appInfos")
             appInfosField.isAccessible = true
             @Suppress("UNCHECKED_CAST")
-            val appInfos = appInfosField.get(null) as com.google.common.collect.Multimap<Int, AppInfo>
+@Suppress("UNCHECKED_CAST")            val appInfos = appInfosField.get(null) as com.google.common.collect.Multimap<Int, AppInfo>
             appInfos.clear()
 
             val foregroundUidsField = globalVariableClass.getDeclaredField("foregroundUids")
             foregroundUidsField.isAccessible = true
             @Suppress("UNCHECKED_CAST")
-            val foregroundUids = foregroundUidsField.get(null) as HashSet<Int>
+@Suppress("UNCHECKED_CAST")            val foregroundUids = foregroundUidsField.get(null) as HashSet<Int>
             foregroundUids.clear()
         } catch (_: Exception) {
             // If reflection fails, try direct access

@@ -89,7 +89,7 @@ import kotlin.math.pow
 import kotlin.time.Duration.Companion.milliseconds
 
 @Suppress("TooManyFunctions", "LargeClass")
-object Utilities {
+@Suppress("TooManyFunctions", "LargeClass")object Utilities {
 
     private const val FLAG_BASE_OFFSET = 0x1F1E6
     private const val ALPHA_BASE_CODE = 'A'.code
@@ -133,7 +133,7 @@ object Utilities {
     }
 
     @Suppress("ReturnCount")
-    fun isAccessibilityServiceEnabled(
+@Suppress("ReturnCount")    fun isAccessibilityServiceEnabled(
         context: Context,
         service: Class<out AccessibilityService?>
     ): Boolean {
@@ -161,7 +161,7 @@ object Utilities {
     }
 
     @Suppress("ReturnCount")
-    fun isAccessibilityServiceEnabledViaSettingsSecure(
+@Suppress("ReturnCount")    fun isAccessibilityServiceEnabledViaSettingsSecure(
         context: Context,
         accessibilityService: Class<out AccessibilityService?>
     ): Boolean {
@@ -238,7 +238,7 @@ object Utilities {
     }
 
     @Suppress("ReturnCount", "TooGenericExceptionCaught")
-    fun normalizeIp(ipstr: String?): InetAddress? {
+@Suppress("ReturnCount", "TooGenericExceptionCaught")    fun normalizeIp(ipstr: String?): InetAddress? {
         if (ipstr.isNullOrEmpty()) return null
 
         try {
@@ -277,7 +277,7 @@ object Utilities {
     }
 
     @Suppress("ReturnCount", "TooGenericExceptionCaught")
-    fun isLanIpv4(ipAddress: String): Boolean {
+@Suppress("ReturnCount", "TooGenericExceptionCaught")    fun isLanIpv4(ipAddress: String): Boolean {
         try {
             val ip = IPAddressString(ipAddress).address ?: return false
 
@@ -411,7 +411,7 @@ object Utilities {
     }
 
     @Suppress("ReturnCount", "TooGenericExceptionCaught")
-    fun copy(from: String, to: String): Boolean {
+@Suppress("ReturnCount", "TooGenericExceptionCaught")    fun copy(from: String, to: String): Boolean {
         try {
             val src = File(from)
             val dest = File(to)
@@ -476,7 +476,7 @@ object Utilities {
 
     // This function is not supported from version 12 onwards.
     @Suppress("TooGenericExceptionCaught")
-    fun isOtherVpnHasAlwaysOn(context: Context): Boolean {
+@Suppress("TooGenericExceptionCaught")    fun isOtherVpnHasAlwaysOn(context: Context): Boolean {
         return try {
             val alwaysOn = Settings.Secure.getString(context.contentResolver, "always_on_vpn_app")
             !TextUtils.isEmpty(alwaysOn) && context.packageName != alwaysOn
@@ -551,7 +551,7 @@ object Utilities {
     }
 
     @Suppress("TooGenericExceptionCaught")
-    fun delay(ms: Long, scope: LifecycleCoroutineScope, updateUi: () -> Unit) {
+@Suppress("TooGenericExceptionCaught")    fun delay(ms: Long, scope: LifecycleCoroutineScope, updateUi: () -> Unit) {
         scope.launch {
             kotlinx.coroutines.delay(ms.milliseconds)
             try {
@@ -582,7 +582,7 @@ object Utilities {
     }
 
     @Suppress("FunctionNaming")
-    fun isAtleastO_MR1(): Boolean {
+@Suppress("FunctionNaming")    fun isAtleastO_MR1(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1
     }
 
@@ -752,7 +752,7 @@ object Utilities {
     }
 
     @Suppress("ReturnCount")
-    fun hasRemoteBlocklists(ctx: Context, timestamp: Long): Boolean {
+@Suppress("ReturnCount")    fun hasRemoteBlocklists(ctx: Context, timestamp: Long): Boolean {
         val remoteDir =
             blocklistDir(ctx, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp) ?: return false
         val remoteFile =
@@ -865,7 +865,7 @@ object Utilities {
     }
 
     @Suppress("ReturnCount")
-    fun getPrivateDnsMode(context: Context): PrivateDnsMode {
+@Suppress("ReturnCount")    fun getPrivateDnsMode(context: Context): PrivateDnsMode {
         // https://github.com/celzero/rethink-app/issues/408
         if (!isAtleastQ()) {
             // Private DNS was introduced in P.
@@ -915,7 +915,7 @@ object Utilities {
     }
 
     @Suppress("ReturnCount", "TooGenericExceptionCaught")
-    fun humanReadableByteCount(bytes: Long, si: Boolean): String {
+@Suppress("ReturnCount", "TooGenericExceptionCaught")    fun humanReadableByteCount(bytes: Long, si: Boolean): String {
         val unit = if (si) BYTE_UNIT_THRESHOLD else BYTE_UNIT_POWER
         if (bytes < unit) return "$bytes B"
         try {
@@ -973,7 +973,7 @@ object Utilities {
     // used to check if the current os version is above 4.12 for anti-censorship feature
     // desync requires os version above 4.12
     @Suppress("ReturnCount")
-    fun isOsVersionAbove412(targetVersion: String): Boolean {
+@Suppress("ReturnCount")    fun isOsVersionAbove412(targetVersion: String): Boolean {
         // get the os version from system properties
         val osVersion = System.getProperty("os.version") ?: return false
 

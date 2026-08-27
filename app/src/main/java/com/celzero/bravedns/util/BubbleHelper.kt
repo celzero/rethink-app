@@ -80,7 +80,7 @@ object BubbleHelper {
         // Check if bubbles are enabled globally (API 31+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             @Suppress("DEPRECATION")
-            if (!notificationManager.areBubblesAllowed()) {
+@Suppress("DEPRECATION")            if (!notificationManager.areBubblesAllowed()) {
                 Logger.w(LOG_TAG_FIREWALL, "bubbles are not allowed globally")
                 bubblesAllowed = false
             }
@@ -567,7 +567,7 @@ object BubbleHelper {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             @Suppress("DEPRECATION")
-            if (!nm.areBubblesAllowed()) return false
+@Suppress("DEPRECATION")            if (!nm.areBubblesAllowed()) return false
         }
 
         val channel = nm.getNotificationChannel(BUBBLE_CHANNEL_ID) ?: return false
@@ -584,7 +584,7 @@ object BubbleHelper {
 
         val globalAllowed = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             @Suppress("DEPRECATION")
-            nm.areBubblesAllowed()
+@Suppress("DEPRECATION")            nm.areBubblesAllowed()
         } else {
             null
         }
@@ -652,7 +652,7 @@ object BubbleHelper {
         // Android 12+: if global bubbles are disabled, open the per-app bubble settings page.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             @Suppress("DEPRECATION")
-            if (!nm.areBubblesAllowed()) {
+@Suppress("DEPRECATION")            if (!nm.areBubblesAllowed()) {
                 return Intent(Settings.ACTION_APP_NOTIFICATION_BUBBLE_SETTINGS).apply {
                     putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

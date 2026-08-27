@@ -101,7 +101,7 @@ class CustomDomainRulesBtmSheet :
 
         // Retrieve CustomDomain from arguments
         @Suppress("DEPRECATION")
-        cd = arguments?.getSerializable(ARG_CUSTOM_DOMAIN) as? CustomDomain ?: run {
+@Suppress("DEPRECATION")        cd = arguments?.getSerializable(ARG_CUSTOM_DOMAIN) as? CustomDomain ?: run {
             Logger.e(LOG_TAG_UI, "$TAG CustomDomain not found in arguments, dismissing")
             dismiss()
             return

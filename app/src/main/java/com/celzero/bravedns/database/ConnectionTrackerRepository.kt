@@ -1,5 +1,4 @@
-@file:Suppress("VariableNaming")
-/*
+@file:Suppress("VariableNaming")/*
  * Copyright 2020 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

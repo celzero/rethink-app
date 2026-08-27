@@ -1,5 +1,4 @@
-@file:Suppress("EmptyFunctionBlock")
-/*
+@file:Suppress("EmptyFunctionBlock")/*
  * Copyright 2023 RethinkDNS and its authors
  *
  * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.

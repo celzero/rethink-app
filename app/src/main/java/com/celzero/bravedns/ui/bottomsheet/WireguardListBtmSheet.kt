@@ -132,10 +132,10 @@ class WireguardListBtmSheet :
         }
 
         @Suppress("DEPRECATION")
-        obj = arguments?.getSerializable(ARG_OBJECT)
+@Suppress("DEPRECATION")        obj = arguments?.getSerializable(ARG_OBJECT)
 
         @Suppress("DEPRECATION", "UNCHECKED_CAST")
-        confs = arguments?.getSerializable(ARG_CONFS) as? ArrayList<WgConfigFilesImmutable?> ?: emptyList()
+@Suppress("DEPRECATION", "UNCHECKED_CAST")        confs = arguments?.getSerializable(ARG_CONFS) as? ArrayList<WgConfigFilesImmutable?> ?: emptyList()
 
         dialog?.window?.let { window ->
             Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)

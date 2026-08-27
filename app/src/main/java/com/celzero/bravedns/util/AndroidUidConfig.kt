@@ -18,7 +18,7 @@ package com.celzero.bravedns.util
 // https://android.googlesource.com/platform/system/core/+/4489ee0a190ad488df8ed9be545986a46c86148e/libcutils/include/private/android_filesystem_config.h
 // UID values are defined by Android AOSP (Android Open Source Project), not magic numbers
 @Suppress("MagicNumber")
-enum class AndroidUidConfig(val uid: Int) {
+@Suppress("MagicNumber")enum class AndroidUidConfig(val uid: Int) {
     ANDROID(0), // Modified as ANDROID instead of ROOT
     DAEMON(1),
     BIN(2),

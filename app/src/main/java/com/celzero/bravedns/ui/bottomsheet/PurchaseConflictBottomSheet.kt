@@ -169,7 +169,7 @@ class PurchaseConflictBottomSheet : BottomSheetDialogFragment() {
     }
 
     @Suppress("UnusedParameter")
-    private fun setupButtons(
+@Suppress("UnusedParameter")    private fun setupButtons(
         operation: ServerApiError.Operation,
         accountId: String,
         purchaseToken: String,

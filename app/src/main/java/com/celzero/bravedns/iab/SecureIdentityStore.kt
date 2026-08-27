@@ -303,7 +303,7 @@ class SecureIdentityStore(private val context: Context) {
      * unrecoverable keyset invalidation).  For a single-environment reset prefer [clear].
      */
     @Suppress("unused")
-    suspend fun clearAll() = withContext(Dispatchers.IO) {
+@Suppress("unused")    suspend fun clearAll() = withContext(Dispatchers.IO) {
         Env.entries.forEach { env ->
             safeDeleteFile(identityFile(env))
         }

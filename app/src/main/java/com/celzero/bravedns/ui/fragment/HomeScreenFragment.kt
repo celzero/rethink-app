@@ -1736,7 +1736,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * be initiated.
      */
     @Suppress("DEPRECATION")
-    private fun maybeAutoStartVpn() {
+@Suppress("DEPRECATION")    private fun maybeAutoStartVpn() {
         if (isVpnActivated && !VpnController.isOn()) {
             // On API 37+, the local network permission is mandatory. Do not auto-start
             // (which is invoked from onResume and would otherwise re-prompt for the

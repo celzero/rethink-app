@@ -55,7 +55,7 @@ class Peer private constructor(builder: Builder) {
     init {
         // Defensively copy to ensure immutability even if the Builder is reused.
         @Suppress("UNCHECKED_CAST")
-        allowedIps =
+@Suppress("UNCHECKED_CAST")        allowedIps =
             Collections.unmodifiableSet(LinkedHashSet<Any?>(builder.allowedIps)) as Set<InetNetwork>
         endpoint = builder.endpoint
         unresolvedEndpoint = builder.unresolvedEndpoint
@@ -65,7 +65,7 @@ class Peer private constructor(builder: Builder) {
     }
 
     @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-    override fun equals(obj: Any?): Boolean {
+@Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")    override fun equals(obj: Any?): Boolean {
         if (obj !is Peer) return false
         return allowedIps == obj.allowedIps &&
                 endpoint == obj.endpoint &&

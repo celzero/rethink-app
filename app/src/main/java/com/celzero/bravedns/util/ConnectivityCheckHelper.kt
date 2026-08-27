@@ -275,7 +275,7 @@ object ConnectivityCheckHelper {
     private suspend fun isReachableTcpUdp(nw: Network?, host: String): Boolean {
         return try {
             @Suppress("DEPRECATION")
-            TrafficStats.setThreadStatsTag(Thread.currentThread().id.toIntOrDefault())
+@Suppress("DEPRECATION")            TrafficStats.setThreadStatsTag(Thread.currentThread().id.toIntOrDefault())
             val result = checkTcpConnection(nw, host, HTTP_PORT, "80") ||
                     checkTcpConnection(nw, host, DNS_PORT, "53")
 
@@ -296,7 +296,7 @@ object ConnectivityCheckHelper {
     private suspend fun isReachable(host: String): Boolean {
         return try {
             @Suppress("DEPRECATION")
-            TrafficStats.setThreadStatsTag(Thread.currentThread().id.toIntOrDefault())
+@Suppress("DEPRECATION")            TrafficStats.setThreadStatsTag(Thread.currentThread().id.toIntOrDefault())
             val result = InetAddress.getByName(host).isReachable(DEFAULT_TIMEOUT)
             Logger.d(LOG_TAG_CONNECTION, "$TAG $host isReachable via ICMP: $result")
             result

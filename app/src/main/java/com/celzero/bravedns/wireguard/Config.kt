@@ -1,5 +1,4 @@
-@file:Suppress("ThrowsCount")
-/*
+@file:Suppress("ThrowsCount")/*
  * Copyright 2023 RethinkDNS and its authors
  *
  * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.
@@ -63,7 +62,7 @@ class Config private constructor(builder: Builder) {
     }
 
     @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-    override fun equals(obj: Any?): Boolean {
+@Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")    override fun equals(obj: Any?): Boolean {
         if (obj !is Config) return false
 
         return wgInterface?.equals(obj.wgInterface) == true && peers?.equals(obj.peers) == true

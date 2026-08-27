@@ -131,7 +131,7 @@ class AppListActivity :
     }
 
     @Suppress("MagicNumber")
-    enum class FirewallFilter(val id: Int) {
+@Suppress("MagicNumber")    enum class FirewallFilter(val id: Int) {
         ALL(0),
         ALLOWED(1),
         BLOCKED(2),

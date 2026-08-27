@@ -1,5 +1,4 @@
-@file:Suppress("UnusedParameter", "FunctionParameterNaming")
-/*
+@file:Suppress("UnusedParameter", "FunctionParameterNaming")/*
  * Copyright 2021 RethinkDNS and its authors
  * Copyright 2019 Jigsaw Operations LLC
  *
@@ -3693,9 +3692,8 @@ class GoVpnAdapter : KoinComponent {
         return false
     }
 
-    @Suppress("FunctionParameterNaming")
     @Suppress("UnusedParameter")
-    fun performAutoConnectivityCheck(controller: Controller, id: String, mode: String): Boolean {
+@Suppress("FunctionParameterNaming", "UnusedParameter")    fun performAutoConnectivityCheck(controller: Controller, id: String, mode: String): Boolean {
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip auto connectivity check")
             return false

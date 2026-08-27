@@ -91,7 +91,7 @@ class RethinkLocalFileTag {
                         url = listOf(it.value as String)
                     } else if (it.value as Any? is List<*>) {
                         @Suppress("UNCHECKED_CAST")
-                        url = it.value as List<String>
+@Suppress("UNCHECKED_CAST")                        url = it.value as List<String>
                     }
                 }
                 "show" -> show = it.value as Int
@@ -101,7 +101,7 @@ class RethinkLocalFileTag {
                         pack = listOf(it.value as String)
                     } else if (it.value as Any? is List<*>) {
                         @Suppress("UNCHECKED_CAST")
-                        pack = it.value as List<String>
+@Suppress("UNCHECKED_CAST")                        pack = it.value as List<String>
                     }
                 }
                 "simpleTagId" -> simpleTagId = it.value as Int

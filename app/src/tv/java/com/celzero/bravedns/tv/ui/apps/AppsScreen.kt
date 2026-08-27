@@ -1,5 +1,4 @@
-@file:Suppress("MatchingDeclarationName")
-/*
+@file:Suppress("MatchingDeclarationName")/*
  * Copyright 2026 ezelab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

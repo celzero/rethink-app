@@ -86,7 +86,7 @@ class DiagnosticsManager(
             // iterate through all keys and values
             for (key in additionalInfo.keySet()) {
                 @Suppress("DEPRECATION")
-                val value = additionalInfo.get(key)
+@Suppress("DEPRECATION")                val value = additionalInfo.get(key)
                 logd("$TAG; Key: '$key' -> Value: '$value' (${value?.javaClass?.simpleName})")
             }
 

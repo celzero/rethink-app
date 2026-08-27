@@ -1395,7 +1395,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
     }
 
     @Suppress("UnusedParameter")
-    private fun updateSsidPermissionState(hasPermissions: Boolean) {
+@Suppress("UnusedParameter")    private fun updateSsidPermissionState(hasPermissions: Boolean) {
         // This method can be used to update UI state when permissions change
         // Currently handled by setupSsidSection being called from callback
         val cfg = WireguardManager.getConfigFilesById(configId)

@@ -787,7 +787,7 @@ object InAppBillingHandler : KoinComponent {
         }
 
     @Suppress("CyclomaticComplexMethod")
-    private suspend fun handlePurchase(
+@Suppress("CyclomaticComplexMethod")    private suspend fun handlePurchase(
         purchasesList: List<Purchase>?,
         queriedProductType: String? = null
     ) {
@@ -2567,7 +2567,7 @@ object InAppBillingHandler : KoinComponent {
      * owned by this object.
      */
     @Suppress("UnusedParameter")
-    private suspend fun handleConflict409(
+@Suppress("UnusedParameter")    private suspend fun handleConflict409(
         operation: ServerApiError.Operation,
         accountId: String,
         deviceId: String,

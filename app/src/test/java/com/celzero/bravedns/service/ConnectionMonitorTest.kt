@@ -104,7 +104,7 @@ class ConnectionMonitorTest {
         every { context.getSystemService(Context.WIFI_SERVICE) } returns wm
 
         @Suppress("DEPRECATION")
-        every { cm.allNetworks } returns emptyArray()
+@Suppress("DEPRECATION")        every { cm.allNetworks } returns emptyArray()
         every { cm.activeNetwork } returns null
         every { cm.isActiveNetworkMetered } returns false
         every { cm.registerNetworkCallback(any<NetworkRequest>(), any<ConnectivityManager.NetworkCallback>()) } just Runs
@@ -260,7 +260,7 @@ class ConnectionMonitorTest {
         val wifiInfo = mockk<WifiInfo>()
         every { wifiInfo.ssid } returns "\"OfficeWiFi\""
         @Suppress("DEPRECATION")
-        every { wm.connectionInfo } returns wifiInfo
+@Suppress("DEPRECATION")        every { wm.connectionInfo } returns wifiInfo
 
         val out = monitor.getNetworkSSID(network, cap)
 
@@ -300,7 +300,7 @@ class ConnectionMonitorTest {
         val wifiInfo = mockk<WifiInfo>()
         every { wifiInfo.ssid } returns "<unknown ssid>"
         @Suppress("DEPRECATION")
-        every { wm.connectionInfo } returns wifiInfo
+@Suppress("DEPRECATION")        every { wm.connectionInfo } returns wifiInfo
 
         val unknown = monitor.getNetworkSSID(network, wifiCap)
         assertNull(unknown)

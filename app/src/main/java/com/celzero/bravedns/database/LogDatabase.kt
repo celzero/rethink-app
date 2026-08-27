@@ -54,7 +54,7 @@ abstract class LogDatabase : RoomDatabase() {
         // Otherwise, WRITE_AHEAD_LOGGING will be used.
         // https://developer.android.com/reference/android/arch/persistence/room/RoomDatabase.JournalMode#automatic
         @Suppress("DEPRECATION")
-        fun buildDatabase(context: Context): LogDatabase {
+@Suppress("DEPRECATION")        fun buildDatabase(context: Context): LogDatabase {
             rethinkDnsDbPath = context.getDatabasePath(AppDatabase.DATABASE_NAME).toString()
             isFreshInstall = Utilities.isFreshInstall(context)
 

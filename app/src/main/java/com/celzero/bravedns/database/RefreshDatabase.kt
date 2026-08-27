@@ -762,7 +762,7 @@ internal constructor(
 
         // no need to notify if the vpn is not on
         @Suppress("DEPRECATION")
-        if (!VpnController.isOn()) return
+@Suppress("DEPRECATION")        if (!VpnController.isOn()) return
 
         var pkgName = app.packageName
         if (pkgName.isEmpty()) {

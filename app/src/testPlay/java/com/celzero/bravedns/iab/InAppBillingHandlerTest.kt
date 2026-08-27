@@ -105,7 +105,7 @@ class InAppBillingHandlerTest : KoinTest {
         setPrivateField(InAppBillingHandler, "consecutiveEmptyInAppQueries", 0)
         // isInitialized is an AtomicBoolean; reset its value rather than replacing the field.
         @Suppress("UNCHECKED_CAST")
-        val initFlag = getPrivateField<java.util.concurrent.atomic.AtomicBoolean>(InAppBillingHandler, "isInitialized")
+@Suppress("UNCHECKED_CAST")        val initFlag = getPrivateField<java.util.concurrent.atomic.AtomicBoolean>(InAppBillingHandler, "isInitialized")
         initFlag.set(false)
     }
 
@@ -127,7 +127,7 @@ class InAppBillingHandlerTest : KoinTest {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T> getPrivateField(obj: Any, fieldName: String): T {
+@Suppress("UNCHECKED_CAST")    private fun <T> getPrivateField(obj: Any, fieldName: String): T {
         val field: Field = obj.javaClass.getDeclaredField(fieldName)
         field.isAccessible = true
         return field.get(obj) as T
@@ -1168,7 +1168,7 @@ class InAppBillingHandlerTest : KoinTest {
         val method = InAppBillingHandler::class.java.getDeclaredMethod("fetchOrEnsureCustomerIds")
         method.isAccessible = true
         @Suppress("UNCHECKED_CAST")
-        val result = method.invoke(InAppBillingHandler) as Pair<String, String>
+@Suppress("UNCHECKED_CAST")        val result = method.invoke(InAppBillingHandler) as Pair<String, String>
 
         assertEquals("", result.first)
         assertEquals("", result.second)
@@ -1183,7 +1183,7 @@ class InAppBillingHandlerTest : KoinTest {
         val method = InAppBillingHandler::class.java.getDeclaredMethod("fetchOrEnsureCustomerIds")
         method.isAccessible = true
         @Suppress("UNCHECKED_CAST")
-        val result = method.invoke(InAppBillingHandler) as Pair<String, String>
+@Suppress("UNCHECKED_CAST")        val result = method.invoke(InAppBillingHandler) as Pair<String, String>
 
         assertEquals("", result.first)
         assertEquals("", result.second)

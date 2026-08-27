@@ -1,5 +1,4 @@
-@file:Suppress("UnusedParameter", "FunctionParameterNaming")
-/*
+@file:Suppress("UnusedParameter", "FunctionParameterNaming")/*
  * Copyright 2026 ezelab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -64,7 +63,7 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 @Suppress("FunctionParameterNaming")
-fun AppDetailScreen(uid: Int, navController: NavController? = null) {
+@Suppress("FunctionParameterNaming")fun AppDetailScreen(uid: Int, navController: NavController? = null) {
     val scope = rememberCoroutineScope()
 
     // Re-fetch on `uid` so navigating to a sibling redraws the screen.

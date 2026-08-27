@@ -87,7 +87,7 @@ object TunFirewallManager : KoinComponent {
     }
 
     @Suppress("CyclomaticComplexMethod")
-    internal suspend fun firewall(params: FirewallParameters): FirewallRuleset {
+@Suppress("CyclomaticComplexMethod")    internal suspend fun firewall(params: FirewallParameters): FirewallRuleset {
         val connId = params.connInfo.connId
         val skipUnknownAppRule = params.forUpstreamAnswer && !persistentState.splitDns
         val res = try {

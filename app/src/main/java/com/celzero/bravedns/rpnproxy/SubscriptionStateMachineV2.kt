@@ -865,7 +865,7 @@ open class SubscriptionStateMachineV2 : KoinComponent {
      *                            Defaults to SUBS so legacy callers are unaffected.
      */
     @Suppress("CyclomaticComplexMethod")
-    suspend fun reconcileWithPlayBilling(
+@Suppress("CyclomaticComplexMethod")    suspend fun reconcileWithPlayBilling(
         purchases: List<Purchase>,
         productMeta: Map<String, Pair<String, String>> = emptyMap(),
         purchaseExpiryMap: Map<String, Long> = emptyMap(),
@@ -1805,7 +1805,7 @@ open class SubscriptionStateMachineV2 : KoinComponent {
     }
 
     @Suppress("CyclomaticComplexMethod")
-    private suspend fun handleServerAckFailed(error: String) {
+@Suppress("CyclomaticComplexMethod")    private suspend fun handleServerAckFailed(error: String) {
         try {
             Logger.w(LOG_IAB, "$TAG: handleServerAckFailed: payment received but server ack failed: $error")
             dbSyncService.savePurchaseFailureHistory("ServerAckFailed: $error", null)
@@ -1829,7 +1829,7 @@ open class SubscriptionStateMachineV2 : KoinComponent {
      * @param updateMachineData If true (default), updates the state machine's in-memory data pointer.
      */
     @Suppress("CyclomaticComplexMethod")
-        private suspend fun handlePaymentSuccessful(
+@Suppress("CyclomaticComplexMethod")        private suspend fun handlePaymentSuccessful(
         purchaseDetail: PurchaseDetail,
         updateMachineData: Boolean = true
     ) {

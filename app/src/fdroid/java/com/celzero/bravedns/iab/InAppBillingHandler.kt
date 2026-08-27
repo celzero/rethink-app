@@ -1,5 +1,4 @@
-@file:Suppress("FunctionOnlyReturningConstant", "UnusedParameter")
-/*
+@file:Suppress("FunctionOnlyReturningConstant", "UnusedParameter")/*
  * Copyright 2026 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -77,31 +76,31 @@ object InAppBillingHandler {
     }
 
     @Suppress("UNUSED_PARAMETER")
-    fun initiate(context: Context, billingListener: Any? = null) { /* no-op */ }
+@Suppress("UNUSED_PARAMETER")    fun initiate(context: Context, billingListener: Any? = null) { /* no-op */ }
 
     @Suppress("FunctionOnlyReturningConstant")
-    fun isBillingClientSetup(): Boolean = false
+@Suppress("FunctionOnlyReturningConstant")    fun isBillingClientSetup(): Boolean = false
 
     @Suppress("UNUSED_PARAMETER")
-    fun enableInAppMessaging(activity: Activity) { /* no-op */ }
+@Suppress("UNUSED_PARAMETER")    fun enableInAppMessaging(activity: Activity) { /* no-op */ }
 
     /** Accepts a list of product-type strings ("subs", "inapp"). No-op in this build. */
     @Suppress("UNUSED_PARAMETER")
-    fun fetchPurchases(productType: List<String>) { /* no-op */ }
+@Suppress("UNUSED_PARAMETER")    fun fetchPurchases(productType: List<String>) { /* no-op */ }
 
     /** Convenience overload: fetches all purchase types. No-op in this build. */
     @Suppress("FunctionOnlyReturningConstant")
-    fun fetchAllPurchases() { /* no-op */ }
+@Suppress("FunctionOnlyReturningConstant")    fun fetchAllPurchases() { /* no-op */ }
 
     @Suppress("FunctionOnlyReturningConstant")
-    suspend fun getObfuscatedDeviceId(): String = ""
+@Suppress("FunctionOnlyReturningConstant")    suspend fun getObfuscatedDeviceId(): String = ""
 
     fun getRemainingDaysForInApp(): Long? = null
 
     suspend fun getRemainingDaysForInAppSuspend(): Long? = null
 
     @Suppress("UNUSED_PARAMETER")
-    suspend fun cancelOneTimePurchase(
+@Suppress("UNUSED_PARAMETER")    suspend fun cancelOneTimePurchase(
         accountId: String,
         deviceId: String,
         purchaseToken: String,
@@ -109,7 +108,7 @@ object InAppBillingHandler {
     ): Pair<Boolean, String> = Pair(false, "Not supported in this build")
 
     @Suppress("UNUSED_PARAMETER")
-    suspend fun cancelPlaySubscription(
+@Suppress("UNUSED_PARAMETER")    suspend fun cancelPlaySubscription(
         accountId: String,
         deviceId: String,
         purchaseToken: String,
@@ -117,7 +116,7 @@ object InAppBillingHandler {
     ): Pair<Boolean, String> = Pair(false, "Not supported in this build")
 
     @Suppress("UNUSED_PARAMETER")
-    suspend fun revokeOneTimePurchase(
+@Suppress("UNUSED_PARAMETER")    suspend fun revokeOneTimePurchase(
         accountId: String,
         deviceId: String,
         purchaseToken: String,
@@ -125,7 +124,7 @@ object InAppBillingHandler {
     ): Pair<Boolean, String> = Pair(false, "Not supported in this build")
 
     @Suppress("UNUSED_PARAMETER")
-    suspend fun revokeSubscription(
+@Suppress("UNUSED_PARAMETER")    suspend fun revokeSubscription(
         accountId: String,
         deviceId: String,
         purchaseToken: String,
@@ -133,7 +132,7 @@ object InAppBillingHandler {
     ): Pair<Boolean, String> = Pair(false, "Not supported in this build")
 
     @Suppress("UNUSED_PARAMETER")
-    suspend fun purchaseSubs(
+@Suppress("UNUSED_PARAMETER")    suspend fun purchaseSubs(
         activity: Activity,
         productId: String,
         planId: String,
@@ -142,14 +141,14 @@ object InAppBillingHandler {
 
     /** No-op: F-Droid build has no account/device IDs to reconcile. */
     @Suppress("UNUSED_PARAMETER")
-    suspend fun reconcileCidDidFromPurchase(cid: String) { /* no-op */ }
+@Suppress("UNUSED_PARAMETER")    suspend fun reconcileCidDidFromPurchase(cid: String) { /* no-op */ }
 
     /** Returns an empty list, F-Droid build has no active Play purchases. */
     fun getActivePurchasesSnapshot(): List<PurchaseDetail> = emptyList()
 
     /** No-op: F-Droid build does not register devices with the billing server. */
     @Suppress("UNUSED_PARAMETER")
-    suspend fun registerDevice(
+@Suppress("UNUSED_PARAMETER")    suspend fun registerDevice(
         accountId: String,
         deviceId: String,
         meta: JsonObject? = null
@@ -157,24 +156,22 @@ object InAppBillingHandler {
 
     /** No-op: F-Droid build has no billing server to return 401 errors. */
     @Suppress("UNUSED_PARAMETER")
-    internal suspend fun handleUnauthorized401(
+@Suppress("UNUSED_PARAMETER")    internal suspend fun handleUnauthorized401(
         operation: ServerApiError.Operation,
         accountId: String,
         deviceId: String
     ) { /* no-op */ }
 
     /** Returns the unchanged [purchase]: F-Droid build has no server entitlements. */
-    @Suppress("UNUSED_PARAMETER")
-    @Suppress("FunctionParameterNaming")
     @Suppress("UnusedParameter")
-    suspend fun queryEntitlementFromServer(
+@Suppress("UNUSED_PARAMETER", "FunctionParameterNaming", "UnusedParameter")    suspend fun queryEntitlementFromServer(
         accountId: String,
         deviceId: String,
         purchase: PurchaseDetail
     ): PurchaseDetail = purchase
 
     @Suppress("FunctionParameterNaming")
-    fun getProductType(purchase: com.android.billingclient.api.Purchase, sku: String? = null): String {
+@Suppress("FunctionParameterNaming")    fun getProductType(purchase: com.android.billingclient.api.Purchase, sku: String? = null): String {
         return PRODUCT_TYPE_SUBS
     }
 

@@ -99,7 +99,7 @@ class PurchaseProcessingBottomSheet : BottomSheetDialogFragment() {
             arguments?.getSerializable(ARG_STATE, ProcessingState::class.java)
         } else {
             @Suppress("DEPRECATION")
-            arguments?.getSerializable(ARG_STATE) as? ProcessingState
+@Suppress("DEPRECATION")            arguments?.getSerializable(ARG_STATE) as? ProcessingState
         } ?: ProcessingState.Processing
 
         val message = arguments?.getString(ARG_MESSAGE)
