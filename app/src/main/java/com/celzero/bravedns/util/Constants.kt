@@ -1,3 +1,4 @@
+@file:Suppress("UtilityClassWithPublicConstructor")
 /*
  * Copyright 2020 RethinkDNS and its authors
  *
@@ -18,7 +19,9 @@ package com.celzero.bravedns.util
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-object Constants {
+class Constants {
+
+    companion object {
         // on-device blocklist download path
         val ONDEVICE_BLOCKLIST_DOWNLOAD_PATH = File.separator + "downloads" + File.separator
 

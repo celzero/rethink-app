@@ -1,4 +1,0 @@
-﻿2026-08-27T04:07:57.6365079Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
-2026-08-27T04:07:57.6366272Z Post job cleanup.
-2026-08-27T04:07:57.7706932Z (node:3147) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-2026-08-27T04:07:57.7707871Z (Use `node --trace-deprecation ...` to show where the warning was created)

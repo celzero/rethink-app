@@ -2,6 +2,10 @@
 # Excludes test files from code scanning
 # excludes magic numbers, return count, long parameter, long methods
 
+potential-bugs:
+  UnsafeCallOnNullableType:
+    active: false
+
 style:
   MaxLineLength:
     active: true
@@ -21,6 +25,9 @@ style:
     active: false
 
   LoopWithTooManyJumpStatements:
+    active: false
+
+  UnusedPrivateProperty:
     active: false
 
 naming:

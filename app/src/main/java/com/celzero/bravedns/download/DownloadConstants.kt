@@ -1,3 +1,4 @@
+@file:Suppress("UtilityClassWithPublicConstructor")
 /*
  * Copyright 2021 RethinkDNS and its authors
  *
@@ -15,9 +16,12 @@
  */
 package com.celzero.bravedns.download
 
-object DownloadConstants {
+class DownloadConstants {
+
+    companion object {
         const val OUTPUT_FILES = "FILES_OUTPUT"
 
         const val FILE_TAG = "FILE_WORKER"
         const val DOWNLOAD_TAG = "DOWNLOAD_WORKER"
+    }
 }

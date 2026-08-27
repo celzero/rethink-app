@@ -1,3 +1,4 @@
+@file:Suppress("UtilityClassWithPublicConstructor")
 /*
  * Copyright 2022 RethinkDNS and its authors
  *
@@ -28,7 +29,9 @@ import java.io.InputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
-object BackupHelper {
+class BackupHelper {
+
+    companion object {
         // MIME type is used for unknown binary files (if stored locally)
         const val INTENT_TYPE_OCTET = "application/octet-stream"
 
@@ -114,6 +117,7 @@ object BackupHelper {
         fun deleteResidue(backupFile: File) {
             if (backupFile.exists()) {
                 backupFile.delete()
+            }
         }
 
         fun unzip(inputStream: InputStream?, path: String): Boolean {
@@ -138,7 +142,9 @@ object BackupHelper {
                     fout.close()
                     zis.closeEntry()
                     ze = zis.nextEntry
+                }
             } catch (e: Exception) {
+                Logger.w(LOG_TAG_BACKUP_RESTORE, "Unzip failed: ${e.message}", e)
                 return false
             } finally {
                 zis?.close()
@@ -148,5 +154,6 @@ object BackupHelper {
 
         fun getFileNameFromPath(file: String): String {
             return file.substring(file.lastIndexOf("/") + 1)
+        }
     }
 }

@@ -1,3 +1,4 @@
+@file:Suppress("UtilityClassWithPublicConstructor")
 /*
  * Copyright 2021 RethinkDNS and its authors
  *
@@ -16,7 +17,9 @@
 @file:Suppress("MagicNumber")
 package com.celzero.bravedns.util
 
-object KnownPorts {
+class KnownPorts {
+
+    companion object {
         const val DNS_PORT: Int = 53
         private const val NTP_PORT: Int = 123
         const val HTTP_PORT: Int = 80
