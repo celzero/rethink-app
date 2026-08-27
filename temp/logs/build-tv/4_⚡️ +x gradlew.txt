@@ -1,8 +1,0 @@
-﻿2026-08-27T04:39:36.1503569Z ##[group]Run chmod +x gradlew
-2026-08-27T04:39:36.1503940Z [36;1mchmod +x gradlew[0m
-2026-08-27T04:39:36.1542068Z shell: /usr/bin/bash -e {0}
-2026-08-27T04:39:36.1542342Z env:
-2026-08-27T04:39:36.1542553Z   VARIANT: assembleFdroidTvDebug
-2026-08-27T04:39:36.1542889Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-8/x64
-2026-08-27T04:39:36.1543316Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-8/x64
-2026-08-27T04:39:36.1543656Z ##[endgroup]

@@ -1,0 +1,76 @@
+﻿2026-08-27T04:51:36.7987447Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-08-27T04:51:36.7995999Z ##[group]Run actions/checkout@v4
+2026-08-27T04:51:36.7996798Z with:
+2026-08-27T04:51:36.7997295Z   repository: varunagarwal1/RethinkDNS
+2026-08-27T04:51:36.8001176Z   token: ***
+2026-08-27T04:51:36.8001660Z   ssh-strict: true
+2026-08-27T04:51:36.8002125Z   ssh-user: git
+2026-08-27T04:51:36.8002601Z   persist-credentials: true
+2026-08-27T04:51:36.8003115Z   clean: true
+2026-08-27T04:51:36.8003630Z   sparse-checkout-cone-mode: true
+2026-08-27T04:51:36.8004219Z   fetch-depth: 1
+2026-08-27T04:51:36.8004717Z   fetch-tags: false
+2026-08-27T04:51:36.8005175Z   show-progress: true
+2026-08-27T04:51:36.8005640Z   lfs: false
+2026-08-27T04:51:36.8006066Z   submodules: false
+2026-08-27T04:51:36.8006573Z   set-safe-directory: true
+2026-08-27T04:51:36.8007099Z   allow-unsafe-pr-checkout: false
+2026-08-27T04:51:36.8007915Z env:
+2026-08-27T04:51:36.8008386Z   VARIANT: assembleWebsiteFullDebug
+2026-08-27T04:51:36.8008942Z ##[endgroup]
+2026-08-27T04:51:36.9028457Z Syncing repository: varunagarwal1/RethinkDNS
+2026-08-27T04:51:36.9032174Z ##[group]Getting Git version info
+2026-08-27T04:51:36.9033480Z Working directory is '/home/runner/work/RethinkDNS/RethinkDNS'
+2026-08-27T04:51:36.9035301Z [command]/usr/bin/git version
+2026-08-27T04:51:36.9110164Z git version 2.55.0
+2026-08-27T04:51:36.9142756Z ##[endgroup]
+2026-08-27T04:51:36.9158892Z Temporarily overriding HOME='/home/runner/work/_temp/dac5a1b6-cae1-48cf-9ca9-d4bcf709acbc' before making global git config changes
+2026-08-27T04:51:36.9162149Z Adding repository directory to the temporary git global config as a safe directory
+2026-08-27T04:51:36.9164116Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/RethinkDNS/RethinkDNS
+2026-08-27T04:51:36.9217312Z Deleting the contents of '/home/runner/work/RethinkDNS/RethinkDNS'
+2026-08-27T04:51:36.9229591Z ##[group]Initializing the repository
+2026-08-27T04:51:36.9231044Z [command]/usr/bin/git init /home/runner/work/RethinkDNS/RethinkDNS
+2026-08-27T04:51:36.9331553Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-08-27T04:51:36.9338401Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-08-27T04:51:36.9340118Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-08-27T04:51:36.9341781Z hint: call:
+2026-08-27T04:51:36.9342559Z hint:
+2026-08-27T04:51:36.9343504Z hint: 	git config --global init.defaultBranch <name>
+2026-08-27T04:51:36.9344647Z hint:
+2026-08-27T04:51:36.9345672Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-08-27T04:51:36.9347259Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-08-27T04:51:36.9348526Z hint:
+2026-08-27T04:51:36.9349235Z hint: 	git branch -m <name>
+2026-08-27T04:51:36.9349758Z hint:
+2026-08-27T04:51:36.9350407Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-08-27T04:51:36.9352232Z Initialized empty Git repository in /home/runner/work/RethinkDNS/RethinkDNS/.git/
+2026-08-27T04:51:36.9355604Z [command]/usr/bin/git remote add origin https://github.com/varunagarwal1/RethinkDNS
+2026-08-27T04:51:36.9398517Z ##[endgroup]
+2026-08-27T04:51:36.9399729Z ##[group]Disabling automatic garbage collection
+2026-08-27T04:51:36.9401902Z [command]/usr/bin/git config --local gc.auto 0
+2026-08-27T04:51:36.9435176Z ##[endgroup]
+2026-08-27T04:51:36.9436307Z ##[group]Setting up auth
+2026-08-27T04:51:36.9442014Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-08-27T04:51:36.9475389Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-08-27T04:51:36.9860111Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-08-27T04:51:36.9900684Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-08-27T04:51:37.0174161Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-08-27T04:51:37.0214409Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-08-27T04:51:37.0469401Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-08-27T04:51:37.0515400Z ##[endgroup]
+2026-08-27T04:51:37.0517396Z ##[group]Fetching the repository
+2026-08-27T04:51:37.0527812Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +6d723f8b57e82dc7bb37fd0547cf57b7c09f0ab9:refs/remotes/origin/main
+2026-08-27T04:51:38.4381547Z From https://github.com/varunagarwal1/RethinkDNS
+2026-08-27T04:51:38.4402377Z  * [new ref]         6d723f8b57e82dc7bb37fd0547cf57b7c09f0ab9 -> origin/main
+2026-08-27T04:51:38.4405975Z ##[endgroup]
+2026-08-27T04:51:38.4407215Z ##[group]Determining the checkout info
+2026-08-27T04:51:38.4408585Z ##[endgroup]
+2026-08-27T04:51:38.4409413Z [command]/usr/bin/git sparse-checkout disable
+2026-08-27T04:51:38.4461726Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-08-27T04:51:38.4496582Z ##[group]Checking out the ref
+2026-08-27T04:51:38.4502221Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-08-27T04:51:38.5938554Z Switched to a new branch 'main'
+2026-08-27T04:51:38.5942595Z branch 'main' set up to track 'origin/main'.
+2026-08-27T04:51:38.5957948Z ##[endgroup]
+2026-08-27T04:51:38.6007390Z [command]/usr/bin/git log -1 --format=%H
+2026-08-27T04:51:38.6035388Z 6d723f8b57e82dc7bb37fd0547cf57b7c09f0ab9

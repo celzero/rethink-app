@@ -1,0 +1,49 @@
+﻿2026-08-27T04:51:35.9912083Z Current runner version: '2.336.0'
+2026-08-27T04:51:35.9938792Z ##[group]Runner Image Provisioner
+2026-08-27T04:51:35.9939783Z Hosted Compute Agent
+2026-08-27T04:51:35.9940398Z Version: 20260819.586
+2026-08-27T04:51:35.9941521Z Commit: 3cc4a88dfa507ef76119ad1bb3eccc6378bb2b76
+2026-08-27T04:51:35.9942392Z Build Date: 2026-08-18T23:20:18Z
+2026-08-27T04:51:35.9943097Z Worker ID: {579cf00d-c566-47c6-8be4-9838f30e88c6}
+2026-08-27T04:51:35.9943899Z Azure Region: eastus
+2026-08-27T04:51:35.9944502Z ##[endgroup]
+2026-08-27T04:51:35.9946230Z ##[group]Operating System
+2026-08-27T04:51:35.9947024Z Ubuntu
+2026-08-27T04:51:35.9947566Z 24.04.4
+2026-08-27T04:51:35.9948156Z LTS
+2026-08-27T04:51:35.9948697Z ##[endgroup]
+2026-08-27T04:51:35.9949264Z ##[group]Runner Image
+2026-08-27T04:51:35.9949921Z Image: ubuntu-24.04
+2026-08-27T04:51:35.9950535Z Version: 20260823.283.1
+2026-08-27T04:51:35.9952360Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260823.283/images/ubuntu/Ubuntu2404-Readme.md
+2026-08-27T04:51:35.9954234Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260823.283
+2026-08-27T04:51:35.9955290Z ##[endgroup]
+2026-08-27T04:51:35.9958407Z ##[group]GITHUB_TOKEN Permissions
+2026-08-27T04:51:35.9961107Z Actions: write
+2026-08-27T04:51:35.9961831Z ArtifactMetadata: write
+2026-08-27T04:51:35.9962524Z Attestations: write
+2026-08-27T04:51:35.9963136Z Checks: write
+2026-08-27T04:51:35.9963741Z CodeQuality: write
+2026-08-27T04:51:35.9964362Z Contents: write
+2026-08-27T04:51:35.9964942Z CopilotRequests: write
+2026-08-27T04:51:35.9965530Z Deployments: write
+2026-08-27T04:51:35.9966243Z Discussions: write
+2026-08-27T04:51:35.9966813Z Drives: write
+2026-08-27T04:51:35.9967411Z Issues: write
+2026-08-27T04:51:35.9967988Z Metadata: read
+2026-08-27T04:51:35.9968693Z Models: read
+2026-08-27T04:51:35.9969268Z Packages: write
+2026-08-27T04:51:35.9969857Z Pages: write
+2026-08-27T04:51:35.9970456Z PullRequests: write
+2026-08-27T04:51:35.9971247Z RepositoryProjects: write
+2026-08-27T04:51:35.9971937Z SecurityEvents: write
+2026-08-27T04:51:35.9972573Z Statuses: write
+2026-08-27T04:51:35.9973157Z VulnerabilityAlerts: read
+2026-08-27T04:51:35.9973816Z ##[endgroup]
+2026-08-27T04:51:35.9975911Z Secret source: Actions
+2026-08-27T04:51:35.9977957Z Prepare workflow directory
+2026-08-27T04:51:36.0367517Z Prepare all required actions
+2026-08-27T04:51:36.0417379Z Getting action download info
+2026-08-27T04:51:36.2422842Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-08-27T04:51:36.3886281Z Download action repository 'actions/setup-java@v4' (SHA:cf277c60eb25467037889841efdb72551f06f6c3)
+2026-08-27T04:51:36.7240469Z Complete job name: build

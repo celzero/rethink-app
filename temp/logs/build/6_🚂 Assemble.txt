@@ -1,0 +1,228 @@
+﻿2026-08-27T04:51:39.1993549Z ##[group]Run ./gradlew lint
+2026-08-27T04:51:39.1994023Z [36;1m./gradlew lint[0m
+2026-08-27T04:51:39.1994380Z [36;1m./gradlew \[0m
+2026-08-27T04:51:39.1994721Z [36;1m  ${VARIANT} \[0m
+2026-08-27T04:51:39.1995111Z [36;1m  --info \[0m
+2026-08-27T04:51:39.1995460Z [36;1m  --warning-mode all[0m
+2026-08-27T04:51:39.2031293Z shell: /usr/bin/bash -e {0}
+2026-08-27T04:51:39.2031684Z env:
+2026-08-27T04:51:39.2032021Z   VARIANT: assembleFdroidFullDebug
+2026-08-27T04:51:39.2032535Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-1/x64
+2026-08-27T04:51:39.2033181Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-1/x64
+2026-08-27T04:51:39.2033696Z ##[endgroup]
+2026-08-27T04:51:40.7475589Z Fetching distribution.
+2026-08-27T04:51:40.7476884Z Downloading https://services.gradle.org/distributions/gradle-9.5.1-bin.zip
+2026-08-27T04:51:43.2971087Z .............10%.............20%..............30%.............40%.............50%..............60%.............70%..............80%.............90%.............100%
+2026-08-27T04:51:44.7411166Z 
+2026-08-27T04:51:44.7421933Z Welcome to Gradle 9.5.1!
+2026-08-27T04:51:44.7422583Z 
+2026-08-27T04:51:44.7451730Z Here are the highlights of this release:
+2026-08-27T04:51:44.7467542Z  - Task provenance in reports and failure messages
+2026-08-27T04:51:44.7468655Z  - Type-safe accessors for precompiled Kotlin Settings plugins
+2026-08-27T04:51:44.7469288Z 
+2026-08-27T04:51:44.7469706Z For more details see https://docs.gradle.org/9.5.1/release-notes.html
+2026-08-27T04:51:44.7470289Z 
+2026-08-27T04:51:44.8408123Z Starting a Gradle Daemon (subsequent builds will be faster)
+2026-08-27T04:51:47.7415815Z Calculating task graph as no cached configuration is available for tasks: lint
+2026-08-27T04:51:51.7422425Z 
+2026-08-27T04:51:51.7423750Z > Configure project :
+2026-08-27T04:51:51.7451816Z app-task names: 'lint'
+2026-08-27T04:51:51.7470600Z app; deGoogled? true (fdroidBuild: false, fdroidBuildServer: false, apkBuild: false)
+2026-08-27T04:52:14.5405885Z 
+2026-08-27T04:52:14.5413100Z > Configure project :app
+2026-08-27T04:52:14.5414152Z app-task names: 'lint'
+2026-08-27T04:52:14.5417219Z gradle deGoogled? true (fdroidBuild: false, fdroidBuildServer: false, apkBuild: false)
+2026-08-27T04:52:14.5418517Z gradle alphaBuild? false, should split? true
+2026-08-27T04:52:14.5419282Z app firebase plugins SKIPPED
+2026-08-27T04:52:14.9405446Z split apks and universal apk (splits enabled)
+2026-08-27T04:52:15.0404868Z Normal build: using config signing config
+2026-08-27T04:52:15.2414242Z rethink-tv: TV_RELEASE_KS_* env vars NOT set; 'release' builds will be unsigned (upstream default)
+2026-08-27T04:52:50.1411355Z 
+2026-08-27T04:52:50.1419287Z > Task :app:preBuild UP-TO-DATE
+2026-08-27T04:52:50.1431042Z > Task :app:preFdroidFullDebugUnitTestBuild UP-TO-DATE
+2026-08-27T04:52:50.1431952Z > Task :app:preFdroidFullDebugBuild UP-TO-DATE
+2026-08-27T04:52:50.3432110Z > Task :app:generateFdroidFullDebugBuildConfig
+2026-08-27T04:52:50.3433172Z > Task :app:generateFdroidFullDebugResValues
+2026-08-27T04:52:50.3461498Z > Task :app:generateFdroidFullDebugResources
+2026-08-27T04:52:51.2403536Z > Task :app:javaPreCompileFdroidFullDebug
+2026-08-27T04:52:55.1422139Z > Task :app:processFdroidFullDebugNavigationResources
+2026-08-27T04:52:55.2422202Z > Task :app:dataBindingMergeDependencyArtifactsFdroidFullDebug
+2026-08-27T04:52:55.2466016Z > Task :app:mapFdroidFullDebugSourceSetPaths
+2026-08-27T04:52:55.5416909Z > Task :app:checkFdroidFullDebugAarMetadata
+2026-08-27T04:52:55.5439022Z > Task :app:createFdroidFullDebugCompatibleScreenManifests
+2026-08-27T04:52:55.5463866Z > Task :app:extractDeepLinksFdroidFullDebug
+2026-08-27T04:52:55.6411837Z > Task :app:compileFdroidFullDebugNavigationResources
+2026-08-27T04:52:55.6455706Z > Task :app:preFdroidFullDebugAndroidTestBuild SKIPPED
+2026-08-27T04:52:55.6480595Z > Task :app:generateFdroidFullDebugAndroidTestResValues FROM-CACHE
+2026-08-27T04:52:55.7405589Z > Task :app:extractProguardFiles
+2026-08-27T04:52:55.7431716Z > Task :app:packageFdroidFullDebugResources
+2026-08-27T04:53:02.0422083Z > Task :app:processFdroidFullDebugMainManifest
+2026-08-27T04:53:02.0459141Z > Task :app:parseFdroidFullDebugLocalResources
+2026-08-27T04:53:02.3412934Z > Task :app:generateFdroidFullDebugRFile
+2026-08-27T04:53:02.4408632Z > Task :app:processFdroidFullDebugManifest
+2026-08-27T04:53:02.4409919Z > Task :app:processFdroidFullDebugManifestForPackage
+2026-08-27T04:53:02.9413467Z > Task :app:mergeFdroidFullDebugResources
+2026-08-27T04:53:04.7421855Z > Task :app:dataBindingGenBaseClassesFdroidFullDebug
+2026-08-27T04:53:11.7431269Z > Task :app:processFdroidFullDebugResources
+2026-08-27T04:53:34.7404205Z > Task :app:kspFdroidFullDebugKotlin
+2026-08-27T04:54:08.8442031Z > Task :app:compileFdroidFullDebugKotlin
+2026-08-27T04:54:41.1442218Z w: Argument "-Xsuppress-warning" is deprecated. Use "-Xwarning-level=SENSELESS_COMPARISON:disabled" instead
+2026-08-27T04:54:41.1444732Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/BillingBackendClient.kt:33:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1472212Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/BillingBackendClient.kt:37:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1502159Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/BillingBackendClient.kt:67:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1504534Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/DeviceAuthErrorNotifier.kt:31:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1562984Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/DeviceAuthErrorNotifier.kt:34:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1565429Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/DeviceNotRegisteredNotifier.kt:27:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1592093Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:79:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1652104Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:82:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1677558Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:85:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1749048Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:89:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1792079Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:93:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1813019Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:96:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1871417Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:103:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1873980Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:111:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1876084Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:119:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1878178Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:127:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1880166Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:135:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1882812Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:144:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1884917Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:151:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1887049Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:159:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1889093Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:167:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1952096Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:174:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1982079Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/PurchaseConflictNotifier.kt:31:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2012299Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/SubscriptionCheckWorker.kt:20:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2072241Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/SubscriptionCheckWorker.kt:22:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2132229Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/SubscriptionCheckWorker.kt:46:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2212245Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/stripe/SubscriptionViewModel.kt:14:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2277761Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/stripe/SubscriptionViewModel.kt:18:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2302152Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/stripe/SubscriptionViewModel.kt:22:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2359457Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/stripe/SubscriptionViewModel.kt:24:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2362439Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/backup/BackupHelper.kt:146:26 Unresolved reference 'LOG_TAG_BACKUP_RESTORE'.
+2026-08-27T04:54:41.2364522Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/backup/RestoreAgent.kt:359:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2366485Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/backup/RestoreAgent.kt:417:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2368307Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/backup/RestoreAgent.kt:485:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2370346Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/ConnectionTrackerRepository.kt:114:50 Unresolved reference 'BLOCKED_WINDOW_MS'.
+2026-08-27T04:54:41.2373243Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/CustomDomain.kt:27:15 Conflicting declarations:
+2026-08-27T04:54:41.2374517Z companion object Companion : Any
+2026-08-27T04:54:41.2375815Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/CustomDomain.kt:39:25 Unresolved reference 'getCurrentVersion'.
+2026-08-27T04:54:41.2378010Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/CustomDomain.kt:100:5 Only one companion object is allowed per class.
+2026-08-27T04:54:41.2380091Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/CustomDomain.kt:100:15 Conflicting declarations:
+2026-08-27T04:54:41.2410672Z companion object Companion : Any
+2026-08-27T04:54:41.2429468Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/CustomDomain.kt:104:20 Unresolved reference 'CURRENT_VERSION'.
+2026-08-27T04:54:41.2430641Z 
+2026-08-27T04:54:41.2478099Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/LogDatabase.kt:57:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2479474Z > Task :app:compileFdroidFullDebugKotlin FAILED
+2026-08-27T04:54:41.2502593Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/RefreshDatabase.kt:765:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2512323Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/RethinkLocalFileTag.kt:94:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2542379Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/RethinkLocalFileTag.kt:104:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2545053Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/RethinkLocalFileTagRepository.kt:35:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2547383Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/RethinkLocalFileTagRepository.kt:40:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2549698Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/RethinkLocalFileTagRepository.kt:81:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2552598Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/iab/SecureIdentityStore.kt:306:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2554685Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/net/go/GoVpnAdapter.kt:3696:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2556730Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/receiver/VPNControlReceiver.kt:75:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2558823Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/receiver/VPNControlReceiver.kt:100:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2561107Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/receiver/VPNControlReceiver.kt:187:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2563382Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/rpnproxy/SubscriptionStateMachineV2.kt:868:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2565570Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/rpnproxy/SubscriptionStateMachineV2.kt:1808:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2567773Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/rpnproxy/SubscriptionStateMachineV2.kt:1832:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2570292Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/BraveVPNService.kt:1458:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2580610Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/ConnectionMonitor.kt:391:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2583007Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/ConnectionMonitor.kt:832:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2585063Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/ConnectionMonitor.kt:1434:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2587376Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/ConnectionMonitor.kt:1753:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2589432Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/ConsoleLogManager.kt:29:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2591677Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/DiagnosticsManager.kt:89:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2593717Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/DnsLogTracker.kt:242:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2595824Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/DomainRulesManager.kt:659:26 Unresolved reference 'getCurrentVersion'.
+2026-08-27T04:54:41.2612348Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/EncryptedFileManager.kt:16:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2614523Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/FirewallManager.kt:322:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2616649Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/GoMemLogConsumer.kt:107:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2618685Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/IPTracker.kt:129:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2620651Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/IPTracker.kt:135:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2622924Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/IPTracker.kt:141:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2624884Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/IPTracker.kt:147:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2626891Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/NetworkLifecycleObserver.kt:226:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2628985Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/TunFirewallManager.kt:90:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2631261Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/TunFlowManager.kt:1084:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2633309Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/VpnController.kt:152:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2635411Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/NotificationHandlerActivity.kt:115:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2637569Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/activity/AppListActivity.kt:134:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2639970Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/activity/WgConfigDetailActivity.kt:1398:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2642522Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/bottomsheet/CustomDomainRulesBtmSheet.kt:104:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2644780Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/bottomsheet/CustomIpRulesBtmSheet.kt:110:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2647018Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/bottomsheet/ProxyCountriesBtmSheet.kt:139:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2649508Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/bottomsheet/PurchaseConflictBottomSheet.kt:172:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2652164Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/bottomsheet/PurchaseProcessingBottomSheet.kt:102:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2654546Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/bottomsheet/RethinkPlusFilterBottomSheet.kt:105:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2656945Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/bottomsheet/ServerRemovalNotificationBottomSheet.kt:102:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2659307Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/bottomsheet/WireguardListBtmSheet.kt:135:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2661737Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/bottomsheet/WireguardListBtmSheet.kt:138:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2663885Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/custom/MoneyBackBadgeView.kt:44:35 Unresolved reference 'Color'.
+2026-08-27T04:54:41.2665916Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/custom/MoneyBackBadgeView.kt:45:34 Unresolved reference 'Color'.
+2026-08-27T04:54:41.2668028Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/custom/MoneyBackBadgeView.kt:50:21 Unresolved reference 'Color'.
+2026-08-27T04:54:41.2670354Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/fragment/HomeScreenFragment.kt:1739:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2672854Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/tour/SpotlightOverlayView.kt:268:16 Return type mismatch: expected 'Int', actual 'Any'.
+2026-08-27T04:54:41.2675026Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/tour/SpotlightOverlayView.kt:273:122 Unresolved reference 'e'.
+2026-08-27T04:54:41.2677014Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/tour/SpotlightOverlayView.kt:273:135 Unresolved reference 'e'.
+2026-08-27T04:54:41.2679047Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/tour/SpotlightOverlayView.kt:274:122 Unresolved reference 'e'.
+2026-08-27T04:54:41.2681189Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/tour/SpotlightOverlayView.kt:274:135 Unresolved reference 'e'.
+2026-08-27T04:54:41.2683145Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/AndroidUidConfig.kt:21:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2685236Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/BackgroundAccessibilityService.kt:66:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2687506Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/BubbleHelper.kt:83:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2689398Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/BubbleHelper.kt:570:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2691468Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/BubbleHelper.kt:587:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2693339Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/BubbleHelper.kt:655:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2695506Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/ConnectivityCheckHelper.kt:278:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2697619Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/ConnectivityCheckHelper.kt:299:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2699916Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/KnownPorts.kt:16:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2702183Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/PlayStoreCategory.kt:20:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2704126Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Protocol.kt:21:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2706138Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/SsidPermissionManager.kt:141:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2708078Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Themes.kt:43:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2709958Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Themes.kt:48:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2712150Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:92:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2714072Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:136:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2715961Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:164:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2717830Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:241:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2719772Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:280:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2725873Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:414:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2726963Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:479:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2727975Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:554:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2728956Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:585:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2729941Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:755:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2731627Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:868:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2732668Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:918:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2733659Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:976:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2734647Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/wireguard/Config.kt:65:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2735677Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/wireguard/InetEndpoint.kt:47:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2736882Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/wireguard/InetNetwork.kt:32:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2737905Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/wireguard/Peer.kt:58:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2738887Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/wireguard/Peer.kt:68:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2739902Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/wireguard/WgInterface.kt:116:1 This annotation is not repeatable.
+2026-08-27T04:54:41.3403317Z 
+2026-08-27T04:54:41.3403777Z 
+2026-08-27T04:54:41.3404545Z FAILURE: Build failed with an exception.
+2026-08-27T04:54:41.3405118Z 
+2026-08-27T04:54:41.3405328Z * What went wrong:
+2026-08-27T04:54:41.3406022Z Execution failed for task ':app:compileFdroidFullDebugKotlin' (registered by plugin 'com.android.internal.application').
+2026-08-27T04:54:41.3407085Z > A failure occurred while executing org.jetbrains.kotlin.compilerRunner.btapi.BuildToolsApiCompilationWork
+2026-08-27T04:54:41.3407846Z    > Compilation error. See log for more details
+2026-08-27T04:54:41.3408211Z 
+2026-08-27T04:54:41.3408396Z * Try:
+2026-08-27T04:54:41.3408757Z > Run with --stacktrace option to get the stack trace.
+2026-08-27T04:54:41.3409295Z > Run with --info or --debug option to get more log output.
+2026-08-27T04:54:41.3409905Z > Run with --scan to get full insights from a Build Scan (powered by Develocity).
+2026-08-27T04:54:41.3410500Z > Get more help at https://help.gradle.org.
+2026-08-27T04:54:41.3411348Z 
+2026-08-27T04:54:41.3411639Z BUILD FAILED in 3m
+2026-08-27T04:54:41.3413159Z [Incubating] Problems report is available at: file:///home/runner/work/RethinkDNS/RethinkDNS/build/reports/problems/problems-report.html
+2026-08-27T04:54:41.3414046Z 
+2026-08-27T04:54:41.3414503Z Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+2026-08-27T04:54:41.3415105Z 
+2026-08-27T04:54:41.3415761Z You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+2026-08-27T04:54:41.3416600Z 
+2026-08-27T04:54:41.3417410Z For more on this, please refer to https://docs.gradle.org/9.5.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+2026-08-27T04:54:41.3418616Z 24 actionable tasks: 23 executed, 1 from cache
+2026-08-27T04:54:41.3419149Z Configuration cache entry stored.
+2026-08-27T04:54:41.8393965Z ##[error]Process completed with exit code 1.

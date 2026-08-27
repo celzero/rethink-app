@@ -1,58 +1,65 @@
-I'll analyze the failing job for you. Let me fetch the logs and details.Now let me check the files mentioned in the error messages:## Problem
+I'll retrieve the job logs to identify the failure and provide you with a solution.Now let me examine the failing files to understand the issues:# Solution for Failing Job
 
-The Kotlin compilation is failing with **"This annotation is not repeatable"** errors on three files:
+The build is failing due to **Kotlin compilation errors** in several database files. Here are the issues and fixes:
 
-1. `InAppBillingHandler.kt` line 168
-2. `Themes.kt` line 2
-3. `InetAddresses.kt` line 2
+## Issues Found
 
-The issue is that you're using multiple `@file:Suppress` annotations on the same file, which is not allowed in Kotlin unless the annotation is marked as `@Repeatable`.
+1. **Duplicate `companion object` in `CustomDomain.kt`** (Line 100-106)
+   - The class has two companion object declarations, which is invalid
+   - Line 27-29 has an empty companion object, and lines 100-106 has the actual implementation with `CURRENT_VERSION`
 
-## Solution
+2. **Duplicate `@Suppress` annotations in `LogDatabase.kt`** (Line 56-57)
+   - The annotation is repeated twice on the same function
 
-Combine all suppression rules into a single `@file:Suppress` annotation on each file:
+3. **Duplicate `@Suppress` annotations in `RefreshDatabase.kt`** (Line 764-765)
+   - The annotation is repeated twice on the same function
 
-### Fix for `Themes.kt`
-**Current (lines 1-2):**
+## Fixes
+
+### Fix 1: CustomDomain.kt
+Remove the empty companion object at line 27-29:
+
 ```kotlin
-@file:Suppress("UnusedParameter", "FunctionParameterNaming")
-@file:Suppress("FunctionParameterNaming")
+@Entity(primaryKeys = ["domain", "uid"], tableName = "CustomDomain")
+class CustomDomain : Serializable {
+    var domain: String = ""
+    var uid: Int = Constants.UID_EVERYBODY
+    var ips: String = ""
+    var status: Int = 0
+    var type: Int = 0
+    var proxyId: String = ""
+    var proxyCC: String = ""
+    var modifiedTs: Long = SystemClock.elapsedRealtime()
+    var deletedTs: Long = SystemClock.elapsedRealtime()
+    var version: Long = getCurrentVersion()
+
+    // ... rest of code ...
+
+    companion object {
+        private const val CURRENT_VERSION: Long = 1L
+
+        fun getCurrentVersion(): Long {
+            return CURRENT_VERSION
+        }
+    }
+    // ... rest of code ...
+}
 ```
 
-**Replace with:**
+### Fix 2: LogDatabase.kt (Line 56-57)
+Remove the duplicate `@Suppress("DEPRECATION")`:
+
 ```kotlin
-@file:Suppress("UnusedParameter", "FunctionParameterNaming")
+@Suppress("DEPRECATION")
+fun buildDatabase(context: Context): LogDatabase {
 ```
 
-[Source: app/src/main/java/com/celzero/bravedns/util/Themes.kt](https://github.com/varunagarwal1/RethinkDNS/blob/1e418c669930517f0c2b2ae91093c59512660a49/app/src/main/java/com/celzero/bravedns/util/Themes.kt)
+### Fix 3: RefreshDatabase.kt (Line 764-765)
+Remove the duplicate `@Suppress("DEPRECATION")`:
 
-### Fix for `InetAddresses.kt`
-**Current (lines 1-2):**
 ```kotlin
-@file:Suppress("SwallowedException")
-@file:Suppress("ThrowsCount")
+@Suppress("DEPRECATION")
+if (!VpnController.isOn()) return
 ```
 
-**Replace with:**
-```kotlin
-@file:Suppress("SwallowedException", "ThrowsCount")
-```
-
-[Source: app/src/main/java/com/celzero/bravedns/wireguard/InetAddresses.kt](https://github.com/varunagarwal1/RethinkDNS/blob/1e418c669930517f0c2b2ae91093c59512660a49/app/src/main/java/com/celzero/bravedns/wireguard/InetAddresses.kt)
-
-### Fix for `InAppBillingHandler.kt`
-**Current (lines 167-169):**
-```kotlin
-    @Suppress("UNUSED_PARAMETER")
-    @Suppress("FunctionParameterNaming")
-    @Suppress("UnusedParameter")
-```
-
-**Replace with:**
-```kotlin
-    @Suppress("UNUSED_PARAMETER", "FunctionParameterNaming", "UnusedParameter")
-```
-
-[Source: app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt](https://github.com/varunagarwal1/RethinkDNS/blob/1e418c669930517f0c2b2ae91093c59512660a49/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt)
-
-After consolidating the suppression annotations into single instances, the Kotlin compiler will successfully compile these files.
+These are straightforward fixes—simply remove the duplicate/empty companion object and deduplicate the `@Suppress` annotations.

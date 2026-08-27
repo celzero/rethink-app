@@ -84,9 +84,6 @@ private const val INVALID_SIMPLE_TAG_ID = -1
 // the object type and converts accordingly.
 // ref: https://stackoverflow.com/a/28325108
 class FileTagDeserializer : JsonDeserializer<FileTag?> {
-    companion object {
-        private const val serialVersionUID = 1L
-    }
     @Throws(JsonParseException::class)
     override fun deserialize(
         json: JsonElement,

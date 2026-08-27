@@ -1,0 +1,435 @@
+﻿2026-08-27T04:51:35.9912919Z Current runner version: '2.336.0'
+2026-08-27T04:51:35.9938816Z ##[group]Runner Image Provisioner
+2026-08-27T04:51:35.9939789Z Hosted Compute Agent
+2026-08-27T04:51:35.9940401Z Version: 20260819.586
+2026-08-27T04:51:35.9941533Z Commit: 3cc4a88dfa507ef76119ad1bb3eccc6378bb2b76
+2026-08-27T04:51:35.9942397Z Build Date: 2026-08-18T23:20:18Z
+2026-08-27T04:51:35.9943100Z Worker ID: {579cf00d-c566-47c6-8be4-9838f30e88c6}
+2026-08-27T04:51:35.9943903Z Azure Region: eastus
+2026-08-27T04:51:35.9944505Z ##[endgroup]
+2026-08-27T04:51:35.9946268Z ##[group]Operating System
+2026-08-27T04:51:35.9947028Z Ubuntu
+2026-08-27T04:51:35.9947570Z 24.04.4
+2026-08-27T04:51:35.9948160Z LTS
+2026-08-27T04:51:35.9948700Z ##[endgroup]
+2026-08-27T04:51:35.9949268Z ##[group]Runner Image
+2026-08-27T04:51:35.9949924Z Image: ubuntu-24.04
+2026-08-27T04:51:35.9950539Z Version: 20260823.283.1
+2026-08-27T04:51:35.9952641Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260823.283/images/ubuntu/Ubuntu2404-Readme.md
+2026-08-27T04:51:35.9954239Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260823.283
+2026-08-27T04:51:35.9955295Z ##[endgroup]
+2026-08-27T04:51:35.9958412Z ##[group]GITHUB_TOKEN Permissions
+2026-08-27T04:51:35.9961128Z Actions: write
+2026-08-27T04:51:35.9961835Z ArtifactMetadata: write
+2026-08-27T04:51:35.9962528Z Attestations: write
+2026-08-27T04:51:35.9963139Z Checks: write
+2026-08-27T04:51:35.9963744Z CodeQuality: write
+2026-08-27T04:51:35.9964366Z Contents: write
+2026-08-27T04:51:35.9964944Z CopilotRequests: write
+2026-08-27T04:51:35.9965614Z Deployments: write
+2026-08-27T04:51:35.9966246Z Discussions: write
+2026-08-27T04:51:35.9966815Z Drives: write
+2026-08-27T04:51:35.9967414Z Issues: write
+2026-08-27T04:51:35.9967992Z Metadata: read
+2026-08-27T04:51:35.9968697Z Models: read
+2026-08-27T04:51:35.9969271Z Packages: write
+2026-08-27T04:51:35.9969859Z Pages: write
+2026-08-27T04:51:35.9970459Z PullRequests: write
+2026-08-27T04:51:35.9971267Z RepositoryProjects: write
+2026-08-27T04:51:35.9971941Z SecurityEvents: write
+2026-08-27T04:51:35.9972576Z Statuses: write
+2026-08-27T04:51:35.9973160Z VulnerabilityAlerts: read
+2026-08-27T04:51:35.9973819Z ##[endgroup]
+2026-08-27T04:51:35.9975929Z Secret source: Actions
+2026-08-27T04:51:35.9977972Z Prepare workflow directory
+2026-08-27T04:51:36.0367554Z Prepare all required actions
+2026-08-27T04:51:36.0417423Z Getting action download info
+2026-08-27T04:51:36.2422879Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-08-27T04:51:36.3886309Z Download action repository 'actions/setup-java@v4' (SHA:cf277c60eb25467037889841efdb72551f06f6c3)
+2026-08-27T04:51:36.7240496Z Complete job name: build
+2026-08-27T04:51:36.7987473Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-08-27T04:51:36.7996020Z ##[group]Run actions/checkout@v4
+2026-08-27T04:51:36.7996807Z with:
+2026-08-27T04:51:36.7997299Z   repository: varunagarwal1/RethinkDNS
+2026-08-27T04:51:36.8001182Z   token: ***
+2026-08-27T04:51:36.8001664Z   ssh-strict: true
+2026-08-27T04:51:36.8002129Z   ssh-user: git
+2026-08-27T04:51:36.8002605Z   persist-credentials: true
+2026-08-27T04:51:36.8003118Z   clean: true
+2026-08-27T04:51:36.8003634Z   sparse-checkout-cone-mode: true
+2026-08-27T04:51:36.8004228Z   fetch-depth: 1
+2026-08-27T04:51:36.8004720Z   fetch-tags: false
+2026-08-27T04:51:36.8005178Z   show-progress: true
+2026-08-27T04:51:36.8005643Z   lfs: false
+2026-08-27T04:51:36.8006103Z   submodules: false
+2026-08-27T04:51:36.8006576Z   set-safe-directory: true
+2026-08-27T04:51:36.8007102Z   allow-unsafe-pr-checkout: false
+2026-08-27T04:51:36.8007923Z env:
+2026-08-27T04:51:36.8008390Z   VARIANT: assembleWebsiteFullDebug
+2026-08-27T04:51:36.8008944Z ##[endgroup]
+2026-08-27T04:51:36.9028533Z Syncing repository: varunagarwal1/RethinkDNS
+2026-08-27T04:51:36.9032200Z ##[group]Getting Git version info
+2026-08-27T04:51:36.9033492Z Working directory is '/home/runner/work/RethinkDNS/RethinkDNS'
+2026-08-27T04:51:36.9035319Z [command]/usr/bin/git version
+2026-08-27T04:51:36.9110220Z git version 2.55.0
+2026-08-27T04:51:36.9142799Z ##[endgroup]
+2026-08-27T04:51:36.9158920Z Temporarily overriding HOME='/home/runner/work/_temp/dac5a1b6-cae1-48cf-9ca9-d4bcf709acbc' before making global git config changes
+2026-08-27T04:51:36.9162165Z Adding repository directory to the temporary git global config as a safe directory
+2026-08-27T04:51:36.9164154Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/RethinkDNS/RethinkDNS
+2026-08-27T04:51:36.9217345Z Deleting the contents of '/home/runner/work/RethinkDNS/RethinkDNS'
+2026-08-27T04:51:36.9229620Z ##[group]Initializing the repository
+2026-08-27T04:51:36.9231053Z [command]/usr/bin/git init /home/runner/work/RethinkDNS/RethinkDNS
+2026-08-27T04:51:36.9331607Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-08-27T04:51:36.9338419Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-08-27T04:51:36.9340125Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-08-27T04:51:36.9341791Z hint: call:
+2026-08-27T04:51:36.9342566Z hint:
+2026-08-27T04:51:36.9343511Z hint: 	git config --global init.defaultBranch <name>
+2026-08-27T04:51:36.9344655Z hint:
+2026-08-27T04:51:36.9345679Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-08-27T04:51:36.9347264Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-08-27T04:51:36.9348588Z hint:
+2026-08-27T04:51:36.9349242Z hint: 	git branch -m <name>
+2026-08-27T04:51:36.9349761Z hint:
+2026-08-27T04:51:36.9350411Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-08-27T04:51:36.9352247Z Initialized empty Git repository in /home/runner/work/RethinkDNS/RethinkDNS/.git/
+2026-08-27T04:51:36.9355623Z [command]/usr/bin/git remote add origin https://github.com/varunagarwal1/RethinkDNS
+2026-08-27T04:51:36.9398537Z ##[endgroup]
+2026-08-27T04:51:36.9399735Z ##[group]Disabling automatic garbage collection
+2026-08-27T04:51:36.9401914Z [command]/usr/bin/git config --local gc.auto 0
+2026-08-27T04:51:36.9435197Z ##[endgroup]
+2026-08-27T04:51:36.9436313Z ##[group]Setting up auth
+2026-08-27T04:51:36.9442038Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-08-27T04:51:36.9475754Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-08-27T04:51:36.9860173Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-08-27T04:51:36.9900739Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-08-27T04:51:37.0174226Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-08-27T04:51:37.0214443Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-08-27T04:51:37.0469481Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-08-27T04:51:37.0515435Z ##[endgroup]
+2026-08-27T04:51:37.0517421Z ##[group]Fetching the repository
+2026-08-27T04:51:37.0527892Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +6d723f8b57e82dc7bb37fd0547cf57b7c09f0ab9:refs/remotes/origin/main
+2026-08-27T04:51:38.4381655Z From https://github.com/varunagarwal1/RethinkDNS
+2026-08-27T04:51:38.4402436Z  * [new ref]         6d723f8b57e82dc7bb37fd0547cf57b7c09f0ab9 -> origin/main
+2026-08-27T04:51:38.4405994Z ##[endgroup]
+2026-08-27T04:51:38.4407222Z ##[group]Determining the checkout info
+2026-08-27T04:51:38.4408602Z ##[endgroup]
+2026-08-27T04:51:38.4409420Z [command]/usr/bin/git sparse-checkout disable
+2026-08-27T04:51:38.4461783Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-08-27T04:51:38.4496645Z ##[group]Checking out the ref
+2026-08-27T04:51:38.4502255Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-08-27T04:51:38.5938745Z Switched to a new branch 'main'
+2026-08-27T04:51:38.5942624Z branch 'main' set up to track 'origin/main'.
+2026-08-27T04:51:38.5957971Z ##[endgroup]
+2026-08-27T04:51:38.6007499Z [command]/usr/bin/git log -1 --format=%H
+2026-08-27T04:51:38.6035457Z 6d723f8b57e82dc7bb37fd0547cf57b7c09f0ab9
+2026-08-27T04:51:38.6449885Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-08-27T04:51:38.6456092Z ##[group]Run actions/setup-java@v4
+2026-08-27T04:51:38.6457176Z with:
+2026-08-27T04:51:38.6457968Z   java-version: 17
+2026-08-27T04:51:38.6458857Z   distribution: temurin
+2026-08-27T04:51:38.6459781Z   cache: gradle
+2026-08-27T04:51:38.6460621Z   java-package: jdk
+2026-08-27T04:51:38.6461925Z   check-latest: false
+2026-08-27T04:51:38.6462857Z   server-id: github
+2026-08-27T04:51:38.6463753Z   server-username: GITHUB_ACTOR
+2026-08-27T04:51:38.6464818Z   server-password: GITHUB_TOKEN
+2026-08-27T04:51:38.6465887Z   overwrite-settings: true
+2026-08-27T04:51:38.6466853Z   job-status: success
+2026-08-27T04:51:38.6476509Z   token: ***
+2026-08-27T04:51:38.6477361Z env:
+2026-08-27T04:51:38.6478193Z   VARIANT: assembleWebsiteFullDebug
+2026-08-27T04:51:38.6479297Z ##[endgroup]
+2026-08-27T04:51:38.8144736Z ##[warning]setup-java v4 is deprecated and will no longer receive updates. Please migrate to actions/setup-java@v5.
+2026-08-27T04:51:38.8153574Z ##[group]Installed distributions
+2026-08-27T04:51:38.8195822Z Resolved Java 17.0.20+1 from tool-cache
+2026-08-27T04:51:38.8196487Z Setting Java 17.0.20+1 as the default
+2026-08-27T04:51:38.8209110Z (node:2207) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-08-27T04:51:38.8213714Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-08-27T04:51:38.8214902Z Creating toolchains.xml for JDK version 17 from temurin
+2026-08-27T04:51:38.8294664Z Writing to /home/runner/.m2/toolchains.xml
+2026-08-27T04:51:38.8295316Z 
+2026-08-27T04:51:38.8295629Z Java configuration:
+2026-08-27T04:51:38.8296381Z   Distribution: temurin
+2026-08-27T04:51:38.8297118Z   Version: 17.0.20+1
+2026-08-27T04:51:38.8297991Z   Path: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-1/x64
+2026-08-27T04:51:38.8298803Z 
+2026-08-27T04:51:38.8299595Z ##[endgroup]
+2026-08-27T04:51:38.8316287Z Creating settings.xml with server-id: github
+2026-08-27T04:51:38.8348942Z Writing to /home/runner/.m2/settings.xml
+2026-08-27T04:51:39.1458775Z gradle cache is not found
+2026-08-27T04:51:39.1627033Z ##[group]Run chmod +x gradlew
+2026-08-27T04:51:39.1627615Z [36;1mchmod +x gradlew[0m
+2026-08-27T04:51:39.1673357Z shell: /usr/bin/bash -e {0}
+2026-08-27T04:51:39.1673826Z env:
+2026-08-27T04:51:39.1674220Z   VARIANT: assembleWebsiteFullDebug
+2026-08-27T04:51:39.1674795Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-1/x64
+2026-08-27T04:51:39.1675492Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-1/x64
+2026-08-27T04:51:39.1676064Z ##[endgroup]
+2026-08-27T04:51:39.1816560Z ##[group]Run mkdir -p app/src/debug
+2026-08-27T04:51:39.1817083Z [36;1mmkdir -p app/src/debug[0m
+2026-08-27T04:51:39.1817619Z [36;1mecho "${GSCV_TEST_JSON}" > app/src/debug/google-services.json[0m
+2026-08-27T04:51:39.1818164Z [36;1m# expected: l:29 w:45 m:691[0m
+2026-08-27T04:51:39.1818825Z [36;1mwc -lwm app/src/debug/google-services.json[0m
+2026-08-27T04:51:39.1819330Z [36;1mif [ -z "$GSCV_TEST_JSON" ]; then[0m
+2026-08-27T04:51:39.1819846Z [36;1m  echo "VARIANT=assembleFdroidFullDebug" >> "$GITHUB_ENV"[0m
+2026-08-27T04:51:39.1820330Z [36;1mfi[0m
+2026-08-27T04:51:39.1857527Z shell: /usr/bin/bash -e {0}
+2026-08-27T04:51:39.1857941Z env:
+2026-08-27T04:51:39.1858304Z   VARIANT: assembleWebsiteFullDebug
+2026-08-27T04:51:39.1858857Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-1/x64
+2026-08-27T04:51:39.1859532Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-1/x64
+2026-08-27T04:51:39.1860073Z   GSCV_TEST_JSON: 
+2026-08-27T04:51:39.1860455Z ##[endgroup]
+2026-08-27T04:51:39.1950596Z 1 0 1 app/src/debug/google-services.json
+2026-08-27T04:51:39.1993567Z ##[group]Run ./gradlew lint
+2026-08-27T04:51:39.1994029Z [36;1m./gradlew lint[0m
+2026-08-27T04:51:39.1994384Z [36;1m./gradlew \[0m
+2026-08-27T04:51:39.1994724Z [36;1m  ${VARIANT} \[0m
+2026-08-27T04:51:39.1995115Z [36;1m  --info \[0m
+2026-08-27T04:51:39.1995464Z [36;1m  --warning-mode all[0m
+2026-08-27T04:51:39.2031305Z shell: /usr/bin/bash -e {0}
+2026-08-27T04:51:39.2031688Z env:
+2026-08-27T04:51:39.2032025Z   VARIANT: assembleFdroidFullDebug
+2026-08-27T04:51:39.2032538Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-1/x64
+2026-08-27T04:51:39.2033185Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-1/x64
+2026-08-27T04:51:39.2033699Z ##[endgroup]
+2026-08-27T04:51:40.7475652Z Fetching distribution.
+2026-08-27T04:51:40.7476893Z Downloading https://services.gradle.org/distributions/gradle-9.5.1-bin.zip
+2026-08-27T04:51:43.2971268Z .............10%.............20%..............30%.............40%.............50%..............60%.............70%..............80%.............90%.............100%
+2026-08-27T04:51:44.7411240Z 
+2026-08-27T04:51:44.7421954Z Welcome to Gradle 9.5.1!
+2026-08-27T04:51:44.7422589Z 
+2026-08-27T04:51:44.7451748Z Here are the highlights of this release:
+2026-08-27T04:51:44.7467561Z  - Task provenance in reports and failure messages
+2026-08-27T04:51:44.7468683Z  - Type-safe accessors for precompiled Kotlin Settings plugins
+2026-08-27T04:51:44.7469312Z 
+2026-08-27T04:51:44.7469717Z For more details see https://docs.gradle.org/9.5.1/release-notes.html
+2026-08-27T04:51:44.7470313Z 
+2026-08-27T04:51:44.8408190Z Starting a Gradle Daemon (subsequent builds will be faster)
+2026-08-27T04:51:47.7415878Z Calculating task graph as no cached configuration is available for tasks: lint
+2026-08-27T04:51:51.7422615Z 
+2026-08-27T04:51:51.7423776Z > Configure project :
+2026-08-27T04:51:51.7451830Z app-task names: 'lint'
+2026-08-27T04:51:51.7470617Z app; deGoogled? true (fdroidBuild: false, fdroidBuildServer: false, apkBuild: false)
+2026-08-27T04:52:14.5405973Z 
+2026-08-27T04:52:14.5413120Z > Configure project :app
+2026-08-27T04:52:14.5414158Z app-task names: 'lint'
+2026-08-27T04:52:14.5417228Z gradle deGoogled? true (fdroidBuild: false, fdroidBuildServer: false, apkBuild: false)
+2026-08-27T04:52:14.5418523Z gradle alphaBuild? false, should split? true
+2026-08-27T04:52:14.5419287Z app firebase plugins SKIPPED
+2026-08-27T04:52:14.9405498Z split apks and universal apk (splits enabled)
+2026-08-27T04:52:15.0404918Z Normal build: using config signing config
+2026-08-27T04:52:15.2414292Z rethink-tv: TV_RELEASE_KS_* env vars NOT set; 'release' builds will be unsigned (upstream default)
+2026-08-27T04:52:50.1411418Z 
+2026-08-27T04:52:50.1419317Z > Task :app:preBuild UP-TO-DATE
+2026-08-27T04:52:50.1431063Z > Task :app:preFdroidFullDebugUnitTestBuild UP-TO-DATE
+2026-08-27T04:52:50.1431958Z > Task :app:preFdroidFullDebugBuild UP-TO-DATE
+2026-08-27T04:52:50.3432158Z > Task :app:generateFdroidFullDebugBuildConfig
+2026-08-27T04:52:50.3433217Z > Task :app:generateFdroidFullDebugResValues
+2026-08-27T04:52:50.3461514Z > Task :app:generateFdroidFullDebugResources
+2026-08-27T04:52:51.2403587Z > Task :app:javaPreCompileFdroidFullDebug
+2026-08-27T04:52:55.1422194Z > Task :app:processFdroidFullDebugNavigationResources
+2026-08-27T04:52:55.2422252Z > Task :app:dataBindingMergeDependencyArtifactsFdroidFullDebug
+2026-08-27T04:52:55.2466049Z > Task :app:mapFdroidFullDebugSourceSetPaths
+2026-08-27T04:52:55.5416956Z > Task :app:checkFdroidFullDebugAarMetadata
+2026-08-27T04:52:55.5439040Z > Task :app:createFdroidFullDebugCompatibleScreenManifests
+2026-08-27T04:52:55.5463885Z > Task :app:extractDeepLinksFdroidFullDebug
+2026-08-27T04:52:55.6411885Z > Task :app:compileFdroidFullDebugNavigationResources
+2026-08-27T04:52:55.6455725Z > Task :app:preFdroidFullDebugAndroidTestBuild SKIPPED
+2026-08-27T04:52:55.6480611Z > Task :app:generateFdroidFullDebugAndroidTestResValues FROM-CACHE
+2026-08-27T04:52:55.7405648Z > Task :app:extractProguardFiles
+2026-08-27T04:52:55.7432165Z > Task :app:packageFdroidFullDebugResources
+2026-08-27T04:53:02.0422133Z > Task :app:processFdroidFullDebugMainManifest
+2026-08-27T04:53:02.0459174Z > Task :app:parseFdroidFullDebugLocalResources
+2026-08-27T04:53:02.3412982Z > Task :app:generateFdroidFullDebugRFile
+2026-08-27T04:53:02.4408683Z > Task :app:processFdroidFullDebugManifest
+2026-08-27T04:53:02.4409931Z > Task :app:processFdroidFullDebugManifestForPackage
+2026-08-27T04:53:02.9413510Z > Task :app:mergeFdroidFullDebugResources
+2026-08-27T04:53:04.7421905Z > Task :app:dataBindingGenBaseClassesFdroidFullDebug
+2026-08-27T04:53:11.7431478Z > Task :app:processFdroidFullDebugResources
+2026-08-27T04:53:34.7404260Z > Task :app:kspFdroidFullDebugKotlin
+2026-08-27T04:54:08.8442083Z > Task :app:compileFdroidFullDebugKotlin
+2026-08-27T04:54:41.1442268Z w: Argument "-Xsuppress-warning" is deprecated. Use "-Xwarning-level=SENSELESS_COMPARISON:disabled" instead
+2026-08-27T04:54:41.1444772Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/BillingBackendClient.kt:33:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1472228Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/BillingBackendClient.kt:37:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1502174Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/BillingBackendClient.kt:67:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1504541Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/DeviceAuthErrorNotifier.kt:31:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1563007Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/DeviceAuthErrorNotifier.kt:34:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1565468Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/DeviceNotRegisteredNotifier.kt:27:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1592111Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:79:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1652136Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:82:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1677578Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:85:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1749076Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:89:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1792101Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:93:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1813069Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:96:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1871441Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:103:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1873992Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:111:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1876094Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:119:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1878188Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:127:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1880458Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:135:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1882827Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:144:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1884926Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:151:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1887055Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:159:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1889098Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:167:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1952117Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/InAppBillingHandler.kt:174:1 This annotation is not repeatable.
+2026-08-27T04:54:41.1982113Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/PurchaseConflictNotifier.kt:31:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2012316Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/SubscriptionCheckWorker.kt:20:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2072264Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/SubscriptionCheckWorker.kt:22:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2132262Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/SubscriptionCheckWorker.kt:46:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2212268Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/stripe/SubscriptionViewModel.kt:14:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2277792Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/stripe/SubscriptionViewModel.kt:18:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2302171Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/stripe/SubscriptionViewModel.kt:22:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2359480Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/fdroid/java/com/celzero/bravedns/iab/stripe/SubscriptionViewModel.kt:24:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2362455Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/backup/BackupHelper.kt:146:26 Unresolved reference 'LOG_TAG_BACKUP_RESTORE'.
+2026-08-27T04:54:41.2364530Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/backup/RestoreAgent.kt:359:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2366494Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/backup/RestoreAgent.kt:417:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2368330Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/backup/RestoreAgent.kt:485:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2370359Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/ConnectionTrackerRepository.kt:114:50 Unresolved reference 'BLOCKED_WINDOW_MS'.
+2026-08-27T04:54:41.2373258Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/CustomDomain.kt:27:15 Conflicting declarations:
+2026-08-27T04:54:41.2374526Z companion object Companion : Any
+2026-08-27T04:54:41.2375821Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/CustomDomain.kt:39:25 Unresolved reference 'getCurrentVersion'.
+2026-08-27T04:54:41.2378018Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/CustomDomain.kt:100:5 Only one companion object is allowed per class.
+2026-08-27T04:54:41.2380449Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/CustomDomain.kt:100:15 Conflicting declarations:
+2026-08-27T04:54:41.2410690Z companion object Companion : Any
+2026-08-27T04:54:41.2429484Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/CustomDomain.kt:104:20 Unresolved reference 'CURRENT_VERSION'.
+2026-08-27T04:54:41.2430646Z 
+2026-08-27T04:54:41.2478135Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/LogDatabase.kt:57:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2479480Z > Task :app:compileFdroidFullDebugKotlin FAILED
+2026-08-27T04:54:41.2502613Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/RefreshDatabase.kt:765:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2512369Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/RethinkLocalFileTag.kt:94:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2542404Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/RethinkLocalFileTag.kt:104:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2545062Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/RethinkLocalFileTagRepository.kt:35:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2547389Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/RethinkLocalFileTagRepository.kt:40:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2549708Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/database/RethinkLocalFileTagRepository.kt:81:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2552636Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/iab/SecureIdentityStore.kt:306:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2554692Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/net/go/GoVpnAdapter.kt:3696:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2556736Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/receiver/VPNControlReceiver.kt:75:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2558830Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/receiver/VPNControlReceiver.kt:100:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2561115Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/receiver/VPNControlReceiver.kt:187:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2563389Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/rpnproxy/SubscriptionStateMachineV2.kt:868:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2565589Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/rpnproxy/SubscriptionStateMachineV2.kt:1808:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2567779Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/rpnproxy/SubscriptionStateMachineV2.kt:1832:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2570297Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/BraveVPNService.kt:1458:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2580627Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/ConnectionMonitor.kt:391:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2583014Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/ConnectionMonitor.kt:832:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2585315Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/ConnectionMonitor.kt:1434:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2587382Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/ConnectionMonitor.kt:1753:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2589438Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/ConsoleLogManager.kt:29:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2591687Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/DiagnosticsManager.kt:89:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2593724Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/DnsLogTracker.kt:242:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2595832Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/DomainRulesManager.kt:659:26 Unresolved reference 'getCurrentVersion'.
+2026-08-27T04:54:41.2612393Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/EncryptedFileManager.kt:16:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2614530Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/FirewallManager.kt:322:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2616655Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/GoMemLogConsumer.kt:107:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2618691Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/IPTracker.kt:129:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2620660Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/IPTracker.kt:135:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2622945Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/IPTracker.kt:141:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2624889Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/IPTracker.kt:147:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2626898Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/NetworkLifecycleObserver.kt:226:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2628990Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/TunFirewallManager.kt:90:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2631270Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/TunFlowManager.kt:1084:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2633319Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/service/VpnController.kt:152:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2635427Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/NotificationHandlerActivity.kt:115:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2637576Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/activity/AppListActivity.kt:134:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2639977Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/activity/WgConfigDetailActivity.kt:1398:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2642529Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/bottomsheet/CustomDomainRulesBtmSheet.kt:104:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2644786Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/bottomsheet/CustomIpRulesBtmSheet.kt:110:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2647232Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/bottomsheet/ProxyCountriesBtmSheet.kt:139:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2649514Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/bottomsheet/PurchaseConflictBottomSheet.kt:172:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2652171Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/bottomsheet/PurchaseProcessingBottomSheet.kt:102:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2654551Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/bottomsheet/RethinkPlusFilterBottomSheet.kt:105:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2656952Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/bottomsheet/ServerRemovalNotificationBottomSheet.kt:102:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2659320Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/bottomsheet/WireguardListBtmSheet.kt:135:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2661744Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/bottomsheet/WireguardListBtmSheet.kt:138:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2663891Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/custom/MoneyBackBadgeView.kt:44:35 Unresolved reference 'Color'.
+2026-08-27T04:54:41.2665922Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/custom/MoneyBackBadgeView.kt:45:34 Unresolved reference 'Color'.
+2026-08-27T04:54:41.2668039Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/custom/MoneyBackBadgeView.kt:50:21 Unresolved reference 'Color'.
+2026-08-27T04:54:41.2670376Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/fragment/HomeScreenFragment.kt:1739:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2672861Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/tour/SpotlightOverlayView.kt:268:16 Return type mismatch: expected 'Int', actual 'Any'.
+2026-08-27T04:54:41.2675031Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/tour/SpotlightOverlayView.kt:273:122 Unresolved reference 'e'.
+2026-08-27T04:54:41.2677020Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/tour/SpotlightOverlayView.kt:273:135 Unresolved reference 'e'.
+2026-08-27T04:54:41.2679051Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/tour/SpotlightOverlayView.kt:274:122 Unresolved reference 'e'.
+2026-08-27T04:54:41.2681195Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/ui/tour/SpotlightOverlayView.kt:274:135 Unresolved reference 'e'.
+2026-08-27T04:54:41.2683157Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/AndroidUidConfig.kt:21:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2685241Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/BackgroundAccessibilityService.kt:66:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2687512Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/BubbleHelper.kt:83:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2689413Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/BubbleHelper.kt:570:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2691474Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/BubbleHelper.kt:587:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2693539Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/BubbleHelper.kt:655:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2695513Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/ConnectivityCheckHelper.kt:278:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2697625Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/ConnectivityCheckHelper.kt:299:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2699932Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/KnownPorts.kt:16:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2702196Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/PlayStoreCategory.kt:20:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2704138Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Protocol.kt:21:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2706158Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/SsidPermissionManager.kt:141:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2708093Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Themes.kt:43:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2709970Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Themes.kt:48:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2712171Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:92:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2714079Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:136:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2715968Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:164:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2717852Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:241:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2719778Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:280:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2725888Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:414:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2726966Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:479:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2727978Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:554:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2728967Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:585:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2729943Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:755:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2731634Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:868:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2732677Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:918:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2733662Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/util/Utilities.kt:976:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2734649Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/wireguard/Config.kt:65:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2735830Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/wireguard/InetEndpoint.kt:47:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2736885Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/wireguard/InetNetwork.kt:32:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2737907Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/wireguard/Peer.kt:58:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2738890Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/wireguard/Peer.kt:68:1 This annotation is not repeatable.
+2026-08-27T04:54:41.2739905Z e: file:///home/runner/work/RethinkDNS/RethinkDNS/app/src/main/java/com/celzero/bravedns/wireguard/WgInterface.kt:116:1 This annotation is not repeatable.
+2026-08-27T04:54:41.3403378Z 
+2026-08-27T04:54:41.3403782Z 
+2026-08-27T04:54:41.3404554Z FAILURE: Build failed with an exception.
+2026-08-27T04:54:41.3405121Z 
+2026-08-27T04:54:41.3405331Z * What went wrong:
+2026-08-27T04:54:41.3406053Z Execution failed for task ':app:compileFdroidFullDebugKotlin' (registered by plugin 'com.android.internal.application').
+2026-08-27T04:54:41.3407088Z > A failure occurred while executing org.jetbrains.kotlin.compilerRunner.btapi.BuildToolsApiCompilationWork
+2026-08-27T04:54:41.3407849Z    > Compilation error. See log for more details
+2026-08-27T04:54:41.3408213Z 
+2026-08-27T04:54:41.3408398Z * Try:
+2026-08-27T04:54:41.3408760Z > Run with --stacktrace option to get the stack trace.
+2026-08-27T04:54:41.3409298Z > Run with --info or --debug option to get more log output.
+2026-08-27T04:54:41.3409908Z > Run with --scan to get full insights from a Build Scan (powered by Develocity).
+2026-08-27T04:54:41.3410503Z > Get more help at https://help.gradle.org.
+2026-08-27T04:54:41.3411365Z 
+2026-08-27T04:54:41.3411643Z BUILD FAILED in 3m
+2026-08-27T04:54:41.3413170Z [Incubating] Problems report is available at: file:///home/runner/work/RethinkDNS/RethinkDNS/build/reports/problems/problems-report.html
+2026-08-27T04:54:41.3414069Z 
+2026-08-27T04:54:41.3414508Z Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+2026-08-27T04:54:41.3415109Z 
+2026-08-27T04:54:41.3415767Z You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+2026-08-27T04:54:41.3416606Z 
+2026-08-27T04:54:41.3417418Z For more on this, please refer to https://docs.gradle.org/9.5.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+2026-08-27T04:54:41.3418624Z 24 actionable tasks: 23 executed, 1 from cache
+2026-08-27T04:54:41.3419156Z Configuration cache entry stored.
+2026-08-27T04:54:41.8393991Z ##[error]Process completed with exit code 1.
+2026-08-27T04:54:41.8546857Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-08-27T04:54:41.8548114Z Post job cleanup.
+2026-08-27T04:54:41.9853467Z (node:2735) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-08-27T04:54:41.9854976Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-08-27T04:54:42.0112520Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-08-27T04:54:42.0114740Z Post job cleanup.
+2026-08-27T04:54:42.1200976Z [command]/usr/bin/git version
+2026-08-27T04:54:42.1226234Z git version 2.55.0
+2026-08-27T04:54:42.1273620Z Temporarily overriding HOME='/home/runner/work/_temp/629ab789-fa8b-48fd-a7cc-57adba01a29f' before making global git config changes
+2026-08-27T04:54:42.1275276Z Adding repository directory to the temporary git global config as a safe directory
+2026-08-27T04:54:42.1280312Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/RethinkDNS/RethinkDNS
+2026-08-27T04:54:42.1361777Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-08-27T04:54:42.1393952Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-08-27T04:54:42.1658136Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-08-27T04:54:42.1680559Z http.https://github.com/.extraheader
+2026-08-27T04:54:42.1699543Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-08-27T04:54:42.1728555Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-08-27T04:54:42.1989196Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-08-27T04:54:42.2037100Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-08-27T04:54:42.2607073Z Cleaning up orphan processes
+2026-08-27T04:54:42.2971983Z Terminate orphan process: pid (2271) (java)
+2026-08-27T04:54:42.3098416Z Terminate orphan process: pid (2681) (java)
+2026-08-27T04:54:42.3108146Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-java@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
