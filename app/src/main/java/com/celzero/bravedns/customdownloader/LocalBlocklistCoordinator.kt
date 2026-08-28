@@ -147,7 +147,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
             persistentState.lastDownloadFailureReason = msg
             notifyDownloadFailure(context)
         } finally {
-            clear()
+            clear(inputData.getLong("blocklistTimestamp", 0))
         }
         return Result.failure()
     }
@@ -183,6 +183,10 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
             // Overall progress = (completed files) / total
             val initialProgress = (index * 100 / totalFiles)
             setProgress(workDataOf("progress" to initialProgress))
+            // keep the notification's progress bar in sync at file boundaries too, so it
+            // doesn't sit frozen at the previous file's percentage while the next file's
+            // download connection is still being established
+            updateProgress(context, initialProgress)
 
             when (startFileDownload(context, onDeviceBlocklistsMetadata.url, filePath, index, totalFiles)) {
                 true -> {
@@ -201,9 +205,11 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
 
         // final progress before processing
         setProgress(workDataOf("progress" to 100))
+        updateProgress(context, 100)
 
         // transition to processing
         setProgress(workDataOf("processing" to true))
+        notifyProcessing(context)
 
         // check if all the files are downloaded, as of now the check if for only number of files
         // downloaded. TODO: Later add checksum matching as well
@@ -357,7 +363,10 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
                 val overallProgress = (((fileIndex.toDouble() * 100) + fileProgress) / totalFiles).toInt()
 
                 if (elapsedMs >= progressJumpsMs) {
-                    updateProgress(context, fileProgress)
+                    // notification must reflect the overall (all-files) progress, not just
+                    // the current file's, otherwise the progress bar/percentage resets back
+                    // towards 0% every time a new file starts downloading
+                    updateProgress(context, overallProgress)
                     setProgress(workDataOf("progress" to overallProgress))
                     // increase the next update duration linearly by another sec; ie,
                     // update in the intervals of once every [1, 2, 3, 4, ...] secs
@@ -547,10 +556,30 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
 
     private fun updateProgress(context: Context, progress: Int) {
         val builder = getBuilder(context)
-        val cur = if (progress <= 0) 0 else progress
-        val max = if (cur <= 0) 0 else NOTIFICATION_PROGRESS_MAX
+        // clamp defensively: rounding in the overall-progress computation could otherwise
+        // push this a hair past 100 on the last tick of the last file
+        val cur = progress.coerceIn(0, NOTIFICATION_PROGRESS_MAX)
         val forever = cur <= 0
+        val max = if (forever) 0 else NOTIFICATION_PROGRESS_MAX
+        // surface the percentage as text as well, since the progress bar alone isn't a
+        // reliable indicator of percent-complete across all devices/launchers
+        val contentText = context.getString(R.string.notif_download_progress_content, cur)
+        builder
+            .setContentText(contentText)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
         builder.setProgress(max, cur, forever)
+        getNotificationManager(context)
+            .notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID, builder.build())
+    }
+
+    private fun notifyProcessing(context: Context) {
+        val builder = getBuilder(context)
+        val contentText = context.getString(R.string.notif_download_processing_content)
+        builder
+            .setContentText(contentText)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
+        // indeterminate spinner while files are being verified/validated
+        builder.setProgress(0, 0, true)
         getNotificationManager(context)
             .notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID, builder.build())
     }
@@ -603,8 +632,17 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
             .notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID, builder.build())
     }
 
-    private fun clear() {
+    private fun clear(timestamp: Long) {
         downloadStatuses.clear()
+        // deleteBlocklistResidue() is a no-op when localBlocklistTimestamp is still
+        // INIT_TIME_MS (ie, no download has ever succeeded). That guard would otherwise
+        // leave this attempt's own temp dir (tempDownloadBasePath, "-timestamp") behind
+        // forever on a first-ever failed download, so always delete it explicitly here.
+        if (timestamp > INIT_TIME_MS) {
+            Utilities.deleteRecursive(
+                File(tempDownloadBasePath(context, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp))
+            )
+        }
         BlocklistDownloadHelper.deleteBlocklistResidue(
             context,
             LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,

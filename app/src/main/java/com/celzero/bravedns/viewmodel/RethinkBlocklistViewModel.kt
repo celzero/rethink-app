@@ -27,6 +27,8 @@ import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.regex.Pattern
@@ -57,6 +59,9 @@ class RethinkBlocklistViewModel(
     private val _selectedFileTags = MutableLiveData<Set<Int>>()
     val selectedFileTags: LiveData<Set<Int>> get() = _selectedFileTags
 
+    // read from the main thread (isStampChanged) and written from IO
+    // (updateSelectedFileTags/applyStamp), so publish writes safely
+    @Volatile
     var modifiedStamp: String = ""
         private set
 
@@ -71,7 +76,23 @@ class RethinkBlocklistViewModel(
     private val base32StampRegex =
         Pattern.compile("(?:^|//)1-([a-z2-7]+)(?:\\.[^/]+)?\\.rethinkdns\\.com")
 
+    private var isConfigured = false
+
+    // confined dispatcher: stampJob is only ever read/written here, so the
+    // cancel-then-launch pair stays atomic across callers
+    private val stampJobSerializer = Dispatchers.Default.limitedParallelism(1)
+    private var stampJob: Job? = null
+
     fun configure(type: RethinkBlocklistManager.RethinkBlocklistType, name: String, url: String) {
+        // The ViewModel survives configuration changes (rotation, view recreation),
+        // while onCreateView() re-invokes configure(). Re-running initialization here
+        // would overwrite the in-progress modifiedStamp and selectedFileTags with the
+        // persisted state. Guard so it runs only once per ViewModel instance.
+        if (isConfigured) {
+            Logger.d(LOG_TAG_UI, "configure already initialized; skipping re-init for ${type.name}")
+            return
+        }
+        isConfigured = true
         this.type = type
         this.remoteName = name
         this.remoteUrl = url
@@ -98,23 +119,32 @@ class RethinkBlocklistViewModel(
         if (_selectedFileTags.value == tags) return
 
         _selectedFileTags.postValue(tags)
-        viewModelScope.launch(Dispatchers.IO) {
-            val recomputed = RethinkBlocklistManager.getStamp(tags, type)
-            if (recomputed.isNotEmpty()) {
-                modifiedStamp = recomputed
-            } else if (tags.isNotEmpty()) {
-                // RDNS unavailable (e.g. Remote DNS configured while the VPN
-                // is stopped). Keep the previously known good stamp instead
-                // of overwriting it with "" and losing the user's selection.
-                // The authoritative selection set is `selectedFileTags`; the
-                // stamp is recomputed at Apply time (see setStamp/Apply).
-                Logger.w(
-                    LOG_TAG_UI,
-                    "skip stamp overwrite: ${tags.size} tags selected but stamp encode failed for ${type.name}; keeping modifiedStamp='${modifiedStamp.take(32)}'"
-                )
-            } else {
-                // user genuinely cleared the selection
-                modifiedStamp = recomputed
+        // serialize stamp recomputation: cancel any in-flight computation so a
+        // slower, older result can never overwrite a newer selection. Every
+        // cancel-then-launch pair runs sequentially on the confined dispatcher,
+        // keeping the pair atomic without thread-blocking locks.
+        viewModelScope.launch(stampJobSerializer) {
+            stampJob?.cancel()
+            stampJob = launch(Dispatchers.IO) {
+                val recomputed = RethinkBlocklistManager.getStamp(tags, type)
+                // bail out if a newer selection superseded this computation
+                ensureActive()
+                if (recomputed.isNotEmpty()) {
+                    modifiedStamp = recomputed
+                } else if (tags.isNotEmpty()) {
+                    // RDNS unavailable (e.g. Remote DNS configured while the VPN
+                    // is stopped). Keep the previously known good stamp instead
+                    // of overwriting it with "" and losing the user's selection.
+                    // The authoritative selection set is `selectedFileTags`; the
+                    // stamp is recomputed at Apply time (see setStamp/Apply).
+                    Logger.w(
+                        LOG_TAG_UI,
+                        "skip stamp overwrite: ${tags.size} tags selected but stamp encode failed for ${type.name}; keeping modifiedStamp='${modifiedStamp.take(32)}'"
+                    )
+                } else {
+                    // user genuinely cleared the selection
+                    modifiedStamp = recomputed
+                }
             }
         }
     }
@@ -154,8 +184,8 @@ class RethinkBlocklistViewModel(
         }
     }
 
-    fun applyStamp() {
-        viewModelScope.launch(Dispatchers.IO) {
+    suspend fun applyStamp() {
+        withContext(Dispatchers.IO) {
             // update rethink stamp. Recompute from the authoritative selection
             // set so that an empty `modifiedStamp` (caused by RDNS being briefly
             // unavailable while toggling) does not discard the user's selections.
@@ -197,8 +227,8 @@ class RethinkBlocklistViewModel(
         }
     }
 
-    fun revertStamp() {
-        viewModelScope.launch(Dispatchers.IO) {
+    suspend fun revertStamp() {
+        withContext(Dispatchers.IO) {
             // Revert to the old stamp for the blocklist type
             val stamp = getInitialStamp()
             val tags = RethinkBlocklistManager.getTagsFromStamp(stamp, type)
