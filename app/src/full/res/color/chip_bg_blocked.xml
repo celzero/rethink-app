@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- blocked-chip fill: soft pink pill while selected, themed base otherwise -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true" android:color="#29FF4081" />
+    <item android:color="?attr/homeScreenBtnBackground" />
+</selector>

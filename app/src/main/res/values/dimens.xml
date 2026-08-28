@@ -9,6 +9,7 @@
     <dimen name="max_size">1000dp</dimen>
     <dimen name="max_btn_size">340dp</dimen>
 
+    <dimen name="extra_small_font_text_view">6sp</dimen>
     <dimen name="mini_font_text_view">8sp</dimen>
     <dimen name="small_font_text_view">10sp</dimen>
     <dimen name="small_font_subheading_text">11sp</dimen>
@@ -18,6 +19,7 @@
     <dimen name="heading_font_text_view">18sp</dimen>
     <dimen name="home_screen_stat_text">22sp</dimen>
     <dimen name="rethink_header_text">24sp</dimen>
+    <dimen name="rethink_sub_header_text">32sp</dimen>
     <dimen name="sponsor_usage_text">72sp</dimen>
 
     <dimen name="badge_dot_padding">10dp</dimen>

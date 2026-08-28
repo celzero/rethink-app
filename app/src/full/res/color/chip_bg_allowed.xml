@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- allowed-chip fill: positive chip color while selected, themed base
+     otherwise. Kept as a state-list so the chip visibly unselects when the
+     Blocked chip is picked (ChipGroup single-selection). -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true" android:color="?attr/chipBgColorPositive" />
+    <item android:color="?attr/homeScreenBtnBackground" />
+</selector>

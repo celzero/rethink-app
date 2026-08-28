@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- allowed-chip outline: positive chip color stroke only while selected -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true" android:color="?attr/chipTextPositive" />
+    <item android:color="@android:color/transparent" />
+</selector>

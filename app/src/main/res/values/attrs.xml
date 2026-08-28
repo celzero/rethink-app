@@ -68,6 +68,10 @@
     <attr name="vpnHeaderGradientStart" format="reference" />
     <attr name="vpnHeaderGradientCenter" format="reference" />
     <attr name="vpnHeaderGradientEnd" format="reference" />
+    <attr name="serverHeaderGradientStart" format="color|reference" />
+    <attr name="serverHeaderGradientCenter" format="color|reference" />
+    <attr name="serverHeaderGradientEnd" format="color|reference" />
+    <attr name="serverHeaderStrokeColor" format="color|reference" />
     <attr name="colorGolden" format="reference" />
 
     <!-- Guided Tour overlay / tooltip theming -->
