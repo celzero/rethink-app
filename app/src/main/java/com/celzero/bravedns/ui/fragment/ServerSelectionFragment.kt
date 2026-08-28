@@ -2013,7 +2013,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             )
             chipStrokeColor = ColorStateList(
                 arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                intArrayOf(resolveAttrColor(R.attr.accentGood), Color.TRANSPARENT)
+                intArrayOf(resolveAttrColor(R.attr.chipTextPositive), Color.TRANSPARENT)
             )
             chipStrokeWidth = 1f * density
             // Compact but accessible touch target, matching the frequent-country chips.
