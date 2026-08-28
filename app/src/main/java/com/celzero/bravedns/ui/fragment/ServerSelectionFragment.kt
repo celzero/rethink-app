@@ -158,6 +158,14 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     /** Active load-tier filter for the "All locations" list. */
     private var loadFilter = LoadFilter.ALL
 
+    /**
+     * Active speed filter for the "All locations" list.  0 means "Any"; any other
+     * value is a link speed in Mbps offered as a chip in the filter dialog.  The
+     * option set is derived from the speeds actually present in [allServers], so
+     * only the values the backend reports (e.g. 1 Gbps, 10 Gbps) are shown.
+     */
+    private var speedFilter = 0
+
     /** When true, the "All locations" list is restricted to favourite countries. */
     private var favouritesOnly = false
 
@@ -1806,8 +1814,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
     /**
      * Rebuilds the "All locations" list applying the current search query together
-     * with the active load-tier and favourites-only filters.  Called on text changes
-     * and whenever the underlying list changes so filters survive refreshes.
+     * with the active load-tier, speed-tier and favourites-only filters.  Called on
+     * text changes and whenever the underlying list changes so filters survive refreshes.
      */
     private fun refreshUnselectedList() {
         if (!isAdded) return
@@ -1829,16 +1837,22 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         if (favouritesOnly && !server.isFavourite) return false
 
         // Load is 0 when unknown; only explicit tiers filter on it.
-        return when (loadFilter) {
+        val matchesLoad = when (loadFilter) {
             LoadFilter.ALL -> true
             LoadFilter.LOW -> server.load in 1..40
             LoadFilter.MEDIUM -> server.load in 41..80
             LoadFilter.HIGH -> server.load > 80
         }
+        if (!matchesLoad) return false
+
+        // 0 means "Any"; otherwise match the exact link speed (Mbps) chosen in the
+        // filter dialog.  Servers with an unknown speed (link == 0) only pass "Any".
+        return speedFilter == 0 || server.link == speedFilter
     }
 
     /** True when any filter other than the defaults is active. */
-    private fun isFilterActive(): Boolean = loadFilter != LoadFilter.ALL || favouritesOnly
+    private fun isFilterActive(): Boolean =
+        loadFilter != LoadFilter.ALL || speedFilter != 0 || favouritesOnly
 
     /** Human-readable summary of the active filters, or null when defaults are in effect. */
     private fun describeActiveFilter(): String? {
@@ -1849,6 +1863,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             LoadFilter.MEDIUM -> parts.add(getString(R.string.server_selection_filter_load_medium))
             LoadFilter.HIGH -> parts.add(getString(R.string.server_selection_filter_load_high))
         }
+        if (speedFilter != 0) parts.add(formatLinkSpeed(speedFilter))
         if (favouritesOnly) parts.add(getString(R.string.server_selection_filter_favourites_only))
         if (parts.isEmpty()) return null
         return parts.joinToString(" ${getString(R.string.lbl_separator_dot)} ")
@@ -1895,9 +1910,10 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.tvActiveFilterSummary.isVisible = true
     }
 
-    /** Resets both filters to their defaults and refreshes all indicators. */
+    /** Resets all filters to their defaults and refreshes all indicators. */
     private fun clearFilters() {
         loadFilter = LoadFilter.ALL
+        speedFilter = 0
         favouritesOnly = false
         refreshUnselectedList()
     }
@@ -1908,8 +1924,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     }
 
     /**
-     * Shows the location filter dialog: a single-choice load-tier chip group plus a
-     * favourites-only chip.  Applied on "Apply", cleared via "Reset".
+     * Shows the location filter dialog: single-choice load-tier and speed-tier chip
+     * groups plus a favourites-only chip.  Applied on "Apply", cleared via "Reset".
      *
      * The chip that matches the currently-applied filter is pre-checked and, via
      * [createFilterChip]'s state-aware styling, rendered in the high-contrast
@@ -1940,13 +1956,38 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             isSingleSelection = true
             isSelectionRequired = true
         }
-        val chipsById = mutableMapOf<LoadFilter, Chip>()
+        val loadChipsById = mutableMapOf<LoadFilter, Chip>()
         loadTiers.forEach { (tier, labelRes) ->
             val chip = createFilterChip(getString(labelRes), isChecked = loadFilter == tier)
-            chipsById[tier] = chip
+            loadChipsById[tier] = chip
             loadGroup.addView(chip)
         }
         container.addView(loadGroup)
+
+        val speedLabel = buildDialogTitleLabel(getString(R.string.server_selection_filter_by_speed))
+        container.addView(speedLabel)
+
+        // Offer one chip per distinct speed present in the server list (e.g. "Any",
+        // "1 Gbps", "10 Gbps", "20 Gbps") so users only ever see speeds that exist.
+        val speedOptions = distinctSpeedOptions()
+        val speedGroup = ChipGroup(requireContext()).apply {
+            isSingleSelection = true
+            isSelectionRequired = true
+        }
+        val speedChipsByValue = mutableMapOf<Int, Chip>()
+        val anyChip = createFilterChip(
+            getString(R.string.server_selection_filter_load_any), isChecked = speedFilter == 0
+        )
+        speedChipsByValue[0] = anyChip
+        speedGroup.addView(anyChip)
+        speedOptions.forEach { linkMbps ->
+            val chip = createFilterChip(
+                formatLinkSpeed(linkMbps), isChecked = speedFilter == linkMbps
+            )
+            speedChipsByValue[linkMbps] = chip
+            speedGroup.addView(chip)
+        }
+        container.addView(speedGroup)
 
         val favLabel = buildDialogTitleLabel(getString(R.string.server_selection_filter_favourites))
         container.addView(favLabel)
@@ -1961,18 +2002,44 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             .setTitle(getString(R.string.server_selection_filter_locations))
             .setView(container)
             .setPositiveButton(getString(R.string.lbl_apply)) { _, _ ->
-                loadFilter = chipsById.entries
+                loadFilter = loadChipsById.entries
                     .firstOrNull { it.value.isChecked }?.key ?: LoadFilter.ALL
+                speedFilter = speedChipsByValue.entries
+                    .firstOrNull { it.value.isChecked }?.key ?: 0
                 favouritesOnly = favChip.isChecked
                 refreshUnselectedList()
             }
             .setNeutralButton(getString(R.string.lbl_reset)) { _, _ ->
                 loadFilter = LoadFilter.ALL
+                speedFilter = 0
                 favouritesOnly = false
                 refreshUnselectedList()
             }
             .setNegativeButton(getString(R.string.lbl_cancel), null)
             .show()
+    }
+
+    /**
+     * Returns the distinct, known link speeds (Mbps) available across
+     * [allServers], sorted ascending.  Servers with an unknown speed
+     * ([CountryConfig.link] == 0) are excluded so the dialog only ever offers
+     * speeds that actually exist (e.g. 1000 → "1 Gbps", 10000 → "10 Gbps").
+     */
+    private fun distinctSpeedOptions(): List<Int> =
+        allServers.map { it.link }.filter { it > 0 }.distinct().sorted()
+
+    /**
+     * Formats a link speed in Mbps for display in filter chips and the active
+     * filter pill, e.g. 100 → "100 Mbps", 1000 → "1 Gbps", 2500 → "2.5 Gbps".
+     */
+    private fun formatLinkSpeed(linkMbps: Int): String {
+        if (linkMbps < 1_000) return "$linkMbps Mbps"
+        val gbps = linkMbps / 1_000.0
+        return if (gbps == gbps.toLong().toDouble()) {
+            "${gbps.toLong()} Gbps"
+        } else {
+            String.format(Locale.US, "%.1f Gbps", gbps)
+        }
     }
 
     /**
