@@ -23,7 +23,7 @@
             android:layout_height="180dp"
             android:fitsSystemWindows="true"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-            app:contentScrim="@drawable/bg_vpn_header_gradient"
+            app:contentScrim="@drawable/bg_plus_hero_gradient"
             app:expandedTitleTextAppearance="@style/TextAppearance.Material3.HeadlineMedium"
             app:collapsedTitleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
             app:expandedTitleMarginStart="24dp"

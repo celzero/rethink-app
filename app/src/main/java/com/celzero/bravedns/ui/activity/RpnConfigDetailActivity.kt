@@ -39,6 +39,7 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.graphics.withRotation
 import androidx.core.view.WindowInsetsControllerCompat
@@ -46,7 +47,6 @@ import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.data.SsidItem
 import com.celzero.bravedns.database.CountryConfig
 import com.celzero.bravedns.databinding.ActivityRpnConfigDetailBinding
@@ -58,7 +58,6 @@ import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_RPN
 import com.celzero.bravedns.ui.activity.RpnConfigDetailActivity.Companion.STATS_POLL_MS
 import com.celzero.bravedns.ui.dialog.RpnSsidDialog
-import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.SnackbarHelper
 import com.celzero.bravedns.util.SsidPermissionManager
@@ -98,6 +97,17 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     private val b by viewBinding(ActivityRpnConfigDetailBinding::bind)
     private val persistentState by inject<PersistentState>()
     private val mappingViewModel: ProxyAppsMappingViewModel by viewModel()
+
+    /**
+     * The apps screen signals (via [android.app.Activity.RESULT_OK]) that apps were
+     * individually modified or bulk removed; any such change turns off catch-all.
+     */
+    private val includeAppsLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                onIndividualAppModified()
+            }
+        }
 
     private var configKey: String = ""
     private var countryConfig: CountryConfig? = null
@@ -225,6 +235,12 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 setupHeaderUI()
             }
         }
+
+        b.hopTitleTv.text = getString(
+            R.string.two_argument_space,
+            getString(R.string.cd_dns_crypt_relay_heading),
+            getString(R.string.symbol_bunny)
+        )
 
         b.lockdownTitleTv.text =
             getString(
@@ -743,10 +759,14 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     b.hopCheck.isChecked = config.hopEnabled
                     b.otherSettingsCard.visibility = View.VISIBLE
                     b.mobileSsidSettingsCard.visibility = View.VISIBLE
+
+                    // apps entry point always stays enabled, even under catch-all;
+                    // users must be able to review/override the implicit mapping
+                    b.applicationsBtn.isEnabled = true
+                    b.applicationsBtn.alpha = 1.0f
+
                     // Update apps section immediately based on catchAll state
                     if (config.catchAll) {
-                        b.applicationsBtn.isEnabled = false
-                        b.applicationsBtn.alpha = 0.5f
                         b.appsLabel.setTextColor(fetchColor(this, R.attr.primaryTextColor))
                         b.appsLabel.text = getString(R.string.lbl_all_apps)
                     }
@@ -796,9 +816,9 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             io {
                 RpnProxyManager.setCatchAllForWinServer(configKey, isChecked)
                 uiCtx {
-                    // Update apps section immediately to reflect the new catch-all state
-                    b.applicationsBtn.isEnabled = !isChecked
-                    b.applicationsBtn.alpha = if (isChecked) 0.5f else 1.0f
+                    // apps entry point remains usable regardless of catch-all state
+                    b.applicationsBtn.isEnabled = true
+                    b.applicationsBtn.alpha = 1.0f
                     if (isChecked) {
                         b.appsLabel.setTextColor(fetchColor(this, R.attr.primaryTextColor))
                         b.appsLabel.text = getString(R.string.lbl_all_apps)
@@ -1004,15 +1024,18 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             cc != null && cc.name.isNotBlank() -> cc.name
             else -> configKey
         }
-        val adapter = WgIncludeAppsAdapter(this, proxyId, proxyName)
-        // Remove any observers registered by previous openAppsDialog()
-        mappingViewModel.apps.removeObservers(this)
-        mappingViewModel.apps.observe(this) { adapter.submitData(lifecycle, it) }
-        var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-        if (Themes.isFrostTheme(themeId)) themeId = R.style.App_Dialog_NoDim
-        val dlg = WgIncludeAppsDialog(this, adapter, mappingViewModel, themeId, proxyId, proxyName)
-        dlg.setCanceledOnTouchOutside(false)
-        dlg.show()
+        includeAppsLauncher.launch(WgIncludeAppsActivity.newIntent(this, proxyId, proxyName))
+    }
+
+    /**
+     * Catch-all only remains active while the routing is untouched by hand. Any individual
+     * app modification (or a bulk remove-all) from the apps dialog turns it off, since the
+     * per-app mapping now expresses the user's intent.
+     */
+    private fun onIndividualAppModified() {
+        if (!b.catchAllCheck.isChecked) return
+        // unchecking via the listener persists state and refreshes the apps section
+        b.catchAllCheck.isChecked = false
     }
 
     private fun setupHeaderUI() {

@@ -31,7 +31,6 @@ import android.widget.Toast
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.animation.Rotate3dAnimation
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.EventSource
@@ -45,7 +44,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.DnsDetailActivity
-import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
+import com.celzero.bravedns.ui.activity.WgIncludeAppsActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Themes
@@ -404,30 +403,13 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
 
     private fun openAppsDialog() {
         // treat proxyId and proxyName of Orbot as base
-        val appsAdapter =
-            WgIncludeAppsAdapter(
+        startActivity(
+            WgIncludeAppsActivity.newIntent(
                 requireContext(),
                 ProxyManager.ID_ORBOT_BASE,
                 ProxyManager.ORBOT_PROXY_NAME
             )
-        mappingViewModel.apps.observe(this.viewLifecycleOwner) {
-            appsAdapter.submitData(lifecycle, it)
-        }
-        var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-        if (Themes.isFrostTheme(themeId)) {
-            themeId = R.style.App_Dialog_NoDim
-        }
-        val includeAppsDialog =
-            WgIncludeAppsDialog(
-                requireActivity(),
-                appsAdapter,
-                mappingViewModel,
-                themeId,
-                ProxyManager.ID_ORBOT_BASE,
-                ProxyManager.ID_ORBOT_BASE
-            )
-        includeAppsDialog.setCanceledOnTouchOutside(false)
-        includeAppsDialog.show()
+        )
     }
 
     private fun updateOrbotNone() {

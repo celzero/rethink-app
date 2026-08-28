@@ -40,7 +40,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.adapter.WgPeersAdapter
 import com.celzero.bravedns.customdownloader.IpInfoDownloader
 import com.celzero.bravedns.data.SsidItem
@@ -63,7 +62,6 @@ import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEAR
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity.Companion.STATS_POLL_MS
 import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
 import com.celzero.bravedns.ui.dialog.WgHopDialog
-import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
 import com.celzero.bravedns.ui.dialog.WgSsidDialog
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.SnackbarHelper
@@ -982,19 +980,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
 
     private fun openAppsDialog(proxyName: String) {
         val proxyId = ID_WG_BASE + configId
-        val appsAdapter = WgIncludeAppsAdapter(this, proxyId, proxyName)
-        // Remove any observers registered by previous openAppsDialog() calls so that stale
-        // adapters from dismissed dialogs do not continue to receive paging data.
-        mappingViewModel.apps.removeObservers(this)
-        mappingViewModel.apps.observe(this) { appsAdapter.submitData(lifecycle, it) }
-        var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-        if (Themes.isFrostTheme(themeId)) {
-            themeId = R.style.App_Dialog_NoDim
-        }
-        val includeAppsDialog =
-            WgIncludeAppsDialog(this, appsAdapter, mappingViewModel, themeId, proxyId, proxyName)
-        includeAppsDialog.setCanceledOnTouchOutside(false)
-        includeAppsDialog.show()
+        startActivity(WgIncludeAppsActivity.newIntent(this, proxyId, proxyName))
     }
 
     private fun refreshHopStatus() {

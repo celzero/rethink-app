@@ -51,7 +51,9 @@ import kotlinx.coroutines.withContext
 class WgIncludeAppsAdapter(
     private val context: Context,
     private val proxyId: String,
-    private val proxyName: String
+    private val proxyName: String,
+    // invoked on the main thread after any individual app inclusion/exclusion is persisted
+    private val onAppModified: (() -> Unit)? = null
 ) :
     PagingDataAdapter<ProxyApplicationMapping, WgIncludeAppsAdapter.IncludedAppInfoViewHolder>(
         DIFF_CALLBACK
@@ -243,7 +245,12 @@ class WgIncludeAppsAdapter(
                     removeProxyFromApp(mapping.uid, mapping.packageName, proxyId)
                     Logger.i(LOG_TAG_PROXY, "Removed app: ${mapping.uid}, $proxyId, $proxyName")
                 }
-                uiCtx { refresh() }
+                uiCtx {
+                    // individual app state diverges from any active catch-all; let the
+                    // host decide what to do with it (e.g. switch catch-all off)
+                    onAppModified?.invoke()
+                    refresh()
+                }
             }
         }
 
@@ -298,7 +305,10 @@ class WgIncludeAppsAdapter(
                                 }
                             }
                         }
-                        uiCtx { refresh() }
+                        uiCtx {
+                            onAppModified?.invoke()
+                            refresh()
+                        }
                     }
                 }
                 .setNeutralButton(context.getString(R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->

@@ -21,7 +21,6 @@ import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
-import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,7 +34,6 @@ import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.ProductDetail
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.facebook.shimmer.ShimmerFrameLayout
-import java.util.Locale
 
 class GooglePlaySubsAdapter(
     val listener: SubscriptionChangeListener,
@@ -133,10 +131,7 @@ class GooglePlaySubsAdapter(
             val planTitle = pricing.planTitle
 
             var currentPrice = ""
-            var currentPriceMicros = 0L
             var discountedPrice = ""
-            var discountedPriceMicros = 0L
-            var currencyCode = ""
             var freeTrialDays = 0
             var isYearly = false
 
@@ -145,20 +140,15 @@ class GooglePlaySubsAdapter(
                     phase.freeTrialPeriod > 0 -> freeTrialDays = phase.freeTrialPeriod
                     phase.recurringMode == InAppBillingHandler.RecurringMode.DISCOUNTED -> {
                         discountedPrice = phase.price
-                        discountedPriceMicros = phase.priceAmountMicros
-                        currencyCode = phase.currencyCode
                     }
                     phase.recurringMode == InAppBillingHandler.RecurringMode.ORIGINAL -> {
                         currentPrice = phase.price
-                        currentPriceMicros = phase.priceAmountMicros
                         isYearly = phase.billingPeriod.contains("Y")
-                        currencyCode = phase.currencyCode
                     }
                 }
             }
 
             val displayPrice = discountedPrice.ifEmpty { currentPrice }
-            val displayPriceMicros = if (discountedPriceMicros > 0) discountedPriceMicros else currentPriceMicros
             val isSelected = prod.productId == selectedProductId && prod.planId == selectedPlanId
             val isInApp = prod.productType == ProductType.INAPP
 
@@ -172,51 +162,7 @@ class GooglePlaySubsAdapter(
 
             Logger.d(LOG_TAG_UI, "$TAG InAppBilling Binding plan: ${prod.productId}, ${prod.planId}, Title: $planTitle, Price: $displayPrice, discount: $discountedPrice FreeTrial: $freeTrialDays days, Yearly: $isYearly, InApp: $isInApp")
 
-            // Original Price (struck through, below price)
-            if (discountedPrice.isNotEmpty() && currentPrice.isNotEmpty()) {
-                binding.originalPrice.visibility = View.VISIBLE
-                binding.originalPrice.text = currentPrice
-                binding.originalPrice.paintFlags = binding.originalPrice.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-            } else {
-                binding.originalPrice.visibility = View.GONE
-            }
-
-            val durationMonthsForCalc: Int = when {
-                isInApp  -> getInAppDurationMonths(prod.planId)
-                isYearly -> 12
-                else     -> 1 // monthly subscription
-            }
-
-            if (displayPriceMicros > 0 && durationMonthsForCalc > 0) {
-                val perMonthMicros = displayPriceMicros / durationMonthsForCalc
-                val perMonthFormatted = formatMicrosAsCurrency(perMonthMicros, currencyCode, displayPrice)
-                if (perMonthFormatted != null) {
-                    binding.pricePerMonth.visibility = View.VISIBLE
-                    binding.pricePerMonth.text = context.getString(R.string.price_per_month_format, perMonthFormatted)
-                } else {
-                    binding.pricePerMonth.visibility = View.GONE
-                }
-                // Show the aggregate total only for multi-period plans (yearly subs, 2yr/5yr INAPP).
-                // For monthly subs durationMonthsForCalc == 1, so the per-month price IS the total
-                // no need to repeat it in the smaller field.
-                if (durationMonthsForCalc > 1 && displayPrice.isNotEmpty()) {
-                    binding.price.visibility = View.VISIBLE
-                    binding.price.text = displayPrice
-                } else {
-                    binding.price.text = displayPrice
-                    binding.pricePerMonth.visibility = View.GONE
-                }
-            } else {
-                // per-month cannot be calculated (unknown purchase duration).
-                // Show at least the full price in the primary field.
-                binding.price.visibility = View.GONE
-                if (displayPrice.isNotEmpty()) {
-                    binding.pricePerMonth.visibility = View.VISIBLE
-                    binding.pricePerMonth.text = displayPrice
-                } else {
-                    binding.pricePerMonth.visibility = View.GONE
-                }
-            }
+            binding.price.text = displayPrice
 
             val billingText = getBillingText(prod.productType)
             if (freeTrialDays > 0) {
@@ -229,7 +175,7 @@ class GooglePlaySubsAdapter(
                 val pct = calculateSavings(currentPrice, discountedPrice)
                 if (pct > 0) {
                     binding.savingsText.visibility = View.VISIBLE
-                    binding.savingsText.text = context.getString(R.string.save_percentage, "${pct}%")
+                    binding.savingsText.text = context.getString(R.string.savings_percent, "$pct%")
                 } else {
                     binding.savingsText.visibility = View.GONE
                 }
@@ -278,28 +224,6 @@ class GooglePlaySubsAdapter(
                     context.resources.getQuantityString(R.plurals.duration_years, yrs, yrs)
                 }
                 else -> planTitle
-            }
-        }
-
-        /**
-         * Attempts to format [micros] as a currency string using the same symbol/format as
-         * [sampleFormatted] (the already-formatted full price from Play). Strips digits/decimal
-         * from [sampleFormatted] and replaces with the per-month amount.
-         */
-        private fun formatMicrosAsCurrency(micros: Long, currencyCode: String, sampleFormatted: String): String? {
-            return try {
-                val amount = micros / 1_000_000.0
-                // Extract currency prefix/suffix from sample (e.g. "₹" or "US$")
-                val numericPart = sampleFormatted.replace(Regex("[0-9,. ]+"), "").trim()
-                val formatted = if (amount >= 100) {
-                    String.format(Locale.getDefault(), "%.0f", amount)
-                } else {
-                    String.format(Locale.getDefault(), "%.2f", amount).trimEnd('0').trimEnd('.')
-                }
-                if (numericPart.isNotEmpty()) "$numericPart$formatted" else "$currencyCode $formatted"
-            } catch (e: Exception) {
-                Logger.w(LOG_TAG_UI, "$TAG GPPA err formatting micros as currency, ${e.message}")
-                null
             }
         }
 

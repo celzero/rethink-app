@@ -19,9 +19,9 @@
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_vpn_header_gradient"
+            android:background="@drawable/bg_plus_hero_gradient"
             app:collapsedTitleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
-            app:contentScrim="@drawable/bg_vpn_header_gradient"
+            app:contentScrim="@drawable/bg_plus_hero_gradient"
             app:expandedTitleMarginBottom="0dp"
             app:expandedTitleMarginEnd="16dp"
             app:expandedTitleMarginStart="10dp"
@@ -41,7 +41,7 @@
                     android:id="@+id/header_gradient_bg"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/bg_vpn_header_gradient" />
+                    android:background="@drawable/bg_plus_hero_gradient" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/hero_content"
@@ -228,18 +228,17 @@
                 android:id="@+id/stats_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="4dp"
-                app:strokeColor="?attr/divider"
-                app:strokeWidth="1dp">
+                style="@style/RethinkPlus.ContentCard">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="18dp">
 
                     <com.facebook.shimmer.ShimmerFrameLayout
                         android:id="@+id/shimmer_stats"
@@ -481,16 +480,16 @@
                 android:id="@+id/actions_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="4dp"
-                app:strokeWidth="0dp">
+                style="@style/RethinkPlus.ContentCard">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="18dp">
 
                     <com.google.android.material.textview.MaterialTextView
                         android:layout_width="wrap_content"
@@ -638,16 +637,16 @@
                 android:id="@+id/other_settings_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="4dp"
-                app:strokeWidth="0dp">
+                style="@style/RethinkPlus.ContentCard">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="18dp">
 
                     <com.google.android.material.textview.MaterialTextView
                         android:layout_width="wrap_content"
@@ -678,7 +677,7 @@
                                 android:id="@+id/hop_title_tv"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Relay"
+                                android:text="@string/cd_dns_crypt_relay_heading"
                                 android:textColor="?attr/primaryTextColor"
                                 android:textSize="15sp"
                                 android:textStyle="bold" />
@@ -772,7 +771,7 @@
                                 android:id="@+id/catch_all_title_tv"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/catch_all_wg_dialog_title"
+                                android:text="Route remaining apps"
                                 android:textColor="?attr/primaryTextColor"
                                 android:textSize="15sp"
                                 android:textStyle="bold" />

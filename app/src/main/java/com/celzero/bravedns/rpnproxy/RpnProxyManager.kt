@@ -2407,6 +2407,7 @@ object RpnProxyManager : KoinComponent {
             winCacheMutex.withLock {
                 winServersCache.filter { it.key == key }.forEach { it.isEnabled = true }
             }
+            config.catchAll = true
             config.isEnabled = true
             try {
                 countryConfigRepo.update(config)
@@ -2419,6 +2420,7 @@ object RpnProxyManager : KoinComponent {
                 winCacheMutex.withLock {
                     winServersCache.filter { it.key == key }.forEach { it.isEnabled = false }
                 }
+                config.catchAll = false
                 config.isEnabled = false
                 return Pair(false, "Failed to update database: ${e.message}")
             }

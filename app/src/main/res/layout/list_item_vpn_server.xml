@@ -5,45 +5,59 @@
     android:id="@+id/server_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground"
-    android:minHeight="64dp"
-    android:paddingStart="12dp"
-    android:paddingTop="8dp"
-    android:paddingEnd="12dp"
-    android:paddingBottom="8dp">
+    android:layout_margin="4dp"
+    android:background="@drawable/bg_vpn_server_item"
+    android:clickable="true"
+    android:focusable="true"
+    android:paddingStart="16dp"
+    android:paddingTop="16dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="10dp">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_flag"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:background="@drawable/bg_server_avatar_circle"
         android:gravity="center"
-        android:textSize="26sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textSize="21sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="🇺🇸" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/iv_flag_image"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:padding="5dp"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:alpha="0.9"
+        android:padding="11dp"
         android:src="@drawable/ic_rpn_auto"
         android:tint="?attr/primaryTextColor"
-        android:alpha="0.8"
         android:visibility="gone"
-        tools:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="gone" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/refresh_stop_icon"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:layout_marginTop="19dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/lbl_remove"
+        android:padding="8dp"
+        android:src="@drawable/ic_cross"
+        android:tint="?attr/primaryLightColorText"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/country_info_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="6dp"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@id/stats_layout"
         app:layout_constraintEnd_toStartOf="@id/refresh_stop_icon"
         app:layout_constraintStart_toEndOf="@id/tv_flag"
         app:layout_constraintTop_toTopOf="parent">
@@ -51,6 +65,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -58,61 +73,57 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp"
                 android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.01"
                 android:maxLines="1"
                 android:textColor="?attr/primaryTextColor"
-                android:textSize="15sp"
-                tools:text="United States" />
+                android:textSize="16sp"
+                tools:text="Singapore" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_server_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_gravity="center_vertical"
                 android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.04"
                 android:maxLines="1"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp"
                 android:textColor="?attr/accentGood"
                 android:textSize="11sp"
-                tools:text="Active" />
+                tools:text="Connected" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="2dp"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp">
+            android:layout_marginTop="5dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_country_code"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
                 android:fontFamily="monospace"
+                android:letterSpacing="0.05"
                 android:maxLines="1"
-                android:layout_gravity="center"
                 android:textColor="?attr/primaryLightColorText"
-                android:textSize="12sp"
-                android:alpha="0.85"
-                tools:visibility="visible"
-                tools:text="US" />
+                android:textSize="11sp"
+                tools:text="SG" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_cc_sep"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:layout_gravity="center"
                 android:layout_marginEnd="5dp"
+                android:alpha="0.55"
                 android:text="@string/lbl_separator_dot"
                 android:textColor="?attr/primaryLightColorText"
-                android:textSize="11sp"
-                android:visibility="visible" />
+                android:textSize="11sp" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_server_ip"
@@ -120,118 +131,125 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:fontFamily="monospace"
+                android:letterSpacing="0.02"
                 android:maxLines="1"
-                android:layout_gravity="center"
                 android:textColor="?attr/primaryLightColorText"
-                android:textSize="12sp"
-                android:alpha="0.85"
-                tools:visibility="visible"
+                android:textSize="11sp"
                 android:visibility="gone"
-                tools:text="100.82.27.93" />
+                tools:text="82.102.25.218"
+                tools:visibility="visible" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_uptime_sep"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:layout_gravity="center"
                 android:layout_marginEnd="5dp"
+                android:alpha="0.55"
                 android:text="@string/lbl_separator_dot"
                 android:textColor="?attr/primaryLightColorText"
                 android:textSize="11sp"
-                android:visibility="visible" />
+                android:visibility="gone" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_uptime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="monospace"
+                android:letterSpacing="0.02"
                 android:maxLines="1"
-                android:textSize="12sp"
-                android:alpha="0.85"
-                android:layout_gravity="center"
                 android:textColor="?attr/primaryLightColorText"
-                tools:visibility="visible"
+                android:textSize="11sp"
                 android:visibility="gone"
-                tools:text="2 min ago" />
+                tools:text="2 min"
+                tools:visibility="visible" />
+
         </LinearLayout>
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/stats_layout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginBottom="4dp"
-        android:gravity="center_vertical"
-        android:orientation="vertical"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBaseline_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/country_info_layout">
-
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:id="@+id/stats_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="9dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/latency_badge"
+                android:id="@+id/tv_last_routed_app"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:alpha="0.6"
-                android:textSize="11sp"
-                tools:text="1.0 Gbps · 20%"
-                tools:textColor="?attr/chipTextPositive" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_status_sep"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="5dp"
-                android:text="@string/lbl_separator_dot"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="11sp"
-                tools:visibility="visible"
-                android:visibility="gone" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_apps_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:letterSpacing="0.02"
                 android:maxLines="1"
                 android:textColor="?attr/primaryLightColorText"
                 android:textSize="11sp"
-                android:visibility="visible"
-                tools:text="3 apps" />
+                android:visibility="gone"
+                tools:text="Last routed app • 3 sec ago"
+                tools:visibility="visible" />
+
         </LinearLayout>
 
     </LinearLayout>
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/refresh_stop_icon"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:padding="6dp"
-        android:src="@drawable/ic_cross"
-        android:tint="?attr/primaryLightColorText"
-        android:contentDescription="@string/lbl_remove"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <View
+        android:id="@+id/action_divider"
         android:layout_width="0dp"
-        android:layout_height="0.5dp"
-        android:layout_marginStart="48dp"
-        android:alpha="0.15"
+        android:layout_height="1dp"
+        android:layout_marginStart="72dp"
+        android:layout_marginTop="14dp"
+        android:alpha="0.45"
         android:background="?attr/divider"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/country_info_layout" />
+
+    <LinearLayout
+        android:id="@+id/apps_action_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_plus_status_chip"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginStart="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="11dp"
+        android:paddingTop="6dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="6dp"
+        app:layout_constraintStart_toEndOf="@id/tv_flag"
+        app:layout_constraintTop_toBottomOf="@id/action_divider">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="13dp"
+            android:layout_height="13dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_person"
+            android:tint="?attr/colorPrimary" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/apps_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:duplicateParentState="true"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.02"
+            android:maxLines="1"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="11sp"
+            tools:text="Apps · 12" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="11dp"
+            android:layout_height="11dp"
+            android:layout_marginStart="4dp"
+            android:duplicateParentState="true"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_right_arrow_small"
+            android:tint="?attr/colorPrimary" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

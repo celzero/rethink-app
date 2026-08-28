@@ -104,6 +104,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     override fun onResume() {
         super.onResume()
         if (b.loadingContainer.isVisible) startShimmer()
+        startHeaderAnimations()
         if (shouldRecheckOnResume) {
             shouldRecheckOnResume = false
             viewModel.initializeBilling()
@@ -124,26 +125,28 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     override fun onPause() {
         super.onPause()
         stopShimmer()
+        stopHeaderAnimations()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        stopHeaderAnimations()
         cancelProcessingTimeout()
         dismissProcessingBottomSheet()
         adapter = null
     }
 
     private fun setupUI() {
-        b.fhsTitleRethink.text = getString(R.string.rpn_title).lowercase()
         applyButtonTheme()
         setupRecyclerView()
         setupTermsAndPolicy()
         setupProductTypeToggle()
         adjustCtaBottomMargin()
+        startHeaderAnimations()
 
         if (viewModel.extendMode) {
             // In extend mode: hide the tab toggle and the page title,show only one-time products.
-            b.productTypeToggle.isVisible = false
+            b.productTypeToggleContainer.isVisible = false
             // Show the extend-mode banner so the user knows they are adding more access time.
             b.extendModeBanner.isVisible = true
             // hide the connection info card since it's not relevant in extend mode
@@ -230,25 +233,34 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     }
 
     private fun updateToggleState(selectedType: RethinkPlusViewModel.ProductTypeFilter) {
+        val ctx = requireContext()
+        val surfaceColor = UIUtils.fetchColor(ctx, R.attr.background)
+        val onSurfaceColor = UIUtils.fetchColor(ctx, R.attr.colorOnSurface)
+        val lightTextColor = UIUtils.fetchColor(ctx, R.attr.primaryLightColorText)
+
         when (selectedType) {
             RethinkPlusViewModel.ProductTypeFilter.SUBSCRIPTION -> {
                 b.btnSubscription.apply {
-                    setBackgroundColor(UIUtils.fetchColor(requireContext(), R.attr.primaryColor))
-                    setTextColor(UIUtils.fetchColor(requireContext(), R.attr.accentGood))
+                    setBackgroundColor(surfaceColor)
+                    setTextColor(onSurfaceColor)
+                    typeface = android.graphics.Typeface.DEFAULT_BOLD
                 }
                 b.btnOneTime.apply {
                     setBackgroundColor(Color.TRANSPARENT)
-                    setTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor))
+                    setTextColor(lightTextColor)
+                    typeface = android.graphics.Typeface.DEFAULT
                 }
             }
             RethinkPlusViewModel.ProductTypeFilter.ONE_TIME -> {
                 b.btnOneTime.apply {
-                    setBackgroundColor(UIUtils.fetchColor(requireContext(), R.attr.primaryColor))
-                    setTextColor(UIUtils.fetchColor(requireContext(), R.attr.accentGood))
+                    setBackgroundColor(surfaceColor)
+                    setTextColor(onSurfaceColor)
+                    typeface = android.graphics.Typeface.DEFAULT_BOLD
                 }
                 b.btnSubscription.apply {
                     setBackgroundColor(Color.TRANSPARENT)
-                    setTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor))
+                    setTextColor(lightTextColor)
+                    typeface = android.graphics.Typeface.DEFAULT
                 }
             }
         }
@@ -925,6 +937,17 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
 
     private fun updateHtmlEncodedText(text: String): Spanned =
         htmlToSpannedText(text)
+
+    // The header hosts a self-contained ocean scene (DolphinOceanView) that
+    // draws the water surface, the dolphin breach cycle, splashes and sparse
+    // bubbles. The fragment only drives its lifecycle.
+    private fun startHeaderAnimations() {
+        b.dolphinOcean.start()
+    }
+
+    private fun stopHeaderAnimations() {
+        b.dolphinOcean.stop()
+    }
 
     override fun onConnectionResult(isSuccess: Boolean, message: String) {
         viewModel.onBillingConnected(isSuccess, message)

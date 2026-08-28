@@ -21,14 +21,22 @@ import android.animation.ObjectAnimator
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context.CLIPBOARD_SERVICE
+import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.text.format.DateUtils
+import android.view.Gravity
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.OvershootInterpolator
+import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -53,7 +61,6 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
 import com.celzero.bravedns.ui.adapter.CountryServerAdapter
 import com.celzero.bravedns.ui.adapter.VpnServerAdapter
-import com.celzero.bravedns.ui.bottomsheet.ManageRpnPurchaseBtmSht
 import com.celzero.bravedns.ui.bottomsheet.ServerRemovalNotificationBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.ServerSettingsBottomSheet
 import com.celzero.bravedns.util.SnackbarHelper
@@ -62,8 +69,8 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ServerSelectionViewModel
 import com.celzero.firestack.backend.Backend
-import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import kotlinx.coroutines.Dispatchers
@@ -101,6 +108,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private val selectedServers = mutableListOf<CountryConfig>()
 
     private var statusUpdateJob: Job? = null
+
+    /** Looping alpha blink on the header status dot while connected. */
+    private var blinkAnimator: ObjectAnimator? = null
 
     /** Job driving the registration / server-list polling loop. */
     private var serverLoadingJob: Job? = null
@@ -142,6 +152,15 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private var resubscribePromptShown = false
     private var winIdentifier: String? = null
 
+    /** Load tiers available in the location filter dialog. */
+    private enum class LoadFilter { ALL, LOW, MEDIUM, HIGH }
+
+    /** Active load-tier filter for the "All locations" list. */
+    private var loadFilter = LoadFilter.ALL
+
+    /** When true, the "All locations" list is restricted to favourite countries. */
+    private var favouritesOnly = false
+
     companion object {
         private const val TAG = "ServerSelectionFragment"
 
@@ -152,7 +171,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         private const val MAX_SELECTIONS = 5
 
         /** UI connection states surfaced by [updateConnectionStatus]. */
-        private enum class ConnectionUiState { DISCONNECTED, CONNECTING, CONNECTED }
+        private enum class ConnectionUiState { DISCONNECTED, CONNECTING, CONNECTED, REGISTERING, FAILED }
 
         /** Maximum time the inline registration progress will poll before giving up. */
         private const val LOADING_DIALOG_TIMEOUT_MS = 20_000L
@@ -198,6 +217,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
         setupNavigationButtons()
         setupSearchBar()
+        updateFilterButtonState()
         setupHeaderUI()
         setupRpnState()
 
@@ -541,7 +561,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                         // Only rebuild the list when something actually changed to avoid an
                         // unnecessary DiffUtil pass on every resume.
                         if (anyChanged) {
-                            serverAdapter.updateCountries(buildCountries(unselectedServers))
+                            refreshUnselectedList()
                         }
                     }
                 }
@@ -575,6 +595,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         runCatching {
             fabLoadingAnimator?.cancel()
             fabLoadingAnimator = null
+            blinkAnimator?.cancel()
+            blinkAnimator = null
             b.fabStopProxy.animate().cancel()
             b.fabStartProxy.animate().cancel()
             b.statusIndicator.animate().cancel()
@@ -595,24 +617,32 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         super.onDestroyView()
     }
 
-    private fun setLoadingState(loading: Boolean) {
+    private fun setLoadingState(loading: Boolean, skipHeader: Boolean = false) {
         if (!isAdded) return
         isLoading = loading
 
         if (loading) {
             // Header shimmer
-            b.shimmerHeader.isVisible = true
-            b.shimmerHeader.startShimmer()
-            b.locationContent.isVisible = false
+            if (!skipHeader) {
+                b.shimmerHeader.isVisible = true
+                b.shimmerHeader.startShimmer()
+                b.locationContent.isVisible = false
+            } else {
+                b.shimmerHeader.stopShimmer()
+                b.shimmerHeader.isVisible = false
+                b.locationContent.isVisible = true
+            }
 
             // hide real list and hint cards
             b.shimmerServerList.isVisible = true
             b.shimmerServerList.startShimmer()
             b.rvServers.isVisible = false
             b.emptySelectionCard.isVisible = false
-            b.selectedServersCard.isVisible = false
-            b.emptyStateLayout.isVisible = false
+            b.rvSelectedServers.isVisible = false
+            b.selectedLocationsHeader.isVisible = false
             b.frequentCountriesSection.isVisible = false
+            b.locationCapacityIndicator.isVisible = false
+            b.errorStateContainer.isVisible = false
 
             // Disable search bar and action icons while data is loading
             setSearchAndActionsEnabled(false)
@@ -648,6 +678,10 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.searchBar.isFocusableInTouchMode = enabled
         b.settingsBtn.alpha             = alpha
         b.settingsBtn.isEnabled         = enabled
+        b.searchFilterBtn.alpha         = alpha
+        b.searchFilterBtn.isEnabled     = enabled
+        b.addLocationBtn.alpha          = alpha
+        b.addLocationBtn.isEnabled      = enabled
     }
 
     private fun initServers(servers: List<CountryConfig>, selectedList: Set<CountryConfig> = emptySet()) {
@@ -660,7 +694,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 uiCtx {
                     if (!isAdded) return@uiCtx
                     setLoadingState(false)
-                    showErrorState()
+                    showEmptyState()
                 }
                 Logger.w(LOG_TAG_UI, "$TAG.initServers: no real servers available (hasRealServers=false, total=${servers.size})")
                 return@io
@@ -736,12 +770,15 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 unselectedServers.clear()
                 unselectedServers.addAll(localUnselected)
 
+                updateHeaderSummary()
                 selectedAdapter.updateServers(selectedServers)
                 serverAdapter.updateCountries(buildCountries(unselectedServers))
                 updateAllServersCount()
                 updateSelectedSectionVisibility()
-                updateVpnStatus()
                 setLoadingState(false)
+                // isLoading must be false before the summary refresh so the
+                // location-capacity scale becomes visible with the loaded data.
+                updateVpnStatus()
                 // Re-apply stopped UI on top of fully-loaded state
                 if (isProxyStopped) applyProxyStoppedUi()
                 // Notify adapter which server items are still waiting for tunnel setup,
@@ -758,29 +795,14 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     }
 
     private fun setupHeaderUI() {
-        b.collapsingToolbar.title = getString(R.string.server_selection_title)
-        b.collapsingToolbar.titleCollapseMode = CollapsingToolbarLayout.TITLE_COLLAPSE_MODE_SCALE
-        // Title is invisible while the header is expanded so it doesn't overlap the status
-        // card content; it fades in only once the toolbar is fully collapsed.
-        b.collapsingToolbar.setExpandedTitleColor(Color.TRANSPARENT)
-        b.collapsingToolbar.setCollapsedTitleTextColor(resolveAttrColor(R.attr.primaryTextColor))
-
-        b.appBarLayout.addOnOffsetChangedListener { appBar, verticalOffset ->
-            val scrollRange = appBar.totalScrollRange
-            if (scrollRange == 0) return@addOnOffsetChangedListener
-            val collapsedFraction = (-verticalOffset).toFloat() / scrollRange.toFloat()
-            val contentAlpha = (1f - ((collapsedFraction - 0.40f) / 0.35f)).coerceIn(0f, 1f)
-            b.statusCard.alpha = contentAlpha
-        }
-
         populateHeroPlanAccountRow()
-        // Periodic status + hero-IP refresh.  updateHeroIpRow uses the RpnProxyManager
-        // cache so the IO path only fires on reconnect (since change) or first load.
+        // Keep the hero header (status dot, duration, summary) in sync with the backend.
         statusUpdateJob = lifecycleScope.launch {
             while (true) {
                 delay(3_000.milliseconds)
                 if (isAdded && !isLoading) {
                     updateConnectionStatusOnly()
+                    updateConnectionDuration()
                 }
             }
         }
@@ -841,6 +863,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     /** Derives the correct [ConnectionUiState] from live VPN adapter state. */
     private fun deriveConnectionUiState(): ConnectionUiState {
         if (isProxyStopped) return ConnectionUiState.DISCONNECTED
+        // If the registration polling job is active, we are in the REGISTERING state.
+        if (serverLoadingJob?.isActive == true) return ConnectionUiState.REGISTERING
+
         val vpnState = VpnController.state()
         return when {
             // Fully connected tunnel
@@ -854,41 +879,48 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     }
 
     /**
-     * Full header refresh: connection status + current location derived from [selectedServers].
+     * Full header refresh: connection status + hero summary derived from [selectedServers].
      * Only called after data is loaded (not during loading).
      */
     private fun updateVpnStatus() {
         if (!isAdded) return
         updateConnectionStatus(deriveConnectionUiState())
-        when {
-            selectedServers.isEmpty() -> {
-                updateCurrentLocation(
-                    countryName = if (isWinRegistered) AUTO_SERVER_ID else getString(R.string.vpn_status_disconnected),
-                    location = ""
-                )
-            }
-            selectedServers.size == 1 -> {
-                val s = selectedServers.first()
-                if (s.id.equals(AUTO_SERVER_ID, ignoreCase = true)) {
-                    updateCurrentLocation(AUTO_SERVER_ID, "")
-                } else {
-                    updateCurrentLocation(s.countryName, s.serverLocation)
+        updateHeaderSummary()
+        updateConnectionDuration()
+    }
+
+    /**
+     * Refreshes the "Active • 2 min ago" label shown beside the header status dot.
+     * Uses the same relative-time presentation as HomeScreenFragment's
+     * active-since label ("10 min ago", "2 hrs ago", …).
+     */
+    private fun updateConnectionDuration() {
+        if (!isAdded) return
+        io {
+            try {
+                val stats = VpnController.getProxyStats(Backend.RpnWin)
+                uiCtx {
+                    if (!isAdded) return@uiCtx
+                    val since = stats?.since ?: 0L
+                    if (since <= 0L) {
+                        b.tvActiveDuration.text = ""
+                        return@uiCtx
+                    }
+                    // returns a string describing 'since' as a time relative to 'now'
+                    val relative = DateUtils.getRelativeTimeSpanString(
+                        since,
+                        System.currentTimeMillis(),
+                        DateUtils.MINUTE_IN_MILLIS,
+                        DateUtils.FORMAT_ABBREV_RELATIVE
+                    )
+                    b.tvActiveDuration.text = getString(
+                        R.string.two_argument_space,
+                        getString(R.string.lbl_separator_dot),
+                        relative.toString()
+                    )
                 }
-            }
-            else -> {
-                val uniqueNames = selectedServers
-                    .filter { !it.id.equals(AUTO_SERVER_ID, ignoreCase = true) }
-                    .map { it.countryName }
-                    .distinct()
-                val namesText = uniqueNames.joinToString(", ")
-                val locationText = selectedServers
-                    .asSequence()
-                    .filter { !it.id.equals(AUTO_SERVER_ID, ignoreCase = true) }
-                    .map { it.serverLocation }
-                    .distinct()
-                    .take(2)
-                    .joinToString(", ")
-                updateCurrentLocation(namesText, locationText)
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_UI, "$TAG.updateConnectionDuration: ${e.message}")
             }
         }
     }
@@ -900,14 +932,14 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 b.tvConnectionStatus.text = getString(R.string.lbl_active)
                 b.tvConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.accentGood))
                 b.statusIndicator.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.accentGood)
-                b.statusIndicator.animate().scaleX(1.3f).scaleY(1.3f).setDuration(500).withEndAction {
-                    if (isAdded) b.statusIndicator.animate().scaleX(1f).scaleY(1f).setDuration(500).start()
-                }.start()
+                b.tvActiveDuration.alpha = 1f
+                startStatusBlink()
             }
             ConnectionUiState.CONNECTING -> {
                 b.tvConnectionStatus.text = getString(R.string.lbl_connecting)
                 b.tvConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorAmber_900))
                 b.statusIndicator.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.colorAmber_900)
+                stopStatusBlink()
                 // Pulse animation to indicate in-progress state
                 b.statusIndicator.animate().scaleX(1.2f).scaleY(1.2f).setDuration(600).withEndAction {
                     if (isAdded) b.statusIndicator.animate().scaleX(0.8f).scaleY(0.8f).setDuration(600).withEndAction {
@@ -915,22 +947,141 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                     }.start()
                 }.start()
             }
+            ConnectionUiState.REGISTERING -> {
+                b.tvConnectionStatus.text = getString(R.string.rpn_restore_dialog_status_registering)
+                b.tvConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorAmber_900))
+                b.statusIndicator.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.colorAmber_900)
+                b.tvActiveDuration.alpha = 1f
+                startStatusBlink()
+            }
+            ConnectionUiState.FAILED -> {
+                b.tvConnectionStatus.text = getString(R.string.ping_status_failed)
+                b.tvConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.accentBad))
+                b.statusIndicator.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.accentBad)
+                stopStatusBlink()
+                b.tvActiveDuration.text = ""
+            }
             ConnectionUiState.DISCONNECTED -> {
                 b.tvConnectionStatus.text = getString(R.string.lbl_inactive)
                 b.tvConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.accentBad))
                 b.statusIndicator.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.accentBad)
+                stopStatusBlink()
             }
         }
     }
 
-    private fun updateCurrentLocation(countryName: String, location: String) {
+    /** Starts a gentle repeating alpha blink on the header status dot. */
+    private fun startStatusBlink() {
         if (!isAdded) return
-
-        b.locationContent.visibility = View.VISIBLE
-        b.tvCurrentCountry.text = countryName.capitalizeWords()
-        b.tvCurrentLocation.text = location.capitalizeWords()
+        if (blinkAnimator?.isRunning == true) return
+        b.statusIndicator.alpha = 1f
+        blinkAnimator = ObjectAnimator.ofFloat(b.statusIndicator, View.ALPHA, 1f, 0.25f).apply {
+            duration = 900L
+            repeatCount = ObjectAnimator.INFINITE
+            repeatMode = ObjectAnimator.REVERSE
+            start()
+        }
     }
 
+    /** Stops the status-dot blink and restores full opacity. */
+    private fun stopStatusBlink() {
+        blinkAnimator?.cancel()
+        blinkAnimator = null
+        if (isAdded) b.statusIndicator.alpha = 1f
+    }
+
+    /**
+     * Refreshes the premium hero summary: connected-location count, overlapping
+     * country avatars, tier/ID block and the location-capacity scale.
+     */
+    private fun updateHeaderSummary() {
+        if (!isAdded) return
+        b.locationContent.visibility = View.VISIBLE
+
+        val nonAutoServers = selectedServers.filter { !it.id.equals(AUTO_SERVER_ID, ignoreCase = true) }
+        val distinctCountries = nonAutoServers.distinctBy { it.cc }
+
+        b.tvConnectedLocationsCount.text = when {
+            isProxyStopped -> getString(R.string.server_settings_proxy_stopped)
+            distinctCountries.isEmpty() -> ""
+            else -> resources.getQuantityString(
+                R.plurals.server_selection_locations_connected,
+                distinctCountries.size,
+                distinctCountries.size
+            )
+        }
+        populateAvatarRow(distinctCountries)
+        updateCapacityIndicator()
+    }
+
+    /**
+     * Rebuilds the overlapping circular avatar strip. Each circle shows the country
+     * flag emoji as its background with the ISO country code overlaid as foreground.
+     */
+    private fun populateAvatarRow(countries: List<CountryConfig>) {
+        if (!isAdded) return
+        val row = b.avatarRow
+        row.removeAllViews()
+        val density = resources.displayMetrics.density
+        countries.take(MAX_SELECTIONS).forEachIndexed { index, config ->
+            if (config.cc.isBlank()) return@forEachIndexed
+            val avatar = FrameLayout(requireContext()).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    (30f * density).toInt(), (30f * density).toInt()
+                ).apply { marginStart = if (index == 0) 0 else -(7f * density).toInt() }
+                background = AppCompatResources.getDrawable(requireContext(), R.drawable.bg_avatar_circle)
+                clipChildren = false
+            }
+            val flag = AppCompatTextView(requireContext()).apply {
+                layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT
+                )
+                gravity = Gravity.CENTER
+                textSize = 17f
+                text = config.flagEmoji
+            }
+            val iso = AppCompatTextView(requireContext()).apply {
+                layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT
+                )
+                gravity = Gravity.CENTER
+                textSize = 8f
+                setTextColor(Color.WHITE)
+                setTypeface(typeface, Typeface.BOLD)
+                setShadowLayer(2f * density, 0f, 1f * density, Color.argb(128, 0, 0, 0))
+                text = config.cc.uppercase(Locale.US)
+            }
+            avatar.addView(flag)
+            avatar.addView(iso)
+            row.addView(avatar)
+        }
+    }
+
+    /** Updates the minimalist "N of M" capacity pills below the connection list. */
+    private fun updateCapacityIndicator() {
+        if (!isAdded) return
+        val filled = selectedServers.count { !it.id.equals(AUTO_SERVER_ID, ignoreCase = true) }
+            .coerceIn(0, MAX_SELECTIONS)
+        b.locationCapacityIndicator.isVisible = !isLoading && !isProxyStopped
+        b.tvCapacityLabel.text = String.format(Locale.US, "%d of %d locations", filled, MAX_SELECTIONS)
+        val dots = listOf(
+            b.capacityDotOne, b.capacityDotTwo, b.capacityDotThree,
+            b.capacityDotFour, b.capacityDotFive
+        )
+        dots.forEachIndexed { index, dot ->
+            if (index < filled) {
+                dot.alpha = 1f
+                dot.backgroundTintList =
+                    ContextCompat.getColorStateList(requireContext(), R.color.accentGood)
+            } else {
+                // Theme-aware "empty" tint: white is invisible on the light theme's
+                // background, so use the adaptive on-surface-variant color instead.
+                dot.alpha = 0.25f
+                dot.backgroundTintList =
+                    ColorStateList.valueOf(resolveAttrColor(R.attr.primaryLightColorText))
+            }
+        }
+    }
 
     private fun animateHeaderEntry() {
         if (!isAdded) return
@@ -945,8 +1096,12 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     }
 
     private fun setupNavigationButtons() {
-        b.supportBtn.setOnClickListener { openHelpAndSupport() }
+        b.supportBtn.setOnClickListener { openAccount() }
         b.settingsBtn.setOnClickListener { showServerSettingsBottomSheet() }
+        b.manageSelectedBtn.setOnClickListener {
+            b.serversScrollView.smoothScrollTo(0, b.selectedLocationsHeader.top)
+        }
+        b.addLocationBtn.setOnClickListener { focusLocationSearch() }
         b.fabStopProxy.setOnClickListener  { onToggleProxyFabClicked() }
         b.fabStartProxy.setOnClickListener { onToggleProxyFabClicked() }
         // Status chip: open settings when running, show a hint when stopped
@@ -957,6 +1112,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 showServerSettingsBottomSheet()
             }
         }
+
         b.tvHeroWho.setOnClickListener {
             val text = b.tvHeroWho.text?.toString().orEmpty()
             if (text.isBlank()) return@setOnClickListener
@@ -968,6 +1124,30 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 Toast.LENGTH_SHORT
             )
         }
+    }
+
+    private fun openAccount() {
+        if (!isAdded || isStateSaved) return
+        val hasPurchase = RpnProxyManager.getSubscriptionData()
+            ?.subscriptionStatus
+            ?.purchaseToken
+            ?.isNotEmpty() == true
+        if (hasPurchase) {
+            val intent = FragmentHostActivity.createIntent(
+                context = requireContext(),
+                fragmentClass = RethinkPlusDashboardFragment::class.java,
+                args = RethinkPlusDashboardFragment.createBundle(showManagePurchase = false)
+            )
+            startActivity(intent)
+        } else {
+            openHelpAndSupport()
+        }
+    }
+
+    private fun focusLocationSearch() {
+        if (!isAdded) return
+        b.serversScrollView.smoothScrollTo(0, b.allLocationsHeader.top)
+        b.searchBar.requestFocus()
     }
 
     /** Opens the unified server-settings bottom sheet. */
@@ -1188,11 +1368,15 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.tvConnectionStatus.setTextColor(
             ContextCompat.getColor(requireContext(), R.color.colorAmber_900)
         )
+        stopStatusBlink()
         b.statusIndicator.backgroundTintList =
             ContextCompat.getColorStateList(requireContext(), R.color.colorAmber_900)
 
-        // Hint under the flag/country row
-        b.tvCurrentLocation.visibility = View.GONE
+        // Hero summary: stopped state, no avatars, no duration.
+        b.tvActiveDuration.text = ""
+        b.tvConnectedLocationsCount.text = getString(R.string.server_settings_proxy_stopped)
+        populateAvatarRow(emptyList())
+        b.locationCapacityIndicator.isVisible = false
 
         val stoppedAlpha = 0.5f
         b.rvServers.alpha         = stoppedAlpha
@@ -1308,6 +1492,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             b.searchBar.text?.clear()
             animateSearchClearButton(false)
         }
+        b.searchFilterBtn.setOnClickListener { showFilterDialog() }
+        b.tvActiveFilterSummary.setOnClickListener { clearFilters() }
         b.searchBar.setOnFocusChangeListener { _, hasFocus ->
             b.searchCard.animate().scaleX(if (hasFocus) 1.02f else 1f).scaleY(if (hasFocus) 1.02f else 1f).setDuration(150).start()
         }
@@ -1331,7 +1517,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun updateSelectedSectionVisibility() {
         if (!isAdded) return
         val hasSelection = selectedServers.isNotEmpty()
-        b.selectedServersCard.isVisible = hasSelection
+        b.selectedLocationsHeader.isVisible = hasSelection
+        b.rvSelectedServers.isVisible = hasSelection
         b.rvSelectedServers.isVisible = hasSelection
 
         b.emptySelectionCard.isVisible = !hasSelection && !isLoading
@@ -1344,7 +1531,45 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         else resources.getQuantityString(R.plurals.server_count, count, count)
     }
 
+    private fun showEmptyState() {
+        showUnifiedErrorState(
+            illustration = R.drawable.illustrations_no_record,
+            title = getString(R.string.server_selection_no_servers),
+            message = getString(R.string.server_selection_no_servers_desc),
+            hint = "",
+            isError = false
+        )
+    }
+
     private fun showErrorState(noTunnel: Boolean = false) {
+        if (noTunnel) {
+            showUnifiedErrorState(
+                illustration = R.drawable.ic_firewall_wifi_off,
+                title = getString(R.string.server_selection_error_title),
+                message = getString(R.string.server_selection_error_message),
+                hint = getString(R.string.ssv_toast_start_rethink),
+                isError = true,
+                noTunnel = true
+            )
+        } else {
+            showUnifiedErrorState(
+                illustration = R.drawable.ic_firewall_wifi_off,
+                title = getString(R.string.server_selection_error_title),
+                message = getString(R.string.server_selection_error_message),
+                hint = getString(R.string.server_selection_error_hint),
+                isError = true
+            )
+        }
+    }
+
+    private fun showUnifiedErrorState(
+        illustration: Int,
+        title: String,
+        message: String,
+        hint: String,
+        isError: Boolean,
+        noTunnel: Boolean = false
+    ) {
         if (!isAdded) return
         b.rvServers.isVisible = false
         b.searchCard.isVisible = true
@@ -1353,12 +1578,28 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
         b.supportBtn.isVisible = true
         b.settingsBtn.isVisible = true
-        b.statusCard.isVisible = false
+
+        // Keep the status card visible but update it for a premium feel.
+        b.statusCard.isVisible = true
+        updateConnectionStatus(if (isError) ConnectionUiState.FAILED else ConnectionUiState.DISCONNECTED)
+        b.tvConnectedLocationsCount.text = title
+        populateAvatarRow(emptyList())
 
         b.serverCountLayout.isVisible = false
-        b.selectedServersCard.isVisible = false
+        b.rvSelectedServers.isVisible = false
         b.emptySelectionCard.isVisible = false
         b.frequentCountriesSection.isVisible = false
+        b.locationCapacityIndicator.isVisible = false
+
+        // Update content
+        b.errorIllustration.setImageResource(illustration)
+        b.errorIllustration.imageTintList = ColorStateList.valueOf(
+            resolveAttrColor(if (isError) R.attr.accentBad else R.attr.primaryLightColorText)
+        )
+        b.errorTitle.text = title
+        b.errorMessage.text = message
+        b.errorHint.text = hint
+        b.errorHint.isVisible = hint.isNotEmpty()
 
         // Animate the container sliding up from below
         b.errorStateContainer.visibility = View.VISIBLE
@@ -1381,39 +1622,49 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             .start()
 
         if (noTunnel) {
-            // The VPN tunnel is not running – registration is impossible.
-            // Show a non-actionable hint so the user knows to start Rethink first.
+            b.errorRetryBtn.isVisible = true
             b.errorRetryBtn.isEnabled = false
             b.errorRetryBtn.isClickable = false
             b.errorRetryBtn.text = getString(R.string.ssv_toast_start_rethink)
             b.errorRetryBtn.setOnClickListener(null)
-            b.errorResetBtn.isEnabled = false
-            b.errorResetBtn.isClickable = false
             b.errorResetBtn.isVisible = false
-            b.errorResetBtn.setOnClickListener(null)
-        } else {
+            b.errorReportBtn.isVisible = true
+            b.errorReportBtn.setOnClickListener { openHelpAndSupport() }
+        } else if (isError) {
+            b.errorRetryBtn.isVisible = true
             b.errorRetryBtn.isEnabled = true
             b.errorRetryBtn.isClickable = true
             b.errorRetryBtn.text = getString(R.string.server_selection_error_retry)
+            b.errorRetryBtn.setOnClickListener { retryLoadingServers() }
+
+            b.errorResetBtn.isVisible = false
             b.errorResetBtn.isEnabled = true
             b.errorResetBtn.isClickable = true
-            b.errorRetryBtn.setOnClickListener { retryLoadingServers() }
             b.errorResetBtn.setOnClickListener {
                 serverSelectionViewModel.reset()
                 showRpnResetDialog()
             }
 
-            // reset button to be shown in error only when there is an error and
-            // VpnController.testRpnProxy() is returned as true
-            b.errorResetBtn.isVisible = false
+            b.errorReportBtn.isVisible = true
+            b.errorReportBtn.setOnClickListener { openHelpAndSupport() }
+
+            // Show reset only if proxy test passes
             io {
                 val shouldShowReset = VpnController.testRpnProxy()
                 uiCtx {
-                    if (isAdded && b.errorStateContainer.isVisible && !noTunnel) {
+                    if (isAdded && b.errorStateContainer.isVisible && isError) {
                         b.errorResetBtn.isVisible = shouldShowReset
                     }
                 }
             }
+        } else {
+            // Empty state (no servers found)
+            b.errorRetryBtn.isVisible = true
+            b.errorRetryBtn.text = getString(R.string.server_selection_error_retry)
+            b.errorRetryBtn.setOnClickListener { retryLoadingServers() }
+            b.errorResetBtn.isVisible = false
+            b.errorReportBtn.isVisible = true
+            b.errorReportBtn.setOnClickListener { openHelpAndSupport() }
         }
     }
 
@@ -1432,8 +1683,10 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.supportBtn.isVisible = true
         b.settingsBtn.isVisible = true
         b.statusCard.isVisible = true
+        updateVpnStatus()
         b.searchCard.isEnabled = true
         b.searchBar.isEnabled = true
+        if (!isProxyStopped) updateCapacityIndicator()
     }
 
     private fun retryLoadingServers() {
@@ -1461,7 +1714,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             .alpha(0f).setDuration(200)
             .withEndAction { if (isAdded) b.errorStateContainer.visibility = View.GONE }
             .start()
-        setLoadingState(true)
+
+        updateConnectionStatus(ConnectionUiState.CONNECTING)
+        setLoadingState(true, skipHeader = true)
 
         io {
             isWinRegistered = VpnController.isWinRegistered()
@@ -1549,20 +1804,240 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         }.sortedBy { it.cityName.lowercase() }
     }
 
-    private fun filterServers(query: String) {
-        val q = query.trim().lowercase()
-        if (q.isEmpty()) {
-            serverAdapter.updateCountries(buildCountries(unselectedServers))
-            animateSearchClearButton(false)
+    /**
+     * Rebuilds the "All locations" list applying the current search query together
+     * with the active load-tier and favourites-only filters.  Called on text changes
+     * and whenever the underlying list changes so filters survive refreshes.
+     */
+    private fun refreshUnselectedList() {
+        if (!isAdded) return
+        val q = b.searchBar.text?.toString()?.trim()?.lowercase().orEmpty()
+        val filtered = unselectedServers.filter { matchesFilters(it, q) }
+        serverAdapter.updateCountries(buildCountries(filtered))
+        animateSearchClearButton(q.isNotEmpty())
+        updateFilterButtonState()
+    }
+
+    /** Returns true when [server] passes the search query and the active filters. */
+    private fun matchesFilters(server: CountryConfig, query: String): Boolean {
+        val matchesQuery = query.isEmpty() ||
+                server.countryName.lowercase().contains(query) ||
+                server.serverLocation.lowercase().contains(query) ||
+                server.cc.lowercase().contains(query)
+        if (!matchesQuery) return false
+
+        if (favouritesOnly && !server.isFavourite) return false
+
+        // Load is 0 when unknown; only explicit tiers filter on it.
+        return when (loadFilter) {
+            LoadFilter.ALL -> true
+            LoadFilter.LOW -> server.load in 1..40
+            LoadFilter.MEDIUM -> server.load in 41..80
+            LoadFilter.HIGH -> server.load > 80
+        }
+    }
+
+    /** True when any filter other than the defaults is active. */
+    private fun isFilterActive(): Boolean = loadFilter != LoadFilter.ALL || favouritesOnly
+
+    /** Human-readable summary of the active filters, or null when defaults are in effect. */
+    private fun describeActiveFilter(): String? {
+        val parts = mutableListOf<String>()
+        when (loadFilter) {
+            LoadFilter.ALL -> {}
+            LoadFilter.LOW -> parts.add(getString(R.string.server_selection_filter_load_low))
+            LoadFilter.MEDIUM -> parts.add(getString(R.string.server_selection_filter_load_medium))
+            LoadFilter.HIGH -> parts.add(getString(R.string.server_selection_filter_load_high))
+        }
+        if (favouritesOnly) parts.add(getString(R.string.server_selection_filter_favourites_only))
+        if (parts.isEmpty()) return null
+        return parts.joinToString(" ${getString(R.string.lbl_separator_dot)} ")
+    }
+
+    /**
+     * Updates every "active filter" indicator on the main screen:
+     * - the filter button (icon + background tint + content description), and
+     * - the dismissible summary pill next to the server count.
+     * Both use the high-contrast positive palette so an active filter is clearly
+     * visible at a glance.
+     */
+    private fun updateFilterButtonState() {
+        if (!isAdded) return
+        val active = isFilterActive()
+
+        b.searchFilterBtn.iconTint = ColorStateList.valueOf(
+            resolveAttrColor(if (active) R.attr.accentGood else R.attr.primaryTextColor)
+        )
+        b.searchFilterBtn.backgroundTintList = ColorStateList.valueOf(
+            resolveAttrColor(if (active) R.attr.chipBgColorPositive else R.attr.colorSurfaceVariant)
+        )
+        b.searchFilterBtn.contentDescription = if (active) {
+            getString(
+                R.string.server_selection_filter_active_desc,
+                describeActiveFilter().orEmpty()
+            )
+        } else {
+            getString(R.string.server_selection_filter_locations)
+        }
+
+        updateActiveFilterSummary()
+    }
+
+    /** Shows or hides the dismissible "active filter" pill; tapping it clears filters. */
+    private fun updateActiveFilterSummary() {
+        if (!isAdded) return
+        val summary = describeActiveFilter()
+        if (summary == null || isProxyStopped) {
+            b.tvActiveFilterSummary.isVisible = false
             return
         }
-        val filtered = unselectedServers.filter { s ->
-            s.countryName.lowercase().contains(q) ||
-            s.serverLocation.lowercase().contains(q) ||
-            s.cc.lowercase().contains(q)
+        b.tvActiveFilterSummary.text = summary
+        b.tvActiveFilterSummary.isVisible = true
+    }
+
+    /** Resets both filters to their defaults and refreshes all indicators. */
+    private fun clearFilters() {
+        loadFilter = LoadFilter.ALL
+        favouritesOnly = false
+        refreshUnselectedList()
+    }
+
+    /** Re-applies the active filters on search-text changes. */
+    private fun filterServers(query: String) {
+        refreshUnselectedList()
+    }
+
+    /**
+     * Shows the location filter dialog: a single-choice load-tier chip group plus a
+     * favourites-only chip.  Applied on "Apply", cleared via "Reset".
+     *
+     * The chip that matches the currently-applied filter is pre-checked and, via
+     * [createFilterChip]'s state-aware styling, rendered in the high-contrast
+     * "positive" palette so the active filter is immediately obvious.
+     */
+    private fun showFilterDialog() {
+        if (!isAdded) return
+        val density = resources.displayMetrics.density
+
+        val container = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(
+                (22f * density).toInt(), (6f * density).toInt(),
+                (22f * density).toInt(), 0
+            )
         }
-        serverAdapter.updateCountries(buildCountries(filtered))
-        animateSearchClearButton(true)
+
+        val loadLabel = buildDialogTitleLabel(getString(R.string.server_selection_filter_by_load))
+        container.addView(loadLabel)
+
+        val loadTiers = listOf(
+            LoadFilter.ALL to R.string.server_selection_filter_load_any,
+            LoadFilter.LOW to R.string.server_selection_filter_load_low,
+            LoadFilter.MEDIUM to R.string.server_selection_filter_load_medium,
+            LoadFilter.HIGH to R.string.server_selection_filter_load_high
+        )
+        val loadGroup = ChipGroup(requireContext()).apply {
+            isSingleSelection = true
+            isSelectionRequired = true
+        }
+        val chipsById = mutableMapOf<LoadFilter, Chip>()
+        loadTiers.forEach { (tier, labelRes) ->
+            val chip = createFilterChip(getString(labelRes), isChecked = loadFilter == tier)
+            chipsById[tier] = chip
+            loadGroup.addView(chip)
+        }
+        container.addView(loadGroup)
+
+        val favLabel = buildDialogTitleLabel(getString(R.string.server_selection_filter_favourites))
+        container.addView(favLabel)
+
+        val favChip = createFilterChip(
+            getString(R.string.server_selection_filter_favourites_only),
+            isChecked = favouritesOnly
+        )
+        container.addView(favChip)
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.server_selection_filter_locations))
+            .setView(container)
+            .setPositiveButton(getString(R.string.lbl_apply)) { _, _ ->
+                loadFilter = chipsById.entries
+                    .firstOrNull { it.value.isChecked }?.key ?: LoadFilter.ALL
+                favouritesOnly = favChip.isChecked
+                refreshUnselectedList()
+            }
+            .setNeutralButton(getString(R.string.lbl_reset)) { _, _ ->
+                loadFilter = LoadFilter.ALL
+                favouritesOnly = false
+                refreshUnselectedList()
+            }
+            .setNegativeButton(getString(R.string.lbl_cancel), null)
+            .show()
+    }
+
+    /**
+     * Builds a checkable filter chip whose colors react to the checked state so the
+     * selection is unmistakable:
+     * - checked:   positive chip background + positive chip text + accent stroke
+     * - unchecked: neutral chip background + neutral chip text + no stroke
+     *
+     * All colors come from the active theme via design-system attributes
+     * ([R.attr.chipBgColorPositive], [R.attr.chipBgColorNeutral], [R.attr.accentGood], …)
+     * so every app theme (dark / light / black / plus variants) gets correct contrast
+     * without any hard-coded values.
+     */
+    private fun createFilterChip(label: String, isChecked: Boolean): Chip {
+        val density = resources.displayMetrics.density
+        return Chip(requireContext()).apply {
+            text = label
+            isCheckable = true
+            this.isChecked = isChecked
+            // The color + stroke contrast carries the selection state; the default
+            // checkmark would be redundant (and low-contrast on some themes).
+            isCheckedIconVisible = false
+            chipBackgroundColor = ColorStateList(
+                arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                intArrayOf(
+                    resolveAttrColor(R.attr.chipBgColorPositive),
+                    resolveAttrColor(R.attr.chipBgColorNeutral)
+                )
+            )
+            setTextColor(
+                ColorStateList(
+                    arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                    intArrayOf(
+                        resolveAttrColor(R.attr.chipTextPositive),
+                        resolveAttrColor(R.attr.chipTextNeutral)
+                    )
+                )
+            )
+            chipStrokeColor = ColorStateList(
+                arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                intArrayOf(resolveAttrColor(R.attr.accentGood), Color.TRANSPARENT)
+            )
+            chipStrokeWidth = 1f * density
+            // Compact but accessible touch target, matching the frequent-country chips.
+            chipMinHeight = 36f * density
+            chipStartPadding = 12f * density
+            chipEndPadding = 12f * density
+        }
+    }
+
+    /**
+     * Builds the small all-caps section label used inside the filter dialog,
+     * mirroring the `RethinkPlus.SectionLabel` style used across this screen.
+     */
+    private fun buildDialogTitleLabel(text: String): AppCompatTextView {
+        return AppCompatTextView(requireContext()).apply {
+            this.text = text
+            textSize = 10.5f
+            setAllCaps(true)
+            letterSpacing = 0.13f
+            typeface = Typeface.create("sans-serif-black", Typeface.NORMAL)
+            setTextColor(resolveAttrColor(R.attr.primaryLightColorText))
+            val density = resources.displayMetrics.density
+            setPadding(0, (10f * density).toInt(), 0, (6f * density).toInt())
+        }
     }
 
 
@@ -1672,7 +2147,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
     private fun refreshAfterSelectionChange() {
         selectedAdapter.updateServers(selectedServers)
-        serverAdapter.updateCountries(buildCountries(unselectedServers))
+        refreshUnselectedList()
         updateAllServersCount()
         updateSelectedSectionVisibility()
         updateVpnStatus()
@@ -1718,7 +2193,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         // Rebuild the unselected list so DiffUtil re-binds the affected row with the
         // correct star state.  unselectedServers shares the same CountryConfig object
         // references as allServers, so they're already updated above.
-        serverAdapter.updateCountries(buildCountries(unselectedServers))
+        refreshUnselectedList()
     }
 
     override fun onServerGroupRemoved(group: VpnServerAdapter.ServerGroup) {
@@ -1899,7 +2374,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 uiCtx {
                     b.shimmerSubscriptionBanner.stopShimmer()
                     b.shimmerSubscriptionBanner.visibility = View.GONE
-                    updateSubscriptionBanner(sub)
+                    // Subscription details belong to the account surface, not the
+                    // compact RPN connection header.
+                    b.subscriptionBanner.visibility = View.GONE
                     maybeShowResubscribePrompt(sub)
                 }
             }
@@ -2007,7 +2484,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     }
 
     /**
-     * Shows [ManageRpnPurchaseBtmSht] once per session when the subscription is in the
+     * Shows [RethinkPlusDashboardFragment] (Manage Purchase) once per session when the subscription is in the
      * **Cancelled** state (isAutoRenewing=false, still active until billing period ends).
      */
     private fun maybeShowResubscribePrompt(sub: SubscriptionStatus?) {
@@ -2021,8 +2498,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 sub.productId.contains("inapp", ignoreCase = true)
         if (isOneTime) return
 
-        // Prevent duplicate sheets
-        if (childFragmentManager.findFragmentByTag("resubscribe") != null) return
         if (!isAdded || isStateSaved) return
 
         val purchaseDetail = RpnProxyManager.getSubscriptionData()?.purchaseDetail
@@ -2035,9 +2510,14 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         Logger.i(LOG_TAG_UI, "$TAG.maybeShowResubscribePrompt: showing resubscribe prompt for status: ${statusState.name} productId=${purchaseDetail.productId}, planId=${purchaseDetail.planId}")
 
         try {
-            ManageRpnPurchaseBtmSht.newInstance().show(childFragmentManager, "resubscribe")
+            val intent = FragmentHostActivity.createIntent(
+                context = requireContext(),
+                fragmentClass = RethinkPlusDashboardFragment::class.java,
+                args = RethinkPlusDashboardFragment.createBundle(showManagePurchase = true)
+            )
+            startActivity(intent)
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_UI, "$TAG.maybeShowResubscribePrompt: error showing sheet: ${e.message}", e)
+            Logger.e(LOG_TAG_UI, "$TAG.maybeShowResubscribePrompt: error opening dashboard: ${e.message}", e)
             resubscribePromptShown = false  // allow retry on next emission
         }
     }
@@ -2107,7 +2587,16 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
         if (!isAdded) return
 
-        setLoadingState(true)
+        // Set status to REGISTERING or Loading in the header for smooth feedback.
+        if (isWinRegistered) {
+            updateConnectionStatus(ConnectionUiState.CONNECTING)
+            b.tvConnectedLocationsCount.text = getString(R.string.loading)
+        } else {
+            updateConnectionStatus(ConnectionUiState.REGISTERING)
+            b.tvConnectedLocationsCount.text = getString(R.string.rpn_restore_dialog_status_registering)
+        }
+
+        setLoadingState(true, skipHeader = true)
         b.registrationProgressBar.show()
         // Prevent start/stop proxy FAB taps while registration is in progress.
         b.fabStopProxy.isClickable  = false
@@ -2202,6 +2691,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 b.registrationProgressBar.hide()
                 b.fabStopProxy.isClickable  = true
                 b.fabStartProxy.isClickable = true
+                updateVpnStatus()
             }
         }
     }

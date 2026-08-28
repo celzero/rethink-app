@@ -20,12 +20,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="3dp"
-            android:background="?attr/accentGood"
-            tools:visibility="visible" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -40,9 +34,8 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/plan_duration"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="12sp"
                     android:textStyle="bold"
@@ -54,7 +47,9 @@
                     android:id="@+id/savings_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/chip_bg_positive"
+                    android:background="@drawable/rectangle_border_sharp_background"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
                     android:paddingStart="6dp"
                     android:paddingEnd="6dp"
                     android:paddingTop="1dp"
@@ -82,17 +77,6 @@
                 tools:text="₹1,700" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/original_price"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="?attr/secondaryTextColor"
-                android:alpha="0.6"
-                android:textSize="12sp"
-                android:visibility="gone"
-                tools:visibility="visible"
-                tools:text="₹2,100" />
-
-            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/billing_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -102,18 +86,6 @@
                 android:maxLines="1"
                 android:ellipsize="end"
                 tools:text="Cancel anytime" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/price_per_month"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:textColor="?attr/accentGood"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:visibility="gone"
-                tools:visibility="visible"
-                tools:text="₹141 / mo" />
 
         </LinearLayout>
     </LinearLayout>

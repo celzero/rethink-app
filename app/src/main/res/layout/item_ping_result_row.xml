@@ -1,40 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:paddingVertical="10dp"
-    android:paddingHorizontal="4dp">
+    android:orientation="horizontal"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="12dp">
 
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/row_icon"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@drawable/ic_circle"
+        android:backgroundTint="?attr/colorSurfaceVariant"
+        android:contentDescription="@string/lbl_status"
+        android:padding="8dp"
         android:src="@drawable/ic_tick"
-        android:contentDescription="@string/lbl_status" />
+        app:tint="?attr/primaryLightColorText" />
 
-    <TextView
-        android:id="@+id/row_domain"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="13dp"
         android:layout_weight="1"
-        android:layout_marginStart="10dp"
-        android:textSize="13sp"
-        android:ellipsize="middle"
-        android:singleLine="true"
-        tools:text="dl.rethinkdns.com" />
+        android:orientation="vertical">
 
-    <TextView
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/row_domain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="middle"
+            android:fontFamily="sans-serif-medium"
+            android:singleLine="true"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="14.5sp"
+            tools:text="dl.rethinkdns.com" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/row_status_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="11.5sp"
+            android:text="@string/rpn_purchased_state"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/row_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:fontFamily="sans-serif-medium"
         android:textSize="12sp"
-        android:textStyle="bold"
-        tools:text="Reachable" />
+        tools:text="Reachable"
+        tools:textColor="?attr/accentGood" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="17dp"
+        android:layout_height="17dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_right_arrow_white"
+        android:tint="?attr/primaryLightColorText"
+        android:visibility="gone" />
 
 </LinearLayout>
-
-

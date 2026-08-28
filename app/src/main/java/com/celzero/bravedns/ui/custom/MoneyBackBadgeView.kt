@@ -41,7 +41,7 @@ class MoneyBackBadgeView @JvmOverloads constructor(
 
     init {
         badgeColor = UIUtils.fetchColor(context, R.attr.accentGood)
-        alpha = 0.85f
+        alpha = 0.65f
         textColor = Color.WHITE
     }
 
@@ -92,6 +92,7 @@ class MoneyBackBadgeView @JvmOverloads constructor(
         paint.color = textColor
         paint.textAlign = Paint.Align.CENTER
         paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+        paint.alpha = 180
         
         val textRadius = radius * 0.70f
         
@@ -118,6 +119,7 @@ class MoneyBackBadgeView @JvmOverloads constructor(
     private fun drawCenterText(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
         paint.color = textColor
         paint.textAlign = Paint.Align.CENTER
+        paint.alpha = 180
         
         // Number
         paint.textSize = radius * 0.65f

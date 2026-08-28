@@ -19,6 +19,7 @@ import com.celzero.bravedns.util.Logger
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
+import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -28,6 +29,7 @@ import android.view.animation.OvershootInterpolator
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -124,7 +126,7 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
     private fun showReadyState() {
         b.statusIcon.setImageResource(R.drawable.ic_shield_check)
         b.statusIcon.colorFilter = null
-        b.statusIcon.setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary))
+        b.statusIcon.setColorFilter(UIUtils.fetchColor(this, R.attr.primaryTextColor))
         b.statusTitle.text = getString(R.string.ping_ready_title)
         b.statusDescription.text = getString(R.string.ping_ready_desc)
         b.pingButton.text = getString(R.string.ping_test_button)
@@ -133,6 +135,7 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
         b.progressIndicator.visibility = View.GONE
         b.latencyContainer.visibility = View.GONE
         b.resultsCard.visibility = View.GONE
+        b.resultsHeader.visibility = View.GONE
     }
 
     private fun showTestingState() {
@@ -150,9 +153,11 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
         b.progressIndicator.visibility = View.VISIBLE
         b.latencyContainer.visibility = View.GONE
         b.resultsCard.visibility = View.GONE
+        b.resultsHeader.visibility = View.GONE
 
         setInputEnabled(false)
     }
+
 
     private fun showSuccessState(latencyMs: Long) {
         isTesting = false
@@ -220,6 +225,7 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
         b.progressIndicator.visibility = View.GONE
         b.latencyContainer.visibility = View.GONE
         b.resultsCard.visibility = View.GONE
+        b.resultsHeader.visibility = View.GONE
 
         setInputEnabled(true)
     }
@@ -233,20 +239,30 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
 
     private fun showResultsCard(results: List<Pair<String, Boolean>>) {
         b.resultsCard.visibility = View.GONE
+        b.resultsHeader.visibility = View.GONE
         b.resultsContainer.removeAllViews()
 
-
-        results.forEach { (domain, reachable) ->
+        results.forEachIndexed { index, (domain, reachable) ->
             val row = LayoutInflater.from(this).inflate(
                 R.layout.item_ping_result_row, b.resultsContainer, false
             )
             row.findViewById<ImageView>(R.id.row_icon).apply {
                 if (reachable) {
                     setImageResource(R.drawable.ic_tick)
-                    setColorFilter(UIUtils.fetchColor(this@PingTestActivity, R.attr.accentGood))
+                    backgroundTintList = ColorStateList.valueOf(
+                        UIUtils.fetchColor(this@PingTestActivity, R.attr.colorSurfaceVariant)
+                    )
+                    imageTintList = ColorStateList.valueOf(
+                        UIUtils.fetchColor(this@PingTestActivity, R.attr.accentGood)
+                    )
                 } else {
                     setImageResource(R.drawable.ic_cross_accent)
-                    setColorFilter(UIUtils.fetchColor(this@PingTestActivity, R.attr.accentBad))
+                    backgroundTintList = ColorStateList.valueOf(
+                        UIUtils.fetchColor(this@PingTestActivity, R.attr.colorSurfaceVariant)
+                    )
+                    imageTintList = ColorStateList.valueOf(
+                        UIUtils.fetchColor(this@PingTestActivity, R.attr.accentBad)
+                    )
                 }
             }
             row.findViewById<TextView>(R.id.row_domain).apply {
@@ -263,12 +279,27 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
                 }
             }
             b.resultsContainer.addView(row)
+
+            if (index < results.size - 1) {
+                val divider = View(this).apply {
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        (resources.displayMetrics.density * 1f).toInt()
+                    ).apply {
+                        setMargins((resources.displayMetrics.density * 16f).toInt(), 0, 0, 0)
+                    }
+                    setBackgroundColor(UIUtils.fetchColor(this@PingTestActivity, R.attr.colorSurfaceVariant))
+                }
+                b.resultsContainer.addView(divider)
+            }
+
         }
 
         // Animate results card in
         b.resultsCard.alpha = 0f
         b.resultsCard.translationY = 40f
         b.resultsCard.visibility = View.VISIBLE
+        b.resultsHeader.visibility = View.VISIBLE
         b.resultsCard.animate()
             .alpha(1f)
             .translationY(0f)
@@ -276,6 +307,7 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
             .setInterpolator(AccelerateDecelerateInterpolator())
             .start()
     }
+
 
     private fun performTest() {
         val rawInput = b.reachInput.text?.toString()?.trim().orEmpty()

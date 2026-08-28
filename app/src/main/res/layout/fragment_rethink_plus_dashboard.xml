@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rpn_dash_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/background">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/dashboard_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_hero_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginEnd="16dp"
+                style="@style/RethinkPlus.HeroCard">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_plus_hero_gradient"
+                    android:paddingStart="20dp"
+                    android:paddingTop="22dp"
+                    android:paddingEnd="20dp"
+                    android:paddingBottom="22dp">
+
+                    <LinearLayout
+                        android:id="@+id/header_top_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:background="@drawable/ic_circle"
+                            android:backgroundTint="?attr/chipBgColorPositive"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_rethink_plus_sparkle"
+                            android:tint="?attr/accentGood" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:text="@string/proxy_rpn_heading"
+                            android:textAllCaps="true"
+                            style="@style/RethinkPlus.SectionLabel" />
+
+                        <LinearLayout
+                            android:id="@+id/status_chip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="26dp"
+                            android:background="@drawable/bg_plus_status_chip"
+                            android:gravity="center_vertical"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp">
+
+                            <View
+                                android:layout_width="5dp"
+                                android:layout_height="5dp"
+                                android:background="@drawable/ic_circle"
+                                android:backgroundTint="?attr/accentGood" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tv_status_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:text="@string/lbl_active"
+                                style="@style/RethinkPlus.StatusChipText" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_hero_plan_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/header_top_row"
+                        android:layout_marginTop="24dp"
+                        android:textSize="34sp"
+                        style="@style/RethinkPlus.HeroTitle"
+                        tools:text="standard.tier" />
+
+                    <LinearLayout
+                        android:id="@+id/hero_meta_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tv_hero_plan_name"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_hero_purchased_date"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="12sp"
+                            tools:text="Purchased Jul 22, 2026" />
+
+                        <View
+                            android:id="@+id/hero_meta_dot"
+                            android:layout_width="3dp"
+                            android:layout_height="3dp"
+                            android:layout_marginStart="9dp"
+                            android:layout_marginEnd="9dp"
+                            android:alpha="0.7"
+                            android:background="@drawable/ic_circle"
+                            android:backgroundTint="?attr/primaryLightColorText" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_hero_server_slots"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="12sp"
+                            tools:text="5 server slots" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_hero_ids"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/hero_meta_row"
+                        android:layout_marginTop="7dp"
+                        android:alpha="0.6"
+                        android:fontFamily="monospace"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="10sp"
+                        tools:text="ID dajgkfkimohj · 1a0c1432c00" />
+
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_get_plus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginEnd="16dp"
+                android:visibility="gone"
+                style="@style/RethinkPlus.ContentCard"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/ic_circle"
+                        android:backgroundTint="?attr/chipBgColorPositive"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_rethink_plus_sparkle"
+                        android:tint="?attr/accentGood" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="13dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/rpn_cta_get_plus"
+                            style="@style/RethinkPlus.RowTitle" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/rpn_no_purchase_subtitle"
+                            style="@style/RethinkPlus.RowSubtitle" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_right_arrow_white"
+                        android:tint="?attr/accentGood" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_run_test"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginEnd="16dp"
+                style="@style/RethinkPlus.ContentCard">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/ic_circle"
+                        android:backgroundTint="?attr/colorSurfaceVariant"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_rethink_plus"
+                        android:tint="?attr/accentGood" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="13dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/rpn_perform_test"
+                            style="@style/RethinkPlus.RowTitle" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/rpn_test_desc"
+                            style="@style/RethinkPlus.RowSubtitle" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_right_arrow_white"
+                        android:tint="?attr/accentGood" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_plan_details_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="26dp"
+                android:text="@string/rpn_overhauled_plan_details_header"
+                style="@style/RethinkPlus.SectionLabel" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_manage_purchase_dashboard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                style="@style/RethinkPlus.ContentCard">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="@drawable/ic_circle"
+                        android:backgroundTint="?attr/colorSurfaceVariant"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_rethink_plus"
+                        android:tint="?attr/accentGood" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="13dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/manage_purchase_title"
+                            style="@style/RethinkPlus.RowTitle" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/rpn_overhauled_manage_purchase_desc"
+                            style="@style/RethinkPlus.RowSubtitle" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="17dp"
+                        android:layout_height="17dp"
+                        android:src="@drawable/ic_right_arrow_white"
+                        android:tint="?attr/primaryLightColorText" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="22dp"
+                android:text="@string/about_connect"
+                style="@style/RethinkPlus.SectionLabel" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_report_issue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="24dp"
+                style="@style/RethinkPlus.ContentCard">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="@drawable/ic_circle"
+                        android:backgroundTint="?attr/colorSurfaceVariant"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_info_white"
+                        android:tint="?attr/accentGood" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="13dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/rpn_report_issue"
+                            style="@style/RethinkPlus.RowTitle" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/rpn_report_desc"
+                            style="@style/RethinkPlus.RowSubtitle" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="17dp"
+                        android:layout_height="17dp"
+                        android:src="@drawable/ic_right_arrow_white"
+                        android:tint="?attr/primaryLightColorText" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</FrameLayout>

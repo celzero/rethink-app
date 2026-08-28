@@ -2,207 +2,231 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/background"
-    android:fitsSystemWindows="true">
+    android:background="?attr/background">
 
-    <androidx.core.widget.NestedScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true"
-        android:paddingBottom="72dp">
+        android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/header_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:orientation="vertical"
+        android:paddingStart="14dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="14dp">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/test_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            style="@style/RethinkPlus.HeroCard">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_plus_hero_gradient"
+                android:orientation="vertical"
+                android:paddingStart="18dp"
+                android:paddingTop="16dp"
+                android:paddingEnd="18dp"
+                android:paddingBottom="18dp">
+
+                <FrameLayout
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="8dp">
+
+                    <com.google.android.material.progressindicator.CircularProgressIndicator
+                        android:id="@+id/progress_indicator"
+                        android:layout_width="104dp"
+                        android:layout_height="104dp"
+                        android:layout_gravity="center"
+                        android:indeterminate="true"
+                        android:visibility="gone"
+                        app:indicatorColor="?attr/accentGood"
+                        app:indicatorSize="104dp"
+                        app:trackColor="@android:color/transparent"
+                        app:trackThickness="4dp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/status_icon"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="@string/ping_test_title"
+                        android:src="@drawable/ic_shield_check"
+                        app:tint="?attr/primaryTextColor" />
+
+                </FrameLayout>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/status_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="@string/ping_ready_title"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/status_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:text="@string/ping_ready_desc"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="14sp" />
+
+                <LinearLayout
+                    android:id="@+id/latency_container"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_plus_status_chip"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="10dp"
+                    android:paddingTop="6dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="6dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <View
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/ic_circle"
+                        android:backgroundTint="?attr/accentGood" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/latency_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:maxLines="1"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        tools:text="320ms" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:alpha="0.25"
+                    android:background="?attr/colorSurfaceVariant" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/reach_input_layout"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/ping_reach_hint"
+                    app:boxCornerRadiusBottomEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusTopStart="16dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/reach_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionDone"
+                        android:inputType="textUri"
+                        android:singleLine="true"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textColorHint="?attr/primaryLightColorText"
+                        android:textSize="15sp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/ping_button"
+                    style="@style/Widget.Material3.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="16dp"
+                    android:letterSpacing="0.02"
+                    android:text="@string/ping_test_button"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="26dp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/results_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:scrollbars="none">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center_horizontal">
+            android:paddingTop="6dp"
+            android:paddingBottom="12dp">
 
-            <!-- Header -->
-            <TextView
-                android:layout_width="match_parent"
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/results_header"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="24dp"
-                android:paddingTop="32dp"
-                android:paddingBottom="16dp"
-                android:text="@string/ping_test_title"
-                android:textColor="?attr/primaryTextColor"
-                android:textSize="22sp"
-                android:textStyle="bold" />
+                android:layout_marginStart="4dp"
+                android:layout_marginBottom="10dp"
+                android:text="@string/rpn_overhauled_plan_details_header"
+                style="@style/RethinkPlus.SectionLabel"
+                android:visibility="gone"
+                tools:visibility="visible" />
 
-            <!-- Single merged card: status + input + button -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/test_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
-                app:strokeWidth="0dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="24dp"
-                    android:gravity="center_horizontal">
-
-                    <!-- Animated Icon + Progress Ring -->
-                    <FrameLayout
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
-                        android:layout_marginBottom="16dp">
-
-                        <com.google.android.material.progressindicator.CircularProgressIndicator
-                            android:id="@+id/progress_indicator"
-                            android:layout_width="104dp"
-                            android:layout_height="104dp"
-                            android:layout_gravity="center"
-                            android:indeterminate="true"
-                            android:visibility="gone"
-                            app:indicatorColor="?attr/accentGood"
-                            app:indicatorSize="104dp"
-                            app:trackColor="@android:color/transparent"
-                            app:trackThickness="4dp" />
-
-                        <ImageView
-                            android:id="@+id/status_icon"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_shield_check"
-                            android:contentDescription="@string/ping_test_title"
-                            app:tint="?attr/primaryTextColor" />
-
-                    </FrameLayout>
-
-                    <TextView
-                        android:id="@+id/status_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/ping_ready_title"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:gravity="center" />
-
-                    <TextView
-                        android:id="@+id/status_description"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/ping_ready_desc"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="13sp"
-                        android:gravity="center" />
-
-                    <!-- Latency badge -->
-                    <LinearLayout
-                        android:id="@+id/latency_container"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:visibility="gone"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="5dp"
-                        android:background="@drawable/bg_card_ripple">
-
-                        <ImageView
-                            android:layout_width="13dp"
-                            android:layout_height="13dp"
-                            android:src="@drawable/ic_timer"
-                            android:contentDescription="@string/lbl_status"
-                            app:tint="?attr/accentGood" />
-
-                        <TextView
-                            android:id="@+id/latency_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp"
-                            android:textColor="?attr/accentGood"
-                            android:textSize="12sp"
-                            android:textStyle="bold"
-                            tools:text="320ms" />
-
-                    </LinearLayout>
-
-                    <!-- Divider -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginBottom="16dp"
-                        android:background="?attr/divider" />
-
-                    <!-- Domain/IP input -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/reach_input_layout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/ping_reach_hint"
-                        app:boxCornerRadiusBottomEnd="12dp"
-                        app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
-                        app:boxCornerRadiusTopStart="12dp"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/reach_input"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="textUri"
-                            android:imeOptions="actionDone"
-                            android:singleLine="true"
-                            android:textColor="?attr/primaryTextColor"
-                            android:textSize="13sp" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <!-- Run Test button -->
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/ping_button"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="52dp"
-                        android:layout_marginTop="12dp"
-                        android:text="@string/ping_test_button"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="15sp"
-                        android:textAllCaps="false"
-                        app:cornerRadius="26dp"
-                        app:strokeColor="?attr/border" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Results Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/results_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="16dp"
                 android:visibility="gone"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
-                app:strokeWidth="0dp">
+                style="@style/RethinkPlus.ContentCard"
+                tools:visibility="visible">
 
                 <LinearLayout
                     android:id="@+id/results_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingHorizontal="20dp"
-                    android:paddingVertical="12dp" />
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="8dp" />
 
             </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
+
+    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
