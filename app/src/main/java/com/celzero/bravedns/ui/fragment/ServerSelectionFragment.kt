@@ -1999,7 +1999,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
                 intArrayOf(
                     resolveAttrColor(R.attr.chipBgColorPositive),
-                    resolveAttrColor(R.attr.chipBgColorNeutral)
+                    resolveAttrColor(R.attr.background)
                 )
             )
             setTextColor(
@@ -2007,7 +2007,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                     arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
                     intArrayOf(
                         resolveAttrColor(R.attr.chipTextPositive),
-                        resolveAttrColor(R.attr.chipTextNeutral)
+                        resolveAttrColor(R.attr.primaryTextColor)
                     )
                 )
             )
