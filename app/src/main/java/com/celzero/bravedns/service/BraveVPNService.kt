@@ -1134,34 +1134,38 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
         VpnController.onConnectionStateChanged(State.NEW)
 
-        ui {
-            // Initialize the value whenever the vpn is started.
-            accessibilityHearbeatTimestamp = INIT_TIME_MS
+        // Initialize the value whenever the vpn is started.
+        accessibilityHearbeatTimestamp = INIT_TIME_MS
 
-            // startForeground should always be called within 5 secs of onStartCommand invocation
-            // https://developer.android.com/guide/components/fg-service-types
-            // to log the exception type, wrap the call in different methods based on the API level
-            // TODO: can remove multiple startForegroundService calls if we decide to remove
-            // multiple catch blocks for API 31 and above
-            if (isAtleastU()) {
-                var ok = startForegroundService(FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED)
-                if (!ok) {
-                    Logger.w(LOG_TAG_VPN, "start service failed, retrying with connected device")
-                    ok = startForegroundService(FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
-                }
-                if (!ok) {
-                    Logger.w(LOG_TAG_VPN, "start service failed, stopping service")
-                    signalStopService("startFg1", userInitiated = false) // notify and stop
-                    return@ui
-                }
-            } else {
-                val ok = startForegroundService()
-                if (!ok) {
-                    Logger.w(LOG_TAG_VPN, "start service failed ( > U ), stopping service")
-                    signalStopService("startFg2", userInitiated = false) // notify and stop
-                    return@ui
-                }
+        // startForeground should always be called within 5 secs of onStartCommand invocation
+        // https://developer.android.com/guide/components/fg-service-types
+        // Call startForeground synchronously (NOT via ui{}): the system validates the foreground
+        // notification asynchronously after startForeground() returns, and crashes the process
+        // with CannotPostForegroundServiceNotificationException ("Bad notification for
+        // startForeground") if validation fails.
+        // TODO: can remove multiple startForegroundService calls if we decide to remove
+        // multiple catch blocks for API 31 and above
+        if (isAtleastU()) {
+            var ok = startForegroundService(FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED)
+            if (!ok) {
+                Logger.w(LOG_TAG_VPN, "start service failed, retrying with connected device")
+                ok = startForegroundService(FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
             }
+            if (!ok) {
+                Logger.w(LOG_TAG_VPN, "start service failed, stopping service")
+                signalStopService("startFg1", userInitiated = false) // notify and stop
+                return START_STICKY
+            }
+        } else {
+            val ok = startForegroundService()
+            if (!ok) {
+                Logger.w(LOG_TAG_VPN, "start service failed ( > U ), stopping service")
+                signalStopService("startFg2", userInitiated = false) // notify and stop
+                return START_STICKY
+            }
+        }
+
+        ui {
             // this should always be set before ConnectionMonitor is init-d
             // see restartVpn and updateTun which expect this to be the case
             persistentState.setVpnEnabled(true)
