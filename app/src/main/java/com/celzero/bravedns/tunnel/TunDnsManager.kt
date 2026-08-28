@@ -325,7 +325,7 @@ object TunDnsManager: KoinComponent {
                 DomainRulesManager.Status.NONE -> {}
             }
 
-            // global trusted domains need to send noBlock as true so onUpstreamAnswer the rest
+            // global trusted domains need to send noBlock as true
             val skipGlobalRules = false
             if (!skipGlobalRules) {
                 val globalDomainRule = DomainRulesManager.getAggregatedDomainRule(fqdn, UID_EVERYBODY).first

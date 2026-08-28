@@ -310,6 +310,10 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     }
 }

@@ -884,7 +884,11 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     }
 
     override fun onBtmSheetDismiss() {

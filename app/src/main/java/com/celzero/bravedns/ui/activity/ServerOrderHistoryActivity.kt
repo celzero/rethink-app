@@ -277,7 +277,11 @@ class ServerOrderHistoryActivity : BaseActivity(R.layout.activity_server_order_h
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (!isFinishing && !isDestroyed) {
+                f()
+            }
+        }
     }
 
     private fun io(f: suspend () -> Unit) {

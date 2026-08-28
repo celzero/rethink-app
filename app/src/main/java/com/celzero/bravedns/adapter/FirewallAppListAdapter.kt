@@ -27,6 +27,7 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
@@ -125,11 +126,11 @@ class FirewallAppListAdapter(
                         b.firewallAppLabelTv.setTextColor(userAppColor)
                     } */
                     b.firewallAppLabelTv.text = appInfo.appName
-                    b.firewallAppInfo.text = if (appInfo.packageName.startsWith(NO_PACKAGE_PREFIX)) {
+                    /*b.firewallAppInfo.text = if (appInfo.packageName.startsWith(NO_PACKAGE_PREFIX)) {
                         context.getString(R.string.app_id_uid_only, appInfo.uid)
                     } else {
                         context.getString(R.string.app_id_package, appInfo.uid, appInfo.packageName)
-                    }
+                    }*/
                     b.firewallAppToggleOther.text = getFirewallText(appStatus, connStatus)
                     displayIcon(
                         getIcon(context, appInfo.packageName, appInfo.appName), b.firewallAppIconIv)
@@ -482,7 +483,15 @@ class FirewallAppListAdapter(
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        val owner = context as? LifecycleOwner ?: return
+
+        withContext(Dispatchers.Main.immediate) {
+            if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                return@withContext
+            }
+
+            f()
+        }
     }
 
     private fun ui(f: suspend () -> Unit) {

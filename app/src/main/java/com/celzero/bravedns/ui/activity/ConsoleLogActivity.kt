@@ -599,7 +599,11 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
     }
 
     private suspend fun uiCtx(f: () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (!isFinishing && !isDestroyed) {
+                f()
+            }
+        }
     }
 
 

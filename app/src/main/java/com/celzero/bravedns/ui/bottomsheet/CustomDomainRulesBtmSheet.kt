@@ -378,7 +378,7 @@ class CustomDomainRulesBtmSheet :
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) {
-            if (_binding != null) { f() }
+            if (isAdded && _binding != null) { f() }
         }
     }
 

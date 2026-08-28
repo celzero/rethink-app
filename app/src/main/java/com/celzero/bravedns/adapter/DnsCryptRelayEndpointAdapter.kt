@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
@@ -291,7 +292,15 @@ class DnsCryptRelayEndpointAdapter(
         }
 
         private suspend fun uiCtx(f: suspend () -> Unit) {
-            withContext(Dispatchers.Main) { f() }
+            val owner = lifecycleOwner
+
+            withContext(Dispatchers.Main.immediate) {
+                if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                    return@withContext
+                }
+
+                f()
+            }
         }
     }
 }

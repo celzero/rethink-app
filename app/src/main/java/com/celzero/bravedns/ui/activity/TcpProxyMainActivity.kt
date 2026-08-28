@@ -180,7 +180,11 @@ class TcpProxyMainActivity : BaseActivity(R.layout.activity_tcp_proxy) {
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (!isFinishing && !isDestroyed) {
+                f()
+            }
+        }
     }
 
     private fun io(f: suspend () -> Unit) {

@@ -389,7 +389,11 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun ui(f: suspend () -> Unit) {
-        lifecycleScope.launch(Dispatchers.Main) { f() }
+        lifecycleScope.launch(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     }
 
     private fun io(f: suspend () -> Unit) {

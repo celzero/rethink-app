@@ -1349,7 +1349,11 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
     }
 
     private fun uiCtx(f: suspend () -> Unit) {
-        lifecycleScope.launch(Dispatchers.Main) { f() }
+        lifecycleScope.launch(Dispatchers.Main) {
+            if (!isFinishing && !isDestroyed) {
+                f()
+            }
+        }
     }
 
     private fun enableAfterDelay(ms: Long, vararg views: View) {

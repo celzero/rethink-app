@@ -296,6 +296,10 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     }
 }

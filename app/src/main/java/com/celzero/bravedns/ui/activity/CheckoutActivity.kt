@@ -320,6 +320,10 @@ class CheckoutActivity : BaseActivity(R.layout.activity_checkout_proxy) {
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (!isFinishing && !isDestroyed) {
+                f()
+            }
+        }
     }
 }

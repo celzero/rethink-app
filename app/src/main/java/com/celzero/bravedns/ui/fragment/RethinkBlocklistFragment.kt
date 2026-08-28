@@ -853,7 +853,11 @@ class RethinkBlocklistFragment :
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     }
 
     private suspend fun ioCtx(f: suspend () -> Unit) {

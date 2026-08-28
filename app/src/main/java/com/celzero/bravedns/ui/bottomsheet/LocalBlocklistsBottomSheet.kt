@@ -729,7 +729,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
 
     private fun ui(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.Main) {
-            if (isAdded) f()
+            if (isAdded && view != null) f()
         }
     }
 

@@ -661,7 +661,15 @@ class VpnServerAdapter(
         }
 
         private suspend fun uiCtx(f: suspend () -> Unit) {
-            withContext(Dispatchers.Main) { f() }
+            val owner = lifecycleOwner ?: b.root.findViewTreeLifecycleOwner() ?: return
+
+            withContext(Dispatchers.Main.immediate) {
+                if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                    return@withContext
+                }
+
+                f()
+            }
         }
 
         private suspend fun ioCtx(f: suspend () -> Unit) {

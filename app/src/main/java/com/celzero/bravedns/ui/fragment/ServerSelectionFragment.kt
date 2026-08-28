@@ -2784,7 +2784,11 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     }
 
     private fun resolveAttrColor(attrRes: Int): Int {

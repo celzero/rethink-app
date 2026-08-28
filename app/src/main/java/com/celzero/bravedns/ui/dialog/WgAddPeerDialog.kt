@@ -191,6 +191,8 @@ class WgAddPeerDialog(
     }
 
     private fun ui(f: suspend () -> Unit) {
+        if (activity.isFinishing || activity.isDestroyed) return
+
         (activity as LifecycleOwner).lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 

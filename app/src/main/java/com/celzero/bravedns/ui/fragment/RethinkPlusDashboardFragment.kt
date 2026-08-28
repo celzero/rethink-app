@@ -348,6 +348,11 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
         }
     }
 
-    private suspend fun uiCtx(f: suspend () -> Unit) = withContext(Dispatchers.Main) { f() }
+    private suspend fun uiCtx(f: suspend () -> Unit) =
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     private fun io(f: suspend () -> Unit) = lifecycleScope.launch(Dispatchers.IO) { f() }
 }

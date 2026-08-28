@@ -1339,7 +1339,11 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     }
 
     private suspend fun uiCtx(f: () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (!isFinishing && !isDestroyed) {
+                f()
+            }
+        }
     }
 }
 

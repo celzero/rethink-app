@@ -791,5 +791,8 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
     private fun io(f: suspend () -> Unit) = lifecycleScope.launch(Dispatchers.IO) { f() }
 
-    private suspend fun uiCtx(f: suspend () -> Unit) = withContext(Dispatchers.Main) { if (isAdded) f() }
+    private suspend fun uiCtx(f: suspend () -> Unit) =
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) f()
+        }
 }

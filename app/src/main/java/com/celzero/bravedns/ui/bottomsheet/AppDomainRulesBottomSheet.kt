@@ -338,7 +338,11 @@ class AppDomainRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmS
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     }
 
     override fun onDismissWg(obj: Any?) {
