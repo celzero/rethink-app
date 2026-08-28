@@ -1426,6 +1426,7 @@
         <item name="android:fontFamily">sans-serif-smallcaps</item>
         <item name="android:letterSpacing">0.25</item>
         <item name="android:textAllCaps">true</item>
+        <item name="textAllCaps">true</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:textSize">@dimen/rethink_header_text</item>
     </style>
