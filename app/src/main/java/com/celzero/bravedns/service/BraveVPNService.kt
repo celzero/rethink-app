@@ -284,6 +284,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     private val persistentState by inject<PersistentState>()
     private val rdb by inject<RefreshDatabase>()
     private val netLogTracker by inject<NetLogTracker>()
+    private val logActivityAggregator by inject<LogActivityAggregator>()
 
     @Volatile
     private var isAccessibilityServiceFunctional: Boolean = false
@@ -422,7 +423,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             // belongs to, else bind to the available network
             val net = if (KnownPorts.isDns(destPort)) curnet?.dnsServers?.get(destAddr) else null
             if (net != null) {
-                val ok = bindToNw(net, pfd, fid)
+                val ok = bindToNw(net, pfd, fid, addrPort)
                 if (!ok) {
                     Logger.e(LOG_TAG_VPN, "bind failed, who: $who, addr: $addrPort, fd: $fid, handle: ${net.networkHandle}, netid:${netid(net.networkHandle)}")
                 } else {
@@ -440,7 +441,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             }
 
             nws.forEach {
-                val ok = bindToNw(it.network, pfd, fid)
+                val ok = bindToNw(it.network, pfd, fid, addrPort)
                 Logger.vv(LOG_TAG_VPN, "bindAny: bindToNw handle: ${it.network.networkHandle}")
                 if (ok) {
                     logd("bind: nw, who: $who, addr: $addrPort, fd: $fid, handle: ${it.network.networkHandle}, netid:${netid(it.network.networkHandle)}")
@@ -466,7 +467,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         var pfd: ParcelFileDescriptor? = null
         try {
             pfd = ParcelFileDescriptor.adoptFd(fid.toInt())
-            return bindToNw(nw, pfd, fid)
+            return bindToNw(nw, pfd, fid, "conn-checks")
         } catch (e: Exception) {
             Logger.i(LOG_TAG_VPN, "err bindToNwForConnectivityChecks, ${e.message}")
         } finally {
@@ -488,15 +489,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         return vpnAdapter?.getPlusTransportById(transportId)
     }
 
-    private fun bindToNw(net: Network, pfd: ParcelFileDescriptor, fid: Long): Boolean {
+    private fun bindToNw(net: Network, pfd: ParcelFileDescriptor, fid: Long, addrPort: String): Boolean {
         val res = try {
             net.bindSocket(pfd.fileDescriptor)
             true
         } catch (e: IOException) {
-            Logger.e(LOG_TAG_VPN, "err bindToNw(nw: ${net.networkHandle}, netid: ${netid(net.networkHandle)}, fid: $fid, ${e.message}, $e")
+            Logger.e(LOG_TAG_VPN, "err bindToNw(nw: ${net.networkHandle}, addrPort: $addrPort, netid: ${netid(net.networkHandle)}, fid: $fid, ${e.message}, $e")
             false
         }
-        Logger.vv(LOG_TAG_VPN, "bindToNw: nw: ${net.networkHandle}, fid: $fid, success: $res")
+        Logger.vv(LOG_TAG_VPN, "bindToNw: addrPort: $addrPort, nw: ${net.networkHandle}, fid: $fid, success: $res")
         return res
     }
 
@@ -720,6 +721,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             Log.d(LOG_BATCH_LOGGER, "vpn: restart $vpnScope")
             netLogTracker.restart(vpnScope)
         }
+
+        // Warm the activity history cache (all days) from the databases so
+        // the current-day heatmap and any historical view are ready
+        // immediately at VPN start.
+        io("logActivityHistory") {
+            logActivityAggregator.restoreFromDatabase()
+        }
+
 
         notificationManager = this.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         activityManager = this.getSystemService(ACTIVITY_SERVICE) as ActivityManager
