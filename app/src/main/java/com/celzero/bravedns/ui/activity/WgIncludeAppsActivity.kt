@@ -286,6 +286,7 @@ class WgIncludeAppsActivity : BaseActivity(R.layout.dialog_wg_apps),
             val selected = ProxyManager.getAppCountForProxy(proxyId)
             val total = ProxyManager.trackedApps().size
             withContext(Dispatchers.Main) {
+                if (isFinishing || isDestroyed) return@withContext
                 if (total > 0 && selected >= total) {
                     b.wgIncludeAppBulkCheck.isChecked = true
                     b.wgIncludeAppDeselectAllCheck.isChecked = false
@@ -355,10 +356,12 @@ class WgIncludeAppsActivity : BaseActivity(R.layout.dialog_wg_apps),
             }
 
             withContext(Dispatchers.Main) {
+                if (isFinishing || isDestroyed) {
+                    bulkOpInProgress = false
+                    return@withContext
+                }
                 bulkOpInProgress = false
                 setBulkControlsEnabled(true)
-
-                if (isDestroyed || isFinishing) return@withContext
 
                 if (!include) {
                     // a bulk remove-all changes routing intent; inform the caller

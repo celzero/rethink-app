@@ -145,6 +145,7 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
             }
             val deviceId = InAppBillingHandler.getObfuscatedDeviceId()
             withContext(Dispatchers.Main) {
+                if (isFinishing || isDestroyed) return@withContext
                 updateHeroSubtitle(sub, deviceId)
             }
         }
@@ -236,12 +237,14 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
                 val emailBody = buildEmailBody(description, category)
 
                 withContext(Dispatchers.Main) {
+                    if (isFinishing || isDestroyed) return@withContext
                     setLoading(false)
                     launchEmailIntent(emailBody, supportZip, category)
                 }
             } catch (e: Exception) {
                 Logger.e(LOG_TAG_UI, "$TAG collectAndSend error: ${e.message}", e)
                 withContext(Dispatchers.Main) {
+                    if (isFinishing || isDestroyed) return@withContext
                     setLoading(false)
                     Toast.makeText(
                         this@CustomerSupportActivity,

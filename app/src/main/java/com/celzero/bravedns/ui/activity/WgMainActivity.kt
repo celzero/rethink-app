@@ -100,6 +100,7 @@ class WgMainActivity :
                         Logger.i(LOG_TAG_PROXY, "result: $result, data: $data")
                         if (result != null) {
                             withContext(Dispatchers.Main) {
+                                if (isFinishing || isDestroyed) return@withContext
                                 Logger.i(LOG_TAG_PROXY, "result: ${result.text}")
                                 TunnelImporter.importTunnel(result.text) {
                                     Utilities.showToastUiCentered(

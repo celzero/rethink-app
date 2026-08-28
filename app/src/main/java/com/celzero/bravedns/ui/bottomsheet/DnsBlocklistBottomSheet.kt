@@ -185,6 +185,9 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         // Defer heavy operations to prevent ANR
         // This allows the UI to render immediately while heavy operations run after first frame
         view.post {
+            // The sheet may be dismissed before this runnable is dispatched;
+            // b throws once the view lifecycle has ended.
+            if (!isAdded || _binding == null) return@post
             displayRecordTypeChip()
             displayDnsTransactionDetails()
             updateRulesUi(log?.queryStr.orEmpty())
@@ -193,6 +196,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         // Defer favicon loading even more (lowest priority, can be slow)
         lifecycleScope.launch {
             kotlinx.coroutines.delay(150.milliseconds) // Let basic UI settle first
+            if (!isAdded || _binding == null) return@launch
             displayFavIcon()
         }
     }
