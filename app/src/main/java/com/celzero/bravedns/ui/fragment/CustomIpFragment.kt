@@ -344,6 +344,14 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
                 return@ui
             }
 
+            // reject non-CIDR-able input such as "1.1.1.1-55"; the ip trie only
+            // accepts CIDR notation and would reject the rule (see isCidrEnforceable)
+            if (!IpRulesManager.isCidrEnforceable(ip)) {
+                dBind.daciFailureTextView.text = getString(R.string.ci_dialog_error_invalid_cidr)
+                dBind.daciFailureTextView.visibility = View.VISIBLE
+                return@ui
+            }
+
             dBind.daciIpEditText.text.clear()
             insertCustomIp(ip, port, status)
         }

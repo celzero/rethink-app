@@ -194,4 +194,88 @@ class IpRulesManagerWildcardTest {
         val editText = if (port != 0) "non-empty" else storedIp
         assertEquals("*.255.255.255", editText)
     }
+
+    // Regression tests for the crash: go.Universe$proxyerror "invalid CIDR
+    // address: 0.0.6.178-228" from Backend$proxyIpTree.add. The IPAddress
+    // library parses sequential ranges like "0.0.6.178-228" (see
+    // https://seancfoley.github.io/IPAddress/), and the old treeKey
+    // non-wildcard branch returned the range verbatim via
+    // toNormalizedString(), which the Go ip trie rejects (CIDR-only) and
+    // panics across JNI.
+
+    @Test
+    fun `getIpNetPort accepts ip ranges (validation gate passes)`() {
+        // This is why the UI allowed the input: the library treats a hyphen
+        // range as a valid multi-address object.
+        val (ip, port) = IpRulesManager.getIpNetPort("0.0.6.178-228")
+        assertNotNull("range input must parse (it did in production)", ip)
+        assertEquals(0, port)
+        assertTrue("range must be recognized as multiple addresses", ip!!.isMultiple)
+    }
+
+    @Test
+    fun `assignPrefixForSingleBlock is null for non-aligned ranges`() {
+        // 178..228 does not align to a CIDR boundary — no single CIDR block.
+        assertNull(IPAddressString("0.0.6.178-228").address!!.assignPrefixForSingleBlock())
+    }
+
+    @Test
+    fun `assignPrefixForSingleBlock converts CIDR-able ranges`() {
+        // A range whose span aligns to a CIDR boundary yields a valid CIDR
+        // block (the exact block depends on the library's segment handling).
+        val block = IPAddressString("1.2.252-255").address!!.assignPrefixForSingleBlock()
+        assertNotNull(block)
+        assertTrue("must be CIDR notation", block!!.toCanonicalString().contains("/"))
+        // The documented case from treeKey's comments: explicit trailing wildcard.
+        assertEquals(
+            "1.2.252.0/22",
+            IPAddressString("1.2.252-255.*").address!!.assignPrefixForSingleBlock()!!.toCanonicalString()
+        )
+    }
+
+    @Test
+    fun `plain single ip is not multiple`() {
+        // Guards the fast path: single addresses must never route through the
+        // range-conversion branch (behavior unchanged from before the fix).
+        val addr = IPAddressString("192.168.1.1").address!!
+        assertTrue(!addr.isMultiple)
+        assertEquals("192.168.1.1", addr.toNormalizedString())
+    }
+
+    // The UI gate: dialogs call IpRulesManager.isCidrEnforceable and show
+    // ci_dialog_error_invalid_cidr instead of accepting unenforceable input.
+
+    @Test
+    fun `isCidrEnforceable rejects the crashing range`() {
+        val ip = IpRulesManager.getIpNetPort("0.0.6.178-228").first
+        assertNotNull(ip)
+        assertTrue("the crashing input must be rejected by the UI gate",
+            !IpRulesManager.isCidrEnforceable(ip))
+    }
+
+    @Test
+    fun `isCidrEnforceable accepts single ips and cidr notation`() {
+        assertTrue(IpRulesManager.isCidrEnforceable(IPAddressString("192.168.1.1").address))
+        assertTrue(IpRulesManager.isCidrEnforceable(IPAddressString("1.1.1.0/24").address))
+        assertTrue(IpRulesManager.isCidrEnforceable(IPAddressString("ffff::/104").address))
+    }
+
+    @Test
+    fun `isCidrEnforceable accepts cidr-able ranges and wildcards`() {
+        // aligned range: enforceable as a single CIDR block
+        assertTrue(IpRulesManager.isCidrEnforceable(IPAddressString("1.2.252-255.*").address))
+        // ordinary wildcards remain acceptable (normalized to a CIDR subnet)
+        assertTrue(IpRulesManager.isCidrEnforceable(IPAddressString("10.*.*.*").address))
+    }
+
+    @Test
+    fun `isCidrEnforceable rejects non-aligned ranges and wildcards`() {
+        assertTrue(!IpRulesManager.isCidrEnforceable(IPAddressString("1.1.1.1-55").address))
+        // deliberate behavior change: *.255.255.255 used to be accepted by the
+        // dialog but was silently never enforced (stored-but-ignored); it is
+        // now rejected up front with ci_dialog_error_invalid_cidr
+        assertTrue(!IpRulesManager.isCidrEnforceable(IPAddressString("*.255.255.255").address))
+        assertTrue(!IpRulesManager.isCidrEnforceable(IPAddressString("1.2.*.4").address))
+        assertTrue(!IpRulesManager.isCidrEnforceable(null))
+    }
 }

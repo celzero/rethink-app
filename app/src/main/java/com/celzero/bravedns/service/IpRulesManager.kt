@@ -187,7 +187,27 @@ object IpRulesManager : KoinComponent {
             }
             singleBlock?.toCanonicalString()
         } else {
-            ipAddr.toNormalizedString()
+            // The IPAddress library accepts sequential ranges such as
+            // "0.0.6.178-228"; toNormalizedString() would return the range
+            // verbatim, which the Go ip trie rejects (it only accepts CIDR
+            // notation) and panics across JNI (go.Universe$proxyerror). Convert
+            // to a single CIDR block when possible (e.g. "1.2.252-255" =>
+            // 1.2.252.0/22); otherwise return null so the rule is stored but not
+            // enforced (same as non-CIDR-able wildcards above).
+            if (!ipAddr.isMultiple) {
+                ipAddr.toNormalizedString()
+            } else {
+                val singleBlock = try {
+                    ipAddr.assignPrefixForSingleBlock()
+                } catch (e: Exception) { // IncompatibleAddressException for non-prefix-block ranges
+                    Logger.w(LOG_TAG_FIREWALL, "err converting range '$ipstr' to CIDR block", e)
+                    null
+                }
+                if (singleBlock == null) {
+                    Logger.w(LOG_TAG_FIREWALL, "ip range '$ipstr' has no single CIDR block; rule stored but not enforced")
+                }
+                singleBlock?.toCanonicalString()
+            }
         }
     }
 
@@ -226,9 +246,13 @@ object IpRulesManager : KoinComponent {
         Logger.i(LOG_TAG_FIREWALL, "ip rule, update: $ipaddr for uid: ${ci.uid}; status: ${ci.status}")
 
         if (!k.isNullOrEmpty()) {
-            // escape old entries and add updated rule using ci.port (not android attr)
-            iptree.escLike(k, treeValLike(ci.uid, ci.port))
-            iptree.add(k, treeVal(ci.uid, ci.port, ci.status, ci.proxyId, ci.proxyCC))
+            try {
+                // escape old entries and add updated rule using ci.port (not android attr)
+                iptree.escLike(k, treeValLike(ci.uid, ci.port))
+                iptree.add(k, treeVal(ci.uid, ci.port, ci.status, ci.proxyId, ci.proxyCC))
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_FIREWALL, "err iptree.add($k) for uid: ${ci.uid}", e)
+            }
         }
         resultsCache.invalidateAll()
     }
@@ -666,9 +690,13 @@ object IpRulesManager : KoinComponent {
         db.insert(c)
         val k = treeKey(normalizedIp)
         if (!k.isNullOrEmpty()) {
-            iptree.escLike(k, treeValLike(uid, port ?: 0))
-            iptree.add(k, treeVal(uid, port ?: 0, status.id, proxyId, proxyCC))
-            Logger.d(LOG_TAG_FIREWALL, "iptree.add($k, ${treeVal(uid, port ?: 0, status.id, proxyId, proxyCC)})")
+            try {
+                iptree.escLike(k, treeValLike(uid, port ?: 0))
+                iptree.add(k, treeVal(uid, port ?: 0, status.id, proxyId, proxyCC))
+                Logger.d(LOG_TAG_FIREWALL, "iptree.add($k, ${treeVal(uid, port ?: 0, status.id, proxyId, proxyCC)})")
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_FIREWALL, "err iptree.add($k) for uid: $uid", e)
+            }
         }
         resultsCache.invalidateAll()
         return c
@@ -730,12 +758,20 @@ object IpRulesManager : KoinComponent {
         db.insert(newRule)
         val pk = treeKey(prevIpAddrStr)
         if (!pk.isNullOrEmpty()) {
-            iptree.escLike(pk, treeValLike(prevRule.uid, prevRule.port))
+            try {
+                iptree.escLike(pk, treeValLike(prevRule.uid, prevRule.port))
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_FIREWALL, "err iptree.escLike($pk) for uid: ${prevRule.uid}", e)
+            }
         }
         val nk = treeKey(newIpAddrStr)
         if (!nk.isNullOrEmpty()) {
-            iptree.escLike(nk, treeValLike(newRule.uid, port ?: 0))
-            iptree.add(nk, treeVal(newRule.uid, port ?: 0, newStatus.id, proxyId, proxyCC))
+            try {
+                iptree.escLike(nk, treeValLike(newRule.uid, port ?: 0))
+                iptree.add(nk, treeVal(newRule.uid, port ?: 0, newStatus.id, proxyId, proxyCC))
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_FIREWALL, "err iptree.add($nk) for uid: ${newRule.uid}", e)
+            }
         }
         resultsCache.invalidateAll()
     }
@@ -804,6 +840,26 @@ object IpRulesManager : KoinComponent {
 
         port = hostport.substring(i + 1)
         return Triple(host, port, err)
+    }
+
+    /**
+     * Returns true if the parsed address can be enforced by the CIDR-only ip
+     * trie. Single addresses, CIDR notation, and wildcards that align to a
+     * single CIDR block are always enforceable. Sequential ranges such as
+     * "0.0.6.178-228" are enforceable only when their span aligns to a single
+     * CIDR block (e.g. "1.2.252-255.*" => 1.2.252.0/22); anything else would
+     * be rejected by the Go trie (see the crash in
+     * Backend$proxyIpTree.add) and should be refused by the UI.
+     */
+    fun isCidrEnforceable(ipaddr: IPAddress?): Boolean {
+        if (ipaddr == null) return false
+        return try {
+            if (!ipaddr.isMultiple) return true
+            ipaddr.assignPrefixForSingleBlock() != null
+        } catch (e: Exception) { // IncompatibleAddressException for non-prefix-block inputs
+            Logger.w(LOG_TAG_FIREWALL, "err isCidrEnforceable, ${e.message}", e)
+            false
+        }
     }
 
     fun getIpNetPort(inp: String): Pair<IPAddress?, Int> {
