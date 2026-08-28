@@ -276,7 +276,7 @@ private fun PeerCard(index: Int, peer: Peer) {
             InfoLine("Public key", peer.getPublicKey().base64(), monospace = true)
             val allowed = peer.getAllowedIps().joinToString(", ") { it.toString() }
             InfoLine("Allowed IPs", allowed.ifBlank { "—" })
-            val endpoint = peer.getEndpointText().orElse(null) ?: "—"
+            val endpoint = peer.getEndpoint().orElse(null) ?: "—"
             InfoLine("Endpoint", endpoint)
             if (peer.persistentKeepalive.isPresent) {
                 InfoLine("Keepalive", "${peer.persistentKeepalive.get()} s")

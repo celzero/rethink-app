@@ -344,7 +344,12 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
 
             if (ip.isNullOrBlank()) {
                 val c = WireguardManager.getConfigById(configId)
-                val host = c?.getPeers()?.getOrNull(0)?.getEndpoint()?.orElse(null)?.host
+                val host =
+                    c?.getPeers()
+                        ?.getOrNull(0)
+                        ?.getEndpoint()
+                        ?.orElse(null)
+                        ?.let { stripPort(it) }
                 if (!host.isNullOrBlank() && HostName(host).asAddress() != null) {
                     ip = host
                 }

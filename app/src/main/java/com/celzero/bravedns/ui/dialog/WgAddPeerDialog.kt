@@ -73,7 +73,7 @@ class WgAddPeerDialog(
             }
             b.peerAllowedIps.setText(wgPeer.getAllowedIps().joinToString { it.toString() })
             if (wgPeer.getEndpoint().isPresent) {
-                b.peerEndpoint.setText(wgPeer.getEndpoint().get().toString())
+                b.peerEndpoint.setText(wgPeer.getEndpoint().get())
             }
             if (wgPeer.persistentKeepalive.isPresent) {
                 val kas = wgPeer.persistentKeepalive.get()

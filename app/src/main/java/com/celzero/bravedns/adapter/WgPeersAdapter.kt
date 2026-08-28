@@ -63,7 +63,7 @@ class WgPeersAdapter(
 
         fun update(wgPeer: Peer) {
             if (wgPeer.getEndpoint().isPresent) {
-                b.endpointText.text = wgPeer.getEndpoint().get().toString()
+                b.endpointText.text = wgPeer.getEndpoint().get()
             } else {
                 b.endpointText.visibility = View.GONE
                 b.endpointLabel.visibility = View.GONE
