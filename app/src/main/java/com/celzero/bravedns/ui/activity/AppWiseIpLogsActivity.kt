@@ -205,6 +205,7 @@ class AppWiseIpLogsActivity :
     }
 
     private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
+        if (isFinishing || isDestroyed) return
         Glide.with(this).load(drawable).error(Utilities.getDefaultIcon(this)).into(mIconImageView)
     }
 
