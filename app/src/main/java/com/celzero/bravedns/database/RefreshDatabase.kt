@@ -213,7 +213,7 @@ internal constructor(
             printAll(packagesToDelete, "packagesToDelete")
             printAll(packagesToUpdate, "packagesToUpdate")
 
-            logEvent(Severity.LOW, "app refresh details", "sizes: rmv: ${packagesToDelete.size}; add: ${packagesToAdd.size}; update: ${packagesToUpdate.size}, tombstone: ${packagesToTombstone.size}, action: $action, tombstoneEnabled? $canTombstone")
+            logEvent(Severity.LOW, "app refresh details", "sizes: rmv: ${packagesToDelete.size}; add: ${packagesToAdd.size} [$packagesToAdd]; update: ${packagesToUpdate.size} [$packagesToUpdate], tombstone: ${packagesToTombstone.size} [$packagesToTombstone], action: $action, tombstoneEnabled? $canTombstone")
             Logger.i(
                 LOG_TAG_APP_DB,
                 "sizes: rmv: ${packagesToDelete.size}; add: ${packagesToAdd.size}; update: ${packagesToUpdate.size}, tombstone: ${packagesToTombstone.size}, action: $action, tombstoneEnabled? $canTombstone"
@@ -657,6 +657,7 @@ internal constructor(
             ctx.getString(R.string.network_log_app_name_unnamed, ai.uid.toString())
         }
         val isSystemApp = isSystemApp(ai)
+        val isSystemComponent = isSystemComponent(ai)
         val entry = AppInfo(null)
 
         entry.appName = appName
@@ -668,7 +669,8 @@ internal constructor(
         entry.isSystemApp = isSystemApp
 
         // do not firewall app by default, if blockNewlyInstalledApp is set to false
-        if (persistentState.getBlockNewlyInstalledApp()) {
+        // skip blocking of system components
+        if (persistentState.getBlockNewlyInstalledApp() && !isSystemComponent) {
             entry.firewallStatus = FirewallManager.FirewallStatus.NONE.id
             entry.connectionStatus = FirewallManager.ConnectionStatus.BOTH.id
         } else {
