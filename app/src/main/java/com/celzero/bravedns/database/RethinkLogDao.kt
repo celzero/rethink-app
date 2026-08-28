@@ -37,6 +37,43 @@ interface RethinkLogDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertBatch(logs: List<RethinkLog>)
 
+    // bucket aggregation for the activity wall (LogActivityAggregator);
+    // bucketIndex = (timeStamp - dayStart) / bucketMs, grouped per blocked
+    // classification. Pass bucketMs=3600000 for hourly wall slots.
+    @Query(
+        "select cast((timeStamp - :dayStart)/:bucketMs as integer) as bucketIndex, isBlocked as blocked, count(id) as total from RethinkLog where timeStamp >= :dayStart and timeStamp < :dayEnd group by bucketIndex, blocked"
+    )
+    suspend fun getActivityBuckets(
+        dayStart: Long,
+        dayEnd: Long,
+        bucketMs: Long
+    ): List<ActivityBucketRow>
+
+    @Query(
+        "select coalesce(sum(case when isBlocked then 1 else 0 end), 0) as blocked, count(*) as total from RethinkLog where timeStamp >= :start and timeStamp < :end"
+    )
+    suspend fun getWindowCounts(start: Long, end: Long): WindowCountRow
+
+    @Query(
+        "select * from RethinkLog where timeStamp >= :start and timeStamp < :end order by id desc limit :limit"
+    )
+    suspend fun getRethinkLogsInWindow(start: Long, end: Long, limit: Int): List<RethinkLog>
+
+    @Query(
+        "select uid as uid, appName as appName, count(id) as total, sum(case when isBlocked then 1 else 0 end) as blocked from RethinkLog where timeStamp >= :start and timeStamp < :end group by uid, appName order by total desc limit :limit"
+    )
+    suspend fun getAppActivity(start: Long, end: Long, limit: Int): List<AppActivityRow>
+
+    @Query(
+        "select * from RethinkLog where timeStamp >= :start and timeStamp < :end and uid = :uid order by id desc limit :limit"
+    )
+    suspend fun getRethinkLogsInWindowForUid(
+        start: Long,
+        end: Long,
+        uid: Int,
+        limit: Int
+    ): List<RethinkLog>
+
     @Query(
         "update RethinkLog set proxyDetails = :pid, rpid = :rpid, downloadBytes = :downloadBytes, uploadBytes = :uploadBytes, duration = :duration, synack = :synack, message = :message where connId = :connId"
     )

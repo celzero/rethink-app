@@ -114,6 +114,38 @@ interface DnsLogDAO {
         "SELECT uid AS uid, MAX(time) AS lastBlocked, COUNT(*) AS count FROM DNSLogs WHERE isBlocked = 1 AND time > :time GROUP BY uid ORDER BY lastBlocked DESC"
     )
     fun getRecentlyBlockedDnsAppsPaged(time: Long): PagingSource<Int, BlockedDnsAppResult>
+
+    // bucket aggregation for the activity wall (LogActivityAggregator);
+    // bucketIndex = (time - dayStart) / bucketMs, grouped per blocked
+    // classification. Pass bucketMs=3600000 for hourly wall slots.
+    @Query(
+        "select cast((time - :dayStart)/:bucketMs as integer) as bucketIndex, isBlocked as blocked, count(id) as total from DNSLogs where time >= :dayStart and time < :dayEnd group by bucketIndex, blocked"
+    )
+    suspend fun getActivityBuckets(
+        dayStart: Long,
+        dayEnd: Long,
+        bucketMs: Long
+    ): List<ActivityBucketRow>
+
+    @Query(
+        "select coalesce(sum(case when isBlocked then 1 else 0 end), 0) as blocked, count(*) as total from DNSLogs where time >= :start and time < :end"
+    )
+    suspend fun getWindowCounts(start: Long, end: Long): WindowCountRow
+
+    @Query(
+        "select * from DNSLogs where time >= :start and time < :end order by id desc limit :limit"
+    )
+    suspend fun getDnsLogsInWindow(start: Long, end: Long, limit: Int): List<DnsLog>
+
+    @Query(
+        "select uid as uid, appName as appName, count(id) as total, sum(case when isBlocked then 1 else 0 end) as blocked from DNSLogs where time >= :start and time < :end group by uid, appName order by total desc limit :limit"
+    )
+    suspend fun getAppActivity(start: Long, end: Long, limit: Int): List<AppActivityRow>
+
+    @Query(
+        "select * from DNSLogs where time >= :start and time < :end and uid = :uid order by id desc limit :limit"
+    )
+    suspend fun getDnsLogsInWindowForUid(start: Long, end: Long, uid: Int, limit: Int): List<DnsLog>
 }
 
 data class BlockedDnsAppResult(

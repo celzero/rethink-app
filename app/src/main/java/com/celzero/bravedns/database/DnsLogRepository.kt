@@ -42,4 +42,33 @@ class DnsLogRepository(private val dnsLogDAO: DnsLogDAO) {
     fun getLeastLoggedTime(): Long {
         return dnsLogDAO.getLeastLoggedTime()
     }
+
+    suspend fun getActivityBuckets(
+        dayStart: Long,
+        dayEnd: Long,
+        bucketMs: Long
+    ): List<ActivityBucketRow> {
+        return dnsLogDAO.getActivityBuckets(dayStart, dayEnd, bucketMs)
+    }
+
+    suspend fun getWindowCounts(start: Long, end: Long): WindowCountRow {
+        return dnsLogDAO.getWindowCounts(start, end)
+    }
+
+    suspend fun getDnsLogsInWindow(start: Long, end: Long, limit: Int): List<DnsLog> {
+        return dnsLogDAO.getDnsLogsInWindow(start, end, limit)
+    }
+
+    suspend fun getAppActivity(start: Long, end: Long, limit: Int): List<AppActivityRow> {
+        return dnsLogDAO.getAppActivity(start, end, limit)
+    }
+
+    suspend fun getDnsLogsInWindowForUid(
+        start: Long,
+        end: Long,
+        uid: Int,
+        limit: Int
+    ): List<DnsLog> {
+        return dnsLogDAO.getDnsLogsInWindowForUid(start, end, uid, limit)
+    }
 }

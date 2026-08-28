@@ -18,6 +18,9 @@ package com.celzero.bravedns.ui.fragment
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
+import android.content.res.Configuration
+import android.content.res.ColorStateList
+import com.celzero.bravedns.util.Themes
 import android.Manifest
 import android.app.Activity
 import android.app.ActivityManager
@@ -35,6 +38,7 @@ import android.os.Bundle
 import android.os.SystemClock
 import android.provider.Settings
 import android.text.format.DateUtils
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
@@ -47,8 +51,11 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import android.widget.GridLayout
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
@@ -65,6 +72,8 @@ import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
+import com.celzero.bravedns.service.LogActivityAggregator
+import com.celzero.bravedns.service.LogActivityState
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
@@ -85,11 +94,14 @@ import com.celzero.bravedns.ui.activity.FragmentHostActivity
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.activity.ProxySettingsActivity
+import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
 import com.celzero.bravedns.ui.activity.WgMainActivity
 import com.celzero.bravedns.ui.bottomsheet.HomeScreenSettingBottomSheet
+import com.celzero.bravedns.ui.bottomsheet.LogActivityIntervalBottomSheet
 import com.celzero.bravedns.ui.tour.GuidedTourManager
 import com.celzero.bravedns.ui.tour.TourOverlayController
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
@@ -123,7 +135,9 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import java.util.Locale
+import java.time.LocalDate
 import java.util.concurrent.TimeUnit
+import kotlin.math.log10
 import kotlin.time.Duration.Companion.milliseconds
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
@@ -135,8 +149,23 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val eventLogger by inject<EventLogger>()
     private val sponsorRepository by inject<SponsorRepository>()
     private val sponsorProvider by inject<SponsorProvider>()
+    private val activityAggregator by inject<LogActivityAggregator>()
 
     private var isVpnActivated: Boolean = false
+
+    // Active-state presentation captured once per view (in px / drawable)
+    // before any state-dependent styling runs, so low-emphasis inactive
+    // styling can be restored exactly on re-activation.
+    private var dnsHeadlineSizePx: Float = 0f
+    private var appsHeadlineSizePx: Float = 0f
+    private var proxyHeadlineSizePx: Float = 0f
+
+    // presentation state for the blocked/allowed activity grid; toggling this
+    // only re-renders from the cached aggregate, it never queries the database
+    private var displayMode: ActivityDisplayMode = ActivityDisplayMode.ALLOWED
+    // last state emitted by LogActivityAggregator; kept so the toggle can
+    // re-render without waiting for a new emission
+    private var lastActivityState: LogActivityState? = null
 
     private lateinit var themeNames: Array<String>
     private lateinit var startForResult: ActivityResultLauncher<Intent>
@@ -152,6 +181,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     companion object {
         private const val TAG = "HSFragment"
+        private const val MAX_RULE_BADGE_CHARS = 3
 
         // UI interaction delays (milliseconds)
         private const val UI_DELAY_MS = 500L
@@ -161,7 +191,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // to this range. If the library is slow (e.g. 6 s for a far-away server) we back
         // off to the same duration so we never have overlapping in-flight requests, but we
         // cap at MAX so the card never goes stale for too long.
-        private const val MIN_POLL_DELAY_MS = 2500L
+        private const val MIN_POLL_DELAY_MS = 5000L
         private const val MAX_PROXY_POLL_DELAY_MS = 10_000L
         private const val TEXT_FADE_DURATION_MS = 150L
 
@@ -176,18 +206,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         private const val BASE_AMOUNT_PER_MONTH = 0.60
         private const val ADDITIONAL_AMOUNT_PER_MONTH = 0.20
 
-        // DNS latency thresholds (milliseconds)
-        private const val LATENCY_VERY_FAST_MAX = 19L
-        private const val LATENCY_FAST_MIN = 20L
-        private const val LATENCY_FAST_MAX = 50L
-        private const val LATENCY_SLOW_MIN = 50L
-        private const val LATENCY_SLOW_MAX = 100L
-
         // Traffic display rotation
         private const val TRAFFIC_DISPLAY_CYCLE_MODULO = 3
         private const val TRAFFIC_DISPLAY_STATS_RATE = 0
         private const val TRAFFIC_DISPLAY_BANDWIDTH = 1
-        private const val TRAFFIC_DISPLAY_DELAY_MS = 2500L
+        private const val TRAFFIC_DISPLAY_DELAY_MS = 5000L
 
         // Byte conversion constants (KB, MB, GB, TB)
         private const val BYTES_PER_KB = 1024.0
@@ -206,6 +229,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         private const val SHIMMER_BASE_ALPHA = 0.85f
         private const val SHIMMER_DROP_OFF = 1f
         private const val SHIMMER_HIGHLIGHT_ALPHA = 0.35f
+
+        // Inactive-state emphasis: card headlines shrink and dim when their
+        // feature is off, so "off" hints never compete with live status values
+        private const val INACTIVE_TEXT_SCALE = 0.6f
+        private const val INACTIVE_ELEMENT_ALPHA = 0.45f
+
+        // activity grid intensity levels (empty + 4 logarithmic levels)
+        private const val HEATMAP_INTENSITY_LEVELS = 5
     }
 
     enum class ScreenType {
@@ -219,6 +250,12 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         PROXY_WIREGUARD
     }
 
+    // which counter drives the activity grid's cell intensity
+    enum class ActivityDisplayMode {
+        BLOCKED,
+        ALLOWED
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         registerForActivityResult()
@@ -230,11 +267,22 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         initializeValues()
         initializeClickListeners()
         isVpnActivated = VpnController.state().activationRequested
+        captureActiveEmphasis()
         updateMainButtonUi()
         updateCardsUi()
+        updateLogsToggleUi(displayMode == ActivityDisplayMode.BLOCKED)
+        observeLogActivity()
+        // one listener on the grid container itself: every tap anywhere inside
+        // the heatmap opens the activity sheet, independent of per-cell
+        // measurement, gaps or margins
+        b.fhsLogsGrid.isClickable = true
+        b.fhsLogsGrid.contentDescription = getString(R.string.logs_card_grid_desc)
+        b.fhsLogsGrid.setOnClickListener { openIntervalDetails() }
+        // the activity wall is reconciled with the databases when
+        // BraveVPNService is created, not on every home-screen resume
         syncDnsStatus()
         observeVpnState()
-        observeSponsorState()
+        //observeSponsorState()
         scheduleTourIfNeeded()
     }
 
@@ -248,23 +296,22 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             )
 
         appConfig.getBraveModeObservable().postValue(appConfig.getBraveMode().mode)
-        b.fhsCardLogsTv.text = getString(R.string.lbl_logs).replaceFirstChar(Char::titlecase)
 
         // Show "α" badge in the title when running an alpha build so testers can
         // immediately identify they are on a pre-release version.
         if (Utilities.isAlphaBuild()) {
-            b.fhsTitleRethink.setText(R.string.app_name_alpha)
-            b.fhsTitleRethink.isAllCaps = false
+            //b.fhsTitleRethink.setText(R.string.app_name_alpha)
+            //b.fhsTitleRethink.isAllCaps = false
         }
 
         // do not show the sponsor card if the rethink plus is enabled
         // sponsor state observer will take care of hiding the sponsor if already sponsored
         if (RpnProxyManager.isRpnEnabled()) {
-            b.fhsSponsor.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_rethink_plus_sparkle))
-            b.fhsSponsor.visibility = View.VISIBLE
+            //b.fhsSponsor.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_rethink_plus_sparkle))
+            //b.fhsSponsor.visibility = View.VISIBLE
         } else {
-            b.fhsSponsor.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_heart_accent))
-            b.fhsSponsor.visibility = View.VISIBLE
+            //b.fhsSponsor.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_heart_accent))
+            //b.fhsSponsor.visibility = View.VISIBLE
         }
     }
 
@@ -296,13 +343,39 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun initializeClickListeners() {
-        b.fhsCardFirewallLl.setOnClickListener {
-            Logger.v(LOG_TAG_UI, "$TAG: click event on firewall card")
-            startFirewallActivity(FirewallActivity.Tabs.UNIVERSAL.screen)
+        b.fhsCardFirewallUnivCard.setOnClickListener {
+            Logger.v(LOG_TAG_UI, "$TAG: click event on universal firewall card")
+            startActivity(Intent(requireContext(), UniversalFirewallSettingsActivity::class.java))
             logEvent(
                 EventType.UI_NAVIGATION,
-                "HomeScreen: Firewall card clicked",
-                "Navigating to FirewallActivity from HomeScreenFragment"
+                "HomeScreen: Universal firewall card clicked",
+                "Navigating to UniversalFirewallSettingsActivity from HomeScreenFragment"
+            )
+        }
+
+        b.fhsCardFirewallIpCard.setOnClickListener {
+            Logger.v(LOG_TAG_UI, "$TAG: click event on ip rules card")
+            val intent = Intent(requireContext(), CustomRulesActivity::class.java)
+            intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, CustomRulesActivity.Tabs.IP_RULES.screen)
+            intent.putExtra(CustomRulesActivity.INTENT_RULES, CustomRulesActivity.RULES.ALL_RULES.type)
+            startActivity(intent)
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: IP rules card clicked",
+                "Navigating to CustomRulesActivity (IP tab) from HomeScreenFragment"
+            )
+        }
+
+        b.fhsCardFirewallDomCard.setOnClickListener {
+            Logger.v(LOG_TAG_UI, "$TAG: click event on domain rules card")
+            val intent = Intent(requireContext(), CustomRulesActivity::class.java)
+            intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, CustomRulesActivity.Tabs.DOMAIN_RULES.screen)
+            intent.putExtra(CustomRulesActivity.INTENT_RULES, CustomRulesActivity.RULES.ALL_RULES.type)
+            startActivity(intent)
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: Domain rules card clicked",
+                "Navigating to CustomRulesActivity (domain tab) from HomeScreenFragment"
             )
         }
 
@@ -323,6 +396,16 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 EventType.UI_NAVIGATION,
                 "HomeScreen: DNS card clicked",
                 "Navigating to DnsDetailActivity from HomeScreenFragment"
+            )
+        }
+
+        b.fhsThroughputLl.setOnClickListener {
+            Logger.v(LOG_TAG_UI, "$TAG: click event on throughput card")
+            openBottomSheet()
+            logEvent(
+                EventType.UI_NAVIGATION,
+                "HomeScreen: Throughput card clicked",
+                "Opening HomeScreen settings bottom sheet from HomeScreenFragment"
             )
         }
 
@@ -381,6 +464,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             )
         }
 
+        b.fhsLogsToggleGroup.setOnCheckedStateChangeListener { _, checkedIds ->
+            val isBlocked = checkedIds.contains(R.id.fhs_logs_blocked_chip)
+            toggleLogsView(if (isBlocked) ActivityDisplayMode.BLOCKED else ActivityDisplayMode.ALLOWED)
+        }
+
         b.fhsCardProxyLl.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on proxy card")
             if (appConfig.isWireGuardEnabled()) {
@@ -395,23 +483,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             )
         }
 
-        b.fhsSponsor.setOnClickListener {
-            Logger.v(LOG_TAG_UI, "$TAG: click event on sponsor card")
-            if (RpnProxyManager.isRpnEnabled()) {
-                Logger.d(LOG_TAG_UI, "RPlus is enabled, not showing sponsor dialog")
-                // load rethink plus dashboard
-                openRpnDashboardScreen()
-                return@setOnClickListener
-            }
-            promptForAppSponsorship()
-            logEvent(
-                EventType.UI_NAVIGATION,
-                "HomeScreen: Sponsor card clicked",
-                "Opening sponsorship dialog from HomeScreenFragment"
-            )
-        }
-
-        b.fhsSponsorBottom.setOnClickListener {
+        /*b.fhsSponsor.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on sponsor card")
             if (RpnProxyManager.isRpnEnabled()) {
                 Logger.d(LOG_TAG_UI, "RPlus is enabled, not showing sponsor dialog")
@@ -442,11 +514,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 "HomeScreen: Sponsor card clicked",
                 "Opening sponsorship dialog from HomeScreenFragment"
             )
-        }
-
-        b.fhsCardAppsTv.setOnClickListener {
-            openRethinkAppInfoIfNeeded()
-        }
+        }*/
 
         b.fhsProtectionLevelTxt.setOnClickListener {
             openRethinkAppInfoIfNeeded()
@@ -477,7 +545,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         )
     }
 
-    private fun observeSponsorState() {
+    /*private fun observeSponsorState() {
         viewLifecycleOwner.lifecycleScope.launch {
             // Seed immediately from a one-shot DB read so the sponsor button reflects
             // the persisted sponsorship state before the reactive flow emits. Without
@@ -488,16 +556,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 applySponsorState(sponsored)
             }
         }
-    }
+    }*/
 
-    private fun applySponsorState(sponsored: Boolean) {
+    /*private fun applySponsorState(sponsored: Boolean) {
         b.fhsSponsorBadge.isVisible = sponsored
         b.fhsSponsor.visibility = if (sponsored) View.GONE else View.VISIBLE
         if (!sponsored) {
-            b.fhsSponsorBottom.setOnClickListener(null)
             b.fhsSponsor.setOnClickListener(null)
         }
-    }
+    }*/
 
     private fun logEvent(type: EventType, msg: String, details: String) {
         io {
@@ -589,13 +656,49 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
     }
 
+    /**
+     * Captures active-state typography and the button's Material background
+     * once per view, before any state-dependent styling is applied.
+     */
+    private fun captureActiveEmphasis() {
+        dnsHeadlineSizePx = b.fhsCardDnsLatency.textSize
+        appsHeadlineSizePx = b.fhsCardAllowedApps.textSize
+        proxyHeadlineSizePx = b.fhsCardProxyCount.textSize
+    }
+
+    /**
+     * Reflects the VPN running/stopped state on the start/stop button.
+     *
+     * Uses MaterialButton's native tint + stroke (instead of swapping the
+     * background drawable) so the button never enters MaterialButton's
+     * "background overwritten" state — which would otherwise drop the tint and
+     * desync the visible state from [isVpnActivated]. The started (running)
+     * look (surface fill + outline border) matches [R.drawable.rectangle_border_background];
+     * the stopped state uses the accent color for a high-visibility call-to-action.
+     */
     private fun updateMainButtonUi() {
+        val ctx = context ?: return
+        val btn = b.fhsDnsOnOffBtn
         if (isVpnActivated) {
-            b.fhsDnsOnOffBtn.setBackgroundResource(R.drawable.home_screen_button_stop_bg)
-            b.fhsDnsOnOffBtn.text = getString(R.string.hsf_stop_btn_state)
+            // Running: quiet surface tone with an outline border; both colors
+            // come from the active theme so light/dark variants stay legible
+            // uppercased here: textAllCaps from XML is not reliably applied to
+            // programmatically-set MaterialButton text
+            btn.text = getString(R.string.hsf_stop_btn_state).uppercase()
+            btn.strokeWidth = (1f * resources.displayMetrics.density).toInt()
+            btn.strokeColor = ColorStateList.valueOf(UIUtils.fetchColor(ctx, R.attr.colorOutline))
+            btn.backgroundTintList =
+                ColorStateList.valueOf(UIUtils.fetchColor(ctx, R.attr.background))
+            btn.setTextColor(UIUtils.fetchColor(ctx, R.attr.primaryTextColor))
         } else {
-            b.fhsDnsOnOffBtn.setBackgroundResource(R.drawable.home_screen_button_start_bg)
-            b.fhsDnsOnOffBtn.text = getString(R.string.hsf_start_btn_state)
+            // Stopped: accent-filled, high-visibility call-to-action
+            btn.text = getString(R.string.hsf_start_btn_state).uppercase()
+            btn.strokeWidth = 0
+            // resolve accentGood from the theme attribute (not the fixed color)
+            // so the accent tracks the active theme
+            btn.backgroundTintList =
+                ColorStateList.valueOf(UIUtils.fetchColor(ctx, R.attr.accentGood))
+            btn.setTextColor(UIUtils.fetchColor(ctx, R.attr.invertedPrimaryTextColor))
         }
     }
 
@@ -619,15 +722,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun enableFirewallCardIfNeeded() {
         if (appConfig.getBraveMode().isFirewallActive()) {
-            b.fhsCardFirewallUnivRules.visibility = View.GONE
-            b.fhsCardFirewallUnivRulesCount.text =
-                getString(
-                    R.string.firewall_card_universal_rules,
-                    persistentState.getUniversalRulesCount().toString()
-                )
-            b.fhsCardFirewallUnivRulesCount.isSelected = true
-            b.fhsCardFirewallDomainRulesCount.visibility = View.VISIBLE
-            b.fhsCardFirewallIpRulesCount.visibility = View.VISIBLE
+            b.fhsFirewallBadgesRow.alpha = 1f
             observeUniversalStates()
             observeCustomRulesCount()
         } else {
@@ -649,6 +744,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun enableDnsCardIfNeeded() {
         if (appConfig.getBraveMode().isDnsActive()) {
+            b.fhsCardDnsLatency.restoreFullEmphasis(dnsHeadlineSizePx)
             observeDnsStates()
         } else {
             disabledDnsCard()
@@ -663,6 +759,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             val isAnyProxyEnabled = appConfig.isProxyEnabled() || RpnProxyManager.isRpnActive()
             Logger.vv(LOG_TAG_UI, "$TAG enableProxyCardIfNeeded: isAnyProxyEnabled=$isAnyProxyEnabled")
             if (isAnyProxyEnabled) {
+                showProxyActiveIndicator()
                 observeProxyStates()
             } else {
                 unobserveProxyStates()
@@ -723,6 +820,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     } */
     private var proxyStateListenerJob: Job? = null
     private var dnsStateListenerJob: Job? = null
+    // last sampled p50 latency (ms) of the active resolver, used by
+    // renderDnsHeadline() whenever either latency or region updates
+    private var lastDnsP50: Long? = null
     // Cache the distinctUntilChanged() LiveData so the same observer instance is reused and
     // unobserveProxyStates() can actually remove it. Without this, every call to
     // observeProxyStates() creates a NEW MediatorLiveData wrapper and registers a brand-new
@@ -759,9 +859,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             } else {
                 // Check if view is available before accessing binding
                 if (view != null && isAdded) {
-                    b.fhsCardProxyCount.setTextAnimated(getString(R.string.lbl_inactive))
-                    b.fhsCardOtherProxyCount.visibility = View.VISIBLE
-                    b.fhsCardOtherProxyCount.setTextAnimated(getString(R.string.lbl_disabled))
+                    showProxyInactive()
                 }
             }
         }
@@ -802,11 +900,20 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         val status = withContext(Dispatchers.IO) {
             VpnController.getDnsStatus(id)
         }
+        // re-sample latency every poll; the one-shot sample taken in
+        // observeDnsStates() usually runs before the tunnel is ready (-1) and
+        // would otherwise keep the headline stuck on the fallback value
+        val p50 = withContext(Dispatchers.IO) {
+            VpnController.p50(id)
+        }
 
         uiCtx {
-            if (isAdded && view != null) {
-                updateUiWithDnsStates(status)
+            // keep the last valid sample; -1 just means "no data yet"
+            if (p50 >= 0) {
+                lastDnsP50 = p50
             }
+            renderDnsHeadline()
+            updateUiWithDnsStates(status)
         }
     }
 
@@ -904,7 +1011,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 // If no proxies are configured but WireGuard/rpn is enabled, show appropriate message
                 if (proxies.isEmpty() && rpnProxies.isEmpty()) {
                     uiCtx {
-                        if (!isAdded || view == null) return@uiCtx
                         b.fhsCardOtherProxyCount.visibility = View.VISIBLE
                         b.fhsCardProxyCount.setTextAnimated(getString(R.string.lbl_checking))
                         b.fhsCardOtherProxyCount.setTextAnimated(getString(resId))
@@ -932,10 +1038,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 val isBoth = proxies.isNotEmpty() && rpnProxies.isNotEmpty()
 
                 uiCtx {
-                    if (!isAdded || view == null) return@uiCtx
                     b.fhsCardOtherProxyCount.visibility = View.VISIBLE
+                    // single-line status summary; per-state counts are shown
+                    // in the colored Live/Idle/Failing row below
                     var text = ""
-                    // show as 3 active 1 failing 1 idle, prioritize showing something if any proxy exists
                     if (active > 0) {
                         text = getString(
                             R.string.two_argument_space,
@@ -943,31 +1049,25 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                             getString(R.string.lbl_active)
                         )
                     }
-                    if (failing > 0) {
-                        text += if (text.isNotEmpty()) {
-                            "\n"
-                        } else {
-                            ""
-                        }
-                        text += getString(
-                            R.string.two_argument_space,
-                            failing.toString(),
-                            getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
-                        )
-                    }
                     if (idle > 0) {
-                        text += if (text.isNotEmpty()) {
-                            "\n"
-                        } else {
-                            ""
-                        }
+                        text += if (text.isNotEmpty()) " · " else ""
                         text += getString(
                             R.string.two_argument_space,
                             idle.toString(),
                             getString(R.string.lbl_idle).replaceFirstChar(Char::titlecase)
                         )
                     }
+                    if (failing > 0) {
+                        text += if (text.isNotEmpty()) " · " else ""
+                        text += getString(
+                            R.string.two_argument_space,
+                            failing.toString(),
+                            getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
+                        )
+                    }
                     Logger.v(LOG_TAG_UI, "$TAG overall wg proxy status: $text, proxies: ${proxies.size}, active: $active, failing: $failing, idle: $idle")
+
+                    updateProxyHealthCounts(active, idle, failing)
 
                     // If we have proxies but no status text, something went wrong - show a fallback
                     if (text.isEmpty() && (proxies.isNotEmpty() || rpnProxies.isNotEmpty())) {
@@ -992,9 +1092,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             if (view == null || !isAdded) return
 
             if (appConfig.isProxyEnabled() || RpnProxyManager.isRpnActive()) {
+                showProxyActiveIndicator()
                 b.fhsCardProxyCount.setTextAnimated(getString(R.string.lbl_active))
             } else {
-                b.fhsCardProxyCount.setTextAnimated(getString(R.string.lbl_inactive))
+                showProxyInactive()
+                return
             }
             b.fhsCardOtherProxyCount.visibility = View.VISIBLE
             b.fhsCardOtherProxyCount.setTextAnimated(getString(resId))
@@ -1116,46 +1218,207 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun disableLogsCard() {
         if (view == null || !isAdded) return
 
-        b.fhsCardNetworkLogsCount.text = getString(R.string.firewall_card_text_inactive)
-        b.fhsCardDnsLogsCount.text = getString(R.string.lbl_disabled)
+        b.fhsCardNetworkLogsCount.visibility = View.GONE
+        b.fhsCardNetworkLogsLabel?.text = getString(R.string.lbl_disabled)
+        b.fhsCardDnsLogsCount.visibility = View.GONE
+        b.fhsCardDnsLogsLabel?.visibility = View.GONE
         b.fhsCardLogsDuration.visibility = View.GONE
     }
 
-    private fun disableProxyCard() {
-        proxyStateListenerJob?.cancel()
+    /**
+     * Renders the compact, non-intrusive "proxy inactive" indicator: dimmed
+     * headline, dimmed proxy icon, and the health legend hidden while no
+     * proxy is running.
+     */
+    private fun showProxyInactive() {
         if (view == null || !isAdded) return
 
-        Logger.w(LOG_TAG_UI, "$TAG disable proxy card, showing inactive")
-        b.fhsCardProxyCount.text = getString(R.string.lbl_inactive)
+        Logger.w(LOG_TAG_UI, "$TAG proxy inactive, showing compact indicator")
+        b.fhsCardProxyCount.text = getString(R.string.hsf_proxy_off_indicator)
+        b.fhsCardProxyCount.applyLowEmphasis(proxyHeadlineSizePx)
         b.fhsCardOtherProxyCount.visibility = View.VISIBLE
-        b.fhsCardOtherProxyCount.text = getString(R.string.lbl_disabled)
+        b.fhsCardOtherProxyCount.text = getString(R.string.lbl_disabled).lowercase()
+        setProxyIconDimmed(true)
+        b.fhsProxyHealthContainer.isVisible = false
+    }
+
+    /** Restores the proxy card to full emphasis for a running proxy. */
+    private fun showProxyActiveIndicator() {
+        if (view == null || !isAdded) return
+
+        b.fhsCardProxyCount.restoreFullEmphasis(proxyHeadlineSizePx)
+        setProxyIconDimmed(false)
+        b.fhsProxyHealthContainer.isVisible = true
+    }
+
+    /**
+     * Renders the per-state proxy counts (Live / Idle / Failing) in the colored
+     * health row at the bottom of the proxy card. Must be called on Main.
+     */
+    private fun updateProxyHealthCounts(active: Int, idle: Int, failing: Int) {
+        if (view == null || !isAdded) return
+
+        b.fhsProxyLiveCount.text = active.toString()
+        b.fhsProxyIdleCount.text = idle.toString()
+        b.fhsProxyFailingCount.text = failing.toString()
+    }
+
+    private fun setProxyIconDimmed(dimmed: Boolean) {
+        val ctx = context ?: return
+        val attr = if (dimmed) R.attr.colorOutline else R.attr.accentGood
+        b.fhsProxyIcon?.imageTintList = ColorStateList.valueOf(UIUtils.fetchColor(ctx, attr))
+    }
+
+    private fun toggleLogsView(mode: ActivityDisplayMode) {
+        if (displayMode == mode) return
+        displayMode = mode
+
+        // re-render from the cached aggregate only; the toggle must not
+        // trigger another database query
+        lastActivityState?.let { buildLogsHeatmap(it, mode) }
+    }
+
+    private fun updateLogsToggleUi(blocked: Boolean) {
+        displayMode = if (blocked) ActivityDisplayMode.BLOCKED else ActivityDisplayMode.ALLOWED
+        if (blocked) {
+            b.fhsLogsBlockedChip.isChecked = true
+        } else {
+            b.fhsLogsAllowedChip.isChecked = true
+        }
+    }
+
+    /**
+     * Collects [LogActivityAggregator.activity] (a map of epoch-day to
+     * [LogActivityState]); the fragment never queries the log databases for the
+     * grid nor maintains any counters itself. It renders only the current
+     * day's entry.
+     */
+    private fun observeLogActivity() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                activityAggregator.activity.collect { state ->
+                    lastActivityState = state
+                    buildLogsHeatmap(state, displayMode)
+                }
+            }
+        }
+    }
+
+    /**
+     * Renders the blocked/allowed activity wall: 6 rows (one per local day,
+     * oldest at top) x 24 columns (hour of day), ending today. Cell intensity
+     * is a deterministic logarithmic level of the real aggregated count; a
+     * count of zero always renders as an empty cell. Tapping anywhere on the
+     * wall opens the detail sheet, which defaults to the latest window.
+     */
+    private fun buildLogsHeatmap(
+        state: LogActivityState,
+        mode: ActivityDisplayMode = displayMode
+    ) {
+        val grid = b.fhsLogsGrid
+        grid.removeAllViews()
+
+        val ctx = context ?: return
+        val blockedMode = mode == ActivityDisplayMode.BLOCKED
+        // allowed cells follow the theme's positive chip color instead of the
+        // fixed accent so the grid matches the Allowed chip; blocked stays red
+        val base =
+            if (blockedMode) ContextCompat.getColor(ctx, R.color.accentBad)
+            else UIUtils.fetchColor(ctx, R.attr.chipTextPositive)
+        // higher base alpha in light mode for better grid visibility
+        val baseAlpha = if (isLightTheme()) 0x33 else 0x0E
+        val alphas = intArrayOf(baseAlpha, 0x2E, 0x5C, 0x8F, 0xFF)
+        val gap = (2f * resources.displayMetrics.density).toInt()
+
+        for (interval in state.intervals) {
+            val count = if (blockedMode) interval.blocked else interval.allowed
+            val lvl = intensityLevel(count)
+            val cell = View(ctx)
+            cell.setBackgroundColor(ColorUtils.setAlphaComponent(base, alphas[lvl]))
+            // cells are pure decoration; interactivity lives on the grid
+            // container so every tap inside the heatmap opens the sheet
+            cell.isClickable = false
+            cell.isFocusable = false
+
+            val lp =
+                GridLayout.LayoutParams().apply {
+                    width = 0
+                    height = 0
+                    columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
+                    rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
+                    setMargins(gap, gap, gap, gap)
+                }
+            cell.layoutParams = lp
+            grid.addView(cell)
+        }
+
+        // legend swatches follow the active mode's base color so the color
+        // switch is readable at a glance
+        val swatches =
+            listOf(
+                b.fhsLogsSwatch0,
+                b.fhsLogsSwatch1,
+                b.fhsLogsSwatch2,
+                b.fhsLogsSwatch3
+            )
+        val legendAlphas = intArrayOf(alphas[0], alphas[2], alphas[3], alphas[4])
+        swatches.forEachIndexed { i, swatch ->
+            swatch.setBackgroundColor(
+                ColorUtils.setAlphaComponent(base, legendAlphas[i])
+            )
+        }
+    }
+
+    /**
+     * Opens the activity detail sheet without waiting on any aggregation or
+     * loading state; the sheet builds its own default (latest) window and
+     * renders its data asynchronously.
+     */
+    private fun openIntervalDetails() {
+        LogActivityIntervalBottomSheet.newInstance()
+            .show(parentFragmentManager, LogActivityIntervalBottomSheet.TAG)
+    }
+
+    // logarithmic scale so skewed traffic distributions stay visually
+    // distinguishable (1-9 -> 1, 10-99 -> 2, 100-999 -> 3, >=1000 -> 4);
+    // zero always maps to the empty/default cell
+    private fun intensityLevel(count: Long): Int {
+        if (count <= 0L) return 0
+        return minOf(alphasMaxIndex(), log10(count.toDouble()).toInt() + 1)
+    }
+
+    private fun alphasMaxIndex(): Int = HEATMAP_INTENSITY_LEVELS - 1
+
+    private fun disableProxyCard() {
+        proxyStateListenerJob?.cancel()
+        showProxyInactive()
     }
 
     private fun disableFirewallCard() {
         if (view == null || !isAdded) return
 
-        b.fhsCardFirewallUnivRules.visibility = View.VISIBLE
-        b.fhsCardFirewallUnivRules.text = getString(R.string.lbl_disabled)
-        b.fhsCardFirewallUnivRulesCount.visibility = View.VISIBLE
-        b.fhsCardFirewallUnivRulesCount.text = getString(R.string.firewall_card_text_inactive)
-        b.fhsCardFirewallDomainRulesCount.visibility = View.GONE
-        b.fhsCardFirewallIpRulesCount.visibility = View.GONE
+        b.fhsCardFirewallUnivRulesCount.text = "0"
+        b.fhsCardIpRulesCount.text = "0"
+        b.fhsCardDomainRulesCount.text = "0"
+        b.fhsFirewallBadgesRow.alpha = INACTIVE_ELEMENT_ALPHA
     }
 
     private fun disabledDnsCard() {
         if (view == null || !isAdded) return
 
-        b.fhsCardDnsLatency.text = getString(R.string.dns_card_latency_inactive)
-        b.fhsCardDnsConnectedDns.text = getString(R.string.lbl_disabled)
+        // subtle, low-emphasis hint instead of the oversized legacy label
+        b.fhsCardDnsLatency.text = getString(R.string.hsf_dns_mode_off_indicator)
+        b.fhsCardDnsLatency.applyLowEmphasis(dnsHeadlineSizePx)
+        b.fhsCardDnsConnectedDns.text = getString(R.string.lbl_disabled).lowercase()
         b.fhsCardDnsConnectedDns.isSelected = true
     }
 
     private fun disableAppsCard() {
         if (view == null || !isAdded) return
 
-        b.fhsCardAppsStatusRl.visibility = View.GONE
-        b.fhsCardApps.visibility = View.VISIBLE
-        b.fhsCardApps.text = getString(R.string.firewall_card_text_inactive)
+        b.fhsCardAllowedApps.text = getString(R.string.hsf_firewall_mode_off_indicator)
+        b.fhsCardAllowedApps.applyLowEmphasis(appsHeadlineSizePx)
+        b.fhsCardAppsAllApps.text = ""
     }
 
     /**
@@ -1189,41 +1452,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
             val p50 = VpnController.p50(dnsId)
             uiCtx {
-                if (!isAdded || view == null) return@uiCtx
-                when (p50) {
-                    in 0L..LATENCY_VERY_FAST_MAX -> {
-                        val string =
-                            getString(
-                                R.string.ci_desc,
-                                getString(R.string.lbl_very),
-                                getString(R.string.lbl_fast)
-                            )
-                                .replaceFirstChar(Char::titlecase)
-                        b.fhsCardDnsLatency.text = string
-                    }
-
-                    in LATENCY_FAST_MIN..LATENCY_FAST_MAX -> {
-                        b.fhsCardDnsLatency.text =
-                            getString(R.string.lbl_fast).replaceFirstChar(Char::titlecase)
-                    }
-
-                    in LATENCY_SLOW_MIN..LATENCY_SLOW_MAX -> {
-                        b.fhsCardDnsLatency.text =
-                            getString(R.string.lbl_slow).replaceFirstChar(Char::titlecase)
-                    }
-
-                    else -> {
-                        val string =
-                            getString(
-                                R.string.ci_desc,
-                                getString(R.string.lbl_very),
-                                getString(R.string.lbl_slow)
-                            )
-                                .replaceFirstChar(Char::titlecase)
-                        b.fhsCardDnsLatency.text = string
-                    }
-                }
-
+                lastDnsP50 = p50
+                renderDnsHeadline()
                 b.fhsCardDnsLatency.isSelected = true
                 startDnsStatePolling()
             }
@@ -1242,10 +1472,30 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         VpnController.getRegionLiveData().distinctUntilChanged().observe(viewLifecycleOwner) {
             Logger.vv(LOG_TAG_UI, "$TAG region changed to $it")
-            if (it != null) {
-                b.fhsCardRegion.text = it.uppercase()
+            if (isAdded && view != null) {
+                renderDnsHeadline()
             }
         }
+    }
+
+    /**
+     * Renders the DNS card headline as "<region>(<p50> ms)" (e.g. "BLR(45 ms)");
+     * falls back to "45 ms" when the resolver region is unknown and shows the
+     * region alone until a latency sample is available.
+     */
+    private fun renderDnsHeadline() {
+        val region = VpnController.getRegionLiveData().value
+        val p50 = lastDnsP50 ?: return
+
+        b.fhsCardDnsLatency.text =
+            when {
+                p50 >= 0L && !region.isNullOrEmpty() ->
+                    getString(R.string.hsf_dns_latency_region_ms, region, p50.toString())
+                p50 >= 0L ->
+                    getString(R.string.hsf_dns_latency_ms, p50.toString())
+                !region.isNullOrEmpty() -> region
+                else -> b.fhsCardDnsLatency.context.getString(R.string.lbl_inactive)
+            }
     }
 
     private fun updateUiWithDnsStates(dnsStatus: Int? = null) {
@@ -1255,11 +1505,21 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         val statusId = UIUtils.getDnsStatusStringRes(dnsStatus)
 
-        b.fhsCardDnsConnectedDns.text = getString(statusId).lowercase().capitalizeWords()
-        b.fhsCardDnsConnectedDns.isSelected = true
+        // show the resolver name alongside its connection status
+        val dnsName = appConfig.getConnectedDnsObservable().value
+        val status = getString(statusId).lowercase().capitalizeWords()
+        b.fhsCardDnsConnectedDns?.text =
+            if (dnsName.isNullOrEmpty()) status else getString(R.string.two_argument_dot, dnsName, status)
+        b.fhsCardDnsConnectedDns?.isSelected = true
     }
 
     private fun observeLogsCount() {
+        b.fhsCardNetworkLogsLabel?.text = "CONNECTIONS"
+        b.fhsCardNetworkLogsLabel?.visibility = View.VISIBLE
+        b.fhsCardNetworkLogsCount.visibility = View.VISIBLE
+        b.fhsCardDnsLogsCount.visibility = View.VISIBLE
+        b.fhsCardDnsLogsLabel?.visibility = View.VISIBLE
+        b.fhsCardLogsDuration.visibility = View.VISIBLE
         io {
             val time = appConfig.getLeastLoggedNetworkLogs()
             if (time == 0L) return@io
@@ -1274,8 +1534,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     DateUtils.FORMAT_ABBREV_RELATIVE
                 )
             uiCtx {
-                if (!isAdded) return@uiCtx
-
                 b.fhsCardLogsDuration.visibility = View.VISIBLE
                 b.fhsCardLogsDuration.text = getString(R.string.logs_card_duration, t)
             }
@@ -1283,14 +1541,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         appConfig.dnsLogsCount.observe(viewLifecycleOwner) {
             val count = formatDecimal(it)
-            b.fhsCardDnsLogsCount.text = getString(R.string.logs_card_dns_count, count)
-            b.fhsCardDnsLogsCount.isSelected = true
+            b.fhsCardDnsLogsCount?.text = count
+            b.fhsCardDnsLogsCount?.isSelected = true
         }
 
         appConfig.networkLogsCount.observe(viewLifecycleOwner) {
             val count = formatDecimal(it)
-            b.fhsCardNetworkLogsCount.text = getString(R.string.logs_card_network_count, count)
-            b.fhsCardNetworkLogsCount.isSelected = true
+            b.fhsCardNetworkLogsCount?.text = count
+            b.fhsCardNetworkLogsCount?.isSelected = true
         }
     }
 
@@ -1307,29 +1565,52 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun unobserveDnsStates() {
         dnsObserverActive = false
         dnsStateListenerJob?.cancel()
+        lastDnsP50 = null
         appConfig.getConnectedDnsObservable().removeObservers(viewLifecycleOwner)
         VpnController.getRegionLiveData().removeObservers(viewLifecycleOwner)
     }
 
     private fun observeUniversalStates() {
         persistentState.universalRulesCount.observe(viewLifecycleOwner) {
-            b.fhsCardFirewallUnivRulesCount.text =
-                getString(R.string.firewall_card_universal_rules, it.toString())
-            b.fhsCardFirewallUnivRulesCount.isSelected = true
+            updateTotalRuleCount()
         }
     }
 
     private fun observeCustomRulesCount() {
         // observer for ips count
         IpRulesManager.getCustomIpsLiveData().observe(viewLifecycleOwner) {
-            b.fhsCardFirewallIpRulesCount.text =
-                getString(R.string.apps_card_ips_count, it.toString())
+            updateTotalRuleCount()
         }
 
         DomainRulesManager.getUniversalCustomDomainCount().observe(viewLifecycleOwner) {
-            b.fhsCardFirewallDomainRulesCount.text =
-                getString(R.string.rules_card_domain_count, it.toString())
+            updateTotalRuleCount()
         }
+    }
+
+    private fun updateTotalRuleCount() {
+        val univ = persistentState.getUniversalRulesCount()
+        val ips = IpRulesManager.getCustomIpsLiveData().value ?: 0
+        val doms = DomainRulesManager.getUniversalCustomDomainCount().value ?: 0
+        b.fhsCardFirewallUnivRulesCount.text = compactRuleCount(univ)
+        b.fhsCardIpRulesCount.text = compactRuleCount(ips)
+        b.fhsCardDomainRulesCount.text = compactRuleCount(doms)
+    }
+
+    private fun compactRuleCount(count: Int): String {
+        if (count <= 0) return "0"
+        if (count < 1000) return count.toString()
+        val units = charArrayOf('K', 'M', 'B')
+        var value = count
+        var unit = -1
+        while (value >= 1000 && unit < units.lastIndex) {
+            value /= 1000
+            unit++
+        }
+        var label = "$value${units[unit]}"
+        if (label.length > MAX_RULE_BADGE_CHARS) {
+            label = "${value / 10}${units[unit]}"
+        }
+        return label
     }
 
     private fun unObserveLogsCount() {
@@ -1381,18 +1662,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     val allowedApps =
                         allApps - (blockedCount + bypassCount + excludedCount + isolatedCount)
                     uiCtx {
-                        if (!isAdded) return@uiCtx
-
-                        b.fhsCardAllowedApps.visibility = View.VISIBLE
-                        b.fhsCardAppsStatusRl.visibility = View.VISIBLE
+                        b.fhsCardAllowedApps.restoreFullEmphasis(appsHeadlineSizePx)
                         b.fhsCardAllowedApps.text = allowedApps.toString()
-                        b.fhsCardAppsAllApps.text = allApps.toString()
-                        b.fhsCardAppsBlockedCount.text = blockedCount.toString()
-                        b.fhsCardAppsBypassCount.text = bypassCount.toString()
-                        b.fhsCardAppsExcludeCount.text = excludedCount.toString()
-                        b.fhsCardAppsIsolatedCount.text = isolatedCount.toString()
-                        b.fhsCardApps.visibility = View.GONE
                         b.fhsCardAllowedApps.isSelected = true
+                        b.fhsCardAppsAllApps.text = getString(R.string.two_argument_space, getString(R.string.symbol_slash), allApps.toString())
+                        b.fhsCardAppsBlockedCount.text = getString(R.string.two_argument_space, blockedCount.toString(), getString(R.string.lbl_blocked).lowercase())
+                        b.fhsCardAppsIsolatedCount.text = getString(R.string.two_argument_space, isolatedCount.toString(), getString(R.string.fapps_firewall_filter_isolate).lowercase())
+                        b.fhsCardAppsBypassedCount.text = getString(R.string.two_argument_space, bypassCount.toString(), getString(R.string.fapps_firewall_filter_bypass_universal).lowercase())
+                        b.fhsCardAppsExcludedCount.text = getString(R.string.two_argument_space, excludedCount.toString(), getString(R.string.fapps_firewall_filter_excluded).lowercase())
                     }
                 } catch (e: Exception) { // NoSuchElementException, ConcurrentModification
                     Logger.e(
@@ -1554,6 +1831,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     override fun onResume() {
         super.onResume()
         isVpnActivated = VpnController.state().activationRequested
+        updateMainButtonUi()
         handleShimmer()
         maybeAutoStartVpn()
         updateCardsUi()
@@ -1561,7 +1839,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         handleLockdownModeIfNeeded()
         startTrafficStats()
         //maybeShowGracePeriodDialog()
-        b.fhsSponsorBottom.bringToFront()
         handleRethinkAppStatus()
     }
 
@@ -1577,16 +1854,17 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         128 // 0-255 (128 = 50% opacity)
                     )
                     b.fhsCardAppsCv.strokeColor = color
-                    b.fhsCardAppsCv.strokeWidth = 2
-                    b.fhsCardAppsRethinkWarningTv?.visibility = View.VISIBLE
-                    b.fhsCardAppsRethinkWarningTv?.setTextColor(color)
+                    b.fhsCardAppsCv.strokeWidth = (2f * requireContext().resources.displayMetrics.density).toInt()
+                    //b.fhsCardAppsRethinkWarningTv?.visibility = View.VISIBLE
+                    //b.fhsCardAppsRethinkWarningTv?.setTextColor(color)
                 }
             } else {
                 canRethinkBlockItself = false
-                Logger.d(LOG_TAG_UI, "canRethinkBlockItself = false, hiding warning")
+                Logger.d(LOG_TAG_UI, "$TAG canRethinkBlockItself = false, hiding warning")
                 uiCtx {
+                    // cards are borderless; fully drop the warning stroke
                     b.fhsCardAppsCv.strokeWidth = 0
-                    b.fhsCardAppsRethinkWarningTv?.visibility = View.GONE
+                    //b.fhsCardAppsRethinkWarningTv?.visibility = View.GONE
                 }
             }
         }
@@ -1621,6 +1899,33 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsInternetSpeedUnit.visibility = View.VISIBLE
         b.fhsInternetSpeed.text = VpnController.protocols()
         b.fhsInternetSpeedUnit.text = getString(R.string.lbl_protos)
+        // refresh the active-since label on the protection bar as well
+        updateActiveSinceUi()
+    }
+
+    /**
+     * Shows how long the VPN has been up on the protection bar using the same
+     * relative-time presentation as HomeScreenSettingBottomSheet.updateUptime().
+     * The label is hidden when the VPN is not running.
+     */
+    private fun updateActiveSinceUi() {
+        val uptimeMs = VpnController.uptimeMs()
+        if (!isVpnActivated || uptimeMs < INIT_TIME_MS) {
+            b.fhsActiveSinceTxt.visibility = View.GONE
+            return
+        }
+
+        val now = System.currentTimeMillis()
+        // returns a string describing 'time' as a time relative to 'now'
+        val t =
+            DateUtils.getRelativeTimeSpanString(
+                now - uptimeMs,
+                now,
+                DateUtils.MINUTE_IN_MILLIS,
+                DateUtils.FORMAT_ABBREV_RELATIVE
+            )
+        b.fhsActiveSinceTxt.visibility = View.VISIBLE
+        b.fhsActiveSinceTxt.text = t
     }
 
     private fun displayTrafficStatsBW() {
@@ -1844,11 +2149,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.create().show()
     }
 
-    private fun startFirewallActivity(screenToLoad: Int) {
-        startActivity(ScreenType.FIREWALL, screenToLoad)
-        return
-    }
-
     private fun startAppsActivity() {
         Logger.d(LOG_TAG_VPN, "Status : $isVpnActivated , BraveMode: ${appConfig.getBraveMode()}")
 
@@ -1908,9 +2208,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun stopShimmer() {
-        if (!b.shimmerViewContainer1.isShimmerStarted) return
+        //if (!b.shimmerViewContainer1.isShimmerStarted) return
 
-        b.shimmerViewContainer1.stopShimmer()
+        //b.shimmerViewContainer1.stopShimmer()
     }
 
     private fun startShimmer() {
@@ -1919,8 +2219,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setBaseAlpha(SHIMMER_BASE_ALPHA)
         builder.setDropoff(SHIMMER_DROP_OFF)
         builder.setHighlightAlpha(SHIMMER_HIGHLIGHT_ALPHA)
-        b.shimmerViewContainer1.setShimmer(builder.build())
-        b.shimmerViewContainer1.startShimmer()
+        //b.shimmerViewContainer1.setShimmer(builder.build())
+        //b.shimmerViewContainer1.startShimmer()
     }
 
     private fun stopVpnService() {
@@ -2176,7 +2476,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun syncDnsStatus() {
         if (canRethinkBlockItself) {
             b.fhsProtectionLevelTxt.setTextColor(fetchTextColor(R.attr.accentWarning))
-            b.fhsProtectionLevelTxt.text = getString(R.string.rethink_home_screen_warning).lowercase()
+            b.fhsProtectionLevelTxt.text = getString(R.string.rethink_home_screen_warning).capitalizeWords()
             return
         }
         val vpnState = VpnController.state()
@@ -2253,19 +2553,20 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         if (persistentState.wgGlobalLockdown) {
             val stat = getString(statusId).lowercase()
-            val s  = stat.replaceFirst(getString(R.string.status_protected), getString(R.string.firewall_rule_global_lockdown).lowercase(), true)
+            val s  = stat.replaceFirst(getString(R.string.status_protected), getString(R.string.firewall_rule_global_lockdown), true).capitalizeWords()
             b.fhsProtectionLevelTxt.setTextColor(colorId)
             b.fhsProtectionLevelTxt.text = s
         } else {
             b.fhsProtectionLevelTxt.setTextColor(colorId)
-            val s = getString(statusId).lowercase()
+            val s = getString(statusId).capitalizeWords()
             b.fhsProtectionLevelTxt.text = s
         }
         val isUnderlyingVpnNwEmpty = VpnController.isUnderlyingVpnNetworkEmpty()
         if (isUnderlyingVpnNwEmpty) {
             b.fhsProtectionLevelTxt.setTextColor(fetchTextColor(R.color.accentBad))
-            b.fhsProtectionLevelTxt.text = getString(R.string.status_no_network)
+            b.fhsProtectionLevelTxt.text = getString(R.string.status_no_network).capitalizeWords()
         }
+        updateActiveSinceUi()
     }
 
     private fun isAnotherVpnActive(): Boolean {
@@ -2330,20 +2631,49 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             .start()
     }
 
+    /**
+     * Shrinks and dims a card headline for its feature's inactive state so the
+     * "off" hint reads as a subtle status indicator rather than a headline.
+     */
+    private fun android.widget.TextView.applyLowEmphasis(activeSizePx: Float) {
+        if (activeSizePx <= 0f) return
+        setTextSize(TypedValue.COMPLEX_UNIT_PX, activeSizePx * INACTIVE_TEXT_SCALE)
+        // higher alpha in light mode for readability
+        alpha = if (isLightTheme()) 0.7f else INACTIVE_ELEMENT_ALPHA
+    }
+
+    private fun isLightTheme(): Boolean {
+        return Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
+    }
+
+    private fun isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
+    }
+
+    /** Restores a card headline to its captured active-state emphasis. */
+    private fun android.widget.TextView.restoreFullEmphasis(activeSizePx: Float) {
+        if (activeSizePx <= 0f) return
+        setTextSize(TypedValue.COMPLEX_UNIT_PX, activeSizePx)
+        alpha = 1f
+    }
+
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
-    }
-
-    private suspend fun ioCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.IO) { f() }
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     }
 
     private fun ui(n: String, f: suspend () -> Unit): Job {
         val mainCtx = CoroutineName(n) + Dispatchers.Main
-        return lifecycleScope.launch(mainCtx) { f() }
+        return lifecycleScope.launch(mainCtx) {
+            if (isAdded && view != null) { f() }
+        }
     }
 }

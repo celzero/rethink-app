@@ -101,12 +101,45 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         return connectionTrackerDAO.getBlockedUniversalRulesCount()
     }
 
+    suspend fun getLastRoutedConnectionForProxy(proxyId: String): ConnectionTracker? {
+        return connectionTrackerDAO.getLastRoutedConnectionForProxy(proxyId)
+    }
+
     suspend fun closeConnections( connIds: List<String>, reason: String) {
         connectionTrackerDAO.closeConnections(connIds, reason)
     }
 
     suspend fun closeConnectionForUids( uids: List<Int>, reason: String) {
         connectionTrackerDAO.closeConnectionForUids(uids, reason)
+    }
+
+    suspend fun getActivityBuckets(
+        dayStart: Long,
+        dayEnd: Long,
+        bucketMs: Long
+    ): List<ActivityBucketRow> {
+        return connectionTrackerDAO.getActivityBuckets(dayStart, dayEnd, bucketMs)
+    }
+
+    suspend fun getWindowCounts(start: Long, end: Long): WindowCountRow {
+        return connectionTrackerDAO.getWindowCounts(start, end)
+    }
+
+    suspend fun getConnectionsInWindow(start: Long, end: Long, limit: Int): List<ConnectionTracker> {
+        return connectionTrackerDAO.getConnectionsInWindow(start, end, limit)
+    }
+
+    suspend fun getAppActivity(start: Long, end: Long, limit: Int): List<AppActivityRow> {
+        return connectionTrackerDAO.getAppActivity(start, end, limit)
+    }
+
+    suspend fun getConnectionsInWindowForUid(
+        start: Long,
+        end: Long,
+        uid: Int,
+        limit: Int
+    ): List<ConnectionTracker> {
+        return connectionTrackerDAO.getConnectionsInWindowForUid(start, end, uid, limit)
     }
 
     private val BLOCKED_WINDOW_MS = 5 * 60 * 1000L // 5 minutes

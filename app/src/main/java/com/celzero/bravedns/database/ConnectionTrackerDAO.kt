@@ -44,6 +44,43 @@ interface ConnectionTrackerDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertBatch(connTrackerList: List<ConnectionTracker>)
 
+    // bucket aggregation for the activity wall (LogActivityAggregator);
+    // bucketIndex = (timeStamp - dayStart) / bucketMs, grouped per blocked
+    // classification. Pass bucketMs=3600000 for hourly wall slots.
+    @Query(
+        "select cast((timeStamp - :dayStart)/:bucketMs as integer) as bucketIndex, isBlocked as blocked, count(id) as total from ConnectionTracker where timeStamp >= :dayStart and timeStamp < :dayEnd group by bucketIndex, blocked"
+    )
+    suspend fun getActivityBuckets(
+        dayStart: Long,
+        dayEnd: Long,
+        bucketMs: Long
+    ): List<ActivityBucketRow>
+
+    @Query(
+        "select coalesce(sum(case when isBlocked then 1 else 0 end), 0) as blocked, count(*) as total from ConnectionTracker where timeStamp >= :start and timeStamp < :end"
+    )
+    suspend fun getWindowCounts(start: Long, end: Long): WindowCountRow
+
+    @Query(
+        "select * from ConnectionTracker where timeStamp >= :start and timeStamp < :end order by id desc limit :limit"
+    )
+    suspend fun getConnectionsInWindow(start: Long, end: Long, limit: Int): List<ConnectionTracker>
+
+    @Query(
+        "select uid as uid, appName as appName, count(id) as total, sum(case when isBlocked then 1 else 0 end) as blocked from ConnectionTracker where timeStamp >= :start and timeStamp < :end group by uid, appName order by total desc limit :limit"
+    )
+    suspend fun getAppActivity(start: Long, end: Long, limit: Int): List<AppActivityRow>
+
+    @Query(
+        "select * from ConnectionTracker where timeStamp >= :start and timeStamp < :end and uid = :uid order by id desc limit :limit"
+    )
+    suspend fun getConnectionsInWindowForUid(
+        start: Long,
+        end: Long,
+        uid: Int,
+        limit: Int
+    ): List<ConnectionTracker>
+
     @Query(
         "update ConnectionTracker set proxyDetails = :pid, rpid = :rpid, downloadBytes = :downloadBytes, uploadBytes = :uploadBytes, duration = :duration, synack = :synack, message = :message where connId = :connId"
     )
@@ -301,6 +338,12 @@ interface ConnectionTrackerDAO {
 
     @Query("SELECT uid AS uid, '' AS ipAddress, 0 AS port, COUNT(id) AS count, flag AS flag, 0 AS blocked, appName AS appOrDnsName, SUM(downloadBytes) AS downloadBytes, SUM(uploadBytes) AS uploadBytes, SUM(uploadBytes + downloadBytes) AS totalBytes FROM ConnectionTracker WHERE proxyDetails like :wgId AND timeStamp > :to GROUP BY appName ORDER BY totalBytes DESC")
     fun getWgAppNetworkActivity(wgId: String, to: Long): PagingSource<Int, AppConnection>
+
+    // last app routed through a proxy (RPN/WG). proxyDetails holds the proxy id
+    // (e.g. Backend.RpnWin + configKey); the wildcard match mirrors the filter used
+    // by ConnectionTrackerFragment when navigated from the RPN detail screen.
+    @Query("select * from ConnectionTracker where proxyDetails like '%' || :proxyId || '%' and isBlocked = 0 order by timeStamp desc limit 1")
+    suspend fun getLastRoutedConnectionForProxy(proxyId: String): ConnectionTracker?
 
     @Query(
         "select sum(downloadBytes) as totalDownload, sum(uploadBytes) as totalUpload, count(id) as connectionsCount, ict.meteredDataUsage as meteredDataUsage from ConnectionTracker as ct join (select sum(downloadBytes + uploadBytes) as meteredDataUsage from ConnectionTracker where connType like :meteredTxt and timeStamp > :to) as ict where timeStamp > :to and proxyDetails = :wgId"
