@@ -72,6 +72,7 @@ import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.IPMetadata
 import com.celzero.firestack.backend.RouterStats
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -117,6 +118,22 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     private var statsJob: Job? = null
     /** Looping spin animator for the refresh chip icon. */
     private var chipAnimator: ValueAnimator? = null
+
+    /**
+     * Fades the hero banner as the app bar collapses. Held as a property so it
+     * can be removed in [onDestroy]; AppBarLayout keeps delivering offset
+     * callbacks from an in-flight collapse animation even after the activity
+     * is destroyed, and touching the view binding then crashes.
+     */
+    private val appBarOffsetListener =
+        AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+            val totalScrollRange = appBarLayout.totalScrollRange
+            if (totalScrollRange == 0) return@OnOffsetChangedListener
+            val fraction = 1f - (abs(verticalOffset).toFloat() / totalScrollRange.toFloat())
+            val alpha = (fraction / 0.6f).coerceIn(0f, 1f)
+            b.heroContent.alpha = alpha
+            b.heroContent.visibility = if (alpha == 0f) View.INVISIBLE else View.VISIBLE
+        }
 
     // SSID permission callback
     private val ssidPermissionCallback = object : SsidPermissionManager.PermissionCallback {
@@ -197,6 +214,18 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         cancelStatsJob()
         chipAnimator?.cancel()
         chipAnimator = null
+    }
+
+    override fun onDestroy() {
+        // Remove before the lifecycle clears the view binding; otherwise a
+        // still-running app-bar collapse animation keeps delivering
+        // onOffsetChanged callbacks that touch the (now cleared) binding.
+        try {
+            b.appBar.removeOnOffsetChangedListener(appBarOffsetListener)
+        } catch (e: IllegalStateException) {
+            Logger.w(LOG_TAG_UI, "onDestroy: offset listener not removed: ${e.message}")
+        }
+        super.onDestroy()
     }
 
     private fun init() {
@@ -1049,14 +1078,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
         // Fade out the entire hero banner content as the toolbar collapses so that
         // other views do not peek through when fully collapsed.
-        b.appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
-            val totalScrollRange = appBarLayout.totalScrollRange
-            if (totalScrollRange == 0) return@addOnOffsetChangedListener
-            val fraction = 1f - (abs(verticalOffset).toFloat() / totalScrollRange.toFloat())
-            val alpha = (fraction / 0.6f).coerceIn(0f, 1f)
-            b.heroContent.alpha = alpha
-            b.heroContent.visibility = if (alpha == 0f) View.INVISIBLE else View.VISIBLE
-        }
+        b.appBar.addOnOffsetChangedListener(appBarOffsetListener)
     }
 
     private fun setupSsidSection(cc: String) {
