@@ -134,19 +134,24 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
         intent.addCategory("android.intent.category.HOME")
         // package manager returns null,
         val thisPackage =
-            if (isAtleastT()) {
-                this.packageManager
-                    .resolveActivity(
-                        intent,
-                        PackageManager.ResolveInfoFlags.of(
-                            PackageManager.MATCH_DEFAULT_ONLY.toLong()))
-                    ?.activityInfo
-                    ?.packageName
-            } else {
-                this.packageManager
-                    .resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
-                    ?.activityInfo
-                    ?.packageName
+            try {
+                if (isAtleastT()) {
+                    this.packageManager
+                        .resolveActivity(
+                            intent,
+                            PackageManager.ResolveInfoFlags.of(
+                                PackageManager.MATCH_DEFAULT_ONLY.toLong()))
+                        ?.activityInfo
+                        ?.packageName
+                } else {
+                    this.packageManager
+                        .resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
+                        ?.activityInfo
+                        ?.packageName
+                }
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_FIREWALL, "err resolving launcher activity: ${e.message}")
+                null
             }
         return thisPackage == packageName
     }

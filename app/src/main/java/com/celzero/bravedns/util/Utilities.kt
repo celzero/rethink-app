@@ -566,9 +566,11 @@ object Utilities {
         try {
             return ctx.packageManager.getPackagesForUid(uid)
         } catch (e: PackageManager.NameNotFoundException) {
-            Logger.w(LOG_TAG_FIREWALL, "package not found: " + e.message)
+            Logger.w(LOG_TAG_FIREWALL, "package not found for uid: $uid, err: ${e.message}")
         } catch (e: SecurityException) {
-            Logger.w(LOG_TAG_FIREWALL, "package not found: " + e.message)
+            Logger.w(LOG_TAG_FIREWALL, "package not found for uid: $uid, err: ${e.message}")
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_FIREWALL, "err fetching packages for uid: $uid, err: ${e.message}")
         }
         return null
     }
@@ -659,6 +661,7 @@ object Utilities {
         return BuildConfig.BUILD_TYPE == BUILD_TYPE_ALPHA
     }
 
+    @Suppress("TooGenericExceptionCaught")
     fun getApplicationInfo(ctx: Context, packageName: String): ApplicationInfo? {
         return try {
             if (isAtleastT()) {
@@ -670,22 +673,16 @@ object Utilities {
                 ctx.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
             }
         } catch (e: PackageManager.NameNotFoundException) {
-            Logger.w(LOG_TAG_FIREWALL, "no app info for package name: $packageName")
+            Logger.w(LOG_TAG_FIREWALL, "no app info for package name: $packageName, err: ${e.message}")
+            null
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_FIREWALL, "err fetching app info for package: $packageName, err: ${e.message}")
             null
         }
     }
 
     fun isUnspecifiedIp(serverIp: String): Boolean {
         return UNSPECIFIED_IP_IPV4 == serverIp || UNSPECIFIED_IP_IPV6 == serverIp
-    }
-
-    fun calculateTtl(ttl: Long): Long {
-        val now = System.currentTimeMillis()
-
-        // on negative ttl, cache dns record for a day
-        if (ttl < 0) return now + TimeUnit.DAYS.toMillis(1L)
-
-        return now + TimeUnit.SECONDS.toMillis((ttl + DnsLogTracker.DNS_TTL_GRACE_SEC))
     }
 
     fun deleteRecursive(fileOrDirectory: File): Boolean {
