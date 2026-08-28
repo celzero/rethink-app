@@ -128,6 +128,9 @@
             android:name=".ui.activity.TcpProxyMainActivity"
             android:finishOnTaskLaunch="true" />
         <activity
+            android:name=".ui.activity.WgIncludeAppsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
             android:name=".ui.activity.UniversalFirewallSettingsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
