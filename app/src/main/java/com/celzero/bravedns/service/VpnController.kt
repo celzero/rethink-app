@@ -320,11 +320,11 @@ object VpnController : KoinComponent {
 
         t =
             if (b.underlyingNetworks?.isActiveNetworkMetered == true) {
-                b.getString(R.string.ada_app_metered).toString()
+                b.getString(R.string.ada_app_metered)
             } else {
                 // the network type is shown as unmetered even when rethink cannot determine
                 // the underlying network / no underlying network
-                b.getString(R.string.ada_app_unmetered).toString()
+                b.getString(R.string.ada_app_unmetered)
             }
         return t
     }
