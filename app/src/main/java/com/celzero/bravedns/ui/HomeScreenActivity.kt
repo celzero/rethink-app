@@ -51,6 +51,7 @@ import androidx.work.WorkRequest
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
@@ -69,6 +70,7 @@ import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.MiscSettingsActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.activity.WelcomeActivity
+import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.ALPHA_UPDATE_CHECK_URL
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
@@ -350,13 +352,29 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
             persistentState.defaultDnsUrl = Constants.DEFAULT_DNS_LIST[2].url
         }
         moveRemoteBlocklistFileFromAsset()
-        // if biometric auth is enabled, then set the biometric auth type to 3 (15 minutes)
-        if (persistentState.biometricAuth) {
-            persistentState.biometricAuthType =
-                MiscSettingsActivity.BioMetricType.FIFTEEN_MIN.action
-            // reset the bio metric auth time, as now the value is changed from System.currentTimeMillis
-            // to SystemClock.elapsedRealtime
-            persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
+
+        try {
+            // /data/data/com.celzero.bravedns/shared_prefs/com.celzero.bravedns_preferences.xml
+            val prefs = getSharedPreferences("com.celzero.bravedns_preferences", MODE_PRIVATE)
+            val allowBypass = prefs.getBoolean("allow_bypass", false)
+            persistentState.privateIps = allowBypass
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_UI, "err reading shared prefs: ${e.message}", e)
+            persistentState.privateIps = isPlayStoreFlavour()
+        }
+
+        try {
+            io {
+                rdb.addNewApp(AndroidUidConfig.ANDROID.uid)
+                rdb.addNewApp(AndroidUidConfig.SYSTEM.uid)
+                rdb.addNewApp(AndroidUidConfig.RADIO.uid)
+                rdb.addNewApp(AndroidUidConfig.MEDIA.uid)
+                rdb.addNewApp(AndroidUidConfig.MDNSR.uid)
+                rdb.addNewApp(AndroidUidConfig.GPS.uid)
+                rdb.addNewApp(AndroidUidConfig.DNS.uid)
+            }
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_UI, "err adding new app: ${e.message}", e)
         }
 
         // reset the local blocklist download from android download manager to custom in v055o
@@ -539,15 +557,34 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
     private val installStateUpdatedListener =
         object : AppUpdater.InstallStateListener {
             override fun onStateUpdate(state: AppUpdater.InstallState) {
-                Logger.i(LOG_TAG_UI, "InstallStateUpdatedListener: state: " + state.status)
+                Logger.i(LOG_TAG_APP_UPDATE, "InstallStateUpdatedListener: state: " + state.status)
                 when (state.status) {
                     AppUpdater.InstallStatus.DOWNLOADED -> {
-                        // CHECK THIS if AppUpdateType.FLEXIBLE, otherwise you can skip
                         showUpdateCompleteSnackbar()
                     }
-
-                    else -> {
+                    AppUpdater.InstallStatus.INSTALLED -> {
+                        Logger.i(LOG_TAG_APP_UPDATE, "InstallStateUpdatedListener: Update installed")
                         appUpdateManager.unregisterListener(this)
+                    }
+                    AppUpdater.InstallStatus.FAILED -> {
+                        Logger.e(LOG_TAG_APP_UPDATE, "InstallStateUpdatedListener: Update failed")
+                        appUpdateManager.unregisterListener(this)
+                    }
+                    AppUpdater.InstallStatus.CANCELED -> {
+                        Logger.i(LOG_TAG_APP_UPDATE, "InstallStateUpdatedListener: Update canceled")
+                        appUpdateManager.unregisterListener(this)
+                    }
+                    AppUpdater.InstallStatus.DOWNLOADING -> {
+                        Logger.i(LOG_TAG_APP_UPDATE, "InstallStateUpdatedListener: Downloading...")
+                    }
+                    AppUpdater.InstallStatus.INSTALLING -> {
+                        Logger.i(LOG_TAG_APP_UPDATE, "InstallStateUpdatedListener: Installing...")
+                    }
+                    AppUpdater.InstallStatus.PENDING -> {
+                        Logger.i(LOG_TAG_APP_UPDATE, "InstallStateUpdatedListener: Pending...")
+                    }
+                    else -> {
+                        Logger.i(LOG_TAG_APP_UPDATE, "InstallStateUpdatedListener: Unknown state: ${state.status}")
                     }
                 }
             }
