@@ -1521,7 +1521,12 @@ open class SubscriptionStateMachineV2 : KoinComponent {
         }
     }
 
-    open fun getCurrentState(): SubscriptionState = stateMachine.getCurrentState()
+    // NOTE: intentionally NOT named `getCurrentState()` — the JVM signature would collide
+    // with the `currentState` property getter above (same name + params, return type only
+    // differs). ByteBuddy/MockK cannot proxy such colliding pairs, which broke every unit
+    // test that stubbed this class (the real getter ran on mocks whose `stateMachine` field
+    // is null, throwing NPE).
+    open fun currentMachineState(): SubscriptionState = stateMachine.getCurrentState()
     open fun getSubscriptionData(): SubscriptionData? = stateMachine.getCurrentData()
     open fun canMakePurchase(): Boolean = stateMachine.getCurrentState().canMakePurchase
     open fun hasValidSubscription(): Boolean = stateMachine.getCurrentState().hasValidSubscription

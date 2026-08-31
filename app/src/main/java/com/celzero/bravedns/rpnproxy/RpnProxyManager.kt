@@ -421,7 +421,7 @@ object RpnProxyManager : KoinComponent {
 
         // Check if current state allows RPN activation
         if (!subscriptionStateMachine.hasValidSubscription()) {
-            val currentState = subscriptionStateMachine.getCurrentState()
+            val currentState = subscriptionStateMachine.currentMachineState()
             Logger.w(LOG_TAG_PROXY, "$TAG; activateRpn: cannot activate RPN - no valid subscription, current state: ${currentState.name}")
             return
         }
@@ -1360,7 +1360,7 @@ object RpnProxyManager : KoinComponent {
      * Used by UI to display the current state of the subscription.
      */
     fun getSubscriptionState(): SubscriptionStateMachineV2.SubscriptionState {
-        return subscriptionStateMachine.getCurrentState()
+        return subscriptionStateMachine.currentMachineState()
     }
 
     fun getCurrentSubscription(): SubscriptionStateMachineV2.SubscriptionData? {
