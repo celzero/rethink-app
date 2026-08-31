@@ -46,6 +46,7 @@ import com.celzero.bravedns.ui.activity.FragmentHostActivity
 import com.celzero.bravedns.ui.bottomsheet.PurchaseProcessingBottomSheet
 import com.celzero.bravedns.ui.dialog.SubscriptionAnimDialog
 import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.iab.InAppBillingHandler.MONEYBACK_WINDOW_DAYS
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import java.util.Locale
@@ -340,7 +341,8 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.selectedProduct.collect { selection ->
                     adapter?.setSelectedProduct(selection?.first, selection?.second)
-                    updateMoneyBackBadge(selection?.first, selection?.second)
+                    updateMoneyBackBadge()
+                    updateCancelPolicyText(selection?.first, selection?.second)
                 }
             }
         }
@@ -965,25 +967,27 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         viewModel.selectProduct(productId, planId)
     }
 
-    private fun updateMoneyBackBadge(productId: String?, planId: String?) {
+    private fun updateMoneyBackBadge() {
+        b.moneyBackBadge.setDays(MONEYBACK_WINDOW_DAYS)
+    }
+
+    private fun updateCancelPolicyText(productId: String?, planId: String?) {
         var days = when (productId) {
-            InAppBillingHandler.SUBS_PRODUCT_MONTHLY -> InAppBillingHandler.MONEYBACK_WINDOW_SUBS_MONTHLY_DAYS
-            InAppBillingHandler.SUBS_PRODUCT_YEARLY -> InAppBillingHandler.MONEYBACK_WINDOW_SUBS_YEARLY_DAYS
-            InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> InAppBillingHandler.MONEYBACK_WINDOW_ONE_TIME_2YRS_DAYS
-            InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> InAppBillingHandler.MONEYBACK_WINDOW_ONE_TIME_5YRS_DAYS
+            InAppBillingHandler.SUBS_PRODUCT_MONTHLY -> InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
+            InAppBillingHandler.SUBS_PRODUCT_YEARLY -> InAppBillingHandler.REVOKE_WINDOW_SUBS_YEARLY_DAYS
+            InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
+            InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_5YRS_DAYS
             else -> 0
         }
-
         if (days == 0) {
             days = when (planId) {
-                InAppBillingHandler.SUBS_PRODUCT_MONTHLY -> InAppBillingHandler.MONEYBACK_WINDOW_SUBS_MONTHLY_DAYS
-                InAppBillingHandler.SUBS_PRODUCT_YEARLY -> InAppBillingHandler.MONEYBACK_WINDOW_SUBS_YEARLY_DAYS
-                InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> InAppBillingHandler.MONEYBACK_WINDOW_ONE_TIME_2YRS_DAYS
-                InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> InAppBillingHandler.MONEYBACK_WINDOW_ONE_TIME_5YRS_DAYS
+                InAppBillingHandler.SUBS_PRODUCT_MONTHLY -> InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
+                InAppBillingHandler.SUBS_PRODUCT_YEARLY -> InAppBillingHandler.REVOKE_WINDOW_SUBS_YEARLY_DAYS
+                InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
+                InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_5YRS_DAYS
                 else -> 7
             }
         }
-
-        b.moneyBackBadge.setDays(days)
+        b.cancelPolicy.text = getString(R.string.cancel_refund_policy, days.toString())
     }
 }

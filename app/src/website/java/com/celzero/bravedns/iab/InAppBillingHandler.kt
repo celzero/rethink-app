@@ -133,10 +133,7 @@ object InAppBillingHandler : KoinComponent {
     const val REVOKE_WINDOW_ONE_TIME_2YRS_DAYS = 2 * 7
     const val REVOKE_WINDOW_ONE_TIME_5YRS_DAYS = 5 * 7
 
-    const val MONEYBACK_WINDOW_SUBS_MONTHLY_DAYS = 14
-    const val MONEYBACK_WINDOW_SUBS_YEARLY_DAYS = 14
-    const val MONEYBACK_WINDOW_ONE_TIME_2YRS_DAYS = 31
-    const val MONEYBACK_WINDOW_ONE_TIME_5YRS_DAYS = 31
+    const val MONEYBACK_WINDOW_DAYS = 31
 
     private lateinit var queryUtils: QueryUtils
     private val productDetails: CopyOnWriteArrayList<ProductDetail> = CopyOnWriteArrayList()
@@ -575,11 +572,11 @@ object InAppBillingHandler : KoinComponent {
                             // an interruption signal so the UI can show a friendly
                             // "Google Play unavailable" error. Routine disconnects (auto-reconnect
                             // enabled) are handled silently by the reconnect path below.
-                            if (subscriptionStateMachine.getCurrentState()
+                            if (subscriptionStateMachine.currentMachineState()
                                 is SubscriptionStateMachineV2.SubscriptionState.PurchaseInitiated ||
-                                subscriptionStateMachine.getCurrentState()
+                                subscriptionStateMachine.currentMachineState()
                                 is SubscriptionStateMachineV2.SubscriptionState.PurchasePending ||
-                                subscriptionStateMachine.getCurrentState()
+                                subscriptionStateMachine.currentMachineState()
                                 is SubscriptionStateMachineV2.SubscriptionState.ServerAckPending) {
                                 _playServicesInterruptedFlow.tryEmit(
                                     com.android.billingclient.api.BillingClient
@@ -960,7 +957,7 @@ object InAppBillingHandler : KoinComponent {
                 subscriptionStateMachine.expireStaleInAppFromDb(playTokens = serverConfirmedValidTokens)
             }
 
-            val currentState = subscriptionStateMachine.getCurrentState()
+            val currentState = subscriptionStateMachine.currentMachineState()
             if (currentState == SubscriptionStateMachineV2.SubscriptionState.PurchasePending) {
                 // Only mark as failed if the pending purchase type MATCHES the queried type.
                 // An empty SUBS result must NOT fail an INAPP (one-time) purchase that is
@@ -1995,11 +1992,17 @@ object InAppBillingHandler : KoinComponent {
 
             when (pd.productType) {
                 ProductType.INAPP -> {
-                    // no need to handle oneTimePurchaseOfferDetails as the list will have all
-                    // the available offers for the in-app product
-                    val offers = pd.oneTimePurchaseOfferDetailsList.orEmpty()
+                    // One-time products surface one raw entry per purchase option plus one
+                    // entry per offer attached to a purchase option. Group them and keep the
+                    // best (cheapest eligible) entry per purchase option so an eligible
+                    // discount offer shadows the base price of the same purchase option.
+                    // The selected offer's offerToken is what makes Play charge the offer
+                    // price when the flow is launched (see purchaseOneTime).
+                    val offers = selectBestOneTimeOffers(
+                        pd.oneTimePurchaseOfferDetailsList.orEmpty(), pd.productId
+                    )
                     if (offers.isEmpty()) {
-                        loge(mname, "INAPP product has no one-time offers: ${pd.productId}")
+                        loge(mname, "INAPP product has no eligible one-time offers: ${pd.productId}")
                         return@forEach
                     }
 
@@ -2016,7 +2019,8 @@ object InAppBillingHandler : KoinComponent {
                             billingCycleCount = 0,
                             billingPeriod = billingPeriod,
                             priceAmountMicros = offer.priceAmountMicros,
-                            freeTrialPeriod = 0
+                            freeTrialPeriod = 0,
+                            discountPercent = oneTimeDiscountPercent(offer)
                         )
 
                         val productDetail = ProductDetail(
@@ -2028,6 +2032,9 @@ object InAppBillingHandler : KoinComponent {
                         )
                         this.productDetails.add(productDetail)
                         queryProductDetails.add(QueryProductDetail(productDetail, pd, null, offer))
+                        logd(mname, "INAPP offer selected: option=${offer.purchaseOptionId}, " +
+                            "offerId=${offer.offerId}, price=${offer.formattedPrice}, " +
+                            "discountPercent=${pricingPhase.discountPercent}, planId=$planId")
                     }
                 }
 
@@ -2144,6 +2151,85 @@ object InAppBillingHandler : KoinComponent {
         productDetailsLiveData.postValue(productDetails)
     }
 
+    /**
+     * Reduces the raw one-time offer list to at most one offer per purchase option,
+     * preferring eligible discount offers (offerId != null) over the base price entry
+     * (offerId == null) of the same purchase option; among the eligible discount offers
+     * the cheapest one wins. Ineligible offers (sold-out limited-quantity offers or
+     * offers outside their validity window) are never selected, so the purchase flow
+     * launched with the selected offerToken cannot fail with an offer-eligibility error.
+     */
+    private fun selectBestOneTimeOffers(
+        offers: List<ProductDetails.OneTimePurchaseOfferDetails>,
+        productId: String
+    ): List<ProductDetails.OneTimePurchaseOfferDetails> {
+        val mname = this::selectBestOneTimeOffers.name
+        val selected = offers
+            .filter { isOneTimeOfferEligible(it) }
+            .groupBy { it.purchaseOptionId ?: it.offerId ?: productId }
+            .map { (optionId, group) ->
+                val discountOffers = group.filter { !it.offerId.isNullOrBlank() }
+                // prefer discount offers; fall back to the plain purchase-option entry
+                val best = discountOffers.ifEmpty { group }.minByOrNull { it.priceAmountMicros }
+                if (discountOffers.isNotEmpty()) {
+                    log(mname, "purchase option $optionId: discount offer selected " +
+                        "(offerId=${best?.offerId}, price=${best?.formattedPrice})")
+                }
+                best ?: group.first()
+            }
+        log(mname, "selected ${selected.size} offer(s) from ${offers.size} raw offer(s) for $productId")
+        return selected
+    }
+
+    /**
+     * A one-time offer is purchasable when its limited quantity is not exhausted and,
+     * when it has a validity window, "now" falls inside that window.
+     */
+    private fun isOneTimeOfferEligible(
+        offer: ProductDetails.OneTimePurchaseOfferDetails
+    ): Boolean {
+        offer.limitedQuantityInfo?.let { lq ->
+            if (lq.remainingQuantity <= 0) return false
+        }
+        offer.validTimeWindow?.let { window ->
+            val now = System.currentTimeMillis()
+            val start = window.startTimeMillis
+            val end = window.endTimeMillis
+            if (start != null && start > now) return false
+            if (end != null && end < now) return false
+        }
+        return true
+    }
+
+    /**
+     * Returns the offer's discount percentage. Play expresses a one-time offer discount
+     * in one of two ways, both handled here:
+     * 1. Percentage offer → [DiscountDisplayInfo.getPercentageDiscount] (e.g. 20% off).
+     * 2. Absolute offer   → [DiscountDisplayInfo.getDiscountAmount] (e.g. $5 off), where
+     *    priceAmountMicros is already the final discounted price, so the equivalent
+     *    percentage is derived against base = final + discount.
+     * As a last resort the percentage is derived from fullPriceMicros when Play
+     * populates it. Returns 0 when the offer carries no discount.
+     */
+    private fun oneTimeDiscountPercent(
+        offer: ProductDetails.OneTimePurchaseOfferDetails
+    ): Int {
+        offer.discountDisplayInfo?.let { ddi ->
+            // type 1: percentage offer, Play reports the percentage directly
+            ddi.percentageDiscount?.let { pct -> return pct }
+            // type 2: absolute (fixed-amount) offer; final price is priceAmountMicros
+            ddi.discountAmount?.let { amt ->
+                val discount = amt.discountAmountMicros
+                val base = offer.priceAmountMicros + discount
+                if (discount > 0L && base > 0L) return ((discount * 100) / base).toInt()
+            }
+        }
+        // fallback: some offer shapes expose the full (undiscounted) price instead
+        val full = offer.fullPriceMicros ?: return 0
+        if (full <= 0L || offer.priceAmountMicros >= full) return 0
+        return (((full - offer.priceAmountMicros) * 100) / full).toInt()
+    }
+
     suspend fun purchaseSubs(
         activity: Activity,
         productId: String,
@@ -2158,7 +2244,7 @@ object InAppBillingHandler : KoinComponent {
         // yet expired). Active has no PurchaseInitiated transition, so startPurchase() is also
         // skipped, the result comes back via PaymentSuccessful which Active→Active handles.
         if (!forceResubscribe && !subscriptionStateMachine.canMakePurchase()) {
-            val currentState = subscriptionStateMachine.getCurrentState()
+            val currentState = subscriptionStateMachine.currentMachineState()
             loge(mname, "cannot make purchase, current state: ${currentState.name}")
             billingListener?.purchasesResult(false, emptyList())
             return
@@ -2241,7 +2327,7 @@ object InAppBillingHandler : KoinComponent {
         log(mname, "init one-time purchase product: $productId, plan: $planId, forceExtend=$forceExtend")
 
         if (!forceExtend && !subscriptionStateMachine.canMakePurchase()) {
-            val currentState = subscriptionStateMachine.getCurrentState()
+            val currentState = subscriptionStateMachine.currentMachineState()
             loge(mname, "cannot make one-time purchase in state: ${currentState.name}")
             billingListener?.purchasesResult(false, emptyList())
             return
@@ -3196,7 +3282,7 @@ object InAppBillingHandler : KoinComponent {
     }
 
     fun getSubscriptionState(): SubscriptionStateMachineV2.SubscriptionState {
-        return subscriptionStateMachine.getCurrentState()
+        return subscriptionStateMachine.currentMachineState()
     }
 
     fun getSubscriptionStateFlow(): StateFlow<SubscriptionStateMachineV2.SubscriptionState> {
@@ -3224,7 +3310,7 @@ object InAppBillingHandler : KoinComponent {
         billingScope.launch {
             try {
                 delay(SERVER_ACK_RETRY_DELAY_MS.milliseconds)
-                val state = subscriptionStateMachine.getCurrentState()
+                val state = subscriptionStateMachine.currentMachineState()
                 logd(caller, "server-ack retry fired: state=${state.name}")
                 if (state is SubscriptionStateMachineV2.SubscriptionState.ServerAckPending) {
                     fetchPurchases(listOf(ProductType.SUBS, ProductType.INAPP))

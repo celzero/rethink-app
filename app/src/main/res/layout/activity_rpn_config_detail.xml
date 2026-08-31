@@ -18,7 +18,7 @@
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="200dp"
             android:background="@drawable/bg_plus_hero_gradient"
             app:collapsedTitleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
             app:contentScrim="@drawable/bg_plus_hero_gradient"
@@ -313,13 +313,6 @@
                                 android:textColor="?attr/primaryTextColor"
                                 android:textSize="11sp"
                                 tools:text="↓ 4.5 MB" />
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text=" · "
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="11sp" />
 
                             <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/value_tx"
@@ -804,10 +797,10 @@
                 android:id="@+id/mobile_ssid_settings_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="4dp"
-                app:strokeWidth="0dp">
+                style="@style/RethinkPlus.ContentCard">
 
                 <LinearLayout
                     android:layout_width="match_parent"

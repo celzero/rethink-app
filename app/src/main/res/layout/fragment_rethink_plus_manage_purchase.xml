@@ -157,26 +157,15 @@
                             android:orientation="horizontal">
 
                             <androidx.appcompat.widget.AppCompatTextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="sans-serif-black"
-                                android:letterSpacing="0.1"
-                                android:text="@string/rpn_overhauled_token_label"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="10sp"
-                                android:textAllCaps="true" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/tv_manage_token"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="9dp"
                                 android:layout_weight="1"
                                 android:ellipsize="end"
                                 android:fontFamily="monospace"
                                 android:maxLines="1"
                                 android:textColor="?attr/primaryLightColorText"
-                                android:textSize="10.5sp"
+                                android:textSize="@dimen/mini_font_text_view"
                                 tools:text="49c0737336de · 7adf · 1a0c1432c00" />
                         </LinearLayout>
                     </LinearLayout>

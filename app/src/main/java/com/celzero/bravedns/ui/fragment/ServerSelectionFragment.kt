@@ -41,6 +41,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -108,6 +109,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private val selectedServers = mutableListOf<CountryConfig>()
 
     private var statusUpdateJob: Job? = null
+    private var headerScrollListener: NestedScrollView.OnScrollChangeListener? = null
 
     /** Looping alpha blink on the header status dot while connected. */
     private var blinkAnimator: ObjectAnimator? = null
@@ -152,8 +154,14 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private var resubscribePromptShown = false
     private var winIdentifier: String? = null
 
-    /** Load tiers available in the location filter dialog. */
-    private enum class LoadFilter { ALL, LOW, MEDIUM, HIGH }
+    /**
+     * Load tiers available in the location filter dialog. [label] is the
+     * server-load percentage range shown on the filter chip and in the
+     * active-filter summary.
+     */
+    private enum class LoadFilter(val label: String) {
+        ALL(""), LOW("≤ 40%"), MEDIUM("41–80%"), HIGH("> 80%")
+    }
 
     /** Active load-tier filter for the "All locations" list. */
     private var loadFilter = LoadFilter.ALL
@@ -252,6 +260,14 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 )
             }
         }
+
+        // Fade in the pinned collapsed title (flag + count) as the hero scrolls away.
+        headerScrollListener = NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, _ ->
+            val bar = b.collapsedTitleBar
+            val range = (b.headerContainer.height - bar.height).coerceAtLeast(1)
+            bar.alpha = (scrollY.toFloat() / range).coerceIn(0f, 1f)
+        }
+        b.serversScrollView.setOnScrollChangeListener(headerScrollListener)
 
         animateHeaderEntry()
         observeRefreshState()
@@ -601,6 +617,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     override fun onDestroyView() {
         // Cancel animations before the binding is torn down
         runCatching {
+            b.serversScrollView.setOnScrollChangeListener(null as NestedScrollView.OnScrollChangeListener?)
+            headerScrollListener = null
             fabLoadingAnimator?.cancel()
             fabLoadingAnimator = null
             blinkAnimator?.cancel()
@@ -1009,15 +1027,13 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         val nonAutoServers = selectedServers.filter { !it.id.equals(AUTO_SERVER_ID, ignoreCase = true) }
         val distinctCountries = nonAutoServers.distinctBy { it.cc }
 
-        b.tvConnectedLocationsCount.text = when {
-            isProxyStopped -> getString(R.string.server_settings_proxy_stopped)
-            distinctCountries.isEmpty() -> ""
-            else -> resources.getQuantityString(
-                R.plurals.server_selection_locations_connected,
-                distinctCountries.size,
-                distinctCountries.size
-            )
-        }
+        // Collapsed app-bar title: first selected location's flag + location count.
+        val collapsedFlag = distinctCountries.firstOrNull()?.flagEmoji.orEmpty()
+        b.tvCollapsedFlag.text = collapsedFlag
+        b.tvCollapsedFlag.isVisible = collapsedFlag.isNotEmpty()
+        b.tvCollapsedTitle.text = if (distinctCountries.isEmpty()) "" else resources.getQuantityString(
+            R.plurals.server_count, distinctCountries.size, distinctCountries.size
+        )
         populateAvatarRow(distinctCountries)
         updateCapacityIndicator()
     }
@@ -1035,8 +1051,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             if (config.cc.isBlank()) return@forEachIndexed
             val avatar = FrameLayout(requireContext()).apply {
                 layoutParams = LinearLayout.LayoutParams(
-                    (30f * density).toInt(), (30f * density).toInt()
-                ).apply { marginStart = if (index == 0) 0 else -(7f * density).toInt() }
+                    (38f * density).toInt(), (38f * density).toInt()
+                ).apply { marginStart = if (index == 0) 0 else -(10f * density).toInt() }
                 background = AppCompatResources.getDrawable(requireContext(), R.drawable.bg_avatar_circle)
                 clipChildren = false
             }
@@ -1045,7 +1061,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                     FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT
                 )
                 gravity = Gravity.CENTER
-                textSize = 17f
+                textSize = 22f
                 text = config.flagEmoji
             }
             val iso = AppCompatTextView(requireContext()).apply {
@@ -1053,7 +1069,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                     FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT
                 )
                 gravity = Gravity.CENTER
-                textSize = 8f
+                textSize = 10f
                 setTextColor(Color.WHITE)
                 setTypeface(typeface, Typeface.BOLD)
                 setShadowLayer(2f * density, 0f, 1f * density, Color.argb(128, 0, 0, 0))
@@ -1382,7 +1398,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
         // Hero summary: stopped state, no avatars, no duration.
         b.tvActiveDuration.text = ""
-        b.tvConnectedLocationsCount.text = getString(R.string.server_settings_proxy_stopped)
+        b.tvCollapsedFlag.isVisible = false
+        b.tvCollapsedTitle.text = ""
         populateAvatarRow(emptyList())
         b.locationCapacityIndicator.isVisible = false
 
@@ -1590,7 +1607,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         // Keep the status card visible but update it for a premium feel.
         b.statusCard.isVisible = true
         updateConnectionStatus(if (isError) ConnectionUiState.FAILED else ConnectionUiState.DISCONNECTED)
-        b.tvConnectedLocationsCount.text = title
+        b.tvCollapsedFlag.isVisible = false
+        b.tvCollapsedTitle.text = ""
         populateAvatarRow(emptyList())
 
         b.serverCountLayout.isVisible = false
@@ -1857,12 +1875,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     /** Human-readable summary of the active filters, or null when defaults are in effect. */
     private fun describeActiveFilter(): String? {
         val parts = mutableListOf<String>()
-        when (loadFilter) {
-            LoadFilter.ALL -> {}
-            LoadFilter.LOW -> parts.add(getString(R.string.server_selection_filter_load_low))
-            LoadFilter.MEDIUM -> parts.add(getString(R.string.server_selection_filter_load_medium))
-            LoadFilter.HIGH -> parts.add(getString(R.string.server_selection_filter_load_high))
-        }
+        if (loadFilter != LoadFilter.ALL) parts.add(loadFilter.label)
         if (speedFilter != 0) parts.add(formatLinkSpeed(speedFilter))
         if (favouritesOnly) parts.add(getString(R.string.server_selection_filter_favourites_only))
         if (parts.isEmpty()) return null
@@ -1946,19 +1959,17 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         val loadLabel = buildDialogTitleLabel(getString(R.string.server_selection_filter_by_load))
         container.addView(loadLabel)
 
-        val loadTiers = listOf(
-            LoadFilter.ALL to R.string.server_selection_filter_load_any,
-            LoadFilter.LOW to R.string.server_selection_filter_load_low,
-            LoadFilter.MEDIUM to R.string.server_selection_filter_load_medium,
-            LoadFilter.HIGH to R.string.server_selection_filter_load_high
-        )
+        val loadTiers = listOf(LoadFilter.ALL, LoadFilter.LOW, LoadFilter.MEDIUM, LoadFilter.HIGH)
         val loadGroup = ChipGroup(requireContext()).apply {
             isSingleSelection = true
             isSelectionRequired = true
         }
         val loadChipsById = mutableMapOf<LoadFilter, Chip>()
-        loadTiers.forEach { (tier, labelRes) ->
-            val chip = createFilterChip(getString(labelRes), isChecked = loadFilter == tier)
+        loadTiers.forEach { tier ->
+            val label =
+                if (tier == LoadFilter.ALL) getString(R.string.server_selection_filter_load_any)
+                else tier.label
+            val chip = createFilterChip(label, isChecked = loadFilter == tier)
             loadChipsById[tier] = chip
             loadGroup.addView(chip)
         }
@@ -2657,10 +2668,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         // Set status to REGISTERING or Loading in the header for smooth feedback.
         if (isWinRegistered) {
             updateConnectionStatus(ConnectionUiState.CONNECTING)
-            b.tvConnectedLocationsCount.text = getString(R.string.loading)
         } else {
             updateConnectionStatus(ConnectionUiState.REGISTERING)
-            b.tvConnectedLocationsCount.text = getString(R.string.rpn_restore_dialog_status_registering)
         }
 
         setLoadingState(true, skipHeader = true)

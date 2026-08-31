@@ -172,28 +172,27 @@ class GooglePlaySubsAdapter(
             }
 
             if (isInApp) {
-                binding.savingsText.visibility = View.VISIBLE
-                val duration = getInAppDurationMonths(prod.planId)
-                if (duration == 60) {
-                    binding.savingsText.text =
-                        context.getString(R.string.savings_percent, "45%")
-                } else {
-                    binding.savingsText.text =
-                        context.getString(R.string.savings_percent, "35%")
-                }
-            } else {
-                if (discountedPrice.isNotEmpty()) {
-                    val pct = calculateSavings(currentPrice, discountedPrice)
-                    if (pct > 0) {
-                        binding.savingsText.visibility = View.VISIBLE
-                        binding.savingsText.text =
-                            context.getString(R.string.savings_percent, "$pct%")
-                    } else {
-                        binding.savingsText.visibility = View.GONE
-                    }
+                // one-time purchase options carry the offer discount directly
+                // (PricingPhase.discountPercent is populated from Play's
+                // DiscountDisplayInfo.percentageDiscount or the full-vs-offer price)
+                val offerPct = pricing.discountPercent
+                if (offerPct > 0) {
+                    binding.savingsText.visibility = View.VISIBLE
+                    binding.savingsText.text = context.getString(R.string.savings_percent, "$offerPct%")
                 } else {
                     binding.savingsText.visibility = View.GONE
                 }
+            } else if (discountedPrice.isNotEmpty()) {
+                val pct = calculateSavings(currentPrice, discountedPrice)
+                if (pct > 0) {
+                    binding.savingsText.visibility = View.VISIBLE
+                    binding.savingsText.text =
+                        context.getString(R.string.savings_percent, "$pct%")
+                } else {
+                    binding.savingsText.visibility = View.GONE
+                }
+            } else {
+                binding.savingsText.visibility = View.GONE
             }
 
             // selection via card stroke only (no radio button)

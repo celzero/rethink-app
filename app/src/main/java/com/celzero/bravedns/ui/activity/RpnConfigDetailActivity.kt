@@ -114,6 +114,9 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     private var countryConfig: CountryConfig? = null
     private var pubPub: String = ""
 
+    /** When true, the Apps screen opens automatically once the proxy is initialized. */
+    private var openAppsOnLaunch: Boolean = false
+
     /** Coroutine that polls VpnController every [STATS_POLL_MS] ms. */
     private var statsJob: Job? = null
     /** Looping spin animator for the refresh chip icon. */
@@ -164,6 +167,13 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         const val INTENT_EXTRA_FROM_SERVER_SELECTION = "FROM_SERVER_SELECTION"
         const val INTENT_EXTRA_CONFIG_KEY = "CONFIG_KEY"
 
+        /**
+         * When set (boolean extra), the Apps screen ([WgIncludeAppsActivity]) is opened
+         * automatically once the proxy is initialized. Used by the server-selection
+         * list's "Apps" chip to land directly on the per-app mapping screen.
+         */
+        const val INTENT_EXTRA_OPEN_APPS = "OPEN_APPS"
+
         /** Polling interval for live stats. */
         private const val STATS_POLL_MS = 2_000L
 
@@ -189,6 +199,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         }
 
         configKey = intent.getStringExtra(INTENT_EXTRA_CONFIG_KEY) ?: ""
+        openAppsOnLaunch = intent.getBooleanExtra(INTENT_EXTRA_OPEN_APPS, false)
         applyScrollPadding()
     }
 
@@ -262,6 +273,11 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 observeAppCount(configKey)
                 loadConfigSettings(configKey)
                 setupHeaderUI()
+                // Server-selection "Apps" chip lands here; forward to the Apps screen.
+                if (openAppsOnLaunch) {
+                    openAppsOnLaunch = false
+                    openAppsDialog()
+                }
             }
         }
 
@@ -347,13 +363,18 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     b.configNameText.text = config.countryName
                     val city = config.city.ifBlank { config.serverLocation }
                     b.tvHeroCity.text = city.ifBlank { config.cc }
+                    // Show the city name in the collapsing toolbar title when collapsed.
+                    b.collapsingToolbar.title = b.tvHeroCity.text
                 } else {
                     b.tvHeroFlag.visibility = View.GONE
                     b.configNameText.text = configKey.ifBlank { getString(R.string.lbl_server_config) }
                     b.tvHeroCity.text = ""
+                    b.collapsingToolbar.title = b.configNameText.text
                 }
-                // Update the collapsing toolbar title now that we have the real config name.
-                b.collapsingToolbar.title = b.configNameText.text
+                // Fallback: if no city-based title was set above, use the config name.
+                if (b.collapsingToolbar.title.isNullOrBlank()) {
+                    b.collapsingToolbar.title = b.configNameText.text
+                }
 
                 startStatsPolling(configKey)
             }
@@ -413,6 +434,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     buildLoadSpeedText(addlInfo.load, addlInfo.link)
                     if (key.isEmpty() || key.equals(AUTO_SERVER_ID, true)) {
                         b.tvHeroCity.text = addlInfo.city + ", " + addlInfo.cc
+                        // Keep the collapsing toolbar title in sync with the hero city.
+                        b.collapsingToolbar.title = b.tvHeroCity.text
                     }
                 }
             }
@@ -445,10 +468,120 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         b.shimmerIpv4.stopShimmer()
         b.shimmerIpv4.visibility = View.GONE
         b.valueIpv4.visibility = View.VISIBLE
-        b.valueIpv4.text = ip4
-            ?.takeIf { it.ip?.isNotBlank() == true }
-            ?.let { buildIpDetailSpan(it) }
-            ?: na
+
+        val exitIp = ip4?.takeIf { it.ip?.isNotBlank() == true }?.ip
+        if (countryConfig?.hopEnabled == true && !exitIp.isNullOrBlank()) {
+            // Relayed connection: show Entry (AUTO) ↓ Exit with a relay marker.
+            // The AUTO entry IP is resolved on IO; the span is composed on the main thread.
+            io {
+                val entryIp = runCatching {
+                    VpnController.getRpnAddlInfo(AUTO_SERVER_ID)?.addr
+                        ?.split(",")?.getOrNull(1)?.trim().orEmpty()
+                }.getOrDefault("")
+                uiCtx { b.valueIpv4.text = buildHopIpSpan(stripPort(entryIp), ip4) }
+            }
+        } else {
+            b.valueIpv4.text = ip4
+                ?.takeIf { it.ip?.isNotBlank() == true }
+                ?.let { buildIpDetailSpan(it) }
+                ?: na
+        }
+    }
+
+    /**
+     * Returns [endpoint] without any trailing port. Handles "ipv4:port",
+     * "[ipv6]:port" and bare "ipv6" (colons preserved).
+     */
+    private fun stripPort(endpoint: String): String {
+        val v = endpoint.trim()
+        if (v.isEmpty()) return v
+        if (v.startsWith("[")) {
+            val end = v.indexOf(']')
+            if (end > 0) return v.substring(1, end)
+        }
+        // A single colon separates host and port in IPv4 endpoints; IPv6 has many.
+        if (v.count { it == ':' } == 1) return v.substringBefore(':')
+        return v
+    }
+
+    /**
+     * Builds the relayed Exit IP presentation:
+     *
+     * ```
+     * ENTRY  82.102.25.218 (AUTO)
+     *    ↓ 🐇
+     * EXIT   45.12.33.9
+     * ASN    AS13335 · Cloudflare Inc
+     * ```
+     *
+     * [entryIp] is AUTO's public IP (the relay entry); the exit is [meta] which
+     * carries the client's public IP and its ASN metadata as seen through the relay.
+     */
+    private fun buildHopIpSpan(entryIp: String, meta: IPMetadata): SpannableStringBuilder {
+        val sb = SpannableStringBuilder()
+        val labelColor = fetchColor(this, R.attr.primaryLightColorText)
+        val accentColor = fetchColor(this, R.attr.accentGood)
+
+        fun mono(start: Int, end: Int) {
+            sb.setSpan(TypefaceSpan("monospace"), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            sb.setSpan(RelativeSizeSpan(1.07f), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        fun styleLabel(start: Int, end: Int, color: Int = labelColor) {
+            sb.setSpan(ForegroundColorSpan(color), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            sb.setSpan(RelativeSizeSpan(0.80f), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        // Entry row (AUTO)
+        val entryLabelStart = sb.length
+        sb.append("ENTRY")
+        styleLabel(entryLabelStart, sb.length)
+        sb.append("  ")
+        val entryIpStart = sb.length
+        sb.append(entryIp.ifBlank { getString(R.string.lbl_not_available_short) })
+        mono(entryIpStart, sb.length)
+        sb.append(" ")
+        val entrySuffixStart = sb.length
+        sb.append("(AUTO)")
+        styleLabel(entrySuffixStart, sb.length)
+
+        // Arrow row (relay marker)
+        sb.append("\n   ")
+        val arrowStart = sb.length
+        sb.append("↓ ${getString(R.string.symbol_bunny)}")
+        styleLabel(arrowStart, sb.length, accentColor)
+
+        // Exit row (relayed public IP)
+        sb.append("\n")
+        val exitLabelStart = sb.length
+        sb.append("EXIT ")
+        styleLabel(exitLabelStart, sb.length)
+        sb.append("  ")
+        val exitIpStart = sb.length
+        sb.append(meta.ip ?: "")
+        mono(exitIpStart, sb.length)
+
+        // ASN metadata of the exit hop
+        val asnParts = buildList {
+            val asn = meta.asn ?: ""
+            val org = meta.asnOrg ?: ""
+            val dom = meta.asnDom ?: ""
+            if (asn.isNotBlank()) add(asn)
+            if (org.isNotBlank()) add(org)
+            if (dom.isNotBlank()) add(dom)
+        }
+        if (asnParts.isNotEmpty()) {
+            sb.append("\n")
+            val asnLabelStart = sb.length
+            sb.append("ASN  ")
+            styleLabel(asnLabelStart, sb.length)
+            val vs = sb.length
+            sb.append(asnParts.joinToString(" · "))
+            sb.setSpan(TypefaceSpan("monospace"), vs, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            sb.setSpan(RelativeSizeSpan(1.07f), vs, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        return sb
     }
 
     /**
@@ -599,7 +732,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             )
         else getString(R.string.lbl_never)
         val meta = SpannableStringBuilder(
-            getString(R.string.rpn_meta_last_times, statusText, okTxt, openTxt)
+            getString(R.string.rpn_meta_last_ok, statusText, okTxt)
         )
         // The status word is always the prefix of the formatted string.
         if (statusText.isNotEmpty()) {
@@ -613,8 +746,15 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         // so they stay subtle. Color emoji glyphs ignore ForegroundColorSpan, so size is
         // the reliable lever here.
         shrinkEmoji(meta, HANDSHAKE_EMOJI, 0.70f)
-        shrinkEmoji(meta, RECONNECT_EMOJI, 0.70f)
         b.valueLastOk.text = meta
+
+        // Last-open gets its own cell (aligned end within the same row); the
+        // reconnect emoji is shrunk to match the handshake emoji above.
+        val metaOpen = SpannableStringBuilder(
+            getString(R.string.rpn_meta_last_open, openTxt)
+        )
+        shrinkEmoji(metaOpen, RECONNECT_EMOJI, 0.70f)
+        b.valueLastOpen.text = metaOpen
 
         // Show when the user selected this server, not the VPN tunnel's uptime.
         b.valueSince.text = if (selectedSinceTs > 0L)
@@ -831,6 +971,10 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         b.hopCheck.setOnCheckedChangeListener { _, isChecked ->
             io {
                 RpnProxyManager.setHopForWinServer(configKey, isChecked)
+                // Re-render the client IP row so the Entry (AUTO) ↓ Exit relay
+                // presentation reflects the new hop state immediately.
+                countryConfig?.hopEnabled = isChecked
+                runCatching { resolveClientIps(configKey) }
                 uiCtx {
                     Utilities.showToastUiCentered(
                         this,
@@ -1046,14 +1190,29 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             Logger.e(LOG_TAG_UI, "openAppsDialog: configKey blank or proxy null")
             return
         }
-        val proxyId = Backend.RpnWin + configKey
         val cc = countryConfig
         val proxyName = when {
             cc != null && cc.city.isNotBlank() -> "${cc.cc} - ${cc.city}"
             cc != null && cc.name.isNotBlank() -> cc.name
             else -> configKey
         }
-        includeAppsLauncher.launch(WgIncludeAppsActivity.newIntent(this, proxyId, proxyName))
+        // AUTO (catch-all) has no per-key proxy id; resolve the live WIN proxy id
+        // from the tunnel, mirroring openLogsDialog().
+        if (configKey.contains(AUTO_SERVER_ID, ignoreCase = true)) {
+            io {
+                val proxyId = VpnController.getWinProxyId()
+                uiCtx {
+                    if (proxyId.isNullOrBlank()) {
+                        Logger.e(LOG_TAG_UI, "openAppsDialog: win proxy id unavailable for AUTO")
+                        return@uiCtx
+                    }
+                    includeAppsLauncher.launch(WgIncludeAppsActivity.newIntent(this, proxyId, proxyName))
+                }
+            }
+        } else {
+            val proxyId = Backend.RpnWin + configKey
+            includeAppsLauncher.launch(WgIncludeAppsActivity.newIntent(this, proxyId, proxyName))
+        }
     }
 
     /**

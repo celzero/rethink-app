@@ -18,6 +18,7 @@ package com.celzero.bravedns.ui.adapter
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.res.ColorStateList
+import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -308,18 +309,27 @@ class CountryServerAdapter(
                         chipLinkSpeed.visibility = View.VISIBLE
                         val (speedStr, speedAttr) = speedInfo(group.avgLink)
                         chipLinkSpeed.text = speedStr
+                        val bgAttr =
+                            if (group.avgLink >= 10_000) speedAttr else R.attr.chipColorBgNormal
                         chipLinkSpeed.chipBackgroundColor =
-                            ColorStateList.valueOf(fetchColor(itemView.context, speedAttr))
+                            ColorStateList.valueOf(fetchColor(itemView.context, bgAttr))
                     } else {
                         chipLinkSpeed.visibility = View.GONE
                     }
 
                     if (group.avgLoad > 0) {
+                        viewLoadDot.visibility = View.VISIBLE
                         tvLoad.visibility = View.VISIBLE
                         val (loadStr, loadAttr) = loadInfo(group.avgLoad)
                         tvLoad.text = loadStr
-                        tvLoad.setTextColor(fetchColor(itemView.context, loadAttr))
+                        val color = fetchColor(itemView.context, loadAttr)
+                        viewLoadDot.background = GradientDrawable().apply {
+                            shape = GradientDrawable.OVAL
+                            setColor(color)
+                        }
+                        tvLoad.setTextColor(color)
                     } else {
+                        viewLoadDot.visibility = View.GONE
                         tvLoad.visibility = View.GONE
                     }
 

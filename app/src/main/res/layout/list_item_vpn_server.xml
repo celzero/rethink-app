@@ -184,7 +184,7 @@
                 android:textColor="?attr/primaryLightColorText"
                 android:textSize="11sp"
                 android:visibility="gone"
-                tools:text="Last routed app • 3 sec ago"
+                tools:text="Recently routed app • 3 sec ago"
                 tools:visibility="visible" />
 
         </LinearLayout>
@@ -220,13 +220,6 @@
         app:layout_constraintStart_toEndOf="@id/tv_flag"
         app:layout_constraintTop_toBottomOf="@id/action_divider">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="13dp"
-            android:layout_height="13dp"
-            android:importantForAccessibility="no"
-            android:src="@drawable/ic_person"
-            android:tint="?attr/colorPrimary" />
-
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/apps_action"
             android:layout_width="wrap_content"
@@ -249,6 +242,50 @@
             android:importantForAccessibility="no"
             android:src="@drawable/ic_right_arrow_small"
             android:tint="?attr/colorPrimary" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/relay_action_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_plus_status_chip"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="11dp"
+        android:paddingTop="6dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="6dp"
+        app:layout_constraintStart_toEndOf="@id/apps_action_container"
+        app:layout_constraintTop_toBottomOf="@id/action_divider">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/relay_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:duplicateParentState="true"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.02"
+            android:maxLines="1"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="11sp"
+            tools:text="Relay · On" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/relay_icon"
+            android:layout_width="11dp"
+            android:layout_height="11dp"
+            android:layout_marginStart="4dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_check_circle"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
     </LinearLayout>
 

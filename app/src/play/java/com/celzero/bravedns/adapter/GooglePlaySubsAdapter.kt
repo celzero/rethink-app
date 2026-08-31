@@ -171,7 +171,18 @@ class GooglePlaySubsAdapter(
                 binding.billingInfo.text = billingText
             }
 
-            if (discountedPrice.isNotEmpty()) {
+            if (isInApp) {
+                // one-time purchase options carry the offer discount directly
+                // (PricingPhase.discountPercent is populated from Play's
+                // DiscountDisplayInfo.percentageDiscount or the full-vs-offer price)
+                val offerPct = pricing.discountPercent
+                if (offerPct > 0) {
+                    binding.savingsText.visibility = View.VISIBLE
+                    binding.savingsText.text = context.getString(R.string.savings_percent, "$offerPct%")
+                } else {
+                    binding.savingsText.visibility = View.GONE
+                }
+            } else if (discountedPrice.isNotEmpty()) {
                 val pct = calculateSavings(currentPrice, discountedPrice)
                 if (pct > 0) {
                     binding.savingsText.visibility = View.VISIBLE

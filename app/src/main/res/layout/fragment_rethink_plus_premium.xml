@@ -412,6 +412,21 @@
             android:paddingEnd="16dp"
             android:paddingBottom="12dp">
 
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/cancel_policy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingBottom="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/cancel_refund_policy"
+                android:textAlignment="center"
+                android:textColor="?attr/primaryLightColorText"
+                android:alpha="0.8"
+                android:textSize="@dimen/small_font_text_view"
+                android:lineSpacingMultiplier="1.3" />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/subscribe_button"
                 android:layout_width="match_parent"

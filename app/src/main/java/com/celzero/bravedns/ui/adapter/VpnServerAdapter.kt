@@ -21,11 +21,13 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
+import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -47,6 +49,7 @@ import com.celzero.bravedns.ui.activity.RpnConfigDetailActivity
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.IPMetadata
 import com.celzero.firestack.backend.RouterStats
@@ -237,6 +240,9 @@ class VpnServerAdapter(
                 // AUTO server: show the vector ic_rpn_auto, hide the emoji text view
                 b.tvFlag.text = ""
                 b.ivFlagImage.visibility = View.VISIBLE
+                // AUTO's config carries no city; resolve the actual exit city from the
+                // backend (mirrors RpnConfigDetailActivity#showServerInfo for tvHeroCity).
+                resolveAutoCity(group)
             } else {
                 b.refreshStopIcon.visibility = View.VISIBLE
                 b.refreshStopIcon.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.ic_cross))
@@ -245,7 +251,11 @@ class VpnServerAdapter(
                 b.ivFlagImage.visibility = View.GONE
             }
 
-            val locationText = if (group.serverCount > 1) {
+            val locationText = if (group.key.equals(AUTO_SERVER_ID, ignoreCase = true)) {
+                // AUTO: bind-time placeholder is the raw city (no capitalisation,
+                // no country); the actual exit city is resolved async in resolveAutoCity.
+                group.cityName
+            } else if (group.serverCount > 1) {
                 val cities = group.servers.map { it.serverLocation }.distinct()
                 val cityText = if (cities.size <= 2) cities.joinToString(", ").capitalizeWords()
                 else "${cities.first().capitalizeWords()} +${cities.size - 1} more"
@@ -256,6 +266,7 @@ class VpnServerAdapter(
             b.tvCountryName.text = locationText
             b.tvCountryCode.text = group.countryCode
             showAppsCount(group)
+            showRelayAction(group)
 
             // Always cancel any running stats job before setting up the new state.
             cancelStatsJob()
@@ -268,6 +279,7 @@ class VpnServerAdapter(
                 b.serverCard.setOnClickListener(stoppedClick)
                 b.refreshStopIcon.setOnClickListener(stoppedClick)
                 b.appsActionContainer.setOnClickListener(stoppedClick)
+                b.relayActionContainer.setOnClickListener(stoppedClick)
             } else if (loadingTunnelKeys.contains(group.key)) {
                 // WIN tunnel for this server is still being set up (getWinByKey returned null).
                 // Show a "Connecting…" indicator with a gentle pulse.
@@ -275,8 +287,9 @@ class VpnServerAdapter(
                 b.refreshStopIcon.setOnClickListener {
                     handleRefreshClick(group)
                 }
-                b.appsActionContainer.setOnClickListener { openServerDetail(group.getBestServer()) }
+                b.appsActionContainer.setOnClickListener { openServerDetail(group.getBestServer(), openApps = true) }
                 b.serverCard.setOnClickListener { openServerDetail(group.getBestServer()) }
+                b.relayActionContainer.setOnClickListener { toggleRelay(group) }
                 // Always start polling
                 statsJob = pollStatsLoop(group)
                 lastRoutedAppJob = pollLastRoutedAppLoop(group)
@@ -285,8 +298,10 @@ class VpnServerAdapter(
                 b.refreshStopIcon.setOnClickListener {
                     handleRefreshClick(group)
                 }
-                b.appsActionContainer.setOnClickListener { openServerDetail(group.getBestServer()) }
+                // Apps chip jumps straight to the Apps screen of the config detail.
+                b.appsActionContainer.setOnClickListener { openServerDetail(group.getBestServer(), openApps = true) }
                 b.serverCard.setOnClickListener { openServerDetail(group.getBestServer()) }
+                b.relayActionContainer.setOnClickListener { toggleRelay(group) }
 
                 // Show "Checking…" immediately so the item is never left stranded
                 showCheckingStatus()
@@ -483,6 +498,7 @@ class VpnServerAdapter(
                     if (!b.root.isAttachedToWindow) return@uiCtx
                     applyLastRoutedApp(ct)
                     applyAppsAction(config, apps)
+                    applyRelayAction(config)
                 }
             } catch (t: Throwable) {
                 Logger.w(LOG_TAG_UI, "VpnServerAdapter fetchAndApplyLastRoutedApp[${group.key}]: ${t.message}")
@@ -490,7 +506,7 @@ class VpnServerAdapter(
         }
 
         /**
-         * Renders the "last routed app" row: "<app> • <relative time>".
+         * Renders the "Recently routed app" row: "<app> • <relative time>".
          * Hidden when no connection has been routed through this server (yet).
          */
         private fun applyLastRoutedApp(ct: ConnectionTracker?) {
@@ -507,7 +523,7 @@ class VpnServerAdapter(
                 R.string.two_argument_space, appName,
                 ctx.getString(R.string.single_argument_parenthesis, relTime.toString())
             )
-            b.tvLastRoutedApp.text = ctx.getString(R.string.temp_allow_desc_with_time, txt)
+            b.tvLastRoutedApp.text = ctx.getString(R.string.recently_routed_app, txt)
             b.tvLastRoutedApp.visibility = View.VISIBLE
         }
 
@@ -565,6 +581,103 @@ class VpnServerAdapter(
                 ctx.getString(R.string.server_item_apps_all)
             } else {
                 ctx.getString(R.string.server_item_apps_count, apps)
+            }
+        }
+
+        /**
+         * Resolves the actual exit city for the AUTO server from the backend's
+         * additional-info (same source as RpnConfigDetailActivity#showServerInfo).
+         * Only the city is shown — no country code and no capitalisation applied.
+         */
+        private fun resolveAutoCity(group: ServerGroup) {
+            io {
+                val addl = runCatching { VpnController.getRpnAddlInfo(group.key) }.getOrNull()
+                val city = addl?.city?.trim().orEmpty()
+                if (city.isEmpty()) return@io
+                uiCtx {
+                    if (!b.root.isAttachedToWindow) return@uiCtx
+                    b.tvCountryName.text = city.capitalizeWords()
+                }
+            }
+        }
+
+        /**
+         * Configures the "Relay" action chip shown next to the Apps chip. Hidden for
+         * AUTO (it is the hop source for every other config, mirroring the detail
+         * screen which hides hop settings for AUTO) and when the config is missing.
+         *
+         * This is the initial (bind-time) render; [pollLastRoutedAppLoop] keeps the
+         * chip in sync so relay changes made in RpnConfigDetailActivity are reflected
+         * when the user returns to this list.
+         */
+        private fun showRelayAction(group: ServerGroup) {
+            b.relayActionContainer.visibility = View.GONE
+            io {
+                val config = RpnProxyManager.getCountryConfigByKey(group.key)
+                uiCtx {
+                    if (!b.root.isAttachedToWindow) return@uiCtx
+                    applyRelayAction(config)
+                }
+            }
+        }
+
+        /**
+         * Renders the Relay chip state: "🐇 Relay · On" with a positive background and
+         * a check icon when the hop is active; "Relay · Off" with the default chip
+         * background when inactive. Tapping toggles the hop for this server.
+         */
+        private fun applyRelayAction(config: CountryConfig?) {
+            if (config == null || config.id.equals(AUTO_SERVER_ID, true)) {
+                b.relayActionContainer.visibility = View.GONE
+                return
+            }
+            b.relayActionContainer.visibility = View.VISIBLE
+            if (config.hopEnabled) {
+                b.relayAction.text = ctx.getString(
+                    R.string.two_argument_space,
+                    ctx.getString(R.string.symbol_bunny),
+                    ctx.getString(R.string.server_item_relay_on)
+                )
+                b.relayAction.setTextColor(fetchColor(ctx, R.attr.accentGood))
+                b.relayActionContainer.backgroundTintList =
+                    ColorStateList.valueOf(fetchColor(ctx, R.attr.chipBgColorPositive))
+                b.relayIcon.visibility = View.VISIBLE
+            } else {
+                b.relayAction.text = ctx.getString(R.string.server_item_relay_off)
+                b.relayAction.setTextColor(fetchColor(ctx, android.R.attr.colorPrimary))
+                b.relayActionContainer.backgroundTintList = null
+                b.relayIcon.visibility = View.GONE
+            }
+        }
+
+        /**
+         * Enables/disables the relay (hop) for [group] via
+         * [RpnProxyManager.setHopForWinServer] and re-renders the chip from the
+         * freshly persisted config. The periodic poll re-applies the state as well,
+         * so even a failed toggle is corrected on the next tick.
+         */
+        private fun toggleRelay(group: ServerGroup) {
+            io {
+                try {
+                    val config = RpnProxyManager.getCountryConfigByKey(group.key) ?: return@io
+                    val newState = !config.hopEnabled
+                    RpnProxyManager.setHopForWinServer(group.key, newState)
+                    val updated = RpnProxyManager.getCountryConfigByKey(group.key)
+                    uiCtx {
+                        if (!b.root.isAttachedToWindow) return@uiCtx
+                        applyRelayAction(updated)
+                        Utilities.showToastUiCentered(
+                            ctx,
+                            ctx.getString(
+                                if (newState) R.string.server_item_relay_enabled_toast
+                                else R.string.server_item_relay_disabled_toast
+                            ),
+                            Toast.LENGTH_SHORT
+                        )
+                    }
+                } catch (t: Throwable) {
+                    Logger.w(LOG_TAG_UI, "VpnServerAdapter toggleRelay[${group.key}]: ${t.message}")
+                }
             }
         }
 
@@ -648,10 +761,15 @@ class VpnServerAdapter(
             else context.getString(R.string.lbl_never)
         }
 
-        private fun openServerDetail(server: CountryConfig) {
+        private fun openServerDetail(server: CountryConfig, openApps: Boolean = false) {
             val intent = Intent(ctx, RpnConfigDetailActivity::class.java)
             intent.putExtra(RpnConfigDetailActivity.INTENT_EXTRA_FROM_SERVER_SELECTION, true)
             intent.putExtra(RpnConfigDetailActivity.INTENT_EXTRA_CONFIG_KEY, server.key)
+            // Always-on (catch-all) locations already route every app, so landing on
+            // the per-app screen automatically is unnecessary — open the detail screen.
+            if (openApps && !server.catchAll) {
+                intent.putExtra(RpnConfigDetailActivity.INTENT_EXTRA_OPEN_APPS, true)
+            }
             ctx.startActivity(intent)
         }
 

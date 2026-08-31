@@ -57,7 +57,7 @@
                         <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
+                            android:layout_marginStart="6dp"
                             android:layout_weight="1"
                             android:text="@string/proxy_rpn_heading"
                             android:textAllCaps="true"
@@ -115,23 +115,6 @@
                             android:textSize="12sp"
                             tools:text="Purchased Jul 22, 2026" />
 
-                        <View
-                            android:id="@+id/hero_meta_dot"
-                            android:layout_width="3dp"
-                            android:layout_height="3dp"
-                            android:layout_marginStart="9dp"
-                            android:layout_marginEnd="9dp"
-                            android:alpha="0.7"
-                            android:background="@drawable/ic_circle"
-                            android:backgroundTint="?attr/primaryLightColorText" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/tv_hero_server_slots"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="?attr/primaryLightColorText"
-                            android:textSize="12sp"
-                            tools:text="5 server slots" />
                     </LinearLayout>
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -143,8 +126,8 @@
                         android:alpha="0.6"
                         android:fontFamily="monospace"
                         android:textColor="?attr/primaryLightColorText"
-                        android:textSize="10sp"
-                        tools:text="ID dajgkfkimohj · 1a0c1432c00" />
+                        android:textSize="@dimen/mini_font_text_view"
+                        tools:text="dajgkfkimohj · 1a0c1432c00" />
 
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>

@@ -164,8 +164,6 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
     private fun renderNoPurchaseHero() {
         b.tvHeroPlanName.text = getString(R.string.rpn_no_active_plan_title)
         b.tvHeroPurchasedDate.isVisible = false
-        b.heroMetaDot.isVisible = false
-        b.tvHeroServerSlots.isVisible = false
         b.tvHeroIds.isVisible = false
     }
 
@@ -182,12 +180,10 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
         } else {
             getString(R.string.lbl_not_available_short)
         }
-        b.heroMetaDot.isVisible = true
-        b.tvHeroServerSlots.isVisible = false
 
         val accountId = model.sub?.accountId?.take(12).orEmpty()
         b.tvHeroIds.isVisible = accountId.isNotEmpty()
-        b.tvHeroIds.text = if (accountId.isNotEmpty()) "ID $accountId" else ""
+        b.tvHeroIds.text = accountId.ifEmpty { "" }
     }
 
     private fun renderValidHero(
@@ -211,9 +207,6 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
         } else {
             getString(R.string.placeholder_dash)
         }
-        b.heroMetaDot.isVisible = true
-        b.tvHeroServerSlots.isVisible = true
-        b.tvHeroServerSlots.text = getString(R.string.rpn_overhauled_server_slots_label, 5)
     }
 
     private fun setupClickListeners() {

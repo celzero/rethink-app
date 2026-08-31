@@ -34,6 +34,7 @@
     <attr name="accentGood" format="reference" />
     <attr name="accentBad" format="reference" />
     <attr name="accentWarning" format="reference" />
+    <attr name="accentInfo" format="reference" />
     <attr name="border" format="reference" />
     <attr name="navBarColor" format="reference" />
     <attr name="buttonBackground" format="reference" />

@@ -7,455 +7,11 @@
     android:layout_height="match_parent"
     android:background="?attr/background">
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/servers_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:id="@+id/header_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fitsSystemWindows="true"
-            android:orientation="vertical"
-            android:paddingStart="14dp"
-            android:paddingTop="12dp"
-            android:paddingEnd="14dp">
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/status_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                style="@style/RethinkPlus.HeroCard">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_plus_hero_gradient"
-                    android:orientation="vertical"
-                    android:paddingStart="18dp"
-                    android:paddingTop="16dp"
-                    android:paddingEnd="12dp"
-                    android:paddingBottom="16dp">
-
-                    <LinearLayout
-                        android:id="@+id/location_content"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:baselineAligned="false"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <LinearLayout
-                                android:id="@+id/status_chip"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:background="@drawable/bg_plus_status_chip"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal"
-                                android:layout_marginEnd="10dp"
-                                android:paddingStart="10dp"
-                                android:paddingTop="6dp"
-                                android:paddingEnd="12dp"
-                                android:paddingBottom="6dp">
-
-                                <View
-                                    android:id="@+id/status_indicator"
-                                    android:layout_width="8dp"
-                                    android:layout_height="8dp"
-                                    android:layout_marginEnd="8dp"
-                                    android:background="@drawable/ic_circle"
-                                    android:backgroundTint="?attr/accentGood" />
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/tv_connection_status"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="sans-serif-medium"
-                                    android:maxLines="1"
-                                    android:text="@string/dns_connected"
-                                    android:textColor="?attr/primaryTextColor"
-                                    android:textSize="15sp"
-                                    android:textStyle="bold" />
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/tv_active_duration"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="6dp"
-                                    android:alpha="0.75"
-                                    android:fontFamily="sans-serif"
-                                    android:maxLines="1"
-                                    android:textColor="?attr/primaryLightColorText"
-                                    android:textSize="13sp"
-                                    tools:text="• 02:45:12" />
-
-                            </LinearLayout>
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/support_btn"
-                                style="@style/Widget.Material3.Button.IconButton"
-                                android:layout_width="38dp"
-                                android:layout_height="38dp"
-                                android:contentDescription="@string/contact_support_title"
-                                app:backgroundTint="@android:color/transparent"
-                                app:cornerRadius="19dp"
-                                app:icon="@drawable/ic_user_crown"
-                                app:iconGravity="textStart"
-                                app:iconPadding="0dp"
-                                app:iconSize="25dp"
-                                app:iconTint="?attr/primaryLightColorText" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/settings_btn"
-                                style="@style/Widget.Material3.Button.IconButton"
-                                android:layout_width="38dp"
-                                android:layout_height="38dp"
-                                android:contentDescription="@string/server_settings_open"
-                                app:backgroundTint="@android:color/transparent"
-                                app:cornerRadius="19dp"
-                                app:icon="@drawable/ic_settings"
-                                app:iconGravity="textStart"
-                                app:iconPadding="0dp"
-                                app:iconSize="24dp"
-                                app:iconTint="?attr/primaryLightColorText" />
-
-                        </LinearLayout>
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/tv_connected_locations_count"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:ellipsize="end"
-                            android:fontFamily="sans-serif"
-                            android:maxLines="1"
-                            android:textColor="?attr/primaryLightColorText"
-                            android:textSize="13sp"
-                            tools:text="4 locations connected" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:baselineAligned="false"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <LinearLayout
-                                android:id="@+id/avatar_row"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal"
-                                tools:ignore="UselessParent">
-
-                                <FrameLayout
-                                    android:layout_width="30dp"
-                                    android:layout_height="30dp"
-                                    android:background="@drawable/bg_avatar_circle"
-                                    android:visibility="gone"
-                                    tools:visibility="visible">
-
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:gravity="center"
-                                        android:textSize="17sp"
-                                        tools:text="🇮🇳" />
-
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:gravity="center"
-                                        android:shadowColor="#80000000"
-                                        android:shadowDy="1"
-                                        android:shadowRadius="2"
-                                        android:textAllCaps="true"
-                                        android:textColor="@android:color/white"
-                                        android:textSize="8sp"
-                                        android:textStyle="bold"
-                                        tools:text="IN" />
-                                </FrameLayout>
-
-                                <FrameLayout
-                                    android:layout_width="30dp"
-                                    android:layout_height="30dp"
-                                    android:layout_marginStart="-7dp"
-                                    android:background="@drawable/bg_avatar_circle"
-                                    android:visibility="gone"
-                                    tools:visibility="visible">
-
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:gravity="center"
-                                        android:textSize="17sp"
-                                        tools:text="🇸🇬" />
-
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:gravity="center"
-                                        android:shadowColor="#80000000"
-                                        android:shadowDy="1"
-                                        android:shadowRadius="2"
-                                        android:textAllCaps="true"
-                                        android:textColor="@android:color/white"
-                                        android:textSize="8sp"
-                                        android:textStyle="bold"
-                                        tools:text="SG" />
-                                </FrameLayout>
-
-                                <FrameLayout
-                                    android:layout_width="30dp"
-                                    android:layout_height="30dp"
-                                    android:layout_marginStart="-7dp"
-                                    android:background="@drawable/bg_avatar_circle"
-                                    android:visibility="gone"
-                                    tools:visibility="visible">
-
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:gravity="center"
-                                        android:textSize="17sp"
-                                        tools:text="🇩🇪" />
-
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:gravity="center"
-                                        android:shadowColor="#80000000"
-                                        android:shadowDy="1"
-                                        android:shadowRadius="2"
-                                        android:textAllCaps="true"
-                                        android:textColor="@android:color/white"
-                                        android:textSize="8sp"
-                                        android:textStyle="bold"
-                                        tools:text="DE" />
-                                </FrameLayout>
-
-                                <FrameLayout
-                                    android:layout_width="30dp"
-                                    android:layout_height="30dp"
-                                    android:layout_marginStart="-7dp"
-                                    android:background="@drawable/bg_avatar_circle"
-                                    android:visibility="gone"
-                                    tools:visibility="visible">
-
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:gravity="center"
-                                        android:textSize="17sp"
-                                        tools:text="🇺🇸" />
-
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:gravity="center"
-                                        android:shadowColor="#80000000"
-                                        android:shadowDy="1"
-                                        android:shadowRadius="2"
-                                        android:textAllCaps="true"
-                                        android:textColor="@android:color/white"
-                                        android:textSize="8sp"
-                                        android:textStyle="bold"
-                                        tools:text="US" />
-                                </FrameLayout>
-
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:gravity="end"
-                                android:orientation="vertical">
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/tv_hero_plan_name"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:ellipsize="end"
-                                    android:fontFamily="sans-serif-medium"
-                                    android:gravity="end"
-                                    android:maxLines="1"
-                                    android:textColor="?attr/primaryLightColorText"
-                                    android:textSize="10sp"
-                                    android:visibility="gone"
-                                    tools:text="Standard.tier"
-                                    tools:visibility="visible" />
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/tv_hero_account_id"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="1dp"
-                                    android:ellipsize="end"
-                                    android:fontFamily="monospace"
-                                    android:gravity="end"
-                                    android:maxLines="1"
-                                    android:textColor="?attr/primaryLightColorText"
-                                    android:textSize="10sp"
-                                    tools:text="49c0737336de · 7adf" />
-
-                                <com.google.android.material.textview.MaterialTextView
-                                    android:id="@+id/tv_hero_who"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:alpha="0.7"
-                                    android:ellipsize="end"
-                                    android:fontFamily="monospace"
-                                    android:gravity="end"
-                                    android:maxLines="1"
-                                    android:textColor="?attr/primaryLightColorText"
-                                    android:textSize="10sp"
-                                    android:visibility="gone"
-                                    tools:text="device-id"
-                                    tools:visibility="visible" />
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                    <com.facebook.shimmer.ShimmerFrameLayout
-                        android:id="@+id/shimmer_header"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:visibility="gone"
-                        app:shimmer_auto_start="true"
-                        app:shimmer_base_alpha="0.12"
-                        app:shimmer_duration="1200"
-                        app:shimmer_highlight_alpha="0.35">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <View
-                                android:layout_width="80dp"
-                                android:layout_height="10dp"
-                                android:background="@drawable/shimmer_placeholder" />
-
-                            <View
-                                android:layout_width="0dp"
-                                android:layout_height="10dp"
-                                android:layout_weight="1" />
-
-                            <View
-                                android:layout_width="60dp"
-                                android:layout_height="26dp"
-                                android:background="@drawable/shimmer_placeholder" />
-
-                        </LinearLayout>
-
-                    </com.facebook.shimmer.ShimmerFrameLayout>
-
-                    <LinearLayout
-                        android:id="@+id/subscription_banner"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:visibility="gone">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/tv_expiry_label"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="4dp"
-                            android:textColor="?attr/primaryLightColorText"
-                            android:textSize="12sp" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/tv_expiry_date"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:textColor="?attr/primaryTextColor"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/tv_days_remaining"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingStart="8dp"
-                            android:paddingTop="2dp"
-                            android:paddingEnd="8dp"
-                            android:paddingBottom="2dp"
-                            android:textColor="?attr/primaryTextColor"
-                            android:textSize="11sp" />
-
-                    </LinearLayout>
-
-                    <com.facebook.shimmer.ShimmerFrameLayout
-                        android:id="@+id/shimmer_subscription_banner"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:visibility="gone">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="40dp"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:padding="8dp">
-
-                            <View
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:layout_marginEnd="8dp"
-                                android:background="@drawable/shimmer_placeholder" />
-
-                            <View
-                                android:layout_width="0dp"
-                                android:layout_height="12dp"
-                                android:layout_weight="1"
-                                android:background="@drawable/shimmer_placeholder" />
-
-                        </LinearLayout>
-
-                    </com.facebook.shimmer.ShimmerFrameLayout>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.progressindicator.LinearProgressIndicator
-                android:id="@+id/registration_progress_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:indeterminate="true"
-                android:visibility="gone"
-                app:indicatorColor="?attr/accentGood"
-                app:trackColor="@android:color/transparent"
-                app:trackThickness="3dp" />
-
-        </LinearLayout>
-
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/servers_scroll_view"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:clipToPadding="false">
+        android:clipToPadding="false">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -464,11 +20,432 @@
                 android:paddingBottom="12dp">
 
                 <LinearLayout
+                    android:id="@+id/header_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fitsSystemWindows="true"
+                    android:orientation="vertical"
+                    android:layout_marginTop="18dp"
+                    android:paddingStart="14dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="14dp">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/status_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    style="@style/RethinkPlus.HeroCard">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_plus_hero_gradient"
+                        android:orientation="vertical"
+                        android:paddingStart="18dp"
+                        android:paddingTop="16dp"
+                        android:paddingEnd="12dp"
+                        android:paddingBottom="16dp">
+
+                        <LinearLayout
+                            android:id="@+id/location_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:baselineAligned="false"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <LinearLayout
+                                    android:id="@+id/status_chip"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_plus_status_chip"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:layout_marginEnd="10dp"
+                                    android:paddingStart="10dp"
+                                    android:paddingTop="6dp"
+                                    android:paddingEnd="12dp"
+                                    android:paddingBottom="6dp">
+
+                                    <View
+                                        android:id="@+id/status_indicator"
+                                        android:layout_width="8dp"
+                                        android:layout_height="8dp"
+                                        android:layout_marginEnd="8dp"
+                                        android:background="@drawable/ic_circle"
+                                        android:backgroundTint="?attr/accentGood" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tv_connection_status"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="sans-serif-medium"
+                                        android:maxLines="1"
+                                        android:text="@string/dns_connected"
+                                        android:textColor="?attr/primaryTextColor"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tv_active_duration"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="6dp"
+                                        android:alpha="0.75"
+                                        android:fontFamily="sans-serif"
+                                        android:maxLines="1"
+                                        android:textColor="?attr/primaryLightColorText"
+                                        android:textSize="@dimen/large_font_text_view"
+                                        tools:text="• 02:45:12" />
+
+                                </LinearLayout>
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/support_btn"
+                                    style="@style/Widget.Material3.Button.IconButton"
+                                    android:layout_width="38dp"
+                                    android:layout_height="38dp"
+                                    android:contentDescription="@string/contact_support_title"
+                                    app:icon="@drawable/ic_user_crown"
+                                    app:iconGravity="textStart"
+                                    app:iconSize="32dp"
+                                    app:iconTint="?attr/primaryLightColorText" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/settings_btn"
+                                    style="@style/Widget.Material3.Button.IconButton"
+                                    android:layout_width="38dp"
+                                    android:layout_height="38dp"
+                                    android:contentDescription="@string/server_settings_open"
+                                    app:icon="@drawable/ic_settings"
+                                    app:iconGravity="textStart"
+                                    app:iconSize="26dp"
+                                    app:iconTint="?attr/primaryLightColorText" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="14dp"
+                                android:baselineAligned="false"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <LinearLayout
+                                    android:id="@+id/avatar_row"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    tools:ignore="UselessParent">
+
+                                    <FrameLayout
+                                        android:layout_width="38dp"
+                                        android:layout_height="38dp"
+                                        android:background="@drawable/bg_avatar_circle"
+                                        android:visibility="gone"
+                                        tools:visibility="visible">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center"
+                                            android:textSize="22sp"
+                                            tools:text="🇮🇳" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center"
+                                            android:shadowColor="#80000000"
+                                            android:shadowDy="1"
+                                            android:shadowRadius="2"
+                                            android:textAllCaps="true"
+                                            android:textColor="@android:color/white"
+                                            android:textSize="10sp"
+                                            android:textStyle="bold"
+                                            tools:text="IN" />
+                                    </FrameLayout>
+
+                                    <FrameLayout
+                                        android:layout_width="38dp"
+                                        android:layout_height="38dp"
+                                        android:layout_marginStart="-10dp"
+                                        android:background="@drawable/bg_avatar_circle"
+                                        android:visibility="gone"
+                                        tools:visibility="visible">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center"
+                                            android:textSize="22sp"
+                                            tools:text="🇸🇬" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center"
+                                            android:shadowColor="#80000000"
+                                            android:shadowDy="1"
+                                            android:shadowRadius="2"
+                                            android:textAllCaps="true"
+                                            android:textColor="@android:color/white"
+                                            android:textSize="10sp"
+                                            android:textStyle="bold"
+                                            tools:text="SG" />
+                                    </FrameLayout>
+
+                                    <FrameLayout
+                                        android:layout_width="38dp"
+                                        android:layout_height="38dp"
+                                        android:layout_marginStart="-10dp"
+                                        android:background="@drawable/bg_avatar_circle"
+                                        android:visibility="gone"
+                                        tools:visibility="visible">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center"
+                                            android:textSize="22sp"
+                                            tools:text="🇩🇪" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center"
+                                            android:shadowColor="#80000000"
+                                            android:shadowDy="1"
+                                            android:shadowRadius="2"
+                                            android:textAllCaps="true"
+                                            android:textColor="@android:color/white"
+                                            android:textSize="10sp"
+                                            android:textStyle="bold"
+                                            tools:text="DE" />
+                                    </FrameLayout>
+
+                                    <FrameLayout
+                                        android:layout_width="38dp"
+                                        android:layout_height="38dp"
+                                        android:layout_marginStart="-10dp"
+                                        android:background="@drawable/bg_avatar_circle"
+                                        android:visibility="gone"
+                                        tools:visibility="visible">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center"
+                                            android:textSize="22sp"
+                                            tools:text="🇺🇸" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center"
+                                            android:shadowColor="#80000000"
+                                            android:shadowDy="1"
+                                            android:shadowRadius="2"
+                                            android:textAllCaps="true"
+                                            android:textColor="@android:color/white"
+                                            android:textSize="10sp"
+                                            android:textStyle="bold"
+                                            tools:text="US" />
+                                    </FrameLayout>
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="end"
+                                    android:orientation="vertical">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tv_hero_plan_name"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:ellipsize="end"
+                                        android:fontFamily="sans-serif-medium"
+                                        android:gravity="end"
+                                        android:maxLines="1"
+                                        android:textColor="?attr/primaryLightColorText"
+                                        android:textSize="@dimen/small_font_text_view"
+                                        android:visibility="gone"
+                                        tools:text="Standard.tier"
+                                        tools:visibility="visible" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tv_hero_account_id"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:alpha="0.7"
+                                        android:layout_marginTop="1dp"
+                                        android:ellipsize="end"
+                                        android:gravity="end"
+                                        android:maxLines="1"
+                                        android:textColor="?attr/primaryLightColorText"
+                                        android:textSize="@dimen/mini_font_text_view"
+                                        tools:text="49c0737336de · 7adf" />
+
+                                    <com.google.android.material.textview.MaterialTextView
+                                        android:id="@+id/tv_hero_who"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:alpha="0.7"
+                                        android:ellipsize="end"
+                                        android:gravity="end"
+                                        android:maxLines="1"
+                                        android:textColor="?attr/primaryLightColorText"
+                                        android:textSize="@dimen/mini_font_text_view"
+                                        android:visibility="gone"
+                                        tools:text="device-id"
+                                        tools:visibility="visible" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <com.facebook.shimmer.ShimmerFrameLayout
+                            android:id="@+id/shimmer_header"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:visibility="gone"
+                            app:shimmer_auto_start="true"
+                            app:shimmer_base_alpha="0.12"
+                            app:shimmer_duration="1200"
+                            app:shimmer_highlight_alpha="0.35">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <View
+                                    android:layout_width="80dp"
+                                    android:layout_height="10dp"
+                                    android:background="@drawable/shimmer_placeholder" />
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="10dp"
+                                    android:layout_weight="1" />
+
+                                <View
+                                    android:layout_width="60dp"
+                                    android:layout_height="26dp"
+                                    android:background="@drawable/shimmer_placeholder" />
+
+                            </LinearLayout>
+
+                        </com.facebook.shimmer.ShimmerFrameLayout>
+
+                        <LinearLayout
+                            android:id="@+id/subscription_banner"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:visibility="gone">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tv_expiry_label"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="4dp"
+                                android:textColor="?attr/primaryLightColorText"
+                                android:textSize="12sp" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tv_expiry_date"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="?attr/primaryTextColor"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tv_days_remaining"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingStart="8dp"
+                                android:paddingTop="2dp"
+                                android:paddingEnd="8dp"
+                                android:paddingBottom="2dp"
+                                android:textColor="?attr/primaryTextColor"
+                                android:textSize="11sp" />
+
+                        </LinearLayout>
+
+                        <com.facebook.shimmer.ShimmerFrameLayout
+                            android:id="@+id/shimmer_subscription_banner"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:visibility="gone">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:padding="8dp">
+
+                                <View
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:background="@drawable/shimmer_placeholder" />
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="12dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/shimmer_placeholder" />
+
+                            </LinearLayout>
+
+                        </com.facebook.shimmer.ShimmerFrameLayout>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/registration_progress_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    app:indicatorColor="?attr/accentGood"
+                    app:trackColor="@android:color/transparent"
+                    app:trackThickness="3dp" />
+
+            </LinearLayout>
+
+
+                <LinearLayout
                     android:id="@+id/selected_locations_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:layout_marginTop="18dp"
+                    android:layout_marginTop="8dp"
                     android:layout_marginEnd="16dp"
                     android:layout_marginBottom="10dp"
                     android:gravity="center_vertical"
@@ -973,6 +950,42 @@
             </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/collapsed_title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_gravity="top"
+        android:alpha="0"
+        android:clickable="false"
+        android:focusable="false"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="18dp"
+        android:paddingEnd="18dp"
+        android:elevation="4dp"
+        android:background="?attr/background">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_collapsed_flag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="22sp"
+            tools:text="🇮🇳" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_collapsed_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="2 locations" />
 
     </LinearLayout>
 

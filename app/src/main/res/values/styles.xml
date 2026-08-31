@@ -313,6 +313,7 @@
         <item name="chipTextNegative">@color/chipTextNegative</item>
         <item name="chipColorBgNormal">@color/chipColorBgNormal</item>
         <item name="chipColorBgHighlight">@color/chipColorBgHighlight</item>
+        <item name="accentInfo">@color/accentInfo</item>
 
         <item name="fabBackgroundColor">@color/fabBackground</item>
 
@@ -449,6 +450,7 @@
         <item name="chipTextNeutral">@color/chipTextNeutralLight</item>
         <item name="chipColorBgNormal">@color/chipColorBgNormalLight</item>
         <item name="chipColorBgHighlight">@color/chipColorBgHighlightLight</item>
+        <item name="accentInfo">@color/accentInfoLight</item>
 
         <item name="fabBackgroundColor">@color/fabBackgroundLight</item>
         <item name="selectedCardBg">@color/selectedCardBgLight</item>
@@ -588,6 +590,7 @@
         <item name="chipTextNeutral">@color/chipTextNeutralBlack</item>
         <item name="chipColorBgNormal">@color/chipColorBgNormalBlack</item>
         <item name="chipColorBgHighlight">@color/chipColorBgHighlightBlack</item>
+        <item name="accentInfo">@color/accentInfo</item>
 
         <item name="fabBackgroundColor">@color/fabBackgroundBlack</item>
         <item name="selectedCardBg">@color/selectedCardBgBlack</item>
@@ -722,6 +725,7 @@
         <item name="chipTextNeutral">@color/chipTextNeutralLightPlus</item>
         <item name="chipColorBgNormal">@color/chipColorBgNormalLightPlus</item>
         <item name="chipColorBgHighlight">@color/chipColorBgHighlightLightPlus</item>
+        <item name="accentInfo">@color/accentInfoLight</item>
 
         <item name="fabBackgroundColor">@color/fabBackgroundLightPlus</item>
         <item name="selectedCardBg">@color/selectedCardBgLightPlus</item>
@@ -860,6 +864,7 @@
         <item name="chipTextNeutral">@color/chipTextNeutralBlackPlus</item>
         <item name="chipColorBgNormal">@color/chipColorBgNormalBlackPlus</item>
         <item name="chipColorBgHighlight">@color/chipColorBgHighlightBlackPlus</item>
+        <item name="accentInfo">@color/accentInfo</item>
 
         <item name="fabBackgroundColor">@color/fabBackgroundBlackPlus</item>
         <item name="selectedCardBg">@color/selectedCardBgBlackPlus</item>
@@ -995,6 +1000,7 @@
         <item name="chipTextNeutral">@color/chipTextNeutralBlack</item>
         <item name="chipColorBgNormal">@color/chipColorBgNormalBlack</item>
         <item name="chipColorBgHighlight">@color/chipColorBgHighlightBlack</item>
+        <item name="accentInfo">@color/accentInfo</item>
 
         <item name="fabBackgroundColor">@color/fabBackgroundBlack</item>
         <item name="selectedCardBg">@color/selectedCardBgBlack</item>

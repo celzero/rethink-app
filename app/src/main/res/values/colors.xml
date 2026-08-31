@@ -28,6 +28,8 @@
     <color name="accentBad">#ff4081</color>
 
     <color name="accentWarning">#ffd149</color>
+    <color name="accentInfo">#64B5F6</color>
+    <color name="accentInfoLight">#1565C0</color>
     <color name="border">#3F4145</color>
     <color name="textViewBackground">#1A000000</color>
     <color name="buttonBackground">#006f67</color>
