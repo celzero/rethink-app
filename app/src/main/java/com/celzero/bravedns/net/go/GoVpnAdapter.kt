@@ -163,6 +163,7 @@ class GoVpnAdapter : KoinComponent {
         // TODO: ideally the values required for transport, alg and rdns should be set in the
         // opts itself.
         setRDNS()
+        setPlusStrategy()
         addTransport()
         setWireguardTunnelModeIfNeeded(opts.tunProxyMode)
         setSocks5TunnelModeIfNeeded(opts.tunProxyMode)
@@ -3609,10 +3610,6 @@ class GoVpnAdapter : KoinComponent {
                     // default transport-id(Plus), append index & individual id with this
                     val id = Backend.Plus + DOT_INDEX + dot.id
                     url = dot.url
-                    // skip mullvad dots
-                    if (url.contains("mullvad.net") || url.contains("mullvad.org")) {
-                        return@io
-                    }
                     // if tls is present, remove it and pass it to getIpString
                     val ips: String = getIpString(context, url.replace("tls://", ""))
                     if (ips.isEmpty()) {
@@ -3708,11 +3705,11 @@ class GoVpnAdapter : KoinComponent {
         return false
     }
 
-    fun setPlusStrategy(option: Long): Tunnel {
+    fun setPlusStrategy(): Tunnel {
         // Settings.PlusFilterSafest, Settings.PlusOrderFastest
         // default value for PlusStrategy is Safest, which is the safest strategy
         // fastest is another strategy, which is not used for now (v055n)
-        Settings.setPlusStrategy(Settings.PlusFilterSafest)
+        Settings.setPlusStrategy(Settings.PlusOrderFastest, Settings.PlusFilterAdblock)
         return tunnel
     }
 
