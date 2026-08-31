@@ -194,6 +194,9 @@
             android:name=".ui.activity.ConfigureOtherDnsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
+            android:name=".ui.activity.SmartDnsListActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
             android:name=".ui.activity.AppWiseIpLogsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
