@@ -271,6 +271,8 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
     }
 
     private fun setupClickListeners() {
+        b.settingsRestoreDefaults.setOnClickListener { showRestoreDefaultsDialog() }
+
         b.settingsActivityAllNetworkRl.setOnClickListener {
             b.settingsActivityAllNetworkSwitch.isChecked =
                 !b.settingsActivityAllNetworkSwitch.isChecked
@@ -614,6 +616,41 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         b.settingsCustomLanIpDesc.text = getString(R.string.custom_lan_ip_desc)
         b.settingsCustomLanIpRl.setOnClickListener {
             openCustomLanIpDialog()
+        }
+    }
+
+    private fun showRestoreDefaultsDialog() {
+        MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+            .setTitle(R.string.restore_defaults_dialog_title)
+            .setMessage(R.string.restore_defaults_dialog_message)
+            .setPositiveButton(R.string.lbl_proceed) { di, _ ->
+                di.dismiss()
+                restoreDefaults()
+            }
+            .setNegativeButton(R.string.lbl_cancel) { di, _ ->
+                di.dismiss()
+            }
+            .show()
+    }
+
+    private fun restoreDefaults() {
+        io {
+            // restore all tunnel settings values to their defaults (flavor aware)
+            persistentState.restoreTunnelSettingsDefaults()
+            logEvent(
+                "restore defaults",
+                "User restored tunnel settings to default values"
+            )
+            uiCtx {
+                // re-read all values from persistentState into the ui
+                initView()
+                handleLockdownModeIfNeeded()
+                Utilities.showToastUiCentered(
+                    this@TunnelSettingsActivity,
+                    getString(R.string.restore_defaults_success_toast),
+                    Toast.LENGTH_SHORT
+                )
+            }
         }
     }
 
