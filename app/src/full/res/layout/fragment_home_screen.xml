@@ -24,28 +24,17 @@
                 android:id="@+id/fhs_protection_bar"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:layout_marginHorizontal="16dp"
+                android:layout_marginHorizontal="10dp"
                 android:layout_marginTop="16dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:paddingHorizontal="16dp"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/fhs_protection_icon"
-                    android:layout_width="14dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_shield_check"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:tint="?attr/accentGood" />
-
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/fhs_protection_level_txt"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
                     android:ellipsize="end"
                     android:fontFamily="sans-serif-medium"
                     android:letterSpacing="0.04"
@@ -56,7 +45,7 @@
                     android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/fhs_active_since_txt"
-                    app:layout_constraintStart_toEndOf="@id/fhs_protection_icon"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -94,16 +83,6 @@
                     android:paddingHorizontal="24dp"
                     android:paddingVertical="12dp">
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/fhs_dns_icon"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/dns_home_screen"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:tint="?attr/accentGood" />
-
                     <LinearLayout
                         android:id="@+id/fhs_dns_text_container"
                         android:layout_width="0dp"
@@ -111,27 +90,26 @@
                         android:layout_marginStart="16dp"
                         android:orientation="vertical"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/fhs_dns_icon"
+                        app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/fhs_card_dns_latency"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:ellipsize="end"
-                            android:fontFamily="sans-serif-medium"
-                            android:maxLines="2"
-                            tools:text="BLR(– ms)"
-                            android:textColor="?attr/primaryTextColor"
-                            android:textSize="20sp" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fhs_card_dns_connected_dns"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:alpha="0.7"
+                            android:ellipsize="end"
+                            android:fontFamily="sans-serif-medium"
+                            android:maxLines="2"
                             tools:text="DNS · Connected"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="@dimen/extra_large_font_text_view" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/fhs_card_dns_latency"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.7"
+                            tools:text="BLR(– ms)"
                             android:textColor="?attr/primaryLightColorText"
                             android:textSize="11sp" />
                     </LinearLayout>
@@ -165,7 +143,6 @@
                         android:id="@+id/fhs_internet_speed"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="monospace"
                         android:gravity="center"
                         tools:text="▲ 0.00 ▼ 0.00"
                         android:textColor="?attr/primaryTextColor"
@@ -177,7 +154,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:alpha="0.8"
-                        android:fontFamily="monospace"
                         tools:text="B/S"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/mini_font_text_view" />
@@ -187,7 +163,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/fhs_firewall_proxy_row"
                 android:layout_width="match_parent"
-                android:layout_height="105dp"
+                android:layout_height="120dp"
                 android:layout_marginStart="2dp"
                 app:layout_constraintTop_toBottomOf="@id/fhs_card_dns_ll">
 
@@ -237,7 +213,6 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="1dp"
-                                    android:alpha="0.55"
                                     android:letterSpacing="0.08"
                                     android:text="UNIV"
                                     android:textAllCaps="true"
@@ -278,7 +253,6 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="1dp"
-                                    android:alpha="0.55"
                                     android:letterSpacing="0.08"
                                     android:text="@string/lbl_ip"
                                     android:textAllCaps="true"
@@ -319,7 +293,6 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="1dp"
-                                    android:alpha="0.55"
                                     android:letterSpacing="0.08"
                                     android:text="DOM"
                                     android:textAllCaps="true"
@@ -453,7 +426,7 @@
                                         android:layout_height="wrap_content"
                                         android:alpha="0.7"
                                         android:letterSpacing="0.05"
-                                        tools:text="LIVE"
+                                        tools:text="ACTIVE"
                                         android:textAllCaps="true"
                                         android:textColor="?attr/primaryLightColorText"
                                         android:textSize="@dimen/extra_small_font_text_view" />
@@ -623,7 +596,7 @@
                                 android:layout_height="wrap_content"
                                 android:alpha="0.8"
                                 android:letterSpacing="0.15"
-                                tools:text="QUERIES"
+                                android:text="QUERIES"
                                 android:textAllCaps="true"
                                 android:textColor="?attr/primaryLightColorText"
                                 android:textSize="@dimen/small_font_text_view" />
@@ -649,13 +622,13 @@
                             android:checkable="true"
                             android:checked="true"
                             android:text="@string/lbl_allowed"
-                            android:textColor="@color/chip_text_allowed"
+                            android:textColor="@color/chip_toggle_text"
                             android:textSize="@dimen/small_font_text_view"
-                            app:chipBackgroundColor="@color/chip_bg_allowed"
+                            app:chipBackgroundColor="?attr/homeScreenBtnBackground"
                             app:chipEndPadding="4dp"
                             app:chipMinHeight="24dp"
                             app:chipStartPadding="4dp"
-                            app:chipStrokeColor="@color/chip_stroke_allowed"
+                            app:chipStrokeColor="@color/chip_toggle_stroke"
                             app:chipStrokeWidth="1dp" />
 
                         <com.google.android.material.chip.Chip
@@ -665,12 +638,13 @@
                             android:layout_height="32dp"
                             android:checkable="true"
                             android:text="@string/lbl_blocked"
+                            android:textColor="@color/chip_toggle_text"
                             android:textSize="@dimen/small_font_text_view"
-                            app:chipBackgroundColor="@color/chip_bg_blocked"
+                            app:chipBackgroundColor="?attr/homeScreenBtnBackground"
                             app:chipEndPadding="4dp"
                             app:chipMinHeight="24dp"
                             app:chipStartPadding="4dp"
-                            app:chipStrokeColor="@color/chip_stroke_blocked"
+                            app:chipStrokeColor="@color/chip_toggle_stroke"
                             app:chipStrokeWidth="1dp" />
                     </com.google.android.material.chip.ChipGroup>
 
@@ -717,31 +691,31 @@
 
                         <View
                             android:id="@+id/fhs_logs_swatch_0"
-                            android:layout_width="8dp"
-                            android:layout_height="8dp"
+                            android:layout_width="12dp"
+                            android:layout_height="6dp"
                             android:layout_marginStart="4dp"
-                            android:background="#2C525C" />
+                            android:background="@drawable/bg_heatmap_swatch" />
 
                         <View
                             android:id="@+id/fhs_logs_swatch_1"
-                            android:layout_width="8dp"
-                            android:layout_height="8dp"
+                            android:layout_width="12dp"
+                            android:layout_height="6dp"
                             android:layout_marginStart="2dp"
-                            android:background="#347E92" />
+                            android:background="@drawable/bg_heatmap_swatch" />
 
                         <View
                             android:id="@+id/fhs_logs_swatch_2"
-                            android:layout_width="8dp"
-                            android:layout_height="8dp"
+                            android:layout_width="12dp"
+                            android:layout_height="6dp"
                             android:layout_marginStart="2dp"
-                            android:background="#4FADC5" />
+                            android:background="@drawable/bg_heatmap_swatch" />
 
                         <View
                             android:id="@+id/fhs_logs_swatch_3"
-                            android:layout_width="8dp"
-                            android:layout_height="8dp"
+                            android:layout_width="12dp"
+                            android:layout_height="6dp"
                             android:layout_marginStart="2dp"
-                            android:background="?attr/accentGood" />
+                            android:background="@drawable/bg_heatmap_swatch" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
@@ -907,7 +881,7 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/home_fragment_pause_icon"
             style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="56dp"
+            android:layout_width="50dp"
             android:layout_height="56dp"
             android:padding="0dp"
             app:icon="@drawable/ic_pause"
@@ -941,7 +915,7 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/home_fragment_bottom_sheet_icon"
             style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="56dp"
+            android:layout_width="50dp"
             android:layout_height="56dp"
             android:padding="0dp"
             app:icon="@drawable/ic_arrow_down"

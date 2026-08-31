@@ -779,12 +779,12 @@
                         android:checked="true"
                         android:text="Allowed"
                         android:textSize="11sp"
-                        android:textColor="@color/chip_text_allowed"
-                        app:chipBackgroundColor="@color/chip_bg_allowed"
+                        android:textColor="@color/chip_toggle_text"
+                        app:chipBackgroundColor="?attr/homeScreenBtnBackground"
                         app:chipMinHeight="28dp"
                         app:chipStartPadding="8dp"
                         app:chipEndPadding="8dp"
-                        app:chipStrokeColor="@color/chip_stroke_allowed"
+                        app:chipStrokeColor="@color/chip_toggle_stroke"
                         app:chipStrokeWidth="1dp" />
 
                     <com.google.android.material.chip.Chip
@@ -795,11 +795,12 @@
                         android:checkable="true"
                         android:text="Blocked"
                         android:textSize="11sp"
-                        app:chipBackgroundColor="@color/chip_bg_blocked"
+                        android:textColor="@color/chip_toggle_text"
+                        app:chipBackgroundColor="?attr/homeScreenBtnBackground"
                         app:chipMinHeight="28dp"
                         app:chipStartPadding="8dp"
                         app:chipEndPadding="8dp"
-                        app:chipStrokeColor="@color/chip_stroke_blocked"
+                        app:chipStrokeColor="@color/chip_toggle_stroke"
                         app:chipStrokeWidth="1dp" />
                 </com.google.android.material.chip.ChipGroup>
 

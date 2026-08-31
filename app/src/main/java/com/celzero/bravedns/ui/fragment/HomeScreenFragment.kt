@@ -38,9 +38,12 @@ import android.os.Bundle
 import android.os.SystemClock
 import android.provider.Settings
 import android.text.format.DateUtils
+import android.graphics.drawable.GradientDrawable
 import android.util.TypedValue
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -147,7 +150,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val appConfig by inject<AppConfig>()
     private val workScheduler by inject<WorkScheduler>()
     private val eventLogger by inject<EventLogger>()
-    private val sponsorRepository by inject<SponsorRepository>()
     private val sponsorProvider by inject<SponsorProvider>()
     private val activityAggregator by inject<LogActivityAggregator>()
 
@@ -237,6 +239,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         // activity grid intensity levels (empty + 4 logarithmic levels)
         private const val HEATMAP_INTENSITY_LEVELS = 5
+
+        // (fhs_logs_grid: 24 columns x 6 rows, 56dp tall)
+        private const val HEATMAP_GRID_ROWS = 6
+        private const val HEATMAP_GRID_HEIGHT_DP = 56
+
+        private const val HEATMAP_CELL_OVAL_RATIO = 2f
+
+        // fraction of the max cell size per intensity level
+        private val HEATMAP_CELL_SIZE_FRACTION = floatArrayOf(0.55f, 0.78f, 0.78f, 1f, 1f)
     }
 
     enum class ScreenType {
@@ -823,6 +834,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     // last sampled p50 latency (ms) of the active resolver, used by
     // renderDnsHeadline() whenever either latency or region updates
     private var lastDnsP50: Long? = null
+    // last known DNS status
+    private var lastDnsStatus: Int? = null
     // Cache the distinctUntilChanged() LiveData so the same observer instance is reused and
     // unobserveProxyStates() can actually remove it. Without this, every call to
     // observeProxyStates() creates a NEW MediatorLiveData wrapper and registers a brand-new
@@ -912,7 +925,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             if (p50 >= 0) {
                 lastDnsP50 = p50
             }
-            renderDnsHeadline()
             updateUiWithDnsStates(status)
         }
     }
@@ -1320,40 +1332,40 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         val ctx = context ?: return
         val blockedMode = mode == ActivityDisplayMode.BLOCKED
-        // allowed cells follow the theme's positive chip color instead of the
-        // fixed accent so the grid matches the Allowed chip; blocked stays red
-        val base =
-            if (blockedMode) ContextCompat.getColor(ctx, R.color.accentBad)
-            else UIUtils.fetchColor(ctx, R.attr.chipTextPositive)
-        // higher base alpha in light mode for better grid visibility
-        val baseAlpha = if (isLightTheme()) 0x33 else 0x0E
-        val alphas = intArrayOf(baseAlpha, 0x2E, 0x5C, 0x8F, 0xFF)
+        val base = UIUtils.fetchColor(ctx, R.attr.primaryLightColorText)
+        val alphas =
+            if (isLightTheme()) intArrayOf(0x40, 0x80, 0x80, 0xB3, 0xE6)
+            else intArrayOf(0x24, 0x52, 0x52, 0x85, 0xCC)
         val gap = (2f * resources.displayMetrics.density).toInt()
+        val gridHeightPx = HEATMAP_GRID_HEIGHT_DP * resources.displayMetrics.density
+        val cellBaseHeight = (gridHeightPx - HEATMAP_GRID_ROWS * gap * 2f) / HEATMAP_GRID_ROWS
 
         for (interval in state.intervals) {
             val count = if (blockedMode) interval.blocked else interval.allowed
             val lvl = intensityLevel(count)
+            val frac = HEATMAP_CELL_SIZE_FRACTION[lvl]
             val cell = View(ctx)
-            cell.setBackgroundColor(ColorUtils.setAlphaComponent(base, alphas[lvl]))
-            // cells are pure decoration; interactivity lives on the grid
-            // container so every tap inside the heatmap opens the sheet
+            cell.background =
+                GradientDrawable().apply {
+                    shape = GradientDrawable.OVAL
+                    setColor(ColorUtils.setAlphaComponent(base, alphas[lvl]))
+                }
             cell.isClickable = false
             cell.isFocusable = false
 
             val lp =
                 GridLayout.LayoutParams().apply {
-                    width = 0
-                    height = 0
+                    width = (cellBaseHeight * frac).toInt()
+                    height = (cellBaseHeight * frac).toInt()
                     columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
                     rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
                     setMargins(gap, gap, gap, gap)
+                    setGravity(Gravity.CENTER)
                 }
             cell.layoutParams = lp
             grid.addView(cell)
         }
 
-        // legend swatches follow the active mode's base color so the color
-        // switch is readable at a glance
         val swatches =
             listOf(
                 b.fhsLogsSwatch0,
@@ -1361,11 +1373,21 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 b.fhsLogsSwatch2,
                 b.fhsLogsSwatch3
             )
+        val legendLevels = intArrayOf(0, 2, 3, 4)
         val legendAlphas = intArrayOf(alphas[0], alphas[2], alphas[3], alphas[4])
+        val legendBaseH = 3f * resources.displayMetrics.density
         swatches.forEachIndexed { i, swatch ->
-            swatch.setBackgroundColor(
-                ColorUtils.setAlphaComponent(base, legendAlphas[i])
-            )
+            val frac = HEATMAP_CELL_SIZE_FRACTION[legendLevels[i]]
+            swatch.background =
+                GradientDrawable().apply {
+                    shape = GradientDrawable.OVAL
+                    setColor(ColorUtils.setAlphaComponent(base, legendAlphas[i]))
+                }
+            swatch.layoutParams =
+                LinearLayout.LayoutParams(
+                    (legendBaseH * HEATMAP_CELL_OVAL_RATIO * frac).toInt(),
+                    (legendBaseH * frac).toInt()
+                ).apply { gravity = Gravity.CENTER_VERTICAL }
         }
     }
 
@@ -1407,10 +1429,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (view == null || !isAdded) return
 
         // subtle, low-emphasis hint instead of the oversized legacy label
-        b.fhsCardDnsLatency.text = getString(R.string.hsf_dns_mode_off_indicator)
-        b.fhsCardDnsLatency.applyLowEmphasis(dnsHeadlineSizePx)
-        b.fhsCardDnsConnectedDns.text = getString(R.string.lbl_disabled).lowercase()
-        b.fhsCardDnsConnectedDns.isSelected = true
+        b.fhsCardDnsConnectedDns.text = getString(R.string.hsf_dns_mode_off_indicator)
+        b.fhsCardDnsConnectedDns.applyLowEmphasis(dnsHeadlineSizePx)
+        b.fhsCardDnsLatency.text = getString(R.string.lbl_disabled).lowercase()
+        b.fhsCardDnsLatency.isSelected = true
     }
 
     private fun disableAppsCard() {
@@ -1479,38 +1501,49 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     /**
-     * Renders the DNS card headline as "<region>(<p50> ms)" (e.g. "BLR(45 ms)");
-     * falls back to "45 ms" when the resolver region is unknown and shows the
-     * region alone until a latency sample is available.
+     * Renders the DNS card's second line as "<status> · <region>(<p50> ms)"
+     * (e.g. "Connected · BLR(45 ms)"). Falls back to "45 ms" when the resolver
+     * region is unknown and shows the region alone until a latency sample is
+     * available. When no sample exists at all, shows the status (or "Inactive").
      */
-    private fun renderDnsHeadline() {
-        val region = VpnController.getRegionLiveData().value
-        val p50 = lastDnsP50 ?: return
+    private fun renderDnsHeadline(dnsStatus: Int? = null) {
+        if (view == null || !isAdded) return
+        if (dnsStatus != null) lastDnsStatus = dnsStatus
 
-        b.fhsCardDnsLatency.text =
+        val status =
+            lastDnsStatus?.let {
+                getString(UIUtils.getDnsStatusStringRes(it)).lowercase().capitalizeWords()
+            }
+        val region = VpnController.getRegionLiveData().value
+        val p50 = lastDnsP50
+
+        val latency =
             when {
-                p50 >= 0L && !region.isNullOrEmpty() ->
+                p50 != null && p50 >= 0L && !region.isNullOrEmpty() ->
                     getString(R.string.hsf_dns_latency_region_ms, region, p50.toString())
-                p50 >= 0L ->
+                p50 != null && p50 >= 0L ->
                     getString(R.string.hsf_dns_latency_ms, p50.toString())
                 !region.isNullOrEmpty() -> region
-                else -> b.fhsCardDnsLatency.context.getString(R.string.lbl_inactive)
+                else -> null
             }
+
+        val parts = listOfNotNull(status, latency)
+        b.fhsCardDnsLatency.text =
+            if (parts.isEmpty()) b.fhsCardDnsLatency.context.getString(R.string.lbl_inactive)
+            else parts.joinToString(" · ")
+        b.fhsCardDnsLatency.isSelected = true
     }
 
     private fun updateUiWithDnsStates(dnsStatus: Int? = null) {
         // Check if view is available before accessing binding
         if (view == null || !isAdded) return
 
-
-        val statusId = UIUtils.getDnsStatusStringRes(dnsStatus)
-
         // show the resolver name alongside its connection status
         val dnsName = appConfig.getConnectedDnsObservable().value
-        val status = getString(statusId).lowercase().capitalizeWords()
-        b.fhsCardDnsConnectedDns?.text =
-            if (dnsName.isNullOrEmpty()) status else getString(R.string.two_argument_dot, dnsName, status)
-        b.fhsCardDnsConnectedDns?.isSelected = true
+        b.fhsCardDnsConnectedDns.text = dnsName
+        b.fhsCardDnsConnectedDns.isSelected = true
+
+        renderDnsHeadline(dnsStatus)
     }
 
     private fun observeLogsCount() {
@@ -1541,14 +1574,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         appConfig.dnsLogsCount.observe(viewLifecycleOwner) {
             val count = formatDecimal(it)
-            b.fhsCardDnsLogsCount?.text = count
-            b.fhsCardDnsLogsCount?.isSelected = true
+            b.fhsCardDnsLogsCount.text = count
+            b.fhsCardDnsLogsCount.isSelected = true
         }
 
         appConfig.networkLogsCount.observe(viewLifecycleOwner) {
             val count = formatDecimal(it)
-            b.fhsCardNetworkLogsCount?.text = count
-            b.fhsCardNetworkLogsCount?.isSelected = true
+            b.fhsCardNetworkLogsCount.text = count
+            b.fhsCardNetworkLogsCount.isSelected = true
         }
     }
 
@@ -1566,6 +1599,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         dnsObserverActive = false
         dnsStateListenerJob?.cancel()
         lastDnsP50 = null
+        lastDnsStatus = null
         appConfig.getConnectedDnsObservable().removeObservers(viewLifecycleOwner)
         VpnController.getRegionLiveData().removeObservers(viewLifecycleOwner)
     }
