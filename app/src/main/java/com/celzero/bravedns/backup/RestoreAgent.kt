@@ -146,6 +146,11 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             // open log database if its not open
             handleDatabaseInit()
 
+            // remove subscription state and history entries restored from the backup,
+            // Google Play will re-fetch purchase details via queryPurchasesAsync and
+            // reconcileWithPlayBilling() on the next app start (Play is the source of truth)
+            clearSubscriptionEntries()
+
             // copy the blocklist file from assets to the remote blocklist folder
             moveRemoteBlocklistFileFromAsset()
 
@@ -219,6 +224,36 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             appDatabase.openHelper.writableDatabase
         } else {
             // no-op
+        }
+    }
+
+    /**
+     * Clears SubscriptionStatus and SubscriptionStateHistory tables after a restore.
+     *
+     * The restored database carries subscription rows (purchase tokens, account ids,
+     * expiry estimates) from the *backing-up* device. These rows dangle mid-state on
+     * the new install and can put the subscription state machine in an inconsistent
+     * position until the next Play query. Since Google Play is the source of truth
+     * (see SubscriptionStateMachineV2.reconcileWithPlayBilling), the tables are
+     * emptied here so Play re-fetches purchases via queryPurchasesAsync on the next
+     * app start and repopulates both tables from scratch.
+     */
+    private suspend fun clearSubscriptionEntries() {
+        try {
+            appDatabase.subscriptionStatusDao().deleteAll()
+            appDatabase.subscriptionStateHistoryDao().deleteAll()
+            Logger.i(
+                LOG_TAG_BACKUP_RESTORE,
+                "cleared subscription status and history entries during restore"
+            )
+        } catch (e: Exception) {
+            // non-fatal: reconcileWithPlayBilling() will expire orphaned rows on the
+            // next Play snapshot even if this cleanup fails
+            Logger.crash(
+                LOG_TAG_BACKUP_RESTORE,
+                "err while clearing subscription entries during restore, reason? ${e.message}",
+                e
+            )
         }
     }
 
