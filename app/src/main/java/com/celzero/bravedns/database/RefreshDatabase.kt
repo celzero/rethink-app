@@ -374,25 +374,33 @@ internal constructor(
         installedApps: Set<FirewallManager.AppInfoTuple>
     ) {
         // if a non-app appears installed-apps group, then upsert its db entry
-        // and give it a proper identity as retrieved from the package-manager
         val nonApps = trackedApps.filter { isNonApp(it.packageName) }.map { it.uid }.toSet()
-        installedApps.forEach { x ->
-            if (nonApps.contains(x.uid)) {
-                val prevPackageName =
-                    trackedApps.filter { i -> i.uid == x.uid }.map { it.packageName }
-                upsertNonApp(x, prevPackageName.firstOrNull())
+        installedApps.filter { nonApps.contains(it.uid) }
+            .groupBy { it.uid }
+            .forEach { (uid, installed) ->
+                // only the placeholder (no_package_<uid>) must be replaced
+                val placeholder =
+                    trackedApps.firstOrNull { it.uid == uid && isNonApp(it.packageName) }?.packageName
+                upsertNonApp(uid, installed, placeholder)
             }
-        }
     }
 
     private suspend fun upsertNonApp(
-        appTuple: FirewallManager.AppInfoTuple,
-        prevPackageName: String?
+        uid: Int,
+        installed: List<FirewallManager.AppInfoTuple>,
+        placeholderPackageName: String?
     ) {
-        val appInfo = fetchApplicationInfo(appTuple.uid) ?: return
         // TODO: implement upsert logic handling all the edge cases
-        deletePackage(appTuple.uid, prevPackageName)
-        insertApp(appInfo)
+        if (placeholderPackageName != null) {
+            deletePackage(uid, placeholderPackageName)
+        }
+        // insert every installed package sharing this uid; skip ones already tracked
+        installed.forEach { x ->
+            val known = FirewallManager.getAppInfoByUidAndPackage(x.uid, x.packageName)
+            if (known != null) return@forEach
+            val ai = Utilities.getApplicationInfo(ctx, x.packageName) ?: return@forEach
+            insertApp(ai)
+        }
     }
 
     private suspend fun addMissingPackages(apps: Set<FirewallManager.AppInfoTuple>) {
