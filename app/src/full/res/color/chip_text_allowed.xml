@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- allowed-chip text: positive chip color while selected, dimmed base
-     text otherwise, so the unchecked state reads as inactive -->
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_checked="true" android:color="?attr/chipTextPositive" />
-    <item android:color="?attr/primaryLightColorText" />
-</selector>
