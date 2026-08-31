@@ -57,7 +57,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
-            app:cardBackgroundColor="?attr/homeScreenBtnBackground"
             app:cardCornerRadius="22dp"
             app:cardElevation="0dp"
             app:strokeColor="?attr/border"
@@ -78,8 +77,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="2dp"
                     android:layout_weight="1"
-                    android:checkable="true"
-                    android:text="@string/logs_range_10m" />
+                    android:checkable="true" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/bs_lai_chip_1h"
@@ -88,8 +86,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="2dp"
                     android:layout_weight="1"
-                    android:checkable="true"
-                    android:text="@string/logs_range_1h" />
+                    android:checkable="true" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/bs_lai_chip_24h"
@@ -98,8 +95,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="2dp"
                     android:layout_weight="1"
-                    android:checkable="true"
-                    android:text="@string/logs_range_24h" />
+                    android:checkable="true" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/bs_lai_chip_7d"
@@ -107,8 +103,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:checkable="true"
-                    android:text="@string/logs_range_7d" />
+                    android:checkable="true" />
             </com.google.android.material.button.MaterialButtonToggleGroup>
         </com.google.android.material.card.MaterialCardView>
 
@@ -124,7 +119,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
-                app:cardBackgroundColor="?attr/homeScreenBtnBackground"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeColor="?attr/border"
@@ -141,7 +135,7 @@
                         android:id="@+id/bs_lai_blocked_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/lbl_zero"
+                        android:text="0"
                         android:textColor="?attr/accentBad"
                         android:textSize="26sp"
                         android:textStyle="bold" />
@@ -162,7 +156,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1"
-                app:cardBackgroundColor="?attr/homeScreenBtnBackground"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeColor="?attr/border"
@@ -179,7 +172,7 @@
                         android:id="@+id/bs_lai_allowed_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/lbl_zero"
+                        android:text="0"
                         android:textColor="?attr/colorPrimary"
                         android:textSize="26sp"
                         android:textStyle="bold" />

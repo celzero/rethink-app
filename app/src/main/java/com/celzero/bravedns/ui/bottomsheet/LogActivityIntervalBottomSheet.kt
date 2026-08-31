@@ -146,6 +146,12 @@ class LogActivityIntervalBottomSheet : BottomSheetDialogFragment() {
      * minutes.
      */
     private fun setupRangeChips() {
+        // range labels reuse the same strings as SummaryStatisticsFragment's
+        // time-range toggle ("10 min", "1 hr", "24 hr", "7 day")
+        b.bsLaiChip10m.text = getString(R.string.ci_desc, "10", getString(R.string.lbl_min))
+        b.bsLaiChip1h.text = getString(R.string.ci_desc, "1", getString(R.string.lbl_hour))
+        b.bsLaiChip24h.text = getString(R.string.ci_desc, "24", getString(R.string.lbl_hour))
+        b.bsLaiChip7d.text = getString(R.string.ci_desc, "7", getString(R.string.lbl_day))
         val listener =
             MaterialButtonToggleGroup.OnButtonCheckedListener { _, buttonId, isChecked ->
                 if (!isChecked) return@OnButtonCheckedListener
