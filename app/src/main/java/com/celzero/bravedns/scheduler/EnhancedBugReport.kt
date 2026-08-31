@@ -24,6 +24,7 @@ import androidx.annotation.RequiresApi
 import com.celzero.bravedns.scheduler.EnhancedBugReport.MAX_TOTAL_FILES
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.ExceptionParser
 import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.Utilities
 import org.koin.core.component.KoinComponent
@@ -60,7 +61,9 @@ object EnhancedBugReport : KoinComponent {
     // When Firebase is OFF, files accumulate up to this limit before the oldest are deleted.
     private const val MAX_TOTAL_FILES = 20
 
-    private const val MAX_BYTES = 64 * 1024
+    // Crashlytics log() is a 64 KB ring buffer; keep each log entry comfortably small so
+    // no chunk of the raw captured trace is truncated or evicted mid-write.
+    private const val LOG_CHUNK_CHARS = 4 * 1024
 
     private val persistentState by inject<PersistentState>()
 
@@ -304,15 +307,26 @@ object EnhancedBugReport : KoinComponent {
     }
 
     /**
-     * Reads [file] content, builds a synthetic exception and records it as a non-fatal event
-     * in Firebase Crashlytics.  Content > 2 KB is also chunked into log() calls so the full
-     * crash text is available in the Crashlytics log tab.
+     * Reads [file] content and reports it to Firebase Crashlytics as a non-fatal event.
+     *
+     * The file content is parsed by [ExceptionParser]; when Go/JVM stack frames are found,
+     * a synthetic imported exception carrying the *captured* frames is recorded via
+     * [FirebaseErrorReporting.recordException] so Crashlytics shows the real crash origin
+     * instead of this reporting method. The complete raw content is additionally shipped
+     * via [FirebaseErrorReporting.log] so information not representable as
+     * [StackTraceElement]s (Caused by / Suppressed / goroutine headers / corrupt lines)
+     * is still available in the Crashlytics log tab.
+     *
+     * When nothing could be parsed (e.g. golog_ files or unrecognised content), falls back
+     * to the legacy behaviour: a synthetic [RuntimeException] with a 2 KB message preview
+     * plus the full content in 8 KB log chunks.
      *
      * Returns true if the record call did not throw.
      */
     private fun sendFileToFirebase(file: File): Boolean {
         return try {
-            val content = readTruncatedContent(file)
+            // read the complete original content; never truncate before parsing.
+            val content = file.readText()
             val type = when {
                 file.name.startsWith(PREFIX_GO_CRASH) -> "GoCrash"
                 file.name.startsWith(PREFIX_GO_LOG) -> "GoLog"
@@ -320,32 +334,36 @@ object EnhancedBugReport : KoinComponent {
                 else -> "CrashLog"
             }
             Logger.d(LOG_TAG_BUG_REPORT, "err-rpting: sending $type ${file.name} (${content.length} chars)")
-            // add 2 kb in the exception, rest to be added in corresponding log calls
-            val messagePreview = content.take(2 * 1024)
-            val ex = RuntimeException("[$type] ${file.name}\n$messagePreview")
 
-            // log rest content in 8 KB chunks so nothing is lost.
-            content.chunked(8 * 1024).forEachIndexed { idx, chunk ->
-                FirebaseErrorReporting.log("[$type][${file.name}][$idx] $chunk")
+            val parsed = ExceptionParser.parse(content)
+            if (parsed.frames.isEmpty()) {
+                // nothing parsable as a stack trace: keep the legacy reporting behaviour.
+                val messagePreview = content.take(2 * 1024)
+                val ex = RuntimeException("[$type] ${file.name}\n$messagePreview")
+
+                // log rest content in 8 KB chunks so nothing is lost.
+                content.chunked(8 * 1024).forEachIndexed { idx, chunk ->
+                    FirebaseErrorReporting.log("[$type][${file.name}][$idx] $chunk")
+                }
+                // note: call the log before exception and then record exception
+                FirebaseErrorReporting.recordException(ex)
+            } else {
+                // log the captured type + full raw trace first, then record the reconstructed
+                // exception so the log lines appear right above it in the Crashlytics log tab.
+                // (Crashlytics log is a 64 KB ring buffer; chunk to keep each entry intact.)
+                FirebaseErrorReporting.log("== captured ${parsed.type.name.lowercase()} ==")
+                content.chunked(LOG_CHUNK_CHARS).forEachIndexed { idx, chunk ->
+                    FirebaseErrorReporting.log("[$type][${file.name}][$idx] $chunk")
+                }
+                FirebaseErrorReporting.recordException(
+                    parsed.toThrowable(context = "$type ${file.name}")
+                )
             }
-            // note: call the log before exception and then record exception
-            FirebaseErrorReporting.recordException(ex)
             Log.d(LOG_TAG_BUG_REPORT, "err-rpting: sent $type ${file.name} (${content.length} chars)")
             true
         } catch (e: Exception) {
             Log.e(LOG_TAG_BUG_REPORT, "err-rpting: failed to send ${file.name}: ${e.message}")
             false
-        }
-    }
-
-    private fun readTruncatedContent(file: File): String {
-        file.inputStream().buffered().use { input ->
-            val buffer = ByteArray(MAX_BYTES)
-            val bytesRead = input.read(buffer)
-            if (bytesRead <= 0) return ""
-
-            return buffer.copyOf(bytesRead)
-                .toString(Charsets.UTF_8)
         }
     }
 
