@@ -42,6 +42,8 @@ import com.celzero.bravedns.database.ProxyEndpointRepository
 import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.database.RethinkDnsEndpointRepository
 import com.celzero.bravedns.database.Severity
+import com.celzero.bravedns.database.SmartDnsEndpoint
+import com.celzero.bravedns.database.SmartDnsEndpointRepository
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TcpProxyHelper
@@ -66,6 +68,7 @@ internal constructor(
     private val dnsCryptRelayEndpointRepository: DnsCryptRelayEndpointRepository,
     private val doTEndpointRepository: DoTEndpointRepository,
     private val oDoHEndpointRepository: ODoHEndpointRepository,
+    private val smartDnsEndpointRepository: SmartDnsEndpointRepository,
     private val proxyEndpointRepository: ProxyEndpointRepository,
     private val persistentState: PersistentState,
     private val networkLogs: ConnectionTrackerRepository,
@@ -582,7 +585,9 @@ internal constructor(
                 postConnectedDnsName(context.getString(R.string.network_dns))
             }
             DnsType.SMART_DNS -> {
-                postConnectedDnsName(context.getString(R.string.smart_dns))
+                val name = getSelectedSmartDnsEndpoint()?.dnsName
+                    ?: context.getString(R.string.smart_dns)
+                postConnectedDnsName(name)
             }
         }
     }
@@ -896,18 +901,24 @@ internal constructor(
         )
     }
 
-    suspend fun enableSmartDns() {
+    suspend fun enableSmartDns(id: Int) {
         if (getDnsType() != DnsType.SMART_DNS) {
             removeConnectionStatus()
         }
 
         val prev = persistentState.connectedDnsName
+        // persist the user's smart dns selection before triggering the dns change
+        smartDnsEndpointRepository.select(id)
         onDnsChange(DnsType.SMART_DNS)
         logEvent(
             EventType.DNS_SERVER_CHANGE,
             "Smart DNS enabled",
-            "Smart DNS enabled, prev: $prev"
+            "Smart DNS enabled, id: $id, prev: $prev"
         )
+    }
+
+    suspend fun getSelectedSmartDnsEndpoint(): SmartDnsEndpoint? {
+        return smartDnsEndpointRepository.getSelectedEndpoint()
     }
 
     fun isSystemDns(): Boolean {

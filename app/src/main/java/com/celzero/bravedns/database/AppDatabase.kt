@@ -55,9 +55,10 @@ import com.celzero.bravedns.util.Constants
         SubscriptionStatus::class,
         SubscriptionStateHistory::class,
         CountryConfig::class,
-        SponsorEntity::class
+        SponsorEntity::class,
+        SmartDnsEndpoint::class
     ],
-    version = 33,
+    version = 34,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -173,6 +174,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_30_31)
                 .addMigrations(MIGRATION_31_32)
                 .addMigrations(MIGRATION_32_33)
+                .addMigrations(MIGRATION_33_34)
                 .build()
 
         private val roomCallback: Callback =
@@ -1320,7 +1322,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_30_31: Migration =
+        val MIGRATION_30_31: Migration =
             object : Migration(30, 31) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     if (!doesColumnExistInTable(db, "AppInfo", "notes")) {
@@ -1378,6 +1380,51 @@ abstract class AppDatabase : RoomDatabase() {
                             "MIGRATION_32_33: dohIp column already exists in DoHEndpoint"
                         )
                     }
+                }
+            }
+
+        private val MIGRATION_33_34: Migration =
+            object : Migration(33, 34) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    createSmartDnsTable(db)
+                    seedSmartDnsEndpoints(db)
+                }
+
+                private fun createSmartDnsTable(db: SupportSQLiteDatabase) {
+                    db.execSQL(
+                        "CREATE TABLE IF NOT EXISTS 'SmartDnsEndpoint' " +
+                                "('id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                                "'dnsName' TEXT NOT NULL, " +
+                                "'dnsMode' INTEGER NOT NULL, " +
+                                "'dnsExplanation' TEXT NOT NULL, " +
+                                "'isSelected' INTEGER NOT NULL, " +
+                                "'modifiedDataTime' INTEGER NOT NULL, " +
+                                "'latency' INTEGER NOT NULL)"
+                    )
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_33_34: created SmartDnsEndpoint table")
+                }
+
+                // seed the three smart dns options; none is selected until the user
+                // explicitly picks one from the smart dns list screen
+                private fun seedSmartDnsEndpoints(db: SupportSQLiteDatabase) {
+                    with(db) {
+                        execSQL(
+                            "INSERT OR REPLACE INTO SmartDnsEndpoint" +
+                                    "(id, dnsName, dnsMode, dnsExplanation, isSelected, modifiedDataTime, latency) " +
+                                    "VALUES (1, 'Smart DNS No Filter', 0, 'Uses any of the configured DNS resolvers without applying any filtering.', 0, 0, 0)"
+                        )
+                        execSQL(
+                            "INSERT OR REPLACE INTO SmartDnsEndpoint" +
+                                    "(id, dnsName, dnsMode, dnsExplanation, isSelected, modifiedDataTime, latency) " +
+                                    "VALUES (2, 'Smart DNS Security', 1, 'Prefers resolvers blocking malicious domains.', 0, 0, 0)"
+                        )
+                        execSQL(
+                            "INSERT OR REPLACE INTO SmartDnsEndpoint" +
+                                    "(id, dnsName, dnsMode, dnsExplanation, isSelected, modifiedDataTime, latency) " +
+                                    "VALUES (3, 'Smart DNS Family', 2, 'Prefers resolvers blocking malicious and adult content.', 0, 0, 0)"
+                        )
+                    }
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_33_34: seeded SmartDnsEndpoint rows")
                 }
             }
 
@@ -1454,11 +1501,15 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun countryConfigDAO(): CountryConfigDAO
 
+    abstract fun smartDnsEndpointDao(): SmartDnsEndpointDAO
+
     fun appInfoRepository() = AppInfoRepository(appInfoDAO())
 
     fun dohEndpointRepository() = DoHEndpointRepository(dohEndpointsDAO())
 
     fun countryConfigRepository() = CountryConfigRepository(countryConfigDAO())
+
+    fun smartDnsEndpointRepository() = SmartDnsEndpointRepository(smartDnsEndpointDao())
 
     fun dnsCryptEndpointRepository() = DnsCryptEndpointRepository(dnsCryptEndpointDAO())
 

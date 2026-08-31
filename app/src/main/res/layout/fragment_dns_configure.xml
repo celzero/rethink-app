@@ -26,10 +26,20 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_alignParentStart="true"
-                android:layout_toStartOf="@id/dc_refresh"
+                android:layout_toStartOf="@id/dc_restore_defaults"
                 android:padding="5dp"
                 android:text="@string/dc_global_heading"
                 android:textColor="?attr/colorPrimary" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/dc_restore_defaults"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@id/dc_refresh"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:padding="5dp"
+                android:src="@drawable/ic_backup_restore" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/dc_refresh"
@@ -124,37 +134,19 @@
                     android:padding="10dp"
                     android:text="@string/dc_rethink_dns_radio" />
 
-                <RelativeLayout
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/smart_dns_rb"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
-                    android:layout_marginBottom="10dp">
-
-                    <com.google.android.material.radiobutton.MaterialRadioButton
-                        android:id="@+id/smart_dns_rb"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
-                        android:layout_gravity="center"
-                        android:enabled="true"
-                        android:minHeight="48dp"
-                        android:padding="10dp"
-                        android:text="@string/smart_dns" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/smart_dns_info"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:layout_gravity="center"
-                        android:padding="10dp"
-                        android:src="@drawable/ic_info_white_16" />
-
-                </RelativeLayout>
+                    android:layout_marginBottom="10dp"
+                    android:drawableEnd="@drawable/ic_right_arrow_white"
+                    android:enabled="true"
+                    android:minHeight="48dp"
+                    android:padding="10dp"
+                    android:text="@string/smart_dns" />
 
                 <LinearLayout
                     android:id="@+id/query_card_view_top"

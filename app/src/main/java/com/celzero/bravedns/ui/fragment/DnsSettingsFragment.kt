@@ -16,7 +16,6 @@
 package com.celzero.bravedns.ui.fragment
 
 import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -31,8 +30,6 @@ import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.data.AppConfig.Companion.DOH_INDEX
-import com.celzero.bravedns.data.AppConfig.Companion.DOT_INDEX
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
@@ -47,6 +44,7 @@ import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
 import com.celzero.bravedns.ui.activity.DnsListActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
+import com.celzero.bravedns.ui.activity.SmartDnsListActivity
 import com.celzero.bravedns.ui.bottomsheet.BlockFreeDnsModeBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.DnsRecordTypesBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.LocalBlocklistsBottomSheet
@@ -466,6 +464,8 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
 
     private fun initClickListeners() {
 
+        b.dcRestoreDefaults.setOnClickListener { showRestoreDefaultsDialog() }
+
         b.dcLocalBlocklistRl.setOnClickListener { openLocalBlocklist() }
 
         b.dcLocalBlocklistImg.setOnClickListener { openLocalBlocklist() }
@@ -561,7 +561,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
 
         b.smartDnsRb.setOnCheckedChangeListener(null)
         b.smartDnsRb.setOnClickListener {
-            setSmartDns()
+            showSmartDnsList()
         }
 
         b.dcDownloaderRl.setOnClickListener {
@@ -652,10 +652,6 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             }
         }
 
-        b.smartDnsInfo.setOnClickListener {
-            showSmartDnsInfoDialog()
-        }
-
         b.dcUndelegatedDomainsRl.setOnClickListener {
             b.dcUndelegatedDomainsSwitch.isChecked = !b.dcUndelegatedDomainsSwitch.isChecked
         }
@@ -687,6 +683,55 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.dcBlockHeadingRl.setOnClickListener { b.dcBlockUnknownSwitch.isChecked = !b.dcBlockUnknownSwitch.isChecked }
     }
 
+    private fun showRestoreDefaultsDialog() {
+        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+            .setTitle(R.string.restore_defaults_dialog_title)
+            .setMessage(R.string.restore_defaults_dialog_message)
+            .setPositiveButton(R.string.lbl_proceed) { di, _ ->
+                di.dismiss()
+                restoreDefaults()
+            }
+            .setNegativeButton(R.string.lbl_cancel) { di, _ ->
+                di.dismiss()
+            }
+            .show()
+    }
+
+    private fun restoreDefaults() {
+        io {
+            // cancel the periodic blocklist update check work if it was scheduled
+            if (persistentState.periodicallyCheckBlocklistUpdate) {
+                Logger.i(Logger.LOG_TAG_SCHEDULER, "Cancel all the work related to blocklist update check")
+                WorkManager.getInstance(requireContext().applicationContext)
+                    .cancelAllWorkByTag(BLOCKLIST_UPDATE_CHECK_JOB_TAG)
+            }
+            // restore all dns settings values to their defaults (flavor / android-version aware)
+            persistentState.restoreDnsSettingsDefaults()
+            // restore dns selection back to the default (RethinkDNS)
+            appConfig.enableRethinkDnsPlus()
+            logEvent(
+                "restore defaults",
+                "User restored dns settings to default values"
+            )
+            uiCtx {
+                refreshUiAfterRestore()
+                Utilities.showToastUiCentered(
+                    requireContext(),
+                    getString(R.string.restore_defaults_success_toast),
+                    Toast.LENGTH_SHORT
+                )
+            }
+        }
+    }
+
+    private fun refreshUiAfterRestore() {
+        if (!isAdded) return
+        // re-read all values from persistentState into the ui
+        initView()
+        updateSelectedDns()
+        io { handleProxyDnsUi() }
+    }
+
     private fun showBlockFreeDnsModeBottomSheet() {
         val bottomSheet = BlockFreeDnsModeBottomSheet()
         parentFragmentManager.setFragmentResultListener(
@@ -707,60 +752,9 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         bottomSheet.show(parentFragmentManager, bottomSheet.tag)
     }
 
-    private fun showSmartDnsInfoDialog() {
-        io {
-            val ids = VpnController.getPlusResolvers()
-            val dnsList: MutableList<String> = mutableListOf()
-            ids.forEach {
-                val index = it.substringAfter(Backend.Plus).getOrNull(0)
-                if (index == null) {
-                    Logger.w(LOG_TAG_DNS, "smart(plus) dns resolver id is empty: $it")
-                    return@forEach
-                }
-                // for now, only doh and dot are supported
-                if (index != DOH_INDEX && index != DOT_INDEX) {
-                    Logger.w(LOG_TAG_DNS, "smart(plus) dns resolver id is not doh or dot: $it")
-                    return@forEach
-                }
-                val transport = VpnController.getPlusTransportById(it)
-                val address = transport?.addr ?: ""
-                if (address.isNotEmpty()) dnsList.add(address)
-            }
-
-            Logger.i(LOG_TAG_DNS, "smart(plus) dns list size: ${dnsList.size}")
-            uiCtx {
-                val stringBuilder = StringBuilder()
-                val desc = getString(R.string.smart_dns_desc)
-                stringBuilder.append(desc).append("\n\n")
-                dnsList.forEach {
-                    val txt = getString(R.string.symbol_star) + " " + it
-                    stringBuilder.append(txt).append("\n")
-                }
-                val list = stringBuilder.toString()
-                val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
-                    .setTitle(R.string.smart_dns)
-                    .setMessage(list)
-                    .setCancelable(true)
-                    .setPositiveButton(R.string.ada_noapp_dialog_positive) { di, _ ->
-                        di.dismiss()
-                    }.setNeutralButton(
-                        requireContext().getString(R.string.dns_info_neutral)
-                    ) { _: DialogInterface, _: Int ->
-                        UIUtils.clipboardCopy(
-                            requireContext(),
-                            list,
-                            requireContext().getString(R.string.copy_clipboard_label)
-                        )
-                        Utilities.showToastUiCentered(
-                            requireContext(),
-                            requireContext().getString(R.string.info_dialog_url_copy_toast_msg),
-                            Toast.LENGTH_SHORT
-                        )
-                    }
-                val dialog = builder.create()
-                dialog.show()
-            }
-        }
+    private fun showSmartDnsList() {
+        val intent = Intent(requireContext(), SmartDnsListActivity::class.java)
+        startActivity(intent)
     }
 
     private fun showSystemDnsDialog(dns: String) {
@@ -858,11 +852,6 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         }
         // set network dns
         io { appConfig.enableSystemDns() }
-    }
-
-    private fun setSmartDns() {
-        // set smart dns
-        io { appConfig.enableSmartDns() }
     }
 
     private fun enableAfterDelay(ms: Long, vararg views: View) {
