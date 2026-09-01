@@ -15,91 +15,103 @@
         android:textColor="?attr/primaryTextColor"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/text_input_layout_name"
+    <ScrollView
+        android:id="@+id/dialog_custom_url_scroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:hint="@string/cd_doh_dialog_resolver_name"
-        app:hintTextColor="?attr/accentGood"
+        android:fillViewport="true"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toTopOf="@id/dialog_custom_url_ok_btn"
         app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_top">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/dialog_custom_name_edit_text"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textNoSuggestions"
-            android:maxLines="2"
-            android:textColor="?attr/primaryTextColor"
-            android:textAppearance="?attr/textAppearanceBodyLarge" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:orientation="vertical">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/text_input_layout1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:hint="@string/cd_doh_dialog_resolver_url"
-        app:hintTextColor="?attr/accentGood"
-        app:layout_constraintTop_toBottomOf="@id/text_input_layout_name">
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/text_input_layout_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:hint="@string/cd_doh_dialog_resolver_name"
+                app:hintTextColor="?attr/accentGood">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/dialog_custom_url_edit_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textUri"
-            android:maxLines="2"
-            android:text="https://"
-            android:textColor="?attr/primaryTextColor"
-            android:textAppearance="?attr/textAppearanceBodyLarge" />
-    </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/dialog_custom_name_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textNoSuggestions"
+                    android:maxLines="2"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/text_input_layout_ip"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:hint="@string/cd_doh_dialog_resolver_ip"
-        app:hintTextColor="?attr/accentGood"
-        app:layout_constraintTop_toBottomOf="@id/text_input_layout1">
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/text_input_layout1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:hint="@string/cd_doh_dialog_resolver_url"
+                app:hintTextColor="?attr/accentGood">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/dialog_custom_ip_edit_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textNoSuggestions"
-            android:maxLines="2"
-            android:textColor="?attr/primaryTextColor"
-            android:textAppearance="?attr/textAppearanceBodyLarge" />
-    </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/dialog_custom_url_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textUri"
+                    android:maxLines="2"
+                    android:text="https://"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/dialog_secure_checkbox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="10dp"
-        android:buttonTint="?attr/accentGood"
-        android:text="@string/cd_doh_dialog_checkbox_desc"
-        android:textAppearance="?attr/textAppearanceBodyMedium"
-        android:textColor="?attr/primaryTextColor"
-        app:layout_constraintTop_toBottomOf="@id/text_input_layout_ip" />
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/text_input_layout_ip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:hint="@string/cd_doh_dialog_resolver_ip"
+                app:hintTextColor="?attr/accentGood">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/dialog_custom_url_failure_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="10dp"
-        android:padding="5dp"
-        android:text="@string/settings_http_proxy_error_text4"
-        android:textAppearance="?attr/textAppearanceBodyMedium"
-        android:textColor="?attr/colorError"
-        android:visibility="invisible"
-        app:layout_constraintTop_toBottomOf="@id/dialog_secure_checkbox" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/dialog_custom_ip_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textNoSuggestions"
+                    android:maxLines="2"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/dialog_secure_checkbox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="10dp"
+                android:buttonTint="?attr/accentGood"
+                android:text="@string/cd_doh_dialog_checkbox_desc"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/primaryTextColor" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/dialog_custom_url_failure_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:padding="5dp"
+                android:text="@string/settings_http_proxy_error_text4"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorError"
+                android:visibility="invisible" />
+
+        </LinearLayout>
+    </ScrollView>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/dialog_custom_url_ok_btn"
@@ -112,8 +124,8 @@
         android:layout_marginBottom="10dp"
         android:text="@string/lbl_add"
         android:textColor="?attr/accentGood"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_failure_text" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/dialog_custom_url_cancel_btn"
@@ -126,8 +138,8 @@
         android:gravity="center"
         android:text="@string/lbl_cancel"
         android:textColor="?attr/accentGood"
-        app:layout_constraintEnd_toStartOf="@id/dialog_custom_url_ok_btn"
-        app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_failure_text" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/dialog_custom_url_ok_btn" />
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/dialog_custom_url_loading"
@@ -139,7 +151,7 @@
         android:layout_marginBottom="10dp"
         android:indeterminate="true"
         android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_custom_url_failure_text" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

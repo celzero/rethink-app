@@ -134,6 +134,9 @@ class ODoHListFragment : Fragment(R.layout.fragment_odoh_list) {
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
 
         dialog.setCancelable(true)
+        // resize the dialog when the keyboard opens, so that the buttons
+        // remain visible on smaller screens (instead of panning the window)
+        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         dialog.window?.attributes = lp
 
         val heading = dialogBinding.dialogCustomUrlTop
