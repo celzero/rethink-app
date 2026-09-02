@@ -24,7 +24,6 @@ class LogActivityWindowTest {
     private val tenMin = LogActivityWindow.TEN_MINUTES_MS
     private val hour = 60L * 60L * 1000L
     private val day = 24L * hour
-    private val week = 7L * day
 
     // arbitrary mid-interval timestamp: e.g. 12:34:56.789 within its slot
     private val nowMs = 1_780_000_000_000L - (1_780_000_000_000L % tenMin) + 4 * 60_000L + 56_789L
@@ -45,20 +44,21 @@ class LogActivityWindowTest {
     }
 
     @Test
-    fun `presets expose four ranges up to seven days`() {
+    fun `presets expose three ranges up to 24 hours`() {
         val presets = LogActivityWindow.presetDurations()
-        assertEquals(4, presets.size)
+        assertEquals(3, presets.size)
         assertEquals(tenMin, presets[0])
-        assertEquals(week, presets[3])
+        assertEquals(hour, presets[1])
+        assertEquals(day, presets[2])
     }
 
     @Test
-    fun `lookback is capped at seven days`() {
+    fun `lookback is capped at 24 hours`() {
         val w = LogActivityWindow.last(30L * day, nowMs)
         assertEquals(LogActivityWindow.MAX_LOOKBACK_MS, w.endMs - w.startMs)
 
         val tooFar = LogActivityWindow.fromPreset(99, nowMs) // clamped to last preset
-        assertEquals(week, tooFar.endMs - tooFar.startMs)
+        assertEquals(day, tooFar.endMs - tooFar.startMs)
     }
 
     @Test

@@ -19,7 +19,7 @@ package com.celzero.bravedns.database
  * Aggregated count of log rows belonging to one time bucket of the activity
  * wall. Used by LogActivityAggregator to rebuild the wall from the log
  * databases without loading individual rows. [bucketIndex] is
- * (timestamp - dayStart) / bucketMs; [blocked] mirrors the row's isBlocked
+ * (timestamp - rangeStart) / bucketMs; [blocked] mirrors the row's isBlocked
  * column (1/0); [total] is the number of rows in that bucket/class pair.
  */
 data class ActivityBucketRow(

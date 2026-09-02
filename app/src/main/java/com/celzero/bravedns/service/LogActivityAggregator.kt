@@ -32,10 +32,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.time.Clock
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.temporal.ChronoUnit
 
 data class LogActivityEvent(
     val timestampMs: Long,
@@ -52,8 +48,8 @@ enum class LogActivitySource {
 }
 
 /**
- * Immutable counts for one cell of the activity wall: a single local hour of a
- * single local day.
+ * Immutable counts for one cell of the activity wall: a single 10-minute
+ * bucket within the last 24 hours.
  */
 data class LogActivityInterval(
     val startTimestamp: Long,
@@ -67,19 +63,22 @@ data class LogActivityInterval(
 
 /**
  * Immutable snapshot of the activity wall: [intervals] holds
- * [LogActivityAggregator.GRID_DAYS] x [LogActivityAggregator.HOURS_PER_DAY]
- * entries in row-major order (oldest day first, hours 00..23 within each day),
- * ending on [date] (today).
+ * [LogActivityAggregator.TOTAL_SLOTS] (= [LogActivityAggregator.HOURS_IN_WINDOW]
+ * x [LogActivityAggregator.BUCKETS_PER_HOUR]) entries in chronological order
+ * (oldest bucket first, newest bucket last), ending at [windowEndMs]. The
+ * grid maps a flat index i to column = i / [LogActivityAggregator.BUCKETS_PER_HOUR]
+ * (hour, oldest left) and row = i % [LogActivityAggregator.BUCKETS_PER_HOUR]
+ * (10-minute bucket within that hour, :00 at top).
  */
 data class LogActivityState(
-    val date: LocalDate,
+    val windowEndMs: Long,
     val intervals: List<LogActivityInterval>
 ) {
     companion object {
-        fun empty(date: LocalDate): LogActivityState {
+        fun empty(windowEndMs: Long): LogActivityState {
             val emptyInterval = LogActivityInterval(0L, 0L, 0L, 0L, 0L, 0L, 0L)
             return LogActivityState(
-                date,
+                windowEndMs,
                 List(LogActivityAggregator.TOTAL_SLOTS) { emptyInterval }
             )
         }
@@ -88,13 +87,16 @@ data class LogActivityState(
 
 /**
  * In-memory aggregation of blocked/allowed DNS and network activity into the
- * home-screen activity wall: [GRID_DAYS] rows (one per local day, oldest
- * first) x [HOURS_PER_DAY] columns (local hour of day), ending today.
+ * home-screen activity wall: the last [HOURS_IN_WINDOW] hours (24 columns,
+ * oldest left, latest right) split into [BUCKETS_PER_HOUR] ten-minute buckets
+ * per hour (6 rows within each column, :00 at top, :50 at bottom). The newest
+ * cell (current 10-minute bucket) is the bottom-right cell.
  *
  * This is a cache over the log databases, not a second source of truth:
  * - The database is authoritative; [restoreFromDatabase] rebuilds the whole
- *   wall via grouped SQL queries (never by loading individual rows). It runs
- *   once when BraveVPNService is created, not on every UI resume.
+ *   wall via grouped SQL queries (one per table over the full 24-hour range;
+ *   never by loading individual rows). It runs once when BraveVPNService is
+ *   created, not on every UI resume.
  * - [recordOnArrival] is invoked by the log-producing callers
  *   (TunDnsManager.handleOnResponse / TunFlowManager write sites) immediately
  *   when a log arrives, decoupled from the batched database write. A failed or
@@ -103,6 +105,9 @@ data class LogActivityState(
  * - Postflow updates never change the isBlocked classification of an existing
  *   row (verified against ConnectionTrackerDAO/RethinkLogDao updateSummary);
  *   should that ever change, [reclassify] applies previous->new as a delta.
+ * - The window slides on every 10-minute boundary: as time advances, the
+ *   oldest bucket is dropped and history shifts left by one, so the wall
+ *   always covers the trailing 24 hours.
  *
  * Threading: producers run concurrently on arbitrary Go-bridge threads, so all
  * mutations are serialized behind [mutex] and published as immutable snapshots
@@ -117,13 +122,19 @@ class LogActivityAggregator(
 ) {
 
     companion object {
-        // wall granularity: one column == one local hour
-        const val HOUR_MS = 60L * 60L * 1000L
-        const val HOURS_PER_DAY = 24
+        // wall granularity: one cell == one ten-minute interval
+        const val BUCKET_MS = 10L * 60L * 1000L
 
-        // wall height: how many local days the wall spans (rows), oldest top
-        const val GRID_DAYS = 6
-        const val TOTAL_SLOTS = GRID_DAYS * HOURS_PER_DAY
+        // rows within one hour-column: 6 x 10 min == 1 hour
+        const val BUCKETS_PER_HOUR = 6
+
+        // wall width: how many hours the wall spans (columns), oldest first
+        const val HOURS_IN_WINDOW = 24
+
+        const val TOTAL_SLOTS = BUCKETS_PER_HOUR * HOURS_IN_WINDOW
+
+        // convenience for callers that reason in whole hours
+        const val HOUR_MS = BUCKET_MS * BUCKETS_PER_HOUR
 
         private const val TAG = "LogActivityAggregator;"
         // dedupe window for network events (connId based); bounded to keep
@@ -131,45 +142,42 @@ class LogActivityAggregator(
         private const val DEDUPE_CAPACITY = 4096
 
         /**
-         * Canonical epoch-millis of local midnight for the day containing
-         * [timestampMs].
+         * Epoch-millis of the 10-minute bucket containing [timestampMs]
+         * (buckets are epoch-aligned, so no timezone involvement).
          */
-        fun startOfLocalDay(timestampMs: Long, zone: ZoneId): Long {
-            return Instant.ofEpochMilli(timestampMs).atZone(zone).toLocalDate()
-                .atStartOfDay(zone).toInstant().toEpochMilli()
+        fun bucketFloor(timestampMs: Long): Long {
+            if (timestampMs < 0) return 0
+            return timestampMs - (timestampMs % BUCKET_MS)
         }
 
         /**
-         * Canonical epoch-millis of local midnight of [date].
+         * Wall slot for an event given the newest bucket start
+         * [currentBucketStart]: index TOTAL_SLOTS-1 is the current bucket,
+         * index 0 the oldest (a full 24 hours back). Returns -1 when the
+         * event lies outside the wall (older than the window or in the
+         * future).
          */
-        fun startOfLocalDay(date: LocalDate, zone: ZoneId): Long {
-            return date.atStartOfDay(zone).toInstant().toEpochMilli()
+        fun slotIndex(timestampMs: Long, currentBucketStart: Long): Long {
+            val bucket = bucketFloor(timestampMs) / BUCKET_MS
+            val current = currentBucketStart / BUCKET_MS
+            val ageBuckets = current - bucket
+            if (ageBuckets < 0 || ageBuckets >= TOTAL_SLOTS) return -1L
+            return TOTAL_SLOTS - 1 - ageBuckets
         }
 
         /**
-         * Wall slot for an event: row = day offset from [windowStartDate],
-         * column = local hour. Returns -1 when the event lies outside the wall
-         * (before the oldest day or after today).
+         * Epoch-millis at which slot [index] of the wall begins; index
+         * TOTAL_SLOTS-1 starts at [currentBucketStart].
          */
-        fun slotIndex(timestampMs: Long, windowStartDate: LocalDate, zone: ZoneId): Long {
-            val zdt = Instant.ofEpochMilli(timestampMs).atZone(zone)
-            val dayOffset = ChronoUnit.DAYS.between(windowStartDate, zdt.toLocalDate())
-            if (dayOffset < 0 || dayOffset >= GRID_DAYS) return -1L
-            return dayOffset * HOURS_PER_DAY + zdt.hour
-        }
-
-        /**
-         * Epoch-millis at which slot [index] of the wall begins (DST-safe:
-         * derived from the actual local day/hour, not fixed offsets).
-         */
-        fun slotStart(windowStartDate: LocalDate, zone: ZoneId, index: Int): Long {
-            val day = windowStartDate.plusDays((index / HOURS_PER_DAY).toLong())
-            val hour = index % HOURS_PER_DAY
-            return day.atStartOfDay(zone).plusHours(hour.toLong()).toInstant().toEpochMilli()
+        fun slotStart(currentBucketStart: Long, index: Int): Long {
+            return currentBucketStart - (TOTAL_SLOTS - 1 - index) * BUCKET_MS
         }
     }
 
-    private val zone: ZoneId = clock.zone
+    // newest 10-minute bucket of the wall (epoch-aligned floor of "now");
+    // the wall covers [currentBucketStart - (TOTAL_SLOTS-1)*BUCKET_MS,
+    // currentBucketStart + BUCKET_MS)
+    private var currentBucketStart: Long = bucketFloor(clock.millis())
 
     private val mutex = Mutex()
 
@@ -178,15 +186,11 @@ class LogActivityAggregator(
     // never canceled: the aggregator is a process-wide singleton
     private val arrivalScope = CoroutineScope(SupervisorJob() + arrivalDispatcher)
 
-    // wall window: rows cover [windowStartDate .. currentDate] (== today)
-    private var currentDate: LocalDate = LocalDate.now(clock)
-    private var windowStartDate: LocalDate =
-        currentDate.minusDays(GRID_DAYS.toLong() - 1)
-
     @Volatile
-    private var restoredForEpochDay: Long = Long.MIN_VALUE
+    private var restoredForBucketStart: Long = Long.MIN_VALUE
 
-    // flat wall counters, index = dayOffset * HOURS_PER_DAY + hour
+    // flat wall counters, chronological: index 0 = oldest bucket,
+    // TOTAL_SLOTS-1 = current bucket
     private val dnsBlocked = LongArray(TOTAL_SLOTS)
     private val dnsAllowed = LongArray(TOTAL_SLOTS)
     private val nwBlocked = LongArray(TOTAL_SLOTS)
@@ -201,7 +205,9 @@ class LogActivityAggregator(
         }
     }
 
-    private val _activity = MutableStateFlow(LogActivityState.empty(LocalDate.now(clock)))
+    private val _activity = MutableStateFlow(
+        LogActivityState.empty(bucketFloor(clock.millis()) + BUCKET_MS)
+    )
     val activity: StateFlow<LogActivityState> = _activity.asStateFlow()
 
     init {
@@ -212,7 +218,7 @@ class LogActivityAggregator(
      * Non-suspend, non-blocking arrival hook for log-producing callers.
      * Applies the event on [arrivalScope] and returns immediately; counts are
      * commutative so cross-event ordering is irrelevant. See [record] for
-     * rollover/dedupe semantics.
+     * slide/dedupe semantics.
      */
     fun recordOnArrival(event: LogActivityEvent) {
         arrivalScope.launch { record(listOf(event)) }
@@ -223,7 +229,7 @@ class LogActivityAggregator(
             var mutated = false
             for (event in events) {
                 if (!shouldRecord(event)) continue
-                rolloverIfNeeded(event.timestampMs)
+                slideWindowIfNeeded(event.timestampMs)
                 applyEvent(event, +1)
                 mutated = true
             }
@@ -241,7 +247,7 @@ class LogActivityAggregator(
         mutex.withLock {
             if (previous != null) applyEvent(previous, -1)
             if (new != null) {
-                rolloverIfNeeded(new.timestampMs)
+                slideWindowIfNeeded(new.timestampMs)
                 applyEvent(new, +1)
             }
             publishSnapshot()
@@ -250,37 +256,35 @@ class LogActivityAggregator(
 
     /**
      * Rebuilds the entire wall from the databases using grouped queries (one
-     * per table over the full [GRID_DAYS]-day range; never by loading
-     * individual rows). Called from BraveVPNService.onCreate; also serves
-     * midnight rollover for long-lived processes. Idempotent.
+     * per table over the full trailing-24h range; never by loading individual
+     * rows). Called from BraveVPNService.onCreate; also re-anchors the window
+     * for long-lived processes. Idempotent.
      */
     suspend fun restoreFromDatabase() {
         try {
             mutex.withLock {
-                val today = LocalDate.now(clock)
-                if (today.toEpochDay() == restoredForEpochDay && loaded) return
-                currentDate = today
-                windowStartDate = today.minusDays(GRID_DAYS.toLong() - 1)
-                val rangeStart = startOfLocalDay(windowStartDate, zone)
-                val rangeEnd = startOfLocalDay(today.plusDays(1), zone)
+                currentBucketStart = bucketFloor(clock.millis())
+                if (restoredForBucketStart == currentBucketStart && loaded) return
+                val rangeStart = currentBucketStart - (TOTAL_SLOTS - 1) * BUCKET_MS
+                val rangeEnd = currentBucketStart + BUCKET_MS
 
                 dnsBlocked.fill(0); dnsAllowed.fill(0)
                 nwBlocked.fill(0); nwAllowed.fill(0)
                 mergeInto(
-                    dnsLogRepository.getActivityBuckets(rangeStart, rangeEnd, HOUR_MS),
+                    dnsLogRepository.getActivityBuckets(rangeStart, rangeEnd, BUCKET_MS),
                     dnsBlocked, dnsAllowed
                 )
                 mergeInto(
-                    connectionTrackerRepository.getActivityBuckets(rangeStart, rangeEnd, HOUR_MS),
+                    connectionTrackerRepository.getActivityBuckets(rangeStart, rangeEnd, BUCKET_MS),
                     nwBlocked, nwAllowed
                 )
                 mergeInto(
-                    rethinkLogRepository.getActivityBuckets(rangeStart, rangeEnd, HOUR_MS),
+                    rethinkLogRepository.getActivityBuckets(rangeStart, rangeEnd, BUCKET_MS),
                     nwBlocked, nwAllowed
                 )
 
                 loaded = true
-                restoredForEpochDay = today.toEpochDay()
+                restoredForBucketStart = currentBucketStart
                 publishSnapshot()
             }
         } catch (e: Exception) {
@@ -290,10 +294,10 @@ class LogActivityAggregator(
 
     /**
      * True while the in-memory wall has not (yet) been reconciled with the
-     * databases for the current wall-clock day.
+     * databases for the current 10-minute bucket.
      */
     fun isStale(): Boolean {
-        return restoredForEpochDay != LocalDate.now(clock).toEpochDay()
+        return restoredForBucketStart != bucketFloor(clock.millis())
     }
 
     private var loaded: Boolean = false
@@ -305,25 +309,27 @@ class LogActivityAggregator(
     }
 
     /**
-     * Advances the wall window when time has moved past [currentDate]: slides
-     * all counters left by the elapsed day count so history stays aligned to
-     * real calendar days and yesterday's rows become visible history instead
-     * of being wiped.
+     * Slides the wall forward when time has moved past [currentBucketStart]:
+     * shifts all counters left by the elapsed bucket count so the wall always
+     * covers the trailing 24 hours instead of growing stale. Never moves the
+     * window backward (late events simply land in their existing slot or get
+     * dropped when older than the window).
      */
-    private fun rolloverIfNeeded(timestampMs: Long) {
-        val eventDate = Instant.ofEpochMilli(timestampMs).atZone(zone).toLocalDate()
-        if (!eventDate.isAfter(currentDate)) return
-        val delta = ChronoUnit.DAYS.between(currentDate, eventDate).toInt()
-        Logger.i(LOG_TAG_VPN, "$TAG wall rolled over $currentDate -> $eventDate ($delta d)")
+    private fun slideWindowIfNeeded(timestampMs: Long) {
+        val bucket = bucketFloor(timestampMs)
+        if (bucket <= currentBucketStart) return
+        val delta = ((bucket - currentBucketStart) / BUCKET_MS).toInt()
+        Logger.v(
+            LOG_TAG_VPN,
+            "$TAG wall slid forward $currentBucketStart -> $bucket ($delta buckets)"
+        )
         slide(delta)
-        currentDate = eventDate
-        windowStartDate = windowStartDate.plusDays(delta.toLong())
-        loaded = false
+        currentBucketStart = bucket
     }
 
-    private fun slide(deltaDays: Int) {
-        if (deltaDays <= 0) return
-        val shift = (deltaDays.toLong() * HOURS_PER_DAY).toInt()
+    private fun slide(deltaBuckets: Int) {
+        if (deltaBuckets <= 0) return
+        val shift = deltaBuckets.coerceAtMost(TOTAL_SLOTS)
         slideLeft(dnsBlocked, shift)
         slideLeft(dnsAllowed, shift)
         slideLeft(nwBlocked, shift)
@@ -340,7 +346,7 @@ class LogActivityAggregator(
     }
 
     private fun applyEvent(event: LogActivityEvent, sign: Int) {
-        val idx = slotIndex(event.timestampMs, windowStartDate, zone)
+        val idx = slotIndex(event.timestampMs, currentBucketStart)
         if (idx < 0) return // outside the wall window
         val i = idx.toInt() // arrays are bounded to TOTAL_SLOTS; idx fits Int
         val magnitude = if (sign > 0) 1L else -1L
@@ -370,7 +376,7 @@ class LogActivityAggregator(
     private fun publishSnapshot() {
         val intervals = List(TOTAL_SLOTS) { i ->
             LogActivityInterval(
-                startTimestamp = slotStart(windowStartDate, zone, i),
+                startTimestamp = slotStart(currentBucketStart, i),
                 blocked = dnsBlocked[i] + nwBlocked[i],
                 allowed = dnsAllowed[i] + nwAllowed[i],
                 dnsBlocked = dnsBlocked[i],
@@ -379,6 +385,6 @@ class LogActivityAggregator(
                 networkAllowed = nwAllowed[i]
             )
         }
-        _activity.value = LogActivityState(currentDate, intervals)
+        _activity.value = LogActivityState(currentBucketStart + BUCKET_MS, intervals)
     }
 }

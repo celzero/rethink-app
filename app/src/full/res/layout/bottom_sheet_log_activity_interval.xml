@@ -41,18 +41,6 @@
             android:textColor="?attr/colorOnSurfaceVariant"
             android:textSize="13sp" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:alpha="0.6"
-            android:text="@string/log_activity_time_range"
-            android:textAllCaps="true"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="11sp"
-            android:textStyle="bold" />
-
-        <!-- time-range selector: 10-minute increments up to the last 7 days -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -90,15 +78,6 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/bs_lai_chip_24h"
-                    style="@style/ActivityTimeSegment"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="2dp"
-                    android:layout_weight="1"
-                    android:checkable="true" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/bs_lai_chip_7d"
                     style="@style/ActivityTimeSegment"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -193,20 +172,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:gravity="center_vertical"
+            android:gravity="end"
             android:orientation="horizontal">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/bs_lai_recent_header"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:alpha="0.7"
-                android:text="@string/log_activity_by_app"
-                android:textAllCaps="true"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="11sp"
-                android:textStyle="bold" />
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/bs_lai_filter_group"

@@ -18,8 +18,8 @@ package com.celzero.bravedns.service
 /**
  * A half-open [startMs, endMs) time window snapped to ten-minute interval
  * boundaries, used by the activity detail sheet. The default window is the
- * last 10 minutes; users can look back up to 7 days at 10-minute granularity
- * ([MAX_LOOKBACK_MS]).
+ * last 10 minutes; users can look back up to 24 hours at 10-minute
+ * granularity ([MAX_LOOKBACK_MS]).
  */
 data class LogActivityWindow(
     val startMs: Long,
@@ -29,14 +29,13 @@ data class LogActivityWindow(
     companion object {
         const val TEN_MINUTES_MS = 10L * 60L * 1000L
 
-        // selectable history cap: 7 days of 10-minute intervals
-        const val MAX_LOOKBACK_MS = 7L * 24L * 60L * 60L * 1000L
+        // selectable history cap: 24 hours of 10-minute intervals
+        const val MAX_LOOKBACK_MS = 24L * 60L * 60L * 1000L
 
         private val PRESETS_MS = longArrayOf(
             TEN_MINUTES_MS,             // 10 minutes (default)
             60L * 60L * 1000L,          // 1 hour
-            24L * 60L * 60L * 1000L,    // 24 hours
-            MAX_LOOKBACK_MS             // 7 days
+            MAX_LOOKBACK_MS             // 24 hours
         )
 
         fun presetDurations(): LongArray = PRESETS_MS.copyOf()

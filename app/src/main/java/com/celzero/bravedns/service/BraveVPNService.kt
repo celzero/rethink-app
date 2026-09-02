@@ -722,9 +722,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             netLogTracker.restart(vpnScope)
         }
 
-        // Warm the activity history cache (all days) from the databases so
-        // the current-day heatmap and any historical view are ready
-        // immediately at VPN start.
+        // Warm the activity-wall cache (trailing 24 hours of 10-minute
+        // buckets) from the databases so the heatmap is ready immediately
+        // at VPN start.
         io("logActivityHistory") {
             logActivityAggregator.restoreFromDatabase()
         }
@@ -1545,9 +1545,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                         }
 
                         AppConfig.DnsType.SMART_DNS -> {
-                            // no need to add multiple DoH as smart dns as it is expected to be
-                            // added by the vpn adapter while starting, but add it if it is missing
-                            if(getDnsStatus(Backend.Plus) == null) addTransport()
+                            vpnAdapter?.setPlusStrategy()
                         }
 
                         AppConfig.DnsType.DOT -> {

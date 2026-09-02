@@ -48,7 +48,7 @@ import org.koin.android.ext.android.inject
 
 /**
  * Premium detail view for a selected activity window (default: last 10
- * minutes; selectable up to 7 days at 10-minute granularity). All data is
+ * minutes; selectable up to 24 hours at 10-minute granularity). All data is
  * queried from the dns/connection log databases for the exact window:
  * per-app summaries are grouped via SQL, connection rows load lazily when an
  * app group is expanded.
@@ -68,8 +68,9 @@ class LogActivityIntervalBottomSheet : BottomSheetDialogFragment() {
 
     private lateinit var adapter: AppActivityAdapter
 
-    // built at open time; the sheet always starts from the latest ten-minute
-    // window, independent of any interaction timing state
+    // built at open time; the sheet starts from the caller-selected window
+    // when given (see newInstance(startMs, endMs)), else from the latest
+    // ten-minute window
     private var currentWindow: LogActivityWindow =
         LogActivityWindow.fromPreset(0, System.currentTimeMillis())
     private var selectedPresetIndex = LogActivityWindow.defaultPresetIndex()
@@ -83,6 +84,10 @@ class LogActivityIntervalBottomSheet : BottomSheetDialogFragment() {
     companion object {
         const val TAG = "LAIBtmSht"
 
+        // args carrying a caller-selected window (e.g. a tapped heatmap cell)
+        private const val ARG_WINDOW_START_MS = "argWindowStartMs"
+        private const val ARG_WINDOW_END_MS = "argWindowEndMs"
+
         // display caps; window totals above stay exact
         private const val MAX_APP_GROUPS = 25
         private const val RANGE_LABEL_TEMPLATE = "dd MMM, HH:mm"
@@ -92,6 +97,20 @@ class LogActivityIntervalBottomSheet : BottomSheetDialogFragment() {
          * minutes and can be filtered via the range chips once visible.
          */
         fun newInstance(): LogActivityIntervalBottomSheet = LogActivityIntervalBottomSheet()
+
+        /**
+         * Opens the sheet on the exact [startMs, endMs) window (e.g. the
+         * 10-minute cell tapped on the home-screen activity wall). The
+         * default 10-minute range chip is preselected since a wall cell
+         * spans one 10-minute interval.
+         */
+        fun newInstance(startMs: Long, endMs: Long): LogActivityIntervalBottomSheet =
+            LogActivityIntervalBottomSheet().apply {
+                arguments = Bundle().apply {
+                    putLong(ARG_WINDOW_START_MS, startMs)
+                    putLong(ARG_WINDOW_END_MS, endMs)
+                }
+            }
     }
 
     override fun getTheme(): Int =
@@ -122,10 +141,19 @@ class LogActivityIntervalBottomSheet : BottomSheetDialogFragment() {
             Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
         }
 
-        // always start from the latest ten-minute window at open time,
-        // regardless of when/why the sheet was launched
-        currentWindow = LogActivityWindow.fromPreset(0, System.currentTimeMillis())
-        selectedPresetIndex = LogActivityWindow.defaultPresetIndex()
+        // start from the caller-selected window (a tapped wall cell) when one
+        // was provided; otherwise the latest ten-minute window at open time
+        val args = arguments?.takeIf { it.containsKey(ARG_WINDOW_START_MS) }
+        if (args != null) {
+            val start = args.getLong(ARG_WINDOW_START_MS)
+            val end = args.getLong(ARG_WINDOW_END_MS, start + LogActivityWindow.TEN_MINUTES_MS)
+            currentWindow = LogActivityWindow(start, end)
+            // a wall cell spans one 10-minute interval == the default chip
+            selectedPresetIndex = LogActivityWindow.defaultPresetIndex()
+        } else {
+            currentWindow = LogActivityWindow.fromPreset(0, System.currentTimeMillis())
+            selectedPresetIndex = LogActivityWindow.defaultPresetIndex()
+        }
 
         setupRangeChips()
         setupFilterChips()
@@ -143,15 +171,14 @@ class LogActivityIntervalBottomSheet : BottomSheetDialogFragment() {
     /**
      * Timer selection: each chip selects a historical range ending at the most
      * recent ten-minute boundary. The default selection covers the last 10
-     * minutes.
+     * minutes; the widest selection covers the last 24 hours.
      */
     private fun setupRangeChips() {
         // range labels reuse the same strings as SummaryStatisticsFragment's
-        // time-range toggle ("10 min", "1 hr", "24 hr", "7 day")
+        // time-range toggle ("10 min", "1 hr", "24 hr")
         b.bsLaiChip10m.text = getString(R.string.ci_desc, "10", getString(R.string.lbl_min))
         b.bsLaiChip1h.text = getString(R.string.ci_desc, "1", getString(R.string.lbl_hour))
         b.bsLaiChip24h.text = getString(R.string.ci_desc, "24", getString(R.string.lbl_hour))
-        b.bsLaiChip7d.text = getString(R.string.ci_desc, "7", getString(R.string.lbl_day))
         val listener =
             MaterialButtonToggleGroup.OnButtonCheckedListener { _, buttonId, isChecked ->
                 if (!isChecked) return@OnButtonCheckedListener
@@ -159,7 +186,6 @@ class LogActivityIntervalBottomSheet : BottomSheetDialogFragment() {
                     R.id.bs_lai_chip_10m -> 0
                     R.id.bs_lai_chip_1h -> 1
                     R.id.bs_lai_chip_24h -> 2
-                    R.id.bs_lai_chip_7d -> 3
                     else -> return@OnButtonCheckedListener
                 }
                 if (idx == selectedPresetIndex) return@OnButtonCheckedListener
@@ -175,7 +201,6 @@ class LogActivityIntervalBottomSheet : BottomSheetDialogFragment() {
             when (selectedPresetIndex) {
                 1 -> R.id.bs_lai_chip_1h
                 2 -> R.id.bs_lai_chip_24h
-                3 -> R.id.bs_lai_chip_7d
                 else -> R.id.bs_lai_chip_10m
             }
         )
@@ -224,7 +249,7 @@ class LogActivityIntervalBottomSheet : BottomSheetDialogFragment() {
                             rethinkLogRepository.getAppActivity(window.startMs, window.endMs, MAX_APP_GROUPS)
                         )
                     )
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     SheetData(WindowCountRow(0L, 0L), emptyList())
                 }
             }
