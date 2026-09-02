@@ -65,11 +65,11 @@ class RethinkLogRepository(private val logDao: RethinkLogDao) {
     }
 
     suspend fun getActivityBuckets(
-        dayStart: Long,
-        dayEnd: Long,
+        rangeStart: Long,
+        rangeEnd: Long,
         bucketMs: Long
     ): List<ActivityBucketRow> {
-        return logDao.getActivityBuckets(dayStart, dayEnd, bucketMs)
+        return logDao.getActivityBuckets(rangeStart, rangeEnd, bucketMs)
     }
 
     suspend fun getWindowCounts(start: Long, end: Long): WindowCountRow {

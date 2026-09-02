@@ -26,12 +26,26 @@ import androidx.room.Update
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.data.DataUsage
 import com.celzero.bravedns.data.DataUsageSummary
+import com.celzero.bravedns.data.RpnConnStatsSummary
 private const val CT_COLUMNS =
     "id, 'ct' as source, appName, uid, packageName, usrId, ipAddress, port, protocol, isBlocked, blockedByRule, blocklists, proxyDetails, flag, dnsQuery, timeStamp, connId, downloadBytes, uploadBytes, duration, synack, rpid, message, connType"
 private const val RLOG_COLUMNS =
     "id, 'rethink' as source, appName, uid, 'com.celzero.bravedns' as packageName, usrId, ipAddress, port, protocol, isBlocked, blockedByRule, blocklists, proxyDetails, flag, dnsQuery, timeStamp, connId, downloadBytes, uploadBytes, duration, synack, rpid, message, connType"
 private const val SEARCH_PREDICATE =
     "(appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query or proxyDetails like :query or connId like :query)"
+
+// Per-arm row cap for merged (UNION ALL) queries. A compound `order by
+// timeStamp desc, id desc` cannot use indexes; without a cap SQLite scans and
+// sorts both tables in full for every page, which made NetworkLogsActivity slow
+// to open (and Room re-runs the query on every insert into either table).
+// Each arm below reads only the newest MERGE_SCAN_LIMIT rows via a reverse
+// rowid scan (`order by id desc limit N`), so the compound sort is bounded by
+// 2 * MERGE_SCAN_LIMIT rows. Logs are appended in near-chronological order, so
+// the newest N rows per arm contain the newest rows of the union. The cap
+// comfortably exceeds the paging window (pageSize 30, maxSize 180,
+// initialLoadSize 60 in ConnectionTrackerViewModel); scrolling past the cap
+// degrades to per-arm id order instead of global time order.
+private const val MERGE_SCAN_LIMIT = 2000
 
 @Dao
 interface ConnectionTrackerDAO {
@@ -45,14 +59,15 @@ interface ConnectionTrackerDAO {
     fun insertBatch(connTrackerList: List<ConnectionTracker>)
 
     // bucket aggregation for the activity wall (LogActivityAggregator);
-    // bucketIndex = (timeStamp - dayStart) / bucketMs, grouped per blocked
-    // classification. Pass bucketMs=3600000 for hourly wall slots.
+    // bucketIndex = (timeStamp - rangeStart) / bucketMs, grouped per blocked
+    // classification. Pass bucketMs=600000 (10 min) for the trailing-24h
+    // ten-minute wall slots.
     @Query(
-        "select cast((timeStamp - :dayStart)/:bucketMs as integer) as bucketIndex, isBlocked as blocked, count(id) as total from ConnectionTracker where timeStamp >= :dayStart and timeStamp < :dayEnd group by bucketIndex, blocked"
+        "select cast((timeStamp - :rangeStart)/:bucketMs as integer) as bucketIndex, isBlocked as blocked, count(id) as total from ConnectionTracker where timeStamp >= :rangeStart and timeStamp < :rangeEnd group by bucketIndex, blocked"
     )
     suspend fun getActivityBuckets(
-        dayStart: Long,
-        dayEnd: Long,
+        rangeStart: Long,
+        rangeEnd: Long,
         bucketMs: Long
     ): List<ActivityBucketRow>
 
@@ -191,34 +206,48 @@ interface ConnectionTrackerDAO {
     // Merged queries: UNION ALL of ConnectionTracker and RethinkLog.
     // These are read-only display queries; inserts remain unchanged.
     // Column list must match MergedConnectionLog in name/order.
+    // Each arm is capped to the newest MERGE_SCAN_LIMIT rows (see the constant
+    // for why) so the compound sort is bounded instead of full-table.
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where isBlocked = 1 UNION ALL select $RLOG_COLUMNS from RethinkLog where isBlocked = 1 order by timeStamp desc, id desc"
+        "select * from (select $CT_COLUMNS from ConnectionTracker where isBlocked = 1 order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "union all select * from (select $RLOG_COLUMNS from RethinkLog where isBlocked = 1 order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "order by timeStamp desc, id desc"
     )
     fun getMergedBlockedConnections(): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where isBlocked = 1 and $SEARCH_PREDICATE UNION ALL select $RLOG_COLUMNS from RethinkLog where isBlocked = 1 and $SEARCH_PREDICATE order by timeStamp desc, id desc"
+        "select * from (select $CT_COLUMNS from ConnectionTracker where isBlocked = 1 and $SEARCH_PREDICATE order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "union all select * from (select $RLOG_COLUMNS from RethinkLog where isBlocked = 1 and $SEARCH_PREDICATE order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "order by timeStamp desc, id desc"
     )
     fun getMergedBlockedConnections(query: String): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where isBlocked = 0 UNION ALL select $RLOG_COLUMNS from RethinkLog where isBlocked = 0 order by timeStamp desc, id desc"
+        "select * from (select $CT_COLUMNS from ConnectionTracker where isBlocked = 0 order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "union all select * from (select $RLOG_COLUMNS from RethinkLog where isBlocked = 0 order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "order by timeStamp desc, id desc"
     )
     fun getMergedAllowedConnections(): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where isBlocked = 0 and $SEARCH_PREDICATE UNION ALL select $RLOG_COLUMNS from RethinkLog where isBlocked = 0 and $SEARCH_PREDICATE order by timeStamp desc, id desc"
+        "select * from (select $CT_COLUMNS from ConnectionTracker where isBlocked = 0 and $SEARCH_PREDICATE order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "union all select * from (select $RLOG_COLUMNS from RethinkLog where isBlocked = 0 and $SEARCH_PREDICATE order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "order by timeStamp desc, id desc"
     )
     fun getMergedAllowedConnections(query: String): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 UNION ALL select $RLOG_COLUMNS from RethinkLog where blockedByRule in (:filter) and isBlocked = 1 order by timeStamp desc, id desc"
+        "select * from (select $CT_COLUMNS from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "union all select * from (select $RLOG_COLUMNS from RethinkLog where blockedByRule in (:filter) and isBlocked = 1 order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "order by timeStamp desc, id desc"
     )
     fun getMergedBlockedConnectionsFiltered(filter: Set<String>): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 and $SEARCH_PREDICATE UNION ALL select $RLOG_COLUMNS from RethinkLog where blockedByRule in (:filter) and isBlocked = 1 and $SEARCH_PREDICATE order by timeStamp desc, id desc"
+        "select * from (select $CT_COLUMNS from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 and $SEARCH_PREDICATE order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "union all select * from (select $RLOG_COLUMNS from RethinkLog where blockedByRule in (:filter) and isBlocked = 1 and $SEARCH_PREDICATE order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "order by timeStamp desc, id desc"
     )
     fun getMergedBlockedConnectionsFiltered(
         query: String,
@@ -226,12 +255,16 @@ interface ConnectionTrackerDAO {
     ): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 0 UNION ALL select $RLOG_COLUMNS from RethinkLog where blockedByRule in (:filter) and isBlocked = 0 order by timeStamp desc, id desc"
+        "select * from (select $CT_COLUMNS from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 0 order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "union all select * from (select $RLOG_COLUMNS from RethinkLog where blockedByRule in (:filter) and isBlocked = 0 order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "order by timeStamp desc, id desc"
     )
     fun getMergedAllowedConnectionsFiltered(filter: Set<String>): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 0 and $SEARCH_PREDICATE UNION ALL select $RLOG_COLUMNS from RethinkLog where blockedByRule in (:filter) and isBlocked = 0 and $SEARCH_PREDICATE order by timeStamp desc, id desc"
+        "select * from (select $CT_COLUMNS from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 0 and $SEARCH_PREDICATE order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "union all select * from (select $RLOG_COLUMNS from RethinkLog where blockedByRule in (:filter) and isBlocked = 0 and $SEARCH_PREDICATE order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "order by timeStamp desc, id desc"
     )
     fun getMergedAllowedConnectionsFiltered(
         query: String,
@@ -239,12 +272,16 @@ interface ConnectionTrackerDAO {
     ): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where protocol = :protocol UNION ALL select $RLOG_COLUMNS from RethinkLog where protocol = :protocol order by timeStamp desc, id desc"
+        "select * from (select $CT_COLUMNS from ConnectionTracker where protocol = :protocol order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "union all select * from (select $RLOG_COLUMNS from RethinkLog where protocol = :protocol order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "order by timeStamp desc, id desc"
     )
     fun getMergedProtocolFilteredConnections(protocol: String): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where protocol = :protocol and blockedByRule in (:filter) UNION ALL select $RLOG_COLUMNS from RethinkLog where protocol = :protocol and blockedByRule in (:filter) order by timeStamp desc, id desc"
+        "select * from (select $CT_COLUMNS from ConnectionTracker where protocol = :protocol and blockedByRule in (:filter) order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "union all select * from (select $RLOG_COLUMNS from RethinkLog where protocol = :protocol and blockedByRule in (:filter) order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "order by timeStamp desc, id desc"
     )
     fun getMergedProtocolFilteredConnections(
         protocol: String,
@@ -252,12 +289,16 @@ interface ConnectionTrackerDAO {
     ): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker UNION ALL select $RLOG_COLUMNS from RethinkLog order by timeStamp desc, id desc"
+        "select * from (select $CT_COLUMNS from ConnectionTracker order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "union all select * from (select $RLOG_COLUMNS from RethinkLog order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "order by timeStamp desc, id desc"
     )
     fun getMergedConnectionTrackerByName(): PagingSource<Int, MergedConnectionLog>
 
     @Query(
-        "select $CT_COLUMNS from ConnectionTracker where $SEARCH_PREDICATE UNION ALL select $RLOG_COLUMNS from RethinkLog where $SEARCH_PREDICATE order by timeStamp desc, id desc"
+        "select * from (select $CT_COLUMNS from ConnectionTracker where $SEARCH_PREDICATE order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "union all select * from (select $RLOG_COLUMNS from RethinkLog where $SEARCH_PREDICATE order by id desc limit $MERGE_SCAN_LIMIT) " +
+            "order by timeStamp desc, id desc"
     )
     fun getMergedConnectionTrackerByName(query: String): PagingSource<Int, MergedConnectionLog>
 
@@ -342,13 +383,26 @@ interface ConnectionTrackerDAO {
     // last app routed through a proxy (RPN/WG). proxyDetails holds the proxy id
     // (e.g. Backend.RpnWin + configKey); the wildcard match mirrors the filter used
     // by ConnectionTrackerFragment when navigated from the RPN detail screen.
-    @Query("select * from ConnectionTracker where proxyDetails like '%' || :proxyId || '%' and isBlocked = 0 order by timeStamp desc limit 1")
+    @Query("select * from ConnectionTracker where proxyDetails like '%' || :proxyId || '%' and isBlocked = 0 and appName != '%Unknown%' order by timeStamp desc limit 1")
     suspend fun getLastRoutedConnectionForProxy(proxyId: String): ConnectionTracker?
 
     @Query(
         "select sum(downloadBytes) as totalDownload, sum(uploadBytes) as totalUpload, count(id) as connectionsCount, ict.meteredDataUsage as meteredDataUsage from ConnectionTracker as ct join (select sum(downloadBytes + uploadBytes) as meteredDataUsage from ConnectionTracker where connType like :meteredTxt and timeStamp > :to) as ict where timeStamp > :to and proxyDetails = :wgId"
     )
     fun getTotalUsagesByWgId(to: Long, meteredTxt: String, wgId: String): DataUsageSummary
+
+    // Aggregate stats for connections routed through an RPN proxy within a time
+    // window. proxyDetails is matched with wildcards (mirrors getLastRoutedConnectionForProxy).
+    @Query(
+        "select count(id) as connectionsCount, coalesce(sum(downloadBytes), 0) as totalDownload, coalesce(sum(uploadBytes), 0) as totalUpload, coalesce(sum(isBlocked), 0) as blockedCount, count(distinct appName) as appCount from ConnectionTracker where proxyDetails like '%' || :proxyId || '%' and timeStamp > :to"
+    )
+    suspend fun getRpnConnStats(proxyId: String, to: Long): RpnConnStatsSummary
+
+    // Top apps (by total bytes) with connections routed through an RPN proxy.
+    @Query(
+        "select uid as uid, '' as ipAddress, 0 as port, count(id) as count, '' as flag, 0 as blocked, appName as appOrDnsName, sum(downloadBytes) as downloadBytes, sum(uploadBytes) as uploadBytes, sum(downloadBytes + uploadBytes) as totalBytes from ConnectionTracker where proxyDetails like '%' || :proxyId || '%' and isBlocked = 0 and timeStamp > :to group by uid, appName order by totalBytes desc limit :limit"
+    )
+    suspend fun getRpnTopAppsForProxy(proxyId: String, to: Long, limit: Int): List<AppConnection>
 
     @Query("update ConnectionTracker set message = :reason, duration = 0 where connId in (:connIds) and message = '' and uploadBytes = 0 and downloadBytes = 0 and synack = 0")
     fun closeConnections(connIds: List<String>, reason: String)

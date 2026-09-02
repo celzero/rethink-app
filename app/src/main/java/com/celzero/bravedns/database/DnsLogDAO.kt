@@ -116,14 +116,15 @@ interface DnsLogDAO {
     fun getRecentlyBlockedDnsAppsPaged(time: Long): PagingSource<Int, BlockedDnsAppResult>
 
     // bucket aggregation for the activity wall (LogActivityAggregator);
-    // bucketIndex = (time - dayStart) / bucketMs, grouped per blocked
-    // classification. Pass bucketMs=3600000 for hourly wall slots.
+    // bucketIndex = (time - rangeStart) / bucketMs, grouped per blocked
+    // classification. Pass bucketMs=600000 (10 min) for the trailing-24h
+    // ten-minute wall slots.
     @Query(
-        "select cast((time - :dayStart)/:bucketMs as integer) as bucketIndex, isBlocked as blocked, count(id) as total from DNSLogs where time >= :dayStart and time < :dayEnd group by bucketIndex, blocked"
+        "select cast((time - :rangeStart)/:bucketMs as integer) as bucketIndex, isBlocked as blocked, count(id) as total from DNSLogs where time >= :rangeStart and time < :rangeEnd group by bucketIndex, blocked"
     )
     suspend fun getActivityBuckets(
-        dayStart: Long,
-        dayEnd: Long,
+        rangeStart: Long,
+        rangeEnd: Long,
         bucketMs: Long
     ): List<ActivityBucketRow>
 

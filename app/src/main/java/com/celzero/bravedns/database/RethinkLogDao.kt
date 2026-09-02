@@ -38,14 +38,15 @@ interface RethinkLogDao {
     fun insertBatch(logs: List<RethinkLog>)
 
     // bucket aggregation for the activity wall (LogActivityAggregator);
-    // bucketIndex = (timeStamp - dayStart) / bucketMs, grouped per blocked
-    // classification. Pass bucketMs=3600000 for hourly wall slots.
+    // bucketIndex = (timeStamp - rangeStart) / bucketMs, grouped per blocked
+    // classification. Pass bucketMs=600000 (10 min) for the trailing-24h
+    // ten-minute wall slots.
     @Query(
-        "select cast((timeStamp - :dayStart)/:bucketMs as integer) as bucketIndex, isBlocked as blocked, count(id) as total from RethinkLog where timeStamp >= :dayStart and timeStamp < :dayEnd group by bucketIndex, blocked"
+        "select cast((timeStamp - :rangeStart)/:bucketMs as integer) as bucketIndex, isBlocked as blocked, count(id) as total from RethinkLog where timeStamp >= :rangeStart and timeStamp < :rangeEnd group by bucketIndex, blocked"
     )
     suspend fun getActivityBuckets(
-        dayStart: Long,
-        dayEnd: Long,
+        rangeStart: Long,
+        rangeEnd: Long,
         bucketMs: Long
     ): List<ActivityBucketRow>
 

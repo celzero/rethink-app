@@ -44,11 +44,11 @@ class DnsLogRepository(private val dnsLogDAO: DnsLogDAO) {
     }
 
     suspend fun getActivityBuckets(
-        dayStart: Long,
-        dayEnd: Long,
+        rangeStart: Long,
+        rangeEnd: Long,
         bucketMs: Long
     ): List<ActivityBucketRow> {
-        return dnsLogDAO.getActivityBuckets(dayStart, dayEnd, bucketMs)
+        return dnsLogDAO.getActivityBuckets(rangeStart, rangeEnd, bucketMs)
     }
 
     suspend fun getWindowCounts(start: Long, end: Long): WindowCountRow {
