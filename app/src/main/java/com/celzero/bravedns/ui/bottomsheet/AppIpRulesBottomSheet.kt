@@ -309,7 +309,22 @@ class AppIpRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmSheet
         val ip = ipPair.first ?: return
 
         // set port number as null for all the rules applied from this screen
-        io { IpRulesManager.addIpRule(uid, ip, null, status, proxyId = "", proxyCC = "") }
+        io {
+            // reject non-CIDR-able input; the ip trie only accepts CIDR notation,
+            // such a rule would be stored but never enforced
+            if (!IpRulesManager.isCidrEnforceable(ip)) {
+                Logger.w(LOG_TAG_FIREWALL, "$TAG ip rule not enforceable (not a valid CIDR): $ipAddress")
+                uiCtx {
+                    Utilities.showToastUiCentered(
+                        requireContext(),
+                        getString(R.string.ci_dialog_error_invalid_cidr),
+                        Toast.LENGTH_SHORT
+                    )
+                }
+                return@io
+            }
+            IpRulesManager.addIpRule(uid, ip, null, status, proxyId = "", proxyCC = "")
+        }
         logEvent("IP Rule set to ${status.name} for IP: $ipAddress, UID: $uid")
     }
 

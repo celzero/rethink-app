@@ -189,7 +189,6 @@ class CustomDomainFragment :
 
         // Import FAB is only shown and wired up in DEBUG builds.
         // The FAB itself is GONE in XML; this block also stays dead-code in release builds
-        // so ProGuard/R8 can strip it entirely.
         if (DEBUG) {
             b.cdaImportFab.visibility = View.VISIBLE
             b.cdaImportFab.setOnClickListener {

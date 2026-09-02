@@ -487,8 +487,12 @@ object DomainRulesManager : KoinComponent {
         trie.del(key)
     }
 
+    // Room's DAO returns a new LiveData instance on every call; cache it so
+    // observers and value-reads share the same instance.
+    private val cachedDomainCountLiveData: LiveData<Int> by lazy { db.getUniversalCustomDomainCount() }
+
     fun getUniversalCustomDomainCount(): LiveData<Int> {
-        return db.getUniversalCustomDomainCount()
+        return cachedDomainCountLiveData
     }
 
     suspend fun getRulesCountByCC(cc: String): Int {

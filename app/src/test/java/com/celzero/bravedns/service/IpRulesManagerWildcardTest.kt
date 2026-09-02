@@ -278,4 +278,47 @@ class IpRulesManagerWildcardTest {
         assertTrue(!IpRulesManager.isCidrEnforceable(IPAddressString("1.2.*.4").address))
         assertTrue(!IpRulesManager.isCidrEnforceable(null))
     }
+
+    // Regression tests for the second wave of invalid-CIDR crashes: treeKey's
+    // wildcard branch called assignPrefixForSingleBlock() unguarded, and the
+    // remaining Backend iptree calls (escLike/esc/getLike/valuesLike) had no
+    // try/catch. treeKey is reached from the per-connection firewall path
+    // (TunFirewallManager.hasRule), so a throwing input crashes the tunnel.
+
+    @Test
+    fun `lookups with non-CIDR-able input return no-match without throwing`() {
+        // the original crashing input, now exercised against the lookup path
+        assertEquals(
+            IpRulesManager.IpRuleStatus.NONE,
+            IpRulesManager.getMostSpecificRuleMatch(10042, "0.0.6.178-228")
+        )
+        // non-CIDR-able wildcards: treeKey must yield null, not throw
+        assertEquals(
+            IpRulesManager.IpRuleStatus.NONE,
+            IpRulesManager.getMostSpecificRuleMatch(10042, "*.255.255.255")
+        )
+        assertEquals(
+            IpRulesManager.IpRuleStatus.NONE,
+            IpRulesManager.getMostSpecificRuleMatch(10042, "1.2.*.4")
+        )
+        // prefix-block whose host bits are set (assignPrefixForSingleBlock edge case)
+        assertEquals(
+            IpRulesManager.IpRuleStatus.NONE,
+            IpRulesManager.getMostSpecificRuleMatch(10042, "1.2.3.4/24")
+        )
+        // garbage input: hostAddr falls back to 0.0.0.0, treeKey stays well-defined
+        assertEquals(
+            IpRulesManager.IpRuleStatus.NONE,
+            IpRulesManager.getMostSpecificRuleMatch(10042, "not-an-ip")
+        )
+        // proxy lookup path shares the same treeKey/iptree guards
+        assertEquals(
+            Pair("", ""),
+            IpRulesManager.getMostSpecificMatchProxies(10042, "0.0.6.178-228")
+        )
+        assertEquals(
+            Pair("", ""),
+            IpRulesManager.getMostSpecificMatchProxies(10042, "*.255.255.255")
+        )
+    }
 }

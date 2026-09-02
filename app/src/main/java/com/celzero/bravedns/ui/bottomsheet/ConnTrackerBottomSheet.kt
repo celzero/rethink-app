@@ -761,6 +761,19 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
             val ipPair = IpRulesManager.getIpNetPort(currentInfo.ipAddress)
             val ip = ipPair.first ?: return@io
+            // reject non-CIDR-able input; the ip trie only accepts CIDR notation,
+            // such a rule would be stored but never enforced
+            if (!IpRulesManager.isCidrEnforceable(ip)) {
+                Logger.w(LOG_TAG_FIREWALL, "ip rule not enforceable (not a valid CIDR): ${currentInfo.ipAddress}")
+                uiCtx {
+                    showToastUiCentered(
+                        requireContext(),
+                        getString(R.string.ci_dialog_error_invalid_cidr),
+                        Toast.LENGTH_SHORT
+                    )
+                }
+                return@io
+            }
             IpRulesManager.addIpRule(currentInfo.uid, ip, /*wildcard-port*/ 0, ipRuleStatus, proxyId = "", proxyCC = "")
             Logger.i(LOG_TAG_FIREWALL, "apply ip-rule for ${currentInfo.uid}, $ip, ${ipRuleStatus.name}")
             logEvent("IP rule changed", "UID: ${currentInfo.uid}, IP: $ip, IpRuleStatus: ${ipRuleStatus.name}")
